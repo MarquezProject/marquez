@@ -1,8 +1,8 @@
-# Gradle artifacts
-build/
-.gradle/
-gradle/
 *.jar
-
-# Mac files
-.DS_Store
+.classpath
+.gradle/
+.project
+.settings
+bin/
+build/
+gradle/
