@@ -6,8 +6,7 @@ import io.dropwizard.setup.Environment;
 public class MarquezApplication extends Application<MarquezConfiguration> {
 
   @Override
-  public void run(final MarquezConfiguration configuration,
-                  final Environment environment) {
+  public void run(final MarquezConfiguration configuration, final Environment environment) {
     // TODO:
   }
 
