@@ -3,6 +3,7 @@
 .gradle/
 .project
 .settings
+.swp
 bin/
 build/
 gradle/
