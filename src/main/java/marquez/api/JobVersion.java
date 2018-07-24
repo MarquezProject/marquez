@@ -89,4 +89,3 @@ public class JobVersion {
     return sb.toString();
   }
 }
-
