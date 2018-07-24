@@ -111,7 +111,7 @@ public class JobRun {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append("JobVersion{");
+    sb.append("JobRun{");
     sb.append("createdAt=").append(createdAt);
     sb.append("jobRunId=").append(jobRunId);
     sb.append("jobRunArgs=").append(jobRunArgs);
