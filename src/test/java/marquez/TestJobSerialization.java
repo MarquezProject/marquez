@@ -20,7 +20,7 @@ public class TestJobSerialization {
           1,
           2,
           new Timestamp(1532036468530L),
-          Boolean.TRUE,
+          "test",
           "Best job. First job.");
 
   @Test

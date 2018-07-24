@@ -3,110 +3,115 @@ package marquez.core;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
+import javax.validation.constraints.NotNull;
 
 public class Job {
 
-    @NotNull
-    private final String name;
+  @NotNull private final String name;
+  @NotNull private final Timestamp updatedAt;
+  @NotNull private final Timestamp createdAt;
+  @NotNull private final Integer currentVersion;
+  @NotNull private final Integer currentOwnershipId;
+  @NotNull private final Timestamp nominalTime;
+  @NotNull private final String category;
+  @NotNull private final String description;
 
-    @NotNull
-    private final Integer currentVersion;
+  @JsonCreator
+  public Job(
+      @JsonProperty("name") String name,
+      @JsonProperty("created_at") Timestamp createdAt,
+      @JsonProperty("updated_at") Timestamp updatedAt,
+      @JsonProperty("current_version") Integer currentVersion,
+      @JsonProperty("current_ownership_id") Integer currentOwnershipId,
+      @JsonProperty("nominal_time") Timestamp nominalTime,
+      @JsonProperty("category") String category,
+      @JsonProperty("description") String description) {
+    this.name = name;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.currentVersion = currentVersion;
+    this.currentOwnershipId = currentOwnershipId;
+    this.nominalTime = nominalTime;
+    this.category = category;
+    this.description = description;
+  }
 
-    @NotNull
-    private final Timestamp updatedAt;
+  public String getName() {
+    return name;
+  }
 
-    @NotNull
-    private final Timestamp createdAt;
+  public Timestamp getCreatedAt() {
+    return createdAt;
+  }
 
-    @NotNull
-    private final Integer ownerId;
+  public Timestamp getUpdatedAt() {
+    return updatedAt;
+  }
 
-    @NotNull
-    private final Timestamp nominalTime;
+  public Integer getCurrentVersion() {
+    return currentVersion;
+  }
 
-    @NotNull
-    private final Boolean isActive;
+  public Integer getCurrentOwnershipId() {
+    return currentOwnershipId;
+  }
 
-    @NotNull
-    private final String description;
+  public Timestamp getNominalTime() {
+    return nominalTime;
+  }
 
-    @JsonCreator
-    public Job(@JsonProperty("name") String name,
-               @JsonProperty("created_at") Timestamp createdAt,
-               @JsonProperty("updated_at") Timestamp updatedAt,
-               @JsonProperty("current_version") Integer currentVersion,
-               @JsonProperty("owner_id") Integer ownerId,
-               @JsonProperty("nominal_time") Timestamp nominalTime,
-               @JsonProperty("is_active") Boolean isActive,
-               @JsonProperty("description") String description){
-        this.name = name;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.currentVersion = currentVersion;
-        this.ownerId = ownerId;
-        this.nominalTime = nominalTime;
-        this.isActive = isActive;
-        this.description = description;
-    }
+  public String getCategory() {
+    return category;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public Boolean getActive() {
-        return isActive;
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Job)) return false;
 
-    public Timestamp getNominalTime() {
-        return nominalTime;
-    }
+    final Job other = (Job) o;
 
-    public Integer getOwnerId() {
-        return ownerId;
-    }
+    return Objects.equals(name, other.name)
+        && Objects.equals(createdAt, other.createdAt)
+        && Objects.equals(updatedAt, other.updatedAt)
+        && Objects.equals(currentVersion, other.currentVersion)
+        && Objects.equals(currentOwnershipId, other.currentOwnershipId)
+        && Objects.equals(nominalTime, other.nominalTime)
+        && Objects.equals(category, other.category)
+        && Objects.equals(description, other.description);
+  }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        name,
+        createdAt,
+        updatedAt,
+        currentVersion,
+        currentOwnershipId,
+        nominalTime,
+        category,
+        description);
+  }
 
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public Integer getCurrentVersion() {
-        return currentVersion;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Job)) {
-            return false;
-        }
-
-        final Job that = (Job) obj;
-
-        return Objects.equals(this.name, that.name) &&
-                Objects.equals(this.createdAt, that.createdAt) &&
-                Objects.equals(this.currentVersion, that.currentVersion) &&
-                Objects.equals(this.description, that.description) &&
-                Objects.equals(this.isActive, that.isActive) &&
-                Objects.equals(this.nominalTime, that.nominalTime) &&
-                Objects.equals(this.ownerId, that.ownerId) &&
-                Objects.equals(this.updatedAt, that.updatedAt);
-    }
-
-    @Override
-    public int hashCode(){
-        return Objects.hash(name, createdAt, currentVersion, description, isActive, nominalTime, ownerId, updatedAt);
-    }
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("Job{");
+    sb.append("name=").append(name);
+    sb.append("createdAt=").append(createdAt);
+    sb.append("updatedAt=").append(updatedAt);
+    sb.append("currentVersion=").append(currentVersion);
+    sb.append("currentOwnershipId=").append(currentOwnershipId);
+    sb.append("nominalTime=").append(nominalTime);
+    sb.append("category=").append(category);
+    sb.append("description=").append(description);
+    sb.append("}");
+    return sb.toString();
+  }
 }
