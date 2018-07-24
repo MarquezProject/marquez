@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
-public class Dataset {
+public final class Dataset {
   @NotNull private final Timestamp createdAt;
   @NotNull private final String type;
   @NotNull private final String name;

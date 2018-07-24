@@ -1,10 +1,10 @@
 package marquez;
 
+import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
-import io.dropwizard.Application;
-import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.migrations.MigrationsBundle;
+import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import marquez.db.JobDAO;
 import marquez.resources.JobResource;
@@ -19,7 +19,6 @@ public class MarquezApplication extends Application<MarquezConfiguration> {
     final JobDAO jobDAO = jdbi.onDemand(JobDAO.class);
     final JobResource jobResource = new JobResource(jobDAO);
     environment.jersey().register(jobResource);
-
   }
 
   @Override
@@ -29,14 +28,14 @@ public class MarquezApplication extends Application<MarquezConfiguration> {
 
   @Override
   public void initialize(Bootstrap<MarquezConfiguration> bootstrap) {
-    bootstrap.addBundle(new MigrationsBundle<MarquezConfiguration>() {
-      @Override
-      public DataSourceFactory getDataSourceFactory(MarquezConfiguration configuration) {
-        return configuration.getDataSourceFactory();
-      }
-    });
+    bootstrap.addBundle(
+        new MigrationsBundle<MarquezConfiguration>() {
+          @Override
+          public DataSourceFactory getDataSourceFactory(MarquezConfiguration configuration) {
+            return configuration.getDataSourceFactory();
+          }
+        });
   }
-
 
   public static void main(final String[] args) throws Exception {
     final MarquezApplication application = new MarquezApplication();

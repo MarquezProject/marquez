@@ -5,8 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
-public class Owner {
-
+public final class Owner {
   @NotNull private final String name;
 
   @JsonCreator

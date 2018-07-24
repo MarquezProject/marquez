@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
-public class JobRunState {
+public final class JobRunState {
 
   @NotNull private final Timestamp transitionedAt;
   @NotNull private final Integer jobRunId;

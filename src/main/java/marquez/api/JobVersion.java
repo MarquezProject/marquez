@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
-public class JobVersion {
+public final class JobVersion {
 
   @NotNull private final Timestamp createdAt;
   @NotNull private final Timestamp updatedAt;

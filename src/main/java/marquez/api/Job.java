@@ -6,8 +6,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
-public class Job {
-
+public final class Job {
   @NotNull private final String name;
   @NotNull private final Timestamp createdAt;
   @NotNull private final Timestamp updatedAt;

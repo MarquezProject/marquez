@@ -6,8 +6,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
-public class Ownership {
-
+public final class Ownership {
   @NotNull private final Timestamp startedAt;
   @NotNull private final Timestamp endedAt;
   @NotNull private final Integer jobId;
