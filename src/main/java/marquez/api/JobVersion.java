@@ -7,7 +7,6 @@ import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 public final class JobVersion {
-
   @NotNull private final Timestamp createdAt;
   @NotNull private final Timestamp updatedAt;
   @NotNull private final Integer jobId;

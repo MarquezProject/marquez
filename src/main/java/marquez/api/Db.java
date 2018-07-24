@@ -6,30 +6,27 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
-public final class Dataset {
+public final class Database {
   public enum Type {
-    DbTable,
-    IcebergTable
+    MySQL,
+    PostgreSQL
   }
 
   @NotNull private final Timestamp createdAt;
   @NotNull private final Type type;
   @NotNull private final String name;
-  @NotNull private final Integer currentVersion;
-  @NotNull private final String description;
+  @NotNull private final String uri;
 
   @JsonCreator
-  public Dataset(
+  public Database(
       @JsonProperty("created_at") final Timestamp createdAt,
       @JsonProperty("type") final Type type,
       @JsonProperty("name") final String name,
-      @JsonProperty("current_version") final Integer currentVersion,
-      @JsonProperty("description") final String description) {
+      @JsonProperty("uri") final String uri) {
     this.createdAt = createdAt;
     this.type = type;
     this.name = name;
-    this.currentVersion = currentVersion;
-    this.description = description;
+    this.uri = uri;
   }
 
   public Timestamp getCreatedAt() {
@@ -44,43 +41,38 @@ public final class Dataset {
     return name;
   }
 
-  public Integer getCurrentVersion() {
-    return currentVersion;
-  }
-
-  public String getDescription() {
-    return description;
+  public String getUri() {
+    return uri;
   }
 
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
-    if (!(o instanceof Dataset)) return false;
+    if (!(o instanceof Database)) return false;
 
-    final Dataset other = (Dataset) o;
+    final Database other = (Database) o;
 
     return Objects.equals(createdAt, other.createdAt)
         && Objects.equals(type, other.type)
         && Objects.equals(name, other.name)
-        && Objects.equals(currentVersion, other.currentVersion)
-        && Objects.equals(description, other.description);
+        && Objects.equals(uri, other.uri);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdAt, type, name, currentVersion, description);
+    return Objects.hash(createdAt, type, name, uri);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append("Dataset{");
+    sb.append("Database{");
     sb.append("createdAt=").append(createdAt);
     sb.append("type=").append(type);
     sb.append("name=").append(name);
-    sb.append("currentVersion=").append(currentVersion);
-    sb.append("description=").append(description);
+    sb.append("uri=").append(uri);
     sb.append("}");
     return sb.toString();
   }
 }
+

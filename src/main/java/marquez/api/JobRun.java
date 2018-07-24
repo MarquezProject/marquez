@@ -7,7 +7,6 @@ import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 public final class JobRun {
-
   @NotNull private final Timestamp createdAt;
   @NotNull private final String jobRunId;
   @NotNull private final String jobRunArgs;
