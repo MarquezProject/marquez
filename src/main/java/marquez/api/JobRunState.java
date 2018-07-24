@@ -7,16 +7,23 @@ import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 public final class JobRunState {
+  public enum State {
+    Started,
+    Running,
+    Finished,
+    Canceled,
+    Failed
+  }
 
   @NotNull private final Timestamp transitionedAt;
   @NotNull private final Integer jobRunId;
-  @NotNull private final String state;
+  @NotNull private final State state;
 
   @JsonCreator
   public JobRunState(
       @JsonProperty("transitioned_at") final Timestamp transitionedAt,
       @JsonProperty("job_run_id") final Integer jobRunId,
-      @JsonProperty("state") final String state) {
+      @JsonProperty("state") final State state) {
     this.transitionedAt = transitionedAt;
     this.jobRunId = jobRunId;
     this.state = state;
@@ -30,7 +37,7 @@ public final class JobRunState {
     return jobRunId;
   }
 
-  public String getState() {
+  public State getState() {
     return state;
   }
 
