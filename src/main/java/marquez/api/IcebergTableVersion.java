@@ -6,5 +6,5 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
-public final class DbTableVersion extends DatasetVersion {
+public final class IcebergTableVersion extends DatasetVersion {
 }
