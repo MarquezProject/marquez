@@ -36,7 +36,7 @@ public class Ownership {
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
-    if (!(o instanceof Owner)) return false;
+    if (!(o instanceof Ownership)) return false;
 
     final Ownership other = (Ownership) o;
 

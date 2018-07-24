@@ -37,7 +37,7 @@ public class JobRunState {
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
-    if (!(o instanceof Owner)) return false;
+    if (!(o instanceof JobRunState)) return false;
 
     final JobRunState other = (JobRunState) o;
 

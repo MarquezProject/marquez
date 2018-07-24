@@ -79,7 +79,7 @@ public class JobRun {
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
-    if (!(o instanceof JobVersion)) return false;
+    if (!(o instanceof JobRun)) return false;
 
     final JobRun other = (JobRun) o;
 
