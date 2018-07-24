@@ -1,4 +1,4 @@
-package marquez.core;
+package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,8 +9,8 @@ import javax.validation.constraints.NotNull;
 public class Job {
 
   @NotNull private final String name;
-  @NotNull private final Timestamp updatedAt;
   @NotNull private final Timestamp createdAt;
+  @NotNull private final Timestamp updatedAt;
   @NotNull private final Integer currentVersion;
   @NotNull private final Integer currentOwnershipId;
   @NotNull private final Timestamp nominalTime;
@@ -19,14 +19,14 @@ public class Job {
 
   @JsonCreator
   public Job(
-      @JsonProperty("name") String name,
-      @JsonProperty("created_at") Timestamp createdAt,
-      @JsonProperty("updated_at") Timestamp updatedAt,
-      @JsonProperty("current_version") Integer currentVersion,
-      @JsonProperty("current_ownership_id") Integer currentOwnershipId,
-      @JsonProperty("nominal_time") Timestamp nominalTime,
-      @JsonProperty("category") String category,
-      @JsonProperty("description") String description) {
+      @JsonProperty("name") final String name,
+      @JsonProperty("created_at") final Timestamp createdAt,
+      @JsonProperty("updated_at") final Timestamp updatedAt,
+      @JsonProperty("current_version") final Integer currentVersion,
+      @JsonProperty("current_ownership_id") final Integer currentOwnershipId,
+      @JsonProperty("nominal_time") final Timestamp nominalTime,
+      @JsonProperty("category") final String category,
+      @JsonProperty("description") final String description) {
     this.name = name;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -70,7 +70,7 @@ public class Job {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) return true;
     if (!(o instanceof Job)) return false;
 
