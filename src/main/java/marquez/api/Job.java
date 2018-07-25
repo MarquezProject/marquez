@@ -22,7 +22,7 @@ public final class Job {
       @JsonProperty("created_at") final Timestamp createdAt,
       @JsonProperty("updated_at") final Timestamp updatedAt,
       @JsonProperty("current_version") final long currentVersion,
-      @JsonProperty("current_ownership_id") final long currentOwnership,
+      @JsonProperty("current_ownership") final long currentOwnership,
       @JsonProperty("nominal_time") final Timestamp nominalTime,
       @JsonProperty("category") final String category,
       @JsonProperty("description") final String description) {
