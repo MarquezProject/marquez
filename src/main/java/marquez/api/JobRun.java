@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.List;
 import javax.validation.constraints.NotNull;
 
 public final class JobRun {
   @NotNull private final Timestamp createdAt;
-  @NotNull private final String jobRunId;
-  @NotNull private final String jobRunArgs;
+  @NotNull private final String runId;
+  @NotNull private final List<String> runArgs;
   @NotNull private final Timestamp startedAt;
   @NotNull private final Timestamp endedAt;
   @NotNull private final long jobVersionId;
@@ -20,8 +21,8 @@ public final class JobRun {
   @JsonCreator
   public JobRun(
       @JsonProperty("created_at") final Timestamp createdAt,
-      @JsonProperty("job_run_id") final String jobRunId,
-      @JsonProperty("job_run_args") final String jobRunArgs,
+      @JsonProperty("run_id") final String runId,
+      @JsonProperty("run_args") final List<String> runArgs,
       @JsonProperty("started_at") final Timestamp startedAt,
       @JsonProperty("ended_at") final Timestamp endedAt,
       @JsonProperty("job_version_id") final long jobVersionId,
@@ -29,8 +30,8 @@ public final class JobRun {
       @JsonProperty("output_dataset_version_id") final long outputDatasetVersionId,
       @JsonProperty("latest_heartbeat") final Timestamp latestHeartbeat) {
     this.createdAt = createdAt;
-    this.jobRunId = jobRunId;
-    this.jobRunArgs = jobRunArgs;
+    this.runId = runId;
+    this.runArgs = runArgs;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
     this.jobVersionId = jobVersionId;
@@ -43,12 +44,12 @@ public final class JobRun {
     return createdAt;
   }
 
-  public String getJobRunId() {
-    return jobRunId;
+  public String getRunId() {
+    return runId;
   }
 
-  public String getJobRunArgs() {
-    return jobRunArgs;
+  public List<String> getRunArgs() {
+    return runArgs;
   }
 
   public Timestamp getStartedAt() {
@@ -83,8 +84,8 @@ public final class JobRun {
     final JobRun other = (JobRun) o;
 
     return Objects.equals(createdAt, other.createdAt)
-        && Objects.equals(jobRunId, other.jobRunId)
-        && Objects.equals(jobRunArgs, other.jobRunArgs)
+        && Objects.equals(runId, other.runId)
+        && Objects.equals(runArgs, other.runArgs)
         && Objects.equals(startedAt, other.startedAt)
         && Objects.equals(endedAt, other.endedAt)
         && Objects.equals(jobVersionId, other.jobVersionId)
@@ -97,8 +98,8 @@ public final class JobRun {
   public int hashCode() {
     return Objects.hash(
         createdAt,
-        jobRunId,
-        jobRunArgs,
+        runId,
+        runArgs,
         startedAt,
         endedAt,
         jobVersionId,
@@ -112,8 +113,8 @@ public final class JobRun {
     final StringBuilder sb = new StringBuilder();
     sb.append("JobRun{");
     sb.append("createdAt=").append(createdAt);
-    sb.append("jobRunId=").append(jobRunId);
-    sb.append("jobRunArgs=").append(jobRunArgs);
+    sb.append("runId=").append(runId);
+    sb.append("runArgs=").append(runArgs);
     sb.append("startedAt=").append(startedAt);
     sb.append("endedAt=").append(endedAt);
     sb.append("jobVersionId=").append(jobVersionId);
