@@ -15,7 +15,7 @@ public final class JobRun {
   @NotNull private final long jobVersionId;
   @NotNull private final long inputDatasetVersionId;
   @NotNull private final long outputDatasetVersionId;
-  @NotNull private final Integer latestHeartbeat;
+  @NotNull private final Timestamp latestHeartbeat;
 
   @JsonCreator
   public JobRun(
@@ -27,7 +27,7 @@ public final class JobRun {
       @JsonProperty("job_version_id") final long jobVersionId,
       @JsonProperty("input_dataset_version_id") final long inputDatasetVersionId,
       @JsonProperty("output_dataset_version_id") final long outputDatasetVersionId,
-      @JsonProperty("latest_heartbeat") final Integer latestHeartbeat) {
+      @JsonProperty("latest_heartbeat") final Timestamp latestHeartbeat) {
     this.createdAt = createdAt;
     this.jobRunId = jobRunId;
     this.jobRunArgs = jobRunArgs;
@@ -71,7 +71,7 @@ public final class JobRun {
     return outputDatasetVersionId;
   }
 
-  public Integer getLatestHeartbeat() {
+  public Timestamp getLatestHeartbeat() {
     return latestHeartbeat;
   }
 
