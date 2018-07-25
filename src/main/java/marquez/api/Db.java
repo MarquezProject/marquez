@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
-public final class Database {
+public final class Db {
   public enum Type {
     MySQL,
     PostgreSQL
@@ -18,7 +18,7 @@ public final class Database {
   @NotNull private final String uri;
 
   @JsonCreator
-  public Database(
+  public Db(
       @JsonProperty("created_at") final Timestamp createdAt,
       @JsonProperty("type") final Type type,
       @JsonProperty("name") final String name,
@@ -48,9 +48,9 @@ public final class Database {
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
-    if (!(o instanceof Database)) return false;
+    if (!(o instanceof Db)) return false;
 
-    final Database other = (Database) o;
+    final Db other = (Db) o;
 
     return Objects.equals(createdAt, other.createdAt)
         && Objects.equals(type, other.type)
@@ -66,7 +66,7 @@ public final class Database {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append("Database{");
+    sb.append("Db{");
     sb.append("createdAt=").append(createdAt);
     sb.append("type=").append(type);
     sb.append("name=").append(name);
@@ -75,4 +75,3 @@ public final class Database {
     return sb.toString();
   }
 }
-

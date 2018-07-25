@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 public final class Dataset {
   public enum Type {
-    DbTable,
+    DatabaseTable,
     IcebergTable
   }
 
