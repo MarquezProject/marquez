@@ -9,15 +9,15 @@ import javax.validation.constraints.NotNull;
 public final class Ownership {
   @NotNull private final Timestamp startedAt;
   @NotNull private final Timestamp endedAt;
-  @NotNull private final Integer jobId;
-  @NotNull private final Integer ownerId;
+  @NotNull private final long jobId;
+  @NotNull private final long ownerId;
 
   @JsonCreator
   public Ownership(
       @JsonProperty("started_at") final Timestamp startedAt,
       @JsonProperty("ended_at") final Timestamp endedAt,
-      @JsonProperty("job_id") final Integer jobId,
-      @JsonProperty("owner_id") final Integer ownerId) {
+      @JsonProperty("job_id") final long jobId,
+      @JsonProperty("owner_id") final long ownerId) {
     this.startedAt = startedAt;
     this.endedAt = endedAt;
     this.jobId = jobId;
