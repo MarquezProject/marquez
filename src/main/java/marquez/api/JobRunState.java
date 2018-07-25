@@ -8,11 +8,44 @@ import javax.validation.constraints.NotNull;
 
 public final class JobRunState {
   public enum State {
-    Started,
-    Running,
-    Finished,
-    Canceled,
-    Failed
+    NEW {
+      @Override
+      boolean isFinished() {
+        return false;
+      }
+    },
+    STARTING {
+      @Override
+      boolean isFinished() {
+        return false;
+      }
+    },
+    RUNNING {
+      @Override
+      boolean isFinished() {
+        return false;
+      }
+    },
+    STOPPING {
+      @Override
+      boolean isFinished() {
+        return false;
+      }
+    },
+    FINISHED {
+      @Override
+      boolean isFinished() {
+        return true;
+      }
+    },
+    FAILED {
+      @Override
+      boolean isFinished() {
+        return true;
+      }
+    };
+
+    abstract boolean isFinished();
   }
 
   @NotNull private final Timestamp transitionedAt;
