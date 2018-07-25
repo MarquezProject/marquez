@@ -7,7 +7,7 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 
 public interface DbTableVersionDAO {
   @SqlQuery("SELECT * FROM db_table_versions WHERE id = :id")
-  DbTableVersion findById(@Bind("id") Long id);
+  DbTableVersion findById(@Bind("id") long id);
 
   @SqlQuery("SELECT * FROM db_table_versions")
   List<DbTableVersion> findAll();

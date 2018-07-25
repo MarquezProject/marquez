@@ -7,7 +7,7 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 
 public interface OwnershipDAO {
   @SqlQuery("SELECT * FROM ownerships WHERE id = :id")
-  Ownership findById(@Bind("id") Long id);
+  Ownership findById(@Bind("id") long id);
 
   @SqlQuery("SELECT * FROM ownerships")
   List<Ownership> findAll();
