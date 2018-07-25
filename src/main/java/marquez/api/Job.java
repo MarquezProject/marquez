@@ -10,8 +10,8 @@ public final class Job {
   @NotNull private final String name;
   @NotNull private final Timestamp createdAt;
   @NotNull private final Timestamp updatedAt;
-  @NotNull private final Integer currentVersion;
-  @NotNull private final Integer currentOwnershipId;
+  @NotNull private final long currentVersion;
+  @NotNull private final long currentOwnership;
   @NotNull private final Timestamp nominalTime;
   @NotNull private final String category;
   @NotNull private final String description;
@@ -21,8 +21,8 @@ public final class Job {
       @JsonProperty("name") final String name,
       @JsonProperty("created_at") final Timestamp createdAt,
       @JsonProperty("updated_at") final Timestamp updatedAt,
-      @JsonProperty("current_version") final Integer currentVersion,
-      @JsonProperty("current_ownership_id") final Integer currentOwnershipId,
+      @JsonProperty("current_version") final long currentVersion,
+      @JsonProperty("current_ownership_id") final long currentOwnership,
       @JsonProperty("nominal_time") final Timestamp nominalTime,
       @JsonProperty("category") final String category,
       @JsonProperty("description") final String description) {
@@ -30,7 +30,7 @@ public final class Job {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.currentVersion = currentVersion;
-    this.currentOwnershipId = currentOwnershipId;
+    this.currentOwnership = currentOwnership;
     this.nominalTime = nominalTime;
     this.category = category;
     this.description = description;
@@ -48,12 +48,12 @@ public final class Job {
     return updatedAt;
   }
 
-  public Integer getCurrentVersion() {
+  public long getCurrentVersion() {
     return currentVersion;
   }
 
-  public Integer getCurrentOwnershipId() {
-    return currentOwnershipId;
+  public long getCurrentOwnership() {
+    return currentOwnership;
   }
 
   public Timestamp getNominalTime() {
@@ -79,7 +79,7 @@ public final class Job {
         && Objects.equals(createdAt, other.createdAt)
         && Objects.equals(updatedAt, other.updatedAt)
         && Objects.equals(currentVersion, other.currentVersion)
-        && Objects.equals(currentOwnershipId, other.currentOwnershipId)
+        && Objects.equals(currentOwnership, other.currentOwnership)
         && Objects.equals(nominalTime, other.nominalTime)
         && Objects.equals(category, other.category)
         && Objects.equals(description, other.description);
@@ -92,7 +92,7 @@ public final class Job {
         createdAt,
         updatedAt,
         currentVersion,
-        currentOwnershipId,
+        currentOwnership,
         nominalTime,
         category,
         description);
@@ -106,7 +106,7 @@ public final class Job {
     sb.append("createdAt=").append(createdAt);
     sb.append("updatedAt=").append(updatedAt);
     sb.append("currentVersion=").append(currentVersion);
-    sb.append("currentOwnershipId=").append(currentOwnershipId);
+    sb.append("currentOwnership=").append(currentOwnership);
     sb.append("nominalTime=").append(nominalTime);
     sb.append("category=").append(category);
     sb.append("description=").append(description);
