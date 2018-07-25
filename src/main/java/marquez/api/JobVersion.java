@@ -9,19 +9,19 @@ import javax.validation.constraints.NotNull;
 public final class JobVersion {
   @NotNull private final Timestamp createdAt;
   @NotNull private final Timestamp updatedAt;
-  @NotNull private final Integer jobId;
+  @NotNull private final long jobId;
   @NotNull private final String gitRepoUri;
   @NotNull private final String gitSha;
-  @NotNull private final Integer latestRun;
+  @NotNull private final long latestRun;
 
   @JsonCreator
   public JobVersion(
       @JsonProperty("created_at") final Timestamp createdAt,
       @JsonProperty("updated_at") final Timestamp updatedAt,
-      @JsonProperty("job_id") final Integer jobId,
+      @JsonProperty("job_id") final long jobId,
       @JsonProperty("git_repo_uri") final String gitRepoUri,
       @JsonProperty("git_sha") final String gitSha,
-      @JsonProperty("latest_run") final Integer latestRun) {
+      @JsonProperty("latest_run") final long latestRun) {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.jobId = jobId;
@@ -38,7 +38,7 @@ public final class JobVersion {
     return updatedAt;
   }
 
-  public Integer getJobId() {
+  public long getJobId() {
     return jobId;
   }
 
@@ -50,7 +50,7 @@ public final class JobVersion {
     return gitSha;
   }
 
-  public Integer getLatestRun() {
+  public long getLatestRun() {
     return latestRun;
   }
 
