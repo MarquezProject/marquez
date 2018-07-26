@@ -1,10 +1,10 @@
 {
   "name": "first-best-job",
-  "created_at": 1532038468530,
-  "updated_at": 1532038468530,
-  "current_version": 1,
-  "current_ownership": 2,
-  "nominal_time": 1532036468530,
+  "createdAt": 1532038468530,
+  "updatedAt": 1532038468530,
+  "currentVersion": 1,
+  "currentOwnership": 2,
+  "nominalTime": 1532036468530,
   "category": "test",
   "description": "Best job. First job."
 }
