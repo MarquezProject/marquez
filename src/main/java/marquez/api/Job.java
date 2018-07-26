@@ -19,11 +19,11 @@ public final class Job {
   @JsonCreator
   public Job(
       @JsonProperty("name") final String name,
-      @JsonProperty("created_at") final Timestamp createdAt,
-      @JsonProperty("updated_at") final Timestamp updatedAt,
-      @JsonProperty("current_version") final long currentVersion,
-      @JsonProperty("current_ownership") final long currentOwnership,
-      @JsonProperty("nominal_time") final Timestamp nominalTime,
+      @JsonProperty("createdAt") final Timestamp createdAt,
+      @JsonProperty("updatedAt") final Timestamp updatedAt,
+      @JsonProperty("currentVersion") final long currentVersion,
+      @JsonProperty("currentOwnership") final long currentOwnership,
+      @JsonProperty("nominalTime") final Timestamp nominalTime,
       @JsonProperty("category") final String category,
       @JsonProperty("description") final String description) {
     this.name = name;

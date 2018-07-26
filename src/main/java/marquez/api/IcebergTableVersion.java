@@ -4,21 +4,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.net.URI;
 import javax.validation.constraints.NotNull;
 
 public final class IcebergTableVersion extends DatasetVersion {
-  @NotNull private final Long previousSnapshotId;
-  @NotNull private final Long currentSnapshotId;
+  @NotNull private final long previousSnapshotId;
+  @NotNull private final long currentSnapshotId;
   @NotNull private final String metadataUri;
 
   @JsonCreator
   public IcebergTableVersion(
-      @JsonProperty("created_at") final Timestamp createdAt,
-      @JsonProperty("dataset_id") final Integer datasetId,
-      @JsonProperty("schema_uri") final String schemaUri,
-      @JsonProperty("previous_snapshot_id") final Long previousSnapshotId,
-      @JsonProperty("current_snapshot_id") final Long currentSnapshotId,
-      @JsonProperty("metadata_uri") final String metadataUri) {
+      @JsonProperty("createdAt") final Timestamp createdAt,
+      @JsonProperty("datasetId") final Integer datasetId,
+      @JsonProperty("schemaUri") final URI schemaUri,
+      @JsonProperty("previousSnapshotId") final long previousSnapshotId,
+      @JsonProperty("currentSnapshotId") final long currentSnapshotId,
+      @JsonProperty("metadataUri") final String metadataUri) {
     super(createdAt, datasetId, schemaUri);
     this.previousSnapshotId = previousSnapshotId;
     this.currentSnapshotId = currentSnapshotId;

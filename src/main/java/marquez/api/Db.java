@@ -19,7 +19,7 @@ public final class Db {
 
   @JsonCreator
   public Db(
-      @JsonProperty("created_at") final Timestamp createdAt,
+      @JsonProperty("createdAt") final Timestamp createdAt,
       @JsonProperty("type") final Type type,
       @JsonProperty("name") final String name,
       @JsonProperty("uri") final String uri) {
