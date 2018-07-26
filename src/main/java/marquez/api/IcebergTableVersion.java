@@ -10,20 +10,20 @@ import javax.validation.constraints.NotNull;
 public final class IcebergTableVersion extends DatasetVersion {
   @NotNull private final long previousSnapshotId;
   @NotNull private final long currentSnapshotId;
-  @NotNull private final URI metadataUri;
+  @NotNull private final String metadataLocation;
 
   @JsonCreator
   public IcebergTableVersion(
       @JsonProperty("createdAt") final Timestamp createdAt,
       @JsonProperty("datasetId") final Integer datasetId,
-      @JsonProperty("schemaUri") final URI schemaUri,
+      @JsonProperty("schemaLocation") final URI schemaUri,
       @JsonProperty("previousSnapshotId") final long previousSnapshotId,
       @JsonProperty("currentSnapshotId") final long currentSnapshotId,
-      @JsonProperty("metadataUri") final URI metadataUri) {
+      @JsonProperty("metadataLocation") final String metadataLocation) {
     super(createdAt, datasetId, schemaUri);
     this.previousSnapshotId = previousSnapshotId;
     this.currentSnapshotId = currentSnapshotId;
-    this.metadataUri = metadataUri;
+    this.metadataLocation = metadataLocation;
   }
 
   public Long getPreviousSnapshotId() {
@@ -34,8 +34,8 @@ public final class IcebergTableVersion extends DatasetVersion {
     return currentSnapshotId;
   }
 
-  public URI getMetadataUri() {
-    return metadataUri;
+  public String getMetadataLocation() {
+    return metadataLocation;
   }
 
   @Override
@@ -50,7 +50,7 @@ public final class IcebergTableVersion extends DatasetVersion {
         && Objects.equals(getSchemaUri(), other.getSchemaUri())
         && Objects.equals(previousSnapshotId, other.previousSnapshotId)
         && Objects.equals(currentSnapshotId, other.currentSnapshotId)
-        && Objects.equals(metadataUri, other.metadataUri);
+        && Objects.equals(metadataLocation, other.metadataLocation);
   }
 
   @Override
@@ -61,7 +61,7 @@ public final class IcebergTableVersion extends DatasetVersion {
         getSchemaUri(),
         previousSnapshotId,
         currentSnapshotId,
-        metadataUri);
+        metadataLocation);
   }
 
   @Override
