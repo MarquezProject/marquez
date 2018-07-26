@@ -8,8 +8,8 @@ import javax.validation.constraints.NotNull;
 
 public final class Db {
   public enum Type {
-    MySQL,
-    PostgreSQL
+    MYSQL,
+    POSTGRESQL
   }
 
   @NotNull private final Timestamp createdAt;
