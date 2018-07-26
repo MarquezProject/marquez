@@ -73,7 +73,7 @@ public final class IcebergTableVersion extends DatasetVersion {
     sb.append("schemaUri=").append(getSchemaUri());
     sb.append("previousSnapshotId=").append(previousSnapshotId);
     sb.append("currentSnapshotId=").append(currentSnapshotId);
-    sb.append("metadataUri=").append(metadataUri);
+    sb.append("metadataLocation=").append(metadataLocation);
     sb.append("}");
     return sb.toString();
   }
