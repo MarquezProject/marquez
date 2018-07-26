@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.net.URL;
 import javax.validation.constraints.NotNull;
 
 public final class Db {
@@ -15,18 +16,21 @@ public final class Db {
   @NotNull private final Timestamp createdAt;
   @NotNull private final Type type;
   @NotNull private final String name;
-  @NotNull private final String uri;
+  @NotNull private final URL connectionUrl;
+  @NotNull private final String description;
 
   @JsonCreator
   public Db(
-      @JsonProperty("created_at") final Timestamp createdAt,
+      @JsonProperty("createdAt") final Timestamp createdAt,
       @JsonProperty("type") final Type type,
       @JsonProperty("name") final String name,
-      @JsonProperty("uri") final String uri) {
+      @JsonProperty("connectionUrl") final URL connectionUrl,
+      @JsonProperty("description") final String description) {
     this.createdAt = createdAt;
     this.type = type;
     this.name = name;
-    this.uri = uri;
+    this.connectionUrl = connectionUrl;
+    this.description = description;
   }
 
   public Timestamp getCreatedAt() {
@@ -41,8 +45,12 @@ public final class Db {
     return name;
   }
 
-  public String getUri() {
-    return uri;
+  public URL getConnectionUrl() {
+    return connectionUrl;
+  }
+
+  public String getDescription() {
+    return description;
   }
 
   @Override
@@ -55,12 +63,13 @@ public final class Db {
     return Objects.equals(createdAt, other.createdAt)
         && Objects.equals(type, other.type)
         && Objects.equals(name, other.name)
-        && Objects.equals(uri, other.uri);
+        && Objects.equals(connectionUrl, other.connectionUrl)
+        && Objects.equals(description, other.description);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdAt, type, name, uri);
+    return Objects.hash(createdAt, type, name, description);
   }
 
   @Override
@@ -70,7 +79,8 @@ public final class Db {
     sb.append("createdAt=").append(createdAt);
     sb.append("type=").append(type);
     sb.append("name=").append(name);
-    sb.append("uri=").append(uri);
+    sb.append("connectionUrl=").append(connectionUrl);
+    sb.append("description=").append(description);
     sb.append("}");
     return sb.toString();
   }
