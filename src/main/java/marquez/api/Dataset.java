@@ -28,11 +28,11 @@ public final class Dataset {
   @JsonCreator
   public Dataset(
       @JsonProperty("name") final String name,
-      @JsonProperty("created_at") final Timestamp createdAt,
-      @JsonProperty("updated_at") final Timestamp updatedAt,
+      @JsonProperty("createdAt") final Timestamp createdAt,
+      @JsonProperty("updatedAt") final Timestamp updatedAt,
       @JsonProperty("type") final Type type,
       @JsonProperty("origin") final Origin origin,
-      @JsonProperty("current_version") final long currentVersion,
+      @JsonProperty("currentVersion") final long currentVersion,
       @JsonProperty("description") final String description) {
     this.name = name;
     this.createdAt = createdAt;

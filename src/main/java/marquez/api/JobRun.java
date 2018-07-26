@@ -20,15 +20,15 @@ public final class JobRun {
 
   @JsonCreator
   public JobRun(
-      @JsonProperty("created_at") final Timestamp createdAt,
-      @JsonProperty("run_id") final String runId,
-      @JsonProperty("run_args") final List<String> runArgs,
-      @JsonProperty("started_at") final Timestamp startedAt,
-      @JsonProperty("ended_at") final Timestamp endedAt,
-      @JsonProperty("job_version_id") final long jobVersionId,
-      @JsonProperty("input_dataset_version_id") final long inputDatasetVersionId,
-      @JsonProperty("output_dataset_version_id") final long outputDatasetVersionId,
-      @JsonProperty("latest_heartbeat") final Timestamp latestHeartbeat) {
+      @JsonProperty("createdAt") final Timestamp createdAt,
+      @JsonProperty("runId") final String runId,
+      @JsonProperty("runArgs") final List<String> runArgs,
+      @JsonProperty("startedAt") final Timestamp startedAt,
+      @JsonProperty("endedAt") final Timestamp endedAt,
+      @JsonProperty("jobVersionId") final long jobVersionId,
+      @JsonProperty("inputDatasetVersionId") final long inputDatasetVersionId,
+      @JsonProperty("outputDatasetVersionId") final long outputDatasetVersionId,
+      @JsonProperty("latestHeartbeat") final Timestamp latestHeartbeat) {
     this.createdAt = createdAt;
     this.runId = runId;
     this.runArgs = runArgs;

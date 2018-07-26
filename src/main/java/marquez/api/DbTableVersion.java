@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.List;
+import java.net.URI;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
@@ -14,10 +15,10 @@ public final class DbTableVersion extends DatasetVersion {
 
   @JsonCreator
   public DbTableVersion(
-      @JsonProperty("created_at") final Timestamp createdAt,
-      @JsonProperty("dataset_id") final Integer datasetId,
-      @JsonProperty("schema_uri") final String schemaUri,
       @JsonProperty("name") final String name,
+      @JsonProperty("createdAt") final Timestamp createdAt,
+      @JsonProperty("datasetId") final Integer datasetId,
+      @JsonProperty("schemaUri") final URI schemaUri,
       @JsonProperty("columns") final List<String> columns,
       @JsonProperty("database_id") final Integer databaseId) {
     super(createdAt, datasetId, schemaUri);

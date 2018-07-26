@@ -16,12 +16,12 @@ public final class JobVersion {
 
   @JsonCreator
   public JobVersion(
-      @JsonProperty("created_at") final Timestamp createdAt,
-      @JsonProperty("updated_at") final Timestamp updatedAt,
-      @JsonProperty("job_id") final long jobId,
-      @JsonProperty("git_repo_uri") final String gitRepoUri,
-      @JsonProperty("git_sha") final String gitSha,
-      @JsonProperty("latest_run") final long latestRun) {
+      @JsonProperty("createdAt") final Timestamp createdAt,
+      @JsonProperty("updatedAt") final Timestamp updatedAt,
+      @JsonProperty("jobId") final long jobId,
+      @JsonProperty("gitRepoUri") final String gitRepoUri,
+      @JsonProperty("gitSha") final String gitSha,
+      @JsonProperty("latestRun") final long latestRun) {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.jobId = jobId;

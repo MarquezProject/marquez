@@ -54,8 +54,8 @@ public final class JobRunState {
 
   @JsonCreator
   public JobRunState(
-      @JsonProperty("transitioned_at") final Timestamp transitionedAt,
-      @JsonProperty("job_run_id") final long jobRunId,
+      @JsonProperty("transitionedAt") final Timestamp transitionedAt,
+      @JsonProperty("jobRunId") final long jobRunId,
       @JsonProperty("state") final State state) {
     this.transitionedAt = transitionedAt;
     this.jobRunId = jobRunId;

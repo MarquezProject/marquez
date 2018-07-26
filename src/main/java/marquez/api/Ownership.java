@@ -14,10 +14,10 @@ public final class Ownership {
 
   @JsonCreator
   public Ownership(
-      @JsonProperty("started_at") final Timestamp startedAt,
-      @JsonProperty("ended_at") final Timestamp endedAt,
-      @JsonProperty("job_id") final long jobId,
-      @JsonProperty("owner_id") final long ownerId) {
+      @JsonProperty("startedAt") final Timestamp startedAt,
+      @JsonProperty("endedAt") final Timestamp endedAt,
+      @JsonProperty("jobId") final long jobId,
+      @JsonProperty("ownerId") final long ownerId) {
     this.startedAt = startedAt;
     this.endedAt = endedAt;
     this.jobId = jobId;
