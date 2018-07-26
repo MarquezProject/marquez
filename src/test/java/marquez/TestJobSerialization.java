@@ -5,7 +5,7 @@ import static io.dropwizard.testing.FixtureHelpers.fixture;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
-import marquez.core.Job;
+import marquez.api.Job;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,8 +32,7 @@ public class TestJobSerialization {
 
   @Test
   public void testDeserialization() throws Exception {
-    final Job resultJob =
-        MAPPER.readValue(fixture("fixtures/job.json"), Job.class);
+    final Job resultJob = MAPPER.readValue(fixture("fixtures/job.json"), Job.class);
     Assert.assertEquals(JOB, resultJob);
   }
 }
