@@ -19,5 +19,5 @@ The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL
 To build the entire project run:
 
 ```bash
-./gradlew build
+$ ./gradlew build
 ```

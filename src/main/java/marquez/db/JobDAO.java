@@ -1,17 +1,14 @@
 package marquez.db;
 
-import marquez.core.Job;
+import java.util.List;
+import marquez.api.Job;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 
-import java.util.List;
-
 public interface JobDAO {
+  @SqlQuery("SELECT * FROM jobs WHERE id = :id")
+  Job findById(@Bind("id") long id);
 
-    @SqlQuery("select * from jobs where ID = :id")
-    Job findById(@Bind("id") Long id);
-
-    @SqlQuery("SELECT * FROM jobs")
-    List<Job> findAll();
-
+  @SqlQuery("SELECT * FROM jobs")
+  List<Job> findAll();
 }

@@ -1,9 +1,9 @@
 *.jar
+*.swp
 .classpath
 .gradle/
 .project
 .settings
-.swp
 bin/
 build/
 gradle/
