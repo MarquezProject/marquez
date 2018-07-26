@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 public final class IcebergTableVersion extends DatasetVersion {
   @NotNull private final long previousSnapshotId;
   @NotNull private final long currentSnapshotId;
-  @NotNull private final String metadataUri;
+  @NotNull private final URI metadataUri;
 
   @JsonCreator
   public IcebergTableVersion(
@@ -19,7 +19,7 @@ public final class IcebergTableVersion extends DatasetVersion {
       @JsonProperty("schemaUri") final URI schemaUri,
       @JsonProperty("previousSnapshotId") final long previousSnapshotId,
       @JsonProperty("currentSnapshotId") final long currentSnapshotId,
-      @JsonProperty("metadataUri") final String metadataUri) {
+      @JsonProperty("metadataUri") final URI metadataUri) {
     super(createdAt, datasetId, schemaUri);
     this.previousSnapshotId = previousSnapshotId;
     this.currentSnapshotId = currentSnapshotId;
@@ -34,7 +34,7 @@ public final class IcebergTableVersion extends DatasetVersion {
     return currentSnapshotId;
   }
 
-  public String getMetadataUri() {
+  public URI getMetadataUri() {
     return metadataUri;
   }
 
