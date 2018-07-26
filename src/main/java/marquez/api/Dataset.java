@@ -12,8 +12,14 @@ public final class Dataset {
     ICEBERG_TABLE
   }
 
+  public enum Origin {
+    EXTERNAL,
+    INTERNAL
+  }
+
   @NotNull private final Timestamp createdAt;
   @NotNull private final Type type;
+  @NotNull private final Origin origin;
   @NotNull private final String name;
   @NotNull private final long currentVersion;
   @NotNull private final String description;
@@ -22,11 +28,13 @@ public final class Dataset {
   public Dataset(
       @JsonProperty("created_at") final Timestamp createdAt,
       @JsonProperty("type") final Type type,
+      @JsonProperty("origin") final Origin origin,
       @JsonProperty("name") final String name,
       @JsonProperty("current_version") final long currentVersion,
       @JsonProperty("description") final String description) {
     this.createdAt = createdAt;
     this.type = type;
+    this.origin = origin;
     this.name = name;
     this.currentVersion = currentVersion;
     this.description = description;
@@ -38,6 +46,10 @@ public final class Dataset {
 
   public Type getType() {
     return type;
+  }
+
+  public Origin getOrigin() {
+    return origin;
   }
 
   public String getName() {
@@ -61,6 +73,7 @@ public final class Dataset {
 
     return Objects.equals(createdAt, other.createdAt)
         && Objects.equals(type, other.type)
+        && Objects.equals(origin, other.origin)
         && Objects.equals(name, other.name)
         && Objects.equals(currentVersion, other.currentVersion)
         && Objects.equals(description, other.description);
@@ -77,6 +90,7 @@ public final class Dataset {
     sb.append("Dataset{");
     sb.append("createdAt=").append(createdAt);
     sb.append("type=").append(type);
+    sb.append("origin=").append(origin);
     sb.append("name=").append(name);
     sb.append("currentVersion=").append(currentVersion);
     sb.append("description=").append(description);
