@@ -6,9 +6,9 @@ import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 
 public interface JobRunDAO {
-  @SqlQuery("SELECT * FROM jobs WHERE id = :id")
+  @SqlQuery("SELECT * FROM job_runs WHERE id = :id")
   JobRun findById(@Bind("id") long id);
 
-  @SqlQuery("SELECT * FROM jobs")
+  @SqlQuery("SELECT * FROM job_runs")
   List<JobRun> findAll();
 }
