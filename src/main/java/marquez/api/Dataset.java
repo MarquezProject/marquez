@@ -8,14 +8,14 @@ import javax.validation.constraints.NotNull;
 
 public final class Dataset {
   public enum Type {
-    DatabaseTable,
-    IcebergTable
+    DATABASE_TABLE,
+    ICEBERG_TABLE
   }
 
   @NotNull private final Timestamp createdAt;
   @NotNull private final Type type;
   @NotNull private final String name;
-  @NotNull private final Integer currentVersion;
+  @NotNull private final long currentVersion;
   @NotNull private final String description;
 
   @JsonCreator
@@ -23,7 +23,7 @@ public final class Dataset {
       @JsonProperty("created_at") final Timestamp createdAt,
       @JsonProperty("type") final Type type,
       @JsonProperty("name") final String name,
-      @JsonProperty("current_version") final Integer currentVersion,
+      @JsonProperty("current_version") final long currentVersion,
       @JsonProperty("description") final String description) {
     this.createdAt = createdAt;
     this.type = type;
@@ -44,7 +44,7 @@ public final class Dataset {
     return name;
   }
 
-  public Integer getCurrentVersion() {
+  public long getCurrentVersion() {
     return currentVersion;
   }
 
