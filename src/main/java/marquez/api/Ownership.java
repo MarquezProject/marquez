@@ -32,6 +32,14 @@ public final class Ownership {
     return endedAt;
   }
 
+  public long getJobId() {
+    return jobId;
+  }
+
+  public long getOwnerId() {
+    return ownerId;
+  }
+
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
