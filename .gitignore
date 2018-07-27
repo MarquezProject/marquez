@@ -7,3 +7,6 @@
 bin/
 build/
 gradle/
+
+# Marquez configuration
+config.yaml
