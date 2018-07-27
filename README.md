@@ -10,9 +10,9 @@ The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL
 
 ## Requirements
 
-* Java 8+
+* Java 8 or higher
 * Postgres Database
-* Gradle 4.8+
+* Gradle 4.8 or higher
 
 ## Building
 
