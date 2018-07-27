@@ -10,14 +10,21 @@ The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL
 
 ## Requirements
 
-* Java 8+
+* Java 8 or higher
 * Postgres Database
-* Gradle 4.8+
+* Gradle 4.8 or higher
 
 ## Building
 
 To build the entire project run:
 
 ```bash
-$ ./gradlew build
+./gradlew shadowJar
 ```
+
+## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApplication.java)
+
+```bash
+$ java -jar build/libs/marquez-all.jar server config.yaml
+```
+Then browse to the admin interface: http://localhost:8081
