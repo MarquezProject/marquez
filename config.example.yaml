@@ -1,0 +1,5 @@
+dataSourceFactory:
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql://127.0.0.1:5432/POSTGRESQL_DATABASE
+  user: POSTGRESQL_USER
+  password: POSTGRESQL_PASSWORD
