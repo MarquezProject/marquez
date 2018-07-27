@@ -2,8 +2,8 @@ package marquez.db;
 
 import java.util.List;
 import marquez.api.Dataset;
-import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.SqlQuery;
+import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 public interface DatasetDAO {
   @SqlQuery("SELECT * FROM datasets WHERE id = :id")

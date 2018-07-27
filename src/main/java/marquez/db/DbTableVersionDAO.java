@@ -2,8 +2,8 @@ package marquez.db;
 
 import java.util.List;
 import marquez.api.DbTableVersion;
-import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.SqlQuery;
+import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 public interface DbTableVersionDAO {
   @SqlQuery("SELECT * FROM db_table_versions WHERE id = :id")
@@ -12,4 +12,3 @@ public interface DbTableVersionDAO {
   @SqlQuery("SELECT * FROM db_table_versions")
   List<DbTableVersion> findAll();
 }
-

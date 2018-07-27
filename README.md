@@ -27,4 +27,4 @@ To build the entire project run:
 ```bash
 $ java -jar build/libs/marquez-all.jar server config.yaml
 ```
-Then browse the admin interface: http://localhost:8081
+Then browse to the admin interface: http://localhost:8081

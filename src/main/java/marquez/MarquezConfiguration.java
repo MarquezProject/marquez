@@ -9,10 +9,10 @@ import javax.validation.constraints.NotNull;
 class MarquezConfiguration extends Configuration {
   @Valid
   @NotNull
-  @JsonProperty
-  private DataSourceFactory dataSourceFactory = new DataSourceFactory();
+  private DataSourceFactory database = new DataSourceFactory();
 
+  @JsonProperty("database")
   public DataSourceFactory getDataSourceFactory() {
-    return dataSourceFactory;
+    return database;
   }
 }
