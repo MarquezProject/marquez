@@ -20,7 +20,7 @@ public final class DbTableVersion extends DatasetVersion {
       @JsonProperty("datasetId") final Integer datasetId,
       @JsonProperty("schemaUri") final URI schemaUri,
       @JsonProperty("columns") final List<String> columns,
-      @JsonProperty("database_id") final Integer databaseId) {
+      @JsonProperty("databaseId") final Integer databaseId) {
     super(createdAt, datasetId, schemaUri);
     this.name = name;
     this.columns = columns;
