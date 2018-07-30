@@ -1,5 +1,6 @@
 database:
-  driverClass: org.postgresql.Driver
+  name: POSTGRESQL_DB
+  host: 127.0.0.1
+  port: 5432
   user: POSTGRESQL_USER
   password: POSTGRESQL_PASSWORD
-  url: jdbc:postgresql://127.0.0.1:5432/POSTGRESQL_DB
