@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import marquez.api.Job;
-import marquez.db.JobDAO;
+import marquez.db.dao.JobDAO;
 
 @Path("/jobs")
 @Produces(MediaType.APPLICATION_JSON)

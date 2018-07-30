@@ -1,4 +1,4 @@
-package marquez.db;
+package marquez.db.dao;
 
 import java.util.List;
 import marquez.api.Ownership;
