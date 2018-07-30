@@ -2,17 +2,15 @@ package marquez;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
-import io.dropwizard.db.DataSourceFactory;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import marquez.db.DbConfiguration;
 
 class MarquezConfiguration extends Configuration {
-  @Valid
   @NotNull
   @JsonProperty("database")
-  private DataSourceFactory database = new DataSourceFactory();
+  private DbConfiguration database = new DbConfiguration();
 
-  public DataSourceFactory getDataSourceFactory() {
+  public DbConfiguration getDbConfiguration() {
     return database;
   }
 }
