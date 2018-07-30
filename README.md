@@ -19,7 +19,7 @@ The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL
 To build the entire project run:
 
 ```bash
-./gradlew shadowJar
+$ ./gradlew shadowJar
 ```
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApplication.java)
