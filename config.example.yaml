@@ -1,5 +1,5 @@
 database:
-  name: POSTGRESQL_DB
+  name: POSTGRESQL_DB_NAME
   host: 127.0.0.1
   port: 5432
   user: POSTGRESQL_USER
