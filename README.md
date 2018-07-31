@@ -4,7 +4,7 @@
 
 ## Status
 
-This project is under active development at [WeWork](https://www.wework.com/) in collaboration with [Stitch Fix](https://www.stitchfix.com) (and many others organizations).
+This project is under active development at [WeWork](https://www.wework.com/) and [Stitch Fix](https://www.stitchfix.com) (in collaboration with many others organizations).
 
 ## Documentation
 
