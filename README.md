@@ -1,5 +1,8 @@
 # Marquez
 
+[![Project status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ## Status
 
 This project is under active development at [WeWork](https://www.wework.com/) in collaboration with [Stitch Fix](https://www.stitchfix.com) (and many others organizations).
