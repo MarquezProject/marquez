@@ -1,4 +1,3 @@
-*.jar
 *.swp
 .classpath
 .gradle/
@@ -6,7 +5,6 @@
 .settings
 bin/
 build/
-gradle/
 
 # Marquez configuration
 config.yaml
