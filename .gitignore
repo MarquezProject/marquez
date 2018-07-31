@@ -1,3 +1,5 @@
+!gradle-wrapper.jar
+*.jar
 *.swp
 .classpath
 .gradle/
