@@ -19,9 +19,6 @@ public class OwnerResource {
     this.dao = dao;
   }
 
-  @GET
-  public List<Owner> listDatasets() {
-    return dao.findAll();
-  }
+
 }
 
