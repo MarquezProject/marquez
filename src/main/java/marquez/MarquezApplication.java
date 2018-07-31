@@ -10,6 +10,7 @@ import marquez.db.dao.OwnerDAO;
 import marquez.resources.JobResource;
 import marquez.resources.DatasetResource;
 import marquez.resources.OwnerResource;
+import marquez.resources.PingResource;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
@@ -41,6 +42,8 @@ public class MarquezApplication extends Application<MarquezConfiguration> {
         Jdbi.create(connectionURL, dbConfig.getUser(), dbConfig.getPassword())
             .installPlugin(new PostgresPlugin())
             .installPlugin(new SqlObjectPlugin());
+
+    env.jersey().register(new PingResource());
 
     final OwnerDAO ownerDAO = jdbi.onDemand(OwnerDAO.class);
     env.jersey().register(new OwnerResource(ownerDAO));
