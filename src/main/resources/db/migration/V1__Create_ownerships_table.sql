@@ -1,4 +1,4 @@
-CREATE TABLE owners (
+CREATE TABLE ownerships (
   id          SERIAL PRIMARY KEY,
   started_at  TIMESTAMP,
   endeded_at  TIMESTAMP,
