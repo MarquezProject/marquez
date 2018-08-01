@@ -83,7 +83,7 @@ public final class JobVersion {
     sb.append("jobId=").append(jobId);
     sb.append("gitRepoUri=").append(gitRepoUri);
     sb.append("gitSha=").append(gitSha);
-    sb.append("latestRun=").append(latestRun);
+    sb.append("latestRunId=").append(latestRunId);
     sb.append("}");
     return sb.toString();
   }
