@@ -11,6 +11,7 @@ import marquez.db.dao.DatasetDAO;
 import marquez.db.dao.JobDAO;
 import marquez.db.dao.OwnerDAO;
 import marquez.resources.DatasetResource;
+import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
 import marquez.resources.OwnerResource;
 import marquez.resources.PingResource;
@@ -57,6 +58,7 @@ public class MarquezApplication extends Application<MarquezConfiguration> {
             .installPlugin(new PostgresPlugin());
 
     env.jersey().register(new PingResource());
+    env.jersey().register(new HealthResource());
 
     final OwnerDAO ownerDAO = jdbi.onDemand(OwnerDAO.class);
     env.jersey().register(new OwnerResource(ownerDAO));
