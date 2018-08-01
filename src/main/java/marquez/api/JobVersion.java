@@ -12,7 +12,7 @@ public final class JobVersion {
   @NotNull private final long jobId;
   @NotNull private final String gitRepoUri;
   @NotNull private final String gitSha;
-  @NotNull private final long latestRun;
+  @NotNull private final long latestRunId;
 
   @JsonCreator
   public JobVersion(
@@ -21,13 +21,13 @@ public final class JobVersion {
       @JsonProperty("jobId") final long jobId,
       @JsonProperty("gitRepoUri") final String gitRepoUri,
       @JsonProperty("gitSha") final String gitSha,
-      @JsonProperty("latestRun") final long latestRun) {
+      @JsonProperty("latestRunId") final long latestRunId) {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.jobId = jobId;
     this.gitRepoUri = gitRepoUri;
     this.gitSha = gitSha;
-    this.latestRun = latestRun;
+    this.latestRunId = latestRunId;
   }
 
   public Timestamp getCreatedAt() {
@@ -50,8 +50,8 @@ public final class JobVersion {
     return gitSha;
   }
 
-  public long getLatestRun() {
-    return latestRun;
+  public long getLatestRunId() {
+    return latestRunId;
   }
 
   @Override
@@ -66,12 +66,12 @@ public final class JobVersion {
         && Objects.equals(jobId, other.jobId)
         && Objects.equals(gitRepoUri, other.gitRepoUri)
         && Objects.equals(gitSha, other.gitSha)
-        && Objects.equals(latestRun, other.latestRun);
+        && Objects.equals(latestRunId, other.latestRunId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdAt, updatedAt, jobId, gitRepoUri, gitSha, latestRun);
+    return Objects.hash(createdAt, updatedAt, jobId, gitRepoUri, gitSha, latestRunId);
   }
 
   @Override
