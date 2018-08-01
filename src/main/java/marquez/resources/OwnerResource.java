@@ -18,6 +18,6 @@ public class OwnerResource {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   public void createOwner(final Owner owner) {
-    dao.insert(owner.getName());
+    dao.insert(owner);
   }
 }
