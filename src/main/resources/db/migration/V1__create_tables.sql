@@ -1,7 +1,7 @@
 CREATE TABLE owners (
   id         SERIAL PRIMARY KEY,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  name       VARCHAR(64) NOT NULL
+  name       VARCHAR(64) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE jobs (
@@ -13,7 +13,7 @@ CREATE TABLE jobs (
   current_ownership INTEGER,
   nominal_time      TIMESTAMP,
   category          VARCHAR(64),
-  description       TEXT
+  description       TEXT NOT NULL
 );
 
 CREATE TABLE ownerships (
@@ -27,7 +27,7 @@ CREATE TABLE ownerships (
 CREATE TABLE job_runs (
   id               SERIAL PRIMARY KEY,
   created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  run_id           VARCHAR(256) NOT NULL,
+  run_id           VARCHAR(255) NOT NULL,
   started_at       TIMESTAMP,
   endeded_at       TIMESTAMP,
   latest_heartbeat TIMESTAMP
@@ -45,8 +45,8 @@ CREATE TABLE job_versions (
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at    TIMESTAMP,
   job_id        INTEGER REFERENCES jobs(id),
-  git_repo_uri  VARCHAR(256),
-  git_sha       VARCHAR(256),
+  git_repo_uri  VARCHAR(255),
+  git_sha       VARCHAR(255),
   latest_run_id INTEGER REFERENCES job_runs(id)
 );
 
@@ -58,5 +58,5 @@ CREATE TABLE datasets (
   type            INTEGER,
   origin          INTEGER,
   current_version INTEGER,
-  description     TEXT
+  description     TEXT NOT NULL
 );
