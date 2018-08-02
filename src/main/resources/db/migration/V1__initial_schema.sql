@@ -49,3 +49,14 @@ CREATE TABLE job_versions (
   git_sha       VARCHAR(256),
   latest_run_id INTEGER REFERENCES job_runs(id)
 );
+
+CREATE TABLE datasets (
+  id              SERIAL PRIMARY KEY,
+  name            VARCHAR(64) NOT NULL,
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at      TIMESTAMP,
+  type            INTEGER,
+  origin          INTEGER,
+  current_version INTEGER,
+  description     TEXT
+);
