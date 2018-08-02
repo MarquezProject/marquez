@@ -1,12 +1,12 @@
 CREATE TABLE owners (
   id         SERIAL PRIMARY KEY,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  name       VARCHAR(64)
+  name       VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE jobs (
   id                SERIAL PRIMARY KEY,
-  name              VARCHAR(64),
+  name              VARCHAR(64) NOT NULL,
   created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at        TIMESTAMP,
   current_version   INTEGER,
@@ -25,8 +25,19 @@ CREATE TABLE ownerships (
 );
 
 CREATE TABLE job_runs (
-  id            SERIAL PRIMARY KEY,
-  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id               SERIAL PRIMARY KEY,
+  created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  run_id           VARCHAR(256) NOT NULL,
+  started_at       TIMESTAMP,
+  endeded_at       TIMESTAMP,
+  latest_heartbeat TIMESTAMP
+);
+
+CREATE TABLE job_run_states (
+  id              SERIAL PRIMARY KEY,
+  transitioned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  job_run_id      INTEGER REFERENCES job_runs(id),
+  state           INTEGER
 );
 
 CREATE TABLE job_versions (
