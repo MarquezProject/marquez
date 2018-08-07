@@ -42,5 +42,5 @@ shadowJar {
 
 jacoco {
     toolVersion = "0.8.1"
-    reportsDir = file("$buildDir/marquez_unit_test_report")
+    reportsDir = file("$buildDir/reports/coverage")
 }
