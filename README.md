@@ -12,9 +12,9 @@ The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL
 
 ## Requirements
 
-* Java 8 or higher
-* Postgres Database
-* Gradle 4.8 or higher
+* Java 8 or above
+* PostgreSQL database
+* Gradle 4.8 or above
 
 ## Building
 
@@ -38,6 +38,8 @@ Then run the database migration:
 ```bash
 $ java -jar build/libs/marquez-all.jar db migrate config.yaml
 ```
+
+**Note:** When creating your database, we recommend calling it `marquez`.
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApplication.java)
 
