@@ -10,11 +10,19 @@ buildscript {
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'java'
 apply plugin: 'jacoco'
+apply plugin: 'java'
 
 repositories {
   mavenCentral()
+}
+
+compileJava {
+  options.incremental = true
+}
+
+compileTestJava {
+  options.incremental = true
 }
 
 if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
