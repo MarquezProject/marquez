@@ -5,7 +5,7 @@ import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayFactory;
 
-public class MarquezConfiguration extends Configuration {
+public final class MarquezConfiguration extends Configuration {
   @JsonProperty("database")
   private final DataSourceFactory database = new DataSourceFactory();
 
