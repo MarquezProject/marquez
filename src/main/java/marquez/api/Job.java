@@ -1,24 +1,24 @@
 package marquez.api;
 
+import org.hibernate.validator.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
 
 public final class Job {
-  @NotNull private final int id;
-  @NotNull private final String name;
-  @NotNull private final String ownerName;
-  @NotNull private final Timestamp nominalTime;
-  @NotNull private final String category;
-  @NotNull private final String description;
+  private final int id;
+  private final String name;
+  private final String ownerName;
+  private final Timestamp nominalTime;
+  private final String category;
+  private final String description;
 
   @JsonCreator
   public Job(
       @JsonProperty("id") final int id,
-      @JsonProperty("name") final String name,
+      @JsonProperty("name") @NotBlank final String name,
       @JsonProperty("ownerName") final String ownerName,
       @JsonProperty("nominalTime") final Timestamp nominalTime,
       @JsonProperty("category") final String category,

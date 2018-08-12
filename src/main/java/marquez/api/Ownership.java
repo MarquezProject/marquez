@@ -5,24 +5,32 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public final class Ownership {
-  @NotNull private final Timestamp startedAt;
-  @NotNull private final Optional<Timestamp> endedAt;
-  @NotNull private final int jobId;
-  @NotNull private final int ownerId;
+  private final int id;
+  private final Timestamp startedAt;
+  private final Optional<Timestamp> endedAt;
+  private final String jobName;
+  private final String ownerName;
 
   @JsonCreator
   public Ownership(
+      @JsonProperty("id") final int id,
       @JsonProperty("startedAt") final Timestamp startedAt,
       @JsonProperty("endedAt") final Optional<Timestamp> endedAt,
-      @JsonProperty("jobId") final int jobId,
-      @JsonProperty("ownerId") final int ownerId) {
+      @JsonProperty("jobName") final String jobName,
+      @JsonProperty("ownerName") final String ownerName) {
+    this.id = id;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
-    this.jobId = jobId;
-    this.ownerId = ownerId;
+    this.jobName = jobName;
+    this.ownerName = ownerName;
+  }
+
+  @JsonIgnore
+  public int getId() {
+    return id;
   }
 
   public Timestamp getStartedAt() {
@@ -33,12 +41,12 @@ public final class Ownership {
     return endedAt;
   }
 
-  public long getJobId() {
-    return jobId;
+  public String getJobName() {
+    return jobName;
   }
 
-  public long getOwnerId() {
-    return ownerId;
+  public String getOwnerName() {
+    return ownerName;
   }
 
   @Override
@@ -48,25 +56,27 @@ public final class Ownership {
 
     final Ownership other = (Ownership) o;
 
-    return Objects.equals(startedAt, other.startedAt)
+    return Objects.equals(id, other.id)
+        && Objects.equals(startedAt, other.startedAt)
         && Objects.equals(endedAt, other.endedAt)
-        && Objects.equals(jobId, other.jobId)
-        && Objects.equals(ownerId, other.ownerId);
+        && Objects.equals(jobName, other.jobName)
+        && Objects.equals(ownerName, other.ownerName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(startedAt, endedAt, jobId, ownerId);
+    return Objects.hash(startedAt, endedAt, jobName, ownerName);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("Ownership{");
+    sb.append("id=").append(id);
     sb.append(",startedAt=").append(startedAt);
     sb.append(",endedAt=").append(endedAt);
-    sb.append(",jobId=").append(jobId);
-    sb.append(",ownerId=").append(ownerId);
+    sb.append(",jobName=").append(jobName);
+    sb.append(",ownerName=").append(ownerName);
     sb.append("}");
     return sb.toString();
   }
