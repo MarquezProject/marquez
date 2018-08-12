@@ -1,7 +1,7 @@
 package marquez.db.repository;
 
 import java.util.List;
-import marquez.db.repository.model.Db;
+import marquez.db.resource.model.Db;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 

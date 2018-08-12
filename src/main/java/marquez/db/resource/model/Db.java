@@ -1,4 +1,4 @@
-package marquez.db.repository.model;
+package marquez.db.resource.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
