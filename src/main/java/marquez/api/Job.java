@@ -1,12 +1,14 @@
 package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 public final class Job {
+  @NotNull private final int id;
   @NotNull private final String name;
   @NotNull private final String ownerName;
   @NotNull private final Timestamp nominalTime;
@@ -15,16 +17,23 @@ public final class Job {
 
   @JsonCreator
   public Job(
+      @JsonProperty("id") final int id,
       @JsonProperty("name") final String name,
       @JsonProperty("ownerName") final String ownerName,
       @JsonProperty("nominalTime") final Timestamp nominalTime,
       @JsonProperty("category") final String category,
       @JsonProperty("description") final String description) {
+    this.id = id;
     this.name = name;
     this.ownerName = ownerName;
     this.nominalTime = nominalTime;
     this.category = category;
     this.description = description;
+  }
+
+  @JsonIgnore
+  public int getId() {
+    return id;
   }
 
   public String getName() {
@@ -54,7 +63,8 @@ public final class Job {
 
     final Job other = (Job) o;
 
-    return Objects.equals(name, other.name)
+    return Objects.equals(id, other.id)
+        && Objects.equals(name, other.name)
         && Objects.equals(ownerName, other.ownerName)
         && Objects.equals(nominalTime, other.nominalTime)
         && Objects.equals(category, other.category)
@@ -70,7 +80,8 @@ public final class Job {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("Job{");
-    sb.append("name=").append(name);
+    sb.append("id=").append(id);
+    sb.append(",name=").append(name);
     sb.append(",owner=").append(ownerName);
     sb.append(",nominalTime=").append(nominalTime);
     sb.append(",category=").append(category);
