@@ -8,12 +8,14 @@ import marquez.api.Ownership;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
+import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RegisterRowMapper(RowMappers.JobRow.class)
 public interface JobDAO extends SqlObject {
   static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
 
@@ -53,12 +55,13 @@ public interface JobDAO extends SqlObject {
     }
   }
 
-  @SqlQuery("SELECT * FROM jobs")
-  List<Job> findAll();
+  @SqlQuery("SELECT * FROM jobs LIMIT :limit")
+  List<Job> findAll(@Bind("limit") int limit);
 
-  @SqlQuery("SELECT * FROM jobs WHERE name = :jobName")
-  Job findByName(final String jobName);
+  @SqlQuery("SELECT * FROM jobs WHERE name = :name")
+  Job findByName(@Bind("name") String name);
 
+  // TODO: Move to OwnershipDAO
   @SqlUpdate("UPDATE jobs SET current_ownership = :ownershipId WHERE id = :jobId")
   void updateOwnership(@Bind("ownershipId") final int ownershipId, @Bind("jobId") final int jobId);
 }
