@@ -1,7 +1,6 @@
 package marquez.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static marquez.resources.ResourceUtil.buildLocation;
 
 import com.codahale.metrics.annotation.Timed;
 import javax.ws.rs.Consumes;
@@ -17,39 +16,39 @@ import marquez.db.dao.JobDAO;
 
 @Path("/jobs")
 @Produces(APPLICATION_JSON)
-public class JobResource {
-  private final JobDAO jobDAO;
+public final class JobResource extends BaseResource {
+  private final JobDAO dao;
 
-  public JobResource(final JobDAO jobDAO) {
-    this.jobDAO = jobDAO;
+  public JobResource(final JobDAO dao) {
+    this.dao = dao;
   }
 
   @POST
   @Consumes(APPLICATION_JSON)
   @Timed
   public Response create(final Job job) {
-    jobDAO.insert(job);
-    return Response.created(buildLocation(Job.class, job.getName())).build();
+    dao.insert(job);
+    return Response.created(buildURI(Job.class, job.getName())).build();
   }
 
   @GET
   @Timed
   public Response getAll() {
-    return Response.ok(jobDAO.findAll()).build();
+    return Response.ok(dao.findAll()).build();
   }
 
   @GET
-  @Path("/{jobName}")
+  @Path("/{name}")
   @Timed
-  public Response get(@PathParam("jobName") final String jobName) {
-    return Response.ok(jobDAO.findByName(jobName)).build();
+  public Response getJob(@PathParam("name") final String name) {
+    return Response.ok(dao.findByName(name)).build();
   }
 
   @PUT
-  @Path("/{jobName}")
+  @Path("/{name}")
   @Consumes(APPLICATION_JSON)
   @Timed
-  public Response update(@PathParam("jobName") final String jobName) {
+  public Response update(@PathParam("name") final String jobName) {
     return Response.ok().build();
   }
 }
