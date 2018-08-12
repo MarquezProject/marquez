@@ -6,13 +6,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
+import marquez.owner.resource.model.Owner;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
-import marquez.db.dao.OwnerDAO;
-import marquez.resources.OwnerResource;
+import marquez.owner.repository.OwnerDAO;
+import marquez.owner.resource.OwnerResource;
 
 public class TestOwner {
 	private static final OwnerDAO dao = mock(OwnerDAO.class);
