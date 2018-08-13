@@ -9,5 +9,5 @@ public interface OwnerDAO {
   void insert(@BindBean final Owner owner);
 
   @SqlUpdate("UPDATE owners SET deleted_at=CURRENT_TIMESTAMP WHERE name = :o.name")
-  void delete(@BindBean("o") Owner owner);
+  void delete(@BindBean("o") final Owner owner);
 }
