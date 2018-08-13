@@ -2,9 +2,9 @@ package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Objects;
-import java.net.URI;
 import javax.validation.constraints.NotNull;
 
 public final class IcebergTableVersion extends DatasetVersion {
