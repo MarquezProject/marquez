@@ -1,27 +1,18 @@
 package marquez.db.dao;
 
-import org.jdbi.v3.core.Handle;
-import org.jdbi.v3.sqlobject.SqlObject;
+import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public interface OwnershipDAO extends SqlObject {
+public interface OwnershipDAO {
   static final Logger LOG = LoggerFactory.getLogger(OwnershipDAO.class);
 
-  default void insert(final String jobName, final String ownerName) {
-    try (final Handle handle = getHandle()) {
-      handle.createUpdate(
-                    "INSERT INTO ownerships"
-                        + "VALUES ("
-                        + "job_id, (SELECT id FROM jobs WHERE name = :jobName),"
-                        + "owner_id, (SELECT id FROM owners WHERE name = :ownerName)"
-                        + ")")
-                .bind("jobName", jobName)
-                .bind("ownerName", ownerName)
-                .execute();
-    } catch (Exception e) {
-      // TODO: Add better error handling
-      LOG.error(e.getMessage());
-    }
-  }
+  @SqlQuery(
+      "INSERT INTO ownerships (job_id, owner_id) "
+          + "VALUES ("
+          + "(SELECT id FROM jobs WHERE name = :jobName),"
+          + "(SELECT id FROM owners WHERE name = :ownerName)"
+          + ")")
+  int insert(@Bind("jobName") String jobName, @Bind("ownerName") String ownerName);
 }
