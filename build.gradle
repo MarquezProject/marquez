@@ -6,12 +6,14 @@ buildscript {
   }
   dependencies {
     classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    classpath 'gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.7.1'
   }
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'java'
+apply plugin: 'com.github.sherter.google-java-format'
 apply plugin: 'jacoco'
+apply plugin: 'java'
 
 repositories {
   mavenCentral()
