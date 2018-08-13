@@ -1,6 +1,8 @@
 package marquez.resources;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -19,5 +21,11 @@ public class OwnerResource {
   @Consumes(MediaType.APPLICATION_JSON)
   public void createOwner(final Owner owner) {
     dao.insert(owner);
+  }
+
+  @DELETE
+  @Consumes(MediaType.APPLICATION_JSON)
+  public void deleteOwner(final Owner owner) {
+    dao.delete(owner);
   }
 }
