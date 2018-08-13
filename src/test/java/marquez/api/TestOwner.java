@@ -34,4 +34,9 @@ public class TestOwner {
         resources.target("/owners").request().post(entity(owner, APPLICATION_JSON));
         verify(dao).insert(owner);
     }
+
+    @Test 
+    public void testDeleteOwner() {
+        resources.target("/owners").request().delete("Aurelaiano");
+    }
 }
