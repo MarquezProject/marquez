@@ -1,24 +1,11 @@
-buildscript {
-  repositories {
-    maven {
-      url 'https://plugins.gradle.org/m2/'
-    }
-  }
-  dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
-  }
+plugins {
+    id 'application'
+    id 'jacoco'
+    id 'java'
 }
-
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'java'
-apply plugin: 'jacoco'
 
 repositories {
   mavenCentral()
-}
-
-if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
-  throw new GradleException("This build must be run with Java 8")
 }
 
 dependencies {
@@ -34,11 +21,7 @@ dependencies {
   testCompile 'org.mockito:mockito-core:2.19.0'
 }
 
-shadowJar {
-  manifest {
-    attributes "Main-Class": "marquez.MarquezApplication"
-  }
-}
+mainClassName = 'marquez.MarquezApplication'
 
 jacoco {
     toolVersion = "0.8.1"
