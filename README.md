@@ -14,14 +14,14 @@ The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL
 
 * Java 8 or above
 * PostgreSQL database
-* Gradle 4.8 or above
+* Gradle 4.9 or above
 
 ## Building
 
 To build the entire project run:
 
 ```bash
-$ ./gradlew shadowJar
+$ ./gradlew build
 ```
 The executable can be found under `build/libs/`
 
@@ -36,7 +36,7 @@ $ cp config.example.yaml config.yaml
 Then run the database migration:
 
 ```bash
-$ java -jar build/libs/marquez-all.jar db migrate config.yaml
+$ java -jar build/libs/marquez.jar db migrate config.yaml
 ```
 
 **Note:** When creating your database, we recommend calling it `marquez`.
@@ -44,7 +44,7 @@ $ java -jar build/libs/marquez-all.jar db migrate config.yaml
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApplication.java)
 
 ```bash
-$ java -jar build/libs/marquez-all.jar server config.yaml
+$ java -jar build/libs/marquez.jar server config.yaml
 ```
 
 Then browse to the admin interface: http://localhost:8081

@@ -1,7 +1,7 @@
 plugins {
-    id 'application'
-    id 'jacoco'
-    id 'java'
+  id 'application'
+  id 'jacoco'
+  id 'java'
 }
 
 repositories {
@@ -22,7 +22,13 @@ dependencies {
 
 mainClassName = 'marquez.MarquezApplication'
 
+jar {
+  manifest {
+    attributes 'Main-Class': 'com.example.Main'
+  }
+}
+
 jacoco {
-    toolVersion = "0.8.1"
-    reportsDir = file("$buildDir/reports/coverage")
+  toolVersion = "0.8.1"
+  reportsDir = file("$buildDir/reports/coverage")
 }
