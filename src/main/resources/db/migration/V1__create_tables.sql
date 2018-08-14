@@ -19,7 +19,7 @@ CREATE TABLE jobs (
 CREATE TABLE ownerships (
   id         SERIAL PRIMARY KEY,
   started_at TIMESTAMP,
-  endeded_at TIMESTAMP,
+  ended_at   TIMESTAMP,
   job_id     INTEGER REFERENCES jobs(id),
   owner_id   INTEGER REFERENCES owners(id)
 );
@@ -42,7 +42,7 @@ CREATE TABLE job_runs (
   job_version_id            INTEGER REFERENCES job_versions(id),
   run_id                    VARCHAR(255) NOT NULL,
   started_at                TIMESTAMP,
-  endeded_at                TIMESTAMP,
+  ended_at                  TIMESTAMP,
   input_dataset_version_id  INTEGER,
   output_dataset_version_id INTEGER,
   latest_heartbeat          TIMESTAMP
