@@ -36,7 +36,7 @@ $ cp config.example.yaml config.yaml
 Then run the database migration:
 
 ```bash
-$ java -jar build/libs/marquez.jar db migrate config.yaml
+$ ./gradlew run --args 'db migrate config.yaml'
 ```
 
 **Note:** When creating your database, we recommend calling it `marquez`.
@@ -44,7 +44,7 @@ $ java -jar build/libs/marquez.jar db migrate config.yaml
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApplication.java)
 
 ```bash
-$ java -jar build/libs/marquez.jar server config.yaml
+$ ./gradlew run --args 'server config.yaml'
 ```
 
 Then browse to the admin interface: http://localhost:8081
