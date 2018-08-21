@@ -21,7 +21,7 @@ The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL
 To build the entire project run:
 
 ```bash
-$ ./gradlew build
+$ ./gradlew shadowJar
 ```
 The executable can be found under `build/libs/`
 
@@ -36,7 +36,7 @@ $ cp config.example.yaml config.yaml
 Then run the database migration:
 
 ```bash
-$ ./gradlew run --args 'db migrate config.yaml'
+$ ./gradlew runDbMigration
 ```
 
 **Note:** When creating your database, we recommend calling it `marquez`.
@@ -44,7 +44,7 @@ $ ./gradlew run --args 'db migrate config.yaml'
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApplication.java)
 
 ```bash
-$ ./gradlew run --args 'server config.yaml'
+$ ./gradlew runShadow
 ```
 
 Then browse to the admin interface: http://localhost:8081
