@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 public final class Job {
   @NotNull private final String name;
-  @NotNull private final String owner;
+  @NotNull private final String ownerName;
   @NotNull private final Timestamp nominalTime;
   @NotNull private final String category;
   @NotNull private final String description;
@@ -16,12 +16,12 @@ public final class Job {
   @JsonCreator
   public Job(
       @JsonProperty("name") final String name,
-      @JsonProperty("owner") final String owner,
+      @JsonProperty("ownerName") final String ownerName,
       @JsonProperty("nominalTime") final Timestamp nominalTime,
       @JsonProperty("category") final String category,
       @JsonProperty("description") final String description) {
     this.name = name;
-    this.owner = owner;
+    this.ownerName = ownerName;
     this.nominalTime = nominalTime;
     this.category = category;
     this.description = description;
@@ -31,8 +31,8 @@ public final class Job {
     return name;
   }
 
-  public String getOwner() {
-    return owner;
+  public String getOwnerName() {
+    return ownerName;
   }
 
   public Timestamp getNominalTime() {
@@ -55,7 +55,7 @@ public final class Job {
     final Job other = (Job) o;
 
     return Objects.equals(name, other.name)
-        && Objects.equals(owner, other.owner)
+        && Objects.equals(ownerName, other.ownerName)
         && Objects.equals(nominalTime, other.nominalTime)
         && Objects.equals(category, other.category)
         && Objects.equals(description, other.description);
@@ -63,12 +63,7 @@ public final class Job {
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-        name,
-        owner,
-        nominalTime,
-        category,
-        description);
+    return Objects.hash(name, ownerName, nominalTime, category, description);
   }
 
   @Override
@@ -76,10 +71,10 @@ public final class Job {
     final StringBuilder sb = new StringBuilder();
     sb.append("Job{");
     sb.append("name=").append(name);
-    sb.append("owner=").append(owner);
-    sb.append("nominalTime=").append(nominalTime);
-    sb.append("category=").append(category);
-    sb.append("description=").append(description);
+    sb.append(",owner=").append(ownerName);
+    sb.append(",nominalTime=").append(nominalTime);
+    sb.append(",category=").append(category);
+    sb.append(",description=").append(description);
     sb.append("}");
     return sb.toString();
   }

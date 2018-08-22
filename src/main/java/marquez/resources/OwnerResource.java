@@ -1,23 +1,29 @@
 package marquez.resources;
 
+import static marquez.resources.ResourceUtil.buildLocation;
+
+import com.codahale.metrics.annotation.Timed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
 
 @Path("/owners")
 public class OwnerResource {
-  private final OwnerDAO dao;
+  private final OwnerDAO ownerDAO;
 
-  public OwnerResource(final OwnerDAO dao) {
-    this.dao = dao;
+  public OwnerResource(final OwnerDAO ownerDAO) {
+    this.ownerDAO = ownerDAO;
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
-  public void createOwner(final Owner owner) {
-    dao.insert(owner);
+  @Timed
+  public Response create(final Owner owner) {
+    ownerDAO.insert(owner);
+    return Response.created(buildLocation(Owner.class, owner.getName())).build();
   }
 }

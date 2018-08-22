@@ -4,20 +4,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 public final class Ownership {
   @NotNull private final Timestamp startedAt;
-  @NotNull private final Timestamp endedAt;
-  @NotNull private final long jobId;
-  @NotNull private final long ownerId;
+  @NotNull private final Optional<Timestamp> endedAt;
+  @NotNull private final int jobId;
+  @NotNull private final int ownerId;
 
   @JsonCreator
   public Ownership(
       @JsonProperty("startedAt") final Timestamp startedAt,
-      @JsonProperty("endedAt") final Timestamp endedAt,
-      @JsonProperty("jobId") final long jobId,
-      @JsonProperty("ownerId") final long ownerId) {
+      @JsonProperty("endedAt") final Optional<Timestamp> endedAt,
+      @JsonProperty("jobId") final int jobId,
+      @JsonProperty("ownerId") final int ownerId) {
     this.startedAt = startedAt;
     this.endedAt = endedAt;
     this.jobId = jobId;
@@ -28,7 +29,7 @@ public final class Ownership {
     return startedAt;
   }
 
-  public Timestamp getEndedAt() {
+  public Optional<Timestamp> getEndedAt() {
     return endedAt;
   }
 
@@ -62,10 +63,10 @@ public final class Ownership {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("Ownership{");
-    sb.append("startedAt=").append(startedAt);
-    sb.append("endedAt=").append(endedAt);
-    sb.append("jobId=").append(jobId);
-    sb.append("ownerId=").append(ownerId);
+    sb.append(",startedAt=").append(startedAt);
+    sb.append(",endedAt=").append(endedAt);
+    sb.append(",jobId=").append(jobId);
+    sb.append(",ownerId=").append(ownerId);
     sb.append("}");
     return sb.toString();
   }
