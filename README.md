@@ -27,16 +27,16 @@ The executable can be found under `build/libs/`
 
 ## Configuration
 
-To run Marquez, you will have to define `config.yaml`. The configuration file is used to specify your database connection. Please copy and edit `config.example.yaml`:
+To run Marquez, you will have to define `config.yml`. The configuration file is used to specify your database connection. Please copy and edit `config.example.yml`:
 
 ```bash
-$ cp config.example.yaml config.yaml
+$ cp config.example.yml config.yml
 ```
 
 Then run the database migration:
 
 ```bash
-$ ./gradlew run --args 'db migrate config.yaml'
+$ ./gradlew run --args 'db migrate config.yml'
 ```
 
 **Note:** When creating your database, we recommend calling it `marquez`.
@@ -44,7 +44,7 @@ $ ./gradlew run --args 'db migrate config.yaml'
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApplication.java)
 
 ```bash
-$ ./gradlew run --args 'server config.yaml'
+$ ./gradlew run --args 'server config.yml'
 ```
 
 Then browse to the admin interface: http://localhost:8081
