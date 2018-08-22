@@ -1,6 +1,5 @@
 plugins {
   id 'application'
-  id 'checkstyle'
   id 'com.github.johnrengelman.shadow' version '2.0.4'
   id 'jacoco'
   id 'java'
