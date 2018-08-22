@@ -1,5 +1,6 @@
 plugins {
   id 'application'
+  id 'checkstyle'
   id 'com.github.johnrengelman.shadow' version '2.0.4'
   id 'jacoco'
   id 'java'
@@ -39,14 +40,6 @@ shadowJar {
 
 runShadow {
   args = ['server', 'config.yaml']
-}
-
-task runDbMigration(type: JavaExec) {
-  group = 'Database'
-  description = 'Migrates the database.'
-  classpath = sourceSets.main.runtimeClasspath
-  main = mainClassName
-  args = ['db', 'migrate', 'config.yaml']
 }
 
 def reportsDir = "$buildDir/reports/coverage";
