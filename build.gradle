@@ -39,13 +39,15 @@ task runDbMigration(type: JavaExec) {
   args = ['db', 'migrate', 'config.yaml']
 }
 
+def reportsDir = "$buildDir/reports/coverage";
+
 jacoco {
   toolVersion = "0.8.1"
-  reportsDir = file("$buildDir/reports/coverage")
+  reportsDir = file(reportsDir)
 }
 
 jacocoTestReport {
   reports {
-    html.destination file("${buildDir}/reports/coverage")
+    html.destination file(reportsDir)
   }
 }
