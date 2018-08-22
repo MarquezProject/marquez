@@ -1,6 +1,6 @@
 # Marquez
 
-[![Coverage Status](https://coveralls.io/repos/github/MarquezProject/marquez/badge.svg?branch=master)](https://coveralls.io/github/MarquezProject/marquez?branch=master) [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status) [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/master/LICENSE)
+[![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/master) [![Coverage Status](https://coveralls.io/repos/github/MarquezProject/marquez/badge.svg?branch=master)](https://coveralls.io/github/MarquezProject/marquez?branch=master) [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status) [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/master/LICENSE)
 
 ## Status
 
