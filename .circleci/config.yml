@@ -10,7 +10,6 @@ jobs:
     steps:
       - checkout
       - run: ./gradlew build
-
   test:
     <<: *defaults
     steps:
