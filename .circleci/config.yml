@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/marquez
+    docker:
+      - image: circleci/openjdk:9-jdk
+    
+    steps:
+      - checkout
+      - run: gradle test
