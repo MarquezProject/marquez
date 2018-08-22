@@ -25,7 +25,7 @@ mainClassName = 'marquez.MarquezApplication'
 
 shadowJar {
   manifest {
-    attributes 'Main-Class': 'marquez.MarquezApplication'
+    attributes 'Main-Class': mainClassName
   }
 }
 
