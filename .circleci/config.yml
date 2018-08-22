@@ -1,10 +1,20 @@
+defaults: &defaults
+  working_directory: ~/marquez
+  docker:
+    - image: circleci/openjdk:9-jdk
+
 version: 2
 jobs:
   build:
-    working_directory: ~/marquez
-    docker:
-      - image: circleci/openjdk:9-jdk
-    
+    <<: *defaults
     steps:
       - checkout
-      - run: gradle test
+      - run: ./gradlew build
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: ./gradlew test
+      - run: ./gradlew jacocoTestReport
+      - run: bash <(curl -s https://codecov.io/bash)
