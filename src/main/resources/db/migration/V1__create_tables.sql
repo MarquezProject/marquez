@@ -1,12 +1,12 @@
 CREATE TABLE owners (
   id         SERIAL PRIMARY KEY,
-  name       VARCHAR(64) NOT NULL,
+  name       VARCHAR(64) UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE jobs (
   id                SERIAL PRIMARY KEY,
-  name              VARCHAR(64) NOT NULL,
+  name              VARCHAR(64) UNIQUE NOT NULL,
   created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at        TIMESTAMP,
   current_version   INTEGER,
@@ -40,7 +40,7 @@ CREATE TABLE job_runs (
   id                        SERIAL PRIMARY KEY,
   created_at                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   job_version_id            INTEGER REFERENCES job_versions(id),
-  run_id                    VARCHAR(255) NOT NULL,
+  run_id                    VARCHAR(255) UNIQUE NOT NULL,
   started_at                TIMESTAMP,
   ended_at                  TIMESTAMP,
   input_dataset_version_id  INTEGER,
@@ -57,7 +57,7 @@ CREATE TABLE job_run_states (
 
 CREATE TABLE datasets (
   id              SERIAL PRIMARY KEY,
-  name            VARCHAR(64) NOT NULL,
+  name            VARCHAR(64) UNIQUE NOT NULL,
   created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at      TIMESTAMP,
   type            INTEGER,
@@ -68,7 +68,7 @@ CREATE TABLE datasets (
 
 CREATE TABLE dbs (
   id             SERIAL PRIMARY KEY,
-  name           VARCHAR(64) NOT NULL,
+  name           VARCHAR(64) UNIQUE NOT NULL,
   created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   type           INTEGER,
   connection_url VARCHAR(255),
