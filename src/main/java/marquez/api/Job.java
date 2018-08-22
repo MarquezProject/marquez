@@ -1,59 +1,47 @@
 package marquez.api;
 
+import org.hibernate.validator.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
 
 public final class Job {
-  @NotNull private final String name;
-  @NotNull private final Timestamp createdAt;
-  @NotNull private final Timestamp updatedAt;
-  @NotNull private final long currentVersion;
-  @NotNull private final long currentOwnership;
-  @NotNull private final Timestamp nominalTime;
-  @NotNull private final String category;
-  @NotNull private final String description;
+  private final int id;
+  private final String name;
+  private final String ownerName;
+  private final Timestamp nominalTime;
+  private final String category;
+  private final String description;
 
   @JsonCreator
   public Job(
-      @JsonProperty("name") final String name,
-      @JsonProperty("createdAt") final Timestamp createdAt,
-      @JsonProperty("updatedAt") final Timestamp updatedAt,
-      @JsonProperty("currentVersion") final long currentVersion,
-      @JsonProperty("currentOwnership") final long currentOwnership,
+      @JsonProperty("id") final int id,
+      @JsonProperty("name") @NotBlank final String name,
+      @JsonProperty("ownerName") final String ownerName,
       @JsonProperty("nominalTime") final Timestamp nominalTime,
       @JsonProperty("category") final String category,
       @JsonProperty("description") final String description) {
+    this.id = id;
     this.name = name;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
-    this.currentVersion = currentVersion;
-    this.currentOwnership = currentOwnership;
+    this.ownerName = ownerName;
     this.nominalTime = nominalTime;
     this.category = category;
     this.description = description;
+  }
+
+  @JsonIgnore
+  public int getId() {
+    return id;
   }
 
   public String getName() {
     return name;
   }
 
-  public Timestamp getCreatedAt() {
-    return createdAt;
-  }
-
-  public Timestamp getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public long getCurrentVersion() {
-    return currentVersion;
-  }
-
-  public long getCurrentOwnership() {
-    return currentOwnership;
+  public String getOwnerName() {
+    return ownerName;
   }
 
   public Timestamp getNominalTime() {
@@ -75,11 +63,9 @@ public final class Job {
 
     final Job other = (Job) o;
 
-    return Objects.equals(name, other.name)
-        && Objects.equals(createdAt, other.createdAt)
-        && Objects.equals(updatedAt, other.updatedAt)
-        && Objects.equals(currentVersion, other.currentVersion)
-        && Objects.equals(currentOwnership, other.currentOwnership)
+    return Objects.equals(id, other.id)
+        && Objects.equals(name, other.name)
+        && Objects.equals(ownerName, other.ownerName)
         && Objects.equals(nominalTime, other.nominalTime)
         && Objects.equals(category, other.category)
         && Objects.equals(description, other.description);
@@ -87,29 +73,19 @@ public final class Job {
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-        name,
-        createdAt,
-        updatedAt,
-        currentVersion,
-        currentOwnership,
-        nominalTime,
-        category,
-        description);
+    return Objects.hash(name, ownerName, nominalTime, category, description);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("Job{");
-    sb.append("name=").append(name);
-    sb.append("createdAt=").append(createdAt);
-    sb.append("updatedAt=").append(updatedAt);
-    sb.append("currentVersion=").append(currentVersion);
-    sb.append("currentOwnership=").append(currentOwnership);
-    sb.append("nominalTime=").append(nominalTime);
-    sb.append("category=").append(category);
-    sb.append("description=").append(description);
+    sb.append("id=").append(id);
+    sb.append(",name=").append(name);
+    sb.append(",owner=").append(ownerName);
+    sb.append(",nominalTime=").append(nominalTime);
+    sb.append(",category=").append(category);
+    sb.append(",description=").append(description);
     sb.append("}");
     return sb.toString();
   }
