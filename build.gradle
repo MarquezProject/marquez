@@ -1,8 +1,8 @@
 plugins {
-  id 'java'
   id 'application'
   id 'com.github.johnrengelman.shadow' version '2.0.4'
   id 'jacoco'
+  id 'java'
 }
 
 repositories {
@@ -42,6 +42,8 @@ runShadow {
 }
 
 task runDbMigration(type: JavaExec) {
+  group = 'Database'
+  description = 'Migrates the database.'
   classpath = sourceSets.main.runtimeClasspath
   main = mainClassName
   args = ['db', 'migrate', 'config.yaml']
