@@ -11,4 +11,4 @@ bin/
 build/
 
 # Marquez configuration
-config.yaml
+config.yml
