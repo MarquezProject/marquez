@@ -2,7 +2,7 @@ plugins {
   id 'java'
   id 'application'
   id 'com.github.johnrengelman.shadow' version '2.0.4'
-  id 'checkstyle'
+  id "com.diffplug.gradle.spotless" version "3.14.0"
   id 'jacoco'
 }
 
@@ -44,18 +44,10 @@ runShadow {
   args = ['server', 'config.yml']
 }
 
-checkstyle {
-    toolVersion '8.12'
-    configFile rootProject.file('checkstyle.xml')
-    ignoreFailures = false
-}
-
-checkstyleMain {
-    source ='src/main/java'
-}
-
-checkstyleTest {
-    source ='src/test/java'
+spotless {
+  java {
+    googleJavaFormat()
+  }
 }
 
 def reportsDir = "$buildDir/reports/coverage";
