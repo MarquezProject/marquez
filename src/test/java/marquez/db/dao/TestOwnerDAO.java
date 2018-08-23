@@ -16,6 +16,5 @@ public class TestOwnerDAO {
 	@Test
 	public void testUpdateOwner() {
 		ownerDAO.insert(new Owner("Amaranta"));
-		// TODO: getOwner
 	}
 }
