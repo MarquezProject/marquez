@@ -1,20 +1,13 @@
 plugins {
+  id 'java'
   id 'application'
   id 'com.github.johnrengelman.shadow' version '2.0.4'
+  id 'checkstyle'
   id 'jacoco'
-  id 'java'
 }
 
 repositories {
   mavenCentral()
-}
-
-compileJava {
-  options.incremental = true
-}
-
-compileTestJava {
-  options.incremental = true
 }
 
 dependencies {
@@ -29,6 +22,14 @@ dependencies {
   testCompile 'org.mockito:mockito-core:2.21.0'
 }
 
+compileJava {
+  options.incremental = true
+}
+
+compileTestJava {
+  options.incremental = true
+}
+
 mainClassName = 'marquez.MarquezApplication'
 
 shadowJar {
@@ -38,7 +39,21 @@ shadowJar {
 }
 
 runShadow {
-  args = ['server', 'config.yaml']
+  args = ['server', 'config.yml']
+}
+
+checkstyle {
+    toolVersion '8.12'
+    configFile rootProject.file('checkstyle.xml')
+    ignoreFailures = false
+}
+
+checkstyleMain {
+    source ='src/main/java'
+}
+
+checkstyleTest {
+    source ='src/test/java'
 }
 
 def reportsDir = "$buildDir/reports/coverage";
