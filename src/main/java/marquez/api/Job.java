@@ -1,11 +1,11 @@
 package marquez.api;
 
-import org.hibernate.validator.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
+import org.hibernate.validator.constraints.NotBlank;
 
 public final class Job {
   private final int id;

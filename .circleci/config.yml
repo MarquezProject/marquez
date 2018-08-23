@@ -14,7 +14,6 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: ./gradlew check
       - run: ./gradlew test
       - run: ./gradlew jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
