@@ -13,7 +13,8 @@ import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
 
 @Path("/owners")
-public class OwnerResource extends BaseResource{
+
+public final class OwnerResource extends BaseResource {
   private final OwnerDAO dao;
 
   public OwnerResource(final OwnerDAO dao) {
