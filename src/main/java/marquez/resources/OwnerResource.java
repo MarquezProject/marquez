@@ -12,7 +12,7 @@ import javax.ws.rs.PathParam;
 import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
 
-@Path("/owners/{owner}")
+@Path("/owners")
 public class OwnerResource extends BaseResource{
   private final OwnerDAO dao;
 
@@ -28,6 +28,7 @@ public class OwnerResource extends BaseResource{
     return Response.created(buildURI(Owner.class, owner.getName())).build();
   }
 
+  @Path("{owner}")
   @DELETE
   @Consumes(APPLICATION_JSON)
   public void deleteOwner(@PathParam("owner") String name) {
