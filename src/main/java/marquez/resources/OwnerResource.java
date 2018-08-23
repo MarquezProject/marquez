@@ -9,7 +9,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
 import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
 
@@ -30,8 +29,8 @@ public class OwnerResource extends BaseResource{
   }
 
   @DELETE
-  @Consumes(MediaType.APPLICATION_JSON)
-  public void deleteOwner(@PathParam("owner") Owner ownerName) {
-    dao.delete(ownerName);
+  @Consumes(APPLICATION_JSON)
+  public void deleteOwner(@PathParam("owner") String name) {
+    dao.delete(name);
   }
 }

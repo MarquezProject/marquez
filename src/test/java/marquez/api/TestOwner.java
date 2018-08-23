@@ -37,6 +37,7 @@ public class TestOwner {
 
     @Test 
     public void testDeleteOwner() {
-        resources.target("/owners").request().delete("Aurelaiano");
+        resources.target("/owners/Aureliano").request().delete();
+        verify(dao).delete("Aureliano");
     }
 }
