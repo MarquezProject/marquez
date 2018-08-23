@@ -47,7 +47,6 @@ runShadow {
 spotless {
   java {
     googleJavaFormat()
-    paddedCell()
   }
 }
 
