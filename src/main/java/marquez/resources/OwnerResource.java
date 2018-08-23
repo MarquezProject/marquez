@@ -14,7 +14,7 @@ import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
 
 @Path("/owners/{owner}")
-public class OwnerResource extends BaseResource {
+public class OwnerResource extends BaseResource{
   private final OwnerDAO dao;
 
   public OwnerResource(final OwnerDAO dao) {
@@ -30,8 +30,8 @@ public class OwnerResource extends BaseResource {
   }
 
   @DELETE
-  @Consumes(APPLICATION_JSON)
-  public void deleteOwner(@PathParam("owner") String ownerName) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  public void deleteOwner(@PathParam("owner") Owner ownerName) {
     dao.delete(ownerName);
   }
 }
