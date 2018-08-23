@@ -29,13 +29,13 @@ public class TestOwner {
 
   @Test
   public void testPostOwner() {
-      resources.target("/owners").request().post(entity(owner, APPLICATION_JSON));
-      verify(dao).insert(owner);
+    resources.target("/owners").request().post(entity(owner, APPLICATION_JSON));
+    verify(dao).insert(owner);
   }
 
-  @Test 
+  @Test
   public void testDeleteOwner() {
-      resources.target("/owners/Aureliano").request().delete();
-      verify(dao).delete("Aureliano");
+    resources.target("/owners/Aureliano").request().delete();
+    verify(dao).delete("Aureliano");
   }
 }
