@@ -45,6 +45,7 @@ runShadow {
 checkstyle {
     toolVersion '8.12'
     configFile rootProject.file('checkstyle.xml')
+    ignoreFailures = false
 }
 
 checkstyleMain {
