@@ -19,7 +19,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
-public class MarquezApplication extends Application<MarquezConfiguration> {
+public final class MarquezApplication extends Application<MarquezConfiguration> {
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRESQL_DB = "postgresql";
 

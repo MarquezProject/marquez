@@ -1,7 +1,9 @@
 !gradle-wrapper.jar
 *.jar
 *.swp
+*.iml
 .classpath
+.idea/
 .gradle/
 .project
 .settings
@@ -9,4 +11,4 @@ bin/
 build/
 
 # Marquez configuration
-config.yaml
+config.yml
