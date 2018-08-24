@@ -30,7 +30,6 @@ public final class OwnerResource extends BaseResource {
 
   @Path("{owner}")
   @DELETE
-  @Consumes(APPLICATION_JSON)
   public Response deleteOwner(@PathParam("owner") String name) {
     dao.delete(name);
     return Response.ok().build();
