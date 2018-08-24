@@ -3,7 +3,6 @@ package marquez.db.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import java.util.List;
 import marquez.api.Owner;
 import marquez.db.dao.fixtures.DAOSetup;
 import org.junit.Before;
@@ -29,17 +28,15 @@ public class TestOwnerDAO {
   }
 
   private static String ownerDeletedAt(String name) {
-    List<String> deletedAts =
-        daoSetup
-            .getJDBI()
-            .withHandle(
-                handle ->
-                    handle
-                        .createQuery("SELECT deleted_at FROM owners WHERE name = :name")
-                        .bind("name", name)
-                        .mapTo(String.class)
-                        .list());
-    return deletedAts.get(0);
+    return daoSetup
+        .getJDBI()
+        .withHandle(
+            handle ->
+                handle
+                    .createQuery("SELECT deleted_at FROM owners WHERE name = :name")
+                    .bind("name", name)
+                    .mapTo(String.class)
+                    .findOnly());
   }
 
   @Test
