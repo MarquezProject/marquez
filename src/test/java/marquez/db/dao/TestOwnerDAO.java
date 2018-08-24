@@ -51,6 +51,9 @@ public class TestOwnerDAO {
     // deleted_at should be null in the DB
     String deletedAt = TestOwnerDAO.ownerDeletedAt(testOwner.getName());
     assertEquals(null, deletedAt);
+
+    // owner is fetchable
+    assertEquals(testOwner, ownerDAO.findByName(testOwner.getName()));
   }
 
   @Test
@@ -61,5 +64,8 @@ public class TestOwnerDAO {
     // deleted_at should be set
     String deletedAt = TestOwnerDAO.ownerDeletedAt(testOwner.getName());
     assertNotEquals(null, deletedAt);
+
+    // owner is no longer fetchable
+    assertEquals(null, ownerDAO.findByName(testOwner.getName()));
   }
 }

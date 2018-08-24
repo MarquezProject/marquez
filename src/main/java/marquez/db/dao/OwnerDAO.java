@@ -9,7 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(OwnerRow.class)
 public interface OwnerDAO {
-  @SqlQuery("SELECT * FROM owners WHERE name = :name")
+  @SqlQuery("SELECT * FROM owners WHERE name = :name AND deleted_at IS NULL")
   Owner findByName(@Bind("name") String name);
 
   @SqlUpdate("INSERT INTO owners (name) VALUES (:name)")
