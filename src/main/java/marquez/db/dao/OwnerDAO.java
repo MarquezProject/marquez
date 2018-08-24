@@ -16,5 +16,5 @@ public interface OwnerDAO {
   void insert(@BindBean final Owner owner);
 
   @SqlUpdate("UPDATE owners SET deleted_at=CURRENT_TIMESTAMP WHERE name = :name")
-  void delete(final String name);
+  void delete(@Bind("name") final String name);
 }
