@@ -48,9 +48,13 @@ public class TestOwner {
 
   @Test
   public void testHashCode() {
+    assertEquals(owner.hashCode(), new Owner("Aureliano").hashCode());
+  }
+
+  @Test
+  public void testEquals() {
     Owner owner2 = new Owner("Aureliano");
     assertTrue(owner.equals(owner2));
     assertTrue(owner2.equals(owner));
-    assertEquals(owner.hashCode(), owner2.hashCode());
   }
 }
