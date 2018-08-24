@@ -2,6 +2,7 @@ package marquez.api;
 
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -12,7 +13,6 @@ import marquez.resources.OwnerResource;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
 public class TestOwner {
   private static final OwnerDAO dao = mock(OwnerDAO.class);
