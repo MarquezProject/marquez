@@ -3,6 +3,7 @@ package marquez.api;
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -43,5 +44,13 @@ public class TestOwner {
   @Test
   public void testToString() {
     assertEquals("Owner{name=Aureliano}", owner.toString());
+  }
+
+  @Test
+  public void testHashCode() {
+    Owner owner2 = new Owner("Aureliano");
+    assertTrue(owner.equals(owner2));
+    assertTrue(owner2.equals(owner));
+    assertEquals(owner.hashCode(), owner2.hashCode());
   }
 }
