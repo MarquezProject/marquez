@@ -12,6 +12,7 @@ import marquez.resources.OwnerResource;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class TestOwner {
   private static final OwnerDAO dao = mock(OwnerDAO.class);
@@ -37,5 +38,10 @@ public class TestOwner {
   public void testDeleteOwner() {
     resources.target("/owners/Aureliano").request().delete();
     verify(dao).delete("Aureliano");
+  }
+
+  @Test
+  public void testToString() {
+    assertEquals("Owner{name=Aureliano}", owner.toString());
   }
 }
