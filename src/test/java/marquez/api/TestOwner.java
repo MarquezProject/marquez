@@ -36,6 +36,12 @@ public class TestOwner {
   }
 
   @Test
+  public void testGetOwner() {
+    resources.target("/owners/Aureliano").request().get();
+    verify(dao).findByName(owner.getName());
+  }
+
+  @Test
   public void testDeleteOwner() {
     resources.target("/owners/Aureliano").request().delete();
     verify(dao).delete("Aureliano");
