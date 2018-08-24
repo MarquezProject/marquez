@@ -1,0 +1,1 @@
+ALTER TABLE owners ADD deleted_at TIMESTAMP;
