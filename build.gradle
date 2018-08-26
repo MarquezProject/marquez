@@ -2,7 +2,7 @@ plugins {
   id 'java'
   id 'application'
   id 'com.github.johnrengelman.shadow' version '2.0.4'
-  id "com.diffplug.gradle.spotless" version "3.14.0"
+  id "com.diffplug.gradle.spotless" version '3.14.0'
   id 'checkstyle'
   id 'jacoco'
 }
@@ -19,9 +19,9 @@ dependencies {
   compile 'org.jdbi:jdbi3-sqlobject:3.3.0'
   compile 'org.postgresql:postgresql:42.2.4'
 
+  testCompile 'com.h2database:h2:1.4.197'
   testCompile 'io.dropwizard:dropwizard-testing:1.3.5'
   testCompile 'junit:junit:4.12'
-  testCompile 'com.h2database:h2:1.4.197'
   testCompile 'org.mockito:mockito-core:2.21.0'
 }
 
@@ -52,29 +52,48 @@ spotless {
   }
 }
 
+def reportsDir = "${buildDir}/reports";
+
 checkstyle {
-  toolVersion '8.12'
-  configFile rootProject.file('checkstyle.xml')
+  toolVersion = '8.12'
+  configFile = rootProject.file('checkstyle.xml')
+}
+
+task checkstyle(type: Checkstyle) {
+  reports {
+    xml {
+      enabled = true
+    }
+    html {
+      enabled = true
+      destination = file("${reportsDir}/checkstyle")
+    }
+  }
 }
 
 checkstyleMain {
-  source ='src/main/java'
+  source = 'src/main/java'
 }
 
 checkstyleTest {
-  source ='src/test/java'
+  source = 'src/test/java'
 }
 
-def reportsDir = "$buildDir/reports/coverage";
+def coverageDir = "${reportsDir}/coverage";
 
 jacoco {
-  toolVersion = "0.8.1"
-  reportsDir = file(reportsDir)
+  toolVersion = '0.8.1'
+  reportsDir = file(coverageDir)
 }
 
 jacocoTestReport {
   reports {
-    xml.enabled = true
-    html.destination file(reportsDir)
+    xml {
+      enabled = true
+    }
+    html {
+      enabled = true
+      destination = file(coverageDir)
+    }
   }
 }
