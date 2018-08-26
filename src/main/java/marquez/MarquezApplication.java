@@ -52,11 +52,11 @@ public class MarquezApplication extends Application<MarquezConfiguration> {
 
   @Override
   public void run(MarquezConfiguration config, Environment env) {
-    migrateDb(config, env);
+    migrateDb(config);
     registerResources(config, env);
   }
 
-  private void migrateDb(MarquezConfiguration config, Environment env) throws FlywayException {
+  private void migrateDb(MarquezConfiguration config) throws FlywayException {
     final Flyway flyway = new Flyway();
     final DataSourceFactory database = config.getDataSourceFactory();
     flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
