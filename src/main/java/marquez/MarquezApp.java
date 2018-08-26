@@ -74,7 +74,7 @@ public class MarquezApp extends Application<MarquezConfig> {
       flyway.repair();
 
       LOG.info("Successfully repaired database, stopping appication...");
-      // Next, we'll signal appication termination and manually stop the throwable from propagating
+      // Next, we'll signal appication termination and not propagating the throwable
       // up the stack.
       onFatalError();
     }
