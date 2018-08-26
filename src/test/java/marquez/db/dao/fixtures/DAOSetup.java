@@ -5,23 +5,23 @@ import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.testing.junit.DropwizardAppRule;
-import marquez.MarquezApplication;
-import marquez.MarquezConfiguration;
+import marquez.MarquezApp;
+import marquez.MarquezConfig;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.h2.H2DatabasePlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
 /** Init code for testing DAOs against h2 */
-public class DAOSetup extends DropwizardAppRule<MarquezConfiguration> {
+public class DAOSetup extends DropwizardAppRule<MarquezConfig> {
 
   /** config file for h2 */
-  private static final String config = DAOSetup.class.getResource("/config.test.yaml").getPath();
+  private static final String h2Config = DAOSetup.class.getResource("/config.test.yaml").getPath();
 
   private Jdbi jdbi;
 
   public DAOSetup() {
-    super(MarquezApplication.class, config);
+    super(MarquezApp.class, h2Config);
   }
 
   @Override
@@ -29,8 +29,8 @@ public class DAOSetup extends DropwizardAppRule<MarquezConfiguration> {
     super.before();
     // init db
     JdbiFactory factory = new JdbiFactory();
-    MarquezConfiguration configuration = this.getConfiguration();
-    DataSourceFactory dataSourceFactory = configuration.getDataSourceFactory();
+    MarquezConfig config = this.getConfiguration();
+    DataSourceFactory dataSourceFactory = config.getDataSourceFactory();
     ManagedDataSource dataSource = dataSourceFactory.build(this.getEnvironment().metrics(), "h2");
     jdbi =
         factory
@@ -39,7 +39,7 @@ public class DAOSetup extends DropwizardAppRule<MarquezConfiguration> {
             .installPlugin(new H2DatabasePlugin());
 
     // setup schema
-    FlywayFactory flywayFactory = configuration.getFlywayFactory();
+    FlywayFactory flywayFactory = config.getFlywayFactory();
     Flyway flyway = flywayFactory.build(dataSource);
     flyway.migrate();
   }

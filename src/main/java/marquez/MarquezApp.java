@@ -21,12 +21,12 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
-public class MarquezApplication extends Application<MarquezConfiguration> {
+public class MarquezApp extends Application<MarquezConfig> {
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRESQL_DB = "postgresql";
 
   public static void main(String[] args) throws Exception {
-    new MarquezApplication().run(args);
+    new MarquezApp().run(args);
   }
 
   @Override
@@ -35,28 +35,28 @@ public class MarquezApplication extends Application<MarquezConfiguration> {
   }
 
   @Override
-  public void initialize(Bootstrap<MarquezConfiguration> bootstrap) {
+  public void initialize(Bootstrap<MarquezConfig> bootstrap) {
     bootstrap.addBundle(
-        new FlywayBundle<MarquezConfiguration>() {
+        new FlywayBundle<MarquezConfig>() {
           @Override
-          public DataSourceFactory getDataSourceFactory(MarquezConfiguration config) {
+          public DataSourceFactory getDataSourceFactory(MarquezConfig config) {
             return config.getDataSourceFactory();
           }
 
           @Override
-          public FlywayFactory getFlywayFactory(MarquezConfiguration config) {
+          public FlywayFactory getFlywayFactory(MarquezConfig config) {
             return config.getFlywayFactory();
           }
         });
   }
 
   @Override
-  public void run(MarquezConfiguration config, Environment env) {
+  public void run(MarquezConfig config, Environment env) {
     migrateDb(config);
     registerResources(config, env);
   }
 
-  private void migrateDb(MarquezConfiguration config) throws FlywayException {
+  private void migrateDb(MarquezConfig config) throws FlywayException {
     final Flyway flyway = new Flyway();
     final DataSourceFactory database = config.getDataSourceFactory();
     flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
@@ -71,7 +71,7 @@ public class MarquezApplication extends Application<MarquezConfiguration> {
     }
   }
 
-  private void registerResources(MarquezConfiguration config, Environment env) {
+  private void registerResources(MarquezConfig config, Environment env) {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
