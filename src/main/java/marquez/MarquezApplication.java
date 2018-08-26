@@ -16,15 +16,16 @@ import marquez.resources.JobResource;
 import marquez.resources.OwnerResource;
 import marquez.resources.PingResource;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
-public final class MarquezApplication extends Application<MarquezConfiguration> {
+public class MarquezApplication extends Application<MarquezConfiguration> {
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRESQL_DB = "postgresql";
 
-  public static void main(final String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {
     new MarquezApplication().run(args);
   }
 
@@ -34,35 +35,43 @@ public final class MarquezApplication extends Application<MarquezConfiguration> 
   }
 
   @Override
-  public void initialize(final Bootstrap<MarquezConfiguration> bootstrap) {
+  public void initialize(Bootstrap<MarquezConfiguration> bootstrap) {
     bootstrap.addBundle(
         new FlywayBundle<MarquezConfiguration>() {
           @Override
-          public DataSourceFactory getDataSourceFactory(final MarquezConfiguration config) {
+          public DataSourceFactory getDataSourceFactory(MarquezConfiguration config) {
             return config.getDataSourceFactory();
           }
 
           @Override
-          public FlywayFactory getFlywayFactory(final MarquezConfiguration config) {
+          public FlywayFactory getFlywayFactory(MarquezConfiguration config) {
             return config.getFlywayFactory();
           }
         });
   }
 
   @Override
-  public void run(final MarquezConfiguration config, final Environment env) {
+  public void run(MarquezConfiguration config, Environment env) {
     migrateDb(config, env);
     registerResources(config, env);
   }
 
-  private void migrateDb(final MarquezConfiguration config, final Environment env) {
+  private void migrateDb(MarquezConfiguration config, Environment env) throws FlywayException {
     final Flyway flyway = new Flyway();
     final DataSourceFactory database = config.getDataSourceFactory();
     flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
-    flyway.migrate();
+    // Attempt to perform a database migration. An exception is thrown on failed migration attempts
+    // requiring we handle the throwable and apply a repair on the database to fix any
+    // issues before rethrowing the exception.
+    try {
+      flyway.migrate();
+    } catch (FlywayException e) {
+      flyway.repair();
+      throw e;
+    }
   }
 
-  private void registerResources(final MarquezConfiguration config, final Environment env) {
+  private void registerResources(MarquezConfiguration config, Environment env) {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
