@@ -16,7 +16,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 public class DAOSetup extends DropwizardAppRule<MarquezConfig> {
 
   /** config file for h2 */
-  private static final String h2Config = DAOSetup.class.getResource("/config.test.yaml").getPath();
+  private static final String h2Config = DAOSetup.class.getResource("/config.test.yml").getPath();
 
   private Jdbi jdbi;
 

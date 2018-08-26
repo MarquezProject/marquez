@@ -2,22 +2,18 @@ package marquez;
 
 import static org.junit.Assert.assertEquals;
 
+import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import java.net.URI;
 import javax.ws.rs.core.Response;
-import org.jdbi.v3.testing.JdbiRule;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
 
 public class MarquezAppIntegrationTest {
-  @ClassRule public static final JdbiRule DB = JdbiRule.embeddedPostgres();
-
   @ClassRule
   public static final DropwizardAppRule<MarquezConfig> APP =
-      new DropwizardAppRule<>(MarquezApp.class, "config.yml");
-
-  @ClassRule public static final RuleChain chain = RuleChain.outerRule(DB).around(APP);
+      new DropwizardAppRule<>(
+          MarquezApp.class, ResourceHelpers.resourceFilePath("config.test.yml"));
 
   @Test
   public void runAppTest() {
