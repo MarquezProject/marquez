@@ -20,8 +20,12 @@ import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MarquezApp extends Application<MarquezConfig> {
+  private static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
+
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRESQL_DB = "postgresql";
 
@@ -52,22 +56,23 @@ public class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void run(MarquezConfig config, Environment env) {
-    migrateDb(config);
+    migrateDbOrError(config);
     registerResources(config, env);
   }
 
-  private void migrateDb(MarquezConfig config) throws FlywayException {
+  private void migrateDbOrError(MarquezConfig config) {
     final Flyway flyway = new Flyway();
     final DataSourceFactory database = config.getDataSourceFactory();
     flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts
     // requiring we handle the throwable and apply a repair on the database to fix any
-    // issues before rethrowing the exception.
+    // issues before terminating.
     try {
       flyway.migrate();
     } catch (FlywayException e) {
+      LOG.error("Failed to apply migration to database.", e.getMessage());
       flyway.repair();
-      throw e;
+      onFatalError(); // Signal appication termination.
     }
   }
 
