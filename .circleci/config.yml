@@ -9,7 +9,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: ./gradlew build
+      - run: ./gradlew clean build
   test:
     <<: *defaults
     steps:
