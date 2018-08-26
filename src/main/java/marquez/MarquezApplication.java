@@ -16,7 +16,6 @@ import marquez.resources.JobResource;
 import marquez.resources.OwnerResource;
 import marquez.resources.PingResource;
 import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
@@ -53,6 +52,17 @@ public final class MarquezApplication extends Application<MarquezConfiguration> 
   @Override
   public void run(final MarquezConfiguration config, final Environment env) {
     migrateDb(config, env);
+    registerResources(config, env);
+  }
+
+  private void migrateDb(final MarquezConfiguration config, final Environment env) {
+    final Flyway flyway = new Flyway();
+    final DataSourceFactory database = config.getDataSourceFactory();
+    flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
+    flyway.migrate();
+  }
+
+  private void registerResources(final MarquezConfiguration config, final Environment env) {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
@@ -71,13 +81,5 @@ public final class MarquezApplication extends Application<MarquezConfiguration> 
 
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));
-  }
-
-  private void migrateDb(final MarquezConfiguration config, final Environment env)
-      throws FlywayException {
-    final Flyway flyway = new Flyway();
-    final DataSourceFactory database = config.getDataSourceFactory();
-    flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
-    flyway.migrate();
   }
 }
