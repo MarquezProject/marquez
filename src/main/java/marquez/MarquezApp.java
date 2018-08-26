@@ -72,7 +72,11 @@ public class MarquezApp extends Application<MarquezConfig> {
     } catch (FlywayException e) {
       LOG.error("Failed to apply migration to database.", e.getMessage());
       flyway.repair();
-      onFatalError(); // Signal appication termination.
+
+      LOG.info("Successfully repaired database, stopping appication...");
+      // Next, we'll signal appication termination and manually stop the throwable from propagating
+      // up the stack.
+      onFatalError();
     }
   }
 
