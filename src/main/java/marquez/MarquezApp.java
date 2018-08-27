@@ -15,16 +15,22 @@ import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
 import marquez.resources.OwnerResource;
 import marquez.resources.PingResource;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public final class MarquezApplication extends Application<MarquezConfiguration> {
+public class MarquezApp extends Application<MarquezConfig> {
+  private static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
+
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRESQL_DB = "postgresql";
 
-  public static void main(final String[] args) throws Exception {
-    new MarquezApplication().run(args);
+  public static void main(String[] args) throws Exception {
+    new MarquezApp().run(args);
   }
 
   @Override
@@ -33,23 +39,47 @@ public final class MarquezApplication extends Application<MarquezConfiguration> 
   }
 
   @Override
-  public void initialize(final Bootstrap<MarquezConfiguration> bootstrap) {
+  public void initialize(Bootstrap<MarquezConfig> bootstrap) {
     bootstrap.addBundle(
-        new FlywayBundle<MarquezConfiguration>() {
+        new FlywayBundle<MarquezConfig>() {
           @Override
-          public DataSourceFactory getDataSourceFactory(final MarquezConfiguration config) {
+          public DataSourceFactory getDataSourceFactory(MarquezConfig config) {
             return config.getDataSourceFactory();
           }
 
           @Override
-          public FlywayFactory getFlywayFactory(final MarquezConfiguration config) {
+          public FlywayFactory getFlywayFactory(MarquezConfig config) {
             return config.getFlywayFactory();
           }
         });
   }
 
   @Override
-  public void run(final MarquezConfiguration config, final Environment env) {
+  public void run(MarquezConfig config, Environment env) {
+    migrateDbOrError(config);
+    registerResources(config, env);
+  }
+
+  private void migrateDbOrError(MarquezConfig config) {
+    final Flyway flyway = new Flyway();
+    final DataSourceFactory database = config.getDataSourceFactory();
+    flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
+    // Attempt to perform a database migration. An exception is thrown on failed migration attempts
+    // requiring we handle the throwable and apply a repair on the database to fix any
+    // issues before terminating.
+    try {
+      flyway.migrate();
+    } catch (FlywayException e) {
+      LOG.error("Failed to apply migration to database.", e.getMessage());
+      flyway.repair();
+
+      LOG.info("Successfully repaired database, stopping app...");
+      // The throwable is not propagating up the stack.
+      onFatalError(); // Signal app termination.
+    }
+  }
+
+  private void registerResources(MarquezConfig config, Environment env) {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
