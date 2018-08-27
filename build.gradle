@@ -62,13 +62,9 @@ checkstyle {
 
 task checkstyle(type: Checkstyle) {
   reports {
-    xml {
-      enabled = true
-    }
-    html {
-      enabled = true
-      destination = file("${reportsDir}/checkstyle")
-    }
+    xml.enabled = true
+    html.enabled = true
+    html.destination = file("${reportsDir}/checkstyle")
   }
 }
 
@@ -89,12 +85,8 @@ jacoco {
 
 jacocoTestReport {
   reports {
-    xml {
-      enabled = true
-    }
-    html {
-      enabled = true
-      destination = file(coverageDir)
-    }
+    xml.enabled = true
+    html.enabled = true
+    html.destination = file(coverageDir)
   }
 }
