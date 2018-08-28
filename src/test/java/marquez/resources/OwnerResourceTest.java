@@ -7,10 +7,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
+import org.junit.Before;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -23,6 +26,12 @@ public class OwnerResourceTest {
       ResourceTestRule.builder().addResource(new OwnerResource(dao)).build();
 
   private final Owner owner = new Owner("Aureliano");
+
+
+  @Before
+  public void setup() {
+      when(dao.findByName(eq("Aureliano"))).thenReturn(owner);
+  }
 
   @After
   public void tearDown() {
@@ -39,6 +48,7 @@ public class OwnerResourceTest {
   public void testGetOwner() {
     resources.target("/owners/Aureliano").request().get();
     verify(dao).findByName(owner.getName());
+    assertEquals(resources.target("/owners/Aureliano").request().get(Owner.class), owner);
   }
 
   @Test
