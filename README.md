@@ -41,7 +41,7 @@ $ ./gradlew run --args 'db migrate config.yml'
 
 **Note:** When creating your database, we recommend calling it `marquez`.
 
-## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApplication.java)
+## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
 
 ```bash
 $ ./gradlew run --args 'server config.yml'
