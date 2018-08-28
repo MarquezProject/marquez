@@ -4,6 +4,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.codahale.metrics.annotation.Timed;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -31,6 +32,7 @@ public final class OwnerResource extends BaseResource {
 
   @Path("{owner}")
   @GET
+  @Produces(APPLICATION_JSON)
   public Response getOwner(@PathParam("owner") String name) {
     return Response.ok(dao.findByName(name)).build();
   }
