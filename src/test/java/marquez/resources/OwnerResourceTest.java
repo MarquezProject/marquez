@@ -1,4 +1,4 @@
-package marquez.api;
+package marquez.resources;
 
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -9,13 +9,13 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
-import marquez.resources.OwnerResource;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class TestOwner {
+public class OwnerResourceTest {
   private static final OwnerDAO dao = mock(OwnerDAO.class);
 
   @ClassRule
