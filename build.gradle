@@ -34,7 +34,7 @@ compileTestJava {
   options.incremental = true
 }
 
-mainClassName = 'marquez.MarquezApp'
+mainClassName = 'marquez.MarquezApplication'
 
 shadowJar {
   manifest {
