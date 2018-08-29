@@ -1,28 +1,16 @@
-defaults: &defaults
-  working_directory: ~/marquez
-  docker:
-    - image: circleci/openjdk:9-jdk
-
 version: 2
 jobs:
   build:
-    <<: *defaults
+    working_directory: ~/marquez
+    docker:
+      - image: circleci/openjdk:9-jdk
     steps:
       - checkout
-      - run: ./gradlew clean build
-  test:
-    <<: *defaults
-    steps:
-      - checkout
-      - run: ./gradlew test
-      - run: ./gradlew jacocoTestReport
+      - run: ./gradlew --no-daemon clean test jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
-
-workflows:
-  version: 2
-  build_and_test:
-    jobs:
-      - build
-      - test:
-          requires:
-            - build
+      - deploy:
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker tag app "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
+              docker push "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
+            fi
