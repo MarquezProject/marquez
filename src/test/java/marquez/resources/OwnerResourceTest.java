@@ -1,21 +1,24 @@
-package marquez.api;
+package marquez.resources;
 
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
-import marquez.resources.OwnerResource;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class TestOwner {
+public class OwnerResourceTest {
   private static final OwnerDAO dao = mock(OwnerDAO.class);
 
   @ClassRule
@@ -23,6 +26,11 @@ public class TestOwner {
       ResourceTestRule.builder().addResource(new OwnerResource(dao)).build();
 
   private final Owner owner = new Owner("Aureliano");
+
+  @Before
+  public void setup() {
+    when(dao.findByName(eq("Aureliano"))).thenReturn(owner);
+  }
 
   @After
   public void tearDown() {
@@ -39,6 +47,7 @@ public class TestOwner {
   public void testGetOwner() {
     resources.target("/owners/Aureliano").request().get();
     verify(dao).findByName(owner.getName());
+    assertEquals(resources.target("/owners/Aureliano").request().get(Owner.class), owner);
   }
 
   @Test
