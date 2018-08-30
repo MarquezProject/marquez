@@ -2,6 +2,8 @@
 
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/master) [![Codecov](https://img.shields.io/codecov/c/github/MarquezProject/marquez.svg)](https://codecov.io/gh/MarquezProject/marquez) [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status) [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/master/LICENSE) [![Known Vulnerabilities](https://snyk.io/test/github/MarquezProject/marquez/badge.svg)](https://snyk.io/test/github/MarquezProject/marquez)
 
+Marquez is a fundamental core service for collection, aggregation, and visualization of all metadata within a data ecosystem. It maintains the provenance of how datasets are consumed and produced, provides visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
+
 ## Status
 
 This project is under active development at [WeWork](https://www.wework.com/) and [Stitch Fix](https://www.stitchfix.com) (in collaboration with many others organizations).
