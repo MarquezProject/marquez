@@ -1,11 +1,11 @@
 CREATE TABLE owners (
-  id         SERIAL PRIMARY KEY,
+  guid       UUID PRIMARY KEY,
   name       VARCHAR(64) UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE jobs (
-  id                SERIAL PRIMARY KEY,
+  guid              UUID PRIMARY KEY,
   name              VARCHAR(64) UNIQUE NOT NULL,
   created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at        TIMESTAMP,
@@ -17,46 +17,46 @@ CREATE TABLE jobs (
 );
 
 CREATE TABLE ownerships (
-  id         SERIAL PRIMARY KEY,
+  guid       UUID PRIMARY KEY,
   started_at TIMESTAMP,
   ended_at   TIMESTAMP,
-  job_id     INTEGER REFERENCES jobs(id),
-  owner_id   INTEGER REFERENCES owners(id)
+  job_guid   UUID REFERENCES jobs(guid),
+  owner_guid UUID REFERENCES owners(guid)
 );
 
 CREATE TABLE job_versions (
-  id             SERIAL PRIMARY KEY,
-  created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at     TIMESTAMP,
-  input_dataset  VARCHAR(64) NOT NULL,
-  output_dataset VARCHAR(64) NOT NULL,
-  job_id         INTEGER REFERENCES jobs(id),
-  git_repo_uri   VARCHAR(255),
-  git_sha        VARCHAR(255),
-  latest_run_id  INTEGER
+  guid            UUID PRIMARY KEY,
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at      TIMESTAMP,
+  input_dataset   VARCHAR(64) NOT NULL,
+  output_dataset  VARCHAR(64) NOT NULL,
+  job_guid        UUID REFERENCES jobs(guid),
+  git_repo_uri    VARCHAR(255),
+  git_sha         VARCHAR(255),
+  latest_run_guid UUID
 );
 
 CREATE TABLE job_runs (
-  id                        SERIAL PRIMARY KEY,
-  created_at                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  job_version_id            INTEGER REFERENCES job_versions(id),
-  run_id                    VARCHAR(255) UNIQUE NOT NULL,
-  started_at                TIMESTAMP,
-  ended_at                  TIMESTAMP,
-  input_dataset_version_id  INTEGER,
-  output_dataset_version_id INTEGER,
-  latest_heartbeat          TIMESTAMP
+  guid                        UUID PRIMARY KEY,
+  created_at                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  job_version_guid            UUID REFERENCES job_versions(guid),
+  run_guid                    VARCHAR(255) UNIQUE NOT NULL,
+  started_at                  TIMESTAMP,
+  ended_at                    TIMESTAMP,
+  input_dataset_version_guid  UUID,
+  output_dataset_version_guid UUID,
+  latest_heartbeat            TIMESTAMP
 );
 
 CREATE TABLE job_run_states (
-  id              SERIAL PRIMARY KEY,
+  guid            UUID PRIMARY KEY,
   transitioned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  job_run_id      INTEGER REFERENCES job_runs(id),
+  job_run_guid    UUID REFERENCES job_runs(guid),
   state           INTEGER
 );
 
 CREATE TABLE datasets (
-  id              SERIAL PRIMARY KEY,
+  guid            UUID PRIMARY KEY,
   name            VARCHAR(64) UNIQUE NOT NULL,
   created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at      TIMESTAMP,
@@ -67,7 +67,7 @@ CREATE TABLE datasets (
 );
 
 CREATE TABLE dbs (
-  id             SERIAL PRIMARY KEY,
+  guid           UUID PRIMARY KEY,
   name           VARCHAR(64) UNIQUE NOT NULL,
   created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   type           INTEGER,
@@ -76,17 +76,17 @@ CREATE TABLE dbs (
 );
 
 CREATE TABLE db_table_versions (
-  id          SERIAL PRIMARY KEY,
-  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  dataset_id  INTEGER REFERENCES datasets(id),
-  db_id       INTEGER REFERENCES dbs(id),
+  guid          UUID PRIMARY KEY,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  dataset_guid  UUID REFERENCES datasets(guid),
+  db_guid       UUID REFERENCES dbs(guid),
   description TEXT NOT NULL
 );
 
 CREATE TABLE iceberg_table_versions (
-  id                   SERIAL PRIMARY KEY,
+  guid                 UUID PRIMARY KEY,
   created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  dataset_id           INTEGER REFERENCES datasets(id),
+  dataset_guid         UUID REFERENCES datasets(guid),
   previous_snapshot_id BIGINT,
   current_snapshot_id  BIGINT,
   metadata_location    VARCHAR(255)
