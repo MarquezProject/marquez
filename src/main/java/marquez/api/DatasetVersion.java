@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.sql.Timestamp;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
@@ -15,16 +16,16 @@ import javax.validation.constraints.NotNull;
 })
 public abstract class DatasetVersion {
   @NotNull private final Timestamp createdAt;
-  @NotNull private final long datasetId;
+  @NotNull private final UUID datasetGuid;
   @NotNull private final URI schemaUri;
 
   @JsonCreator
   public DatasetVersion(
       @JsonProperty("createdAt") final Timestamp createdAt,
-      @JsonProperty("datasetId") final long datasetId,
+      @JsonProperty("datasetGuid") final UUID datasetGuid,
       @JsonProperty("schemaUri") final URI schemaUri) {
     this.createdAt = createdAt;
-    this.datasetId = datasetId;
+    this.datasetGuid = datasetGuid;
     this.schemaUri = schemaUri;
   }
 
@@ -32,8 +33,8 @@ public abstract class DatasetVersion {
     return createdAt;
   }
 
-  public long getDatasetId() {
-    return datasetId;
+  public UUID getDatasetGuid() {
+    return datasetGuid;
   }
 
   public URI getSchemaUri() {

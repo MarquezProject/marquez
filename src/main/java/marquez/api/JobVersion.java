@@ -4,30 +4,31 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 public final class JobVersion {
   @NotNull private final Timestamp createdAt;
   @NotNull private final Timestamp updatedAt;
-  @NotNull private final long jobId;
+  @NotNull private final UUID jobGuid;
   @NotNull private final String gitRepoUri;
   @NotNull private final String gitSha;
-  @NotNull private final long latestRunId;
+  @NotNull private final UUID latestRunGuid;
 
   @JsonCreator
   public JobVersion(
       @JsonProperty("createdAt") final Timestamp createdAt,
       @JsonProperty("updatedAt") final Timestamp updatedAt,
-      @JsonProperty("jobId") final long jobId,
+      @JsonProperty("jobGuid") final UUID jobGuid,
       @JsonProperty("gitRepoUri") final String gitRepoUri,
       @JsonProperty("gitSha") final String gitSha,
-      @JsonProperty("latestRunId") final long latestRunId) {
+      @JsonProperty("latestRunGuid") final UUID latestRunId) {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.jobId = jobId;
+    this.jobGuid = jobGuid;
     this.gitRepoUri = gitRepoUri;
     this.gitSha = gitSha;
-    this.latestRunId = latestRunId;
+    this.latestRunGuid = latestRunId;
   }
 
   public Timestamp getCreatedAt() {
@@ -38,8 +39,8 @@ public final class JobVersion {
     return updatedAt;
   }
 
-  public long getJobId() {
-    return jobId;
+  public UUID getJobGuid() {
+    return jobGuid;
   }
 
   public String getGitRepoUri() {
@@ -50,8 +51,8 @@ public final class JobVersion {
     return gitSha;
   }
 
-  public long getLatestRunId() {
-    return latestRunId;
+  public UUID getLatestRunGuid() {
+    return latestRunGuid;
   }
 
   @Override
@@ -63,15 +64,15 @@ public final class JobVersion {
 
     return Objects.equals(createdAt, other.createdAt)
         && Objects.equals(updatedAt, other.updatedAt)
-        && Objects.equals(jobId, other.jobId)
+        && Objects.equals(jobGuid, other.jobGuid)
         && Objects.equals(gitRepoUri, other.gitRepoUri)
         && Objects.equals(gitSha, other.gitSha)
-        && Objects.equals(latestRunId, other.latestRunId);
+        && Objects.equals(latestRunGuid, other.latestRunGuid);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdAt, updatedAt, jobId, gitRepoUri, gitSha, latestRunId);
+    return Objects.hash(createdAt, updatedAt, jobGuid, gitRepoUri, gitSha, latestRunGuid);
   }
 
   @Override
@@ -80,10 +81,10 @@ public final class JobVersion {
     sb.append("JobVersion{");
     sb.append("createdAt=").append(createdAt);
     sb.append("updatedAt=").append(updatedAt);
-    sb.append("jobId=").append(jobId);
+    sb.append("jobGuid=").append(jobGuid);
     sb.append("gitRepoUri=").append(gitRepoUri);
     sb.append("gitSha=").append(gitSha);
-    sb.append("latestRunId=").append(latestRunId);
+    sb.append("latestRunGuid=").append(latestRunGuid);
     sb.append("}");
     return sb.toString();
   }

@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class Ownership {
-  private final int id;
+  private final int guid;
   private final Timestamp startedAt;
   private final Optional<Timestamp> endedAt;
   private final String jobName;
@@ -16,12 +16,12 @@ public final class Ownership {
 
   @JsonCreator
   public Ownership(
-      @JsonProperty("id") final int id,
+      @JsonProperty("guid") final int guid,
       @JsonProperty("startedAt") final Timestamp startedAt,
       @JsonProperty("endedAt") final Optional<Timestamp> endedAt,
       @JsonProperty("jobName") final String jobName,
       @JsonProperty("ownerName") final String ownerName) {
-    this.id = id;
+    this.guid = guid;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
     this.jobName = jobName;
@@ -29,8 +29,8 @@ public final class Ownership {
   }
 
   @JsonIgnore
-  public int getId() {
-    return id;
+  public int getGuid() {
+    return guid;
   }
 
   public Timestamp getStartedAt() {
@@ -56,7 +56,7 @@ public final class Ownership {
 
     final Ownership other = (Ownership) o;
 
-    return Objects.equals(id, other.id)
+    return Objects.equals(guid, other.guid)
         && Objects.equals(startedAt, other.startedAt)
         && Objects.equals(endedAt, other.endedAt)
         && Objects.equals(jobName, other.jobName)
@@ -72,7 +72,7 @@ public final class Ownership {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("Ownership{");
-    sb.append("id=").append(id);
+    sb.append("guid=").append(guid);
     sb.append(",startedAt=").append(startedAt);
     sb.append(",endedAt=").append(endedAt);
     sb.append(",jobName=").append(jobName);
