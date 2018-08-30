@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response;
 import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
 
+import java.util.UUID;
+
 @Path("/owners")
 public final class OwnerResource extends BaseResource {
   private final OwnerDAO dao;
@@ -26,7 +28,7 @@ public final class OwnerResource extends BaseResource {
   @Consumes(APPLICATION_JSON)
   @Timed
   public Response create(final Owner owner) {
-    dao.insert(owner);
+    dao.insert(UUID.randomUUID(), owner);
     return Response.created(buildURI(Owner.class, owner.getName())).build();
   }
 

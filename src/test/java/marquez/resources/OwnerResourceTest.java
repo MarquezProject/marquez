@@ -4,6 +4,7 @@ import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -17,6 +18,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import java.util.UUID;
 
 public class OwnerResourceTest {
   private static final OwnerDAO dao = mock(OwnerDAO.class);
@@ -40,7 +43,7 @@ public class OwnerResourceTest {
   @Test
   public void testPostOwner() {
     resources.target("/owners").request().post(entity(owner, APPLICATION_JSON));
-    verify(dao).insert(owner);
+    verify(dao).insert(any(UUID.class), eq(owner));
   }
 
   @Test
