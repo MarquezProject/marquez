@@ -22,13 +22,13 @@ public final class JobVersion {
       @JsonProperty("jobGuid") final UUID jobGuid,
       @JsonProperty("gitRepoUri") final String gitRepoUri,
       @JsonProperty("gitSha") final String gitSha,
-      @JsonProperty("latestRunGuid") final UUID latestRunId) {
+      @JsonProperty("latestRunGuid") final UUID latestRunGuid) {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.jobGuid = jobGuid;
     this.gitRepoUri = gitRepoUri;
     this.gitSha = gitSha;
-    this.latestRunGuid = latestRunId;
+    this.latestRunGuid = latestRunGuid;
   }
 
   public Timestamp getCreatedAt() {
