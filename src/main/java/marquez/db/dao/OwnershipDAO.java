@@ -9,10 +9,10 @@ public interface OwnershipDAO {
   static final Logger LOG = LoggerFactory.getLogger(OwnershipDAO.class);
 
   @SqlQuery(
-      "INSERT INTO ownerships (job_id, owner_id) "
+      "INSERT INTO ownerships (job_guid, owner_guid) "
           + "VALUES ("
-          + "(SELECT id FROM jobs WHERE name = :jobName),"
-          + "(SELECT id FROM owners WHERE name = :ownerName)"
+          + "(SELECT guid FROM jobs WHERE name = :jobName),"
+          + "(SELECT guid FROM owners WHERE name = :ownerName)"
           + ")")
   int insert(@Bind("jobName") String jobName, @Bind("ownerName") String ownerName);
 }

@@ -3,6 +3,7 @@ package marquez.db.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import java.util.UUID;
 import marquez.api.Owner;
 import marquez.db.dao.fixtures.DAOSetup;
 import org.junit.Before;
@@ -41,7 +42,7 @@ public class TestOwnerDAO {
 
   @Test
   public void testCreateOwner() {
-    ownerDAO.insert(testOwner);
+    ownerDAO.insert(UUID.randomUUID(), testOwner);
     Owner o = ownerDAO.findByName(testOwner.getName());
     assertEquals(testOwner.getName(), o.getName());
 
@@ -55,7 +56,7 @@ public class TestOwnerDAO {
 
   @Test
   public void testDeleteOwner() {
-    ownerDAO.insert(testOwner);
+    ownerDAO.insert(UUID.randomUUID(), testOwner);
     ownerDAO.delete(testOwner.getName());
 
     // deleted_at should be set

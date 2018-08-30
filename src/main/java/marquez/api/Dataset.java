@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 public final class Dataset {
@@ -22,7 +23,7 @@ public final class Dataset {
   @NotNull private final Timestamp updatedAt;
   @NotNull private final Type type;
   @NotNull private final Origin origin;
-  @NotNull private final long currentVersion;
+  @NotNull private final UUID currentVersion;
   @NotNull private final String description;
 
   @JsonCreator
@@ -32,7 +33,7 @@ public final class Dataset {
       @JsonProperty("updatedAt") final Timestamp updatedAt,
       @JsonProperty("type") final Type type,
       @JsonProperty("origin") final Origin origin,
-      @JsonProperty("currentVersion") final long currentVersion,
+      @JsonProperty("currentVersion") final UUID currentVersion,
       @JsonProperty("description") final String description) {
     this.name = name;
     this.createdAt = createdAt;
@@ -63,7 +64,7 @@ public final class Dataset {
     return origin;
   }
 
-  public long getCurrentVersion() {
+  public UUID getCurrentVersion() {
     return currentVersion;
   }
 

@@ -5,38 +5,39 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 public final class JobRun {
   @NotNull private final Timestamp createdAt;
-  @NotNull private final String runId;
+  @NotNull private final String runGuid;
   @NotNull private final List<String> runArgs;
   @NotNull private final Timestamp startedAt;
   @NotNull private final Timestamp endedAt;
-  @NotNull private final long jobVersionId;
-  @NotNull private final long inputDatasetVersionId;
-  @NotNull private final long outputDatasetVersionId;
+  @NotNull private final UUID jobVersionGuid;
+  @NotNull private final UUID inputDatasetVersionGuid;
+  @NotNull private final UUID outputDatasetVersionGuid;
   @NotNull private final Timestamp latestHeartbeat;
 
   @JsonCreator
   public JobRun(
       @JsonProperty("createdAt") final Timestamp createdAt,
-      @JsonProperty("runId") final String runId,
+      @JsonProperty("runGuid") final String runGuid,
       @JsonProperty("runArgs") final List<String> runArgs,
       @JsonProperty("startedAt") final Timestamp startedAt,
       @JsonProperty("endedAt") final Timestamp endedAt,
-      @JsonProperty("jobVersionId") final long jobVersionId,
-      @JsonProperty("inputDatasetVersionId") final long inputDatasetVersionId,
-      @JsonProperty("outputDatasetVersionId") final long outputDatasetVersionId,
+      @JsonProperty("jobVersionGuid") final UUID jobVersionGuid,
+      @JsonProperty("inputDatasetVersionGuid") final UUID inputDatasetVersionGuid,
+      @JsonProperty("outputDatasetVersionGuid") final UUID outputDatasetVersionGuid,
       @JsonProperty("latestHeartbeat") final Timestamp latestHeartbeat) {
     this.createdAt = createdAt;
-    this.runId = runId;
+    this.runGuid = runGuid;
     this.runArgs = runArgs;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
-    this.jobVersionId = jobVersionId;
-    this.inputDatasetVersionId = inputDatasetVersionId;
-    this.outputDatasetVersionId = outputDatasetVersionId;
+    this.jobVersionGuid = jobVersionGuid;
+    this.inputDatasetVersionGuid = inputDatasetVersionGuid;
+    this.outputDatasetVersionGuid = outputDatasetVersionGuid;
     this.latestHeartbeat = latestHeartbeat;
   }
 
@@ -44,8 +45,8 @@ public final class JobRun {
     return createdAt;
   }
 
-  public String getRunId() {
-    return runId;
+  public String getRunGuid() {
+    return runGuid;
   }
 
   public List<String> getRunArgs() {
@@ -60,16 +61,16 @@ public final class JobRun {
     return endedAt;
   }
 
-  public long getJobVersionId() {
-    return jobVersionId;
+  public UUID getJobVersionGuid() {
+    return jobVersionGuid;
   }
 
-  public long getInputDatasetVersionId() {
-    return inputDatasetVersionId;
+  public UUID getInputDatasetVersionGuid() {
+    return inputDatasetVersionGuid;
   }
 
-  public long getOutputDatasetVersionId() {
-    return outputDatasetVersionId;
+  public UUID getOutputDatasetVersionGuid() {
+    return outputDatasetVersionGuid;
   }
 
   public Timestamp getLatestHeartbeat() {
@@ -84,13 +85,13 @@ public final class JobRun {
     final JobRun other = (JobRun) o;
 
     return Objects.equals(createdAt, other.createdAt)
-        && Objects.equals(runId, other.runId)
+        && Objects.equals(runGuid, other.runGuid)
         && Objects.equals(runArgs, other.runArgs)
         && Objects.equals(startedAt, other.startedAt)
         && Objects.equals(endedAt, other.endedAt)
-        && Objects.equals(jobVersionId, other.jobVersionId)
-        && Objects.equals(inputDatasetVersionId, other.inputDatasetVersionId)
-        && Objects.equals(outputDatasetVersionId, other.outputDatasetVersionId)
+        && Objects.equals(jobVersionGuid, other.jobVersionGuid)
+        && Objects.equals(inputDatasetVersionGuid, other.inputDatasetVersionGuid)
+        && Objects.equals(outputDatasetVersionGuid, other.outputDatasetVersionGuid)
         && Objects.equals(latestHeartbeat, other.latestHeartbeat);
   }
 
@@ -98,13 +99,13 @@ public final class JobRun {
   public int hashCode() {
     return Objects.hash(
         createdAt,
-        runId,
+        runGuid,
         runArgs,
         startedAt,
         endedAt,
-        jobVersionId,
-        inputDatasetVersionId,
-        outputDatasetVersionId,
+        jobVersionGuid,
+        inputDatasetVersionGuid,
+        outputDatasetVersionGuid,
         latestHeartbeat);
   }
 
@@ -113,13 +114,13 @@ public final class JobRun {
     final StringBuilder sb = new StringBuilder();
     sb.append("JobRun{");
     sb.append("createdAt=").append(createdAt);
-    sb.append("runId=").append(runId);
+    sb.append("runGuid=").append(runGuid);
     sb.append("runArgs=").append(runArgs);
     sb.append("startedAt=").append(startedAt);
     sb.append("endedAt=").append(endedAt);
-    sb.append("jobVersionId=").append(jobVersionId);
-    sb.append("inputDatasetVersionId=").append(inputDatasetVersionId);
-    sb.append("outputDatasetVersionId=").append(outputDatasetVersionId);
+    sb.append("jobVersionGuid=").append(jobVersionGuid);
+    sb.append("inputDatasetVersionGuid=").append(inputDatasetVersionGuid);
+    sb.append("outputDatasetVersionGuid=").append(outputDatasetVersionGuid);
     sb.append("latestHeartbeat=").append(latestHeartbeat);
     sb.append("}");
     return sb.toString();

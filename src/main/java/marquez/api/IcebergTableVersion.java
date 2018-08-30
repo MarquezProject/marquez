@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 public final class IcebergTableVersion extends DatasetVersion {
@@ -15,12 +16,12 @@ public final class IcebergTableVersion extends DatasetVersion {
   @JsonCreator
   public IcebergTableVersion(
       @JsonProperty("createdAt") final Timestamp createdAt,
-      @JsonProperty("datasetId") final Integer datasetId,
+      @JsonProperty("datasetGuid") final UUID datasetGuid,
       @JsonProperty("schemaLocation") final URI schemaUri,
       @JsonProperty("previousSnapshotId") final long previousSnapshotId,
       @JsonProperty("currentSnapshotId") final long currentSnapshotId,
       @JsonProperty("metadataLocation") final String metadataLocation) {
-    super(createdAt, datasetId, schemaUri);
+    super(createdAt, datasetGuid, schemaUri);
     this.previousSnapshotId = previousSnapshotId;
     this.currentSnapshotId = currentSnapshotId;
     this.metadataLocation = metadataLocation;
@@ -46,7 +47,7 @@ public final class IcebergTableVersion extends DatasetVersion {
     final IcebergTableVersion other = (IcebergTableVersion) o;
 
     return Objects.equals(getCreatedAt(), other.getCreatedAt())
-        && Objects.equals(getDatasetId(), other.getDatasetId())
+        && Objects.equals(getDatasetGuid(), other.getDatasetGuid())
         && Objects.equals(getSchemaUri(), other.getSchemaUri())
         && Objects.equals(previousSnapshotId, other.previousSnapshotId)
         && Objects.equals(currentSnapshotId, other.currentSnapshotId)
@@ -57,7 +58,7 @@ public final class IcebergTableVersion extends DatasetVersion {
   public int hashCode() {
     return Objects.hash(
         getCreatedAt(),
-        getDatasetId(),
+        getDatasetGuid(),
         getSchemaUri(),
         previousSnapshotId,
         currentSnapshotId,
@@ -69,7 +70,7 @@ public final class IcebergTableVersion extends DatasetVersion {
     final StringBuilder sb = new StringBuilder();
     sb.append("DbTableVersion{");
     sb.append("createdAt=").append(getCreatedAt());
-    sb.append("datasetId=").append(getDatasetId());
+    sb.append("datasetGuid=").append(getDatasetGuid());
     sb.append("schemaUri=").append(getSchemaUri());
     sb.append("previousSnapshotId=").append(previousSnapshotId);
     sb.append("currentSnapshotId=").append(currentSnapshotId);

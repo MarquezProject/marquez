@@ -4,6 +4,7 @@ import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.util.UUID;
 import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
 import org.junit.After;
@@ -40,7 +42,7 @@ public class OwnerResourceTest {
   @Test
   public void testPostOwner() {
     resources.target("/owners").request().post(entity(owner, APPLICATION_JSON));
-    verify(dao).insert(owner);
+    verify(dao).insert(any(UUID.class), eq(owner));
   }
 
   @Test
