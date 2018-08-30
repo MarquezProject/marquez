@@ -57,7 +57,8 @@ public final class DbTableVersion extends DatasetVersion {
 
   @Override
   public int hashCode() {
-    return Objects.hash(getCreatedAt(), getDatasetGuid(), getSchemaUri(), name, columns, databaseGuid);
+    return Objects.hash(
+        getCreatedAt(), getDatasetGuid(), getSchemaUri(), name, columns, databaseGuid);
   }
 
   @Override

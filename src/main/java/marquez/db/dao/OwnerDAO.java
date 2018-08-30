@@ -1,13 +1,12 @@
 package marquez.db.dao;
 
+import java.util.UUID;
 import marquez.api.Owner;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-
-import java.util.UUID;
 
 @RegisterRowMapper(OwnerRow.class)
 public interface OwnerDAO {

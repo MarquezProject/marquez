@@ -99,13 +99,13 @@ public final class JobRun {
   public int hashCode() {
     return Objects.hash(
         createdAt,
-            runGuid,
+        runGuid,
         runArgs,
         startedAt,
         endedAt,
-            jobVersionGuid,
-            inputDatasetVersionGuid,
-            outputDatasetVersionGuid,
+        jobVersionGuid,
+        inputDatasetVersionGuid,
+        outputDatasetVersionGuid,
         latestHeartbeat);
   }
 

@@ -3,6 +3,7 @@ package marquez.resources;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.codahale.metrics.annotation.Timed;
+import java.util.UUID;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -13,8 +14,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
-
-import java.util.UUID;
 
 @Path("/owners")
 public final class OwnerResource extends BaseResource {

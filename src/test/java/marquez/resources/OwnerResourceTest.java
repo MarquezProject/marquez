@@ -12,14 +12,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.util.UUID;
 import marquez.api.Owner;
 import marquez.db.dao.OwnerDAO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import java.util.UUID;
 
 public class OwnerResourceTest {
   private static final OwnerDAO dao = mock(OwnerDAO.class);
