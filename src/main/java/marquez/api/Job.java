@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.hibernate.validator.constraints.NotBlank;
 
 public final class Job {
+
   @JsonIgnore private final UUID guid;
 
   private final String name;

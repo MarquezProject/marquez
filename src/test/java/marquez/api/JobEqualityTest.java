@@ -18,7 +18,7 @@ public class JobEqualityTest {
   private static final String CATEGORY = "myCategory";
   private static final String DESCRIPTION = "the first job";
 
-  private static Job JOB =
+  private static final Job JOB =
       new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
 
   @Test
