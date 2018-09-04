@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNotEquals;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JobEqualityTest {
@@ -19,12 +18,8 @@ public class JobEqualityTest {
   private static final String CATEGORY = "myCategory";
   private static final String DESCRIPTION = "the first job";
 
-  private static Job JOB;
-
-  @BeforeClass
-  public static void setupTestJob() {
-    JOB = new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
-  }
+  private static Job JOB =
+      new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
 
   @Test
   public void testJobEquality() {
