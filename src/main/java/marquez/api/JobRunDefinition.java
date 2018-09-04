@@ -94,6 +94,7 @@ public final class JobRunDefinition {
     return Objects.equals(guid, other.guid)
         && Objects.equals(jobVersionGuid, other.jobVersionGuid)
         && Objects.equals(runArgsJson, other.runArgsJson)
+        && Objects.equals(URI, other.URI)
         && Objects.equals(nominalTimeStart, other.nominalTimeStart)
         && Objects.equals(nominalTimeEnd, other.nominalTimeEnd);
   }
@@ -110,9 +111,6 @@ public final class JobRunDefinition {
     sb.append("guid=").append(guid);
     sb.append("job_version_guid=").append(jobVersionGuid);
     sb.append("runArgs=").append(runArgsJson);
-    sb.append("nominalTimeStart=").append(nominalTimeStart);
-    sb.append("nominalTimeEnd=").append(nominalTimeEnd);
-    sb.append("}");
     return sb.toString();
   }
 }
