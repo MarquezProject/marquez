@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
-
 import org.hibernate.validator.constraints.NotBlank;
 
 public final class Job {
