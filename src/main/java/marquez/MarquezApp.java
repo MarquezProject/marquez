@@ -9,10 +9,12 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import marquez.db.dao.DatasetDAO;
 import marquez.db.dao.JobDAO;
+import marquez.db.dao.JobRunDefinitionDAO;
 import marquez.db.dao.OwnerDAO;
 import marquez.resources.DatasetResource;
 import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
+import marquez.resources.JobRunDefinitionResource;
 import marquez.resources.OwnerResource;
 import marquez.resources.PingResource;
 import org.flywaydb.core.Flyway;
@@ -98,5 +100,8 @@ public class MarquezApp extends Application<MarquezConfig> {
 
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));
+
+    final JobRunDefinitionDAO jobRunDefinitionDAO = jdbi.onDemand(JobRunDefinitionDAO.class);
+    env.jersey().register(new JobRunDefinitionResource(jobRunDefinitionDAO));
   }
 }
