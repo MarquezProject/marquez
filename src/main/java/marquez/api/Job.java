@@ -2,7 +2,6 @@ package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -10,8 +9,7 @@ import java.util.UUID;
 import org.hibernate.validator.constraints.NotBlank;
 
 public final class Job {
-  @JsonIgnore
-  private final UUID guid;
+  @JsonIgnore private final UUID guid;
 
   private final String name;
   private final String ownerName;
