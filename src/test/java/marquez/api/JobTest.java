@@ -9,7 +9,6 @@ import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
-
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
 
@@ -23,7 +22,7 @@ public class JobTest {
   private static final String DESCRIPTION = "the first job";
 
   private static final Job JOB =
-          new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
+      new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
@@ -76,7 +75,7 @@ public class JobTest {
   @Test
   public void testJobHashcodeInequalityOnNonIdField() {
     Job j2 =
-            new Job(JOB_UUID, "some other job name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
+        new Job(JOB_UUID, "some other job name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
     assertNotEquals(JOB.hashCode(), j2.hashCode());
   }
 }
