@@ -5,10 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.UUID;
 import org.hibernate.validator.constraints.NotBlank;
 
 public final class Job {
-  private final int id;
+  private final UUID guid;
   private final String name;
   private final String ownerName;
   private final Timestamp nominalTime;
@@ -17,13 +18,13 @@ public final class Job {
 
   @JsonCreator
   public Job(
-      @JsonProperty("id") final int id,
+      @JsonProperty("guid") final UUID guid,
       @JsonProperty("name") @NotBlank final String name,
       @JsonProperty("ownerName") final String ownerName,
       @JsonProperty("nominalTime") final Timestamp nominalTime,
       @JsonProperty("category") final String category,
       @JsonProperty("description") final String description) {
-    this.id = id;
+    this.guid = guid;
     this.name = name;
     this.ownerName = ownerName;
     this.nominalTime = nominalTime;
@@ -32,8 +33,8 @@ public final class Job {
   }
 
   @JsonIgnore
-  public int getId() {
-    return id;
+  public UUID getGuid() {
+    return guid;
   }
 
   public String getName() {
@@ -63,7 +64,7 @@ public final class Job {
 
     final Job other = (Job) o;
 
-    return Objects.equals(id, other.id)
+    return Objects.equals(guid, other.guid)
         && Objects.equals(name, other.name)
         && Objects.equals(ownerName, other.ownerName)
         && Objects.equals(nominalTime, other.nominalTime)
@@ -80,7 +81,7 @@ public final class Job {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("Job{");
-    sb.append("id=").append(id);
+    sb.append("guid=").append(guid);
     sb.append(",name=").append(name);
     sb.append(",owner=").append(ownerName);
     sb.append(",nominalTime=").append(nominalTime);

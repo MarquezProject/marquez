@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 public final class JobRun {
   @NotNull private final Timestamp createdAt;
-  @NotNull private final String runGuid;
+  @NotNull private final UUID runGuid;
   @NotNull private final List<String> runArgs;
   @NotNull private final Timestamp startedAt;
   @NotNull private final Timestamp endedAt;
@@ -22,7 +22,7 @@ public final class JobRun {
   @JsonCreator
   public JobRun(
       @JsonProperty("createdAt") final Timestamp createdAt,
-      @JsonProperty("runGuid") final String runGuid,
+      @JsonProperty("runGuid") final UUID runGuid,
       @JsonProperty("runArgs") final List<String> runArgs,
       @JsonProperty("startedAt") final Timestamp startedAt,
       @JsonProperty("endedAt") final Timestamp endedAt,
@@ -45,7 +45,7 @@ public final class JobRun {
     return createdAt;
   }
 
-  public String getRunGuid() {
+  public UUID getRunGuid() {
     return runGuid;
   }
 
