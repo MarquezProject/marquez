@@ -6,9 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 public final class Ownership {
-  private final int guid;
+  private final UUID guid;
   private final Timestamp startedAt;
   private final Optional<Timestamp> endedAt;
   private final String jobName;
@@ -16,7 +17,7 @@ public final class Ownership {
 
   @JsonCreator
   public Ownership(
-      @JsonProperty("guid") final int guid,
+      @JsonProperty("guid") final UUID guid,
       @JsonProperty("startedAt") final Timestamp startedAt,
       @JsonProperty("endedAt") final Optional<Timestamp> endedAt,
       @JsonProperty("jobName") final String jobName,
@@ -29,7 +30,7 @@ public final class Ownership {
   }
 
   @JsonIgnore
-  public int getGuid() {
+  public UUID getGuid() {
     return guid;
   }
 
