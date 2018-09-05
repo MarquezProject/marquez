@@ -1,6 +1,7 @@
 package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -8,6 +9,9 @@ import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 public final class JobRunState {
+
+  @JsonIgnore private final UUID guid;
+
   public enum State {
     NEW {
       @Override
@@ -55,9 +59,11 @@ public final class JobRunState {
 
   @JsonCreator
   public JobRunState(
+      final UUID guid,
       @JsonProperty("transitionedAt") final Timestamp transitionedAt,
       @JsonProperty("jobRunGuid") final UUID jobRunGuid,
       @JsonProperty("state") final State state) {
+    this.guid = guid;
     this.transitionedAt = transitionedAt;
     this.jobRunGuid = jobRunGuid;
     this.state = state;
@@ -87,15 +93,21 @@ public final class JobRunState {
         && Objects.equals(state, other.state);
   }
 
+  @JsonIgnore
+  public UUID getGuid() {
+    return guid;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(transitionedAt, jobRunGuid, state);
+    return Objects.hash(guid, transitionedAt, jobRunGuid, state);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("JobRunState{");
+    sb.append("guid=").append(guid);
     sb.append("transitionedAt=").append(transitionedAt);
     sb.append("jobRunGuid=").append(jobRunGuid);
     sb.append("state=").append(state);
