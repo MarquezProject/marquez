@@ -1,4 +1,3 @@
 package marquez.db.dao;
 
-public class JobRunRow {
-}
+public class JobRunRow {}

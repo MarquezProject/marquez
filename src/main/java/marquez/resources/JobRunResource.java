@@ -1,4 +1,3 @@
 package marquez.resources;
 
-public class JobRunResource {
-}
+public class JobRunResource {}

@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
@@ -18,27 +16,19 @@ public class JobRunTest {
 
   private static final UUID JOB_RUN_UUID = UUID.randomUUID();
   private static final Timestamp CREATED_AT_TIME = Timestamp.from(Instant.now());
-  private static final UUID RUN_GUID = UUID.randomUUID();
-  private static final List<String> RUN_ARGS = Collections.singletonList("--my-flag");
   private static final Timestamp STARTED_AT_TIME = Timestamp.from(Instant.now());
   private static final Timestamp ENDED_AT_TIME = Timestamp.from(Instant.now());
-  private static final UUID JOB_VERSION_GUID = UUID.randomUUID();
-  private static final UUID INPUT_DATA_SET_GUID = UUID.randomUUID();
-  private static final UUID OUTPUT_DATA_SET_GUID = UUID.randomUUID();
-  private static final Timestamp LATEST_HEARTBEAT = Timestamp.from(Instant.now());
+  private static final UUID JOB_RUN_DEFINITION_UUID = UUID.randomUUID();
+  private static final JobRunState.State CURRENT_STATE = JobRunState.State.NEW;
 
   private static final JobRun JOB_RUN =
       new JobRun(
           JOB_RUN_UUID,
           CREATED_AT_TIME,
-          RUN_GUID,
-          RUN_ARGS,
           STARTED_AT_TIME,
           ENDED_AT_TIME,
-          JOB_VERSION_GUID,
-          INPUT_DATA_SET_GUID,
-          OUTPUT_DATA_SET_GUID,
-          LATEST_HEARTBEAT);
+          JOB_RUN_DEFINITION_UUID,
+          CURRENT_STATE);
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
@@ -60,14 +50,10 @@ public class JobRunTest {
         new JobRun(
             JOB_RUN_UUID,
             CREATED_AT_TIME,
-            RUN_GUID,
-            RUN_ARGS,
             STARTED_AT_TIME,
             ENDED_AT_TIME,
-            JOB_VERSION_GUID,
-            INPUT_DATA_SET_GUID,
-            OUTPUT_DATA_SET_GUID,
-            LATEST_HEARTBEAT);
+            JOB_RUN_DEFINITION_UUID,
+            CURRENT_STATE);
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(jr2.equals(JOB_RUN));
@@ -79,14 +65,10 @@ public class JobRunTest {
         new JobRun(
             JOB_RUN_UUID,
             CREATED_AT_TIME,
-            RUN_GUID,
-            RUN_ARGS,
             STARTED_AT_TIME,
             ENDED_AT_TIME,
-            JOB_VERSION_GUID,
-            INPUT_DATA_SET_GUID,
-            OUTPUT_DATA_SET_GUID,
-            LATEST_HEARTBEAT);
+            JOB_RUN_DEFINITION_UUID,
+            CURRENT_STATE);
     assertEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
@@ -96,14 +78,10 @@ public class JobRunTest {
         new JobRun(
             UUID.randomUUID(),
             CREATED_AT_TIME,
-            RUN_GUID,
-            RUN_ARGS,
             STARTED_AT_TIME,
             ENDED_AT_TIME,
-            JOB_VERSION_GUID,
-            INPUT_DATA_SET_GUID,
-            OUTPUT_DATA_SET_GUID,
-            LATEST_HEARTBEAT);
+            JOB_RUN_DEFINITION_UUID,
+            CURRENT_STATE);
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
   }
@@ -114,14 +92,10 @@ public class JobRunTest {
         new JobRun(
             JOB_RUN_UUID,
             CREATED_AT_TIME,
-            RUN_GUID,
-            RUN_ARGS,
             STARTED_AT_TIME,
             ENDED_AT_TIME,
-            UUID.randomUUID(),
-            INPUT_DATA_SET_GUID,
-            OUTPUT_DATA_SET_GUID,
-            LATEST_HEARTBEAT);
+            JOB_RUN_DEFINITION_UUID,
+            JobRunState.State.FINISHED);
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
   }
 
@@ -131,14 +105,10 @@ public class JobRunTest {
         new JobRun(
             UUID.randomUUID(),
             CREATED_AT_TIME,
-            RUN_GUID,
-            RUN_ARGS,
             STARTED_AT_TIME,
             ENDED_AT_TIME,
-            JOB_VERSION_GUID,
-            INPUT_DATA_SET_GUID,
-            OUTPUT_DATA_SET_GUID,
-            LATEST_HEARTBEAT);
+            JOB_RUN_DEFINITION_UUID,
+            CURRENT_STATE);
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
@@ -148,14 +118,10 @@ public class JobRunTest {
         new JobRun(
             JOB_RUN_UUID,
             CREATED_AT_TIME,
-            RUN_GUID,
-            RUN_ARGS,
             STARTED_AT_TIME,
             ENDED_AT_TIME,
-            UUID.randomUUID(),
-            INPUT_DATA_SET_GUID,
-            OUTPUT_DATA_SET_GUID,
-            LATEST_HEARTBEAT);
+            JOB_RUN_DEFINITION_UUID,
+            JobRunState.State.FINISHED);
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 }

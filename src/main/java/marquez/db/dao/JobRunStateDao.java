@@ -2,7 +2,4 @@ package marquez.db.dao;
 
 import org.jdbi.v3.sqlobject.SqlObject;
 
-public interface JobRunStateDao extends SqlObject {
-
-
-}
+public interface JobRunStateDao extends SqlObject {}
