@@ -40,7 +40,7 @@ CREATE TABLE job_runs (
   guid                        UUID PRIMARY KEY,
   created_at                  TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
   job_version_guid            UUID REFERENCES job_versions(guid),
-  run_guid                    VARCHAR(255) UNIQUE NOT NULL,
+  run_guid                    UUID UNIQUE NOT NULL,
   started_at                  TIMESTAMP with time zone,
   ended_at                    TIMESTAMP with time zone,
   input_dataset_version_guid  UUID,

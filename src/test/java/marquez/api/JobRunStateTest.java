@@ -38,7 +38,7 @@ public class JobRunStateTest {
   }
 
   @Test
-  public void testJobEquality() {
+  public void testJobRunStateEquality() {
     JobRunState jrs2 =
         new JobRunState(JOB_RUN_STATE_UUID, TRANSITIONED_AT_TIME, JOB_RUN_UUID, STATE);
     AssertionsForClassTypes.assertThat(JOB_RUN_STATE.equals(JOB_RUN_STATE));

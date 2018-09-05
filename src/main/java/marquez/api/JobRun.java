@@ -1,6 +1,7 @@
 package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 public final class JobRun {
+
+  @JsonIgnore private final UUID guid;
   @NotNull private final Timestamp createdAt;
   @NotNull private final UUID runGuid;
   @NotNull private final List<String> runArgs;
@@ -21,6 +24,7 @@ public final class JobRun {
 
   @JsonCreator
   public JobRun(
+      final UUID guid,
       @JsonProperty("createdAt") final Timestamp createdAt,
       @JsonProperty("runGuid") final UUID runGuid,
       @JsonProperty("runArgs") final List<String> runArgs,
@@ -30,6 +34,7 @@ public final class JobRun {
       @JsonProperty("inputDatasetVersionGuid") final UUID inputDatasetVersionGuid,
       @JsonProperty("outputDatasetVersionGuid") final UUID outputDatasetVersionGuid,
       @JsonProperty("latestHeartbeat") final Timestamp latestHeartbeat) {
+    this.guid = guid;
     this.createdAt = createdAt;
     this.runGuid = runGuid;
     this.runArgs = runArgs;
@@ -39,6 +44,11 @@ public final class JobRun {
     this.inputDatasetVersionGuid = inputDatasetVersionGuid;
     this.outputDatasetVersionGuid = outputDatasetVersionGuid;
     this.latestHeartbeat = latestHeartbeat;
+  }
+
+  @JsonIgnore
+  public UUID getGuid() {
+    return guid;
   }
 
   public Timestamp getCreatedAt() {
@@ -98,6 +108,7 @@ public final class JobRun {
   @Override
   public int hashCode() {
     return Objects.hash(
+        guid,
         createdAt,
         runGuid,
         runArgs,
@@ -113,6 +124,7 @@ public final class JobRun {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("JobRun{");
+    sb.append("guid=").append(guid);
     sb.append("createdAt=").append(createdAt);
     sb.append("runGuid=").append(runGuid);
     sb.append("runArgs=").append(runArgs);
