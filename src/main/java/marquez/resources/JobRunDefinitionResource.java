@@ -37,6 +37,8 @@ public final class JobRunDefinitionResource extends BaseResource {
   @Consumes(APPLICATION_JSON)
   @Timed
   public Response create(@Valid CreateJobRunDefinitionRequest request) {
+
+    // find or create the job
     UUID jobGuid; 
     Job matchingJob = this.jobDAO.findByName(request.getName());
     if (matchingJob == null) {
@@ -47,7 +49,7 @@ public final class JobRunDefinitionResource extends BaseResource {
       jobGuid = matchingJob.getGuid();
     }
 
-    // determine if version is new or not
+    // find or create the job version
     JobRunDefinition reqJrd = JobRunDefinition.create(request);
     UUID computedVersion = reqJrd.computeVersionGuid();
     JobVersion matchingJobVersion = this.jobVersionDAO.findByVersion(computedVersion);
@@ -61,14 +63,11 @@ public final class JobRunDefinitionResource extends BaseResource {
       jobVersionGuid = matchingJobVersion.getGuid();
     }
 
-    // generate new uuid for Job Run Definition
+    // insert new Job Run Definition
     UUID jobRunDefGuid = UUID.randomUUID();
-
-    // insert rows as needed
     this.jobRunDefDAO.insert(
         jobRunDefGuid, jobVersionGuid, request.getRunArgsJson());
 
-    // return Job Run Definition Guid
     CreateJobRunDefinitionResponse res = new CreateJobRunDefinitionResponse(jobRunDefGuid);
     try {
       String jsonRes = mapper.writeValueAsString(res);
