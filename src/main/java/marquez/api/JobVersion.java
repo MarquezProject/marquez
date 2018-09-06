@@ -1,11 +1,10 @@
 package marquez.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public final class JobVersion {
 
