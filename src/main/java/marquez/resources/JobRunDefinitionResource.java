@@ -66,7 +66,7 @@ public final class JobRunDefinitionResource extends BaseResource {
 
     // insert rows as needed
     this.jobRunDefDAO.insert(
-        jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(), request.getURI());
+        jobRunDefGuid, jobVersionGuid, request.getRunArgsJson());
 
     // return Job Run Definition Guid
     CreateJobRunDefinitionResponse res = new CreateJobRunDefinitionResponse(jobRunDefGuid);

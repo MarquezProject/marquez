@@ -11,10 +11,9 @@ public interface JobRunDefinitionDAO {
   Owner findByName(@Bind("guid") UUID guid);
 
   @SqlUpdate(
-      "INSERT INTO job_run_definitions (guid, job_version_guid, run_args_json, uri) VALUES (:guid, :job_version_guid, :run_args, :uri)")
+      "INSERT INTO job_run_definitions (guid, job_version_guid, run_args_json) VALUES (:guid, :job_version_guid, :run_args)")
   void insert(
       @Bind("guid") final UUID guid,
       @Bind("job_version_guid") final UUID job_version_guid,
-      @Bind("run_args") final String runArgsJson,
-      @Bind("uri") final String URI);
+      @Bind("run_args") final String runArgsJson);
 }
