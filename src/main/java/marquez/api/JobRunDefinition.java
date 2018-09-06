@@ -50,6 +50,21 @@ public final class JobRunDefinition {
     return nominalTimeEnd;
   }
 
+  public UUID computeVersionGuid() {
+    byte[] raw = String.format("%s", URI).getBytes();
+    return UUID.nameUUIDFromBytes(raw);
+  }
+
+  public static JobRunDefinition create(CreateJobRunDefinitionRequest request) {
+    return new JobRunDefinition(
+        null,
+        null,
+        request.getRunArgsJson(),
+        request.getURI(),
+        request.getNominalTimeStart(),
+        request.getNominalTimeEnd());
+  }
+
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
