@@ -10,15 +10,15 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import marquez.api.Owner;
 import marquez.api.Job;
 import marquez.api.JobRunDefinition;
 import marquez.api.JobVersion;
+import marquez.api.Owner;
 import marquez.api.entities.*;
-import marquez.db.dao.OwnerDAO;
 import marquez.db.dao.JobDAO;
 import marquez.db.dao.JobRunDefinitionDAO;
 import marquez.db.dao.JobVersionDAO;
+import marquez.db.dao.OwnerDAO;
 
 @Path("/job_run_definition")
 public final class JobRunDefinitionResource extends BaseResource {
@@ -44,12 +44,12 @@ public final class JobRunDefinitionResource extends BaseResource {
   public Response create(@Valid CreateJobRunDefinitionRequest request) {
     // register the new owner, if necessary
     Owner owner = this.ownerDAO.findByName(request.getOwnerName());
-    if(owner == null) {
+    if (owner == null) {
       this.ownerDAO.insert(UUID.randomUUID(), new Owner(request.getOwnerName()));
     }
 
     // find or create the job
-    UUID jobGuid; 
+    UUID jobGuid;
     Job matchingJob = this.jobDAO.findByName(request.getName());
     if (matchingJob == null) {
       jobGuid = UUID.randomUUID();
@@ -75,8 +75,7 @@ public final class JobRunDefinitionResource extends BaseResource {
 
     // insert new Job Run Definition
     UUID jobRunDefGuid = UUID.randomUUID();
-    this.jobRunDefDAO.insert(
-        jobRunDefGuid, jobVersionGuid, request.getRunArgsJson());
+    this.jobRunDefDAO.insert(jobRunDefGuid, jobVersionGuid, request.getRunArgsJson());
 
     CreateJobRunDefinitionResponse res = new CreateJobRunDefinitionResponse(jobRunDefGuid);
     try {
