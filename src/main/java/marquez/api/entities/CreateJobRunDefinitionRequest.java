@@ -1,4 +1,4 @@
-package marquez.api;
+package marquez.api.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
