@@ -10,9 +10,11 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import marquez.api.entities.*;
-import marquez.api.JobVersion;
+import marquez.api.Job;
 import marquez.api.JobRunDefinition;
+import marquez.api.JobVersion;
+import marquez.api.entities.*;
+import marquez.db.dao.JobDAO;
 import marquez.db.dao.JobRunDefinitionDAO;
 import marquez.db.dao.JobVersionDAO;
 
@@ -20,18 +22,30 @@ import marquez.db.dao.JobVersionDAO;
 public final class JobRunDefinitionResource extends BaseResource {
   private JobVersionDAO jobVersionDAO;
   private JobRunDefinitionDAO jobRunDefDAO;
+  private JobDAO jobDAO;
 
-  public JobRunDefinitionResource(final JobRunDefinitionDAO jobRunDefDAO, final JobVersionDAO jobVersionDAO) {
+  public JobRunDefinitionResource(
+      final JobRunDefinitionDAO jobRunDefDAO,
+      final JobVersionDAO jobVersionDAO,
+      final JobDAO jobDAO) {
     this.jobRunDefDAO = jobRunDefDAO;
     this.jobVersionDAO = jobVersionDAO;
+    this.jobDAO = jobDAO;
   }
 
   @POST
   @Consumes(APPLICATION_JSON)
   @Timed
   public Response create(@Valid CreateJobRunDefinitionRequest request) {
-    // INPROGRESS: replace this with actual job detection / insertion
-    UUID jobGuid = UUID.fromString("a35bedfe-f913-4167-9562-80c5e22bfbc4");
+    UUID jobGuid; 
+    Job matchingJob = this.jobDAO.findByName(request.getName());
+    if (matchingJob == null) {
+      jobGuid = UUID.randomUUID();
+      Job newJob = new Job(jobGuid, request.getName(), request.getOwnerName(), null, null, null);
+      this.jobDAO.insert(newJob);
+    } else {
+      jobGuid = matchingJob.getGuid();
+    }
 
     // determine if version is new or not
     JobRunDefinition reqJrd = JobRunDefinition.create(request);
@@ -39,7 +53,7 @@ public final class JobRunDefinitionResource extends BaseResource {
     JobVersion matchingJobVersion = this.jobVersionDAO.findByVersion(computedVersion);
 
     UUID jobVersionGuid;
-    if(matchingJobVersion == null) {
+    if (matchingJobVersion == null) {
       // insert new job version
       jobVersionGuid = UUID.randomUUID();
       this.jobVersionDAO.insert(jobVersionGuid, computedVersion, jobGuid, request.getURI());
@@ -51,7 +65,8 @@ public final class JobRunDefinitionResource extends BaseResource {
     UUID jobRunDefGuid = UUID.randomUUID();
 
     // insert rows as needed
-    this.jobRunDefDAO.insert(jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(), request.getURI());
+    this.jobRunDefDAO.insert(
+        jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(), request.getURI());
 
     // return Job Run Definition Guid
     CreateJobRunDefinitionResponse res = new CreateJobRunDefinitionResponse(jobRunDefGuid);

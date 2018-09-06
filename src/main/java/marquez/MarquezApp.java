@@ -104,6 +104,6 @@ public class MarquezApp extends Application<MarquezConfig> {
 
     final JobRunDefinitionDAO jobRunDefinitionDAO = jdbi.onDemand(JobRunDefinitionDAO.class);
     final JobVersionDAO jobVersionDAO = jdbi.onDemand(JobVersionDAO.class);
-    env.jersey().register(new JobRunDefinitionResource(jobRunDefinitionDAO, jobVersionDAO));
+    env.jersey().register(new JobRunDefinitionResource(jobRunDefinitionDAO, jobVersionDAO, jobDAO));
   }
 }
