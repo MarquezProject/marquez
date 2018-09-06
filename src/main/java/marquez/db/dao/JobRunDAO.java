@@ -1,23 +1,22 @@
 package marquez.db.dao;
 
 import marquez.api.JobRun;
-import marquez.api.JobRunState;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public interface JobRunStateDao extends SqlObject {
-    static final Logger LOG = LoggerFactory.getLogger(JobRunStateDao.class);
+public interface JobRunDAO extends SqlObject {
+    static final Logger LOG = LoggerFactory.getLogger(JobRunDAO.class);
 
-    default void insert(final JobRunState jobRunState) {
+    default void insert(final JobRun jobRun) {
         try (final Handle handle = getHandle()) {
             handle.useTransaction(
                     h -> {
                         h.createUpdate(
-                                "INSERT INTO job_run_states (transitioned_at, job_run_guid, state)"
-                                        + " VALUES (:transitionedAt, :jobRunGuid, :state)")
-                                .bindBean(jobRunState)
+                                "INSERT INTO job_runs (started_at, job_run_definition_guid, current_state)"
+                                        + " VALUES (:startedAt, :jobRunDefinitionId, :currentState)")
+                                .bindBean(jobRun)
                                 .execute();
                         h.commit();
                     });
