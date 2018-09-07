@@ -2,7 +2,6 @@ package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -13,9 +12,9 @@ public final class CreateJobRunStateRequest {
 
   @JsonCreator
   public CreateJobRunStateRequest(
-          @JsonProperty("transitioned_at") final Timestamp transitionedAt,
-          @JsonProperty("job_run_guid") final UUID jobRunGuid,
-          @JsonProperty("state") final JobRunState.State state) {
+      @JsonProperty("transitioned_at") final Timestamp transitionedAt,
+      @JsonProperty("job_run_guid") final UUID jobRunGuid,
+      @JsonProperty("state") final JobRunState.State state) {
     this.transitionedAt = transitionedAt;
     this.jobRunGuid = jobRunGuid;
     this.state = state;

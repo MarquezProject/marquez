@@ -1,5 +1,6 @@
 package marquez.api;
 
+import static marquez.api.JobRunState.State.toInt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -19,7 +20,7 @@ public class JobRunTest {
   private static final Timestamp STARTED_AT_TIME = Timestamp.from(Instant.now());
   private static final Timestamp ENDED_AT_TIME = Timestamp.from(Instant.now());
   private static final UUID JOB_RUN_DEFINITION_UUID = UUID.randomUUID();
-  private static final JobRunState.State CURRENT_STATE = JobRunState.State.NEW;
+  private static final Integer CURRENT_STATE = toInt(JobRunState.State.NEW);
 
   private static final JobRun JOB_RUN =
       new JobRun(
@@ -95,7 +96,7 @@ public class JobRunTest {
             STARTED_AT_TIME,
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
-            JobRunState.State.FINISHED);
+            toInt(JobRunState.State.FINISHED));
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
   }
 
@@ -121,7 +122,7 @@ public class JobRunTest {
             STARTED_AT_TIME,
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
-            JobRunState.State.FINISHED);
+            toInt(JobRunState.State.FINISHED));
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 }

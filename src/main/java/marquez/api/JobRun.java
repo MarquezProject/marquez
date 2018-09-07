@@ -1,17 +1,18 @@
 package marquez.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
 
 public final class JobRun {
 
-  private final UUID guid;
+  @JsonIgnore private final UUID guid;
   private final Timestamp createdAt;
   private final Timestamp startedAt;
   private final Timestamp endedAt;
   private final UUID jobRunDefinitionGuid;
-  private final JobRunState.State currentState;
+  private final Integer currentState;
 
   public JobRun(
       final UUID guid,
@@ -19,7 +20,7 @@ public final class JobRun {
       final Timestamp startedAt,
       final Timestamp endedAt,
       final UUID jobRunDefinitionGuid,
-      final JobRunState.State currentState) {
+      final Integer currentState) {
     this.guid = guid;
     this.createdAt = createdAt;
     this.startedAt = startedAt;
@@ -28,6 +29,7 @@ public final class JobRun {
     this.currentState = currentState;
   }
 
+  @JsonIgnore
   public UUID getGuid() {
     return guid;
   }
@@ -48,7 +50,7 @@ public final class JobRun {
     return jobRunDefinitionGuid;
   }
 
-  public JobRunState.State getCurrentState() {
+  public Integer getCurrentState() {
     return currentState;
   }
 

@@ -3,9 +3,9 @@ package marquez.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -20,7 +20,6 @@ public final class JobRunState {
       boolean isFinished() {
         return false;
       }
-
     },
     STARTING {
       @Override
@@ -54,19 +53,26 @@ public final class JobRunState {
     };
 
     abstract boolean isFinished();
-    static int toInt(State s) {
-      final Map<State, Integer> myMap;
 
-      {
-        myMap = new HashMap<>();
-        myMap.put(NEW, 0);
-        myMap.put(STARTING, 1);
-        myMap.put(RUNNING, 2);
-        myMap.put(STOPPING, 3);
-        myMap.put(FINISHED, 4);
-        myMap.put(FAILED, 5);
-      }
-      return myMap.get(s);
+    public static BiMap<State, Integer> mapState;
+
+    static {
+      mapState = HashBiMap.create();
+      ;
+      mapState.put(NEW, 0);
+      mapState.put(STARTING, 1);
+      mapState.put(RUNNING, 2);
+      mapState.put(STOPPING, 3);
+      mapState.put(FINISHED, 4);
+      mapState.put(FAILED, 5);
+    }
+
+    public static int toInt(State s) {
+      return mapState.get(s);
+    }
+
+    public static State fromInt(Integer stateInt) {
+      return mapState.inverse().get(stateInt);
     }
   }
 
