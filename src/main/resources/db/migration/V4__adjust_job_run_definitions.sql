@@ -14,7 +14,7 @@ ALTER TABLE job_runs
 DROP COLUMN latest_heartbeat;
 
 ALTER TABLE job_runs
-ADD COLUMN job_run_definition_guid UUID REFERENCES job_versions(guid);
+ADD COLUMN job_run_definition_guid UUID REFERENCES job_run_definitions(guid);
 
 ALTER TABLE job_runs
 ADD COLUMN current_state INTEGER;

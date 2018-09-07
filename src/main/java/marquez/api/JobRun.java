@@ -1,30 +1,25 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
 
 public final class JobRun {
 
-  @JsonIgnore private final UUID guid;
-  @NotNull private final Timestamp createdAt;
-  @NotNull private final Timestamp startedAt;
-  @NotNull private final Timestamp endedAt;
+  private final UUID guid;
+  private final Timestamp createdAt;
+  private final Timestamp startedAt;
+  private final Timestamp endedAt;
   private final UUID jobRunDefinitionGuid;
   private final JobRunState.State currentState;
 
-  @JsonCreator
   public JobRun(
       final UUID guid,
-      @JsonProperty("createdAt") final Timestamp createdAt,
-      @JsonProperty("startedAt") final Timestamp startedAt,
-      @JsonProperty("endedAt") final Timestamp endedAt,
-      @JsonProperty("jobRunDefinitionGuid") final UUID jobRunDefinitionGuid,
-      @JsonProperty("currentState") final JobRunState.State currentState) {
+      final Timestamp createdAt,
+      final Timestamp startedAt,
+      final Timestamp endedAt,
+      final UUID jobRunDefinitionGuid,
+      final JobRunState.State currentState) {
     this.guid = guid;
     this.createdAt = createdAt;
     this.startedAt = startedAt;
@@ -33,7 +28,6 @@ public final class JobRun {
     this.currentState = currentState;
   }
 
-  @JsonIgnore
   public UUID getGuid() {
     return guid;
   }
@@ -50,6 +44,14 @@ public final class JobRun {
     return endedAt;
   }
 
+  public UUID getJobRunDefinitionGuid() {
+    return jobRunDefinitionGuid;
+  }
+
+  public JobRunState.State getCurrentState() {
+    return currentState;
+  }
+
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
@@ -57,7 +59,8 @@ public final class JobRun {
 
     final JobRun other = (JobRun) o;
 
-    return Objects.equals(createdAt, other.createdAt)
+    return Objects.equals(guid, other.guid)
+        && Objects.equals(createdAt, other.createdAt)
         && Objects.equals(startedAt, other.startedAt)
         && Objects.equals(endedAt, other.endedAt)
         && Objects.equals(jobRunDefinitionGuid, other.jobRunDefinitionGuid)
@@ -77,8 +80,8 @@ public final class JobRun {
     sb.append("createdAt=").append(createdAt);
     sb.append("startedAt=").append(startedAt);
     sb.append("endedAt=").append(endedAt);
-    sb.append("endedAt=").append(jobRunDefinitionGuid);
-    sb.append("endedAt=").append(currentState);
+    sb.append("jobRunDefinitionGuid=").append(jobRunDefinitionGuid);
+    sb.append("currentState=").append(currentState);
     sb.append("}");
     return sb.toString();
   }

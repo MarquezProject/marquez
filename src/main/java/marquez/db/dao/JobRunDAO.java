@@ -1,28 +1,21 @@
 package marquez.db.dao;
 
-import marquez.api.JobRun;
-import org.jdbi.v3.core.Handle;
+import java.sql.Timestamp;
+import java.util.UUID;
 import org.jdbi.v3.sqlobject.SqlObject;
+import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public interface JobRunDAO extends SqlObject {
-    static final Logger LOG = LoggerFactory.getLogger(JobRunDAO.class);
+  static final Logger LOG = LoggerFactory.getLogger(JobRunDAO.class);
 
-    default void insert(final JobRun jobRun) {
-        try (final Handle handle = getHandle()) {
-            handle.useTransaction(
-                    h -> {
-                        h.createUpdate(
-                                "INSERT INTO job_runs (started_at, job_run_definition_guid, current_state)"
-                                        + " VALUES (:startedAt, :jobRunDefinitionId, :currentState)")
-                                .bindBean(jobRun)
-                                .execute();
-                        h.commit();
-                    });
-        } catch (Exception e) {
-            // TODO: Add better error handling
-            LOG.error(e.getMessage());
-        }
-    }
+  @SqlUpdate(
+      "INSERT INTO job_runs (guid, started_at, job_run_definition_guid, current_state) VALUES (:guid, :started_at, :job_run_definition_guid, :current_state)")
+  void insert(
+      @Bind("guid") final UUID guid,
+      @Bind("started_at") final Timestamp started_at,
+      @Bind("job_run_definition_guid") final UUID job_run_definition_guid,
+      @Bind("current_state") final Integer current_state);
 }
