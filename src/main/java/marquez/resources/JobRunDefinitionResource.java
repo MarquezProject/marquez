@@ -77,10 +77,14 @@ public final class JobRunDefinitionResource extends BaseResource {
     UUID jobRunDefGuid = UUID.randomUUID();
     this.jobRunDefDAO.insert(jobRunDefGuid, jobVersionGuid, request.getRunArgsJson());
 
-    CreateJobRunDefinitionResponse res = new CreateJobRunDefinitionResponse(jobRunDefGuid);
+    CreateJobRunDefinitionResponse jrdRes = new CreateJobRunDefinitionResponse(jobRunDefGuid);
     try {
-      String jsonRes = mapper.writeValueAsString(res);
-      return Response.ok(jsonRes, APPLICATION_JSON).build();
+      String jsonRes = mapper.writeValueAsString(jrdRes);
+      return Response.status(HTTP_CREATED)
+          .header("Location", "/job_run_definition/" + jobRunDefGuid)
+          .entity(jsonRes)
+          .type(APPLICATION_JSON)
+          .build();
     } catch (JsonProcessingException e) {
       return Response.serverError().build();
     }
