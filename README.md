@@ -29,26 +29,24 @@ The executable can be found under `build/libs/`
 
 ## Configuration
 
-**Note:** When creating your database, we recommend calling it `marquez`.
-
-To run Marquez, you will have to define `config.yml`. The configuration file is used to specify your database connection. Please copy and edit `config.example.yml`:
+To run Marquez, you will have to define `config.yml`. The configuration file is used to specify your database connection an p. When creating your database, we recommend calling it `marquez` Please copy and edit `config.example.yml`:
 
 ```bash
 $ cp config.example.yml config.yml
 ```
 
-Edit the following parameters in the config.yml you created based on your environment:
+You will then need to edit the following parameters in the configuration file:
 
-```
-  DB name (need to be created beforehand):      POSTGRESQL_DB_NAME
-  DB user:                                      POSTGRESQL_USER
-  DB password:                                  POSTGRESQL_PASSWORD
-```
-Then run the database migration:
+* `POSTGRESQL_DB_NAME`
+* `POSTGRESQL_USER`
+* `POSTGRESQL_PASSWORD`
+
+**Note:** As an optional step, you can manually run the database migration with:
 
 ```bash
 $ ./gradlew run --args 'db migrate config.yml'
 ```
+
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
 
