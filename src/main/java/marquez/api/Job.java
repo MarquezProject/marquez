@@ -13,7 +13,7 @@ public final class Job {
   @JsonIgnore private final UUID guid;
 
   private final String name;
-  private final String ownerName;
+  private final String currentOwnership;
   private final Timestamp nominalTime;
   private final String category;
   private final String description;
@@ -22,13 +22,13 @@ public final class Job {
   public Job(
       final UUID guid,
       @JsonProperty("name") @NotBlank final String name,
-      @JsonProperty("ownerName") final String ownerName,
+      @JsonProperty("current_ownership") final String current_ownership,
       @JsonProperty("nominalTime") final Timestamp nominalTime,
       @JsonProperty("category") final String category,
       @JsonProperty("description") final String description) {
     this.guid = guid;
     this.name = name;
-    this.ownerName = ownerName;
+    this.currentOwnership = current_ownership;
     this.nominalTime = nominalTime;
     this.category = category;
     this.description = description;
@@ -43,8 +43,8 @@ public final class Job {
     return name;
   }
 
-  public String getOwnerName() {
-    return ownerName;
+  public String getCurrentOwnership() {
+    return currentOwnership;
   }
 
   public Timestamp getNominalTime() {
@@ -68,7 +68,7 @@ public final class Job {
 
     return Objects.equals(guid, other.guid)
         && Objects.equals(name, other.name)
-        && Objects.equals(ownerName, other.ownerName)
+        && Objects.equals(currentOwnership, other.currentOwnership)
         && Objects.equals(nominalTime, other.nominalTime)
         && Objects.equals(category, other.category)
         && Objects.equals(description, other.description);
@@ -76,7 +76,7 @@ public final class Job {
 
   @Override
   public int hashCode() {
-    return Objects.hash(guid, name, ownerName, nominalTime, category, description);
+    return Objects.hash(guid, name, currentOwnership, nominalTime, category, description);
   }
 
   @Override
@@ -85,7 +85,7 @@ public final class Job {
     sb.append("Job{");
     sb.append("guid=").append(guid);
     sb.append(",name=").append(name);
-    sb.append(",owner=").append(ownerName);
+    sb.append(",owner=").append(currentOwnership);
     sb.append(",nominalTime=").append(nominalTime);
     sb.append(",category=").append(category);
     sb.append(",description=").append(description);

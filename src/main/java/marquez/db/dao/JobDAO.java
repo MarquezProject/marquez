@@ -27,7 +27,7 @@ public interface JobDAO extends SqlObject {
                         + " VALUES (:name, :nominalTime, :category, :description)")
                 .bindBean(job)
                 .execute();
-            createOwnershipDAO().insert(job.getName(), job.getOwnerName());
+            createOwnershipDAO().insert(job.getName(), job.getCurrentOwnership());
             h.commit();
           });
     } catch (Exception e) {
