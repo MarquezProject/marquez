@@ -1,5 +1,6 @@
 package marquez.db.dao;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 import marquez.api.JobRun;
 import org.jdbi.v3.core.Handle;
@@ -31,6 +32,26 @@ public interface JobRunDAO extends SqlObject {
                 .insert(
                     UUID.randomUUID(),
                     jobRun.getCreatedAt(),
+                    jobRun.getGuid(),
+                    jobRun.getCurrentState());
+          });
+    } catch (Exception e) {
+      // TODO: Add better error handling
+      LOG.error(e.getMessage());
+    }
+  }
+
+  default void update(JobRun jobRun) {
+    try (final Handle handle = getHandle()) {
+      handle.useTransaction(
+          h -> {
+            h.createUpdate("UPDATE job_runs SET current_state = :currentState where guid = :guid")
+                .bindBean(jobRun)
+                .execute();
+            createJobRunStateDAO()
+                .insert(
+                    UUID.randomUUID(),
+                    new Timestamp(System.currentTimeMillis()),
                     jobRun.getGuid(),
                     jobRun.getCurrentState());
           });

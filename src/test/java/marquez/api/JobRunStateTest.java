@@ -65,7 +65,7 @@ public class JobRunStateTest {
   public void testJobRunStateInequalityOnNonIDField() {
     JobRunState jrs2 =
         new JobRunState(
-            JOB_RUN_STATE_UUID, TRANSITIONED_AT_TIME, JOB_RUN_UUID, JobRunState.State.FINISHED);
+            JOB_RUN_STATE_UUID, TRANSITIONED_AT_TIME, JOB_RUN_UUID, JobRunState.State.COMPLETED);
     AssertionsForClassTypes.assertThat(!JOB_RUN_STATE.equals(jrs2));
   }
 
@@ -80,7 +80,7 @@ public class JobRunStateTest {
   public void testJobRunStateHashcodeInequalityOnNonIdField() {
     JobRunState jrs2 =
         new JobRunState(
-            UUID.randomUUID(), TRANSITIONED_AT_TIME, JOB_RUN_UUID, JobRunState.State.FINISHED);
+            UUID.randomUUID(), TRANSITIONED_AT_TIME, JOB_RUN_UUID, JobRunState.State.COMPLETED);
     assertNotEquals(JOB_RUN_STATE.hashCode(), jrs2.hashCode());
   }
 }

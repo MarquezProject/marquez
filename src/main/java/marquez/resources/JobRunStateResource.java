@@ -5,6 +5,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.sql.Timestamp;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -28,8 +29,8 @@ public class JobRunStateResource extends BaseResource {
     try {
       dao.insert(
           jobRunStateGuid,
+          new Timestamp(System.currentTimeMillis()),
           request.getJobRunGuid(),
-          request.getTransitionedAt(),
           JobRunState.State.toInt(request.getState()));
 
       CreateJobRunStateResponse res = new CreateJobRunStateResponse(jobRunStateGuid);

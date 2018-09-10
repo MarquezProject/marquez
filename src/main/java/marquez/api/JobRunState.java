@@ -17,54 +17,49 @@ public final class JobRunState {
   public enum State {
     NEW {
       @Override
-      boolean isFinished() {
+      public boolean isFinished() {
         return false;
       }
     },
-    STARTING {
-      @Override
-      boolean isFinished() {
-        return false;
-      }
-    },
+
     RUNNING {
       @Override
-      boolean isFinished() {
+      public boolean isFinished() {
         return false;
       }
     },
-    STOPPING {
+
+    COMPLETED {
       @Override
-      boolean isFinished() {
-        return false;
-      }
-    },
-    FINISHED {
-      @Override
-      boolean isFinished() {
+      public boolean isFinished() {
         return true;
       }
     },
     FAILED {
       @Override
-      boolean isFinished() {
+      public boolean isFinished() {
+        return true;
+      }
+    },
+
+    ABORTED {
+      @Override
+      public boolean isFinished() {
         return true;
       }
     };
 
-    abstract boolean isFinished();
+    public abstract boolean isFinished();
 
     public static BiMap<State, Integer> mapState;
 
     static {
       mapState = HashBiMap.create();
-      ;
       mapState.put(NEW, 0);
-      mapState.put(STARTING, 1);
-      mapState.put(RUNNING, 2);
-      mapState.put(STOPPING, 3);
-      mapState.put(FINISHED, 4);
-      mapState.put(FAILED, 5);
+      mapState.put(RUNNING, 1);
+      mapState.put(COMPLETED, 2);
+      mapState.put(FAILED, 3);
+      mapState.put(ABORTED, 4);
     }
 
     public static int toInt(State s) {

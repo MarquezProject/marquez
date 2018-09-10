@@ -96,7 +96,7 @@ public class JobRunTest {
             STARTED_AT_TIME,
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
-            toInt(JobRunState.State.FINISHED));
+            toInt(JobRunState.State.COMPLETED));
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
   }
 
@@ -122,7 +122,7 @@ public class JobRunTest {
             STARTED_AT_TIME,
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
-            toInt(JobRunState.State.FINISHED));
+            toInt(JobRunState.State.COMPLETED));
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 }

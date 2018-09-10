@@ -2,8 +2,7 @@ package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public final class JobRun {
 
@@ -13,6 +12,31 @@ public final class JobRun {
   private final Timestamp endedAt;
   private final UUID jobRunDefinitionGuid;
   private final Integer currentState;
+
+  private static Map<JobRunState.State, Set<JobRunState.State>> validTransitions = new HashMap<>();
+
+  static {
+    validTransitions.put(
+        JobRunState.State.NEW,
+        new HashSet<JobRunState.State>() {
+          {
+            add(JobRunState.State.RUNNING);
+            add(JobRunState.State.ABORTED);
+          }
+        });
+    validTransitions.put(
+        JobRunState.State.RUNNING,
+        new HashSet<JobRunState.State>() {
+          {
+            add(JobRunState.State.COMPLETED);
+            add(JobRunState.State.FAILED);
+            add(JobRunState.State.ABORTED);
+          }
+        });
+    validTransitions.put(JobRunState.State.FAILED, new HashSet<>());
+    validTransitions.put(JobRunState.State.COMPLETED, new HashSet<>());
+    validTransitions.put(JobRunState.State.ABORTED, new HashSet<>());
+  }
 
   public JobRun(
       final UUID guid,
@@ -67,6 +91,16 @@ public final class JobRun {
         && Objects.equals(endedAt, other.endedAt)
         && Objects.equals(jobRunDefinitionGuid, other.jobRunDefinitionGuid)
         && Objects.equals(currentState, other.currentState);
+  }
+
+  public static boolean isValidJobTransition(
+      JobRunState.State oldState, JobRunState.State newState) {
+    return validTransitions.get(oldState).contains(newState);
+  }
+
+  public static boolean isValidJobTransition(Integer oldState, Integer newState) {
+    return isValidJobTransition(
+        JobRunState.State.fromInt(oldState), JobRunState.State.fromInt(newState));
   }
 
   @Override
