@@ -7,14 +7,11 @@ import java.net.URI;
 import java.sql.Timestamp;
 import java.util.UUID;
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import marquez.api.CreateJobRunRequest;
-import marquez.api.CreateJobRunResponse;
-import marquez.api.JobRun;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import marquez.api.*;
 import marquez.db.dao.JobRunDAO;
 
 @Path("/job_runs")
@@ -47,6 +44,25 @@ public class JobRunResource extends BaseResource {
       CreateJobRunResponse res = new CreateJobRunResponse(jobRunGuid);
       return Response.created(URI.create("/job_runs/" + res.getExternalGuid())).build();
     } catch (Exception e) {
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Consumes(APPLICATION_JSON)
+  @Timed
+  @Path("/{guid}")
+  public Response get(@PathParam("guid") final UUID guid) {
+    JobRun result = dao.findJobRunById(guid);
+    GetJobRunResponse getJobRunResponse = new GetJobRunResponse(result.getGuid(), result.getCreatedAt(), result.getStartedAt(), result.getEndedAt(), result.getJobRunDefinitionGuid(), JobRunState.State.fromInt(result.getCurrentState()));
+    try {
+      String jsonRes = mapper.writeValueAsString(getJobRunResponse);
+
+      return Response.status(Response.Status.OK).
+              entity(jsonRes).
+              type(APPLICATION_JSON).
+              build();
+    } catch (JsonProcessingException e) {
       return Response.serverError().build();
     }
   }
