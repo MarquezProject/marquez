@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/master) [![Codecov](https://img.shields.io/codecov/c/github/MarquezProject/marquez.svg)](https://codecov.io/gh/MarquezProject/marquez) [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status) [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/master/LICENSE) [![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/projectmarquez/marquez/) [![Known Vulnerabilities](https://snyk.io/test/github/MarquezProject/marquez/badge.svg)](https://snyk.io/test/github/MarquezProject/marquez)
 
-Marquez is a fundamental core service for the collection, aggregation and visualization of all metadata within a data ecosystem. It maintains the provenance of how datasets are consumed and produced, provides visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management and much more.
+Marquez is a fundamental core service for the collection, aggregation, and visualization of all metadata within a data ecosystem. It maintains the provenance of how datasets are consumed and produced, provides visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
 
 ## Status
 
@@ -29,17 +29,13 @@ The executable can be found under `build/libs/`
 
 ## Configuration
 
-To run Marquez, you will have to define `config.yml`. The configuration file is used to specify your database connection an p. When creating your database, we recommend calling it `marquez` Please copy and edit `config.example.yml`:
+To run Marquez, you will have to define `config.yml`. The [configuration]((https://dropwizard.readthedocs.io/en/latest/manual/configuration.html)) file is passed to the application and used to specify your database connection. When creating your database, we recommend calling it `marquez`. Please copy `config.example.yml`:
 
 ```bash
 $ cp config.example.yml config.yml
 ```
 
-You will then need to edit the following parameters in the configuration file:
-
-* `POSTGRESQL_DB_NAME`
-* `POSTGRESQL_USER`
-* `POSTGRESQL_PASSWORD`
+You will then need to edit it and specify your database information.
 
 **Note:** As an optional step, you can manually run the database migration with:
 
@@ -47,6 +43,7 @@ You will then need to edit the following parameters in the configuration file:
 $ ./gradlew run --args 'db migrate config.yml'
 ```
 
+**Tip:** You can access environment variables from `config.yml` with [`${VAR_NAME}`](https://dropwizard.readthedocs.io/en/latest/manual/core.html#environment-variables).
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
 
