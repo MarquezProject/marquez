@@ -1,14 +1,13 @@
 package marquez.resources;
 
+import static java.net.HttpURLConnection.HTTP_CREATED;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.codahale.metrics.annotation.Timed;
-import java.net.URI;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.UUID;
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import marquez.api.*;
 import marquez.db.dao.JobRunStateDAO;
@@ -34,8 +33,35 @@ public class JobRunStateResource extends BaseResource {
           JobRunState.State.toInt(request.getState()));
 
       CreateJobRunStateResponse res = new CreateJobRunStateResponse(jobRunStateGuid);
-      return Response.created(URI.create("/job_run_states/" + res.getExternalGuid())).build();
+      String jsonRes = mapper.writeValueAsString(res);
+      return Response.status(HTTP_CREATED)
+          .header("Location", "/job_run_states/" + jobRunStateGuid)
+          .entity(jsonRes)
+          .type(APPLICATION_JSON)
+          .build();
     } catch (Exception e) {
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Consumes(APPLICATION_JSON)
+  @Timed
+  @Path("/{guid}")
+  public Response get(@PathParam("guid") final UUID guid) {
+
+    JobRunState result = dao.findJobRunStateById(guid);
+    GetJobRunStateResponse getJobRunStateResponse =
+        new GetJobRunStateResponse(
+            result.getGuid(),
+            result.getTransitionedAt(),
+            result.getJobRunGuid(),
+            result.getState());
+    try {
+      String jsonRes = mapper.writeValueAsString(getJobRunStateResponse);
+
+      return Response.status(Response.Status.OK).entity(jsonRes).type(APPLICATION_JSON).build();
+    } catch (JsonProcessingException e) {
       return Response.serverError().build();
     }
   }

@@ -2,13 +2,18 @@ package marquez.db.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import marquez.api.Job;
+import java.util.UUID;
+import marquez.api.JobRunState;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-final class JobRunStateRow implements RowMapper<Job> {
+public class JobRunStateRow implements RowMapper<JobRunState> {
   @Override
-  public Job map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-    throw new UnsupportedOperationException();
+  public JobRunState map(final ResultSet rs, final StatementContext ctx) throws SQLException {
+    return new JobRunState(
+        UUID.fromString(rs.getString("guid")),
+        rs.getTimestamp("transitioned_at"),
+        UUID.fromString(rs.getString("job_run_guid")),
+        JobRunState.State.fromInt(rs.getInt("state")));
   }
 }
