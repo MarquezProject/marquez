@@ -1,7 +1,6 @@
 package marquez.api;
 
 import static java.lang.String.format;
-import static marquez.api.JobRunState.State.NEW;
 import static marquez.api.JobRunState.State.fromInt;
 import static marquez.api.JobRunState.State.toInt;
 import static org.junit.Assert.assertEquals;
@@ -88,12 +87,16 @@ public class JobRunIntegrationTest {
   @After
   public void cleanup() {
     daoSetup
-            .getJDBI()
-            .useHandle(
-                    handle -> {
-                      handle.execute(format("delete from job_run_states where job_run_guid = '%s'", NEW_JOB_RUN.getGuid()));
-                      handle.execute(format("delete from job_runs where guid = '%s'", NEW_JOB_RUN.getGuid()));
-                    });
+        .getJDBI()
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  format(
+                      "delete from job_run_states where job_run_guid = '%s'",
+                      NEW_JOB_RUN.getGuid()));
+              handle.execute(
+                  format("delete from job_runs where guid = '%s'", NEW_JOB_RUN.getGuid()));
+            });
   }
 
   @Test
