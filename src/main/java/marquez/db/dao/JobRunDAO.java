@@ -45,7 +45,8 @@ public interface JobRunDAO extends SqlObject {
     try (final Handle handle = getHandle()) {
       handle.useTransaction(
           h -> {
-            h.createUpdate("UPDATE job_runs SET current_state = :currentState where guid = :guid")
+            h.createUpdate(
+                    "UPDATE job_runs SET current_state = :currentState, started_at = :startedAt, ended_at = :endedAt where guid = :guid")
                 .bindBean(jobRun)
                 .execute();
             createJobRunStateDAO()

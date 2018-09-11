@@ -26,4 +26,8 @@ public interface JobRunStateDAO extends SqlObject {
 
   @SqlQuery("SELECT * FROM job_run_states WHERE guid = :guid")
   JobRunState findJobRunStateById(@Bind("guid") UUID guid);
+
+  @SqlQuery(
+      "SELECT * FROM job_run_states WHERE job_run_guid = :jobRunGuid ORDER by transitioned_at DESC")
+  JobRunState findJobLatestJobRunStateByJobRun(@Bind("jobRunGuid") UUID jobRunGuid);
 }

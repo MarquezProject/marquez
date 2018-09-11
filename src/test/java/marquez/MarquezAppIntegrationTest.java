@@ -23,7 +23,7 @@ public class MarquezAppIntegrationTest {
             .path("/ping")
             .request()
             .get();
-    assertEquals(res.getStatus(), 200);
-    assertEquals(res.readEntity(String.class), "pong");
+    assertEquals(200, res.getStatus());
+    assertEquals("pong", res.readEntity(String.class));
   }
 }
