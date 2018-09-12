@@ -6,13 +6,18 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.UUID;
 import marquez.api.Job;
 import marquez.api.JobRunDefinition;
+import marquez.api.JobVersion;
 import marquez.api.Owner;
 import marquez.api.entities.*;
 import marquez.db.dao.JobDAO;
@@ -41,11 +46,14 @@ public class JobRunDefinitionResourceTest {
 
   @Before
   public void tearDown() {
+    reset(ownerDAO);
+    reset(jobDAO);
+    reset(jobVersionDAO);
     reset(jobRunDefDAO);
   }
 
   @Test
-  public void testPostJobRunDef() {
+  public void testPostJobRunDef_NewRows() {
     resources.target("/job_run_definition").request().post(entity(request, APPLICATION_JSON));
     verify(ownerDAO).insert(any(UUID.class), eq(new Owner(request.getOwnerName())));
 
@@ -71,6 +79,156 @@ public class JobRunDefinitionResourceTest {
 
     // a new JobRunDefinition is created, with correct job version guid
     verify(jobRunDefDAO)
-        .insert(any(UUID.class), eq(jobVersionGuidCaptor.getValue()), eq(request.getRunArgsJson()));
+        .insert(
+            any(UUID.class),
+            eq(jrd.computeDefinitionHash()),
+            eq(jobVersionGuidCaptor.getValue()),
+            eq(request.getRunArgsJson()));
+  }
+
+  @Test
+  public void testPostJobRunDef_ExistingOwner() {
+    // the Owner is successfully found
+    Owner existingOwner = new Owner(request.getOwnerName());
+    when(ownerDAO.findByName(eq(request.getOwnerName()))).thenReturn(existingOwner);
+
+    // a new Owner is not created
+    resources.target("/job_run_definition").request().post(entity(request, APPLICATION_JSON));
+    verify(ownerDAO, never()).insert(any(UUID.class), any(Owner.class));
+
+    // a new Job is created
+    ArgumentCaptor<Job> jobArgCaptor = ArgumentCaptor.forClass(Job.class);
+    verify(jobDAO).insert(jobArgCaptor.capture());
+    assertEquals(jobArgCaptor.getValue().getOwnerName(), existingOwner.getName());
+  }
+
+  @Test
+  public void testPostJobRunDef_ExistingJob() {
+    // the Job is successfully found
+    Job existingJob =
+        new Job(
+            UUID.randomUUID(),
+            request.getName(),
+            "some owner",
+            new Timestamp(new Date(0).getTime()),
+            "",
+            "");
+    when(jobDAO.findByName(eq(request.getName()))).thenReturn(existingJob);
+
+    // a new Job is not created
+    resources.target("/job_run_definition").request().post(entity(request, APPLICATION_JSON));
+    verify(jobDAO, never()).insert(any(Job.class));
+
+    // a new Job Version is created, with correct job guid and version
+    JobRunDefinition jrd = JobRunDefinition.create(request);
+    ArgumentCaptor<UUID> jobVersionGuidCaptor = ArgumentCaptor.forClass(UUID.class);
+    verify(jobVersionDAO)
+        .insert(
+            jobVersionGuidCaptor.capture(),
+            eq(jrd.computeVersionGuid()),
+            eq(existingJob.getGuid()),
+            eq(request.getURI()));
+
+    // a new JobRunDefinition is created, with correct job version guid
+    verify(jobRunDefDAO)
+        .insert(
+            any(UUID.class),
+            eq(jrd.computeDefinitionHash()),
+            eq(jobVersionGuidCaptor.getValue()),
+            eq(request.getRunArgsJson()));
+  }
+
+  @Test
+  public void testPostJobRunDef_ExistingJobVersion() {
+    // the Job and JobVersion is successfully found
+    Job existingJob =
+        new Job(
+            UUID.randomUUID(),
+            request.getName(),
+            "some owner",
+            new Timestamp(new Date(0).getTime()),
+            "",
+            "");
+    when(jobDAO.findByName(eq(request.getName()))).thenReturn(existingJob);
+
+    // create a JobRunDefinition from request so we can compute version
+    JobRunDefinition jrd = JobRunDefinition.create(request);
+    UUID versionUUID = jrd.computeVersionGuid();
+    JobVersion existingJobVersion =
+        new JobVersion(
+            UUID.randomUUID(),
+            existingJob.getGuid(),
+            request.getURI(),
+            versionUUID,
+            UUID.randomUUID(),
+            new Timestamp(new Date(0).getTime()),
+            new Timestamp(new Date(0).getTime()));
+    when(jobVersionDAO.findByVersion(versionUUID)).thenReturn(existingJobVersion);
+
+    // a new Job Version is not created
+    resources.target("/job_run_definition").request().post(entity(request, APPLICATION_JSON));
+    verify(jobDAO, never()).insert(any(Job.class));
+    verify(jobVersionDAO, never())
+        .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
+
+    // a new JobRunDefinition is created, with correct job version guid
+    verify(jobRunDefDAO)
+        .insert(
+            any(UUID.class),
+            eq(jrd.computeDefinitionHash()),
+            eq(existingJobVersion.getGuid()),
+            eq(request.getRunArgsJson()));
+  }
+
+  @Test
+  public void testPostJobRunDef_ExistingJobRunDefinition() {
+    // the Job and JobVersion is successfully found
+    Job existingJob =
+        new Job(
+            UUID.randomUUID(),
+            request.getName(),
+            "some owner",
+            new Timestamp(new Date(0).getTime()),
+            "",
+            "");
+    when(jobDAO.findByName(eq(request.getName()))).thenReturn(existingJob);
+
+    // create a JobRunDefinition from request so we can compute version
+    JobRunDefinition reqJrd = JobRunDefinition.create(request);
+
+    UUID versionUUID = reqJrd.computeVersionGuid();
+    JobVersion existingJobVersion =
+        new JobVersion(
+            UUID.randomUUID(),
+            existingJob.getGuid(),
+            request.getURI(),
+            versionUUID,
+            UUID.randomUUID(),
+            new Timestamp(new Date(0).getTime()),
+            new Timestamp(new Date(0).getTime()));
+    when(jobVersionDAO.findByVersion(versionUUID)).thenReturn(existingJobVersion);
+
+    // return the existing Job Run Definition with a hash lookup
+    JobRunDefinition existingJobRunDefinition =
+        new JobRunDefinition(
+            UUID.randomUUID(),
+            existingJobVersion.getGuid(),
+            request.getRunArgsJson(),
+            request.getURI(),
+            0,
+            0);
+    when(jobRunDefDAO.findByHash(reqJrd.computeDefinitionHash()))
+        .thenReturn(existingJobRunDefinition);
+
+    // return a matching Job Run Definition
+    // a new Job Version is not created
+    resources.target("/job_run_definition").request().post(entity(request, APPLICATION_JSON));
+    verify(jobDAO, never()).insert(any(Job.class));
+    verify(jobVersionDAO, never())
+        .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
+
+    // a new JobRunDefinition is created, with correct job version guid
+    verify(jobRunDefDAO, never())
+        .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
   }
 }
