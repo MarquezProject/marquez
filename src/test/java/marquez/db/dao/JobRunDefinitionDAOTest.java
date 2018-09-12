@@ -12,7 +12,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.jdbi.v3.core.Jdbi;
 
 public class JobRunDefinitionDAOTest {
 
@@ -39,7 +38,9 @@ public class JobRunDefinitionDAOTest {
 
   @After
   public void tearDown() {
-    daoSetup.getJDBI().useHandle(
+    daoSetup
+        .getJDBI()
+        .useHandle(
             handle -> {
               handle.execute("DELETE FROM job_run_definitions;");
               handle.execute("DELETE FROM job_versions;");
@@ -50,17 +51,24 @@ public class JobRunDefinitionDAOTest {
 
   @Test
   public void testFindByHash() {
-    JobRunDefinition expectedJrd = new JobRunDefinition(jobRunDefinitionGuid, jobVersionGuid, "{}", "", 0, 0);
-    daoSetup.getJDBI().useHandle(
-        handle -> {
-            handle.createUpdate("INSERT INTO job_run_definitions(guid, job_version_guid, run_args_json, content_hash, nominal_time) VALUES (:guid, :job_version_guid, :run_args_json, :content_hash, :nominal_time)")
-            .bind("guid", expectedJrd.getGuid())
-            .bind("job_version_guid", expectedJrd.getJobVersionGuid())
-            .bind("run_args_json", expectedJrd.getRunArgsJson())
-            .bind("content_hash", jobRunDefinitionHash)
-            .bind("nominal_time", new Timestamp(new Date(expectedJrd.getNominalTimeStart()).getTime()))
-            .execute();
-        });
+    JobRunDefinition expectedJrd =
+        new JobRunDefinition(jobRunDefinitionGuid, jobVersionGuid, "{}", "", 0, 0);
+    daoSetup
+        .getJDBI()
+        .useHandle(
+            handle -> {
+              handle
+                  .createUpdate(
+                      "INSERT INTO job_run_definitions(guid, job_version_guid, run_args_json, content_hash, nominal_time) VALUES (:guid, :job_version_guid, :run_args_json, :content_hash, :nominal_time)")
+                  .bind("guid", expectedJrd.getGuid())
+                  .bind("job_version_guid", expectedJrd.getJobVersionGuid())
+                  .bind("run_args_json", expectedJrd.getRunArgsJson())
+                  .bind("content_hash", jobRunDefinitionHash)
+                  .bind(
+                      "nominal_time",
+                      new Timestamp(new Date(expectedJrd.getNominalTimeStart()).getTime()))
+                  .execute();
+            });
     assertEquals(expectedJrd, jobRunDefDAO.findByHash(jobRunDefinitionHash));
   }
 
@@ -68,7 +76,7 @@ public class JobRunDefinitionDAOTest {
   public void testInsert() {
     jobRunDefDAO.insert(jobRunDefinitionGuid, jobRunDefinitionHash, jobVersionGuid, "{}");
     JobRunDefinition expectedJrd =
-    new JobRunDefinition(jobRunDefinitionGuid, jobVersionGuid, "{}", "", 0, 0);
-assertEquals(expectedJrd, jobRunDefDAO.findByHash(jobRunDefinitionHash));
+        new JobRunDefinition(jobRunDefinitionGuid, jobVersionGuid, "{}", "", 0, 0);
+    assertEquals(expectedJrd, jobRunDefDAO.findByHash(jobRunDefinitionHash));
   }
 }
