@@ -54,7 +54,7 @@ public class GetJobRunResponse {
     return jobRunDefinitionGuid;
   }
 
-  @JsonProperty("current_state")
+  @JsonProperty("state")
   public String getCurrentState() {
     return current_state.toString();
   }

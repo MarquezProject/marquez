@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -24,9 +23,9 @@ import org.slf4j.LoggerFactory;
 public class JobRunIntegrationTest {
   private static Logger LOG = LoggerFactory.getLogger(JobRunIntegrationTest.class);
 
-  static final String TEST_JOB_GUID = "063d736b-8232-422b-9a39-20310f72cbdd";
-  static final String TEST_JOB_RUN_VERSION_GUID = "ba53171c-9e19-4c1b-a7cd-592b7400dea9";
-  static final String TEST_JOB_RUN_DEFINITION_GUID = "0322c4e4-7b9f-4082-a583-26f6ffa4d78b";
+  static final String TEST_JOB_GUID = UUID.randomUUID().toString();
+  static final String TEST_JOB_RUN_VERSION_GUID = UUID.randomUUID().toString();
+  static final String TEST_JOB_RUN_DEFINITION_GUID = UUID.randomUUID().toString();
 
   @ClassRule public static final DAOSetup daoSetup = new DAOSetup();
   final JobRunDAO jobRunDAO = daoSetup.onDemand(JobRunDAO.class);
@@ -60,7 +59,6 @@ public class JobRunIntegrationTest {
 
   @AfterClass
   public static void tearDown() {
-    // TODO: Fix this.
     daoSetup
         .getJDBI()
         .useHandle(
@@ -136,9 +134,8 @@ public class JobRunIntegrationTest {
     assertEquals(JobRunState.State.NEW, fromInt(returnedJobRun.getCurrentState()));
   }
 
-  // @Ignore("in development")
   @Test
-  public void testJobRunCreationEndToEnd() throws IOException {
+  public void testJobRunCreationEndToEnd() {
     final String jobRunRequestString =
         format("{\"job_run_definition_guid\": \"%s\"}", TEST_JOB_RUN_DEFINITION_GUID);
     Entity jobRunRequestJsonAsEntity = Entity.json(jobRunRequestString);
@@ -149,7 +146,7 @@ public class JobRunIntegrationTest {
             .path("/job_runs")
             .request(MediaType.APPLICATION_JSON)
             .post(jobRunRequestJsonAsEntity);
-    assertEquals(201, res.getStatus());
+    assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
     CreateJobRunResponse responseBody = res.readEntity(CreateJobRunResponse.class);
     UUID returnedId = responseBody.getExternalGuid();
     try {
@@ -171,46 +168,56 @@ public class JobRunIntegrationTest {
 
   @Ignore("in development")
   @Test
-  public void testJobRunStateCreatedUponJobRunCreation() {
+  public void testJobRunStateCreatedUponJobRunCreationEndToEnd() {
     final String path = "/job_runs";
     final Response res =
         daoSetup
             .client()
             .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
             .path(path)
-            .request()
+            .request(MediaType.APPLICATION_JSON)
             .post(Entity.json("{'k':'v'}"));
-    assertEquals(res.getStatus(), 200);
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
     assertEquals(res.readEntity(String.class), "pong");
   }
 
-  @Ignore("in development")
   @Test
   public void testJobRunGetterEndToEnd() {
-    final String path = "/job_runs";
-    final Response res =
-        daoSetup
-            .client()
-            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
-            .path(path)
-            .request()
-            .post(Entity.json("{'k':'v'}"));
-    assertEquals(200, res.getStatus());
-    assertEquals(res.readEntity(String.class), "pong");
+    GetJobRunResponse responseBody = getJobRunResponse(NEW_JOB_RUN.getGuid());
+
+    assertEquals(JobRunState.State.NEW, JobRunState.State.valueOf(responseBody.getCurrentState()));
+    assertNotNull(responseBody.getCreatedAt());
+    assertNull(responseBody.getStartedAt());
+    assertNull(responseBody.getEndedAt());
   }
 
-  @Ignore("in development")
   @Test
-  public void testJobRunStateGetter() {
-    final String path = "/job_run_states";
+  public void testJobRunAfterUpdateEndToEnd() {
+    JobRunState jrs = jobRunStateDAO.findJobLatestJobRunStateByJobRun(NEW_JOB_RUN.getGuid());
+
+    final String path = "/job_run_states/" + jrs.getGuid();
     final Response res =
         daoSetup
             .client()
             .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
             .path(path)
-            .request()
-            .post(Entity.json("{'k':'v'}"));
-    assertEquals(res.getStatus(), 200);
-    assertEquals(res.readEntity(String.class), "pong");
+            .request(MediaType.APPLICATION_JSON)
+            .get();
+    assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+    GetJobRunStateResponse jrsResponse = res.readEntity(GetJobRunStateResponse.class);
+    assertEquals(JobRunState.State.NEW, JobRunState.State.valueOf(jrsResponse.getState()));
+    assertEquals(jrs.getGuid(), jrsResponse.getGuid());
+  }
+
+  private GetJobRunResponse getJobRunResponse(UUID jobRunGuid) {
+    final Response res =
+        daoSetup
+            .client()
+            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
+            .path(format("/job_runs/%s", jobRunGuid))
+            .request(MediaType.APPLICATION_JSON)
+            .get();
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+    return res.readEntity(GetJobRunResponse.class);
   }
 }

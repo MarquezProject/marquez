@@ -19,7 +19,10 @@ public class GetJobRunStateResponse {
   private final JobRunState.State state;
 
   public GetJobRunStateResponse(
-      UUID guid, Timestamp transitionedAt, UUID jobRunGuid, JobRunState.State state) {
+      @JsonProperty("guid") UUID guid,
+      @JsonProperty("transitioned_at") Timestamp transitionedAt,
+      @JsonProperty("job_guid_guid") UUID jobRunGuid,
+      @JsonProperty("state") JobRunState.State state) {
     this.guid = guid;
     this.transitionedAt = transitionedAt;
     this.jobRunGuid = jobRunGuid;
