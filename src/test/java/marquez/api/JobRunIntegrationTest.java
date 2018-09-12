@@ -61,7 +61,7 @@ public class JobRunIntegrationTest {
   @AfterClass
   public static void tearDown() {
     //TODO: Fix this.
-    /*daoSetup
+    daoSetup
         .getJDBI()
         .useHandle(
             handle -> {
@@ -73,7 +73,6 @@ public class JobRunIntegrationTest {
                   format("delete from job_versions where guid = '%s'", TEST_JOB_RUN_VERSION_GUID));
               handle.execute(format("delete from jobs where guid = '%s'", TEST_JOB_GUID));
             });
-            */
   }
 
   @Before
@@ -157,6 +156,8 @@ public class JobRunIntegrationTest {
       assertNotNull(returnedId);
       LOG.info("Returned id is: " + returnedId);
     } finally {
+      // TODO: This doesn't clean up correctly. Find out why.
+      // Temp workaround would be disable the AfterClass section.
       daoSetup
           .getJDBI()
           .useHandle(
@@ -164,8 +165,8 @@ public class JobRunIntegrationTest {
                 handle.execute(
                     format(
                         "delete from job_run_states where job_run_guid = '%s'",
-                            returnedId.toString()));
-                handle.execute(format("delete from job_runs where guid = '%s'", returnedId.toString()));
+                            returnedId));
+                handle.execute(format("delete from job_runs where guid = '%s'", returnedId));
               });
     }
   }
