@@ -153,8 +153,6 @@ public class JobRunIntegrationTest {
       assertNotNull(returnedId);
       LOG.info("Returned id is: " + returnedId);
     } finally {
-      // TODO: This doesn't clean up correctly. Find out why.
-      // Temp workaround would be disable the AfterClass section.
       daoSetup
           .getJDBI()
           .useHandle(
