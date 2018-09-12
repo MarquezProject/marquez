@@ -153,6 +153,8 @@ public class JobRunIntegrationTest {
       assertNotNull(returnedId);
       LOG.info("Returned id is: " + returnedId);
     } finally {
+      // TODO: This doesn't clean up correctly. Find out why.
+      // Temp workaround would be disable the AfterClass section.
       daoSetup
           .getJDBI()
           .useHandle(
@@ -176,6 +178,62 @@ public class JobRunIntegrationTest {
 
   @Test
   public void testJobRunAfterUpdateEndToEnd() {
+    final String jobRunUpdateRequestString =
+        format("{\"state\": \"RUNNING\"}", TEST_JOB_RUN_DEFINITION_GUID);
+    Entity jobRunRequestJsonAsEntity = Entity.json(jobRunUpdateRequestString);
+    final Response res =
+        daoSetup
+            .client()
+            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
+            .path(format("/job_runs/%s", NEW_JOB_RUN.getGuid()))
+            .request(MediaType.APPLICATION_JSON)
+            .put(jobRunRequestJsonAsEntity);
+
+    assertEquals(Response.Status.ACCEPTED.getStatusCode(), res.getStatus());
+
+    GetJobRunResponse responseBody = getJobRunResponse(NEW_JOB_RUN.getGuid());
+
+    assertEquals(
+        JobRunState.State.RUNNING, JobRunState.State.valueOf(responseBody.getCurrentState()));
+    assertNotNull(responseBody.getCreatedAt());
+    assertNotNull(responseBody.getStartedAt());
+    assertNull(responseBody.getEndedAt());
+  }
+
+  @Test
+  public void testJobRunAfterForbiddenUpdateEndToEnd() {
+    final String jobRunUpdateRequestString =
+        format("{\"state\": \"FAILED\"}", TEST_JOB_RUN_DEFINITION_GUID);
+    Entity jobRunRequestJsonAsEntity = Entity.json(jobRunUpdateRequestString);
+    final Response res =
+        daoSetup
+            .client()
+            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
+            .path(format("/job_runs/%s", NEW_JOB_RUN.getGuid()))
+            .request(MediaType.APPLICATION_JSON)
+            .put(jobRunRequestJsonAsEntity);
+
+    assertEquals(Response.Status.FORBIDDEN.getStatusCode(), res.getStatus());
+  }
+
+  @Test
+  public void testJobRunAfterInvalidUpdateEndToEnd() {
+    final String jobRunUpdateRequestString =
+        format("{\"state\": \"NO_SUCH_STATE\"}", TEST_JOB_RUN_DEFINITION_GUID);
+    Entity jobRunRequestJsonAsEntity = Entity.json(jobRunUpdateRequestString);
+    final Response res =
+        daoSetup
+            .client()
+            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
+            .path(format("/job_runs/%s", NEW_JOB_RUN.getGuid()))
+            .request(MediaType.APPLICATION_JSON)
+            .put(jobRunRequestJsonAsEntity);
+
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), res.getStatus());
+  }
+
+  @Test
+  public void testJobRunStateGetter() {
     JobRunState jrs = jobRunStateDAO.findJobLatestJobRunStateByJobRun(NEW_JOB_RUN.getGuid());
 
     final String path = "/job_run_states/" + jrs.getGuid();
