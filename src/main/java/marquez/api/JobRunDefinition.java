@@ -74,7 +74,7 @@ public final class JobRunDefinition {
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
-    if (!(o instanceof JobRun)) return false;
+    if (!(o instanceof JobRunDefinition)) return false;
 
     final JobRunDefinition other = (JobRunDefinition) o;
 
@@ -96,6 +96,7 @@ public final class JobRunDefinition {
     final StringBuilder sb = new StringBuilder();
     sb.append("JobRunDefinition{");
     sb.append("guid=").append(guid);
+    sb.append("job_version_guid=").append(jobVersionGuid);
     sb.append("runArgs=").append(runArgsJson);
     sb.append("uri=").append(URI);
     sb.append("nominalTimeStart=").append(nominalTimeStart);
