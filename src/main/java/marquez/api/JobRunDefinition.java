@@ -56,6 +56,11 @@ public final class JobRunDefinition {
     return UUID.nameUUIDFromBytes(raw);
   }
 
+  public UUID computeDefinitionHash() {
+    byte[] raw = String.format("%s:%s", runArgsJson, computeVersionGuid()).getBytes();
+    return UUID.nameUUIDFromBytes(raw);
+  }
+
   public static JobRunDefinition create(CreateJobRunDefinitionRequest request) {
     return new JobRunDefinition(
         null,
