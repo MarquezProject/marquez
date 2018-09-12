@@ -49,27 +49,39 @@ public class JobRunDefinitionDAOTest {
             });
   }
 
+  private static void insertJobRunDefinition(final JobRunDefinition jrd) {
+    daoSetup
+    .getJDBI()
+    .useHandle(
+        handle -> {
+          handle
+              .createUpdate(
+                  "INSERT INTO job_run_definitions(guid, job_version_guid, run_args_json, content_hash, nominal_time) VALUES (:guid, :job_version_guid, :run_args_json, :content_hash, :nominal_time)")
+              .bind("guid", jrd.getGuid())
+              .bind("job_version_guid", jrd.getJobVersionGuid())
+              .bind("run_args_json", jrd.getRunArgsJson())
+              .bind("content_hash", jrd.computeDefinitionHash())
+              .bind(
+                  "nominal_time",
+                  new Timestamp(new Date(jrd.getNominalTimeStart()).getTime()))
+              .execute();
+        });
+  }
+
   @Test
   public void testFindByHash() {
-    JobRunDefinition expectedJrd =
+    JobRunDefinition jrd =
         new JobRunDefinition(jobRunDefinitionGuid, jobVersionGuid, "{}", "", 0, 0);
-    daoSetup
-        .getJDBI()
-        .useHandle(
-            handle -> {
-              handle
-                  .createUpdate(
-                      "INSERT INTO job_run_definitions(guid, job_version_guid, run_args_json, content_hash, nominal_time) VALUES (:guid, :job_version_guid, :run_args_json, :content_hash, :nominal_time)")
-                  .bind("guid", expectedJrd.getGuid())
-                  .bind("job_version_guid", expectedJrd.getJobVersionGuid())
-                  .bind("run_args_json", expectedJrd.getRunArgsJson())
-                  .bind("content_hash", jobRunDefinitionHash)
-                  .bind(
-                      "nominal_time",
-                      new Timestamp(new Date(expectedJrd.getNominalTimeStart()).getTime()))
-                  .execute();
-            });
-    assertEquals(expectedJrd, jobRunDefDAO.findByHash(jobRunDefinitionHash));
+    insertJobRunDefinition(jrd);
+    assertEquals(jrd, jobRunDefDAO.findByHash(jrd.computeDefinitionHash()));
+  }
+
+  @Test
+  public void testFindByGuid() {
+    JobRunDefinition jrd =
+        new JobRunDefinition(jobRunDefinitionGuid, jobVersionGuid, "{}", "", 0, 0);
+    insertJobRunDefinition(jrd);
+    assertEquals(jrd, jobRunDefDAO.findByGuid(jrd.getGuid()));
   }
 
   @Test
