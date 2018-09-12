@@ -49,6 +49,10 @@ public class JobRunDefinitionDAOTest {
             });
   }
 
+  private JobRunDefinition genRandomFixture() {
+    return new JobRunDefinition(UUID.randomUUID(), jobVersionGuid, "{}", "", 0, 0);
+  }
+
   private static void insertJobRunDefinition(final JobRunDefinition jrd) {
     daoSetup
     .getJDBI()
@@ -70,25 +74,22 @@ public class JobRunDefinitionDAOTest {
 
   @Test
   public void testFindByHash() {
-    JobRunDefinition jrd =
-        new JobRunDefinition(jobRunDefinitionGuid, jobVersionGuid, "{}", "", 0, 0);
+    JobRunDefinition jrd = genRandomFixture();
     insertJobRunDefinition(jrd);
     assertEquals(jrd, jobRunDefDAO.findByHash(jrd.computeDefinitionHash()));
   }
 
   @Test
   public void testFindByGuid() {
-    JobRunDefinition jrd =
-        new JobRunDefinition(jobRunDefinitionGuid, jobVersionGuid, "{}", "", 0, 0);
+    JobRunDefinition jrd = genRandomFixture();
     insertJobRunDefinition(jrd);
     assertEquals(jrd, jobRunDefDAO.findByGuid(jrd.getGuid()));
   }
 
   @Test
   public void testInsert() {
-    jobRunDefDAO.insert(jobRunDefinitionGuid, jobRunDefinitionHash, jobVersionGuid, "{}");
-    JobRunDefinition expectedJrd =
-        new JobRunDefinition(jobRunDefinitionGuid, jobVersionGuid, "{}", "", 0, 0);
-    assertEquals(expectedJrd, jobRunDefDAO.findByHash(jobRunDefinitionHash));
+    JobRunDefinition jrd = genRandomFixture();
+    jobRunDefDAO.insert(jrd.getGuid(), jrd.computeDefinitionHash(), jrd.getJobVersionGuid(), jrd.getRunArgsJson());
+    assertEquals(jrd, jobRunDefDAO.findByHash(jrd.computeDefinitionHash()));
   }
 }
