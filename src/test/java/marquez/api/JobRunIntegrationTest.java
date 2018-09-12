@@ -60,7 +60,7 @@ public class JobRunIntegrationTest {
 
   @AfterClass
   public static void tearDown() {
-    //TODO: Fix this.
+    // TODO: Fix this.
     daoSetup
         .getJDBI()
         .useHandle(
@@ -163,9 +163,7 @@ public class JobRunIntegrationTest {
           .useHandle(
               handle -> {
                 handle.execute(
-                    format(
-                        "delete from job_run_states where job_run_guid = '%s'",
-                            returnedId));
+                    format("delete from job_run_states where job_run_guid = '%s'", returnedId));
                 handle.execute(format("delete from job_runs where guid = '%s'", returnedId));
               });
     }
