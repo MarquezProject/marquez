@@ -166,21 +166,6 @@ public class JobRunIntegrationTest {
     }
   }
 
-  @Ignore("in development")
-  @Test
-  public void testJobRunStateCreatedUponJobRunCreationEndToEnd() {
-    final String path = "/job_runs";
-    final Response res =
-        daoSetup
-            .client()
-            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
-            .path(path)
-            .request(MediaType.APPLICATION_JSON)
-            .post(Entity.json("{'k':'v'}"));
-    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    assertEquals(res.readEntity(String.class), "pong");
-  }
-
   @Test
   public void testJobRunGetterEndToEnd() {
     GetJobRunResponse responseBody = getJobRunResponse(NEW_JOB_RUN.getGuid());
