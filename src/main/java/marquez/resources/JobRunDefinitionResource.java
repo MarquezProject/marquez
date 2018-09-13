@@ -84,7 +84,7 @@ public final class JobRunDefinitionResource extends BaseResource {
           jobRunDefGuid, definitionHash, jobVersionGuid, request.getRunArgsJson());
       resJrd =
           new JobRunDefinition(
-              jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(), request.getURI(), 0, 0);
+              jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(),  0, 0);
     } else {
       resJrd = existingJrd;
     }

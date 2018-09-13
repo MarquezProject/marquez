@@ -217,7 +217,6 @@ public class JobRunDefinitionResourceTest {
             UUID.randomUUID(),
             existingJobVersion.getGuid(),
             request.getRunArgsJson(),
-            request.getURI(),
             0,
             0);
     when(jobRunDefDAO.findByHash(reqJrd.computeDefinitionHash()))

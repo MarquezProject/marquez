@@ -14,7 +14,6 @@ public class JobRunDefinitionRow implements RowMapper<JobRunDefinition> {
         UUID.fromString(rs.getString("guid")),
         UUID.fromString(rs.getString("job_version_guid")),
         rs.getString("run_args_json"),
-        "",
         0,
         0);
   }
