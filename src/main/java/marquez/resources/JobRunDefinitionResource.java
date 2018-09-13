@@ -78,19 +78,22 @@ public final class JobRunDefinitionResource extends BaseResource {
     UUID definitionHash = reqJrd.computeDefinitionHash();
     JobRunDefinition existingJrd = jobRunDefDAO.findByHash(definitionHash);
     JobRunDefinition resJrd;
+    Integer resStatus;
     if (existingJrd == null) {
       UUID jobRunDefGuid = UUID.randomUUID();
       this.jobRunDefDAO.insert(
           jobRunDefGuid, definitionHash, jobVersionGuid, request.getRunArgsJson());
       resJrd = new JobRunDefinition(jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(), 0, 0);
+      resStatus = HTTP_CREATED;
     } else {
       resJrd = existingJrd;
+      resStatus = HTTP_OK;
     }
 
     CreateJobRunDefinitionResponse res = new CreateJobRunDefinitionResponse(resJrd.getGuid());
     try {
       String jsonRes = mapper.writeValueAsString(res);
-      return Response.status(HTTP_CREATED)
+      return Response.status(resStatus)
           .header("Location", "/job_run_definition/" + resJrd.getGuid())
           .entity(jsonRes)
           .type(APPLICATION_JSON)
