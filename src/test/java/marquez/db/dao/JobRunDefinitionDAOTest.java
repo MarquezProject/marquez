@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.UUID;
 import java.util.Random;
+import java.util.UUID;
 import marquez.api.Job;
 import marquez.api.JobRunDefinition;
 import marquez.db.dao.fixtures.DAOSetup;
@@ -57,21 +57,20 @@ public class JobRunDefinitionDAOTest {
 
   private static void insertJobRunDefinition(final JobRunDefinition jrd) {
     daoSetup
-    .getJDBI()
-    .useHandle(
-        handle -> {
-          handle
-              .createUpdate(
-                  "INSERT INTO job_run_definitions(guid, job_version_guid, run_args_json, content_hash, nominal_time) VALUES (:guid, :job_version_guid, :run_args_json, :content_hash, :nominal_time)")
-              .bind("guid", jrd.getGuid())
-              .bind("job_version_guid", jrd.getJobVersionGuid())
-              .bind("run_args_json", jrd.getRunArgsJson())
-              .bind("content_hash", jrd.computeDefinitionHash())
-              .bind(
-                  "nominal_time",
-                  new Timestamp(new Date(jrd.getNominalTimeStart()).getTime()))
-              .execute();
-        });
+        .getJDBI()
+        .useHandle(
+            handle -> {
+              handle
+                  .createUpdate(
+                      "INSERT INTO job_run_definitions(guid, job_version_guid, run_args_json, content_hash, nominal_time) VALUES (:guid, :job_version_guid, :run_args_json, :content_hash, :nominal_time)")
+                  .bind("guid", jrd.getGuid())
+                  .bind("job_version_guid", jrd.getJobVersionGuid())
+                  .bind("run_args_json", jrd.getRunArgsJson())
+                  .bind("content_hash", jrd.computeDefinitionHash())
+                  .bind(
+                      "nominal_time", new Timestamp(new Date(jrd.getNominalTimeStart()).getTime()))
+                  .execute();
+            });
   }
 
   @Test
@@ -109,12 +108,12 @@ public class JobRunDefinitionDAOTest {
     assertEquals(jrd1, jobRunDefDAO.findByGuid(jrd1.getGuid()));
     assertEquals(jrd2, jobRunDefDAO.findByGuid(jrd2.getGuid()));
   }
-  
 
   @Test
   public void testInsert() {
     JobRunDefinition jrd = genRandomFixture();
-    jobRunDefDAO.insert(jrd.getGuid(), jrd.computeDefinitionHash(), jrd.getJobVersionGuid(), jrd.getRunArgsJson());
+    jobRunDefDAO.insert(
+        jrd.getGuid(), jrd.computeDefinitionHash(), jrd.getJobVersionGuid(), jrd.getRunArgsJson());
     assertEquals(jrd, jobRunDefDAO.findByHash(jrd.computeDefinitionHash()));
   }
 }
