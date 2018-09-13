@@ -2,6 +2,10 @@ package marquez.api.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public final class CreateJobRunDefinitionRequest {
   private final String name;
@@ -55,5 +59,15 @@ public final class CreateJobRunDefinitionRequest {
   @JsonProperty("owner_name")
   public String getOwnerName() {
     return ownerName;
+  }
+
+  public boolean validate() {
+    try {
+      new JSONObject(runArgsJson);
+      new URI(URI);
+    } catch (JSONException | URISyntaxException e) {
+      return false;
+    }
+    return true;
   }
 }

@@ -10,6 +10,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import marquez.api.Job;
 import marquez.api.JobRunDefinition;
 import marquez.api.JobVersion;
@@ -42,6 +43,11 @@ public final class JobRunDefinitionResource extends BaseResource {
   @Consumes(APPLICATION_JSON)
   @Timed
   public Response create(@Valid CreateJobRunDefinitionRequest request) {
+    // validate arguments
+    if (!request.validate()) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
     // register the new owner, if necessary
     Owner owner = this.ownerDAO.findByName(request.getOwnerName());
     if (owner == null) {
