@@ -51,20 +51,16 @@ public final class JobRunDefinition {
     return nominalTimeEnd;
   }
 
-  public UUID computeVersionGuid() {
-    byte[] raw = String.format("%s", URI).getBytes();
-    return UUID.nameUUIDFromBytes(raw);
-  }
-
   public UUID computeDefinitionHash() {
-    byte[] raw = String.format("%s:%s", runArgsJson, computeVersionGuid()).getBytes();
+    byte[] raw = String.format("%s:%s", runArgsJson, jobVersionGuid).getBytes();
     return UUID.nameUUIDFromBytes(raw);
   }
 
-  public static JobRunDefinition create(CreateJobRunDefinitionRequest request) {
+  public static JobRunDefinition create(
+      CreateJobRunDefinitionRequest request, UUID jobVersionGuid) {
     return new JobRunDefinition(
         null,
-        null,
+        jobVersionGuid,
         request.getRunArgsJson(),
         request.getURI(),
         request.getNominalTimeStart(),

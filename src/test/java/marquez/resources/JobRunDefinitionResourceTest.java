@@ -68,20 +68,21 @@ public class JobRunDefinitionResourceTest {
     assertEquals(jobArgCaptor.getValue().getOwnerName(), request.getOwnerName());
 
     // a new Job Version is created, with correct job guid and version
-    JobRunDefinition jrd = JobRunDefinition.create(request);
+    JobVersion reqJV = JobVersion.create(request);
     ArgumentCaptor<UUID> jobVersionGuidCaptor = ArgumentCaptor.forClass(UUID.class);
     verify(jobVersionDAO)
         .insert(
             jobVersionGuidCaptor.capture(),
-            eq(jrd.computeVersionGuid()),
+            eq(reqJV.computeVersionGuid()),
             eq(jobArgCaptor.getValue().getGuid()),
             eq(request.getURI()));
 
     // a new JobRunDefinition is created, with correct job version guid
+    JobRunDefinition reqJrd = JobRunDefinition.create(request, jobVersionGuidCaptor.getValue());
     verify(jobRunDefDAO)
         .insert(
             any(UUID.class),
-            eq(jrd.computeDefinitionHash()),
+            eq(reqJrd.computeDefinitionHash()),
             eq(jobVersionGuidCaptor.getValue()),
             eq(request.getRunArgsJson()));
   }
@@ -120,16 +121,17 @@ public class JobRunDefinitionResourceTest {
     verify(jobDAO, never()).insert(any(Job.class));
 
     // a new Job Version is created, with correct job guid and version
-    JobRunDefinition jrd = JobRunDefinition.create(request);
+    JobVersion reqJV = JobVersion.create(request);
     ArgumentCaptor<UUID> jobVersionGuidCaptor = ArgumentCaptor.forClass(UUID.class);
     verify(jobVersionDAO)
         .insert(
             jobVersionGuidCaptor.capture(),
-            eq(jrd.computeVersionGuid()),
+            eq(reqJV.computeVersionGuid()),
             eq(existingJob.getGuid()),
             eq(request.getURI()));
 
     // a new JobRunDefinition is created, with correct job version guid
+    JobRunDefinition jrd = JobRunDefinition.create(request, jobVersionGuidCaptor.getValue());
     verify(jobRunDefDAO)
         .insert(
             any(UUID.class),
@@ -151,9 +153,9 @@ public class JobRunDefinitionResourceTest {
             "");
     when(jobDAO.findByName(eq(request.getName()))).thenReturn(existingJob);
 
-    // create a JobRunDefinition from request so we can compute version
-    JobRunDefinition jrd = JobRunDefinition.create(request);
-    UUID versionUUID = jrd.computeVersionGuid();
+    // create a JobVersion from request so we can compute version
+    JobVersion reqJV = JobVersion.create(request);
+    UUID versionUUID = reqJV.computeVersionGuid();
     JobVersion existingJobVersion =
         new JobVersion(
             UUID.randomUUID(),
@@ -172,6 +174,7 @@ public class JobRunDefinitionResourceTest {
         .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
 
     // a new JobRunDefinition is created, with correct job version guid
+    JobRunDefinition jrd = JobRunDefinition.create(request, existingJobVersion.getGuid());
     verify(jobRunDefDAO)
         .insert(
             any(UUID.class),
@@ -193,10 +196,9 @@ public class JobRunDefinitionResourceTest {
             "");
     when(jobDAO.findByName(eq(request.getName()))).thenReturn(existingJob);
 
-    // create a JobRunDefinition from request so we can compute version
-    JobRunDefinition reqJrd = JobRunDefinition.create(request);
-
-    UUID versionUUID = reqJrd.computeVersionGuid();
+    // create a JobVersion from request so we can compute version
+    JobVersion reqJV = JobVersion.create(request);
+    UUID versionUUID = reqJV.computeVersionGuid();
     JobVersion existingJobVersion =
         new JobVersion(
             UUID.randomUUID(),
@@ -208,7 +210,8 @@ public class JobRunDefinitionResourceTest {
             new Timestamp(new Date(0).getTime()));
     when(jobVersionDAO.findByVersion(versionUUID)).thenReturn(existingJobVersion);
 
-    // return the existing Job Run Definition with a hash lookup
+    // return the existing Job Run Definition which matches the request Job Run Definition
+    JobRunDefinition reqJrd = JobRunDefinition.create(request, existingJobVersion.getGuid());
     JobRunDefinition existingJobRunDefinition =
         new JobRunDefinition(
             UUID.randomUUID(),

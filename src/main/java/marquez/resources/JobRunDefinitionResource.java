@@ -60,8 +60,8 @@ public final class JobRunDefinitionResource extends BaseResource {
     }
 
     // find or create the job version
-    JobRunDefinition reqJrd = JobRunDefinition.create(request);
-    UUID computedVersion = reqJrd.computeVersionGuid();
+    JobVersion reqJV = JobVersion.create(request);
+    UUID computedVersion = reqJV.computeVersionGuid();
     JobVersion matchingJobVersion = this.jobVersionDAO.findByVersion(computedVersion);
 
     UUID jobVersionGuid;
@@ -74,6 +74,7 @@ public final class JobRunDefinitionResource extends BaseResource {
     }
 
     // find or create a new Job Run Definition
+    JobRunDefinition reqJrd = JobRunDefinition.create(request, jobVersionGuid);
     UUID definitionHash = reqJrd.computeDefinitionHash();
     JobRunDefinition existingJrd = jobRunDefDAO.findByHash(definitionHash);
     JobRunDefinition resJrd;

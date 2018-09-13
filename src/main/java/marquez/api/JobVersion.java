@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
+import marquez.api.entities.*;
 
 public final class JobVersion {
 
@@ -72,6 +73,15 @@ public final class JobVersion {
         && Objects.equals(createdAt, other.createdAt)
         && Objects.equals(latestJobRunGuid, other.latestJobRunGuid)
         && Objects.equals(updatedAt, other.updatedAt);
+  }
+
+  public static JobVersion create(CreateJobRunDefinitionRequest request) {
+    return new JobVersion(null, null, request.getURI(), null, null, null, null);
+  }
+
+  public UUID computeVersionGuid() {
+    byte[] raw = String.format("%s", uri).getBytes();
+    return UUID.nameUUIDFromBytes(raw);
   }
 
   @Override
