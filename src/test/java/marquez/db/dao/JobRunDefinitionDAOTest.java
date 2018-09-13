@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
+import java.util.Random;
 import marquez.api.Job;
 import marquez.api.JobRunDefinition;
 import marquez.db.dao.fixtures.DAOSetup;
@@ -50,7 +51,8 @@ public class JobRunDefinitionDAOTest {
   }
 
   private JobRunDefinition genRandomFixture() {
-    return new JobRunDefinition(UUID.randomUUID(), jobVersionGuid, "{}", "", 0, 0);
+    String runArgs = String.format("{'foo': %d}", new Random().nextInt(100));
+    return new JobRunDefinition(UUID.randomUUID(), jobVersionGuid, runArgs, "", 0, 0);
   }
 
   private static void insertJobRunDefinition(final JobRunDefinition jrd) {
@@ -80,11 +82,34 @@ public class JobRunDefinitionDAOTest {
   }
 
   @Test
+  public void testFindByHash_Multi() {
+    JobRunDefinition jrd1 = genRandomFixture();
+    insertJobRunDefinition(jrd1);
+    JobRunDefinition jrd2 = genRandomFixture();
+    insertJobRunDefinition(jrd2);
+
+    assertEquals(jrd1, jobRunDefDAO.findByHash(jrd1.computeDefinitionHash()));
+    assertEquals(jrd2, jobRunDefDAO.findByHash(jrd2.computeDefinitionHash()));
+  }
+
+  @Test
   public void testFindByGuid() {
     JobRunDefinition jrd = genRandomFixture();
     insertJobRunDefinition(jrd);
     assertEquals(jrd, jobRunDefDAO.findByGuid(jrd.getGuid()));
   }
+
+  @Test
+  public void testFindByGuid_Multi() {
+    JobRunDefinition jrd1 = genRandomFixture();
+    insertJobRunDefinition(jrd1);
+    JobRunDefinition jrd2 = genRandomFixture();
+    insertJobRunDefinition(jrd2);
+
+    assertEquals(jrd1, jobRunDefDAO.findByGuid(jrd1.getGuid()));
+    assertEquals(jrd2, jobRunDefDAO.findByGuid(jrd2.getGuid()));
+  }
+  
 
   @Test
   public void testInsert() {
