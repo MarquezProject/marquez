@@ -35,21 +35,6 @@ public class MarquezAppIntegrationTest {
     CreateJobRunDefinitionRequest req =
         new CreateJobRunDefinitionRequest("job name", "{}", 0, 0, "http://foo.bar", "my owner");
 
-    final Response res =
-        APP.client()
-            .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/job_run_definition")
-            .request()
-            .post(entity(req, APPLICATION_JSON));
-
-    assertEquals(res.getStatus(), 201);
-  }
-
-  @Test
-  public void createJobRunDefinition_Dedup_OK() {
-    CreateJobRunDefinitionRequest req =
-        new CreateJobRunDefinitionRequest("job name", "{}", 0, 0, "http://foo.bar", "my owner");
-
     final Response res1 =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
@@ -65,7 +50,8 @@ public class MarquezAppIntegrationTest {
             .post(entity(req, APPLICATION_JSON));
 
     assertEquals(res1.readEntity(String.class), res2.readEntity(String.class));
-    assertEquals(res2.getStatus(), 200);
+    assertEquals(201, res1.getStatus());
+    assertEquals(200, res2.getStatus());
   }
 
   @Test
