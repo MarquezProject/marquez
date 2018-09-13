@@ -6,8 +6,6 @@ import java.net.URI;
 
 abstract class BaseResource {
   protected static final ObjectMapper mapper = Jackson.newObjectMapper();
-  protected static final Integer HTTP_OK = 200;
-  protected static final Integer HTTP_CREATED = 201;
 
   URI buildURI(final Class<?> resource, final String id) {
     return URI.create(String.format("/%ss/%s", name(resource), id));

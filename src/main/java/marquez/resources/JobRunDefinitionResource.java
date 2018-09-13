@@ -84,16 +84,17 @@ public final class JobRunDefinitionResource extends BaseResource {
     UUID definitionHash = reqJrd.computeDefinitionHash();
     JobRunDefinition existingJrd = jobRunDefDAO.findByHash(definitionHash);
     JobRunDefinition resJrd;
-    Integer resStatus;
+
+    Status resStatus;
     if (existingJrd == null) {
       UUID jobRunDefGuid = UUID.randomUUID();
       this.jobRunDefDAO.insert(
           jobRunDefGuid, definitionHash, jobVersionGuid, request.getRunArgsJson());
       resJrd = new JobRunDefinition(jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(), 0, 0);
-      resStatus = HTTP_CREATED;
+      resStatus = Status.CREATED;
     } else {
       resJrd = existingJrd;
-      resStatus = HTTP_OK;
+      resStatus = Status.OK;
     }
 
     CreateJobRunDefinitionResponse res = new CreateJobRunDefinitionResponse(resJrd.getGuid());
