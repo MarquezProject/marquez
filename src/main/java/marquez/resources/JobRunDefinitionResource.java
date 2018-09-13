@@ -82,9 +82,7 @@ public final class JobRunDefinitionResource extends BaseResource {
       UUID jobRunDefGuid = UUID.randomUUID();
       this.jobRunDefDAO.insert(
           jobRunDefGuid, definitionHash, jobVersionGuid, request.getRunArgsJson());
-      resJrd =
-          new JobRunDefinition(
-              jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(),  0, 0);
+      resJrd = new JobRunDefinition(jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(), 0, 0);
     } else {
       resJrd = existingJrd;
     }

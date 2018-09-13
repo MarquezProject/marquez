@@ -214,11 +214,7 @@ public class JobRunDefinitionResourceTest {
     JobRunDefinition reqJrd = JobRunDefinition.create(request, existingJobVersion.getGuid());
     JobRunDefinition existingJobRunDefinition =
         new JobRunDefinition(
-            UUID.randomUUID(),
-            existingJobVersion.getGuid(),
-            request.getRunArgsJson(),
-            0,
-            0);
+            UUID.randomUUID(), existingJobVersion.getGuid(), request.getRunArgsJson(), 0, 0);
     when(jobRunDefDAO.findByHash(reqJrd.computeDefinitionHash()))
         .thenReturn(existingJobRunDefinition);
 
