@@ -117,7 +117,6 @@ public class JobRunResource extends BaseResource {
           .type(APPLICATION_JSON)
           .build();
     } catch (Exception e) {
-      System.out.println("bad");
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
           .entity(Entity.json("{'error' : 'an unexpected error occurred.'}"))
           .type(APPLICATION_JSON)
