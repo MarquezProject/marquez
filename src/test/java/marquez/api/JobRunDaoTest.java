@@ -17,8 +17,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @BeforeClass
   public static void setUpRowMapper() {
-    daoSetup
-        .getJDBI()
+    APP.getJDBI()
         .registerRowMapper(
             JobRunState.class,
             (rs, ctx) ->
@@ -59,7 +58,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
   }
 
   private JobRunState getLatestJobRunStateForJobId(UUID jobRunId) {
-    Handle handle = daoSetup.getJDBI().open();
+    Handle handle = APP.getJDBI().open();
     Query qr =
         handle.select(
             format(

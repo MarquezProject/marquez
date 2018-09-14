@@ -3,8 +3,10 @@ package marquez.db.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import com.opentable.db.postgres.embedded.FlywayPreparer;
 import java.util.UUID;
 import marquez.api.Owner;
+import marquez.db.dao.fixtures.ConfigExportingPreparedDbRule;
 import marquez.db.dao.fixtures.DAOSetup;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -12,15 +14,20 @@ import org.junit.Test;
 
 public class TestOwnerDAO {
 
-  @ClassRule public static final DAOSetup daoSetup = new DAOSetup();
+  @ClassRule
+  public static ConfigExportingPreparedDbRule DB =
+      new ConfigExportingPreparedDbRule(
+          FlywayPreparer.forClasspathLocation("db/migration"),
+          DAOSetup.POSTGRES_FULL_TEST_CONFIG_FILE_PATH);
 
-  final OwnerDAO ownerDAO = daoSetup.onDemand(OwnerDAO.class);
+  @ClassRule public static final DAOSetup APP = new DAOSetup();
+
+  final OwnerDAO ownerDAO = APP.onDemand(OwnerDAO.class);
   final Owner testOwner = new Owner("Amaranta");
 
   @Before
   public void setUp() {
-    daoSetup
-        .getJDBI()
+    APP.getJDBI()
         .useHandle(
             handle -> {
               handle.execute("DELETE FROM ownerships");
@@ -29,8 +36,7 @@ public class TestOwnerDAO {
   }
 
   private static String ownerDeletedAt(String name) {
-    return daoSetup
-        .getJDBI()
+    return APP.getJDBI()
         .withHandle(
             handle ->
                 handle

@@ -2,46 +2,40 @@ package marquez.db.dao.fixtures;
 
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
-import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import marquez.MarquezApp;
 import marquez.MarquezConfig;
-import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.h2.H2DatabasePlugin;
+import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
-/** Init code for testing DAOs against h2 */
+/** Init code for testing DAOs against postgres */
 public class DAOSetup extends DropwizardAppRule<MarquezConfig> {
-
-  /** config file for h2 */
-  private static final String h2Config = DAOSetup.class.getResource("/config.test.yml").getPath();
+  public static final String POSTGRES_TEST_CONFIG_FILE_NAME = "config.test.yml";
+  public static final String POSTGRES_FULL_TEST_CONFIG_FILE_PATH =
+      "src/test/resources/" + POSTGRES_TEST_CONFIG_FILE_NAME;
 
   private Jdbi jdbi;
 
   public DAOSetup() {
-    super(MarquezApp.class, h2Config);
+    super(MarquezApp.class, POSTGRES_FULL_TEST_CONFIG_FILE_PATH);
   }
 
   @Override
   protected void before() {
     super.before();
-    // init db
+    // init DB
     JdbiFactory factory = new JdbiFactory();
     MarquezConfig config = this.getConfiguration();
     DataSourceFactory dataSourceFactory = config.getDataSourceFactory();
-    ManagedDataSource dataSource = dataSourceFactory.build(this.getEnvironment().metrics(), "h2");
+    ManagedDataSource dataSource =
+        dataSourceFactory.build(this.getEnvironment().metrics(), "postgres");
     jdbi =
         factory
-            .build(this.getEnvironment(), dataSourceFactory, dataSource, "h2")
+            .build(this.getEnvironment(), dataSourceFactory, dataSource, "postgres")
             .installPlugin(new SqlObjectPlugin())
-            .installPlugin(new H2DatabasePlugin());
-
-    // setup schema
-    FlywayFactory flywayFactory = config.getFlywayFactory();
-    Flyway flyway = flywayFactory.build(dataSource);
-    flyway.migrate();
+            .installPlugin(new PostgresPlugin());
   }
 
   public Jdbi getJDBI() {

@@ -4,9 +4,11 @@ import static java.lang.String.format;
 import static marquez.api.JobRunState.State.toInt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opentable.db.postgres.embedded.FlywayPreparer;
 import io.dropwizard.jackson.Jackson;
 import java.util.UUID;
 import marquez.db.dao.JobRunDAO;
+import marquez.db.dao.fixtures.ConfigExportingPreparedDbRule;
 import marquez.db.dao.fixtures.DAOSetup;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -21,8 +23,14 @@ public abstract class JobRunBaseTest {
   static final String TEST_JOB_RUN_VERSION_GUID = UUID.randomUUID().toString();
   static final String TEST_JOB_RUN_DEFINITION_GUID = UUID.randomUUID().toString();
 
-  @ClassRule public static final DAOSetup daoSetup = new DAOSetup();
-  final JobRunDAO jobRunDAO = daoSetup.onDemand(JobRunDAO.class);
+  @ClassRule
+  public static ConfigExportingPreparedDbRule DB =
+      new ConfigExportingPreparedDbRule(
+          FlywayPreparer.forClasspathLocation("db/migration"),
+          DAOSetup.POSTGRES_FULL_TEST_CONFIG_FILE_PATH);
+
+  @ClassRule public static final DAOSetup APP = new DAOSetup();
+  final JobRunDAO jobRunDAO = APP.onDemand(JobRunDAO.class);
 
   protected static JobRun NEW_JOB_RUN =
       new JobRun(
@@ -34,23 +42,22 @@ public abstract class JobRunBaseTest {
 
   @BeforeClass
   public static void setUp() {
-    daoSetup
-        .getJDBI()
+    APP.getJDBI()
         .useHandle(
             handle -> {
               handle.execute(
                   format(
-                      "merge into jobs (guid, name, category, description) values "
+                      "insert into jobs (guid, name, category, description) values "
                           + "('%s', 'my_job', 'testing', 'fake job for reference');",
                       TEST_JOB_GUID));
               handle.execute(
                   format(
-                      "merge into job_versions (guid, input_dataset, output_dataset, job_guid) values "
+                      "insert into job_versions (guid, input_dataset, output_dataset, job_guid) values "
                           + "('%s', 'input_set1', 'output_set1', '%s');",
                       TEST_JOB_RUN_VERSION_GUID, TEST_JOB_GUID));
               handle.execute(
                   format(
-                      "merge into job_run_definitions (guid, job_version_guid, run_args_json, content_hash, nominal_start_time, nominal_end_time) values "
+                      "insert into job_run_definitions (guid, job_version_guid, run_args_json, content_hash, nominal_start_time, nominal_end_time) values "
                           + "('%s', '%s', '--my-favorite-flag', '6706da44-61d9-454d-a6c3-b9fea5a92a43', 5000, 10000);",
                       TEST_JOB_RUN_DEFINITION_GUID, TEST_JOB_RUN_VERSION_GUID));
             });
@@ -58,8 +65,7 @@ public abstract class JobRunBaseTest {
 
   @AfterClass
   public static void tearDown() {
-    daoSetup
-        .getJDBI()
+    APP.getJDBI()
         .useHandle(
             handle -> {
               handle.execute(
@@ -79,8 +85,7 @@ public abstract class JobRunBaseTest {
 
   @After
   public void cleanup() {
-    daoSetup
-        .getJDBI()
+    APP.getJDBI()
         .useHandle(
             handle -> {
               handle.execute(
