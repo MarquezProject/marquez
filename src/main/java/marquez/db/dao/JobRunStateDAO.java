@@ -1,5 +1,6 @@
 package marquez.db.dao;
 
+import java.util.UUID;
 import marquez.api.JobRunState;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -9,19 +10,15 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Timestamp;
-import java.util.UUID;
-
 @RegisterRowMapper(JobRunStateRow.class)
 public interface JobRunStateDAO extends SqlObject {
   static final Logger LOG = LoggerFactory.getLogger(JobRunStateDAO.class);
 
   @SqlUpdate(
-      "INSERT INTO job_run_states (guid, job_run_guid, transitioned_at, state)"
-          + "VALUES (:guid, :job_run_guid, :transitioned_at, :state)")
+      "INSERT INTO job_run_states (guid, job_run_guid, state)"
+          + "VALUES (:guid, :job_run_guid, :state)")
   void insert(
       @Bind("guid") final UUID guid,
-      @Bind("transitioned_at") final Timestamp transitionedAt,
       @Bind("job_run_guid") UUID job_run_guid,
       @Bind("state") final Integer state);
 

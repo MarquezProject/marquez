@@ -1,16 +1,13 @@
 package marquez.resources;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static marquez.api.JobRunState.State.fromInt;
+import static marquez.api.JobRunState.State.toInt;
+
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import marquez.api.CreateJobRunRequest;
-import marquez.api.CreateJobRunResponse;
-import marquez.api.GetJobRunResponse;
-import marquez.api.JobRun;
-import marquez.api.JobRunState;
-import marquez.api.UpdateJobRunRequest;
-import marquez.api.UpdateJobRunResponse;
-import marquez.db.dao.JobRunDAO;
-
+import java.sql.Timestamp;
+import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -21,12 +18,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
-import java.sql.Timestamp;
-import java.util.UUID;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static marquez.api.JobRunState.State.fromInt;
-import static marquez.api.JobRunState.State.toInt;
+import marquez.api.CreateJobRunRequest;
+import marquez.api.CreateJobRunResponse;
+import marquez.api.GetJobRunResponse;
+import marquez.api.JobRun;
+import marquez.api.JobRunState;
+import marquez.api.UpdateJobRunRequest;
+import marquez.api.UpdateJobRunResponse;
+import marquez.db.dao.JobRunDAO;
 
 @Path("/job_runs")
 @Produces(APPLICATION_JSON)
@@ -49,12 +48,7 @@ public class JobRunResource extends BaseResource {
     try {
       JobRun jobRun =
           new JobRun(
-              jobRunGuid,
-              new Timestamp(System.currentTimeMillis()),
-              null,
-              null,
-              request.getJobRunDefinitionGuid(),
-              request.getState());
+              jobRunGuid, null, null, request.getRunDefinitionId(), toInt(JobRunState.State.NEW));
       dao.insert(jobRun);
 
       CreateJobRunResponse res = new CreateJobRunResponse(jobRunGuid);
@@ -109,7 +103,6 @@ public class JobRunResource extends BaseResource {
       JobRun updatedJobRunRow =
           new JobRun(
               existingJobRunRow.getGuid(),
-              existingJobRunRow.getCreatedAt(),
               startedAt,
               endedAt,
               existingJobRunRow.getJobRunDefinitionGuid(),
@@ -141,7 +134,6 @@ public class JobRunResource extends BaseResource {
     GetJobRunResponse getJobRunResponse =
         new GetJobRunResponse(
             result.getGuid(),
-            result.getCreatedAt(),
             result.getStartedAt(),
             result.getEndedAt(),
             result.getJobRunDefinitionGuid(),

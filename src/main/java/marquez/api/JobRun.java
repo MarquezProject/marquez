@@ -1,7 +1,5 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,8 +10,7 @@ import java.util.UUID;
 
 public final class JobRun {
 
-  @JsonIgnore private final UUID guid;
-  private final Timestamp createdAt;
+  private final UUID guid;
   private final Timestamp startedAt;
   private final Timestamp endedAt;
   private final UUID jobRunDefinitionGuid;
@@ -46,26 +43,19 @@ public final class JobRun {
 
   public JobRun(
       final UUID guid,
-      final Timestamp createdAt,
       final Timestamp startedAt,
       final Timestamp endedAt,
       final UUID jobRunDefinitionGuid,
       final Integer currentState) {
     this.guid = guid;
-    this.createdAt = createdAt;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
     this.jobRunDefinitionGuid = jobRunDefinitionGuid;
     this.currentState = currentState;
   }
 
-  @JsonIgnore
   public UUID getGuid() {
     return guid;
-  }
-
-  public Timestamp getCreatedAt() {
-    return createdAt;
   }
 
   public Timestamp getStartedAt() {
@@ -92,7 +82,6 @@ public final class JobRun {
     final JobRun other = (JobRun) o;
 
     return Objects.equals(guid, other.guid)
-        && Objects.equals(createdAt, other.createdAt)
         && Objects.equals(startedAt, other.startedAt)
         && Objects.equals(endedAt, other.endedAt)
         && Objects.equals(jobRunDefinitionGuid, other.jobRunDefinitionGuid)
@@ -111,7 +100,7 @@ public final class JobRun {
 
   @Override
   public int hashCode() {
-    return Objects.hash(guid, createdAt, startedAt, endedAt, jobRunDefinitionGuid, currentState);
+    return Objects.hash(guid, startedAt, endedAt, jobRunDefinitionGuid, currentState);
   }
 
   @Override
@@ -119,7 +108,6 @@ public final class JobRun {
     final StringBuilder sb = new StringBuilder();
     sb.append("JobRun{");
     sb.append("guid=").append(guid);
-    sb.append("createdAt=").append(createdAt);
     sb.append("startedAt=").append(startedAt);
     sb.append("endedAt=").append(endedAt);
     sb.append("jobRunDefinitionGuid=").append(jobRunDefinitionGuid);

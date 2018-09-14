@@ -2,12 +2,11 @@ package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
+import javax.validation.constraints.NotNull;
 
 public final class IcebergTableVersion extends DatasetVersion {
   @NotNull private final long previousSnapshotId;

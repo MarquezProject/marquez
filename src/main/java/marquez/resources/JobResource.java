@@ -1,9 +1,8 @@
 package marquez.resources;
 
-import com.codahale.metrics.annotation.Timed;
-import marquez.api.Job;
-import marquez.db.dao.JobDAO;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import com.codahale.metrics.annotation.Timed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -14,8 +13,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import marquez.api.Job;
+import marquez.db.dao.JobDAO;
 
 @Path("/jobs")
 @Produces(APPLICATION_JSON)

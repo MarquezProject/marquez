@@ -1,11 +1,10 @@
 package marquez.db.dao;
 
+import java.util.List;
+import java.util.UUID;
 import marquez.api.Db;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-
-import java.util.List;
-import java.util.UUID;
 
 public interface DbDAO {
   @SqlQuery("SELECT * FROM dbs WHERE guid = :guid")

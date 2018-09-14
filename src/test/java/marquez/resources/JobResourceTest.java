@@ -1,10 +1,10 @@
 package marquez.resources;
 
+import static org.mockito.Mockito.mock;
+
 import io.dropwizard.testing.junit.ResourceTestRule;
 import marquez.db.dao.JobDAO;
 import org.junit.ClassRule;
-
-import static org.mockito.Mockito.mock;
 
 class JobResourceTest {
   private static final JobDAO JOB_DAO = mock(JobDAO.class);

@@ -1,5 +1,18 @@
 package marquez.api;
 
+import static java.lang.String.format;
+import static marquez.api.JobRunState.State.fromInt;
+import static marquez.api.JobRunState.State.toInt;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.net.URI;
+import java.sql.Timestamp;
+import java.util.UUID;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import marquez.db.dao.JobRunDAO;
 import marquez.db.dao.JobRunStateDAO;
 import marquez.db.dao.fixtures.DAOSetup;
@@ -11,20 +24,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.net.URI;
-import java.sql.Timestamp;
-import java.util.UUID;
-
-import static java.lang.String.format;
-import static marquez.api.JobRunState.State.fromInt;
-import static marquez.api.JobRunState.State.toInt;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class JobRunIntegrationTest {
   private static Logger LOG = LoggerFactory.getLogger(JobRunIntegrationTest.class);
@@ -85,7 +84,6 @@ public class JobRunIntegrationTest {
     NEW_JOB_RUN =
         new JobRun(
             jobRunUUID,
-            new Timestamp(System.currentTimeMillis()),
             null,
             null,
             UUID.fromString(TEST_JOB_RUN_DEFINITION_GUID),
@@ -120,7 +118,6 @@ public class JobRunIntegrationTest {
     JobRun modifiedJobRun =
         new JobRun(
             NEW_JOB_RUN.getGuid(),
-            NEW_JOB_RUN.getCreatedAt(),
             new Timestamp(System.currentTimeMillis()),
             NEW_JOB_RUN.getEndedAt(),
             NEW_JOB_RUN.getJobRunDefinitionGuid(),
@@ -143,7 +140,7 @@ public class JobRunIntegrationTest {
   @Test
   public void testJobRunCreationEndToEnd() {
     final String jobRunRequestString =
-        format("{\"job_run_definition_guid\": \"%s\"}", TEST_JOB_RUN_DEFINITION_GUID);
+        format("{\"run_definition_id\": \"%s\"}", TEST_JOB_RUN_DEFINITION_GUID);
     Entity jobRunRequestJsonAsEntity = Entity.json(jobRunRequestString);
     final Response res =
         daoSetup
@@ -176,8 +173,7 @@ public class JobRunIntegrationTest {
   public void testJobRunGetterEndToEnd() {
     GetJobRunResponse responseBody = getJobRunResponse(NEW_JOB_RUN.getGuid());
 
-    assertEquals(JobRunState.State.NEW, JobRunState.State.valueOf(responseBody.getCurrentState()));
-    assertNotNull(responseBody.getCreatedAt());
+    assertEquals(JobRunState.State.NEW, JobRunState.State.valueOf(responseBody.getState()));
     assertNull(responseBody.getStartedAt());
     assertNull(responseBody.getEndedAt());
   }
@@ -199,9 +195,7 @@ public class JobRunIntegrationTest {
 
     GetJobRunResponse responseBody = getJobRunResponse(NEW_JOB_RUN.getGuid());
 
-    assertEquals(
-        JobRunState.State.RUNNING, JobRunState.State.valueOf(responseBody.getCurrentState()));
-    assertNotNull(responseBody.getCreatedAt());
+    assertEquals(JobRunState.State.RUNNING, JobRunState.State.valueOf(responseBody.getState()));
     assertNotNull(responseBody.getStartedAt());
     assertNull(responseBody.getEndedAt());
   }
@@ -236,24 +230,6 @@ public class JobRunIntegrationTest {
             .put(jobRunRequestJsonAsEntity);
 
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), res.getStatus());
-  }
-
-  @Test
-  public void testJobRunStateGetter() {
-    JobRunState jrs = jobRunStateDAO.findJobLatestJobRunStateByJobRun(NEW_JOB_RUN.getGuid());
-
-    final String path = "/job_run_states/" + jrs.getGuid();
-    final Response res =
-        daoSetup
-            .client()
-            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
-            .path(path)
-            .request(MediaType.APPLICATION_JSON)
-            .get();
-    assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
-    GetJobRunStateResponse jrsResponse = res.readEntity(GetJobRunStateResponse.class);
-    assertEquals(JobRunState.State.NEW, JobRunState.State.valueOf(jrsResponse.getState()));
-    assertEquals(jrs.getGuid(), jrsResponse.getGuid());
   }
 
   private GetJobRunResponse getJobRunResponse(UUID jobRunGuid) {

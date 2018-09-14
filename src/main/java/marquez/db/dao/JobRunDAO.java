@@ -1,5 +1,6 @@
 package marquez.db.dao;
 
+import java.util.UUID;
 import marquez.api.JobRun;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
@@ -9,9 +10,6 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Timestamp;
-import java.util.UUID;
 
 @RegisterRowMapper(JobRunRow.class)
 public interface JobRunDAO extends SqlObject {
@@ -25,16 +23,12 @@ public interface JobRunDAO extends SqlObject {
       handle.useTransaction(
           h -> {
             h.createUpdate(
-                    "INSERT INTO job_runs (guid, created_at, started_at, job_run_definition_guid, current_state) "
-                        + "VALUES (:guid, :createdAt, :startedAt, :jobRunDefinitionGuid, :currentState)")
+                    "INSERT INTO job_runs (guid, started_at, job_run_definition_guid, current_state) "
+                        + "VALUES (:guid, :startedAt, :jobRunDefinitionGuid, :currentState)")
                 .bindBean(jobRun)
                 .execute();
             createJobRunStateDAO()
-                .insert(
-                    UUID.randomUUID(),
-                    jobRun.getCreatedAt(),
-                    jobRun.getGuid(),
-                    jobRun.getCurrentState());
+                .insert(UUID.randomUUID(), jobRun.getGuid(), jobRun.getCurrentState());
           });
     } catch (Exception e) {
       // TODO: Add better error handling
@@ -51,11 +45,7 @@ public interface JobRunDAO extends SqlObject {
                 .bindBean(jobRun)
                 .execute();
             createJobRunStateDAO()
-                .insert(
-                    UUID.randomUUID(),
-                    new Timestamp(System.currentTimeMillis()),
-                    jobRun.getGuid(),
-                    jobRun.getCurrentState());
+                .insert(UUID.randomUUID(), jobRun.getGuid(), jobRun.getCurrentState());
           });
     } catch (Exception e) {
       // TODO: Add better error handling

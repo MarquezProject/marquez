@@ -1,17 +1,16 @@
 package marquez.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dropwizard.jackson.Jackson;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.Test;
-
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.UUID;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.Test;
 
 public class JobTest {
 
@@ -26,13 +25,6 @@ public class JobTest {
       new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
-
-  @Test
-  public void testGuidNotSerialized() throws Exception {
-    final String serializedOutput = MAPPER.writeValueAsString(JOB);
-    assertThat(serializedOutput).doesNotContain("guid");
-    assertThat(serializedOutput).doesNotContain(JOB_UUID.toString());
-  }
 
   @Test
   public void testGuidSet() {
