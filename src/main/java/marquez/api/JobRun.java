@@ -1,8 +1,14 @@
 package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 public final class JobRun {
 

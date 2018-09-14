@@ -2,6 +2,7 @@ package marquez.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
+
 import java.net.URI;
 
 abstract class BaseResource {

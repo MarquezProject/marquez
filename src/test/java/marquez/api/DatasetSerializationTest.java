@@ -1,17 +1,18 @@
 package marquez.api;
 
-import static io.dropwizard.testing.FixtureHelpers.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.UUID;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import static io.dropwizard.testing.FixtureHelpers.fixture;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DatasetSerializationTest {
 

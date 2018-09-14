@@ -1,6 +1,5 @@
 package marquez.db.dao;
 
-import java.util.List;
 import marquez.api.Job;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
@@ -10,6 +9,8 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 @RegisterRowMapper(JobRow.class)
 public interface JobDAO extends SqlObject {

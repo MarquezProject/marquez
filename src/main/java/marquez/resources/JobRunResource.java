@@ -1,19 +1,32 @@
 package marquez.resources;
 
+import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import marquez.api.CreateJobRunRequest;
+import marquez.api.CreateJobRunResponse;
+import marquez.api.GetJobRunResponse;
+import marquez.api.JobRun;
+import marquez.api.JobRunState;
+import marquez.api.UpdateJobRunRequest;
+import marquez.api.UpdateJobRunResponse;
+import marquez.db.dao.JobRunDAO;
+
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
+import java.sql.Timestamp;
+import java.util.UUID;
+
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static marquez.api.JobRunState.State.fromInt;
 import static marquez.api.JobRunState.State.toInt;
-
-import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.sql.Timestamp;
-import java.util.UUID;
-import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
-import marquez.api.*;
-import marquez.db.dao.JobRunDAO;
 
 @Path("/job_runs")
 @Produces(APPLICATION_JSON)

@@ -2,6 +2,7 @@ package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.UUID;
 
 public final class CreateJobRunRequest {

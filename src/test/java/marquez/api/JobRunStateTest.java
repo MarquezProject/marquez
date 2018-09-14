@@ -1,16 +1,17 @@
 package marquez.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.Test;
+
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class JobRunStateTest {
 

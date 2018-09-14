@@ -2,8 +2,9 @@ package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Objects;
+
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 public final class Owner {
   @NotNull private final String name;

@@ -1,7 +1,5 @@
 package marquez.db.dao;
 
-import java.sql.Timestamp;
-import java.util.UUID;
 import marquez.api.JobRunState;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -10,6 +8,9 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Timestamp;
+import java.util.UUID;
 
 @RegisterRowMapper(JobRunStateRow.class)
 public interface JobRunStateDAO extends SqlObject {

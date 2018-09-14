@@ -1,24 +1,30 @@
 package marquez.api;
 
+import marquez.db.dao.JobRunDAO;
+import marquez.db.dao.JobRunStateDAO;
+import marquez.db.dao.fixtures.DAOSetup;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.sql.Timestamp;
+import java.util.UUID;
+
 import static java.lang.String.format;
 import static marquez.api.JobRunState.State.fromInt;
 import static marquez.api.JobRunState.State.toInt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
-import java.net.URI;
-import java.sql.Timestamp;
-import java.util.UUID;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import marquez.db.dao.JobRunDAO;
-import marquez.db.dao.JobRunStateDAO;
-import marquez.db.dao.fixtures.DAOSetup;
-import org.junit.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JobRunIntegrationTest {
   private static Logger LOG = LoggerFactory.getLogger(JobRunIntegrationTest.class);

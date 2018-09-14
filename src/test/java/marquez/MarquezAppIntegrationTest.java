@@ -1,13 +1,14 @@
 package marquez;
 
-import static org.junit.Assert.assertEquals;
-
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
-import java.net.URI;
-import javax.ws.rs.core.Response;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response;
+import java.net.URI;
+
+import static org.junit.Assert.assertEquals;
 
 public class MarquezAppIntegrationTest {
   @ClassRule

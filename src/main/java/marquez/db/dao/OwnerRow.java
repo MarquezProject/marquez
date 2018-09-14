@@ -1,10 +1,11 @@
 package marquez.db.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import marquez.api.Owner;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class OwnerRow implements RowMapper<Owner> {
   @Override
