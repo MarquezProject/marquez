@@ -180,8 +180,7 @@ public class JobRunIntegrationTest {
 
   @Test
   public void testJobRunAfterUpdateEndToEnd() {
-    final String jobRunUpdateRequestString =
-        format("{\"state\": \"RUNNING\"}", TEST_JOB_RUN_DEFINITION_GUID);
+    final String jobRunUpdateRequestString = "{\"state\": \"RUNNING\"}";
     Entity jobRunRequestJsonAsEntity = Entity.json(jobRunUpdateRequestString);
     final Response res =
         daoSetup
@@ -202,8 +201,7 @@ public class JobRunIntegrationTest {
 
   @Test
   public void testJobRunAfterForbiddenUpdateEndToEnd() {
-    final String jobRunUpdateRequestString =
-        format("{\"state\": \"FAILED\"}", TEST_JOB_RUN_DEFINITION_GUID);
+    final String jobRunUpdateRequestString = "{\"state\": \"FAILED\"}";
     Entity jobRunRequestJsonAsEntity = Entity.json(jobRunUpdateRequestString);
     final Response res =
         daoSetup
@@ -218,8 +216,7 @@ public class JobRunIntegrationTest {
 
   @Test
   public void testJobRunAfterInvalidUpdateEndToEnd() {
-    final String jobRunUpdateRequestString =
-        format("{\"state\": \"NO_SUCH_STATE\"}", TEST_JOB_RUN_DEFINITION_GUID);
+    final String jobRunUpdateRequestString = "{\"state\": \"NO_SUCH_STATE\"}";
     Entity jobRunRequestJsonAsEntity = Entity.json(jobRunUpdateRequestString);
     final Response res =
         daoSetup
