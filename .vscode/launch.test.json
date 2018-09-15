@@ -1,0 +1,30 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "marquez",
+                "projectName": "marquez",
+                "workingDirectory": "/Users/sshah/wework/marquez",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "marquez",
+                "projectName": "marquez",
+                "workingDirectory": "/Users/sshah/wework/marquez",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}

@@ -3,16 +3,24 @@ package marquez;
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
+import java.io.IOException;
 import java.net.URI;
+import java.util.UUID;
 import javax.ws.rs.core.Response;
 import marquez.api.entities.CreateJobRunDefinitionRequest;
+import marquez.api.entities.CreateJobRunDefinitionResponse;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 public class MarquezAppIntegrationTest {
+  protected static final ObjectMapper mapper = Jackson.newObjectMapper();
+
   @ClassRule
   public static final DropwizardAppRule<MarquezConfig> APP =
       new DropwizardAppRule<>(
@@ -83,5 +91,37 @@ public class MarquezAppIntegrationTest {
             .post(entity(req, APPLICATION_JSON));
 
     assertEquals(400, res.getStatus());
+  }
+
+  @Test
+  public void readJobRunDefinition_OK() {
+    CreateJobRunDefinitionRequest req =
+        new CreateJobRunDefinitionRequest("job name", "{}", 0, 0, "http://foo.bar", "my owner");
+
+    final Response createRes =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path("/job_run_definition")
+            .request()
+            .post(entity(req, APPLICATION_JSON));
+
+    UUID jobRunDefId;
+    try {
+      CreateJobRunDefinitionResponse createResJrd =
+          mapper.readValue(
+              createRes.readEntity(String.class), CreateJobRunDefinitionResponse.class);
+      jobRunDefId = createResJrd.getExternalGuid();
+      final Response readRes =
+          APP.client()
+              .target(URI.create("http://localhost:" + APP.getLocalPort()))
+              .path("/job_run_definition/" + jobRunDefId.toString())
+              .request()
+              .get();
+
+      assertEquals(Response.Status.OK, readRes.getStatus());
+
+    } catch (IOException e) {
+      fail("failed to parse response.");
+    }
   }
 }
