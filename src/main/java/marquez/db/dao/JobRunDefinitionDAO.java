@@ -9,7 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(JobRunDefinitionRow.class)
 public interface JobRunDefinitionDAO {
-  @SqlQuery("SELECT * FROM job_run_definitions WHERE guid = :guid")
+  @SqlQuery("SELECT jrd.guid, jrd.job_version_guid, jrd.run_args_json, jrd.nominal_time, j.name, j.current_ownership, jv.uri FROM job_run_definitions jrd INNER JOIN job_versions jv ON (jv.guid = jrd.job_version_guid) INNER JOIN jobs j ON(j.guid = jv.job_guid) WHERE jrd.guid = :guid")
   JobRunDefinition findByGuid(@Bind("guid") UUID guid);
 
   @SqlQuery("SELECT * FROM job_run_definitions WHERE content_hash = :hash")
