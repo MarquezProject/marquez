@@ -52,7 +52,7 @@ public class JobRunDefinitionDAOTest {
 
   private JobRunDefinition genRandomFixture() {
     String runArgs = String.format("{'foo': %d}", new Random().nextInt(100));
-    return new JobRunDefinition(UUID.randomUUID(), jobVersionGuid, runArgs, 0, 0);
+    return new JobRunDefinition(UUID.randomUUID(), null, null, null, jobVersionGuid, runArgs, 0, 0);
   }
 
   private static void insertJobRunDefinition(final JobRunDefinition jrd) {
