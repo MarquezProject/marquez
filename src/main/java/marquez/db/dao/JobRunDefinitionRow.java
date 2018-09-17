@@ -1,5 +1,6 @@
 package marquez.db.dao;
 
+import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -12,6 +13,9 @@ public class JobRunDefinitionRow implements RowMapper<JobRunDefinition> {
   public JobRunDefinition map(ResultSet rs, StatementContext ctx) throws SQLException {
     return new JobRunDefinition(
         UUID.fromString(rs.getString("guid")),
+        rs.getString("name"),
+        rs.getString("current_owner_name"),
+        URI.create(rs.getString("uri")),
         UUID.fromString(rs.getString("job_version_guid")),
         rs.getString("run_args_json"),
         0,

@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
@@ -214,7 +215,14 @@ public class JobRunDefinitionResourceTest {
     JobRunDefinition reqJrd = JobRunDefinition.create(request, existingJobVersion.getGuid());
     JobRunDefinition existingJobRunDefinition =
         new JobRunDefinition(
-            UUID.randomUUID(), existingJobVersion.getGuid(), request.getRunArgsJson(), 0, 0);
+            UUID.randomUUID(),
+            existingJob.getName(),
+            existingJob.getOwnerName(),
+            URI.create(existingJobVersion.getURI()),
+            existingJobVersion.getGuid(),
+            request.getRunArgsJson(),
+            0,
+            0);
     when(jobRunDefDAO.findByHash(reqJrd.computeDefinitionHash()))
         .thenReturn(existingJobRunDefinition);
 

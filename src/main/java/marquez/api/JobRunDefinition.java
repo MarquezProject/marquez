@@ -1,11 +1,15 @@
 package marquez.api;
 
+import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
 import marquez.api.entities.*;
 
 public final class JobRunDefinition {
   private final UUID guid;
+  private final String name;
+  private final String ownerName;
+  private final URI uri;
   private final UUID jobVersionGuid;
   private final String runArgsJson;
   private final Integer nominalTimeStart;
@@ -13,11 +17,17 @@ public final class JobRunDefinition {
 
   public JobRunDefinition(
       final UUID guid,
+      final String name,
+      final String ownerName,
+      final URI uri,
       final UUID jobVersionGuid,
       final String runArgsJson,
       final Integer nominalTimeStart,
       final Integer nominalTimeEnd) {
     this.guid = guid;
+    this.name = name;
+    this.ownerName = ownerName;
+    this.uri = uri;
     this.jobVersionGuid = jobVersionGuid;
     this.runArgsJson = runArgsJson;
     this.nominalTimeStart = nominalTimeStart;
@@ -26,6 +36,18 @@ public final class JobRunDefinition {
 
   public UUID getGuid() {
     return guid;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getOwnerName() {
+    return ownerName;
+  }
+
+  public URI getURI() {
+    return uri;
   }
 
   public String getRunArgsJson() {
@@ -52,6 +74,9 @@ public final class JobRunDefinition {
   public static JobRunDefinition create(
       CreateJobRunDefinitionRequest request, UUID jobVersionGuid) {
     return new JobRunDefinition(
+        null,
+        "",
+        "",
         null,
         jobVersionGuid,
         request.getRunArgsJson(),
