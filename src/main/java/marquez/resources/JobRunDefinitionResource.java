@@ -7,8 +7,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import marquez.api.Job;
@@ -41,11 +44,13 @@ public final class JobRunDefinitionResource extends BaseResource {
 
   @POST
   @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   @Timed
   public Response create(@Valid CreateJobRunDefinitionRequest request) {
     // validate arguments
     if (!request.validate()) {
-      return Response.status(Status.BAD_REQUEST).build();
+      ErrorResponse err = new ErrorResponse("run_args and/or uri not well-formed.");
+      return Response.status(Status.BAD_REQUEST).entity(err).type(APPLICATION_JSON).build();
     }
 
     // register the new owner, if necessary
@@ -83,30 +88,55 @@ public final class JobRunDefinitionResource extends BaseResource {
     JobRunDefinition reqJrd = JobRunDefinition.create(request, jobVersionGuid);
     UUID definitionHash = reqJrd.computeDefinitionHash();
     JobRunDefinition existingJrd = jobRunDefDAO.findByHash(definitionHash);
-    JobRunDefinition resJrd;
+    UUID resJrdGuid;
 
     Status resStatus;
     if (existingJrd == null) {
       UUID jobRunDefGuid = UUID.randomUUID();
       this.jobRunDefDAO.insert(
           jobRunDefGuid, definitionHash, jobVersionGuid, request.getRunArgsJson());
-      resJrd = new JobRunDefinition(jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(), 0, 0);
+      resJrdGuid = jobRunDefGuid;
       resStatus = Status.CREATED;
     } else {
-      resJrd = existingJrd;
+      resJrdGuid = existingJrd.getGuid();
       resStatus = Status.OK;
     }
 
-    CreateJobRunDefinitionResponse res = new CreateJobRunDefinitionResponse(resJrd.getGuid());
+    CreateJobRunDefinitionResponse res = new CreateJobRunDefinitionResponse(resJrdGuid);
     try {
       String jsonRes = mapper.writeValueAsString(res);
       return Response.status(resStatus)
-          .header("Location", "/job_run_definition/" + resJrd.getGuid())
+          .header("Location", "/job_run_definition/" + resJrdGuid)
           .entity(jsonRes)
           .type(APPLICATION_JSON)
           .build();
     } catch (JsonProcessingException e) {
       return Response.serverError().build();
     }
+  }
+
+  @Path("/{id}")
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Timed
+  public Response read(@PathParam("id") String id) {
+    UUID jobRunDefinitionId;
+    try {
+      jobRunDefinitionId = UUID.fromString(id);
+    } catch (IllegalArgumentException e) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(new ErrorResponse("id is not well-formed."))
+          .type(APPLICATION_JSON)
+          .build();
+    }
+    JobRunDefinition jrd = jobRunDefDAO.findByGuid(jobRunDefinitionId);
+    if (jrd == null) {
+      return Response.status(Response.Status.NOT_FOUND.getStatusCode())
+          .entity(new ErrorResponse("no Job Run Definition found."))
+          .type(APPLICATION_JSON)
+          .build();
+    }
+    GetJobRunDefinitionResponse jrdRes = GetJobRunDefinitionResponse.create(jrd);
+    return Response.ok(jrdRes, APPLICATION_JSON).build();
   }
 }
