@@ -98,7 +98,8 @@ public class MarquezAppIntegrationTest {
   @Test
   public void readJobRunDefinition_OK() {
     CreateJobRunDefinitionRequest req =
-        new CreateJobRunDefinitionRequest("job name", "{}", 5, 10, "http://foo.bar", "my owner");
+        new CreateJobRunDefinitionRequest(
+            "job name", "{\"test\":\"readJrd\"}", 5, 10, "http://foo2.bar2", "my owner");
     final Response createRes =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))

@@ -241,6 +241,12 @@ public class JobRunDefinitionResourceTest {
 
     // the existing Job Run Definition is returned instead of inserting a new one
     verify(jobRunDefDAO, never())
-        .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class), any(Integer.class), any(Integer.class));
+        .insert(
+            any(UUID.class),
+            any(UUID.class),
+            any(UUID.class),
+            any(String.class),
+            any(Integer.class),
+            any(Integer.class));
   }
 }
