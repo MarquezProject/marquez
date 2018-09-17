@@ -24,7 +24,6 @@ public final class JobRun {
         new HashSet<JobRunState.State>() {
           {
             add(JobRunState.State.RUNNING);
-            add(JobRunState.State.ABORTED);
           }
         });
     validTransitions.put(
