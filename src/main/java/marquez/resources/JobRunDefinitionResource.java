@@ -100,8 +100,10 @@ public final class JobRunDefinitionResource extends BaseResource {
   @Timed
   public Response create(@Valid CreateJobRunDefinitionRequest request) {
     if (!request.validate()) {
-      ErrorResponse err = new ErrorResponse("run_args and/or uri not well-formed.");
-      return Response.status(Status.BAD_REQUEST).entity(err).type(APPLICATION_JSON).build();
+      return Response.status(Status.BAD_REQUEST)
+          .entity(new ErrorResponse("run_args and/or uri not well-formed."))
+          .type(APPLICATION_JSON)
+          .build();
     }
 
     try {
