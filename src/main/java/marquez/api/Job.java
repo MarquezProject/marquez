@@ -1,5 +1,6 @@
 package marquez.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
