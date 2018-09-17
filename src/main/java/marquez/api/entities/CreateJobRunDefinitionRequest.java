@@ -4,16 +4,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 import java.net.URISyntaxException;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class CreateJobRunDefinitionRequest {
-  private final String name;
-  private final String runArgsJson;
+  @NotEmpty private final String name;
+
+  @NotEmpty private final String runArgsJson;
   private final Integer nominalTimeStart;
   private final Integer nominalTimeEnd;
-  private final String URI;
-  private final String ownerName;
+
+  @NotEmpty private final String URI;
+
+  @NotEmpty private final String ownerName;
 
   @JsonCreator
   public CreateJobRunDefinitionRequest(
