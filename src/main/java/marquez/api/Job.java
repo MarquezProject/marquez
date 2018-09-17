@@ -1,31 +1,25 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
-import org.hibernate.validator.constraints.NotBlank;
 
 public final class Job {
 
-  @JsonIgnore private final UUID guid;
-
+  private final UUID guid;
   private final String name;
   private final String ownerName;
   private final Timestamp nominalTime;
   private final String category;
   private final String description;
-
-  @JsonCreator
   public Job(
       final UUID guid,
-      @JsonProperty("name") @NotBlank final String name,
-      @JsonProperty("ownerName") final String ownerName,
-      @JsonProperty("nominalTime") final Timestamp nominalTime,
-      @JsonProperty("category") final String category,
-      @JsonProperty("description") final String description) {
+      final String name,
+      final String ownerName,
+      final Timestamp nominalTime,
+      final String category,
+      final String description) {
     this.guid = guid;
     this.name = name;
     this.ownerName = ownerName;
