@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class UpdateJobRunRequest {
-  Logger LOG = LoggerFactory.getLogger(UpdateJobRunRequest.class);
 
   private final String currentState;
 
