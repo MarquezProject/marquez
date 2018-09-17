@@ -51,8 +51,10 @@ public class JobRunDefinitionDAOTest {
   }
 
   private JobRunDefinition genRandomFixture() {
-    String runArgs = String.format("{'foo': %d}", new Random().nextInt(100));
-    return new JobRunDefinition(UUID.randomUUID(), null, null, null, jobVersionGuid, runArgs, 0, 0);
+    Random rand = new Random();
+    String runArgs = String.format("{'foo': %d}", rand.nextInt(100));
+    Integer randNominalStartTime = rand.nextInt(1000);
+    return new JobRunDefinition(UUID.randomUUID(), null, null, null, jobVersionGuid, runArgs, randNominalStartTime, randNominalStartTime+1000);
   }
 
   private static void insertJobRunDefinition(final JobRunDefinition jrd) {
@@ -62,13 +64,14 @@ public class JobRunDefinitionDAOTest {
             handle -> {
               handle
                   .createUpdate(
-                      "INSERT INTO job_run_definitions(guid, job_version_guid, run_args_json, content_hash, nominal_time) VALUES (:guid, :job_version_guid, :run_args_json, :content_hash, :nominal_time)")
+                      "INSERT INTO job_run_definitions(guid, job_version_guid, run_args_json, content_hash, nominal_start_time, nominal_end_time) VALUES (:guid, :job_version_guid, :run_args_json, :content_hash, :nominal_start_time, :nominal_end_time)")
                   .bind("guid", jrd.getGuid())
                   .bind("job_version_guid", jrd.getJobVersionGuid())
                   .bind("run_args_json", jrd.getRunArgsJson())
                   .bind("content_hash", jrd.computeDefinitionHash())
                   .bind(
-                      "nominal_time", new Timestamp(new Date(jrd.getNominalTimeStart()).getTime()))
+                      "nominal_start_time", jrd.getNominalTimeStart())
+                  .bind("nominal_end_time", jrd.getNominalTimeEnd())
                   .execute();
             });
   }
@@ -113,7 +116,7 @@ public class JobRunDefinitionDAOTest {
   public void testInsert() {
     JobRunDefinition jrd = genRandomFixture();
     jobRunDefDAO.insert(
-        jrd.getGuid(), jrd.computeDefinitionHash(), jrd.getJobVersionGuid(), jrd.getRunArgsJson());
+        jrd.getGuid(), jrd.computeDefinitionHash(), jrd.getJobVersionGuid(), jrd.getRunArgsJson(), jrd.getNominalTimeStart(), jrd.getNominalTimeEnd());
     assertEquals(jrd, jobRunDefDAO.findByHash(jrd.computeDefinitionHash()));
   }
 }

@@ -80,8 +80,8 @@ public final class JobRunDefinition {
         null,
         jobVersionGuid,
         request.getRunArgsJson(),
-        request.getNominalTimeStart(),
-        request.getNominalTimeEnd());
+        request.getNominalStartTime(),
+        request.getNominalEndTime());
   }
 
   @Override

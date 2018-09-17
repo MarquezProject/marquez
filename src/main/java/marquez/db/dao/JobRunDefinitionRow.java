@@ -18,7 +18,7 @@ public class JobRunDefinitionRow implements RowMapper<JobRunDefinition> {
         URI.create(rs.getString("uri")),
         UUID.fromString(rs.getString("job_version_guid")),
         rs.getString("run_args_json"),
-        0,
-        0);
+        rs.getInt("nominal_start_time"),
+        rs.getInt("nominal_end_time"));
   }
 }

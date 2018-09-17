@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS job_run_definitions (
     job_version_guid UUID REFERENCES job_versions(guid),
     run_args_json TEXT,
     content_hash UUID NOT NULL,
-    nominal_time TIMESTAMP WITH TIME ZONE,
+    nominal_start_time INTEGER,
+    nominal_end_time INTEGER,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

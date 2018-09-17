@@ -98,7 +98,7 @@ public class MarquezAppIntegrationTest {
   @Test
   public void readJobRunDefinition_OK() {
     CreateJobRunDefinitionRequest req =
-        new CreateJobRunDefinitionRequest("job name", "{}", 0, 0, "http://foo.bar", "my owner");
+        new CreateJobRunDefinitionRequest("job name", "{}", 5, 10, "http://foo.bar", "my owner");
     final Response createRes =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
@@ -127,6 +127,7 @@ public class MarquezAppIntegrationTest {
       assertEquals(req.getOwnerName(), res.getOwnerName());
       assertEquals(req.getRunArgsJson(), res.getRunArgsJson());
       assertEquals(req.getURI(), res.getURI());
+      assertEquals(req.getNominalStartTime(), res.getNominalTimeStart());
 
     } catch (IOException e) {
       fail("failed to parse GET /job_run_definition/{id} response");

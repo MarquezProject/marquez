@@ -85,7 +85,9 @@ public class JobRunDefinitionResourceTest {
             any(UUID.class),
             eq(reqJrd.computeDefinitionHash()),
             eq(jobVersionGuidCaptor.getValue()),
-            eq(request.getRunArgsJson()));
+            eq(request.getRunArgsJson()),
+            eq(request.getNominalStartTime()),
+            eq(request.getNominalEndTime()));
   }
 
   @Test
@@ -138,7 +140,9 @@ public class JobRunDefinitionResourceTest {
             any(UUID.class),
             eq(jrd.computeDefinitionHash()),
             eq(jobVersionGuidCaptor.getValue()),
-            eq(request.getRunArgsJson()));
+            eq(request.getRunArgsJson()),
+            eq(request.getNominalStartTime()),
+            eq(request.getNominalEndTime()));
   }
 
   @Test
@@ -181,7 +185,9 @@ public class JobRunDefinitionResourceTest {
             any(UUID.class),
             eq(jrd.computeDefinitionHash()),
             eq(existingJobVersion.getGuid()),
-            eq(request.getRunArgsJson()));
+            eq(request.getRunArgsJson()),
+            eq(request.getNominalStartTime()),
+            eq(request.getNominalEndTime()));
   }
 
   @Test
@@ -233,8 +239,8 @@ public class JobRunDefinitionResourceTest {
     verify(jobVersionDAO, never())
         .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
 
-    // a new JobRunDefinition is created, with correct job version guid
+    // the existing Job Run Definition is returned instead of inserting a new one
     verify(jobRunDefDAO, never())
-        .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
+        .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class), any(Integer.class), any(Integer.class));
   }
 }

@@ -12,8 +12,8 @@ public final class CreateJobRunDefinitionRequest {
   @NotEmpty private final String name;
 
   @NotEmpty private final String runArgsJson;
-  private final Integer nominalTimeStart;
-  private final Integer nominalTimeEnd;
+  private final Integer nominalStartTime;
+  private final Integer nominalEndTime;
 
   @NotEmpty private final String URI;
 
@@ -23,14 +23,14 @@ public final class CreateJobRunDefinitionRequest {
   public CreateJobRunDefinitionRequest(
       @JsonProperty("name") final String name,
       @JsonProperty("run_args") final String runArgsJson,
-      @JsonProperty("nominal_time_start") final Integer nominalTimeStart,
-      @JsonProperty("nominal_time_end") final Integer nominalTimeEnd,
+      @JsonProperty("nominal_start_time") final Integer nominalStartTime,
+      @JsonProperty("nominal_end_time") final Integer nominalEndTime,
       @JsonProperty("uri") final String URI,
       @JsonProperty("owner_name") final String ownerName) {
     this.name = name;
     this.runArgsJson = runArgsJson;
-    this.nominalTimeStart = nominalTimeStart;
-    this.nominalTimeEnd = nominalTimeEnd;
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
     this.URI = URI;
     this.ownerName = ownerName;
   }
@@ -40,14 +40,14 @@ public final class CreateJobRunDefinitionRequest {
     return name;
   }
 
-  @JsonProperty("nominal_time_start")
-  public Integer getNominalTimeStart() {
-    return nominalTimeStart;
+  @JsonProperty("nominal_start_time")
+  public Integer getNominalStartTime() {
+    return nominalStartTime;
   }
 
-  @JsonProperty("nominal_time_end")
-  public Integer getNominalTimeEnd() {
-    return nominalTimeEnd;
+  @JsonProperty("nominal_end_time")
+  public Integer getNominalEndTime() {
+    return nominalEndTime;
   }
 
   @JsonProperty("run_args")
