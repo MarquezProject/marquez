@@ -1,5 +1,6 @@
 ALTER TABLE jobs DROP COLUMN nominal_time;
 ALTER TABLE jobs ALTER COLUMN description DROP NOT NULL;
+ALTER TABLE jobs ADD COLUMN current_owner_name VARCHAR(64);
 
 ALTER TABLE job_versions ADD COLUMN version UUID;
 ALTER TABLE job_versions ADD COLUMN uri VARCHAR(256);

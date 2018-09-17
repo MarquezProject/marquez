@@ -22,11 +22,13 @@ public interface JobDAO extends SqlObject {
     try (final Handle handle = getHandle()) {
       handle.useTransaction(
           h -> {
-            h.createUpdate("INSERT INTO jobs (guid, name)" + " VALUES (:guid, :name)")
+            h.createUpdate(
+                    "INSERT INTO jobs (guid, name, current_owner_name)"
+                        + " VALUES (:guid, :name, :current_owner_name)")
                 .bind("guid", job.getGuid())
                 .bind("name", job.getName())
+                .bind("current_owner_name", job.getOwnerName())
                 .execute();
-            // createOwnershipDAO().insert(job.getName(), job.getOwnerName());
             h.commit();
           });
     } catch (Exception e) {
