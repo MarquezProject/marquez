@@ -7,12 +7,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.jackson.Jackson;
+import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Set;
 import java.util.UUID;
 import javax.ws.rs.core.Response;
 import marquez.api.entities.CreateJobRunDefinitionRequest;
@@ -20,16 +22,9 @@ import marquez.api.entities.CreateJobRunDefinitionResponse;
 import marquez.api.entities.GetJobRunDefinitionResponse;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.h2.H2DatabasePlugin;
-import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.db.ManagedDataSource;
-import io.dropwizard.flyway.FlywayFactory;
-import io.dropwizard.jdbi3.JdbiFactory;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-
-import org.junit.Before;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -49,22 +44,23 @@ public class MarquezAppIntegrationTest {
     MarquezConfig config = APP.getConfiguration();
     DataSourceFactory dataSourceFactory = config.getDataSourceFactory();
     ManagedDataSource dataSource = dataSourceFactory.build(APP.getEnvironment().metrics(), "h2");
-    jdbi = factory
+    jdbi =
+        factory
             .build(APP.getEnvironment(), dataSourceFactory, dataSource, "h2")
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new H2DatabasePlugin());
   }
 
   @After
-  public void teardown(){
+  public void teardown() {
     jdbi.useHandle(
-            handle -> {
-              handle.execute("DELETE FROM job_run_definitions;");
-              handle.execute("DELETE FROM job_versions;");
-              handle.execute("DELETE FROM jobs;");
-              handle.execute("DELETE FROM owners;");
-              handle.execute("DELETE FROM ownerships;");
-            });
+        handle -> {
+          handle.execute("DELETE FROM job_run_definitions;");
+          handle.execute("DELETE FROM job_versions;");
+          handle.execute("DELETE FROM jobs;");
+          handle.execute("DELETE FROM owners;");
+          handle.execute("DELETE FROM ownerships;");
+        });
   }
 
   @Test
