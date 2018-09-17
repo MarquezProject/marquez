@@ -41,22 +41,22 @@ public final class JobRunDefinitionResource extends BaseResource {
     this.ownerDAO = ownerDAO;
   }
 
-  private Owner findOrCreateOwner(final String ownerName) {
-    Owner owner = this.ownerDAO.findByName(ownerName);
+  private Owner findOrCreateOwner(CreateJobRunDefinitionRequest request) {
+    Owner owner = this.ownerDAO.findByName(request.getOwnerName());
     if (owner == null) {
-      owner = new Owner(ownerName);
+      owner = new Owner(request.getOwnerName());
       this.ownerDAO.insert(UUID.randomUUID(), owner);
     }
     return owner;
   }
 
-  private Job findOrCreateJob(final String jobName, Owner owner) {
-    Job matchingJob = this.jobDAO.findByName(jobName);
+  private Job findOrCreateJob(CreateJobRunDefinitionRequest request) {
+    Job matchingJob = this.jobDAO.findByName(request.getName());
     if (matchingJob != null) {
       return matchingJob;
     }
     UUID jobGuid = UUID.randomUUID();
-    Job newJob = new Job(jobGuid, jobName, owner.getName(), null, null, null);
+    Job newJob = new Job(jobGuid, request.getName(), request.getOwnerName(), null, null, null);
     this.jobDAO.insert(newJob);
     return newJob;
   }
@@ -99,15 +99,14 @@ public final class JobRunDefinitionResource extends BaseResource {
   @Produces(APPLICATION_JSON)
   @Timed
   public Response create(@Valid CreateJobRunDefinitionRequest request) {
-    // validate arguments
     if (!request.validate()) {
       ErrorResponse err = new ErrorResponse("run_args and/or uri not well-formed.");
       return Response.status(Status.BAD_REQUEST).entity(err).type(APPLICATION_JSON).build();
     }
 
     try {
-      Owner owner = findOrCreateOwner(request.getOwnerName());
-      Job job = findOrCreateJob(request.getName(), owner);
+      Owner owner = findOrCreateOwner(request);
+      Job job = findOrCreateJob(request);
       UUID jobVersionGuid = findOrCreateJobVersion(request, job);
       JobRunDefinition jobRunDefinition = findOrCreateJobRunDefinition(request, jobVersionGuid);
       CreateJobRunDefinitionResponse res =
