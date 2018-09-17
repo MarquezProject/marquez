@@ -3,6 +3,7 @@ package marquez;
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +16,7 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 import marquez.api.entities.CreateJobRunDefinitionRequest;
 import marquez.api.entities.CreateJobRunDefinitionResponse;
+import marquez.api.entities.GetJobRunDefinitionResponse;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -97,7 +99,6 @@ public class MarquezAppIntegrationTest {
   public void readJobRunDefinition_OK() {
     CreateJobRunDefinitionRequest req =
         new CreateJobRunDefinitionRequest("job name", "{}", 0, 0, "http://foo.bar", "my owner");
-
     final Response createRes =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
@@ -118,10 +119,17 @@ public class MarquezAppIntegrationTest {
               .request()
               .get();
 
-      assertEquals(Response.Status.OK, readRes.getStatus());
+      GetJobRunDefinitionResponse res =
+          mapper.readValue(readRes.readEntity(String.class), GetJobRunDefinitionResponse.class);
+      assertEquals(Response.Status.OK.getStatusCode(), readRes.getStatus());
+      assertNotNull(res.getGuid());
+      assertEquals(req.getName(), res.getName());
+      assertEquals(req.getOwnerName(), res.getOwnerName());
+      assertEquals(req.getRunArgsJson(), res.getRunArgsJson());
+      assertEquals(req.getURI(), res.getURI());
 
     } catch (IOException e) {
-      fail("failed to parse response.");
+      fail("failed to parse GET /job_run_definition/{id} response");
     }
   }
 }
