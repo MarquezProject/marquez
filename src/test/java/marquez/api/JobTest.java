@@ -27,13 +27,6 @@ public class JobTest {
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
   @Test
-  public void testGuidNotSerialized() throws Exception {
-    final String serializedOutput = MAPPER.writeValueAsString(JOB);
-    assertThat(serializedOutput).doesNotContain("guid");
-    assertThat(serializedOutput).doesNotContain(JOB_UUID.toString());
-  }
-
-  @Test
   public void testGuidSet() {
     assertThat(JOB.getGuid().equals(JOB_UUID));
   }

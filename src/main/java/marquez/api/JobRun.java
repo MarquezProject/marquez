@@ -1,56 +1,60 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
 
 public final class JobRun {
-  @NotNull private final Timestamp createdAt;
-  @NotNull private final UUID runGuid;
-  @NotNull private final List<String> runArgs;
-  @NotNull private final Timestamp startedAt;
-  @NotNull private final Timestamp endedAt;
-  @NotNull private final UUID jobVersionGuid;
-  @NotNull private final UUID inputDatasetVersionGuid;
-  @NotNull private final UUID outputDatasetVersionGuid;
-  @NotNull private final Timestamp latestHeartbeat;
 
-  @JsonCreator
+  private final UUID guid;
+  private final Timestamp startedAt;
+  private final Timestamp endedAt;
+  private final UUID jobRunDefinitionGuid;
+  private final Integer currentState;
+
+  private static Map<JobRunState.State, Set<JobRunState.State>> validTransitions = new HashMap<>();
+
+  static {
+    validTransitions.put(
+        JobRunState.State.NEW,
+        new HashSet<JobRunState.State>() {
+          {
+            add(JobRunState.State.RUNNING);
+          }
+        });
+    validTransitions.put(
+        JobRunState.State.RUNNING,
+        new HashSet<JobRunState.State>() {
+          {
+            add(JobRunState.State.COMPLETED);
+            add(JobRunState.State.FAILED);
+            add(JobRunState.State.ABORTED);
+          }
+        });
+    validTransitions.put(JobRunState.State.FAILED, new HashSet<>());
+    validTransitions.put(JobRunState.State.COMPLETED, new HashSet<>());
+    validTransitions.put(JobRunState.State.ABORTED, new HashSet<>());
+  }
+
   public JobRun(
-      @JsonProperty("createdAt") final Timestamp createdAt,
-      @JsonProperty("runGuid") final UUID runGuid,
-      @JsonProperty("runArgs") final List<String> runArgs,
-      @JsonProperty("startedAt") final Timestamp startedAt,
-      @JsonProperty("endedAt") final Timestamp endedAt,
-      @JsonProperty("jobVersionGuid") final UUID jobVersionGuid,
-      @JsonProperty("inputDatasetVersionGuid") final UUID inputDatasetVersionGuid,
-      @JsonProperty("outputDatasetVersionGuid") final UUID outputDatasetVersionGuid,
-      @JsonProperty("latestHeartbeat") final Timestamp latestHeartbeat) {
-    this.createdAt = createdAt;
-    this.runGuid = runGuid;
-    this.runArgs = runArgs;
+      final UUID guid,
+      final Timestamp startedAt,
+      final Timestamp endedAt,
+      final UUID jobRunDefinitionGuid,
+      final Integer currentState) {
+    this.guid = guid;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
-    this.jobVersionGuid = jobVersionGuid;
-    this.inputDatasetVersionGuid = inputDatasetVersionGuid;
-    this.outputDatasetVersionGuid = outputDatasetVersionGuid;
-    this.latestHeartbeat = latestHeartbeat;
+    this.jobRunDefinitionGuid = jobRunDefinitionGuid;
+    this.currentState = currentState;
   }
 
-  public Timestamp getCreatedAt() {
-    return createdAt;
-  }
-
-  public UUID getRunGuid() {
-    return runGuid;
-  }
-
-  public List<String> getRunArgs() {
-    return runArgs;
+  public UUID getGuid() {
+    return guid;
   }
 
   public Timestamp getStartedAt() {
@@ -61,20 +65,12 @@ public final class JobRun {
     return endedAt;
   }
 
-  public UUID getJobVersionGuid() {
-    return jobVersionGuid;
+  public UUID getJobRunDefinitionGuid() {
+    return jobRunDefinitionGuid;
   }
 
-  public UUID getInputDatasetVersionGuid() {
-    return inputDatasetVersionGuid;
-  }
-
-  public UUID getOutputDatasetVersionGuid() {
-    return outputDatasetVersionGuid;
-  }
-
-  public Timestamp getLatestHeartbeat() {
-    return latestHeartbeat;
+  public Integer getCurrentState() {
+    return currentState;
   }
 
   @Override
@@ -84,44 +80,37 @@ public final class JobRun {
 
     final JobRun other = (JobRun) o;
 
-    return Objects.equals(createdAt, other.createdAt)
-        && Objects.equals(runGuid, other.runGuid)
-        && Objects.equals(runArgs, other.runArgs)
+    return Objects.equals(guid, other.guid)
         && Objects.equals(startedAt, other.startedAt)
         && Objects.equals(endedAt, other.endedAt)
-        && Objects.equals(jobVersionGuid, other.jobVersionGuid)
-        && Objects.equals(inputDatasetVersionGuid, other.inputDatasetVersionGuid)
-        && Objects.equals(outputDatasetVersionGuid, other.outputDatasetVersionGuid)
-        && Objects.equals(latestHeartbeat, other.latestHeartbeat);
+        && Objects.equals(jobRunDefinitionGuid, other.jobRunDefinitionGuid)
+        && Objects.equals(currentState, other.currentState);
+  }
+
+  public static boolean isValidJobTransition(
+      JobRunState.State oldState, JobRunState.State newState) {
+    return validTransitions.get(oldState).contains(newState);
+  }
+
+  public static boolean isValidJobTransition(Integer oldState, Integer newState) {
+    return isValidJobTransition(
+        JobRunState.State.fromInt(oldState), JobRunState.State.fromInt(newState));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-        createdAt,
-        runGuid,
-        runArgs,
-        startedAt,
-        endedAt,
-        jobVersionGuid,
-        inputDatasetVersionGuid,
-        outputDatasetVersionGuid,
-        latestHeartbeat);
+    return Objects.hash(guid, startedAt, endedAt, jobRunDefinitionGuid, currentState);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("JobRun{");
-    sb.append("createdAt=").append(createdAt);
-    sb.append("runGuid=").append(runGuid);
-    sb.append("runArgs=").append(runArgs);
+    sb.append("guid=").append(guid);
     sb.append("startedAt=").append(startedAt);
     sb.append("endedAt=").append(endedAt);
-    sb.append("jobVersionGuid=").append(jobVersionGuid);
-    sb.append("inputDatasetVersionGuid=").append(inputDatasetVersionGuid);
-    sb.append("outputDatasetVersionGuid=").append(outputDatasetVersionGuid);
-    sb.append("latestHeartbeat=").append(latestHeartbeat);
+    sb.append("jobRunDefinitionGuid=").append(jobRunDefinitionGuid);
+    sb.append("currentState=").append(currentState);
     sb.append("}");
     return sb.toString();
   }

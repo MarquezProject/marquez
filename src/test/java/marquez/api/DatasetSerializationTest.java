@@ -1,6 +1,6 @@
 package marquez.api;
 
-import static io.dropwizard.testing.FixtureHelpers.*;
+import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
