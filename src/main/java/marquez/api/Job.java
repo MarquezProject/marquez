@@ -1,6 +1,5 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
@@ -9,7 +8,7 @@ public final class Job {
 
   private final UUID guid;
   private final String name;
-  private final String ownerName;
+  private final String owner;
   private final Timestamp nominalTime;
   private final String category;
   private final String description;
@@ -17,19 +16,18 @@ public final class Job {
   public Job(
       final UUID guid,
       final String name,
-      final String ownerName,
+      final String owner,
       final Timestamp nominalTime,
       final String category,
       final String description) {
     this.guid = guid;
     this.name = name;
-    this.ownerName = ownerName;
+    this.owner = owner;
     this.nominalTime = nominalTime;
     this.category = category;
     this.description = description;
   }
 
-  @JsonIgnore
   public UUID getGuid() {
     return guid;
   }
@@ -38,8 +36,8 @@ public final class Job {
     return name;
   }
 
-  public String getOwnerName() {
-    return ownerName;
+  public String getOwner() {
+    return owner;
   }
 
   public Timestamp getNominalTime() {
@@ -63,7 +61,7 @@ public final class Job {
 
     return Objects.equals(guid, other.guid)
         && Objects.equals(name, other.name)
-        && Objects.equals(ownerName, other.ownerName)
+        && Objects.equals(owner, other.owner)
         && Objects.equals(nominalTime, other.nominalTime)
         && Objects.equals(category, other.category)
         && Objects.equals(description, other.description);
@@ -71,7 +69,7 @@ public final class Job {
 
   @Override
   public int hashCode() {
-    return Objects.hash(guid, name, ownerName, nominalTime, category, description);
+    return Objects.hash(guid, name, owner, nominalTime, category, description);
   }
 
   @Override
@@ -80,7 +78,7 @@ public final class Job {
     sb.append("Job{");
     sb.append("guid=").append(guid);
     sb.append(",name=").append(name);
-    sb.append(",owner=").append(ownerName);
+    sb.append(",owner=").append(owner);
     sb.append(",nominalTime=").append(nominalTime);
     sb.append(",category=").append(category);
     sb.append(",description=").append(description);

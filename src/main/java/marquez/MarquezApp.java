@@ -99,6 +99,11 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JobDAO jobDAO = jdbi.onDemand(JobDAO.class);
     env.jersey().register(new JobResource(jobDAO));
 
+    final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
+    env.jersey().register(new JobRunResource(jobRunDAO));
+
+    final JobRunStateDAO jobRunStateDAO = jdbi.onDemand(JobRunStateDAO.class);
+
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));
 
