@@ -10,6 +10,7 @@ import io.dropwizard.setup.Environment;
 import marquez.db.dao.DatasetDAO;
 import marquez.db.dao.JobDAO;
 import marquez.db.dao.JobRunDAO;
+import marquez.db.dao.JobRunStateDAO;
 import marquez.db.dao.OwnerDAO;
 import marquez.resources.DatasetResource;
 import marquez.resources.HealthResource;
@@ -100,6 +101,8 @@ public class MarquezApp extends Application<MarquezConfig> {
 
     final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
     env.jersey().register(new JobRunResource(jobRunDAO));
+
+    final JobRunStateDAO jobRunStateDAO = jdbi.onDemand(JobRunStateDAO.class);
 
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));

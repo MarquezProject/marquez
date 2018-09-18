@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import java.util.UUID;
 import marquez.db.dao.JobRunDAO;
-import marquez.db.dao.JobRunStateDAO;
 import marquez.db.dao.fixtures.DAOSetup;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -24,7 +23,6 @@ public abstract class JobRunBaseTest {
 
   @ClassRule public static final DAOSetup daoSetup = new DAOSetup();
   final JobRunDAO jobRunDAO = daoSetup.onDemand(JobRunDAO.class);
-  final JobRunStateDAO jobRunStateDAO = daoSetup.onDemand(JobRunStateDAO.class);
 
   protected static JobRun NEW_JOB_RUN =
       new JobRun(
