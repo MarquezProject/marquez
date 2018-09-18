@@ -80,7 +80,7 @@ public final class JobVersion {
   }
 
   public UUID computeVersionGuid() {
-    byte[] raw = String.format("%s", uri).getBytes();
+    byte[] raw = String.format("%s:%s", jobGuid, uri).getBytes();
     return UUID.nameUUIDFromBytes(raw);
   }
 
