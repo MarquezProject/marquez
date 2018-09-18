@@ -13,6 +13,7 @@ public final class Job {
   private final Timestamp nominalTime;
   private final String category;
   private final String description;
+
   public Job(
       final UUID guid,
       final String name,
