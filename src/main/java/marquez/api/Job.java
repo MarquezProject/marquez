@@ -36,8 +36,8 @@ public final class Job {
     return name;
   }
 
-  public String getOwner() {
-    return owner;
+  public String getOwnerName() {
+    return ownerName;
   }
 
   public Timestamp getNominalTime() {
