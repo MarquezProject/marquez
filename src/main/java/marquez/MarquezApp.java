@@ -13,7 +13,6 @@ import marquez.db.dao.JobRunDAO;
 import marquez.db.dao.JobRunDefinitionDAO;
 import marquez.db.dao.JobRunStateDAO;
 import marquez.db.dao.JobVersionDAO;
-import marquez.db.dao.JobRunStateDAO;
 import marquez.db.dao.OwnerDAO;
 import marquez.resources.DatasetResource;
 import marquez.resources.HealthResource;
