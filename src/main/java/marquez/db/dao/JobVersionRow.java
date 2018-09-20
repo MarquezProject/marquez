@@ -26,12 +26,22 @@ public class JobVersionRow implements RowMapper<JobVersion> {
       updatedAt = null;
     }
 
+    String rawLastRunGuid = rs.getString("latest_run_guid");
+    UUID latestJobRunGuid = null;
+    if(rawLastRunGuid != null) {
+      try {
+        latestJobRunGuid = UUID.fromString(rs.getString("latest_run_guid"));
+      } catch (SQLException | IllegalArgumentException e) {
+        latestJobRunGuid = null;
+      }
+    }
+
     return new JobVersion(
         UUID.fromString(rs.getString("guid")),
         UUID.fromString(rs.getString("job_guid")),
         rs.getString("uri"),
         UUID.fromString(rs.getString("version")),
-        null, // TODO: populate eventually
+        latestJobRunGuid,
         createdAt,
         updatedAt);
   }
