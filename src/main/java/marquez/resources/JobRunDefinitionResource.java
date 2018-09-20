@@ -78,17 +78,32 @@ public final class JobRunDefinitionResource extends BaseResource {
     JobRunDefinition reqJrd = JobRunDefinition.create(request, jobVersionGuid);
     UUID definitionHash = reqJrd.computeDefinitionHash();
     JobRunDefinition existingJrd = jobRunDefDAO.findByHash(definitionHash);
-    JobRunDefinition resJrd;
-    Integer resStatus;
-    if (existingJrd == null) {
-      UUID jobRunDefGuid = UUID.randomUUID();
-      this.jobRunDefDAO.insert(
-          jobRunDefGuid, definitionHash, jobVersionGuid, request.getRunArgsJson());
-      resJrd = new JobRunDefinition(jobRunDefGuid, jobVersionGuid, request.getRunArgsJson(), 0, 0);
-      resStatus = HTTP_CREATED;
-    } else {
-      resJrd = existingJrd;
-      resStatus = HTTP_OK;
+
+    if (existingJrd != null) {
+      return existingJrd;
+    }
+
+    UUID jobRunDefGuid = UUID.randomUUID();
+    this.jobRunDefDAO.insert(
+        jobRunDefGuid,
+        definitionHash,
+        jobVersionGuid,
+        request.getRunArgsJson(),
+        request.getNominalStartTime(),
+        request.getNominalEndTime());
+    return jobRunDefDAO.findByGuid(jobRunDefGuid);
+  }
+
+  @POST
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  @Timed
+  public Response create(@Valid CreateJobRunDefinitionRequest request) {
+    if (!request.validate()) {
+      return Response.status(Status.BAD_REQUEST)
+          .entity(new ErrorResponse("run_args and/or uri not well-formed."))
+          .type(APPLICATION_JSON)
+          .build();
     }
 
     try {
