@@ -94,7 +94,6 @@ public final class JobRunDefinition {
     return Objects.equals(guid, other.guid)
         && Objects.equals(jobVersionGuid, other.jobVersionGuid)
         && Objects.equals(runArgsJson, other.runArgsJson)
-        && Objects.equals(URI, other.URI)
         && Objects.equals(nominalTimeStart, other.nominalTimeStart)
         && Objects.equals(nominalTimeEnd, other.nominalTimeEnd);
   }
