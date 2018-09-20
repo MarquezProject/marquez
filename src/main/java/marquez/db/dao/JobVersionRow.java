@@ -6,11 +6,6 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
-import java.text.ParseException;
-import java.util.UUID;
-import java.text.SimpleDateFormat;
-import java.sql.Timestamp;
-
 import marquez.api.JobVersion;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;

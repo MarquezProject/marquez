@@ -9,8 +9,6 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import marquez.db.dao.DatasetDAO;
 import marquez.db.dao.JobDAO;
-import marquez.db.dao.JobRunDefinitionDAO;
-import marquez.db.dao.JobVersionDAO;
 import marquez.db.dao.JobRunDAO;
 import marquez.db.dao.JobRunDefinitionDAO;
 import marquez.db.dao.JobRunStateDAO;
