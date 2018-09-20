@@ -2,11 +2,11 @@ package marquez.api.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.IOException;
 
 public final class CreateJobRunDefinitionRequest {
   @NotEmpty private final String name;
@@ -67,9 +67,9 @@ public final class CreateJobRunDefinitionRequest {
 
   public boolean validate() {
     try {
-      new JSONObject(runArgsJson);
+      new ObjectMapper().readTree(runArgsJson);
       new URI(URI);
-    } catch (JSONException | URISyntaxException e) {
+    } catch (IOException | URISyntaxException e) {
       return false;
     }
     return true;
