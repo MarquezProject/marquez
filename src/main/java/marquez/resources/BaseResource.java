@@ -5,7 +5,6 @@ import io.dropwizard.jackson.Jackson;
 import java.net.URI;
 
 abstract class BaseResource {
-
   protected static final ObjectMapper mapper = Jackson.newObjectMapper();
 
   URI buildURI(final Class<?> resource, final String id) {

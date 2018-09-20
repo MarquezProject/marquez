@@ -2,6 +2,8 @@ package marquez.db.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.UUID;
 import marquez.api.Job;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -13,9 +15,9 @@ public final class JobRow implements RowMapper<Job> {
     return new Job(
         UUID.fromString(rs.getString("guid")),
         rs.getString("name"),
-        null,
-        null,
-        rs.getString("category"),
-        rs.getString("description"));
+        rs.getString("current_ownership"),
+        new Timestamp(new Date(0).getTime()),
+        "",
+        "");
   }
 }
