@@ -8,7 +8,7 @@ public final class Job {
 
   private final UUID guid;
   private final String name;
-  private final String ownerName;
+  private final String owner;
   private final Timestamp nominalTime;
   private final String category;
   private final String description;
@@ -22,7 +22,7 @@ public final class Job {
       final String description) {
     this.guid = guid;
     this.name = name;
-    this.ownerName = ownerName;
+    this.owner = owner;
     this.nominalTime = nominalTime;
     this.category = category;
     this.description = description;
@@ -61,7 +61,7 @@ public final class Job {
 
     return Objects.equals(guid, other.guid)
         && Objects.equals(name, other.name)
-        && Objects.equals(ownerName, other.ownerName)
+        && Objects.equals(owner, other.owner)
         && Objects.equals(nominalTime, other.nominalTime)
         && Objects.equals(category, other.category)
         && Objects.equals(description, other.description);
@@ -69,7 +69,7 @@ public final class Job {
 
   @Override
   public int hashCode() {
-    return Objects.hash(guid, name, ownerName, nominalTime, category, description);
+    return Objects.hash(guid, name, owner, nominalTime, category, description);
   }
 
   @Override
@@ -78,7 +78,7 @@ public final class Job {
     sb.append("Job{");
     sb.append("guid=").append(guid);
     sb.append(",name=").append(name);
-    sb.append(",owner=").append(ownerName);
+    sb.append(",owner=").append(owner);
     sb.append(",nominalTime=").append(nominalTime);
     sb.append(",category=").append(category);
     sb.append(",description=").append(description);

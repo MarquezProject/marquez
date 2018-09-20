@@ -2,8 +2,6 @@ package marquez.db.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.UUID;
 import marquez.api.Job;
 import org.jdbi.v3.core.mapper.RowMapper;

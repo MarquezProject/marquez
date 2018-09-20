@@ -52,6 +52,7 @@ public abstract class JobRunBaseTest {
                   format(
                       "merge into job_run_definitions (guid, job_version_guid, run_args_json, content_hash, nominal_start_time, nominal_end_time) values "
                           + "('%s', '%s', '--my-favorite-flag', '6706da44-61d9-454d-a6c3-b9fea5a92a43', 5000, 10000);",
+
                       TEST_JOB_RUN_DEFINITION_GUID, TEST_JOB_RUN_VERSION_GUID));
             });
   }
