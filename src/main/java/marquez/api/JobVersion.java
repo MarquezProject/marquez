@@ -1,21 +1,19 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
-import marquez.api.entities.*;
+import marquez.api.entities.CreateJobRunDefinitionRequest;
 
 public final class JobVersion {
 
-  @NotNull private final UUID guid;
-  @NotNull private final UUID jobGuid;
-  @NotNull private final String uri;
-  @NotNull private final UUID version;
-  @NotNull private final UUID latestJobRunGuid;
-  @NotNull private final Timestamp createdAt;
-  @NotNull private final Timestamp updatedAt;
+  private final UUID guid;
+  private final UUID jobGuid;
+  private final String uri;
+  private final UUID version;
+  private final UUID latestJobRunGuid;
+  private final Timestamp createdAt;
+  private final Timestamp updatedAt;
 
   public JobVersion(
       final UUID guid,
@@ -34,7 +32,6 @@ public final class JobVersion {
     this.updatedAt = updatedAt;
   }
 
-  @JsonIgnore
   public UUID getGuid() {
     return guid;
   }

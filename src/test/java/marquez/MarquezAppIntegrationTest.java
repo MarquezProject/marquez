@@ -147,7 +147,7 @@ public class MarquezAppIntegrationTest {
       CreateJobRunDefinitionResponse createResJrd =
           mapper.readValue(
               createRes.readEntity(String.class), CreateJobRunDefinitionResponse.class);
-      jobRunDefId = createResJrd.getExternalGuid();
+      jobRunDefId = createResJrd.getGuid();
       final Response readRes =
           APP.client()
               .target(URI.create("http://localhost:" + APP.getLocalPort()))

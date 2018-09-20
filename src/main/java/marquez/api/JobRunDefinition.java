@@ -3,7 +3,7 @@ package marquez.api;
 import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
-import marquez.api.entities.*;
+import marquez.api.entities.CreateJobRunDefinitionRequest;
 
 public final class JobRunDefinition {
   private final UUID guid;

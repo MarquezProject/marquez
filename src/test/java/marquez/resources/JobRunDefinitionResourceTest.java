@@ -20,7 +20,7 @@ import marquez.api.Job;
 import marquez.api.JobRunDefinition;
 import marquez.api.JobVersion;
 import marquez.api.Owner;
-import marquez.api.entities.*;
+import marquez.api.entities.CreateJobRunDefinitionRequest;
 import marquez.db.dao.JobDAO;
 import marquez.db.dao.JobRunDefinitionDAO;
 import marquez.db.dao.JobVersionDAO;
