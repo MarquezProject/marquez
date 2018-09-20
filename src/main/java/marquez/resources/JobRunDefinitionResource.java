@@ -116,7 +116,7 @@ public final class JobRunDefinitionResource extends BaseResource {
       JobRunDefinition jobRunDefinition = findOrCreateJobRunDefinition(request, jobVersionGuid);
       CreateJobRunDefinitionResponse res =
           new CreateJobRunDefinitionResponse(jobRunDefinition.getGuid());
-      return Response.status(Response.Status.OK)
+      return Response.status(Response.Status.CREATED)
           .header("Location", "/job_run_definition/" + jobRunDefinition.getGuid())
           .entity(res)
           .type(APPLICATION_JSON)

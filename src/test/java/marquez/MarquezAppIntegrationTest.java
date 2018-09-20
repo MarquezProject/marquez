@@ -95,8 +95,8 @@ public class MarquezAppIntegrationTest {
             .post(entity(req, APPLICATION_JSON));
 
     assertEquals(res1.readEntity(String.class), res2.readEntity(String.class));
-    assertEquals(200, res1.getStatus());
-    assertEquals(200, res2.getStatus());
+    assertEquals(Response.Status.CREATED.getStatusCode(), res1.getStatus());
+    assertEquals(Response.Status.CREATED.getStatusCode(), res2.getStatus());
   }
 
   @Test
