@@ -3,10 +3,10 @@ package marquez.api.entities;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.hibernate.validator.constraints.NotEmpty;
-import java.io.IOException;
 
 public final class CreateJobRunDefinitionRequest {
   @NotEmpty private final String name;
