@@ -1,12 +1,13 @@
 !gradle-wrapper.jar
+*.iml
 *.jar
 *.swp
-*.iml
 .classpath
-.idea/
 .gradle/
+.idea/
 .project
 .settings
+.vscode/
 bin/
 build/
 
