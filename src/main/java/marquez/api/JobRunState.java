@@ -26,7 +26,7 @@ public final class JobRunState {
       }
 
       public Set<State> getValidTransitions() {
-        return new HashSet<>(Arrays.asList(State.RUNNING));
+        return new HashSet<State>(Arrays.asList(State.RUNNING));
       }
     },
 
@@ -37,7 +37,7 @@ public final class JobRunState {
       }
 
       public Set<State> getValidTransitions() {
-        return new HashSet<>(
+        return new HashSet<State>(
             Arrays.asList(State.RUNNING, State.FAILED, State.COMPLETED, State.ABORTED));
       }
     },
@@ -82,14 +82,14 @@ public final class JobRunState {
     public static Map<Integer, State> intToStateMap;
 
     static {
-      stateToIntMap = new HashMap();
+      stateToIntMap = new HashMap<State, Integer>();
       stateToIntMap.put(NEW, 0);
       stateToIntMap.put(RUNNING, 1);
       stateToIntMap.put(COMPLETED, 2);
       stateToIntMap.put(FAILED, 3);
       stateToIntMap.put(ABORTED, 4);
 
-      intToStateMap = new HashMap();
+      intToStateMap = new HashMap<Integer, State>();
       for (State s : stateToIntMap.keySet()) {
         intToStateMap.put(stateToIntMap.get(s), s);
       }
