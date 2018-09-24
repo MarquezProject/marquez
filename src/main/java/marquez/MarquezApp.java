@@ -1,6 +1,8 @@
 package marquez;
 
 import io.dropwizard.Application;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayBundle;
 import io.dropwizard.flyway.FlywayFactory;
@@ -46,6 +48,11 @@ public class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void initialize(Bootstrap<MarquezConfig> bootstrap) {
+    // Enable variable substitution with environment variables.
+    bootstrap.setConfigurationSourceProvider(
+        new SubstitutingSourceProvider(
+            bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor(false)));
+
     bootstrap.addBundle(
         new FlywayBundle<MarquezConfig>() {
           @Override
