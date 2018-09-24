@@ -25,9 +25,8 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
             MAPPER.writeValueAsString(
                 new CreateJobRunRequest(UUID.fromString(TEST_JOB_RUN_DEFINITION_GUID))));
     final Response res =
-        daoSetup
-            .client()
-            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
             .path("/job_runs")
             .request(MediaType.APPLICATION_JSON)
             .post(createJobRunRequestEntity);
@@ -38,8 +37,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
       assertNotNull(returnedId);
       LOG.info("Returned id is: " + returnedId);
     } finally {
-      daoSetup
-          .getJDBI()
+      APP.getJDBI()
           .useHandle(
               handle -> {
                 handle.execute(
@@ -63,9 +61,8 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     Entity jobRunUpdateRequestEntity =
         Entity.json(MAPPER.writeValueAsString(new UpdateJobRunRequest("RUNNING")));
     final Response res =
-        daoSetup
-            .client()
-            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
             .path(format("/job_runs/%s", NEW_JOB_RUN.getGuid()))
             .request(MediaType.APPLICATION_JSON)
             .put(jobRunUpdateRequestEntity);
@@ -85,9 +82,8 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     Entity jobRunUpdateRequestEntity =
         Entity.json(MAPPER.writeValueAsString(new UpdateJobRunRequest("FAILED")));
     final Response res =
-        daoSetup
-            .client()
-            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
             .path(format("/job_runs/%s", NEW_JOB_RUN.getGuid()))
             .request(MediaType.APPLICATION_JSON)
             .put(jobRunUpdateRequestEntity);
@@ -100,9 +96,8 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     Entity jobRunRequestJsonAsEntity =
         Entity.json(MAPPER.writeValueAsString(new UpdateJobRunRequest("NO_SUCH_STATE")));
     final Response res =
-        daoSetup
-            .client()
-            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
             .path(format("/job_runs/%s", NEW_JOB_RUN.getGuid()))
             .request(MediaType.APPLICATION_JSON)
             .put(jobRunRequestJsonAsEntity);
@@ -112,9 +107,8 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
 
   private GetJobRunResponse getJobRunApiResponse(UUID jobRunGuid) {
     final Response res =
-        daoSetup
-            .client()
-            .target(URI.create("http://localhost:" + daoSetup.getLocalPort()))
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
             .path(format("/job_runs/%s", jobRunGuid))
             .request(MediaType.APPLICATION_JSON)
             .get();
