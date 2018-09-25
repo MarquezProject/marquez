@@ -29,7 +29,7 @@ The executable can be found under `build/libs/`
 
 ## Configuration
 
-To run Marquez, you will have to define `config.yml`. The [configuration]((https://dropwizard.readthedocs.io/en/latest/manual/configuration.html)) file is passed to the application and used to specify your database connection. When creating your database, we recommend calling it `marquez`. Please copy `config.example.yml`:
+To run Marquez, you will have to define `config.yml` (see [reference](https://www.dropwizard.io/1.3.5/docs/manual/configuration.html)). The configuration file is passed to the application and used to specify your database connection. When creating your database, we recommend calling it `marquez`. Please copy `config.example.yml`:
 
 ```bash
 $ cp config.example.yml config.yml
@@ -43,7 +43,7 @@ You will then need to edit it and specify your database information.
 $ ./gradlew run --args 'db migrate config.yml'
 ```
 
-**Tip:** You can access environment variables from `config.yml` with [`${VAR_NAME}`](https://dropwizard.readthedocs.io/en/latest/manual/core.html#environment-variables).
+**Tip:** You can access environment variables from `config.yml` with [`${VAR_NAME}`](https://www.dropwizard.io/1.3.5/docs/manual/core.html#environment-variables).
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
 
