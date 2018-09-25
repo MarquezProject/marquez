@@ -51,7 +51,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     // Enable variable substitution with environment variables.
     bootstrap.setConfigurationSourceProvider(
         new SubstitutingSourceProvider(
-            bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor(false)));
+            bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor()));
 
     bootstrap.addBundle(
         new FlywayBundle<MarquezConfig>() {
