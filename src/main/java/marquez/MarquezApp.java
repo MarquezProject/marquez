@@ -1,6 +1,8 @@
 package marquez;
 
 import io.dropwizard.Application;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayBundle;
 import io.dropwizard.flyway.FlywayFactory;
@@ -11,7 +13,6 @@ import marquez.db.dao.DatasetDAO;
 import marquez.db.dao.JobDAO;
 import marquez.db.dao.JobRunDAO;
 import marquez.db.dao.JobRunDefinitionDAO;
-import marquez.db.dao.JobRunStateDAO;
 import marquez.db.dao.JobVersionDAO;
 import marquez.db.dao.OwnerDAO;
 import marquez.resources.DatasetResource;
@@ -46,6 +47,11 @@ public class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void initialize(Bootstrap<MarquezConfig> bootstrap) {
+    // Enable variable substitution with environment variables.
+    bootstrap.setConfigurationSourceProvider(
+        new SubstitutingSourceProvider(
+            bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor()));
+
     bootstrap.addBundle(
         new FlywayBundle<MarquezConfig>() {
           @Override
@@ -104,8 +110,6 @@ public class MarquezApp extends Application<MarquezConfig> {
 
     final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
     env.jersey().register(new JobRunResource(jobRunDAO));
-
-    final JobRunStateDAO jobRunStateDAO = jdbi.onDemand(JobRunStateDAO.class);
 
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));
