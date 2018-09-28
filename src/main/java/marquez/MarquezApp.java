@@ -35,6 +35,7 @@ public class MarquezApp extends Application<MarquezConfig> {
 
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRESQL_DB = "postgresql";
+  private static final boolean ERROR_ON_UNDEFINED = false;
 
   public static void main(String[] args) throws Exception {
     new MarquezApp().run(args);
@@ -50,7 +51,8 @@ public class MarquezApp extends Application<MarquezConfig> {
     // Enable variable substitution with environment variables.
     bootstrap.setConfigurationSourceProvider(
         new SubstitutingSourceProvider(
-            bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor()));
+            bootstrap.getConfigurationSourceProvider(),
+            new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
 
     bootstrap.addBundle(
         new FlywayBundle<MarquezConfig>() {
