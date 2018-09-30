@@ -36,6 +36,7 @@ compileTestJava {
 mainClassName = 'marquez.MarquezApp'
 
 shadowJar {
+  transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
   manifest {
     attributes 'Main-Class': mainClassName
   }
