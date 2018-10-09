@@ -4,12 +4,10 @@ import static java.lang.String.format;
 import static marquez.api.JobRunState.State.toInt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opentable.db.postgres.embedded.FlywayPreparer;
 import io.dropwizard.jackson.Jackson;
 import java.util.UUID;
 import marquez.db.dao.JobRunDAO;
-import marquez.db.dao.fixtures.ConfigExportingPreparedDbRule;
-import marquez.db.dao.fixtures.DAOSetup;
+import marquez.db.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -23,13 +21,8 @@ public abstract class JobRunBaseTest {
   static final String TEST_JOB_RUN_VERSION_GUID = UUID.randomUUID().toString();
   static final String TEST_JOB_RUN_DEFINITION_GUID = UUID.randomUUID().toString();
 
-  @ClassRule
-  public static ConfigExportingPreparedDbRule DB =
-      new ConfigExportingPreparedDbRule(
-          FlywayPreparer.forClasspathLocation("db/migration"),
-          DAOSetup.POSTGRES_FULL_TEST_CONFIG_FILE_PATH);
+  @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
-  @ClassRule public static final DAOSetup APP = new DAOSetup();
   final JobRunDAO jobRunDAO = APP.onDemand(JobRunDAO.class);
 
   protected static JobRun NEW_JOB_RUN =
