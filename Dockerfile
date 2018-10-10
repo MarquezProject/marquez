@@ -1,6 +1,7 @@
 FROM openjdk:8-jdk AS base
 WORKDIR /usr/src/app
 COPY gradle gradle
+COPY gradle.properties gradle.properties
 COPY gradlew gradlew
 COPY settings.gradle settings.gradle
 RUN ./gradlew --version
