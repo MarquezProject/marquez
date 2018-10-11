@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.UUID;
 import marquez.api.Job;
 import marquez.api.JobRunDefinition;
-import marquez.db.dao.fixtures.DAOSetup;
+import marquez.db.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -16,19 +16,17 @@ import org.junit.Test;
 
 public class JobRunDefinitionDAOTest {
 
-  @ClassRule public static final DAOSetup daoSetup = new DAOSetup();
+  @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
   final Timestamp defaultTimestamp = new Timestamp(new Date(0).getTime());
 
-  final JobDAO jobDAO = daoSetup.onDemand(JobDAO.class);
-  final JobVersionDAO jobVersionDAO = daoSetup.onDemand(JobVersionDAO.class);
-  final JobRunDefinitionDAO jobRunDefDAO = daoSetup.onDemand(JobRunDefinitionDAO.class);
+  final JobDAO jobDAO = APP.onDemand(JobDAO.class);
+  final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
+  final JobRunDefinitionDAO jobRunDefDAO = APP.onDemand(JobRunDefinitionDAO.class);
 
   final UUID jobGuid = UUID.randomUUID();
   final UUID jobVersionGuid = UUID.randomUUID();
   final UUID jobVersionVersion = UUID.randomUUID();
-  final UUID jobRunDefinitionGuid = UUID.randomUUID();
-  final UUID jobRunDefinitionHash = UUID.randomUUID();
 
   @Before
   public void setUp() {
@@ -39,8 +37,7 @@ public class JobRunDefinitionDAOTest {
 
   @After
   public void tearDown() {
-    daoSetup
-        .getJDBI()
+    APP.getJDBI()
         .useHandle(
             handle -> {
               handle.execute("DELETE FROM job_run_definitions;");
@@ -66,8 +63,7 @@ public class JobRunDefinitionDAOTest {
   }
 
   private static void insertJobRunDefinition(final JobRunDefinition jrd) {
-    daoSetup
-        .getJDBI()
+    APP.getJDBI()
         .useHandle(
             handle -> {
               handle

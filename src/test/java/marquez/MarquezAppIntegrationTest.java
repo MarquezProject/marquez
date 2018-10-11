@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opentable.db.postgres.embedded.FlywayPreparer;
 import io.dropwizard.jackson.Jackson;
 import java.io.IOException;
 import java.net.URI;
@@ -16,8 +15,7 @@ import javax.ws.rs.core.Response;
 import marquez.api.entities.CreateJobRunDefinitionRequest;
 import marquez.api.entities.CreateJobRunDefinitionResponse;
 import marquez.api.entities.GetJobRunDefinitionResponse;
-import marquez.db.dao.fixtures.ConfigExportingPreparedDbRule;
-import marquez.db.dao.fixtures.DAOSetup;
+import marquez.db.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -25,13 +23,7 @@ import org.junit.Test;
 public class MarquezAppIntegrationTest {
   protected static final ObjectMapper mapper = Jackson.newObjectMapper();
 
-  @ClassRule
-  public static ConfigExportingPreparedDbRule DB =
-      new ConfigExportingPreparedDbRule(
-          FlywayPreparer.forClasspathLocation("db/migration"),
-          DAOSetup.POSTGRES_FULL_TEST_CONFIG_FILE_PATH);
-
-  @ClassRule public static final DAOSetup APP = new DAOSetup();
+  @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
   @After
   public void teardown() {

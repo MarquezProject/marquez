@@ -3,24 +3,16 @@ package marquez.db.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import com.opentable.db.postgres.embedded.FlywayPreparer;
 import java.util.UUID;
 import marquez.api.Owner;
-import marquez.db.dao.fixtures.ConfigExportingPreparedDbRule;
-import marquez.db.dao.fixtures.DAOSetup;
+import marquez.db.dao.fixtures.AppWithPostgresRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 public class TestOwnerDAO {
 
-  @ClassRule
-  public static ConfigExportingPreparedDbRule DB =
-      new ConfigExportingPreparedDbRule(
-          FlywayPreparer.forClasspathLocation("db/migration"),
-          DAOSetup.POSTGRES_FULL_TEST_CONFIG_FILE_PATH);
-
-  @ClassRule public static final DAOSetup APP = new DAOSetup();
+  @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
   final OwnerDAO ownerDAO = APP.onDemand(OwnerDAO.class);
   final Owner testOwner = new Owner("Amaranta");
