@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/marquez
   docker:
-    - image: circleci/openjdk:9-jdk
+    - image: circleci/openjdk:8-jdk
 
 version: 2
 jobs:
