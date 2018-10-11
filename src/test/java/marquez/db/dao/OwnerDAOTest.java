@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class TestOwnerDAO {
+public class OwnerDAOTest {
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
@@ -45,7 +45,7 @@ public class TestOwnerDAO {
     assertEquals(testOwner.getName(), o.getName());
 
     // deleted_at should be null in the DB
-    String deletedAt = TestOwnerDAO.ownerDeletedAt(testOwner.getName());
+    String deletedAt = OwnerDAOTest.ownerDeletedAt(testOwner.getName());
     assertEquals(null, deletedAt);
 
     // owner is fetchable
@@ -58,7 +58,7 @@ public class TestOwnerDAO {
     ownerDAO.delete(testOwner.getName());
 
     // deleted_at should be set
-    String deletedAt = TestOwnerDAO.ownerDeletedAt(testOwner.getName());
+    String deletedAt = OwnerDAOTest.ownerDeletedAt(testOwner.getName());
     assertNotEquals(null, deletedAt);
 
     // owner is no longer fetchable
