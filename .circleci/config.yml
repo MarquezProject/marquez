@@ -40,7 +40,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: ./docker/login.sh
-      - run: ./docker/build-tag-push.sh $CIRCLE_TAG
+      - run: ./docker/build-and-push.sh $CIRCLE_TAG
 
 workflows:
   version: 2
