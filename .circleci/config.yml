@@ -38,6 +38,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - run: ./docker/login.sh
       - run: ./docker/build-tag-push.sh
 
 workflows:
@@ -56,6 +57,6 @@ workflows:
             - test
           filters:
             tags:
-              only: /^v\d+\.\d+\.\d+$/
+              only: /^\d+\.\d+\.\d+$/
             branches:
               only: master
