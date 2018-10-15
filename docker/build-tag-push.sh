@@ -4,8 +4,8 @@
 
 set -eu
 
-declare -r org=projectmarquez
-declare -r repo=marquez
+readonly ORG=projectmarquez
+readonly REPO=marquez
 
 project_root=$(git rev-parse --show-toplevel)
 cd $project_root/docker
@@ -13,7 +13,11 @@ cd $project_root/docker
 # Version of Marquez image to build
 version=$1
 
-docker build --no-cache -t ${org}/${repo}:${version} .
-docker tag ${org}/${repo}:${version} ${org}/${repo}:latest
-docker push ${org}/${repo}:${version}
-docker push ${org}/${repo}:latest
+echo "Building image (tag: ${version})..."
+
+docker build --no-cache -t ${ORG}/${REPO}:${version} .
+docker tag ${ORG}/${REPO}:${version} ${ORG}/${REPO}:latest
+docker push ${ORG}/${REPO}:${version}
+docker push ${ORG}/${REPO}:latest
+
+echo "DONE!"
