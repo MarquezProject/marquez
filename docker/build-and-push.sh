@@ -4,9 +4,7 @@
 
 set -eu
 
-# X.Y.Z
-readonly SEMVER_REGEX=/^\d+\.\d+\.\d+$/
-# Docker Hub repository
+readonly SEMVER_REGEX=^[0-9]+\.[0-9]+\.[0-9]+$ # X.Y.Z
 readonly ORG=projectmarquez
 readonly REPO=marquez
 
