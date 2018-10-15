@@ -33,11 +33,29 @@ jobs:
       - run: ./gradlew jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
 
+  release:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: ./docker/build-tag-push.sh
+
 workflows:
   version: 2
-  build_and_test:
+  marquez:
     jobs:
-      - build
+      - build:
+          filters:
+            tags:
+              ignore: /.*/
       - test:
           requires:
             - build
+      - release:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+            branches:
+              only: master
