@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Usage: $ ./entrypoint.sh
 
 set -eu
 
