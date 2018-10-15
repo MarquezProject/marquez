@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/marquez
   docker:
-    - image: circleci/openjdk:9-jdk
+    - image: circleci/openjdk:8-jdk
 
 version: 2
 jobs:
@@ -9,12 +9,12 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: ./gradlew clean build
+      - run: ./gradlew clean build -x test checkstyleTest --stacktrace
   test:
     <<: *defaults
     steps:
       - checkout
-      - run: ./gradlew test
+      - run: ./gradlew test --stacktrace
       - run: ./gradlew jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
 

@@ -1,29 +1,26 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
-import org.hibernate.validator.constraints.NotBlank;
+import java.util.UUID;
 
 public final class Job {
-  private final int id;
+
+  private final UUID guid;
   private final String name;
   private final String ownerName;
   private final Timestamp nominalTime;
   private final String category;
   private final String description;
 
-  @JsonCreator
   public Job(
-      @JsonProperty("id") final int id,
-      @JsonProperty("name") @NotBlank final String name,
-      @JsonProperty("ownerName") final String ownerName,
-      @JsonProperty("nominalTime") final Timestamp nominalTime,
-      @JsonProperty("category") final String category,
-      @JsonProperty("description") final String description) {
-    this.id = id;
+      final UUID guid,
+      final String name,
+      final String ownerName,
+      final Timestamp nominalTime,
+      final String category,
+      final String description) {
+    this.guid = guid;
     this.name = name;
     this.ownerName = ownerName;
     this.nominalTime = nominalTime;
@@ -31,9 +28,8 @@ public final class Job {
     this.description = description;
   }
 
-  @JsonIgnore
-  public int getId() {
-    return id;
+  public UUID getGuid() {
+    return guid;
   }
 
   public String getName() {
@@ -63,7 +59,7 @@ public final class Job {
 
     final Job other = (Job) o;
 
-    return Objects.equals(id, other.id)
+    return Objects.equals(guid, other.guid)
         && Objects.equals(name, other.name)
         && Objects.equals(ownerName, other.ownerName)
         && Objects.equals(nominalTime, other.nominalTime)
@@ -73,14 +69,14 @@ public final class Job {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, ownerName, nominalTime, category, description);
+    return Objects.hash(guid, name, ownerName, nominalTime, category, description);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("Job{");
-    sb.append("id=").append(id);
+    sb.append("guid=").append(guid);
     sb.append(",name=").append(name);
     sb.append(",owner=").append(ownerName);
     sb.append(",nominalTime=").append(nominalTime);

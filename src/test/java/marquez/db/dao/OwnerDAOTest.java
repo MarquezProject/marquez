@@ -5,22 +5,21 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.util.UUID;
 import marquez.api.Owner;
-import marquez.db.dao.fixtures.DAOSetup;
+import marquez.db.dao.fixtures.AppWithPostgresRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class TestOwnerDAO {
+public class OwnerDAOTest {
 
-  @ClassRule public static final DAOSetup daoSetup = new DAOSetup();
+  @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
-  final OwnerDAO ownerDAO = daoSetup.onDemand(OwnerDAO.class);
+  final OwnerDAO ownerDAO = APP.onDemand(OwnerDAO.class);
   final Owner testOwner = new Owner("Amaranta");
 
   @Before
   public void setUp() {
-    daoSetup
-        .getJDBI()
+    APP.getJDBI()
         .useHandle(
             handle -> {
               handle.execute("DELETE FROM ownerships");
@@ -29,8 +28,7 @@ public class TestOwnerDAO {
   }
 
   private static String ownerDeletedAt(String name) {
-    return daoSetup
-        .getJDBI()
+    return APP.getJDBI()
         .withHandle(
             handle ->
                 handle
@@ -47,7 +45,7 @@ public class TestOwnerDAO {
     assertEquals(testOwner.getName(), o.getName());
 
     // deleted_at should be null in the DB
-    String deletedAt = TestOwnerDAO.ownerDeletedAt(testOwner.getName());
+    String deletedAt = OwnerDAOTest.ownerDeletedAt(testOwner.getName());
     assertEquals(null, deletedAt);
 
     // owner is fetchable
@@ -60,7 +58,7 @@ public class TestOwnerDAO {
     ownerDAO.delete(testOwner.getName());
 
     // deleted_at should be set
-    String deletedAt = TestOwnerDAO.ownerDeletedAt(testOwner.getName());
+    String deletedAt = OwnerDAOTest.ownerDeletedAt(testOwner.getName());
     assertNotEquals(null, deletedAt);
 
     // owner is no longer fetchable

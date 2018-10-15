@@ -5,12 +5,13 @@ import marquez.api.Job;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
+import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// @RegisterRowMapper(JobRow.class)
+@RegisterRowMapper(JobRow.class)
 public interface JobDAO extends SqlObject {
   static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
 
@@ -22,11 +23,12 @@ public interface JobDAO extends SqlObject {
       handle.useTransaction(
           h -> {
             h.createUpdate(
-                    "INSERT INTO jobs (name, nominal_time, category, description)"
-                        + " VALUES (:name, :nominalTime, :category, :description)")
-                .bindBean(job)
+                    "INSERT INTO jobs (guid, name, current_owner_name)"
+                        + " VALUES (:guid, :name, :current_owner_name)")
+                .bind("guid", job.getGuid())
+                .bind("name", job.getName())
+                .bind("current_owner_name", job.getOwnerName())
                 .execute();
-            createOwnershipDAO().insert(job.getName(), job.getOwnerName());
             h.commit();
           });
     } catch (Exception e) {

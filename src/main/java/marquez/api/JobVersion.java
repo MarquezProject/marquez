@@ -1,34 +1,39 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
+import marquez.api.entities.CreateJobRunDefinitionRequest;
 
 public final class JobVersion {
-  @NotNull private final Timestamp createdAt;
-  @NotNull private final Timestamp updatedAt;
-  @NotNull private final UUID jobGuid;
-  @NotNull private final String gitRepoUri;
-  @NotNull private final String gitSha;
-  @NotNull private final UUID latestRunGuid;
 
-  @JsonCreator
+  private final UUID guid;
+  private final UUID jobGuid;
+  private final String uri;
+  private final UUID version;
+  private final UUID latestJobRunGuid;
+  private final Timestamp createdAt;
+  private final Timestamp updatedAt;
+
   public JobVersion(
-      @JsonProperty("createdAt") final Timestamp createdAt,
-      @JsonProperty("updatedAt") final Timestamp updatedAt,
-      @JsonProperty("jobGuid") final UUID jobGuid,
-      @JsonProperty("gitRepoUri") final String gitRepoUri,
-      @JsonProperty("gitSha") final String gitSha,
-      @JsonProperty("latestRunGuid") final UUID latestRunGuid) {
+      final UUID guid,
+      final UUID jobGuid,
+      final String uri,
+      final UUID version,
+      final UUID latestJobRunGuid,
+      final Timestamp createdAt,
+      final Timestamp updatedAt) {
+    this.guid = guid;
+    this.jobGuid = jobGuid;
+    this.uri = uri;
+    this.latestJobRunGuid = latestJobRunGuid;
+    this.version = version;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.jobGuid = jobGuid;
-    this.gitRepoUri = gitRepoUri;
-    this.gitSha = gitSha;
-    this.latestRunGuid = latestRunGuid;
+  }
+
+  public UUID getGuid() {
+    return guid;
   }
 
   public Timestamp getCreatedAt() {
@@ -43,16 +48,12 @@ public final class JobVersion {
     return jobGuid;
   }
 
-  public String getGitRepoUri() {
-    return gitRepoUri;
-  }
-
-  public String getGitSha() {
-    return gitSha;
+  public String getURI() {
+    return uri;
   }
 
   public UUID getLatestRunGuid() {
-    return latestRunGuid;
+    return latestJobRunGuid;
   }
 
   @Override
@@ -62,17 +63,27 @@ public final class JobVersion {
 
     final JobVersion other = (JobVersion) o;
 
-    return Objects.equals(createdAt, other.createdAt)
-        && Objects.equals(updatedAt, other.updatedAt)
+    return Objects.equals(guid, other.guid)
         && Objects.equals(jobGuid, other.jobGuid)
-        && Objects.equals(gitRepoUri, other.gitRepoUri)
-        && Objects.equals(gitSha, other.gitSha)
-        && Objects.equals(latestRunGuid, other.latestRunGuid);
+        && Objects.equals(uri, other.uri)
+        && Objects.equals(version, other.version)
+        && Objects.equals(createdAt, other.createdAt)
+        && Objects.equals(latestJobRunGuid, other.latestJobRunGuid)
+        && Objects.equals(updatedAt, other.updatedAt);
+  }
+
+  public static JobVersion create(CreateJobRunDefinitionRequest request) {
+    return new JobVersion(null, null, request.getURI(), null, null, null, null);
+  }
+
+  public UUID computeVersionGuid() {
+    byte[] raw = String.format("%s:%s", jobGuid, uri).getBytes();
+    return UUID.nameUUIDFromBytes(raw);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdAt, updatedAt, jobGuid, gitRepoUri, gitSha, latestRunGuid);
+    return Objects.hash(createdAt, updatedAt, guid, jobGuid, uri, version);
   }
 
   @Override
@@ -81,10 +92,10 @@ public final class JobVersion {
     sb.append("JobVersion{");
     sb.append("createdAt=").append(createdAt);
     sb.append("updatedAt=").append(updatedAt);
+    sb.append("guid=").append(guid);
     sb.append("jobGuid=").append(jobGuid);
-    sb.append("gitRepoUri=").append(gitRepoUri);
-    sb.append("gitSha=").append(gitSha);
-    sb.append("latestRunGuid=").append(latestRunGuid);
+    sb.append("uri=").append(uri);
+    sb.append("latestJobRunGuid=").append(latestJobRunGuid);
     sb.append("}");
     return sb.toString();
   }

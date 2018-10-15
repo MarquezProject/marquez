@@ -1,6 +1,8 @@
 package marquez;
 
 import io.dropwizard.Application;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayBundle;
 import io.dropwizard.flyway.FlywayFactory;
@@ -9,10 +11,15 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import marquez.db.dao.DatasetDAO;
 import marquez.db.dao.JobDAO;
+import marquez.db.dao.JobRunDAO;
+import marquez.db.dao.JobRunDefinitionDAO;
+import marquez.db.dao.JobVersionDAO;
 import marquez.db.dao.OwnerDAO;
 import marquez.resources.DatasetResource;
 import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
+import marquez.resources.JobRunDefinitionResource;
+import marquez.resources.JobRunResource;
 import marquez.resources.OwnerResource;
 import marquez.resources.PingResource;
 import org.flywaydb.core.Flyway;
@@ -28,6 +35,7 @@ public class MarquezApp extends Application<MarquezConfig> {
 
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRESQL_DB = "postgresql";
+  private static final boolean ERROR_ON_UNDEFINED = false;
 
   public static void main(String[] args) throws Exception {
     new MarquezApp().run(args);
@@ -40,6 +48,12 @@ public class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void initialize(Bootstrap<MarquezConfig> bootstrap) {
+    // Enable variable substitution with environment variables.
+    bootstrap.setConfigurationSourceProvider(
+        new SubstitutingSourceProvider(
+            bootstrap.getConfigurationSourceProvider(),
+            new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
+
     bootstrap.addBundle(
         new FlywayBundle<MarquezConfig>() {
           @Override
@@ -96,7 +110,16 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JobDAO jobDAO = jdbi.onDemand(JobDAO.class);
     env.jersey().register(new JobResource(jobDAO));
 
+    final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
+    env.jersey().register(new JobRunResource(jobRunDAO));
+
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));
+
+    final JobRunDefinitionDAO jobRunDefinitionDAO = jdbi.onDemand(JobRunDefinitionDAO.class);
+    final JobVersionDAO jobVersionDAO = jdbi.onDemand(JobVersionDAO.class);
+    env.jersey()
+        .register(
+            new JobRunDefinitionResource(jobRunDefinitionDAO, jobVersionDAO, jobDAO, ownerDAO));
   }
 }
