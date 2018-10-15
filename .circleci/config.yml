@@ -1,20 +1,35 @@
+version: 2
+
 defaults: &defaults
   working_directory: ~/marquez
   docker:
     - image: circleci/openjdk:8-jdk
 
-version: 2
+cache: &cache
+  keys:
+    - v1-dependencies-{{ checksum "build.gradle" }}
+    - v1-dependencies-
+
 jobs:
   build:
     <<: *defaults
     steps:
       - checkout
-      - run: ./gradlew --no-daemon --stacktrace clean build check -x test checkstyleTest
+      - restore_cache:
+          <<: *cache
+      - run: ./gradlew --no-daemon --stacktrace build -x test checkstyleTest
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+
   test:
     <<: *defaults
     steps:
       - checkout
-      - run: ./gradlew --no-daemon --stacktrace clean test
+      - restore_cache:
+          <<: *cache
+      - run: ./gradlew --no-daemon --stacktrace test
       - run: ./gradlew jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
 
