@@ -1,9 +1,9 @@
 version: 2
 
 defaults: &defaults
-  working_directory: ~/marquez
   docker:
     - image: circleci/openjdk:8-jdk
+  working_directory: ~/marquez
 
 cache: &cache
   keys:
@@ -34,7 +34,8 @@ jobs:
       - run: bash <(curl -s https://codecov.io/bash)
 
   release:
-    <<: *defaults
+    machine: true
+    working_directory: ~/marquez
     steps:
       - checkout
       - setup_remote_docker
