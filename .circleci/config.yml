@@ -21,7 +21,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+          key: v1-deps-{{ .Branch }}-{{ .Revision }}
 
   test:
     <<: *defaults
