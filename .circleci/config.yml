@@ -7,8 +7,8 @@ defaults: &defaults
 
 cache: &cache
   keys:
-    - v1-dependencies-{{ checksum "build.gradle" }}
-    - v1-dependencies-
+    - v1-deps-{{ .Branch }}-{{ .Revision }}
+    - v1-deps-
 
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+          key: v1-deps-{{ .Branch }}-{{ .Revision }}
 
   test:
     <<: *defaults
