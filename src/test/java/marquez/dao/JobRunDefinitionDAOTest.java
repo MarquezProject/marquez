@@ -1,4 +1,4 @@
-package marquez.db.dao;
+package marquez.dao;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.UUID;
 import marquez.api.Job;
 import marquez.api.JobRunDefinition;
-import marquez.db.dao.fixtures.AppWithPostgresRule;
+import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;

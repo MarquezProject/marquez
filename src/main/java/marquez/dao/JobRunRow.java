@@ -1,4 +1,4 @@
-package marquez.db.dao;
+package marquez.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

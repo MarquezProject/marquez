@@ -25,7 +25,7 @@ import marquez.api.JobRun;
 import marquez.api.JobRunState;
 import marquez.api.UpdateJobRunRequest;
 import marquez.api.UpdateJobRunResponse;
-import marquez.db.dao.JobRunDAO;
+import marquez.dao.JobRunDAO;
 
 @Path("/job_runs")
 @Produces(APPLICATION_JSON)

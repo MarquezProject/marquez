@@ -1,11 +1,11 @@
-package marquez.db.dao;
+package marquez.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import java.util.UUID;
 import marquez.api.Owner;
-import marquez.db.dao.fixtures.AppWithPostgresRule;
+import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;

@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 import marquez.api.entities.CreateJobRunDefinitionRequest;
 import marquez.api.entities.CreateJobRunDefinitionResponse;
 import marquez.api.entities.GetJobRunDefinitionResponse;
-import marquez.db.dao.fixtures.AppWithPostgresRule;
+import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
