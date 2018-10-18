@@ -1,4 +1,4 @@
-package marquez.db.dao;
+package marquez.dao;
 
 import java.util.List;
 import java.util.UUID;

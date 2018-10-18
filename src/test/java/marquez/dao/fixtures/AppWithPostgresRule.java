@@ -1,4 +1,4 @@
-package marquez.db.dao.fixtures;
+package marquez.dao.fixtures;
 
 import static org.junit.Assert.fail;
 
