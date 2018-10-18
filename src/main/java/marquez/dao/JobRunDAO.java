@@ -1,4 +1,4 @@
-package marquez.db.dao;
+package marquez.dao;
 
 import java.util.UUID;
 import marquez.api.JobRun;

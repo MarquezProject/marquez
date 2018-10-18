@@ -1,4 +1,4 @@
-package marquez.db.dao;
+package marquez.dao;
 
 import java.net.URI;
 import java.sql.ResultSet;
