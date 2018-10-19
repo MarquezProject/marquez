@@ -1,11 +1,19 @@
 package marquez.core.services;
 import marquez.dao.JobDAO;
 import marquez.dao.JobVersionDAO;
+
+import java.util.UUID;
+
 import marquez.api.Job;
 import marquez.api.JobVersion;
 
 class JobService {
+    private JobDAO jobDAO;
+    private JobVersionDAO jobVersionDAO;
+
     public JobService(JobDAO jobDAO, JobVersionDAO jobVersionDAO) {
+        this.jobDAO = jobDAO;
+        this.jobVersionDAO = jobVersionDAO;
     }
 
     public void create(String namespace, Job job) {
@@ -15,8 +23,15 @@ class JobService {
         return true;
     }
 
-    public Job[] getAll(String namespace) {
-        return new Job[]{};
+    public Job[] getAll(String namespace) throws Exception {
+        Job[] jobs;
+        try {
+            jobs = this.jobDAO.getAllInNamespace(namespace);
+        } catch (Exception e) {
+            // log exception
+            throw new Exception("error fetching jobs");
+        }
+        return jobs;
     }
 
     public JobVersion[] getAllVersions(String namespace, String jobName) {
