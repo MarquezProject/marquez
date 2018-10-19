@@ -1,9 +1,12 @@
 package marquez.core.services;
 import marquez.dao.JobDAO;
+<<<<<<< HEAD
 import marquez.dao.JobVersionDAO;
 
 import java.util.UUID;
 
+=======
+>>>>>>> 75f9b6d... checkpoint -- skeleton JobService
 import marquez.api.Job;
 import marquez.api.JobVersion;
 
