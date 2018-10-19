@@ -1,14 +1,14 @@
 package marquez.core.services;
 import marquez.dao.JobDAO;
+import marquez.dao.JobVersionDAO;
 import marquez.api.Job;
 import marquez.api.JobVersion;
 
 class JobService {
-    public JobService(JobDAO jobDAO) {
+    public JobService(JobDAO jobDAO, JobVersionDAO jobVersionDAO) {
     }
 
     public void create(String namespace, Job job) {
-
     }
 
     private boolean createVersion(String namespace, Job job) {
