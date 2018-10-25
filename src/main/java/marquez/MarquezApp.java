@@ -20,6 +20,7 @@ import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
 import marquez.resources.JobRunDefinitionResource;
 import marquez.resources.JobRunResource;
+import marquez.resources.NamespaceResource;
 import marquez.resources.OwnerResource;
 import marquez.resources.PingResource;
 import org.flywaydb.core.Flyway;
@@ -121,5 +122,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey()
         .register(
             new JobRunDefinitionResource(jobRunDefinitionDAO, jobVersionDAO, jobDAO, ownerDAO));
+
+    env.jersey().register(new NamespaceResource());
   }
 }

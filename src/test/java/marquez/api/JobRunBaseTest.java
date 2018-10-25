@@ -40,7 +40,7 @@ public abstract class JobRunBaseTest {
             handle -> {
               handle.execute(
                   format(
-                      "insert into jobs (guid, name, category, description) values "
+                      "insert into jobs (guid, name, category, DESCRIPTION) values "
                           + "('%s', 'my_job', 'testing', 'fake job for reference');",
                       TEST_JOB_GUID));
               handle.execute(
