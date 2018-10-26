@@ -1,28 +1,60 @@
+version: 2
+
 defaults: &defaults
-  working_directory: ~/marquez
   docker:
     - image: circleci/openjdk:8-jdk
+  working_directory: ~/marquez
 
-version: 2
+cache: &cache
+  keys:
+    - v1-deps-{{ .Branch }}-{{ .Revision }}
+    - v1-deps-
+
 jobs:
   build:
     <<: *defaults
     steps:
       - checkout
-      - run: ./gradlew clean build -x test checkstyleTest --stacktrace
+      - restore_cache:
+          <<: *cache
+      - run: ./gradlew --no-daemon --stacktrace build -x test checkstyleTest
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-deps-{{ .Branch }}-{{ .Revision }}
+
   test:
     <<: *defaults
     steps:
       - checkout
-      - run: ./gradlew test --stacktrace
+      - restore_cache:
+          <<: *cache
+      - run: ./gradlew --no-daemon --stacktrace test
       - run: ./gradlew jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
 
+  release:
+    machine: true
+    working_directory: ~/marquez
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: ./docker/login.sh
+      - run: ./docker/build-and-push.sh $CIRCLE_TAG
+
 workflows:
   version: 2
-  build_and_test:
+  marquez:
     jobs:
       - build
       - test:
           requires:
             - build
+      - release:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^[0-9]+\.[0-9]+\.[0-9]+$/
+            branches:
+              ignore: /.*/
