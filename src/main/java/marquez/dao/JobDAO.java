@@ -42,4 +42,7 @@ public interface JobDAO extends SqlObject {
 
   @SqlQuery("SELECT * FROM jobs LIMIT :limit")
   List<Job> findAll(@Bind("limit") int limit);
+
+  @SqlQuery("SELECT * FROM jobs LIMIT 1") // TODO: replace stub query
+  List<Job> findAllInNamespace(@Bind("namespace") String namespace);
 }

@@ -1,14 +1,10 @@
 package marquez.core.services;
 import marquez.dao.JobDAO;
-<<<<<<< HEAD
 import marquez.dao.JobVersionDAO;
-
-import java.util.UUID;
-
-=======
->>>>>>> 75f9b6d... checkpoint -- skeleton JobService
 import marquez.api.Job;
 import marquez.api.JobVersion;
+import java.util.List;
+
 
 class JobService {
     private JobDAO jobDAO;
@@ -26,13 +22,13 @@ class JobService {
         return true;
     }
 
-    public Job[] getAll(String namespace) throws Exception {
-        Job[] jobs;
+    public List<Job> getAll(String namespace) throws Exception {
+        List<Job> jobs;
         try {
-            jobs = this.jobDAO.getAllInNamespace(namespace);
+            jobs = this.jobDAO.findAllInNamespace(namespace);
         } catch (Exception e) {
             // log exception
-            throw new Exception("error fetching jobs");
+            throw new JobServiceException("error fetching jobs");
         }
         return jobs;
     }
