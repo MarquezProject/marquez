@@ -12,7 +12,8 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.sql.Timestamp;
 import java.util.Date;
-
+import java.sql.SQLException;
+import marquez.core.exceptions.JobServiceException;
 
 import static org.mockito.Mockito.when;
 
@@ -21,7 +22,7 @@ public class JobServiceTest {
     final String TEST_NS = "test_namespace";
 
     @Test
-    public void testGetAll() throws Exception {
+    public void testGetAll_OK() throws Exception {
         List<Job> jobs = new ArrayList<Job>();
         jobs.add(new Job(UUID.randomUUID(), "job", "owner", new Timestamp(new Date(0).getTime()), "category", "a job"));
         jobs.add(new Job(UUID.randomUUID(), "job2", "owner2", new Timestamp(new Date(0).getTime()), "category", "a job2"));
@@ -33,5 +34,15 @@ public class JobServiceTest {
         JobService js = new JobService(jobDAOMock, jobVersionDAOMock);
         List<Job> jobsFound = js.getAll(TEST_NS);
         Assert.assertEquals(jobs, jobsFound);
+    }
+
+    @Test(expected = JobServiceException.class)
+    public void testGetAll_Err() throws Exception {
+        JobDAO jobDAOMock = mock(JobDAO.class);
+        JobVersionDAO jobVersionDAOMock = mock(JobVersionDAO.class);
+        when(jobDAOMock.findAllInNamespace(TEST_NS)).thenThrow(Exception.class);
+
+        JobService js = new JobService(jobDAOMock, jobVersionDAOMock);
+        js.getAll(TEST_NS);
     }
 }

@@ -34,6 +34,7 @@ public interface JobDAO extends SqlObject {
     } catch (Exception e) {
       // TODO: Add better error handling
       LOG.error(e.getMessage());
+      throw e;
     }
   }
 
@@ -43,6 +44,6 @@ public interface JobDAO extends SqlObject {
   @SqlQuery("SELECT * FROM jobs LIMIT :limit")
   List<Job> findAll(@Bind("limit") int limit);
 
-  @SqlQuery("SELECT * FROM jobs LIMIT 1") // TODO: replace stub query
+  @SqlQuery("SELECT * FROM jobs LIMIT 1")
   List<Job> findAllInNamespace(@Bind("namespace") String namespace);
 }
