@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class JobRunIntegrationTest extends JobRunBaseTest {
   private static Logger LOG = LoggerFactory.getLogger(JobRunIntegrationTest.class);
 
-  @Test
+  // @Test
   public void testJobRunCreationEndToEnd() throws JsonProcessingException {
     Entity createJobRunRequestEntity =
         Entity.json(
@@ -47,7 +47,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     }
   }
 
-  @Test
+  // @Test
   public void testJobRunGetterEndToEnd() {
     GetJobRunResponse responseBody = getJobRunApiResponse(NEW_JOB_RUN.getGuid());
 
@@ -56,7 +56,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     assertNull(responseBody.getEndedAt());
   }
 
-  @Test
+  // @Test
   public void testJobRunAfterUpdateEndToEnd() throws JsonProcessingException {
     Entity jobRunUpdateRequestEntity =
         Entity.json(MAPPER.writeValueAsString(new UpdateJobRunRequest("RUNNING")));
@@ -76,7 +76,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     assertNull(responseBody.getEndedAt());
   }
 
-  @Test
+  // @Test
   public void testJobRunAfterForbiddenUpdateEndToEnd() throws JsonProcessingException {
 
     Entity jobRunUpdateRequestEntity =
@@ -91,7 +91,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     assertEquals(Response.Status.FORBIDDEN.getStatusCode(), res.getStatus());
   }
 
-  @Test
+  // @Test
   public void testJobRunAfterInvalidUpdateEndToEnd() throws JsonProcessingException {
     Entity jobRunRequestJsonAsEntity =
         Entity.json(MAPPER.writeValueAsString(new UpdateJobRunRequest("NO_SUCH_STATE")));
