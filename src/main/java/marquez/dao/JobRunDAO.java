@@ -53,6 +53,24 @@ public interface JobRunDAO extends SqlObject {
     }
   }
 
+  default void updateState(UUID jobRunID, Integer state) {
+    try (final Handle handle = getHandle()) {
+      handle.useTransaction(
+          h -> {
+            h.createUpdate(
+                    "UPDATE job_runs SET current_state = :state, started_at = :startedAt, ended_at = :endedAt where guid = :job_run_id")
+                .bind("job_run_id", jobRunID)
+                .bind("current_state", state)
+                .execute();
+            createJobRunStateDAO()
+                .insert(UUID.randomUUID(), jobRunID, state);
+          });
+    } catch (Exception e) {
+      // TODO: Add better error handling
+      LOG.error(e.getMessage());
+    }
+  }
+
   @SqlQuery("SELECT * FROM job_runs WHERE guid = :guid")
   JobRun findJobRunById(@Bind("guid") UUID guid);
 }
