@@ -29,7 +29,6 @@ public interface JobDAO extends SqlObject {
                 .bind("name", job.getName())
                 .bind("current_owner_name", job.getOwnerName())
                 .execute();
-            h.commit();
           });
     } catch (Exception e) {
       // TODO: Add better error handling
