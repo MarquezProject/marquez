@@ -15,6 +15,7 @@ public final class JobRun {
   private final Timestamp endedAt;
   private final UUID jobRunDefinitionGuid;
   private final Integer currentState;
+  private final UUID jobVersionGuid;
 
   private static Map<JobRunState.State, Set<JobRunState.State>> validTransitions = new HashMap<>();
 
@@ -45,12 +46,14 @@ public final class JobRun {
       final Timestamp startedAt,
       final Timestamp endedAt,
       final UUID jobRunDefinitionGuid,
-      final Integer currentState) {
+      final Integer currentState,
+      final UUID jobVersionGuid) {
     this.guid = guid;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
     this.jobRunDefinitionGuid = jobRunDefinitionGuid;
     this.currentState = currentState;
+    this.jobVersionGuid = jobVersionGuid;
   }
 
   public UUID getGuid() {
@@ -71,6 +74,10 @@ public final class JobRun {
 
   public Integer getCurrentState() {
     return currentState;
+  }
+
+  public UUID getJobVersionGuid() {
+    return jobVersionGuid;
   }
 
   @Override

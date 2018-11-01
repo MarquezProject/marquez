@@ -18,6 +18,7 @@ public final class JobRow implements RowMapper<Job> {
         rs.getString("current_ownership"),
         new Timestamp(new Date(0).getTime()),
         "",
-        "");
+        "",
+        null);
   }
 }
