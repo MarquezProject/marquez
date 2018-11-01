@@ -31,7 +31,8 @@ public abstract class JobRunBaseTest {
           null,
           null,
           UUID.fromString(TEST_JOB_RUN_DEFINITION_GUID),
-          toInt(JobRunState.State.NEW));
+          toInt(JobRunState.State.NEW),
+          null);
 
   @BeforeClass
   public static void setUp() {

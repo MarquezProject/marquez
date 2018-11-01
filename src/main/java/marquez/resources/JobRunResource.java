@@ -48,7 +48,7 @@ public class JobRunResource extends BaseResource {
     try {
       JobRun jobRun =
           new JobRun(
-              jobRunGuid, null, null, request.getRunDefinitionId(), toInt(JobRunState.State.NEW));
+              jobRunGuid, null, null, request.getRunDefinitionId(), toInt(JobRunState.State.NEW), null);
       dao.insert(jobRun);
 
       CreateJobRunResponse res = new CreateJobRunResponse(jobRunGuid);
@@ -106,7 +106,8 @@ public class JobRunResource extends BaseResource {
               startedAt,
               endedAt,
               existingJobRunRow.getJobRunDefinitionGuid(),
-              toInt(JobRunState.State.valueOf(request.getState())));
+              toInt(JobRunState.State.valueOf(request.getState())),
+              null);
 
       dao.update(updatedJobRunRow);
 

@@ -116,7 +116,8 @@ public class JobRunDefinitionResourceTest {
             "some owner",
             new Timestamp(new Date(0).getTime()),
             "",
-            "");
+            "",
+            null);
     when(jobDAO.findByName(eq(request.getName()))).thenReturn(existingJob);
 
     // a new Job is not created
@@ -155,7 +156,8 @@ public class JobRunDefinitionResourceTest {
             "some owner",
             new Timestamp(new Date(0).getTime()),
             "",
-            "");
+            "",
+            null);
     when(jobDAO.findByName(eq(request.getName()))).thenReturn(existingJob);
 
     // create a JobVersion from request so we can compute version
@@ -200,7 +202,8 @@ public class JobRunDefinitionResourceTest {
             "some owner",
             new Timestamp(new Date(0).getTime()),
             "",
-            "");
+            "",
+            null);
     when(jobDAO.findByName(eq(request.getName()))).thenReturn(existingJob);
 
     // create a JobVersion from request so we can compute version

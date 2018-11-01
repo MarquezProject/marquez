@@ -30,7 +30,7 @@ public class JobRunDefinitionDAOTest {
 
   @Before
   public void setUp() {
-    Job job = new Job(jobGuid, "my name", "my owner", defaultTimestamp, "", "");
+    Job job = new Job(jobGuid, "my name", "my owner", defaultTimestamp, "", "", null);
     jobDAO.insert(job);
     jobVersionDAO.insert(jobVersionGuid, jobVersionVersion, jobGuid, "http://foo.bar");
   }
