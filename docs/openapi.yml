@@ -27,14 +27,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/namespaceReqBody'
+              type: object
+              properties:
+                owner:
+                  description: The owner of the namespace.
+                  type: string
+                description:
+                  description: The description of the namespace.
+                  type: string
+              required:
+                - owner
+                - description
+              example:
+                owner: dataengineering
+                description: A namespace for core jobs and datasets at wework.
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/namespaceResBody'
+                $ref: '#/components/schemas/namespace'
   /namespaces:
     get:
       summary: List all namespaces
@@ -264,22 +277,7 @@ components:
         type: string
         format: uuid
   schemas:
-    namespaceReqBody:
-      type: object
-      properties:
-        owner:
-          description: The owner of the namespace.
-          type: string
-        description:
-          description: The description of the namespace.
-          type: string
-      required:
-        - owner
-        - description
-      example:
-        owner: dataengineering
-        description: A namespace for core jobs and datasets at wework.
-    namespaceResBody:
+    namespace:
       type: object
       properties:
         name:
@@ -295,10 +293,8 @@ components:
         description:
           description: The description of the namespace.
           type: string
-      required:
-        - owner
-        - description
       example:
+        name: wework
         createdAt: 2018-10-04T15:01:23.045Z
         owner: dataengineering
         description: A namespace for core jobs and datasets at wework.
@@ -308,22 +304,8 @@ components:
         namespaces:
           type: array
           items:
-            type: object
             format: namespace
-            properties:
-              name:
-                description: The name of the namespace.
-                type: string
-              owner:
-                description: The owner of the namespace.
-                type: string
-              description:
-                description: The description of the namespace.
-                type: string
-            example:
-              name: wework
-              owner: dataengineering
-              description: A namespace for core jobs and datasets at wework.
+            $ref: '#/components/schemas/namespace'
     job:
       type: object
       properties:
