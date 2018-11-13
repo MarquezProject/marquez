@@ -2,8 +2,8 @@ openapi: 3.0.1
 info:
   title: Marquez 
   version: 0.1.0
-  description: The Marquez API is an interface for the collection, aggregation, and visualization
-    of a data ecosystems metadata.
+  description: Marquez is a core service for the collection, aggregation, and visualization
+    of a data ecosystem's metadata.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
