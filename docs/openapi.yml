@@ -48,6 +48,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/namespace'
+    get:
+      summary: Retrieve a namespace
+      description: Returns a namespaces.
+      tags:
+        - Namespaces
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/namespace'
   /namespaces:
     get:
       summary: List all namespaces
@@ -336,8 +348,8 @@ components:
         - location
         - description
       example:
-        inputDatasetsUrns: ["urn:db:wework:wedata.room_bookings", "urn:db:meetup:meetup.scheduled_events"]
-        outputDatasetsUrns: ["urn:db:wework:wedata.room_bookings_7_days"]
+        inputDatasetsUrns: ["urn:wework:room_bookings", "urn:meetup:scheduled_events"]
+        outputDatasetsUrns: ["urn:wework:room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         description: Determine weekly room booking occupancy patterns.
     jobs:
@@ -375,8 +387,8 @@ components:
                 type: string
             example:
               name: etl_room_bookings_7_days
-              inputDatasets: ["urn:db:wework:wedata.room_bookings", "urn:db:meetup.scheduled_events"]
-              outputDatasets: ["urn:db:wework:wedata.room_bookings_7_days"]
+              inputDatasets: ["urn:wework:room_bookings", "urn:meetup:scheduled_events"]
+              outputDatasets: ["urn:wework:room_bookings_7_days"]
               location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
               description: Determine weekly room booking occupancy patterns.
     jobVersion:
@@ -441,7 +453,7 @@ components:
           type: string
           format: date-time
       example:
-        urn: urn:db:wework:wedata.room_bookings
+        urn: urn:wework:room_bookings
         createdAt: 2018-10-04T15:01:23.045Z
     datasets:
       type: object
