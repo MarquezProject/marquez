@@ -148,10 +148,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/jobRunId'
-  /namespaces/{namespace}/jobs/{job}/runs/{run-id}/complete:
+  /jobs/runs/{run-id}/complete:
     parameters:
-      - $ref: '#/components/parameters/namespace'
-      - $ref: '#/components/parameters/job'
       - $ref: '#/components/parameters/jobRunId'
     put:
       summary: Complete a job run
@@ -161,10 +159,8 @@ paths:
       responses:
         '200':
           description: OK
-  /namespaces/{namespace}/jobs/{job}/runs/{run-id}/fail:
+  /jobs/runs/{run-id}/fail:
     parameters:
-      - $ref: '#/components/parameters/namespace'
-      - $ref: '#/components/parameters/job'
       - $ref: '#/components/parameters/jobRunId'
     put:
       summary: Fail a job run
@@ -174,10 +170,8 @@ paths:
       responses:
         '200':
           description: OK
-  /namespaces/{namespace}/jobs/{job}/runs/{run-id}/outputs:
+  /jobs/runs/{run-id}/outputs:
     parameters:
-      - $ref: '#/components/parameters/namespace'
-      - $ref: '#/components/parameters/job'
       - $ref: '#/components/parameters/jobRunId'
     put:
       summary: Create multiple output datasets
