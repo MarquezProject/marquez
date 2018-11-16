@@ -36,6 +36,7 @@ public class JobServiceTest {
     private static final JobDAO jobDAO = mock(JobDAO.class);
     private static final JobVersionDAO jobVersionDAO = mock(JobVersionDAO.class);
     private static final JobRunDAO jobRunDAO = mock(JobRunDAO.class);
+    private static final Timestamp timeZero = new Timestamp(new Date(0).getTime());
 
 
     JobService jobService;
@@ -126,7 +127,6 @@ public class JobServiceTest {
         UUID existingJobVersion = JobService.computeVersion(existingJob);
         when(jobDAO.findByName("job")).thenReturn(existingJob);
         when(jobVersionDAO.findByVersion(existingJobVersion)).thenReturn(null);
-  
         jobService.create(TEST_NS, newJob);
         verify(jobDAO, never()).insert(newJob);
         verify(jobVersionDAO).insert(any(UUID.class), eq(existingJobVersion), eq(existingJob.getGuid()), eq(existingJob.getLocation()));
@@ -134,7 +134,15 @@ public class JobServiceTest {
 
     @Test
     public void testCreate_VersionFound_OK() throws Exception {
-
+        Job existingJob = new Job(UUID.randomUUID(), "job", "owner", new Timestamp(new Date(0).getTime()), null, null, "http://foo.com");
+        Job newJob = new Job(null, "job", "owner", new Timestamp(new Date(0).getTime()), null, null, "http://foo.com");
+        UUID existingJobVersionID = JobService.computeVersion(existingJob);
+        JobVersion existingJobVersion = new JobVersion(UUID.randomUUID(), existingJob.getGuid(), existingJob.getLocation(), existingJobVersionID, null, timeZero, timeZero);
+        when(jobDAO.findByName("job")).thenReturn(existingJob);
+        when(jobVersionDAO.findByVersion(existingJobVersionID)).thenReturn(existingJobVersion);
+        assertEquals(existingJob, jobService.create(TEST_NS, newJob));
+        verify(jobDAO, never()).insert(newJob);
+        verify(jobVersionDAO, never()).insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
     }
  
     @Test(expected=JobServiceException.class)
