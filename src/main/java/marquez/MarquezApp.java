@@ -9,6 +9,7 @@ import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import marquez.core.mappers.ResourceExceptionMapper;
 import marquez.core.services.NamespaceService;
 import marquez.dao.DatasetDAO;
 import marquez.dao.JobDAO;
@@ -126,5 +127,7 @@ public class MarquezApp extends Application<MarquezConfig> {
 
     final NamespaceService namespaceService = new NamespaceService();
     env.jersey().register(new NamespaceResource(namespaceService));
+
+    env.jersey().register(new ResourceExceptionMapper());
   }
 }
