@@ -95,7 +95,7 @@ public class JobRunTest {
     JobRun jr2 =
         new JobRun(
             JOB_RUN_UUID,
-            STARTED_AT_TIME,
+            STARTED_AT_TIME,  
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
             toInt(JobRunState.State.COMPLETED),

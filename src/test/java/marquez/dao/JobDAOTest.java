@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 import marquez.api.Job;
+import marquez.dao.JobDAO;
 import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
@@ -19,9 +20,6 @@ public class JobDAOTest {
 
   @Before
   public void setUp() {
-    Job job = new Job(jobGuid, "my name", "my owner", defaultTimestamp, "", "");
-    jobDAO.insert(job);
-    jobVersionDAO.insert(jobVersionGuid, jobVersionVersion, jobGuid, "http://foo.bar");
   }
 
   @After

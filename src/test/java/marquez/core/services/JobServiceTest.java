@@ -11,6 +11,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+
 
 import marquez.api.Job;
 import marquez.api.JobVersion;
@@ -20,10 +22,12 @@ import marquez.dao.JobRunDAO;
 import java.util.List;
 import java.util.UUID;
 import java.util.ArrayList;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import marquez.core.exceptions.JobServiceException;
 import org.junit.Before;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 
 
@@ -88,4 +92,71 @@ public class JobServiceTest {
         when(jobVersionDAO.find(TEST_NS, jobName)).thenReturn(jobVersions);
         Assert.assertEquals(jobVersions, jobService.getAllVersions(TEST_NS, jobName));
     }
+
+    @Test(expected=JobServiceException.class)
+    public void testGetAllVersions_Exception() throws Exception {
+        String jobName = "job";
+        when(jobVersionDAO.find(TEST_NS, jobName)).thenThrow(UnableToExecuteStatementException.class);
+        jobService.getAllVersions(TEST_NS, jobName);
+    }
+
+    @Test
+    public void testCreate_NewJob_OK() throws Exception {
+        Job job = new Job(UUID.randomUUID(), "job", "owner", new Timestamp(new Date(0).getTime()), null, null, "http://foo.com");
+        when(jobDAO.findByName("job")).thenReturn(null);
+        jobService.create(TEST_NS, job);
+        verify(jobDAO).insert(job);
+    }
+
+    @Test
+    public void testCreate_JobFound_OK() throws Exception {
+        Job existingJob = new Job(UUID.randomUUID(), "job", "owner", new Timestamp(new Date(0).getTime()), null, null, "http://foo.com");
+        Job newJob = new Job(null, "job", "owner", new Timestamp(new Date(0).getTime()), null, null, "http://foo.com");
+        when(jobDAO.findByName("job")).thenReturn(existingJob);
+        Job jobCreated = jobService.create(TEST_NS, newJob);
+        verify(jobDAO, never()).insert(newJob);
+        verify(jobVersionDAO).findByVersion(JobService.computeVersion(existingJob));
+        assertEquals(existingJob, jobCreated);
+    }
+
+    @Test
+    public void testCreate_NewVersion_OK() throws Exception {
+        Job existingJob = new Job(UUID.randomUUID(), "job", "owner", new Timestamp(new Date(0).getTime()), null, null, "http://foo.com");
+        Job newJob = new Job(null, "job", "owner", new Timestamp(new Date(0).getTime()), null, null, "http://foo.com");
+        UUID existingJobVersion = JobService.computeVersion(existingJob);
+        when(jobDAO.findByName("job")).thenReturn(existingJob);
+        when(jobVersionDAO.findByVersion(existingJobVersion)).thenReturn(null);
+  
+        jobService.create(TEST_NS, newJob);
+        verify(jobDAO, never()).insert(newJob);
+        verify(jobVersionDAO).insert(any(UUID.class), eq(existingJobVersion), eq(existingJob.getGuid()), eq(existingJob.getLocation()));
+    }
+
+    @Test
+    public void testCreate_VersionFound_OK() throws Exception {
+
+    }
+ 
+    @Test(expected=JobServiceException.class)
+    public void testCreate_JobDAOException() throws Exception {
+        Job job = new Job(UUID.randomUUID(), "job", "owner", new Timestamp(new Date(0).getTime()), null, null, "http://foo.com");
+        when(jobDAO.findByName("job")).thenThrow(UnableToExecuteStatementException.class);
+        jobService.create(TEST_NS, job);
+    } 
+
+    @Test(expected=JobServiceException.class)
+    public void testCreate_JobVersionDAOException() throws Exception {
+        Job job = new Job(UUID.randomUUID(), "job", "owner", new Timestamp(new Date(0).getTime()), null, null, "http://foo.com");
+        UUID jobVersionID = JobService.computeVersion(job);
+        when(jobDAO.findByName("job")).thenReturn(job);
+        when(jobVersionDAO.findByVersion(jobVersionID)).thenThrow(UnableToExecuteStatementException.class);
+        jobService.create(TEST_NS, job);
+    } 
+
+    @Test(expected=JobServiceException.class)
+    public void testGetAll_Exception() throws Exception {
+        when(jobDAO.findAllInNamespace(TEST_NS)).thenThrow(UnableToExecuteStatementException.class);
+        jobService.getAll(TEST_NS);
+    }
+
 }

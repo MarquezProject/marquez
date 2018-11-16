@@ -13,6 +13,8 @@ import java.util.UUID;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.Ignore;
+
 
 @Ignore("TODO: Need to figure out why this started to fail. Please see issue #140")
 public class DatasetSerializationTest {
@@ -42,14 +44,14 @@ public class DatasetSerializationTest {
     }
   }
 
-  // @Test
+  @Ignore @Test
   public void serializesToJSON() throws Exception {
     final String expected =
         MAPPER.writeValueAsString(MAPPER.readValue(fixture(DATASET_SAMPLE_JSON), Dataset.class));
     assertThat(MAPPER.writeValueAsString(DATASET)).isEqualTo(expected);
   }
 
-  // @Test
+  @Ignore @Test
   public void deserializesFromJSON() throws Exception {
     assertThat(MAPPER.readValue(fixture(DATASET_SAMPLE_JSON), Dataset.class)).isEqualTo(DATASET);
   }

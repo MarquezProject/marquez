@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.UUID;
 import java.sql.Timestamp;
 import java.util.Date;
+
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +37,9 @@ class JobService {
         try {
             job = this.jobDAO.findByName(jobToCreate.getName());
             if (job == null) {
-                job = this.createJob(namespace, job);
+                job = this.createJob(namespace, jobToCreate);
             } 
-        } catch (Exception e) {
+        } catch (UnableToExecuteStatementException e) {
             String err = "failed to create job";
             logger.error(err, e);
             throw new JobServiceException(err);
@@ -49,7 +51,7 @@ class JobService {
             if (existingJobVersion == null) {
               this.createVersion(namespace, job, versionID);
             }
-        } catch (Exception e) {
+        } catch (UnableToExecuteStatementException e) {
             String err = "error finding/creating job version";
             logger.error(err, e);
             throw new JobServiceException(err);
@@ -62,7 +64,7 @@ class JobService {
         List<Job> jobs;
         try {
             jobs = this.jobDAO.findAllInNamespace(namespace);
-        } catch (Exception e) {
+        } catch (UnableToExecuteStatementException e) {
             logger.error("caught exception while fetching jobs in namespace ", e);
             throw new JobServiceException("error fetching jobs");
         }
@@ -73,7 +75,7 @@ class JobService {
         List<JobVersion> jobVersions;
         try {
             jobVersions = this.jobVersionDAO.find(namespace, jobName);
-        } catch (Exception e) {
+        } catch (UnableToExecuteStatementException e) {
             logger.error("caught exception while fetching versions of job", e);
             throw new JobServiceException("error fetching job versions");
         }
@@ -84,7 +86,7 @@ class JobService {
         JobVersion latestVersion;
         try {
             latestVersion = this.jobVersionDAO.findLatest(namespace, jobName);
-        } catch (Exception e) {
+        } catch (UnableToExecuteStatementException e) {
             String err = "error fetching latest version of job";
             logger.error(err, e);
             throw new JobServiceException(err);
@@ -148,15 +150,14 @@ class JobService {
 
     //// PRIVATE METHODS ////
 
-    private static UUID computeVersion(Job job) {
+    protected static UUID computeVersion(Job job) {
         byte[] raw = String.format("%s:%s", job.getGuid(), job.getLocation()).getBytes();
         return UUID.nameUUIDFromBytes(raw);    
     }
 
     private Job createJob(String namespace, Job job) throws JobServiceException {
-        Job newJob = new Job(UUID.randomUUID(), job.getName(), job.getOwnerName(), null, null, null, null);
-        this.jobDAO.insert(newJob);
-        return newJob;
+        this.jobDAO.insert(job);
+        return job;
     }
 
     private boolean createVersion(String namespace, Job job, UUID versionID) {
