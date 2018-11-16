@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 import marquez.api.CreateNamespaceRequest;
 import marquez.api.CreateNamespaceResponse;
 import marquez.api.ListNamespacesResponse;
-import marquez.api.entities.ErrorResponse;
+import marquez.core.exceptions.UnexpectedErrorException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.core.mappers.GetNamespaceResponseMapper;
 import marquez.core.models.Namespace;
@@ -40,77 +40,46 @@ public class NamespaceResource extends BaseResource {
     this.namespaceService = namespaceService;
   }
 
-  // TODO: Something like this is used in almost every resource so it can be factored out in
-  // the error-handling review
-  private static Response UNEXPECTED_ERROR_RESPONSE =
-      Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-          .entity(new ErrorResponse("Unexpected error occurred"))
-          .type(APPLICATION_JSON)
-          .build();
-
   @PUT
   @Consumes(APPLICATION_JSON)
   @Timed
   @Path("/{namespace}")
   public Response create(
-      @PathParam("namespace") String namespace, @Valid CreateNamespaceRequest request) {
-    try {
-      Namespace n =
-          namespaceService.create(namespace, request.getOwner(), request.getDescription());
-      return Response.status(Response.Status.OK)
-          .entity(new CreateNamespaceResponse(namespaceMapper.map(n).get()))
-          .type(APPLICATION_JSON)
-          .build();
-    } catch (Exception e) {
-      LOG.error(
-          "Could not successfully create namespace "
-              + namespace
-              + ". Exception: "
-              + e.getLocalizedMessage());
-      return UNEXPECTED_ERROR_RESPONSE;
-    }
+      @PathParam("namespace") String namespace, @Valid CreateNamespaceRequest request)
+      throws UnexpectedErrorException {
+
+    Namespace n = namespaceService.create(namespace, request.getOwner(), request.getDescription());
+    return Response.status(Response.Status.OK)
+        .entity(new CreateNamespaceResponse(namespaceMapper.map(n).get()))
+        .type(APPLICATION_JSON)
+        .build();
   }
 
   @GET
   @Consumes(APPLICATION_JSON)
   @Timed
   @Path("/{namespace}")
-  public Response get(@PathParam("namespace") String namespace) {
-    try {
-      Optional<Namespace> n = namespaceService.get(namespace);
-      if (n.isPresent()) {
-        Namespace returnedNamespace = n.get();
-        return Response.status(Response.Status.OK)
-            .entity(getNamespaceResponseMapper.map(returnedNamespace).get())
-            .type(APPLICATION_JSON)
-            .build();
-      } else {
-        return Response.status(Response.Status.NOT_FOUND).type(APPLICATION_JSON).build();
-      }
-    } catch (Exception e) {
-      LOG.error(
-          "Could not successfully get namespace "
-              + namespace
-              + ". Exception: "
-              + e.getLocalizedMessage());
-      return UNEXPECTED_ERROR_RESPONSE;
+  public Response get(@PathParam("namespace") String namespace) throws UnexpectedErrorException {
+    Optional<Namespace> n = namespaceService.get(namespace);
+    if (n.isPresent()) {
+      Namespace returnedNamespace = n.get();
+      return Response.status(Response.Status.OK)
+          .entity(getNamespaceResponseMapper.map(returnedNamespace).get())
+          .type(APPLICATION_JSON)
+          .build();
+    } else {
+      return Response.status(Response.Status.NOT_FOUND).type(APPLICATION_JSON).build();
     }
   }
 
   @GET
   @Consumes(APPLICATION_JSON)
   @Timed
-  public Response listNamespaces() {
-    try {
-      // TODO: Implement this using the NamespaceService
-      List<Namespace> namespaceList = namespaceService.listNamespaces();
-      return Response.status(Response.Status.OK)
-          .entity(new ListNamespacesResponse(namespaceList))
-          .build();
-    } catch (Exception e) {
-      LOG.error(
-          "Could not successfully get a list of namespaces. Exception: " + e.getLocalizedMessage());
-      return UNEXPECTED_ERROR_RESPONSE;
-    }
+  public Response listNamespaces() throws UnexpectedErrorException {
+    // TODO: Implement this using the NamespaceService
+    List<Namespace> namespaceList = namespaceService.listNamespaces();
+    return Response.status(Response.Status.OK)
+        .entity(new ListNamespacesResponse(namespaceList))
+        .build();
   }
 }

@@ -2,9 +2,13 @@ package marquez.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import io.dropwizard.testing.junit.ResourceTestRule;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -12,36 +16,55 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import marquez.NamespaceBaseTest;
 import marquez.api.GetNamespaceResponse;
 import marquez.api.ListNamespacesResponse;
-import marquez.core.exceptions.NamespaceException;
+import marquez.core.exceptions.UnexpectedErrorException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
+import marquez.core.mappers.UnexpectedErrorExceptionMapper;
 import marquez.core.models.Namespace;
 import marquez.core.services.NamespaceService;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class NamespaceResourceTest extends NamespaceBaseTest {
 
   CoreNamespaceToApiNamespaceMapper namespaceMapper = new CoreNamespaceToApiNamespaceMapper();
+  private static final NamespaceService NAMESPACE_SERVICE = mock(NamespaceService.class);
 
-  @Test
-  public void testCreateNamespaceRequestErrorHandling() throws Exception {
-    NamespaceService namespaceService = Mockito.mock(NamespaceService.class);
-    NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
-    when(namespaceService.create(anyString(), anyString(), anyString()))
-        .thenThrow(NamespaceException.class);
+  @ClassRule
+  public static final ResourceTestRule resources =
+      ResourceTestRule.builder()
+          .addResource(new NamespaceResource(NAMESPACE_SERVICE))
+          .addProvider(UnexpectedErrorExceptionMapper.class)
+          .build();
 
-    Response res = namespaceResource.create("someNamespace", createNamespaceRequest);
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+  @Before
+  public void clearMocks() {
+    reset(NAMESPACE_SERVICE);
   }
 
   @Test
-  public void testValidNamespace() throws NamespaceException {
+  public void testCreateNamespaceErrorHandling() throws UnexpectedErrorException {
+    doThrow(new UnexpectedErrorException()).when(NAMESPACE_SERVICE).create(any(), any(), any());
+
+    assertEquals(
+        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+        resources
+            .target("/namespaces/" + NAMESPACE_NAME)
+            .request()
+            .put(Entity.json(createNamespaceRequest))
+            .getStatus());
+  }
+
+  @Test
+  public void testValidNamespace() throws UnexpectedErrorException {
     Optional<Namespace> returnedOptionalNamespace = Optional.of(TEST_NAMESPACE);
-    NamespaceService namespaceService = Mockito.mock(NamespaceService.class);
+    NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
     when(namespaceService.get(NAMESPACE_NAME)).thenReturn(returnedOptionalNamespace);
@@ -55,19 +78,18 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testGetNamespaceRequestErrorHandling() throws Exception {
-    NamespaceService namespaceService = Mockito.mock(NamespaceService.class);
-    NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
-    when(namespaceService.get(anyString())).thenThrow(NamespaceException.class);
+  public void testGetNamespaceRequestErrorHandling() throws Throwable {
+    doThrow(new UnexpectedErrorException()).when(NAMESPACE_SERVICE).get(any());
 
-    Response res = namespaceResource.get("someNamespace");
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+    assertEquals(
+        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+        resources.target("/namespaces/" + NAMESPACE_NAME).request().get().getStatus());
   }
 
   @Test
-  public void testListNamespaceWithSingleResultSet() throws NamespaceException {
+  public void testListNamespaceWithSingleResultSet() throws UnexpectedErrorException {
     final List<Namespace> existingCoreModelNamespaces = Collections.singletonList(TEST_NAMESPACE);
-    NamespaceService namespaceService = Mockito.mock(NamespaceService.class);
+    NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
     when(namespaceService.listNamespaces()).thenReturn(existingCoreModelNamespaces);
 
@@ -79,9 +101,10 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testAllNamespaceFieldsPresentInListNamespacesResponse() throws NamespaceException {
+  public void testAllNamespaceFieldsPresentInListNamespacesResponse()
+      throws UnexpectedErrorException {
     final List<Namespace> existingNamespaces = Collections.singletonList(TEST_NAMESPACE);
-    NamespaceService namespaceService = Mockito.mock(NamespaceService.class);
+    NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
     when(namespaceService.listNamespaces()).thenReturn(existingNamespaces);
@@ -96,8 +119,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testListNamespaceWithMultipleResultSet() throws NamespaceException {
-    NamespaceService namespaceService = Mockito.mock(NamespaceService.class);
+  public void testListNamespaceWithMultipleResultSet() throws UnexpectedErrorException {
+    NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
     final List<Namespace> existingCoreModelNamespaces = new ArrayList<>();
@@ -121,12 +144,11 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testListNamespacesErrorHandling() throws NamespaceException {
-    NamespaceService namespaceService = Mockito.mock(NamespaceService.class);
-    NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
-    when(namespaceService.listNamespaces()).thenThrow(NamespaceException.class);
+  public void testListNamespacesErrorHandling() throws UnexpectedErrorException {
+    doThrow(new UnexpectedErrorException()).when(NAMESPACE_SERVICE).listNamespaces();
 
-    Response res = namespaceResource.listNamespaces();
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+    assertEquals(
+        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+        resources.target("/namespaces/").request().get().getStatus());
   }
 }
