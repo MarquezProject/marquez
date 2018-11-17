@@ -1,7 +1,7 @@
 package marquez.dao;
 
 import java.util.List;
-import marquez.api.Job;
+import marquez.core.models.Job;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
