@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import java.util.UUID;
 import marquez.api.Owner;
-import marquez.dao.OwnerDAO;
+import marquez.dao.deprecated.OwnerDAO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;

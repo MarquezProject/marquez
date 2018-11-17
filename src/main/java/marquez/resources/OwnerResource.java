@@ -13,7 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import marquez.api.Owner;
-import marquez.dao.OwnerDAO;
+import marquez.dao.deprecated.OwnerDAO;
 
 @Path("/owners")
 public final class OwnerResource extends BaseResource {

@@ -14,7 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import marquez.api.Job;
-import marquez.dao.JobDAO;
+import marquez.dao.deprecated.JobDAO;
 
 @Path("/jobs")
 @Produces(APPLICATION_JSON)

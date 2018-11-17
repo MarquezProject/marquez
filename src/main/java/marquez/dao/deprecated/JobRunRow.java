@@ -1,9 +1,9 @@
-package marquez.dao;
+package marquez.dao.deprecated;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-import marquez.core.models.JobRun;
+import marquez.api.JobRun;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 

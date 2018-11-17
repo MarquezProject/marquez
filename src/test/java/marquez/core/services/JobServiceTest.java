@@ -12,8 +12,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-import marquez.api.Job;
-import marquez.api.JobVersion;
+import marquez.core.models.Job;
+import marquez.core.models.JobVersion;
 import marquez.dao.JobDAO;
 import marquez.dao.JobVersionDAO;
 import marquez.dao.JobRunDAO;

@@ -1,8 +1,8 @@
-package marquez.dao;
+package marquez.dao.deprecated;
 
 import java.util.UUID;
 import java.util.List;
-import marquez.core.models.JobVersion;
+import marquez.api.JobVersion;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;

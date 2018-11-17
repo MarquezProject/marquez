@@ -1,7 +1,7 @@
-package marquez.dao;
+package marquez.dao.deprecated;
 
 import java.util.UUID;
-import marquez.core.models.JobRun;
+import marquez.api.JobRun;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;

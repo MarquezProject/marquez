@@ -21,10 +21,10 @@ import marquez.api.entities.CreateJobRunDefinitionRequest;
 import marquez.api.entities.CreateJobRunDefinitionResponse;
 import marquez.api.entities.ErrorResponse;
 import marquez.api.entities.GetJobRunDefinitionResponse;
-import marquez.dao.JobDAO;
-import marquez.dao.JobRunDefinitionDAO;
-import marquez.dao.JobVersionDAO;
-import marquez.dao.OwnerDAO;
+import marquez.dao.deprecated.JobDAO;
+import marquez.dao.deprecated.JobRunDefinitionDAO;
+import marquez.dao.deprecated.JobVersionDAO;
+import marquez.dao.deprecated.OwnerDAO;
 
 @Path("/job_run_definition")
 public final class JobRunDefinitionResource extends BaseResource {
