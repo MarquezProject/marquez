@@ -1,0 +1,31 @@
+version: '3'
+services:
+  api:
+    build: .
+    ports:
+    - "5000:5000"
+    environment:
+    - MARQUEZ_PORT=5000
+    - MARQUEZ_CONFIG=config.yml
+    - POSTGRESQL_HOST=marquez_db
+    - POSTGRESQL_PORT=5432
+    - POSTGRESQL_DB_NAME=marquez
+    - POSTGRESQL_USER=marquez_api
+    - POSTGRESQL_PASSWORD=marquez_pass
+    volumes:
+    - ./docker/config.yml:/usr/src/app/config.yml
+    links:
+    - postgres:marquez_db
+    depends_on:
+      - "postgres"
+    command: ["./wait-for-it.sh", "db:5432", "--", "/usr/src/app/entrypoint.sh"]
+  postgres:
+    image: postgres
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=password
+    - MARQUEZ_DB_NAME=marquez
+    - MARQUEZ_API_USER=marquez_api
+    - MARQUEZ_API_PASSWORD=marquez_pass
+    volumes:
+    - ./docker/create_database.sh:/docker-entrypoint-initdb.d/create_database.sh
