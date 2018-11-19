@@ -52,3 +52,12 @@ $ ./gradlew run --args 'server config.yml'
 ```
 
 Then browse to the admin interface: http://localhost:8081
+
+## Getting involved
+
+* Mailing List: [marquez-users@googlegroups.com](https://groups.google.com/group/marquez-users)
+* Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
+
+## Contributing
+
+ See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details about how to contribute.
