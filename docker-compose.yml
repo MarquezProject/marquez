@@ -15,15 +15,16 @@ services:
       - POSTGRES_PASSWORD=macondo
     volumes:
       - ./config.yml:/usr/src/app/config.yml
+      - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
     depends_on:
       - db
 
   db:
     networks:
       - net
-    image: 'postgres:11-alpine'
+    image: 'postgres:9.6'
     ports:
-      - '5001:5432'
+      - '5432:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
@@ -32,6 +33,7 @@ services:
       - MARQUEZ_PASSWORD=macondo
     volumes:
       - ./docker/initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
+    restart: always
 
 networks:
     net:
