@@ -147,6 +147,20 @@ class JobService {
         return jobRun;
     }
 
+    public JobRun createJobRun(UUID jobUUID, String runArgsJson) throws JobServiceException {
+        // get latest job version for job
+        try{
+            JobVersion latestJobVersion = 
+            // insert the run args
+            // create and return the job run
+        } catch (UnableToExecuteStatementException e){
+            String err = "error creating job run";
+            logger.error(err, e);
+            throw new JobServiceException(err);
+        }
+
+    }
+
 
     //// PRIVATE METHODS ////
 
