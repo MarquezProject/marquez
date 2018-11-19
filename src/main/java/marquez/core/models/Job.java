@@ -13,6 +13,7 @@ public final class Job {
   private final String category;
   private final String description;
   private final String location;
+  private final UUID namespaceGuid;
 
   public Job(
       final UUID guid,
@@ -21,7 +22,8 @@ public final class Job {
       final Timestamp nominalTime,
       final String category,
       final String description,
-      final String location) {
+      final String location,
+      final UUID namespaceGuid) {
     this.guid = guid;
     this.name = name;
     this.ownerName = ownerName;
@@ -29,6 +31,7 @@ public final class Job {
     this.category = category;
     this.description = description;
     this.location = location;
+    this.namespaceGuid = namespaceGuid;
   }
 
   public UUID getGuid() {
@@ -59,6 +62,10 @@ public final class Job {
     return location;
   }
 
+  public UUID getNsGuid() {
+    return namespaceGuid;
+  }
+
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
@@ -71,7 +78,8 @@ public final class Job {
         && Objects.equals(ownerName, other.ownerName)
         && Objects.equals(nominalTime, other.nominalTime)
         && Objects.equals(category, other.category)
-        && Objects.equals(description, other.description);
+        && Objects.equals(description, other.description)
+        && Objects.equals(namespaceGuid, other.namespaceGuid);
   }
 
   @Override
