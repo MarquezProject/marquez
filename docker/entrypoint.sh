@@ -4,6 +4,6 @@
 
 set -eu
 
-if [ -f ./wait-for-it.sh ]; then ./wait-for-it.sh "${POSTGRES_HOST}:5432"; fi
+./wait-for-it.sh "${POSTGRES_HOST}:5432" -t 300 -s -- echo "postgres is up!"
 
 java -jar marquez-all.jar server "${MARQUEZ_CONFIG}"

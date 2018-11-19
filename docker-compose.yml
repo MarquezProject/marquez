@@ -15,7 +15,6 @@ services:
       - POSTGRES_PASSWORD=macondo
     volumes:
       - ./config.yml:/usr/src/app/config.yml
-      - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
     depends_on:
       - db
 

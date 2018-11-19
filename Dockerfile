@@ -16,5 +16,6 @@ FROM openjdk:8-jre
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build/libs/marquez-all.jar marquez-all.jar
 COPY docker/entrypoint.sh entrypoint.sh
+COPY docker/wait-for-it.sh wait-for-it.sh
 EXPOSE 5000
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
