@@ -55,7 +55,9 @@ Then browse to the admin interface: http://localhost:8081
 
 ## Getting involved
 
-* Mailing List: [marquez-users@googlegroups.com](https://groups.google.com/group/marquez-users)
+* Mailing Lists:
+  * [marquez-user@googlegroups.com](https://groups.google.com/group/marquez-user) (_user support and questions_)
+  * [marquez-dev@googlegroups.com](https://groups.google.com/group/marquez-dev) (_development discussions_)
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing
