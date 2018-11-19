@@ -13,9 +13,9 @@ services:
       - POSTGRES_DB=marquez
       - POSTGRES_USER=buendia
       - POSTGRES_PASSWORD=macondo
+      - WAIT_TIMEOUT=60
     volumes:
       - ./config.yml:/usr/src/app/config.yml
-      - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
     depends_on:
       - db
 

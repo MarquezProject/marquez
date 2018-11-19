@@ -4,6 +4,6 @@
 
 set -eu
 
-if [ -f ./wait-for-it.sh ]; then ./wait-for-it.sh "${POSTGRES_HOST}:5432"; fi
+./wait-for-it.sh "${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}" --timeout="${WAIT_TIMEOUT:-30}" --strict -- echo "postgres is up!"
 
 java -jar marquez-all.jar server "${MARQUEZ_CONFIG}"
