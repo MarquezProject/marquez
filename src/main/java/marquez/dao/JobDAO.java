@@ -1,5 +1,6 @@
 package marquez.dao;
 
+import java.util.UUID;
 import java.util.List;
 import marquez.core.models.Job;
 import org.jdbi.v3.core.Handle;
@@ -23,11 +24,12 @@ public interface JobDAO extends SqlObject {
       handle.useTransaction(
           h -> {
             h.createUpdate(
-                    "INSERT INTO jobs (guid, name, current_owner_name)"
-                        + " VALUES (:guid, :name, :current_owner_name)")
+                    "INSERT INTO jobs (guid, name, current_owner_name, namespace_guid)"
+                        + " VALUES (:guid, :name, :current_owner_name, :namespace_guid)")
                 .bind("guid", job.getGuid())
                 .bind("name", job.getName())
                 .bind("current_owner_name", job.getOwnerName())
+                .bind("namespace_guid", job.getNsGuid())
                 .execute();
           });
     } catch (Exception e) {
@@ -37,12 +39,15 @@ public interface JobDAO extends SqlObject {
     }
   }
 
+  @SqlQuery("SELECT * FROM jobs WHERE guid = :guid")
+  Job findByID(@Bind("guid") UUID guid);
+
   @SqlQuery("SELECT * FROM jobs WHERE name = :name")
   Job findByName(@Bind("name") String name);
 
-  @SqlQuery("SELECT * FROM jobs LIMIT :limit")
-  List<Job> findAll(@Bind("limit") int limit);
-
-  @SqlQuery("SELECT * FROM jobs LIMIT 1")
-  List<Job> findAllInNamespace(@Bind("namespace") String namespace);
+  String findAllByNamespaceNameSQL = "SELECT * "
+                                    + " FROM jobs j"
+                                    + " INNER JOIN namespaces n ON (j.namespace_guid = n.guid AND n.name = :ns_name)";
+  @SqlQuery(findAllByNamespaceNameSQL)
+  List<Job> findAllInNamespace(@Bind("ns_name") String namespaceName);
 }
