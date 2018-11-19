@@ -5,6 +5,6 @@ server:
 
 database:
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://${POSTGRESQL_HOST:-localhost}:${POSTGRESQL_PORT:-5432}/${POSTGRESQL_DB_NAME}
-  user: ${POSTGRESQL_USER}
-  password: ${POSTGRESQL_PASSWORD}
+  url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
+  user: ${POSTGRES_USER}
+  password: ${POSTGRES_PASSWORD}
