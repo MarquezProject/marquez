@@ -1,0 +1,38 @@
+version: '3'
+services:
+  app:
+    networks:
+      - net
+    build: .
+    ports:
+      - '5000:5000'
+    environment:
+      - MARQUEZ_PORT=5000
+      - MARQUEZ_CONFIG=/usr/src/app/config.yml
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=marquez
+      - POSTGRES_USER=buendia
+      - POSTGRES_PASSWORD=macondo
+      - WAIT_TIMEOUT=60
+    volumes:
+      - ./config.yml:/usr/src/app/config.yml
+    depends_on:
+      - db
+
+  db:
+    networks:
+      - net
+    image: 'postgres:9.6'
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - MARQUEZ_DB=marquez
+      - MARQUEZ_USER=buendia
+      - MARQUEZ_PASSWORD=macondo
+    volumes:
+      - ./docker/initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
+
+networks:
+    net:
