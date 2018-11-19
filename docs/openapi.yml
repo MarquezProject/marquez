@@ -50,7 +50,7 @@ paths:
                 $ref: '#/components/schemas/namespace'
     get:
       summary: Retrieve a namespace
-      description: Returns a namespaces.
+      description: Returns a namespace.
       tags:
         - Namespaces
       responses:
@@ -91,10 +91,47 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/job'
+              type: object
+              properties:
+                inputDatasetUrns:
+                  description: The URN list of input datasets.
+                  type: array
+                  items:
+                    type: string
+                    format: URN
+                  uniqueItems: true
+                outputDatasetUrns:
+                  description: The URN list of output datasets.
+                  type: array
+                  items:
+                    type: string
+                    format: URN
+                  uniqueItems: true
+                location:
+                  description: The URI of the job source or artifact.
+                  type: string
+                  format: URI
+                description:
+                  description: The description of the job.
+                  type: string
+              required:
+                - inputDatasetUrns
+                - outputDatasetUrns
+                - location
+                - description
+              example:
+                inputDatasetsUrns: ["urn:wework:room_bookings", "urn:meetup:scheduled_events"]
+                outputDatasetsUrns: ["urn:wework:room_bookings_7_days"]
+                location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+                description: Determine weekly room booking occupancy patterns.
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job'
+
   /namespaces/{namespace}/jobs:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -148,7 +185,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/jobRunId'
-  /jobs/runs/{run-id}/complete:
+  /runs/{run-id}/complete:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
@@ -159,7 +196,7 @@ paths:
       responses:
         '200':
           description: OK
-  /jobs/runs/{run-id}/fail:
+  /runs/{run-id}/fail:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
@@ -170,7 +207,7 @@ paths:
       responses:
         '200':
           description: OK
-  /jobs/runs/{run-id}/outputs:
+  /runs/{run-id}/outputs:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
