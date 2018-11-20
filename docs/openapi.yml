@@ -2,8 +2,8 @@ openapi: 3.0.1
 info:
   title: Marquez 
   version: 0.1.0
-  description: Marquez is a core service for the collection, aggregation, and visualization
-    of a data ecosystem's metadata.
+  description: Marquez is an open source solution for the collection, aggregation,
+    and visualization of a data ecosystem's metadata.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -350,6 +350,10 @@ components:
     job:
       type: object
       properties:
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the version was created.
+          type: string
+          format: date-time
         inputDatasetUrns:
           description: The URN list of input datasets.
           type: array
@@ -371,11 +375,6 @@ components:
         description:
           description: The description of the job.
           type: string
-      required:
-        - inputDatasetUrns
-        - outputDatasetUrns
-        - location
-        - description
       example:
         inputDatasetsUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:events.scheduled_events"]
         outputDatasetsUrns: ["urn:wework:wedata.room_bookings_7_days"]
@@ -384,42 +383,11 @@ components:
     jobs:
       type: object
       properties:
-        jobs:
+        namespaces:
           type: array
-          format: 
           items:
-            type: object
-            properties:
-              name:
-                description: The name of the job.
-                type: string
-              inputDatasetUrns:
-                description: The URN list of input datasets.
-                type: array
-                items:
-                  type: string
-                  format: URN
-                uniqueItems: true
-              outputDatasetUrns:
-                description: The URN list of output datasets.
-                type: array
-                items:
-                  type: string
-                  format: URN
-                uniqueItems: true
-              location:
-                description: The URI of the job source or artifact.
-                type: string
-                format: URI
-              description:
-                description: The description of the job.
-                type: string
-            example:
-              name: etl_room_bookings_7_days
-              inputDatasets: ["urn:wework:room_bookings", "urn:meetup:scheduled_events"]
-              outputDatasets: ["urn:wework:room_bookings_7_days"]
-              location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-              description: Determine weekly room booking occupancy patterns.
+            format: namespace
+            $ref: '#/components/schemas/job'
     jobVersion:
       type: object
       properties:
