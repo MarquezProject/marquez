@@ -2,8 +2,8 @@ openapi: 3.0.1
 info:
   title: Marquez 
   version: 0.1.0
-  description: Marquez is an open source solution for the collection, aggregation,
-    and visualization of a data ecosystem's metadata.
+  description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
+    and **visualization** of a data ecosystem's metadata.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -118,7 +118,7 @@ paths:
                 - outputDatasetUrns
                 - location
               example:
-                inputDatasetsUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:events.scheduled_events"]
+                inputDatasetsUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
                 outputDatasetsUrns: ["urn:wework:wedata.room_bookings_7_days"]
                 location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
                 description: Determine weekly room booking occupancy patterns.
@@ -308,7 +308,7 @@ components:
       schema:
         type: string
         maxLength: 1024
-        example: etl_room_bookings_7_days
+        example: room_bookings_7_days
     jobRunId:
       name: run-id
       in: path
@@ -325,7 +325,7 @@ components:
           description: The name of the namespace.
           type: string
         createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the object was created.
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the namespace was created.
           type: string
           format: date-time
         owner:
@@ -345,13 +345,15 @@ components:
         namespaces:
           type: array
           items:
-            format: namespace
             $ref: '#/components/schemas/namespace'
     job:
       type: object
       properties:
+        name:
+          description: The name of the job.
+          type: string
         createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the version was created.
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
           type: string
           format: date-time
         inputDatasetUrns:
@@ -376,7 +378,9 @@ components:
           description: The description of the job.
           type: string
       example:
-        inputDatasetsUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:events.scheduled_events"]
+        name: room_bookings_7_days
+        createdAt: 2018-10-04T15:01:23.045Z
+        inputDatasetsUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
         outputDatasetsUrns: ["urn:wework:wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         description: Determine weekly room booking occupancy patterns.
@@ -386,22 +390,26 @@ components:
         jobs:
           type: array
           items:
-            format: job
             $ref: '#/components/schemas/job'
     jobVersion:
       type: object
       properties:
         version:
           description: The version of the job.
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the version was created.
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job version was created.
           type: string
           format: date-time
+        location:
+          description: The URI of the job source or artifact.
+          type: string
+          format: URI
       example:
-        version: 3546343826724305
+        version: b39b5cea-bc2e-42a5-a4ab-5329ae9fc54f
         createdAt: 2018-10-04T15:01:23.045Z
+        location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
     jobVersions:
       type: object
       properties:
@@ -413,11 +421,11 @@ components:
       type: object
       properties:
         nominalStartTime:
-          description:
+          description: The nominal start time of the job.
           type: string
           format: date-time
         nominalEndTime:
-          description:
+          description: The nominal end time of the job.
           type: string
           format: date-time
         runArgs:
@@ -425,8 +433,6 @@ components:
           type: map
           additionalProperties: true
       example:
-        nominalStartTime:
-        nominalEndTime:
         runArgs:
           email: data@wework.com
           emailOnFailure: false
@@ -449,7 +455,7 @@ components:
           type: string
           format: URN
         createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the object was created.
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
           type: string
           format: date-time
       example:
