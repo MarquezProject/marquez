@@ -117,7 +117,6 @@ paths:
                 - inputDatasetUrns
                 - outputDatasetUrns
                 - location
-                - description
               example:
                 inputDatasetsUrns: ["urn:wework:room_bookings", "urn:meetup:scheduled_events"]
                 outputDatasetsUrns: ["urn:wework:room_bookings_7_days"]
