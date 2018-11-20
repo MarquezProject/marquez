@@ -37,7 +37,6 @@ paths:
                   type: string
               required:
                 - owner
-                - description
               example:
                 owner: dataengineering
                 description: A namespace for core jobs and datasets at wework.
