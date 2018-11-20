@@ -383,10 +383,10 @@ components:
     jobs:
       type: object
       properties:
-        namespaces:
+        jobs:
           type: array
           items:
-            format: namespace
+            format: job
             $ref: '#/components/schemas/job'
     jobVersion:
       type: object
