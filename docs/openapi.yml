@@ -183,7 +183,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/jobRunId'
-  /runs/{run-id}/complete:
+  /jobs/runs/{run-id}/complete:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
@@ -194,7 +194,7 @@ paths:
       responses:
         '200':
           description: OK
-  /runs/{run-id}/fail:
+  /jobs/runs/{run-id}/fail:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
@@ -205,7 +205,7 @@ paths:
       responses:
         '200':
           description: OK
-  /runs/{run-id}/outputs:
+  /jobs/runs/{run-id}/outputs:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
