@@ -59,6 +59,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/namespace'
+
   /namespaces:
     get:
       summary: List all namespaces
@@ -145,6 +146,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/jobs'
+
   /namespaces/{namespace}/jobs/{job}/versions:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -161,6 +163,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/jobVersions'
+
   /namespaces/{namespace}/jobs/{job}/runs:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -175,7 +178,25 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/jobRun'
+              type: object
+              properties:
+                nominalStartTime:
+                  description: The nominal start time of the job.
+                  type: string
+                  format: date-time
+                nominalEndTime:
+                  description: The nominal end time of the job.
+                  type: string
+                  format: date-time
+                runArgs:
+                  description: The runtime arguments of the job.
+                  type: map
+              example:
+                runArgs:
+                  email: data@wework.com
+                  emailOnFailure: false
+                  emailOnRetry: true
+                  retries: 1
       responses:
         '201':
           description: CREATED
@@ -183,6 +204,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/jobRunId'
+    get:
+      summary: List all job runs
+      description: Returns a list of job runs.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobRuns'
+
   /jobs/runs/{run-id}/complete:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
@@ -194,6 +228,7 @@ paths:
       responses:
         '200':
           description: OK
+
   /jobs/runs/{run-id}/fail:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
@@ -205,6 +240,19 @@ paths:
       responses:
         '200':
           description: OK
+
+  /jobs/runs/{run-id}/abort:
+    parameters:
+      - $ref: '#/components/parameters/jobRunId'
+    put:
+      summary: Abort a job run
+      description: Marks the job run as aborted.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+
   /jobs/runs/{run-id}/outputs:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
@@ -300,6 +348,7 @@ components:
         type: string
         maxLength: 1024
         example: wework
+
     job:
       name: job
       in: path
@@ -309,6 +358,7 @@ components:
         type: string
         maxLength: 1024
         example: room_bookings_7_days
+
     jobRunId:
       name: run-id
       in: path
@@ -317,6 +367,7 @@ components:
       schema:
         type: string
         format: uuid
+
   schemas:
     namespace:
       type: object
@@ -339,6 +390,7 @@ components:
         createdAt: 2018-10-04T15:01:23.045Z
         owner: dataengineering
         description: A namespace for core jobs and datasets at wework.
+
     namespaces:
       type: object
       properties:
@@ -346,6 +398,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/namespace'
+
     job:
       type: object
       properties:
@@ -354,6 +407,10 @@ components:
           type: string
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.
           type: string
           format: date-time
         inputDatasetUrns:
@@ -384,6 +441,7 @@ components:
         outputDatasetsUrns: ["urn:wework:wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         description: Determine weekly room booking occupancy patterns.
+
     jobs:
       type: object
       properties:
@@ -391,6 +449,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/job'
+
     jobVersion:
       type: object
       properties:
@@ -410,6 +469,7 @@ components:
         version: b39b5cea-bc2e-42a5-a4ab-5329ae9fc54f
         createdAt: 2018-10-04T15:01:23.045Z
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+
     jobVersions:
       type: object
       properties:
@@ -417,6 +477,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/jobVersion'
+
+    jobRunId:
+      type: object
+      properties:
+        runId:
+          description: The unique ID assigned to the run.
+          type: string
+          format: uuid
+      example:
+        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+
     jobRun:
       type: object
       properties:
@@ -428,25 +499,44 @@ components:
           description: The nominal end time of the job.
           type: string
           format: date-time
+        runId:
+          description: The unique ID assigned to the run.
+          type: string
+          format: uuid
+        runState:
+          description: The current state of the job.
+          type: enum
+          enum: [STARTED, COMPLETED, FAILED]
         runArgs:
           description: The runtime arguments of the job.
           type: map
-          additionalProperties: true
+        startedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job started.
+          type: string
+          format: date-time
+        endedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job ended.
+          type: string
+          format: date-time
       example:
+        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        runState: COMPLETED
         runArgs:
           email: data@wework.com
           emailOnFailure: false
           emailOnRetry: true
           retries: 1
-    jobRunId:
+        startedAt: 2018-10-04T15:01:23.045Z
+        endedAt: 2018-10-04T15:01:30.045Z
+
+    jobRuns:
       type: object
       properties:
-        runId:
-          description: The unique ID assigned to the run.
-          type: string
-          format: uuid
-      example:
-        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/jobRun'
+
     dataset:
       type: object
       properties:
@@ -461,12 +551,14 @@ components:
       example:
         urn: urn:wework:room_bookings
         createdAt: 2018-10-04T15:01:23.045Z
+
     datasets:
       type: object
       properties:
         datasets:
           items:
             $ref: '#/components/schemas/dataset'
+
     db:
       type: object
       properties:
@@ -496,6 +588,7 @@ components:
         - schema 
         - table 
         - description 
+
     iceberg:
       type: object
       properties:
@@ -519,6 +612,7 @@ components:
          - snapshotId 
          - location 
          - description
+
     stream:
       type: object
       properties:
