@@ -2,13 +2,13 @@ package marquez.api;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -23,24 +23,23 @@ public class DatasetSerializationTest {
 
   @BeforeClass
   public static void setupDataset() {
-    TimeZone tz = TimeZone.getDefault();
-    Calendar cal = GregorianCalendar.getInstance(tz);
-    int offsetInMillis = tz.getOffset(cal.getTimeInMillis());
+    SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
+    try {
+      Timestamp createdAt = new Timestamp(dateFmt.parse("2018-07-14 19:43:37+0000").getTime());
+      Timestamp updatedAt = new Timestamp(dateFmt.parse("2018-08-15 11:20:05+0000").getTime());
 
-    Timestamp createdAt =
-        new Timestamp(Timestamp.valueOf("2018-07-14 19:43:37").getTime() + offsetInMillis);
-    Timestamp updatedAt =
-        new Timestamp(Timestamp.valueOf("2018-08-15 11:20:05").getTime() + offsetInMillis);
-
-    DATASET =
-        new Dataset(
-            "sample_dataset",
-            createdAt,
-            updatedAt,
-            Dataset.Type.DB_TABLE,
-            Dataset.Origin.EXTERNAL,
-            UUID.fromString("10892965-454c-4bb1-b187-d67f2141423c"),
-            "sample dataset for testing");
+      DATASET =
+          new Dataset(
+              "sample_dataset",
+              createdAt,
+              updatedAt,
+              Dataset.Type.DB_TABLE,
+              Dataset.Origin.EXTERNAL,
+              UUID.fromString("10892965-454c-4bb1-b187-d67f2141423c"),
+              "sample dataset for testing");
+    } catch (ParseException e) {
+      fail("couldn't parse test timestamps");
+    }
   }
 
   @Test
