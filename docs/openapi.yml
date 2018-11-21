@@ -294,44 +294,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                datasets:
-                  type: array
-                  items:
-                    oneOf:
-                      - $ref: '#/components/schemas/db'
-                      - $ref: '#/components/schemas/iceberg'
-                      - $ref: '#/components/schemas/stream'
-              examples:
-                db:
-                  summary: db dataset
-                  value: {
-                    "type": "db",
-                    "server": "localhost:5432",
-                    "database": "wework",
-                    "schema": "wedata",
-                    "table": "room_bookings",
-                    "description": "A list of booked rooms."
-                  }
-                iceberg:
-                  summary: fs dataset
-                  value: {
-                    "type": "iceberg",
-                    "snapshotId": 3051729675574597004,
-                    "location": "s3://b/wh/data.db/table",
-                    "description": "Archived warehouse data."
-                  }
-                stream:
-                  summary: stream dataset
-                  value: {
-                    "type": "stream",
-                    "origin": "external",
-                    "stream": "streaming.meetup.scheduled_events",
-                    "partition": 10,
-                    "offset": 2,
-                    "description": "A stream of scheduled meetup events."
-                  }
+              $ref: '#/components/schemas/jobRunOutputs'
       responses:
         '200':
           description: OK
@@ -566,6 +529,16 @@ components:
           items:
             $ref: '#/components/schemas/jobRun'
 
+    jobRunOutputs:
+      type: object
+      properties:
+        outputs:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/DB'
+              - $ref: '#/components/schemas/ICEBERG'
+
     dataset:
       type: object
       properties:
@@ -578,7 +551,7 @@ components:
           type: string
           format: date-time
       example:
-        urn: urn:wework:room_bookings
+        urn: urn:wework:wedata.room_bookings
         createdAt: 2018-10-04T15:01:23.045Z
 
     datasets:
@@ -588,21 +561,19 @@ components:
           items:
             $ref: '#/components/schemas/dataset'
 
-    db:
+    DB:
       type: object
       properties:
         type:
           description: The output dataset type.
           type: enum
-          enum: [db]
-        server:
-          description: The database server.
+          enum: [DB]
+        connectionUrl:
+          description: The URL to connect to the database.
           type: string
-        database:
-          description: The name of the database.
-          type: string
+          format: URL
         schema:
-          description: The name of the database schema.
+          description:  The name of the database schema.
           type: string
         table:
           description: The name of the table.
@@ -611,20 +582,23 @@ components:
           description: The description of the output dataset.
           type: string
       required:
-        - type 
-        - server 
-        - database 
-        - schema 
-        - table 
-        - description 
-
-    iceberg:
+        - type
+        - connectionUrl
+        - schema
+        - table
+      example:
+        type: DB
+        connectionUrl: jdbc:postgresql://localhost:5432/wework
+        schema: wedata
+        table: room_bookings
+        
+    ICEBERG:
       type: object
       properties:
         type:
           description: The output dataset type.
           type: enum
-          enum: [iceberg]
+          enum: [ICEBERG]
         snapshotId:
           description: The unique ID of the snapshot representing a list of files on the file system.
           type: integer
@@ -639,32 +613,9 @@ components:
       required:
          - type 
          - snapshotId 
-         - location 
-         - description
-
-    stream:
-      type: object
-      properties:
-        type:
-          description: The output dataset type.
-          type: enum    
-          enum: [stream]
-        stream:
-          description: The name of the stream.
-          type: string
-        partition:
-          description: The partition of the stream.
-          type: integer
-        offset:
-          description: The offset of the stream.
-          type: integer
-          format: int64
-        description:
-          description: The description of the output dataset.
-          type: string
-      required:
-         - type 
-         - stream 
-         - partition 
-         - offset
-         - description
+         - location
+      example:
+        type: ICEBERG
+        snapshotId: 3051729675574597004
+        location: s3://b/wh/data.db/table
+        description: Archived warehouse data.
