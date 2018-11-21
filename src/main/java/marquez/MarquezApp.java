@@ -9,6 +9,8 @@ import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import marquez.core.mappers.ResourceExceptionMapper;
+import marquez.core.services.NamespaceService;
 import marquez.dao.DatasetDAO;
 import marquez.dao.JobDAO;
 import marquez.dao.JobRunDAO;
@@ -20,6 +22,7 @@ import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
 import marquez.resources.JobRunDefinitionResource;
 import marquez.resources.JobRunResource;
+import marquez.resources.NamespaceResource;
 import marquez.resources.OwnerResource;
 import marquez.resources.PingResource;
 import org.flywaydb.core.Flyway;
@@ -121,5 +124,10 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey()
         .register(
             new JobRunDefinitionResource(jobRunDefinitionDAO, jobVersionDAO, jobDAO, ownerDAO));
+
+    final NamespaceService namespaceService = new NamespaceService();
+    env.jersey().register(new NamespaceResource(namespaceService));
+
+    env.jersey().register(new ResourceExceptionMapper());
   }
 }
