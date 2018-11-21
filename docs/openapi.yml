@@ -573,7 +573,7 @@ components:
           type: string
           format: URL
         schema:
-          description:  The name of the database schema.
+          description: The name of the database schema.
           type: string
         table:
           description: The name of the table.
