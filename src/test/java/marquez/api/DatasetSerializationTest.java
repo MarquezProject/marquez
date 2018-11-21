@@ -4,12 +4,11 @@ import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.text.ParseException;
-
 import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
-import java.util.UUID;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.UUID;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,21 +21,21 @@ public class DatasetSerializationTest {
   @BeforeClass
   public static void setupDataset() {
     SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
-    try{
-        Timestamp createdAt = new Timestamp(dateFmt.parse("2018-07-14 19:43:37+0000").getTime());
-        Timestamp updatedAt = new Timestamp(dateFmt.parse("2018-08-15 11:20:05+0000").getTime());
+    try {
+      Timestamp createdAt = new Timestamp(dateFmt.parse("2018-07-14 19:43:37+0000").getTime());
+      Timestamp updatedAt = new Timestamp(dateFmt.parse("2018-08-15 11:20:05+0000").getTime());
 
-        DATASET =
-        new Dataset(
-            "sample_dataset",
-            createdAt,
-            updatedAt,
-            Dataset.Type.DB_TABLE,
-            Dataset.Origin.EXTERNAL,
-            UUID.fromString("10892965-454c-4bb1-b187-d67f2141423c"),
-            "sample dataset for testing");
-    } catch (ParseException e){
-        System.out.println(e.getMessage());
+      DATASET =
+          new Dataset(
+              "sample_dataset",
+              createdAt,
+              updatedAt,
+              Dataset.Type.DB_TABLE,
+              Dataset.Origin.EXTERNAL,
+              UUID.fromString("10892965-454c-4bb1-b187-d67f2141423c"),
+              "sample dataset for testing");
+    } catch (ParseException e) {
+      System.out.println(e.getMessage());
     }
   }
 
