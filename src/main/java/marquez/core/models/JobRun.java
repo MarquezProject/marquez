@@ -13,9 +13,10 @@ public final class JobRun {
   private final UUID guid;
   private final Timestamp startedAt;
   private final Timestamp endedAt;
-  private final UUID jobRunDefinitionGuid;
   private final Integer currentState;
   private final UUID jobVersionGuid;
+  private final String runArgsHexDigest;
+  private final String runArgs;
 
   private static Map<JobRunState.State, Set<JobRunState.State>> validTransitions = new HashMap<>();
 
@@ -43,17 +44,34 @@ public final class JobRun {
 
   public JobRun(
       final UUID guid,
+      final Integer currentState,
+      final UUID jobVersionGuid,
+      final String runArgsHexDigest,
+      final String runArgs) {
+    this.guid = guid;
+    this.startedAt = null;
+    this.endedAt = null;
+    this.currentState = currentState;
+    this.jobVersionGuid = jobVersionGuid;
+    this.runArgsHexDigest = runArgsHexDigest;
+    this.runArgs = runArgs;
+  }
+
+  public JobRun(
+      final UUID guid,
       final Timestamp startedAt,
       final Timestamp endedAt,
-      final UUID jobRunDefinitionGuid,
       final Integer currentState,
-      final UUID jobVersionGuid) {
+      final UUID jobVersionGuid,
+      final String runArgsHexDigest,
+      final String runArgs) {
     this.guid = guid;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
-    this.jobRunDefinitionGuid = jobRunDefinitionGuid;
     this.currentState = currentState;
     this.jobVersionGuid = jobVersionGuid;
+    this.runArgsHexDigest = runArgsHexDigest;
+    this.runArgs = runArgs;
   }
 
   public UUID getGuid() {
@@ -68,16 +86,20 @@ public final class JobRun {
     return endedAt;
   }
 
-  public UUID getJobRunDefinitionGuid() {
-    return jobRunDefinitionGuid;
-  }
-
   public Integer getCurrentState() {
     return currentState;
   }
 
   public UUID getJobVersionGuid() {
     return jobVersionGuid;
+  }
+  
+  public String runArgsHexDigest() {
+    return runArgsHexDigest;
+  }
+
+  public String runArgs(){
+    return runArgs;
   }
 
   @Override
@@ -90,8 +112,9 @@ public final class JobRun {
     return Objects.equals(guid, other.guid)
         && Objects.equals(startedAt, other.startedAt)
         && Objects.equals(endedAt, other.endedAt)
-        && Objects.equals(jobRunDefinitionGuid, other.jobRunDefinitionGuid)
-        && Objects.equals(currentState, other.currentState);
+        && Objects.equals(currentState, other.currentState)
+        && Objects.equals(jobVersionGuid, other.jobVersionGuid)
+        && Objects.equals(runArgsHexDigest, other.runArgsHexDigest);
   }
 
   public static boolean isValidJobTransition(
@@ -106,7 +129,7 @@ public final class JobRun {
 
   @Override
   public int hashCode() {
-    return Objects.hash(guid, startedAt, endedAt, jobRunDefinitionGuid, currentState);
+    return Objects.hash(guid, startedAt, endedAt, currentState, jobVersionGuid, runArgsHexDigest);
   }
 
   @Override
@@ -116,8 +139,9 @@ public final class JobRun {
     sb.append("guid=").append(guid);
     sb.append("startedAt=").append(startedAt);
     sb.append("endedAt=").append(endedAt);
-    sb.append("jobRunDefinitionGuid=").append(jobRunDefinitionGuid);
     sb.append("currentState=").append(currentState);
+    sb.append("jobVersionGuid=").append(jobVersionGuid);
+    sb.append("runArgsHexDigest=").append(runArgsHexDigest);
     sb.append("}");
     return sb.toString();
   }
