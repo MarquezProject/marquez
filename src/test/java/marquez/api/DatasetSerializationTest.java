@@ -2,6 +2,8 @@ package marquez.api;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
@@ -35,7 +37,7 @@ public class DatasetSerializationTest {
               UUID.fromString("10892965-454c-4bb1-b187-d67f2141423c"),
               "sample dataset for testing");
     } catch (ParseException e) {
-      System.out.println(e.getMessage());
+      fail("couldn't parse test timestamps");
     }
   }
 
