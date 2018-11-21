@@ -32,7 +32,7 @@ services:
       - MARQUEZ_USER=buendia
       - MARQUEZ_PASSWORD=macondo
     volumes:
-      - ./docker/initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
+      - ./docker/init-marquezdb.sh:/docker-entrypoint-initdb.d/init-marquezdb.sh
 
 networks:
     net:
