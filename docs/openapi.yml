@@ -617,5 +617,5 @@ components:
       example:
         type: ICEBERG
         snapshotId: 3051729675574597004
-        location: s3://b/wh/data.db/table
-        description: Archived warehouse data.
+        location: s3://wedata/room_bookings
+        description: Archived room bookings data.
