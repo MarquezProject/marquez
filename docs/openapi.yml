@@ -217,6 +217,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/jobRuns'
 
+  /jobs/runs/{run-id}:
+    parameters:
+      - $ref: '#/components/parameters/jobRunId'
+    get:
+      summary: Retrieve a job run
+      description: Retrieve a job run.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobRun'
+
   /jobs/runs/{run-id}/complete:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
