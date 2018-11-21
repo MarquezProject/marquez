@@ -5,11 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.text.ParseException;
+
 import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -44,14 +48,14 @@ public class DatasetSerializationTest {
     }
   }
 
-  @Ignore @Test
+  @Test
   public void serializesToJSON() throws Exception {
     final String expected =
         MAPPER.writeValueAsString(MAPPER.readValue(fixture(DATASET_SAMPLE_JSON), Dataset.class));
     assertThat(MAPPER.writeValueAsString(DATASET)).isEqualTo(expected);
   }
 
-  @Ignore @Test
+  @Test
   public void deserializesFromJSON() throws Exception {
     assertThat(MAPPER.readValue(fixture(DATASET_SAMPLE_JSON), Dataset.class)).isEqualTo(DATASET);
   }
