@@ -130,6 +130,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/job'
+    get:
+      summary: Retrieve a job
+      description: Retrieve a job.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job'
 
   /namespaces/{namespace}/jobs:
     parameters:
