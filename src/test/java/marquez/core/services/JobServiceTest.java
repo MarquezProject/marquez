@@ -17,6 +17,7 @@ import marquez.core.models.JobVersion;
 import marquez.dao.JobDAO;
 import marquez.dao.JobVersionDAO;
 import marquez.dao.JobRunDAO;
+import marquez.dao.RunArgsDAO;
 import java.util.List;
 import java.util.UUID;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class JobServiceTest {
     private static final JobDAO jobDAO = mock(JobDAO.class);
     private static final JobVersionDAO jobVersionDAO = mock(JobVersionDAO.class);
     private static final JobRunDAO jobRunDAO = mock(JobRunDAO.class);
+    private static final RunArgsDAO runArgsDAO = mock(RunArgsDAO.class);
     private static final Timestamp timeZero = new Timestamp(new Date(0).getTime());
     private static final UUID namespaceID = UUID.randomUUID();
 
@@ -42,7 +44,7 @@ public class JobServiceTest {
 
     @Before
     public void setUp() {
-        jobService = new JobService(jobDAO, jobVersionDAO, jobRunDAO);
+        jobService = new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
     }
 
     @After

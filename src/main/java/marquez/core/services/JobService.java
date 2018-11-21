@@ -4,14 +4,17 @@ import marquez.core.exceptions.JobServiceException;
 import marquez.dao.JobDAO;
 import marquez.dao.JobVersionDAO;
 import marquez.dao.JobRunDAO;
+import marquez.dao.RunArgsDAO;
 import marquez.core.models.Job;
 import marquez.core.models.JobVersion;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
+import marquez.core.models.RunArgs;
 import java.util.List;
 import java.util.UUID;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.slf4j.Logger;
@@ -22,12 +25,14 @@ class JobService {
     private JobDAO jobDAO;
     private JobVersionDAO jobVersionDAO;
     private JobRunDAO jobRunDAO;
+    private RunArgsDAO runArgsDAO;
     static final Logger logger = LoggerFactory.getLogger(JobDAO.class);
 
-    public JobService(JobDAO jobDAO, JobVersionDAO jobVersionDAO, JobRunDAO jobRunDAO) {
+    public JobService(JobDAO jobDAO, JobVersionDAO jobVersionDAO, JobRunDAO jobRunDAO, RunArgsDAO runArgsDAO) {
         this.jobDAO = jobDAO;
         this.jobVersionDAO = jobVersionDAO;
         this.jobRunDAO = jobRunDAO;
+        this.runArgsDAO = runArgsDAO;
     }
 
     //// PUBLIC METHODS ////
@@ -94,36 +99,6 @@ class JobService {
         return latestVersion;      
     }
 
-    public UUID createJobRun(
-        String namespace, 
-        String jobName, 
-        String nominalStarTime, 
-        String nominalEndTime, 
-        String runArgsJson) 
-    throws JobServiceException {
-        // get latest JobVersion for Job
-        JobVersion jobVersion = this.getVersionLatest(namespace, jobName);
-
-        // create a JobRun linked to that JobVersion
-        UUID jobRunID = UUID.randomUUID();
-
-        try{    
-            JobRun jobRun = new JobRun(
-                jobRunID, 
-                new Timestamp(new Date().getTime()), 
-                new Timestamp(new Date().getTime()),
-                UUID.randomUUID(), // TODO: remove
-                JobRunState.State.toInt(JobRunState.State.NEW),
-                jobVersion.getGuid());
-            this.jobRunDAO.insert(jobRun);
-        } catch (Exception e) {
-            String err = "error creating job run";
-            logger.error(err, e);
-            throw new JobServiceException(err);
-        }
-        return jobRunID;
-    }
-
     public JobRun updateJobRunState(UUID jobRunID, JobRunState.State state) throws JobServiceException {
         try {   
             this.jobRunDAO.updateState(jobRunID, JobRunState.State.toInt(state));
@@ -147,18 +122,28 @@ class JobService {
         return jobRun;
     }
 
-    public JobRun createJobRun(UUID jobUUID, String runArgsJson) throws JobServiceException {
+    public JobRun createJobRun(String namespaceName, String jobName, String runArgsJson) throws JobServiceException {
         // get latest job version for job
         try{
-            JobVersion latestJobVersion = 
-            // insert the run args
-            // create and return the job run
-        } catch (UnableToExecuteStatementException e){
+            JobVersion latestJobVersion = getVersionLatest(namespaceName, jobName);
+            String runArgsDigest = computeRunArgsDigest(runArgsJson);
+            RunArgs runArgs = new RunArgs(runArgsDigest, runArgsJson);
+            if (!runArgsDAO.digestExists(runArgsDigest)) {
+                runArgsDAO.insert(runArgs);
+            }
+            JobRun jobRun = new JobRun(
+                UUID.randomUUID(), 
+                JobRunState.State.toInt(JobRunState.State.NEW),
+                latestJobVersion.getGuid(), 
+                runArgsDigest, 
+                runArgsJson
+            );
+            return jobRun;
+        } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e){
             String err = "error creating job run";
             logger.error(err, e);
             throw new JobServiceException(err);
         }
-
     }
 
 
@@ -169,6 +154,22 @@ class JobService {
         return UUID.nameUUIDFromBytes(raw);    
     }
 
+    protected String computeRunArgsDigest(String runArgsJson) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(runArgsJson.getBytes(StandardCharsets.UTF_8));
+        return bytesToHex(hash);
+    }
+
+    protected String bytesToHex(byte[] hash){
+        StringBuffer hexString = new StringBuffer();
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+    
     private Job createJob(String namespace, Job job) throws JobServiceException {
         this.jobDAO.insert(job);
         return job;
