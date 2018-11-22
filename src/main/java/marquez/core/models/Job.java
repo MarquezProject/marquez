@@ -19,6 +19,22 @@ public final class Job {
       final UUID guid,
       final String name,
       final String ownerName,
+      final String location,
+      final UUID namespaceGuid) {
+    this.guid = guid;
+    this.name = name;
+    this.ownerName = ownerName;
+    this.nominalTime = null;
+    this.category = null;
+    this.description = null;
+    this.location = location;
+    this.namespaceGuid = namespaceGuid;
+  }
+
+  public Job(
+      final UUID guid,
+      final String name,
+      final String ownerName,
       final Timestamp nominalTime,
       final String category,
       final String description,
