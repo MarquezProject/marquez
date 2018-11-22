@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MarquezApp extends Application<MarquezConfig> {
-  private static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MarquezApp.class);
 
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRESQL_DB = "postgresql";
