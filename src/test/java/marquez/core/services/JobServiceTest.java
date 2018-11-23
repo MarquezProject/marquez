@@ -51,6 +51,8 @@ public class JobServiceTest {
     public void tearDown() {
         reset(jobDAO);
         reset(jobVersionDAO);
+        reset(jobRunDAO);
+        reset(runArgsDAO);
     }
 
     @Test
