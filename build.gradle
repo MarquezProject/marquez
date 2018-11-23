@@ -1,10 +1,10 @@
 plugins {
-  id 'java'
   id 'application'
-  id 'com.github.johnrengelman.shadow' version '2.0.4'
-  id "com.diffplug.gradle.spotless" version '3.14.0'
   id 'checkstyle'
+  id 'com.diffplug.gradle.spotless' version '3.14.0'
+  id 'com.github.johnrengelman.shadow' version '2.0.4'
   id 'jacoco'
+  id 'java'
 }
 
 repositories {
