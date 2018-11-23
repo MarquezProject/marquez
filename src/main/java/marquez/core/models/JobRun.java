@@ -94,7 +94,7 @@ public final class JobRun {
     return jobVersionGuid;
   }
   
-  public String runArgsHexDigest() {
+  public String getRunArgsHexDigest() {
     return runArgsHexDigest;
   }
 

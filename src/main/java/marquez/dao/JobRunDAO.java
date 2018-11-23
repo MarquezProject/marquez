@@ -2,6 +2,8 @@ package marquez.dao;
 
 import java.util.UUID;
 import marquez.core.models.JobRun;
+import marquez.core.models.JobRunState;
+
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
@@ -23,8 +25,8 @@ public interface JobRunDAO extends SqlObject {
       handle.useTransaction(
           h -> {
             h.createUpdate(
-                    "INSERT INTO job_runs (guid, started_at, job_run_definition_guid, current_state) "
-                        + "VALUES (:guid, :startedAt, :jobRunDefinitionGuid, :currentState)")
+                    "INSERT INTO job_runs (guid, started_at, job_version_guid, current_state, job_run_args_hex_digest) "
+                        + "VALUES (:guid, :startedAt, :jobVersionGuid, :currentState, :runArgsHexDigest)")
                 .bindBean(jobRun)
                 .execute();
             createJobRunStateDAO()
@@ -52,13 +54,17 @@ public interface JobRunDAO extends SqlObject {
       LOG.error(e.getMessage());
     }
   }
-
+  
+  String updateStateSQL = "UPDATE job_runs "
+                        + "SET current_state = :state, "
+                        + "SET started_at = CASE started_at WHEN NULL THEN CASE :state WHEN 1 THEN NOW() END ELSE started_at END, "
+                        + "SET ended_at = CASE WHEN NULL THEN CASE :state WHEN 2 THEN NOW() END ELSE ended_at END "
+                        + "where guid = :job_run_id";
   default void updateState(UUID jobRunID, Integer state) {
     try (final Handle handle = getHandle()) {
       handle.useTransaction(
           h -> {
-            h.createUpdate(
-                    "UPDATE job_runs SET current_state = :state, started_at = :startedAt, ended_at = :endedAt where guid = :job_run_id")
+            h.createUpdate("updateStateSQL")
                 .bind("job_run_id", jobRunID)
                 .bind("current_state", state)
                 .execute();
