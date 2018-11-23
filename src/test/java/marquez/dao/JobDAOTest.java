@@ -75,7 +75,7 @@ public class JobDAOTest {
   }
 
   private void assertJobFieldsMatch(Job job1, Job job2) {
-    assertEquals(job1.getNsGuid(), job2.getNsGuid());
+    assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
     assertEquals(job1.getName(), job2.getName());
     assertEquals(job1.getOwnerName(), job2.getOwnerName());
   }

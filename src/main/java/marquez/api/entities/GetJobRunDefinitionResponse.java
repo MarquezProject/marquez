@@ -38,7 +38,7 @@ public final class GetJobRunDefinitionResponse {
         jrd.getRunArgsJson(),
         jrd.getNominalTimeStart(),
         jrd.getNominalTimeEnd(),
-        jrd.getURI().toString(),
+        jrd.getUri().toString(),
         jrd.getOwnerName());
   }
 
@@ -68,7 +68,7 @@ public final class GetJobRunDefinitionResponse {
   }
 
   @JsonProperty("uri")
-  public String getURI() {
+  public String getUri() {
     return uri;
   }
 

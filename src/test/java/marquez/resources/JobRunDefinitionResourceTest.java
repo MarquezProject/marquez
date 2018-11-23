@@ -76,7 +76,7 @@ public class JobRunDefinitionResourceTest {
             jobVersionGuidCaptor.capture(),
             eq(reqJV.computeVersionGuid()),
             eq(jobArgCaptor.getValue().getGuid()),
-            eq(request.getURI()));
+            eq(request.getUri()));
 
     // a new JobRunDefinition is created, with correct job version guid
     JobRunDefinition reqJrd = JobRunDefinition.create(request, jobVersionGuidCaptor.getValue());
@@ -132,7 +132,7 @@ public class JobRunDefinitionResourceTest {
             jobVersionGuidCaptor.capture(),
             eq(reqJV.computeVersionGuid()),
             eq(existingJob.getGuid()),
-            eq(request.getURI()));
+            eq(request.getUri()));
 
     // a new JobRunDefinition is created, with correct job version guid
     JobRunDefinition jrd = JobRunDefinition.create(request, jobVersionGuidCaptor.getValue());
@@ -167,7 +167,7 @@ public class JobRunDefinitionResourceTest {
         new JobVersion(
             UUID.randomUUID(),
             existingJob.getGuid(),
-            request.getURI(),
+            request.getUri(),
             versionUUID,
             UUID.randomUUID(),
             new Timestamp(new Date(0).getTime()),
@@ -213,7 +213,7 @@ public class JobRunDefinitionResourceTest {
         new JobVersion(
             UUID.randomUUID(),
             existingJob.getGuid(),
-            request.getURI(),
+            request.getUri(),
             versionUUID,
             UUID.randomUUID(),
             new Timestamp(new Date(0).getTime()),
@@ -227,7 +227,7 @@ public class JobRunDefinitionResourceTest {
             UUID.randomUUID(),
             existingJob.getName(),
             existingJob.getOwnerName(),
-            URI.create(existingJobVersion.getURI()),
+            URI.create(existingJobVersion.getUri()),
             existingJobVersion.getGuid(),
             request.getRunArgsJson(),
             0,

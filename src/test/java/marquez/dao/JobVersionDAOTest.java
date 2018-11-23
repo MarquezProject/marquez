@@ -73,7 +73,7 @@ public class JobVersionDAOTest {
         jobVersion.getGuid(),
         jobVersion.getVersion(),
         jobVersion.getJobGuid(),
-        jobVersion.getURI());
+        jobVersion.getUri());
     JobVersion jobVersionFound = jobVersionDAO.findByVersion(jobVersion.getVersion());
     assertEquals(jobVersion, jobVersionFound);
     assertNull(jobVersionDAO.findByVersion(UUID.randomUUID()));
@@ -87,12 +87,12 @@ public class JobVersionDAOTest {
         jobVersion1.getGuid(),
         jobVersion1.getVersion(),
         jobVersion1.getJobGuid(),
-        jobVersion1.getURI());
+        jobVersion1.getUri());
     jobVersionDAO.insert(
         jobVersion2.getGuid(),
         jobVersion2.getVersion(),
         jobVersion2.getJobGuid(),
-        jobVersion2.getURI());
+        jobVersion2.getUri());
     assertEquals(jobVersion1, jobVersionDAO.findByVersion(jobVersion1.getVersion()));
     assertEquals(jobVersion2, jobVersionDAO.findByVersion(jobVersion2.getVersion()));
   }
@@ -101,7 +101,7 @@ public class JobVersionDAOTest {
   public void testFind() {
     List<JobVersion> versionsWeWant = Arrays.asList(randomJobVersion(), randomJobVersion());
     versionsWeWant.forEach(
-        jv -> jobVersionDAO.insert(jv.getGuid(), jv.getVersion(), jv.getJobGuid(), jv.getURI()));
+        jv -> jobVersionDAO.insert(jv.getGuid(), jv.getVersion(), jv.getJobGuid(), jv.getUri()));
     assertEquals(versionsWeWant.size(), jobVersionDAO.find(nsName, job.getName()).size());
   }
 
@@ -127,12 +127,12 @@ public class JobVersionDAOTest {
             UUID.randomUUID(), unrelatedJob.getGuid(), "http://random.version", UUID.randomUUID());
     List<JobVersion> versionsWeDontWant = Arrays.asList(dontWant1, dontWant2);
     versionsWeDontWant.forEach(
-        jv -> jobVersionDAO.insert(jv.getGuid(), jv.getVersion(), jv.getJobGuid(), jv.getURI()));
+        jv -> jobVersionDAO.insert(jv.getGuid(), jv.getVersion(), jv.getJobGuid(), jv.getUri()));
 
     // insert the job versions we want to fetch
     List<JobVersion> versionsWeWant = Arrays.asList(randomJobVersion(), randomJobVersion());
     versionsWeWant.forEach(
-        jv -> jobVersionDAO.insert(jv.getGuid(), jv.getVersion(), jv.getJobGuid(), jv.getURI()));
+        jv -> jobVersionDAO.insert(jv.getGuid(), jv.getVersion(), jv.getJobGuid(), jv.getUri()));
 
     assertEquals(versionsWeWant.size(), jobVersionDAO.find(nsName, job.getName()).size());
   }
@@ -145,12 +145,12 @@ public class JobVersionDAOTest {
         jobVersion1.getGuid(),
         jobVersion1.getVersion(),
         jobVersion1.getJobGuid(),
-        jobVersion1.getURI());
+        jobVersion1.getUri());
     jobVersionDAO.insert(
         jobVersion2.getGuid(),
         jobVersion2.getVersion(),
         jobVersion2.getJobGuid(),
-        jobVersion2.getURI());
+        jobVersion2.getUri());
     assertEquals(jobVersion2, jobVersionDAO.findLatest(nsName, job.getName()));
   }
 }

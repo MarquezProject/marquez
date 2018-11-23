@@ -48,7 +48,7 @@ public final class JobVersion {
     return jobGuid;
   }
 
-  public String getURI() {
+  public String getUri() {
     return uri;
   }
 
@@ -73,7 +73,7 @@ public final class JobVersion {
   }
 
   public static JobVersion create(CreateJobRunDefinitionRequest request) {
-    return new JobVersion(null, null, request.getURI(), null, null, null, null);
+    return new JobVersion(null, null, request.getUri(), null, null, null, null);
   }
 
   public UUID computeVersionGuid() {

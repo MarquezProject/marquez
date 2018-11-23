@@ -138,7 +138,7 @@ public class MarquezAppIntegrationTest {
       assertEquals(req.getName(), res.getName());
       assertEquals(req.getOwnerName(), res.getOwnerName());
       assertEquals(req.getRunArgsJson(), res.getRunArgsJson());
-      assertEquals(req.getURI(), res.getURI());
+      assertEquals(req.getUri(), res.getUri());
       assertEquals(req.getNominalStartTime(), res.getNominalTimeStart());
 
     } catch (IOException e) {

@@ -4,10 +4,11 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import lombok.Data;
 
+@Data
 public final class JobRun {
 
   private final UUID guid;
@@ -72,77 +73,5 @@ public final class JobRun {
     this.jobVersionGuid = jobVersionGuid;
     this.runArgsHexDigest = runArgsHexDigest;
     this.runArgs = runArgs;
-  }
-
-  public UUID getGuid() {
-    return guid;
-  }
-
-  public Timestamp getStartedAt() {
-    return startedAt;
-  }
-
-  public Timestamp getEndedAt() {
-    return endedAt;
-  }
-
-  public Integer getCurrentState() {
-    return currentState;
-  }
-
-  public UUID getJobVersionGuid() {
-    return jobVersionGuid;
-  }
-
-  public String getRunArgsHexDigest() {
-    return runArgsHexDigest;
-  }
-
-  public String runArgs() {
-    return runArgs;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) return true;
-    if (!(o instanceof JobRun)) return false;
-
-    final JobRun other = (JobRun) o;
-
-    return Objects.equals(guid, other.guid)
-        && Objects.equals(startedAt, other.startedAt)
-        && Objects.equals(endedAt, other.endedAt)
-        && Objects.equals(currentState, other.currentState)
-        && Objects.equals(jobVersionGuid, other.jobVersionGuid)
-        && Objects.equals(runArgsHexDigest, other.runArgsHexDigest);
-  }
-
-  public static boolean isValidJobTransition(
-      JobRunState.State oldState, JobRunState.State newState) {
-    return validTransitions.get(oldState).contains(newState);
-  }
-
-  public static boolean isValidJobTransition(Integer oldState, Integer newState) {
-    return isValidJobTransition(
-        JobRunState.State.fromInt(oldState), JobRunState.State.fromInt(newState));
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(guid, startedAt, endedAt, currentState, jobVersionGuid, runArgsHexDigest);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("JobRun{");
-    sb.append("guid=").append(guid);
-    sb.append("startedAt=").append(startedAt);
-    sb.append("endedAt=").append(endedAt);
-    sb.append("currentState=").append(currentState);
-    sb.append("jobVersionGuid=").append(jobVersionGuid);
-    sb.append("runArgsHexDigest=").append(runArgsHexDigest);
-    sb.append("}");
-    return sb.toString();
   }
 }

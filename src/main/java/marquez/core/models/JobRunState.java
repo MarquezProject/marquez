@@ -9,13 +9,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
+@Data
 public final class JobRunState {
-
   @JsonIgnore private final UUID guid;
 
   public enum State {
@@ -118,51 +118,5 @@ public final class JobRunState {
     this.transitionedAt = transitionedAt;
     this.jobRunGuid = jobRunGuid;
     this.state = state;
-  }
-
-  public Timestamp getTransitionedAt() {
-    return transitionedAt;
-  }
-
-  public UUID getJobRunGuid() {
-    return jobRunGuid;
-  }
-
-  public State getState() {
-    return state;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) return true;
-    if (!(o instanceof JobRunState)) return false;
-
-    final JobRunState other = (JobRunState) o;
-
-    return Objects.equals(transitionedAt, other.transitionedAt)
-        && Objects.equals(jobRunGuid, other.jobRunGuid)
-        && Objects.equals(state, other.state);
-  }
-
-  @JsonIgnore
-  public UUID getGuid() {
-    return guid;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(guid, transitionedAt, jobRunGuid, state);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("JobRunState{");
-    sb.append("guid=").append(guid);
-    sb.append("transitionedAt=").append(transitionedAt);
-    sb.append("jobRunGuid=").append(jobRunGuid);
-    sb.append("state=").append(state);
-    sb.append("}");
-    return sb.toString();
   }
 }

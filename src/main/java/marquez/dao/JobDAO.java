@@ -29,7 +29,7 @@ public interface JobDAO extends SqlObject {
                 .bind("guid", job.getGuid())
                 .bind("name", job.getName())
                 .bind("current_owner_name", job.getOwnerName())
-                .bind("namespace_guid", job.getNsGuid())
+                .bind("namespace_guid", job.getNamespaceGuid())
                 .execute();
           });
     } catch (Exception e) {

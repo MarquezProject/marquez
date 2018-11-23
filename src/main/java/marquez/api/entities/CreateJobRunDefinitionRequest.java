@@ -56,7 +56,7 @@ public final class CreateJobRunDefinitionRequest {
   }
 
   @JsonProperty("uri")
-  public String getURI() {
+  public String getUri() {
     return URI;
   }
 

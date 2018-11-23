@@ -73,7 +73,7 @@ public final class JobRunDefinitionResource extends BaseResource {
       return matchingJobVersion.getGuid();
     }
     UUID jobVersionGuid = UUID.randomUUID();
-    this.jobVersionDAO.insert(jobVersionGuid, computedVersion, job.getGuid(), request.getURI());
+    this.jobVersionDAO.insert(jobVersionGuid, computedVersion, job.getGuid(), request.getUri());
     return jobVersionGuid;
   }
 

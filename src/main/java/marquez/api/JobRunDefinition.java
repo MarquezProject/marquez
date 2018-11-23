@@ -46,7 +46,7 @@ public final class JobRunDefinition {
     return ownerName;
   }
 
-  public URI getURI() {
+  public URI getUri() {
     return uri;
   }
 
