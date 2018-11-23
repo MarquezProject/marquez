@@ -1,182 +1,183 @@
 package marquez.core.services;
 
-import marquez.core.exceptions.JobServiceException;
-import marquez.dao.JobDAO;
-import marquez.dao.JobVersionDAO;
-import marquez.dao.JobRunDAO;
-import marquez.dao.RunArgsDAO;
-import marquez.core.models.Job;
-import marquez.core.models.JobVersion;
-import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
-import marquez.core.models.RunArgs;
-import java.util.List;
-import java.util.UUID;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
+import java.util.List;
+import java.util.UUID;
+import marquez.core.exceptions.JobServiceException;
+import marquez.core.models.Job;
+import marquez.core.models.JobRun;
+import marquez.core.models.JobRunState;
+import marquez.core.models.JobVersion;
+import marquez.core.models.RunArgs;
+import marquez.dao.JobDAO;
+import marquez.dao.JobRunDAO;
+import marquez.dao.JobVersionDAO;
+import marquez.dao.RunArgsDAO;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 class JobService {
-    private JobDAO jobDAO;
-    private JobVersionDAO jobVersionDAO;
-    private JobRunDAO jobRunDAO;
-    private RunArgsDAO runArgsDAO;
-    static final Logger logger = LoggerFactory.getLogger(JobDAO.class);
+  private JobDAO jobDAO;
+  private JobVersionDAO jobVersionDAO;
+  private JobRunDAO jobRunDAO;
+  private RunArgsDAO runArgsDAO;
+  static final Logger logger = LoggerFactory.getLogger(JobDAO.class);
 
-    public JobService(JobDAO jobDAO, JobVersionDAO jobVersionDAO, JobRunDAO jobRunDAO, RunArgsDAO runArgsDAO) {
-        this.jobDAO = jobDAO;
-        this.jobVersionDAO = jobVersionDAO;
-        this.jobRunDAO = jobRunDAO;
-        this.runArgsDAO = runArgsDAO;
+  public JobService(
+      JobDAO jobDAO, JobVersionDAO jobVersionDAO, JobRunDAO jobRunDAO, RunArgsDAO runArgsDAO) {
+    this.jobDAO = jobDAO;
+    this.jobVersionDAO = jobVersionDAO;
+    this.jobRunDAO = jobRunDAO;
+    this.runArgsDAO = runArgsDAO;
+  }
+
+  //// PUBLIC METHODS ////
+
+  public Job create(String namespace, Job jobToCreate) throws JobServiceException {
+    Job job;
+    try {
+      job = this.jobDAO.findByName(jobToCreate.getName());
+      if (job == null) {
+        job = this.createJob(namespace, jobToCreate);
+      }
+      UUID versionID = JobService.computeVersion(job);
+      JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
+      if (existingJobVersion == null) {
+        this.createVersion(namespace, job, versionID);
+      }
+    } catch (UnableToExecuteStatementException e) {
+      String err = "failed to create new job";
+      logger.error(err, e);
+      throw new JobServiceException(err);
     }
 
-    //// PUBLIC METHODS ////
+    return job;
+  }
 
-    public Job create(String namespace, Job jobToCreate) throws JobServiceException {
-        Job job;
-        try {
-            job = this.jobDAO.findByName(jobToCreate.getName());
-            if (job == null) {
-                job = this.createJob(namespace, jobToCreate);
-            } 
-            UUID versionID = JobService.computeVersion(job);
-            JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
-            if (existingJobVersion == null) {
-              this.createVersion(namespace, job, versionID);
-            }
-        } catch (UnableToExecuteStatementException e) {
-            String err = "failed to create new job";
-            logger.error(err, e);
-            throw new JobServiceException(err);
-        }
-
-        return job;
+  public List<Job> getAll(String namespace) throws JobServiceException {
+    List<Job> jobs;
+    try {
+      jobs = this.jobDAO.findAllInNamespace(namespace);
+    } catch (UnableToExecuteStatementException e) {
+      logger.error("caught exception while fetching jobs in namespace ", e);
+      throw new JobServiceException("error fetching jobs");
     }
+    return jobs;
+  }
 
-    public List<Job> getAll(String namespace) throws JobServiceException {
-        List<Job> jobs;
-        try {
-            jobs = this.jobDAO.findAllInNamespace(namespace);
-        } catch (UnableToExecuteStatementException e) {
-            logger.error("caught exception while fetching jobs in namespace ", e);
-            throw new JobServiceException("error fetching jobs");
-        }
-        return jobs;
+  public List<JobVersion> getAllVersions(String namespace, String jobName)
+      throws JobServiceException {
+    List<JobVersion> jobVersions;
+    try {
+      jobVersions = this.jobVersionDAO.find(namespace, jobName);
+    } catch (UnableToExecuteStatementException e) {
+      logger.error("caught exception while fetching versions of job", e);
+      throw new JobServiceException("error fetching job versions");
     }
+    return jobVersions;
+  }
 
-    public List<JobVersion> getAllVersions(String namespace, String jobName) throws JobServiceException {
-        List<JobVersion> jobVersions;
-        try {
-            jobVersions = this.jobVersionDAO.find(namespace, jobName);
-        } catch (UnableToExecuteStatementException e) {
-            logger.error("caught exception while fetching versions of job", e);
-            throw new JobServiceException("error fetching job versions");
-        }
-        return jobVersions;     
+  public JobVersion getVersionLatest(String namespace, String jobName) throws JobServiceException {
+    JobVersion latestVersion;
+    try {
+      latestVersion = this.jobVersionDAO.findLatest(namespace, jobName);
+    } catch (UnableToExecuteStatementException e) {
+      String err = "error fetching latest version of job";
+      logger.error(err, e);
+      throw new JobServiceException(err);
     }
+    return latestVersion;
+  }
 
-    public JobVersion getVersionLatest(String namespace, String jobName) throws JobServiceException {
-        JobVersion latestVersion;
-        try {
-            latestVersion = this.jobVersionDAO.findLatest(namespace, jobName);
-        } catch (UnableToExecuteStatementException e) {
-            String err = "error fetching latest version of job";
-            logger.error(err, e);
-            throw new JobServiceException(err);
-        }
-        return latestVersion;      
+  public JobRun updateJobRunState(UUID jobRunID, JobRunState.State state)
+      throws JobServiceException {
+    try {
+      this.jobRunDAO.updateState(jobRunID, JobRunState.State.toInt(state));
+      return this.jobRunDAO.findJobRunById(jobRunID);
+    } catch (Exception e) {
+      String err = "error updating job run state";
+      logger.error(err, e);
+      throw new JobServiceException(err);
     }
+  }
 
-    public JobRun updateJobRunState(UUID jobRunID, JobRunState.State state) throws JobServiceException {
-        try {   
-            this.jobRunDAO.updateState(jobRunID, JobRunState.State.toInt(state));
-            return this.jobRunDAO.findJobRunById(jobRunID);
-        } catch (Exception e){
-            String err = "error updating job run state";
-            logger.error(err, e);
-            throw new JobServiceException(err);
-        }
+  public JobRun getJobRun(UUID jobRunID) throws JobServiceException {
+    JobRun jobRun;
+    try {
+      jobRun = this.jobRunDAO.findJobRunById(jobRunID);
+    } catch (Exception e) {
+      String err = "error fetching job run";
+      logger.error(err, e);
+      throw new JobServiceException(err);
     }
+    return jobRun;
+  }
 
-    public JobRun getJobRun(UUID jobRunID) throws JobServiceException {
-        JobRun jobRun;
-        try {
-            jobRun = this.jobRunDAO.findJobRunById(jobRunID);
-        } catch (Exception e) {
-            String err = "error fetching job run";
-            logger.error(err, e);
-            throw new JobServiceException(err);
-        }
-        return jobRun;
+  public JobRun createJobRun(String namespaceName, String jobName, String runArgsJson)
+      throws JobServiceException {
+    // get latest job version for job
+    try {
+      JobVersion latestJobVersion = getVersionLatest(namespaceName, jobName);
+      String runArgsDigest = computeRunArgsDigest(runArgsJson);
+      RunArgs runArgs = new RunArgs(runArgsDigest, runArgsJson);
+      if (!runArgsDAO.digestExists(runArgsDigest)) {
+        runArgsDAO.insert(runArgs);
+      }
+      JobRun jobRun =
+          new JobRun(
+              UUID.randomUUID(),
+              JobRunState.State.toInt(JobRunState.State.NEW),
+              latestJobVersion.getGuid(),
+              runArgsDigest,
+              runArgsJson);
+      jobRunDAO.insert(jobRun);
+      return jobRun;
+    } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e) {
+      String err = "error creating job run";
+      logger.error(err, e);
+      throw new JobServiceException(err);
     }
+  }
 
-    public JobRun createJobRun(String namespaceName, String jobName, String runArgsJson) throws JobServiceException {
-        // get latest job version for job
-        try{
-            JobVersion latestJobVersion = getVersionLatest(namespaceName, jobName);
-            String runArgsDigest = computeRunArgsDigest(runArgsJson);
-            RunArgs runArgs = new RunArgs(runArgsDigest, runArgsJson);
-            if (!runArgsDAO.digestExists(runArgsDigest)) {
-                runArgsDAO.insert(runArgs);
-            }
-            JobRun jobRun = new JobRun(
-                UUID.randomUUID(), 
-                JobRunState.State.toInt(JobRunState.State.NEW),
-                latestJobVersion.getGuid(), 
-                runArgsDigest, 
-                runArgsJson
-            );
-            jobRunDAO.insert(jobRun);
-            return jobRun;
-        } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e){
-            String err = "error creating job run";
-            logger.error(err, e);
-            throw new JobServiceException(err);
-        }
+  //// PRIVATE METHODS ////
+
+  protected static UUID computeVersion(Job job) {
+    byte[] raw = String.format("%s:%s", job.getGuid(), job.getLocation()).getBytes();
+    return UUID.nameUUIDFromBytes(raw);
+  }
+
+  protected String computeRunArgsDigest(String runArgsJson) throws NoSuchAlgorithmException {
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    byte[] hash = digest.digest(runArgsJson.getBytes(StandardCharsets.UTF_8));
+    return bytesToHex(hash);
+  }
+
+  protected String bytesToHex(byte[] hash) {
+    StringBuffer hexString = new StringBuffer();
+    for (int i = 0; i < hash.length; i++) {
+      String hex = Integer.toHexString(0xff & hash[i]);
+      if (hex.length() == 1) hexString.append('0');
+      hexString.append(hex);
     }
+    return hexString.toString();
+  }
 
+  private Job createJob(String namespace, Job job) throws JobServiceException {
+    this.jobDAO.insert(job);
+    return job;
+  }
 
-    //// PRIVATE METHODS ////
-
-    protected static UUID computeVersion(Job job) {
-        byte[] raw = String.format("%s:%s", job.getGuid(), job.getLocation()).getBytes();
-        return UUID.nameUUIDFromBytes(raw);    
+  private boolean createVersion(String namespace, Job job, UUID versionID) {
+    try {
+      this.jobVersionDAO.insert(UUID.randomUUID(), versionID, job.getGuid(), job.getLocation());
+    } catch (Exception e) {
+      String err = "error creating new job version";
+      logger.error(err, e);
+      return false;
     }
-
-    protected String computeRunArgsDigest(String runArgsJson) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(runArgsJson.getBytes(StandardCharsets.UTF_8));
-        return bytesToHex(hash);
-    }
-
-    protected String bytesToHex(byte[] hash){
-        StringBuffer hexString = new StringBuffer();
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-    
-    private Job createJob(String namespace, Job job) throws JobServiceException {
-        this.jobDAO.insert(job);
-        return job;
-    }
-
-    private boolean createVersion(String namespace, Job job, UUID versionID) {
-        try{
-            this.jobVersionDAO.insert(UUID.randomUUID(), versionID, job.getGuid(), job.getLocation());
-        } catch (Exception e) {
-            String err = "error creating new job version";
-            logger.error(err, e);
-            return false;
-        }
-        return true;
-    }
+    return true;
+  }
 }

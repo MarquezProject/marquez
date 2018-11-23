@@ -59,7 +59,8 @@ public final class JobRunDefinitionResource extends BaseResource {
       return matchingJob;
     }
     UUID jobGuid = UUID.randomUUID();
-    Job newJob = new Job(jobGuid, request.getName(), request.getOwnerName(), null, null, null, null);
+    Job newJob =
+        new Job(jobGuid, request.getName(), request.getOwnerName(), null, null, null, null);
     this.jobDAO.insert(newJob);
     return newJob;
   }

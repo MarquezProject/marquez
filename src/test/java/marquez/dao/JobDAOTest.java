@@ -1,17 +1,15 @@
 package marquez.dao;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Random;
-import java.util.List;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import marquez.core.models.Job;
-import marquez.dao.JobDAO;
 import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
@@ -29,36 +27,42 @@ public class JobDAOTest {
   @Before
   public void setUp() {
     APP.getJDBI()
-    .useHandle(
-        handle -> {
-          handle.execute(
-              "INSERT INTO namespaces(guid, name, current_ownership)"
-            + "VALUES (?, ?, ?);",  nsID, nsName, "Amaranta");
-        });
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  "INSERT INTO namespaces(guid, name, current_ownership)" + "VALUES (?, ?, ?);",
+                  nsID,
+                  nsName,
+                  "Amaranta");
+            });
   }
 
   @After
   public void tearDown() {
     APP.getJDBI()
-    .useHandle(
-        handle -> {
-          handle.execute("DELETE FROM jobs;");
-          handle.execute("DELETE FROM job_runs;");
-          handle.execute("DELETE FROM job_versions;");
-          handle.execute("DELETE FROM owners;");
-          handle.execute("DELETE FROM namespaces;");
-        });
+        .useHandle(
+            handle -> {
+              handle.execute("DELETE FROM jobs;");
+              handle.execute("DELETE FROM job_runs;");
+              handle.execute("DELETE FROM job_versions;");
+              handle.execute("DELETE FROM owners;");
+              handle.execute("DELETE FROM namespaces;");
+            });
   }
 
   // this is a simple insert outside of JobDAO we can use to test findByID
-  private void naiveInsertJob(Job job){
+  private void naiveInsertJob(Job job) {
     APP.getJDBI()
-    .useHandle(
-        handle -> {
-          handle.execute(
-              "INSERT INTO jobs(guid, name, current_owner_name, namespace_guid)"
-            + "VALUES (?, ?, ?, ?);",  job.getGuid(), job.getName(), job.getOwnerName(), nsID);
-        });
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  "INSERT INTO jobs(guid, name, current_owner_name, namespace_guid)"
+                      + "VALUES (?, ?, ?, ?);",
+                  job.getGuid(),
+                  job.getName(),
+                  job.getOwnerName(),
+                  nsID);
+            });
   }
 
   private Job randomJob() {
@@ -66,7 +70,7 @@ public class JobDAOTest {
     String name = "job" + String.valueOf(new Random().nextInt());
     String owner = "owner" + String.valueOf(new Random().nextInt());
     Timestamp nominalTime = new Timestamp(new Date(0).getTime());
-    String loc = "http://foo.bar/"+name;
+    String loc = "http://foo.bar/" + name;
     return new Job(id, name, owner, nominalTime, "", "", loc, nsID);
   }
 
@@ -104,9 +108,10 @@ public class JobDAOTest {
   @Test
   public void testFindAllInNamespace() {
     List<Job> jobs = Arrays.asList(randomJob(), randomJob(), randomJob());
-    jobs.forEach(job -> {
-      jobDAO.insert(job);
-    });
+    jobs.forEach(
+        job -> {
+          jobDAO.insert(job);
+        });
     List<Job> jobsFound = jobDAO.findAllInNamespace(nsName);
     assertEquals(jobs.size(), jobsFound.size());
     assertEquals(0, jobDAO.findAllInNamespace("nonexistent").size());

@@ -12,9 +12,8 @@ import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Test;
 import org.junit.Ignore;
-
+import org.junit.Test;
 
 public class JobRunDefinitionDAOTest {
 
@@ -88,7 +87,8 @@ public class JobRunDefinitionDAOTest {
     assertEquals(jrd, jobRunDefDAO.findByHash(jrd.computeDefinitionHash()));
   }
 
-  @Ignore @Test
+  @Ignore
+  @Test
   public void testFindByHash_Multi() {
     JobRunDefinition jrd1 = genRandomFixture();
     insertJobRunDefinition(jrd1);

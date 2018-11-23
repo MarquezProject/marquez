@@ -1,7 +1,7 @@
 package marquez.dao;
 
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 import marquez.core.models.Job;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
@@ -45,9 +45,11 @@ public interface JobDAO extends SqlObject {
   @SqlQuery("SELECT * FROM jobs WHERE name = :name")
   Job findByName(@Bind("name") String name);
 
-  String findAllByNamespaceNameSQL = "SELECT * "
-                                    + " FROM jobs j"
-                                    + " INNER JOIN namespaces n ON (j.namespace_guid = n.guid AND n.name = :ns_name)";
+  String findAllByNamespaceNameSQL =
+      "SELECT * "
+          + " FROM jobs j"
+          + " INNER JOIN namespaces n ON (j.namespace_guid = n.guid AND n.name = :ns_name)";
+
   @SqlQuery(findAllByNamespaceNameSQL)
   List<Job> findAllInNamespace(@Bind("ns_name") String namespaceName);
 }

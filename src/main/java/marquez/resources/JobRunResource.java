@@ -48,7 +48,12 @@ public class JobRunResource extends BaseResource {
     try {
       JobRun jobRun =
           new JobRun(
-              jobRunGuid, null, null, request.getRunDefinitionId(), toInt(JobRunState.State.NEW), null);
+              jobRunGuid,
+              null,
+              null,
+              request.getRunDefinitionId(),
+              toInt(JobRunState.State.NEW),
+              null);
       dao.insert(jobRun);
 
       CreateJobRunResponse res = new CreateJobRunResponse(jobRunGuid);

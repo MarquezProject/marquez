@@ -2,8 +2,6 @@ package marquez.dao;
 
 import java.util.UUID;
 import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
-
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
@@ -54,12 +52,14 @@ public interface JobRunDAO extends SqlObject {
       LOG.error(e.getMessage());
     }
   }
-  
-  String updateStateSQL = "UPDATE job_runs "
-                        + "SET current_state = :state, "
-                        + "SET started_at = CASE started_at WHEN NULL THEN CASE :state WHEN 1 THEN NOW() END ELSE started_at END, "
-                        + "SET ended_at = CASE WHEN NULL THEN CASE :state WHEN 2 THEN NOW() END ELSE ended_at END "
-                        + "where guid = :job_run_id";
+
+  String updateStateSQL =
+      "UPDATE job_runs "
+          + "SET current_state = :state, "
+          + "SET started_at = CASE started_at WHEN NULL THEN CASE :state WHEN 1 THEN NOW() END ELSE started_at END, "
+          + "SET ended_at = CASE WHEN NULL THEN CASE :state WHEN 2 THEN NOW() END ELSE ended_at END "
+          + "where guid = :job_run_id";
+
   default void updateState(UUID jobRunID, Integer state) {
     try (final Handle handle = getHandle()) {
       handle.useTransaction(
@@ -68,8 +68,7 @@ public interface JobRunDAO extends SqlObject {
                 .bind("job_run_id", jobRunID)
                 .bind("current_state", state)
                 .execute();
-            createJobRunStateDAO()
-                .insert(UUID.randomUUID(), jobRunID, state);
+            createJobRunStateDAO().insert(UUID.randomUUID(), jobRunID, state);
           });
     } catch (Exception e) {
       // TODO: Add better error handling

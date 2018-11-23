@@ -24,7 +24,7 @@ public class NamespaceRow implements RowMapper<Namespace> {
     } catch (ParseException e) {
       logger.error("failed to parse timestamp", e);
       createdAt = null;
-    }    
+    }
 
     return new Namespace(
         UUID.fromString(rs.getString("guid")),

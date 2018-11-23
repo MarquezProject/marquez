@@ -1,26 +1,16 @@
 package marquez.dao.deprecated;
 
-import static org.junit.Assert.assertEquals;
-
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Random;
-import java.util.UUID;
-import marquez.api.Job;
-import marquez.dao.JobDAO;
 import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Test;
 
 public class JobDAOTest {
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
   @Before
-  public void setUp() {
-  }
+  public void setUp() {}
 
   @After
   public void tearDown() {

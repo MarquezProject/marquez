@@ -62,8 +62,7 @@ public interface JobRunDAO extends SqlObject {
                 .bind("job_run_id", jobRunID)
                 .bind("current_state", state)
                 .execute();
-            createJobRunStateDAO()
-                .insert(UUID.randomUUID(), jobRunID, state);
+            createJobRunStateDAO().insert(UUID.randomUUID(), jobRunID, state);
           });
     } catch (Exception e) {
       // TODO: Add better error handling

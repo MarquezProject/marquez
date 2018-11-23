@@ -93,12 +93,12 @@ public final class JobRun {
   public UUID getJobVersionGuid() {
     return jobVersionGuid;
   }
-  
+
   public String getRunArgsHexDigest() {
     return runArgsHexDigest;
   }
 
-  public String runArgs(){
+  public String runArgs() {
     return runArgs;
   }
 

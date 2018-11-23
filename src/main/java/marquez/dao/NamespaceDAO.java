@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
 public interface NamespaceDAO extends SqlObject {
   static final Logger LOG = LoggerFactory.getLogger(NamespaceDAO.class);
 
-  @SqlUpdate("INSERT INTO namespaces(uuid, name, description, current_owner) VALUES(:namespace.name, :namespace.description, :namespace.currentOwner)")
+  @SqlUpdate(
+      "INSERT INTO namespaces(uuid, name, description, current_owner) VALUES(:namespace.name, :namespace.description, :namespace.currentOwner)")
   void insert(@BindBean("namespace") Namespace namespace);
 
   @SqlQuery("SELECT * FROM namespaces WHERE name = :name")

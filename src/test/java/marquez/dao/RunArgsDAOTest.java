@@ -1,8 +1,8 @@
 package marquez.dao;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import marquez.core.models.RunArgs;
 import marquez.dao.fixtures.AppWithPostgresRule;
@@ -21,39 +21,40 @@ public class RunArgsDAOTest {
   final RunArgs runArgs = new RunArgs(hexDigest, argsJson);
 
   @Before
-  public void setUp() {
-    }
+  public void setUp() {}
 
   @After
   public void tearDown() {
     APP.getJDBI()
-    .useHandle(
-        handle -> {
-          handle.execute("DELETE FROM job_run_args;");
-        });
+        .useHandle(
+            handle -> {
+              handle.execute("DELETE FROM job_run_args;");
+            });
   }
-
 
   @Test
   public void testFindByDigest() {
     APP.getJDBI()
-    .useHandle(
-        handle -> {
-          handle.execute("INSERT INTO job_run_args(hex_digest, args_json) VALUES(?, ?)", hexDigest, argsJson);
-        });      
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  "INSERT INTO job_run_args(hex_digest, args_json) VALUES(?, ?)",
+                  hexDigest,
+                  argsJson);
+            });
     assertEquals(runArgs, runArgsDAO.findByDigest(hexDigest));
   }
 
   @Test
   public void testInsert() {
-      runArgsDAO.insert(runArgs);
-      assertEquals(runArgs, runArgsDAO.findByDigest(hexDigest));
+    runArgsDAO.insert(runArgs);
+    assertEquals(runArgs, runArgsDAO.findByDigest(hexDigest));
   }
 
   @Test
   public void testDigestExists() {
-      runArgsDAO.insert(runArgs);
-      assertTrue(runArgsDAO.digestExists(hexDigest));
-      assertFalse(runArgsDAO.digestExists("non-existent"));
+    runArgsDAO.insert(runArgs);
+    assertTrue(runArgsDAO.digestExists(hexDigest));
+    assertFalse(runArgsDAO.digestExists("non-existent"));
   }
 }

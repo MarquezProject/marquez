@@ -5,20 +5,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.text.ParseException;
-
 import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.text.ParseException;
+<<<<<<< HEAD
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 import java.util.Date;
+=======
+>>>>>>> spotlessApply
 import java.text.SimpleDateFormat;
+import java.util.UUID;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.Ignore;
-
 
 @Ignore("TODO: Need to figure out why this started to fail. Please see issue #140")
 public class DatasetSerializationTest {

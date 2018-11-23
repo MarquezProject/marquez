@@ -47,28 +47,32 @@ public class JobTest {
 
   @Test
   public void testJobInequalityOnUUID() {
-    Job j2 = new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+    Job j2 =
+        new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
     AssertionsForClassTypes.assertThat(!JOB.equals(j2));
     AssertionsForClassTypes.assertThat(JOB.equals(JOB));
   }
 
   @Test
   public void testJobInequalityOnNonIDField() {
-    Job j2 = new Job(JOB_UUID, "some other name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+    Job j2 =
+        new Job(JOB_UUID, "some other name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
     AssertionsForClassTypes.assertThat(!JOB.equals(j2));
     AssertionsForClassTypes.assertThat(JOB.equals(JOB));
   }
 
   @Test
   public void testJobHashcodeInequality() {
-    Job j2 = new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+    Job j2 =
+        new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
     assertNotEquals(JOB.hashCode(), j2.hashCode());
   }
 
   @Test
   public void testJobHashcodeInequalityOnNonIdField() {
     Job j2 =
-        new Job(JOB_UUID, "some other job name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+        new Job(
+            JOB_UUID, "some other job name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
     assertNotEquals(JOB.hashCode(), j2.hashCode());
   }
 }
