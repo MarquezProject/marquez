@@ -44,20 +44,13 @@ class JobService {
             if (job == null) {
                 job = this.createJob(namespace, jobToCreate);
             } 
-        } catch (UnableToExecuteStatementException e) {
-            String err = "failed to create job";
-            logger.error(err, e);
-            throw new JobServiceException(err);
-        }
-
-        try{
             UUID versionID = JobService.computeVersion(job);
             JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
             if (existingJobVersion == null) {
               this.createVersion(namespace, job, versionID);
             }
         } catch (UnableToExecuteStatementException e) {
-            String err = "error finding/creating job version";
+            String err = "failed to create new job";
             logger.error(err, e);
             throw new JobServiceException(err);
         }
@@ -138,6 +131,7 @@ class JobService {
                 runArgsDigest, 
                 runArgsJson
             );
+            jobRunDAO.insert(jobRun);
             return jobRun;
         } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e){
             String err = "error creating job run";
