@@ -13,6 +13,14 @@ public class Namespace {
   private final String description;
   private final Timestamp createdAt;
 
+  public Namespace(UUID guid, String name, String ownerName, String description) {
+    this.guid = guid;
+    this.name = name;
+    this.ownerName = ownerName;
+    this.description = description;
+    this.createdAt = null;
+  }
+
   public Namespace(
       UUID guid, Timestamp createdAt, String name, String ownerName, String description) {
     this.guid = guid;
