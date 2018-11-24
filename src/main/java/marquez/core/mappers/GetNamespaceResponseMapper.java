@@ -9,6 +9,6 @@ public class GetNamespaceResponseMapper extends Mapper<Namespace, GetNamespaceRe
       new CoreNamespaceToApiNamespaceMapper();
 
   public GetNamespaceResponse map(@NotNull Namespace namespace) {
-    return new GetNamespaceResponse(namespaceMapper.mapIfPresent(namespace).get());
+    return new GetNamespaceResponse(namespaceMapper.map(namespace));
   }
 }
