@@ -14,13 +14,10 @@ import marquez.core.services.NamespaceService;
 import marquez.dao.deprecated.DatasetDAO;
 import marquez.dao.deprecated.JobDAO;
 import marquez.dao.deprecated.JobRunDAO;
-import marquez.dao.deprecated.JobRunDefinitionDAO;
-import marquez.dao.deprecated.JobVersionDAO;
 import marquez.dao.deprecated.OwnerDAO;
 import marquez.resources.DatasetResource;
 import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
-import marquez.resources.JobRunDefinitionResource;
 import marquez.resources.JobRunResource;
 import marquez.resources.NamespaceResource;
 import marquez.resources.OwnerResource;
@@ -118,12 +115,6 @@ public class MarquezApp extends Application<MarquezConfig> {
 
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));
-
-    final JobRunDefinitionDAO jobRunDefinitionDAO = jdbi.onDemand(JobRunDefinitionDAO.class);
-    final JobVersionDAO jobVersionDAO = jdbi.onDemand(JobVersionDAO.class);
-    env.jersey()
-        .register(
-            new JobRunDefinitionResource(jobRunDefinitionDAO, jobVersionDAO, jobDAO, ownerDAO));
 
     final NamespaceService namespaceService = new NamespaceService();
     env.jersey().register(new NamespaceResource(namespaceService));
