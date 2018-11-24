@@ -1,6 +1,7 @@
 package marquez.core.mappers;
 
-import javax.validation.constraints.NotNull;
+import static java.util.Objects.requireNonNull;
+
 import marquez.api.GetNamespaceResponse;
 import marquez.core.models.Namespace;
 
@@ -11,7 +12,8 @@ public class GetNamespaceResponseMapper extends Mapper<Namespace, GetNamespaceRe
       new CoreNamespaceToApiNamespaceMapper();
 
   // TODO: GetNamespaceResponseMapper.map() should accept marquez.api.models.Namespace instead
-  public GetNamespaceResponse map(@NotNull Namespace namespace) {
+  public GetNamespaceResponse map(Namespace namespace) {
+    requireNonNull(namespace, "namespace must not be null");
     return new GetNamespaceResponse(namespaceMapper.map(namespace));
   }
 }
