@@ -1,12 +1,13 @@
 package marquez.core.mappers;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
-import javax.validation.constraints.NotNull;
 
 public abstract class Mapper<A, B> {
-  public Optional<B> mapIfPresent(@NotNull A value) {
-    return Optional.ofNullable(map(value));
+  public Optional<B> mapIfPresent(A value) {
+    return Optional.ofNullable(map(requireNonNull(value)));
   }
 
-  public abstract B map(@NotNull A value);
+  public abstract B map(A value);
 }
