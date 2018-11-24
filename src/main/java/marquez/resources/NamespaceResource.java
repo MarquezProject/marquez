@@ -53,7 +53,7 @@ public class NamespaceResource extends BaseResource {
       Namespace n =
           namespaceService.create(namespace, request.getOwner(), request.getDescription());
       return Response.status(Response.Status.OK)
-          .entity(new CreateNamespaceResponse(namespaceMapper.mapIfPresent(n).get()))
+          .entity(new CreateNamespaceResponse(namespaceMapper.map(n)))
           .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException e) {
