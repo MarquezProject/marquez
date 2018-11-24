@@ -1,9 +1,12 @@
 package marquez.core.mappers;
 
 import java.util.Optional;
+import javax.validation.constraints.NotNull;
 
-interface Mapper<A, B> {
-  B map(A value);
+public abstract class Mapper<A, B> {
+  public Optional<B> mapIfPresent(@NotNull A value) {
+    return Optional.ofNullable(map(value));
+  }
 
-  Optional<B> mapIfPresent(A value);
+  public abstract B map(A value);
 }
