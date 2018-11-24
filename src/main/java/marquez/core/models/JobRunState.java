@@ -1,8 +1,5 @@
 package marquez.core.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,12 +8,25 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public final class JobRunState {
-  @JsonIgnore private final UUID guid;
+  private final UUID guid;
+  private final Timestamp transitionedAt;
+  private final UUID jobRunGuid;
+  private final State state;
+
+  public JobRunState(
+      final UUID guid,
+      final Timestamp transitionedAt,
+      final UUID jobRunGuid,
+      final JobRunState.State state) {
+    this.guid = guid;
+    this.transitionedAt = transitionedAt;
+    this.jobRunGuid = jobRunGuid;
+    this.state = state;
+  }
 
   public enum State {
     NEW {
@@ -102,21 +112,5 @@ public final class JobRunState {
     public static State fromInt(Integer stateInt) {
       return intToStateMap.get(stateInt);
     }
-  }
-
-  @NotNull private final Timestamp transitionedAt;
-  @NotNull private final UUID jobRunGuid;
-  @NotNull private final State state;
-
-  @JsonCreator
-  public JobRunState(
-      final UUID guid,
-      @JsonProperty("transitionedAt") final Timestamp transitionedAt,
-      @JsonProperty("jobRunGuid") final UUID jobRunGuid,
-      @JsonProperty("state") final State state) {
-    this.guid = guid;
-    this.transitionedAt = transitionedAt;
-    this.jobRunGuid = jobRunGuid;
-    this.state = state;
   }
 }
