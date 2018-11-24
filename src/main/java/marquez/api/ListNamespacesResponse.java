@@ -20,7 +20,7 @@ public class ListNamespacesResponse {
   public List<marquez.api.Namespace> getNamespaces() {
     return namespaces
         .stream()
-        .map(namespaceMapper::map)
+        .map(namespaceMapper::mapIfPresent)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
