@@ -8,5 +8,5 @@ public abstract class Mapper<A, B> {
     return Optional.ofNullable(map(value));
   }
 
-  public abstract B map(A value);
+  public abstract B map(@NotNull A value);
 }
