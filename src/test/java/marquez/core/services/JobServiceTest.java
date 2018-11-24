@@ -2,13 +2,16 @@ package marquez.core.services;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +19,8 @@ import java.util.List;
 import java.util.UUID;
 import marquez.core.exceptions.JobServiceException;
 import marquez.core.models.Job;
+import marquez.core.models.JobRun;
+import marquez.core.models.JobRunState;
 import marquez.core.models.JobVersion;
 import marquez.dao.JobDAO;
 import marquez.dao.JobRunDAO;
@@ -271,6 +276,15 @@ public class JobServiceTest {
   }
 
   @Test(expected = JobServiceException.class)
+  public void testCreateJobRun() throws Exception {
+    String runArgsJson = "{'foo': 1}";
+    String jobName = "a job";
+    JobService jobService = spy(this.jobService);
+    when(jobService.computeRunArgsDigest(runArgsJson)).thenThrow(NoSuchAlgorithmException.class);
+    jobService.createJobRun(TEST_NS, jobName, runArgsJson);
+  }
+
+  @Test(expected = JobServiceException.class)
   public void testCreate_JobVersionDAOException() throws Exception {
     Job job =
         new Job(
@@ -290,8 +304,66 @@ public class JobServiceTest {
   }
 
   @Test(expected = JobServiceException.class)
+  public void testCreate_JobVersionInsertException() throws Exception {
+    Job job =
+        new Job(
+            UUID.randomUUID(),
+            "job",
+            "owner",
+            new Timestamp(new Date(0).getTime()),
+            null,
+            null,
+            "http://foo.com",
+            namespaceID);
+    when(jobDAO.findByName(job.getName())).thenReturn(job);
+    when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
+    doThrow(UnableToExecuteStatementException.class)
+        .when(jobVersionDAO)
+        .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
+    jobService.create(TEST_NS, job);
+  }
+
+  @Test(expected = JobServiceException.class)
   public void testGetAll_Exception() throws Exception {
     when(jobDAO.findAllInNamespace(TEST_NS)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getAll(TEST_NS);
+  }
+
+  @Test
+  public void testGetJobRun() throws Exception {
+    JobRun jobRun =
+        new JobRun(
+            UUID.randomUUID(),
+            JobRunState.State.toInt(JobRunState.State.NEW),
+            UUID.randomUUID(),
+            "abc123",
+            "{'foo': 1}");
+    when(jobRunDAO.findJobRunById(jobRun.getGuid())).thenReturn(jobRun);
+    assertEquals(jobRun, jobService.getJobRun(jobRun.getGuid()));
+  }
+
+  @Test(expected = JobServiceException.class)
+  public void testGetJobRun_SQLException() throws Exception {
+    UUID jobRunID = UUID.randomUUID();
+    when(jobRunDAO.findJobRunById(jobRunID)).thenThrow(UnableToExecuteStatementException.class);
+    jobService.getJobRun(jobRunID);
+  }
+
+  @Test(expected = JobServiceException.class)
+  public void testGetVersionLatest_Exception() throws Exception {
+    String jobName = "a job";
+    when(jobVersionDAO.findLatest(TEST_NS, jobName))
+        .thenThrow(UnableToExecuteStatementException.class);
+    jobService.getVersionLatest(TEST_NS, jobName);
+  }
+
+  @Test(expected = JobServiceException.class)
+  public void testUpdateJobRunState_Exception() throws Exception {
+    UUID jobRunID = UUID.randomUUID();
+    JobRunState.State state = JobRunState.State.NEW;
+    doThrow(UnableToExecuteStatementException.class)
+        .when(jobRunDAO)
+        .updateState(jobRunID, JobRunState.State.toInt(state));
+    jobService.updateJobRunState(jobRunID, state);
   }
 }

@@ -46,15 +46,14 @@ class JobService {
       UUID versionID = JobService.computeVersion(job);
       JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
       if (existingJobVersion == null) {
-        this.createVersion(namespace, job, versionID);
+        this.jobVersionDAO.insert(UUID.randomUUID(), versionID, job.getGuid(), job.getLocation());
       }
+      return job;
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to create new job";
       logger.error(err, e);
       throw new JobServiceException(err);
     }
-
-    return job;
   }
 
   public List<Job> getAll(String namespace) throws JobServiceException {
@@ -81,15 +80,13 @@ class JobService {
   }
 
   public JobVersion getVersionLatest(String namespace, String jobName) throws JobServiceException {
-    JobVersion latestVersion;
     try {
-      latestVersion = this.jobVersionDAO.findLatest(namespace, jobName);
+      return this.jobVersionDAO.findLatest(namespace, jobName);
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching latest version of job";
       logger.error(err, e);
       throw new JobServiceException(err);
     }
-    return latestVersion;
   }
 
   public JobRun updateJobRunState(UUID jobRunID, JobRunState.State state)
@@ -108,24 +105,24 @@ class JobService {
     JobRun jobRun;
     try {
       jobRun = this.jobRunDAO.findJobRunById(jobRunID);
+      return jobRun;
     } catch (Exception e) {
       String err = "error fetching job run";
       logger.error(err, e);
       throw new JobServiceException(err);
     }
-    return jobRun;
   }
 
   public JobRun createJobRun(String namespaceName, String jobName, String runArgsJson)
       throws JobServiceException {
     // get latest job version for job
     try {
-      JobVersion latestJobVersion = getVersionLatest(namespaceName, jobName);
       String runArgsDigest = computeRunArgsDigest(runArgsJson);
       RunArgs runArgs = new RunArgs(runArgsDigest, runArgsJson);
       if (!runArgsDAO.digestExists(runArgsDigest)) {
         runArgsDAO.insert(runArgs);
       }
+      JobVersion latestJobVersion = getVersionLatest(namespaceName, jobName);
       JobRun jobRun =
           new JobRun(
               UUID.randomUUID(),
@@ -168,16 +165,5 @@ class JobService {
   private Job createJob(String namespace, Job job) throws JobServiceException {
     this.jobDAO.insert(job);
     return job;
-  }
-
-  private boolean createVersion(String namespace, Job job, UUID versionID) {
-    try {
-      this.jobVersionDAO.insert(UUID.randomUUID(), versionID, job.getGuid(), job.getLocation());
-    } catch (Exception e) {
-      String err = "error creating new job version";
-      logger.error(err, e);
-      return false;
-    }
-    return true;
   }
 }
