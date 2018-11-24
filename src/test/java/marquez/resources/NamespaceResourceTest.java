@@ -96,7 +96,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     Response res = namespaceResource.listNamespaces();
     ListNamespacesResponse responseBody = (ListNamespacesResponse) res.getEntity();
 
-    marquez.api.Namespace expectedApiNamespace = namespaceMapper.mapIfPresent(TEST_NAMESPACE).get();
+    marquez.api.Namespace expectedApiNamespace = namespaceMapper.map(TEST_NAMESPACE);
     assertThat(responseBody.getNamespaces()).contains(expectedApiNamespace);
   }
 
@@ -138,8 +138,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
     Response res = namespaceResource.listNamespaces();
     ListNamespacesResponse responseBody = (ListNamespacesResponse) res.getEntity();
-    marquez.api.Namespace nsResponse = namespaceMapper.mapIfPresent(TEST_NAMESPACE).get();
-    marquez.api.Namespace secondNsResponse = namespaceMapper.mapIfPresent(secondNamespace).get();
+    marquez.api.Namespace nsResponse = namespaceMapper.map(TEST_NAMESPACE);
+    marquez.api.Namespace secondNsResponse = namespaceMapper.map(secondNamespace);
 
     assertThat(responseBody.getNamespaces()).containsExactly(nsResponse, secondNsResponse);
   }
