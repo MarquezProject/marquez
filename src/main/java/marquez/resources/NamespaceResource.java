@@ -72,7 +72,7 @@ public class NamespaceResource extends BaseResource {
       if (n.isPresent()) {
         Namespace returnedNamespace = n.get();
         return Response.status(Response.Status.OK)
-            .entity(getNamespaceResponseMapper.mapIfPresent(returnedNamespace).get())
+            .entity(getNamespaceResponseMapper.map(returnedNamespace))
             .type(APPLICATION_JSON)
             .build();
       } else {

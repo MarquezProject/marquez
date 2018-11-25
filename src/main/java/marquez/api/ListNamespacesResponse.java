@@ -22,7 +22,7 @@ public class ListNamespacesResponse {
     // TODO: simplify to just: return namespaces;
     return namespaces
         .stream()
-        .map(namespaceMapper::mapIfPresent)
+        .map(namespaceMapper::mapAsOptional)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
