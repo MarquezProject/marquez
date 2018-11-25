@@ -40,7 +40,7 @@ public class MapperTest {
         }
       };
 
-  static final class A {}
+  private static final class A {}
 
-  static final class B {}
+  private static final class B {}
 }
