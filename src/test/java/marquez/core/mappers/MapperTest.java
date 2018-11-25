@@ -27,6 +27,12 @@ public class MapperTest {
     assertTrue(optB.isPresent());
   }
 
+  @Test(expected = NullPointerException.class)
+  public void testMapIfPresentFromNull() {
+    Optional<A> nullOptA = null;
+    B_MAPPER.mapIfPresent(nullOptA);
+  }
+
   private static final Mapper<A, B> B_MAPPER =
       new Mapper<A, B>() {
         public B map(A value) {

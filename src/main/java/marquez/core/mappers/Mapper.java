@@ -1,5 +1,7 @@
 package marquez.core.mappers;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 
 public abstract class Mapper<A, B> {
@@ -8,7 +10,7 @@ public abstract class Mapper<A, B> {
   }
 
   public Optional<B> mapIfPresent(Optional<A> value) {
-    return value.map(this::map);
+    return requireNonNull(value).map(this::map);
   }
 
   public abstract B map(A value);
