@@ -24,11 +24,10 @@ public interface JobDAO extends SqlObject {
       handle.useTransaction(
           h -> {
             h.createUpdate(
-                    "INSERT INTO jobs (guid, name, current_owner_name, namespace_guid)"
-                        + " VALUES (:guid, :name, :current_owner_name, :namespace_guid)")
+                    "INSERT INTO jobs (guid, name, namespace_guid)"
+                        + " VALUES (:guid, :name, :namespace_guid)")
                 .bind("guid", job.getGuid())
                 .bind("name", job.getName())
-                .bind("current_owner_name", job.getOwnerName())
                 .bind("namespace_guid", job.getNamespaceGuid())
                 .execute();
           });

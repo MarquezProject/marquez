@@ -6,16 +6,11 @@ import java.util.UUID;
 
 class Generator {
   public static Job genJob() {
-    return new Job(UUID.randomUUID(), "a job", "an owner", "http://foo.bar/", UUID.randomUUID());
+    return new Job(UUID.randomUUID(), "a job", "http://foo.bar/", UUID.randomUUID());
   }
 
   public static Job cloneJob(Job job) {
-    return new Job(
-        job.getGuid(),
-        job.getName(),
-        job.getOwnerName(),
-        job.getLocation(),
-        job.getNamespaceGuid());
+    return new Job(job.getGuid(), job.getName(), job.getLocation(), job.getNamespaceGuid());
   }
 
   public static JobRun genJobRun() {

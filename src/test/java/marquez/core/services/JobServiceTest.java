@@ -63,7 +63,6 @@ public class JobServiceTest {
         new Job(
             UUID.randomUUID(),
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             "category",
             "a job",
@@ -73,7 +72,6 @@ public class JobServiceTest {
         new Job(
             UUID.randomUUID(),
             "job2",
-            "owner2",
             new Timestamp(new Date(0).getTime()),
             "category",
             "a job2",
@@ -144,7 +142,6 @@ public class JobServiceTest {
         new Job(
             UUID.randomUUID(),
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,
@@ -161,7 +158,6 @@ public class JobServiceTest {
         new Job(
             UUID.randomUUID(),
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,
@@ -171,7 +167,6 @@ public class JobServiceTest {
         new Job(
             null,
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,
@@ -190,7 +185,6 @@ public class JobServiceTest {
         new Job(
             UUID.randomUUID(),
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,
@@ -200,7 +194,6 @@ public class JobServiceTest {
         new Job(
             null,
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,
@@ -225,7 +218,6 @@ public class JobServiceTest {
         new Job(
             UUID.randomUUID(),
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,
@@ -235,7 +227,6 @@ public class JobServiceTest {
         new Job(
             null,
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,
@@ -265,7 +256,6 @@ public class JobServiceTest {
         new Job(
             UUID.randomUUID(),
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,
@@ -290,7 +280,6 @@ public class JobServiceTest {
         new Job(
             UUID.randomUUID(),
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,
@@ -309,7 +298,6 @@ public class JobServiceTest {
         new Job(
             UUID.randomUUID(),
             "job",
-            "owner",
             new Timestamp(new Date(0).getTime()),
             null,
             null,

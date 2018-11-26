@@ -15,7 +15,6 @@ public final class JobRow implements RowMapper<Job> {
     return new Job(
         UUID.fromString(rs.getString("guid")),
         rs.getString("name"),
-        rs.getString("current_owner_name"),
         new Timestamp(new Date(0).getTime()),
         "",
         "",

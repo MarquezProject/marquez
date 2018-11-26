@@ -60,7 +60,7 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void testCreate() {
-    Job job = new Job(UUID.randomUUID(), "a job", "an owner", "http://foo.bar", namespaceID);
+    Job job = new Job(UUID.randomUUID(), "a job", "http://foo.bar", namespaceID);
     try {
       jobService.create(namespaceName, job);
     } catch (JobServiceException e) {
@@ -76,7 +76,7 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void createAndUpdateJobRun() {
-    Job job = new Job(UUID.randomUUID(), "a job", "an owner", "http://foo.bar", namespaceID);
+    Job job = new Job(UUID.randomUUID(), "a job", "http://foo.bar", namespaceID);
     try {
       String runArgsJson = "{'foo': 1}";
       jobService.create(namespaceName, job);

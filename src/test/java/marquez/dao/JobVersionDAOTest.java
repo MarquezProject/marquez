@@ -28,7 +28,6 @@ public class JobVersionDAOTest {
       new Job(
           UUID.randomUUID(),
           "a job",
-          "an owner",
           new Timestamp(new Date(0).getTime()),
           "category",
           "description",
@@ -112,7 +111,6 @@ public class JobVersionDAOTest {
         new Job(
             UUID.randomUUID(),
             "unrelated job",
-            "unrelated owner",
             new Timestamp(new Date(0).getTime()),
             "category",
             "description",
