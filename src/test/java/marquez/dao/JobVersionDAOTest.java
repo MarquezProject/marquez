@@ -3,9 +3,7 @@ package marquez.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import marquez.core.models.Job;
@@ -24,15 +22,7 @@ public class JobVersionDAOTest {
   final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
-  final Job job =
-      new Job(
-          UUID.randomUUID(),
-          "a job",
-          new Timestamp(new Date(0).getTime()),
-          "category",
-          "description",
-          "http://foo.com",
-          nsID);
+  final Job job = new Job(UUID.randomUUID(), "a job", "description", "http://foo.com", nsID);
 
   @Before
   public void setUp() {
@@ -108,14 +98,7 @@ public class JobVersionDAOTest {
   public void testFind_Multi() {
     // add some unrelated jobs and job versions
     Job unrelatedJob =
-        new Job(
-            UUID.randomUUID(),
-            "unrelated job",
-            new Timestamp(new Date(0).getTime()),
-            "category",
-            "description",
-            "http://unrelated.job",
-            nsID);
+        new Job(UUID.randomUUID(), "unrelated job", "description", "http://unrelated.job", nsID);
     jobDAO.insert(unrelatedJob);
     JobVersion dontWant1 =
         new JobVersion(

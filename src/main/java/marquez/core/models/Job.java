@@ -1,6 +1,5 @@
 package marquez.core.models;
 
-import java.sql.Timestamp;
 import java.util.UUID;
 import lombok.Data;
 
@@ -8,8 +7,6 @@ import lombok.Data;
 public final class Job {
   private final UUID guid;
   private final String name;
-  private final Timestamp nominalTime;
-  private final String category;
   private final String description;
   private final String location;
   private final UUID namespaceGuid;
@@ -17,8 +14,6 @@ public final class Job {
   public Job(final UUID guid, final String name, final String location, final UUID namespaceGuid) {
     this.guid = guid;
     this.name = name;
-    this.nominalTime = null;
-    this.category = null;
     this.description = null;
     this.location = location;
     this.namespaceGuid = namespaceGuid;
@@ -27,15 +22,11 @@ public final class Job {
   public Job(
       final UUID guid,
       final String name,
-      final Timestamp nominalTime,
-      final String category,
       final String description,
       final String location,
       final UUID namespaceGuid) {
     this.guid = guid;
     this.name = name;
-    this.nominalTime = nominalTime;
-    this.category = category;
     this.description = description;
     this.location = location;
     this.namespaceGuid = namespaceGuid;

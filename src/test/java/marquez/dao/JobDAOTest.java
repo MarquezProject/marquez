@@ -69,7 +69,7 @@ public class JobDAOTest {
     String owner = "owner" + String.valueOf(new Random().nextInt());
     Timestamp nominalTime = new Timestamp(new Date(0).getTime());
     String loc = "http://foo.bar/" + name;
-    return new Job(id, name, nominalTime, "", "", loc, nsID);
+    return new Job(id, name, "", loc, nsID);
   }
 
   private void assertJobFieldsMatch(Job job1, Job job2) {

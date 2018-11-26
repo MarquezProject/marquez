@@ -59,24 +59,8 @@ public class JobServiceTest {
   @Test
   public void testGetAll_OK() throws Exception {
     List<Job> jobs = new ArrayList<Job>();
-    jobs.add(
-        new Job(
-            UUID.randomUUID(),
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            "category",
-            "a job",
-            null,
-            namespaceID));
-    jobs.add(
-        new Job(
-            UUID.randomUUID(),
-            "job2",
-            new Timestamp(new Date(0).getTime()),
-            "category",
-            "a job2",
-            null,
-            namespaceID));
+    jobs.add(new Job(UUID.randomUUID(), "job", "a job", null, namespaceID));
+    jobs.add(new Job(UUID.randomUUID(), "job2", "a job2", null, namespaceID));
     when(jobDAO.findAllInNamespace(TEST_NS)).thenReturn(jobs);
 
     Assert.assertEquals(jobs, jobService.getAll(TEST_NS));
@@ -138,15 +122,7 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_NewJob_OK() throws Exception {
-    Job job =
-        new Job(
-            UUID.randomUUID(),
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
+    Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
     when(jobDAO.findByName("job")).thenReturn(null);
     jobService.create(TEST_NS, job);
     verify(jobDAO).insert(job);
@@ -154,24 +130,8 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_JobFound_OK() throws Exception {
-    Job existingJob =
-        new Job(
-            UUID.randomUUID(),
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
-    Job newJob =
-        new Job(
-            null,
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
+    Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
+    Job newJob = new Job(null, "job", null, "http://foo.com", namespaceID);
     when(jobDAO.findByName("job")).thenReturn(existingJob);
     Job jobCreated = jobService.create(TEST_NS, newJob);
     verify(jobDAO, never()).insert(newJob);
@@ -181,24 +141,8 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_NewVersion_OK() throws Exception {
-    Job existingJob =
-        new Job(
-            UUID.randomUUID(),
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
-    Job newJob =
-        new Job(
-            null,
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
+    Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
+    Job newJob = new Job(null, "job", null, "http://foo.com", namespaceID);
     UUID existingJobVersion = JobService.computeVersion(existingJob);
     when(jobDAO.findByName("job")).thenReturn(existingJob);
     when(jobVersionDAO.findByVersion(existingJobVersion)).thenReturn(null);
@@ -214,24 +158,8 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_VersionFound_OK() throws Exception {
-    Job existingJob =
-        new Job(
-            UUID.randomUUID(),
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
-    Job newJob =
-        new Job(
-            null,
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
+    Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
+    Job newJob = new Job(null, "job", null, "http://foo.com", namespaceID);
     UUID existingJobVersionID = JobService.computeVersion(existingJob);
     JobVersion existingJobVersion =
         new JobVersion(
@@ -252,15 +180,7 @@ public class JobServiceTest {
 
   @Test(expected = JobServiceException.class)
   public void testCreate_JobDAOException() throws Exception {
-    Job job =
-        new Job(
-            UUID.randomUUID(),
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
+    Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
     when(jobDAO.findByName("job")).thenThrow(UnableToExecuteStatementException.class);
     jobService.create(TEST_NS, job);
   }
@@ -276,15 +196,7 @@ public class JobServiceTest {
 
   @Test(expected = JobServiceException.class)
   public void testCreate_JobVersionDAOException() throws Exception {
-    Job job =
-        new Job(
-            UUID.randomUUID(),
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
+    Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
     UUID jobVersionID = JobService.computeVersion(job);
     when(jobDAO.findByName("job")).thenReturn(job);
     when(jobVersionDAO.findByVersion(jobVersionID))
@@ -294,15 +206,7 @@ public class JobServiceTest {
 
   @Test(expected = JobServiceException.class)
   public void testCreate_JobVersionInsertException() throws Exception {
-    Job job =
-        new Job(
-            UUID.randomUUID(),
-            "job",
-            new Timestamp(new Date(0).getTime()),
-            null,
-            null,
-            "http://foo.com",
-            namespaceID);
+    Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
     when(jobDAO.findByName(job.getName())).thenReturn(job);
     when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
     doThrow(UnableToExecuteStatementException.class)
