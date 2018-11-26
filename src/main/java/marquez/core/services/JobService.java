@@ -41,7 +41,8 @@ class JobService {
     try {
       job = this.jobDAO.findByName(jobToCreate.getName());
       if (job == null) {
-        job = this.createJob(namespace, jobToCreate);
+        this.jobDAO.insert(jobToCreate);
+        job = jobToCreate;
       }
       UUID versionID = JobService.computeVersion(job);
       JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
@@ -59,24 +60,22 @@ class JobService {
   public List<Job> getAll(String namespace) throws JobServiceException {
     List<Job> jobs;
     try {
-      jobs = this.jobDAO.findAllInNamespace(namespace);
+      return this.jobDAO.findAllInNamespace(namespace);
     } catch (UnableToExecuteStatementException e) {
       logger.error("caught exception while fetching jobs in namespace ", e);
       throw new JobServiceException("error fetching jobs");
     }
-    return jobs;
   }
 
   public List<JobVersion> getAllVersions(String namespace, String jobName)
       throws JobServiceException {
     List<JobVersion> jobVersions;
     try {
-      jobVersions = this.jobVersionDAO.find(namespace, jobName);
+      return this.jobVersionDAO.find(namespace, jobName);
     } catch (UnableToExecuteStatementException e) {
       logger.error("caught exception while fetching versions of job", e);
       throw new JobServiceException("error fetching job versions");
     }
-    return jobVersions;
   }
 
   public JobVersion getVersionLatest(String namespace, String jobName) throws JobServiceException {
@@ -104,8 +103,7 @@ class JobService {
   public JobRun getJobRun(UUID jobRunID) throws JobServiceException {
     JobRun jobRun;
     try {
-      jobRun = this.jobRunDAO.findJobRunById(jobRunID);
-      return jobRun;
+      return this.jobRunDAO.findJobRunById(jobRunID);
     } catch (Exception e) {
       String err = "error fetching job run";
       logger.error(err, e);
@@ -142,8 +140,8 @@ class JobService {
   //// PRIVATE METHODS ////
 
   protected static UUID computeVersion(Job job) {
-    byte[] raw = String.format("%s:%s", job.getGuid(), job.getLocation()).getBytes();
-    return UUID.nameUUIDFromBytes(raw);
+    return UUID.nameUUIDFromBytes(
+        String.format("%s:%s", job.getGuid(), job.getLocation()).getBytes());
   }
 
   protected String computeRunArgsDigest(String runArgsJson) throws NoSuchAlgorithmException {
@@ -160,10 +158,5 @@ class JobService {
       hexString.append(hex);
     }
     return hexString.toString();
-  }
-
-  private Job createJob(String namespace, Job job) throws JobServiceException {
-    this.jobDAO.insert(job);
-    return job;
   }
 }
