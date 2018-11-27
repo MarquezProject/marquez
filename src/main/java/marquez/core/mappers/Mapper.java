@@ -9,7 +9,7 @@ public abstract class Mapper<A, B> {
     return Optional.ofNullable(map(value));
   }
 
-  public Optional<B> map(Optional<A> value) {
+  public Optional<B> mapIfPresent(Optional<A> value) {
     return requireNonNull(value).map(this::map);
   }
 

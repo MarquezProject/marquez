@@ -23,14 +23,14 @@ public class MapperTest {
   @Test
   public void testMapFromOptional() {
     Optional<A> optA = Optional.of(new A());
-    Optional<B> optB = B_MAPPER.map(optA);
+    Optional<B> optB = B_MAPPER.mapIfPresent(optA);
     assertTrue(optB.isPresent());
   }
 
   @Test(expected = NullPointerException.class)
   public void testMapThrowOnNull() {
     Optional<A> nullOptA = null;
-    B_MAPPER.map(nullOptA);
+    B_MAPPER.mapIfPresent(nullOptA);
   }
 
   private static final Mapper<A, B> B_MAPPER =
