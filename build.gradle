@@ -1,7 +1,7 @@
 plugins {
   id 'java'
   id 'application'
-  id 'com.github.johnrengelman.shadow' version '2.0.4'
+  id 'com.github.johnrengelman.shadow' version '4.0.3'
   id "com.diffplug.gradle.spotless" version '3.16.0'
   id 'checkstyle'
   id 'jacoco'
