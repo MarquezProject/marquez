@@ -2,6 +2,7 @@ package marquez.core.mappers;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 public abstract class Mapper<A, B> {
@@ -14,4 +15,6 @@ public abstract class Mapper<A, B> {
   }
 
   public abstract B map(A value);
+
+  public abstract List<B> map(List<A> value);
 }
