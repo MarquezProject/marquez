@@ -5,7 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.UUID;
-import marquez.core.exceptions.JobServiceException;
+import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Job;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
@@ -63,7 +63,7 @@ public class JobServiceIntegrationTest {
     Job job = new Job(UUID.randomUUID(), "a job", "http://foo.bar", namespaceID);
     try {
       jobService.create(namespaceName, job);
-    } catch (JobServiceException e) {
+    } catch (UnexpectedException e) {
       fail("caught an unexpected exception");
     }
 
@@ -88,7 +88,7 @@ public class JobServiceIntegrationTest {
       String argsHexDigest = jobRun.getRunArgsHexDigest();
       assertEquals(runArgsJson, runArgsDAO.findByDigest(argsHexDigest).getJson());
       jobService.updateJobRunState(jobRun.getGuid(), JobRunState.State.RUNNING);
-    } catch (JobServiceException e) {
+    } catch (UnexpectedException e) {
       fail("caught an unexpected exception");
     }
   }

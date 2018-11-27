@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
-import marquez.core.exceptions.JobServiceException;
+import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Job;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
@@ -36,7 +36,7 @@ class JobService {
 
   //// PUBLIC METHODS ////
 
-  public Job create(String namespace, Job jobToCreate) throws JobServiceException {
+  public Job create(String namespace, Job jobToCreate) throws UnexpectedException {
     Job job;
     try {
       job = this.jobDAO.findByName(jobToCreate.getName());
@@ -53,66 +53,66 @@ class JobService {
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to create new job";
       logger.error(err, e);
-      throw new JobServiceException(err);
+      throw new UnexpectedException(err);
     }
   }
 
-  public List<Job> getAll(String namespace) throws JobServiceException {
+  public List<Job> getAll(String namespace) throws UnexpectedException {
     List<Job> jobs;
     try {
       return this.jobDAO.findAllInNamespace(namespace);
     } catch (UnableToExecuteStatementException e) {
       logger.error("caught exception while fetching jobs in namespace ", e);
-      throw new JobServiceException("error fetching jobs");
+      throw new UnexpectedException("error fetching jobs");
     }
   }
 
   public List<JobVersion> getAllVersions(String namespace, String jobName)
-      throws JobServiceException {
+      throws UnexpectedException {
     List<JobVersion> jobVersions;
     try {
       return this.jobVersionDAO.find(namespace, jobName);
     } catch (UnableToExecuteStatementException e) {
       logger.error("caught exception while fetching versions of job", e);
-      throw new JobServiceException("error fetching job versions");
+      throw new UnexpectedException("error fetching job versions");
     }
   }
 
-  public JobVersion getVersionLatest(String namespace, String jobName) throws JobServiceException {
+  public JobVersion getVersionLatest(String namespace, String jobName) throws UnexpectedException {
     try {
       return this.jobVersionDAO.findLatest(namespace, jobName);
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching latest version of job";
       logger.error(err, e);
-      throw new JobServiceException(err);
+      throw new UnexpectedException(err);
     }
   }
 
   public JobRun updateJobRunState(UUID jobRunID, JobRunState.State state)
-      throws JobServiceException {
+      throws UnexpectedException {
     try {
       this.jobRunDAO.updateState(jobRunID, JobRunState.State.toInt(state));
       return this.jobRunDAO.findJobRunById(jobRunID);
     } catch (Exception e) {
       String err = "error updating job run state";
       logger.error(err, e);
-      throw new JobServiceException(err);
+      throw new UnexpectedException(err);
     }
   }
 
-  public JobRun getJobRun(UUID jobRunID) throws JobServiceException {
+  public JobRun getJobRun(UUID jobRunID) throws UnexpectedException {
     JobRun jobRun;
     try {
       return this.jobRunDAO.findJobRunById(jobRunID);
     } catch (Exception e) {
       String err = "error fetching job run";
       logger.error(err, e);
-      throw new JobServiceException(err);
+      throw new UnexpectedException(err);
     }
   }
 
   public JobRun createJobRun(String namespaceName, String jobName, String runArgsJson)
-      throws JobServiceException {
+      throws UnexpectedException {
     // get latest job version for job
     try {
       String runArgsDigest = computeRunArgsDigest(runArgsJson);
@@ -133,7 +133,7 @@ class JobService {
     } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e) {
       String err = "error creating job run";
       logger.error(err, e);
-      throw new JobServiceException(err);
+      throw new UnexpectedException(err);
     }
   }
 
