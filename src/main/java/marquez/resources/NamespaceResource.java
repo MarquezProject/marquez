@@ -15,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import marquez.api.CreateNamespaceRequest;
 import marquez.api.CreateNamespaceResponse;
+import marquez.api.ErrorResponse;
 import marquez.api.ListNamespacesResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
