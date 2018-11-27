@@ -1,21 +1,19 @@
 package marquez.core.mappers;
 
-import java.util.Optional;
+import static java.util.Objects.requireNonNull;
+
 import marquez.api.GetNamespaceResponse;
 import marquez.core.models.Namespace;
 
-public class GetNamespaceResponseMapper implements Mapper<Namespace, GetNamespaceResponse> {
+// TODO: Move to marquez.api.mappers pgk
+public class GetNamespaceResponseMapper extends Mapper<Namespace, GetNamespaceResponse> {
+  // TODO: Remove use of CoreNamespaceToApiNamespaceMapper
+  private final CoreNamespaceToApiNamespaceMapper namespaceMapper =
+      new CoreNamespaceToApiNamespaceMapper();
 
-  CoreNamespaceToApiNamespaceMapper namespaceMapper = new CoreNamespaceToApiNamespaceMapper();
-
-  @Override
-  public Optional<GetNamespaceResponse> map(Namespace namespace) {
-    if (namespace == null) {
-      return Optional.empty();
-    }
-
-    GetNamespaceResponse response = new GetNamespaceResponse(namespaceMapper.map(namespace).get());
-    // TODO: make this more defensive use optional correctly
-    return Optional.of(response);
+  // TODO: GetNamespaceResponseMapper.map() should accept marquez.api.models.Namespace instead
+  public GetNamespaceResponse map(Namespace namespace) {
+    requireNonNull(namespace, "namespace must not be null");
+    return new GetNamespaceResponse(namespaceMapper.map(namespace));
   }
 }

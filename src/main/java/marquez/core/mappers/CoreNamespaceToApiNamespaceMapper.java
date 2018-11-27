@@ -1,18 +1,17 @@
 package marquez.core.mappers;
 
-import java.util.Optional;
+import static java.util.Objects.requireNonNull;
 
+// TODO: Move to marquez.api.mappers pgk
+// TODO: Rename class to NamespaceMapper
 public class CoreNamespaceToApiNamespaceMapper
-    implements Mapper<marquez.core.models.Namespace, marquez.api.Namespace> {
-  @Override
-  public Optional<marquez.api.Namespace> map(marquez.core.models.Namespace value) {
-    if (value == null) {
-      return Optional.empty();
-    }
-
-    marquez.api.Namespace toValue =
-        new marquez.api.Namespace(
-            value.getName(), value.getCreatedAt(), value.getOwnerName(), value.getDescription());
-    return Optional.of(toValue);
+    extends Mapper<marquez.core.models.Namespace, marquez.api.Namespace> {
+  public marquez.api.Namespace map(marquez.core.models.Namespace namespace) {
+    requireNonNull(namespace, "namespace must not be null");
+    return new marquez.api.Namespace(
+        namespace.getName(),
+        namespace.getCreatedAt(),
+        namespace.getOwnerName(),
+        namespace.getDescription());
   }
 }

@@ -8,19 +8,21 @@ import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.core.models.Namespace;
 
 public class ListNamespacesResponse {
-
+  // TODO: Remove use of CoreNamespaceToApiNamespaceMapper
   CoreNamespaceToApiNamespaceMapper namespaceMapper = new CoreNamespaceToApiNamespaceMapper();
   private final List<Namespace> namespaces;
 
-  public ListNamespacesResponse(@JsonProperty("namespaces") List<Namespace> namespaceList) {
-    this.namespaces = namespaceList;
+  // TODO: Constructor should accept marquez.api.models.Namespace instead
+  public ListNamespacesResponse(@JsonProperty("namespaces") List<Namespace> namespaces) {
+    this.namespaces = namespaces;
   }
 
   @JsonProperty("namespaces")
   public List<marquez.api.Namespace> getNamespaces() {
+    // TODO: simplify to just: return namespaces;
     return namespaces
         .stream()
-        .map(namespaceMapper::map)
+        .map(namespaceMapper::mapAsOptional)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
