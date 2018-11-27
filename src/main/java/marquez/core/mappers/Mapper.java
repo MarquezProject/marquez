@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public abstract class Mapper<A, B> {
   public Optional<B> mapAsOptional(A value) {
@@ -14,7 +15,9 @@ public abstract class Mapper<A, B> {
     return requireNonNull(value).map(this::map);
   }
 
-  public abstract B map(A value);
+  public List<B> map(List<A> value) {
+    return requireNonNull(value).stream().map(this::map).collect(Collectors.toList());
+  }
 
-  public abstract List<B> map(List<A> value);
+  public abstract B map(A value);
 }
