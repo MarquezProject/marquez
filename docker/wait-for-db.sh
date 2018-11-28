@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Usage: $ wait-for-db.sh
+# Usage: $ wait-for-db.sh <host> <port>
 
 set -eu
 
