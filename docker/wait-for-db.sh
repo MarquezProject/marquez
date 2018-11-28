@@ -6,8 +6,8 @@ set -eu
 
 source common.sh
 
-host="$1"
-port="$2"
+host="${1}"
+port="${2}"
 
 until PGPASSWORD="${POSTGRES_PASSWORD}" psql \
         --host="${host}" \

@@ -15,7 +15,7 @@ project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}"
 
 # Version X.Y.Z of Marquez image to build
-version="$1"
+version="${1}"
 
 if [[ ! "${version}" =~ ${SEMVER_REGEX} ]]; then
   error "Version must match ${SEMVER_REGEX}"
