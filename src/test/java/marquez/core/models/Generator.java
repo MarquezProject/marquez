@@ -2,11 +2,18 @@ package marquez.core.models;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Random;
 import java.util.UUID;
 
-class Generator {
+public class Generator {
   public static Job genJob() {
     return new Job(UUID.randomUUID(), "a job", "http://foo.bar/", UUID.randomUUID());
+  }
+
+  public static Job genJob(UUID namespaceID) {
+    Random r = new Random();
+    int jobNum = r.nextInt();
+    return new Job(UUID.randomUUID(), "job" + jobNum, "http://foo.bar/" + jobNum, namespaceID);
   }
 
   public static Job cloneJob(Job job) {

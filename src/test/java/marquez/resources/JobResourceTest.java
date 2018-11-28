@@ -3,7 +3,7 @@ package marquez.resources;
 import static org.mockito.Mockito.mock;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
-import marquez.dao.deprecated.JobDAO;
+import marquez.dao.JobDAO;
 import org.junit.ClassRule;
 
 class JobResourceTest {

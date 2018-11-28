@@ -3,12 +3,10 @@ package marquez.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
+import marquez.core.models.Generator;
 import marquez.core.models.Job;
 import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
@@ -23,6 +21,7 @@ public class JobDAOTest {
   final JobDAO jobDAO = APP.onDemand(JobDAO.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
+  Job job;
 
   @Before
   public void setUp() {
@@ -35,6 +34,7 @@ public class JobDAOTest {
                   nsName,
                   "Amaranta");
             });
+    job = Generator.genJob(nsID);
   }
 
   @After
@@ -63,23 +63,14 @@ public class JobDAOTest {
             });
   }
 
-  private Job randomJob() {
-    UUID id = UUID.randomUUID();
-    String name = "job" + String.valueOf(new Random().nextInt());
-    String owner = "owner" + String.valueOf(new Random().nextInt());
-    Timestamp nominalTime = new Timestamp(new Date(0).getTime());
-    String loc = "http://foo.bar/" + name;
-    return new Job(id, name, "", loc, nsID);
-  }
-
   private void assertJobFieldsMatch(Job job1, Job job2) {
     assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
+    assertEquals(job1.getGuid(), job2.getGuid());
     assertEquals(job1.getName(), job2.getName());
   }
 
   @Test
   public void testFindByID() {
-    Job job = randomJob();
     naiveInsertJob(job);
     Job jobFound = jobDAO.findByID(job.getGuid());
     assertJobFieldsMatch(job, jobFound);
@@ -87,7 +78,6 @@ public class JobDAOTest {
   }
 
   public void testFindByName() {
-    Job job = randomJob();
     naiveInsertJob(job);
     Job jobFound = jobDAO.findByName(job.getName());
     assertJobFieldsMatch(job, jobFound);
@@ -96,7 +86,6 @@ public class JobDAOTest {
 
   @Test
   public void testInsert() {
-    Job job = randomJob();
     jobDAO.insert(job);
     Job jobFound = jobDAO.findByID(job.getGuid());
     assertJobFieldsMatch(job, jobFound);
@@ -104,7 +93,8 @@ public class JobDAOTest {
 
   @Test
   public void testFindAllInNamespace() {
-    List<Job> jobs = Arrays.asList(randomJob(), randomJob(), randomJob());
+    List<Job> jobs =
+        Arrays.asList(Generator.genJob(nsID), Generator.genJob(nsID), Generator.genJob(nsID));
     jobs.forEach(
         job -> {
           jobDAO.insert(job);

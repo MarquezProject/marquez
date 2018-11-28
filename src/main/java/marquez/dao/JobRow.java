@@ -13,8 +13,8 @@ public final class JobRow implements RowMapper<Job> {
     return new Job(
         UUID.fromString(rs.getString("guid")),
         rs.getString("name"),
-        "",
-        null,
+        rs.getString("description"),
+        rs.getString("location"),
         UUID.fromString(rs.getString("namespace_guid")));
   }
 }

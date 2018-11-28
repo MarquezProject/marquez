@@ -34,8 +34,6 @@ class JobService {
     this.runArgsDAO = runArgsDAO;
   }
 
-  //// PUBLIC METHODS ////
-
   public Job create(String namespace, Job jobToCreate) throws UnexpectedException {
     Job job;
     try {
@@ -136,8 +134,6 @@ class JobService {
       throw new UnexpectedException(err);
     }
   }
-
-  //// PRIVATE METHODS ////
 
   protected static UUID computeVersion(Job job) {
     return UUID.nameUUIDFromBytes(

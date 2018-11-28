@@ -13,8 +13,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import marquez.api.Job;
-import marquez.dao.deprecated.JobDAO;
+import marquez.core.models.Job;
+import marquez.dao.JobDAO;
 
 @Path("/jobs")
 @Produces(APPLICATION_JSON)

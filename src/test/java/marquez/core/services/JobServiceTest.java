@@ -59,8 +59,8 @@ public class JobServiceTest {
   @Test
   public void testGetAll_OK() throws Exception {
     List<Job> jobs = new ArrayList<Job>();
-    jobs.add(new Job(UUID.randomUUID(), "job", "a job", null, namespaceID));
-    jobs.add(new Job(UUID.randomUUID(), "job2", "a job2", null, namespaceID));
+    jobs.add(Generator.genJob(namespaceID));
+    jobs.add(Generator.genJob(namespaceID));
     when(jobDAO.findAllInNamespace(TEST_NS)).thenReturn(jobs);
 
     Assert.assertEquals(jobs, jobService.getAll(TEST_NS));
@@ -122,7 +122,7 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_NewJob_OK() throws Exception {
-    Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
+    Job job = Generator.genJob(namespaceID);
     when(jobDAO.findByName("job")).thenReturn(null);
     jobService.create(TEST_NS, job);
     verify(jobDAO).insert(job);
