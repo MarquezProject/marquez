@@ -13,6 +13,7 @@ COPY build.gradle build.gradle
 RUN ./gradlew --no-daemon shadowJar
 
 FROM openjdk:8-jre
+RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client-9.6
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build/libs/marquez-all.jar marquez-all.jar
 COPY docker/entrypoint.sh entrypoint.sh
