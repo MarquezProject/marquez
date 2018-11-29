@@ -12,3 +12,4 @@ ALTER TABLE job_runs ADD FOREIGN KEY(job_run_args_hex_digest) REFERENCES job_run
 ALTER TABLE jobs DROP COLUMN category;
 ALTER TABLE jobs DROP COLUMN current_ownership;
 ALTER TABLE jobs DROP COLUMN current_owner_name;
+ALTER TABLE jobs ADD COLUMN current_version_guid UUID;
