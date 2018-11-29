@@ -15,7 +15,7 @@ services:
       - POSTGRES_USER=buendia
       - POSTGRES_PASSWORD=macondo
     volumes:
-      - ./config.yml:/usr/src/app/config.yml
+      - ./config.example.yml:/usr/src/app/config.yml
     depends_on:
       - db
 
