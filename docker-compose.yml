@@ -10,10 +10,10 @@ services:
       - MARQUEZ_PORT=5000
       - MARQUEZ_CONFIG=/usr/src/app/config.yml
       - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
       - POSTGRES_DB=marquez
       - POSTGRES_USER=buendia
       - POSTGRES_PASSWORD=macondo
-      - WAIT_TIMEOUT=60
     volumes:
       - ./config.yml:/usr/src/app/config.yml
     depends_on:
