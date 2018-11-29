@@ -37,7 +37,7 @@ class JobService {
   public Job create(String namespace, Job jobToCreate) throws UnexpectedException {
     Job job;
     try {
-      job = this.jobDAO.findByName(jobToCreate.getName());
+      job = this.jobDAO.findByName(namespace, jobToCreate.getName());
       if (job == null) {
         this.jobDAO.insert(jobToCreate);
         job = jobToCreate;

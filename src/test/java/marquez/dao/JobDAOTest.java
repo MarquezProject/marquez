@@ -79,9 +79,9 @@ public class JobDAOTest {
 
   public void testFindByName() {
     naiveInsertJob(job);
-    Job jobFound = jobDAO.findByName(job.getName());
+    Job jobFound = jobDAO.findByName(nsName, job.getName());
     assertJobFieldsMatch(job, jobFound);
-    assertNull(null, jobDAO.findByName("nonexistent job"));
+    assertNull(null, jobDAO.findByName(nsName, "nonexistent job"));
   }
 
   @Test

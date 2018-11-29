@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import marquez.core.exceptions.UnexpectedException;
+import marquez.core.models.Generator;
 import marquez.core.models.Job;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
@@ -123,7 +124,7 @@ public class JobServiceTest {
   @Test
   public void testCreate_NewJob_OK() throws Exception {
     Job job = Generator.genJob(namespaceID);
-    when(jobDAO.findByName("job")).thenReturn(null);
+    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(null);
     jobService.create(TEST_NS, job);
     verify(jobDAO).insert(job);
   }
@@ -132,7 +133,7 @@ public class JobServiceTest {
   public void testCreate_JobFound_OK() throws Exception {
     Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
     Job newJob = new Job(null, "job", null, "http://foo.com", namespaceID);
-    when(jobDAO.findByName("job")).thenReturn(existingJob);
+    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(existingJob);
     Job jobCreated = jobService.create(TEST_NS, newJob);
     verify(jobDAO, never()).insert(newJob);
     verify(jobVersionDAO).findByVersion(JobService.computeVersion(existingJob));
@@ -144,7 +145,7 @@ public class JobServiceTest {
     Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
     Job newJob = new Job(null, "job", null, "http://foo.com", namespaceID);
     UUID existingJobVersion = JobService.computeVersion(existingJob);
-    when(jobDAO.findByName("job")).thenReturn(existingJob);
+    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(existingJob);
     when(jobVersionDAO.findByVersion(existingJobVersion)).thenReturn(null);
     jobService.create(TEST_NS, newJob);
     verify(jobDAO, never()).insert(newJob);
@@ -170,7 +171,7 @@ public class JobServiceTest {
             null,
             timeZero,
             timeZero);
-    when(jobDAO.findByName("job")).thenReturn(existingJob);
+    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(existingJob);
     when(jobVersionDAO.findByVersion(existingJobVersionID)).thenReturn(existingJobVersion);
     assertEquals(existingJob, jobService.create(TEST_NS, newJob));
     verify(jobDAO, never()).insert(newJob);
@@ -181,7 +182,7 @@ public class JobServiceTest {
   @Test(expected = UnexpectedException.class)
   public void testCreate_JobDAOException() throws Exception {
     Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
-    when(jobDAO.findByName("job")).thenThrow(UnableToExecuteStatementException.class);
+    when(jobDAO.findByName(TEST_NS, "job")).thenThrow(UnableToExecuteStatementException.class);
     jobService.create(TEST_NS, job);
   }
 
@@ -198,7 +199,7 @@ public class JobServiceTest {
   public void testCreate_JobVersionDAOException() throws Exception {
     Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
     UUID jobVersionID = JobService.computeVersion(job);
-    when(jobDAO.findByName("job")).thenReturn(job);
+    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(job);
     when(jobVersionDAO.findByVersion(jobVersionID))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.create(TEST_NS, job);
@@ -207,7 +208,7 @@ public class JobServiceTest {
   @Test(expected = UnexpectedException.class)
   public void testCreate_JobVersionInsertException() throws Exception {
     Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
-    when(jobDAO.findByName(job.getName())).thenReturn(job);
+    when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(job);
     when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
     doThrow(UnableToExecuteStatementException.class)
         .when(jobVersionDAO)

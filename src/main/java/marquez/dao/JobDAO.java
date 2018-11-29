@@ -41,11 +41,16 @@ public interface JobDAO extends SqlObject {
   @SqlQuery("SELECT * FROM jobs WHERE guid = :guid")
   Job findByID(@Bind("guid") UUID guid);
 
-  @SqlQuery("SELECT * FROM jobs WHERE name = :name")
-  Job findByName(@Bind("name") String name);
+  String findJobByNamespaceNameSQL =
+      "SELECT j.*"
+          + " FROM jobs j"
+          + " INNER JOIN namespaces n ON (j.namespace_guid = n.guid AND n.name = :ns_name AND j.name = :job_name)";
+
+  @SqlQuery(findJobByNamespaceNameSQL)
+  Job findByName(@Bind("ns_name") String namespace, @Bind("job_name") String name);
 
   String findAllByNamespaceNameSQL =
-      "SELECT * "
+      "SELECT j.*"
           + " FROM jobs j"
           + " INNER JOIN namespaces n ON (j.namespace_guid = n.guid AND n.name = :ns_name)";
 
