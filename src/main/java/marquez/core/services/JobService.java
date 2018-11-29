@@ -34,20 +34,44 @@ class JobService {
     this.runArgsDAO = runArgsDAO;
   }
 
-  public Job create(String namespace, Job jobToCreate) throws UnexpectedException {
-    Job job;
+  public Job create(String namespace, Job job) throws UnexpectedException {
     try {
-      job = this.jobDAO.findByName(namespace, jobToCreate.getName());
-      if (job == null) {
-        this.jobDAO.insert(jobToCreate);
-        job = jobToCreate;
+      boolean insertJob = false;
+      boolean insertJobVersion = false;
+      UUID versionID;
+      Job existingJob = this.jobDAO.findByName(namespace, job.getName());
+
+      if (existingJob == null) {
+        // if the job does not exist, job version must also not exist by definition
+        versionID = JobService.computeVersion(job);
+        insertJob = true;
+        insertJobVersion = true;
+      } else {
+        versionID = JobService.computeVersion(existingJob);
+        JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
+        if (existingJobVersion == null) {
+          // job exists, but job version is new
+          logger.warn("job version does not exist");
+          insertJobVersion = true;
+        } else {
+          // job and job version already exist, nothing to do
+          return existingJob;
+        }
       }
-      UUID versionID = JobService.computeVersion(job);
-      JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
-      if (existingJobVersion == null) {
-        this.jobVersionDAO.insert(UUID.randomUUID(), versionID, job.getGuid(), job.getLocation());
+
+      JobVersion jobVersion =
+          new JobVersion(UUID.randomUUID(), job.getGuid(), job.getLocation(), versionID);
+      if (insertJobVersion) {
+        if (insertJob) {
+          jobDAO.insertJobAndVersion(job, jobVersion);
+          return job;
+        }
+        jobVersionDAO.insert(jobVersion);
+        return existingJob;
+      } else {
+        logger.error("impossible case: no job version to insert, but job does not exist");
+        throw new UnexpectedException("failed to create new job");
       }
-      return job;
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to create new job";
       logger.error(err, e);

@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 public class JobServiceTest {
   final String TEST_NS = "test_namespace";
@@ -126,7 +127,7 @@ public class JobServiceTest {
     Job job = Generator.genJob(namespaceID);
     when(jobDAO.findByName(TEST_NS, "job")).thenReturn(null);
     jobService.create(TEST_NS, job);
-    verify(jobDAO).insert(job);
+    verify(jobDAO).insertJobAndVersion(eq(job), any(JobVersion.class));
   }
 
   @Test
@@ -142,23 +143,20 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_NewVersion_OK() throws Exception {
-    Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
-    Job newJob = new Job(null, "job", null, "http://foo.com", namespaceID);
-    UUID existingJobVersion = JobService.computeVersion(existingJob);
+    ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
+    Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com/1", namespaceID);
+    Job newJob = new Job(null, "job", null, "http://foo.com/2", namespaceID);
     when(jobDAO.findByName(TEST_NS, "job")).thenReturn(existingJob);
-    when(jobVersionDAO.findByVersion(existingJobVersion)).thenReturn(null);
+    when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
     jobService.create(TEST_NS, newJob);
     verify(jobDAO, never()).insert(newJob);
-    verify(jobVersionDAO)
-        .insert(
-            any(UUID.class),
-            eq(existingJobVersion),
-            eq(existingJob.getGuid()),
-            eq(existingJob.getLocation()));
+    verify(jobVersionDAO).insert(jobVersionCaptor.capture());
+    assertEquals(newJob.getGuid(), jobVersionCaptor.getValue().getJobGuid());
+    assertEquals(newJob.getLocation(), jobVersionCaptor.getValue().getUri());
   }
 
   @Test
-  public void testCreate_VersionFound_OK() throws Exception {
+  public void testCreate_JobAndVersionFound_NoInsert_OK() throws Exception {
     Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
     Job newJob = new Job(null, "job", null, "http://foo.com", namespaceID);
     UUID existingJobVersionID = JobService.computeVersion(existingJob);
@@ -167,16 +165,12 @@ public class JobServiceTest {
             UUID.randomUUID(),
             existingJob.getGuid(),
             existingJob.getLocation(),
-            existingJobVersionID,
-            null,
-            timeZero,
-            timeZero);
+            existingJobVersionID);
     when(jobDAO.findByName(TEST_NS, "job")).thenReturn(existingJob);
     when(jobVersionDAO.findByVersion(existingJobVersionID)).thenReturn(existingJobVersion);
     assertEquals(existingJob, jobService.create(TEST_NS, newJob));
     verify(jobDAO, never()).insert(newJob);
-    verify(jobVersionDAO, never())
-        .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
+    verify(jobVersionDAO, never()).insert(any(JobVersion.class));
   }
 
   @Test(expected = UnexpectedException.class)
@@ -212,7 +206,7 @@ public class JobServiceTest {
     when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
     doThrow(UnableToExecuteStatementException.class)
         .when(jobVersionDAO)
-        .insert(any(UUID.class), any(UUID.class), any(UUID.class), any(String.class));
+        .insert(any(JobVersion.class));
     jobService.create(TEST_NS, job);
   }
 
