@@ -201,14 +201,10 @@ paths:
                   type: string
                   format: date-time
                 runArgs:
-                  description: The runtime arguments of the job.
-                  type: map
+                  description: The runtime arguments of the job. JSON encoded.
+                  type: string
               example:
-                runArgs:
-                  email: data@wework.com
-                  emailOnFailure: false
-                  emailOnRetry: true
-                  retries: 1
+                runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
       responses:
         '201':
           description: CREATED
@@ -500,8 +496,8 @@ components:
           type: enum
           enum: [STARTED, COMPLETED, FAILED]
         runArgs:
-          description: The runtime arguments of the job.
-          type: map
+          description: The runtime arguments of the job. JSON encoded.
+          type: string
         startedAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job started.
           type: string
@@ -513,11 +509,7 @@ components:
       example:
         runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         runState: COMPLETED
-        runArgs:
-          email: data@wework.com
-          emailOnFailure: false
-          emailOnRetry: true
-          retries: 1
+        runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
         startedAt: 2018-10-04T15:01:23.045Z
         endedAt: 2018-10-04T15:01:30.045Z
 
