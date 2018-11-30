@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import marquez.core.models.Generator;
 import marquez.core.models.Job;
+import marquez.core.models.JobVersion;
 import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
@@ -86,9 +87,18 @@ public class JobDAOTest {
 
   @Test
   public void testInsert() {
+    JobVersion jobVersion = Generator.genJobVersion(job.getGuid());
+    jobDAO.insertJobAndVersion(job, jobVersion);
+    Job jobFound = jobDAO.findByID(job.getGuid());
+    assertJobFieldsMatch(job, jobFound);
+  }
+
+  @Test
+  public void testInsertJobAndVersion() {
     jobDAO.insert(job);
     Job jobFound = jobDAO.findByID(job.getGuid());
     assertJobFieldsMatch(job, jobFound);
+    assertEquals(job.getLocation(), jobFound.getLocation());
   }
 
   @Test

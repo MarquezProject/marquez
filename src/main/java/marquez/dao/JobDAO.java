@@ -22,23 +22,6 @@ public interface JobDAO extends SqlObject {
   @CreateSqlObject
   JobVersionDAO createJobVersionDAO();
 
-  /* default void insertJob(final Job job) {
-    try (final Handle handle = getHandle()) {
-            h.createUpdate(
-                    "INSERT INTO jobs (guid, name, namespace_guid)"
-                        + " VALUES (:guid, :name, :namespace_guid)")
-                .bind("guid", job.getGuid())
-                .bind("name", job.getName())
-                .bind("namespace_guid", job.getNamespaceGuid())
-                .bind("current_version_guid", jobVersion.getGuid())
-                .execute();
-    } catch (Exception e) {
-      // TODO: Add better error handling
-      LOG.error(e.getMessage());
-      throw e;
-    }
-  } */
-
   @SqlUpdate("INSERT INTO jobs (guid, name, namespace_guid) VALUES (:guid, :name, :namespaceGuid)")
   public void insert(@BindBean Job job);
 

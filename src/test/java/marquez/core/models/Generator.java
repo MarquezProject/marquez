@@ -56,6 +56,11 @@ public class Generator {
         UUID.randomUUID(), UUID.randomUUID(), "http://foo.bar", UUID.randomUUID());
   }
 
+  public static JobVersion genJobVersion(UUID jobID) {
+    return new JobVersion(
+        UUID.randomUUID(), jobID, "http://foo.bar", UUID.randomUUID());
+  }
+
   public static JobVersion cloneJobVersion(JobVersion jv) {
     return new JobVersion(jv.getGuid(), jv.getJobGuid(), jv.getUri(), jv.getVersion());
   }
