@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Job;
 import marquez.core.models.JobRun;
@@ -16,15 +17,13 @@ import marquez.dao.JobRunDAO;
 import marquez.dao.JobVersionDAO;
 import marquez.dao.RunArgsDAO;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 class JobService {
   private JobDAO jobDAO;
   private JobVersionDAO jobVersionDAO;
   private JobRunDAO jobRunDAO;
   private RunArgsDAO runArgsDAO;
-  static final Logger logger = LoggerFactory.getLogger(JobDAO.class);
 
   public JobService(
       JobDAO jobDAO, JobVersionDAO jobVersionDAO, JobRunDAO jobRunDAO, RunArgsDAO runArgsDAO) {
@@ -51,7 +50,6 @@ class JobService {
         JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
         if (existingJobVersion == null) {
           // job exists, but job version is new
-          logger.warn("job version does not exist");
           insertJobVersion = true;
         } else {
           // job and job version already exist, nothing to do
@@ -69,33 +67,31 @@ class JobService {
         jobVersionDAO.insert(jobVersion);
         return existingJob;
       } else {
-        logger.error("impossible case: no job version to insert, but job does not exist");
+        log.error("impossible case: no job version to insert, but job does not exist");
         throw new UnexpectedException("failed to create new job");
       }
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to create new job";
-      logger.error(err, e);
+      log.error(err, e);
       throw new UnexpectedException(err);
     }
   }
 
   public List<Job> getAll(String namespace) throws UnexpectedException {
-    List<Job> jobs;
     try {
       return this.jobDAO.findAllInNamespace(namespace);
     } catch (UnableToExecuteStatementException e) {
-      logger.error("caught exception while fetching jobs in namespace ", e);
+      log.error("caught exception while fetching jobs in namespace ", e);
       throw new UnexpectedException("error fetching jobs");
     }
   }
 
   public List<JobVersion> getAllVersions(String namespace, String jobName)
       throws UnexpectedException {
-    List<JobVersion> jobVersions;
     try {
       return this.jobVersionDAO.find(namespace, jobName);
     } catch (UnableToExecuteStatementException e) {
-      logger.error("caught exception while fetching versions of job", e);
+      log.error("caught exception while fetching versions of job", e);
       throw new UnexpectedException("error fetching job versions");
     }
   }
@@ -105,7 +101,7 @@ class JobService {
       return this.jobVersionDAO.findLatest(namespace, jobName);
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching latest version of job";
-      logger.error(err, e);
+      log.error(err, e);
       throw new UnexpectedException(err);
     }
   }
@@ -117,18 +113,17 @@ class JobService {
       return this.jobRunDAO.findJobRunById(jobRunID);
     } catch (Exception e) {
       String err = "error updating job run state";
-      logger.error(err, e);
+      log.error(err, e);
       throw new UnexpectedException(err);
     }
   }
 
   public JobRun getJobRun(UUID jobRunID) throws UnexpectedException {
-    JobRun jobRun;
     try {
       return this.jobRunDAO.findJobRunById(jobRunID);
     } catch (Exception e) {
       String err = "error fetching job run";
-      logger.error(err, e);
+      log.error(err, e);
       throw new UnexpectedException(err);
     }
   }
@@ -154,7 +149,7 @@ class JobService {
       return jobRun;
     } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e) {
       String err = "error creating job run";
-      logger.error(err, e);
+      log.error(err, e);
       throw new UnexpectedException(err);
     }
   }
