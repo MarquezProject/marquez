@@ -36,20 +36,23 @@ public interface JobDAO extends SqlObject {
     setCurrentVersionGuid(job.getGuid(), jobVersion.getGuid());
   }
 
-  @SqlQuery("SELECT * FROM jobs WHERE guid = :guid")
+  @SqlQuery(
+      "SELECT j.*, jv.uri FROM jobs j INNER JOIN job_versions jv ON (j.guid = :guid AND j.current_version_guid = jv.guid)")
   Job findByID(@Bind("guid") UUID guid);
 
   String findJobByNamespaceNameSQL =
-      "SELECT j.*"
+      "SELECT j.*, jv.uri"
           + " FROM jobs j"
+          + " INNER JOIN job_versions jv ON (j.current_version_guid = jv.guid)"
           + " INNER JOIN namespaces n ON (j.namespace_guid = n.guid AND n.name = :ns_name AND j.name = :job_name)";
 
   @SqlQuery(findJobByNamespaceNameSQL)
   Job findByName(@Bind("ns_name") String namespace, @Bind("job_name") String name);
 
   String findAllByNamespaceNameSQL =
-      "SELECT j.*"
+      "SELECT j.*, jv.uri"
           + " FROM jobs j"
+          + " INNER JOIN job_versions jv ON (j.current_version_guid = jv.guid)"
           + " INNER JOIN namespaces n ON (j.namespace_guid = n.guid AND n.name = :ns_name)";
 
   @SqlQuery(findAllByNamespaceNameSQL)

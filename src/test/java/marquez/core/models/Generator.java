@@ -7,12 +7,16 @@ import java.util.UUID;
 
 public class Generator {
   public static Job genJob() {
-    return new Job(UUID.randomUUID(), "a job", "http://foo.bar/", UUID.randomUUID());
+    return new Job(
+        UUID.randomUUID(),
+        "a job",
+        "http://foo.bar/" + new Random().nextInt(10000),
+        UUID.randomUUID());
   }
 
   public static Job genJob(UUID namespaceID) {
     Random r = new Random();
-    int jobNum = r.nextInt();
+    int jobNum = r.nextInt(10000);
     return new Job(UUID.randomUUID(), "job" + jobNum, "http://foo.bar/" + jobNum, namespaceID);
   }
 
@@ -57,8 +61,11 @@ public class Generator {
   }
 
   public static JobVersion genJobVersion(UUID jobID) {
-    return new JobVersion(
-        UUID.randomUUID(), jobID, "http://foo.bar", UUID.randomUUID());
+    return new JobVersion(UUID.randomUUID(), jobID, "http://foo.bar", UUID.randomUUID());
+  }
+
+  public static JobVersion genJobVersion(Job job) {
+    return new JobVersion(UUID.randomUUID(), job.getGuid(), job.getLocation(), UUID.randomUUID());
   }
 
   public static JobVersion cloneJobVersion(JobVersion jv) {

@@ -1,6 +1,7 @@
 package marquez.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
@@ -23,6 +24,7 @@ public class JobDAOTest {
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
   Job job;
+  JobVersion jobVersion;
 
   @Before
   public void setUp() {
@@ -36,6 +38,7 @@ public class JobDAOTest {
                   "Amaranta");
             });
     job = Generator.genJob(nsID);
+    jobVersion = Generator.genJobVersion(job);
   }
 
   @After
@@ -43,24 +46,32 @@ public class JobDAOTest {
     APP.getJDBI()
         .useHandle(
             handle -> {
-              handle.execute("DELETE FROM jobs;");
               handle.execute("DELETE FROM job_runs;");
               handle.execute("DELETE FROM job_versions;");
+              handle.execute("DELETE FROM jobs;");
               handle.execute("DELETE FROM owners;");
               handle.execute("DELETE FROM namespaces;");
             });
   }
 
   // this is a simple insert outside of JobDAO we can use to test findByID
-  private void naiveInsertJob(Job job) {
+  private void naiveInsertJob(Job job, JobVersion jobVersion) {
     APP.getJDBI()
         .useHandle(
             handle -> {
               handle.execute(
-                  "INSERT INTO jobs(guid, name, namespace_guid)" + "VALUES (?, ?, ?);",
+                  "INSERT INTO jobs(guid, name, namespace_guid, current_version_guid)"
+                      + "VALUES (?, ?, ?, ?);",
                   job.getGuid(),
                   job.getName(),
-                  nsID);
+                  nsID,
+                  jobVersion.getGuid());
+              handle.execute(
+                  "INSERT INTO job_versions(guid, job_guid, uri, version) VALUES(?, ?, ?, ?);",
+                  jobVersion.getGuid(),
+                  jobVersion.getJobGuid(),
+                  jobVersion.getUri(),
+                  jobVersion.getVersion());
             });
   }
 
@@ -72,15 +83,17 @@ public class JobDAOTest {
 
   @Test
   public void testFindByID() {
-    naiveInsertJob(job);
+    naiveInsertJob(job, jobVersion);
     Job jobFound = jobDAO.findByID(job.getGuid());
+    assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
     assertNull(null, jobDAO.findByID(UUID.randomUUID()));
   }
 
   public void testFindByName() {
-    naiveInsertJob(job);
+    naiveInsertJob(job, jobVersion);
     Job jobFound = jobDAO.findByName(nsName, job.getName());
+    assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
     assertNull(null, jobDAO.findByName(nsName, "nonexistent job"));
   }
@@ -90,13 +103,15 @@ public class JobDAOTest {
     JobVersion jobVersion = Generator.genJobVersion(job.getGuid());
     jobDAO.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDAO.findByID(job.getGuid());
+    assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
   }
 
   @Test
   public void testInsertJobAndVersion() {
-    jobDAO.insert(job);
+    jobDAO.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDAO.findByID(job.getGuid());
+    assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
     assertEquals(job.getLocation(), jobFound.getLocation());
   }
@@ -107,7 +122,7 @@ public class JobDAOTest {
         Arrays.asList(Generator.genJob(nsID), Generator.genJob(nsID), Generator.genJob(nsID));
     jobs.forEach(
         job -> {
-          jobDAO.insert(job);
+          jobDAO.insertJobAndVersion(job, Generator.genJobVersion(job.getGuid()));
         });
     List<Job> jobsFound = jobDAO.findAllInNamespace(nsName);
     assertEquals(jobs.size(), jobsFound.size());
