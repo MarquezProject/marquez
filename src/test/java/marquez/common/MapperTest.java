@@ -1,4 +1,4 @@
-package marquez.core.mappers;
+package marquez.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -45,6 +45,7 @@ public class MapperTest {
 
   private static final Mapper<A, B> B_MAPPER =
       new Mapper<A, B>() {
+        @Override
         public B map(A value) {
           return value == null ? null : new B();
         }
