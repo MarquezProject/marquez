@@ -15,7 +15,7 @@ public class JobRunRow implements RowMapper<JobRun> {
         rs.getInt("current_state"),
         UUID.fromString(rs.getString("job_version_guid")),
         rs.getString("job_run_args_hex_digest"),
-        "",
+        rs.getString("args_json"),
         rs.getTimestamp("nominal_start_time"),
         rs.getTimestamp("nominal_end_time"),
         rs.getTimestamp("created_at"));

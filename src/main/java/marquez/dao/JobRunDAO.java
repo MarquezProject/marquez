@@ -54,6 +54,7 @@ public interface JobRunDAO extends SqlObject {
     createJobRunStateDAO().insert(UUID.randomUUID(), jobRunID, state);
   }
 
-  @SqlQuery("SELECT * FROM job_runs WHERE guid = :guid")
+  @SqlQuery(
+      "SELECT jr.*, jra.args_json FROM job_runs jr LEFT JOIN job_run_args jra ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest)")
   JobRun findJobRunById(@Bind("guid") UUID guid);
 }
