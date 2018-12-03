@@ -22,7 +22,7 @@ public class JobTest {
   private static final String DESCRIPTION = "the first job";
 
   private static final Job JOB =
-      new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+      new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
@@ -33,7 +33,7 @@ public class JobTest {
 
   @Test
   public void testJobEquality() {
-    Job j2 = new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+    Job j2 = new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
     AssertionsForClassTypes.assertThat(JOB.equals(JOB));
     AssertionsForClassTypes.assertThat(JOB.equals(j2));
     AssertionsForClassTypes.assertThat(j2.equals(JOB));
@@ -41,38 +41,34 @@ public class JobTest {
 
   @Test
   public void testHashCodeEquality() {
-    Job j2 = new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+    Job j2 = new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
     assertEquals(JOB.hashCode(), j2.hashCode());
   }
 
   @Test
   public void testJobInequalityOnUUID() {
-    Job j2 =
-        new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+    Job j2 = new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
     AssertionsForClassTypes.assertThat(!JOB.equals(j2));
     AssertionsForClassTypes.assertThat(JOB.equals(JOB));
   }
 
   @Test
   public void testJobInequalityOnNonIDField() {
-    Job j2 =
-        new Job(JOB_UUID, "some other name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+    Job j2 = new Job(JOB_UUID, "some other name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
     AssertionsForClassTypes.assertThat(!JOB.equals(j2));
     AssertionsForClassTypes.assertThat(JOB.equals(JOB));
   }
 
   @Test
   public void testJobHashcodeInequality() {
-    Job j2 =
-        new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+    Job j2 = new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
     assertNotEquals(JOB.hashCode(), j2.hashCode());
   }
 
   @Test
   public void testJobHashcodeInequalityOnNonIdField() {
     Job j2 =
-        new Job(
-            JOB_UUID, "some other job name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION, null);
+        new Job(JOB_UUID, "some other job name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
     assertNotEquals(JOB.hashCode(), j2.hashCode());
   }
 }
