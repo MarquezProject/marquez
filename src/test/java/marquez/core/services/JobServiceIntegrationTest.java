@@ -2,7 +2,6 @@ package marquez.core.services;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -68,19 +67,19 @@ public class JobServiceIntegrationTest {
     Job job = Generator.genJob(namespaceID);
     try {
       jobService.create(namespaceName, job);
+      Optional<Job> jobFound = jobService.getJob(namespaceName, job.getName());
+      assertTrue(jobFound.isPresent());
+      assertEquals(job.getName(), jobFound.get().getName());
+      List<JobVersion> versions = jobService.getAllVersions(namespaceName, job.getName());
+      assertEquals(1, versions.size());
+      assertEquals(jobFound.get().getGuid(), versions.get(0).getJobGuid());
     } catch (UnexpectedException e) {
       fail("caught an unexpected exception");
     }
-    Job jobFound = jobDAO.findByName(namespaceName, job.getName());
-    assertNotNull(jobFound);
-    assertEquals(job.getName(), jobFound.getName());
-    List<JobVersion> versions = jobVersionDAO.find(namespaceName, job.getName());
-    assertEquals(1, versions.size());
-    assertEquals(jobFound.getGuid(), versions.get(0).getJobGuid());
   }
 
   @Test
-  public void testGet_JobFound() {
+  public void testGetJob_JobFound() {
     Job job = Generator.genJob(namespaceID);
     try {
       jobService.create(namespaceName, job);
@@ -93,7 +92,7 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void testGet_JobNotFound() {
+  public void testGetJob_JobNotFound() {
     Job job = Generator.genJob(namespaceID);
     Job job2 = Generator.genJob(namespaceID);
     try {
@@ -113,14 +112,25 @@ public class JobServiceIntegrationTest {
       jobService.create(namespaceName, job);
       JobRun jobRun =
           jobService.createJobRun(namespaceName, job.getName(), runArgsJson, null, null);
-      JobRun jobRunFound = jobRunDAO.findJobRunById(jobRun.getGuid());
-      assertNotNull(jobRunFound);
-      assertEquals(jobRun.getGuid(), jobRunFound.getGuid());
+      Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getGuid());
+      assertTrue(jobRunFound.isPresent());
+      assertEquals(jobRun.getGuid(), jobRunFound.get().getGuid());
       assertEquals(
-          JobRunState.State.toInt(JobRunState.State.NEW), jobRunFound.getCurrentState().intValue());
+          JobRunState.State.toInt(JobRunState.State.NEW),
+          jobRunFound.get().getCurrentState().intValue());
       String argsHexDigest = jobRun.getRunArgsHexDigest();
       assertEquals(runArgsJson, runArgsDAO.findByDigest(argsHexDigest).getJson());
       jobService.updateJobRunState(jobRun.getGuid(), JobRunState.State.RUNNING);
+    } catch (UnexpectedException e) {
+      fail("caught an unexpected exception");
+    }
+  }
+
+  @Test
+  public void testGetJobRun_NotFound() {
+    try {
+      Optional<JobRun> jobRunFound = jobService.getJobRun(UUID.randomUUID());
+      assertFalse(jobRunFound.isPresent());
     } catch (UnexpectedException e) {
       fail("caught an unexpected exception");
     }
