@@ -57,7 +57,7 @@ public class JobVersionDAOTest {
     JobVersion jobVersion = Generator.genJobVersion(job);
     jobVersionDAO.insert(jobVersion);
     JobVersion jobVersionFound = jobVersionDAO.findByVersion(jobVersion.getVersion());
-    assertEquals(jobVersion, jobVersionFound);
+    assertEquals(jobVersion.getGuid(), jobVersionFound.getGuid());
     assertNull(jobVersionDAO.findByVersion(UUID.randomUUID()));
   }
 
@@ -67,8 +67,10 @@ public class JobVersionDAOTest {
     JobVersion jobVersion2 = Generator.genJobVersion(job);
     jobVersionDAO.insert(jobVersion1);
     jobVersionDAO.insert(jobVersion2);
-    assertEquals(jobVersion1, jobVersionDAO.findByVersion(jobVersion1.getVersion()));
-    assertEquals(jobVersion2, jobVersionDAO.findByVersion(jobVersion2.getVersion()));
+    assertEquals(
+        jobVersion1.getGuid(), jobVersionDAO.findByVersion(jobVersion1.getVersion()).getGuid());
+    assertEquals(
+        jobVersion2.getGuid(), jobVersionDAO.findByVersion(jobVersion2.getVersion()).getGuid());
   }
 
   @Test
@@ -100,6 +102,6 @@ public class JobVersionDAOTest {
     JobVersion jobVersion2 = Generator.genJobVersion(job);
     jobVersionDAO.insert(jobVersion1);
     jobVersionDAO.insert(jobVersion2);
-    assertEquals(jobVersion2, jobVersionDAO.findLatest(nsName, job.getName()));
+    assertEquals(jobVersion2.getGuid(), jobVersionDAO.findLatest(nsName, job.getName()).getGuid());
   }
 }

@@ -2,9 +2,6 @@ package marquez.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.UUID;
 import marquez.core.models.Namespace;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -17,18 +14,9 @@ public class NamespaceRow implements RowMapper<Namespace> {
 
   @Override
   public Namespace map(ResultSet rs, StatementContext ctx) throws SQLException {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSS-XX");
-    Timestamp createdAt;
-    try {
-      createdAt = new Timestamp(dateFormat.parse(rs.getString("created_at")).getTime());
-    } catch (ParseException e) {
-      logger.error("failed to parse timestamp", e);
-      createdAt = null;
-    }
-
     return new Namespace(
         UUID.fromString(rs.getString("guid")),
-        createdAt,
+        rs.getTimestamp("created_at"),
         rs.getString("name"),
         rs.getString("description"),
         rs.getString("current_ownership"));
