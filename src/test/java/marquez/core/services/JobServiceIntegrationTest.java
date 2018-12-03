@@ -66,11 +66,11 @@ public class JobServiceIntegrationTest {
   public void testCreate() {
     Job job = Generator.genJob(namespaceID);
     try {
-      jobService.create(namespaceName, job);
+      jobService.createJob(namespaceName, job);
       Optional<Job> jobFound = jobService.getJob(namespaceName, job.getName());
       assertTrue(jobFound.isPresent());
       assertEquals(job.getName(), jobFound.get().getName());
-      List<JobVersion> versions = jobService.getAllVersions(namespaceName, job.getName());
+      List<JobVersion> versions = jobService.getAllVersionsOfJob(namespaceName, job.getName());
       assertEquals(1, versions.size());
       assertEquals(jobFound.get().getGuid(), versions.get(0).getJobGuid());
     } catch (UnexpectedException e) {
@@ -82,7 +82,7 @@ public class JobServiceIntegrationTest {
   public void testGetJob_JobFound() {
     Job job = Generator.genJob(namespaceID);
     try {
-      jobService.create(namespaceName, job);
+      jobService.createJob(namespaceName, job);
       Optional<Job> jobFound = jobService.getJob(namespaceName, job.getName());
       assertTrue(jobFound.isPresent());
       assertEquals(job.getName(), jobFound.get().getName());
@@ -96,7 +96,7 @@ public class JobServiceIntegrationTest {
     Job job = Generator.genJob(namespaceID);
     Job job2 = Generator.genJob(namespaceID);
     try {
-      jobService.create(namespaceName, job);
+      jobService.createJob(namespaceName, job);
       Optional<Job> jobFound = jobService.getJob(namespaceName, job2.getName());
       assertFalse(jobFound.isPresent());
     } catch (UnexpectedException e) {
@@ -109,7 +109,7 @@ public class JobServiceIntegrationTest {
     Job job = Generator.genJob(namespaceID);
     try {
       String runArgsJson = "{'foo': 1}";
-      jobService.create(namespaceName, job);
+      jobService.createJob(namespaceName, job);
       JobRun jobRun =
           jobService.createJobRun(namespaceName, job.getName(), runArgsJson, null, null);
       Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getGuid());

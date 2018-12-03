@@ -45,7 +45,7 @@ class JobService {
     }
   }
 
-  public Job create(String namespace, Job job) throws UnexpectedException {
+  public Job createJob(String namespace, Job job) throws UnexpectedException {
     try {
       Job existingJob = this.jobDAO.findByName(namespace, job.getName());
       if (existingJob == null) {
@@ -84,7 +84,7 @@ class JobService {
     }
   }
 
-  public List<Job> getAll(String namespace) throws UnexpectedException {
+  public List<Job> getAllJobsInNamespace(String namespace) throws UnexpectedException {
     try {
       return this.jobDAO.findAllInNamespace(namespace);
     } catch (UnableToExecuteStatementException e) {
@@ -93,7 +93,7 @@ class JobService {
     }
   }
 
-  public List<JobVersion> getAllVersions(String namespace, String jobName)
+  public List<JobVersion> getAllVersionsOfJob(String namespace, String jobName)
       throws UnexpectedException {
     try {
       return this.jobVersionDAO.find(namespace, jobName);
@@ -103,7 +103,7 @@ class JobService {
     }
   }
 
-  public Optional<JobVersion> getVersionLatest(String namespace, String jobName)
+  public Optional<JobVersion> getLatestVersionOfJob(String namespace, String jobName)
       throws UnexpectedException {
     try {
       return Optional.ofNullable(jobVersionDAO.findLatest(namespace, jobName));
@@ -152,7 +152,7 @@ class JobService {
         log.error(err);
         throw new UnexpectedException(err);
       }
-      Optional<JobVersion> latestJobVersion = getVersionLatest(namespaceName, jobName);
+      Optional<JobVersion> latestJobVersion = getLatestVersionOfJob(namespaceName, jobName);
       if (!latestJobVersion.isPresent()) {
         String err =
             String.format(
