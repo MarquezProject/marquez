@@ -119,7 +119,7 @@ class JobService {
     try {
       this.jobRunDAO.updateState(jobRunID, JobRunState.State.toInt(state));
       return this.jobRunDAO.findJobRunById(jobRunID);
-    } catch (Exception e) {
+    } catch (UnableToExecuteStatementException e) {
       String err = "error updating job run state";
       log.error(err, e);
       throw new UnexpectedException(err);
@@ -129,7 +129,7 @@ class JobService {
   public Optional<JobRun> getJobRun(UUID jobRunID) throws UnexpectedException {
     try {
       return Optional.ofNullable(this.jobRunDAO.findJobRunById(jobRunID));
-    } catch (Exception e) {
+    } catch (UnableToExecuteStatementException e) {
       String err = "error fetching job run";
       log.error(err, e);
       throw new UnexpectedException(err);
