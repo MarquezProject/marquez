@@ -59,7 +59,8 @@ class JobService {
       }
 
       JobVersion jobVersion =
-          new JobVersion(UUID.randomUUID(), job.getGuid(), job.getLocation(), versionID);
+          new JobVersion(
+              UUID.randomUUID(), job.getGuid(), job.getLocation(), versionID, null, null, null);
       if (insertJobVersion) {
         if (insertJob) {
           jobDAO.insertJobAndVersion(job, jobVersion);

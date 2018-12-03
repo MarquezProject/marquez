@@ -15,16 +15,6 @@ public final class JobVersion {
   private final Timestamp createdAt;
   private final Timestamp updatedAt;
 
-  public JobVersion(final UUID guid, final UUID jobGuid, final String uri, final UUID version) {
-    this.guid = guid;
-    this.jobGuid = jobGuid;
-    this.uri = uri;
-    this.latestJobRunGuid = null;
-    this.version = version;
-    this.createdAt = null;
-    this.updatedAt = null;
-  }
-
   public JobVersion(
       final UUID guid,
       final UUID jobGuid,

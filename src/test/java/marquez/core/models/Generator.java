@@ -65,19 +65,34 @@ public class Generator {
 
   public static JobVersion genJobVersion() {
     return new JobVersion(
-        UUID.randomUUID(), UUID.randomUUID(), "http://foo.bar", UUID.randomUUID());
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        "http://foo.bar",
+        UUID.randomUUID(),
+        null,
+        null,
+        null);
   }
 
   public static JobVersion genJobVersion(UUID jobID) {
-    return new JobVersion(UUID.randomUUID(), jobID, "http://foo.bar", UUID.randomUUID());
+    return new JobVersion(
+        UUID.randomUUID(), jobID, "http://foo.bar", UUID.randomUUID(), null, null, null);
   }
 
   public static JobVersion genJobVersion(Job job) {
-    return new JobVersion(UUID.randomUUID(), job.getGuid(), job.getLocation(), UUID.randomUUID());
+    return new JobVersion(
+        UUID.randomUUID(), job.getGuid(), job.getLocation(), UUID.randomUUID(), null, null, null);
   }
 
   public static JobVersion cloneJobVersion(JobVersion jv) {
-    return new JobVersion(jv.getGuid(), jv.getJobGuid(), jv.getUri(), jv.getVersion());
+    return new JobVersion(
+        jv.getGuid(),
+        jv.getJobGuid(),
+        jv.getUri(),
+        jv.getVersion(),
+        jv.getLatestJobRunGuid(),
+        jv.getCreatedAt(),
+        jv.getUpdatedAt());
   }
 
   public static Namespace genNamespace() {

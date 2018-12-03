@@ -52,7 +52,8 @@ public class JobVersionDAOTest {
   }
 
   private JobVersion randomJobVersion() {
-    return new JobVersion(UUID.randomUUID(), job.getGuid(), job.getLocation(), UUID.randomUUID());
+    return new JobVersion(
+        UUID.randomUUID(), job.getGuid(), job.getLocation(), UUID.randomUUID(), null, null, null);
   }
 
   @Test
@@ -89,10 +90,22 @@ public class JobVersionDAOTest {
     jobDAO.insert(unrelatedJob);
     JobVersion dontWant1 =
         new JobVersion(
-            UUID.randomUUID(), unrelatedJob.getGuid(), "http://random.version", UUID.randomUUID());
+            UUID.randomUUID(),
+            unrelatedJob.getGuid(),
+            "http://random.version",
+            UUID.randomUUID(),
+            null,
+            null,
+            null);
     JobVersion dontWant2 =
         new JobVersion(
-            UUID.randomUUID(), unrelatedJob.getGuid(), "http://random.version", UUID.randomUUID());
+            UUID.randomUUID(),
+            unrelatedJob.getGuid(),
+            "http://random.version",
+            UUID.randomUUID(),
+            null,
+            null,
+            null);
     List<JobVersion> versionsWeDontWant = Arrays.asList(dontWant1, dontWant2);
     versionsWeDontWant.forEach(jv -> jobVersionDAO.insert(jv));
 

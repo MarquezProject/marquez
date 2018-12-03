@@ -165,7 +165,10 @@ public class JobServiceTest {
             UUID.randomUUID(),
             existingJob.getGuid(),
             existingJob.getLocation(),
-            existingJobVersionID);
+            existingJobVersionID,
+            null,
+            null,
+            null);
     when(jobDAO.findByName(TEST_NS, "job")).thenReturn(existingJob);
     when(jobVersionDAO.findByVersion(existingJobVersionID)).thenReturn(existingJobVersion);
     assertEquals(existingJob, jobService.create(TEST_NS, newJob));
