@@ -15,6 +15,7 @@ public final class JobRow implements RowMapper<Job> {
         rs.getString("name"),
         rs.getString("description"),
         rs.getString("uri"),
-        UUID.fromString(rs.getString("namespace_guid")));
+        UUID.fromString(rs.getString("namespace_guid")),
+        rs.getTimestamp("created_at"));
   }
 }

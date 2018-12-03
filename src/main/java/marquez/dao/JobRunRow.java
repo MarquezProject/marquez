@@ -18,7 +18,6 @@ public class JobRunRow implements RowMapper<JobRun> {
         "",
         rs.getTimestamp("nominal_start_time"),
         rs.getTimestamp("nominal_end_time"),
-        rs.getTimestamp("started_at"),
-        rs.getTimestamp("ended_at")); // TODO: this needs to be the real run args json
+        rs.getTimestamp("created_at"));
   }
 }
