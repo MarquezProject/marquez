@@ -186,7 +186,7 @@ public class JobServiceTest {
     String jobName = "a job";
     JobService jobService = spy(this.jobService);
     when(jobService.computeRunArgsDigest(runArgsJson)).thenThrow(NoSuchAlgorithmException.class);
-    jobService.createJobRun(TEST_NS, jobName, runArgsJson);
+    jobService.createJobRun(TEST_NS, jobName, runArgsJson, null, null);
   }
 
   @Test(expected = UnexpectedException.class)
@@ -224,7 +224,11 @@ public class JobServiceTest {
             JobRunState.State.toInt(JobRunState.State.NEW),
             UUID.randomUUID(),
             "abc123",
-            "{'foo': 1}");
+            "{'foo': 1}",
+            null,
+            null,
+            null,
+            null);
     when(jobRunDAO.findJobRunById(jobRun.getGuid())).thenReturn(jobRun);
     assertEquals(jobRun, jobService.getJobRun(jobRun.getGuid()));
   }

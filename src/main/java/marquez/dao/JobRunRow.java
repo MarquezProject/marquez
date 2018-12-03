@@ -12,11 +12,13 @@ public class JobRunRow implements RowMapper<JobRun> {
   public JobRun map(final ResultSet rs, final StatementContext ctx) throws SQLException {
     return new JobRun(
         UUID.fromString(rs.getString("guid")),
-        rs.getTimestamp("started_at"),
-        rs.getTimestamp("ended_at"),
         rs.getInt("current_state"),
         UUID.fromString(rs.getString("job_version_guid")),
         rs.getString("job_run_args_hex_digest"),
-        ""); // TODO: this needs to be the real run args json
+        "",
+        rs.getTimestamp("nominal_start_time"),
+        rs.getTimestamp("nominal_end_time"),
+        rs.getTimestamp("started_at"),
+        rs.getTimestamp("ended_at")); // TODO: this needs to be the real run args json
   }
 }

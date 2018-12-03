@@ -14,36 +14,27 @@ public final class JobRun {
   private final UUID jobVersionGuid;
   private final String runArgsHexDigest;
   private final String runArgs;
+  private final Timestamp nominalStartTime;
+  private final Timestamp nominalEndTime;
 
   public JobRun(
       final UUID guid,
       final Integer currentState,
       final UUID jobVersionGuid,
       final String runArgsHexDigest,
-      final String runArgs) {
+      final String runArgs,
+      final Timestamp nominalStartTime,
+      final Timestamp nominalEndTime,
+      final Timestamp startedAt,
+      final Timestamp endedAt) {
     this.guid = guid;
     this.currentState = currentState;
     this.jobVersionGuid = jobVersionGuid;
     this.runArgsHexDigest = runArgsHexDigest;
     this.runArgs = runArgs;
-    this.startedAt = null;
-    this.endedAt = null;
-  }
-
-  public JobRun(
-      final UUID guid,
-      final Timestamp startedAt,
-      final Timestamp endedAt,
-      final Integer currentState,
-      final UUID jobVersionGuid,
-      final String runArgsHexDigest,
-      final String runArgs) {
-    this.guid = guid;
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
-    this.currentState = currentState;
-    this.jobVersionGuid = jobVersionGuid;
-    this.runArgsHexDigest = runArgsHexDigest;
-    this.runArgs = runArgs;
   }
 }

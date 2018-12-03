@@ -80,7 +80,8 @@ public class JobServiceIntegrationTest {
     try {
       String runArgsJson = "{'foo': 1}";
       jobService.create(namespaceName, job);
-      JobRun jobRun = jobService.createJobRun(namespaceName, job.getName(), runArgsJson);
+      JobRun jobRun =
+          jobService.createJobRun(namespaceName, job.getName(), runArgsJson, null, null);
       JobRun jobRunFound = jobRunDAO.findJobRunById(jobRun.getGuid());
       assertEquals(jobRun.getGuid(), jobRunFound.getGuid());
       assertEquals(

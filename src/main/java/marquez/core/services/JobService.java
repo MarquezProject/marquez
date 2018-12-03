@@ -3,6 +3,7 @@ package marquez.core.services;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -128,7 +129,12 @@ class JobService {
     }
   }
 
-  public JobRun createJobRun(String namespaceName, String jobName, String runArgsJson)
+  public JobRun createJobRun(
+      String namespaceName,
+      String jobName,
+      String runArgsJson,
+      Timestamp nominalStartTime,
+      Timestamp nominalEndTime)
       throws UnexpectedException {
     // get latest job version for job
     try {
@@ -144,7 +150,11 @@ class JobService {
               JobRunState.State.toInt(JobRunState.State.NEW),
               latestJobVersion.getGuid(),
               runArgsDigest,
-              runArgsJson);
+              runArgsJson,
+              nominalStartTime,
+              nominalEndTime,
+              null,
+              null);
       jobRunDAO.insert(jobRun);
       return jobRun;
     } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e) {

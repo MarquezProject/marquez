@@ -23,8 +23,8 @@ public interface JobRunDAO extends SqlObject {
       handle.useTransaction(
           h -> {
             h.createUpdate(
-                    "INSERT INTO job_runs (guid, started_at, job_version_guid, current_state, job_run_args_hex_digest) "
-                        + "VALUES (:guid, :startedAt, :jobVersionGuid, :currentState, :runArgsHexDigest)")
+                    "INSERT INTO job_runs (guid, started_at, job_version_guid, current_state, job_run_args_hex_digest, nominal_start_time, nominal_end_time) "
+                        + "VALUES (:guid, :startedAt, :jobVersionGuid, :currentState, :runArgsHexDigest, :nominalStartTime, :nominalEndTime)")
                 .bindBean(jobRun)
                 .execute();
             createJobRunStateDAO()

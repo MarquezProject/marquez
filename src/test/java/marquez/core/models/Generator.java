@@ -30,7 +30,11 @@ public class Generator {
         JobRunState.State.toInt(JobRunState.State.NEW),
         UUID.randomUUID(),
         "abc123",
-        "{'foo': 1}");
+        "{'foo': 1}",
+        null,
+        null,
+        null,
+        null);
   }
 
   public static JobRun cloneJobRun(JobRun j) {
@@ -39,7 +43,11 @@ public class Generator {
         j.getCurrentState(),
         j.getJobVersionGuid(),
         j.getRunArgsHexDigest(),
-        j.getRunArgs());
+        j.getRunArgs(),
+        null,
+        null,
+        null,
+        null);
   }
 
   public static JobRunState genJobRunState() {
