@@ -14,9 +14,8 @@ import org.slf4j.LoggerFactory;
 public interface RunArgsDAO extends SqlObject {
   static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
 
-  @SqlUpdate(
-      "INSERT INTO job_run_args(hex_digest, args_json) VALUES (:run_args.hexDigest, :run_args.json)")
-  void insert(@BindBean("run_args") RunArgs runArgs);
+  @SqlUpdate("INSERT INTO job_run_args(hex_digest, args_json) VALUES (:hexDigest, :json)")
+  void insert(@BindBean RunArgs runArgs);
 
   @SqlQuery("SELECT COUNT(*) > 0 FROM job_run_args WHERE hex_digest=:digest")
   boolean digestExists(@Bind("digest") String hexDigest);
