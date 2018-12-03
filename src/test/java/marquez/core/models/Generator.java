@@ -7,21 +7,29 @@ import java.util.UUID;
 
 public class Generator {
   public static Job genJob() {
-    return new Job(
-        UUID.randomUUID(),
-        "a job",
-        "http://foo.bar/" + new Random().nextInt(10000),
-        UUID.randomUUID());
+    return genJob(UUID.randomUUID());
   }
 
   public static Job genJob(UUID namespaceID) {
     Random r = new Random();
     int jobNum = r.nextInt(10000);
-    return new Job(UUID.randomUUID(), "job" + jobNum, "http://foo.bar/" + jobNum, namespaceID);
+    return new Job(
+        UUID.randomUUID(),
+        "job" + jobNum,
+        "job desc",
+        "http://foo.bar/" + jobNum,
+        namespaceID,
+        null);
   }
 
   public static Job cloneJob(Job job) {
-    return new Job(job.getGuid(), job.getName(), job.getLocation(), job.getNamespaceGuid());
+    return new Job(
+        job.getGuid(),
+        job.getName(),
+        job.getDescription(),
+        job.getLocation(),
+        job.getNamespaceGuid(),
+        job.getCreatedAt());
   }
 
   public static JobRun genJobRun() {
@@ -31,7 +39,6 @@ public class Generator {
         UUID.randomUUID(),
         "abc123",
         "{'foo': 1}",
-        null,
         null,
         null,
         null);
@@ -44,7 +51,6 @@ public class Generator {
         j.getJobVersionGuid(),
         j.getRunArgsHexDigest(),
         j.getRunArgs(),
-        null,
         null,
         null,
         null);
@@ -104,10 +110,10 @@ public class Generator {
   }
 
   public static RunArgs genRunArgs() {
-    return new RunArgs("abc123", "{'foo': 1}");
+    return new RunArgs("abc123", "{'foo': 1}", null);
   }
 
   public static RunArgs cloneRunArgs(RunArgs ra) {
-    return new RunArgs(ra.getHexDigest(), ra.getJson());
+    return new RunArgs(ra.getHexDigest(), ra.getJson(), ra.getCreatedAt());
   }
 }
