@@ -2,6 +2,7 @@ package marquez.core.services;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -121,6 +122,23 @@ public class JobServiceIntegrationTest {
       String argsHexDigest = jobRun.getRunArgsHexDigest();
       assertEquals(runArgsJson, runArgsDAO.findByDigest(argsHexDigest).getJson());
       jobService.updateJobRunState(jobRun.getGuid(), JobRunState.State.RUNNING);
+    } catch (UnexpectedException e) {
+      fail("caught an unexpected exception");
+    }
+  }
+
+  @Test
+  public void testCreateJobRun_NullArgs() throws UnexpectedException {
+    Job job = Generator.genJob(namespaceID);
+    try {
+      String nullRunArgsJson = null;
+      jobService.createJob(namespaceName, job);
+      JobRun jobRun =
+          jobService.createJobRun(namespaceName, job.getName(), nullRunArgsJson, null, null);
+      Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getGuid());
+      assertTrue(jobRunFound.isPresent());
+      assertNull(jobRun.getRunArgsHexDigest());
+      assertNull(jobRun.getRunArgs());
     } catch (UnexpectedException e) {
       fail("caught an unexpected exception");
     }

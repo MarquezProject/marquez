@@ -144,6 +144,8 @@ class JobService {
       Timestamp nominalEndTime)
       throws UnexpectedException {
     try {
+      String runArgsDigest = null;
+      RunArgs runArgs = null;
       if (null == jobDAO.findByName(namespaceName, jobName)) {
         String err =
             String.format(
@@ -161,8 +163,10 @@ class JobService {
         log.error(err);
         throw new UnexpectedException();
       }
-      String runArgsDigest = computeRunArgsDigest(runArgsJson);
-      RunArgs runArgs = new RunArgs(runArgsDigest, runArgsJson, null);
+      if (runArgsJson != null) {
+        runArgsDigest = computeRunArgsDigest(runArgsJson);
+        runArgs = new RunArgs(runArgsDigest, runArgsJson, null);
+      }
       JobRun jobRun =
           new JobRun(
               UUID.randomUUID(),
@@ -173,7 +177,7 @@ class JobService {
               nominalStartTime,
               nominalEndTime,
               null);
-      if (runArgsDAO.digestExists(runArgsDigest)) {
+      if (runArgsJson == null || runArgsDAO.digestExists(runArgsDigest)) {
         jobRunDAO.insert(jobRun);
       } else {
         jobRunDAO.insertJobRunAndArgs(jobRun, runArgs);
