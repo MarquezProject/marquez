@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Generator;
@@ -203,7 +204,7 @@ public class JobServiceTest {
   public void testGetJobRun() throws Exception {
     JobRun jobRun = Generator.genJobRun();
     when(jobRunDAO.findJobRunById(jobRun.getGuid())).thenReturn(jobRun);
-    assertEquals(jobRun, jobService.getJobRun(jobRun.getGuid()));
+    assertEquals(Optional.ofNullable(jobRun), jobService.getJobRun(jobRun.getGuid()));
   }
 
   @Test(expected = UnexpectedException.class)

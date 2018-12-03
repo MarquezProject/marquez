@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import marquez.core.exceptions.UnexpectedException;
@@ -92,9 +93,10 @@ class JobService {
     }
   }
 
-  public JobVersion getVersionLatest(String namespace, String jobName) throws UnexpectedException {
+  public Optional<JobVersion> getVersionLatest(String namespace, String jobName)
+      throws UnexpectedException {
     try {
-      return this.jobVersionDAO.findLatest(namespace, jobName);
+      return Optional.ofNullable(jobVersionDAO.findLatest(namespace, jobName));
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching latest version of job";
       log.error(err, e);
@@ -114,9 +116,9 @@ class JobService {
     }
   }
 
-  public JobRun getJobRun(UUID jobRunID) throws UnexpectedException {
+  public Optional<JobRun> getJobRun(UUID jobRunID) throws UnexpectedException {
     try {
-      return this.jobRunDAO.findJobRunById(jobRunID);
+      return Optional.ofNullable(this.jobRunDAO.findJobRunById(jobRunID));
     } catch (Exception e) {
       String err = "error fetching job run";
       log.error(err, e);
@@ -131,25 +133,41 @@ class JobService {
       Timestamp nominalStartTime,
       Timestamp nominalEndTime)
       throws UnexpectedException {
-    // get latest job version for job
     try {
+      if (null == jobDAO.findByName(namespaceName, jobName)) {
+        String err =
+            String.format(
+                "unable to find job <ns='%s', job name='%s'> to create job run",
+                namespaceName, jobName);
+        log.error(err);
+        throw new UnexpectedException(err);
+      }
+      Optional<JobVersion> latestJobVersion = getVersionLatest(namespaceName, jobName);
+      if (!latestJobVersion.isPresent()) {
+        String err =
+            String.format(
+                "unable to find latest job version for <ns='%s', job name='%s'> to create job run",
+                namespaceName, jobName);
+        log.error(err);
+        throw new UnexpectedException(err);
+      }
       String runArgsDigest = computeRunArgsDigest(runArgsJson);
       RunArgs runArgs = new RunArgs(runArgsDigest, runArgsJson, null);
-      if (!runArgsDAO.digestExists(runArgsDigest)) {
-        runArgsDAO.insert(runArgs);
-      }
-      JobVersion latestJobVersion = getVersionLatest(namespaceName, jobName);
       JobRun jobRun =
           new JobRun(
               UUID.randomUUID(),
               JobRunState.State.toInt(JobRunState.State.NEW),
-              latestJobVersion.getGuid(),
+              latestJobVersion.get().getGuid(),
               runArgsDigest,
               runArgsJson,
               nominalStartTime,
               nominalEndTime,
               null);
-      jobRunDAO.insert(jobRun);
+      if (runArgsDAO.digestExists(runArgsDigest)) {
+        jobRunDAO.insert(jobRun);
+      } else {
+        jobRunDAO.insertJobRunAndArgs(jobRun, runArgs);
+      }
       return jobRun;
     } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e) {
       String err = "error creating job run";
