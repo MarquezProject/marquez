@@ -36,41 +36,35 @@ class JobService {
 
   public Job create(String namespace, Job job) throws UnexpectedException {
     try {
-      boolean insertJob = false;
-      boolean insertJobVersion = false;
-      UUID versionID;
       Job existingJob = this.jobDAO.findByName(namespace, job.getName());
-
       if (existingJob == null) {
-        // if the job does not exist, job version must also not exist by definition
-        versionID = JobService.computeVersion(job);
-        insertJob = true;
-        insertJobVersion = true;
+        Job newJob =
+            new Job(
+                UUID.randomUUID(),
+                job.getName(),
+                job.getDescription(),
+                job.getLocation(),
+                job.getNamespaceGuid(),
+                null);
+        jobDAO.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
+        return newJob;
       } else {
-        versionID = JobService.computeVersion(existingJob);
+        Job existingJobWithNewUri =
+            new Job(
+                existingJob.getGuid(),
+                existingJob.getName(),
+                existingJob.getDescription(),
+                job.getLocation(),
+                existingJob.getNamespaceGuid(),
+                existingJob.getCreatedAt());
+        UUID versionID = JobService.computeVersion(existingJobWithNewUri);
         JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
         if (existingJobVersion == null) {
-          // job exists, but job version is new
-          insertJobVersion = true;
+          jobVersionDAO.insert(JobService.createJobVersion(existingJobWithNewUri));
+          return existingJobWithNewUri;
         } else {
-          // job and job version already exist, nothing to do
           return existingJob;
         }
-      }
-
-      JobVersion jobVersion =
-          new JobVersion(
-              UUID.randomUUID(), job.getGuid(), job.getLocation(), versionID, null, null, null);
-      if (insertJobVersion) {
-        if (insertJob) {
-          jobDAO.insertJobAndVersion(job, jobVersion);
-          return job;
-        }
-        jobVersionDAO.insert(jobVersion);
-        return existingJob;
-      } else {
-        log.error("impossible case: no job version to insert, but job does not exist");
-        throw new UnexpectedException("failed to create new job");
       }
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to create new job";
@@ -140,7 +134,7 @@ class JobService {
     // get latest job version for job
     try {
       String runArgsDigest = computeRunArgsDigest(runArgsJson);
-      RunArgs runArgs = new RunArgs(runArgsDigest, runArgsJson);
+      RunArgs runArgs = new RunArgs(runArgsDigest, runArgsJson, null);
       if (!runArgsDAO.digestExists(runArgsDigest)) {
         runArgsDAO.insert(runArgs);
       }
@@ -154,7 +148,6 @@ class JobService {
               runArgsJson,
               nominalStartTime,
               nominalEndTime,
-              null,
               null);
       jobRunDAO.insert(jobRun);
       return jobRun;
@@ -163,6 +156,17 @@ class JobService {
       log.error(err, e);
       throw new UnexpectedException(err);
     }
+  }
+
+  private static JobVersion createJobVersion(Job job) {
+    return new JobVersion(
+        UUID.randomUUID(),
+        job.getGuid(),
+        job.getLocation(),
+        JobService.computeVersion(job),
+        null,
+        null,
+        null);
   }
 
   protected static UUID computeVersion(Job job) {
