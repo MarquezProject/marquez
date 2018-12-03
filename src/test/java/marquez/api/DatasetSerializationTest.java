@@ -8,12 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.text.ParseException;
-<<<<<<< HEAD
-import java.text.SimpleDateFormat;
-import java.util.UUID;
-import java.util.Date;
-=======
->>>>>>> spotlessApply
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 import org.junit.BeforeClass;

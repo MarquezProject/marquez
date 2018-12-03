@@ -41,7 +41,7 @@ class JobService {
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to get a job";
       log.error(err, e);
-      throw new UnexpectedException(err);
+      throw new UnexpectedException();
     }
   }
 
@@ -80,7 +80,7 @@ class JobService {
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to create new job";
       log.error(err, e);
-      throw new UnexpectedException(err);
+      throw new UnexpectedException();
     }
   }
 
@@ -89,7 +89,7 @@ class JobService {
       return this.jobDAO.findAllInNamespace(namespace);
     } catch (UnableToExecuteStatementException e) {
       log.error("caught exception while fetching jobs in namespace ", e);
-      throw new UnexpectedException("error fetching jobs");
+      throw new UnexpectedException();
     }
   }
 
@@ -99,7 +99,7 @@ class JobService {
       return this.jobVersionDAO.find(namespace, jobName);
     } catch (UnableToExecuteStatementException e) {
       log.error("caught exception while fetching versions of job", e);
-      throw new UnexpectedException("error fetching job versions");
+      throw new UnexpectedException();
     }
   }
 
@@ -110,7 +110,7 @@ class JobService {
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching latest version of job";
       log.error(err, e);
-      throw new UnexpectedException(err);
+      throw new UnexpectedException();
     }
   }
 
@@ -122,7 +122,7 @@ class JobService {
     } catch (UnableToExecuteStatementException e) {
       String err = "error updating job run state";
       log.error(err, e);
-      throw new UnexpectedException(err);
+      throw new UnexpectedException();
     }
   }
 
@@ -132,7 +132,7 @@ class JobService {
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching job run";
       log.error(err, e);
-      throw new UnexpectedException(err);
+      throw new UnexpectedException();
     }
   }
 
@@ -150,7 +150,7 @@ class JobService {
                 "unable to find job <ns='%s', job name='%s'> to create job run",
                 namespaceName, jobName);
         log.error(err);
-        throw new UnexpectedException(err);
+        throw new UnexpectedException();
       }
       Optional<JobVersion> latestJobVersion = getLatestVersionOfJob(namespaceName, jobName);
       if (!latestJobVersion.isPresent()) {
@@ -159,7 +159,7 @@ class JobService {
                 "unable to find latest job version for <ns='%s', job name='%s'> to create job run",
                 namespaceName, jobName);
         log.error(err);
-        throw new UnexpectedException(err);
+        throw new UnexpectedException();
       }
       String runArgsDigest = computeRunArgsDigest(runArgsJson);
       RunArgs runArgs = new RunArgs(runArgsDigest, runArgsJson, null);
@@ -182,7 +182,7 @@ class JobService {
     } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e) {
       String err = "error creating job run";
       log.error(err, e);
-      throw new UnexpectedException(err);
+      throw new UnexpectedException();
     }
   }
 

@@ -57,7 +57,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testGetAll_OK() throws Exception {
+  public void testGetAll_OK() throws UnexpectedException {
     List<Job> jobs = new ArrayList<Job>();
     jobs.add(Generator.genJob(namespaceID));
     jobs.add(Generator.genJob(namespaceID));
@@ -66,14 +66,14 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testGetAll_NoJobs_OK() throws Exception {
+  public void testGetAll_NoJobs_OK() throws UnexpectedException {
     List<Job> jobs = new ArrayList<Job>();
     when(jobDAO.findAllInNamespace(TEST_NS)).thenReturn(jobs);
     Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS));
   }
 
   @Test
-  public void testGetAllVersions_OK() throws Exception {
+  public void testGetAllVersions_OK() throws UnexpectedException {
     String jobName = "a job";
     UUID jobGuid = UUID.randomUUID();
     List<JobVersion> jobVersions = new ArrayList<JobVersion>();
@@ -84,7 +84,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testGetAllVersions_NoVersions_OK() throws Exception {
+  public void testGetAllVersions_NoVersions_OK() throws UnexpectedException {
     String jobName = "a job";
     List<JobVersion> jobVersions = new ArrayList<JobVersion>();
     when(jobVersionDAO.find(TEST_NS, jobName)).thenReturn(jobVersions);
@@ -92,14 +92,14 @@ public class JobServiceTest {
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testGetAllVersions_Exception() throws Exception {
+  public void testGetAllVersions_Exception() throws UnexpectedException {
     String jobName = "job";
     when(jobVersionDAO.find(TEST_NS, jobName)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getAllVersionsOfJob(TEST_NS, jobName);
   }
 
   @Test
-  public void testCreate_NewJob_OK() throws Exception {
+  public void testCreate_NewJob_OK() throws UnexpectedException {
     ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
     Job job = Generator.genJob(namespaceID);
@@ -111,7 +111,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testCreate_JobFound_OK() throws Exception {
+  public void testCreate_JobFound_OK() throws UnexpectedException {
     Job existingJob = Generator.genJob(namespaceID);
     Job newJob = Generator.cloneJob(existingJob);
     when(jobDAO.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
@@ -121,7 +121,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testCreate_NewVersion_OK() throws Exception {
+  public void testCreate_NewVersion_OK() throws UnexpectedException {
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
     Job existingJob = Generator.genJob(namespaceID);
     Job newJob = Generator.genJob(namespaceID);
@@ -135,7 +135,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testCreate_JobAndVersionFound_NoInsert_OK() throws Exception {
+  public void testCreate_JobAndVersionFound_NoInsert_OK() throws UnexpectedException {
     Job existingJob = Generator.genJob(namespaceID);
     Job newJob = Generator.cloneJob(existingJob);
     UUID existingJobVersionID = JobService.computeVersion(existingJob);
@@ -156,14 +156,14 @@ public class JobServiceTest {
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testGet_JobDAOException() throws Exception {
+  public void testGet_JobDAOException() throws UnexpectedException {
     when(jobDAO.findByName(eq(TEST_NS), any(String.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.getJob(TEST_NS, "a job");
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testCreate_JobDAOException() throws Exception {
+  public void testCreate_JobDAOException() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
     when(jobDAO.findByName(eq(TEST_NS), any(String.class)))
         .thenThrow(UnableToExecuteStatementException.class);
@@ -171,7 +171,7 @@ public class JobServiceTest {
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testCreateJobRun() throws Exception {
+  public void testCreateJobRun() throws UnexpectedException, NoSuchAlgorithmException {
     String runArgsJson = "{'foo': 1}";
     String jobName = "a job";
     JobService jobService = spy(this.jobService);
@@ -180,7 +180,7 @@ public class JobServiceTest {
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testCreate_JobVersionDAOException() throws Exception {
+  public void testCreate_JobVersionDAOException() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
     UUID jobVersionID = JobService.computeVersion(job);
     when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(job);
@@ -190,7 +190,7 @@ public class JobServiceTest {
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testCreate_JobVersionInsertException() throws Exception {
+  public void testCreate_JobVersionInsertException() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
     when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(job);
     when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
@@ -201,27 +201,27 @@ public class JobServiceTest {
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testGetAll_Exception() throws Exception {
+  public void testGetAll_Exception() throws UnexpectedException {
     when(jobDAO.findAllInNamespace(TEST_NS)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getAllJobsInNamespace(TEST_NS);
   }
 
   @Test
-  public void testGetJobRun() throws Exception {
+  public void testGetJobRun() throws UnexpectedException {
     JobRun jobRun = Generator.genJobRun();
     when(jobRunDAO.findJobRunById(jobRun.getGuid())).thenReturn(jobRun);
     assertEquals(Optional.ofNullable(jobRun), jobService.getJobRun(jobRun.getGuid()));
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testGetJobRun_SQLException() throws Exception {
+  public void testGetJobRun_SQLException() throws UnexpectedException {
     UUID jobRunID = UUID.randomUUID();
     when(jobRunDAO.findJobRunById(jobRunID)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getJobRun(jobRunID);
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testGetVersionLatest_Exception() throws Exception {
+  public void testGetVersionLatest_Exception() throws UnexpectedException {
     String jobName = "a job";
     when(jobVersionDAO.findLatest(TEST_NS, jobName))
         .thenThrow(UnableToExecuteStatementException.class);
@@ -229,7 +229,7 @@ public class JobServiceTest {
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testUpdateJobRunState_Exception() throws Exception {
+  public void testUpdateJobRunState_Exception() throws UnexpectedException {
     UUID jobRunID = UUID.randomUUID();
     JobRunState.State state = JobRunState.State.NEW;
     doThrow(UnableToExecuteStatementException.class)
