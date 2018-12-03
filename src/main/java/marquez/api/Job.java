@@ -12,7 +12,6 @@ public final class Job {
   private final Timestamp nominalTime;
   private final String category;
   private final String description;
-  private final String location;
 
   public Job(
       final UUID guid,
@@ -20,15 +19,13 @@ public final class Job {
       final String ownerName,
       final Timestamp nominalTime,
       final String category,
-      final String description,
-      final String location) {
+      final String description) {
     this.guid = guid;
     this.name = name;
     this.ownerName = ownerName;
     this.nominalTime = nominalTime;
     this.category = category;
     this.description = description;
-    this.location = location;
   }
 
   public UUID getGuid() {
@@ -53,10 +50,6 @@ public final class Job {
 
   public String getDescription() {
     return description;
-  }
-
-  public String getLocation() {
-    return location;
   }
 
   @Override
