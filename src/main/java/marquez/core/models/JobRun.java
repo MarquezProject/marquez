@@ -8,14 +8,14 @@ import lombok.Data;
 public final class JobRun {
 
   private final UUID guid;
-  private final Timestamp startedAt;
-  private final Timestamp endedAt;
+
   private final Integer currentState;
   private final UUID jobVersionGuid;
   private final String runArgsHexDigest;
   private final String runArgs;
   private final Timestamp nominalStartTime;
   private final Timestamp nominalEndTime;
+  private final Timestamp createdAt;
 
   public JobRun(
       final UUID guid,
@@ -25,8 +25,7 @@ public final class JobRun {
       final String runArgs,
       final Timestamp nominalStartTime,
       final Timestamp nominalEndTime,
-      final Timestamp startedAt,
-      final Timestamp endedAt) {
+      final Timestamp createdAt) {
     this.guid = guid;
     this.currentState = currentState;
     this.jobVersionGuid = jobVersionGuid;
@@ -34,7 +33,6 @@ public final class JobRun {
     this.runArgs = runArgs;
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;
-    this.startedAt = startedAt;
-    this.endedAt = endedAt;
+    this.createdAt = createdAt;
   }
 }
