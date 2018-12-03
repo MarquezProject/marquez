@@ -8,6 +8,7 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
+@Deprecated
 @RegisterRowMapper(JobRunStateRow.class)
 public interface JobRunStateDAO extends SqlObject {
   @SqlUpdate(

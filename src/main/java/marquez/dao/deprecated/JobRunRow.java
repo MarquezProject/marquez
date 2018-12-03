@@ -7,6 +7,7 @@ import marquez.api.JobRun;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
+@Deprecated
 public class JobRunRow implements RowMapper<JobRun> {
   @Override
   public JobRun map(final ResultSet rs, final StatementContext ctx) throws SQLException {

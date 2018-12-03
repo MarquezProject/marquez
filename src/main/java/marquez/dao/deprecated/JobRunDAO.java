@@ -11,6 +11,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated
 @RegisterRowMapper(JobRunRow.class)
 public interface JobRunDAO extends SqlObject {
   Logger LOG = LoggerFactory.getLogger(JobRunDAO.class);

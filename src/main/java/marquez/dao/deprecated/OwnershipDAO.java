@@ -5,6 +5,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated
 public interface OwnershipDAO {
   static final Logger LOG = LoggerFactory.getLogger(OwnershipDAO.class);
 
