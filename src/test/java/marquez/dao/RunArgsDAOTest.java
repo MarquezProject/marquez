@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import marquez.core.models.RunArgs;
 import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -19,9 +18,6 @@ public class RunArgsDAOTest {
   final String hexDigest = "07d4ee12aac795ec60a549dce809c8105c541f0c4f3e7715686953f1702940e0";
   final String argsJson = "{'foo': 1}";
   final RunArgs runArgs = new RunArgs(hexDigest, argsJson, null);
-
-  @Before
-  public void setUp() {}
 
   @After
   public void tearDown() {
