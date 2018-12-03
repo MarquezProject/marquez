@@ -35,6 +35,16 @@ class JobService {
     this.runArgsDAO = runArgsDAO;
   }
 
+  public Optional<Job> getJob(String namespace, String jobName) throws UnexpectedException {
+    try {
+      return Optional.ofNullable(jobDAO.findByName(namespace, jobName));
+    } catch (UnableToExecuteStatementException e) {
+      String err = "failed to get a job";
+      log.error(err, e);
+      throw new UnexpectedException(err);
+    }
+  }
+
   public Job create(String namespace, Job job) throws UnexpectedException {
     try {
       Job existingJob = this.jobDAO.findByName(namespace, job.getName());

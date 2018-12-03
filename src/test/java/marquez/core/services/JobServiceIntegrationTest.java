@@ -1,10 +1,13 @@
 package marquez.core.services;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Generator;
@@ -74,6 +77,32 @@ public class JobServiceIntegrationTest {
     List<JobVersion> versions = jobVersionDAO.find(namespaceName, job.getName());
     assertEquals(1, versions.size());
     assertEquals(jobFound.getGuid(), versions.get(0).getJobGuid());
+  }
+
+  @Test
+  public void testGet_JobFound() {
+    Job job = Generator.genJob(namespaceID);
+    try {
+      jobService.create(namespaceName, job);
+      Optional<Job> jobFound = jobService.getJob(namespaceName, job.getName());
+      assertTrue(jobFound.isPresent());
+      assertEquals(job.getName(), jobFound.get().getName());
+    } catch (UnexpectedException e) {
+      fail("caught unexpected exception");
+    }
+  }
+
+  @Test
+  public void testGet_JobNotFound() {
+    Job job = Generator.genJob(namespaceID);
+    Job job2 = Generator.genJob(namespaceID);
+    try {
+      jobService.create(namespaceName, job);
+      Optional<Job> jobFound = jobService.getJob(namespaceName, job2.getName());
+      assertFalse(jobFound.isPresent());
+    } catch (UnexpectedException e) {
+      fail("caught unexpected exception");
+    }
   }
 
   @Test

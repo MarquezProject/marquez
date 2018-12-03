@@ -157,6 +157,13 @@ public class JobServiceTest {
   }
 
   @Test(expected = UnexpectedException.class)
+  public void testGet_JobDAOException() throws Exception {
+    when(jobDAO.findByName(eq(TEST_NS), any(String.class)))
+        .thenThrow(UnableToExecuteStatementException.class);
+    jobService.getJob(TEST_NS, "a job");
+  }
+
+  @Test(expected = UnexpectedException.class)
   public void testCreate_JobDAOException() throws Exception {
     Job job = Generator.genJob(namespaceID);
     when(jobDAO.findByName(eq(TEST_NS), any(String.class)))
