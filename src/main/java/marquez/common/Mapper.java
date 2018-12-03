@@ -1,4 +1,4 @@
-package marquez.core.common;
+package marquez.common;
 
 import static java.util.Objects.requireNonNull;
 
