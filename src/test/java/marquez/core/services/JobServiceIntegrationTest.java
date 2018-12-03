@@ -1,11 +1,13 @@
 package marquez.core.services;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.UUID;
 import marquez.core.exceptions.UnexpectedException;
+import marquez.core.models.Generator;
 import marquez.core.models.Job;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
@@ -60,29 +62,30 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void testCreate() {
-    Job job = new Job(UUID.randomUUID(), "a job", "http://foo.bar", namespaceID);
+    Job job = Generator.genJob(namespaceID);
     try {
       jobService.create(namespaceName, job);
     } catch (UnexpectedException e) {
       fail("caught an unexpected exception");
     }
-
-    Job jobFound = jobDAO.findByID(job.getGuid());
-    assertEquals(job.getGuid(), jobFound.getGuid());
+    Job jobFound = jobDAO.findByName(namespaceName, job.getName());
+    assertNotNull(jobFound);
+    assertEquals(job.getName(), jobFound.getName());
     List<JobVersion> versions = jobVersionDAO.find(namespaceName, job.getName());
     assertEquals(1, versions.size());
-    assertEquals(job.getGuid(), versions.get(0).getJobGuid());
+    assertEquals(jobFound.getGuid(), versions.get(0).getJobGuid());
   }
 
   @Test
   public void createAndUpdateJobRun() {
-    Job job = new Job(UUID.randomUUID(), "a job", "http://foo.bar", namespaceID);
+    Job job = Generator.genJob(namespaceID);
     try {
       String runArgsJson = "{'foo': 1}";
       jobService.create(namespaceName, job);
       JobRun jobRun =
           jobService.createJobRun(namespaceName, job.getName(), runArgsJson, null, null);
       JobRun jobRunFound = jobRunDAO.findJobRunById(jobRun.getGuid());
+      assertNotNull(jobRunFound);
       assertEquals(jobRun.getGuid(), jobRunFound.getGuid());
       assertEquals(
           JobRunState.State.toInt(JobRunState.State.NEW), jobRunFound.getCurrentState().intValue());

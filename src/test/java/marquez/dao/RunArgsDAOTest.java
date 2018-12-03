@@ -18,7 +18,7 @@ public class RunArgsDAOTest {
   final RunArgsDAO runArgsDAO = APP.onDemand(RunArgsDAO.class);
   final String hexDigest = "07d4ee12aac795ec60a549dce809c8105c541f0c4f3e7715686953f1702940e0";
   final String argsJson = "{'foo': 1}";
-  final RunArgs runArgs = new RunArgs(hexDigest, argsJson);
+  final RunArgs runArgs = new RunArgs(hexDigest, argsJson, null);
 
   @Before
   public void setUp() {}
@@ -42,13 +42,17 @@ public class RunArgsDAOTest {
                   hexDigest,
                   argsJson);
             });
-    assertEquals(runArgs, runArgsDAO.findByDigest(hexDigest));
+    RunArgs runArgsFound = runArgsDAO.findByDigest(hexDigest);
+    assertEquals(runArgs.getHexDigest(), runArgsFound.getHexDigest());
+    assertEquals(runArgs.getJson(), runArgsFound.getJson());
   }
 
   @Test
   public void testInsert() {
     runArgsDAO.insert(runArgs);
-    assertEquals(runArgs, runArgsDAO.findByDigest(hexDigest));
+    RunArgs runArgsFound = runArgsDAO.findByDigest(hexDigest);
+    assertEquals(runArgs.getHexDigest(), runArgsFound.getHexDigest());
+    assertEquals(runArgs.getJson(), runArgsFound.getJson());
   }
 
   @Test

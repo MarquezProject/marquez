@@ -12,9 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import marquez.core.exceptions.UnexpectedException;
@@ -40,7 +38,6 @@ public class JobServiceTest {
   private static final JobVersionDAO jobVersionDAO = mock(JobVersionDAO.class);
   private static final JobRunDAO jobRunDAO = mock(JobRunDAO.class);
   private static final RunArgsDAO runArgsDAO = mock(RunArgsDAO.class);
-  private static final Timestamp timeZero = new Timestamp(new Date(0).getTime());
   private static final UUID namespaceID = UUID.randomUUID();
 
   JobService jobService;
@@ -79,30 +76,9 @@ public class JobServiceTest {
   public void testGetAllVersions_OK() throws Exception {
     String jobName = "a job";
     UUID jobGuid = UUID.randomUUID();
-    Timestamp createdAt, updatedAt;
-
     List<JobVersion> jobVersions = new ArrayList<JobVersion>();
-    createdAt = updatedAt = new Timestamp(new Date(0).getTime());
-    jobVersions.add(
-        new JobVersion(
-            UUID.randomUUID(),
-            jobGuid,
-            "git://foo.com/v1.git",
-            UUID.randomUUID(),
-            null,
-            createdAt,
-            updatedAt));
-    createdAt = updatedAt = new Timestamp(new Date(1).getTime());
-    jobVersions.add(
-        new JobVersion(
-            UUID.randomUUID(),
-            jobGuid,
-            "git://foo.com/v2.git",
-            UUID.randomUUID(),
-            null,
-            createdAt,
-            updatedAt));
-
+    jobVersions.add(Generator.genJobVersion(jobGuid));
+    jobVersions.add(Generator.genJobVersion(jobGuid));
     when(jobVersionDAO.find(TEST_NS, jobName)).thenReturn(jobVersions);
     Assert.assertEquals(jobVersions, jobService.getAllVersions(TEST_NS, jobName));
   }
@@ -124,41 +100,44 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_NewJob_OK() throws Exception {
+    ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
+    ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
     Job job = Generator.genJob(namespaceID);
-    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(null);
+    when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(null);
     jobService.create(TEST_NS, job);
-    verify(jobDAO).insertJobAndVersion(eq(job), any(JobVersion.class));
+    verify(jobDAO).insertJobAndVersion(jobCaptor.capture(), jobVersionCaptor.capture());
+    assertEquals(job.getName(), jobCaptor.getValue().getName());
+    assertEquals(job.getLocation(), jobVersionCaptor.getValue().getUri());
   }
 
   @Test
   public void testCreate_JobFound_OK() throws Exception {
-    Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
-    Job newJob = new Job(null, "job", null, "http://foo.com", namespaceID);
-    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(existingJob);
+    Job existingJob = Generator.genJob(namespaceID);
+    Job newJob = Generator.cloneJob(existingJob);
+    when(jobDAO.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
     Job jobCreated = jobService.create(TEST_NS, newJob);
     verify(jobDAO, never()).insert(newJob);
-    verify(jobVersionDAO).findByVersion(JobService.computeVersion(existingJob));
     assertEquals(existingJob, jobCreated);
   }
 
   @Test
   public void testCreate_NewVersion_OK() throws Exception {
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
-    Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com/1", namespaceID);
-    Job newJob = new Job(null, "job", null, "http://foo.com/2", namespaceID);
-    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(existingJob);
+    Job existingJob = Generator.genJob(namespaceID);
+    Job newJob = Generator.genJob(namespaceID);
+    when(jobDAO.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
     when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
-    jobService.create(TEST_NS, newJob);
+    Job jobCreated = jobService.create(TEST_NS, newJob);
     verify(jobDAO, never()).insert(newJob);
     verify(jobVersionDAO).insert(jobVersionCaptor.capture());
-    assertEquals(newJob.getGuid(), jobVersionCaptor.getValue().getJobGuid());
+    assertEquals(jobCreated.getGuid(), jobVersionCaptor.getValue().getJobGuid());
     assertEquals(newJob.getLocation(), jobVersionCaptor.getValue().getUri());
   }
 
   @Test
   public void testCreate_JobAndVersionFound_NoInsert_OK() throws Exception {
-    Job existingJob = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
-    Job newJob = new Job(null, "job", null, "http://foo.com", namespaceID);
+    Job existingJob = Generator.genJob(namespaceID);
+    Job newJob = Generator.cloneJob(existingJob);
     UUID existingJobVersionID = JobService.computeVersion(existingJob);
     JobVersion existingJobVersion =
         new JobVersion(
@@ -169,7 +148,7 @@ public class JobServiceTest {
             null,
             null,
             null);
-    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(existingJob);
+    when(jobDAO.findByName(TEST_NS, existingJob.getName())).thenReturn(existingJob);
     when(jobVersionDAO.findByVersion(existingJobVersionID)).thenReturn(existingJobVersion);
     assertEquals(existingJob, jobService.create(TEST_NS, newJob));
     verify(jobDAO, never()).insert(newJob);
@@ -178,8 +157,9 @@ public class JobServiceTest {
 
   @Test(expected = UnexpectedException.class)
   public void testCreate_JobDAOException() throws Exception {
-    Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
-    when(jobDAO.findByName(TEST_NS, "job")).thenThrow(UnableToExecuteStatementException.class);
+    Job job = Generator.genJob(namespaceID);
+    when(jobDAO.findByName(eq(TEST_NS), any(String.class)))
+        .thenThrow(UnableToExecuteStatementException.class);
     jobService.create(TEST_NS, job);
   }
 
@@ -194,9 +174,9 @@ public class JobServiceTest {
 
   @Test(expected = UnexpectedException.class)
   public void testCreate_JobVersionDAOException() throws Exception {
-    Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
+    Job job = Generator.genJob(namespaceID);
     UUID jobVersionID = JobService.computeVersion(job);
-    when(jobDAO.findByName(TEST_NS, "job")).thenReturn(job);
+    when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(job);
     when(jobVersionDAO.findByVersion(jobVersionID))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.create(TEST_NS, job);
@@ -204,7 +184,7 @@ public class JobServiceTest {
 
   @Test(expected = UnexpectedException.class)
   public void testCreate_JobVersionInsertException() throws Exception {
-    Job job = new Job(UUID.randomUUID(), "job", null, "http://foo.com", namespaceID);
+    Job job = Generator.genJob(namespaceID);
     when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(job);
     when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
     doThrow(UnableToExecuteStatementException.class)
@@ -221,17 +201,7 @@ public class JobServiceTest {
 
   @Test
   public void testGetJobRun() throws Exception {
-    JobRun jobRun =
-        new JobRun(
-            UUID.randomUUID(),
-            JobRunState.State.toInt(JobRunState.State.NEW),
-            UUID.randomUUID(),
-            "abc123",
-            "{'foo': 1}",
-            null,
-            null,
-            null,
-            null);
+    JobRun jobRun = Generator.genJobRun();
     when(jobRunDAO.findJobRunById(jobRun.getGuid())).thenReturn(jobRun);
     assertEquals(jobRun, jobService.getJobRun(jobRun.getGuid()));
   }
