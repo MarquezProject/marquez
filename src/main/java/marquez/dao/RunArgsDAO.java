@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 
 @RegisterRowMapper(RunArgsRow.class)
 public interface RunArgsDAO extends SqlObject {
-  static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
-
   @SqlUpdate("INSERT INTO job_run_args(hex_digest, args_json) VALUES (:hexDigest, :json)")
   void insert(@BindBean RunArgs runArgs);
 
