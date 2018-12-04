@@ -93,16 +93,12 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void testGetJob_JobNotFound() {
+  public void testGetJob_JobNotFound() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
     Job job2 = Generator.genJob(namespaceID);
-    try {
-      jobService.createJob(namespaceName, job);
-      Optional<Job> jobFound = jobService.getJob(namespaceName, job2.getName());
-      assertFalse(jobFound.isPresent());
-    } catch (UnexpectedException e) {
-      fail("caught unexpected exception");
-    }
+    jobService.createJob(namespaceName, job);
+    Optional<Job> jobFound = jobService.getJob(namespaceName, job2.getName());
+    assertFalse(jobFound.isPresent());
   }
 
   @Test
