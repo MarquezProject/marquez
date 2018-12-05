@@ -16,8 +16,8 @@ import javax.ws.rs.core.Response;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.ListDatasetsResponse;
-import marquez.services.DatasetService;
-import marquez.services.models.Dataset;
+import marquez.service.DatasetService;
+import marquez.service.models.Dataset;
 
 @Path("/api/v1")
 public final class DatasetResource {
