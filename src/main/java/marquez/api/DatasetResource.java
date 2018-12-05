@@ -7,16 +7,15 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
-import java.util.Optional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.ListDatasetsResponse;
-import marquez.api.mappers.DatasetResponseMapper;
 import marquez.services.DatasetService;
 import marquez.services.models.Dataset;
 
