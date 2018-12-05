@@ -7,6 +7,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -36,8 +37,8 @@ public final class DatasetResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") String namespace,
-      @QueryParam("limit") Integer limit,
-      @QueryParam("offset") Integer offset) {
+      @QueryParam("limit") @DefaultValue("0") int limit,
+      @QueryParam("offset") @DefaultValue("100") int offset) {
     final List<Dataset> datasets = datasetService.getAll(namespace, limit, offset);
     final List<DatasetResponse> datasetResponse = datasetResponseMapper.map(datasets);
     return Response.ok(new ListDatasetsResponse(datasetResponse)).build();
