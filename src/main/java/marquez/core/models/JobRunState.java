@@ -6,24 +6,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor
 public class JobRunState {
   private final UUID guid;
   private final Timestamp transitionedAt;
   private final UUID jobRunGuid;
   private final State state;
-
-  public JobRunState(
-      final UUID guid,
-      final Timestamp transitionedAt,
-      final UUID jobRunGuid,
-      final JobRunState.State state) {
-    this.guid = guid;
-    this.transitionedAt = transitionedAt;
-    this.jobRunGuid = jobRunGuid;
-    this.state = state;
-  }
 
   public enum State {
     NEW,
