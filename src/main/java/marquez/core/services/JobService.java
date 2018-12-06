@@ -22,10 +22,10 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 class JobService {
-  private JobDAO jobDAO;
-  private JobVersionDAO jobVersionDAO;
-  private JobRunDAO jobRunDAO;
-  private RunArgsDAO runArgsDAO;
+  private final JobDAO jobDAO;
+  private final JobVersionDAO jobVersionDAO;
+  private final JobRunDAO jobRunDAO;
+  private final RunArgsDAO runArgsDAO;
 
   public JobService(
       JobDAO jobDAO, JobVersionDAO jobVersionDAO, JobRunDAO jobRunDAO, RunArgsDAO runArgsDAO) {
