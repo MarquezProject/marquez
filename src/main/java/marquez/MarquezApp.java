@@ -27,12 +27,10 @@ import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class MarquezApp extends Application<MarquezConfig> {
-  private static final Logger LOG = LoggerFactory.getLogger(MarquezApp.class);
-
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRESQL_DB = "postgresql";
   private static final boolean ERROR_ON_UNDEFINED = false;
@@ -84,10 +82,10 @@ public class MarquezApp extends Application<MarquezConfig> {
     try {
       flyway.migrate();
     } catch (FlywayException e) {
-      LOG.error("Failed to apply migration to database.", e.getMessage());
+      log.error("Failed to apply migration to database.", e.getMessage());
       flyway.repair();
 
-      LOG.info("Successfully repaired database, stopping app...");
+      log.info("Successfully repaired database, stopping app...");
       // The throwable is not propagating up the stack.
       onFatalError(); // Signal app termination.
     }
