@@ -11,7 +11,11 @@ import java.util.UUID;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.statement.Query;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
+@Ignore(
+    "Tests currently failing, but leaving in as a reference. Please remove before merging issue-100")
 public class JobRunDaoTest extends JobRunBaseTest {
 
   @BeforeClass
@@ -27,13 +31,13 @@ public class JobRunDaoTest extends JobRunBaseTest {
                     JobRunState.State.fromInt(rs.getInt("state"))));
   }
 
-  // @Test
+  @Test
   public void testJobRunCreationCreatesJobRunState() {
     JobRunState returnedJobRunState = getLatestJobRunStateForJobId(NEW_JOB_RUN.getGuid());
     assertEquals(JobRunState.State.NEW, returnedJobRunState.getState());
   }
 
-  // @Test
+  @Test
   public void testJobRunUpdateCreatesJobRunState() {
     JobRun modifiedJobRun =
         new JobRun(
@@ -48,7 +52,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
     assertEquals(JobRunState.State.RUNNING, returnedJobRunState.getState());
   }
 
-  // @Test
+  @Test
   public void testJobRunGetter() {
     JobRun returnedJobRun = jobRunDAO.findJobRunById(NEW_JOB_RUN.getGuid());
     assertNull(returnedJobRun.getStartedAt());
