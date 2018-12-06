@@ -10,7 +10,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @Deprecated
 @RegisterRowMapper(JobRunStateRow.class)
-public interface JobRunStateDAO extends SqlObject {
+public interface JobRunStateDAO  {
   @SqlUpdate(
       "INSERT INTO job_run_states (guid, job_run_guid, state)"
           + "VALUES (:guid, :job_run_guid, :state)")

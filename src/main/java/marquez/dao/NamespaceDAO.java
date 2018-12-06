@@ -10,7 +10,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(NamespaceRow.class)
-public interface NamespaceDAO extends SqlObject {
+public interface NamespaceDAO  {
   @SqlUpdate(
       "INSERT INTO namespaces(uuid, name, description, current_owner) VALUES(:namespace.name, :namespace.description, :namespace.currentOwner)")
   void insert(@BindBean("namespace") Namespace namespace);

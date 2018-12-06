@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RegisterRowMapper(JobRunRow.class)
-public interface JobRunDAO extends SqlObject {
+public interface JobRunDAO  {
   Logger LOG = LoggerFactory.getLogger(JobRunDAO.class);
 
   @CreateSqlObject
