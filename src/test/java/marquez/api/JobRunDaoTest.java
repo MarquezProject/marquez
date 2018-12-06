@@ -41,8 +41,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
             new Timestamp(System.currentTimeMillis()),
             NEW_JOB_RUN.getEndedAt(),
             NEW_JOB_RUN.getJobRunDefinitionGuid(),
-            toInt(JobRunState.State.RUNNING),
-            null);
+            toInt(JobRunState.State.RUNNING));
     jobRunDAO.update(modifiedJobRun);
 
     JobRunState returnedJobRunState = getLatestJobRunStateForJobId(NEW_JOB_RUN.getGuid());
