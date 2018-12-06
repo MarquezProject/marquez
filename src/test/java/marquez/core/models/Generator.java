@@ -14,21 +14,16 @@ public class Generator {
     Random r = new Random();
     int jobNum = r.nextInt(10000);
     return new Job(
-        UUID.randomUUID(),
-        "job" + jobNum,
-        "job desc",
-        "http://foo.bar/" + jobNum,
-        namespaceID,
-        null);
+        UUID.randomUUID(), "job" + jobNum, "http://foo.bar/" + jobNum, namespaceID, null);
   }
 
   public static Job cloneJob(Job job) {
     return new Job(
         job.getGuid(),
         job.getName(),
-        job.getDescription(),
         job.getLocation(),
         job.getNamespaceGuid(),
+        job.getDescription(),
         job.getCreatedAt());
   }
 

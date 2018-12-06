@@ -53,10 +53,9 @@ class JobService {
             new Job(
                 UUID.randomUUID(),
                 job.getName(),
-                job.getDescription(),
                 job.getLocation(),
                 job.getNamespaceGuid(),
-                null);
+                job.getDescription());
         jobDAO.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
         return newJob;
       } else {
@@ -64,10 +63,9 @@ class JobService {
             new Job(
                 existingJob.getGuid(),
                 existingJob.getName(),
-                existingJob.getDescription(),
                 job.getLocation(),
                 existingJob.getNamespaceGuid(),
-                existingJob.getCreatedAt());
+                existingJob.getDescription());
         UUID versionID = JobService.computeVersion(existingJobWithNewUri);
         JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
         if (existingJobVersion == null) {
