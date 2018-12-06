@@ -21,7 +21,7 @@ import marquez.dao.RunArgsDAO;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
-class JobService {
+public class JobService {
   private final JobDAO jobDAO;
   private final JobVersionDAO jobVersionDAO;
   private final JobRunDAO jobRunDAO;
