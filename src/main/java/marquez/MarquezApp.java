@@ -1,5 +1,7 @@
 package marquez;
 
+import static java.util.Objects.requireNonNull;
+
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
@@ -46,6 +48,8 @@ public class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void initialize(Bootstrap<MarquezConfig> bootstrap) {
+    requireNonNull(bootstrap, "bootstrap must not be null");
+
     // Enable variable substitution with environment variables.
     bootstrap.setConfigurationSourceProvider(
         new SubstitutingSourceProvider(
@@ -56,23 +60,28 @@ public class MarquezApp extends Application<MarquezConfig> {
         new FlywayBundle<MarquezConfig>() {
           @Override
           public DataSourceFactory getDataSourceFactory(MarquezConfig config) {
-            return config.getDataSourceFactory();
+            return requireNonNull(config).getDataSourceFactory();
           }
 
           @Override
           public FlywayFactory getFlywayFactory(MarquezConfig config) {
-            return config.getFlywayFactory();
+            return requireNonNull(config).getFlywayFactory();
           }
         });
   }
 
   @Override
   public void run(MarquezConfig config, Environment env) {
+    requireNonNull(config, "config must not be null");
+    requireNonNull(env, "env must not be null");
+
     migrateDbOrError(config);
     registerResources(config, env);
   }
 
   private void migrateDbOrError(MarquezConfig config) {
+    requireNonNull(config, "config must not be null");
+
     final Flyway flyway = new Flyway();
     final DataSourceFactory database = config.getDataSourceFactory();
     flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
@@ -92,6 +101,9 @@ public class MarquezApp extends Application<MarquezConfig> {
   }
 
   private void registerResources(MarquezConfig config, Environment env) {
+    requireNonNull(config, "config must not be null");
+    requireNonNull(env, "env must not be null");
+
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
