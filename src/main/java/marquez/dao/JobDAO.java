@@ -39,21 +39,21 @@ public interface JobDAO {
       "SELECT j.*, jv.uri FROM jobs j INNER JOIN job_versions jv ON (j.guid = :guid AND j.current_version_guid = jv.guid)")
   Job findByID(@Bind("guid") UUID guid);
 
-  String findJobByNamespaceNameSQL =
-      "SELECT j.*, jv.uri"
-          + " FROM jobs j"
-          + " INNER JOIN job_versions jv ON (j.current_version_guid = jv.guid)"
-          + " INNER JOIN namespaces n ON (j.namespace_guid = n.guid AND n.name = :ns_name AND j.name = :job_name)";
-
-  @SqlQuery(findJobByNamespaceNameSQL)
+  @SqlQuery(
+      "SELECT j.*, jv.uri "
+          + "FROM jobs j "
+          + "INNER JOIN job_versions jv "
+          + "    ON (j.current_version_guid = jv.guid) "
+          + "INNER JOIN namespaces n "
+          + "    ON (j.namespace_guid = n.guid AND n.name = :ns_name AND j.name = :job_name)")
   Job findByName(@Bind("ns_name") String namespace, @Bind("job_name") String name);
 
-  String findAllByNamespaceNameSQL =
-      "SELECT j.*, jv.uri"
-          + " FROM jobs j"
-          + " INNER JOIN job_versions jv ON (j.current_version_guid = jv.guid)"
-          + " INNER JOIN namespaces n ON (j.namespace_guid = n.guid AND n.name = :ns_name)";
-
-  @SqlQuery(findAllByNamespaceNameSQL)
+  @SqlQuery(
+      "SELECT j.*, jv.uri "
+          + "FROM jobs j "
+          + "INNER JOIN job_versions jv "
+          + " ON (j.current_version_guid = jv.guid) "
+          + "INNER JOIN namespaces n "
+          + " ON (j.namespace_guid = n.guid AND n.name = :ns_name)")
   List<Job> findAllInNamespace(@Bind("ns_name") String namespaceName);
 }

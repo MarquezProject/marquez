@@ -23,11 +23,11 @@ public interface JobRunDAO {
   @CreateSqlObject
   RunArgsDAO createRunArgsDAO();
 
-  String insertJobRunSQL =
-      "INSERT INTO job_runs (guid, job_version_guid, current_state, job_run_args_hex_digest, nominal_start_time, nominal_end_time) "
-          + "VALUES (:guid, :jobVersionGuid, :currentState, :runArgsHexDigest, :nominalStartTime, :nominalEndTime)";
-
-  @SqlUpdate(insertJobRunSQL)
+  @SqlUpdate(
+      "INSERT INTO job_runs (guid, job_version_guid, current_state, "
+          + " job_run_args_hex_digest, nominal_start_time, nominal_end_time) "
+          + "VALUES (:guid, :jobVersionGuid, :currentState, :runArgsHexDigest, "
+          + " :nominalStartTime, :nominalEndTime)")
   void insertJobRun(@BindBean JobRun jobRun);
 
   @Transaction
@@ -42,9 +42,7 @@ public interface JobRunDAO {
     insert(jobRun);
   }
 
-  String updateStateSQL = "UPDATE job_runs SET current_state = :state WHERE guid = :job_run_id";
-
-  @SqlUpdate(updateStateSQL)
+  @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE guid = :job_run_id")
   void updateCurrentState(@Bind("job_run_id") UUID jobRunID, @Bind("state") Integer state);
 
   @Transaction
@@ -54,6 +52,9 @@ public interface JobRunDAO {
   }
 
   @SqlQuery(
-      "SELECT jr.*, jra.args_json FROM job_runs jr LEFT JOIN job_run_args jra ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest)")
+      "SELECT jr.*, jra.args_json "
+          + "FROM job_runs jr "
+          + "LEFT JOIN job_run_args jra "
+          + " ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest)")
   JobRun findJobRunById(@Bind("guid") UUID guid);
 }

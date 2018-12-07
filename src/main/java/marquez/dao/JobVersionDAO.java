@@ -20,25 +20,25 @@ public interface JobVersionDAO {
   @SqlQuery("SELECT * FROM job_versions WHERE version = :version")
   JobVersion findByVersion(@Bind("version") UUID version);
 
-  String findVersionsSQL =
+  @SqlQuery(
       "SELECT jv.* \n"
           + "FROM job_versions jv\n"
-          + "INNER JOIN jobs j ON (j.guid = jv.job_guid AND j.name=:job_name)"
-          + "INNER JOIN namespaces n ON (n.guid = j.namespace_guid AND n.name=:namespace_name)\n"
-          + "ORDER BY created_at";
-
-  @SqlQuery(findVersionsSQL)
+          + "INNER JOIN jobs j "
+          + " ON (j.guid = jv.job_guid AND j.name=:job_name)"
+          + "INNER JOIN namespaces n "
+          + " ON (n.guid = j.namespace_guid AND n.name=:namespace_name)\n"
+          + "ORDER BY created_at")
   List<JobVersion> find(@Bind("namespace_name") String namespace, @Bind("job_name") String jobName);
 
-  String findLatestVersionSQL =
+  @SqlQuery(
       "SELECT jv.* \n"
           + "FROM job_versions jv\n"
-          + "INNER JOIN jobs j ON (j.guid = jv.job_guid AND j.name=:job_name)"
-          + "INNER JOIN namespaces n ON (n.guid = j.namespace_guid AND n.name=:namespace_name)\n"
+          + "INNER JOIN jobs j "
+          + " ON (j.guid = jv.job_guid AND j.name=:job_name)"
+          + "INNER JOIN namespaces n "
+          + " ON (n.guid = j.namespace_guid AND n.name=:namespace_name)\n"
           + "ORDER BY created_at DESC \n"
-          + "LIMIT 1";
-
-  @SqlQuery(findLatestVersionSQL)
+          + "LIMIT 1")
   JobVersion findLatest(@Bind("namespace_name") String namespace, @Bind("job_name") String jobName);
 
   @SqlUpdate(
