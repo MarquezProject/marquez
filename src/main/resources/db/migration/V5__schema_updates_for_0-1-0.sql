@@ -65,11 +65,9 @@ ALTER TABLE job_runs ADD nominal_start_time TIMESTAMP;
 ALTER TABLE job_runs ADD nominal_end_time TIMESTAMP;
 ALTER TABLE job_runs ADD job_run_args_guid UUID;
 ALTER TABLE job_runs ADD FOREIGN KEY(job_run_args_guid) REFERENCES job_run_args(guid);
-ALTER TABLE job_runs ADD job_version_guid UUID NOT NULL;
-ALTER TABLE job_runs ADD FOREIGN KEY(job_version_guid) REFERENCES job_versions(guid);
 
 ALTER TABLE datasets ADD COLUMN urn VARCHAR(128) NOT NULL;
-ALTER TABLE datasets ADD namespace_guid UUID NOT NULL;
+ALTER TABLE datasets ADD namespace_guid UUID;
 ALTER TABLE datasets ADD FOREIGN KEY(namespace_guid) REFERENCES namespaces(guid);
-ALTER TABLE datasets ADD datasource_uuid UUID NOT NULL;
+ALTER TABLE datasets ADD datasource_uuid UUID;
 ALTER TABLE datasets ADD FOREIGN KEY(datasource_uuid) REFERENCES datasources(guid);
