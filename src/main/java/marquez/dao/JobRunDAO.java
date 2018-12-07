@@ -4,7 +4,6 @@ import java.util.UUID;
 import marquez.core.models.JobRun;
 import marquez.core.models.RunArgs;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
-import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -15,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RegisterRowMapper(JobRunRow.class)
-public interface JobRunDAO  {
+public interface JobRunDAO {
   Logger LOG = LoggerFactory.getLogger(JobRunDAO.class);
 
   @CreateSqlObject

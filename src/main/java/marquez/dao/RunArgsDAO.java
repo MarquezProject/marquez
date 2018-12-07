@@ -1,7 +1,6 @@
 package marquez.dao;
 
 import marquez.core.models.RunArgs;
-import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -9,7 +8,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(RunArgsRow.class)
-public interface RunArgsDAO  {
+public interface RunArgsDAO {
   @SqlUpdate("INSERT INTO job_run_args(hex_digest, args_json) VALUES (:hexDigest, :json)")
   void insert(@BindBean RunArgs runArgs);
 

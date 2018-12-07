@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 @Deprecated
 @RegisterRowMapper(JobRunRow.class)
-public interface JobRunDAO  {
+public interface JobRunDAO extends SqlObject {
   Logger LOG = LoggerFactory.getLogger(JobRunDAO.class);
 
   @CreateSqlObject

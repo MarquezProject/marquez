@@ -2,7 +2,6 @@ package marquez.dao.deprecated;
 
 import java.util.UUID;
 import marquez.api.JobRunState;
-import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -10,7 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @Deprecated
 @RegisterRowMapper(JobRunStateRow.class)
-public interface JobRunStateDAO  {
+public interface JobRunStateDAO {
   @SqlUpdate(
       "INSERT INTO job_run_states (guid, job_run_guid, state)"
           + "VALUES (:guid, :job_run_guid, :state)")
