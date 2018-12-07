@@ -6,7 +6,7 @@ import static marquez.api.JobRunState.State.toInt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import java.util.UUID;
-import marquez.dao.JobRunDAO;
+import marquez.dao.deprecated.JobRunDAO;
 import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.AfterClass;

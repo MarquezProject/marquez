@@ -11,19 +11,14 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import marquez.core.mappers.ResourceExceptionMapper;
 import marquez.core.services.NamespaceService;
-import marquez.dao.DatasetDAO;
-import marquez.dao.JobDAO;
-import marquez.dao.JobRunDAO;
-import marquez.dao.JobRunDefinitionDAO;
-import marquez.dao.JobVersionDAO;
-import marquez.dao.OwnerDAO;
+import marquez.dao.deprecated.DatasetDAO;
+import marquez.dao.deprecated.JobDAO;
+import marquez.dao.deprecated.JobRunDAO;
 import marquez.resources.DatasetResource;
 import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
-import marquez.resources.JobRunDefinitionResource;
 import marquez.resources.JobRunResource;
 import marquez.resources.NamespaceResource;
-import marquez.resources.OwnerResource;
 import marquez.resources.PingResource;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
@@ -107,9 +102,6 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey().register(new PingResource());
     env.jersey().register(new HealthResource());
 
-    final OwnerDAO ownerDAO = jdbi.onDemand(OwnerDAO.class);
-    env.jersey().register(new OwnerResource(ownerDAO));
-
     final JobDAO jobDAO = jdbi.onDemand(JobDAO.class);
     env.jersey().register(new JobResource(jobDAO));
 
@@ -118,12 +110,6 @@ public class MarquezApp extends Application<MarquezConfig> {
 
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));
-
-    final JobRunDefinitionDAO jobRunDefinitionDAO = jdbi.onDemand(JobRunDefinitionDAO.class);
-    final JobVersionDAO jobVersionDAO = jdbi.onDemand(JobVersionDAO.class);
-    env.jersey()
-        .register(
-            new JobRunDefinitionResource(jobRunDefinitionDAO, jobVersionDAO, jobDAO, ownerDAO));
 
     final NamespaceService namespaceService = new NamespaceService();
     env.jersey().register(new NamespaceResource(namespaceService));
