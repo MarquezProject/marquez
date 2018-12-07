@@ -1,23 +1,19 @@
 package marquez.common;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public interface Mapper<A, B> {
-  public default Optional<B> mapAsOptional(A value) {
-    return Optional.ofNullable(map(value));
+  default List<B> map(List<A> value) {
+    requireNonNull(value);
+
+    return value.isEmpty()
+        ? Collections.emptyList()
+        : Collections.unmodifiableList(value.stream().map(this::map).collect(toList()));
   }
 
-  public default Optional<B> mapIfPresent(Optional<A> value) {
-    return requireNonNull(value).map(this::map);
-  }
-
-  public default List<B> map(List<A> value) {
-    return requireNonNull(value).stream().map(this::map).collect(Collectors.toList());
-  }
-
-  public B map(A value);
+  B map(A value);
 }
