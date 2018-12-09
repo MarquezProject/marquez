@@ -1,11 +1,21 @@
 package marquez.common.models;
 
 import static java.util.stream.Collectors.joining;
+import static org.junit.Assert.assertEquals;
 
 import java.util.stream.Stream;
 import org.junit.Test;
 
 public class NamespaceTest {
+  @Test
+  public void testNewNamespace() {
+    String namespace = "aracataca";
+    Namespace expected = new Namespace(namespace);
+    Namespace actual = new Namespace(namespace);
+
+    assertEquals(expected, actual);
+  }
+
   @Test(expected = NullPointerException.class)
   public void testNamespaceNull() {
     String nullNamespace = null;
