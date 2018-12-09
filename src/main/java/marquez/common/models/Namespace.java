@@ -7,13 +7,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
 @EqualsAndHashCode
 public final class Namespace {
   private static final Pattern NAMESPACE_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{1,1024}$");
 
-  private final String value;
+  @Getter private final String value;
 
   public Namespace(final String value) {
     requireNonNull(value, "value must not be null");
