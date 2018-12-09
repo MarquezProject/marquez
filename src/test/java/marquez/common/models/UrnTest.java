@@ -1,12 +1,22 @@
 package marquez.common.models;
 
 import static java.util.stream.Collectors.joining;
+import static org.junit.Assert.assertEquals;
 
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 import org.junit.Test;
 
 public class UrnTest {
+  @Test
+  public void testNewUrn() {
+    String urn = "urn:a:b:c";
+    Urn expected = new Urn(urn);
+    Urn actual = new Urn(urn);
+
+    assertEquals(expected, actual);
+  }
+
   @Test(expected = NullPointerException.class)
   public void testUrnNull() {
     String nullUrn = null;
