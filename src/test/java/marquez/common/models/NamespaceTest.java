@@ -9,7 +9,7 @@ import org.junit.Test;
 public class NamespaceTest {
   @Test
   public void testNewNamespace() {
-    String namespace = "aracataca";
+    String namespace = "macondo";
     Namespace expected = new Namespace(namespace);
     Namespace actual = new Namespace(namespace);
 
@@ -47,6 +47,6 @@ public class NamespaceTest {
   }
 
   private String newGreaterThan1024Namespace() {
-    return Stream.generate(() -> "a").limit(((1024 + 1))).collect(joining());
+    return Stream.generate(() -> "a").limit(1024 + 1).collect(joining());
   }
 }
