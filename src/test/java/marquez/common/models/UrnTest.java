@@ -44,6 +44,12 @@ public class UrnTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
+  public void testUrnNonAlphanumericPart() {
+    String nonAlphanumericPartUrn = "urn:a:~$^:c";
+    new Namespace(nonAlphanumericPartUrn);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
   public void testUrnWithPartGreaterThan64() {
     String greaterThan1024Urn = newUrnWithPartGreaterThan64();
     new Urn(greaterThan1024Urn);
