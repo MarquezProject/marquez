@@ -34,7 +34,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 @Slf4j
 public class MarquezApp extends Application<MarquezConfig> {
   private static final String APP_NAME = "MarquezApp";
-  private static final String POSTGRESQL_DB = "postgresql";
+  private static final String POSTGRES_DB = "postgresql";
   private static final boolean ERROR_ON_UNDEFINED = false;
 
   public static void main(String[] args) throws Exception {
@@ -56,6 +56,7 @@ public class MarquezApp extends Application<MarquezConfig> {
             bootstrap.getConfigurationSourceProvider(),
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
 
+    // Enable Flyway for database migrations.
     bootstrap.addBundle(
         new FlywayBundle<MarquezConfig>() {
           @Override
@@ -92,6 +93,7 @@ public class MarquezApp extends Application<MarquezConfig> {
       flyway.migrate();
     } catch (FlywayException e) {
       log.error("Failed to apply migration to database.", e.getMessage());
+      log.info("Repairing failed database migration...", e.getMessage());
       flyway.repair();
 
       log.info("Successfully repaired database, stopping app...");
@@ -107,7 +109,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
-            .build(env, config.getDataSourceFactory(), POSTGRESQL_DB)
+            .build(env, config.getDataSourceFactory(), POSTGRES_DB)
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
 
