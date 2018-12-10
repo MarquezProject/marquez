@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.ListDatasetsResponse;
-import marquez.common.models.Namespace;
+import marquez.common.Namespace;
 import marquez.service.DatasetService;
 import marquez.service.models.Dataset;
 
