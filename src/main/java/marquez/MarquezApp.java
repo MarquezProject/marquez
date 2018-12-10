@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.resources.DatasetResource;
 import marquez.core.mappers.ResourceExceptionMapper;
 import marquez.core.services.NamespaceService;
-import marquez.dao.deprecated.DatasetDAO;
 import marquez.dao.deprecated.JobDAO;
 import marquez.dao.deprecated.JobRunDAO;
 import marquez.db.DatasetDao;
