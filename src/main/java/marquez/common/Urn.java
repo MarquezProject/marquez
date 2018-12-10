@@ -1,4 +1,4 @@
-package marquez.common.models;
+package marquez.common;
 
 import static java.util.Objects.requireNonNull;
 
@@ -7,8 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-@ToString
 @EqualsAndHashCode
+@ToString
 public final class Urn {
   private static final Pattern URN_PATTERN = Pattern.compile("^urn(:[a-zA-Z0-9]{1,64}){3}$");
 

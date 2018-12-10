@@ -1,4 +1,4 @@
-package marquez.common.models;
+package marquez.common;
 
 import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertEquals;
@@ -10,65 +10,65 @@ import org.junit.Test;
 public class UrnTest {
   @Test
   public void testNewUrn() {
-    String urn = "urn:a:b:c";
-    Urn expected = new Urn(urn);
-    Urn actual = new Urn(urn);
-
+    final String urn = "urn:a:b:c";
+    final Urn expected = new Urn(urn);
+    final Urn actual = new Urn(urn);
     assertEquals(expected, actual);
   }
 
   @Test(expected = NullPointerException.class)
   public void testUrnNull() {
-    String nullUrn = null;
+    final String nullUrn = null;
     new Urn(nullUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnEmpty() {
-    String emptyUrn = "";
+    final String emptyUrn = "";
     new Urn(emptyUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnBlank() {
-    String blankUrn = " ";
+    final String blankUrn = " ";
     new Urn(blankUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnNoPrefix() {
-    String noPrefixUrn = "a:b:c";
+    final String noPrefixUrn = "a:b:c";
     new Urn(noPrefixUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnMissingPart() {
-    String missingPartUrn = "urn:a:b";
+    final String missingPartUrn = "urn:a:b";
     new Urn(missingPartUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnExtraPart() {
-    String extraPartUrn = "urn:a:b:c:d";
+    final String extraPartUrn = "urn:a:b:c:d";
     new Urn(extraPartUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnNonAlphanumericPart() {
-    String nonAlphanumericPartUrn = "urn:a:~$^:c";
+    final String nonAlphanumericPartUrn = "urn:a:~$^:c";
     new Namespace(nonAlphanumericPartUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnWithPartGreaterThan64() {
-    String greaterThan1024Urn = newUrnWithPartGreaterThan64();
+    final String greaterThan1024Urn = newUrnWithPartGreaterThan64();
     new Urn(greaterThan1024Urn);
   }
 
   private String newUrnWithPartGreaterThan64() {
-    String urnPart0 = Stream.generate(() -> "a").limit(64).collect(joining());
-    String urnPart1 = Stream.generate(() -> "b").limit(64).collect(joining());
-    String urnPart2GreaterThan64 = Stream.generate(() -> "c").limit(64 + 1).collect(joining());
+    final String urnPart0 = Stream.generate(() -> "a").limit(64).collect(joining());
+    final String urnPart1 = Stream.generate(() -> "b").limit(64).collect(joining());
+    final String urnPart2GreaterThan64 =
+        Stream.generate(() -> "c").limit(64 + 1).collect(joining());
 
     return new StringJoiner(":")
         .add("urn")

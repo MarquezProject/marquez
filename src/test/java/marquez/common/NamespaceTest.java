@@ -1,4 +1,4 @@
-package marquez.common.models;
+package marquez.common;
 
 import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertEquals;
@@ -9,40 +9,39 @@ import org.junit.Test;
 public class NamespaceTest {
   @Test
   public void testNewNamespace() {
-    String namespace = "macondo";
-    Namespace expected = new Namespace(namespace);
-    Namespace actual = new Namespace(namespace);
-
+    final String namespace = "macondo";
+    final Namespace expected = new Namespace(namespace);
+    final Namespace actual = new Namespace(namespace);
     assertEquals(expected, actual);
   }
 
   @Test(expected = NullPointerException.class)
   public void testNamespaceNull() {
-    String nullNamespace = null;
+    final String nullNamespace = null;
     new Namespace(nullNamespace);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNamespaceEmpty() {
-    String emptyNamespace = "";
+    final String emptyNamespace = "";
     new Namespace(emptyNamespace);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNamespaceBlank() {
-    String blankNamespace = " ";
+    final String blankNamespace = " ";
     new Namespace(blankNamespace);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNamespaceNonAlphanumeric() {
-    String nonAlphanumericNamespace = "~$^+=<>";
+    final String nonAlphanumericNamespace = "~$^+=<>";
     new Namespace(nonAlphanumericNamespace);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNamespaceGreaterThan1024() {
-    String greaterThan1024Namespace = newGreaterThan1024Namespace();
+    final String greaterThan1024Namespace = newGreaterThan1024Namespace();
     new Namespace(greaterThan1024Namespace);
   }
 
