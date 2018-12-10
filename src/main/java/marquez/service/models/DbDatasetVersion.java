@@ -11,9 +11,9 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class DbDatasetVersion {
-  @NonNull @Getter private final String connectionUrl;
-  @NonNull @Getter private final String schema;
-  @NonNull @Getter private final String table;
+  @Getter @NonNull private final String connectionUrl;
+  @Getter @NonNull private final String schema;
+  @Getter @NonNull private final String table;
   private final String description;
 
   public Optional<String> getDescription() {
