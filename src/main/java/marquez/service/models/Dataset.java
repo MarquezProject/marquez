@@ -12,7 +12,7 @@ import marquez.common.Urn;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class Dataset {
+public final class Dataset {
   @Getter @NonNull private final Urn urn;
   @Getter @NonNull private final Instant createdAt;
   private final String description;
