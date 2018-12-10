@@ -13,8 +13,8 @@ import marquez.common.Urn;
 @EqualsAndHashCode
 @ToString
 public class DatasetResponse {
-  @NonNull @Getter private final Urn urn;
-  @NonNull @Getter private final Instant createdAt;
+  @Getter @NonNull private final Urn urn;
+  @Getter @NonNull private final Instant createdAt;
   private final String description;
 
   public Optional<String> getDescription() {
