@@ -29,6 +29,7 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
         .urn(urn)
         .createdAt(results.getDate("created_at").toInstant())
         .createdAt(results.getDate("updated_at").toInstant())
+        .description(results.getString("description"))
         .build();
   }
 }
