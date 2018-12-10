@@ -1,5 +1,6 @@
 package marquez.api.resources;
 
+import static javax.ws.rs.core.Response.Status.OK;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -28,11 +29,14 @@ public class DatasetResourceTest {
 
   @Test
   public void testListDatasets() {
-    final List<Dataset> datasets = Arrays.asList(DATASET);
-    when(mockDatasetService.getAll(NAMESPACE, 0, 100)).thenReturn(datasets);
+    final Integer limit = 0;
+    final Integer offset = 100;
 
-    final Response response = datasetResource.list(NAMESPACE, 0, 100);
-    assertEquals(200, response.getStatus());
+    final List<Dataset> datasets = Arrays.asList(DATASET);
+    when(mockDatasetService.getAll(NAMESPACE, limit, offset)).thenReturn(datasets);
+
+    final Response response = datasetResource.list(NAMESPACE, limit, offset);
+    assertEquals(OK, response.getStatus());
 
     final ListDatasetsResponse listDatasetsResponse = (ListDatasetsResponse) response.getEntity();
     final List<DatasetResponse> datasetsResponses = listDatasetsResponse.getDatasetResponses();
@@ -41,6 +45,6 @@ public class DatasetResourceTest {
     assertEquals(DATASET.getCreatedAt(), datasetsResponses.get(0).getCreatedAt());
     assertEquals(DATASET.getDescription(), datasetsResponses.get(0).getDescription());
 
-    verify(mockDatasetService, times(1)).getAll(NAMESPACE, 0, 100);
+    verify(mockDatasetService, times(1)).getAll(NAMESPACE, limit, offset);
   }
 }
