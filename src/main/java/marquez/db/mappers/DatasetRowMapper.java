@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.UUID;
 import marquez.common.Urn;
 import marquez.db.models.DatasetRow;
@@ -21,15 +22,18 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
     final UUID dataSourceUuid = UUID.fromString(results.getString("data_source_uuid"));
     final UUID currentVersion = UUID.fromString(results.getString("current_version"));
     final Urn urn = new Urn(results.getString("urn"));
+    final Instant createdAt = results.getDate("created_at").toInstant();
+    final Instant updatedAt = results.getDate("updated_at").toInstant();
+    final String description = results.getString("description");
     return DatasetRow.builder()
         .uuid(uuid)
         .namespaceUuid(namespaceUuid)
         .dataSourceUuid(dataSourceUuid)
         .currentVersion(currentVersion)
         .urn(urn)
-        .createdAt(results.getDate("created_at").toInstant())
-        .createdAt(results.getDate("updated_at").toInstant())
-        .description(results.getString("description"))
+        .createdAt(createdAt)
+        .updatedAt(updatedAt)
+        .description(description)
         .build();
   }
 }
