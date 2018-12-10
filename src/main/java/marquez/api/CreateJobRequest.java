@@ -1,21 +1,22 @@
 package marquez.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import javax.ws.rs.QueryParam;
 import lombok.Data;
 
+// TODO: Add integration testing for this
 @Data
 public final class CreateJobRequest {
 
-  @QueryParam("location")
+  @JsonProperty("location")
   private final String location;
 
-  @QueryParam("description")
+  @JsonProperty("description")
   private final String description;
 
-  @QueryParam("inputDatasetUrns")
+  @JsonProperty("inputDatasetUrns")
   public List<String> getInputDatasetUrns;
 
-  @QueryParam("oututDatasetUrns")
+  @JsonProperty("oututDatasetUrns")
   public List<String> getOutputDatasetUrns;
 }

@@ -1,14 +1,10 @@
 package marquez.resources;
 
-import com.codahale.metrics.annotation.Timed;
-import marquez.api.CreateJobRunRequest;
-import marquez.api.CreateJobRunResponse;
-import marquez.core.exceptions.ResourceException;
-import marquez.core.exceptions.UnexpectedException;
-import marquez.core.services.JobService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import com.codahale.metrics.annotation.Timed;
+import java.util.Optional;
+import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -19,10 +15,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
-import java.util.Optional;
-import java.util.UUID;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import marquez.api.CreateJobRunRequest;
+import marquez.api.CreateJobRunResponse;
+import marquez.core.exceptions.ResourceException;
+import marquez.core.exceptions.UnexpectedException;
+import marquez.core.services.JobService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Produces(APPLICATION_JSON)
 public class JobRunResource extends BaseResource {
@@ -46,7 +45,12 @@ public class JobRunResource extends BaseResource {
     UUID jobRunGuid = UUID.randomUUID();
 
     try {
-      jobService.createJobRun(namespace, job, request.getRunArgs(), request.getNominalStartTime(), request.getNominalEndTime());
+      jobService.createJobRun(
+          namespace,
+          job,
+          request.getRunArgs(),
+          request.getNominalStartTime(),
+          request.getNominalEndTime());
 
       CreateJobRunResponse res = new CreateJobRunResponse(jobRunGuid);
       String jsonRes = mapper.writeValueAsString(res);
@@ -67,7 +71,8 @@ public class JobRunResource extends BaseResource {
   public Response completeJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
 
-      jobService.updateJobRunState(UUID.fromString(runId), marquez.core.models.JobRunState.State.COMPLETED);
+      jobService.updateJobRunState(
+          UUID.fromString(runId), marquez.core.models.JobRunState.State.COMPLETED);
       return Response.status(Response.Status.OK).build();
     } catch (UnexpectedException | Exception e) {
       LOG.error(e.getLocalizedMessage());
@@ -81,7 +86,8 @@ public class JobRunResource extends BaseResource {
   @Path("/jobs/runs/{runId}/fail")
   public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      jobService.updateJobRunState(UUID.fromString(runId), marquez.core.models.JobRunState.State.FAILED);
+      jobService.updateJobRunState(
+          UUID.fromString(runId), marquez.core.models.JobRunState.State.FAILED);
       return Response.status(Response.Status.OK).build();
     } catch (UnexpectedException | Exception e) {
       LOG.error(e.getLocalizedMessage());
@@ -95,7 +101,8 @@ public class JobRunResource extends BaseResource {
   @Path("/jobs/runs/{runId}/abort")
   public Response abortJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      jobService.updateJobRunState(UUID.fromString(runId), marquez.core.models.JobRunState.State.ABORTED);
+      jobService.updateJobRunState(
+          UUID.fromString(runId), marquez.core.models.JobRunState.State.ABORTED);
       return Response.status(Response.Status.OK).build();
     } catch (UnexpectedException | Exception e) {
       LOG.error(e.getLocalizedMessage());
