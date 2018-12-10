@@ -29,13 +29,10 @@ public class DatasetResourceTest {
 
   @Test
   public void testListDatasets() {
-    final Integer limit = 0;
-    final Integer offset = 100;
-
     final List<Dataset> datasets = Arrays.asList(DATASET);
-    when(mockDatasetService.getAll(NAMESPACE, limit, offset)).thenReturn(datasets);
+    when(mockDatasetService.getAll(NAMESPACE, 0, 100)).thenReturn(datasets);
 
-    final Response response = datasetResource.list(NAMESPACE, limit, offset);
+    final Response response = datasetResource.list(NAMESPACE, 0, 100);
     assertEquals(OK, response.getStatusInfo());
 
     final ListDatasetsResponse listDatasetsResponse = (ListDatasetsResponse) response.getEntity();
@@ -45,6 +42,6 @@ public class DatasetResourceTest {
     assertEquals(DATASET.getCreatedAt(), datasetsResponses.get(0).getCreatedAt());
     assertEquals(DATASET.getDescription(), datasetsResponses.get(0).getDescription());
 
-    verify(mockDatasetService, times(1)).getAll(NAMESPACE, limit, offset);
+    verify(mockDatasetService, times(1)).getAll(NAMESPACE, 0, 100);
   }
 }
