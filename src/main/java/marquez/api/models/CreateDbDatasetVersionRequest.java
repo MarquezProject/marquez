@@ -5,15 +5,14 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString
 public final class CreateDbDatasetVersionRequest extends CreateDatasetVersionRequest {
-  @Getter @NonNull private final String connectionUrl;
-  @Getter @NonNull private final String schema;
-  @Getter @NonNull private final String table;
+  @Getter private final String connectionUrl;
+  @Getter private final String schema;
+  @Getter private final String table;
   private final String description;
 
   public CreateDbDatasetVersionRequest(
