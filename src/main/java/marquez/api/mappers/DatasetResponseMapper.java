@@ -10,7 +10,10 @@ public final class DatasetResponseMapper implements Mapper<Dataset, DatasetRespo
   @Override
   public DatasetResponse map(Dataset dataset) {
     requireNonNull(dataset, "dataset must not be null");
-    return new DatasetResponse(
-        dataset.getUrn(), dataset.getCreatedAt(), dataset.getDescription().orElse(null));
+    return DatasetResponse.builder()
+        .urn(dataset.getUrn())
+        .createdAt(dataset.getCreatedAt())
+        .description(dataset.getDescription().orElse(null))
+        .build();
   }
 }
