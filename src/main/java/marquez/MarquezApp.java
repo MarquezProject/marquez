@@ -15,11 +15,13 @@ import marquez.dao.deprecated.DatasetDAO;
 import marquez.dao.deprecated.JobDAO;
 import marquez.dao.deprecated.JobRunDAO;
 import marquez.resources.DatasetResource;
+import marquez.db.DatasetDao;
 import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
 import marquez.resources.JobRunResource;
 import marquez.resources.NamespaceResource;
 import marquez.resources.PingResource;
+import marquez.service.DatasetService;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
@@ -99,8 +101,11 @@ public class MarquezApp extends Application<MarquezConfig> {
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
 
+    final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
+
     env.jersey().register(new PingResource());
     env.jersey().register(new HealthResource());
+    env.jersey().register(new DatasetResource(new DatasetService(datasetDao)));
 
     final JobDAO jobDAO = jdbi.onDemand(JobDAO.class);
     env.jersey().register(new JobResource(jobDAO));
@@ -108,8 +113,11 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
     env.jersey().register(new JobRunResource(jobRunDAO));
 
-    final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
-    env.jersey().register(new DatasetResource(datasetDAO));
+    final JobRunDefinitionDAO jobRunDefinitionDAO = jdbi.onDemand(JobRunDefinitionDAO.class);
+    final JobVersionDAO jobVersionDAO = jdbi.onDemand(JobVersionDAO.class);
+    env.jersey()
+        .register(
+            new JobRunDefinitionResource(jobRunDefinitionDAO, jobVersionDAO, jobDAO, ownerDAO));
 
     final NamespaceService namespaceService = new NamespaceService();
     env.jersey().register(new NamespaceResource(namespaceService));
