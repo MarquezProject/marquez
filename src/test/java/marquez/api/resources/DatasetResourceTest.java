@@ -36,7 +36,7 @@ public class DatasetResourceTest {
     when(mockDatasetService.getAll(NAMESPACE, limit, offset)).thenReturn(datasets);
 
     final Response response = datasetResource.list(NAMESPACE, limit, offset);
-    assertEquals(OK, response.getStatus());
+    assertEquals(OK, response.getStatusInfo());
 
     final ListDatasetsResponse listDatasetsResponse = (ListDatasetsResponse) response.getEntity();
     final List<DatasetResponse> datasetsResponses = listDatasetsResponse.getDatasetResponses();
