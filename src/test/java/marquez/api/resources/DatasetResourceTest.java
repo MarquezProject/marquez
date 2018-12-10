@@ -20,18 +20,15 @@ import org.junit.Test;
 
 public class DatasetResourceTest {
   private static final Namespace NAMESPACE = new Namespace("test");
+  private static final Dataset DATASET =
+      new Dataset(new Urn("urn:a:b:c"), Instant.now(), "test description");
 
   private final DatasetService mockDatasetService = mock(DatasetService.class);
   private final DatasetResource datasetResource = new DatasetResource(mockDatasetService);
 
   @Test
   public void testListDatasets() {
-    final Urn urn = new Urn("urn:a:b:c");
-    final Instant createdAt = Instant.now();
-    final String description = "test description";
-    final Dataset expectedDataset = new Dataset(urn, createdAt, description);
-
-    final List<Dataset> datasets = Arrays.asList(expectedDataset);
+    final List<Dataset> datasets = Arrays.asList(DATASET);
     when(mockDatasetService.getAll(NAMESPACE, 0, 100)).thenReturn(datasets);
 
     final Response response = datasetResource.list(NAMESPACE, 0, 100);
@@ -40,9 +37,9 @@ public class DatasetResourceTest {
     final ListDatasetsResponse listDatasetsResponse = (ListDatasetsResponse) response.getEntity();
     final List<DatasetResponse> datasetsResponses = listDatasetsResponse.getDatasetResponses();
     assertEquals(1, datasetsResponses.size());
-    assertEquals(expectedDataset.getUrn(), datasetsResponses.get(0).getUrn());
-    assertEquals(expectedDataset.getCreatedAt(), datasetsResponses.get(0).getCreatedAt());
-    assertEquals(expectedDataset.getDescription(), datasetsResponses.get(0).getDescription());
+    assertEquals(DATASET.getUrn(), datasetsResponses.get(0).getUrn());
+    assertEquals(DATASET.getCreatedAt(), datasetsResponses.get(0).getCreatedAt());
+    assertEquals(DATASET.getDescription(), datasetsResponses.get(0).getDescription());
 
     verify(mockDatasetService, times(1)).getAll(NAMESPACE, 0, 100);
   }
