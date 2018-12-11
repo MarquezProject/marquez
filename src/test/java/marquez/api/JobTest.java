@@ -1,15 +1,14 @@
 package marquez.api;
 
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.Test;
 
 public class JobTest {
 
