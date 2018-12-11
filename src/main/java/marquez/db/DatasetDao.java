@@ -9,8 +9,12 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @RegisterRowMapper(DatasetRowMapper.class)
 public interface DatasetDao {
-  @SqlQuery("SELECT * FROM datasets LIMIT :limit OFFSET :offset")
-  DatasetRow find(@Bind("namespace") String namespace, @Bind("limit") String urn);
+  @SqlQuery("SELECT * FROM datasets WHERE urn = :urn LIMIT :limit OFFSET :offset")
+  DatasetRow findByUrn(
+      @Bind("namespace") String namespace,
+      @Bind("urn") String urn,
+      @Bind("limit") Integer limit,
+      @Bind("offset") Integer offset);
 
   @SqlQuery("SELECT * FROM datasets LIMIT :limit OFFSET :offset")
   List<DatasetRow> findAll(
