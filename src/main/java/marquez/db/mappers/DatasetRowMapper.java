@@ -15,7 +15,6 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
   @Override
   public DatasetRow map(ResultSet results, StatementContext context) throws SQLException {
     requireNonNull(results, "results must not be null");
-    requireNonNull(context, "context must not be null");
 
     final UUID uuid = UUID.fromString(results.getString("uuid"));
     final UUID namespaceUuid = UUID.fromString(results.getString("namespace_uuid"));
@@ -25,15 +24,15 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
     final Instant createdAt = results.getDate("created_at").toInstant();
     final Instant updatedAt = results.getDate("updated_at").toInstant();
     final String description = results.getString("description");
-    return DatasetRow.builder()
-        .uuid(uuid)
-        .namespaceUuid(namespaceUuid)
-        .dataSourceUuid(dataSourceUuid)
-        .currentVersion(currentVersion)
-        .urn(urn)
-        .createdAt(createdAt)
-        .updatedAt(updatedAt)
-        .description(description)
-        .build();
+
+    return new DatasetRow(
+        uuid,
+        namespaceUuid,
+        dataSourceUuid,
+        currentVersion,
+        urn,
+        createdAt,
+        updatedAt,
+        description);
   }
 }
