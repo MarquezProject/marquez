@@ -25,14 +25,15 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
     final Instant updatedAt = results.getDate("updated_at").toInstant();
     final String description = results.getString("description");
 
-    return new DatasetRow(
-        uuid,
-        namespaceUuid,
-        dataSourceUuid,
-        currentVersion,
-        urn,
-        createdAt,
-        updatedAt,
-        description);
+    return DatasetRow.builder()
+        .uuid(uuid)
+        .namespaceUuid(namespaceUuid)
+        .dataSourceUuid(dataSourceUuid)
+        .currentVersion(currentVersion)
+        .urn(urn)
+        .createdAt(createdAt)
+        .updatedAt(updatedAt)
+        .description(description)
+        .build();
   }
 }
