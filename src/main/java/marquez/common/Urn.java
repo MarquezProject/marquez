@@ -10,7 +10,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class Urn {
-  private static final Pattern URN_PATTERN = Pattern.compile("^urn(:[a-zA-Z0-9]{1,64}){3}$");
+  private static final Pattern URN_PATTERN = Pattern.compile("^urn(:[a-zA-Z0-9.]{1,64}){2}$");
 
   @Getter private final String value;
 

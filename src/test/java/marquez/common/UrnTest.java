@@ -10,7 +10,7 @@ import org.junit.Test;
 public class UrnTest {
   @Test
   public void testNewUrn() {
-    final String urn = "urn:a:b:c";
+    final String urn = "urn:a:b.c";
     final Urn expected = new Urn(urn);
     final Urn actual = new Urn(urn);
     assertEquals(expected, actual);
@@ -36,25 +36,25 @@ public class UrnTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnNoPrefix() {
-    final String noPrefixUrn = "a:b:c";
+    final String noPrefixUrn = "a:b";
     new Urn(noPrefixUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnMissingPart() {
-    final String missingPartUrn = "urn:a:b";
+    final String missingPartUrn = "urn:a";
     new Urn(missingPartUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnExtraPart() {
-    final String extraPartUrn = "urn:a:b:c:d";
+    final String extraPartUrn = "urn:a:b:c";
     new Urn(extraPartUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnNonAlphanumericPart() {
-    final String nonAlphanumericPartUrn = "urn:a:~$^:c";
+    final String nonAlphanumericPartUrn = "urn:a:~$^";
     new Namespace(nonAlphanumericPartUrn);
   }
 
@@ -66,15 +66,13 @@ public class UrnTest {
 
   private String newUrnWithPartGreaterThan64() {
     final String urnPart0 = Stream.generate(() -> "a").limit(64).collect(joining());
-    final String urnPart1 = Stream.generate(() -> "b").limit(64).collect(joining());
-    final String urnPart2GreaterThan64 =
+    final String urnPart1GreaterThan64 =
         Stream.generate(() -> "c").limit(64 + 1).collect(joining());
 
     return new StringJoiner(":")
         .add("urn")
         .add(urnPart0)
-        .add(urnPart1)
-        .add(urnPart2GreaterThan64)
+        .add(urnPart1GreaterThan64)
         .toString();
   }
 }
