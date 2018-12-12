@@ -68,11 +68,11 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunGetterEndToEnd() {
-    GetJobRunResponse responseBody = getJobRunApiResponse(NEW_JOB_RUN.getGuid());
+    JobRun responseBody = getJobRunApiResponse(NEW_JOB_RUN.getGuid());
 
-    assertEquals(marquez.core.models.JobRunState.State.NEW.name(), responseBody.getState());
-    assertNull(responseBody.getStartedAt());
-    assertNull(responseBody.getEndedAt());
+    assertEquals(marquez.core.models.JobRunState.State.NEW.name(), responseBody.getCurrentState());
+    assertNull(responseBody.getNominalStartTime());
+    assertNull(responseBody.getNominalEndTime());
   }
 
   @Test
@@ -88,7 +88,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
   }
 
-  private GetJobRunResponse getJobRunApiResponse(UUID jobRunGuid) {
+  private JobRun getJobRunApiResponse(UUID jobRunGuid) {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
@@ -96,6 +96,6 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
             .request(MediaType.APPLICATION_JSON)
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    return res.readEntity(GetJobRunResponse.class);
+    return res.readEntity(JobRun.class);
   }
 }
