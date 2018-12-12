@@ -42,7 +42,7 @@ public class AppWithPostgresRule extends DropwizardAppRule<MarquezConfig> {
     super(
         MarquezApp.class,
         "src/test/resources/config.postgres.test.yml",
-        ConfigOverride.config("database.url", urlString));
+        ConfigOverride.config("db.url", urlString));
   }
 
   @Override
