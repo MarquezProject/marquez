@@ -1,11 +1,10 @@
 package marquez.api;
 
+import java.sql.Timestamp;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.sql.Timestamp;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
