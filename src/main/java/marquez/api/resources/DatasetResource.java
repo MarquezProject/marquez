@@ -38,8 +38,8 @@ public final class DatasetResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") Namespace namespace,
-      @QueryParam("limit") @DefaultValue("0") Integer limit,
-      @QueryParam("offset") @DefaultValue("100") Integer offset) {
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset) {
     final List<Dataset> datasets = datasetService.getAll(namespace, limit, offset);
     final List<DatasetResponse> datasetResponse = datasetResponseMapper.map(datasets);
     return Response.ok(new ListDatasetsResponse(datasetResponse)).build();
