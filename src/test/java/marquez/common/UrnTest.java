@@ -68,11 +68,6 @@ public class UrnTest {
     final String urnPart0 = Stream.generate(() -> "a").limit(64).collect(joining());
     final String urnPart1GreaterThan64 =
         Stream.generate(() -> "c").limit(64 + 1).collect(joining());
-
-    return new StringJoiner(":")
-        .add("urn")
-        .add(urnPart0)
-        .add(urnPart1GreaterThan64)
-        .toString();
+    return new StringJoiner(":").add("urn").add(urnPart0).add(urnPart1GreaterThan64).toString();
   }
 }
