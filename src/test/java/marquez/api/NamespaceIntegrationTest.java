@@ -26,11 +26,11 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
             .put(Entity.json(createNamespaceRequest));
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
 
-    CreateNamespaceResponse responseBody = res.readEntity(CreateNamespaceResponse.class);
+    Namespace responseBody = res.readEntity(Namespace.class);
 
-    assertThat(responseBody.getNamespace().getCreatedAt()).isAfter(START_TIME);
-    assertThat(responseBody.getNamespace().getOwner()).isEqualTo(OWNER);
-    assertThat(responseBody.getNamespace().getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(responseBody.getCreatedAt()).isAfter(START_TIME);
+    assertThat(responseBody.getOwner()).isEqualTo(OWNER);
+    assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
   }
 
   @Test

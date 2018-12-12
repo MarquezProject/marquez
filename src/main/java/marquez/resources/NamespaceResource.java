@@ -15,7 +15,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import marquez.api.CreateNamespaceRequest;
-import marquez.api.CreateNamespaceResponse;
 import marquez.api.ListNamespacesResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
@@ -57,7 +56,7 @@ public class NamespaceResource extends BaseResource {
       marquez.core.models.Namespace n =
           namespaceService.create(namespaceAPIMapper.of(namespace, request));
       return Response.status(Response.Status.OK)
-          .entity(new CreateNamespaceResponse(namespaceMapper.map(n)))
+          .entity(namespaceMapper.map(n))
           .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException e) {
