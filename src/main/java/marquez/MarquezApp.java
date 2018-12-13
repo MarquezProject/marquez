@@ -11,6 +11,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import marquez.core.mappers.ResourceExceptionMapper;
 import marquez.core.services.NamespaceService;
+import marquez.dao.NamespaceDAO;
 import marquez.dao.deprecated.DatasetDAO;
 import marquez.dao.deprecated.JobDAO;
 import marquez.dao.deprecated.JobRunDAO;
@@ -111,7 +112,8 @@ public class MarquezApp extends Application<MarquezConfig> {
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));
 
-    final NamespaceService namespaceService = new NamespaceService();
+    final NamespaceDAO namespaceDAO = jdbi.onDemand(NamespaceDAO.class);
+    final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
     env.jersey().register(new NamespaceResource(namespaceService));
 
     env.jersey().register(new ResourceExceptionMapper());
