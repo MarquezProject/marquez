@@ -8,8 +8,8 @@ public class CoreJobRunToApiJobRunMapper extends Mapper<marquez.core.models.JobR
   public JobRun map(marquez.core.models.JobRun value) {
     return new JobRun(
         value.getGuid(),
-        value.getNominalStartTime(),
-        value.getNominalEndTime(),
+        value.getNominalStartTime().toString(),
+        value.getNominalEndTime().toString(),
         value.getRunArgs(),
         JobRunState.State.fromInt(value.getCurrentState()).name());
   }

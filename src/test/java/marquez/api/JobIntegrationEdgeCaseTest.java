@@ -1,6 +1,7 @@
 package marquez.api;
 
 import static java.lang.String.format;
+import static javax.ws.rs.client.Entity.entity;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -11,7 +12,6 @@ import io.dropwizard.testing.junit.ResourceTestRule;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.core.exceptions.UnexpectedException;
@@ -67,7 +67,7 @@ public class JobIntegrationEdgeCaseTest {
             .client()
             .target(path)
             .request(MediaType.APPLICATION_JSON)
-            .put(Entity.json(createJobRequest));
+            .put(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
   }
 
@@ -90,7 +90,7 @@ public class JobIntegrationEdgeCaseTest {
             .client()
             .target(path)
             .request(MediaType.APPLICATION_JSON)
-            .put(Entity.json(createJobRequest));
+            .put(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
 

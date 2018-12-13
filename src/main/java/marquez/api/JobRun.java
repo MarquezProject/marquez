@@ -1,7 +1,6 @@
 package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.sql.Timestamp;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,10 +16,10 @@ public final class JobRun {
   private UUID guid;
 
   @JsonProperty("startedAt")
-  private Timestamp nominalStartTime;
+  private String nominalStartTime;
 
   @JsonProperty("endedAt")
-  private Timestamp nominalEndTime;
+  private String nominalEndTime;
 
   @JsonProperty("runArgs")
   private String runArgs;
