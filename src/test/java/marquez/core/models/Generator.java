@@ -97,7 +97,9 @@ public class Generator {
   }
 
   public static Namespace genNamespace() {
-    return new Namespace(UUID.randomUUID(), "ns name", "ns owner", "ns desc");
+    Random r = new Random();
+    int nsNum = r.nextInt(10000);
+    return new Namespace(UUID.randomUUID(), "ns" + nsNum, "ns owner" + nsNum, "ns desc" + nsNum);
   }
 
   public static Namespace cloneNamespace(Namespace n) {
