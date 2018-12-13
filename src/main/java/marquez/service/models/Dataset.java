@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import marquez.common.models.Description;
 import marquez.common.models.Urn;
 
 @RequiredArgsConstructor
@@ -15,9 +16,9 @@ import marquez.common.models.Urn;
 public final class Dataset {
   @Getter @NonNull private final Urn urn;
   @Getter @NonNull private final Instant createdAt;
-  private final String description;
+  private final Description description;
 
-  public Optional<String> getDescription() {
+  public Optional<Description> getDescription() {
     return Optional.ofNullable(description);
   }
 }

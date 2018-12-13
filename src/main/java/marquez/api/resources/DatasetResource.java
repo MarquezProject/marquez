@@ -41,7 +41,7 @@ public final class DatasetResource {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
     final List<Dataset> datasets = datasetService.getAll(namespace, limit, offset);
-    final List<DatasetResponse> datasetResponse = datasetResponseMapper.map(datasets);
-    return Response.ok(new DatasetsResponse(datasetResponse)).build();
+    final List<DatasetResponse> datasetResponses = datasetResponseMapper.map(datasets);
+    return Response.ok(new DatasetsResponse(datasetResponses)).build();
   }
 }

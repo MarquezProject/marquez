@@ -13,7 +13,11 @@ public final class Namespace {
 
   @Getter private final String value;
 
-  public Namespace(@NonNull final String value) {
+  public static Namespace of(final String value) {
+    return new Namespace(value);
+  }
+
+  private Namespace(@NonNull final String value) {
     if (!NAMESPACE_PATTERN.matcher(value).matches()) {
       throw new IllegalArgumentException(
           "A namespaces must contain only letters (a-z, A-Z), numbers (0-9), or "

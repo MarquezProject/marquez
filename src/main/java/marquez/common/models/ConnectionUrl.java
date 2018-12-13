@@ -1,9 +1,10 @@
 package marquez.common.models;
 
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.RequiredArgsConstructor;
 
-@Value
+@RequiredArgsConstructor(staticName = "of")
 public final class ConnectionUrl {
-  @NonNull private final String value;
+  @Getter @NonNull private final String value;
 }

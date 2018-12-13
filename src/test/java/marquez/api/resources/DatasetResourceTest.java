@@ -13,6 +13,7 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
+import marquez.common.models.Description;
 import marquez.common.models.Namespace;
 import marquez.common.models.Urn;
 import marquez.service.DatasetService;
@@ -20,9 +21,10 @@ import marquez.service.models.Dataset;
 import org.junit.Test;
 
 public class DatasetResourceTest {
-  private static final Urn URN = new Urn("urn:a:b.c");
-  private static final Dataset DATASET = new Dataset(URN, Instant.now(), "test description");
-  private static final Namespace NAMESPACE = new Namespace("test");
+  private static final Urn URN = Urn.of("urn:a:b.c");
+  private static final Dataset DATASET =
+      new Dataset(URN, Instant.now(), Description.of("test description"));
+  private static final Namespace NAMESPACE = Namespace.of("test");
   private static final Integer LIMIT = 100;
   private static final Integer OFFSET = 0;
 

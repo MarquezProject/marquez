@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import marquez.common.models.Description;
 import marquez.common.models.Urn;
 
 @RequiredArgsConstructor
@@ -23,9 +24,9 @@ public final class DatasetRow {
   @Getter @NonNull private final UUID dataSourceUuid;
   @Getter @NonNull private final Urn urn;
   @Getter @NonNull private final UUID currentVersionUuid;
-  private final String description;
+  private final Description description;
 
-  public Optional<String> getDescription() {
+  public Optional<Description> getDescription() {
     return Optional.ofNullable(description);
   }
 }

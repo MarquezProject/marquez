@@ -1,7 +1,5 @@
 package marquez.common.models;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
@@ -20,7 +18,11 @@ public final class Urn {
 
   @Getter private final String value;
 
-  public Urn(@NonNull final String value) {
+  public static Urn of(final String value) {
+    return new Urn(value);
+  }
+
+  private Urn(@NonNull final String value) {
     if (!URN_PATTERN.matcher(value).matches()) {
       throw new IllegalArgumentException(
           "A urn must contain only letters (a-z, A-Z), numbers (0-9), and "
@@ -30,17 +32,14 @@ public final class Urn {
     this.value = value;
   }
 
-  public static Urn from(final Namespace namespace, final Dataset dataset) {
-    requireNonNull(namespace, "namespace must not be null");
-    requireNonNull(dataset, "dataset must not be null");
-
-    final String urnAsString =
+  public static Urn from(@NonNull final Namespace namespace, @NonNull final Dataset dataset) {
+    final String value =
         new StringJoiner(URN_DELIM)
             .add(URN_PREFIX)
             .add(namespace.getValue())
             .add(dataset.getValue())
             .toString();
 
-    return new Urn(urnAsString);
+    return new Urn(value);
   }
 }

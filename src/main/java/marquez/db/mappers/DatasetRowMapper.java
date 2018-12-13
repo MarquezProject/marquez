@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.NonNull;
+import marquez.common.models.Description;
 import marquez.common.models.Urn;
 import marquez.db.models.DatasetRow;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -19,9 +20,9 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
     final Instant updatedAt = results.getDate("updated_at").toInstant();
     final UUID namespaceUuid = UUID.fromString(results.getString("namespace_uuid"));
     final UUID dataSourceUuid = UUID.fromString(results.getString("data_source_uuid"));
-    final Urn urn = new Urn(results.getString("urn"));
+    final Urn urn = Urn.of(results.getString("urn"));
     final UUID currentVersionUuid = UUID.fromString(results.getString("current_version_uuid"));
-    final String description = results.getString("description");
+    final Description description = Description.of(results.getString("description"));
 
     return DatasetRow.builder()
         .uuid(uuid)

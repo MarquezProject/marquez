@@ -5,6 +5,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(staticName = "of")
-public final class Dataset {
+public final class Table {
   @Getter @NonNull private final String value;
 }
