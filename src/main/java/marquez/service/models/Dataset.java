@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import marquez.common.Urn;
+import marquez.common.models.Urn;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode

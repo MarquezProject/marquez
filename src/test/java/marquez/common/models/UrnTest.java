@@ -1,4 +1,4 @@
-package marquez.common;
+package marquez.common.models;
 
 import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertEquals;
@@ -10,9 +10,9 @@ import org.junit.Test;
 public class UrnTest {
   @Test
   public void testNewUrn() {
-    final String urn = "urn:a:b.c";
-    final Urn expected = new Urn(urn);
-    final Urn actual = new Urn(urn);
+    final String urnString = "urn:a:b.c";
+    final Urn expected = new Urn(urnString);
+    final Urn actual = new Urn(urnString);
     assertEquals(expected, actual);
   }
 
@@ -60,6 +60,17 @@ public class UrnTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnWithPartGreaterThan64() {
+    final String greaterThan1024Urn = newUrnWithPartGreaterThan64();
+    new Urn(greaterThan1024Urn);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testNewUrnFromNamespaceAndDataset() {
+    final String urnString = "urn:a:b.c";
+    final Urn expected = new Urn(urnString);
+    final Urn actual = new Urn(urnString);
+    assertEquals(expected, actual);
+
     final String greaterThan1024Urn = newUrnWithPartGreaterThan64();
     new Urn(greaterThan1024Urn);
   }

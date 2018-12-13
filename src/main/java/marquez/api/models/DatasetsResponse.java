@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public final class ListDatasetsResponse {
+public final class DatasetsResponse {
   @NonNull
   @JsonProperty("datasets")
   private final List<DatasetResponse> datasetResponses;

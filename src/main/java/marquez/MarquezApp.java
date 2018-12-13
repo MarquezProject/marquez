@@ -1,7 +1,5 @@
 package marquez;
 
-import static java.util.Objects.requireNonNull;
-
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
@@ -11,6 +9,7 @@ import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.resources.DatasetResource;
 import marquez.core.mappers.ResourceExceptionMapper;
@@ -46,9 +45,7 @@ public class MarquezApp extends Application<MarquezConfig> {
   }
 
   @Override
-  public void initialize(Bootstrap<MarquezConfig> bootstrap) {
-    requireNonNull(bootstrap, "bootstrap must not be null");
-
+  public void initialize(@NonNull Bootstrap<MarquezConfig> bootstrap) {
     // Enable variable substitution with environment variables.
     bootstrap.setConfigurationSourceProvider(
         new SubstitutingSourceProvider(
@@ -59,29 +56,24 @@ public class MarquezApp extends Application<MarquezConfig> {
     bootstrap.addBundle(
         new FlywayBundle<MarquezConfig>() {
           @Override
-          public DataSourceFactory getDataSourceFactory(MarquezConfig config) {
-            return requireNonNull(config).getDataSourceFactory();
+          public DataSourceFactory getDataSourceFactory(@NonNull MarquezConfig config) {
+            return config.getDataSourceFactory();
           }
 
           @Override
-          public FlywayFactory getFlywayFactory(MarquezConfig config) {
-            return requireNonNull(config).getFlywayFactory();
+          public FlywayFactory getFlywayFactory(@NonNull MarquezConfig config) {
+            return config.getFlywayFactory();
           }
         });
   }
 
   @Override
-  public void run(MarquezConfig config, Environment env) {
-    requireNonNull(config, "config must not be null");
-    requireNonNull(env, "env must not be null");
-
+  public void run(@NonNull MarquezConfig config, @NonNull Environment env) {
     migrateDbOrError(config);
     registerResources(config, env);
   }
 
-  private void migrateDbOrError(MarquezConfig config) {
-    requireNonNull(config, "config must not be null");
-
+  private void migrateDbOrError(@NonNull MarquezConfig config) {
     final Flyway flyway = new Flyway();
     final DataSourceFactory database = config.getDataSourceFactory();
     flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
@@ -101,10 +93,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     }
   }
 
-  private void registerResources(MarquezConfig config, Environment env) {
-    requireNonNull(config, "config must not be null");
-    requireNonNull(env, "env must not be null");
-
+  private void registerResources(@NonNull MarquezConfig config, @NonNull Environment env) {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory

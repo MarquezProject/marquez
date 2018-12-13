@@ -1,6 +1,5 @@
 package marquez.api.resources;
 
-import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
@@ -14,10 +13,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import lombok.NonNull;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetResponse;
-import marquez.api.models.ListDatasetsResponse;
-import marquez.common.Namespace;
+import marquez.api.models.DatasetsResponse;
+import marquez.common.models.Namespace;
 import marquez.service.DatasetService;
 import marquez.service.models.Dataset;
 
@@ -26,8 +26,8 @@ public final class DatasetResource {
   private final DatasetResponseMapper datasetResponseMapper = new DatasetResponseMapper();
   private final DatasetService datasetService;
 
-  public DatasetResource(final DatasetService datasetService) {
-    this.datasetService = requireNonNull(datasetService);
+  public DatasetResource(@NonNull final DatasetService datasetService) {
+    this.datasetService = datasetService;
   }
 
   @GET
@@ -42,6 +42,6 @@ public final class DatasetResource {
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
     final List<Dataset> datasets = datasetService.getAll(namespace, limit, offset);
     final List<DatasetResponse> datasetResponse = datasetResponseMapper.map(datasets);
-    return Response.ok(new ListDatasetsResponse(datasetResponse)).build();
+    return Response.ok(new DatasetsResponse(datasetResponse)).build();
   }
 }

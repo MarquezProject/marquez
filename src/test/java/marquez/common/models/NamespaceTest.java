@@ -1,4 +1,4 @@
-package marquez.common;
+package marquez.common.models;
 
 import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertEquals;

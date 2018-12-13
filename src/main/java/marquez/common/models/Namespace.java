@@ -1,10 +1,9 @@
-package marquez.common;
-
-import static java.util.Objects.requireNonNull;
+package marquez.common.models;
 
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode
@@ -14,9 +13,7 @@ public final class Namespace {
 
   @Getter private final String value;
 
-  public Namespace(final String value) {
-    requireNonNull(value, "value must not be null");
-
+  public Namespace(@NonNull final String value) {
     if (!NAMESPACE_PATTERN.matcher(value).matches()) {
       throw new IllegalArgumentException(
           "A namespaces must contain only letters (a-z, A-Z), numbers (0-9), or "

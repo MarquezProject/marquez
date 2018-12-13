@@ -1,0 +1,46 @@
+package marquez.common.models;
+
+import static java.util.Objects.requireNonNull;
+
+import java.util.StringJoiner;
+import java.util.regex.Pattern;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
+
+@EqualsAndHashCode
+@ToString
+public final class Urn {
+  private static final String URN_DELIM = ":";
+  private static final String URN_PREFIX = "urn";
+  private static final String URN_REGEX =
+      String.format("^%s(%s[a-zA-Z0-9.]{1,64}){2}$", URN_PREFIX, URN_DELIM);
+  private static final Pattern URN_PATTERN = Pattern.compile(URN_REGEX);
+
+  @Getter private final String value;
+
+  public Urn(@NonNull final String value) {
+    if (!URN_PATTERN.matcher(value).matches()) {
+      throw new IllegalArgumentException(
+          "A urn must contain only letters (a-z, A-Z), numbers (0-9), and "
+              + "be sperated by colons (:) with each part having a maximum length of 64 characters.");
+    }
+
+    this.value = value;
+  }
+
+  public static Urn from(final Namespace namespace, final Dataset dataset) {
+    requireNonNull(namespace, "namespace must not be null");
+    requireNonNull(dataset, "dataset must not be null");
+
+    final String urnAsString =
+        new StringJoiner(URN_DELIM)
+            .add(URN_PREFIX)
+            .add(namespace.getValue())
+            .add(dataset.getValue())
+            .toString();
+
+    return new Urn(urnAsString);
+  }
+}

@@ -8,9 +8,9 @@ import lombok.NonNull;
 
 @Data
 @Builder
-public final class DbRow {
+public final class DbTableInfoRow {
   @NonNull private final UUID uuid;
   @NonNull private final Instant createdAt;
-  @NonNull private final String name;
+  @NonNull private final String db;
   @NonNull private final String schema;
 }

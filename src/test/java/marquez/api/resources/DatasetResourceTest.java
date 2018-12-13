@@ -12,9 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.core.Response;
 import marquez.api.models.DatasetResponse;
-import marquez.api.models.ListDatasetsResponse;
-import marquez.common.Namespace;
-import marquez.common.Urn;
+import marquez.api.models.DatasetsResponse;
+import marquez.common.models.Namespace;
+import marquez.common.models.Urn;
 import marquez.service.DatasetService;
 import marquez.service.models.Dataset;
 import org.junit.Test;
@@ -37,8 +37,8 @@ public class DatasetResourceTest {
     final Response response = datasetResource.list(NAMESPACE, LIMIT, OFFSET);
     assertEquals(OK, response.getStatusInfo());
 
-    final ListDatasetsResponse listDatasetsResponse = (ListDatasetsResponse) response.getEntity();
-    final List<DatasetResponse> datasetsResponses = listDatasetsResponse.getDatasetResponses();
+    final DatasetsResponse datasetsResponse = (DatasetsResponse) response.getEntity();
+    final List<DatasetResponse> datasetsResponses = datasetsResponse.getDatasetResponses();
     assertEquals(1, datasetsResponses.size());
     assertEquals(DATASET.getUrn(), datasetsResponses.get(0).getUrn());
     assertEquals(DATASET.getCreatedAt(), datasetsResponses.get(0).getCreatedAt());

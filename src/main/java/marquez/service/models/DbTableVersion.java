@@ -10,7 +10,7 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-public final class DbDatasetVersion {
+public final class DbTableVersion {
   @Getter @NonNull private final String connectionUrl;
   @Getter @NonNull private final String schema;
   @Getter @NonNull private final String table;
