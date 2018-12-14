@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DataSource;
 import marquez.db.mappers.DataSourceRowMapper;
 import marquez.db.models.DataSourceRow;
-import marquez.db.models.DataSourceType;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -17,10 +17,10 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 public interface DataSourceDao {
   @SqlUpdate(
       "INSERT INTO data_sources (uuid, type, connection_url) "
-          + "VALUES (:uuid, :type, :connectionUrl.value)")
+          + "VALUES (:uuid, :dataSource.value, :connectionUrl.value)")
   void insert(
       @Bind("uuid") UUID uuid,
-      @Bind("type") DataSourceType type,
+      @BindBean("dataSource") DataSource dataSource,
       @BindBean("connectionUrl") ConnectionUrl connectionUrl);
 
   @SqlQuery("SELECT * FROM data_sources WHERE uuid = :uuid")
