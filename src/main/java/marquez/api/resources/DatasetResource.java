@@ -21,7 +21,7 @@ import marquez.common.models.Namespace;
 import marquez.service.DatasetService;
 import marquez.service.models.Dataset;
 
-@Path("/api/v1")
+@Path("/api/v1/namespaces/{namespace}")
 public final class DatasetResource {
   private final DatasetResponseMapper datasetResponseMapper = new DatasetResponseMapper();
   private final DatasetService datasetService;
@@ -34,13 +34,13 @@ public final class DatasetResource {
   @ResponseMetered
   @ExceptionMetered
   @Timed
-  @Path("/namespaces/{namespace}/datasets")
+  @Path("/datasets")
   @Produces(APPLICATION_JSON)
   public Response list(
-      @PathParam("namespace") Namespace namespace,
+      @PathParam("namespace") String namespace,
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
-    final List<Dataset> datasets = datasetService.getAll(namespace, limit, offset);
+    final List<Dataset> datasets = datasetService.getAll(Namespace.of(namespace), limit, offset);
     final List<DatasetResponse> datasetResponses = datasetResponseMapper.map(datasets);
     return Response.ok(new DatasetsResponse(datasetResponses)).build();
   }
