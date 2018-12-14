@@ -27,7 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/namespaces")
+@Path("/api/v1/namespaces")
 @Produces(APPLICATION_JSON)
 public class NamespaceResource extends BaseResource {
   private static final Logger LOG = LoggerFactory.getLogger(NamespaceResource.class);

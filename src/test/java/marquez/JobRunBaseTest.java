@@ -26,7 +26,7 @@ public abstract class JobRunBaseTest {
   static final String TEST_JOB_RUN_ARGS = "--my-flag -Dkey=value";
   static final String TEST_JOB_RUN_ARGS_HEX_DIGEST = UUID.randomUUID().toString();
 
-  static final String TEST_JOB_NAME = "testJob";
+  public static final String TEST_JOB_NAME = "testJob";
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 

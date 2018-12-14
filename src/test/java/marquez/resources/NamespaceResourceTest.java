@@ -1,23 +1,6 @@
 package marquez.resources;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
-
 import io.dropwizard.testing.junit.ResourceTestRule;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
 import marquez.NamespaceBaseTest;
 import marquez.api.GetNamespaceResponse;
 import marquez.api.ListNamespacesResponse;
@@ -30,6 +13,24 @@ import marquez.core.services.NamespaceService;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 public class NamespaceResourceTest extends NamespaceBaseTest {
 
@@ -55,7 +56,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
         resources
-            .target("/namespaces/" + NAMESPACE_NAME)
+            .target("/api/v1/namespaces/" + NAMESPACE_NAME)
             .request()
             .put(Entity.json(createNamespaceRequest))
             .getStatus());
@@ -83,7 +84,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-        resources.target("/namespaces/" + NAMESPACE_NAME).request().get().getStatus());
+        resources.target("/api/v1/namespaces/" + NAMESPACE_NAME).request().get().getStatus());
   }
 
   @Test
@@ -150,6 +151,6 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-        resources.target("/namespaces/").request().get().getStatus());
+        resources.target("/api/v1/namespaces/").request().get().getStatus());
   }
 }

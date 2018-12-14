@@ -29,8 +29,6 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
   static final String NAMESPACE_OWNER = "nsOwner";
   static final String NAMESPACE_DESC = "nsDesc";
 
-  static final String JOB_NAME = "myJob";
-
   @BeforeClass
   public static void setUpNamespace() {
     namespaceDAO.insert(
@@ -46,12 +44,12 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/namespaces/" + NAMESPACE_NAME + "/jobs/" + JOB_NAME + "/runs/")
+            .path("/api/v1/namespaces/" + NAMESPACE_NAME + "/jobs/" + TEST_JOB_NAME + "/runs/")
             .request(MediaType.APPLICATION_JSON)
             .post(createJobRunRequestEntity);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
-    CreateJobRunResponse responseBody = res.readEntity(CreateJobRunResponse.class);
-    UUID returnedId = responseBody.getExternalGuid();
+    JobRun responseBody = res.readEntity(JobRun.class);
+    UUID returnedId = responseBody.getGuid();
     try {
       assertNotNull(returnedId);
       LOG.info("Returned id is: " + returnedId);
@@ -81,7 +79,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path(format("/jobs/runs/%s/complete", NEW_JOB_RUN.getGuid()))
+            .path(format("/api/v1/jobs/runs/%s/complete", NEW_JOB_RUN.getGuid()))
             .request(MediaType.APPLICATION_JSON)
             .put(Entity.json(""));
 
@@ -92,7 +90,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path(format("/jobs/runs/%s", jobRunGuid))
+            .path(format("/api/v1/jobs/runs/%s", jobRunGuid))
             .request(MediaType.APPLICATION_JSON)
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());

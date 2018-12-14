@@ -15,10 +15,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import marquez.api.CreateJobRunRequest;
-import marquez.api.CreateJobRunResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreJobRunToApiJobRunMapper;
+import marquez.core.models.JobRun;
 import marquez.core.services.JobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,27 +35,23 @@ public class JobRunResource extends BaseResource {
 
   @POST
   @Consumes(APPLICATION_JSON)
-  @Path("/namespaces/{namespace}/jobs/{job}/runs")
-  @Timed
+  @Path("/api/v1/namespaces/{namespace}/jobs/{job}/runs")
+  // @Timed
   public Response create(
       @PathParam("namespace") final String namespace,
       @PathParam("job") final String job,
       @Valid CreateJobRunRequest request)
       throws ResourceException {
-    UUID jobRunGuid = UUID.randomUUID();
-
     try {
-      jobService.createJobRun(
-          namespace,
-          job,
-          request.getRunArgs(),
-          request.getNominalStartTime(),
-          request.getNominalEndTime());
-
-      CreateJobRunResponse res = new CreateJobRunResponse(jobRunGuid);
-      String jsonRes = mapper.writeValueAsString(res);
+      JobRun createdJobRun =
+          jobService.createJobRun(
+              namespace,
+              job,
+              request.getRunArgs(),
+              request.getNominalStartTime(),
+              request.getNominalEndTime());
       return Response.status(Response.Status.CREATED)
-          .entity(jsonRes)
+          .entity(new CoreJobRunToApiJobRunMapper().map(createdJobRun))
           .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException | Exception e) {
@@ -67,7 +63,7 @@ public class JobRunResource extends BaseResource {
   @PUT
   @Consumes(APPLICATION_JSON)
   @Timed
-  @Path("/jobs/runs/{runId}/complete")
+  @Path("/api/v1/jobs/runs/{runId}/complete")
   public Response completeJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
 
@@ -83,7 +79,7 @@ public class JobRunResource extends BaseResource {
   @PUT
   @Consumes(APPLICATION_JSON)
   @Timed
-  @Path("/jobs/runs/{runId}/fail")
+  @Path("/api/v1/jobs/runs/{runId}/fail")
   public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
       jobService.updateJobRunState(
@@ -98,7 +94,7 @@ public class JobRunResource extends BaseResource {
   @PUT
   @Consumes(APPLICATION_JSON)
   @Timed
-  @Path("/jobs/runs/{runId}/abort")
+  @Path("/api/v1/jobs/runs/{runId}/abort")
   public Response abortJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
       jobService.updateJobRunState(
@@ -113,7 +109,7 @@ public class JobRunResource extends BaseResource {
   @GET
   @Consumes(APPLICATION_JSON)
   @Timed
-  @Path("/jobs/runs/{runId}/")
+  @Path("/api/v1/jobs/runs/{runId}/")
   public Response get(@PathParam("runId") final UUID runId) throws ResourceException {
     try {
       // TODO: Test both paths
