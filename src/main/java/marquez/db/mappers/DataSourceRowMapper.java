@@ -17,7 +17,7 @@ public final class DataSourceRowMapper implements RowMapper<DataSourceRow> {
       throws SQLException {
     final UUID uuid = UUID.fromString(results.getString("uuid"));
     final Instant createdAt = results.getDate("created_at").toInstant();
-    final DataSource dataSource = DataSource.of(results.getString("type"));
+    final DataSource dataSource = DataSource.of(results.getString("data_source"));
     final ConnectionUrl connectionUrl = ConnectionUrl.of(results.getString("connection_url"));
 
     return DataSourceRow.builder()
