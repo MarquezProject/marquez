@@ -10,10 +10,13 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class Urn {
+  private static final Integer URN_MIN_SIZE = 1;
+  private static final Integer URN_MAX_SIZE = 1024;
   private static final String URN_DELIM = ":";
   private static final String URN_PREFIX = "urn";
   private static final String URN_REGEX =
-      String.format("^%s(%s[a-zA-Z0-9.]{1,64}){2}$", URN_PREFIX, URN_DELIM);
+      String.format(
+          "^%s(%s[a-zA-Z0-9.]{%d,%d}){2}$", URN_PREFIX, URN_DELIM, URN_MIN_SIZE, URN_MAX_SIZE);
   private static final Pattern URN_PATTERN = Pattern.compile(URN_REGEX);
 
   @Getter private final String value;
