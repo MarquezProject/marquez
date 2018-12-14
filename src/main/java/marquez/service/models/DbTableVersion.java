@@ -1,6 +1,7 @@
 package marquez.service.models;
 
 import java.net.URI;
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.URI;
 import lombok.EqualsAndHashCode;
@@ -18,24 +19,25 @@ import marquez.common.models.Table;
 @ToString
 public final class DbTableVersion {
   @Getter private final ConnectionUrl connectionUrl;
-  @Getter private final DataSource dataSource;
   @Getter private final Database database;
   @Getter private final Schema schema;
   @Getter private final Table table;
+  @Getter private final DataSource dataSource;
   private final Description description;
 
   public DbTableVersion(
       @NonNull final ConnectionUrl connectionUrl,
       @NonNull final Schema schema,
-      @NonNull final Table table) {
-    this.connectionUrl = connectionUrl;
-
+      @NonNull final Table table,
+      @Nullable final Description description) {
     final URI uri = URI.create(connectionUrl.getValue());
-    this.dataSource = DataSource.of(uri);
-    this.database = Database.of(uri);
 
+    this.connectionUrl = connectionUrl;
+    this.database = Database.of(uri);
     this.schema = schema;
     this.table = table;
+    this.dataSource = DataSource.of(uri);
+    this.description = description;
   }
 
   public Optional<Description> getDescription() {
