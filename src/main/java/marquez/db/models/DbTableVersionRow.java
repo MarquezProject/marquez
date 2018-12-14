@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import marquez.common.models.Description;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode
@@ -20,9 +21,9 @@ public final class DbTableVersionRow {
   @Getter @NonNull private final UUID datasetUuid;
   @Getter @NonNull private final UUID dbTableInfoUuid;
   @Getter @NonNull private final String name;
-  private final String description;
+  private final Description description;
 
-  public Optional<String> getDescription() {
+  public Optional<Description> getDescription() {
     return Optional.ofNullable(description);
   }
 }
