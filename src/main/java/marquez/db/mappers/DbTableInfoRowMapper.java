@@ -17,7 +17,7 @@ public final class DbTableInfoRowMapper implements RowMapper<DbTableInfoRow> {
       throws SQLException {
     final UUID uuid = UUID.fromString(results.getString("uuid"));
     final Instant createdAt = results.getDate("created_at").toInstant();
-    final Db db = Db.of(results.getString("name"));
+    final Db db = Db.of(results.getString("db"));
     final Schema schema = Schema.of(results.getString("schema"));
 
     return DbTableInfoRow.builder().uuid(uuid).createdAt(createdAt).db(db).schema(schema).build();
