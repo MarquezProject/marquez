@@ -10,12 +10,15 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.Description;
 import marquez.common.models.Namespace;
 import marquez.common.models.Urn;
+import marquez.core.exceptions.UnexpectedException;
+import marquez.core.services.NamespaceService;
 import marquez.service.DatasetService;
 import marquez.service.models.Dataset;
 import org.junit.Test;
@@ -28,11 +31,15 @@ public class DatasetResourceTest {
   private static final Integer LIMIT = 100;
   private static final Integer OFFSET = 0;
 
+  private final NamespaceService mockNamespaceService = mock(NamespaceService.class);
   private final DatasetService mockDatasetService = mock(DatasetService.class);
-  private final DatasetResource datasetResource = new DatasetResource(mockDatasetService);
+  private final DatasetResource datasetResource =
+      new DatasetResource(mockNamespaceService, mockDatasetService);
 
   @Test
-  public void testListDatasets() {
+  public void testListDatasets200() throws UnexpectedException {
+    when(mockNamespaceService.exists(NAMESPACE.getValue())).thenReturn(true);
+
     final Dataset dataset = new Dataset(URN, CREATED_AT, NO_DESCRIPTION);
     final List<Dataset> datasets = Arrays.asList(dataset);
     when(mockDatasetService.getAll(NAMESPACE, LIMIT, OFFSET)).thenReturn(datasets);
@@ -47,5 +54,11 @@ public class DatasetResourceTest {
     assertEquals(CREATED_AT.toString(), datasetsResponses.get(0).getCreatedAt());
 
     verify(mockDatasetService, times(1)).getAll(NAMESPACE, LIMIT, OFFSET);
+  }
+
+  @Test(expected = WebApplicationException.class)
+  public void testListDatasetsNamespaceDoesNotExist() throws UnexpectedException {
+    when(mockNamespaceService.exists(NAMESPACE.getValue())).thenReturn(false);
+    datasetResource.list(NAMESPACE.getValue(), LIMIT, OFFSET);
   }
 }

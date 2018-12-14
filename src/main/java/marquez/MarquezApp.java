@@ -14,11 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.resources.DatasetResource;
 import marquez.core.mappers.ResourceExceptionMapper;
 import marquez.core.services.NamespaceService;
-<<<<<<< HEAD
-=======
 import marquez.dao.NamespaceDAO;
-import marquez.dao.deprecated.DatasetDAO;
->>>>>>> issue-100
 import marquez.dao.deprecated.JobDAO;
 import marquez.dao.deprecated.JobRunDAO;
 import marquez.db.DatasetDao;
@@ -106,21 +102,21 @@ public class MarquezApp extends Application<MarquezConfig> {
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
 
+    final NamespaceDAO namespaceDAO = jdbi.onDemand(NamespaceDAO.class);
     final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
+
+    final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
 
     env.jersey().register(new PingResource());
     env.jersey().register(new HealthResource());
-    env.jersey().register(new DatasetResource(new DatasetService(datasetDao)));
+    env.jersey().register(new NamespaceResource(namespaceService));
+    env.jersey().register(new DatasetResource(namespaceService, new DatasetService(datasetDao)));
 
     final JobDAO jobDAO = jdbi.onDemand(JobDAO.class);
     env.jersey().register(new JobResource(jobDAO));
 
     final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
     env.jersey().register(new JobRunResource(jobRunDAO));
-
-    final NamespaceDAO namespaceDAO = jdbi.onDemand(NamespaceDAO.class);
-    final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
-    env.jersey().register(new NamespaceResource(namespaceService));
 
     env.jersey().register(new ResourceExceptionMapper());
   }
