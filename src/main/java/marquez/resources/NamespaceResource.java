@@ -25,9 +25,9 @@ import marquez.core.models.Namespace;
 import marquez.core.services.NamespaceService;
 import org.hibernate.validator.constraints.NotEmpty;
 
-@Path("/api/v1/namespaces")
 @Produces(APPLICATION_JSON)
 @Slf4j
+@Path("/api/v1")
 public class NamespaceResource extends BaseResource {
 
   private final NamespaceService namespaceService;
@@ -46,7 +46,7 @@ public class NamespaceResource extends BaseResource {
   @PUT
   @Consumes(APPLICATION_JSON)
   @Timed
-  @Path("/{namespace}")
+  @Path("/namespaces/{namespace}")
   public Response create(
       @PathParam("namespace") @NotEmpty String namespace, @Valid CreateNamespaceRequest request)
       throws ResourceException {
@@ -66,7 +66,7 @@ public class NamespaceResource extends BaseResource {
   @GET
   @Consumes(APPLICATION_JSON)
   @Timed
-  @Path("/{namespace}")
+  @Path("/namespaces/{namespace}")
   public Response get(@PathParam("namespace") String namespace) throws ResourceException {
     try {
       Optional<Namespace> n = namespaceService.get(namespace);
@@ -88,6 +88,7 @@ public class NamespaceResource extends BaseResource {
   @GET
   @Consumes(APPLICATION_JSON)
   @Timed
+  @Path("/namespaces")
   public Response listNamespaces() throws ResourceException {
     try {
       List<marquez.core.models.Namespace> namespaceCoreModels = namespaceService.listNamespaces();

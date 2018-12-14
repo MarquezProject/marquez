@@ -46,7 +46,7 @@ public final class JobResource extends BaseResource {
 
   @POST
   @Consumes(APPLICATION_JSON)
-  @Path("/namespaces/{namespace}/jobs/{job}/runs")
+  @Path("namespaces/{namespace}/jobs/{job}/runs")
   public Response create(
       @PathParam("namespace") final String namespace,
       @PathParam("job") final String job,
