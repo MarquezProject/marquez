@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Usage: $ ./init-marquezdb.sh
+# Usage: $ ./init-db.sh
 
 set -eu
 

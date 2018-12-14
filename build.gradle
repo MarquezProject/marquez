@@ -1,7 +1,8 @@
 plugins {
   id 'application'
   id 'checkstyle'
-  id "com.diffplug.gradle.spotless" version '3.16.0'
+  id 'com.diffplug.gradle.spotless' version '3.16.0'
+  id 'com.github.jk1.dependency-license-report' version '1.2'
   id 'com.github.johnrengelman.shadow' version '4.0.3'
   id 'jacoco'
   id 'java'
