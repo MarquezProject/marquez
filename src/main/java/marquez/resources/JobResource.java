@@ -88,10 +88,6 @@ public final class JobResource extends BaseResource {
       @Valid CreateJobRequest request)
       throws ResourceException {
     try {
-      if (!jobService.getJob(namespace, job).isPresent()) {
-        log.error("Could not find job: " + job);
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
       Job jobToCreate =
           apiJobToCoreJobMapper.map(
               new marquez.api.Job(
