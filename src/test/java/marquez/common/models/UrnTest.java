@@ -11,68 +11,68 @@ public class UrnTest {
   @Test
   public void testNewUrn() {
     final String urnString = "urn:a:b.c";
-    final Urn expected = new Urn(urnString);
-    final Urn actual = new Urn(urnString);
+    final Urn expected = Urn.of(urnString);
+    final Urn actual = Urn.of(urnString);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testNewUrnFromNamespaceAndDataset() {
+    final String urnString = "urn:a:b.c";
+    final Urn expected = Urn.of(urnString);
+
+    final Namespace namespace = Namespace.of("a");
+    final Dataset dataset = Dataset.of("b.c");
+    final Urn actual = Urn.of(namespace, dataset);
     assertEquals(expected, actual);
   }
 
   @Test(expected = NullPointerException.class)
   public void testUrnNull() {
     final String nullUrn = null;
-    new Urn(nullUrn);
+    Urn.of(nullUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnEmpty() {
     final String emptyUrn = "";
-    new Urn(emptyUrn);
+    Urn.of(emptyUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnBlank() {
     final String blankUrn = " ";
-    new Urn(blankUrn);
+    Urn.of(blankUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnNoPrefix() {
     final String noPrefixUrn = "a:b";
-    new Urn(noPrefixUrn);
+    Urn.of(noPrefixUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnMissingPart() {
     final String missingPartUrn = "urn:a";
-    new Urn(missingPartUrn);
+    Urn.of(missingPartUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnExtraPart() {
     final String extraPartUrn = "urn:a:b:c";
-    new Urn(extraPartUrn);
+    Urn.of(extraPartUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnNonAlphanumericPart() {
     final String nonAlphanumericPartUrn = "urn:a:~$^";
-    new Namespace(nonAlphanumericPartUrn);
+    Urn.of(nonAlphanumericPartUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testUrnWithPartGreaterThan64() {
     final String greaterThan1024Urn = newUrnWithPartGreaterThan64();
-    new Urn(greaterThan1024Urn);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testNewUrnFromNamespaceAndDataset() {
-    final String urnString = "urn:a:b.c";
-    final Urn expected = new Urn(urnString);
-    final Urn actual = new Urn(urnString);
-    assertEquals(expected, actual);
-
-    final String greaterThan1024Urn = newUrnWithPartGreaterThan64();
-    new Urn(greaterThan1024Urn);
+    Urn.of(greaterThan1024Urn);
   }
 
   private String newUrnWithPartGreaterThan64() {
