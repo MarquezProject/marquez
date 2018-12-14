@@ -3,11 +3,11 @@ package marquez.service.mappers;
 import lombok.NonNull;
 import marquez.api.models.DbTableVersionRequest;
 import marquez.common.Mapper;
-import marquez.service.models.DbTableVersion;
 import marquez.common.models.ConnectionUrl;
-import marquez.common.models.Table;
 import marquez.common.models.Description;
 import marquez.common.models.Schema;
+import marquez.common.models.Table;
+import marquez.service.models.DbTableVersion;
 
 public final class DbTableVersionMapper implements Mapper<DbTableVersionRequest, DbTableVersion> {
   @Override
