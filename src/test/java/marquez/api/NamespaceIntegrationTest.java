@@ -34,6 +34,26 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
   }
 
   @Test
+  public void testCreateNamespace_NoDup() {
+    APP.client()
+        .target(URI.create("http://localhost:" + APP.getLocalPort()))
+        .path("/namespaces/" + NAMESPACE_NAME)
+        .request(MediaType.APPLICATION_JSON)
+        .put(Entity.json(createNamespaceRequest));
+    Response res =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path("/namespaces/" + NAMESPACE_NAME)
+            .request(MediaType.APPLICATION_JSON)
+            .put(Entity.json(createNamespaceRequest));
+    CreateNamespaceResponse responseBody = res.readEntity(CreateNamespaceResponse.class);
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+    assertThat(responseBody.getNamespace().getCreatedAt()).isAfter(START_TIME);
+    assertThat(responseBody.getNamespace().getOwnerName()).isEqualTo(OWNER);
+    assertThat(responseBody.getNamespace().getDescription()).isEqualTo(DESCRIPTION);
+  }
+
+  @Test
   public void testBadCreateNamespaceRequest() {
     final Response res =
         APP.client()

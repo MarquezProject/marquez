@@ -50,7 +50,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Test
   public void testCreateNamespaceErrorHandling() throws UnexpectedException {
-    doThrow(new UnexpectedException()).when(NAMESPACE_SERVICE).create(any(), any(), any());
+    doThrow(new UnexpectedException()).when(NAMESPACE_SERVICE).create(any(Namespace.class));
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),

@@ -11,13 +11,17 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(NamespaceRow.class)
 public interface NamespaceDAO {
   @SqlUpdate(
-      "INSERT INTO namespaces(uuid, name, description, current_owner) "
-          + "VALUES(:namespace.name, :namespace.description, :namespace.currentOwner)")
-  void insert(@BindBean("namespace") Namespace namespace);
+      "INSERT INTO namespaces(guid, name, description, current_ownership) "
+          + "VALUES(:guid, :name, :description, :ownerName) "
+          + "ON CONFLICT DO NOTHING")
+  void insert(@BindBean Namespace namespace);
 
   @SqlQuery("SELECT * FROM namespaces WHERE name = :name")
-  Namespace findByName(@Bind("name") String name);
+  Namespace find(@Bind("name") String name);
 
   @SqlQuery("SELECT * FROM namespaces")
   List<Namespace> findAll();
+
+  @SqlQuery("SELECT COUNT(*) > 0 FROM namespaces WHERE name = :name")
+  boolean exists(@Bind("name") String name);
 }
