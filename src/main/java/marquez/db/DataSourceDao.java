@@ -16,7 +16,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(DataSourceRowMapper.class)
 public interface DataSourceDao {
   @SqlUpdate(
-      "INSERT INTO data_sources (uuid, type, connection_url) "
+      "INSERT INTO data_sources (uuid, data_source, connection_url) "
           + "VALUES (:uuid, :dataSource.value, :connectionUrl.value)")
   void insert(
       @Bind("uuid") UUID uuid,
@@ -24,7 +24,7 @@ public interface DataSourceDao {
       @BindBean("connectionUrl") ConnectionUrl connectionUrl);
 
   @SqlQuery("SELECT * FROM data_sources WHERE uuid = :uuid")
-  Optional<DataSourceRow> find(@Bind("uuid") UUID uuid);
+  Optional<DataSourceRow> findBy(@Bind("uuid") UUID uuid);
 
   @SqlQuery("SELECT * FROM data_sources LIMIT :limit OFFSET :offset")
   List<DataSourceRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);
