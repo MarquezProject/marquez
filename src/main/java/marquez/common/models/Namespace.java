@@ -9,8 +9,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class Namespace {
-  private static final int NAMESPACE_MIN_SIZE = 1;
-  private static final int NAMESPACE_MAX_SIZE = 1024;
+  private static final Integer NAMESPACE_MIN_SIZE = 1;
+  private static final Integer NAMESPACE_MAX_SIZE = 1024;
   private static final Pattern NAMESPACE_PATTERN =
       Pattern.compile(
           String.format("^[a-zA-Z0-9_]{%d,%d}$", NAMESPACE_MIN_SIZE, NAMESPACE_MAX_SIZE));
