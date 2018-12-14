@@ -5,6 +5,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -45,7 +46,7 @@ public final class JobResource extends BaseResource {
 
   @POST
   @Consumes(APPLICATION_JSON)
-  @Path("/{job}/runs")
+  @Path("/namespaces/{namespace}/jobs/{job}/runs")
   public Response create(
       @PathParam("namespace") final String namespace,
       @PathParam("job") final String job,
@@ -78,7 +79,7 @@ public final class JobResource extends BaseResource {
   }
 
   @PUT
-  @Path("/{job}")
+  @Path("/namespaces/{namespace}/jobs/{job}")
   @Consumes(APPLICATION_JSON)
   @Timed
   public Response create(
@@ -112,7 +113,7 @@ public final class JobResource extends BaseResource {
   }
 
   @GET
-  @Path("/{job}")
+  @Path("/namespaces/{namespace}/jobs/{job}")
   @Timed
   public Response getJob(
       @PathParam("namespace") final String namespace, @PathParam("job") final String job)
@@ -135,6 +136,7 @@ public final class JobResource extends BaseResource {
 
   @GET
   @Timed
+  @Path("/namespaces")
   public Response listJobs(@PathParam("namespace") final String namespace)
       throws ResourceException {
     // TODO: Deal with the case of an invalid namespace
@@ -146,6 +148,72 @@ public final class JobResource extends BaseResource {
       return Response.status(Response.Status.OK).entity(new ListJobsResponse(jobList)).build();
 
     } catch (UnexpectedException e) {
+      log.error(e.getLocalizedMessage());
+      throw new ResourceException();
+    }
+  }
+
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @Timed
+  @Path("/jobs/runs/{runId}/complete")
+  public Response completeJobRun(@PathParam("runId") final String runId) throws ResourceException {
+    try {
+
+      jobService.updateJobRunState(
+          UUID.fromString(runId), marquez.core.models.JobRunState.State.COMPLETED);
+      return Response.status(Response.Status.OK).build();
+    } catch (UnexpectedException | Exception e) {
+      log.error(e.getLocalizedMessage());
+      throw new ResourceException();
+    }
+  }
+
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @Timed
+  @Path("/jobs/runs/{runId}/fail")
+  public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
+    try {
+      jobService.updateJobRunState(
+          UUID.fromString(runId), marquez.core.models.JobRunState.State.FAILED);
+      return Response.status(Response.Status.OK).build();
+    } catch (UnexpectedException | Exception e) {
+      log.error(e.getLocalizedMessage());
+      throw new ResourceException();
+    }
+  }
+
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @Timed
+  @Path("/jobs/runs/{runId}/abort")
+  public Response abortJobRun(@PathParam("runId") final String runId) throws ResourceException {
+    try {
+      jobService.updateJobRunState(
+          UUID.fromString(runId), marquez.core.models.JobRunState.State.ABORTED);
+      return Response.status(Response.Status.OK).build();
+    } catch (UnexpectedException | Exception e) {
+      log.error(e.getLocalizedMessage());
+      throw new ResourceException();
+    }
+  }
+
+  @GET
+  @Consumes(APPLICATION_JSON)
+  @Timed
+  @Path("/jobs/runs/{runId}")
+  public Response get(@PathParam("runId") final UUID runId) throws ResourceException {
+    try {
+      // TODO: Test both paths
+      Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(runId);
+      if (jobRun.isPresent()) {
+        return Response.status(Response.Status.OK)
+            .entity(new CoreJobRunToApiJobRunMapper().map(jobRun.get()))
+            .build();
+      }
+      return Response.status(Response.Status.NOT_FOUND).build();
+    } catch (UnexpectedException | Exception e) {
       log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }

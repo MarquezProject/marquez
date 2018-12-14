@@ -19,7 +19,6 @@ import marquez.dao.NamespaceDAO;
 import marquez.dao.RunArgsDAO;
 import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
-import marquez.resources.JobRunExistingResource;
 import marquez.resources.NamespaceResource;
 import marquez.resources.PingResource;
 import org.flywaydb.core.Flyway;
@@ -116,7 +115,6 @@ public class MarquezApp extends Application<MarquezConfig> {
 
     final JobService jobService = new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
     env.jersey().register(new JobResource(namespaceService, jobService));
-    env.jersey().register(new JobRunExistingResource(jobService));
 
     env.jersey().register(new ResourceExceptionMapper());
   }
