@@ -9,7 +9,7 @@ import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DataSource;
-import marquez.common.models.Database;
+import marquez.common.models.Db;
 import marquez.common.models.Description;
 import marquez.common.models.Schema;
 import marquez.common.models.Table;
@@ -17,11 +17,11 @@ import marquez.common.models.Table;
 @EqualsAndHashCode
 @ToString
 public final class DbTableVersion {
+  @Getter private final DataSource dataSource;
   @Getter private final ConnectionUrl connectionUrl;
-  @Getter private final Database database;
+  @Getter private final Db db;
   @Getter private final Schema schema;
   @Getter private final Table table;
-  @Getter private final DataSource dataSource;
   private final Description description;
 
   public DbTableVersion(
@@ -31,11 +31,11 @@ public final class DbTableVersion {
       @Nullable final Description description) {
     final URI uri = connectionUrl.toUri();
 
+    this.dataSource = DataSource.of(uri);
     this.connectionUrl = connectionUrl;
-    this.database = Database.of(uri);
+    this.db = Db.of(uri);
     this.schema = schema;
     this.table = table;
-    this.dataSource = DataSource.of(uri);
     this.description = description;
   }
 

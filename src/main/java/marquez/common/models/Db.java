@@ -10,10 +10,10 @@ import lombok.ToString;
 @RequiredArgsConstructor(staticName = "of")
 @EqualsAndHashCode
 @ToString
-public final class Database {
+public final class Db {
   @Getter @NonNull private final String value;
 
-  public static Database of(@NonNull final URI uri) {
+  public static Db of(@NonNull final URI uri) {
     return of(uri.getScheme());
   }
 }
