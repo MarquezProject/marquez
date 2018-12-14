@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ResourceExceptionMapper;
-import marquez.core.models.Generator;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
 import marquez.dao.JobDAO;
@@ -26,7 +25,6 @@ import marquez.dao.RunArgsDAO;
 import marquez.resources.JobResource;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JobIntegrationEdgeCaseTest {
@@ -55,36 +53,17 @@ public class JobIntegrationEdgeCaseTest {
   }
 
   @Test
-  @Ignore("Re-enable once namespace issue is resolved")
-  public void testJobCreationWithValidNamespace() throws UnexpectedException {
-    Job jobForJobCreationRequest = generateApiJob();
-    CreateJobRequest createJobRequest = generateCreateJobRequest(jobForJobCreationRequest);
-
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
-
-    String path =
-        format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, jobForJobCreationRequest.getName());
-    Response res =
-        resources
-            .client()
-            .target(path)
-            .request(MediaType.APPLICATION_JSON)
-            .put(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
-    assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
-  }
-
-  @Test
   public void testJobCreationWithInvalidNamespace() throws UnexpectedException {
     Job jobForJobCreationRequest = generateApiJob();
+
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
     CreateJobRequest createJobRequest =
         new CreateJobRequest(
             jobForJobCreationRequest.getLocation(),
             jobForJobCreationRequest.getDescription(),
             jobForJobCreationRequest.getInputDataSetUrns(),
             jobForJobCreationRequest.getOutputDataSetUrns());
-
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
-
     String path =
         format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, jobForJobCreationRequest.getName());
     Response res =
