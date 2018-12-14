@@ -19,9 +19,9 @@ public interface DbTableInfoDao {
       "INSERT INTO db_table_info (uuid, db, table) " + "VALUES (:uuid, :db.value, :schema.value)")
   void insert(@Bind("uuid") UUID uuid, @BindBean("db") Db db, @BindBean("schema") Schema schema);
 
-  @SqlQuery("SELECT * FROM dbs WHERE uuid = :uuid")
+  @SqlQuery("SELECT * FROM db_table_info WHERE uuid = :uuid")
   Optional<DbTableInfoRow> findBy(@Bind("uuid") UUID uuid);
 
-  @SqlQuery("SELECT * FROM dbs LIMIT :limit OFFSET :offset")
+  @SqlQuery("SELECT * FROM db_table_info LIMIT :limit OFFSET :offset")
   List<DbTableInfoRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);
 }
