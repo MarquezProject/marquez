@@ -34,9 +34,9 @@ public class NamespaceService {
     }
   }
 
-  public boolean exists(Namespace namespace) throws UnexpectedException {
+  public boolean exists(String namespaceName) throws UnexpectedException {
     try {
-      return namespaceDAO.exists(namespace.getName());
+      return namespaceDAO.exists(namespaceName.toLowerCase());
     } catch (UnableToExecuteStatementException e) {
       String err = "error checking namespace existence";
       log.error(err);
