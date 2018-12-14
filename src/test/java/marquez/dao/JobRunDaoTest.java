@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNull;
 
 import java.util.UUID;
 import marquez.JobRunBaseTest;
-import marquez.api.JobRunState;
+import marquez.core.models.JobRunState;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.statement.Query;
 import org.junit.BeforeClass;

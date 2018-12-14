@@ -11,9 +11,9 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(NamespaceRow.class)
 public interface NamespaceDAO {
   @SqlUpdate(
-      "INSERT INTO namespaces(guid, name, description, current_ownership) "
-          + "VALUES(:guid, :name, :description, :ownerName) "
-          + "ON CONFLICT DO NOTHING")
+          "INSERT INTO namespaces(guid, name, description, current_ownership) "
+                  + "VALUES(:guid, :name, :description, :ownerName) "
+                  + "ON CONFLICT DO NOTHING")
   void insert(@BindBean Namespace namespace);
 
   @SqlQuery("SELECT * FROM namespaces WHERE name = :name")

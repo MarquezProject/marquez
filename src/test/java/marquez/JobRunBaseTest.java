@@ -7,7 +7,7 @@ import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
-import marquez.api.JobRunState;
+import marquez.core.models.JobRunState;
 import marquez.dao.JobRunDAO;
 import marquez.dao.RunArgsDAO;
 import marquez.dao.fixtures.AppWithPostgresRule;
@@ -25,6 +25,8 @@ public abstract class JobRunBaseTest {
 
   static final String TEST_JOB_RUN_ARGS = "--my-flag -Dkey=value";
   static final String TEST_JOB_RUN_ARGS_HEX_DIGEST = UUID.randomUUID().toString();
+
+  static final String TEST_JOB_NAME = "testJob";
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
@@ -50,8 +52,8 @@ public abstract class JobRunBaseTest {
               handle.execute(
                   format(
                       "insert into jobs (guid, name, description) values "
-                          + "('%s', 'my_job', 'fake job for reference');",
-                      TEST_JOB_GUID_STRING));
+                          + "('%s', '%s', 'fake job for reference');",
+                      TEST_JOB_GUID_STRING, TEST_JOB_NAME));
               handle.execute(
                   format(
                       "insert into job_versions (guid, input_dataset, output_dataset, job_guid, uri) values "

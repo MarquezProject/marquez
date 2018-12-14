@@ -12,6 +12,9 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.JobRunBaseTest;
+import marquez.core.models.Namespace;
+import marquez.dao.NamespaceDAO;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -21,15 +24,29 @@ import org.slf4j.LoggerFactory;
     "TODO: Job Run Definition was removed, disabling tests so they can be updated for new endpoints")
 public class JobRunIntegrationTest extends JobRunBaseTest {
   private static Logger LOG = LoggerFactory.getLogger(JobRunIntegrationTest.class);
+  static NamespaceDAO namespaceDAO = APP.onDemand(NamespaceDAO.class);
+  static final String NAMESPACE_NAME = "nsName";
+  static final String NAMESPACE_OWNER = "nsOwner";
+  static final String NAMESPACE_DESC = "nsDesc";
+
+  static final String JOB_NAME = "myJob";
+
+  @BeforeClass
+  public static void setUpNamespace() {
+    namespaceDAO.insert(
+        new Namespace(UUID.randomUUID(), NAMESPACE_NAME, NAMESPACE_OWNER, NAMESPACE_DESC));
+  }
 
   @Test
+  @Ignore("Re-enable when the namespace service is checked in")
   public void testJobRunCreationEndToEnd() throws JsonProcessingException {
     Entity createJobRunRequestEntity =
-        Entity.json(MAPPER.writeValueAsString(new CreateJobRunRequest(null, null, "")));
+        Entity.json(
+            MAPPER.writeValueAsString(new CreateJobRunRequest(null, null, "{'key': 'value'}")));
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/job_runs")
+            .path("/namespaces/" + NAMESPACE_NAME + "/jobs/" + JOB_NAME + "/runs/")
             .request(MediaType.APPLICATION_JSON)
             .post(createJobRunRequestEntity);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
@@ -53,65 +70,29 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
   public void testJobRunGetterEndToEnd() {
     GetJobRunResponse responseBody = getJobRunApiResponse(NEW_JOB_RUN.getGuid());
 
-    assertEquals(JobRunState.State.NEW, responseBody.getState());
+    assertEquals(marquez.core.models.JobRunState.State.NEW.name(), responseBody.getState());
     assertNull(responseBody.getStartedAt());
     assertNull(responseBody.getEndedAt());
   }
 
   @Test
   public void testJobRunAfterUpdateEndToEnd() throws JsonProcessingException {
-    Entity jobRunUpdateRequestEntity =
-        Entity.json(MAPPER.writeValueAsString(new UpdateJobRunRequest("RUNNING")));
+
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path(format("/job_runs/%s", NEW_JOB_RUN.getGuid()))
+            .path(format("/jobs/runs/%s/complete", NEW_JOB_RUN.getGuid()))
             .request(MediaType.APPLICATION_JSON)
-            .put(jobRunUpdateRequestEntity);
+            .put(Entity.json(""));
 
-    assertEquals(Response.Status.ACCEPTED.getStatusCode(), res.getStatus());
-
-    GetJobRunResponse responseBody = getJobRunApiResponse(NEW_JOB_RUN.getGuid());
-
-    assertEquals(JobRunState.State.RUNNING, responseBody.getState());
-    assertNotNull(responseBody.getStartedAt());
-    assertNull(responseBody.getEndedAt());
-  }
-
-  @Test
-  public void testJobRunAfterForbiddenUpdateEndToEnd() throws JsonProcessingException {
-
-    Entity jobRunUpdateRequestEntity =
-        Entity.json(MAPPER.writeValueAsString(new UpdateJobRunRequest("FAILED")));
-    final Response res =
-        APP.client()
-            .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path(format("/job_runs/%s", NEW_JOB_RUN.getGuid()))
-            .request(MediaType.APPLICATION_JSON)
-            .put(jobRunUpdateRequestEntity);
-
-    assertEquals(Response.Status.FORBIDDEN.getStatusCode(), res.getStatus());
-  }
-
-  @Test
-  public void testJobRunAfterInvalidUpdateEndToEnd() throws JsonProcessingException {
-    Entity jobRunRequestJsonAsEntity =
-        Entity.json(MAPPER.writeValueAsString(new UpdateJobRunRequest("NO_SUCH_STATE")));
-    final Response res =
-        APP.client()
-            .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path(format("/job_runs/%s", NEW_JOB_RUN.getGuid()))
-            .request(MediaType.APPLICATION_JSON)
-            .put(jobRunRequestJsonAsEntity);
-
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), res.getStatus());
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
   }
 
   private GetJobRunResponse getJobRunApiResponse(UUID jobRunGuid) {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path(format("/job_runs/%s", jobRunGuid))
+            .path(format("/jobs/runs/%s", jobRunGuid))
             .request(MediaType.APPLICATION_JSON)
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());

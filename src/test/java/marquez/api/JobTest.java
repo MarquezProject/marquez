@@ -1,16 +1,15 @@
 package marquez.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class JobTest {
 
@@ -23,8 +22,6 @@ public class JobTest {
 
   private static final Job JOB =
       new Job(JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
-
-  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
   @Test
   public void testJobEquality() {

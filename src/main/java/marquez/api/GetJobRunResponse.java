@@ -16,12 +16,12 @@ public class GetJobRunResponse {
   @NotBlank
   private UUID guid;
 
-  @JsonProperty("startedAtt")
+  @JsonProperty("startedAt")
   private Timestamp startedAt;
 
   @JsonProperty("endedAt")
   private Timestamp endedAt;
 
   @JsonProperty("runState")
-  private JobRunState.State state;
+  private String state;
 }

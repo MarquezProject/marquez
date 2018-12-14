@@ -18,7 +18,8 @@ public class JobRunTest {
   private static final Timestamp STARTED_AT_TIME = Timestamp.from(Instant.now());
   private static final Timestamp ENDED_AT_TIME = Timestamp.from(Instant.now());
   private static final UUID JOB_RUN_DEFINITION_UUID = UUID.randomUUID();
-  private static final JobRunState.State CURRENT_STATE = JobRunState.State.NEW;
+  private static final marquez.core.models.JobRunState.State CURRENT_STATE =
+      marquez.core.models.JobRunState.State.NEW;
   private static final String RUN_ARGS = "--no-such-argument";
 
   private static final JobRun JOB_RUN =
@@ -28,7 +29,7 @@ public class JobRunTest {
           ENDED_AT_TIME,
           JOB_RUN_DEFINITION_UUID,
           RUN_ARGS,
-          JobRunState.State.toInt(CURRENT_STATE));
+          CURRENT_STATE.name());
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
@@ -46,7 +47,7 @@ public class JobRunTest {
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
             RUN_ARGS,
-            JobRunState.State.toInt(CURRENT_STATE));
+            CURRENT_STATE.name());
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(jr2.equals(JOB_RUN));
@@ -61,7 +62,7 @@ public class JobRunTest {
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
             RUN_ARGS,
-            JobRunState.State.toInt(CURRENT_STATE));
+            CURRENT_STATE.name());
     assertEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
@@ -74,7 +75,7 @@ public class JobRunTest {
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
             RUN_ARGS,
-            JobRunState.State.toInt(CURRENT_STATE));
+            CURRENT_STATE.name());
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
   }
@@ -88,7 +89,7 @@ public class JobRunTest {
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
             RUN_ARGS,
-            JobRunState.State.toInt(JobRunState.State.COMPLETED));
+            CURRENT_STATE.name());
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
   }
 
@@ -101,7 +102,7 @@ public class JobRunTest {
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
             RUN_ARGS,
-            JobRunState.State.toInt(CURRENT_STATE));
+            CURRENT_STATE.name());
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
@@ -114,7 +115,7 @@ public class JobRunTest {
             ENDED_AT_TIME,
             JOB_RUN_DEFINITION_UUID,
             RUN_ARGS,
-            JobRunState.State.toInt(JobRunState.State.COMPLETED));
+            "RUNNING");
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 }

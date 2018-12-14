@@ -47,6 +47,7 @@ public final class JobResource extends BaseResource {
       @PathParam("job") final String job,
       @Valid CreateJobRequest request)
       throws ResourceException {
+
     try {
       Job jobToCreate =
           apiJobToCoreJobMapper.map(
@@ -57,6 +58,7 @@ public final class JobResource extends BaseResource {
                   request.getOutputDatasetUrns,
                   request.getLocation(),
                   request.getDescription()));
+      // TODO: Need to handle the case where the NS doesn't yet exist
       Job createdJob = jobService.createJob(namespace, jobToCreate);
       return Response.status(Response.Status.OK)
           .entity(Entity.json(coreJobToApiJobMapper.map(createdJob)))
