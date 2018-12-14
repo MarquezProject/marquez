@@ -81,8 +81,12 @@ public abstract class JobRunBaseTest {
         .useHandle(
             handle -> {
               handle.execute(
-                  format("delete from job_versions where guid = '%s'", TEST_JOB_RUN_VERSION_GUID));
-              handle.execute(format("delete from jobs where guid = '%s'", TEST_JOB_GUID_STRING));
+                  format(
+                      "DELETE from job_versions where guid in (select job_versions.guid as guid from jobs inner join job_versions on job_versions.job_guid=jobs.guid and jobs.namespace_guid='%s')",
+                      TEST_NAMESPACE_GUID_STRING));
+              handle.execute(
+                  format(
+                      "delete from jobs where namespace_guid = '%s'", TEST_NAMESPACE_GUID_STRING));
               handle.execute(
                   format("delete from namespaces where guid = '%s'", TEST_NAMESPACE_GUID_STRING));
             });
