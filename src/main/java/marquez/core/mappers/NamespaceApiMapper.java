@@ -9,10 +9,7 @@ public class NamespaceApiMapper
   public marquez.core.models.Namespace map(marquez.api.Namespace namespace) {
     requireNonNull(namespace, "namespace must not be null");
     return new marquez.core.models.Namespace(
-        null,
-        namespace.getName().toLowerCase(),
-        namespace.getOwnerName(),
-        namespace.getDescription());
+        null, namespace.getName().toLowerCase(), namespace.getOwner(), namespace.getDescription());
   }
 
   public marquez.core.models.Namespace of(String namespaceName, CreateNamespaceRequest request) {

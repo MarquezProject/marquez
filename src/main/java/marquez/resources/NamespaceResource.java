@@ -5,7 +5,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -92,10 +91,11 @@ public class NamespaceResource extends BaseResource {
   public Response listNamespaces() throws ResourceException {
     try {
       List<marquez.core.models.Namespace> namespaceCoreModels = namespaceService.listNamespaces();
-      List<marquez.api.Namespace> namespaceList = new CoreNamespaceToApiNamespaceMapper().map(namespaceCoreModels);
+      List<marquez.api.Namespace> namespaceList =
+          new CoreNamespaceToApiNamespaceMapper().map(namespaceCoreModels);
       return Response.status(Response.Status.OK)
-              .entity(new ListNamespacesResponse(namespaceList))
-              .build();
+          .entity(new ListNamespacesResponse(namespaceList))
+          .build();
     } catch (UnexpectedException e) {
       log.error(e.getLocalizedMessage());
       throw new ResourceException();
