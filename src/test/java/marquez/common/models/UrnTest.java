@@ -18,11 +18,13 @@ public class UrnTest {
 
   @Test
   public void testNewUrnFromNamespaceAndDataset() {
-    final String urnString = "urn:a:b.c";
+    final String namespaceString = "a";
+    final String datasetString = "b.c";
+    final String urnString = "urn:" + namespaceString + ":" + datasetString;
     final Urn expected = Urn.of(urnString);
 
-    final Namespace namespace = Namespace.of("a");
-    final Dataset dataset = Dataset.of("b.c");
+    final Namespace namespace = Namespace.of(namespaceString);
+    final Dataset dataset = Dataset.of(datasetString);
     final Urn actual = Urn.of(namespace, dataset);
     assertEquals(expected, actual);
   }
