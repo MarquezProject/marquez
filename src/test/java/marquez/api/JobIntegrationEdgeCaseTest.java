@@ -75,14 +75,6 @@ public class JobIntegrationEdgeCaseTest {
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
 
-  CreateJobRequest generateCreateJobRequest(Job job) {
-    return new CreateJobRequest(
-        job.getLocation(),
-        job.getDescription(),
-        job.getInputDataSetUrns(),
-        job.getOutputDataSetUrns());
-  }
-
   Job generateApiJob() {
     String jobName = "myJob" + System.currentTimeMillis();
     final String location = "someLocation";
