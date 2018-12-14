@@ -32,7 +32,7 @@ public final class Urn {
     this.value = value;
   }
 
-  public static Urn from(@NonNull final Namespace namespace, @NonNull final Dataset dataset) {
+  public static Urn of(@NonNull final Namespace namespace, @NonNull final Dataset dataset) {
     final String value =
         new StringJoiner(URN_DELIM)
             .add(URN_PREFIX)
