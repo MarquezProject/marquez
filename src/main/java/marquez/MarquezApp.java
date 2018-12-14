@@ -14,6 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.resources.DatasetResource;
 import marquez.core.mappers.ResourceExceptionMapper;
 import marquez.core.services.NamespaceService;
+<<<<<<< HEAD
+=======
+import marquez.dao.NamespaceDAO;
+import marquez.dao.deprecated.DatasetDAO;
+>>>>>>> issue-100
 import marquez.dao.deprecated.JobDAO;
 import marquez.dao.deprecated.JobRunDAO;
 import marquez.db.DatasetDao;
@@ -113,7 +118,8 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
     env.jersey().register(new JobRunResource(jobRunDAO));
 
-    final NamespaceService namespaceService = new NamespaceService();
+    final NamespaceDAO namespaceDAO = jdbi.onDemand(NamespaceDAO.class);
+    final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
     env.jersey().register(new NamespaceResource(namespaceService));
 
     env.jersey().register(new ResourceExceptionMapper());

@@ -5,6 +5,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -20,6 +21,7 @@ import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.core.mappers.GetNamespaceResponseMapper;
+import marquez.core.mappers.NamespaceApiMapper;
 import marquez.core.models.Namespace;
 import marquez.core.services.NamespaceService;
 import org.slf4j.Logger;
@@ -37,6 +39,8 @@ public class NamespaceResource extends BaseResource {
   private final CoreNamespaceToApiNamespaceMapper namespaceMapper =
       new CoreNamespaceToApiNamespaceMapper();
 
+  private final NamespaceApiMapper namespaceAPIMapper = new NamespaceApiMapper();
+
   public NamespaceResource(NamespaceService namespaceService) {
     this.namespaceService = namespaceService;
   }
@@ -50,8 +54,8 @@ public class NamespaceResource extends BaseResource {
       throws ResourceException {
 
     try {
-      Namespace n =
-          namespaceService.create(namespace, request.getOwner(), request.getDescription());
+      marquez.core.models.Namespace n =
+          namespaceService.create(namespaceAPIMapper.of(namespace, request));
       return Response.status(Response.Status.OK)
           .entity(new CreateNamespaceResponse(namespaceMapper.map(n)))
           .type(APPLICATION_JSON)
@@ -90,7 +94,14 @@ public class NamespaceResource extends BaseResource {
   public Response listNamespaces() throws ResourceException {
     // TODO: Implement this using the NamespaceService
     try {
-      List<Namespace> namespaceList = namespaceService.listNamespaces();
+      List<marquez.core.models.Namespace> namespaceCoreModels = namespaceService.listNamespaces();
+      List<marquez.api.Namespace> namespaceList =
+          namespaceCoreModels
+              .stream()
+              .map(namespaceMapper::mapAsOptional)
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .collect(Collectors.toList());
       return Response.status(Response.Status.OK)
           .entity(new ListNamespacesResponse(namespaceList))
           .build();

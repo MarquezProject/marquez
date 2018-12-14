@@ -18,7 +18,7 @@ public class NamespaceRow implements RowMapper<Namespace> {
         UUID.fromString(rs.getString("guid")),
         rs.getTimestamp("created_at"),
         rs.getString("name"),
-        rs.getString("description"),
-        rs.getString("current_ownership"));
+        rs.getString("current_ownership"),
+        rs.getString("description"));
   }
 }
