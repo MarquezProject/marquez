@@ -12,13 +12,11 @@ import io.dropwizard.setup.Environment;
 import marquez.core.mappers.ResourceExceptionMapper;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
-import marquez.dao.DatasetDAO;
 import marquez.dao.JobDAO;
 import marquez.dao.JobRunDAO;
 import marquez.dao.JobVersionDAO;
 import marquez.dao.NamespaceDAO;
 import marquez.dao.RunArgsDAO;
-import marquez.resources.DatasetResource;
 import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
 import marquez.resources.JobRunExistingResource;
@@ -111,12 +109,8 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
 
     final RunArgsDAO runArgsDAO = jdbi.onDemand(RunArgsDAO.class);
-
-    final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
-
-    env.jersey().register(new DatasetResource(datasetDAO));
-
     final NamespaceDAO namespaceDAO = jdbi.onDemand(NamespaceDAO.class);
+
     final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
     env.jersey().register(new NamespaceResource(namespaceService));
 

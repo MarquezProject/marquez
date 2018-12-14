@@ -14,6 +14,6 @@ public class JobRunStateRow implements RowMapper<marquez.core.models.JobRunState
         UUID.fromString(rs.getString("guid")),
         rs.getTimestamp("transitioned_at"),
         UUID.fromString(rs.getString("job_run_guid")),
-        marquez.core.models.JobRunState.State.fromInt(rs.getInt("currentState")));
+        marquez.core.models.JobRunState.State.fromInt(rs.getInt("state")));
   }
 }

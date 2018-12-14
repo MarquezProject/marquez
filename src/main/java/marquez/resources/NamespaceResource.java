@@ -14,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.CreateNamespaceRequest;
 import marquez.api.ListNamespacesResponse;
 import marquez.core.exceptions.ResourceException;
@@ -24,13 +25,11 @@ import marquez.core.mappers.NamespaceApiMapper;
 import marquez.core.models.Namespace;
 import marquez.core.services.NamespaceService;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("/api/v1/namespaces")
 @Produces(APPLICATION_JSON)
+@Slf4j
 public class NamespaceResource extends BaseResource {
-  private static final Logger LOG = LoggerFactory.getLogger(NamespaceResource.class);
 
   private final NamespaceService namespaceService;
   private final GetNamespaceResponseMapper getNamespaceResponseMapper =
@@ -60,7 +59,7 @@ public class NamespaceResource extends BaseResource {
           .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }
@@ -82,7 +81,7 @@ public class NamespaceResource extends BaseResource {
         return Response.status(Response.Status.NOT_FOUND).type(APPLICATION_JSON).build();
       }
     } catch (UnexpectedException e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }
@@ -98,7 +97,7 @@ public class NamespaceResource extends BaseResource {
               .entity(new ListNamespacesResponse(namespaceList))
               .build();
     } catch (UnexpectedException e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }

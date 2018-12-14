@@ -14,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.CreateJobRequest;
 import marquez.api.CreateJobRunRequest;
 import marquez.api.ListJobsResponse;
@@ -26,13 +27,11 @@ import marquez.core.models.Job;
 import marquez.core.models.JobRun;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("/api/v1/namespaces/{namespace}/jobs")
 @Produces(APPLICATION_JSON)
+@Slf4j
 public final class JobResource extends BaseResource {
-  private static final Logger LOG = LoggerFactory.getLogger(JobResource.class);
   private final JobService jobService;
   private final NamespaceService namespaceService;
 
@@ -54,8 +53,12 @@ public final class JobResource extends BaseResource {
       throws ResourceException {
     // TODO: Verify that the job exists
     try {
+      if (!namespaceExists(namespace)) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
       if (!jobService.getJob(namespace, job).isPresent()) {
-        LOG.error("Could not find job");
+        log.error("Could not find job: " + job);
+        return Response.status(Response.Status.NOT_FOUND).build();
       }
       JobRun createdJobRun =
           jobService.createJobRun(
@@ -69,7 +72,7 @@ public final class JobResource extends BaseResource {
           .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException | Exception e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }
@@ -84,7 +87,8 @@ public final class JobResource extends BaseResource {
       @Valid CreateJobRequest request)
       throws ResourceException {
     try {
-      if (!namespaceExists(namespace)) {
+      if (!jobService.getJob(namespace, job).isPresent()) {
+        log.error("Could not find job: " + job);
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       Job jobToCreate =
@@ -102,7 +106,7 @@ public final class JobResource extends BaseResource {
           .entity(coreJobToApiJobMapper.map(createdJob))
           .build();
     } catch (UnexpectedException e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }
@@ -113,6 +117,8 @@ public final class JobResource extends BaseResource {
   public Response getJob(
       @PathParam("namespace") final String namespace, @PathParam("job") final String job)
       throws ResourceException {
+
+    // TODO: Verify that the job exists
     try {
       Optional<Job> returnedJob = jobService.getJob(namespace, job);
       if (returnedJob.isPresent()) {
@@ -122,7 +128,7 @@ public final class JobResource extends BaseResource {
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }
@@ -133,11 +139,14 @@ public final class JobResource extends BaseResource {
       throws ResourceException {
     // TODO: Deal with the case of an invalid namespace
     try {
+      if (!namespaceExists(namespace)) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
       List<Job> jobList = jobService.getAllJobsInNamespace(namespace);
       return Response.status(Response.Status.OK).entity(new ListJobsResponse(jobList)).build();
 
     } catch (UnexpectedException e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }

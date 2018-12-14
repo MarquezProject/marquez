@@ -12,18 +12,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreJobRunToApiJobRunMapper;
 import marquez.core.services.JobService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Produces(APPLICATION_JSON)
 @Path("/api/v1")
+@Slf4j
 public class JobRunExistingResource extends BaseResource {
 
-  private static final Logger LOG = LoggerFactory.getLogger(JobRunExistingResource.class);
   private final JobService jobService;
 
   public JobRunExistingResource(final JobService jobService) {
@@ -41,7 +40,7 @@ public class JobRunExistingResource extends BaseResource {
           UUID.fromString(runId), marquez.core.models.JobRunState.State.COMPLETED);
       return Response.status(Response.Status.OK).build();
     } catch (UnexpectedException | Exception e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }
@@ -56,7 +55,7 @@ public class JobRunExistingResource extends BaseResource {
           UUID.fromString(runId), marquez.core.models.JobRunState.State.FAILED);
       return Response.status(Response.Status.OK).build();
     } catch (UnexpectedException | Exception e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }
@@ -71,7 +70,7 @@ public class JobRunExistingResource extends BaseResource {
           UUID.fromString(runId), marquez.core.models.JobRunState.State.ABORTED);
       return Response.status(Response.Status.OK).build();
     } catch (UnexpectedException | Exception e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }
@@ -91,7 +90,7 @@ public class JobRunExistingResource extends BaseResource {
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
   }
