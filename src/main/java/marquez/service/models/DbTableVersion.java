@@ -30,7 +30,7 @@ public final class DbTableVersion {
       @NonNull final Schema schema,
       @NonNull final Table table,
       @Nullable final Description description) {
-    final URI uri = URI.create(connectionUrl.getValue());
+    final URI uri = connectionUrl.toUri();
 
     this.connectionUrl = connectionUrl;
     this.database = Database.of(uri);

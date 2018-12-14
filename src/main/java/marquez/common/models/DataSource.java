@@ -1,5 +1,6 @@
 package marquez.common.models;
 
+import java.net.URI;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
