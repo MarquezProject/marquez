@@ -8,7 +8,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import marquez.api.Dataset;
-import marquez.dao.deprecated.DatasetDAO;
+import marquez.dao.DatasetDAO;
 
 @Path("/datasets")
 @Produces(MediaType.APPLICATION_JSON)

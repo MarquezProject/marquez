@@ -18,10 +18,10 @@ public final class Ownership {
   @JsonCreator
   public Ownership(
       @JsonProperty("guid") final UUID guid,
-      @JsonProperty("startedAt") final Timestamp startedAt,
-      @JsonProperty("endedAt") final Optional<Timestamp> endedAt,
+      @JsonProperty("nominalStartTime") final Timestamp startedAt,
+      @JsonProperty("nominalEndTime") final Optional<Timestamp> endedAt,
       @JsonProperty("jobName") final String jobName,
-      @JsonProperty("ownerName") final String ownerName) {
+      @JsonProperty("owner") final String ownerName) {
     this.guid = guid;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
@@ -74,10 +74,10 @@ public final class Ownership {
     final StringBuilder sb = new StringBuilder();
     sb.append("Ownership{");
     sb.append("guid=").append(guid);
-    sb.append(",startedAt=").append(startedAt);
-    sb.append(",endedAt=").append(endedAt);
+    sb.append(",nominalStartTime=").append(startedAt);
+    sb.append(",nominalEndTime=").append(endedAt);
     sb.append(",jobName=").append(jobName);
-    sb.append(",ownerName=").append(ownerName);
+    sb.append(",owner=").append(ownerName);
     sb.append("}");
     return sb.toString();
   }

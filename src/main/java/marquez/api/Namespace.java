@@ -9,18 +9,20 @@ public class Namespace {
 
   final String name;
   final Timestamp createdAt;
-  final String ownerName;
+  final String owner;
   final String description;
+
+  // TODO: Adjust to use Lombok
 
   @JsonCreator
   public Namespace(
       @JsonProperty("name") final String name,
       @JsonProperty("createdAt") Timestamp createdAt,
-      @JsonProperty("owner") final String ownerName,
+      @JsonProperty("owner") final String owner,
       @JsonProperty("description") final String description) {
     this.name = name;
     this.createdAt = createdAt;
-    this.ownerName = ownerName;
+    this.owner = owner;
     this.description = description;
   }
 
@@ -35,8 +37,8 @@ public class Namespace {
   }
 
   @JsonProperty("owner")
-  public String getOwnerName() {
-    return ownerName;
+  public String getOwner() {
+    return owner;
   }
 
   @JsonProperty("description")
@@ -53,12 +55,12 @@ public class Namespace {
 
     return Objects.equals(name, other.name)
         && Objects.equals(createdAt, other.createdAt)
-        && Objects.equals(ownerName, other.ownerName)
+        && Objects.equals(owner, other.owner)
         && Objects.equals(description, other.description);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, createdAt, ownerName, description);
+    return Objects.hash(name, createdAt, owner, description);
   }
 }

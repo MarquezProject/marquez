@@ -10,11 +10,15 @@ import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import marquez.core.mappers.ResourceExceptionMapper;
+import marquez.core.services.JobRunService;
+import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
+import marquez.dao.DatasetDAO;
+import marquez.dao.JobDAO;
+import marquez.dao.JobRunDAO;
+import marquez.dao.JobVersionDAO;
 import marquez.dao.NamespaceDAO;
-import marquez.dao.deprecated.DatasetDAO;
-import marquez.dao.deprecated.JobDAO;
-import marquez.dao.deprecated.JobRunDAO;
+import marquez.dao.RunArgsDAO;
 import marquez.resources.DatasetResource;
 import marquez.resources.HealthResource;
 import marquez.resources.JobResource;
@@ -104,10 +108,13 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey().register(new HealthResource());
 
     final JobDAO jobDAO = jdbi.onDemand(JobDAO.class);
-    env.jersey().register(new JobResource(jobDAO));
-
+    final JobVersionDAO jobVersionDAO = jdbi.onDemand(JobVersionDAO.class);
     final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
-    env.jersey().register(new JobRunResource(jobRunDAO));
+
+    final RunArgsDAO runArgsDAO = jdbi.onDemand(RunArgsDAO.class);
+
+    final JobRunService jobRunService = new JobRunService();
+    env.jersey().register(new JobRunResource(jobRunService));
 
     final DatasetDAO datasetDAO = jdbi.onDemand(DatasetDAO.class);
     env.jersey().register(new DatasetResource(datasetDAO));
@@ -115,6 +122,9 @@ public class MarquezApp extends Application<MarquezConfig> {
     final NamespaceDAO namespaceDAO = jdbi.onDemand(NamespaceDAO.class);
     final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
     env.jersey().register(new NamespaceResource(namespaceService));
+
+    final JobService jobService = new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
+    env.jersey().register(new JobResource(jobService));
 
     env.jersey().register(new ResourceExceptionMapper());
   }

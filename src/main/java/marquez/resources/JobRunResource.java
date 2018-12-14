@@ -1,12 +1,8 @@
 package marquez.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static marquez.api.JobRunState.State.fromInt;
-import static marquez.api.JobRunState.State.toInt;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.sql.Timestamp;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -20,27 +16,33 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import marquez.api.CreateJobRunRequest;
 import marquez.api.CreateJobRunResponse;
-import marquez.api.GetJobRunResponse;
 import marquez.api.JobRun;
 import marquez.api.JobRunState;
-import marquez.api.UpdateJobRunRequest;
-import marquez.api.UpdateJobRunResponse;
-import marquez.dao.deprecated.JobRunDAO;
+import marquez.core.exceptions.ResourceException;
+import marquez.core.exceptions.UnexpectedException;
+import marquez.core.services.JobRunService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Path("/job_runs")
 @Produces(APPLICATION_JSON)
 public class JobRunResource extends BaseResource {
 
-  private final JobRunDAO dao;
+  private static final Logger LOG = LoggerFactory.getLogger(JobRunResource.class);
+  private final JobRunService jobRunService;
 
-  public JobRunResource(final JobRunDAO dao) {
-    this.dao = dao;
+  public JobRunResource(final JobRunService jobRunService) {
+    this.jobRunService = jobRunService;
   }
 
   @POST
   @Consumes(APPLICATION_JSON)
+  @Path("/namespaces/{namespace}/jobs/{job}/runs")
   @Timed
-  public Response create(@Valid CreateJobRunRequest request) {
+  public Response create(
+      @PathParam("namespace") final String namespace,
+      @PathParam("job") final String job,
+      @Valid CreateJobRunRequest request)
+      throws ResourceException {
     UUID jobRunGuid = UUID.randomUUID();
 
     // TODO: Validate that the job run definition exists. Otherwise, throw a 404.
@@ -48,8 +50,13 @@ public class JobRunResource extends BaseResource {
     try {
       JobRun jobRun =
           new JobRun(
-              jobRunGuid, null, null, request.getRunDefinitionId(), toInt(JobRunState.State.NEW));
-      dao.insert(jobRun);
+              jobRunGuid,
+              request.getNominalStartTime(),
+              request.getNominalEndTime(),
+              null,
+              request.getRunArgs(),
+              JobRunState.State.toInt(JobRunState.State.NEW));
+      jobRunService.insert(jobRun);
 
       CreateJobRunResponse res = new CreateJobRunResponse(jobRunGuid);
       String jsonRes = mapper.writeValueAsString(res);
@@ -57,95 +64,66 @@ public class JobRunResource extends BaseResource {
           .entity(jsonRes)
           .type(APPLICATION_JSON)
           .build();
-    } catch (Exception e) {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-          .entity(Entity.json("{'error' : 'an unexpected error occurred.'}"))
-          .type(APPLICATION_JSON)
-          .build();
+    } catch (UnexpectedException | Exception e) {
+      LOG.error(e.getLocalizedMessage());
+      throw new ResourceException();
     }
   }
 
   @PUT
   @Consumes(APPLICATION_JSON)
   @Timed
-  @Path("/{guid}")
-  public Response update(@PathParam("guid") final UUID guid, @Valid UpdateJobRunRequest request) {
+  @Path("/jobs/runs/{runId}/complete")
+  public Response completeJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      JobRun existingJobRunRow = dao.findJobRunById(guid);
-      Integer oldState = existingJobRunRow.getCurrentState();
-      Integer newState;
-      try {
-        newState = toInt(JobRunState.State.valueOf(request.getState()));
-      } catch (IllegalArgumentException iae) {
-        return Response.status(Response.Status.BAD_REQUEST)
-            .type(APPLICATION_JSON)
-            .entity(Entity.json("'{'error': 'unknown state value'}"))
-            .build();
-      }
+      jobRunService.updateJobRunState(runId, JobRunState.State.COMPLETED);
+      return Response.status(Response.Status.OK).build();
+    } catch (UnexpectedException | Exception e) {
+      LOG.error(e.getLocalizedMessage());
+      throw new ResourceException();
+    }
+  }
 
-      if (!JobRun.isValidJobTransition(oldState, newState)) {
-        return Response.status(Response.Status.FORBIDDEN)
-            .type(APPLICATION_JSON)
-            .entity(Entity.json("{'error' : 'invalid transition'}"))
-            .build();
-      }
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @Timed
+  @Path("/jobs/runs/{runId}/fail")
+  public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
+    try {
+      jobRunService.updateJobRunState(runId, JobRunState.State.FAILED);
+      return Response.status(Response.Status.OK).build();
+    } catch (UnexpectedException | Exception e) {
+      LOG.error(e.getLocalizedMessage());
+      throw new ResourceException();
+    }
+  }
 
-      Timestamp startedAt = existingJobRunRow.getStartedAt();
-      Timestamp endedAt = existingJobRunRow.getEndedAt();
-
-      if (fromInt(oldState) == JobRunState.State.NEW
-          && fromInt(newState) == JobRunState.State.RUNNING) {
-        startedAt = new Timestamp(System.currentTimeMillis());
-      } else if (fromInt(newState).isFinished()) {
-        endedAt = new Timestamp(System.currentTimeMillis());
-      }
-
-      JobRun updatedJobRunRow =
-          new JobRun(
-              existingJobRunRow.getGuid(),
-              startedAt,
-              endedAt,
-              existingJobRunRow.getJobRunDefinitionGuid(),
-              toInt(JobRunState.State.valueOf(request.getState())));
-
-      dao.update(updatedJobRunRow);
-
-      UpdateJobRunResponse res = new UpdateJobRunResponse(guid);
-      String jsonRes = mapper.writeValueAsString(res);
-      return Response.status(Response.Status.ACCEPTED)
-          .entity(jsonRes)
-          .type(APPLICATION_JSON)
-          .build();
-    } catch (Exception e) {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-          .entity(Entity.json("{'error' : 'an unexpected error occurred.'}"))
-          .type(APPLICATION_JSON)
-          .build();
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @Timed
+  @Path("/jobs/runs/{runId}/abort")
+  public Response abortJobRun(@PathParam("runId") final String runId) throws ResourceException {
+    try {
+      jobRunService.updateJobRunState(runId, JobRunState.State.ABORTED);
+      return Response.status(Response.Status.OK).build();
+    } catch (UnexpectedException | Exception e) {
+      LOG.error(e.getLocalizedMessage());
+      throw new ResourceException();
     }
   }
 
   @GET
   @Consumes(APPLICATION_JSON)
   @Timed
-  @Path("/{guid}")
-  public Response get(@PathParam("guid") final UUID guid) {
-    JobRun result = dao.findJobRunById(guid);
-    GetJobRunResponse getJobRunResponse =
-        new GetJobRunResponse(
-            result.getGuid(),
-            result.getStartedAt(),
-            result.getEndedAt(),
-            result.getJobRunDefinitionGuid(),
-            fromInt(result.getCurrentState()));
+  @Path("/jobs/runs/{runId}/")
+  public Response get(@PathParam("runId") final UUID runId) throws ResourceException {
     try {
-      String jsonRes = mapper.writeValueAsString(getJobRunResponse);
+      marquez.core.models.JobRun jobRun = jobRunService.getJobRun(runId);
 
-      return Response.status(Response.Status.OK).entity(jsonRes).type(APPLICATION_JSON).build();
-    } catch (JsonProcessingException e) {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-          .entity(Entity.json("{'error' : 'an unexpected error occurred.'}"))
-          .type(APPLICATION_JSON)
-          .build();
+      return Response.status(Response.Status.OK).entity(Entity.json(jobRun)).build();
+    } catch (UnexpectedException | Exception e) {
+      LOG.error(e.getLocalizedMessage());
+      throw new ResourceException();
     }
   }
 }

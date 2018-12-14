@@ -1,21 +1,17 @@
-package marquez.api;
+package marquez.dao;
 
 import static java.lang.String.format;
-import static marquez.api.JobRunState.State.fromInt;
-import static marquez.api.JobRunState.State.toInt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.sql.Timestamp;
 import java.util.UUID;
+import marquez.JobRunBaseTest;
+import marquez.api.JobRunState;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.statement.Query;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore(
-    "Tests currently failing, but leaving in as a reference. Please remove before merging issue-100")
 public class JobRunDaoTest extends JobRunBaseTest {
 
   @BeforeClass
@@ -39,14 +35,8 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunUpdateCreatesJobRunState() {
-    JobRun modifiedJobRun =
-        new JobRun(
-            NEW_JOB_RUN.getGuid(),
-            new Timestamp(System.currentTimeMillis()),
-            NEW_JOB_RUN.getEndedAt(),
-            NEW_JOB_RUN.getJobRunDefinitionGuid(),
-            toInt(JobRunState.State.RUNNING));
-    jobRunDAO.update(modifiedJobRun);
+    jobRunDAO.updateState(
+        NEW_JOB_RUN.getGuid(), JobRunState.State.toInt(JobRunState.State.RUNNING));
 
     JobRunState returnedJobRunState = getLatestJobRunStateForJobId(NEW_JOB_RUN.getGuid());
     assertEquals(JobRunState.State.RUNNING, returnedJobRunState.getState());
@@ -54,10 +44,11 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunGetter() {
-    JobRun returnedJobRun = jobRunDAO.findJobRunById(NEW_JOB_RUN.getGuid());
-    assertNull(returnedJobRun.getStartedAt());
-    assertNull(returnedJobRun.getEndedAt());
-    assertEquals(JobRunState.State.NEW, fromInt(returnedJobRun.getCurrentState()));
+    marquez.core.models.JobRun returnedJobRun = jobRunDAO.findJobRunById(NEW_JOB_RUN.getGuid());
+    assertNull(returnedJobRun.getNominalStartTime());
+    assertNull(returnedJobRun.getNominalEndTime());
+    assertEquals(
+        JobRunState.State.NEW, JobRunState.State.fromInt(returnedJobRun.getCurrentState()));
   }
 
   private JobRunState getLatestJobRunStateForJobId(UUID jobRunId) {

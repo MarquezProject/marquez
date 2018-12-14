@@ -1,6 +1,5 @@
 package marquez.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -8,32 +7,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.UUID;
+import java.util.Collections;
+import java.util.List;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
 
 public class JobTest {
 
-  private static final UUID JOB_UUID = UUID.randomUUID();
   private static final String JOB_NAME = "myJob";
-  private static final String OWNER_NAME = "myOwner";
-  private static final Timestamp NOMINAL_TIME = Timestamp.from(Instant.now());
-  private static final String CATEGORY = "myCategory";
   private static final String DESCRIPTION = "the first job";
+  private static final Timestamp CREATED_AT = Timestamp.from(Instant.now());
+  private static final List<String> INPUT_DATA_SETS = Collections.EMPTY_LIST;
+  private static final List<String> OUTPUT_DATA_SETS = Collections.EMPTY_LIST;
+  private static final String LOCATION = "git://some/path/123";
 
   private static final Job JOB =
-      new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
+      new Job(JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
   @Test
-  public void testGuidSet() {
-    assertThat(JOB.getGuid().equals(JOB_UUID));
-  }
-
-  @Test
   public void testJobEquality() {
-    Job j2 = new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
+    Job j2 =
+        new Job(JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
     AssertionsForClassTypes.assertThat(JOB.equals(JOB));
     AssertionsForClassTypes.assertThat(JOB.equals(j2));
     AssertionsForClassTypes.assertThat(j2.equals(JOB));
@@ -41,34 +37,35 @@ public class JobTest {
 
   @Test
   public void testHashCodeEquality() {
-    Job j2 = new Job(JOB_UUID, JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
+    Job j2 =
+        new Job(JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
     assertEquals(JOB.hashCode(), j2.hashCode());
   }
 
   @Test
-  public void testJobInequalityOnUUID() {
-    Job j2 = new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
-    AssertionsForClassTypes.assertThat(!JOB.equals(j2));
-    AssertionsForClassTypes.assertThat(JOB.equals(JOB));
-  }
-
-  @Test
   public void testJobInequalityOnNonIDField() {
-    Job j2 = new Job(JOB_UUID, "some other name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
+    Job j2 =
+        new Job(
+            JOB_NAME,
+            CREATED_AT,
+            INPUT_DATA_SETS,
+            OUTPUT_DATA_SETS,
+            "someOtherLocation",
+            DESCRIPTION);
     AssertionsForClassTypes.assertThat(!JOB.equals(j2));
     AssertionsForClassTypes.assertThat(JOB.equals(JOB));
-  }
-
-  @Test
-  public void testJobHashcodeInequality() {
-    Job j2 = new Job(UUID.randomUUID(), JOB_NAME, OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
-    assertNotEquals(JOB.hashCode(), j2.hashCode());
   }
 
   @Test
   public void testJobHashcodeInequalityOnNonIdField() {
     Job j2 =
-        new Job(JOB_UUID, "some other job name", OWNER_NAME, NOMINAL_TIME, CATEGORY, DESCRIPTION);
+        new Job(
+            JOB_NAME,
+            CREATED_AT,
+            INPUT_DATA_SETS,
+            OUTPUT_DATA_SETS,
+            "someOtherLocation",
+            DESCRIPTION);
     assertNotEquals(JOB.hashCode(), j2.hashCode());
   }
 }

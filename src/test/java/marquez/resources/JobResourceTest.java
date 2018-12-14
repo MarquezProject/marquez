@@ -3,13 +3,13 @@ package marquez.resources;
 import static org.mockito.Mockito.mock;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
-import marquez.dao.deprecated.JobDAO;
+import marquez.core.services.JobService;
 import org.junit.ClassRule;
 
 class JobResourceTest {
-  private static final JobDAO JOB_DAO = mock(JobDAO.class);
+  private static final JobService JOB_SERVICE = mock(JobService.class);
 
   @ClassRule
   public static final ResourceTestRule JOB_RESOURCE =
-      ResourceTestRule.builder().addResource(new JobResource(JOB_DAO)).build();
+      ResourceTestRule.builder().addResource(new JobResource(JOB_SERVICE)).build();
 }

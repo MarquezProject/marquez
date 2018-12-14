@@ -7,8 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class CreateNamespaceResponse {
-  @JsonProperty @JsonUnwrapped private Namespace namespace;
+@NoArgsConstructor
+public class CreateJobResponse {
+  @JsonUnwrapped
+  @JsonProperty("job")
+  private Job job;
 }

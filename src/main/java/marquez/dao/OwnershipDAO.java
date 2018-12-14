@@ -12,7 +12,7 @@ public interface OwnershipDAO {
       "INSERT INTO ownerships (job_guid, owner_guid) "
           + "VALUES ("
           + "(SELECT guid FROM jobs WHERE name = :jobName),"
-          + "(SELECT guid FROM owners WHERE name = :ownerName)"
+          + "(SELECT guid FROM owners WHERE name = :namespace)"
           + ")")
-  int insert(@Bind("jobName") String jobName, @Bind("ownerName") String ownerName);
+  int insert(@Bind("jobName") String jobName, @Bind("namespace") String ownerName);
 }

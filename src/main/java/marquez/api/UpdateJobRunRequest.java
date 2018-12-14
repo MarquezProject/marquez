@@ -1,19 +1,14 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public final class UpdateJobRunRequest {
-
-  private final String currentState;
-
-  @JsonCreator
-  public UpdateJobRunRequest(@JsonProperty("state") final String state) {
-    this.currentState = state;
-  }
-
-  @JsonProperty("state")
-  public String getState() {
-    return currentState;
-  }
+  @JsonProperty("currentState")
+  private String state;
 }

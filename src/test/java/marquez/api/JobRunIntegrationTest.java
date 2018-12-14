@@ -11,21 +11,21 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import marquez.JobRunBaseTest;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Ignore("Job Run Definition was removed, disabling tests so they can be updated for new endpoints")
+@Ignore(
+    "TODO: Job Run Definition was removed, disabling tests so they can be updated for new endpoints")
 public class JobRunIntegrationTest extends JobRunBaseTest {
   private static Logger LOG = LoggerFactory.getLogger(JobRunIntegrationTest.class);
 
   @Test
   public void testJobRunCreationEndToEnd() throws JsonProcessingException {
     Entity createJobRunRequestEntity =
-        Entity.json(
-            MAPPER.writeValueAsString(
-                new CreateJobRunRequest(UUID.fromString(TEST_JOB_RUN_DEFINITION_GUID))));
+        Entity.json(MAPPER.writeValueAsString(new CreateJobRunRequest(null, null, "")));
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
@@ -53,7 +53,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
   public void testJobRunGetterEndToEnd() {
     GetJobRunResponse responseBody = getJobRunApiResponse(NEW_JOB_RUN.getGuid());
 
-    assertEquals(JobRunState.State.NEW, JobRunState.State.valueOf(responseBody.getState()));
+    assertEquals(JobRunState.State.NEW, responseBody.getState());
     assertNull(responseBody.getStartedAt());
     assertNull(responseBody.getEndedAt());
   }
@@ -73,7 +73,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
 
     GetJobRunResponse responseBody = getJobRunApiResponse(NEW_JOB_RUN.getGuid());
 
-    assertEquals(JobRunState.State.RUNNING, JobRunState.State.valueOf(responseBody.getState()));
+    assertEquals(JobRunState.State.RUNNING, responseBody.getState());
     assertNotNull(responseBody.getStartedAt());
     assertNull(responseBody.getEndedAt());
   }

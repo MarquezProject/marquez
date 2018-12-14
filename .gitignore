@@ -8,6 +8,8 @@
 .project
 .settings
 .vscode/
+./out/*
+./**/*.class
 bin/
 build/
 

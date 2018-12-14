@@ -20,11 +20,11 @@ public class NamespaceService {
   public Namespace create(Namespace namespace) throws UnexpectedException {
     try {
       Namespace newNamespace =
-          new Namespace(
-              UUID.randomUUID(),
-              namespace.getName(),
-              namespace.getOwnerName(),
-              namespace.getDescription());
+              new Namespace(
+                      UUID.randomUUID(),
+                      namespace.getName(),
+                      namespace.getOwnerName(),
+                      namespace.getDescription());
       namespaceDAO.insert(newNamespace);
       return namespaceDAO.find(newNamespace.getName());
     } catch (UnableToExecuteStatementException e) {

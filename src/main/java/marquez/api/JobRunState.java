@@ -113,7 +113,7 @@ public final class JobRunState {
       final UUID guid,
       @JsonProperty("transitionedAt") final Timestamp transitionedAt,
       @JsonProperty("jobRunGuid") final UUID jobRunGuid,
-      @JsonProperty("state") final State state) {
+      @JsonProperty("currentState") final State state) {
     this.guid = guid;
     this.transitionedAt = transitionedAt;
     this.jobRunGuid = jobRunGuid;
@@ -161,7 +161,7 @@ public final class JobRunState {
     sb.append("guid=").append(guid);
     sb.append("transitionedAt=").append(transitionedAt);
     sb.append("jobRunGuid=").append(jobRunGuid);
-    sb.append("state=").append(state);
+    sb.append("currentState=").append(state);
     sb.append("}");
     return sb.toString();
   }

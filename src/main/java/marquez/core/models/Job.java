@@ -14,7 +14,7 @@ public final class Job {
   @NonNull private final String location;
   @NonNull private final UUID namespaceGuid;
   private String description;
-  private Timestamp createdAt = null;
+  private Timestamp createdAt;
 
   public Job(
       final UUID guid,
