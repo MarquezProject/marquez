@@ -1,17 +1,18 @@
 package marquez.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
-import java.net.URI;
-import java.sql.Timestamp;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import marquez.NamespaceBaseTest;
 import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.sql.Timestamp;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class NamespaceIntegrationTest extends NamespaceBaseTest {
 
