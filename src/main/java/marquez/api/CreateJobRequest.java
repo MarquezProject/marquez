@@ -18,8 +18,8 @@ public final class CreateJobRequest {
   private String description;
 
   @JsonProperty("inputDatasetUrns")
-  public List<String> getInputDatasetUrns;
+  public List<String> inputDataSetUrns;
 
-  @JsonProperty("oututDatasetUrns")
-  public List<String> getOutputDatasetUrns;
+  @JsonProperty("outputDatasetUrns")
+  public List<String> outputDatasetUrns;
 }

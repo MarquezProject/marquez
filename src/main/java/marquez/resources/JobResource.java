@@ -8,19 +8,22 @@ import java.util.Optional;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import marquez.api.CreateJobRequest;
+import marquez.api.CreateJobRunRequest;
 import marquez.api.ListJobsResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ApiJobToCoreJobMapper;
+import marquez.core.mappers.CoreJobRunToApiJobRunMapper;
 import marquez.core.mappers.CoreJobToApiJobMapper;
 import marquez.core.models.Job;
+import marquez.core.models.JobRun;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
 import org.slf4j.Logger;
@@ -41,6 +44,36 @@ public final class JobResource extends BaseResource {
     this.jobService = jobService;
   }
 
+  @POST
+  @Consumes(APPLICATION_JSON)
+  @Path("/{job}/runs")
+  public Response create(
+      @PathParam("namespace") final String namespace,
+      @PathParam("job") final String job,
+      CreateJobRunRequest request)
+      throws ResourceException {
+    // TODO: Verify that the job exists
+    try {
+      if (!jobService.getJob(namespace, job).isPresent()) {
+        LOG.error("Could not find job");
+      }
+      JobRun createdJobRun =
+          jobService.createJobRun(
+              namespace,
+              job,
+              request.getRunArgs(),
+              request.getNominalStartTime(),
+              request.getNominalEndTime());
+      return Response.status(Response.Status.CREATED)
+          .entity(new CoreJobRunToApiJobRunMapper().map(createdJobRun))
+          .type(APPLICATION_JSON)
+          .build();
+    } catch (UnexpectedException | Exception e) {
+      LOG.error(e.getLocalizedMessage());
+      throw new ResourceException();
+    }
+  }
+
   @PUT
   @Path("/{job}")
   @Consumes(APPLICATION_JSON)
@@ -59,10 +92,11 @@ public final class JobResource extends BaseResource {
               new marquez.api.Job(
                   job,
                   null,
-                  request.getInputDatasetUrns,
-                  request.getOutputDatasetUrns,
+                  request.getInputDataSetUrns(),
+                  request.getOutputDatasetUrns(),
                   request.getLocation(),
                   request.getDescription()));
+      jobToCreate.setNamespaceGuid(namespaceService.get(namespace).get().getGuid());
       Job createdJob = jobService.createJob(namespace, jobToCreate);
       return Response.status(Response.Status.CREATED)
           .entity(coreJobToApiJobMapper.map(createdJob))
@@ -83,7 +117,7 @@ public final class JobResource extends BaseResource {
       Optional<Job> returnedJob = jobService.getJob(namespace, job);
       if (returnedJob.isPresent()) {
         return Response.status(Response.Status.OK)
-            .entity(Entity.json(coreJobToApiJobMapper.map(returnedJob.get())))
+            .entity(coreJobToApiJobMapper.map(returnedJob.get()))
             .build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();

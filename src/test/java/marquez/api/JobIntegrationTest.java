@@ -14,13 +14,10 @@ import marquez.JobRunBaseTest;
 import marquez.core.models.Namespace;
 import marquez.dao.NamespaceDAO;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Ignore(
-    "TODO: Job Run Definition was removed, disabling tests so they can be updated for new endpoints")
 public class JobIntegrationTest extends JobRunBaseTest {
   private static Logger LOG = LoggerFactory.getLogger(JobIntegrationTest.class);
 
@@ -37,16 +34,38 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   @Test
-  public void testJobRunCreationEndToEnd() {
+  public void testJobCreationResponseEndToEnd() {
+    Job jobForJobCreationRequest = generateApiJob();
+
+    Response res = createJobOnNamespace(NAMESPACE_NAME, jobForJobCreationRequest);
+    assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
+    evaluateResponse(res, jobForJobCreationRequest);
+  }
+
+  @Test
+  public void testJobGetterResponseEndToEnd() {
     Job jobForJobCreationRequest = generateApiJob();
 
     Response res = createJobOnNamespace(NAMESPACE_NAME, jobForJobCreationRequest);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
 
-    Job returnedJob = res.readEntity(Job.class);
-    assertEquals(returnedJob.getName(), jobForJobCreationRequest.getName());
-    assertEquals(returnedJob.getDescription(), jobForJobCreationRequest.getDescription());
-    assertEquals(returnedJob.getLocation(), jobForJobCreationRequest.getLocation());
+    String path =
+        format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, jobForJobCreationRequest.getName());
+    Response returnedJobResponse =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path(path)
+            .request(MediaType.APPLICATION_JSON)
+            .get();
+    assertEquals(Response.Status.OK.getStatusCode(), returnedJobResponse.getStatus());
+    evaluateResponse(returnedJobResponse, jobForJobCreationRequest);
+  }
+
+  private void evaluateResponse(Response res, Job inputJob) {
+    Job responseJob = res.readEntity(Job.class);
+    assertEquals(responseJob.getName(), inputJob.getName());
+    assertEquals(responseJob.getDescription(), inputJob.getDescription());
+    assertEquals(responseJob.getLocation(), inputJob.getLocation());
 
     // TODO: Re-enable once marquez-188 is resolved
     // assertEquals(returnedJob.getInputDataSetUrns(), inputList);

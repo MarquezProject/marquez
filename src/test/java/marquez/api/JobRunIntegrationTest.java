@@ -12,9 +12,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.JobRunBaseTest;
-import marquez.core.models.Namespace;
-import marquez.dao.NamespaceDAO;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -24,16 +21,6 @@ import org.slf4j.LoggerFactory;
     "TODO: Job Run Definition was removed, disabling tests so they can be updated for new endpoints")
 public class JobRunIntegrationTest extends JobRunBaseTest {
   private static Logger LOG = LoggerFactory.getLogger(JobRunIntegrationTest.class);
-  static NamespaceDAO namespaceDAO = APP.onDemand(NamespaceDAO.class);
-  static final String NAMESPACE_NAME = "nsName";
-  static final String NAMESPACE_OWNER = "nsOwner";
-  static final String NAMESPACE_DESC = "nsDesc";
-
-  @BeforeClass
-  public static void setUpNamespace() {
-    namespaceDAO.insert(
-        new Namespace(UUID.randomUUID(), NAMESPACE_NAME, NAMESPACE_OWNER, NAMESPACE_DESC));
-  }
 
   @Test
   @Ignore("Re-enable when the namespace service is checked in")
@@ -44,7 +31,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/api/v1/namespaces/" + NAMESPACE_NAME + "/jobs/" + TEST_JOB_NAME + "/runs/")
+            .path("/api/v1/namespaces/" + NAMESPACE_NAME + "/jobs/" + TEST_JOB_NAME + "/runs")
             .request(MediaType.APPLICATION_JSON)
             .post(createJobRunRequestEntity);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());

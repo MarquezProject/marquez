@@ -20,13 +20,17 @@ import org.junit.ClassRule;
 public abstract class JobRunBaseTest {
   protected static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
+  static final String TEST_NAMESPACE_GUID_STRING = UUID.randomUUID().toString();
   static final String TEST_JOB_GUID_STRING = UUID.randomUUID().toString();
   static final UUID TEST_JOB_RUN_VERSION_GUID = UUID.randomUUID();
 
   static final String TEST_JOB_RUN_ARGS = "--my-flag -Dkey=value";
   static final String TEST_JOB_RUN_ARGS_HEX_DIGEST = UUID.randomUUID().toString();
 
-  public static final String TEST_JOB_NAME = "testJob";
+  public static final String NAMESPACE_NAME = "nsname";
+  public static final String NAMESPACE_OWNER = "nsowner";
+  public static final String NAMESPACE_DESC = "nsdesc";
+  public static final String TEST_JOB_NAME = "testjob";
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
@@ -51,13 +55,22 @@ public abstract class JobRunBaseTest {
             handle -> {
               handle.execute(
                   format(
-                      "insert into jobs (guid, name, description) values "
-                          + "('%s', '%s', 'fake job for reference');",
-                      TEST_JOB_GUID_STRING, TEST_JOB_NAME));
+                      "insert into namespaces (guid, name, description, current_ownership) values "
+                          + "('%s', '%s', '%s', '%s');",
+                      TEST_NAMESPACE_GUID_STRING, NAMESPACE_NAME, NAMESPACE_DESC, NAMESPACE_OWNER));
+              handle.execute(
+                  format(
+                      "insert into jobs (guid, name, description, namespace_guid) values "
+                          + "('%s', '%s', 'fake job for reference', '%s');",
+                      TEST_JOB_GUID_STRING, TEST_JOB_NAME, TEST_NAMESPACE_GUID_STRING));
               handle.execute(
                   format(
                       "insert into job_versions (guid, input_dataset, output_dataset, job_guid, uri) values "
                           + "('%s', 'input_set1', 'output_set1', '%s', 'http://wework.github.com' );",
+                      TEST_JOB_RUN_VERSION_GUID, TEST_JOB_GUID_STRING));
+              handle.execute(
+                  format(
+                      "update jobs set current_version_guid = '%s' where guid = '%s';",
                       TEST_JOB_RUN_VERSION_GUID, TEST_JOB_GUID_STRING));
             });
   }
@@ -70,6 +83,8 @@ public abstract class JobRunBaseTest {
               handle.execute(
                   format("delete from job_versions where guid = '%s'", TEST_JOB_RUN_VERSION_GUID));
               handle.execute(format("delete from jobs where guid = '%s'", TEST_JOB_GUID_STRING));
+              handle.execute(
+                  format("delete from namespaces where guid = '%s'", TEST_NAMESPACE_GUID_STRING));
             });
   }
 
