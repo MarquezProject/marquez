@@ -7,6 +7,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.models.Namespace;
 import marquez.common.models.Urn;
+import marquez.core.exceptions.UnexpectedException;
 import marquez.db.DatasetDao;
 import marquez.db.models.DatasetRow;
 import marquez.service.mappers.DatasetMapper;
@@ -21,7 +22,8 @@ public class DatasetService {
     this.datasetDao = datasetDao;
   }
 
-  public Dataset create(@NonNull Namespace namespace, @NonNull DbTableVersion dbTableVersion) {
+  public Dataset create(@NonNull Namespace namespace, @NonNull DbTableVersion dbTableVersion)
+      throws UnexpectedException {
     final UUID datasetUuid =
         datasetDao.insert(
             namespace,
@@ -33,7 +35,7 @@ public class DatasetService {
             dbTableVersion.getDescription().orElse(null));
     final Optional<DatasetRow> datasetRow = datasetDao.findBy(datasetUuid);
     final Optional<Dataset> dataset = datasetRow.map(datasetMapper::map);
-    return dataset.orElseThrow(IllegalStateException::new);
+    return dataset.orElseThrow(UnexpectedException::new);
   }
 
   public Optional<Dataset> get(@NonNull Namespace namespace, @NonNull Urn urn) {
