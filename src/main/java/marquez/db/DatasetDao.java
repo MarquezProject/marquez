@@ -42,7 +42,7 @@ public interface DatasetDao {
       @BindBean("description") Description description);
 
   @Transaction
-  default DatasetRow insert(
+  default UUID insert(
       Namespace namespace,
       DataSource dataSource,
       ConnectionUrl connectionUrl,
@@ -58,10 +58,8 @@ public interface DatasetDao {
     final Dataset dataset = Dataset.of(qualifiedName);
     final Urn urn = Urn.of(namespace, dataset);
     insert(datasetUuid, urn, null, dataSourceUuid, description);
-
     createDbTableVersionDao().insert(datasetUuid, db, schema, table);
-
-    return null;
+    return datasetUuid;
   }
 
   @SqlUpdate(
