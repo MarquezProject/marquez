@@ -2,6 +2,7 @@ package marquez.core.services;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -120,6 +121,18 @@ public class JobServiceIntegrationTest {
     assertTrue(jobRunFound.isPresent());
     assertNull(jobRun.getRunArgsHexDigest());
     assertNull(jobRun.getRunArgs());
+  }
+
+  @Test
+  public void testCreateJobRun_NonNullArgs() throws UnexpectedException {
+    Job job = Generator.genJob(namespaceID);
+    String argsJson = "{'foo': 1}";
+    jobService.createJob(namespaceName, job);
+    JobRun jobRun = jobService.createJobRun(namespaceName, job.getName(), argsJson, null, null);
+    Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getGuid());
+    assertTrue(jobRunFound.isPresent());
+    assertNotNull(jobRun.getRunArgsHexDigest());
+    assertEquals(argsJson, jobRun.getRunArgs());
   }
 
   @Test
