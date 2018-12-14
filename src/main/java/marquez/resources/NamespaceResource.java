@@ -21,6 +21,7 @@ import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.core.mappers.GetNamespaceResponseMapper;
+import marquez.core.mappers.NamespaceApiMapper;
 import marquez.core.models.Namespace;
 import marquez.core.services.NamespaceService;
 import org.slf4j.Logger;
@@ -38,6 +39,8 @@ public class NamespaceResource extends BaseResource {
   private final CoreNamespaceToApiNamespaceMapper namespaceMapper =
       new CoreNamespaceToApiNamespaceMapper();
 
+  private final NamespaceApiMapper namespaceAPIMapper = new NamespaceApiMapper();
+
   public NamespaceResource(NamespaceService namespaceService) {
     this.namespaceService = namespaceService;
   }
@@ -51,13 +54,8 @@ public class NamespaceResource extends BaseResource {
       throws ResourceException {
 
     try {
-      Namespace n =
-          namespaceService.create(
-              new Namespace(
-                  null,
-                  namespace,
-                  request.getOwner(),
-                  request.getDescription())); // need to call mapper here
+      marquez.core.models.Namespace n =
+          namespaceService.create(namespaceAPIMapper.of(namespace, request));
       return Response.status(Response.Status.OK)
           .entity(new CreateNamespaceResponse(namespaceMapper.map(n)))
           .type(APPLICATION_JSON)

@@ -22,7 +22,7 @@ public class NamespaceService {
       Namespace newNamespace =
           new Namespace(
               UUID.randomUUID(),
-              namespace.getName().toLowerCase(),
+              namespace.getName(),
               namespace.getOwnerName(),
               namespace.getDescription());
       namespaceDAO.insert(newNamespace);
