@@ -22,8 +22,8 @@ import org.junit.Test;
 
 public class DatasetResourceTest {
   private static final Urn URN = Urn.of("urn:a:b.c");
-  private static final Dataset DATASET =
-      new Dataset(URN, Instant.now(), Description.of("test description"));
+  private static final Instant CREATED_AT = Instant.now();
+  private static final Description NO_DESCRIPTION = null;
   private static final Namespace NAMESPACE = Namespace.of("test");
   private static final Integer LIMIT = 100;
   private static final Integer OFFSET = 0;
@@ -33,18 +33,18 @@ public class DatasetResourceTest {
 
   @Test
   public void testListDatasets() {
-    final List<Dataset> datasets = Arrays.asList(DATASET);
+    final Dataset dataset = new Dataset(URN, CREATED_AT, NO_DESCRIPTION);
+    final List<Dataset> datasets = Arrays.asList(dataset);
     when(mockDatasetService.getAll(NAMESPACE, LIMIT, OFFSET)).thenReturn(datasets);
 
-    final Response response = datasetResource.list(NAMESPACE, LIMIT, OFFSET);
+    final Response response = datasetResource.list(NAMESPACE.getValue(), LIMIT, OFFSET);
     assertEquals(OK, response.getStatusInfo());
 
     final DatasetsResponse datasetsResponse = (DatasetsResponse) response.getEntity();
     final List<DatasetResponse> datasetsResponses = datasetsResponse.getDatasetResponses();
     assertEquals(1, datasetsResponses.size());
-    assertEquals(DATASET.getUrn(), datasetsResponses.get(0).getUrn());
-    assertEquals(DATASET.getCreatedAt(), datasetsResponses.get(0).getCreatedAt());
-    assertEquals(DATASET.getDescription(), datasetsResponses.get(0).getDescription());
+    assertEquals(URN.getValue(), datasetsResponses.get(0).getUrn());
+    assertEquals(CREATED_AT.toString(), datasetsResponses.get(0).getCreatedAt());
 
     verify(mockDatasetService, times(1)).getAll(NAMESPACE, LIMIT, OFFSET);
   }

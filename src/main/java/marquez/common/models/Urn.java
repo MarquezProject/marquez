@@ -18,6 +18,17 @@ public final class Urn {
 
   @Getter private final String value;
 
+  public static Urn of(@NonNull final Namespace namespace, @NonNull final Dataset dataset) {
+    final String value =
+        new StringJoiner(URN_DELIM)
+            .add(URN_PREFIX)
+            .add(namespace.getValue())
+            .add(dataset.getValue())
+            .toString();
+
+    return of(value);
+  }
+
   public static Urn of(final String value) {
     return new Urn(value);
   }
@@ -30,16 +41,5 @@ public final class Urn {
     }
 
     this.value = value;
-  }
-
-  public static Urn of(@NonNull final Namespace namespace, @NonNull final Dataset dataset) {
-    final String value =
-        new StringJoiner(URN_DELIM)
-            .add(URN_PREFIX)
-            .add(namespace.getValue())
-            .add(dataset.getValue())
-            .toString();
-
-    return new Urn(value);
   }
 }
