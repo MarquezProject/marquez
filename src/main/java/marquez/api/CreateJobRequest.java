@@ -2,17 +2,20 @@ package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-// TODO: Add integration testing for this
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public final class CreateJobRequest {
 
   @JsonProperty("location")
-  private final String location;
+  private String location;
 
   @JsonProperty("description")
-  private final String description;
+  private String description;
 
   @JsonProperty("inputDatasetUrns")
   public List<String> getInputDatasetUrns;

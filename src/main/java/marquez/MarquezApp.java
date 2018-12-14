@@ -119,7 +119,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey().register(new NamespaceResource(namespaceService));
 
     final JobService jobService = new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
-    env.jersey().register(new JobResource(jobService));
+    env.jersey().register(new JobResource(namespaceService, jobService));
 
     env.jersey().register(new ResourceExceptionMapper());
   }

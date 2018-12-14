@@ -22,6 +22,7 @@ import marquez.core.mappers.ApiJobToCoreJobMapper;
 import marquez.core.mappers.CoreJobToApiJobMapper;
 import marquez.core.models.Job;
 import marquez.core.services.JobService;
+import marquez.core.services.NamespaceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +31,13 @@ import org.slf4j.LoggerFactory;
 public final class JobResource extends BaseResource {
   private static final Logger LOG = LoggerFactory.getLogger(JobResource.class);
   private final JobService jobService;
+  private final NamespaceService namespaceService;
 
   private ApiJobToCoreJobMapper apiJobToCoreJobMapper = new ApiJobToCoreJobMapper();
   private CoreJobToApiJobMapper coreJobToApiJobMapper = new CoreJobToApiJobMapper();
 
-  public JobResource(final JobService jobService) {
+  public JobResource(final NamespaceService namespaceService, final JobService jobService) {
+    this.namespaceService = namespaceService;
     this.jobService = jobService;
   }
 
@@ -47,8 +50,10 @@ public final class JobResource extends BaseResource {
       @PathParam("job") final String job,
       @Valid CreateJobRequest request)
       throws ResourceException {
-
     try {
+      if (!namespaceExists(namespace)) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
       Job jobToCreate =
           apiJobToCoreJobMapper.map(
               new marquez.api.Job(
@@ -58,10 +63,9 @@ public final class JobResource extends BaseResource {
                   request.getOutputDatasetUrns,
                   request.getLocation(),
                   request.getDescription()));
-      // TODO: Need to handle the case where the NS doesn't yet exist
       Job createdJob = jobService.createJob(namespace, jobToCreate);
-      return Response.status(Response.Status.OK)
-          .entity(Entity.json(coreJobToApiJobMapper.map(createdJob)))
+      return Response.status(Response.Status.CREATED)
+          .entity(coreJobToApiJobMapper.map(createdJob))
           .build();
     } catch (UnexpectedException e) {
       LOG.error(e.getLocalizedMessage());
@@ -102,5 +106,9 @@ public final class JobResource extends BaseResource {
       LOG.error(e.getLocalizedMessage());
       throw new ResourceException();
     }
+  }
+
+  public boolean namespaceExists(String namespace) throws UnexpectedException {
+    return namespaceService.get(namespace).isPresent();
   }
 }
