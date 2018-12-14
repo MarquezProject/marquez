@@ -1,9 +1,8 @@
 package marquez.service.models;
 
 import java.net.URI;
-import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.URI;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
