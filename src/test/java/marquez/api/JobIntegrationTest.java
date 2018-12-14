@@ -2,8 +2,6 @@ package marquez.api;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.Collections;
@@ -14,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.JobRunBaseTest;
 import marquez.core.models.Namespace;
-import marquez.core.services.NamespaceService;
 import marquez.dao.NamespaceDAO;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -39,13 +36,6 @@ public class JobIntegrationTest extends JobRunBaseTest {
         new Namespace(UUID.randomUUID(), NAMESPACE_NAME, NAMESPACE_OWNER, NAMESPACE_DESC));
   }
 
-  static NamespaceService mockNamespaceService = mock(NamespaceService.class);
-
-  @Test
-  public void testMocking() {
-    when(APP.onDemand(NamespaceService.class)).thenReturn(mockNamespaceService);
-  }
-
   @Test
   public void testJobRunCreationEndToEnd() {
     Job jobForJobCreationRequest = generateApiJob();
@@ -62,15 +52,6 @@ public class JobIntegrationTest extends JobRunBaseTest {
     // assertEquals(returnedJob.getInputDataSetUrns(), inputList);
     // assertEquals(returnedJob.getOutputDataSetUrns(), outputList);
     // assertNotNull(returnedJob.getCreatedAt());
-  }
-
-  @Test
-  public void testJobRunCreatedAJobRunVersionEndToEnd() {
-    // Given a valid namespace
-
-    // When we insert a job on the valid endpoint
-
-    // A job run version is created
   }
 
   private Response createJobOnNamespace(String namespace, Job job) {

@@ -13,12 +13,12 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import marquez.api.CreateJobRunRequest;
 import marquez.api.CreateJobRunResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
+import marquez.core.mappers.CoreJobRunToApiJobRunMapper;
 import marquez.core.services.JobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,9 +119,11 @@ public class JobRunResource extends BaseResource {
       // TODO: Test both paths
       Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(runId);
       if (jobRun.isPresent()) {
-        return Response.status(Response.Status.OK).entity(Entity.json(jobRun)).build();
+        return Response.status(Response.Status.OK)
+            .entity(new CoreJobRunToApiJobRunMapper().map(jobRun.get()))
+            .build();
       }
-      return Response.status(Response.Status.NOT_FOUND).entity(Entity.json(jobRun)).build();
+      return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
       LOG.error(e.getLocalizedMessage());
       throw new ResourceException();

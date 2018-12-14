@@ -17,19 +17,12 @@ public class JobRunTest {
   private static final UUID JOB_RUN_UUID = UUID.randomUUID();
   private static final Timestamp STARTED_AT_TIME = Timestamp.from(Instant.now());
   private static final Timestamp ENDED_AT_TIME = Timestamp.from(Instant.now());
-  private static final UUID JOB_RUN_DEFINITION_UUID = UUID.randomUUID();
   private static final marquez.core.models.JobRunState.State CURRENT_STATE =
       marquez.core.models.JobRunState.State.NEW;
   private static final String RUN_ARGS = "--no-such-argument";
 
   private static final JobRun JOB_RUN =
-      new JobRun(
-          JOB_RUN_UUID,
-          STARTED_AT_TIME,
-          ENDED_AT_TIME,
-          JOB_RUN_DEFINITION_UUID,
-          RUN_ARGS,
-          CURRENT_STATE.name());
+      new JobRun(JOB_RUN_UUID, STARTED_AT_TIME, ENDED_AT_TIME, RUN_ARGS, CURRENT_STATE.name());
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
@@ -41,13 +34,7 @@ public class JobRunTest {
   @Test
   public void testJobRunEquality() {
     JobRun jr2 =
-        new JobRun(
-            JOB_RUN_UUID,
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            RUN_ARGS,
-            CURRENT_STATE.name());
+        new JobRun(JOB_RUN_UUID, STARTED_AT_TIME, ENDED_AT_TIME, RUN_ARGS, CURRENT_STATE.name());
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(jr2.equals(JOB_RUN));
@@ -56,13 +43,7 @@ public class JobRunTest {
   @Test
   public void testHashCodeEquality() {
     JobRun jr2 =
-        new JobRun(
-            JOB_RUN_UUID,
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            RUN_ARGS,
-            CURRENT_STATE.name());
+        new JobRun(JOB_RUN_UUID, STARTED_AT_TIME, ENDED_AT_TIME, RUN_ARGS, CURRENT_STATE.name());
     assertEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
@@ -70,12 +51,7 @@ public class JobRunTest {
   public void testJobRunInequalityOnUUID() {
     JobRun jr2 =
         new JobRun(
-            UUID.randomUUID(),
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            RUN_ARGS,
-            CURRENT_STATE.name());
+            UUID.randomUUID(), STARTED_AT_TIME, ENDED_AT_TIME, RUN_ARGS, CURRENT_STATE.name());
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
   }
@@ -83,13 +59,7 @@ public class JobRunTest {
   @Test
   public void testJobRunInequalityOnNonIDField() {
     JobRun jr2 =
-        new JobRun(
-            JOB_RUN_UUID,
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            RUN_ARGS,
-            CURRENT_STATE.name());
+        new JobRun(JOB_RUN_UUID, STARTED_AT_TIME, ENDED_AT_TIME, RUN_ARGS, CURRENT_STATE.name());
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
   }
 
@@ -97,25 +67,13 @@ public class JobRunTest {
   public void testJobRunHashcodeInequality() {
     JobRun jr2 =
         new JobRun(
-            UUID.randomUUID(),
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            RUN_ARGS,
-            CURRENT_STATE.name());
+            UUID.randomUUID(), STARTED_AT_TIME, ENDED_AT_TIME, RUN_ARGS, CURRENT_STATE.name());
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
   @Test
   public void testJobRunHashcodeInequalityOnNonIdField() {
-    JobRun jr2 =
-        new JobRun(
-            JOB_RUN_UUID,
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            RUN_ARGS,
-            "RUNNING");
+    JobRun jr2 = new JobRun(JOB_RUN_UUID, STARTED_AT_TIME, ENDED_AT_TIME, RUN_ARGS, "RUNNING");
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 }
