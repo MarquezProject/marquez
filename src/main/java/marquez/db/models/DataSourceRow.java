@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import marquez.common.models.DataSource;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode
@@ -16,6 +17,6 @@ import lombok.ToString;
 public final class DataSourceRow {
   @Getter @NonNull private final UUID uuid;
   @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final DataSourceType type;
+  @Getter @NonNull private final DataSource dataSource;
   @Getter @NonNull private final String connectionUrl;
 }
