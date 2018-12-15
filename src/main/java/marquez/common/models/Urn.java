@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 public final class Urn {
   private static final Integer URN_MIN_SIZE = 1;
-  private static final Integer URN_MAX_SIZE = 1024;
+  private static final Integer URN_MAX_SIZE = 64;
   private static final String URN_DELIM = ":";
   private static final String URN_PREFIX = "urn";
   private static final String URN_REGEX =
