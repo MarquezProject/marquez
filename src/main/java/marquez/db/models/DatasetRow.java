@@ -23,7 +23,7 @@ public final class DatasetRow {
   @Getter @NonNull private final UUID namespaceUuid;
   @Getter @NonNull private final UUID dataSourceUuid;
   @Getter @NonNull private final Urn urn;
-  @Getter @NonNull private final UUID currentVersionUuid;
+  @Getter @NonNull private final UUID currentVersion;
   private final Description description;
 
   public Optional<Description> getDescription() {

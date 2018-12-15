@@ -1,6 +1,7 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.Response.Status.OK;
+import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -14,7 +15,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
-import marquez.common.models.Description;
 import marquez.common.models.Namespace;
 import marquez.common.models.Urn;
 import marquez.core.exceptions.UnexpectedException;
@@ -26,7 +26,6 @@ import org.junit.Test;
 public class DatasetResourceTest {
   private static final Urn URN = Urn.of("urn:a:b.c");
   private static final Instant CREATED_AT = Instant.now();
-  private static final Description NO_DESCRIPTION = null;
   private static final Namespace NAMESPACE = Namespace.of("test");
   private static final Integer LIMIT = 100;
   private static final Integer OFFSET = 0;
@@ -59,6 +58,7 @@ public class DatasetResourceTest {
   @Test(expected = WebApplicationException.class)
   public void testListDatasetsNamespaceDoesNotExist() throws UnexpectedException {
     when(mockNamespaceService.exists(NAMESPACE.getValue())).thenReturn(false);
+
     datasetResource.list(NAMESPACE.getValue(), LIMIT, OFFSET);
   }
 }

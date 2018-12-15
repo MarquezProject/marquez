@@ -21,8 +21,8 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
         .namespaceUuid(UUID.fromString(results.getString("namespace_uuid")))
         .dataSourceUuid(UUID.fromString(results.getString("data_source_uuid")))
         .urn(Urn.of(results.getString("urn")))
-        .currentVersionUuid(UUID.fromString(results.getString("current_version_uuid")))
         .description(Description.of(results.getString("description")))
+        .currentVersion(UUID.fromString(results.getString("current_version")))
         .build();
   }
 }

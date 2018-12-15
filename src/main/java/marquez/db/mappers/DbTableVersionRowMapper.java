@@ -17,8 +17,8 @@ public final class DbTableVersionRowMapper implements RowMapper<DbTableVersionRo
         .uuid(UUID.fromString(results.getString("uuid")))
         .createdAt(results.getDate("created_at").toInstant())
         .datasetUuid(UUID.fromString(results.getString("dataset_uuid")))
-        .dbTable(DbTable.of(results.getString("db_table")))
         .dbTableInfoUuid(UUID.fromString(results.getString("db_table_info_uuid")))
+        .dbTable(DbTable.of(results.getString("db_table")))
         .build();
   }
 }

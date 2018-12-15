@@ -1,5 +1,7 @@
 package marquez.service;
 
+import static marquez.common.models.Description.NO_DESCRIPTION;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +34,7 @@ public class DatasetService {
             dbTableVersion.getDb(),
             dbTableVersion.getDbSchema(),
             dbTableVersion.getDbTable(),
-            dbTableVersion.getDescription().orElse(null));
+            dbTableVersion.getDescription().orElse(NO_DESCRIPTION));
     final Optional<DatasetRow> datasetRow = datasetDao.findBy(datasetUuid);
     final Optional<Dataset> dataset = datasetRow.map(datasetMapper::map);
     return dataset.orElseThrow(UnexpectedException::new);
