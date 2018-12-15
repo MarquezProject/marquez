@@ -9,6 +9,6 @@ import lombok.ToString;
 @RequiredArgsConstructor(staticName = "of")
 @EqualsAndHashCode
 @ToString
-public final class Table {
+public final class DbSchema {
   @Getter @NonNull private final String value;
 }

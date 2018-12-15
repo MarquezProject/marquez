@@ -4,9 +4,9 @@ import lombok.NonNull;
 import marquez.api.models.DbTableVersionRequest;
 import marquez.common.Mapper;
 import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DbSchema;
+import marquez.common.models.DbTable;
 import marquez.common.models.Description;
-import marquez.common.models.Schema;
-import marquez.common.models.Table;
 import marquez.service.models.DbTableVersion;
 
 public final class DbTableVersionMapper implements Mapper<DbTableVersionRequest, DbTableVersion> {
@@ -14,8 +14,8 @@ public final class DbTableVersionMapper implements Mapper<DbTableVersionRequest,
   public DbTableVersion map(@NonNull DbTableVersionRequest request) {
     return new DbTableVersion(
         ConnectionUrl.of(request.getConnectionUrl()),
-        Schema.of(request.getSchema()),
-        Table.of(request.getTable()),
+        DbSchema.of(request.getSchema()),
+        DbTable.of(request.getTable()),
         request.getDescription().map(Description::of).orElse(null));
   }
 }

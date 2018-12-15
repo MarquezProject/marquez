@@ -8,10 +8,10 @@ import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DataSource;
 import marquez.common.models.Dataset;
 import marquez.common.models.Db;
+import marquez.common.models.DbSchema;
+import marquez.common.models.DbTable;
 import marquez.common.models.Description;
 import marquez.common.models.Namespace;
-import marquez.common.models.Schema;
-import marquez.common.models.Table;
 import marquez.common.models.Urn;
 import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.models.DatasetRow;
@@ -32,13 +32,13 @@ public interface DatasetDao {
   DbTableVersionDao createDbTableVersionDao();
 
   @SqlUpdate(
-      "INSERT INTO datasets (uuid, urn, namespace_uuid, datasource_uuid, description) "
-          + "VALUES (:uuid, :urn.value, :namespaceUuid, :dataSourceUuid, :description.value)")
+      "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, urn, description) "
+          + "VALUES (:uuid, :namespaceUuid, :dataSourceUuid, :urn.value, :description.value)")
   void insert(
       @Bind("uuid") UUID uuid,
-      @BindBean("urn") Urn urn,
       @Bind("namespaceUuid") UUID namespaceUuid,
       @Bind("dataSourceUuid") UUID dataSourceUuid,
+      @BindBean("urn") Urn urn,
       @BindBean("description") Description description);
 
   @Transaction
@@ -47,28 +47,28 @@ public interface DatasetDao {
       DataSource dataSource,
       ConnectionUrl connectionUrl,
       Db db,
-      Schema schema,
-      Table table,
+      DbSchema dbSchema,
+      DbTable dbTable,
       Description description) {
     final UUID dataSourceUuid = UUID.randomUUID();
     createDataSourceDao().insert(dataSourceUuid, dataSource, connectionUrl);
 
     final UUID datasetUuid = UUID.randomUUID();
-    final String qualifiedName = schema.getValue() + '.' + table.getValue();
+    final String qualifiedName = dbSchema.getValue() + '.' + dbTable.getValue();
     final Dataset dataset = Dataset.of(qualifiedName);
     final Urn urn = Urn.of(namespace, dataset);
-    insert(datasetUuid, urn, null, dataSourceUuid, description);
-    createDbTableVersionDao().insert(datasetUuid, db, schema, table);
+    insert(datasetUuid, null, dataSourceUuid, urn, description);
+    createDbTableVersionDao().insert(datasetUuid, db, dbSchema, dbTable);
     return datasetUuid;
   }
 
   @SqlUpdate(
-      "UPDATE datasets SET updated_at = :updatedAt, current_version_uuid = :versionUuid"
+      "UPDATE datasets SET updated_at = :updatedAt, current_version = :currentVersion"
           + "WHERE uuid = :uuid")
   void updateCurrentVersion(
       @Bind("uuid") UUID uuid,
       @Bind("updatedAt") Instant updatedAt,
-      @Bind("versionUuid") UUID versionUuid);
+      @Bind("currentVersion") UUID currentVersion);
 
   @SqlQuery("SELECT * FROM datasets WHERE uuid = :uuid")
   Optional<DatasetRow> findBy(@Bind("uuid") UUID uuid);

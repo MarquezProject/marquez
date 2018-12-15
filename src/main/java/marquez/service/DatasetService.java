@@ -30,8 +30,8 @@ public class DatasetService {
             dbTableVersion.getDataSource(),
             dbTableVersion.getConnectionUrl(),
             dbTableVersion.getDb(),
-            dbTableVersion.getSchema(),
-            dbTableVersion.getTable(),
+            dbTableVersion.getDbSchema(),
+            dbTableVersion.getDbTable(),
             dbTableVersion.getDescription().orElse(null));
     final Optional<DatasetRow> datasetRow = datasetDao.findBy(datasetUuid);
     final Optional<Dataset> dataset = datasetRow.map(datasetMapper::map);

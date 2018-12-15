@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import marquez.common.models.Db;
-import marquez.common.models.Schema;
+import marquez.common.models.DbSchema;
 
 @Data
 @Builder
@@ -14,5 +14,5 @@ public final class DbTableInfoRow {
   @NonNull private final UUID uuid;
   @NonNull private final Instant createdAt;
   @NonNull private final Db db;
-  @NonNull private final Schema schema;
+  @NonNull private final DbSchema dbSchema;
 }

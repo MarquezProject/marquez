@@ -10,9 +10,9 @@ import lombok.ToString;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DataSource;
 import marquez.common.models.Db;
+import marquez.common.models.DbSchema;
+import marquez.common.models.DbTable;
 import marquez.common.models.Description;
-import marquez.common.models.Schema;
-import marquez.common.models.Table;
 
 @EqualsAndHashCode
 @ToString
@@ -20,22 +20,22 @@ public final class DbTableVersion {
   @Getter private final DataSource dataSource;
   @Getter private final ConnectionUrl connectionUrl;
   @Getter private final Db db;
-  @Getter private final Schema schema;
-  @Getter private final Table table;
+  @Getter private final DbSchema dbSchema;
+  @Getter private final DbTable dbTable;
   private final Description description;
 
   public DbTableVersion(
       @NonNull final ConnectionUrl connectionUrl,
-      @NonNull final Schema schema,
-      @NonNull final Table table,
+      @NonNull final DbSchema dbSchema,
+      @NonNull final DbTable dbTable,
       @Nullable final Description description) {
     final URI uri = connectionUrl.toUri();
 
     this.dataSource = DataSource.of(uri);
     this.connectionUrl = connectionUrl;
     this.db = Db.of(uri);
-    this.schema = schema;
-    this.table = table;
+    this.dbSchema = dbSchema;
+    this.dbTable = dbTable;
     this.description = description;
   }
 

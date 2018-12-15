@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.models.Db;
-import marquez.common.models.Schema;
+import marquez.common.models.DbSchema;
 import marquez.db.models.DbTableInfoRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -18,7 +18,7 @@ public final class DbTableInfoRowMapper implements RowMapper<DbTableInfoRow> {
         .uuid(UUID.fromString(results.getString("uuid")))
         .createdAt(results.getDate("created_at").toInstant())
         .db(Db.of(results.getString("db")))
-        .schema(Schema.of(results.getString("schema")))
+        .dbSchema(DbSchema.of(results.getString("db_schema")))
         .build();
   }
 }
