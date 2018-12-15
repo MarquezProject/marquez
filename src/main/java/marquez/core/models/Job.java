@@ -12,20 +12,27 @@ public final class Job {
   @NonNull private final UUID guid;
   @NonNull private final String name;
   @NonNull private final String location;
-  @NonNull private UUID namespaceGuid;
-  private String description;
-  private Timestamp createdAt;
+  @NonNull private final UUID namespaceGuid;
+  private final String description;
+  private final String[] inputDatasetUrns;
+  private final String[] outputDatasetUrns;
+  private final Timestamp createdAt;
 
   public Job(
       final UUID guid,
       final String name,
       final String location,
       final UUID namespaceGuid,
-      final String description) {
+      final String description,
+      final String[] inputDatasetUrns,
+      final String[] outputDatasetUrns) {
     this.guid = guid;
     this.name = name;
     this.location = location;
     this.namespaceGuid = namespaceGuid;
     this.description = description;
+    this.inputDatasetUrns = inputDatasetUrns;
+    this.outputDatasetUrns = outputDatasetUrns;
+    this.createdAt = null;
   }
 }

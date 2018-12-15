@@ -1,5 +1,6 @@
 package marquez.dao;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -23,8 +24,8 @@ public class JobDAOTest {
   final JobDAO jobDAO = APP.onDemand(JobDAO.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
-  Job job;
-  JobVersion jobVersion;
+  Job job = Generator.genJob(nsID);;
+  JobVersion jobVersion = Generator.genJobVersion(job);
 
   @Before
   public void setUp() {
@@ -37,8 +38,6 @@ public class JobDAOTest {
                   nsName,
                   "Amaranta");
             });
-    job = Generator.genJob(nsID);
-    jobVersion = Generator.genJobVersion(job);
   }
 
   @After
@@ -60,12 +59,14 @@ public class JobDAOTest {
         .useHandle(
             handle -> {
               handle.execute(
-                  "INSERT INTO jobs(guid, name, namespace_guid, current_version_guid)"
-                      + "VALUES (?, ?, ?, ?);",
+                  "INSERT INTO jobs(guid, name, namespace_guid, current_version_guid, input_dataset_urns, output_dataset_urns)"
+                      + "VALUES (?, ?, ?, ?, ?, ?);",
                   job.getGuid(),
                   job.getName(),
                   nsID,
-                  jobVersion.getGuid());
+                  jobVersion.getGuid(),
+                  job.getInputDatasetUrns(),
+                  job.getOutputDatasetUrns());
               handle.execute(
                   "INSERT INTO job_versions(guid, job_guid, uri, version) VALUES(?, ?, ?, ?);",
                   jobVersion.getGuid(),
@@ -79,6 +80,10 @@ public class JobDAOTest {
     assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
     assertEquals(job1.getGuid(), job2.getGuid());
     assertEquals(job1.getName(), job2.getName());
+    assertEquals(job1.getLocation(), job2.getLocation());
+    assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
+    assertArrayEquals(job1.getInputDatasetUrns(), job2.getInputDatasetUrns());
+    assertArrayEquals(job1.getOutputDatasetUrns(), job2.getOutputDatasetUrns());
   }
 
   @Test
@@ -100,7 +105,7 @@ public class JobDAOTest {
 
   @Test
   public void testInsert() {
-    JobVersion jobVersion = Generator.genJobVersion(job.getGuid());
+    JobVersion jobVersion = Generator.genJobVersion(job);
     jobDAO.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDAO.findByID(job.getGuid());
     assertNotNull(jobFound);
@@ -122,7 +127,7 @@ public class JobDAOTest {
         Arrays.asList(Generator.genJob(nsID), Generator.genJob(nsID), Generator.genJob(nsID));
     jobs.forEach(
         job -> {
-          jobDAO.insertJobAndVersion(job, Generator.genJobVersion(job.getGuid()));
+          jobDAO.insertJobAndVersion(job, Generator.genJobVersion(job));
         });
     List<Job> jobsFound = jobDAO.findAllInNamespace(nsName);
     assertEquals(jobs.size(), jobsFound.size());

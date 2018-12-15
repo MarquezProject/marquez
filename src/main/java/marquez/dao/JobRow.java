@@ -16,6 +16,12 @@ public final class JobRow implements RowMapper<Job> {
         rs.getString("uri"),
         UUID.fromString(rs.getString("namespace_guid")),
         rs.getString("description"),
+        (rs.getArray("input_dataset_urns") != null)
+            ? (String[]) rs.getArray("input_dataset_urns").getArray()
+            : new String[0],
+        (rs.getArray("output_dataset_urns") != null)
+            ? (String[]) rs.getArray("output_dataset_urns").getArray()
+            : new String[0],
         rs.getTimestamp("created_at"));
   }
 }
