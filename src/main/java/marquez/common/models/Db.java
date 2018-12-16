@@ -13,7 +13,8 @@ import lombok.ToString;
 public final class Db {
   @Getter @NonNull private final String value;
 
-  public static Db of(@NonNull final URI uri) {
-    return of(uri.getScheme());
+  public static Db of(@NonNull URI uri) {
+    // TODO: uri.getPath()
+    return of("");
   }
 }

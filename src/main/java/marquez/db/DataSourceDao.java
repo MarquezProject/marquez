@@ -3,8 +3,6 @@ package marquez.db;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DataSource;
 import marquez.db.mappers.DataSourceRowMapper;
 import marquez.db.models.DataSourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -18,10 +16,7 @@ public interface DataSourceDao {
   @SqlUpdate(
       "INSERT INTO data_sources (uuid, data_source, connection_url) "
           + "VALUES (:uuid, :dataSource.value, :connectionUrl.value)")
-  void insert(
-      @Bind("uuid") UUID uuid,
-      @BindBean("dataSource") DataSource dataSource,
-      @BindBean("connectionUrl") ConnectionUrl connectionUrl);
+  void insert(@BindBean("dataSourceRow") DataSourceRow dataSourceRow);
 
   @SqlQuery("SELECT * FROM data_sources WHERE uuid = :uuid")
   Optional<DataSourceRow> findBy(@Bind("uuid") UUID uuid);

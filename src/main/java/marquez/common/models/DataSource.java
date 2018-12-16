@@ -13,7 +13,7 @@ import lombok.ToString;
 public final class DataSource {
   @Getter @NonNull private final String value;
 
-  public static DataSource of(@NonNull final URI uri) {
+  public static DataSource of(@NonNull URI uri) {
     return of(uri.getScheme());
   }
 }

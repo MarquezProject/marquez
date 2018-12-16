@@ -45,15 +45,15 @@ public final class DatasetResource {
   @Path("/datasets")
   @Produces(APPLICATION_JSON)
   public Response list(
-      @PathParam("namespace") String namespace,
+      @PathParam("namespace") String namespaceString,
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset)
       throws UnexpectedException, WebApplicationException {
-    if (!namespaceService.exists(namespace)) {
+    if (!namespaceService.exists(namespaceString)) {
       throw new WebApplicationException(
-          String.format("The namespace %s does not exist.", namespace), NOT_FOUND);
+          String.format("The namespace %s does not exist.", namespaceString), NOT_FOUND);
     }
-    final List<Dataset> datasets = datasetService.getAll(Namespace.of(namespace), limit, offset);
+    final List<Dataset> datasets = datasetService.getAll(Namespace.of(namespaceString), limit, offset);
     final List<DatasetResponse> datasetResponses = datasetResponseMapper.map(datasets);
     return Response.ok(new DatasetsResponse(datasetResponses)).build();
   }

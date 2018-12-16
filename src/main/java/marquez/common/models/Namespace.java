@@ -17,7 +17,7 @@ public final class Namespace {
 
   @Getter private final String value;
 
-  public static Namespace of(final String value) {
+  public static Namespace of(String value) {
     return new Namespace(value);
   }
 
