@@ -15,8 +15,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
+import marquez.common.models.DatasetUrn;
 import marquez.common.models.Namespace;
-import marquez.common.models.Urn;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.services.NamespaceService;
 import marquez.service.DatasetService;
@@ -24,7 +24,7 @@ import marquez.service.models.Dataset;
 import org.junit.Test;
 
 public class DatasetResourceTest {
-  private static final Urn URN = Urn.of("urn:a:b.c");
+  private static final DatasetUrn DATASET_URN = DatasetUrn.of("urn:a:b.c");
   private static final Instant CREATED_AT = Instant.now();
   private static final Namespace NAMESPACE = Namespace.of("test");
   private static final Integer LIMIT = 100;
@@ -39,7 +39,7 @@ public class DatasetResourceTest {
   public void testListDatasets200() throws UnexpectedException {
     when(mockNamespaceService.exists(NAMESPACE.getValue())).thenReturn(true);
 
-    final Dataset dataset = new Dataset(URN, CREATED_AT, NO_DESCRIPTION);
+    final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
     final List<Dataset> datasets = Arrays.asList(dataset);
     when(mockDatasetService.getAll(NAMESPACE, LIMIT, OFFSET)).thenReturn(datasets);
 
@@ -49,7 +49,7 @@ public class DatasetResourceTest {
     final DatasetsResponse datasetsResponse = (DatasetsResponse) response.getEntity();
     final List<DatasetResponse> datasetsResponses = datasetsResponse.getDatasetResponses();
     assertEquals(1, datasetsResponses.size());
-    assertEquals(URN.getValue(), datasetsResponses.get(0).getUrn());
+    assertEquals(DATASET_URN.getValue(), datasetsResponses.get(0).getUrn());
     assertEquals(CREATED_AT.toString(), datasetsResponses.get(0).getCreatedAt());
 
     verify(mockDatasetService, times(1)).getAll(NAMESPACE, LIMIT, OFFSET);

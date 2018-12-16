@@ -4,8 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 import lombok.NonNull;
+import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
-import marquez.common.models.Urn;
 import marquez.db.models.DatasetRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -20,7 +20,7 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
         .updatedAt(results.getDate("updated_at").toInstant())
         .namespaceUuid(UUID.fromString(results.getString("namespace_uuid")))
         .dataSourceUuid(UUID.fromString(results.getString("data_source_uuid")))
-        .urn(Urn.of(results.getString("urn")))
+        .datasetUrn(DatasetUrn.of(results.getString("urn")))
         .description(Description.of(results.getString("description")))
         .currentVersion(UUID.fromString(results.getString("current_version")))
         .build();

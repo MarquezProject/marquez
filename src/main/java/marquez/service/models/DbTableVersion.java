@@ -9,14 +9,17 @@ import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DataSource;
+import marquez.common.models.Dataset;
+import marquez.common.models.DatasetUrn;
 import marquez.common.models.Db;
 import marquez.common.models.DbSchema;
 import marquez.common.models.DbTable;
 import marquez.common.models.Description;
+import marquez.common.models.Namespace;
 
 @EqualsAndHashCode
 @ToString
-public final class DbTableVersion {
+public final class DbTableVersion implements DatasetVersion {
   @Getter private final DataSource dataSource;
   @Getter private final ConnectionUrl connectionUrl;
   @Getter private final Db db;
@@ -41,5 +44,10 @@ public final class DbTableVersion {
 
   public Optional<Description> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  @Override
+  public DatasetUrn toDatasetUrn(Namespace namespace) {
+    return DatasetUrn.of(namespace, Dataset.of(dbSchema.getValue() + '.' + dbSchema.getValue()));
   }
 }

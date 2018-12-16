@@ -7,14 +7,14 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
-import marquez.common.models.Urn;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
 public final class Dataset {
-  @Getter @NonNull private final Urn urn;
+  @Getter @NonNull private final DatasetUrn datasetUrn;
   @Getter @NonNull private final Instant createdAt;
   private final Description description;
 
