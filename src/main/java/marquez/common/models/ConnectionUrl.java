@@ -44,7 +44,7 @@ public final class ConnectionUrl {
       private static final int DB_PART_NO_PARAMS = 0;
 
       @Override
-      public ConnectionUrl parse(String value) {
+      public ConnectionUrl parse(@NonNull String value) {
         final String[] urlParts = value.split(URL_DELIM);
         if (urlParts.length != URL_PART_COUNT) {
           throw new IllegalArgumentException(
@@ -65,7 +65,7 @@ public final class ConnectionUrl {
     },
     UNKNOWN("") {
       @Override
-      public ConnectionUrl parse(String value) {
+      public ConnectionUrl parse(@NonNull String value) {
         throw new UnsupportedOperationException();
       }
     };
@@ -82,7 +82,7 @@ public final class ConnectionUrl {
       return value;
     }
 
-    static ValueParser get(String value) {
+    static ValueParser get(@NonNull String value) {
       if (value.startsWith(JDBC.getValue())) {
         return JDBC;
       }
