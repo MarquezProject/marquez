@@ -46,8 +46,12 @@ public final class DbTableVersion implements DatasetVersion {
     return Optional.ofNullable(description);
   }
 
+  public String getQualifiedName() {
+    return dbSchema.getValue() + '.' + dbSchema.getValue();
+  }
+
   @Override
   public DatasetUrn toDatasetUrn(Namespace namespace) {
-    return DatasetUrn.of(namespace, Dataset.of(dbSchema.getValue() + '.' + dbSchema.getValue()));
+    return DatasetUrn.of(namespace, Dataset.of(getQualifiedName()));
   }
 }
