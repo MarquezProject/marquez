@@ -6,10 +6,10 @@ import java.net.URI;
 import org.junit.Test;
 
 public class ConnectionUrlTest {
+  private static final String CONNECTION_URL = "jdbc:postgresql://localhost:5432/marquez";
   @Test
   public void testNewConnectionUrl() {
-    final String connectionUrl = "jdbc:postgresql://localhost:5432/marquez";
-    assertEquals(connectionUrl, ConnectionUrl.of(connectionUrl).getValue());
+    assertEquals(CONNECTION_URL, ConnectionUrl.of(CONNECTION_URL).getValue());
   }
 
   @Test(expected = NullPointerException.class)
@@ -20,9 +20,8 @@ public class ConnectionUrlTest {
 
   @Test
   public void testToUri() {
-    final String connectionUrl = "jdbc:postgresql://localhost:5432/marquez";
-    final URI expected = URI.create(connectionUrl);
-    final URI actual = ConnectionUrl.of(connectionUrl).toUri();
+    final URI expected = URI.create(CONNECTION_URL);
+    final URI actual = ConnectionUrl.of(CONNECTION_URL).toUri();
     assertEquals(expected, actual);
   }
 }
