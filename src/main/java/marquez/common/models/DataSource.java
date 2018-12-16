@@ -1,6 +1,5 @@
 package marquez.common.models;
 
-import java.net.URI;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,8 +11,4 @@ import lombok.ToString;
 @ToString
 public final class DataSource {
   @Getter @NonNull private final String value;
-
-  public static DataSource of(@NonNull URI uri) {
-    return of(uri.getScheme());
-  }
 }

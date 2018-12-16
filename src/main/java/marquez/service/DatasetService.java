@@ -35,20 +35,19 @@ public class DatasetService {
     final DataSourceRow dataSourceRow =
         DataSourceRow.builder()
             .uuid(UUID.randomUUID())
-            .dataSource(dbTableVersion.getDataSource())
             .connectionUrl(dbTableVersion.getConnectionUrl())
             .build();
     final DatasetRow datasetRow =
         DatasetRow.builder()
             .uuid(UUID.randomUUID())
             .dataSourceUuid(dataSourceRow.getUuid())
-            .datasetUrn(dbTableVersion.toDatasetUrn(namespace))
+            .urn(dbTableVersion.toDatasetUrn(namespace))
             .description(dbTableVersion.getDescription().orElse(NO_DESCRIPTION))
             .build();
     final DbTableInfoRow dbTableInfoRow =
         DbTableInfoRow.builder()
             .uuid(UUID.randomUUID())
-            .db(dbTableVersion.getDb())
+            .db(dbTableVersion.getConnectionUrl().getDb())
             .dbSchema(dbTableVersion.getDbSchema())
             .build();
     final DbTableVersionRow dbTableVersionRow =
