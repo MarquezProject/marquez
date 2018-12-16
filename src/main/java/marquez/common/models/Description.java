@@ -10,7 +10,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class Description {
-  @Getter @NonNull private final String value;
   private static final String NO_VALUE = "";
   public static final Description NO_DESCRIPTION = new Description(NO_VALUE);
+
+  @Getter @NonNull private final String value;
 }

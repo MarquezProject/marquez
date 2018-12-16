@@ -53,7 +53,8 @@ public final class DatasetResource {
       throw new WebApplicationException(
           String.format("The namespace %s does not exist.", namespaceString), NOT_FOUND);
     }
-    final List<Dataset> datasets = datasetService.getAll(Namespace.of(namespaceString), limit, offset);
+    final List<Dataset> datasets =
+        datasetService.getAll(Namespace.of(namespaceString), limit, offset);
     final List<DatasetResponse> datasetResponses = datasetResponseMapper.map(datasets);
     return Response.ok(new DatasetsResponse(datasetResponses)).build();
   }

@@ -59,7 +59,7 @@ public class DatasetService {
             .dbTable(dbTableVersion.getDbTable())
             .build();
     try {
-      datasetDao.insertInTransaction(dataSourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
+      datasetDao.insertAll(dataSourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
       final Optional<DatasetRow> datasetRowIfFound = datasetDao.findBy(datasetRow.getUuid());
       return datasetRowIfFound.map(datasetMapper::map).orElseThrow(UnexpectedException::new);
     } catch (UnableToExecuteStatementException e) {

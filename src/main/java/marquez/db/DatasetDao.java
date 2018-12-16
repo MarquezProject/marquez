@@ -33,14 +33,14 @@ public interface DatasetDao {
   void insert(@BindBean("datasetRow") DatasetRow datasetRow);
 
   @Transaction
-  default void insertInTransaction(
+  default void insertAll(
       DataSourceRow dataSourceRow,
       DatasetRow datasetRow,
       DbTableInfoRow dbTableInfoRow,
       DbTableVersionRow dbTableVersionRow) {
     createDataSourceDao().insert(dataSourceRow);
     insert(datasetRow);
-    createDbTableVersionDao().insertInTransaction(dbTableInfoRow, dbTableVersionRow);
+    createDbTableVersionDao().insertAll(dbTableInfoRow, dbTableVersionRow);
   }
 
   @SqlUpdate(

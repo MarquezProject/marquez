@@ -20,8 +20,7 @@ public interface DbTableVersionDao {
   void insert(@BindBean("dbTableVersionRow") DbTableVersionRow dbTableVersionRow);
 
   @Transaction
-  default void insertInTransaction(
-      DbTableInfoRow dbTableInfoRow, DbTableVersionRow dbTableVersionRow) {
+  default void insertAll(DbTableInfoRow dbTableInfoRow, DbTableVersionRow dbTableVersionRow) {
     createDbTableInfoDao().insert(dbTableInfoRow);
     insert(dbTableVersionRow);
   }
