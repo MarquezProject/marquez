@@ -8,6 +8,11 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 public class DatasetUrnTest {
+  private static final String DATASET_URN_DELIM = ":";
+  private static final String DATASET_URN_PREFIX = "urn";
+  private static final Integer ALLOWED_DATASET_URN_SIZE = 64;
+  private static final Integer DATASET_URN_SIZE_NOT_ALLOWED = ALLOWED_DATASET_URN_SIZE + 1;
+
   @Test
   public void testNewDatasetUrn() {
     final String datasetUrn = "urn:a:b.c";
@@ -59,7 +64,7 @@ public class DatasetUrnTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testDatasetUrnNonAlphanumericPart() {
-    final String nonAlphanumericPartDatasetUrn = "urn:a:~$^";
+    final String nonAlphanumericPartDatasetUrn = "urn:a:b$c^";
     DatasetUrn.of(nonAlphanumericPartDatasetUrn);
   }
 
@@ -70,9 +75,17 @@ public class DatasetUrnTest {
   }
 
   private String newDatasetUrnWithPartGreaterThan64() {
-    final String urnPart0 = Stream.generate(() -> "a").limit(64).collect(joining());
-    final String urnPart1GreaterThan64 =
-        Stream.generate(() -> "c").limit(64 + 1).collect(joining());
-    return new StringJoiner(":").add("urn").add(urnPart0).add(urnPart1GreaterThan64).toString();
+    final String part0 = newDatasetUrnPart("a", ALLOWED_DATASET_URN_SIZE);
+    final String part1GreaterThan64 = newDatasetUrnPart("b", DATASET_URN_SIZE_NOT_ALLOWED);
+
+    return new StringJoiner(DATASET_URN_DELIM)
+        .add(DATASET_URN_PREFIX)
+        .add(part0)
+        .add(part1GreaterThan64)
+        .toString();
+  }
+
+  private String newDatasetUrnPart(String s, Integer limit) {
+    return Stream.generate(() -> s).limit(limit).collect(joining());
   }
 }
