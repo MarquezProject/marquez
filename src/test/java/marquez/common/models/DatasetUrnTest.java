@@ -10,18 +10,14 @@ import org.junit.Test;
 public class DatasetUrnTest {
   @Test
   public void testNewDatasetUrn() {
-    final String urnString = "urn:a:b.c";
-    final DatasetUrn expected = DatasetUrn.of(urnString);
-    final DatasetUrn actual = DatasetUrn.of(urnString);
-    assertEquals(expected, actual);
+    final String datasetUrn = "urn:a:b.c";
+    assertEquals(datasetUrn, DatasetUrn.of(datasetUrn).getValue());
   }
 
   @Test
   public void testNewDatasetUrnFromNamespaceAndDataset() {
     final DatasetUrn expected = DatasetUrn.of("urn:a:b.c");
-    final Namespace namespace = Namespace.of("a");
-    final Dataset dataset = Dataset.of("b.c");
-    final DatasetUrn actual = DatasetUrn.of(namespace, dataset);
+    final DatasetUrn actual = DatasetUrn.of(Namespace.of("a"), Dataset.of("b.c"));
     assertEquals(expected, actual);
   }
 
