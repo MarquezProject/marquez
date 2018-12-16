@@ -52,17 +52,14 @@ public final class ConnectionUrl {
                   "The connection url value has missing parts: %d != %d.",
                   urlParts.length, URL_PART_COUNT));
         }
-
         final String dataSourceString = urlParts[DATA_SOURCE_PART];
         final DataSource dataSource = DataSource.of(dataSourceString);
-
         final String dbString = urlParts[DB_AND_PORT_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
         final Db db =
             Db.of(
                 dbString.contains(DB_PART_DELIM)
                     ? dbString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
                     : dbString);
-
         return new ConnectionUrl(dataSource, db, value);
       }
     },
