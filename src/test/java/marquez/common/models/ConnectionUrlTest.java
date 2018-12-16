@@ -7,6 +7,7 @@ import org.junit.Test;
 
 public class ConnectionUrlTest {
   private static final String CONNECTION_URL = "jdbc:postgresql://localhost:5432/marquez";
+
   @Test
   public void testNewConnectionUrl() {
     assertEquals(CONNECTION_URL, ConnectionUrl.of(CONNECTION_URL).getValue());
