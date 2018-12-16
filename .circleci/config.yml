@@ -17,7 +17,7 @@ jobs:
       - checkout
       - restore_cache:
           <<: *cache
-      - run: ./gradlew --no-daemon --stacktrace build -x test checkstyleTest
+      - run: ./gradlew --no-daemon --stacktrace build -x test
       - save_cache:
           paths:
             - ~/.gradle
