@@ -10,17 +10,18 @@ public class ConnectionUrlTest {
 
   @Test
   public void testNewConnectionUrl() {
-    assertEquals(CONNECTION_URL, ConnectionUrl.of(CONNECTION_URL).getValue());
+    final ConnectionUrl connectionUrl = ConnectionUrl.of(CONNECTION_URL);
+    assertEquals(CONNECTION_URL, connectionUrl.getValue());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testConnectionUrlNull() {
+  public void testThrowOnConnectionUrlNull() {
     final String nullConnectionUrl = null;
     ConnectionUrl.of(nullConnectionUrl);
   }
 
   @Test
-  public void testToUri() {
+  public void testConnectionUrlToUri() {
     final URI expected = URI.create(CONNECTION_URL);
     final URI actual = ConnectionUrl.of(CONNECTION_URL).toUri();
     assertEquals(expected, actual);
