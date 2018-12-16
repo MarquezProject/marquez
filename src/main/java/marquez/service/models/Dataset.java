@@ -14,7 +14,7 @@ import marquez.common.models.Description;
 @EqualsAndHashCode
 @ToString
 public final class Dataset {
-  @Getter @NonNull private final DatasetUrn datasetUrn;
+  @Getter @NonNull private final DatasetUrn urn;
   @Getter @NonNull private final Instant createdAt;
   private final Description description;
 

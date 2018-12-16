@@ -9,7 +9,7 @@ public final class DatasetResponseMapper implements Mapper<Dataset, DatasetRespo
   @Override
   public DatasetResponse map(@NonNull Dataset dataset) {
     return new DatasetResponse(
-        dataset.getDatasetUrn().getValue(),
+        dataset.getUrn().getValue(),
         dataset.getCreatedAt().toString(),
         dataset.getDescription().map(String::valueOf).orElse(null));
   }

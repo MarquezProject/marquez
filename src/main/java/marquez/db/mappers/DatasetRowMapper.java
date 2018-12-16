@@ -20,7 +20,7 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
         .updatedAt(results.getDate("updated_at").toInstant())
         .namespaceUuid(UUID.fromString(results.getString("namespace_uuid")))
         .dataSourceUuid(UUID.fromString(results.getString("data_source_uuid")))
-        .datasetUrn(DatasetUrn.of(results.getString("urn")))
+        .urn(DatasetUrn.of(results.getString("urn")))
         .description(Description.of(results.getString("description")))
         .currentVersion(UUID.fromString(results.getString("current_version")))
         .build();
