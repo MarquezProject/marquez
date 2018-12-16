@@ -10,21 +10,20 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class DatasetUrn {
-  private static final Integer URN_MIN_SIZE = 1;
-  private static final Integer URN_MAX_SIZE = 64;
-  private static final String URN_DELIM = ":";
-  private static final String URN_PREFIX = "urn";
-  private static final String URN_REGEX =
-      String.format(
-          "^%s(%s[a-zA-Z0-9.]{%d,%d}){2}$", URN_PREFIX, URN_DELIM, URN_MIN_SIZE, URN_MAX_SIZE);
-  private static final Pattern URN_PATTERN = Pattern.compile(URN_REGEX);
+  private static final Integer MIN_SIZE = 1;
+  private static final Integer MAX_SIZE = 64;
+  private static final String DELIM = ":";
+  private static final String PREFIX = "urn";
+  private static final String REGEX =
+      String.format("^%s(%s[a-zA-Z0-9.]{%d,%d}){2}$", PREFIX, DELIM, MIN_SIZE, MAX_SIZE);
+  private static final Pattern PATTERN = Pattern.compile(REGEX);
 
   @Getter private final String value;
 
   public static DatasetUrn of(@NonNull Namespace namespace, @NonNull Dataset dataset) {
     final String value =
-        new StringJoiner(URN_DELIM)
-            .add(URN_PREFIX)
+        new StringJoiner(DELIM)
+            .add(PREFIX)
             .add(namespace.getValue())
             .add(dataset.getValue())
             .toString();
@@ -36,7 +35,7 @@ public final class DatasetUrn {
   }
 
   private DatasetUrn(@NonNull final String value) {
-    if (!URN_PATTERN.matcher(value).matches()) {
+    if (!PATTERN.matcher(value).matches()) {
       throw new IllegalArgumentException(
           "A urn must contain only letters (a-z, A-Z), numbers (0-9), and "
               + "be sperated by colons (:) with each part having a maximum length of 64 characters.");
