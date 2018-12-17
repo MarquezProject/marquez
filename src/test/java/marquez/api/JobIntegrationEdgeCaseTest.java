@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static java.lang.String.format;
 import static javax.ws.rs.client.Entity.entity;
@@ -108,14 +109,29 @@ public class JobIntegrationEdgeCaseTest {
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
 
-
   @Test
   public void testJobRunCreationWithInvalidNamespace() throws UnexpectedException {
-    Job jobForJobCreationRequest = generateApiJob();
+    JobRun jobRunForJobRunCreationRequest = generateApiJobRun();
 
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
-    Response res = insertJob(jobForJobCreationRequest);
+
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.of(Generator.genJob()));
+
+    Response res = insertJobRun(jobRunForJobRunCreationRequest);
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  @Test
+  public void testJobRunCreationWithInvalidJobNamespace() throws UnexpectedException {
+    JobRun jobRunForJobRunCreationRequest = generateApiJobRun();
+
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
+
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
+
+    Response res = insertJobRun(jobRunForJobRunCreationRequest);
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
 
@@ -136,16 +152,14 @@ public class JobIntegrationEdgeCaseTest {
 
   private Response insertJobRun(JobRun jobRun) {
     CreateJobRunRequest createJobRequest =
-            new CreateJobRunRequest(
-                    jobRun.getNominalStartTime(),
-                    jobRun.getNominalEndTime(),
-                    jobRun.getRunArgs());
-    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, "somejob");
+        new CreateJobRunRequest(
+            jobRun.getNominalStartTime(), jobRun.getNominalEndTime(), jobRun.getRunArgs());
+    String path = format("/api/v1/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME, "somejob");
     return resources
-            .client()
-            .target(path)
-            .request(MediaType.APPLICATION_JSON)
-            .put(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        .client()
+        .target(path)
+        .request(MediaType.APPLICATION_JSON)
+        .post(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
   }
 
   Job generateApiJob() {
@@ -155,5 +169,14 @@ public class JobIntegrationEdgeCaseTest {
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
     return new Job(jobName, null, inputList, outputList, location, description);
+  }
+
+  JobRun generateApiJobRun() {
+    return new JobRun(
+        UUID.randomUUID(),
+        "2018-07-14T19:43:37+0000",
+        "2018-07-14T19:43:37+0000",
+        "{'key': 'value'}",
+        "NEW");
   }
 }
