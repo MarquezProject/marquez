@@ -30,7 +30,7 @@ jobs:
       - restore_cache:
           <<: *cache
       - run: ./gradlew --no-daemon --stacktrace test
-      - run: ./gradlew jacocoTestReport
+      - run: ./gradlew --no-daemon jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
 
   release:
