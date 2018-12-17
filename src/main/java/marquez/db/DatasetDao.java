@@ -30,7 +30,7 @@ public interface DatasetDao {
 
   @SqlUpdate(
       "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, urn, description) "
-          + "VALUES (:uuid, :namespaceUuid, :dataSourceUuid, :urn, :description)")
+          + "VALUES (:uuid, :namespace_uuid, :datasource_uuid, :urn, :description)")
   void insert(@BindDatasetRow DatasetRow datasetRow);
 
   @Transaction

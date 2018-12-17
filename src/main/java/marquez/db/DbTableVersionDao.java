@@ -16,7 +16,7 @@ public interface DbTableVersionDao {
 
   @SqlUpdate(
       "INSERT INTO db_table_versions (uuid, dataset_uuid, db_table_info_uuid, db_table) "
-          + "VALUES (:uuid, :datasetUuid, :dbTableInfoUuid, :dbTable)")
+          + "VALUES (:uuid, :dataset_uuid, :db_table_info_uuid, :db_table)")
   void insert(@BindDbTableVersionRow DbTableVersionRow dbTableVersionRow);
 
   @Transaction

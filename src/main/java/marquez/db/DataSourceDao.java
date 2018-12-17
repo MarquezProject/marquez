@@ -15,7 +15,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 public interface DataSourceDao {
   @SqlUpdate(
       "INSERT INTO data_sources (uuid, data_source, connection_url) "
-          + "VALUES (:uuid, :dataSource, :connectionUrl)")
+          + "VALUES (:uuid, :data_sources, :connection_url)")
   void insert(@BindDataSourceRow DataSourceRow dataSourceRow);
 
   @SqlQuery("SELECT * FROM data_sources WHERE uuid = :uuid")

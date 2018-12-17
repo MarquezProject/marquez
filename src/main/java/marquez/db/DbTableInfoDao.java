@@ -13,7 +13,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(DbTableInfoRowMapper.class)
 public interface DbTableInfoDao {
-  @SqlUpdate("INSERT INTO db_table_infos (uuid, db, db_schema) VALUES (:uuid, :db, :dbSchema)")
+  @SqlUpdate("INSERT INTO db_table_infos (uuid, db, db_schema) VALUES (:uuid, :db, :db_schema)")
   void insert(@BindDbTableInfoRow DbTableInfoRow dbTableInfoRow);
 
   @SqlQuery("SELECT * FROM db_table_info WHERE uuid = :uuid")
