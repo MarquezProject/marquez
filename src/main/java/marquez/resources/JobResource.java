@@ -1,6 +1,22 @@
 package marquez.resources;
 
+import static java.lang.String.format;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 import com.codahale.metrics.annotation.Timed;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.CreateJobRequest;
 import marquez.api.CreateJobRunRequest;
@@ -15,25 +31,7 @@ import marquez.core.models.JobRun;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
 
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static java.lang.String.format;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
 @Path("/api/v1")
-@Produces(APPLICATION_JSON)
 @Slf4j
 public final class JobResource extends BaseResource {
   private final JobService jobService;
@@ -48,6 +46,7 @@ public final class JobResource extends BaseResource {
   }
 
   @POST
+  @Produces(APPLICATION_JSON)
   @Consumes(APPLICATION_JSON)
   @Path("namespaces/{namespace}/jobs/{job}/runs")
   public Response create(
@@ -87,6 +86,7 @@ public final class JobResource extends BaseResource {
   @PUT
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   @Timed
   public Response create(
       @PathParam("namespace") final String namespace,
@@ -119,6 +119,7 @@ public final class JobResource extends BaseResource {
 
   @GET
   @Path("/namespaces/{namespace}/jobs/{job}")
+  @Produces(APPLICATION_JSON)
   @Timed
   public Response getJob(
       @PathParam("namespace") final String namespace, @PathParam("job") final String job)
@@ -142,6 +143,7 @@ public final class JobResource extends BaseResource {
 
   @GET
   @Timed
+  @Produces(APPLICATION_JSON)
   @Path("/namespaces/{namespace}/jobs")
   public Response listJobs(@PathParam("namespace") final String namespace)
       throws ResourceException {
@@ -159,7 +161,6 @@ public final class JobResource extends BaseResource {
   }
 
   @PUT
-  @Consumes(APPLICATION_JSON)
   @Timed
   @Path("/jobs/runs/{runId}/complete")
   public Response completeJobRun(@PathParam("runId") final String runId) throws ResourceException {
@@ -178,7 +179,6 @@ public final class JobResource extends BaseResource {
   }
 
   @PUT
-  @Consumes(APPLICATION_JSON)
   @Timed
   @Path("/jobs/runs/{runId}/fail")
   public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
@@ -198,7 +198,6 @@ public final class JobResource extends BaseResource {
   }
 
   @PUT
-  @Consumes(APPLICATION_JSON)
   @Timed
   @Path("/jobs/runs/{runId}/abort")
   public Response abortJobRun(@PathParam("runId") final String runId) throws ResourceException {
@@ -219,7 +218,7 @@ public final class JobResource extends BaseResource {
   }
 
   @GET
-  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   @Timed
   @Path("/jobs/runs/{runId}")
   public Response get(@PathParam("runId") final UUID runId) throws ResourceException {
