@@ -37,7 +37,7 @@ public final class ConnectionUrl {
       private static final String URL_DELIM = ":";
       private static final int URL_PART_COUNT = 4;
       private static final int DATA_SOURCE_PART = 1;
-      private static final int DB_AND_PORT_PART = 3;
+      private static final int PORT_AND_DB_PART = 3;
       private static final String PORT_AND_DB_PART_DELIM = "/";
       private static final int DB_PART = 1;
       private static final String DB_PART_DELIM = ";";
@@ -54,7 +54,7 @@ public final class ConnectionUrl {
         }
         final String dataSourceString = urlParts[DATA_SOURCE_PART];
         final DataSource dataSource = DataSource.of(dataSourceString);
-        final String dbString = urlParts[DB_AND_PORT_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
+        final String dbString = urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
         final Db db =
             Db.of(
                 dbString.contains(DB_PART_DELIM)
