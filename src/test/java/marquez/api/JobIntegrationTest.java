@@ -9,7 +9,16 @@ import java.util.List;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.JobRunBaseTest;
+import marquez.core.exceptions.UnexpectedException;
+import marquez.core.models.Generator;
+import marquez.core.services.JobService;
+import marquez.core.services.NamespaceService;
+import marquez.dao.JobDAO;
+import marquez.dao.JobRunDAO;
+import marquez.dao.JobVersionDAO;
+import marquez.dao.NamespaceDAO;
+import marquez.dao.RunArgsDAO;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +26,30 @@ import org.slf4j.LoggerFactory;
 public class JobIntegrationTest extends JobRunBaseTest {
   private static Logger LOG = LoggerFactory.getLogger(JobIntegrationTest.class);
 
+  protected static String NS_NAME;
+  protected static final NamespaceDAO namespaceDAO = APP.onDemand(NamespaceDAO.class);
+  protected static final JobDAO jobDAO = APP.onDemand(JobDAO.class);
+  protected static final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
+  protected static final JobRunDAO jobRunDAO = APP.onDemand(JobRunDAO.class);
+  protected static final RunArgsDAO runArgsDAO = APP.onDemand(RunArgsDAO.class);
+
+  protected static final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
+  protected static final JobService jobService =
+      new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
+
+  @BeforeClass
+  public static void setup() throws UnexpectedException {
+    // Create a namespace and a job through the service API
+    marquez.core.models.Namespace generatedNamespace =
+        namespaceService.create(Generator.genNamespace());
+    NS_NAME = generatedNamespace.getName();
+  }
+
   @Test
   public void testJobCreationResponseEndToEnd() {
     Job jobForJobCreationRequest = generateApiJob();
 
-    Response res = createJobOnNamespace(NAMESPACE_NAME, jobForJobCreationRequest);
+    Response res = createJobOnNamespace(NS_NAME, jobForJobCreationRequest);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
     evaluateResponse(res, jobForJobCreationRequest);
   }
@@ -30,11 +58,11 @@ public class JobIntegrationTest extends JobRunBaseTest {
   public void testJobGetterResponseEndToEnd() {
     Job jobForJobCreationRequest = generateApiJob();
 
-    Response res = createJobOnNamespace(NAMESPACE_NAME, jobForJobCreationRequest);
+    Response res = createJobOnNamespace(NS_NAME, jobForJobCreationRequest);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
 
     String path =
-        format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, jobForJobCreationRequest.getName());
+        format("/api/v1/namespaces/%s/jobs/%s", NS_NAME, jobForJobCreationRequest.getName());
     Response returnedJobResponse =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
