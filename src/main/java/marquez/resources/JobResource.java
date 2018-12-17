@@ -1,22 +1,6 @@
 package marquez.resources;
 
-import static java.lang.String.format;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
 import com.codahale.metrics.annotation.Timed;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.CreateJobRequest;
 import marquez.api.CreateJobRunRequest;
@@ -30,6 +14,23 @@ import marquez.core.models.Job;
 import marquez.core.models.JobRun;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
+
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static java.lang.String.format;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/api/v1")
 @Produces(APPLICATION_JSON)
@@ -52,7 +53,7 @@ public final class JobResource extends BaseResource {
   public Response create(
       @PathParam("namespace") final String namespace,
       @PathParam("job") final String job,
-      CreateJobRunRequest request)
+      @Valid CreateJobRunRequest request)
       throws ResourceException {
     try {
       if (!namespaceService.exists(namespace)) {
