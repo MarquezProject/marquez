@@ -40,7 +40,7 @@ public class ConnectionUrlTest {
   @Test(expected = IllegalArgumentException.class)
   public void testConnectionUrlMissingParts() {
     final String missingPartsConnectionUrl =
-        String.format("postgresql://localhost/%s", DB.getValue());
+        String.format("jdbc:postgresql://localhost/%s", DB.getValue());
     ConnectionUrl.of(missingPartsConnectionUrl);
   }
 }
