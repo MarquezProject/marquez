@@ -1,10 +1,11 @@
 package marquez.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -12,11 +13,12 @@ import lombok.NoArgsConstructor;
 public final class CreateJobRunRequest {
 
   @JsonProperty("nominalStartTime")
-  private Timestamp nominalStartTime;
+  private String nominalStartTime;
 
   @JsonProperty("nominalEndTime")
-  private Timestamp nominalEndTime;
+  private String nominalEndTime;
 
   @JsonProperty("runArgs")
+  @NotNull
   private String runArgs;
 }

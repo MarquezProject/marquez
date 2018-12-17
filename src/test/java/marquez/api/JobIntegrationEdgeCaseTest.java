@@ -85,7 +85,7 @@ public class JobIntegrationEdgeCaseTest {
   }
 
   @Test
-  public void testDecriptionOptionalForCreateJobInputs() throws UnexpectedException {
+  public void testDescriptionOptionalForCreateJobInputs() throws UnexpectedException {
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
 
@@ -108,6 +108,17 @@ public class JobIntegrationEdgeCaseTest {
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
 
+
+  @Test
+  public void testJobRunCreationWithInvalidNamespace() throws UnexpectedException {
+    Job jobForJobCreationRequest = generateApiJob();
+
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
+    Response res = insertJob(jobForJobCreationRequest);
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
   private Response insertJob(Job job) {
     CreateJobRequest createJobRequest =
         new CreateJobRequest(
@@ -121,6 +132,20 @@ public class JobIntegrationEdgeCaseTest {
         .target(path)
         .request(MediaType.APPLICATION_JSON)
         .put(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+  }
+
+  private Response insertJobRun(JobRun jobRun) {
+    CreateJobRunRequest createJobRequest =
+            new CreateJobRunRequest(
+                    jobRun.getNominalStartTime(),
+                    jobRun.getNominalEndTime(),
+                    jobRun.getRunArgs());
+    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, "somejob");
+    return resources
+            .client()
+            .target(path)
+            .request(MediaType.APPLICATION_JSON)
+            .put(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
   }
 
   Job generateApiJob() {
