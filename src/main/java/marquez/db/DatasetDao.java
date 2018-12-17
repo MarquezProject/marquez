@@ -11,6 +11,7 @@ import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
+import marquez.db.sql.BindDatasetRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -29,8 +30,8 @@ public interface DatasetDao {
 
   @SqlUpdate(
       "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, urn, description) "
-          + "VALUES (:uuid, :namespaceUuid, :dataSourceUuid, :urn.value, :description.value)")
-  void insert(@BindBean("datasetRow") DatasetRow datasetRow);
+          + "VALUES (:uuid, :namespaceUuid, :dataSourceUuid, :urn, :description)")
+  void insert(@BindDatasetRow DatasetRow datasetRow);
 
   @Transaction
   default void insertAll(

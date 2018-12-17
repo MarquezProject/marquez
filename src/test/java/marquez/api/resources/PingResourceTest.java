@@ -12,6 +12,6 @@ public class PingResourceTest {
     final PingResource pingResource = new PingResource();
     final Response response = pingResource.ping();
     assertEquals(OK, response.getStatusInfo());
-    assertEquals("pong", (String) response.getEntity());
+    assertEquals("pong", response.readEntity(String.class));
   }
 }
