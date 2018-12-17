@@ -23,7 +23,6 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
   private static Logger LOG = LoggerFactory.getLogger(JobRunIntegrationTest.class);
 
   @Test
-  @Ignore("Re-enable when the namespace service is checked in")
   public void testJobRunCreationEndToEnd() throws JsonProcessingException {
     Entity createJobRunRequestEntity =
         Entity.json(
@@ -53,7 +52,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunGetterEndToEnd() {
-    JobRun responseBody = getJobRunApiResponse(NEW_JOB_RUN.getGuid());
+    JobRun responseBody = getJobRunApiResponse(newJobRun.getGuid());
 
     assertEquals(marquez.core.models.JobRunState.State.NEW.name(), responseBody.getCurrentState());
     assertNull(responseBody.getNominalStartTime());
@@ -66,7 +65,7 @@ public class JobRunIntegrationTest extends JobRunBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path(format("/api/v1/jobs/runs/%s/complete", NEW_JOB_RUN.getGuid()))
+            .path(format("/api/v1/jobs/runs/%s/complete", newJobRun.getGuid()))
             .request(MediaType.APPLICATION_JSON)
             .put(Entity.json(""));
 

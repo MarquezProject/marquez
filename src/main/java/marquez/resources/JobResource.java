@@ -1,5 +1,6 @@
 package marquez.resources;
 
+import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.codahale.metrics.annotation.Timed;
@@ -73,7 +74,7 @@ public final class JobResource extends BaseResource {
           .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException | Exception e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
@@ -106,7 +107,7 @@ public final class JobResource extends BaseResource {
           .entity(coreJobToApiJobMapper.map(createdJob))
           .build();
     } catch (UnexpectedException e) {
-      log.error(e.getLocalizedMessage());
+      log.error(format("Error creating the job <%s>:<%s>.", namespace, job), e);
       throw new ResourceException();
     }
   }

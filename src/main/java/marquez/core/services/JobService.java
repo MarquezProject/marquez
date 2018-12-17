@@ -126,7 +126,12 @@ public class JobService {
 
   public Optional<JobRun> getJobRun(UUID jobRunID) throws UnexpectedException {
     try {
-      return Optional.ofNullable(this.jobRunDAO.findJobRunById(jobRunID));
+      JobRun producedJobRun = this.jobRunDAO.findJobRunById(jobRunID);
+      if (producedJobRun == null) {
+        return Optional.empty();
+      } else {
+        return Optional.of(producedJobRun);
+      }
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching job run";
       log.error(err, e);

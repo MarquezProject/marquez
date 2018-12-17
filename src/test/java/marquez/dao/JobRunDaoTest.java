@@ -29,22 +29,21 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunCreationCreatesJobRunState() {
-    JobRunState returnedJobRunState = getLatestJobRunStateForJobId(NEW_JOB_RUN.getGuid());
+    JobRunState returnedJobRunState = getLatestJobRunStateForJobId(newJobRun.getGuid());
     assertEquals(JobRunState.State.NEW, returnedJobRunState.getState());
   }
 
   @Test
   public void testJobRunUpdateCreatesJobRunState() {
-    jobRunDAO.updateState(
-        NEW_JOB_RUN.getGuid(), JobRunState.State.toInt(JobRunState.State.RUNNING));
+    jobRunDAO.updateState(newJobRun.getGuid(), JobRunState.State.toInt(JobRunState.State.RUNNING));
 
-    JobRunState returnedJobRunState = getLatestJobRunStateForJobId(NEW_JOB_RUN.getGuid());
+    JobRunState returnedJobRunState = getLatestJobRunStateForJobId(newJobRun.getGuid());
     assertEquals(JobRunState.State.RUNNING, returnedJobRunState.getState());
   }
 
   @Test
   public void testJobRunGetter() {
-    marquez.core.models.JobRun returnedJobRun = jobRunDAO.findJobRunById(NEW_JOB_RUN.getGuid());
+    marquez.core.models.JobRun returnedJobRun = jobRunDAO.findJobRunById(newJobRun.getGuid());
     assertNull(returnedJobRun.getNominalStartTime());
     assertNull(returnedJobRun.getNominalEndTime());
     assertEquals(
