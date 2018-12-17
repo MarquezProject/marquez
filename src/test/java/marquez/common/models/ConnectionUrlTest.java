@@ -18,6 +18,12 @@ public class ConnectionUrlTest {
     assertEquals(CONNECTION_URL, connectionUrl.getRawValue());
   }
 
+  @Test(expected = NullPointerException.class)
+  public void testConnectionUrlNull() {
+    final String nullConnectionUrl = null;
+    ConnectionUrl.of(nullConnectionUrl);
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testConnectionUrlEmpty() {
     final String emptyConnectionUrl = "";

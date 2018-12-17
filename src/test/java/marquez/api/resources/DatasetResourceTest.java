@@ -35,6 +35,18 @@ public class DatasetResourceTest {
   private final DatasetResource datasetResource =
       new DatasetResource(mockNamespaceService, mockDatasetService);
 
+  @Test(expected = NullPointerException.class)
+  public void testNamespaceServiceNull() {
+    final NamespaceService nullNamespaceService = null;
+    new DatasetResource(nullNamespaceService, mockDatasetService);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testDatasetServiceNull() {
+    final DatasetService nullDatasetService = null;
+    new DatasetResource(mockNamespaceService, nullDatasetService);
+  }
+
   @Test
   public void testListDatasets200() throws UnexpectedException {
     when(mockNamespaceService.exists(NAMESPACE.getValue())).thenReturn(true);
