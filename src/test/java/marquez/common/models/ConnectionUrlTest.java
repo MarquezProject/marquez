@@ -17,4 +17,30 @@ public class ConnectionUrlTest {
     assertEquals(DB, connectionUrl.getDb());
     assertEquals(CONNECTION_URL, connectionUrl.getRawValue());
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testConnectionUrlEmpty() {
+    final String emptyConnectionUrl = "";
+    ConnectionUrl.of(emptyConnectionUrl);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testConnectionUrlBlank() {
+    final String blankConnectionUrl = " ";
+    ConnectionUrl.of(blankConnectionUrl);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testConnectionUrlUnknownProtocol() {
+    final String unknownProtocolConnectionUrl =
+        String.format("melquiades:postgresql://localhost:5432/%s", DB.getValue());
+    ConnectionUrl.of(unknownProtocolConnectionUrl);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testConnectionUrlMissingParts() {
+    final String missingPartsConnectionUrl =
+        String.format("postgresql://localhost/%s", DB.getValue());
+    ConnectionUrl.of(missingPartsConnectionUrl);
+  }
 }
