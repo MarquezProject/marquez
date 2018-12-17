@@ -9,13 +9,9 @@ import org.junit.Test;
 public class PingResourceTest {
   @Test
   public void testPing200() {
-    final String expected = "pong";
-
     final PingResource pingResource = new PingResource();
     final Response response = pingResource.ping();
     assertEquals(OK, response.getStatusInfo());
-
-    final String actual = (String) response.getEntity();
-    assertEquals(expected, actual);
+    assertEquals("pong", (String) response.getEntity());
   }
 }
