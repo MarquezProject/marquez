@@ -25,7 +25,7 @@ import marquez.core.services.NamespaceService;
 import marquez.service.DatasetService;
 import marquez.service.models.Dataset;
 
-@Path("/api/v1/namespaces/{namespace}")
+@Path("/api/v1/namespaces/{namespace}/datasets")
 public final class DatasetResource {
   private final DatasetResponseMapper datasetResponseMapper = new DatasetResponseMapper();
   private final NamespaceService namespaceService;
@@ -42,7 +42,6 @@ public final class DatasetResource {
   @ResponseMetered
   @ExceptionMetered
   @Timed
-  @Path("/datasets")
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") String namespaceString,

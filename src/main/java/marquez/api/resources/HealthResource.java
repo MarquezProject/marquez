@@ -1,4 +1,4 @@
-package marquez.resources;
+package marquez.api.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

@@ -11,7 +11,7 @@ public class DatasetUrnTest {
   private static final String DATASET_URN_DELIM = ":";
   private static final String DATASET_URN_PREFIX = "urn";
   private static final Integer ALLOWED_DATASET_URN_SIZE = 64;
-  private static final Integer DATASET_URN_SIZE_NOT_ALLOWED = ALLOWED_DATASET_URN_SIZE + 1;
+  private static final Integer DATASET_URN_SIZE_GREATER_THAN_ALLOWED = ALLOWED_DATASET_URN_SIZE + 1;
 
   @Test
   public void testNewDatasetUrn() {
@@ -76,7 +76,7 @@ public class DatasetUrnTest {
 
   private String newDatasetUrnWithPartGreaterThan64() {
     final String part0 = newDatasetUrnPart("a", ALLOWED_DATASET_URN_SIZE);
-    final String part1GreaterThan64 = newDatasetUrnPart("b", DATASET_URN_SIZE_NOT_ALLOWED);
+    final String part1GreaterThan64 = newDatasetUrnPart("b", DATASET_URN_SIZE_GREATER_THAN_ALLOWED);
 
     return new StringJoiner(DATASET_URN_DELIM)
         .add(DATASET_URN_PREFIX)
