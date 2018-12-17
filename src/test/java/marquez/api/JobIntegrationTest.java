@@ -2,10 +2,16 @@ package marquez.api;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -18,15 +24,27 @@ import marquez.dao.JobRunDAO;
 import marquez.dao.JobVersionDAO;
 import marquez.dao.NamespaceDAO;
 import marquez.dao.RunArgsDAO;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JobIntegrationTest extends JobRunBaseTest {
-  private static Logger LOG = LoggerFactory.getLogger(JobIntegrationTest.class);
 
-  protected static String NS_NAME;
+  private static Logger LOG = LoggerFactory.getLogger(JobIntegrationTest.class);
+  protected static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
+  protected static String NAMESPACE_NAME;
+  protected static UUID CREATED_NAMESPACE_UUID;
+
+  protected static String CREATED_JOB_NAME;
+  protected static UUID CREATED_JOB_RUN_UUID;
+
+  protected static final String JOB_RUN_ARGS = "{'key': 'value'}";
+
   protected static final NamespaceDAO namespaceDAO = APP.onDemand(NamespaceDAO.class);
   protected static final JobDAO jobDAO = APP.onDemand(JobDAO.class);
   protected static final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
@@ -39,17 +57,23 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
   @BeforeClass
   public static void setup() throws UnexpectedException {
-    // Create a namespace and a job through the service API
     marquez.core.models.Namespace generatedNamespace =
         namespaceService.create(Generator.genNamespace());
-    NS_NAME = generatedNamespace.getName();
+    NAMESPACE_NAME = generatedNamespace.getName();
+    CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
+
+    marquez.core.models.Job job = Generator.genJob(generatedNamespace.getGuid());
+    marquez.core.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
+
+    CREATED_JOB_NAME = createdJob.getName();
+    CREATED_JOB_RUN_UUID = createdJob.getNamespaceGuid();
   }
 
   @Test
   public void testJobCreationResponseEndToEnd() {
     Job jobForJobCreationRequest = generateApiJob();
 
-    Response res = createJobOnNamespace(NS_NAME, jobForJobCreationRequest);
+    Response res = createJobOnNamespace(NAMESPACE_NAME, jobForJobCreationRequest);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
     evaluateResponse(res, jobForJobCreationRequest);
   }
@@ -58,11 +82,11 @@ public class JobIntegrationTest extends JobRunBaseTest {
   public void testJobGetterResponseEndToEnd() {
     Job jobForJobCreationRequest = generateApiJob();
 
-    Response res = createJobOnNamespace(NS_NAME, jobForJobCreationRequest);
+    Response res = createJobOnNamespace(NAMESPACE_NAME, jobForJobCreationRequest);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
 
     String path =
-        format("/api/v1/namespaces/%s/jobs/%s", NS_NAME, jobForJobCreationRequest.getName());
+        format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, jobForJobCreationRequest.getName());
     Response returnedJobResponse =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
@@ -71,6 +95,62 @@ public class JobIntegrationTest extends JobRunBaseTest {
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), returnedJobResponse.getStatus());
     evaluateResponse(returnedJobResponse, jobForJobCreationRequest);
+  }
+
+  @Before
+  public void createJobRun() throws UnexpectedException {
+    marquez.core.models.JobRun createdJobRun =
+        jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
+    CREATED_JOB_RUN_UUID = createdJobRun.getGuid();
+  }
+
+  @Test
+  public void testJobRunCreationEndToEnd() throws JsonProcessingException {
+    Entity createJobRunRequestEntity =
+        Entity.json(MAPPER.writeValueAsString(new CreateJobRunRequest(null, null, JOB_RUN_ARGS)));
+    final Response res =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path("/api/v1/namespaces/" + NAMESPACE_NAME + "/jobs/" + CREATED_JOB_NAME + "/runs")
+            .request(MediaType.APPLICATION_JSON)
+            .post(createJobRunRequestEntity);
+    assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
+    JobRun responseBody = res.readEntity(JobRun.class);
+    UUID returnedId = responseBody.getGuid();
+    try {
+      assertNotNull(returnedId);
+      LOG.info("Returned id is: " + returnedId);
+    } finally {
+      APP.getJDBI()
+          .useHandle(
+              handle -> {
+                handle.execute(
+                    format("delete from job_run_states where job_run_guid = '%s'", returnedId));
+                handle.execute(format("delete from job_runs where guid = '%s'", returnedId));
+              });
+    }
+  }
+
+  @Test
+  public void testJobRunGetterEndToEnd() {
+    JobRun responseBody = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
+
+    assertEquals(marquez.core.models.JobRunState.State.NEW.name(), responseBody.getCurrentState());
+    assertNull(responseBody.getNominalStartTime());
+    assertNull(responseBody.getNominalEndTime());
+  }
+
+  @Test
+  public void testJobRunAfterUpdateEndToEnd() {
+
+    final Response res =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path(format("/api/v1/jobs/runs/%s/complete", CREATED_JOB_RUN_UUID))
+            .request(MediaType.APPLICATION_JSON)
+            .put(Entity.json(""));
+
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
   }
 
   private void evaluateResponse(Response res, Job inputJob) {
@@ -108,5 +188,46 @@ public class JobIntegrationTest extends JobRunBaseTest {
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
     return new Job(jobName, null, inputList, outputList, location, description);
+  }
+
+  private JobRun getJobRunApiResponse(UUID jobRunGuid) {
+    final Response res =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path(format("/api/v1/jobs/runs/%s", jobRunGuid))
+            .request(MediaType.APPLICATION_JSON)
+            .get();
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+    return res.readEntity(JobRun.class);
+  }
+
+  @After
+  public void cleanup() {
+    APP.getJDBI()
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  format(
+                      "delete from job_run_states where job_run_guid = '%s'",
+                      CREATED_JOB_RUN_UUID));
+              handle.execute(
+                  format("delete from job_runs where guid = '%s'", CREATED_JOB_RUN_UUID));
+            });
+  }
+
+  @AfterClass
+  public static void tearDown() {
+    APP.getJDBI()
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  format(
+                      "DELETE from job_versions where guid in (select job_versions.guid as guid from jobs inner join job_versions on job_versions.job_guid=jobs.guid and jobs.namespace_guid='%s')",
+                      CREATED_NAMESPACE_UUID));
+              handle.execute(
+                  format("delete from jobs where namespace_guid = '%s'", CREATED_NAMESPACE_UUID));
+              handle.execute(
+                  format("delete from namespaces where guid = '%s'", CREATED_NAMESPACE_UUID));
+            });
   }
 }
