@@ -35,6 +35,7 @@ public class DatasetService {
     final DataSourceRow dataSourceRow =
         DataSourceRow.builder()
             .uuid(UUID.randomUUID())
+            .dataSource(dbTableVersion.getConnectionUrl().getDataSource())
             .connectionUrl(dbTableVersion.getConnectionUrl())
             .build();
     final DatasetRow datasetRow =

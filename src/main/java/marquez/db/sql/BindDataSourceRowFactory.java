@@ -20,7 +20,7 @@ public class BindDataSourceRowFactory implements SqlStatementCustomizerFactory {
     return (stmt, obj) -> {
       final DataSourceRow dataSourceRow = (DataSourceRow) obj;
       stmt.bind("uuid", dataSourceRow.getUuid().toString())
-          .bind("data_sources", dataSourceRow.getDataSource().getValue())
+          .bind("data_source", dataSourceRow.getDataSource().getValue())
           .bind("connection_url", dataSourceRow.getConnectionUrl().getRawValue());
     };
   }
