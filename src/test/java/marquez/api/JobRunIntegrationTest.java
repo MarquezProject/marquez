@@ -12,13 +12,10 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.JobRunBaseTest;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Ignore(
-    "TODO: Job Run Definition was removed, disabling tests so they can be updated for new endpoints")
 public class JobRunIntegrationTest extends JobRunBaseTest {
   private static Logger LOG = LoggerFactory.getLogger(JobRunIntegrationTest.class);
 
