@@ -11,6 +11,6 @@ public final class DatasetResponseMapper implements Mapper<Dataset, DatasetRespo
     return new DatasetResponse(
         dataset.getUrn().getValue(),
         dataset.getCreatedAt().toString(),
-        dataset.getDescription().map(s -> s.getValue()).orElse(null));
+        dataset.getDescription().map(x -> x.getValue()).orElse(null));
   }
 }
