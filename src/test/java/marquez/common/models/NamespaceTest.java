@@ -13,9 +13,7 @@ public class NamespaceTest {
   @Test
   public void testNewNamespace() {
     final String namespace = "macondo";
-    final Namespace expected = Namespace.of(namespace);
-    final Namespace actual = Namespace.of(namespace);
-    assertEquals(expected, actual);
+    assertEquals(namespace, Namespace.of(namespace).getValue());
   }
 
   @Test(expected = NullPointerException.class)
