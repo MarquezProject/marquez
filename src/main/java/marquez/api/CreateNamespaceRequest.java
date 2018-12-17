@@ -3,12 +3,13 @@ package marquez.api;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public final class CreateNamespaceRequest {
-  @NotEmpty private String owner;
-  @NotEmpty private String description;
+  @NotBlank
+  private String owner;
+  private String description;
 }
