@@ -1,20 +1,19 @@
 package marquez.api;
 
-import static io.dropwizard.testing.FixtureHelpers.fixture;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
-@Ignore("TODO: Need to figure out why this started to fail. Please see issue #140")
+import static io.dropwizard.testing.FixtureHelpers.fixture;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 public class DatasetSerializationTest {
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
