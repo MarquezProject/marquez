@@ -56,7 +56,7 @@ public final class JobResource extends BaseResource {
       CreateJobRunRequest request)
       throws ResourceException {
     try {
-      if (!namespaceExists(namespace)) {
+      if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       if (!jobService.getJob(namespace, job).isPresent()) {
@@ -132,7 +132,7 @@ public final class JobResource extends BaseResource {
           .entity(coreJobToApiJobMapper.map(returnedJobs))
           .build();
     } catch (UnexpectedException e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
@@ -152,7 +152,7 @@ public final class JobResource extends BaseResource {
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
@@ -163,14 +163,14 @@ public final class JobResource extends BaseResource {
   public Response listJobs(@PathParam("namespace") final String namespace)
       throws ResourceException {
     try {
-      if (!namespaceExists(namespace)) {
+      if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       List<Job> jobList = jobService.getAllJobsInNamespace(namespace);
       return Response.status(Response.Status.OK).entity(new ListJobsResponse(jobList)).build();
 
     } catch (UnexpectedException e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
@@ -189,7 +189,7 @@ public final class JobResource extends BaseResource {
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
@@ -209,7 +209,7 @@ public final class JobResource extends BaseResource {
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
@@ -230,7 +230,7 @@ public final class JobResource extends BaseResource {
 
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
@@ -249,12 +249,8 @@ public final class JobResource extends BaseResource {
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
-  }
-
-  public boolean namespaceExists(String namespace) throws UnexpectedException {
-    return namespaceService.get(namespace).isPresent();
   }
 }
