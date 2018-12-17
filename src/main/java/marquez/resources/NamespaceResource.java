@@ -23,9 +23,8 @@ import marquez.core.mappers.GetNamespaceResponseMapper;
 import marquez.core.mappers.NamespaceApiMapper;
 import marquez.core.models.Namespace;
 import marquez.core.services.NamespaceService;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.NotBlank;
 
-@Produces(APPLICATION_JSON)
 @Slf4j
 @Path("/api/v1")
 public class NamespaceResource extends BaseResource {
@@ -45,10 +44,11 @@ public class NamespaceResource extends BaseResource {
 
   @PUT
   @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces/{namespace}")
   public Response create(
-      @PathParam("namespace") @NotEmpty String namespace, @Valid CreateNamespaceRequest request)
+      @PathParam("namespace") @NotBlank String namespace, @Valid CreateNamespaceRequest request)
       throws ResourceException {
     try {
       marquez.core.models.Namespace n =
@@ -58,13 +58,13 @@ public class NamespaceResource extends BaseResource {
           .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
 
   @GET
-  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces/{namespace}")
   public Response get(@PathParam("namespace") String namespace) throws ResourceException {
@@ -80,13 +80,13 @@ public class NamespaceResource extends BaseResource {
         return Response.status(Response.Status.NOT_FOUND).type(APPLICATION_JSON).build();
       }
     } catch (UnexpectedException e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
 
   @GET
-  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces")
   public Response listNamespaces() throws ResourceException {
@@ -98,7 +98,7 @@ public class NamespaceResource extends BaseResource {
           .entity(new ListNamespacesResponse(namespaceList))
           .build();
     } catch (UnexpectedException e) {
-      log.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }

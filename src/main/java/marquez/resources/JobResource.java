@@ -183,7 +183,6 @@ public final class JobResource extends BaseResource {
   @Path("/jobs/runs/{runId}/fail")
   public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-
       Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
         jobService.updateJobRunState(
@@ -204,12 +203,10 @@ public final class JobResource extends BaseResource {
     try {
       Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
-
         jobService.updateJobRunState(
             UUID.fromString(runId), marquez.core.models.JobRunState.State.ABORTED);
         return Response.status(Response.Status.OK).build();
       }
-
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
       log.error(e.getMessage(), e);
