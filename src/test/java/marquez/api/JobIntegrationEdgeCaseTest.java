@@ -2,6 +2,7 @@ package marquez.api;
 
 import static java.lang.String.format;
 import static javax.ws.rs.client.Entity.entity;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -73,6 +75,16 @@ public class JobIntegrationEdgeCaseTest {
   }
 
   @Test
+  public void testGetJobInternalErrorHandling() throws UnexpectedException {
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenThrow(new UnexpectedException());
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+
+    Response res = getJob("someName");
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+  }
+
+  @Test
   public void testCreateJobBadInputs() throws UnexpectedException {
     when(MOCK_JOB_SERVICE.createJob(any(), any())).thenThrow(new UnexpectedException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
@@ -107,6 +119,43 @@ public class JobIntegrationEdgeCaseTest {
     String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, "nosuchjob");
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  @Test
+  public void testGetAllJobsInNamespaceWithInvalidNamespace() throws UnexpectedException {
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
+
+    String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
+    Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  @Test
+  public void testGetAllJobsInNamespace() throws UnexpectedException {
+    marquez.core.models.Job job1 = Generator.genJob();
+    marquez.core.models.Job job2 = Generator.genJob();
+    List<marquez.core.models.Job> jobsList = Arrays.asList(job1, job2);
+
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME)).thenReturn(jobsList);
+    String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
+    Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+    List<Job> returnedJobs = res.readEntity(ListJobsResponse.class).getJobs();
+    assertThat(returnedJobs).hasSize(jobsList.size());
+  }
+
+  @Test
+  public void testCreateJobRunInternalErrorHandling() throws UnexpectedException {
+    when(MOCK_JOB_SERVICE.createJobRun(any(), any(), any(), any(), any()))
+        .thenThrow(new UnexpectedException());
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+
+    Job jobForJobCreationRequest = generateApiJob();
+    Response res = insertJob(jobForJobCreationRequest);
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
 
   @Test
@@ -148,6 +197,11 @@ public class JobIntegrationEdgeCaseTest {
 
     res = markJobRunAborted(externalRunId);
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  private Response getJob(String jobName) {
+    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, jobName);
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
   }
 
   private Response insertJob(Job job) {

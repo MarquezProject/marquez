@@ -117,26 +117,6 @@ public final class JobResource extends BaseResource {
   }
 
   @GET
-  @Path("/namespaces/{namespace}/jobs/")
-  @Timed
-  public Response getAllJobs(@PathParam("namespace") final String namespace)
-      throws ResourceException {
-    try {
-      if (!namespaceService.exists(namespace)) {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-
-      List<Job> returnedJobs = jobService.getAllJobsInNamespace(namespace);
-      return Response.status(Response.Status.OK)
-          .entity(coreJobToApiJobMapper.map(returnedJobs))
-          .build();
-    } catch (UnexpectedException e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
-  }
-
-  @GET
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Timed
   public Response getJob(
@@ -158,7 +138,7 @@ public final class JobResource extends BaseResource {
 
   @GET
   @Timed
-  @Path("/namespaces/{namespace}")
+  @Path("/namespaces/{namespace}/jobs")
   public Response listJobs(@PathParam("namespace") final String namespace)
       throws ResourceException {
     try {
@@ -166,8 +146,8 @@ public final class JobResource extends BaseResource {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       List<Job> jobList = jobService.getAllJobsInNamespace(namespace);
-      return Response.status(Response.Status.OK).entity(new ListJobsResponse(jobList)).build();
-
+      ListJobsResponse response = new ListJobsResponse(coreJobToApiJobMapper.map(jobList));
+      return Response.status(Response.Status.OK).entity(response).build();
     } catch (UnexpectedException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
