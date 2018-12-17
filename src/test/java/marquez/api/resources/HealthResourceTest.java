@@ -12,6 +12,6 @@ public class HealthResourceTest {
     final HealthResource healthResource = new HealthResource();
     final Response response = healthResource.checkHealth();
     assertEquals(OK, response.getStatusInfo());
-    assertEquals("OK", response.readEntity(String.class));
+    assertEquals("OK", (String) response.getEntity());
   }
 }
