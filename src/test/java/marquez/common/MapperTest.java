@@ -2,6 +2,7 @@ package marquez.common;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -12,6 +13,13 @@ public class MapperTest {
     List<A> listA = Arrays.asList(new A());
     List<B> listB = B_MAPPER.map(listA);
     assertEquals(1, listB.size());
+  }
+
+  @Test
+  public void testMapEmptyList() {
+    List<A> emptyListA = new ArrayList<A>();
+    List<B> listB = B_MAPPER.map(emptyListA);
+    assertEquals(0, listB.size());
   }
 
   @Test(expected = NullPointerException.class)
