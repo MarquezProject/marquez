@@ -13,7 +13,7 @@ public class DataSourceTest {
 
   @Test(expected = NullPointerException.class)
   public void testDataSourceNull() {
-    final String nullDataSourceString = null;
-    DataSource.of(nullDataSourceString);
+    final String nullDataSource = null;
+    DataSource.of(nullDataSource);
   }
 }
