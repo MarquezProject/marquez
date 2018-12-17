@@ -124,6 +124,9 @@ public final class JobResource extends BaseResource {
       @PathParam("namespace") final String namespace, @PathParam("job") final String job)
       throws ResourceException {
     try {
+      if (!namespaceService.exists(namespace)) {
+        return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
+      }
       Optional<Job> returnedJob = jobService.getJob(namespace, job);
       if (returnedJob.isPresent()) {
         return Response.status(Response.Status.OK)
