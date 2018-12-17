@@ -1,23 +1,5 @@
 package marquez.api;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
-import marquez.core.exceptions.UnexpectedException;
-import marquez.core.mappers.ResourceExceptionMapper;
-import marquez.core.models.Generator;
-import marquez.core.services.JobService;
-import marquez.core.services.NamespaceService;
-import marquez.resources.JobResource;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import static java.lang.String.format;
 import static javax.ws.rs.client.Entity.entity;
 import static org.junit.Assert.assertEquals;
@@ -27,6 +9,23 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import io.dropwizard.testing.junit.ResourceTestRule;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import marquez.core.exceptions.UnexpectedException;
+import marquez.core.mappers.ResourceExceptionMapper;
+import marquez.core.models.Generator;
+import marquez.core.services.JobService;
+import marquez.core.services.NamespaceService;
+import marquez.resources.JobResource;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
 
 public class JobIntegrationEdgeCaseTest {
 
