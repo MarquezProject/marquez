@@ -7,6 +7,9 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 public class NamespaceTest {
+  private static final Integer ALLOWED_NAMESPACE_SIZE = 1024;
+  private static final Integer NAMESPACE_SIZE_GREATER_THAN_ALLOWED = ALLOWED_NAMESPACE_SIZE + 1;
+
   @Test
   public void testNewNamespace() {
     final String namespace = "macondo";
@@ -35,7 +38,7 @@ public class NamespaceTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testNamespaceNonAlphanumeric() {
-    final String nonAlphanumericNamespace = "~$^+=<>";
+    final String nonAlphanumericNamespace = "m@c?nd>";
     Namespace.of(nonAlphanumericNamespace);
   }
 
@@ -46,6 +49,6 @@ public class NamespaceTest {
   }
 
   private String newGreaterThan1024Namespace() {
-    return Stream.generate(() -> "a").limit(1024 + 1).collect(joining());
+    return Stream.generate(() -> "a").limit(NAMESPACE_SIZE_GREATER_THAN_ALLOWED).collect(joining());
   }
 }

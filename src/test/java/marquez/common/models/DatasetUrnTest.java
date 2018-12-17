@@ -70,8 +70,8 @@ public class DatasetUrnTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testDatasetUrnWithPartGreaterThan64() {
-    final String greaterThan1024DatasetUrn = newDatasetUrnWithPartGreaterThan64();
-    DatasetUrn.of(greaterThan1024DatasetUrn);
+    final String partGreaterThan64DatasetUrn = newDatasetUrnWithPartGreaterThan64();
+    DatasetUrn.of(partGreaterThan64DatasetUrn);
   }
 
   private String newDatasetUrnWithPartGreaterThan64() {
