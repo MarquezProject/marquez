@@ -184,10 +184,13 @@ public final class JobResource extends BaseResource {
   @Path("/jobs/runs/{runId}/complete")
   public Response completeJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-
-      jobService.updateJobRunState(
-          UUID.fromString(runId), marquez.core.models.JobRunState.State.COMPLETED);
-      return Response.status(Response.Status.OK).build();
+      Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      if (jobRun.isPresent()) {
+        jobService.updateJobRunState(
+            UUID.fromString(runId), marquez.core.models.JobRunState.State.COMPLETED);
+        return Response.status(Response.Status.OK).build();
+      }
+      return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
       log.error(e.getLocalizedMessage());
       throw new ResourceException();
@@ -200,9 +203,14 @@ public final class JobResource extends BaseResource {
   @Path("/jobs/runs/{runId}/fail")
   public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      jobService.updateJobRunState(
-          UUID.fromString(runId), marquez.core.models.JobRunState.State.FAILED);
-      return Response.status(Response.Status.OK).build();
+
+      Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      if (jobRun.isPresent()) {
+        jobService.updateJobRunState(
+            UUID.fromString(runId), marquez.core.models.JobRunState.State.FAILED);
+        return Response.status(Response.Status.OK).build();
+      }
+      return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
       log.error(e.getLocalizedMessage());
       throw new ResourceException();
@@ -215,9 +223,15 @@ public final class JobResource extends BaseResource {
   @Path("/jobs/runs/{runId}/abort")
   public Response abortJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      jobService.updateJobRunState(
-          UUID.fromString(runId), marquez.core.models.JobRunState.State.ABORTED);
-      return Response.status(Response.Status.OK).build();
+      Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      if (jobRun.isPresent()) {
+
+        jobService.updateJobRunState(
+            UUID.fromString(runId), marquez.core.models.JobRunState.State.ABORTED);
+        return Response.status(Response.Status.OK).build();
+      }
+
+      return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
       log.error(e.getLocalizedMessage());
       throw new ResourceException();

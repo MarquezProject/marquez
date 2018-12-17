@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.core.exceptions.UnexpectedException;
@@ -134,6 +135,21 @@ public class JobIntegrationEdgeCaseTest {
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
 
+  @Test
+  public void testJobRunStatusUpdateWithInvalidExternalRunId() throws UnexpectedException {
+    UUID externalRunId = UUID.randomUUID();
+
+    when(MOCK_JOB_SERVICE.getJobRun(externalRunId)).thenReturn(Optional.empty());
+    Response res = markJobRunComplete(externalRunId);
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+
+    res = markJobRunFailed(externalRunId);
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+
+    res = markJobRunAborted(externalRunId);
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
   private Response insertJob(Job job) {
     CreateJobRequest createJobRequest =
         new CreateJobRequest(
@@ -159,6 +175,21 @@ public class JobIntegrationEdgeCaseTest {
         .target(path)
         .request(MediaType.APPLICATION_JSON)
         .post(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+  }
+
+  private Response markJobRunComplete(UUID jobRunId) {
+    String path = format("/api/v1/jobs/runs/%s/complete", jobRunId);
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(Entity.json(""));
+  }
+
+  private Response markJobRunAborted(UUID jobRunId) {
+    String path = format("/api/v1/jobs/runs/%s/abort", jobRunId);
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(Entity.json(""));
+  }
+
+  private Response markJobRunFailed(UUID jobRunId) {
+    String path = format("/api/v1/jobs/runs/%s/failed", jobRunId);
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(Entity.json(""));
   }
 
   Job generateApiJob() {
