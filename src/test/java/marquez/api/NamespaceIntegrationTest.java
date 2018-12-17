@@ -61,7 +61,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
             .path("/api/v1/namespaces/" + "abc123")
             .request(MediaType.APPLICATION_JSON)
-            .put(Entity.json(new CreateNamespaceRequest("someOwner", null)));
+            .put(Entity.json(new CreateNamespaceRequest(null, "someDesc")));
     assertEquals(HTTP_UNPROCESSABLE_ENTITY, res.getStatus());
   }
 

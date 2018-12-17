@@ -1,20 +1,8 @@
 package marquez.api;
 
-import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Generator;
 import marquez.core.services.JobService;
@@ -31,6 +19,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import static java.lang.String.format;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class JobIntegrationTest extends JobRunBaseTest {
 
@@ -116,7 +117,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
             .post(createJobRunRequestEntity);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
     JobRun responseBody = res.readEntity(JobRun.class);
-    UUID returnedId = responseBody.getGuid();
+    UUID returnedId = responseBody.getRunId();
     try {
       assertNotNull(returnedId);
       LOG.info("Returned id is: " + returnedId);
@@ -135,7 +136,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   public void testJobRunGetterEndToEnd() {
     JobRun responseBody = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
 
-    assertEquals(marquez.core.models.JobRunState.State.NEW.name(), responseBody.getCurrentState());
+    assertEquals(marquez.core.models.JobRunState.State.NEW.name(), responseBody.getRunState());
     assertNull(responseBody.getNominalStartTime());
     assertNull(responseBody.getNominalEndTime());
   }

@@ -9,7 +9,6 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public final class CreateNamespaceRequest {
-  @NotBlank
-  private String owner;
+  @NotBlank private String owner;
   private String description;
 }
