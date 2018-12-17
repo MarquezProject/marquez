@@ -1,8 +1,20 @@
 package marquez.api;
 
+import static java.lang.String.format;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Generator;
 import marquez.core.services.JobService;
@@ -19,19 +31,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
-import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class JobIntegrationTest extends JobRunBaseTest {
 
