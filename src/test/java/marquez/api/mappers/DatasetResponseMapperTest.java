@@ -66,8 +66,6 @@ public class DatasetResponseMapperTest {
   @Test(expected = NullPointerException.class)
   public void testMapNullDatasetList() {
     final List<Dataset> datasets = null;
-    final List<DatasetResponse> datasetResponses = DatasetResponseMapper.map(datasets);
-    assertNotNull(datasetResponses);
-    assertEquals(0, datasetResponses.size());
+    DatasetResponseMapper.map(datasets);
   }
 }
