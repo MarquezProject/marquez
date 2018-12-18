@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
 public class JobIntegrationTest extends JobRunBaseTest {
 
   protected static final ObjectMapper MAPPER = Jackson.newObjectMapper();
