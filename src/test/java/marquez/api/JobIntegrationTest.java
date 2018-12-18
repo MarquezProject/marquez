@@ -15,7 +15,6 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import lombok.extern.slf4j.Slf4j;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Generator;
@@ -31,8 +30,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Slf4j
 public class JobIntegrationTest extends JobRunBaseTest {
