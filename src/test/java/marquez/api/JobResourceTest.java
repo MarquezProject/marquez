@@ -133,6 +133,17 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testGetAllJobsInNamespaceErrorHandling() throws UnexpectedException {
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME))
+        .thenThrow(new UnexpectedException());
+
+    String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
+    Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+  }
+
+  @Test
   public void testGetAllJobsInNamespace() throws UnexpectedException {
     marquez.core.models.Job job1 = Generator.genJob();
     marquez.core.models.Job job2 = Generator.genJob();
