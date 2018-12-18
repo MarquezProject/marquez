@@ -4,20 +4,20 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
-@Data
 @AllArgsConstructor
 public final class Job {
-  @NonNull private final UUID guid;
-  @NonNull private final String name;
-  @NonNull private final String location;
-  @NonNull private final UUID namespaceGuid;
-  private final String description;
-  private final List<String> inputDatasetUrns;
-  private final List<String> outputDatasetUrns;
-  private final Timestamp createdAt;
+  @NonNull @Getter private final UUID guid;
+  @NonNull @Getter private final String name;
+  @NonNull @Getter private final String location;
+  @NonNull @Getter @Setter private UUID namespaceGuid;
+  @Getter private final String description;
+  @Getter private final List<String> inputDatasetUrns;
+  @Getter private final List<String> outputDatasetUrns;
+  @Getter private final Timestamp createdAt;
 
   public Job(
       final UUID guid,
