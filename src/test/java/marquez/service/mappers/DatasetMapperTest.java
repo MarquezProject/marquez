@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.common.models.DatasetUrn;
@@ -14,19 +16,19 @@ import marquez.service.models.Dataset;
 import org.junit.Test;
 
 public class DatasetMapperTest {
+  private static final Description NON_EMPTY_DESCRIPTION = Description.of("test description");
   private static final DatasetUrn DATASET_URN = DatasetUrn.of("urn:a:b.c");
   private static final Instant CREATED_AT = Instant.now();
   private static final Instant UPDATED_AT = Instant.now();
 
   @Test
   public void testMapDataset() {
-    final Description nonEmptyDescription = Description.of("test description");
-    final DatasetRow datasetRow = newDatasetRow(nonEmptyDescription);
+    final DatasetRow datasetRow = newDatasetRow(NON_EMPTY_DESCRIPTION);
     final Dataset dataset = DatasetMapper.map(datasetRow);
     assertNotNull(dataset);
     assertEquals(DATASET_URN, dataset.getUrn());
     assertEquals(CREATED_AT, dataset.getCreatedAt());
-    assertEquals(Optional.of(nonEmptyDescription), dataset.getDescription());
+    assertEquals(Optional.of(NON_EMPTY_DESCRIPTION), dataset.getDescription());
   }
 
   @Test
@@ -37,6 +39,22 @@ public class DatasetMapperTest {
     assertEquals(DATASET_URN, dataset.getUrn());
     assertEquals(CREATED_AT, dataset.getCreatedAt());
     assertEquals(Optional.of(NO_DESCRIPTION), dataset.getDescription());
+  }
+
+  @Test
+  public void testMapDatasetList() {
+    final List<DatasetRow> datasetiRows = Arrays.asList(newDatasetRow(NON_EMPTY_DESCRIPTION));
+    final List<Dataset> datasetRows = DatasetMapper.map(datasetiRows);
+    assertNotNull(datasetRows);
+    assertEquals(1, datasetRows.size());
+  }
+
+  @Test
+  public void testMapEmptyDatasetList() {
+    final List<DatasetRow> datasetiRows = Arrays.asList();
+    final List<Dataset> datasetRows = DatasetMapper.map(datasetiRows);
+    assertNotNull(datasetRows);
+    assertEquals(0, datasetRows.size());
   }
 
   @Test(expected = NullPointerException.class)
