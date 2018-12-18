@@ -51,10 +51,10 @@ public class DatasetMapperTest {
 
   @Test
   public void testMapEmptyDatasetList() {
-    final List<DatasetRow> datasetiRows = Arrays.asList();
-    final List<Dataset> datasetRows = DatasetMapper.map(datasetiRows);
-    assertNotNull(datasetRows);
-    assertEquals(0, datasetRows.size());
+    final List<DatasetRow> emptyDatasetRows = Arrays.asList();
+    final List<Dataset> datasets = DatasetMapper.map(emptyDatasetRows);
+    assertNotNull(datasets);
+    assertEquals(0, datasets.size());
   }
 
   @Test(expected = NullPointerException.class)
