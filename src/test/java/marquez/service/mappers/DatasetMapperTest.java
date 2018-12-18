@@ -14,7 +14,6 @@ import marquez.service.models.Dataset;
 import org.junit.Test;
 
 public class DatasetMapperTest {
-  private static final DatasetMapper DATASET_MAPPER = new DatasetMapper();
   private static final DatasetUrn DATASET_URN = DatasetUrn.of("urn:a:b.c");
   private static final Instant CREATED_AT = Instant.now();
   private static final Instant UPDATED_AT = Instant.now();
@@ -23,7 +22,7 @@ public class DatasetMapperTest {
   public void testMapDataset() {
     final Description nonEmptyDescription = Description.of("test description");
     final DatasetRow datasetRow = newDatasetRow(nonEmptyDescription);
-    final Dataset dataset = DATASET_MAPPER.map(datasetRow);
+    final Dataset dataset = DatasetMapper.map(datasetRow);
     assertNotNull(dataset);
     assertEquals(DATASET_URN, dataset.getUrn());
     assertEquals(CREATED_AT, dataset.getCreatedAt());
@@ -33,7 +32,7 @@ public class DatasetMapperTest {
   @Test
   public void testMapDatasetNoDescription() {
     final DatasetRow datasetRow = newDatasetRow(NO_DESCRIPTION);
-    final Dataset dataset = DATASET_MAPPER.map(datasetRow);
+    final Dataset dataset = DatasetMapper.map(datasetRow);
     assertNotNull(dataset);
     assertEquals(DATASET_URN, dataset.getUrn());
     assertEquals(CREATED_AT, dataset.getCreatedAt());
@@ -43,7 +42,7 @@ public class DatasetMapperTest {
   @Test(expected = NullPointerException.class)
   public void testMapDatasetNullDatasetRow() {
     final DatasetRow nullDatasetRow = null;
-    DATASET_MAPPER.map(nullDatasetRow);
+    DatasetMapper.map(nullDatasetRow);
   }
 
   private DatasetRow newDatasetRow(Description description) {

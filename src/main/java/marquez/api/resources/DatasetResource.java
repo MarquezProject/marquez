@@ -27,7 +27,6 @@ import marquez.service.models.Dataset;
 
 @Path("/api/v1")
 public final class DatasetResource {
-  private final DatasetResponseMapper datasetResponseMapper = new DatasetResponseMapper();
   private final NamespaceService namespaceService;
   private final DatasetService datasetService;
 
@@ -55,7 +54,7 @@ public final class DatasetResource {
     }
     final List<Dataset> datasets =
         datasetService.getAll(Namespace.of(namespaceString), limit, offset);
-    final List<DatasetResponse> datasetResponses = datasetResponseMapper.map(datasets);
+    final List<DatasetResponse> datasetResponses = DatasetResponseMapper.map(datasets);
     return Response.ok(new DatasetsResponse(datasetResponses)).build();
   }
 }

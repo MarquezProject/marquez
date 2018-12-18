@@ -13,7 +13,6 @@ import marquez.service.models.Dataset;
 import org.junit.Test;
 
 public class DatasetResponseMapperTest {
-  private static final DatasetResponseMapper DATASET_RESPONSE_MAPPER = new DatasetResponseMapper();
   private static final DatasetUrn DATASET_URN = DatasetUrn.of("urn:a:b.c");
   private static final Instant CREATED_AT = Instant.now();
 
@@ -22,7 +21,7 @@ public class DatasetResponseMapperTest {
     final Description nonEmptyDescription = Description.of("test description");
     final Optional<String> nonEmptyDescriptionString = Optional.of(nonEmptyDescription.getValue());
     final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, nonEmptyDescription);
-    final DatasetResponse datasetResponse = DATASET_RESPONSE_MAPPER.map(dataset);
+    final DatasetResponse datasetResponse = DatasetResponseMapper.map(dataset);
     assertNotNull(datasetResponse);
     assertEquals(DATASET_URN.getValue(), datasetResponse.getUrn());
     assertEquals(CREATED_AT.toString(), datasetResponse.getCreatedAt());
@@ -33,7 +32,7 @@ public class DatasetResponseMapperTest {
   public void testMapDatasetResponseNoDescription() {
     final Optional<String> noDescriptionString = Optional.of(NO_DESCRIPTION.getValue());
     final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
-    final DatasetResponse datasetResponse = DATASET_RESPONSE_MAPPER.map(dataset);
+    final DatasetResponse datasetResponse = DatasetResponseMapper.map(dataset);
     assertNotNull(datasetResponse);
     assertEquals(DATASET_URN.getValue(), datasetResponse.getUrn());
     assertEquals(CREATED_AT.toString(), datasetResponse.getCreatedAt());
@@ -43,6 +42,6 @@ public class DatasetResponseMapperTest {
   @Test(expected = NullPointerException.class)
   public void testMapDatasetResponseNullDataset() {
     final Dataset nullDataset = null;
-    DATASET_RESPONSE_MAPPER.map(nullDataset);
+    DatasetResponseMapper.map(nullDataset);
   }
 }
