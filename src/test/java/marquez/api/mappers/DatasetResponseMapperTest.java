@@ -44,6 +44,5 @@ public class DatasetResponseMapperTest {
   public void testMapDatasetResponseNullDataset() {
     final Dataset nullDataset = null;
     DATASET_RESPONSE_MAPPER.map(nullDataset);
-    ;
   }
 }

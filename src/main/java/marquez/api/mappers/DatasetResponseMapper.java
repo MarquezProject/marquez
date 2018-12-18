@@ -6,11 +6,12 @@ import marquez.common.Mapper;
 import marquez.service.models.Dataset;
 
 public final class DatasetResponseMapper implements Mapper<Dataset, DatasetResponse> {
+
   @Override
   public DatasetResponse map(@NonNull Dataset dataset) {
     return new DatasetResponse(
         dataset.getUrn().getValue(),
         dataset.getCreatedAt().toString(),
-        dataset.getDescription().map(x -> x.getValue()).orElse(null));
+        dataset.getDescription().map((desc) -> desc.getValue()).orElse(null));
   }
 }
