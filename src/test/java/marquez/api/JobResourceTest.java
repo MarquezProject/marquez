@@ -161,6 +161,23 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testUpdateJobRunInternalErrorHandling() throws UnexpectedException {
+    UUID externalRunId = UUID.randomUUID();
+    marquez.core.models.JobRun generatedJobRun = Generator.genJobRun();
+
+    when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
+    when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
+    Response res = markJobRunComplete(externalRunId);
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+
+    res = markJobRunFailed(externalRunId);
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+
+    res = markJobRunAborted(externalRunId);
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+  }
+
+  @Test
   public void testJobRunCreationWithInvalidNamespace() throws UnexpectedException {
     JobRun jobRunForJobRunCreationRequest = generateApiJobRun();
 
@@ -234,16 +251,16 @@ public class JobResourceTest {
 
   private Response markJobRunComplete(UUID jobRunId) {
     String path = format("/api/v1/jobs/runs/%s/complete", jobRunId);
-    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(Entity.json(""));
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(EMPTY_PUT_BODY);
   }
 
   private Response markJobRunAborted(UUID jobRunId) {
     String path = format("/api/v1/jobs/runs/%s/abort", jobRunId);
-    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(Entity.json(""));
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(EMPTY_PUT_BODY);
   }
 
   private Response markJobRunFailed(UUID jobRunId) {
-    String path = format("/api/v1/jobs/runs/%s/failed", jobRunId);
+    String path = format("/api/v1/jobs/runs/%s/fail", jobRunId);
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(EMPTY_PUT_BODY);
   }
 
