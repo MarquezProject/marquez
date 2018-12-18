@@ -61,27 +61,6 @@ public class JobDAOTest {
             });
   }
 
-  // this is a simple insert outside of JobDAO we can use to test findByID
-  private void naiveInsertJob(Job job, JobVersion jobVersion) {
-    APP.getJDBI()
-        .useHandle(
-            handle -> {
-              handle.execute(
-                  "INSERT INTO jobs(guid, name, namespace_guid, current_version_guid)"
-                      + "VALUES (?, ?, ?, ?);",
-                  job.getGuid(),
-                  job.getName(),
-                  nsID,
-                  jobVersion.getGuid());
-              handle.execute(
-                  "INSERT INTO job_versions(guid, job_guid, uri, version) VALUES(?, ?, ?, ?);",
-                  jobVersion.getGuid(),
-                  jobVersion.getJobGuid(),
-                  jobVersion.getUri(),
-                  jobVersion.getVersion());
-            });
-  }
-
   private void assertJobFieldsMatch(Job job1, Job job2) {
     assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
     assertEquals(job1.getGuid(), job2.getGuid());
@@ -126,14 +105,28 @@ public class JobDAOTest {
 
     try {
       Job jobWithDiffNsSameName =
-          new Job(UUID.randomUUID(), job.getName(), "location", newNamespaceId, "desc");
+          new Job(
+              UUID.randomUUID(),
+              job.getName(),
+              "location",
+              newNamespaceId,
+              "desc",
+              Collections.<String>emptyList(),
+              Collections.<String>emptyList());
       jobDAO.insert(jobWithDiffNsSameName);
     } catch (UnableToExecuteStatementException e) {
       fail("failed to insert a job with the same name into a different namespace");
     }
 
     Job jobWithSameNsSameName =
-        new Job(UUID.randomUUID(), job.getName(), "location", job.getNamespaceGuid(), "desc");
+        new Job(
+            UUID.randomUUID(),
+            job.getName(),
+            "location",
+            job.getNamespaceGuid(),
+            "desc",
+            Collections.<String>emptyList(),
+            Collections.<String>emptyList());
     jobDAO.insert(jobWithSameNsSameName);
   }
 
