@@ -165,9 +165,10 @@ public class JobResourceTest {
         .thenThrow(new UnexpectedException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.of(Generator.genJob()));
 
-    Job jobForJobCreationRequest = generateApiJob();
-    Response res = insertJob(jobForJobCreationRequest);
+    JobRun jobForJobCreationRequest = generateApiJobRun();
+    Response res = insertJobRun(jobForJobCreationRequest);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
 
