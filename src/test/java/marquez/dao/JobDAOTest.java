@@ -1,6 +1,5 @@
 package marquez.dao;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -53,42 +52,19 @@ public class JobDAOTest {
             });
   }
 
-  // this is a simple insert outside of JobDAO we can use to test findByID
-  private void naiveInsertJob(Job job, JobVersion jobVersion) {
-    APP.getJDBI()
-        .useHandle(
-            handle -> {
-              handle.execute(
-                  "INSERT INTO jobs(guid, name, namespace_guid, current_version_guid, input_dataset_urns, output_dataset_urns)"
-                      + "VALUES (?, ?, ?, ?, ?, ?);",
-                  job.getGuid(),
-                  job.getName(),
-                  nsID,
-                  jobVersion.getGuid(),
-                  job.getInputDatasetUrns(),
-                  job.getOutputDatasetUrns());
-              handle.execute(
-                  "INSERT INTO job_versions(guid, job_guid, uri, version) VALUES(?, ?, ?, ?);",
-                  jobVersion.getGuid(),
-                  jobVersion.getJobGuid(),
-                  jobVersion.getUri(),
-                  jobVersion.getVersion());
-            });
-  }
-
   private void assertJobFieldsMatch(Job job1, Job job2) {
     assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
     assertEquals(job1.getGuid(), job2.getGuid());
     assertEquals(job1.getName(), job2.getName());
     assertEquals(job1.getLocation(), job2.getLocation());
     assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
-    assertArrayEquals(job1.getInputDatasetUrns(), job2.getInputDatasetUrns());
-    assertArrayEquals(job1.getOutputDatasetUrns(), job2.getOutputDatasetUrns());
+    assertEquals(job1.getInputDatasetUrns(), job2.getInputDatasetUrns());
+    assertEquals(job1.getOutputDatasetUrns(), job2.getOutputDatasetUrns());
   }
 
   @Test
   public void testFindByID() {
-    naiveInsertJob(job, jobVersion);
+    jobDAO.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDAO.findByID(job.getGuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
@@ -96,7 +72,7 @@ public class JobDAOTest {
   }
 
   public void testFindByName() {
-    naiveInsertJob(job, jobVersion);
+    jobDAO.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDAO.findByName(nsName, job.getName());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);

@@ -1,6 +1,7 @@
 package marquez.core.models;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
@@ -28,8 +29,8 @@ public class Generator {
         "http://foo.bar/" + jobNum,
         namespaceID,
         null,
-        new String[] {randUrn(), randUrn()},
-        new String[] {randUrn(), randUrn()});
+        Arrays.asList(randUrn(), randUrn()),
+        Arrays.asList(randUrn(), randUrn()));
   }
 
   public static Job cloneJob(Job job) {

@@ -1,6 +1,7 @@
 package marquez.core.models;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,8 +15,8 @@ public final class Job {
   @NonNull private final String location;
   @NonNull private final UUID namespaceGuid;
   private final String description;
-  private final String[] inputDatasetUrns;
-  private final String[] outputDatasetUrns;
+  private final List<String> inputDatasetUrns;
+  private final List<String> outputDatasetUrns;
   private final Timestamp createdAt;
 
   public Job(
@@ -24,8 +25,8 @@ public final class Job {
       final String location,
       final UUID namespaceGuid,
       final String description,
-      final String[] inputDatasetUrns,
-      final String[] outputDatasetUrns) {
+      final List<String> inputDatasetUrns,
+      final List<String> outputDatasetUrns) {
     this.guid = guid;
     this.name = name;
     this.location = location;

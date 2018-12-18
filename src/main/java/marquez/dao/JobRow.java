@@ -2,12 +2,15 @@ package marquez.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 import marquez.core.models.Job;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
 public final class JobRow implements RowMapper<Job> {
+
   @Override
   public Job map(final ResultSet rs, final StatementContext ctx) throws SQLException {
     return new Job(
@@ -17,11 +20,11 @@ public final class JobRow implements RowMapper<Job> {
         UUID.fromString(rs.getString("namespace_guid")),
         rs.getString("description"),
         (rs.getArray("input_dataset_urns") != null)
-            ? (String[]) rs.getArray("input_dataset_urns").getArray()
-            : new String[0],
+            ? Arrays.asList((String[]) rs.getArray("input_dataset_urns").getArray())
+            : Collections.<String>emptyList(),
         (rs.getArray("output_dataset_urns") != null)
-            ? (String[]) rs.getArray("output_dataset_urns").getArray()
-            : new String[0],
+            ? Arrays.asList((String[]) rs.getArray("output_dataset_urns").getArray())
+            : Collections.<String>emptyList(),
         rs.getTimestamp("created_at"));
   }
 }
