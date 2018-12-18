@@ -11,8 +11,8 @@ public final class DataSourceRowMapper {
   public static DataSourceRow map(@NonNull DbTableVersion dbTableVersion) {
     return DataSourceRow.builder()
         .uuid(UUID.randomUUID())
-        .dataSource(dbTableVersion.getConnectionUrl().getDataSource())
-        .connectionUrl(dbTableVersion.getConnectionUrl())
+        .dataSource(dbTableVersion.getConnectionUrl().getDataSource().getValue())
+        .connectionUrl(dbTableVersion.getConnectionUrl().getRawValue())
         .build();
   }
 }

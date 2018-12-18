@@ -5,7 +5,6 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import marquez.common.models.DbTable;
 
 @Data
 @Builder
@@ -14,5 +13,5 @@ public final class DbTableVersionRow {
   @NonNull private final Instant createdAt;
   @NonNull private final UUID datasetUuid;
   @NonNull private final UUID dbTableInfoUuid;
-  @NonNull private final DbTable dbTable;
+  @NonNull private final String dbTable;
 }

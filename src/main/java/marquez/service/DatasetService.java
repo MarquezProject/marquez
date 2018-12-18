@@ -47,9 +47,9 @@ public class DatasetService {
     }
   }
 
-  public Optional<Dataset> get(@NonNull DatasetUrn datasetUrn) throws UnexpectedException {
+  public Optional<Dataset> get(@NonNull DatasetUrn urn) throws UnexpectedException {
     try {
-      final Optional<DatasetRow> datasetRowIfFound = datasetDao.findBy(datasetUrn);
+      final Optional<DatasetRow> datasetRowIfFound = datasetDao.findBy(urn);
       return datasetRowIfFound.map(DatasetMapper::map);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
@@ -61,7 +61,7 @@ public class DatasetService {
       @NonNull Namespace namespace, @NonNull Integer limit, @NonNull Integer offset)
       throws UnexpectedException {
     try {
-      final List<DatasetRow> datasetRows = datasetDao.findAll(namespace, limit, offset);
+      final List<DatasetRow> datasetRows = datasetDao.findAll(namespace.getValue(), limit, offset);
       return Collections.unmodifiableList(DatasetMapper.map(datasetRows));
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());

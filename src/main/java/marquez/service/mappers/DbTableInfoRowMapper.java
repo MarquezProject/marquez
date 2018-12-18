@@ -11,8 +11,8 @@ public final class DbTableInfoRowMapper {
   public static DbTableInfoRow map(@NonNull DbTableVersion dbTableVersion) {
     return DbTableInfoRow.builder()
         .uuid(UUID.randomUUID())
-        .db(dbTableVersion.getConnectionUrl().getDb())
-        .dbSchema(dbTableVersion.getDbSchema())
+        .db(dbTableVersion.getConnectionUrl().getDb().getValue())
+        .dbSchema(dbTableVersion.getDbSchema().getValue())
         .build();
   }
 }

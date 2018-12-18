@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 import lombok.NonNull;
-import marquez.common.models.DbTable;
 import marquez.db.models.DbTableVersionRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -18,7 +17,7 @@ public final class DbTableVersionRowMapper implements RowMapper<DbTableVersionRo
         .createdAt(results.getDate("created_at").toInstant())
         .datasetUuid(UUID.fromString(results.getString("dataset_uuid")))
         .dbTableInfoUuid(UUID.fromString(results.getString("db_table_info_uuid")))
-        .dbTable(DbTable.of(results.getString("db_table")))
+        .dbTable(results.getString("db_table"))
         .build();
   }
 }

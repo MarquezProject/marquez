@@ -4,8 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 import lombok.NonNull;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DataSource;
 import marquez.db.models.DataSourceRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -17,8 +15,8 @@ public final class DataSourceRowMapper implements RowMapper<DataSourceRow> {
     return DataSourceRow.builder()
         .uuid(UUID.fromString(results.getString("uuid")))
         .createdAt(results.getDate("created_at").toInstant())
-        .dataSource(DataSource.of(results.getString("data_source")))
-        .connectionUrl(ConnectionUrl.of(results.getString("connection_url")))
+        .dataSource(results.getString("data_source"))
+        .connectionUrl(results.getString("connection_url"))
         .build();
   }
 }
