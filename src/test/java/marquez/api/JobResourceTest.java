@@ -133,6 +133,17 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testGetAllJobsInNamespaceErrorHandling() throws UnexpectedException {
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME))
+        .thenThrow(new UnexpectedException());
+
+    String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
+    Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+  }
+
+  @Test
   public void testGetAllJobsInNamespace() throws UnexpectedException {
     marquez.core.models.Job job1 = Generator.genJob();
     marquez.core.models.Job job2 = Generator.genJob();
@@ -154,9 +165,27 @@ public class JobResourceTest {
         .thenThrow(new UnexpectedException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.of(Generator.genJob()));
 
-    Job jobForJobCreationRequest = generateApiJob();
-    Response res = insertJob(jobForJobCreationRequest);
+    JobRun jobForJobCreationRequest = generateApiJobRun();
+    Response res = insertJobRun(jobForJobCreationRequest);
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+  }
+
+  @Test
+  public void testUpdateJobRunInternalErrorHandling() throws UnexpectedException {
+    UUID externalRunId = UUID.randomUUID();
+    marquez.core.models.JobRun generatedJobRun = Generator.genJobRun();
+
+    when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
+    when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
+    Response res = markJobRunComplete(externalRunId);
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+
+    res = markJobRunFailed(externalRunId);
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+
+    res = markJobRunAborted(externalRunId);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
 
@@ -234,16 +263,16 @@ public class JobResourceTest {
 
   private Response markJobRunComplete(UUID jobRunId) {
     String path = format("/api/v1/jobs/runs/%s/complete", jobRunId);
-    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(Entity.json(""));
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(EMPTY_PUT_BODY);
   }
 
   private Response markJobRunAborted(UUID jobRunId) {
     String path = format("/api/v1/jobs/runs/%s/abort", jobRunId);
-    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(Entity.json(""));
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(EMPTY_PUT_BODY);
   }
 
   private Response markJobRunFailed(UUID jobRunId) {
-    String path = format("/api/v1/jobs/runs/%s/failed", jobRunId);
+    String path = format("/api/v1/jobs/runs/%s/fail", jobRunId);
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(EMPTY_PUT_BODY);
   }
 
