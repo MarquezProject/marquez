@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import marquez.core.models.Generator;
@@ -108,5 +109,25 @@ public class JobDAOTest {
     List<Job> jobsFound = jobDAO.findAllInNamespace(nsName);
     assertEquals(jobs.size(), jobsFound.size());
     assertEquals(0, jobDAO.findAllInNamespace("nonexistent").size());
+  }
+
+  @Test
+  public void testFetchJob_EmptyUrns() {
+    UUID jobId = UUID.randomUUID();
+    Job jobWithEmptyInputsOutputs =
+        new Job(
+            jobId,
+            "job",
+            "location",
+            nsID,
+            "description",
+            Collections.<String>emptyList(),
+            Collections.<String>emptyList(),
+            null);
+    JobVersion jobVersion = Generator.genJobVersion(jobWithEmptyInputsOutputs);
+    jobDAO.insertJobAndVersion(jobWithEmptyInputsOutputs, jobVersion);
+    Job jobFound = jobDAO.findByID(jobId);
+    assertEquals(0, jobFound.getInputDatasetUrns().size());
+    assertEquals(0, jobFound.getOutputDatasetUrns().size());
   }
 }
