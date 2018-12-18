@@ -1,20 +1,36 @@
 package marquez.core.models;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
 public class Generator {
+  private static Random rand = new Random();
+
+  private static int randNum() {
+    return rand.nextInt(10000);
+  }
+
+  private static String randUrn() {
+    return String.format("urn:rand:%d.%d.%d", randNum(), randNum(), randNum());
+  }
+
   public static Job genJob() {
     return genJob(UUID.randomUUID());
   }
 
   public static Job genJob(UUID namespaceID) {
-    Random r = new Random();
-    int jobNum = r.nextInt(10000);
+    int jobNum = randNum();
     return new Job(
-        UUID.randomUUID(), "job" + jobNum, "http://foo.bar/" + jobNum, namespaceID, null);
+        UUID.randomUUID(),
+        "job" + jobNum,
+        "http://foo.bar/" + jobNum,
+        namespaceID,
+        null,
+        Arrays.asList(randUrn(), randUrn()),
+        Arrays.asList(randUrn(), randUrn()));
   }
 
   public static Job cloneJob(Job job) {
@@ -24,6 +40,8 @@ public class Generator {
         job.getLocation(),
         job.getNamespaceGuid(),
         job.getDescription(),
+        job.getInputDatasetUrns(),
+        job.getOutputDatasetUrns(),
         job.getCreatedAt());
   }
 
@@ -97,8 +115,7 @@ public class Generator {
   }
 
   public static Namespace genNamespace() {
-    Random r = new Random();
-    int nsNum = r.nextInt(10000);
+    int nsNum = randNum();
     return new Namespace(UUID.randomUUID(), "ns" + nsNum, "ns owner" + nsNum, "ns desc" + nsNum);
   }
 

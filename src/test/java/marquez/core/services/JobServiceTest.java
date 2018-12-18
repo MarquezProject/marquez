@@ -56,6 +56,16 @@ public class JobServiceTest {
     reset(runArgsDAO);
   }
 
+  private void assertJobFieldsMatch(Job job1, Job job2) {
+    assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
+    assertEquals(job1.getGuid(), job2.getGuid());
+    assertEquals(job1.getName(), job2.getName());
+    assertEquals(job1.getLocation(), job2.getLocation());
+    assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
+    assertEquals(job1.getInputDatasetUrns(), job2.getInputDatasetUrns());
+    assertEquals(job1.getOutputDatasetUrns(), job2.getOutputDatasetUrns());
+  }
+
   @Test
   public void testGetAll_OK() throws UnexpectedException {
     List<Job> jobs = new ArrayList<Job>();
@@ -104,10 +114,14 @@ public class JobServiceTest {
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
     Job job = Generator.genJob(namespaceID);
     when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(null);
-    jobService.createJob(TEST_NS, job);
+    Job jobReturned = jobService.createJob(TEST_NS, job);
     verify(jobDAO).insertJobAndVersion(jobCaptor.capture(), jobVersionCaptor.capture());
-    assertEquals(job.getName(), jobCaptor.getValue().getName());
-    assertEquals(job.getLocation(), jobVersionCaptor.getValue().getUri());
+    assertEquals(job.getNamespaceGuid(), jobReturned.getNamespaceGuid());
+    assertEquals(job.getName(), jobReturned.getName());
+    assertEquals(job.getLocation(), jobReturned.getLocation());
+    assertEquals(job.getNamespaceGuid(), jobReturned.getNamespaceGuid());
+    assertEquals(job.getInputDatasetUrns(), jobReturned.getInputDatasetUrns());
+    assertEquals(job.getOutputDatasetUrns(), jobReturned.getOutputDatasetUrns());
   }
 
   @Test
@@ -117,7 +131,7 @@ public class JobServiceTest {
     when(jobDAO.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
     Job jobCreated = jobService.createJob(TEST_NS, newJob);
     verify(jobDAO, never()).insert(newJob);
-    assertEquals(existingJob, jobCreated);
+    assertJobFieldsMatch(existingJob, jobCreated);
   }
 
   @Test
@@ -150,7 +164,7 @@ public class JobServiceTest {
             null);
     when(jobDAO.findByName(TEST_NS, existingJob.getName())).thenReturn(existingJob);
     when(jobVersionDAO.findByVersion(existingJobVersionID)).thenReturn(existingJobVersion);
-    assertEquals(existingJob, jobService.createJob(TEST_NS, newJob));
+    assertJobFieldsMatch(existingJob, jobService.createJob(TEST_NS, newJob));
     verify(jobDAO, never()).insert(newJob);
     verify(jobVersionDAO, never()).insert(any(JobVersion.class));
   }

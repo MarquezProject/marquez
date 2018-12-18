@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import marquez.core.models.Generator;
@@ -23,8 +24,8 @@ public class JobDAOTest {
   final JobDAO jobDAO = APP.onDemand(JobDAO.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
-  Job job;
-  JobVersion jobVersion;
+  Job job = Generator.genJob(nsID);;
+  JobVersion jobVersion = Generator.genJobVersion(job);
 
   @Before
   public void setUp() {
@@ -37,8 +38,6 @@ public class JobDAOTest {
                   nsName,
                   "Amaranta");
             });
-    job = Generator.genJob(nsID);
-    jobVersion = Generator.genJobVersion(job);
   }
 
   @After
@@ -54,36 +53,19 @@ public class JobDAOTest {
             });
   }
 
-  // this is a simple insert outside of JobDAO we can use to test findByID
-  private void naiveInsertJob(Job job, JobVersion jobVersion) {
-    APP.getJDBI()
-        .useHandle(
-            handle -> {
-              handle.execute(
-                  "INSERT INTO jobs(guid, name, namespace_guid, current_version_guid)"
-                      + "VALUES (?, ?, ?, ?);",
-                  job.getGuid(),
-                  job.getName(),
-                  nsID,
-                  jobVersion.getGuid());
-              handle.execute(
-                  "INSERT INTO job_versions(guid, job_guid, uri, version) VALUES(?, ?, ?, ?);",
-                  jobVersion.getGuid(),
-                  jobVersion.getJobGuid(),
-                  jobVersion.getUri(),
-                  jobVersion.getVersion());
-            });
-  }
-
   private void assertJobFieldsMatch(Job job1, Job job2) {
     assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
     assertEquals(job1.getGuid(), job2.getGuid());
     assertEquals(job1.getName(), job2.getName());
+    assertEquals(job1.getLocation(), job2.getLocation());
+    assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
+    assertEquals(job1.getInputDatasetUrns(), job2.getInputDatasetUrns());
+    assertEquals(job1.getOutputDatasetUrns(), job2.getOutputDatasetUrns());
   }
 
   @Test
   public void testFindByID() {
-    naiveInsertJob(job, jobVersion);
+    jobDAO.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDAO.findByID(job.getGuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
@@ -91,7 +73,7 @@ public class JobDAOTest {
   }
 
   public void testFindByName() {
-    naiveInsertJob(job, jobVersion);
+    jobDAO.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDAO.findByName(nsName, job.getName());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
@@ -100,7 +82,7 @@ public class JobDAOTest {
 
   @Test
   public void testInsert() {
-    JobVersion jobVersion = Generator.genJobVersion(job.getGuid());
+    JobVersion jobVersion = Generator.genJobVersion(job);
     jobDAO.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDAO.findByID(job.getGuid());
     assertNotNull(jobFound);
@@ -122,10 +104,30 @@ public class JobDAOTest {
         Arrays.asList(Generator.genJob(nsID), Generator.genJob(nsID), Generator.genJob(nsID));
     jobs.forEach(
         job -> {
-          jobDAO.insertJobAndVersion(job, Generator.genJobVersion(job.getGuid()));
+          jobDAO.insertJobAndVersion(job, Generator.genJobVersion(job));
         });
     List<Job> jobsFound = jobDAO.findAllInNamespace(nsName);
     assertEquals(jobs.size(), jobsFound.size());
     assertEquals(0, jobDAO.findAllInNamespace("nonexistent").size());
+  }
+
+  @Test
+  public void testFetchJob_EmptyUrns() {
+    UUID jobId = UUID.randomUUID();
+    Job jobWithEmptyInputsOutputs =
+        new Job(
+            jobId,
+            "job",
+            "location",
+            nsID,
+            "description",
+            Collections.<String>emptyList(),
+            Collections.<String>emptyList(),
+            null);
+    JobVersion jobVersion = Generator.genJobVersion(jobWithEmptyInputsOutputs);
+    jobDAO.insertJobAndVersion(jobWithEmptyInputsOutputs, jobVersion);
+    Job jobFound = jobDAO.findByID(jobId);
+    assertEquals(0, jobFound.getInputDatasetUrns().size());
+    assertEquals(0, jobFound.getOutputDatasetUrns().size());
   }
 }
