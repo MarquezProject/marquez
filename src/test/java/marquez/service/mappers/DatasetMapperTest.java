@@ -22,7 +22,7 @@ public class DatasetMapperTest {
   private static final Instant UPDATED_AT = Instant.now();
 
   @Test
-  public void testMapDataset() {
+  public void testMapDatasetRow() {
     final DatasetRow datasetRow = newDatasetRow(NON_EMPTY_DESCRIPTION);
     final Dataset dataset = DatasetMapper.map(datasetRow);
     assertNotNull(dataset);
@@ -32,7 +32,7 @@ public class DatasetMapperTest {
   }
 
   @Test
-  public void testMapDatasetNoDescription() {
+  public void testMapDatasetRowNoDescription() {
     final DatasetRow datasetRow = newDatasetRow(NO_DESCRIPTION);
     final Dataset dataset = DatasetMapper.map(datasetRow);
     assertNotNull(dataset);
@@ -42,7 +42,7 @@ public class DatasetMapperTest {
   }
 
   @Test
-  public void testMapDatasetList() {
+  public void testMapDatasetRowList() {
     final List<DatasetRow> datasetiRows = Arrays.asList(newDatasetRow(NON_EMPTY_DESCRIPTION));
     final List<Dataset> datasetRows = DatasetMapper.map(datasetiRows);
     assertNotNull(datasetRows);
@@ -50,7 +50,7 @@ public class DatasetMapperTest {
   }
 
   @Test
-  public void testMapEmptyDatasetList() {
+  public void testMapEmptyDatasetRowList() {
     final List<DatasetRow> emptyDatasetRows = Arrays.asList();
     final List<Dataset> datasets = DatasetMapper.map(emptyDatasetRows);
     assertNotNull(datasets);
@@ -58,7 +58,13 @@ public class DatasetMapperTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testMapDatasetNullDatasetRow() {
+  public void testMapNullDatasetRowList() {
+    final List<DatasetRow> nullDatasetRowList = null;
+    DatasetMapper.map(nullDatasetRowList);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testMapNullDatasetRow() {
     final DatasetRow nullDatasetRow = null;
     DatasetMapper.map(nullDatasetRow);
   }
