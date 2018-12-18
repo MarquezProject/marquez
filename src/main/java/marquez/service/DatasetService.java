@@ -61,7 +61,7 @@ public class DatasetService {
       @NonNull Namespace namespace, @NonNull Integer limit, @NonNull Integer offset)
       throws UnexpectedException {
     try {
-      final List<DatasetRow> datasetRows = datasetDao.findAll(namespace.getValue(), limit, offset);
+      final List<DatasetRow> datasetRows = datasetDao.findAll(namespace, limit, offset);
       return Collections.unmodifiableList(DatasetMapper.map(datasetRows));
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
