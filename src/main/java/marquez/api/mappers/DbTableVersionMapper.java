@@ -1,4 +1,4 @@
-package marquez.service.mappers;
+package marquez.api.mappers;
 
 import static marquez.common.models.Description.NO_DESCRIPTION;
 
