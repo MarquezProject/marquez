@@ -3,6 +3,7 @@ package marquez.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,6 +13,7 @@ import marquez.core.models.Generator;
 import marquez.core.models.Job;
 import marquez.core.models.JobVersion;
 import marquez.dao.fixtures.AppWithPostgresRule;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -24,20 +26,14 @@ public class JobDAOTest {
   final JobDAO jobDAO = APP.onDemand(JobDAO.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
-  Job job = Generator.genJob(nsID);;
+  Job job = Generator.genJob(nsID);
   JobVersion jobVersion = Generator.genJobVersion(job);
 
   @Before
   public void setUp() {
-    APP.getJDBI()
-        .useHandle(
-            handle -> {
-              handle.execute(
-                  "INSERT INTO namespaces(guid, name, current_ownership)" + "VALUES (?, ?, ?);",
-                  nsID,
-                  nsName,
-                  "Amaranta");
-            });
+    insertNamespace(nsID, nsName, "Amaranta");
+    job = Generator.genJob(nsID);
+    jobVersion = Generator.genJobVersion(job);
   }
 
   @After
@@ -50,6 +46,39 @@ public class JobDAOTest {
               handle.execute("DELETE FROM jobs;");
               handle.execute("DELETE FROM owners;");
               handle.execute("DELETE FROM namespaces;");
+            });
+  }
+
+  private void insertNamespace(UUID namespaceId, String name, String ownerName) {
+    APP.getJDBI()
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  "INSERT INTO namespaces(guid, name, current_ownership)" + "VALUES (?, ?, ?);",
+                  nsID,
+                  nsName,
+                  ownerName);
+            });
+  }
+
+  // this is a simple insert outside of JobDAO we can use to test findByID
+  private void naiveInsertJob(Job job, JobVersion jobVersion) {
+    APP.getJDBI()
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  "INSERT INTO jobs(guid, name, namespace_guid, current_version_guid)"
+                      + "VALUES (?, ?, ?, ?);",
+                  job.getGuid(),
+                  job.getName(),
+                  nsID,
+                  jobVersion.getGuid());
+              handle.execute(
+                  "INSERT INTO job_versions(guid, job_guid, uri, version) VALUES(?, ?, ?, ?);",
+                  jobVersion.getGuid(),
+                  jobVersion.getJobGuid(),
+                  jobVersion.getUri(),
+                  jobVersion.getVersion());
             });
   }
 
@@ -87,6 +116,25 @@ public class JobDAOTest {
     Job jobFound = jobDAO.findByID(job.getGuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
+  }
+
+  @Test(expected = UnableToExecuteStatementException.class)
+  public void testInsert_Duplicate() {
+    UUID newNamespaceId = UUID.randomUUID();
+    insertNamespace(newNamespaceId, "newNsForDupTest", "Amaranta");
+    jobDAO.insert(job);
+
+    try {
+      Job jobWithDiffNsSameName =
+          new Job(UUID.randomUUID(), job.getName(), "location", newNamespaceId, "desc");
+      jobDAO.insert(jobWithDiffNsSameName);
+    } catch (UnableToExecuteStatementException e) {
+      fail("failed to insert a job with the same name into a different namespace");
+    }
+
+    Job jobWithSameNsSameName =
+        new Job(UUID.randomUUID(), job.getName(), "location", job.getNamespaceGuid(), "desc");
+    jobDAO.insert(jobWithSameNsSameName);
   }
 
   @Test
