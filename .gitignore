@@ -3,6 +3,7 @@
 *.jar
 *.swp
 .classpath
+.editorconfig
 .gradle/
 .idea/
 .project
