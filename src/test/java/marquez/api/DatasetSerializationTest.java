@@ -11,10 +11,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("TODO: Need to figure out why this started to fail. Please see issue #140")
 public class DatasetSerializationTest {
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();

@@ -12,9 +12,9 @@ public final class Job {
   @NonNull private final UUID guid;
   @NonNull private final String name;
   @NonNull private final String location;
-  @NonNull private final UUID namespaceGuid;
+  @NonNull private UUID namespaceGuid;
   private String description;
-  private Timestamp createdAt = null;
+  private Timestamp createdAt;
 
   public Job(
       final UUID guid,

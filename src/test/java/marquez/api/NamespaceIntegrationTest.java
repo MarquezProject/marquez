@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URI;
+import java.sql.Timestamp;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,36 +22,36 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/namespaces/" + NAMESPACE_NAME)
+            .path("/api/v1/namespaces/" + NAMESPACE_NAME)
             .request(MediaType.APPLICATION_JSON)
             .put(Entity.json(createNamespaceRequest));
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
 
-    CreateNamespaceResponse responseBody = res.readEntity(CreateNamespaceResponse.class);
+    Namespace responseBody = res.readEntity(Namespace.class);
 
-    assertThat(responseBody.getNamespace().getCreatedAt()).isAfter(START_TIME);
-    assertThat(responseBody.getNamespace().getOwnerName()).isEqualTo(OWNER);
-    assertThat(responseBody.getNamespace().getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(Timestamp.valueOf(responseBody.getCreatedAt())).isAfter(START_TIME);
+    assertThat(responseBody.getOwner()).isEqualTo(OWNER);
+    assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
   }
 
   @Test
   public void testCreateNamespace_NoDup() {
     APP.client()
         .target(URI.create("http://localhost:" + APP.getLocalPort()))
-        .path("/namespaces/" + NAMESPACE_NAME)
+        .path("/api/v1/namespaces/" + NAMESPACE_NAME)
         .request(MediaType.APPLICATION_JSON)
         .put(Entity.json(createNamespaceRequest));
     Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/namespaces/" + NAMESPACE_NAME)
+            .path("/api/v1/namespaces/" + NAMESPACE_NAME)
             .request(MediaType.APPLICATION_JSON)
             .put(Entity.json(createNamespaceRequest));
-    CreateNamespaceResponse responseBody = res.readEntity(CreateNamespaceResponse.class);
+    Namespace responseBody = res.readEntity(Namespace.class);
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    assertThat(responseBody.getNamespace().getCreatedAt()).isAfter(START_TIME);
-    assertThat(responseBody.getNamespace().getOwnerName()).isEqualTo(OWNER);
-    assertThat(responseBody.getNamespace().getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(Timestamp.valueOf(responseBody.getCreatedAt())).isAfter(START_TIME);
+    assertThat(responseBody.getOwner()).isEqualTo(OWNER);
+    assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
   }
 
   @Test
@@ -58,9 +59,9 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/namespaces/" + "abc123")
+            .path("/api/v1/namespaces/" + "abc123")
             .request(MediaType.APPLICATION_JSON)
-            .put(Entity.json(new CreateNamespaceRequest("someOwner", null)));
+            .put(Entity.json(new CreateNamespaceRequest(null, "someDesc")));
     assertEquals(HTTP_UNPROCESSABLE_ENTITY, res.getStatus());
   }
 
@@ -69,7 +70,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/namespaces/")
+            .path("/api/v1/namespaces/")
             .request(MediaType.APPLICATION_JSON)
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
@@ -83,7 +84,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/namespaces/" + "nosuchnamespace")
+            .path("/api/v1/namespaces/" + "nosuchnamespace")
             .request(MediaType.APPLICATION_JSON)
             .get();
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
@@ -94,7 +95,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/namespace/" + NAMESPACE_NAME)
+            .path("/api/v1/namespace/" + NAMESPACE_NAME)
             .request(MediaType.APPLICATION_JSON)
             .put(Entity.json(createNamespaceRequest));
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());

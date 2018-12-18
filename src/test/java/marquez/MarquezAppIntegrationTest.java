@@ -21,7 +21,6 @@ public class MarquezAppIntegrationTest {
     APP.getJDBI()
         .useHandle(
             handle -> {
-              handle.execute("DELETE FROM job_run_definitions;");
               handle.execute("DELETE FROM job_versions;");
               handle.execute("DELETE FROM jobs;");
               handle.execute("DELETE FROM owners;");

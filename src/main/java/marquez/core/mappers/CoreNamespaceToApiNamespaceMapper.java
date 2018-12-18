@@ -10,7 +10,7 @@ public class CoreNamespaceToApiNamespaceMapper
     requireNonNull(namespace, "namespace must not be null");
     return new marquez.api.Namespace(
         namespace.getName(),
-        namespace.getCreatedAt(),
+        namespace.getCreatedAt().toString(),
         namespace.getOwnerName(),
         namespace.getDescription());
   }
