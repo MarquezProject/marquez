@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class JobIntegrationEdgeCaseTest {
+public class JobResourceTest {
 
   private static final JobService MOCK_JOB_SERVICE = mock(JobService.class);
   private static final NamespaceService MOCK_NAMESPACE_SERVICE = mock(NamespaceService.class);
