@@ -2,6 +2,7 @@ package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static marquez.api.mappers.DatasetResponseMapper.map;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -16,7 +17,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
-import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.Namespace;
@@ -54,7 +54,7 @@ public final class DatasetResource {
     }
     final List<Dataset> datasets =
         datasetService.getAll(Namespace.of(namespaceString), limit, offset);
-    final List<DatasetResponse> datasetResponses = DatasetResponseMapper.map(datasets);
+    final List<DatasetResponse> datasetResponses = map(datasets);
     return Response.ok(new DatasetsResponse(datasetResponses)).build();
   }
 }

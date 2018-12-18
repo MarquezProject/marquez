@@ -13,7 +13,7 @@ import marquez.service.models.DbTableVersion;
 public final class DbTableVersionMapper {
   private DbTableVersionMapper() {}
 
-  public DbTableVersion map(@NonNull DbTableVersionRequest request) {
+  public static DbTableVersion map(@NonNull DbTableVersionRequest request) {
     return new DbTableVersion(
         ConnectionUrl.of(request.getConnectionUrl()),
         DbSchema.of(request.getSchema()),
