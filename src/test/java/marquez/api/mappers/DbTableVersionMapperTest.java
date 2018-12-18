@@ -20,7 +20,8 @@ public class DbTableVersionMapperTest {
       ConnectionUrl.of("jdbc:postgresql://localhost:5432/marquez");
   private static final DbSchema DB_SCHEMA = DbSchema.of("novelists");
   private static final DbTable DB_TABLE = DbTable.of("marquez");
-  private static final Description DESCRIPTION = Description.of("test description");
+  private static final Description DESCRIPTION =
+      Description.of("It's enough for me to be sure that you and I exist as this moment");
 
   @Test
   public void testMapDbTableVersionRequest() {
