@@ -15,7 +15,6 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import lombok.extern.slf4j.Slf4j;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Generator;
 import marquez.core.services.JobService;
@@ -31,7 +30,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-@Slf4j
+
 public class JobIntegrationTest extends JobRunBaseTest {
 
   protected static final ObjectMapper MAPPER = Jackson.newObjectMapper();
@@ -118,7 +117,6 @@ public class JobIntegrationTest extends JobRunBaseTest {
     UUID returnedId = responseBody.getRunId();
     try {
       assertNotNull(returnedId);
-      log.info("Returned id is: " + returnedId);
     } finally {
       APP.getJDBI()
           .useHandle(
