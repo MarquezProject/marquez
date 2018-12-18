@@ -37,6 +37,7 @@ public class JobResourceTest {
   private static final JobResource JOB_RESOURCE =
       new JobResource(MOCK_NAMESPACE_SERVICE, MOCK_JOB_SERVICE);
   private static final String NAMESPACE_NAME = "someNamespace";
+  private static final Entity<?> EMPTY_PUT_BODY = Entity.json("");
 
   final int UNPROCESSABLE_ENTRY_STATUS_CODE = 422;
 
@@ -139,6 +140,7 @@ public class JobResourceTest {
 
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
     when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME)).thenReturn(jobsList);
+
     String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
@@ -164,7 +166,6 @@ public class JobResourceTest {
 
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
-
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.of(Generator.genJob()));
 
     Response res = insertJobRun(jobRunForJobRunCreationRequest);
@@ -243,7 +244,7 @@ public class JobResourceTest {
 
   private Response markJobRunFailed(UUID jobRunId) {
     String path = format("/api/v1/jobs/runs/%s/failed", jobRunId);
-    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(Entity.json(""));
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(EMPTY_PUT_BODY);
   }
 
   Job generateApiJob() {
