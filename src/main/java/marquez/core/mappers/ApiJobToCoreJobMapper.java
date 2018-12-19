@@ -1,6 +1,6 @@
 package marquez.core.mappers;
 
-import marquez.api.Job;
+import marquez.api.models.Job;
 
 public class ApiJobToCoreJobMapper extends Mapper<Job, marquez.core.models.Job> {
   @Override

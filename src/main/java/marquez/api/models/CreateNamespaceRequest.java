@@ -1,4 +1,4 @@
-package marquez.api;
+package marquez.api.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

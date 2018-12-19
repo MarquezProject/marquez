@@ -1,19 +1,15 @@
-package marquez.api;
+package marquez.api.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.UUID;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public final class JobRun {
-  @JsonProperty("runId")
-  @NotBlank
-  private UUID runId;
+public final class CreateJobRunRequest {
 
   @JsonProperty("nominalStartTime")
   private String nominalStartTime;
@@ -22,8 +18,6 @@ public final class JobRun {
   private String nominalEndTime;
 
   @JsonProperty("runArgs")
+  @NotNull
   private String runArgs;
-
-  @JsonProperty("runState")
-  private String runState;
 }

@@ -1,6 +1,6 @@
 package marquez.core.mappers;
 
-import marquez.api.JobRun;
+import marquez.api.models.JobRun;
 import marquez.core.models.JobRunState;
 
 public class CoreJobRunToApiJobRunMapper extends Mapper<marquez.core.models.JobRun, JobRun> {

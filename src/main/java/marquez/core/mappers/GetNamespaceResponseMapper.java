@@ -2,7 +2,7 @@ package marquez.core.mappers;
 
 import static java.util.Objects.requireNonNull;
 
-import marquez.api.GetNamespaceResponse;
+import marquez.api.models.GetNamespaceResponse;
 import marquez.core.models.Namespace;
 
 // TODO: Move to marquez.api.mappers pgk
