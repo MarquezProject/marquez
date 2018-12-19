@@ -5,7 +5,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,8 +13,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.CreateNamespaceRequest;
-import marquez.api.CreateNamespaceResponse;
 import marquez.api.ListNamespacesResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
@@ -24,13 +23,11 @@ import marquez.core.mappers.GetNamespaceResponseMapper;
 import marquez.core.mappers.NamespaceApiMapper;
 import marquez.core.models.Namespace;
 import marquez.core.services.NamespaceService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.validator.constraints.NotBlank;
 
-@Path("/namespaces")
-@Produces(APPLICATION_JSON)
+@Slf4j
+@Path("/api/v1")
 public class NamespaceResource extends BaseResource {
-  private static final Logger LOG = LoggerFactory.getLogger(NamespaceResource.class);
 
   private final NamespaceService namespaceService;
   private final GetNamespaceResponseMapper getNamespaceResponseMapper =
@@ -47,29 +44,29 @@ public class NamespaceResource extends BaseResource {
 
   @PUT
   @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   @Timed
-  @Path("/{namespace}")
+  @Path("/namespaces/{namespace}")
   public Response create(
-      @PathParam("namespace") String namespace, @Valid CreateNamespaceRequest request)
+      @PathParam("namespace") @NotBlank String namespace, @Valid CreateNamespaceRequest request)
       throws ResourceException {
-
     try {
       marquez.core.models.Namespace n =
           namespaceService.create(namespaceAPIMapper.of(namespace, request));
       return Response.status(Response.Status.OK)
-          .entity(new CreateNamespaceResponse(namespaceMapper.map(n)))
+          .entity(namespaceMapper.map(n))
           .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
 
   @GET
-  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   @Timed
-  @Path("/{namespace}")
+  @Path("/namespaces/{namespace}")
   public Response get(@PathParam("namespace") String namespace) throws ResourceException {
     try {
       Optional<Namespace> n = namespaceService.get(namespace);
@@ -83,30 +80,25 @@ public class NamespaceResource extends BaseResource {
         return Response.status(Response.Status.NOT_FOUND).type(APPLICATION_JSON).build();
       }
     } catch (UnexpectedException e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }
 
   @GET
-  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   @Timed
+  @Path("/namespaces")
   public Response listNamespaces() throws ResourceException {
-    // TODO: Implement this using the NamespaceService
     try {
       List<marquez.core.models.Namespace> namespaceCoreModels = namespaceService.listNamespaces();
       List<marquez.api.Namespace> namespaceList =
-          namespaceCoreModels
-              .stream()
-              .map(namespaceMapper::mapAsOptional)
-              .filter(Optional::isPresent)
-              .map(Optional::get)
-              .collect(Collectors.toList());
+          new CoreNamespaceToApiNamespaceMapper().map(namespaceCoreModels);
       return Response.status(Response.Status.OK)
           .entity(new ListNamespacesResponse(namespaceList))
           .build();
     } catch (UnexpectedException e) {
-      LOG.error(e.getLocalizedMessage());
+      log.error(e.getMessage(), e);
       throw new ResourceException();
     }
   }

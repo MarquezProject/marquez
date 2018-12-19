@@ -21,7 +21,9 @@ public interface JobDAO {
   @CreateSqlObject
   JobVersionDAO createJobVersionDAO();
 
-  @SqlUpdate("INSERT INTO jobs (guid, name, namespace_guid) VALUES (:guid, :name, :namespaceGuid)")
+  @SqlUpdate(
+      "INSERT INTO jobs (guid, name, namespace_guid, description, input_dataset_urns, output_dataset_urns) "
+          + " VALUES (:guid, :name, :namespaceGuid, :description, :inputDatasetUrns, :outputDatasetUrns)")
   public void insert(@BindBean Job job);
 
   @SqlUpdate("UPDATE jobs SET current_version_guid = :version_guid WHERE guid = :job_guid")

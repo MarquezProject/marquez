@@ -55,7 +55,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
         resources
-            .target("/namespaces/" + NAMESPACE_NAME)
+            .target("/api/v1/namespaces/" + NAMESPACE_NAME)
             .request()
             .put(Entity.json(createNamespaceRequest))
             .getStatus());
@@ -74,7 +74,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
     assertThat(responseBody.getNamespace().getName()).isEqualTo(NAMESPACE_NAME);
     assertThat(responseBody.getNamespace().getDescription()).isEqualTo(DESCRIPTION);
-    assertThat(responseBody.getNamespace().getOwnerName()).isEqualTo(OWNER);
+    assertThat(responseBody.getNamespace().getOwner()).isEqualTo(OWNER);
   }
 
   @Test
@@ -83,7 +83,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-        resources.target("/namespaces/" + NAMESPACE_NAME).request().get().getStatus());
+        resources.target("/api/v1/namespaces/" + NAMESPACE_NAME).request().get().getStatus());
   }
 
   @Test
@@ -114,7 +114,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     marquez.api.Namespace nsResponseFromList = responseBody.getNamespaces().get(0);
 
     assertThat(nsResponseFromList.getName()).isEqualTo(TEST_NAMESPACE.getName());
-    assertThat(nsResponseFromList.getOwnerName()).isEqualTo(TEST_NAMESPACE.getOwnerName());
+    assertThat(nsResponseFromList.getOwner()).isEqualTo(TEST_NAMESPACE.getOwnerName());
     assertThat(nsResponseFromList.getDescription()).isEqualTo(TEST_NAMESPACE.getDescription());
   }
 
@@ -150,6 +150,6 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-        resources.target("/namespaces/").request().get().getStatus());
+        resources.target("/api/v1/namespaces/").request().get().getStatus());
   }
 }
