@@ -1,19 +1,23 @@
 package marquez.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.UUID;
+import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public final class CreateJobRunRequest {
-  private final UUID runDefinitionId;
 
-  @JsonCreator
-  public CreateJobRunRequest(@JsonProperty("run_definition_id") final UUID runDefinitionId) {
-    this.runDefinitionId = runDefinitionId;
-  }
+  @JsonProperty("nominalStartTime")
+  private String nominalStartTime;
 
-  @JsonProperty("run_definition_id")
-  public UUID getRunDefinitionId() {
-    return runDefinitionId;
-  }
+  @JsonProperty("nominalEndTime")
+  private String nominalEndTime;
+
+  @JsonProperty("runArgs")
+  @NotNull
+  private String runArgs;
 }

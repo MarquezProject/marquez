@@ -1,6 +1,5 @@
 package marquez.api;
 
-import static marquez.api.JobRunState.State.toInt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -18,25 +17,34 @@ public class JobRunTest {
   private static final UUID JOB_RUN_UUID = UUID.randomUUID();
   private static final Timestamp STARTED_AT_TIME = Timestamp.from(Instant.now());
   private static final Timestamp ENDED_AT_TIME = Timestamp.from(Instant.now());
-  private static final UUID JOB_RUN_DEFINITION_UUID = UUID.randomUUID();
-  private static final Integer CURRENT_STATE = toInt(JobRunState.State.NEW);
+  private static final marquez.core.models.JobRunState.State CURRENT_STATE =
+      marquez.core.models.JobRunState.State.NEW;
+  private static final String RUN_ARGS = "--no-such-argument";
 
   private static final JobRun JOB_RUN =
       new JobRun(
-          JOB_RUN_UUID, STARTED_AT_TIME, ENDED_AT_TIME, JOB_RUN_DEFINITION_UUID, CURRENT_STATE);
+          JOB_RUN_UUID,
+          STARTED_AT_TIME.toString(),
+          ENDED_AT_TIME.toString(),
+          RUN_ARGS,
+          CURRENT_STATE.name());
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
   @Test
   public void testGuidSet() {
-    assertThat(JOB_RUN.getGuid().equals(JOB_RUN_UUID));
+    assertThat(JOB_RUN.getRunId().equals(JOB_RUN_UUID));
   }
 
   @Test
   public void testJobRunEquality() {
     JobRun jr2 =
         new JobRun(
-            JOB_RUN_UUID, STARTED_AT_TIME, ENDED_AT_TIME, JOB_RUN_DEFINITION_UUID, CURRENT_STATE);
+            JOB_RUN_UUID,
+            STARTED_AT_TIME.toString(),
+            ENDED_AT_TIME.toString(),
+            RUN_ARGS,
+            CURRENT_STATE.name());
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(jr2.equals(JOB_RUN));
@@ -46,7 +54,11 @@ public class JobRunTest {
   public void testHashCodeEquality() {
     JobRun jr2 =
         new JobRun(
-            JOB_RUN_UUID, STARTED_AT_TIME, ENDED_AT_TIME, JOB_RUN_DEFINITION_UUID, CURRENT_STATE);
+            JOB_RUN_UUID,
+            STARTED_AT_TIME.toString(),
+            ENDED_AT_TIME.toString(),
+            RUN_ARGS,
+            CURRENT_STATE.name());
     assertEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
@@ -55,10 +67,10 @@ public class JobRunTest {
     JobRun jr2 =
         new JobRun(
             UUID.randomUUID(),
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            CURRENT_STATE);
+            STARTED_AT_TIME.toString(),
+            ENDED_AT_TIME.toString(),
+            RUN_ARGS,
+            CURRENT_STATE.name());
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
   }
@@ -68,10 +80,10 @@ public class JobRunTest {
     JobRun jr2 =
         new JobRun(
             JOB_RUN_UUID,
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            toInt(JobRunState.State.COMPLETED));
+            STARTED_AT_TIME.toString(),
+            ENDED_AT_TIME.toString(),
+            RUN_ARGS,
+            CURRENT_STATE.name());
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
   }
 
@@ -80,10 +92,10 @@ public class JobRunTest {
     JobRun jr2 =
         new JobRun(
             UUID.randomUUID(),
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            CURRENT_STATE);
+            STARTED_AT_TIME.toString(),
+            ENDED_AT_TIME.toString(),
+            RUN_ARGS,
+            CURRENT_STATE.name());
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
@@ -92,10 +104,10 @@ public class JobRunTest {
     JobRun jr2 =
         new JobRun(
             JOB_RUN_UUID,
-            STARTED_AT_TIME,
-            ENDED_AT_TIME,
-            JOB_RUN_DEFINITION_UUID,
-            toInt(JobRunState.State.COMPLETED));
+            STARTED_AT_TIME.toString(),
+            ENDED_AT_TIME.toString(),
+            RUN_ARGS,
+            "RUNNING");
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 }

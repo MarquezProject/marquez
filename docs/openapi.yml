@@ -1,0 +1,613 @@
+openapi: 3.0.2
+info:
+  title: Marquez 
+  version: 0.1.0
+  description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
+    and **visualization** of a data ecosystem's metadata.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local API server
+paths:
+  /namespaces/{namespace}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+    put:
+      summary: Create a namespace
+      description: Creates a new namespace object. A namespace enables the contextual grouping of related
+        jobs and datasets. Namespaces must contain only letters (`a-z`, `A-Z`), numbers (`0-9`), or
+        underscores (`_`). A namespace is case-insensitive with a maximum length of `1024` characters.
+        Note jobs and datasets will be unique within a namespace, but not across namespaces.
+      tags:
+        - Namespaces
+      required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                owner:
+                  description: The owner of the namespace.
+                  type: string
+                description:
+                  description: The description of the namespace.
+                  type: string
+              required:
+                - owner
+              example:
+                owner: dataengineering
+                description: A namespace for core jobs and datasets at wework.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/namespace'
+    get:
+      summary: Retrieve a namespace
+      description: Returns a namespace.
+      tags:
+        - Namespaces
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/namespace'
+
+  /namespaces:
+    get:
+      summary: List all namespaces
+      description: Returns a list of namespaces.
+      tags:
+        - Namespaces
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/namespaces'
+ 
+  /namespaces/{namespace}/jobs/{job}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/job'
+    put:
+      summary: Create a job
+      description: Creates a new job object. All job objects are immutable and are uniquely identified by a generated ID.
+        Marquez will create a version of a job each time the contents of the object is modified. For example, the `location`
+        of a job may change over time resulting in new versions. The accumulated versions can be listed, used to rerun a
+        specific job version or possibly help debug a failed job run.
+      tags:
+        - Jobs
+      required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputDatasetUrns:
+                  description: The URN list of input datasets.
+                  type: array
+                  items:
+                    type: string
+                    format: URN
+                  uniqueItems: true
+                outputDatasetUrns:
+                  description: The URN list of output datasets.
+                  type: array
+                  items:
+                    type: string
+                    format: URN
+                  uniqueItems: true
+                location:
+                  description: The URI of the job source or artifact.
+                  type: string
+                  format: URI
+                description:
+                  description: The description of the job.
+                  type: string
+              required:
+                - inputDatasetUrns
+                - outputDatasetUrns
+                - location
+              example:
+                inputDatasetsUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
+                outputDatasetsUrns: ["urn:wework:wedata.room_bookings_7_days"]
+                location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+                description: Determine weekly room booking occupancy patterns.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job'
+    get:
+      summary: Retrieve a job
+      description: Retrieve a job.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job'
+
+  /namespaces/{namespace}/jobs:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+    get:
+      summary: List all jobs
+      description: Returns a list of jobs.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobs'
+
+  /namespaces/{namespace}/jobs/{job}/versions:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/job'
+    get:
+      summary: List all job versions
+      description: Returns a list of job versions.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobVersions'
+
+  /namespaces/{namespace}/jobs/{job}/runs:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/job'
+    post:
+      summary: Create a job run
+      description: Creates a new job run object.
+      tags:
+        - Jobs
+      required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nominalStartTime:
+                  description: The nominal start time of the job.
+                  type: string
+                  format: date-time
+                nominalEndTime:
+                  description: The nominal end time of the job.
+                  type: string
+                  format: date-time
+                runArgs:
+                  description: The runtime arguments of the job. JSON encoded.
+                  type: string
+              example:
+                runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
+      responses:
+        '201':
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobRunId'
+    get:
+      summary: List all job runs
+      description: Returns a list of job runs.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobRuns'
+
+  /jobs/runs/{run-id}:
+    parameters:
+      - $ref: '#/components/parameters/jobRunId'
+    get:
+      summary: Retrieve a job run
+      description: Retrieve a job run.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobRun'
+
+  /jobs/runs/{run-id}/complete:
+    parameters:
+      - $ref: '#/components/parameters/jobRunId'
+    put:
+      summary: Complete a job run
+      description: Marks the job run as completed.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+
+  /jobs/runs/{run-id}/fail:
+    parameters:
+      - $ref: '#/components/parameters/jobRunId'
+    put:
+      summary: Fail a job run
+      description: Marks the job run as failed.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+
+  /jobs/runs/{run-id}/abort:
+    parameters:
+      - $ref: '#/components/parameters/jobRunId'
+    put:
+      summary: Abort a job run
+      description: Marks the job run as aborted.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+
+  /jobs/runs/{run-id}/outputs:
+    parameters:
+      - $ref: '#/components/parameters/jobRunId'
+    put:
+      summary: Create multiple output datasets
+      description: Creates a multiple output dataset objects.
+      tags:
+        - Jobs
+      required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/jobRunOutputs'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datasets'
+    get:
+      summary: List all job run outputs
+      description: Returns a list job run outputs.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datasets'
+
+  /namespaces/{namespace}/datasets:
+    get:
+      summary: List all datasets
+      description: Returns a list of datasets.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datasets'
+components:
+  parameters:
+    namespace:
+      name: namespace
+      in: path
+      description: The name of the namespace.
+      required: true
+      schema:
+        type: string
+        maxLength: 1024
+        example: wework
+
+    job:
+      name: job
+      in: path
+      description: The name of the job.
+      required: true
+      schema:
+        type: string
+        maxLength: 1024
+        example: room_bookings_7_days
+
+    jobRunId:
+      name: run-id
+      in: path
+      description: The unique ID of the job run.
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    namespace:
+      type: object
+      properties:
+        name:
+          description: The name of the namespace.
+          type: string
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the namespace was created.
+          type: string
+          format: date-time
+        owner:
+          description: The owner of the namespace.
+          type: string
+        description:
+          description: The description of the namespace.
+          type: string
+      example:
+        name: wework
+        createdAt: 2018-10-04T15:01:23.045Z
+        owner: dataengineering
+        description: A namespace for core jobs and datasets at wework.
+
+    namespaces:
+      type: object
+      properties:
+        namespaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/namespace'
+
+    job:
+      type: object
+      properties:
+        name:
+          description: The name of the job.
+          type: string
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.
+          type: string
+          format: date-time
+        inputDatasetUrns:
+          description: The URN list of input datasets.
+          type: array
+          items:
+            type: string
+            format: URN
+          uniqueItems: true
+        outputDatasetUrns:
+          description: The URN list of output datasets.
+          type: array
+          items:
+            type: string
+            format: URN
+          uniqueItems: true
+        location:
+          description: The URI of the job source or artifact.
+          type: string
+          format: URI
+        description:
+          description: The description of the job.
+          type: string
+      example:
+        name: room_bookings_7_days
+        createdAt: 2018-10-04T15:01:23.045Z
+        updatedAt: 2018-10-04T16:15:30.000Z
+        inputDatasetsUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
+        outputDatasetsUrns: ["urn:wework:wedata.room_bookings_7_days"]
+        location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+        description: Determine weekly room booking occupancy patterns.
+
+    jobs:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/job'
+
+    jobVersion:
+      type: object
+      properties:
+        version:
+          description: The version of the job.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job version was created.
+          type: string
+          format: date-time
+        location:
+          description: The URI of the job source or artifact.
+          type: string
+          format: URI
+      example:
+        version: b39b5cea-bc2e-42a5-a4ab-5329ae9fc54f
+        createdAt: 2018-10-04T15:01:23.045Z
+        location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+
+    jobVersions:
+      type: object
+      properties:
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/jobVersion'
+
+    jobRunId:
+      type: object
+      properties:
+        runId:
+          description: The unique ID assigned to the run.
+          type: string
+          format: uuid
+      example:
+        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+
+    jobRun:
+      type: object
+      properties:
+        nominalStartTime:
+          description: The nominal start time of the job.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: The nominal end time of the job.
+          type: string
+          format: date-time
+        runId:
+          description: The unique ID assigned to the run.
+          type: string
+          format: uuid
+        runState:
+          description: The current state of the job.
+          type: enum
+          enum: [STARTED, COMPLETED, FAILED]
+        runArgs:
+          description: The runtime arguments of the job. JSON encoded.
+          type: string
+        startedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job started.
+          type: string
+          format: date-time
+        endedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job ended.
+          type: string
+          format: date-time
+      example:
+        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        runState: COMPLETED
+        runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
+        startedAt: 2018-10-04T15:01:23.045Z
+        endedAt: 2018-10-04T15:01:30.045Z
+
+    jobRuns:
+      type: object
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/jobRun'
+
+    jobRunOutputs:
+      type: object
+      properties:
+        datasets:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/DB'
+              - $ref: '#/components/schemas/ICEBERG'
+
+    dataset:
+      type: object
+      properties:
+        urn:
+          description: The URN of the dataset.
+          type: string
+          format: URN
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
+          type: string
+          format: date-time
+      example:
+        urn: urn:wework:wedata.room_bookings
+        createdAt: 2018-10-04T15:01:23.045Z
+
+    datasets:
+      type: object
+      properties:
+        datasets:
+          items:
+            $ref: '#/components/schemas/dataset'
+
+    DB:
+      type: object
+      properties:
+        type:
+          description: The output dataset type.
+          type: enum
+          enum: [DB]
+        connectionUrl:
+          description: The URL to connect to the database.
+          type: string
+          format: URL
+        schema:
+          description: The name of the database schema.
+          type: string
+        table:
+          description: The name of the table.
+          type: string
+        description:
+          description: The description of the output dataset.
+          type: string
+      required:
+        - type
+        - connectionUrl
+        - schema
+        - table
+      example:
+        type: DB
+        connectionUrl: jdbc:postgresql://localhost:5432/wework
+        schema: wedata
+        table: room_bookings
+        
+    ICEBERG:
+      type: object
+      properties:
+        type:
+          description: The output dataset type.
+          type: enum
+          enum: [ICEBERG]
+        snapshotId:
+          description: The unique ID of the snapshot representing a list of files on the file system.
+          type: integer
+          format: int64
+        location:
+          description: The location on the file system where data files, manifest files, and table
+            metadata files are stored.
+          type: string
+        description:
+          description: The description of the output dataset.
+          type: string
+      required:
+         - type 
+         - snapshotId 
+         - location
+      example:
+        type: ICEBERG
+        snapshotId: 3051729675574597004
+        location: s3://wedata/room_bookings
+        description: Archived room bookings data.
