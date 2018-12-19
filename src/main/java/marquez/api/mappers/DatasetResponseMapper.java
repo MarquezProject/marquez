@@ -15,13 +15,13 @@ public final class DatasetResponseMapper {
     return new DatasetResponse(
         dataset.getUrn().getValue(),
         dataset.getCreatedAt().toString(),
-        dataset.getDescription().map((desc) -> desc.getValue()).orElse(null));
+        dataset.getDescription().map(desc -> desc.getValue()).orElse(null));
   }
 
   public static List<DatasetResponse> map(@NonNull List<Dataset> datasets) {
     return datasets.isEmpty()
         ? Collections.emptyList()
         : Collections.unmodifiableList(
-            datasets.stream().map((dataset) -> map(dataset)).collect(toList()));
+            datasets.stream().map(dataset -> map(dataset)).collect(toList()));
   }
 }
