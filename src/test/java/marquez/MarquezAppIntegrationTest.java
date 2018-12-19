@@ -1,5 +1,6 @@
 package marquez;
 
+import static javax.ws.rs.core.Response.Status.OK;
 import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,13 +31,13 @@ public class MarquezAppIntegrationTest {
 
   @Test
   public void runAppTest() {
-    final Response res =
+    final Response response =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
             .path("/ping")
             .request()
             .get();
-    assertEquals(200, res.getStatus());
-    assertEquals("pong", res.readEntity(String.class));
+    assertEquals(OK.getStatusCode(), response.getStatus());
+    assertEquals("pong", response.readEntity(String.class));
   }
 }
