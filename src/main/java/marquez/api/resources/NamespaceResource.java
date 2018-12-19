@@ -1,4 +1,4 @@
-package marquez.resources;
+package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
