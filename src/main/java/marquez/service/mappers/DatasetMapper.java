@@ -24,7 +24,6 @@ public final class DatasetMapper {
   public static List<Dataset> map(@NonNull List<DatasetRow> datasetRows) {
     return datasetRows.isEmpty()
         ? Collections.emptyList()
-        : Collections.unmodifiableList(
-            datasetRows.stream().map(row -> map(row)).collect(toList()));
+        : Collections.unmodifiableList(datasetRows.stream().map(row -> map(row)).collect(toList()));
   }
 }
