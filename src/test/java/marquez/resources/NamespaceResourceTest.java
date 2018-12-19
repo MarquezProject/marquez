@@ -18,9 +18,9 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
-import marquez.NamespaceBaseTest;
-import marquez.api.GetNamespaceResponse;
-import marquez.api.ListNamespacesResponse;
+import marquez.api.models.GetNamespaceResponse;
+import marquez.api.models.ListNamespacesResponse;
+import marquez.api.resources.NamespaceBaseTest;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
@@ -96,7 +96,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     Response res = namespaceResource.listNamespaces();
     ListNamespacesResponse responseBody = (ListNamespacesResponse) res.getEntity();
 
-    marquez.api.Namespace expectedApiNamespace = namespaceMapper.map(TEST_NAMESPACE);
+    marquez.api.models.Namespace expectedApiNamespace = namespaceMapper.map(TEST_NAMESPACE);
     assertThat(responseBody.getNamespaces()).contains(expectedApiNamespace);
   }
 
@@ -111,7 +111,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     Response res = namespaceResource.listNamespaces();
 
     ListNamespacesResponse responseBody = (ListNamespacesResponse) res.getEntity();
-    marquez.api.Namespace nsResponseFromList = responseBody.getNamespaces().get(0);
+    marquez.api.models.Namespace nsResponseFromList = responseBody.getNamespaces().get(0);
 
     assertThat(nsResponseFromList.getName()).isEqualTo(TEST_NAMESPACE.getName());
     assertThat(nsResponseFromList.getOwner()).isEqualTo(TEST_NAMESPACE.getOwnerName());
@@ -138,8 +138,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
     Response res = namespaceResource.listNamespaces();
     ListNamespacesResponse responseBody = (ListNamespacesResponse) res.getEntity();
-    marquez.api.Namespace nsResponse = namespaceMapper.map(TEST_NAMESPACE);
-    marquez.api.Namespace secondNsResponse = namespaceMapper.map(secondNamespace);
+    marquez.api.models.Namespace nsResponse = namespaceMapper.map(TEST_NAMESPACE);
+    marquez.api.models.Namespace secondNsResponse = namespaceMapper.map(secondNamespace);
 
     assertThat(responseBody.getNamespaces()).containsExactly(nsResponse, secondNsResponse);
   }

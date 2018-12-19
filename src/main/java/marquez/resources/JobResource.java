@@ -18,9 +18,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.CreateJobRequest;
-import marquez.api.CreateJobRunRequest;
-import marquez.api.ListJobsResponse;
+import marquez.api.models.CreateJobRequest;
+import marquez.api.models.CreateJobRunRequest;
+import marquez.api.models.ListJobsResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ApiJobToCoreJobMapper;
@@ -99,7 +99,7 @@ public final class JobResource extends BaseResource {
       }
       Job jobToCreate =
           apiJobToCoreJobMapper.map(
-              new marquez.api.Job(
+              new marquez.api.models.Job(
                   job,
                   null,
                   request.getInputDataSetUrns(),

@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import marquez.api.models.Job;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
 

@@ -14,8 +14,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.CreateNamespaceRequest;
-import marquez.api.ListNamespacesResponse;
+import marquez.api.models.CreateNamespaceRequest;
+import marquez.api.models.ListNamespacesResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
@@ -92,7 +92,7 @@ public class NamespaceResource extends BaseResource {
   public Response listNamespaces() throws ResourceException {
     try {
       List<marquez.core.models.Namespace> namespaceCoreModels = namespaceService.listNamespaces();
-      List<marquez.api.Namespace> namespaceList =
+      List<marquez.api.models.Namespace> namespaceList =
           new CoreNamespaceToApiNamespaceMapper().map(namespaceCoreModels);
       return Response.status(Response.Status.OK)
           .entity(new ListNamespacesResponse(namespaceList))

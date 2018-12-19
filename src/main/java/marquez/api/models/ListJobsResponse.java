@@ -1,4 +1,4 @@
-package marquez.api;
+package marquez.api.models;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

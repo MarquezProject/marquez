@@ -9,6 +9,7 @@ import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
+import marquez.api.models.JobRun;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
 

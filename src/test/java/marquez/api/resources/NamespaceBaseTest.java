@@ -1,10 +1,10 @@
-package marquez;
+package marquez.api.resources;
 
 import static java.time.Instant.now;
 
 import java.sql.Timestamp;
 import java.util.UUID;
-import marquez.api.CreateNamespaceRequest;
+import marquez.api.models.CreateNamespaceRequest;
 import marquez.core.models.Namespace;
 import org.junit.BeforeClass;
 
