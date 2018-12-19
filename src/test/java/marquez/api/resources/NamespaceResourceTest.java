@@ -1,4 +1,4 @@
-package marquez.resources;
+package marquez.api.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;

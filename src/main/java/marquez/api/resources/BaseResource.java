@@ -1,4 +1,4 @@
-package marquez.resources;
+package marquez.api.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
