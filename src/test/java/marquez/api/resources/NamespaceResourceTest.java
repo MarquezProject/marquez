@@ -18,8 +18,8 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
-import marquez.api.models.GetNamespaceResponse;
-import marquez.api.models.ListNamespacesResponse;
+import marquez.api.models.NamespaceResponse;
+import marquez.api.models.NamespacesResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
@@ -68,12 +68,13 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
     when(namespaceService.get(NAMESPACE_NAME)).thenReturn(returnedOptionalNamespace);
     Response res = namespaceResource.get(NAMESPACE_NAME);
-    GetNamespaceResponse responseBody = (GetNamespaceResponse) res.getEntity();
+    NamespaceResponse responseBody = (NamespaceResponse) res.getEntity();
 
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    assertThat(responseBody.getNamespace().getName()).isEqualTo(NAMESPACE_NAME);
-    assertThat(responseBody.getNamespace().getDescription()).isEqualTo(DESCRIPTION);
-    assertThat(responseBody.getNamespace().getOwner()).isEqualTo(OWNER);
+    assertThat(responseBody.getName()).isEqualTo(NAMESPACE_NAME);
+    assertThat(responseBody.getCreatedAt()).isNotEmpty();
+    assertThat(responseBody.getOwner()).isEqualTo(OWNER);
+    assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
   }
 
   @Test
@@ -93,9 +94,9 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     when(namespaceService.listNamespaces()).thenReturn(existingCoreModelNamespaces);
 
     Response res = namespaceResource.listNamespaces();
-    ListNamespacesResponse responseBody = (ListNamespacesResponse) res.getEntity();
+    NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
 
-    marquez.api.models.Namespace expectedApiNamespace = namespaceMapper.map(TEST_NAMESPACE);
+    NamespaceResponse expectedApiNamespace = namespaceMapper.map(TEST_NAMESPACE);
     assertThat(responseBody.getNamespaces()).contains(expectedApiNamespace);
   }
 
@@ -109,8 +110,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     when(namespaceService.listNamespaces()).thenReturn(existingNamespaces);
     Response res = namespaceResource.listNamespaces();
 
-    ListNamespacesResponse responseBody = (ListNamespacesResponse) res.getEntity();
-    marquez.api.models.Namespace nsResponseFromList = responseBody.getNamespaces().get(0);
+    NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
+    NamespaceResponse nsResponseFromList = responseBody.getNamespaces().get(0);
 
     assertThat(nsResponseFromList.getName()).isEqualTo(TEST_NAMESPACE.getName());
     assertThat(nsResponseFromList.getOwner()).isEqualTo(TEST_NAMESPACE.getOwnerName());
@@ -136,9 +137,9 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     when(namespaceService.listNamespaces()).thenReturn(existingCoreModelNamespaces);
 
     Response res = namespaceResource.listNamespaces();
-    ListNamespacesResponse responseBody = (ListNamespacesResponse) res.getEntity();
-    marquez.api.models.Namespace nsResponse = namespaceMapper.map(TEST_NAMESPACE);
-    marquez.api.models.Namespace secondNsResponse = namespaceMapper.map(secondNamespace);
+    NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
+    NamespaceResponse nsResponse = namespaceMapper.map(TEST_NAMESPACE);
+    NamespaceResponse secondNsResponse = namespaceMapper.map(secondNamespace);
 
     assertThat(responseBody.getNamespaces()).containsExactly(nsResponse, secondNsResponse);
   }
