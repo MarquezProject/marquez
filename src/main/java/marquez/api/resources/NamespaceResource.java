@@ -49,9 +49,9 @@ public final class NamespaceResource {
       @Valid CreateNamespaceRequest request)
       throws ResourceException {
     try {
-      Namespace namespace =
+      final Namespace namespace =
           namespaceService.create(namespaceApiMapper.of(namespaceString, request));
-      NamespaceResponse response = NamespaceResponseMapper.map(namespace);
+      final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
       return Response.ok(response).build();
     } catch (UnexpectedException e) {
       log.error(e.getMessage(), e);

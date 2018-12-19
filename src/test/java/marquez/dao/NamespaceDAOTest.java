@@ -60,11 +60,12 @@ public class NamespaceDAOTest {
 
   @Test
   public void testFindAll() {
-    List<Namespace> namespaces =
+    List<Namespace> existingNamespacesFound = namespaceDAO.findAll();
+    List<Namespace> newNamespaces =
         new ArrayList<Namespace>(Arrays.asList(Generator.genNamespace(), Generator.genNamespace()));
-    namespaces.forEach(n -> namespaceDAO.insert(n));
+    newNamespaces.forEach(n -> namespaceDAO.insert(n));
     List<Namespace> namespacesFound = namespaceDAO.findAll();
-    assertEquals(namespaces.size(), namespacesFound.size());
+    assertEquals(newNamespaces.size(), namespacesFound.size() - existingNamespacesFound.size());
   }
 
   @Test
