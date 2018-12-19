@@ -12,6 +12,7 @@ import marquez.core.models.Generator;
 import marquez.core.models.Job;
 import marquez.core.models.JobVersion;
 import marquez.dao.fixtures.AppWithPostgresRule;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -24,20 +25,14 @@ public class JobDAOTest {
   final JobDAO jobDAO = APP.onDemand(JobDAO.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
-  Job job = Generator.genJob(nsID);;
+  Job job = Generator.genJob(nsID);
   JobVersion jobVersion = Generator.genJobVersion(job);
 
   @Before
   public void setUp() {
-    APP.getJDBI()
-        .useHandle(
-            handle -> {
-              handle.execute(
-                  "INSERT INTO namespaces(guid, name, current_ownership)" + "VALUES (?, ?, ?);",
-                  nsID,
-                  nsName,
-                  "Amaranta");
-            });
+    insertNamespace(nsID, nsName, "Amaranta");
+    job = Generator.genJob(nsID);
+    jobVersion = Generator.genJobVersion(job);
   }
 
   @After
@@ -50,6 +45,18 @@ public class JobDAOTest {
               handle.execute("DELETE FROM jobs;");
               handle.execute("DELETE FROM owners;");
               handle.execute("DELETE FROM namespaces;");
+            });
+  }
+
+  private void insertNamespace(UUID namespaceId, String name, String ownerName) {
+    APP.getJDBI()
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  "INSERT INTO namespaces(guid, name, current_ownership)" + "VALUES (?, ?, ?);",
+                  namespaceId,
+                  name,
+                  ownerName);
             });
   }
 
@@ -87,6 +94,38 @@ public class JobDAOTest {
     Job jobFound = jobDAO.findByID(job.getGuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
+  }
+
+  @Test
+  public void testInsert_DiffNsSameName() {
+    UUID newNamespaceId = UUID.randomUUID();
+    insertNamespace(newNamespaceId, "newNsForDupTest", "Amaranta");
+    jobDAO.insert(job);
+    Job jobWithDiffNsSameName =
+        new Job(
+            UUID.randomUUID(),
+            job.getName(),
+            "location",
+            newNamespaceId,
+            "desc",
+            Collections.<String>emptyList(),
+            Collections.<String>emptyList());
+    jobDAO.insert(jobWithDiffNsSameName);
+  }
+
+  @Test(expected = UnableToExecuteStatementException.class)
+  public void testInsert_SameNsSameName() {
+    jobDAO.insert(job);
+    Job jobWithSameNsSameName =
+        new Job(
+            UUID.randomUUID(),
+            job.getName(),
+            "location",
+            job.getNamespaceGuid(),
+            "desc",
+            Collections.<String>emptyList(),
+            Collections.<String>emptyList());
+    jobDAO.insert(jobWithSameNsSameName);
   }
 
   @Test
