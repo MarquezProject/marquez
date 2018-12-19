@@ -1,5 +1,6 @@
 package marquez.service.mappers;
 
+import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -33,5 +34,18 @@ public class DataSourceRowMapperTest {
     assertEquals(DATA_SOURCE.getValue(), dataSourceRow.getDataSource());
     assertEquals(CONNECTION_URL.getRawValue(), dataSourceRow.getConnectionUrl());
     assertEquals(nonEmptyDescription, dbTableVersion.getDescription());
+  }
+
+  @Test
+  public void testMapDbTableVersionNoDescription() {
+    final Optional<Description> noDescription = Optional.of(NO_DESCRIPTION);
+    final DbTableVersion dbTableVersion =
+        new DbTableVersion(CONNECTION_URL, DB_SCHEMA, DB_TABLE, DESCRIPTION);
+    final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
+    assertNotNull(dataSourceRow);
+    assertNotNull(dataSourceRow.getUuid());
+    assertEquals(DATA_SOURCE.getValue(), dataSourceRow.getDataSource());
+    assertEquals(CONNECTION_URL.getRawValue(), dataSourceRow.getConnectionUrl());
+    assertEquals(noDescription, dbTableVersion.getDescription());
   }
 }
