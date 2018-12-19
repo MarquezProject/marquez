@@ -173,7 +173,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testUpdateJobRunInternalErrorHandling() throws UnexpectedException {
+  public void testCompleteJobRunInternalErrorHandling() throws UnexpectedException {
     UUID externalRunId = UUID.randomUUID();
     marquez.core.models.JobRun generatedJobRun = Generator.genJobRun();
 
@@ -181,11 +181,27 @@ public class JobResourceTest {
     when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
     Response res = markJobRunComplete(externalRunId);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+  }
 
-    res = markJobRunFailed(externalRunId);
+  @Test
+  public void testAbortJobRunInternalErrorHandling() throws UnexpectedException {
+    UUID externalRunId = UUID.randomUUID();
+    marquez.core.models.JobRun generatedJobRun = Generator.genJobRun();
+
+    when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
+    when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
+    Response res = markJobRunAborted(externalRunId);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+  }
 
-    res = markJobRunAborted(externalRunId);
+  @Test
+  public void testFailJobRunInternalErrorHandling() throws UnexpectedException {
+    UUID externalRunId = UUID.randomUUID();
+    marquez.core.models.JobRun generatedJobRun = Generator.genJobRun();
+
+    when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
+    when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
+    Response res = markJobRunFailed(externalRunId);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
 
