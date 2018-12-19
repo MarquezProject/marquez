@@ -40,12 +40,18 @@ public class DataSourceRowMapperTest {
   public void testMapDbTableVersionNoDescription() {
     final Optional<Description> noDescription = Optional.of(NO_DESCRIPTION);
     final DbTableVersion dbTableVersion =
-        new DbTableVersion(CONNECTION_URL, DB_SCHEMA, DB_TABLE, DESCRIPTION);
+        new DbTableVersion(CONNECTION_URL, DB_SCHEMA, DB_TABLE, NO_DESCRIPTION);
     final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
     assertNotNull(dataSourceRow);
     assertNotNull(dataSourceRow.getUuid());
     assertEquals(DATA_SOURCE.getValue(), dataSourceRow.getDataSource());
     assertEquals(CONNECTION_URL.getRawValue(), dataSourceRow.getConnectionUrl());
     assertEquals(noDescription, dbTableVersion.getDescription());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testMapNullDbTableVersion() {
+    final DbTableVersion nullDbTableVersion = null;
+    DataSourceRowMapper.map(nullDbTableVersion);
   }
 }
