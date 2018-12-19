@@ -3,7 +3,7 @@ server:
   - type: http
     port: ${MARQUEZ_PORT:-5000}
 
-database:
+db:
   driverClass: org.postgresql.Driver
   url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
   user: ${POSTGRES_USER}
