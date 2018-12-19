@@ -3,7 +3,6 @@ package marquez.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,8 +54,8 @@ public class JobDAOTest {
             handle -> {
               handle.execute(
                   "INSERT INTO namespaces(guid, name, current_ownership)" + "VALUES (?, ?, ?);",
-                  nsID,
-                  nsName,
+                  namespaceId,
+                  name,
                   ownerName);
             });
   }
@@ -97,27 +96,26 @@ public class JobDAOTest {
     assertJobFieldsMatch(job, jobFound);
   }
 
-  @Test(expected = UnableToExecuteStatementException.class)
-  public void testInsert_Duplicate() {
+  @Test
+  public void testInsert_DiffNsSameName() {
     UUID newNamespaceId = UUID.randomUUID();
     insertNamespace(newNamespaceId, "newNsForDupTest", "Amaranta");
     jobDAO.insert(job);
+    Job jobWithDiffNsSameName =
+        new Job(
+            UUID.randomUUID(),
+            job.getName(),
+            "location",
+            newNamespaceId,
+            "desc",
+            Collections.<String>emptyList(),
+            Collections.<String>emptyList());
+    jobDAO.insert(jobWithDiffNsSameName);
+  }
 
-    try {
-      Job jobWithDiffNsSameName =
-          new Job(
-              UUID.randomUUID(),
-              job.getName(),
-              "location",
-              newNamespaceId,
-              "desc",
-              Collections.<String>emptyList(),
-              Collections.<String>emptyList());
-      jobDAO.insert(jobWithDiffNsSameName);
-    } catch (UnableToExecuteStatementException e) {
-      fail("failed to insert a job with the same name into a different namespace");
-    }
-
+  @Test(expected = UnableToExecuteStatementException.class)
+  public void testInsert_SameNsSameName() {
+    jobDAO.insert(job);
     Job jobWithSameNsSameName =
         new Job(
             UUID.randomUUID(),
