@@ -3,14 +3,19 @@ package marquez.db.models;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-@Data
+@RequiredArgsConstructor
+@EqualsAndHashCode
+@ToString
 @Builder
 public final class DataSourceRow {
-  @NonNull private final UUID uuid;
-  @NonNull private final Instant createdAt;
-  @NonNull private final String dataSource;
-  @NonNull private final String connectionUrl;
+  @Getter @NonNull private final UUID uuid;
+  @Getter @NonNull private final String dataSource;
+  @Getter @NonNull private final String connectionUrl;
+  @Getter private final Instant createdAt;
 }
