@@ -66,7 +66,8 @@ public class JobServiceIntegrationTest {
   @Test
   public void testCreate() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
-    jobService.createJob(namespaceName, job);
+    Job jobReturned = jobService.createJob(namespaceName, job);
+    assertNotNull(jobReturned.getCreatedAt());
     Optional<Job> jobFound = jobService.getJob(namespaceName, job.getName());
     assertTrue(jobFound.isPresent());
     assertEquals(job.getName(), jobFound.get().getName());
