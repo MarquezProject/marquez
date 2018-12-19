@@ -2,16 +2,18 @@ package marquez.api.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-public class NamespacesResponse {
-  private final List<NamespaceResponse> namespaces;
-
-  public NamespacesResponse(@JsonProperty("namespaces") List<NamespaceResponse> namespaces) {
-    this.namespaces = namespaces;
-  }
-
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+public final class NamespacesResponse {
   @JsonProperty("namespaces")
-  public List<NamespaceResponse> getNamespaces() {
-    return this.namespaces;
-  }
+  @Getter
+  private List<NamespaceResponse> namespaces;
 }
