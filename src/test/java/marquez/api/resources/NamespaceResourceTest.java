@@ -1,4 +1,4 @@
-package marquez.resources;
+package marquez.api.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -20,7 +20,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import marquez.api.models.GetNamespaceResponse;
 import marquez.api.models.ListNamespacesResponse;
-import marquez.api.resources.NamespaceBaseTest;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
