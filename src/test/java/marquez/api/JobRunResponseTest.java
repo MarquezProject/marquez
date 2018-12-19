@@ -9,21 +9,21 @@ import io.dropwizard.jackson.Jackson;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
-import marquez.api.models.JobRun;
+import marquez.api.models.JobRunResponse;
+import marquez.core.models.JobRunState;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
 
-public class JobRunTest {
+public class JobRunResponseTest {
 
   private static final UUID JOB_RUN_UUID = UUID.randomUUID();
   private static final Timestamp STARTED_AT_TIME = Timestamp.from(Instant.now());
   private static final Timestamp ENDED_AT_TIME = Timestamp.from(Instant.now());
-  private static final marquez.core.models.JobRunState.State CURRENT_STATE =
-      marquez.core.models.JobRunState.State.NEW;
+  private static final JobRunState.State CURRENT_STATE = JobRunState.State.NEW;
   private static final String RUN_ARGS = "--no-such-argument";
 
-  private static final JobRun JOB_RUN =
-      new JobRun(
+  private static final JobRunResponse JOB_RUN =
+      new JobRunResponse(
           JOB_RUN_UUID,
           STARTED_AT_TIME.toString(),
           ENDED_AT_TIME.toString(),
@@ -39,8 +39,8 @@ public class JobRunTest {
 
   @Test
   public void testJobRunEquality() {
-    JobRun jr2 =
-        new JobRun(
+    JobRunResponse jr2 =
+        new JobRunResponse(
             JOB_RUN_UUID,
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
@@ -53,8 +53,8 @@ public class JobRunTest {
 
   @Test
   public void testHashCodeEquality() {
-    JobRun jr2 =
-        new JobRun(
+    JobRunResponse jr2 =
+        new JobRunResponse(
             JOB_RUN_UUID,
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
@@ -65,8 +65,8 @@ public class JobRunTest {
 
   @Test
   public void testJobRunInequalityOnUUID() {
-    JobRun jr2 =
-        new JobRun(
+    JobRunResponse jr2 =
+        new JobRunResponse(
             UUID.randomUUID(),
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
@@ -78,8 +78,8 @@ public class JobRunTest {
 
   @Test
   public void testJobRunInequalityOnNonIDField() {
-    JobRun jr2 =
-        new JobRun(
+    JobRunResponse jr2 =
+        new JobRunResponse(
             JOB_RUN_UUID,
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
@@ -90,8 +90,8 @@ public class JobRunTest {
 
   @Test
   public void testJobRunHashcodeInequality() {
-    JobRun jr2 =
-        new JobRun(
+    JobRunResponse jr2 =
+        new JobRunResponse(
             UUID.randomUUID(),
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
@@ -102,8 +102,8 @@ public class JobRunTest {
 
   @Test
   public void testJobRunHashcodeInequalityOnNonIdField() {
-    JobRun jr2 =
-        new JobRun(
+    JobRunResponse jr2 =
+        new JobRunResponse(
             JOB_RUN_UUID,
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),

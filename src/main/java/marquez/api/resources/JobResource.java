@@ -24,10 +24,11 @@ import marquez.api.models.ListJobsResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ApiJobToCoreJobMapper;
-import marquez.core.mappers.CoreJobRunToApiJobRunMapper;
+import marquez.core.mappers.CoreJobRunToApiJobRunResponseMapper;
 import marquez.core.mappers.CoreJobToApiJobMapper;
 import marquez.core.models.Job;
 import marquez.core.models.JobRun;
+import marquez.core.models.JobRunState;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
 
@@ -37,8 +38,10 @@ public final class JobResource {
   private final JobService jobService;
   private final NamespaceService namespaceService;
 
-  private ApiJobToCoreJobMapper apiJobToCoreJobMapper = new ApiJobToCoreJobMapper();
-  private CoreJobToApiJobMapper coreJobToApiJobMapper = new CoreJobToApiJobMapper();
+  private final ApiJobToCoreJobMapper apiJobToCoreJobMapper = new ApiJobToCoreJobMapper();
+  private final CoreJobToApiJobMapper coreJobToApiJobMapper = new CoreJobToApiJobMapper();
+  private CoreJobRunToApiJobRunResponseMapper coreJobRunToApiJobRunMapper =
+      new CoreJobRunToApiJobRunResponseMapper();
 
   public JobResource(final NamespaceService namespaceService, final JobService jobService) {
     this.namespaceService = namespaceService;
@@ -74,7 +77,7 @@ public final class JobResource {
                   ? null
                   : Timestamp.valueOf(request.getNominalEndTime()));
       return Response.status(Response.Status.CREATED)
-          .entity(new CoreJobRunToApiJobRunMapper().map(createdJobRun))
+          .entity(coreJobRunToApiJobRunMapper.map(createdJobRun))
           .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException | Exception e) {
@@ -130,9 +133,7 @@ public final class JobResource {
       }
       Optional<Job> returnedJob = jobService.getJob(namespace, job);
       if (returnedJob.isPresent()) {
-        return Response.status(Response.Status.OK)
-            .entity(coreJobToApiJobMapper.map(returnedJob.get()))
-            .build();
+        return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException e) {
@@ -153,7 +154,7 @@ public final class JobResource {
       }
       List<Job> jobList = jobService.getAllJobsInNamespace(namespace);
       ListJobsResponse response = new ListJobsResponse(coreJobToApiJobMapper.map(jobList));
-      return Response.status(Response.Status.OK).entity(response).build();
+      return Response.ok().entity(response).build();
     } catch (UnexpectedException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
@@ -165,11 +166,10 @@ public final class JobResource {
   @Path("/jobs/runs/{runId}/complete")
   public Response completeJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
-        jobService.updateJobRunState(
-            UUID.fromString(runId), marquez.core.models.JobRunState.State.COMPLETED);
-        return Response.status(Response.Status.OK).build();
+        jobService.updateJobRunState(UUID.fromString(runId), JobRunState.State.COMPLETED);
+        return Response.ok().build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
@@ -183,11 +183,10 @@ public final class JobResource {
   @Path("/jobs/runs/{runId}/fail")
   public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
-        jobService.updateJobRunState(
-            UUID.fromString(runId), marquez.core.models.JobRunState.State.FAILED);
-        return Response.status(Response.Status.OK).build();
+        jobService.updateJobRunState(UUID.fromString(runId), JobRunState.State.FAILED);
+        return Response.ok().build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
@@ -201,11 +200,10 @@ public final class JobResource {
   @Path("/jobs/runs/{runId}/abort")
   public Response abortJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
-        jobService.updateJobRunState(
-            UUID.fromString(runId), marquez.core.models.JobRunState.State.ABORTED);
-        return Response.status(Response.Status.OK).build();
+        jobService.updateJobRunState(UUID.fromString(runId), JobRunState.State.ABORTED);
+        return Response.ok().build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {
@@ -220,11 +218,9 @@ public final class JobResource {
   @Path("/jobs/runs/{runId}")
   public Response get(@PathParam("runId") final UUID runId) throws ResourceException {
     try {
-      Optional<marquez.core.models.JobRun> jobRun = jobService.getJobRun(runId);
+      Optional<JobRun> jobRun = jobService.getJobRun(runId);
       if (jobRun.isPresent()) {
-        return Response.status(Response.Status.OK)
-            .entity(new CoreJobRunToApiJobRunMapper().map(jobRun.get()))
-            .build();
+        return Response.ok().entity(coreJobRunToApiJobRunMapper.map(jobRun.get())).build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {

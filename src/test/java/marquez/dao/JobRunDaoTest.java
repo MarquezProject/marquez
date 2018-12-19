@@ -8,7 +8,9 @@ import java.util.UUID;
 import marquez.api.JobRunBaseTest;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Generator;
+import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
+import marquez.core.models.Namespace;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
 import org.jdbi.v3.core.Handle;
@@ -58,8 +60,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @BeforeClass
   public static void setup() throws UnexpectedException {
-    marquez.core.models.Namespace generatedNamespace =
-        namespaceService.create(Generator.genNamespace());
+    Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 
@@ -72,7 +73,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Before
   public void createJobRun() throws UnexpectedException {
-    marquez.core.models.JobRun createdJobRun =
+    JobRun createdJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     CREATED_JOB_RUN_UUID = createdJobRun.getGuid();
   }
@@ -93,7 +94,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunGetter() {
-    marquez.core.models.JobRun returnedJobRun = jobRunDAO.findJobRunById(CREATED_JOB_RUN_UUID);
+    JobRun returnedJobRun = jobRunDAO.findJobRunById(CREATED_JOB_RUN_UUID);
     assertNull(returnedJobRun.getNominalStartTime());
     assertNull(returnedJobRun.getNominalEndTime());
     assertEquals(

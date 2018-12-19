@@ -18,9 +18,12 @@ import javax.ws.rs.core.Response;
 import marquez.api.models.CreateJobRequest;
 import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
-import marquez.api.models.JobRun;
+import marquez.api.models.JobRunResponse;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Generator;
+import marquez.core.models.JobRun;
+import marquez.core.models.JobRunState;
+import marquez.core.models.Namespace;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
 import marquez.dao.JobDAO;
@@ -58,8 +61,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
   @BeforeClass
   public static void setup() throws UnexpectedException {
-    marquez.core.models.Namespace generatedNamespace =
-        namespaceService.create(Generator.genNamespace());
+    Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 
@@ -100,7 +102,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
   @Before
   public void createJobRun() throws UnexpectedException {
-    marquez.core.models.JobRun createdJobRun =
+    JobRun createdJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     CREATED_JOB_RUN_UUID = createdJobRun.getGuid();
   }
@@ -116,7 +118,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
             .request(MediaType.APPLICATION_JSON)
             .post(createJobRunRequestEntity);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
-    JobRun responseBody = res.readEntity(JobRun.class);
+    JobRunResponse responseBody = res.readEntity(JobRunResponse.class);
     UUID returnedId = responseBody.getRunId();
     try {
       assertNotNull(returnedId);
@@ -133,9 +135,9 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunGetterEndToEnd() {
-    JobRun responseBody = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
+    JobRunResponse responseBody = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
 
-    assertEquals(marquez.core.models.JobRunState.State.NEW.name(), responseBody.getRunState());
+    assertEquals(JobRunState.State.NEW.name(), responseBody.getRunState());
     assertNull(responseBody.getNominalStartTime());
     assertNull(responseBody.getNominalEndTime());
   }
@@ -190,7 +192,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
     return new Job(jobName, null, inputList, outputList, location, description);
   }
 
-  private JobRun getJobRunApiResponse(UUID jobRunGuid) {
+  private JobRunResponse getJobRunApiResponse(UUID jobRunGuid) {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
@@ -198,7 +200,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
             .request(MediaType.APPLICATION_JSON)
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    return res.readEntity(JobRun.class);
+    return res.readEntity(JobRunResponse.class);
   }
 
   @After
