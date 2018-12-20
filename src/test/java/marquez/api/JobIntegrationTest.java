@@ -1,6 +1,7 @@
 package marquez.api;
 
 import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -143,7 +144,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   @Test
-  public void testJobRunAfterUpdateEndToEnd() {
+  public void testJobRunAfterCompletionEndToEnd() {
 
     final Response res =
         APP.client()
@@ -153,6 +154,40 @@ public class JobIntegrationTest extends JobRunBaseTest {
             .put(Entity.json(""));
 
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+
+    final JobRunResponse getJobRunResponse = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
+    assertThat(getJobRunResponse.getRunState()).isEqualTo(JobRunState.State.COMPLETED.name());
+  }
+
+  @Test
+  public void testJobRunAfterMarkedFailedEndToEnd() {
+
+    final Response res =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path(format("/api/v1/jobs/runs/%s/fail", CREATED_JOB_RUN_UUID))
+            .request(MediaType.APPLICATION_JSON)
+            .put(Entity.json(""));
+
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+
+    final JobRunResponse getJobRunResponse = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
+    assertThat(getJobRunResponse.getRunState()).isEqualTo(JobRunState.State.FAILED.name());
+  }
+
+  @Test
+  public void testJobRunAfterMarkedAbortedEndToEnd() {
+    final Response res =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path(format("/api/v1/jobs/runs/%s/abort", CREATED_JOB_RUN_UUID))
+            .request(MediaType.APPLICATION_JSON)
+            .put(Entity.json(""));
+
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+
+    final JobRunResponse getJobRunResponse = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
+    assertThat(getJobRunResponse.getRunState()).isEqualTo(JobRunState.State.ABORTED.name());
   }
 
   private void evaluateResponse(Response res, Job inputJob) {
