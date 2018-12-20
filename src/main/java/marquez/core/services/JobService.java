@@ -59,7 +59,7 @@ public class JobService {
                 job.getInputDatasetUrns(),
                 job.getOutputDatasetUrns());
         jobDAO.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
-        return newJob;
+        return jobDAO.findByID(newJob.getGuid());
       } else {
         Job existingJobWithNewUri =
             new Job(
@@ -74,10 +74,9 @@ public class JobService {
         JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
         if (existingJobVersion == null) {
           jobVersionDAO.insert(JobService.createJobVersion(existingJobWithNewUri));
-          return existingJobWithNewUri;
-        } else {
-          return existingJob;
+          return jobDAO.findByID(existingJob.getGuid());
         }
+        return existingJob;
       }
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to create new job";

@@ -1,6 +1,7 @@
 package marquez.core.services;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
@@ -114,6 +115,7 @@ public class JobServiceTest {
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
     Job job = Generator.genJob(namespaceID);
     when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(null);
+    when(jobDAO.findByID(any(UUID.class))).thenReturn(job);
     Job jobReturned = jobService.createJob(TEST_NS, job);
     verify(jobDAO).insertJobAndVersion(jobCaptor.capture(), jobVersionCaptor.capture());
     assertEquals(job.getNamespaceGuid(), jobReturned.getNamespaceGuid());
@@ -127,10 +129,13 @@ public class JobServiceTest {
   @Test
   public void testCreate_JobFound_OK() throws UnexpectedException {
     Job existingJob = Generator.genJob(namespaceID);
+    JobVersion existingJobVersion = Generator.genJobVersion(existingJob);
     Job newJob = Generator.cloneJob(existingJob);
     when(jobDAO.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
+    when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(existingJobVersion);
     Job jobCreated = jobService.createJob(TEST_NS, newJob);
     verify(jobDAO, never()).insert(newJob);
+    assertNotNull(jobCreated);
     assertJobFieldsMatch(existingJob, jobCreated);
   }
 
@@ -141,6 +146,7 @@ public class JobServiceTest {
     Job newJob = Generator.genJob(namespaceID);
     when(jobDAO.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
     when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
+    when(jobDAO.findByID(existingJob.getGuid())).thenReturn(existingJob);
     Job jobCreated = jobService.createJob(TEST_NS, newJob);
     verify(jobDAO, never()).insert(newJob);
     verify(jobVersionDAO).insert(jobVersionCaptor.capture());
