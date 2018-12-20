@@ -20,7 +20,7 @@ import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.CreateJobRequest;
 import marquez.api.models.CreateJobRunRequest;
-import marquez.api.models.ListJobsResponse;
+import marquez.api.models.JobsResponse;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ApiJobToCoreJobMapper;
@@ -40,12 +40,87 @@ public final class JobResource {
 
   private final ApiJobToCoreJobMapper apiJobToCoreJobMapper = new ApiJobToCoreJobMapper();
   private final CoreJobToApiJobMapper coreJobToApiJobMapper = new CoreJobToApiJobMapper();
-  private CoreJobRunToApiJobRunResponseMapper coreJobRunToApiJobRunMapper =
+  private final CoreJobRunToApiJobRunResponseMapper coreJobRunToApiJobRunMapper =
       new CoreJobRunToApiJobRunResponseMapper();
 
   public JobResource(final NamespaceService namespaceService, final JobService jobService) {
     this.namespaceService = namespaceService;
     this.jobService = jobService;
+  }
+
+  @PUT
+  @Path("/namespaces/{namespace}/jobs/{job}")
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  @Timed
+  public Response create(
+      @PathParam("namespace") final String namespace,
+      @PathParam("job") final String job,
+      @Valid final CreateJobRequest request)
+      throws ResourceException {
+    try {
+      if (!namespaceService.exists(namespace)) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      final Job jobToCreate =
+          apiJobToCoreJobMapper.map(
+              new marquez.api.models.Job(
+                  job,
+                  null,
+                  request.getInputDataSetUrns(),
+                  request.getOutputDatasetUrns(),
+                  request.getLocation(),
+                  request.getDescription()));
+      jobToCreate.setNamespaceGuid(namespaceService.get(namespace).get().getGuid());
+      final Job createdJob = jobService.createJob(namespace, jobToCreate);
+      return Response.status(Response.Status.CREATED)
+          .entity(coreJobToApiJobMapper.map(createdJob))
+          .build();
+    } catch (UnexpectedException e) {
+      log.error(format("Error creating the job <%s>:<%s>.", namespace, job), e);
+      throw new ResourceException();
+    }
+  }
+
+  @GET
+  @Path("/namespaces/{namespace}/jobs/{job}")
+  @Produces(APPLICATION_JSON)
+  @Timed
+  public Response getJob(
+      @PathParam("namespace") final String namespace, @PathParam("job") final String job)
+      throws ResourceException {
+    try {
+      if (!namespaceService.exists(namespace)) {
+        return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
+      }
+      final Optional<Job> returnedJob = jobService.getJob(namespace, job);
+      if (returnedJob.isPresent()) {
+        return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
+      }
+      return Response.status(Response.Status.NOT_FOUND).build();
+    } catch (UnexpectedException e) {
+      log.error(e.getMessage(), e);
+      throw new ResourceException();
+    }
+  }
+
+  @GET
+  @Timed
+  @Produces(APPLICATION_JSON)
+  @Path("/namespaces/{namespace}/jobs")
+  public Response listJobs(@PathParam("namespace") final String namespace)
+      throws ResourceException {
+    try {
+      if (!namespaceService.exists(namespace)) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      final List<Job> jobList = jobService.getAllJobsInNamespace(namespace);
+      final JobsResponse response = new JobsResponse(coreJobToApiJobMapper.map(jobList));
+      return Response.ok().entity(response).build();
+    } catch (UnexpectedException e) {
+      log.error(e.getMessage(), e);
+      throw new ResourceException();
+    }
   }
 
   @POST
@@ -55,7 +130,7 @@ public final class JobResource {
   public Response create(
       @PathParam("namespace") final String namespace,
       @PathParam("job") final String job,
-      @Valid CreateJobRunRequest request)
+      @Valid final CreateJobRunRequest request)
       throws ResourceException {
     try {
       if (!namespaceService.exists(namespace)) {
@@ -78,7 +153,6 @@ public final class JobResource {
                   : Timestamp.valueOf(request.getNominalEndTime()));
       return Response.status(Response.Status.CREATED)
           .entity(coreJobRunToApiJobRunMapper.map(createdJobRun))
-          .type(APPLICATION_JSON)
           .build();
     } catch (UnexpectedException | Exception e) {
       log.error(e.getMessage(), e);
@@ -86,76 +160,18 @@ public final class JobResource {
     }
   }
 
-  @PUT
-  @Path("/namespaces/{namespace}/jobs/{job}")
-  @Consumes(APPLICATION_JSON)
-  @Produces(APPLICATION_JSON)
-  @Timed
-  public Response create(
-      @PathParam("namespace") final String namespace,
-      @PathParam("job") final String job,
-      @Valid CreateJobRequest request)
-      throws ResourceException {
-    try {
-      if (!namespaceService.exists(namespace)) {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-      Job jobToCreate =
-          apiJobToCoreJobMapper.map(
-              new marquez.api.models.Job(
-                  job,
-                  null,
-                  request.getInputDataSetUrns(),
-                  request.getOutputDatasetUrns(),
-                  request.getLocation(),
-                  request.getDescription()));
-      jobToCreate.setNamespaceGuid(namespaceService.get(namespace).get().getGuid());
-      Job createdJob = jobService.createJob(namespace, jobToCreate);
-      return Response.status(Response.Status.CREATED)
-          .entity(coreJobToApiJobMapper.map(createdJob))
-          .build();
-    } catch (UnexpectedException e) {
-      log.error(format("Error creating the job <%s>:<%s>.", namespace, job), e);
-      throw new ResourceException();
-    }
-  }
-
   @GET
-  @Path("/namespaces/{namespace}/jobs/{job}")
   @Produces(APPLICATION_JSON)
   @Timed
-  public Response getJob(
-      @PathParam("namespace") final String namespace, @PathParam("job") final String job)
-      throws ResourceException {
+  @Path("/jobs/runs/{runId}")
+  public Response get(@PathParam("runId") final UUID runId) throws ResourceException {
     try {
-      if (!namespaceService.exists(namespace)) {
-        return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
-      }
-      Optional<Job> returnedJob = jobService.getJob(namespace, job);
-      if (returnedJob.isPresent()) {
-        return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
+      final Optional<JobRun> jobRun = jobService.getJobRun(runId);
+      if (jobRun.isPresent()) {
+        return Response.ok().entity(coreJobRunToApiJobRunMapper.map(jobRun.get())).build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
-    } catch (UnexpectedException e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
-  }
-
-  @GET
-  @Timed
-  @Produces(APPLICATION_JSON)
-  @Path("/namespaces/{namespace}/jobs")
-  public Response listJobs(@PathParam("namespace") final String namespace)
-      throws ResourceException {
-    try {
-      if (!namespaceService.exists(namespace)) {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-      List<Job> jobList = jobService.getAllJobsInNamespace(namespace);
-      ListJobsResponse response = new ListJobsResponse(coreJobToApiJobMapper.map(jobList));
-      return Response.ok().entity(response).build();
-    } catch (UnexpectedException e) {
+    } catch (UnexpectedException | Exception e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }
@@ -166,7 +182,7 @@ public final class JobResource {
   @Path("/jobs/runs/{runId}/complete")
   public Response completeJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      final Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
         jobService.updateJobRunState(UUID.fromString(runId), JobRunState.State.COMPLETED);
         return Response.ok().build();
@@ -183,7 +199,7 @@ public final class JobResource {
   @Path("/jobs/runs/{runId}/fail")
   public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      final Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
         jobService.updateJobRunState(UUID.fromString(runId), JobRunState.State.FAILED);
         return Response.ok().build();
@@ -200,27 +216,10 @@ public final class JobResource {
   @Path("/jobs/runs/{runId}/abort")
   public Response abortJobRun(@PathParam("runId") final String runId) throws ResourceException {
     try {
-      Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      final Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
         jobService.updateJobRunState(UUID.fromString(runId), JobRunState.State.ABORTED);
         return Response.ok().build();
-      }
-      return Response.status(Response.Status.NOT_FOUND).build();
-    } catch (UnexpectedException | Exception e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
-  }
-
-  @GET
-  @Produces(APPLICATION_JSON)
-  @Timed
-  @Path("/jobs/runs/{runId}")
-  public Response get(@PathParam("runId") final UUID runId) throws ResourceException {
-    try {
-      Optional<JobRun> jobRun = jobService.getJobRun(runId);
-      if (jobRun.isPresent()) {
-        return Response.ok().entity(coreJobRunToApiJobRunMapper.map(jobRun.get())).build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnexpectedException | Exception e) {

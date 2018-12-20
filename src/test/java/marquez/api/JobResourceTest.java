@@ -24,7 +24,7 @@ import marquez.api.models.CreateJobRequest;
 import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
 import marquez.api.models.JobRunResponse;
-import marquez.api.models.ListJobsResponse;
+import marquez.api.models.JobsResponse;
 import marquez.api.resources.JobResource;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ResourceExceptionMapper;
@@ -161,7 +161,7 @@ public class JobResourceTest {
     String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    List<Job> returnedJobs = res.readEntity(ListJobsResponse.class).getJobs();
+    List<Job> returnedJobs = res.readEntity(JobsResponse.class).getJobs();
     assertThat(returnedJobs).hasSize(jobsList.size());
   }
 
