@@ -9,8 +9,8 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.api.models.CreateNamespaceRequest;
-import marquez.api.models.ListNamespacesResponse;
-import marquez.api.models.Namespace;
+import marquez.api.models.NamespaceResponse;
+import marquez.api.models.NamespacesResponse;
 import marquez.api.resources.NamespaceBaseTest;
 import marquez.dao.fixtures.AppWithPostgresRule;
 import org.junit.ClassRule;
@@ -30,7 +30,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
             .put(Entity.json(createNamespaceRequest));
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
 
-    Namespace responseBody = res.readEntity(Namespace.class);
+    NamespaceResponse responseBody = res.readEntity(NamespaceResponse.class);
 
     assertThat(Timestamp.valueOf(responseBody.getCreatedAt())).isAfter(START_TIME);
     assertThat(responseBody.getOwner()).isEqualTo(OWNER);
@@ -50,7 +50,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
             .path("/api/v1/namespaces/" + NAMESPACE_NAME)
             .request(MediaType.APPLICATION_JSON)
             .put(Entity.json(createNamespaceRequest));
-    Namespace responseBody = res.readEntity(Namespace.class);
+    NamespaceResponse responseBody = res.readEntity(NamespaceResponse.class);
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
     assertThat(Timestamp.valueOf(responseBody.getCreatedAt())).isAfter(START_TIME);
     assertThat(responseBody.getOwner()).isEqualTo(OWNER);
@@ -78,7 +78,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
 
-    ListNamespacesResponse responseBody = res.readEntity(ListNamespacesResponse.class);
+    NamespacesResponse responseBody = res.readEntity(NamespacesResponse.class);
     assertThat(responseBody.getNamespaces().isEmpty());
   }
 

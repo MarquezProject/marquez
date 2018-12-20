@@ -33,7 +33,7 @@ import marquez.core.services.NamespaceService;
 
 @Path("/api/v1")
 @Slf4j
-public final class JobResource extends BaseResource {
+public final class JobResource {
   private final JobService jobService;
   private final NamespaceService namespaceService;
 
