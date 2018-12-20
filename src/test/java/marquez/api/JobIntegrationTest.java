@@ -199,8 +199,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
     assertEquals(inputJob.getInputDataSetUrns(), responseJob.getInputDataSetUrns());
     assertEquals(inputJob.getOutputDataSetUrns(), responseJob.getOutputDataSetUrns());
 
-    // Re-enable once issue-188 is resolved
-    // assertNotNull(responseJob.getCreatedAt());
+    assertNotNull(responseJob.getCreatedAt());
   }
 
   private Response createJobOnNamespace(String namespace, Job job) {
