@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import marquez.api.models.NamespaceResponse;
@@ -58,5 +59,12 @@ public class NamespaceResponseMapperTest {
     namespaceResponses
         .stream()
         .forEach(s -> assertThat(Timestamp.valueOf(s.getCreatedAt())).isEqualTo(createdAt));
+  }
+
+  @Test
+  public void testEmptyList() {
+    List<NamespaceResponse> namespaceResponses =
+        NamespaceResponseMapper.map(Collections.emptyList());
+    assertThat(namespaceResponses).hasSize(0);
   }
 }
