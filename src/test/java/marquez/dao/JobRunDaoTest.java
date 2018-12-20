@@ -1,6 +1,7 @@
 package marquez.dao;
 
 import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -39,6 +40,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
   protected static final JobDAO jobDAO = APP.onDemand(JobDAO.class);
   protected static final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
   protected static final JobRunDAO jobRunDAO = APP.onDemand(JobRunDAO.class);
+  protected static final JobRunStateDAO jobRunStateDAO = APP.onDemand(JobRunStateDAO.class);
   protected static final RunArgsDAO runArgsDAO = APP.onDemand(RunArgsDAO.class);
 
   protected static final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
@@ -99,6 +101,12 @@ public class JobRunDaoTest extends JobRunBaseTest {
     assertNull(returnedJobRun.getNominalEndTime());
     assertEquals(
         JobRunState.State.NEW, JobRunState.State.fromInt(returnedJobRun.getCurrentState()));
+  }
+
+  @Test
+  public void testLatestGetJobRunStateForJobId() {
+    assertThat(jobRunStateDAO.findByLatestJobRun(CREATED_JOB_RUN_UUID))
+        .isEqualTo(getLatestJobRunStateForJobId(CREATED_JOB_RUN_UUID));
   }
 
   private JobRunState getLatestJobRunStateForJobId(UUID jobRunId) {
