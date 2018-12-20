@@ -82,6 +82,16 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testGetJobWithInvalidNamespace() throws UnexpectedException {
+    Job jobForJobCreationRequest = generateApiJob();
+
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
+    Response res = getJob(jobForJobCreationRequest.getName());
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  @Test
   public void testGetJobInternalErrorHandling() throws UnexpectedException {
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenThrow(new UnexpectedException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
@@ -224,7 +234,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testJobRunCreationWithInvalidJobNamespace() throws UnexpectedException {
+  public void testJobRunCreationWithInvalidJob() throws UnexpectedException {
     JobRunResponse jobRunForJobRunCreationRequest = generateApiJobRun();
 
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
