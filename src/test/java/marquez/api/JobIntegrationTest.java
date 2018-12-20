@@ -157,14 +157,15 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
   private void evaluateResponse(Response res, Job inputJob) {
     Job responseJob = res.readEntity(Job.class);
-    assertEquals(responseJob.getName(), inputJob.getName());
-    assertEquals(responseJob.getDescription(), inputJob.getDescription());
-    assertEquals(responseJob.getLocation(), inputJob.getLocation());
+    assertEquals(inputJob.getName(), responseJob.getName());
+    assertEquals(inputJob.getDescription(), responseJob.getDescription());
+    assertEquals(inputJob.getLocation(), responseJob.getLocation());
 
-    // TODO: Re-enable once marquez-188 is resolved
-    // assertEquals(returnedJob.getInputDataSetUrns(), inputList);
-    // assertEquals(returnedJob.getOutputDataSetUrns(), outputList);
-    // assertNotNull(returnedJob.getCreatedAt());
+    assertEquals(inputJob.getInputDataSetUrns(), responseJob.getInputDataSetUrns());
+    assertEquals(inputJob.getOutputDataSetUrns(), responseJob.getOutputDataSetUrns());
+
+    // Re-enable once issue-188 is resolved
+    // assertNotNull(responseJob.getCreatedAt());
   }
 
   private Response createJobOnNamespace(String namespace, Job job) {

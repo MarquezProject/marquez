@@ -6,12 +6,15 @@ import marquez.api.models.Job;
 public class CoreJobToApiJobMapper extends Mapper<marquez.core.models.Job, Job> {
   @Override
   public Job map(marquez.core.models.Job value) {
-    // TODO: Update to add real values for input and output datasets
     return new Job(
         value.getName(),
         value.getCreatedAt(),
-        Collections.emptyList(),
-        Collections.emptyList(),
+        value.getInputDatasetUrns().isEmpty()
+            ? Collections.emptyList()
+            : value.getInputDatasetUrns(),
+        value.getOutputDatasetUrns().isEmpty()
+            ? Collections.emptyList()
+            : value.getOutputDatasetUrns(),
         value.getLocation(),
         value.getDescription());
   }
