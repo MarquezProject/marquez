@@ -139,6 +139,14 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testGetJobRunNoSuchJob() throws UnexpectedException {
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
+
+    Response res = getJobRun("abc123nojustjobid");
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  @Test
   public void testGetAllJobsInNamespaceWithInvalidNamespace() throws UnexpectedException {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
@@ -259,6 +267,11 @@ public class JobResourceTest {
 
     res = markJobRunAborted(externalRunId);
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  private Response getJobRun(String jobRunId) {
+    String path = format("/api/v1/jobs/runs/%s", NAMESPACE_NAME, jobRunId);
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
   }
 
   private Response getJob(String jobName) {
