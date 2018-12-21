@@ -4,11 +4,13 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
 @AllArgsConstructor
+@EqualsAndHashCode
 public final class Job {
   @NonNull @Getter private final UUID guid;
   @NonNull @Getter private final String name;
