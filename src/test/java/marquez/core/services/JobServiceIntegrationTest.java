@@ -66,23 +66,50 @@ public class JobServiceIntegrationTest {
   @Test
   public void testCreate() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
-    Job jobReturned = jobService.createJob(namespaceName, job);
-    assertNotNull(jobReturned.getCreatedAt());
-    Optional<Job> jobFound = jobService.getJob(namespaceName, job.getName());
-    assertTrue(jobFound.isPresent());
-    assertEquals(job.getName(), jobFound.get().getName());
+    Job jobCreateRet = jobService.createJob(namespaceName, job);
+    assertNotNull(jobCreateRet.getCreatedAt());
+    Optional<Job> jobGetRet = jobService.getJob(namespaceName, job.getName());
+    assertTrue(jobGetRet.isPresent());
+    assertEquals(jobGetRet.get(), jobCreateRet);
+    assertEquals(job.getName(), jobGetRet.get().getName());
     List<JobVersion> versions = jobService.getAllVersionsOfJob(namespaceName, job.getName());
     assertEquals(1, versions.size());
-    assertEquals(jobFound.get().getGuid(), versions.get(0).getJobGuid());
+    assertEquals(jobGetRet.get().getGuid(), versions.get(0).getJobGuid());
+  }
+
+  @Test
+  public void testCreateNewVersion() throws UnexpectedException {
+    Job job = Generator.genJob(namespaceID);
+    jobService.createJob(namespaceName, job);
+    Job jobWithNewLoc =
+        new Job(
+            null,
+            job.getName(),
+            job.getLocation() + "/new",
+            job.getNamespaceGuid(),
+            job.getDescription(),
+            job.getInputDatasetUrns(),
+            job.getOutputDatasetUrns());
+    Job jobCreateRet =
+        jobService.createJob(namespaceName, jobWithNewLoc); // should create new version implicitly
+    Optional<Job> jobGetRet = jobService.getJob(namespaceName, job.getName());
+    assertTrue(jobGetRet.isPresent());
+    assertEquals(jobGetRet.get(), jobCreateRet);
+    assertEquals(job.getName(), jobGetRet.get().getName());
+    assertEquals(jobCreateRet, jobGetRet.get());
+    List<JobVersion> versions = jobService.getAllVersionsOfJob(namespaceName, job.getName());
+    assertEquals(jobGetRet.get().getGuid(), versions.get(0).getJobGuid());
+    assertEquals(jobGetRet.get().getGuid(), versions.get(1).getJobGuid());
   }
 
   @Test
   public void testGetJob_JobFound() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
-    jobService.createJob(namespaceName, job);
-    Optional<Job> jobFound = jobService.getJob(namespaceName, job.getName());
-    assertTrue(jobFound.isPresent());
-    assertEquals(job.getName(), jobFound.get().getName());
+    Job jobCreateRet = jobService.createJob(namespaceName, job);
+    Optional<Job> jobGetRet = jobService.getJob(namespaceName, job.getName());
+    assertTrue(jobGetRet.isPresent());
+    assertEquals(job.getName(), jobGetRet.get().getName());
+    assertEquals(jobGetRet.get(), jobCreateRet);
   }
 
   @Test
