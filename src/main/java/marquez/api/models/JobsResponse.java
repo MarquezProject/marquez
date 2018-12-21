@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListJobsResponse {
+public class JobsResponse {
   @Getter private List<Job> jobs;
 }

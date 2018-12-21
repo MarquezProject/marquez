@@ -23,12 +23,13 @@ import javax.ws.rs.core.Response;
 import marquez.api.models.CreateJobRequest;
 import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
-import marquez.api.models.JobRun;
-import marquez.api.models.ListJobsResponse;
+import marquez.api.models.JobRunResponse;
+import marquez.api.models.JobsResponse;
 import marquez.api.resources.JobResource;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ResourceExceptionMapper;
 import marquez.core.models.Generator;
+import marquez.core.models.JobRun;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
 import org.junit.Before;
@@ -81,6 +82,16 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testGetJobWithInvalidNamespace() throws UnexpectedException {
+    Job jobForJobCreationRequest = generateApiJob();
+
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
+    Response res = getJob(jobForJobCreationRequest.getName());
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  @Test
   public void testGetJobInternalErrorHandling() throws UnexpectedException {
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenThrow(new UnexpectedException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
@@ -128,6 +139,14 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testGetJobRunNoSuchJob() throws UnexpectedException {
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
+
+    Response res = getJobRun("abc123nojustjobid");
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  @Test
   public void testGetAllJobsInNamespaceWithInvalidNamespace() throws UnexpectedException {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
@@ -160,7 +179,7 @@ public class JobResourceTest {
     String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    List<Job> returnedJobs = res.readEntity(ListJobsResponse.class).getJobs();
+    List<Job> returnedJobs = res.readEntity(JobsResponse.class).getJobs();
     assertThat(returnedJobs).hasSize(jobsList.size());
   }
 
@@ -172,7 +191,7 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.of(Generator.genJob()));
 
-    JobRun jobForJobCreationRequest = generateApiJobRun();
+    JobRunResponse jobForJobCreationRequest = generateApiJobRun();
     Response res = insertJobRun(jobForJobCreationRequest);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
@@ -180,7 +199,7 @@ public class JobResourceTest {
   @Test
   public void testCompleteJobRunInternalErrorHandling() throws UnexpectedException {
     UUID externalRunId = UUID.randomUUID();
-    marquez.core.models.JobRun generatedJobRun = Generator.genJobRun();
+    JobRun generatedJobRun = Generator.genJobRun();
 
     when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
     when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
@@ -191,7 +210,7 @@ public class JobResourceTest {
   @Test
   public void testAbortJobRunInternalErrorHandling() throws UnexpectedException {
     UUID externalRunId = UUID.randomUUID();
-    marquez.core.models.JobRun generatedJobRun = Generator.genJobRun();
+    JobRun generatedJobRun = Generator.genJobRun();
 
     when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
     when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
@@ -202,7 +221,7 @@ public class JobResourceTest {
   @Test
   public void testFailJobRunInternalErrorHandling() throws UnexpectedException {
     UUID externalRunId = UUID.randomUUID();
-    marquez.core.models.JobRun generatedJobRun = Generator.genJobRun();
+    JobRun generatedJobRun = Generator.genJobRun();
 
     when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
     when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
@@ -212,7 +231,7 @@ public class JobResourceTest {
 
   @Test
   public void testJobRunCreationWithInvalidNamespace() throws UnexpectedException {
-    JobRun jobRunForJobRunCreationRequest = generateApiJobRun();
+    JobRunResponse jobRunForJobRunCreationRequest = generateApiJobRun();
 
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
@@ -223,8 +242,8 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testJobRunCreationWithInvalidJobNamespace() throws UnexpectedException {
-    JobRun jobRunForJobRunCreationRequest = generateApiJobRun();
+  public void testJobRunCreationWithInvalidJob() throws UnexpectedException {
+    JobRunResponse jobRunForJobRunCreationRequest = generateApiJobRun();
 
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
@@ -250,6 +269,11 @@ public class JobResourceTest {
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
 
+  private Response getJobRun(String jobRunId) {
+    String path = format("/api/v1/jobs/runs/%s", NAMESPACE_NAME, jobRunId);
+    return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
+  }
+
   private Response getJob(String jobName) {
     String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, jobName);
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
@@ -270,7 +294,7 @@ public class JobResourceTest {
         .put(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
   }
 
-  private Response insertJobRun(JobRun jobRun) {
+  private Response insertJobRun(JobRunResponse jobRun) {
     CreateJobRunRequest createJobRequest =
         new CreateJobRunRequest(
             jobRun.getNominalStartTime(), jobRun.getNominalEndTime(), jobRun.getRunArgs());
@@ -306,8 +330,8 @@ public class JobResourceTest {
     return new Job(jobName, null, inputList, outputList, location, description);
   }
 
-  JobRun generateApiJobRun() {
-    return new JobRun(
+  JobRunResponse generateApiJobRun() {
+    return new JobRunResponse(
         UUID.randomUUID(),
         "2018-07-14T19:43:37+0000",
         "2018-07-14T19:43:37+0000",

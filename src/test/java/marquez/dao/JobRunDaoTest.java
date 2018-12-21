@@ -1,6 +1,7 @@
 package marquez.dao;
 
 import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -8,7 +9,9 @@ import java.util.UUID;
 import marquez.api.JobRunBaseTest;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Generator;
+import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
+import marquez.core.models.Namespace;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
 import org.jdbi.v3.core.Handle;
@@ -37,6 +40,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
   protected static final JobDAO jobDAO = APP.onDemand(JobDAO.class);
   protected static final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
   protected static final JobRunDAO jobRunDAO = APP.onDemand(JobRunDAO.class);
+  protected static final JobRunStateDAO jobRunStateDAO = APP.onDemand(JobRunStateDAO.class);
   protected static final RunArgsDAO runArgsDAO = APP.onDemand(RunArgsDAO.class);
 
   protected static final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
@@ -58,8 +62,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @BeforeClass
   public static void setup() throws UnexpectedException {
-    marquez.core.models.Namespace generatedNamespace =
-        namespaceService.create(Generator.genNamespace());
+    Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 
@@ -72,7 +75,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Before
   public void createJobRun() throws UnexpectedException {
-    marquez.core.models.JobRun createdJobRun =
+    JobRun createdJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     CREATED_JOB_RUN_UUID = createdJobRun.getGuid();
   }
@@ -93,11 +96,17 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunGetter() {
-    marquez.core.models.JobRun returnedJobRun = jobRunDAO.findJobRunById(CREATED_JOB_RUN_UUID);
+    JobRun returnedJobRun = jobRunDAO.findJobRunById(CREATED_JOB_RUN_UUID);
     assertNull(returnedJobRun.getNominalStartTime());
     assertNull(returnedJobRun.getNominalEndTime());
     assertEquals(
         JobRunState.State.NEW, JobRunState.State.fromInt(returnedJobRun.getCurrentState()));
+  }
+
+  @Test
+  public void testLatestGetJobRunStateForJobId() {
+    assertThat(jobRunStateDAO.findByLatestJobRun(CREATED_JOB_RUN_UUID))
+        .isEqualTo(getLatestJobRunStateForJobId(CREATED_JOB_RUN_UUID));
   }
 
   private JobRunState getLatestJobRunStateForJobId(UUID jobRunId) {

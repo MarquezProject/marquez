@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public final class JobRun {
+public final class JobRunResponse {
   @JsonProperty("runId")
   @NotBlank
   private UUID runId;
