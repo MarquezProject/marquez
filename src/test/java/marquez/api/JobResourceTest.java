@@ -257,7 +257,8 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testJobRunStatusUpdateWithInvalidExternalRunId() throws UnexpectedException, Exception {
+  public void testJobRunStatusUpdateWithInvalidExternalRunId()
+      throws UnexpectedException, Exception {
     UUID externalRunId = UUID.randomUUID();
 
     when(MOCK_JOB_SERVICE.getJobRun(externalRunId)).thenReturn(Optional.empty());
@@ -329,6 +330,7 @@ public class JobResourceTest {
   private Response markJobRunComplete(String jobRunId) throws Exception {
     return markJobRunWithState(jobRunId, "complete");
   }
+
   private Response markJobRunAborted(UUID jobRunId) throws Exception {
     return markJobRunAborted(jobRunId.toString());
   }

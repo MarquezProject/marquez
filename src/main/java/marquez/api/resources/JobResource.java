@@ -199,7 +199,8 @@ public final class JobResource {
     return processJobRunStateUpdate(runId, JobRunState.State.ABORTED);
   }
 
-  private Response processJobRunStateUpdate(String runId, JobRunState.State state) throws ResourceException {
+  private Response processJobRunStateUpdate(String runId, JobRunState.State state)
+      throws ResourceException {
     final UUID jobRunUUID;
     try {
       jobRunUUID = UUID.fromString(runId);
