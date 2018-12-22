@@ -31,7 +31,6 @@ import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
 import marquez.core.services.JobService;
 import marquez.core.services.NamespaceService;
-import org.eclipse.jetty.http.HttpStatus;
 
 @Path("/api/v1")
 @Slf4j
@@ -207,7 +206,7 @@ public final class JobResource {
     } catch (IllegalArgumentException e) {
       final String errorMsg = "Could not parse " + runId + " into a UUID!";
       log.error(errorMsg, e);
-      return Response.status(HttpStatus.BAD_REQUEST_400).entity(errorMsg).build();
+      return Response.status(Response.Status.BAD_REQUEST).entity(errorMsg).build();
     }
     try {
       final Optional<JobRun> jobRun = jobService.getJobRun(jobRunUUID);
