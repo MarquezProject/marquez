@@ -14,9 +14,9 @@ The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL
 
 ## Requirements
 
-* Java 8
+* [Java 8](https://openjdk.java.net/install)+
 * [PostgreSQL 9.6](https://www.postgresql.org/download)
-* [Gradle 4.10.2](https://gradle.org/releases) (_optional_)
+* [Gradle 4.10](https://gradle.org/releases)+ (_optional_)
 
 ## Building
 
