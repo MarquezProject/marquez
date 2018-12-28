@@ -59,6 +59,9 @@ runShadow {
 }
 
 release {
+  preTagCommitMessage = 'Prepare for release '
+  tagCommitMessage = 'Version '
+  newVersionCommitMessage = 'Prepare next development version '
   tagTemplate = 'v${version}'
 }
 
