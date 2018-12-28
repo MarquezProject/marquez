@@ -53,6 +53,12 @@ $ ./gradlew run --args 'server config.yml'
 
 Then browse to the admin interface: http://localhost:8081
 
+## Running with [Docker](./Dockerfile) 
+
+```
+$ docker-compose up
+```
+
 ## Getting involved
 
 * Website: https://marquezproject.github.io/marquez
