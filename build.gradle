@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+
 plugins {
   id 'application'
   id 'checkstyle'
@@ -41,11 +43,14 @@ mainClassName = 'marquez.MarquezApp'
 
 shadowJar {
   baseName = project.name
-  classifier = null
+  classifier = ''
   version = project.version
-  transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
+  transform(ServiceFileTransformer)
   manifest {
-    attributes 'Main-Class': mainClassName
+    attributes(
+      'Implementation-Title': project.name,
+      'Implementation-Version': project.version,
+      'Main-Class': mainClassName)
   }
 }
 
