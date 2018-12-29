@@ -17,6 +17,7 @@ import lombok.ToString;
 @Builder
 public final class JobRunRow {
   @Getter @NonNull private final UUID uuid;
+  @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final UUID jobVersionUuid;
   @Getter @NonNull private final UUID jobRunArgsUuid;
   @Getter @NonNull private final String currentState;
