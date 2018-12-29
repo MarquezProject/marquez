@@ -35,7 +35,7 @@ To run Marquez, you will have to define `config.yml`. The configuration file is 
 $ cp config.example.yml config.yml
 ```
 
-You will then need to set the following environment variables (we recommend adding them to your `.bashrc` or equivalent): `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`.
+You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`.
 
 **Note:** All environment variables in `config.yml` are accessed with [`${VAR_NAME}`](https://www.dropwizard.io/1.3.5/docs/manual/core.html#environment-variables).
 
