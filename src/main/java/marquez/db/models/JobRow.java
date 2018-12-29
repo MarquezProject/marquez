@@ -16,12 +16,16 @@ import lombok.ToString;
 @Builder
 public final class JobRow {
   @Getter @NonNull private final UUID uuid;
+  @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final UUID namespaceUuid;
   @Getter @NonNull private final String job;
   @Getter @NonNull private final UUID currentVersionUuid;
-  @Getter private final Instant createdAt;
-  @Getter private final Instant updatedAt;
+  private final Instant updatedAt;
   private final String description;
+
+  public Optional<Instant> getUpdatedAt() {
+    return Optional.ofNullable(updatedAt);
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
