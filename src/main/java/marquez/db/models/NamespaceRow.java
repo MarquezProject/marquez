@@ -17,9 +17,14 @@ import lombok.ToString;
 public final class NamespaceRow {
   @Getter @NonNull private final UUID uuid;
   @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final String currentOwnership;
   @Getter @NonNull private final String namespace;
+  @Getter @NonNull private final String currentOwnership;
+  private final Instant updatedAt;
   private final String description;
+
+  public Optional<Instant> getUpdatedAt() {
+    return Optional.ofNullable(updatedAt);
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
