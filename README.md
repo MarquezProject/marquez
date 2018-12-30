@@ -63,4 +63,4 @@ $ docker-compose up
 
 ## Contributing
 
- See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details about how to contribute.
+See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez/blob/master/CONTRIBUTING.md) for more details about how to contribute.
