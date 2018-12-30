@@ -4,7 +4,7 @@ We're excited you're interested in contributing to Marquez! We'd love you're hel
 
 * Fix or [report](https://github.com/MarquezProject/marquez/issues/new) a bug
 * Fix or improve documentation
-* Pick up a ["good first issue"](https://github.com/MarquezProject/marquez/labels/good%20first%20issue) and send a pull request our way
+* Pick up a ["good first issue"](https://github.com/MarquezProject/marquez/labels/good%20first%20issue), then send a pull request our way
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
 
@@ -15,9 +15,10 @@ We feel that a welcoming community is important and we ask that you follow the [
 3. Create a new branch: `git checkout -b my-cool-new-branch`
 4. Make change on your cool new branch
 5. Write a test for your change
-6. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
-7. Add the ["review"](https://github.com/MarquezProject/marquez/labels/review) label to your pull request
-8. Wait for your change to be reviewed and merged into `master`
+6. Update the [changelog](../CHANGELOG.md)
+7. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
+8. Add the ["review"](https://github.com/MarquezProject/marquez/labels/review) label to your pull request
+9. Work with project maintainers to get your change reviewed and merged into `master`
 
 To ensure your pull request is accepted, follow these guidelines:
 
@@ -27,5 +28,4 @@ To ensure your pull request is accepted, follow these guidelines:
 # Resources
 
 * [How to Contribute to Open Source](https://opensource.guide/how-to-contribute)
-* [Fork a Repository](https://help.github.com/articles/fork-a-repo)
 * [Using the Fork-and-Branch Git Workflow](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow)
