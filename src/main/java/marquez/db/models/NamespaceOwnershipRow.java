@@ -1,4 +1,4 @@
-package marquez.db.model;
+package marquez.db.models;
 
 import java.time.Instant;
 import java.util.Optional;
