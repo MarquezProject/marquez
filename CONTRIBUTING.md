@@ -1,21 +1,28 @@
 # How to Contribute
 
-We'd love you're help, and there are plenty of ways to contribute!
+We're excited you're interested in contributing to Marquez! We'd love you're help, and there are plenty of ways to contribute:
 
-* Become a stargazer!
-* Pick up an issue labled ["good first issue"](https://github.com/MarquezProject/marquez/labels/good%20first%20issue) and submit a pull request with your patch
-* Join the Marquez [mailing list](https://groups.google.com/group/marquez-dev)
+* Fix or [report](https://github.com/MarquezProject/marquez/issues/new) a bug
+* Fix or improve documentation
+* Pick up a ["good first issue"](https://github.com/MarquezProject/marquez/labels/good%20first%20issue) and send a pull request our way
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
 
 # Submitting a [pull request](https://help.github.com/articles/about-pull-requests)
 
 1. [Fork](https://github.com/MarquezProject/marquez/fork) and clone the repository
-2. Make sure all tests pass locally on your machine: `./gradlew test`
+2. Make sure all tests pass locally: `./gradlew test`
 3. Create a new branch: `git checkout -b my-cool-new-branch`
-4. Apply formatting: `./gradlew spotlessApply`
-5. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
-6. Add the ["review"](https://github.com/MarquezProject/marquez/labels/review) label to your pull request.
+4. Make change on your cool new branch
+5. Write a test for your change
+6. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
+7. Add the ["review"](https://github.com/MarquezProject/marquez/labels/review) label to your pull request
+8. Wait for your change to be reviewed and merged into `master`
+
+To ensure your pull request is accepted, follow these guidelines:
+
+* All changes should be accompanied by tests
+* Do your best to have a [well-formed commit message](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for your change
 
 # Resources
 

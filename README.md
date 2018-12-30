@@ -69,4 +69,4 @@ $ docker-compose up
 
 ## Contributing
 
-The `master` branch of this repository contains the latest stable releases of Marquez. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details about how to contribute.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details about how to contribute.
