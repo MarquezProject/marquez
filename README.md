@@ -69,4 +69,6 @@ $ docker-compose up
 
 ## Contributing
 
- See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details about how to contribute.
+We'd love you're help, and there are plenty of ways to contribute! We also feel that a welcoming community is important and we ask that you please follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
+
+The `master` branch of this repository contains the latest stable releases of Marquez. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for more details about how to contribute.
