@@ -163,8 +163,8 @@ public final class JobResource {
   @GET
   @Produces(APPLICATION_JSON)
   @Timed
-  @Path("/jobs/runs/{runId}")
-  public Response get(@PathParam("runId") final UUID runId) throws ResourceException {
+  @Path("/jobs/runs/{id}")
+  public Response get(@PathParam("id") final UUID runId) throws ResourceException {
     try {
       final Optional<JobRun> jobRun = jobService.getJobRun(runId);
       if (jobRun.isPresent()) {
@@ -179,8 +179,8 @@ public final class JobResource {
 
   @PUT
   @Timed
-  @Path("/jobs/runs/{runId}/complete")
-  public Response completeJobRun(@PathParam("runId") final String runId) throws ResourceException {
+  @Path("/jobs/runs/{id}/complete")
+  public Response completeJobRun(@PathParam("id") final String runId) throws ResourceException {
     try {
       final Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
@@ -196,8 +196,8 @@ public final class JobResource {
 
   @PUT
   @Timed
-  @Path("/jobs/runs/{runId}/fail")
-  public Response failJobRun(@PathParam("runId") final String runId) throws ResourceException {
+  @Path("/jobs/runs/{id}/fail")
+  public Response failJobRun(@PathParam("id") final String runId) throws ResourceException {
     try {
       final Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
@@ -213,8 +213,8 @@ public final class JobResource {
 
   @PUT
   @Timed
-  @Path("/jobs/runs/{runId}/abort")
-  public Response abortJobRun(@PathParam("runId") final String runId) throws ResourceException {
+  @Path("/jobs/runs/{id}/abort")
+  public Response abortJobRun(@PathParam("id") final String runId) throws ResourceException {
     try {
       final Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
       if (jobRun.isPresent()) {
