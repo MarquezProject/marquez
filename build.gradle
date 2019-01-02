@@ -48,6 +48,9 @@ shadowJar {
   transform(ServiceFileTransformer)
   manifest {
     attributes(
+      'Created-By': "Gradle ${gradle.gradleVersion}",
+      'Built-By': System.getProperty('user.name'),
+      'Build-Jdk': System.getProperty('java.version'),
       'Implementation-Title': project.name,
       'Implementation-Version': project.version,
       'Main-Class': mainClassName)
@@ -95,7 +98,7 @@ checkstyleTest {
 def coverageDir = "${reportsDir}/coverage";
 
 jacoco {
-  toolVersion = '0.8.1'
+  toolVersion = '0.8.2'
   reportsDir = file(coverageDir)
 }
 
