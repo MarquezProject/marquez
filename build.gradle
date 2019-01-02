@@ -41,7 +41,11 @@ mainClassName = 'marquez.MarquezApp'
 shadowJar {
   transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
   manifest {
-    attributes 'Main-Class': mainClassName
+    attributes(
+      'Created-By': "Gradle ${gradle.gradleVersion}",
+      'Built-By': System.getProperty('user.name'),
+      'Build-Jdk': System.getProperty('java.version'),
+      'Main-Class': mainClassName)
   }
 }
 
