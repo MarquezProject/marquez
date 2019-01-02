@@ -1,6 +1,6 @@
 # How to Contribute
 
-We're excited you're interested in contributing to Marquez! We'd love you're help, and there are plenty of ways to contribute:
+We're excited you're interested in contributing to Marquez! We'd love your help, and there are plenty of ways to contribute:
 
 * Fix or [report](https://github.com/MarquezProject/marquez/issues/new) a bug
 * Fix or improve documentation
