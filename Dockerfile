@@ -19,5 +19,5 @@ COPY --from=build /usr/src/app/build/libs/marquez-*.jar marquez-*.jar
 COPY docker/common.sh common.sh
 COPY docker/wait-for-db.sh wait-for-db.sh
 COPY docker/entrypoint.sh entrypoint.sh
-EXPOSE 5000
+EXPOSE 5000 5001
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

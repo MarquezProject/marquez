@@ -6,8 +6,10 @@ services:
     build: .
     ports:
       - '5000:5000'
+      - '5001:5001'
     environment:
       - MARQUEZ_PORT=5000
+      - MARQUEZ_ADMIN_PORT=5001
       - MARQUEZ_CONFIG=/usr/src/app/config.yml
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
