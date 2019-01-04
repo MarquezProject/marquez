@@ -47,7 +47,7 @@ public class JobResourceTest {
 
   final int UNPROCESSABLE_ENTRY_STATUS_CODE = 422;
 
-  final List<String> validJobEndpoints = Arrays.asList("abort", "complete", "fail");
+  final List<String> validJobEndpoints = Arrays.asList("abort", "complete", "start", "fail");
 
   @ClassRule
   public static final ResourceTestRule resources =
@@ -199,6 +199,17 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testStartJobRunInternalErrorHandling() throws UnexpectedException, Exception {
+    UUID externalRunId = UUID.randomUUID();
+    JobRun generatedJobRun = Generator.genJobRun();
+
+    when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
+    when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
+    Response res = markJobRunStarted(externalRunId);
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
+  }
+
+  @Test
   public void testCompleteJobRunInternalErrorHandling() throws UnexpectedException, Exception {
     UUID externalRunId = UUID.randomUUID();
     JobRun generatedJobRun = Generator.genJobRun();
@@ -253,6 +264,19 @@ public class JobResourceTest {
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
 
     Response res = insertJobRun(jobRunForJobRunCreationRequest);
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
+  }
+
+  @Test
+  public void testJobRunStartWithInvalidJob() throws UnexpectedException, Exception {
+    JobRunResponse jobRunForJobRunCreationRequest = generateApiJobRun();
+
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
+
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
+
+    Response res = markJobRunStarted(jobRunForJobRunCreationRequest.getRunId());
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
 
@@ -321,6 +345,14 @@ public class JobResourceTest {
         .target(path)
         .request(MediaType.APPLICATION_JSON)
         .post(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+  }
+
+  private Response markJobRunStarted(UUID jobRunId) throws Exception {
+    return markJobRunStarted(jobRunId.toString());
+  }
+
+  private Response markJobRunStarted(String jobRunId) throws Exception {
+    return markJobRunWithState(jobRunId, "start");
   }
 
   private Response markJobRunComplete(UUID jobRunId) throws Exception {
