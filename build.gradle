@@ -1,12 +1,15 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+
 plugins {
   id 'application'
-  id 'java'
   id 'checkstyle'
   id 'jacoco'
+  id 'java'
   id 'com.adarshr.test-logger' version '1.6.0'
   id 'com.diffplug.gradle.spotless' version '3.16.0'
   id 'com.github.jk1.dependency-license-report' version '1.2'
   id 'com.github.johnrengelman.shadow' version '4.0.3'
+  id 'net.researchgate.release' version '2.6.0'
 }
 
 repositories {
@@ -39,14 +42,27 @@ compileTestJava {
 mainClassName = 'marquez.MarquezApp'
 
 shadowJar {
-  transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
+  baseName = project.name
+  classifier = ''
+  version = project.version
+  transform(ServiceFileTransformer)
   manifest {
-    attributes 'Main-Class': mainClassName
+    attributes(
+      'Created-By': "Gradle ${gradle.gradleVersion}",
+      'Built-By': System.getProperty('user.name'),
+      'Build-Jdk': System.getProperty('java.version'),
+      'Implementation-Title': project.name,
+      'Implementation-Version': project.version,
+      'Main-Class': mainClassName)
   }
 }
 
 runShadow {
   args = ['server', 'config.yml']
+}
+
+release {
+  tagTemplate = 'v${version}'
 }
 
 spotless {
@@ -82,7 +98,7 @@ checkstyleTest {
 def coverageDir = "${reportsDir}/coverage";
 
 jacoco {
-  toolVersion = '0.8.1'
+  toolVersion = '0.8.2'
   reportsDir = file(coverageDir)
 }
 
