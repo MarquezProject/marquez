@@ -225,7 +225,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/jobRuns'
 
-  /jobs/runs/{run-id}:
+  /jobs/runs/{id}:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     get:
@@ -241,7 +241,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/jobRun'
 
-  /jobs/runs/{run-id}/complete:
+  /jobs/runs/{id}/complete:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
@@ -253,7 +253,7 @@ paths:
         '200':
           description: OK
 
-  /jobs/runs/{run-id}/fail:
+  /jobs/runs/{id}/fail:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
@@ -265,7 +265,7 @@ paths:
         '200':
           description: OK
 
-  /jobs/runs/{run-id}/abort:
+  /jobs/runs/{id}/abort:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
@@ -277,7 +277,7 @@ paths:
         '200':
           description: OK
 
-  /jobs/runs/{run-id}/outputs:
+  /jobs/runs/{id}/outputs:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
     put:
@@ -347,7 +347,7 @@ components:
         example: room_bookings_7_days
 
     jobRunId:
-      name: run-id
+      name: id
       in: path
       description: The unique ID of the job run.
       required: true
