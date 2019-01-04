@@ -181,44 +181,37 @@ public final class JobResource {
   @Timed
   @Path("/jobs/runs/{id}/complete")
   public Response completeJobRun(@PathParam("id") final String runId) throws ResourceException {
-    try {
-      final Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
-      if (jobRun.isPresent()) {
-        jobService.updateJobRunState(UUID.fromString(runId), JobRunState.State.COMPLETED);
-        return Response.ok().build();
-      }
-      return Response.status(Response.Status.NOT_FOUND).build();
-    } catch (UnexpectedException | Exception e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
+    return processJobRunStateUpdate(runId, JobRunState.State.COMPLETED);
   }
 
   @PUT
   @Timed
   @Path("/jobs/runs/{id}/fail")
   public Response failJobRun(@PathParam("id") final String runId) throws ResourceException {
-    try {
-      final Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
-      if (jobRun.isPresent()) {
-        jobService.updateJobRunState(UUID.fromString(runId), JobRunState.State.FAILED);
-        return Response.ok().build();
-      }
-      return Response.status(Response.Status.NOT_FOUND).build();
-    } catch (UnexpectedException | Exception e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
+    return processJobRunStateUpdate(runId, JobRunState.State.FAILED);
   }
 
   @PUT
   @Timed
   @Path("/jobs/runs/{id}/abort")
   public Response abortJobRun(@PathParam("id") final String runId) throws ResourceException {
+    return processJobRunStateUpdate(runId, JobRunState.State.ABORTED);
+  }
+
+  private Response processJobRunStateUpdate(String runId, JobRunState.State state)
+      throws ResourceException {
+    final UUID jobRunUUID;
     try {
-      final Optional<JobRun> jobRun = jobService.getJobRun(UUID.fromString(runId));
+      jobRunUUID = UUID.fromString(runId);
+    } catch (IllegalArgumentException e) {
+      final String errorMsg = "Could not parse " + runId + " into a UUID!";
+      log.error(errorMsg, e);
+      return Response.status(Response.Status.BAD_REQUEST).entity(errorMsg).build();
+    }
+    try {
+      final Optional<JobRun> jobRun = jobService.getJobRun(jobRunUUID);
       if (jobRun.isPresent()) {
-        jobService.updateJobRunState(UUID.fromString(runId), JobRunState.State.ABORTED);
+        jobService.updateJobRunState(jobRunUUID, state);
         return Response.ok().build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
