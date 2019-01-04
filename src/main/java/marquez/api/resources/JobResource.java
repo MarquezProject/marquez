@@ -179,7 +179,7 @@ public final class JobResource {
 
   @PUT
   @Timed
-  @Path("/jobs/runs/{runId}/start")
+  @Path("/jobs/runs/{id}/start")
   public Response startJobRun(@PathParam("id") final String runId) throws ResourceException {
     return processJobRunStateUpdate(runId, JobRunState.State.RUNNING);
   }
