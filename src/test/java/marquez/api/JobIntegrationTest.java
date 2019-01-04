@@ -160,6 +160,22 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   @Test
+  public void testJobRunAfterMarkedStartedEndToEnd() {
+
+    final Response res =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path(format("/api/v1/jobs/runs/%s/start", CREATED_JOB_RUN_UUID))
+            .request(MediaType.APPLICATION_JSON)
+            .put(Entity.json(""));
+
+    assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
+
+    final JobRunResponse getJobRunResponse = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
+    assertThat(getJobRunResponse.getRunState()).isEqualTo(JobRunState.State.RUNNING.name());
+  }
+
+  @Test
   public void testJobRunAfterMarkedFailedEndToEnd() {
 
     final Response res =
