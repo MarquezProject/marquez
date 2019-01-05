@@ -19,14 +19,17 @@ We feel that a welcoming community is important and we ask that you follow the [
 7. Update the [changelog](https://github.com/MarquezProject/marquez/blob/master/CHANGELOG.md)
 8. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
 9. Add the ["review"](https://github.com/MarquezProject/marquez/labels/review) label to your pull request
-10. Work with project maintainers to get your change reviewed and merged into `master`
+10. Work with project maintainers to get your change reviewed and merged into the `master` branch
 
 To ensure your pull request is accepted, follow these guidelines:
 
 * All changes should be accompanied by tests
 * Do your best to have a [well-formed commit message](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for your change
+* [Keep diffs small](https://graysonkoonce.com/stacked-pull-requests-keeping-github-diffs-small) and self-contained
+* If your change fixes a bug, please [link](https://help.github.com/articles/closing-issues-using-keywords) the issue in your pull request description
 
 # Resources
 
 * [How to Contribute to Open Source](https://opensource.guide/how-to-contribute)
 * [Using the Fork-and-Branch Git Workflow](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow)
+* [Keep a Changelog](https://keepachangelog.com)
