@@ -47,8 +47,6 @@ public class JobResourceTest {
 
   final int UNPROCESSABLE_ENTRY_STATUS_CODE = 422;
 
-  final List<String> validJobEndpoints = Arrays.asList("abort", "complete", "start", "fail");
-
   @ClassRule
   public static final ResourceTestRule resources =
       ResourceTestRule.builder()
@@ -205,7 +203,7 @@ public class JobResourceTest {
 
     when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
     when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new UnexpectedException());
-    Response res = markJobRunStarted(externalRunId);
+    Response res = markJobRunAsRunning(externalRunId);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
 
@@ -276,7 +274,7 @@ public class JobResourceTest {
 
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
 
-    Response res = markJobRunStarted(jobRunForJobRunCreationRequest.getRunId());
+    Response res = markJobRunAsRunning(jobRunForJobRunCreationRequest.getRunId());
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
 
@@ -347,42 +345,39 @@ public class JobResourceTest {
         .post(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
   }
 
-  private Response markJobRunStarted(UUID jobRunId) throws Exception {
-    return markJobRunStarted(jobRunId.toString());
+  private Response markJobRunAsRunning(UUID jobRunId) {
+    return markJobRunAsRunning(jobRunId.toString());
   }
 
-  private Response markJobRunStarted(String jobRunId) throws Exception {
-    return markJobRunWithState(jobRunId, "start");
+  private Response markJobRunAsRunning(String jobRunId) {
+    return markJobRunWithState(jobRunId, "run");
   }
 
-  private Response markJobRunComplete(UUID jobRunId) throws Exception {
+  private Response markJobRunComplete(UUID jobRunId) {
     return markJobRunComplete(jobRunId.toString());
   }
 
-  private Response markJobRunComplete(String jobRunId) throws Exception {
+  private Response markJobRunComplete(String jobRunId) {
     return markJobRunWithState(jobRunId, "complete");
   }
 
-  private Response markJobRunAborted(UUID jobRunId) throws Exception {
+  private Response markJobRunAborted(UUID jobRunId) {
     return markJobRunAborted(jobRunId.toString());
   }
 
-  private Response markJobRunAborted(String jobRunId) throws Exception {
+  private Response markJobRunAborted(String jobRunId) {
     return markJobRunWithState(jobRunId, "abort");
   }
 
-  private Response markJobRunFailed(UUID jobRunId) throws Exception {
+  private Response markJobRunFailed(UUID jobRunId) {
     return markJobRunFailed(jobRunId.toString());
   }
 
-  private Response markJobRunFailed(String jobRunId) throws Exception {
+  private Response markJobRunFailed(String jobRunId) {
     return markJobRunWithState(jobRunId, "fail");
   }
 
-  private Response markJobRunWithState(String jobRunId, String newState) throws Exception {
-    if (!validJobEndpoints.contains(newState)) {
-      throw new Exception("Cannot mark a job as " + newState);
-    }
+  private Response markJobRunWithState(String jobRunId, String newState) {
     String path = format("/api/v1/jobs/runs/%s/%s", jobRunId, newState);
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(EMPTY_PUT_BODY);
   }

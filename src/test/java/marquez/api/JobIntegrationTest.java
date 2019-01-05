@@ -165,7 +165,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path(format("/api/v1/jobs/runs/%s/start", CREATED_JOB_RUN_UUID))
+            .path(format("/api/v1/jobs/runs/%s/run", CREATED_JOB_RUN_UUID))
             .request(MediaType.APPLICATION_JSON)
             .put(Entity.json(""));
 
