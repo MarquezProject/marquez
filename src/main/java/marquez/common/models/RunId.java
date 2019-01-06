@@ -17,7 +17,7 @@ public final class RunId {
   public RunId(@NonNull final String value) {
     Validate.notBlank(value, "value must not be blank or empty");
     Validate.isTrue(
-        value.length() == ID_LENGTH, "value length must = %d", value.length(), ID_LENGTH);
+        value.length() == ID_LENGTH, "value length must = %d", ID_LENGTH);
 
     this.value = UUID.fromString(value);
   }
