@@ -61,10 +61,6 @@ runShadow {
   args = ['server', 'config.yml']
 }
 
-release {
-  tagTemplate = 'v${version}'
-}
-
 spotless {
   java {
     googleJavaFormat()
