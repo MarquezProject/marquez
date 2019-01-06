@@ -23,6 +23,7 @@ dependencies {
   compile 'org.jdbi:jdbi3-postgres:3.5.1'
   compile 'org.jdbi:jdbi3-sqlobject:3.5.1'
   compile 'org.postgresql:postgresql:42.2.5'
+  compile 'org.apache.commons:commons-lang3:3.8.1'
   compileOnly 'org.projectlombok:lombok:1.18.4'
 
   testCompile 'junit:junit:4.12'
