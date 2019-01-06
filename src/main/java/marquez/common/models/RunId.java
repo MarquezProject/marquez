@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 @EqualsAndHashCode
 @ToString
@@ -15,13 +15,9 @@ public final class RunId {
   @Getter private final UUID value;
 
   public RunId(@NonNull final String value) {
-    if (StringUtils.isBlank(value)) {
-      throw new IllegalArgumentException("A run id must not be blank or empty.");
-    }
-    if (value.length() != ID_LENGTH) {
-      throw new IllegalArgumentException(
-          String.format("A run id must have a length of %d.", ID_LENGTH));
-    }
+    Validate.notBlank(value, "value must not be blank or empty");
+    Validate.isTrue(
+        value.length() == ID_LENGTH, "value length %d != %d", value.length(), ID_LENGTH);
 
     this.value = UUID.fromString(value);
   }
