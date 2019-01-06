@@ -35,13 +35,13 @@ public class RunIdTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testRunIdGreaterThan36() {
-    final String idGreaterThan36 = "5f217783-ff48-4650-aab4-ek1306afb3960";
-    new RunId(idGreaterThan36);
+    final String runIdGreaterThan36 = "5f217783-ff48-4650-aab4-ek1306afb3960";
+    new RunId(runIdGreaterThan36);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testRunIdLessThan36() {
-    final String idLessThan36 = "5f217783-ff48-4650-ek1306afb3960";
-    new RunId(idLessThan36);
+    final String runIdLessThan36 = "5f217783-ff48-4650-ek1306afb3960";
+    new RunId(runIdLessThan36);
   }
 }
