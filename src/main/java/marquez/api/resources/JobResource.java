@@ -179,6 +179,13 @@ public final class JobResource {
 
   @PUT
   @Timed
+  @Path("/jobs/runs/{id}/run")
+  public Response runJobRun(@PathParam("id") final String runId) throws ResourceException {
+    return processJobRunStateUpdate(runId, JobRunState.State.RUNNING);
+  }
+
+  @PUT
+  @Timed
   @Path("/jobs/runs/{id}/complete")
   public Response completeJobRun(@PathParam("id") final String runId) throws ResourceException {
     return processJobRunStateUpdate(runId, JobRunState.State.COMPLETED);
