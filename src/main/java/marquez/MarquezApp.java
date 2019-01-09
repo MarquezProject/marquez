@@ -1,5 +1,7 @@
 package marquez;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
@@ -103,6 +105,8 @@ public class MarquezApp extends Application<MarquezConfig> {
             .build(env, config.getDataSourceFactory(), POSTGRES_DB)
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
+    final MetricRegistry metricRegistry = new MetricRegistry();
+    jdbi.setSqlLogger(new InstrumentedSqlLogger(metricRegistry));
 
     final NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
     final JobDao jobDao = jdbi.onDemand(JobDao.class);
