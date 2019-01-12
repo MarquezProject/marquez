@@ -241,6 +241,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/jobRun'
 
+  /jobs/runs/{id}/run:
+    parameters:
+      - $ref: '#/components/parameters/jobRunId'
+    put:
+      summary: Start a job run
+      description: Marks the job run as running.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+
   /jobs/runs/{id}/complete:
     parameters:
       - $ref: '#/components/parameters/jobRunId'
