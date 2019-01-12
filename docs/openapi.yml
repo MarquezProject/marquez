@@ -119,8 +119,8 @@ paths:
                 - outputDatasetUrns
                 - location
               example:
-                inputDatasetsUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
-                outputDatasetsUrns: ["urn:wework:wedata.room_bookings_7_days"]
+                inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
+                outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
                 location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
                 description: Determine weekly room booking occupancy patterns.
       responses:
@@ -437,8 +437,8 @@ components:
         name: room_bookings_7_days
         createdAt: 2018-10-04T15:01:23.045Z
         updatedAt: 2018-10-04T16:15:30.000Z
-        inputDatasetsUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
-        outputDatasetsUrns: ["urn:wework:wedata.room_bookings_7_days"]
+        inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
+        outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         description: Determine weekly room booking occupancy patterns.
 
