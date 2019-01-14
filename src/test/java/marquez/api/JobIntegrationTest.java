@@ -25,13 +25,13 @@ import marquez.core.models.Generator;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
 import marquez.core.models.Namespace;
-import marquez.core.services.JobService;
-import marquez.core.services.NamespaceService;
-import marquez.dao.JobDAO;
-import marquez.dao.JobRunDAO;
-import marquez.dao.JobVersionDAO;
-import marquez.dao.NamespaceDAO;
-import marquez.dao.RunArgsDAO;
+import marquez.service.JobService;
+import marquez.service.NamespaceService;
+import marquez.db.JobDao;
+import marquez.db.JobRunDao;
+import marquez.db.JobVersionDao;
+import marquez.db.NamespaceDao;
+import marquez.db.RunArgsDao;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -50,15 +50,15 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
   protected static final String JOB_RUN_ARGS = "{'key': 'value'}";
 
-  protected static final NamespaceDAO namespaceDAO = APP.onDemand(NamespaceDAO.class);
-  protected static final JobDAO jobDAO = APP.onDemand(JobDAO.class);
-  protected static final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
-  protected static final JobRunDAO jobRunDAO = APP.onDemand(JobRunDAO.class);
-  protected static final RunArgsDAO runArgsDAO = APP.onDemand(RunArgsDAO.class);
+  protected static final NamespaceDao namespaceDao = APP.onDemand(NamespaceDao.class);
+  protected static final JobDao jobDao = APP.onDemand(JobDao.class);
+  protected static final JobVersionDao jobVersionDao = APP.onDemand(JobVersionDao.class);
+  protected static final JobRunDao jobRunDao = APP.onDemand(JobRunDao.class);
+  protected static final RunArgsDao runArgsDao = APP.onDemand(RunArgsDao.class);
 
-  protected static final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
+  protected static final NamespaceService namespaceService = new NamespaceService(namespaceDao);
   protected static final JobService jobService =
-      new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
+      new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
 
   @BeforeClass
   public static void setup() throws UnexpectedException {

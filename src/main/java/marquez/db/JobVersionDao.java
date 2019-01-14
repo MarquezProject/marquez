@@ -1,8 +1,9 @@
-package marquez.dao;
+package marquez.db;
 
 import java.util.List;
 import java.util.UUID;
 import marquez.core.models.JobVersion;
+import marquez.db.mappers.JobVersionRowMapper;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -11,11 +12,10 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
-@RegisterRowMapper(JobVersionRow.class)
-public interface JobVersionDAO {
-
+@RegisterRowMapper(JobVersionRowMapper.class)
+public interface JobVersionDao {
   @CreateSqlObject
-  JobDAO createJobDAO();
+  JobDao createJobDao();
 
   @SqlQuery("SELECT * FROM job_versions WHERE version = :version")
   JobVersion findByVersion(@Bind("version") UUID version);
@@ -48,6 +48,6 @@ public interface JobVersionDAO {
   @Transaction
   default void insert(JobVersion jobVersion) {
     insertVersionOnly(jobVersion);
-    createJobDAO().setCurrentVersionGuid(jobVersion.getJobGuid(), jobVersion.getGuid());
+    createJobDao().setCurrentVersionGuid(jobVersion.getJobGuid(), jobVersion.getGuid());
   }
 }

@@ -1,15 +1,16 @@
-package marquez.dao;
+package marquez.db;
 
 import java.util.List;
 import marquez.core.models.Namespace;
+import marquez.db.mappers.NamespaceRowMapper;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-@RegisterRowMapper(NamespaceRow.class)
-public interface NamespaceDAO {
+@RegisterRowMapper(NamespaceRowMapper.class)
+public interface NamespaceDao {
   @SqlUpdate(
       "INSERT INTO namespaces(guid, name, description, current_ownership) "
           + "VALUES(:guid, :name, :description, :ownerName) "

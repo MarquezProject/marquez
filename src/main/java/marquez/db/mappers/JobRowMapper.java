@@ -1,4 +1,4 @@
-package marquez.dao;
+package marquez.db.mappers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,7 +9,7 @@ import marquez.core.models.Job;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public final class JobRow implements RowMapper<Job> {
+public final class JobRowMapper implements RowMapper<Job> {
 
   @Override
   public Job map(final ResultSet rs, final StatementContext ctx) throws SQLException {

@@ -1,4 +1,4 @@
-package marquez.core.services;
+package marquez.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -23,10 +23,10 @@ import marquez.core.models.Job;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
 import marquez.core.models.JobVersion;
-import marquez.dao.JobDAO;
-import marquez.dao.JobRunDAO;
-import marquez.dao.JobVersionDAO;
-import marquez.dao.RunArgsDAO;
+import marquez.db.JobDao;
+import marquez.db.JobRunDao;
+import marquez.db.JobVersionDao;
+import marquez.db.RunArgsDao;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Assert;
@@ -36,25 +36,25 @@ import org.mockito.ArgumentCaptor;
 
 public class JobServiceTest {
   final String TEST_NS = "test_namespace";
-  private static final JobDAO jobDAO = mock(JobDAO.class);
-  private static final JobVersionDAO jobVersionDAO = mock(JobVersionDAO.class);
-  private static final JobRunDAO jobRunDAO = mock(JobRunDAO.class);
-  private static final RunArgsDAO runArgsDAO = mock(RunArgsDAO.class);
+  private static final JobDao jobDao = mock(JobDao.class);
+  private static final JobVersionDao jobVersionDao = mock(JobVersionDao.class);
+  private static final JobRunDao jobRunDao = mock(JobRunDao.class);
+  private static final RunArgsDao runArgsDao = mock(RunArgsDao.class);
   private static final UUID namespaceID = UUID.randomUUID();
 
   JobService jobService;
 
   @Before
   public void setUp() {
-    jobService = new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
+    jobService = new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
   }
 
   @After
   public void tearDown() {
-    reset(jobDAO);
-    reset(jobVersionDAO);
-    reset(jobRunDAO);
-    reset(runArgsDAO);
+    reset(jobDao);
+    reset(jobVersionDao);
+    reset(jobRunDao);
+    reset(runArgsDao);
   }
 
   private void assertJobFieldsMatch(Job job1, Job job2) {
@@ -72,14 +72,14 @@ public class JobServiceTest {
     List<Job> jobs = new ArrayList<Job>();
     jobs.add(Generator.genJob(namespaceID));
     jobs.add(Generator.genJob(namespaceID));
-    when(jobDAO.findAllInNamespace(TEST_NS)).thenReturn(jobs);
+    when(jobDao.findAllInNamespace(TEST_NS)).thenReturn(jobs);
     Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS));
   }
 
   @Test
   public void testGetAll_NoJobs_OK() throws UnexpectedException {
     List<Job> jobs = new ArrayList<Job>();
-    when(jobDAO.findAllInNamespace(TEST_NS)).thenReturn(jobs);
+    when(jobDao.findAllInNamespace(TEST_NS)).thenReturn(jobs);
     Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS));
   }
 
@@ -90,7 +90,7 @@ public class JobServiceTest {
     List<JobVersion> jobVersions = new ArrayList<JobVersion>();
     jobVersions.add(Generator.genJobVersion(jobGuid));
     jobVersions.add(Generator.genJobVersion(jobGuid));
-    when(jobVersionDAO.find(TEST_NS, jobName)).thenReturn(jobVersions);
+    when(jobVersionDao.find(TEST_NS, jobName)).thenReturn(jobVersions);
     Assert.assertEquals(jobVersions, jobService.getAllVersionsOfJob(TEST_NS, jobName));
   }
 
@@ -98,14 +98,14 @@ public class JobServiceTest {
   public void testGetAllVersions_NoVersions_OK() throws UnexpectedException {
     String jobName = "a job";
     List<JobVersion> jobVersions = new ArrayList<JobVersion>();
-    when(jobVersionDAO.find(TEST_NS, jobName)).thenReturn(jobVersions);
+    when(jobVersionDao.find(TEST_NS, jobName)).thenReturn(jobVersions);
     Assert.assertEquals(jobVersions, jobService.getAllVersionsOfJob(TEST_NS, jobName));
   }
 
   @Test(expected = UnexpectedException.class)
   public void testGetAllVersions_Exception() throws UnexpectedException {
     String jobName = "job";
-    when(jobVersionDAO.find(TEST_NS, jobName)).thenThrow(UnableToExecuteStatementException.class);
+    when(jobVersionDao.find(TEST_NS, jobName)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getAllVersionsOfJob(TEST_NS, jobName);
   }
 
@@ -114,10 +114,10 @@ public class JobServiceTest {
     ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
     Job job = Generator.genJob(namespaceID);
-    when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(null);
-    when(jobDAO.findByID(any(UUID.class))).thenReturn(job);
+    when(jobDao.findByName(TEST_NS, job.getName())).thenReturn(null);
+    when(jobDao.findByID(any(UUID.class))).thenReturn(job);
     Job jobReturned = jobService.createJob(TEST_NS, job);
-    verify(jobDAO).insertJobAndVersion(jobCaptor.capture(), jobVersionCaptor.capture());
+    verify(jobDao).insertJobAndVersion(jobCaptor.capture(), jobVersionCaptor.capture());
     assertEquals(job.getNamespaceGuid(), jobReturned.getNamespaceGuid());
     assertEquals(job.getName(), jobReturned.getName());
     assertEquals(job.getLocation(), jobReturned.getLocation());
@@ -131,10 +131,10 @@ public class JobServiceTest {
     Job existingJob = Generator.genJob(namespaceID);
     JobVersion existingJobVersion = Generator.genJobVersion(existingJob);
     Job newJob = Generator.cloneJob(existingJob);
-    when(jobDAO.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
-    when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(existingJobVersion);
+    when(jobDao.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
+    when(jobVersionDao.findByVersion(any(UUID.class))).thenReturn(existingJobVersion);
     Job jobCreated = jobService.createJob(TEST_NS, newJob);
-    verify(jobDAO, never()).insert(newJob);
+    verify(jobDao, never()).insert(newJob);
     assertNotNull(jobCreated);
     assertJobFieldsMatch(existingJob, jobCreated);
   }
@@ -144,12 +144,12 @@ public class JobServiceTest {
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
     Job existingJob = Generator.genJob(namespaceID);
     Job newJob = Generator.genJob(namespaceID);
-    when(jobDAO.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
-    when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
-    when(jobDAO.findByID(existingJob.getGuid())).thenReturn(existingJob);
+    when(jobDao.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
+    when(jobVersionDao.findByVersion(any(UUID.class))).thenReturn(null);
+    when(jobDao.findByID(existingJob.getGuid())).thenReturn(existingJob);
     Job jobCreated = jobService.createJob(TEST_NS, newJob);
-    verify(jobDAO, never()).insert(newJob);
-    verify(jobVersionDAO).insert(jobVersionCaptor.capture());
+    verify(jobDao, never()).insert(newJob);
+    verify(jobVersionDao).insert(jobVersionCaptor.capture());
     assertEquals(jobCreated.getGuid(), jobVersionCaptor.getValue().getJobGuid());
     assertEquals(newJob.getLocation(), jobVersionCaptor.getValue().getUri());
   }
@@ -168,24 +168,24 @@ public class JobServiceTest {
             null,
             null,
             null);
-    when(jobDAO.findByName(TEST_NS, existingJob.getName())).thenReturn(existingJob);
-    when(jobVersionDAO.findByVersion(existingJobVersionID)).thenReturn(existingJobVersion);
+    when(jobDao.findByName(TEST_NS, existingJob.getName())).thenReturn(existingJob);
+    when(jobVersionDao.findByVersion(existingJobVersionID)).thenReturn(existingJobVersion);
     assertJobFieldsMatch(existingJob, jobService.createJob(TEST_NS, newJob));
-    verify(jobDAO, never()).insert(newJob);
-    verify(jobVersionDAO, never()).insert(any(JobVersion.class));
+    verify(jobDao, never()).insert(newJob);
+    verify(jobVersionDao, never()).insert(any(JobVersion.class));
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testGet_JobDAOException() throws UnexpectedException {
-    when(jobDAO.findByName(eq(TEST_NS), any(String.class)))
+  public void testGet_JobDaoException() throws UnexpectedException {
+    when(jobDao.findByName(eq(TEST_NS), any(String.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.getJob(TEST_NS, "a job");
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testCreate_JobDAOException() throws UnexpectedException {
+  public void testCreate_JobDaoException() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
-    when(jobDAO.findByName(eq(TEST_NS), any(String.class)))
+    when(jobDao.findByName(eq(TEST_NS), any(String.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.createJob(TEST_NS, job);
   }
@@ -200,11 +200,11 @@ public class JobServiceTest {
   }
 
   @Test(expected = UnexpectedException.class)
-  public void testCreate_JobVersionDAOException() throws UnexpectedException {
+  public void testCreate_JobVersionDaoException() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
     UUID jobVersionID = JobService.computeVersion(job);
-    when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(job);
-    when(jobVersionDAO.findByVersion(jobVersionID))
+    when(jobDao.findByName(TEST_NS, job.getName())).thenReturn(job);
+    when(jobVersionDao.findByVersion(jobVersionID))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.createJob(TEST_NS, job);
   }
@@ -212,38 +212,38 @@ public class JobServiceTest {
   @Test(expected = UnexpectedException.class)
   public void testCreate_JobVersionInsertException() throws UnexpectedException {
     Job job = Generator.genJob(namespaceID);
-    when(jobDAO.findByName(TEST_NS, job.getName())).thenReturn(job);
-    when(jobVersionDAO.findByVersion(any(UUID.class))).thenReturn(null);
+    when(jobDao.findByName(TEST_NS, job.getName())).thenReturn(job);
+    when(jobVersionDao.findByVersion(any(UUID.class))).thenReturn(null);
     doThrow(UnableToExecuteStatementException.class)
-        .when(jobVersionDAO)
+        .when(jobVersionDao)
         .insert(any(JobVersion.class));
     jobService.createJob(TEST_NS, job);
   }
 
   @Test(expected = UnexpectedException.class)
   public void testGetAll_Exception() throws UnexpectedException {
-    when(jobDAO.findAllInNamespace(TEST_NS)).thenThrow(UnableToExecuteStatementException.class);
+    when(jobDao.findAllInNamespace(TEST_NS)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getAllJobsInNamespace(TEST_NS);
   }
 
   @Test
   public void testGetJobRun() throws UnexpectedException {
     JobRun jobRun = Generator.genJobRun();
-    when(jobRunDAO.findJobRunById(jobRun.getGuid())).thenReturn(jobRun);
+    when(jobRunDao.findJobRunById(jobRun.getGuid())).thenReturn(jobRun);
     assertEquals(Optional.ofNullable(jobRun), jobService.getJobRun(jobRun.getGuid()));
   }
 
   @Test(expected = UnexpectedException.class)
   public void testGetJobRun_SQLException() throws UnexpectedException {
     UUID jobRunID = UUID.randomUUID();
-    when(jobRunDAO.findJobRunById(jobRunID)).thenThrow(UnableToExecuteStatementException.class);
+    when(jobRunDao.findJobRunById(jobRunID)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getJobRun(jobRunID);
   }
 
   @Test(expected = UnexpectedException.class)
   public void testGetVersionLatest_Exception() throws UnexpectedException {
     String jobName = "a job";
-    when(jobVersionDAO.findLatest(TEST_NS, jobName))
+    when(jobVersionDao.findLatest(TEST_NS, jobName))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.getLatestVersionOfJob(TEST_NS, jobName);
   }
@@ -253,7 +253,7 @@ public class JobServiceTest {
     UUID jobRunID = UUID.randomUUID();
     JobRunState.State state = JobRunState.State.NEW;
     doThrow(UnableToExecuteStatementException.class)
-        .when(jobRunDAO)
+        .when(jobRunDao)
         .updateState(jobRunID, JobRunState.State.toInt(state));
     jobService.updateJobRunState(jobRunID, state);
   }

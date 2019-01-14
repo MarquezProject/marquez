@@ -29,8 +29,8 @@ import marquez.core.mappers.CoreJobToApiJobMapper;
 import marquez.core.models.Job;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
-import marquez.core.services.JobService;
-import marquez.core.services.NamespaceService;
+import marquez.service.JobService;
+import marquez.service.NamespaceService;
 
 @Path("/api/v1")
 @Slf4j

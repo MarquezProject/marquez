@@ -1,14 +1,15 @@
-package marquez.dao;
+package marquez.db;
 
 import java.util.UUID;
 import marquez.core.models.JobRunState;
+import marquez.db.mappers.JobRunStateRowMapper;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-@RegisterRowMapper(JobRunStateRow.class)
-public interface JobRunStateDAO {
+@RegisterRowMapper(JobRunStateRowMapper.class)
+public interface JobRunStateDao {
   @SqlUpdate(
       "INSERT INTO job_run_states (guid, job_run_guid, state)"
           + "VALUES (:guid, :job_run_guid, :state)")

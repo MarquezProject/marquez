@@ -1,9 +1,10 @@
-package marquez.dao;
+package marquez.db;
 
 import java.util.List;
 import java.util.UUID;
 import marquez.core.models.Job;
 import marquez.core.models.JobVersion;
+import marquez.db.mappers.JobRowMapper;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -11,15 +12,11 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-@RegisterRowMapper(JobRow.class)
-public interface JobDAO {
-  static final Logger LOG = LoggerFactory.getLogger(JobDAO.class);
-
+@RegisterRowMapper(JobRowMapper.class)
+public interface JobDao {
   @CreateSqlObject
-  JobVersionDAO createJobVersionDAO();
+  JobVersionDao createJobVersionDao();
 
   @SqlUpdate(
       "INSERT INTO jobs (guid, name, namespace_guid, description, input_dataset_urns, output_dataset_urns) "
@@ -33,7 +30,7 @@ public interface JobDAO {
   @Transaction
   default void insertJobAndVersion(final Job job, final JobVersion jobVersion) {
     insert(job);
-    createJobVersionDAO().insert(jobVersion);
+    createJobVersionDao().insert(jobVersion);
     setCurrentVersionGuid(job.getGuid(), jobVersion.getGuid());
   }
 

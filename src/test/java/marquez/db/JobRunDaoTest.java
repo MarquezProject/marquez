@@ -1,4 +1,4 @@
-package marquez.dao;
+package marquez.db;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,8 +12,8 @@ import marquez.core.models.Generator;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
 import marquez.core.models.Namespace;
-import marquez.core.services.JobService;
-import marquez.core.services.NamespaceService;
+import marquez.service.JobService;
+import marquez.service.NamespaceService;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.statement.Query;
 import org.junit.After;
@@ -21,13 +21,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JobRunDaoTest extends JobRunBaseTest {
-
-  private static Logger LOG = LoggerFactory.getLogger(JobRunDaoTest.class);
-
   protected static String NAMESPACE_NAME;
   protected static String CREATED_JOB_NAME;
   protected static UUID CREATED_JOB_RUN_UUID;
@@ -36,16 +31,16 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   protected static final String JOB_RUN_ARGS = "{'key': 'value'}";
 
-  protected static final NamespaceDAO namespaceDAO = APP.onDemand(NamespaceDAO.class);
-  protected static final JobDAO jobDAO = APP.onDemand(JobDAO.class);
-  protected static final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
-  protected static final JobRunDAO jobRunDAO = APP.onDemand(JobRunDAO.class);
-  protected static final JobRunStateDAO jobRunStateDAO = APP.onDemand(JobRunStateDAO.class);
-  protected static final RunArgsDAO runArgsDAO = APP.onDemand(RunArgsDAO.class);
+  protected static final NamespaceDao namespaceDao = APP.onDemand(NamespaceDao.class);
+  protected static final JobDao jobDao = APP.onDemand(JobDao.class);
+  protected static final JobVersionDao jobVersionDao = APP.onDemand(JobVersionDao.class);
+  protected static final JobRunDao jobRunDao = APP.onDemand(JobRunDao.class);
+  protected static final JobRunStateDao jobRunStateDao = APP.onDemand(JobRunStateDao.class);
+  protected static final RunArgsDao runArgsDao = APP.onDemand(RunArgsDao.class);
 
-  protected static final NamespaceService namespaceService = new NamespaceService(namespaceDAO);
+  protected static final NamespaceService namespaceService = new NamespaceService(namespaceDao);
   protected static final JobService jobService =
-      new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
+      new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
 
   @BeforeClass
   public static void setUpRowMapper() {
@@ -88,7 +83,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunUpdateCreatesJobRunState() {
-    jobRunDAO.updateState(CREATED_JOB_RUN_UUID, JobRunState.State.toInt(JobRunState.State.RUNNING));
+    jobRunDao.updateState(CREATED_JOB_RUN_UUID, JobRunState.State.toInt(JobRunState.State.RUNNING));
 
     JobRunState returnedJobRunState = getLatestJobRunStateForJobId(CREATED_JOB_RUN_UUID);
     assertEquals(JobRunState.State.RUNNING, returnedJobRunState.getState());
@@ -96,7 +91,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Test
   public void testJobRunGetter() {
-    JobRun returnedJobRun = jobRunDAO.findJobRunById(CREATED_JOB_RUN_UUID);
+    JobRun returnedJobRun = jobRunDao.findJobRunById(CREATED_JOB_RUN_UUID);
     assertNull(returnedJobRun.getNominalStartTime());
     assertNull(returnedJobRun.getNominalEndTime());
     assertEquals(
@@ -105,7 +100,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @Test
   public void testLatestGetJobRunStateForJobId() {
-    assertThat(jobRunStateDAO.findByLatestJobRun(CREATED_JOB_RUN_UUID))
+    assertThat(jobRunStateDao.findByLatestJobRun(CREATED_JOB_RUN_UUID))
         .isEqualTo(getLatestJobRunStateForJobId(CREATED_JOB_RUN_UUID));
   }
 
