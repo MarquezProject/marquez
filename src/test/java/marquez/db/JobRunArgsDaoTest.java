@@ -10,11 +10,11 @@ import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class RunArgsDaoTest {
+public class JobRunArgsDaoTest {
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
-  final RunArgsDao runArgsDao = APP.onDemand(RunArgsDao.class);
+  final JobRunArgsDao jobRunArgsDao = APP.onDemand(JobRunArgsDao.class);
   final String hexDigest = "07d4ee12aac795ec60a549dce809c8105c541f0c4f3e7715686953f1702940e0";
   final String argsJson = "{'foo': 1}";
   final RunArgs runArgs = new RunArgs(hexDigest, argsJson, null);
@@ -38,23 +38,23 @@ public class RunArgsDaoTest {
                   hexDigest,
                   argsJson);
             });
-    RunArgs runArgsFound = runArgsDao.findByDigest(hexDigest);
+    RunArgs runArgsFound = jobRunArgsDao.findByDigest(hexDigest);
     assertEquals(runArgs.getHexDigest(), runArgsFound.getHexDigest());
     assertEquals(runArgs.getJson(), runArgsFound.getJson());
   }
 
   @Test
   public void testInsert() {
-    runArgsDao.insert(runArgs);
-    RunArgs runArgsFound = runArgsDao.findByDigest(hexDigest);
+    jobRunArgsDao.insert(runArgs);
+    RunArgs runArgsFound = jobRunArgsDao.findByDigest(hexDigest);
     assertEquals(runArgs.getHexDigest(), runArgsFound.getHexDigest());
     assertEquals(runArgs.getJson(), runArgsFound.getJson());
   }
 
   @Test
   public void testDigestExists() {
-    runArgsDao.insert(runArgs);
-    assertTrue(runArgsDao.digestExists(hexDigest));
-    assertFalse(runArgsDao.digestExists("non-existent"));
+    jobRunArgsDao.insert(runArgs);
+    assertTrue(jobRunArgsDao.digestExists(hexDigest));
+    assertFalse(jobRunArgsDao.digestExists("non-existent"));
   }
 }

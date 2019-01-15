@@ -15,9 +15,9 @@ import marquez.core.models.JobRunState;
 import marquez.core.models.JobVersion;
 import marquez.core.models.RunArgs;
 import marquez.db.JobDao;
+import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
-import marquez.db.RunArgsDao;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -25,14 +25,17 @@ public class JobService {
   private final JobDao jobDao;
   private final JobVersionDao jobVersionDao;
   private final JobRunDao jobRunDao;
-  private final RunArgsDao runArgsDao;
+  private final JobRunArgsDao jobRunArgsDao;
 
   public JobService(
-      JobDao jobDao, JobVersionDao jobVersionDao, JobRunDao jobRunDao, RunArgsDao runArgsDao) {
+      JobDao jobDao,
+      JobVersionDao jobVersionDao,
+      JobRunDao jobRunDao,
+      JobRunArgsDao jobRunArgsDao) {
     this.jobDao = jobDao;
     this.jobVersionDao = jobVersionDao;
     this.jobRunDao = jobRunDao;
-    this.runArgsDao = runArgsDao;
+    this.jobRunArgsDao = jobRunArgsDao;
   }
 
   public Optional<Job> getJob(String namespace, String jobName) throws UnexpectedException {
@@ -178,7 +181,7 @@ public class JobService {
               nominalStartTime,
               nominalEndTime,
               null);
-      if (runArgsJson == null || runArgsDao.digestExists(runArgsDigest)) {
+      if (runArgsJson == null || jobRunArgsDao.digestExists(runArgsDigest)) {
         jobRunDao.insert(jobRun);
       } else {
         jobRunDao.insertJobRunAndArgs(jobRun, runArgs);
