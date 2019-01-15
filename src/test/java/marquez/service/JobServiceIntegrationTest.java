@@ -16,9 +16,9 @@ import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
 import marquez.core.models.JobVersion;
 import marquez.db.JobDao;
+import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
-import marquez.db.RunArgsDao;
 import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
@@ -30,11 +30,11 @@ public class JobServiceIntegrationTest {
   final JobDao jobDao = APP.onDemand(JobDao.class);
   final JobVersionDao jobVersionDao = APP.onDemand(JobVersionDao.class);
   final JobRunDao jobRunDao = APP.onDemand(JobRunDao.class);
-  final RunArgsDao runArgsDao = APP.onDemand(RunArgsDao.class);
+  final JobRunArgsDao jobRunArgsDao = APP.onDemand(JobRunArgsDao.class);
   final UUID namespaceID = UUID.randomUUID();
   final String namespaceName = "job_service_test_ns";
   final String jobOwner = "Amaranta";
-  JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
+  JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
   @Before
   public void setup() {
@@ -134,7 +134,7 @@ public class JobServiceIntegrationTest {
         JobRunState.State.toInt(JobRunState.State.NEW),
         jobRunFound.get().getCurrentState().intValue());
     String argsHexDigest = jobRun.getRunArgsHexDigest();
-    assertEquals(runArgsJson, runArgsDao.findByDigest(argsHexDigest).getJson());
+    assertEquals(runArgsJson, jobRunArgsDao.findByDigest(argsHexDigest).getJson());
     jobService.updateJobRunState(jobRun.getGuid(), JobRunState.State.RUNNING);
   }
 

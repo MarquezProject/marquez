@@ -18,7 +18,7 @@ public interface JobRunDao {
   JobRunStateDao createJobRunStateDao();
 
   @CreateSqlObject
-  RunArgsDao createRunArgsDao();
+  JobRunArgsDao createJobRunArgsDao();
 
   @SqlUpdate(
       "INSERT INTO job_runs (guid, job_version_guid, current_state, "
@@ -35,7 +35,7 @@ public interface JobRunDao {
 
   @Transaction
   default void insertJobRunAndArgs(JobRun jobRun, RunArgs runArgs) {
-    createRunArgsDao().insert(runArgs);
+    createJobRunArgsDao().insert(runArgs);
     insert(jobRun);
   }
 
