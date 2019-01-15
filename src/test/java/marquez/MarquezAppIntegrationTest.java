@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import java.net.URI;
 import javax.ws.rs.core.Response;
-import marquez.dao.fixtures.AppWithPostgresRule;
+import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;

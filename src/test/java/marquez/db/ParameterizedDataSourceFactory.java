@@ -1,4 +1,4 @@
-package marquez.dao;
+package marquez.db;
 
 import io.dropwizard.db.DataSourceFactory;
 

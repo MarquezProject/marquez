@@ -1,4 +1,4 @@
-package marquez.core.services;
+package marquez.service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -14,30 +14,30 @@ import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
 import marquez.core.models.JobVersion;
 import marquez.core.models.RunArgs;
-import marquez.dao.JobDAO;
-import marquez.dao.JobRunDAO;
-import marquez.dao.JobVersionDAO;
-import marquez.dao.RunArgsDAO;
+import marquez.db.JobDao;
+import marquez.db.JobRunDao;
+import marquez.db.JobVersionDao;
+import marquez.db.RunArgsDao;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class JobService {
-  private final JobDAO jobDAO;
-  private final JobVersionDAO jobVersionDAO;
-  private final JobRunDAO jobRunDAO;
-  private final RunArgsDAO runArgsDAO;
+  private final JobDao jobDao;
+  private final JobVersionDao jobVersionDao;
+  private final JobRunDao jobRunDao;
+  private final RunArgsDao runArgsDao;
 
   public JobService(
-      JobDAO jobDAO, JobVersionDAO jobVersionDAO, JobRunDAO jobRunDAO, RunArgsDAO runArgsDAO) {
-    this.jobDAO = jobDAO;
-    this.jobVersionDAO = jobVersionDAO;
-    this.jobRunDAO = jobRunDAO;
-    this.runArgsDAO = runArgsDAO;
+      JobDao jobDao, JobVersionDao jobVersionDao, JobRunDao jobRunDao, RunArgsDao runArgsDao) {
+    this.jobDao = jobDao;
+    this.jobVersionDao = jobVersionDao;
+    this.jobRunDao = jobRunDao;
+    this.runArgsDao = runArgsDao;
   }
 
   public Optional<Job> getJob(String namespace, String jobName) throws UnexpectedException {
     try {
-      return Optional.ofNullable(jobDAO.findByName(namespace, jobName));
+      return Optional.ofNullable(jobDao.findByName(namespace, jobName));
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to get a job";
       log.error(err, e);
@@ -47,7 +47,7 @@ public class JobService {
 
   public Job createJob(String namespace, Job job) throws UnexpectedException {
     try {
-      Job existingJob = this.jobDAO.findByName(namespace, job.getName());
+      Job existingJob = this.jobDao.findByName(namespace, job.getName());
       if (existingJob == null) {
         Job newJob =
             new Job(
@@ -58,8 +58,8 @@ public class JobService {
                 job.getDescription(),
                 job.getInputDatasetUrns(),
                 job.getOutputDatasetUrns());
-        jobDAO.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
-        return jobDAO.findByID(newJob.getGuid());
+        jobDao.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
+        return jobDao.findByID(newJob.getGuid());
       } else {
         Job existingJobWithNewUri =
             new Job(
@@ -71,10 +71,10 @@ public class JobService {
                 existingJob.getInputDatasetUrns(),
                 existingJob.getOutputDatasetUrns());
         UUID versionID = JobService.computeVersion(existingJobWithNewUri);
-        JobVersion existingJobVersion = this.jobVersionDAO.findByVersion(versionID);
+        JobVersion existingJobVersion = jobVersionDao.findByVersion(versionID);
         if (existingJobVersion == null) {
-          jobVersionDAO.insert(JobService.createJobVersion(existingJobWithNewUri));
-          return jobDAO.findByID(existingJob.getGuid());
+          jobVersionDao.insert(JobService.createJobVersion(existingJobWithNewUri));
+          return jobDao.findByID(existingJob.getGuid());
         }
         return existingJob;
       }
@@ -87,7 +87,7 @@ public class JobService {
 
   public List<Job> getAllJobsInNamespace(String namespace) throws UnexpectedException {
     try {
-      return this.jobDAO.findAllInNamespace(namespace);
+      return jobDao.findAllInNamespace(namespace);
     } catch (UnableToExecuteStatementException e) {
       log.error("caught exception while fetching jobs in namespace ", e);
       throw new UnexpectedException();
@@ -97,7 +97,7 @@ public class JobService {
   public List<JobVersion> getAllVersionsOfJob(String namespace, String jobName)
       throws UnexpectedException {
     try {
-      return this.jobVersionDAO.find(namespace, jobName);
+      return jobVersionDao.find(namespace, jobName);
     } catch (UnableToExecuteStatementException e) {
       log.error("caught exception while fetching versions of job", e);
       throw new UnexpectedException();
@@ -107,7 +107,7 @@ public class JobService {
   public Optional<JobVersion> getLatestVersionOfJob(String namespace, String jobName)
       throws UnexpectedException {
     try {
-      return Optional.ofNullable(jobVersionDAO.findLatest(namespace, jobName));
+      return Optional.ofNullable(jobVersionDao.findLatest(namespace, jobName));
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching latest version of job";
       log.error(err, e);
@@ -118,8 +118,8 @@ public class JobService {
   public JobRun updateJobRunState(UUID jobRunID, JobRunState.State state)
       throws UnexpectedException {
     try {
-      this.jobRunDAO.updateState(jobRunID, JobRunState.State.toInt(state));
-      return this.jobRunDAO.findJobRunById(jobRunID);
+      this.jobRunDao.updateState(jobRunID, JobRunState.State.toInt(state));
+      return jobRunDao.findJobRunById(jobRunID);
     } catch (UnableToExecuteStatementException e) {
       String err = "error updating job run state";
       log.error(err, e);
@@ -129,7 +129,7 @@ public class JobService {
 
   public Optional<JobRun> getJobRun(UUID jobRunID) throws UnexpectedException {
     try {
-      return Optional.ofNullable(this.jobRunDAO.findJobRunById(jobRunID));
+      return Optional.ofNullable(jobRunDao.findJobRunById(jobRunID));
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching job run";
       log.error(err, e);
@@ -147,7 +147,7 @@ public class JobService {
     try {
       String runArgsDigest = null;
       RunArgs runArgs = null;
-      if (null == jobDAO.findByName(namespaceName, jobName)) {
+      if (null == jobDao.findByName(namespaceName, jobName)) {
         String err =
             String.format(
                 "unable to find job <ns='%s', job name='%s'> to create job run",
@@ -178,10 +178,10 @@ public class JobService {
               nominalStartTime,
               nominalEndTime,
               null);
-      if (runArgsJson == null || runArgsDAO.digestExists(runArgsDigest)) {
-        jobRunDAO.insert(jobRun);
+      if (runArgsJson == null || runArgsDao.digestExists(runArgsDigest)) {
+        jobRunDao.insert(jobRun);
       } else {
-        jobRunDAO.insertJobRunAndArgs(jobRun, runArgs);
+        jobRunDao.insertJobRunAndArgs(jobRun, runArgs);
       }
       return jobRun;
     } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e) {

@@ -1,4 +1,4 @@
-package marquez.dao;
+package marquez.db.mappers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,7 +7,7 @@ import marquez.core.models.JobVersion;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public class JobVersionRow implements RowMapper<JobVersion> {
+public class JobVersionRowMapper implements RowMapper<JobVersion> {
   @Override
   public JobVersion map(ResultSet rs, StatementContext ctx) throws SQLException {
     String rawLastRunGuid = rs.getString("latest_run_guid");

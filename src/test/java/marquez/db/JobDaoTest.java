@@ -1,4 +1,4 @@
-package marquez.dao;
+package marquez.db;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -11,18 +11,18 @@ import java.util.UUID;
 import marquez.core.models.Generator;
 import marquez.core.models.Job;
 import marquez.core.models.JobVersion;
-import marquez.dao.fixtures.AppWithPostgresRule;
+import marquez.db.fixtures.AppWithPostgresRule;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class JobDAOTest {
+public class JobDaoTest {
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
-  final JobDAO jobDAO = APP.onDemand(JobDAO.class);
+  final JobDao jobDao = APP.onDemand(JobDao.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
   Job job = Generator.genJob(nsID);
@@ -72,26 +72,26 @@ public class JobDAOTest {
 
   @Test
   public void testFindByID() {
-    jobDAO.insertJobAndVersion(job, jobVersion);
-    Job jobFound = jobDAO.findByID(job.getGuid());
+    jobDao.insertJobAndVersion(job, jobVersion);
+    Job jobFound = jobDao.findByID(job.getGuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
-    assertNull(null, jobDAO.findByID(UUID.randomUUID()));
+    assertNull(null, jobDao.findByID(UUID.randomUUID()));
   }
 
   public void testFindByName() {
-    jobDAO.insertJobAndVersion(job, jobVersion);
-    Job jobFound = jobDAO.findByName(nsName, job.getName());
+    jobDao.insertJobAndVersion(job, jobVersion);
+    Job jobFound = jobDao.findByName(nsName, job.getName());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
-    assertNull(null, jobDAO.findByName(nsName, "nonexistent job"));
+    assertNull(null, jobDao.findByName(nsName, "nonexistent job"));
   }
 
   @Test
   public void testInsert() {
     JobVersion jobVersion = Generator.genJobVersion(job);
-    jobDAO.insertJobAndVersion(job, jobVersion);
-    Job jobFound = jobDAO.findByID(job.getGuid());
+    jobDao.insertJobAndVersion(job, jobVersion);
+    Job jobFound = jobDao.findByID(job.getGuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
   }
@@ -100,7 +100,7 @@ public class JobDAOTest {
   public void testInsert_DiffNsSameName() {
     UUID newNamespaceId = UUID.randomUUID();
     insertNamespace(newNamespaceId, "newNsForDupTest", "Amaranta");
-    jobDAO.insert(job);
+    jobDao.insert(job);
     Job jobWithDiffNsSameName =
         new Job(
             UUID.randomUUID(),
@@ -110,12 +110,12 @@ public class JobDAOTest {
             "desc",
             Collections.<String>emptyList(),
             Collections.<String>emptyList());
-    jobDAO.insert(jobWithDiffNsSameName);
+    jobDao.insert(jobWithDiffNsSameName);
   }
 
   @Test(expected = UnableToExecuteStatementException.class)
   public void testInsert_SameNsSameName() {
-    jobDAO.insert(job);
+    jobDao.insert(job);
     Job jobWithSameNsSameName =
         new Job(
             UUID.randomUUID(),
@@ -125,13 +125,13 @@ public class JobDAOTest {
             "desc",
             Collections.<String>emptyList(),
             Collections.<String>emptyList());
-    jobDAO.insert(jobWithSameNsSameName);
+    jobDao.insert(jobWithSameNsSameName);
   }
 
   @Test
   public void testInsertJobAndVersion() {
-    jobDAO.insertJobAndVersion(job, jobVersion);
-    Job jobFound = jobDAO.findByID(job.getGuid());
+    jobDao.insertJobAndVersion(job, jobVersion);
+    Job jobFound = jobDao.findByID(job.getGuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
     assertEquals(job.getLocation(), jobFound.getLocation());
@@ -143,11 +143,11 @@ public class JobDAOTest {
         Arrays.asList(Generator.genJob(nsID), Generator.genJob(nsID), Generator.genJob(nsID));
     jobs.forEach(
         job -> {
-          jobDAO.insertJobAndVersion(job, Generator.genJobVersion(job));
+          jobDao.insertJobAndVersion(job, Generator.genJobVersion(job));
         });
-    List<Job> jobsFound = jobDAO.findAllInNamespace(nsName);
+    List<Job> jobsFound = jobDao.findAllInNamespace(nsName);
     assertEquals(jobs.size(), jobsFound.size());
-    assertEquals(0, jobDAO.findAllInNamespace("nonexistent").size());
+    assertEquals(0, jobDao.findAllInNamespace("nonexistent").size());
   }
 
   @Test
@@ -164,8 +164,8 @@ public class JobDAOTest {
             Collections.<String>emptyList(),
             null);
     JobVersion jobVersion = Generator.genJobVersion(jobWithEmptyInputsOutputs);
-    jobDAO.insertJobAndVersion(jobWithEmptyInputsOutputs, jobVersion);
-    Job jobFound = jobDAO.findByID(jobId);
+    jobDao.insertJobAndVersion(jobWithEmptyInputsOutputs, jobVersion);
+    Job jobFound = jobDao.findByID(jobId);
     assertEquals(0, jobFound.getInputDatasetUrns().size());
     assertEquals(0, jobFound.getOutputDatasetUrns().size());
   }

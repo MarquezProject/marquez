@@ -1,4 +1,4 @@
-package marquez.dao;
+package marquez.db;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,14 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 import marquez.core.models.Generator;
 import marquez.core.models.Namespace;
-import marquez.dao.fixtures.AppWithPostgresRule;
+import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class NamespaceDAOTest {
+public class NamespaceDaoTest {
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
-  NamespaceDAO namespaceDAO = APP.onDemand(NamespaceDAO.class);
+  NamespaceDao namespaceDao = APP.onDemand(NamespaceDao.class);
 
   @After
   public void tearDown() {
@@ -47,38 +47,38 @@ public class NamespaceDAOTest {
                   namespace.getDescription(),
                   namespace.getOwnerName());
             });
-    assertFieldsMatchExceptTS(namespace, namespaceDAO.find(namespace.getName()));
-    assertEquals(null, namespaceDAO.find("nonexistent_namespace"));
+    assertFieldsMatchExceptTS(namespace, namespaceDao.find(namespace.getName()));
+    assertEquals(null, namespaceDao.find("nonexistent_namespace"));
   }
 
   @Test
   public void testInsert() {
     Namespace newNs = Generator.genNamespace();
-    namespaceDAO.insert(newNs);
-    assertFieldsMatchExceptTS(newNs, namespaceDAO.find(newNs.getName()));
+    namespaceDao.insert(newNs);
+    assertFieldsMatchExceptTS(newNs, namespaceDao.find(newNs.getName()));
   }
 
   @Test
   public void testFindAll() {
-    List<Namespace> existingNamespacesFound = namespaceDAO.findAll();
+    List<Namespace> existingNamespacesFound = namespaceDao.findAll();
     List<Namespace> newNamespaces =
         new ArrayList<Namespace>(Arrays.asList(Generator.genNamespace(), Generator.genNamespace()));
-    newNamespaces.forEach(n -> namespaceDAO.insert(n));
-    List<Namespace> namespacesFound = namespaceDAO.findAll();
+    newNamespaces.forEach(n -> namespaceDao.insert(n));
+    List<Namespace> namespacesFound = namespaceDao.findAll();
     assertEquals(newNamespaces.size(), namespacesFound.size() - existingNamespacesFound.size());
   }
 
   @Test
   public void testFindAll_Empty() {
-    assertEquals(0, namespaceDAO.findAll().size());
+    assertEquals(0, namespaceDao.findAll().size());
   }
 
   @Test
   public void testExists() {
     Namespace nonexistentNs = Generator.genNamespace();
-    assertFalse(namespaceDAO.exists(nonexistentNs.getName()));
+    assertFalse(namespaceDao.exists(nonexistentNs.getName()));
     Namespace existingNs = Generator.genNamespace();
-    namespaceDAO.insert(existingNs);
-    assertTrue(namespaceDAO.exists(existingNs.getName()));
+    namespaceDao.insert(existingNs);
+    assertTrue(namespaceDao.exists(existingNs.getName()));
   }
 }

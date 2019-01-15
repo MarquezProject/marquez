@@ -1,4 +1,4 @@
-package marquez.core.services;
+package marquez.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,15 +6,15 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Namespace;
-import marquez.dao.NamespaceDAO;
+import marquez.db.NamespaceDao;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class NamespaceService {
-  private NamespaceDAO namespaceDAO;
+  private NamespaceDao namespaceDao;
 
-  public NamespaceService(NamespaceDAO namespaceDAO) {
-    this.namespaceDAO = namespaceDAO;
+  public NamespaceService(NamespaceDao namespaceDao) {
+    this.namespaceDao = namespaceDao;
   }
 
   public Namespace create(Namespace namespace) throws UnexpectedException {
@@ -25,8 +25,8 @@ public class NamespaceService {
               namespace.getName(),
               namespace.getOwnerName(),
               namespace.getDescription());
-      namespaceDAO.insert(newNamespace);
-      return namespaceDAO.find(newNamespace.getName());
+      namespaceDao.insert(newNamespace);
+      return namespaceDao.find(newNamespace.getName());
     } catch (UnableToExecuteStatementException e) {
       String err = "error creating namespace";
       log.error(err);
@@ -36,7 +36,7 @@ public class NamespaceService {
 
   public boolean exists(String namespaceName) throws UnexpectedException {
     try {
-      return namespaceDAO.exists(namespaceName.toLowerCase());
+      return namespaceDao.exists(namespaceName.toLowerCase());
     } catch (UnableToExecuteStatementException e) {
       String err = "error checking namespace existence";
       log.error(err);
@@ -46,7 +46,7 @@ public class NamespaceService {
 
   public Optional<Namespace> get(String name) throws UnexpectedException {
     try {
-      return Optional.ofNullable(namespaceDAO.find(name));
+      return Optional.ofNullable(namespaceDao.find(name));
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching namespace";
       log.error(err);
@@ -56,7 +56,7 @@ public class NamespaceService {
 
   public List<Namespace> listNamespaces() throws UnexpectedException {
     try {
-      return namespaceDAO.findAll();
+      return namespaceDao.findAll();
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching list of namespaces";
       log.error(err);

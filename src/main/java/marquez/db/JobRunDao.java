@@ -1,8 +1,9 @@
-package marquez.dao;
+package marquez.db;
 
 import java.util.UUID;
 import marquez.core.models.JobRun;
 import marquez.core.models.RunArgs;
+import marquez.db.mappers.JobRunRowMapper;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -10,18 +11,14 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-@RegisterRowMapper(JobRunRow.class)
-public interface JobRunDAO {
-  Logger LOG = LoggerFactory.getLogger(JobRunDAO.class);
+@RegisterRowMapper(JobRunRowMapper.class)
+public interface JobRunDao {
+  @CreateSqlObject
+  JobRunStateDao createJobRunStateDao();
 
   @CreateSqlObject
-  JobRunStateDAO createJobRunStateDAO();
-
-  @CreateSqlObject
-  RunArgsDAO createRunArgsDAO();
+  RunArgsDao createRunArgsDao();
 
   @SqlUpdate(
       "INSERT INTO job_runs (guid, job_version_guid, current_state, "
@@ -33,12 +30,12 @@ public interface JobRunDAO {
   @Transaction
   default void insert(JobRun jobRun) {
     insertJobRun(jobRun);
-    createJobRunStateDAO().insert(UUID.randomUUID(), jobRun.getGuid(), jobRun.getCurrentState());
+    createJobRunStateDao().insert(UUID.randomUUID(), jobRun.getGuid(), jobRun.getCurrentState());
   }
 
   @Transaction
   default void insertJobRunAndArgs(JobRun jobRun, RunArgs runArgs) {
-    createRunArgsDAO().insert(runArgs);
+    createRunArgsDao().insert(runArgs);
     insert(jobRun);
   }
 
@@ -48,7 +45,7 @@ public interface JobRunDAO {
   @Transaction
   default void updateState(UUID jobRunID, Integer state) {
     updateCurrentState(jobRunID, state);
-    createJobRunStateDAO().insert(UUID.randomUUID(), jobRunID, state);
+    createJobRunStateDao().insert(UUID.randomUUID(), jobRunID, state);
   }
 
   @SqlQuery(

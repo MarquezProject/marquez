@@ -12,7 +12,7 @@ import marquez.api.models.CreateNamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
 import marquez.api.resources.NamespaceBaseTest;
-import marquez.dao.fixtures.AppWithPostgresRule;
+import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 

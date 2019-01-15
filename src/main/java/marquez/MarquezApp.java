@@ -17,15 +17,15 @@ import marquez.api.resources.JobResource;
 import marquez.api.resources.NamespaceResource;
 import marquez.api.resources.PingResource;
 import marquez.core.mappers.ResourceExceptionMapper;
-import marquez.core.services.JobService;
-import marquez.core.services.NamespaceService;
-import marquez.dao.JobDAO;
-import marquez.dao.JobRunDAO;
-import marquez.dao.JobVersionDAO;
-import marquez.dao.NamespaceDAO;
-import marquez.dao.RunArgsDAO;
 import marquez.db.DatasetDao;
+import marquez.db.JobDao;
+import marquez.db.JobRunDao;
+import marquez.db.JobVersionDao;
+import marquez.db.NamespaceDao;
+import marquez.db.RunArgsDao;
 import marquez.service.DatasetService;
+import marquez.service.JobService;
+import marquez.service.NamespaceService;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
@@ -104,7 +104,7 @@ public class MarquezApp extends Application<MarquezConfig> {
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
 
-    final NamespaceDAO namespaceDao = jdbi.onDemand(NamespaceDAO.class);
+    final NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
     final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
 
     final NamespaceService namespaceService = new NamespaceService(namespaceDao);
@@ -114,12 +114,12 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new DatasetResource(namespaceService, new DatasetService(datasetDao)));
 
-    final JobDAO jobDAO = jdbi.onDemand(JobDAO.class);
-    final JobVersionDAO jobVersionDAO = jdbi.onDemand(JobVersionDAO.class);
-    final JobRunDAO jobRunDAO = jdbi.onDemand(JobRunDAO.class);
-    final RunArgsDAO runArgsDAO = jdbi.onDemand(RunArgsDAO.class);
+    final JobDao jobDao = jdbi.onDemand(JobDao.class);
+    final JobVersionDao jobVersionDao = jdbi.onDemand(JobVersionDao.class);
+    final JobRunDao jobRunDao = jdbi.onDemand(JobRunDao.class);
+    final RunArgsDao runArgsDao = jdbi.onDemand(RunArgsDao.class);
 
-    final JobService jobService = new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
+    final JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
     env.jersey().register(new JobResource(namespaceService, jobService));
 
     env.jersey().register(new ResourceExceptionMapper());

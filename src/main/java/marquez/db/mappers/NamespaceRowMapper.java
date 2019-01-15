@@ -1,4 +1,4 @@
-package marquez.dao;
+package marquez.db.mappers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6,12 +6,8 @@ import java.util.UUID;
 import marquez.core.models.Namespace;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class NamespaceRow implements RowMapper<Namespace> {
-  static final Logger logger = LoggerFactory.getLogger(NamespaceDAO.class);
-
+public class NamespaceRowMapper implements RowMapper<Namespace> {
   @Override
   public Namespace map(ResultSet rs, StatementContext ctx) throws SQLException {
     return new Namespace(

@@ -24,7 +24,7 @@ import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.core.mappers.NamespaceApiMapper;
 import marquez.core.models.Namespace;
-import marquez.core.services.NamespaceService;
+import marquez.service.NamespaceService;
 import org.hibernate.validator.constraints.NotBlank;
 
 @Slf4j

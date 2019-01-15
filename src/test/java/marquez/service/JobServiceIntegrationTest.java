@@ -1,4 +1,4 @@
-package marquez.core.services;
+package marquez.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,11 +15,11 @@ import marquez.core.models.Job;
 import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
 import marquez.core.models.JobVersion;
-import marquez.dao.JobDAO;
-import marquez.dao.JobRunDAO;
-import marquez.dao.JobVersionDAO;
-import marquez.dao.RunArgsDAO;
-import marquez.dao.fixtures.AppWithPostgresRule;
+import marquez.db.JobDao;
+import marquez.db.JobRunDao;
+import marquez.db.JobVersionDao;
+import marquez.db.RunArgsDao;
+import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -27,14 +27,14 @@ import org.junit.Test;
 
 public class JobServiceIntegrationTest {
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
-  final JobDAO jobDAO = APP.onDemand(JobDAO.class);
-  final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
-  final JobRunDAO jobRunDAO = APP.onDemand(JobRunDAO.class);
-  final RunArgsDAO runArgsDAO = APP.onDemand(RunArgsDAO.class);
+  final JobDao jobDao = APP.onDemand(JobDao.class);
+  final JobVersionDao jobVersionDao = APP.onDemand(JobVersionDao.class);
+  final JobRunDao jobRunDao = APP.onDemand(JobRunDao.class);
+  final RunArgsDao runArgsDao = APP.onDemand(RunArgsDao.class);
   final UUID namespaceID = UUID.randomUUID();
   final String namespaceName = "job_service_test_ns";
   final String jobOwner = "Amaranta";
-  JobService jobService = new JobService(jobDAO, jobVersionDAO, jobRunDAO, runArgsDAO);
+  JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
 
   @Before
   public void setup() {
@@ -134,7 +134,7 @@ public class JobServiceIntegrationTest {
         JobRunState.State.toInt(JobRunState.State.NEW),
         jobRunFound.get().getCurrentState().intValue());
     String argsHexDigest = jobRun.getRunArgsHexDigest();
-    assertEquals(runArgsJson, runArgsDAO.findByDigest(argsHexDigest).getJson());
+    assertEquals(runArgsJson, runArgsDao.findByDigest(argsHexDigest).getJson());
     jobService.updateJobRunState(jobRun.getGuid(), JobRunState.State.RUNNING);
   }
 

@@ -1,6 +1,6 @@
 package marquez.api;
 
-import marquez.dao.fixtures.AppWithPostgresRule;
+import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.ClassRule;
 
 public class JobRunBaseTest {

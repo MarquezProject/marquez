@@ -1,4 +1,4 @@
-package marquez.dao;
+package marquez.db;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -9,18 +9,18 @@ import java.util.UUID;
 import marquez.core.models.Generator;
 import marquez.core.models.Job;
 import marquez.core.models.JobVersion;
-import marquez.dao.fixtures.AppWithPostgresRule;
+import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class JobVersionDAOTest {
+public class JobVersionDaoTest {
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
-  final JobDAO jobDAO = APP.onDemand(JobDAO.class);
-  final JobVersionDAO jobVersionDAO = APP.onDemand(JobVersionDAO.class);
+  final JobDao jobDao = APP.onDemand(JobDao.class);
+  final JobVersionDao jobVersionDao = APP.onDemand(JobVersionDao.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
   final Job job = Generator.genJob(nsID);
@@ -36,7 +36,7 @@ public class JobVersionDAOTest {
                   nsName,
                   "Amaranta");
             });
-    jobDAO.insert(job);
+    jobDao.insert(job);
   }
 
   @After
@@ -55,53 +55,53 @@ public class JobVersionDAOTest {
   @Test
   public void testFindByVersion() {
     JobVersion jobVersion = Generator.genJobVersion(job);
-    jobVersionDAO.insert(jobVersion);
-    JobVersion jobVersionFound = jobVersionDAO.findByVersion(jobVersion.getVersion());
+    jobVersionDao.insert(jobVersion);
+    JobVersion jobVersionFound = jobVersionDao.findByVersion(jobVersion.getVersion());
     assertEquals(jobVersion.getGuid(), jobVersionFound.getGuid());
-    assertNull(jobVersionDAO.findByVersion(UUID.randomUUID()));
+    assertNull(jobVersionDao.findByVersion(UUID.randomUUID()));
   }
 
   @Test
   public void testFindByVersion_Multi() {
     JobVersion jobVersion1 = Generator.genJobVersion(job);
     JobVersion jobVersion2 = Generator.genJobVersion(job);
-    jobVersionDAO.insert(jobVersion1);
-    jobVersionDAO.insert(jobVersion2);
+    jobVersionDao.insert(jobVersion1);
+    jobVersionDao.insert(jobVersion2);
     assertEquals(
-        jobVersion1.getGuid(), jobVersionDAO.findByVersion(jobVersion1.getVersion()).getGuid());
+        jobVersion1.getGuid(), jobVersionDao.findByVersion(jobVersion1.getVersion()).getGuid());
     assertEquals(
-        jobVersion2.getGuid(), jobVersionDAO.findByVersion(jobVersion2.getVersion()).getGuid());
+        jobVersion2.getGuid(), jobVersionDao.findByVersion(jobVersion2.getVersion()).getGuid());
   }
 
   @Test
   public void testFind() {
     List<JobVersion> versionsWeWant =
         Arrays.asList(Generator.genJobVersion(job), Generator.genJobVersion(job));
-    versionsWeWant.forEach(jv -> jobVersionDAO.insert(jv));
-    assertEquals(versionsWeWant.size(), jobVersionDAO.find(nsName, job.getName()).size());
+    versionsWeWant.forEach(jv -> jobVersionDao.insert(jv));
+    assertEquals(versionsWeWant.size(), jobVersionDao.find(nsName, job.getName()).size());
   }
 
   @Test
   public void testFind_Multi() {
     // add some unrelated jobs and job versions
     Job unrelatedJob = Generator.genJob(nsID);
-    jobDAO.insert(unrelatedJob);
+    jobDao.insert(unrelatedJob);
     JobVersion dontWant1 = Generator.genJobVersion(unrelatedJob);
     JobVersion dontWant2 = Generator.genJobVersion(unrelatedJob);
     List<JobVersion> versionsWeDontWant = Arrays.asList(dontWant1, dontWant2);
-    versionsWeDontWant.forEach(jv -> jobVersionDAO.insert(jv));
+    versionsWeDontWant.forEach(jv -> jobVersionDao.insert(jv));
     List<JobVersion> versionsWeWant =
         Arrays.asList(Generator.genJobVersion(job), Generator.genJobVersion(job));
-    versionsWeWant.forEach(jv -> jobVersionDAO.insert(jv));
-    assertEquals(versionsWeWant.size(), jobVersionDAO.find(nsName, job.getName()).size());
+    versionsWeWant.forEach(jv -> jobVersionDao.insert(jv));
+    assertEquals(versionsWeWant.size(), jobVersionDao.find(nsName, job.getName()).size());
   }
 
   @Test
   public void testFindLatest() {
     JobVersion jobVersion1 = Generator.genJobVersion(job);
     JobVersion jobVersion2 = Generator.genJobVersion(job);
-    jobVersionDAO.insert(jobVersion1);
-    jobVersionDAO.insert(jobVersion2);
-    assertEquals(jobVersion2.getGuid(), jobVersionDAO.findLatest(nsName, job.getName()).getGuid());
+    jobVersionDao.insert(jobVersion1);
+    jobVersionDao.insert(jobVersion2);
+    assertEquals(jobVersion2.getGuid(), jobVersionDao.findLatest(nsName, job.getName()).getGuid());
   }
 }
