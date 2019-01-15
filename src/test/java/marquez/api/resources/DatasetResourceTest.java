@@ -18,8 +18,8 @@ import marquez.api.models.DatasetsResponse;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.Namespace;
 import marquez.core.exceptions.UnexpectedException;
-import marquez.service.NamespaceService;
 import marquez.service.DatasetService;
+import marquez.service.NamespaceService;
 import marquez.service.models.Dataset;
 import org.junit.Test;
 
