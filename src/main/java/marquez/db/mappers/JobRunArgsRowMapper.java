@@ -6,7 +6,7 @@ import marquez.core.models.RunArgs;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public class RunArgsRowMapper implements RowMapper<RunArgs> {
+public class JobRunArgsRowMapper implements RowMapper<RunArgs> {
   @Override
   public RunArgs map(ResultSet rs, StatementContext ctx) throws SQLException {
     return new RunArgs(

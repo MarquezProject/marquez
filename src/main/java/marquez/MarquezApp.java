@@ -19,10 +19,10 @@ import marquez.api.resources.PingResource;
 import marquez.core.mappers.ResourceExceptionMapper;
 import marquez.db.DatasetDao;
 import marquez.db.JobDao;
+import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
-import marquez.db.RunArgsDao;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -105,22 +105,20 @@ public class MarquezApp extends Application<MarquezConfig> {
             .installPlugin(new PostgresPlugin());
 
     final NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
+    final JobDao jobDao = jdbi.onDemand(JobDao.class);
+    final JobVersionDao jobVersionDao = jdbi.onDemand(JobVersionDao.class);
+    final JobRunDao jobRunDao = jdbi.onDemand(JobRunDao.class);
+    final JobRunArgsDao jobRunArgsDao = jdbi.onDemand(JobRunArgsDao.class);
     final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
 
     final NamespaceService namespaceService = new NamespaceService(namespaceDao);
+    final JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
     env.jersey().register(new PingResource());
     env.jersey().register(new HealthResource());
     env.jersey().register(new NamespaceResource(namespaceService));
-    env.jersey().register(new DatasetResource(namespaceService, new DatasetService(datasetDao)));
-
-    final JobDao jobDao = jdbi.onDemand(JobDao.class);
-    final JobVersionDao jobVersionDao = jdbi.onDemand(JobVersionDao.class);
-    final JobRunDao jobRunDao = jdbi.onDemand(JobRunDao.class);
-    final RunArgsDao runArgsDao = jdbi.onDemand(RunArgsDao.class);
-
-    final JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
     env.jersey().register(new JobResource(namespaceService, jobService));
+    env.jersey().register(new DatasetResource(namespaceService, new DatasetService(datasetDao)));
 
     env.jersey().register(new ResourceExceptionMapper());
   }

@@ -36,11 +36,11 @@ public class JobRunDaoTest extends JobRunBaseTest {
   protected static final JobVersionDao jobVersionDao = APP.onDemand(JobVersionDao.class);
   protected static final JobRunDao jobRunDao = APP.onDemand(JobRunDao.class);
   protected static final JobRunStateDao jobRunStateDao = APP.onDemand(JobRunStateDao.class);
-  protected static final RunArgsDao runArgsDao = APP.onDemand(RunArgsDao.class);
+  protected static final JobRunArgsDao jobRunArgsDao = APP.onDemand(JobRunArgsDao.class);
 
   protected static final NamespaceService namespaceService = new NamespaceService(namespaceDao);
   protected static final JobService jobService =
-      new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
+      new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
   @BeforeClass
   public static void setUpRowMapper() {

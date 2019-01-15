@@ -24,9 +24,9 @@ import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
 import marquez.core.models.JobVersion;
 import marquez.db.JobDao;
+import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
-import marquez.db.RunArgsDao;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Assert;
@@ -39,14 +39,14 @@ public class JobServiceTest {
   private static final JobDao jobDao = mock(JobDao.class);
   private static final JobVersionDao jobVersionDao = mock(JobVersionDao.class);
   private static final JobRunDao jobRunDao = mock(JobRunDao.class);
-  private static final RunArgsDao runArgsDao = mock(RunArgsDao.class);
+  private static final JobRunArgsDao jobRunArgsDao = mock(JobRunArgsDao.class);
   private static final UUID namespaceID = UUID.randomUUID();
 
   JobService jobService;
 
   @Before
   public void setUp() {
-    jobService = new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
+    jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
   }
 
   @After
@@ -54,7 +54,7 @@ public class JobServiceTest {
     reset(jobDao);
     reset(jobVersionDao);
     reset(jobRunDao);
-    reset(runArgsDao);
+    reset(jobRunArgsDao);
   }
 
   private void assertJobFieldsMatch(Job job1, Job job2) {

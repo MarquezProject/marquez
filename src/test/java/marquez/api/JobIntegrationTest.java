@@ -26,10 +26,10 @@ import marquez.core.models.JobRun;
 import marquez.core.models.JobRunState;
 import marquez.core.models.Namespace;
 import marquez.db.JobDao;
+import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
-import marquez.db.RunArgsDao;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import org.junit.After;
@@ -54,11 +54,11 @@ public class JobIntegrationTest extends JobRunBaseTest {
   protected static final JobDao jobDao = APP.onDemand(JobDao.class);
   protected static final JobVersionDao jobVersionDao = APP.onDemand(JobVersionDao.class);
   protected static final JobRunDao jobRunDao = APP.onDemand(JobRunDao.class);
-  protected static final RunArgsDao runArgsDao = APP.onDemand(RunArgsDao.class);
+  protected static final JobRunArgsDao jobRunArgsDao = APP.onDemand(JobRunArgsDao.class);
 
   protected static final NamespaceService namespaceService = new NamespaceService(namespaceDao);
   protected static final JobService jobService =
-      new JobService(jobDao, jobVersionDao, jobRunDao, runArgsDao);
+      new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
   @BeforeClass
   public static void setup() throws UnexpectedException {

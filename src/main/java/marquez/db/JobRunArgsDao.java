@@ -1,15 +1,15 @@
 package marquez.db;
 
 import marquez.core.models.RunArgs;
-import marquez.db.mappers.RunArgsRowMapper;
+import marquez.db.mappers.JobRunArgsRowMapper;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-@RegisterRowMapper(RunArgsRowMapper.class)
-public interface RunArgsDao {
+@RegisterRowMapper(JobRunArgsRowMapper.class)
+public interface JobRunArgsDao {
   @SqlUpdate("INSERT INTO job_run_args(hex_digest, args_json) VALUES (:hexDigest, :json)")
   void insert(@BindBean RunArgs runArgs);
 
