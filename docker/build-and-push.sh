@@ -6,7 +6,7 @@ set -eu
 
 source common.sh
 
-readonly SEMVER_REGEX="^v[0-9]+(\.[0-9]+){2}$" # vX.Y.Z
+readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}$" # X.Y.Z
 readonly ORG="marquezproject"
 readonly REPO="marquez"
 readonly NAME="${ORG}/${REPO}"
