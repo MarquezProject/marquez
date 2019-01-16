@@ -39,7 +39,7 @@ public class JobRowTest {
   }
 
   @Test
-  public void testNewJobRowNoDescription() {
+  public void testNewJobRow_noDescription() {
     final Optional<String> noDescription = Optional.empty();
     final JobRow jobRow =
         JobRow.builder()
@@ -57,5 +57,89 @@ public class JobRowTest {
     assertEquals(NAME, jobRow.getName());
     assertEquals(noDescription, jobRow.getDescription());
     assertEquals(CURRENT_VERSION_UUID, jobRow.getCurrentVersionUuid());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobRow_nullRowUuid() {
+    final UUID nullRowUuid = null;
+    JobRow.builder()
+        .uuid(nullRowUuid)
+        .createdAt(CREATED_AT)
+        .updatedAt(UPDATED_AT)
+        .namespaceUuid(NAMESPACE_UUID)
+        .name(NAME)
+        .description(DESCRIPTION)
+        .currentVersionUuid(CURRENT_VERSION_UUID)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobRow_nullCreatedAt() {
+    final Instant nullCreatedAt = null;
+    JobRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(nullCreatedAt)
+        .updatedAt(UPDATED_AT)
+        .namespaceUuid(NAMESPACE_UUID)
+        .name(NAME)
+        .description(DESCRIPTION)
+        .currentVersionUuid(CURRENT_VERSION_UUID)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobRow_nullUpdatedAt() {
+    final Instant nullUpdatedAt = null;
+    JobRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .updatedAt(nullUpdatedAt)
+        .namespaceUuid(NAMESPACE_UUID)
+        .name(NAME)
+        .description(DESCRIPTION)
+        .currentVersionUuid(CURRENT_VERSION_UUID)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobRow_nullNamespaceUuid() {
+    final UUID nullNamespaceUuid = null;
+    JobRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .updatedAt(UPDATED_AT)
+        .namespaceUuid(nullNamespaceUuid)
+        .name(NAME)
+        .description(DESCRIPTION)
+        .currentVersionUuid(CURRENT_VERSION_UUID)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobRow_nullName() {
+    final String nullName = null;
+    JobRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .updatedAt(UPDATED_AT)
+        .namespaceUuid(NAMESPACE_UUID)
+        .name(nullName)
+        .description(DESCRIPTION)
+        .currentVersionUuid(CURRENT_VERSION_UUID)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobRow_nullCurrentVersionUuid() {
+    final UUID nullCurrentVersionUuid = null;
+    JobRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .updatedAt(UPDATED_AT)
+        .namespaceUuid(NAMESPACE_UUID)
+        .name(NAME)
+        .description(DESCRIPTION)
+        .currentVersionUuid(nullCurrentVersionUuid)
+        .build();
   }
 }
