@@ -105,8 +105,7 @@ public class MarquezApp extends Application<MarquezConfig> {
             .build(env, config.getDataSourceFactory(), POSTGRES_DB)
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
-    final MetricRegistry metricRegistry = new MetricRegistry();
-    jdbi.setSqlLogger(new InstrumentedSqlLogger(metricRegistry));
+    jdbi.setSqlLogger(new InstrumentedSqlLogger(env.metrics()));
 
     final NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
     final JobDao jobDao = jdbi.onDemand(JobDao.class);
