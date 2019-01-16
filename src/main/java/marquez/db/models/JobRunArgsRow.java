@@ -12,6 +12,6 @@ public final class JobRunArgsRow {
   @NonNull private final UUID uuid;
   @NonNull private final Instant createdAt;
   @NonNull private final UUID jobRunUuid;
-  @NonNull private final Long hash;
-  @NonNull private final String args;
+  @NonNull private final String runArgs;
+  @NonNull private final Long checksum;
 }

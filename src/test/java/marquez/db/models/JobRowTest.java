@@ -60,10 +60,10 @@ public class JobRowTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testNewJobRow_nullRowUuid() {
-    final UUID nullRowUuid = null;
+  public void testNewJobRow_nullUuid() {
+    final UUID nullUuid = null;
     JobRow.builder()
-        .uuid(nullRowUuid)
+        .uuid(nullUuid)
         .createdAt(CREATED_AT)
         .updatedAt(UPDATED_AT)
         .namespaceUuid(NAMESPACE_UUID)
