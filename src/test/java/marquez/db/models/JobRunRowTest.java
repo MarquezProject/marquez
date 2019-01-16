@@ -95,6 +95,20 @@ public class JobRunRowTest {
   }
 
   @Test(expected = NullPointerException.class)
+  public void testNewJobRow_nullCurrentRunState() {
+    final String nullCurrentRunState = null;
+    JobRunRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .updatedAt(UPDATED_AT)
+        .jobVersionUuid(JOB_VERSION_UUID)
+        .currentRunState(nullCurrentRunState)
+        .inputDatasetVersionUuids(INPUT_DATASET_VERSION_UUIDS)
+        .outputDatasetVersionUuids(OUTPUT_DATASET_VERSION_UUIDS)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
   public void testNewJobRow_nullInputDatasetVersionUuids() {
     final List<UUID> nullInputDatasetVersionUuids = null;
     JobRunRow.builder()
