@@ -18,9 +18,9 @@ import lombok.ToString;
 public final class JobVersionRow {
   @Getter @NonNull private final UUID uuid;
   @Getter @NonNull private final Instant createdAt;
+  @Getter @NonNull private final UUID jobUuid;
   @Getter @NonNull private final List<String> inputDatasetUrns;
   @Getter @NonNull private final List<String> outputDatasetUrns;
-  @Getter @NonNull private final UUID jobUuid;
   @Getter @NonNull private final UUID version;
   @Getter @NonNull private final String location;
   private final Instant updatedAt;
