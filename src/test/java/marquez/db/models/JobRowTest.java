@@ -13,12 +13,12 @@ public class JobRowTest {
   private static final Instant UPDATED_AT = Instant.now();
   private static final UUID NAMESPACE_UUID = UUID.randomUUID();
   private static final String NAME = "test job";
-  private static final String DESCRIPTION = "test description";
   private static final UUID CURRENT_VERSION_UUID = UUID.randomUUID();
 
   @Test
   public void testNewJobRow() {
-    final Optional<String> nonEmptyDescription = Optional.of(DESCRIPTION);
+    final String description = "test description";
+    final Optional<String> expectedDescription = Optional.of(description);
     final JobRow jobRow =
         JobRow.builder()
             .uuid(ROW_UUID)
@@ -26,7 +26,7 @@ public class JobRowTest {
             .updatedAt(UPDATED_AT)
             .namespaceUuid(NAMESPACE_UUID)
             .name(NAME)
-            .description(DESCRIPTION)
+            .description(description)
             .currentVersionUuid(CURRENT_VERSION_UUID)
             .build();
     assertEquals(ROW_UUID, jobRow.getUuid());
@@ -34,7 +34,7 @@ public class JobRowTest {
     assertEquals(UPDATED_AT, jobRow.getUpdatedAt());
     assertEquals(NAMESPACE_UUID, jobRow.getNamespaceUuid());
     assertEquals(NAME, jobRow.getName());
-    assertEquals(nonEmptyDescription, jobRow.getDescription());
+    assertEquals(expectedDescription, jobRow.getDescription());
     assertEquals(CURRENT_VERSION_UUID, jobRow.getCurrentVersionUuid());
   }
 
@@ -68,7 +68,6 @@ public class JobRowTest {
         .updatedAt(UPDATED_AT)
         .namespaceUuid(NAMESPACE_UUID)
         .name(NAME)
-        .description(DESCRIPTION)
         .currentVersionUuid(CURRENT_VERSION_UUID)
         .build();
   }
@@ -82,7 +81,6 @@ public class JobRowTest {
         .updatedAt(UPDATED_AT)
         .namespaceUuid(NAMESPACE_UUID)
         .name(NAME)
-        .description(DESCRIPTION)
         .currentVersionUuid(CURRENT_VERSION_UUID)
         .build();
   }
@@ -96,7 +94,6 @@ public class JobRowTest {
         .updatedAt(nullUpdatedAt)
         .namespaceUuid(NAMESPACE_UUID)
         .name(NAME)
-        .description(DESCRIPTION)
         .currentVersionUuid(CURRENT_VERSION_UUID)
         .build();
   }
@@ -110,7 +107,6 @@ public class JobRowTest {
         .updatedAt(UPDATED_AT)
         .namespaceUuid(nullNamespaceUuid)
         .name(NAME)
-        .description(DESCRIPTION)
         .currentVersionUuid(CURRENT_VERSION_UUID)
         .build();
   }
@@ -124,7 +120,6 @@ public class JobRowTest {
         .updatedAt(UPDATED_AT)
         .namespaceUuid(NAMESPACE_UUID)
         .name(nullName)
-        .description(DESCRIPTION)
         .currentVersionUuid(CURRENT_VERSION_UUID)
         .build();
   }
@@ -138,7 +133,6 @@ public class JobRowTest {
         .updatedAt(UPDATED_AT)
         .namespaceUuid(NAMESPACE_UUID)
         .name(NAME)
-        .description(DESCRIPTION)
         .currentVersionUuid(nullCurrentVersionUuid)
         .build();
   }

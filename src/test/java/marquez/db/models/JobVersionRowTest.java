@@ -21,31 +21,6 @@ public class JobVersionRowTest {
 
   @Test
   public void testNewJobVersionRow() {
-    final Optional<Instant> noUpdatedAt = Optional.empty();
-    final Optional<UUID> noLatestJobRunUuid = Optional.empty();
-    final JobVersionRow jobVersionRow =
-        JobVersionRow.builder()
-            .uuid(ROW_UUID)
-            .createdAt(CREATED_AT)
-            .jobUuid(JOB_UUID)
-            .inputDatasetUrns(INPUT_DATASET_URNS)
-            .outputDatasetUrns(OUTPUT_DATASET_URNS)
-            .version(VERSION)
-            .location(LOCATION)
-            .build();
-    assertEquals(ROW_UUID, jobVersionRow.getUuid());
-    assertEquals(CREATED_AT, jobVersionRow.getCreatedAt());
-    assertEquals(noUpdatedAt, jobVersionRow.getUpdatedAt());
-    assertEquals(JOB_UUID, jobVersionRow.getJobUuid());
-    assertEquals(INPUT_DATASET_URNS, jobVersionRow.getInputDatasetUrns());
-    assertEquals(OUTPUT_DATASET_URNS, jobVersionRow.getOutputDatasetUrns());
-    assertEquals(VERSION, jobVersionRow.getVersion());
-    assertEquals(LOCATION, jobVersionRow.getLocation());
-    assertEquals(noLatestJobRunUuid, jobVersionRow.getLatestJobRunUuid());
-  }
-
-  @Test
-  public void testNewJobVersionRow_latestJobRunUuid() {
     final Instant updatedAt = Instant.now();
     final UUID latestJobRunUuid = UUID.randomUUID();
     final Optional<Instant> expectedUpdatedAt = Optional.of(updatedAt);
@@ -71,6 +46,31 @@ public class JobVersionRowTest {
     assertEquals(VERSION, jobVersionRow.getVersion());
     assertEquals(LOCATION, jobVersionRow.getLocation());
     assertEquals(expectedLatestJobRunUuid, jobVersionRow.getLatestJobRunUuid());
+  }
+
+  @Test
+  public void testNewJobVersionRow_noLatestJobRunUuid() {
+    final Optional<Instant> noUpdatedAt = Optional.empty();
+    final Optional<UUID> noLatestJobRunUuid = Optional.empty();
+    final JobVersionRow jobVersionRow =
+        JobVersionRow.builder()
+            .uuid(ROW_UUID)
+            .createdAt(CREATED_AT)
+            .jobUuid(JOB_UUID)
+            .inputDatasetUrns(INPUT_DATASET_URNS)
+            .outputDatasetUrns(OUTPUT_DATASET_URNS)
+            .version(VERSION)
+            .location(LOCATION)
+            .build();
+    assertEquals(ROW_UUID, jobVersionRow.getUuid());
+    assertEquals(CREATED_AT, jobVersionRow.getCreatedAt());
+    assertEquals(noUpdatedAt, jobVersionRow.getUpdatedAt());
+    assertEquals(JOB_UUID, jobVersionRow.getJobUuid());
+    assertEquals(INPUT_DATASET_URNS, jobVersionRow.getInputDatasetUrns());
+    assertEquals(OUTPUT_DATASET_URNS, jobVersionRow.getOutputDatasetUrns());
+    assertEquals(VERSION, jobVersionRow.getVersion());
+    assertEquals(LOCATION, jobVersionRow.getLocation());
+    assertEquals(noLatestJobRunUuid, jobVersionRow.getLatestJobRunUuid());
   }
 
   @Test(expected = NullPointerException.class)

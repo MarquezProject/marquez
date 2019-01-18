@@ -20,31 +20,6 @@ public class JobRunRowTest {
 
   @Test
   public void testNewJobRunRow() {
-    final Optional<Instant> noNominalStartTime = Optional.empty();
-    final Optional<Instant> noNominalEndTime = Optional.empty();
-    final JobRunRow jobRunRow =
-        JobRunRow.builder()
-            .uuid(ROW_UUID)
-            .createdAt(CREATED_AT)
-            .updatedAt(UPDATED_AT)
-            .jobVersionUuid(JOB_VERSION_UUID)
-            .currentRunState(CURRENT_RUN_STATE)
-            .inputDatasetVersionUuids(INPUT_DATASET_VERSION_UUIDS)
-            .outputDatasetVersionUuids(OUTPUT_DATASET_VERSION_UUIDS)
-            .build();
-    assertEquals(ROW_UUID, jobRunRow.getUuid());
-    assertEquals(CREATED_AT, jobRunRow.getCreatedAt());
-    assertEquals(UPDATED_AT, jobRunRow.getUpdatedAt());
-    assertEquals(JOB_VERSION_UUID, jobRunRow.getJobVersionUuid());
-    assertEquals(noNominalStartTime, jobRunRow.getNominalStartTime());
-    assertEquals(noNominalEndTime, jobRunRow.getNominalEndTime());
-    assertEquals(CURRENT_RUN_STATE, jobRunRow.getCurrentRunState());
-    assertEquals(INPUT_DATASET_VERSION_UUIDS, jobRunRow.getInputDatasetVersionUuids());
-    assertEquals(OUTPUT_DATASET_VERSION_UUIDS, jobRunRow.getOutputDatasetVersionUuids());
-  }
-
-  @Test
-  public void testNewJobRunRow_nominalStartAndEndTime() {
     final Instant nominalStartTime = Instant.parse("2018-10-04T15:01:00.00Z");
     final Instant nominalEndTime = Instant.parse("2018-10-04T15:02:00.00Z");
     final Optional<Instant> expectedNominalStartTime = Optional.of(nominalStartTime);
@@ -67,6 +42,31 @@ public class JobRunRowTest {
     assertEquals(JOB_VERSION_UUID, jobRunRow.getJobVersionUuid());
     assertEquals(expectedNominalStartTime, jobRunRow.getNominalStartTime());
     assertEquals(expectedNominalEndTime, jobRunRow.getNominalEndTime());
+    assertEquals(CURRENT_RUN_STATE, jobRunRow.getCurrentRunState());
+    assertEquals(INPUT_DATASET_VERSION_UUIDS, jobRunRow.getInputDatasetVersionUuids());
+    assertEquals(OUTPUT_DATASET_VERSION_UUIDS, jobRunRow.getOutputDatasetVersionUuids());
+  }
+
+  @Test
+  public void testNewJobRunRow_noNominalStartAndEndTime() {
+    final Optional<Instant> noNominalStartTime = Optional.empty();
+    final Optional<Instant> noNominalEndTime = Optional.empty();
+    final JobRunRow jobRunRow =
+        JobRunRow.builder()
+            .uuid(ROW_UUID)
+            .createdAt(CREATED_AT)
+            .updatedAt(UPDATED_AT)
+            .jobVersionUuid(JOB_VERSION_UUID)
+            .currentRunState(CURRENT_RUN_STATE)
+            .inputDatasetVersionUuids(INPUT_DATASET_VERSION_UUIDS)
+            .outputDatasetVersionUuids(OUTPUT_DATASET_VERSION_UUIDS)
+            .build();
+    assertEquals(ROW_UUID, jobRunRow.getUuid());
+    assertEquals(CREATED_AT, jobRunRow.getCreatedAt());
+    assertEquals(UPDATED_AT, jobRunRow.getUpdatedAt());
+    assertEquals(JOB_VERSION_UUID, jobRunRow.getJobVersionUuid());
+    assertEquals(noNominalStartTime, jobRunRow.getNominalStartTime());
+    assertEquals(noNominalEndTime, jobRunRow.getNominalEndTime());
     assertEquals(CURRENT_RUN_STATE, jobRunRow.getCurrentRunState());
     assertEquals(INPUT_DATASET_VERSION_UUIDS, jobRunRow.getInputDatasetVersionUuids());
     assertEquals(OUTPUT_DATASET_VERSION_UUIDS, jobRunRow.getOutputDatasetVersionUuids());
