@@ -21,7 +21,7 @@ public class JobVersionRowTest {
 
   @Test
   public void testNewJobVersionRow() {
-    final Optional<Instant> notUpdated = Optional.empty();
+    final Optional<Instant> noUpdatedAt = Optional.empty();
     final Optional<UUID> noLatestJobRunUuid = Optional.empty();
     final JobVersionRow jobVersionRow =
         JobVersionRow.builder()
@@ -35,7 +35,7 @@ public class JobVersionRowTest {
             .build();
     assertEquals(ROW_UUID, jobVersionRow.getUuid());
     assertEquals(CREATED_AT, jobVersionRow.getCreatedAt());
-    assertEquals(notUpdated, jobVersionRow.getUpdatedAt());
+    assertEquals(noUpdatedAt, jobVersionRow.getUpdatedAt());
     assertEquals(JOB_UUID, jobVersionRow.getJobUuid());
     assertEquals(INPUT_DATASET_URNS, jobVersionRow.getInputDatasetUrns());
     assertEquals(OUTPUT_DATASET_URNS, jobVersionRow.getOutputDatasetUrns());
@@ -71,5 +71,103 @@ public class JobVersionRowTest {
     assertEquals(VERSION, jobVersionRow.getVersion());
     assertEquals(LOCATION, jobVersionRow.getLocation());
     assertEquals(expectedLatestJobRunUuid, jobVersionRow.getLatestJobRunUuid());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobVersionRow_nullUuid() {
+    final UUID nullUuid = null;
+    JobVersionRow.builder()
+        .uuid(nullUuid)
+        .createdAt(CREATED_AT)
+        .jobUuid(JOB_UUID)
+        .inputDatasetUrns(INPUT_DATASET_URNS)
+        .outputDatasetUrns(OUTPUT_DATASET_URNS)
+        .version(VERSION)
+        .location(LOCATION)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobVersionRow_nullCreatedAt() {
+    final Instant nullCreatedAt = null;
+    JobVersionRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(nullCreatedAt)
+        .jobUuid(JOB_UUID)
+        .inputDatasetUrns(INPUT_DATASET_URNS)
+        .outputDatasetUrns(OUTPUT_DATASET_URNS)
+        .version(VERSION)
+        .location(LOCATION)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobVersionRow_nullJobUuid() {
+    final UUID nullJobUuid = null;
+    JobVersionRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .jobUuid(nullJobUuid)
+        .inputDatasetUrns(INPUT_DATASET_URNS)
+        .outputDatasetUrns(OUTPUT_DATASET_URNS)
+        .version(VERSION)
+        .location(LOCATION)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobVersionRow_nullInputDatasetUrns() {
+    final List<String> nullInputDatasetUrns = null;
+    JobVersionRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .jobUuid(JOB_UUID)
+        .inputDatasetUrns(nullInputDatasetUrns)
+        .outputDatasetUrns(OUTPUT_DATASET_URNS)
+        .version(VERSION)
+        .location(LOCATION)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobVersionRow_nullOutDatasetUrns() {
+    final List<String> nullOutDatasetUrns = null;
+    JobVersionRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .jobUuid(JOB_UUID)
+        .inputDatasetUrns(INPUT_DATASET_URNS)
+        .outputDatasetUrns(nullOutDatasetUrns)
+        .version(VERSION)
+        .location(LOCATION)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobVersionRow_nullVersion() {
+    final UUID nullVersion = null;
+    JobVersionRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .jobUuid(JOB_UUID)
+        .inputDatasetUrns(INPUT_DATASET_URNS)
+        .outputDatasetUrns(OUTPUT_DATASET_URNS)
+        .version(nullVersion)
+        .location(LOCATION)
+        .build();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewJobVersionRow_nullLocation() {
+    final String nullLocation = null;
+    JobVersionRow.builder()
+        .uuid(ROW_UUID)
+        .createdAt(CREATED_AT)
+        .jobUuid(JOB_UUID)
+        .inputDatasetUrns(INPUT_DATASET_URNS)
+        .outputDatasetUrns(OUTPUT_DATASET_URNS)
+        .version(VERSION)
+        .location(nullLocation)
+        .build();
   }
 }
