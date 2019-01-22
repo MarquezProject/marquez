@@ -11,3 +11,10 @@ db:
   url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
   user: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}
+
+metrics:
+  frequency: 1 minute
+  reporters:
+    - type: console
+      timeZone: UTC
+      output: stdout
