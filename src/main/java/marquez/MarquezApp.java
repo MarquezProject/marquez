@@ -1,6 +1,5 @@
 package marquez;
 
-import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
