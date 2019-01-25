@@ -32,8 +32,8 @@ class Job(object):
     """
     openapi_types = {
         'name': 'str',
-        'created_at': 'datetime',
-        'updated_at': 'datetime',
+        'created_at': 'str',
+        'updated_at': 'str',
         'input_dataset_urns': 'list[str]',
         'output_dataset_urns': 'list[str]',
         'location': 'str',
@@ -107,7 +107,7 @@ class Job(object):
         An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.  # noqa: E501
 
         :return: The created_at of this Job.  # noqa: E501
-        :rtype: datetime
+        :rtype: str
         """
         return self._created_at
 
@@ -118,7 +118,7 @@ class Job(object):
         An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.  # noqa: E501
 
         :param created_at: The created_at of this Job.  # noqa: E501
-        :type: datetime
+        :type: str
         """
 
         self._created_at = created_at
@@ -130,7 +130,7 @@ class Job(object):
         An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.  # noqa: E501
 
         :return: The updated_at of this Job.  # noqa: E501
-        :rtype: datetime
+        :rtype: str
         """
         return self._updated_at
 
@@ -141,7 +141,7 @@ class Job(object):
         An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.  # noqa: E501
 
         :param updated_at: The updated_at of this Job.  # noqa: E501
-        :type: datetime
+        :type: str
         """
 
         self._updated_at = updated_at
