@@ -1,4 +1,4 @@
-# openapi_client.NamespacesApi
+# marquez_client.NamespacesApi
 
 All URIs are relative to *http://localhost:5000/api/v1*
 
@@ -20,12 +20,12 @@ Returns a list of namespaces.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.NamespacesApi()
+api_instance = marquez_client.NamespacesApi()
 
 try:
     # List all namespaces
@@ -64,12 +64,12 @@ Returns a namespace.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.NamespacesApi()
+api_instance = marquez_client.NamespacesApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 
 try:
@@ -112,14 +112,14 @@ Creates a new namespace object. A namespace enables the contextual grouping of r
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.NamespacesApi()
+api_instance = marquez_client.NamespacesApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
-inline_object = openapi_client.InlineObject() # InlineObject |  (optional)
+inline_object = marquez_client.InlineObject() # InlineObject |  (optional)
 
 try:
     # Create a namespace

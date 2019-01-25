@@ -1,4 +1,4 @@
-# openapi_client.DatasetsApi
+# marquez_client.DatasetsApi
 
 All URIs are relative to *http://localhost:5000/api/v1*
 
@@ -18,12 +18,12 @@ Returns a list of datasets.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.DatasetsApi()
+api_instance = marquez_client.DatasetsApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 
 try:

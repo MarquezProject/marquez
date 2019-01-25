@@ -12,7 +12,7 @@
 
 from setuptools import setup, find_packages  # noqa: H301
 
-NAME = "marqeuz-python"
+NAME = "marquez-python"
 VERSION = "1.0.0"
 # To install the library, run the following
 #
@@ -27,8 +27,8 @@ setup(
     name=NAME,
     version=VERSION,
     description="Marquez",
-    author_email="marquez-user@googlegroups.com",
-    url="https://github.com/MarquezProject/marquez",
+    author_email="",
+    url="",
     keywords=["OpenAPI", "OpenAPI-Generator", "Marquez"],
     install_requires=REQUIRES,
     packages=find_packages(),

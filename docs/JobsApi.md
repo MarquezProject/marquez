@@ -1,4 +1,4 @@
-# openapi_client.JobsApi
+# marquez_client.JobsApi
 
 All URIs are relative to *http://localhost:5000/api/v1*
 
@@ -30,12 +30,12 @@ Marks the job run as aborted.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 id = 'id_example' # str | The unique ID of the job run.
 
 try:
@@ -77,12 +77,12 @@ Marks the job run as completed.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 id = 'id_example' # str | The unique ID of the job run.
 
 try:
@@ -124,12 +124,12 @@ Marks the job run as failed.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 id = 'id_example' # str | The unique ID of the job run.
 
 try:
@@ -171,12 +171,12 @@ Retrieve a job run.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 id = 'id_example' # str | The unique ID of the job run.
 
 try:
@@ -219,12 +219,12 @@ Returns a list job run outputs.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 id = 'id_example' # str | The unique ID of the job run.
 
 try:
@@ -267,14 +267,14 @@ Creates a multiple output dataset objects.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 id = 'id_example' # str | The unique ID of the job run.
-job_run_outputs = openapi_client.JobRunOutputs() # JobRunOutputs |  (optional)
+job_run_outputs = marquez_client.JobRunOutputs() # JobRunOutputs |  (optional)
 
 try:
     # Create multiple output datasets
@@ -317,12 +317,12 @@ Marks the job run as running.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 id = 'id_example' # str | The unique ID of the job run.
 
 try:
@@ -364,12 +364,12 @@ Returns a list of jobs.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 
 try:
@@ -412,12 +412,12 @@ Retrieve a job.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 job = room_bookings_7_days # str | The name of the job. (default to 'room_bookings_7_days')
 
@@ -462,15 +462,15 @@ Creates a new job object. All job objects are immutable and are uniquely identif
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 job = room_bookings_7_days # str | The name of the job. (default to 'room_bookings_7_days')
-inline_object1 = openapi_client.InlineObject1() # InlineObject1 |  (optional)
+inline_object1 = marquez_client.InlineObject1() # InlineObject1 |  (optional)
 
 try:
     # Create a job
@@ -514,12 +514,12 @@ Returns a list of job runs.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 job = room_bookings_7_days # str | The name of the job. (default to 'room_bookings_7_days')
 
@@ -564,15 +564,15 @@ Creates a new job run object.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 job = room_bookings_7_days # str | The name of the job. (default to 'room_bookings_7_days')
-inline_object2 = openapi_client.InlineObject2() # InlineObject2 |  (optional)
+inline_object2 = marquez_client.InlineObject2() # InlineObject2 |  (optional)
 
 try:
     # Create a job run
@@ -616,12 +616,12 @@ Returns a list of job versions.
 ```python
 from __future__ import print_function
 import time
-import openapi_client
-from openapi_client.rest import ApiException
+import marquez_client
+from marquez_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = openapi_client.JobsApi()
+api_instance = marquez_client.JobsApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 job = room_bookings_7_days # str | The name of the job. (default to 'room_bookings_7_days')
 
