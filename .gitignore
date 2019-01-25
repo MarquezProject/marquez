@@ -1,0 +1,17 @@
+*.iml
+*.jar
+*.swp
+*.egg-info
+.classpath
+.editorconfig
+.gradle/
+.idea/
+.project
+.settings
+.vscode/
+./out/*
+./**/*.class
+bin/
+build/
+dist/
+__pycache__
