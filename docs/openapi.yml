@@ -22,7 +22,6 @@ paths:
         Note jobs and datasets will be unique within a namespace, but not across namespaces.
       tags:
         - Namespaces
-      required: true
       requestBody:
         content:
           application/json:
@@ -86,7 +85,6 @@ paths:
         specific job version or possibly help debug a failed job run.
       tags:
         - Jobs
-      required: true
       requestBody:
         content:
           application/json:
@@ -185,7 +183,6 @@ paths:
       description: Creates a new job run object.
       tags:
         - Jobs
-      required: true
       requestBody:
         content:
           application/json:
@@ -297,7 +294,6 @@ paths:
       description: Creates a multiple output dataset objects.
       tags:
         - Jobs
-      required: true
       requestBody:
         content:
           application/json:
@@ -324,6 +320,8 @@ paths:
                 $ref: '#/components/schemas/datasets'
 
   /namespaces/{namespace}/datasets:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
     get:
       summary: List all datasets
       description: Returns a list of datasets.
@@ -336,6 +334,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/datasets'
+
 components:
   parameters:
     namespace:
@@ -407,11 +406,11 @@ components:
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
           type: string
-          format: date-time
+          format: long
         updatedAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.
           type: string
-          format: date-time
+          format: long
         inputDatasetUrns:
           description: The URN list of input datasets.
           type: array
@@ -435,8 +434,8 @@ components:
           type: string
       example:
         name: room_bookings_7_days
-        createdAt: 2018-10-04T15:01:23.045Z
-        updatedAt: 2018-10-04T16:15:30.000Z
+        createdAt: 1546584262373
+        updatedAt: 1546586497777
         inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
         outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
