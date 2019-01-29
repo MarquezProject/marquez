@@ -26,19 +26,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                owner:
-                  description: The owner of the namespace.
-                  type: string
-                description:
-                  description: The description of the namespace.
-                  type: string
-              required:
-                - owner
-              example:
-                owner: dataengineering
-                description: A namespace for core jobs and datasets at wework.
+              $ref: '#/components/schemas/createNamespace'
       responses:
         '200':
           description: OK
@@ -89,38 +77,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                inputDatasetUrns:
-                  description: The URN list of input datasets.
-                  type: array
-                  items:
-                    type: string
-                    format: URN
-                  uniqueItems: true
-                outputDatasetUrns:
-                  description: The URN list of output datasets.
-                  type: array
-                  items:
-                    type: string
-                    format: URN
-                  uniqueItems: true
-                location:
-                  description: The URI of the job source or artifact.
-                  type: string
-                  format: URI
-                description:
-                  description: The description of the job.
-                  type: string
-              required:
-                - inputDatasetUrns
-                - outputDatasetUrns
-                - location
-              example:
-                inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
-                outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
-                location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-                description: Determine weekly room booking occupancy patterns.
+              $ref: '#/components/schemas/createJob'
       responses:
         '200':
           description: OK
@@ -187,21 +144,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                nominalStartTime:
-                  description: The nominal start time of the job.
-                  type: string
-                  format: date-time
-                nominalEndTime:
-                  description: The nominal end time of the job.
-                  type: string
-                  format: date-time
-                runArgs:
-                  description: The runtime arguments of the job. JSON encoded.
-                  type: string
-              example:
-                runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
+              $ref: '#/components/schemas/createJobRun'
       responses:
         '201':
           description: CREATED
@@ -367,6 +310,21 @@ components:
         format: uuid
 
   schemas:
+    createNamespace:
+      type: object
+      properties:
+        owner:
+          description: The owner of the namespace.
+          type: string
+        description:
+          description: The description of the namespace.
+          type: string
+      required:
+        - owner
+      example:
+        owner: dataengineering
+        description: A namespace for core jobs and datasets at wework.
+
     namespace:
       type: object
       properties:
@@ -396,6 +354,40 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/namespace'
+
+    createJob:
+      type: object
+      properties:
+        inputDatasetUrns:
+          description: The URN list of input datasets.
+          type: array
+          items:
+            type: string
+            format: URN
+          uniqueItems: true
+        outputDatasetUrns:
+          description: The URN list of output datasets.
+          type: array
+          items:
+            type: string
+            format: URN
+          uniqueItems: true
+        location:
+          description: The URI of the job source or artifact.
+          type: string
+          format: URI
+        description:
+          description: The description of the job.
+          type: string
+      required:
+        - inputDatasetUrns
+        - outputDatasetUrns
+        - location
+      example:
+        inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
+        outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
+        location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+        description: Determine weekly room booking occupancy patterns.
 
     job:
       type: object
@@ -476,6 +468,23 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/jobVersion'
+
+    createJobRun:
+      type: object
+      properties:
+        nominalStartTime:
+          description: The nominal start time of the job.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: The nominal end time of the job.
+          type: string
+          format: date-time
+        runArgs:
+          description: The runtime arguments of the job. JSON encoded.
+          type: string
+      example:
+        runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
 
     jobRunId:
       type: object
