@@ -14,13 +14,13 @@
 from __future__ import absolute_import
 
 # import models into model package
+from marquez_client.models.create_job import CreateJob
+from marquez_client.models.create_job_run import CreateJobRun
+from marquez_client.models.create_namespace import CreateNamespace
 from marquez_client.models.db import DB
 from marquez_client.models.dataset import Dataset
 from marquez_client.models.datasets import Datasets
 from marquez_client.models.iceberg import ICEBERG
-from marquez_client.models.inline_object import InlineObject
-from marquez_client.models.inline_object1 import InlineObject1
-from marquez_client.models.inline_object2 import InlineObject2
 from marquez_client.models.job import Job
 from marquez_client.models.job_run import JobRun
 from marquez_client.models.job_run_id import JobRunId

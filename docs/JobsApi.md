@@ -452,7 +452,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **namespaces_namespace_jobs_job_put**
-> Job namespaces_namespace_jobs_job_put(namespace, job, inline_object1=inline_object1)
+> Job namespaces_namespace_jobs_job_put(namespace, job, create_job=create_job)
 
 Create a job
 
@@ -470,11 +470,11 @@ from pprint import pprint
 api_instance = marquez_client.JobsApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 job = room_bookings_7_days # str | The name of the job. (default to 'room_bookings_7_days')
-inline_object1 = marquez_client.InlineObject1() # InlineObject1 |  (optional)
+create_job = marquez_client.CreateJob() # CreateJob |  (optional)
 
 try:
     # Create a job
-    api_response = api_instance.namespaces_namespace_jobs_job_put(namespace, job, inline_object1=inline_object1)
+    api_response = api_instance.namespaces_namespace_jobs_job_put(namespace, job, create_job=create_job)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling JobsApi->namespaces_namespace_jobs_job_put: %s\n" % e)
@@ -486,7 +486,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **namespace** | **str**| The name of the namespace. | [default to &#39;wework&#39;]
  **job** | **str**| The name of the job. | [default to &#39;room_bookings_7_days&#39;]
- **inline_object1** | [**InlineObject1**](InlineObject1.md)|  | [optional] 
+ **create_job** | [**CreateJob**](CreateJob.md)|  | [optional] 
 
 ### Return type
 
@@ -554,7 +554,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **namespaces_namespace_jobs_job_runs_post**
-> JobRunId namespaces_namespace_jobs_job_runs_post(namespace, job, inline_object2=inline_object2)
+> JobRunId namespaces_namespace_jobs_job_runs_post(namespace, job, create_job_run=create_job_run)
 
 Create a job run
 
@@ -572,11 +572,11 @@ from pprint import pprint
 api_instance = marquez_client.JobsApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
 job = room_bookings_7_days # str | The name of the job. (default to 'room_bookings_7_days')
-inline_object2 = marquez_client.InlineObject2() # InlineObject2 |  (optional)
+create_job_run = marquez_client.CreateJobRun() # CreateJobRun |  (optional)
 
 try:
     # Create a job run
-    api_response = api_instance.namespaces_namespace_jobs_job_runs_post(namespace, job, inline_object2=inline_object2)
+    api_response = api_instance.namespaces_namespace_jobs_job_runs_post(namespace, job, create_job_run=create_job_run)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling JobsApi->namespaces_namespace_jobs_job_runs_post: %s\n" % e)
@@ -588,7 +588,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **namespace** | **str**| The name of the namespace. | [default to &#39;wework&#39;]
  **job** | **str**| The name of the job. | [default to &#39;room_bookings_7_days&#39;]
- **inline_object2** | [**InlineObject2**](InlineObject2.md)|  | [optional] 
+ **create_job_run** | [**CreateJobRun**](CreateJobRun.md)|  | [optional] 
 
 ### Return type
 

@@ -230,7 +230,7 @@ class NamespacesApi(object):
 
         :param async_req bool
         :param str namespace: The name of the namespace. (required)
-        :param InlineObject inline_object:
+        :param CreateNamespace create_namespace:
         :return: Namespace
                  If the method is called asynchronously,
                  returns the request thread.
@@ -253,7 +253,7 @@ class NamespacesApi(object):
 
         :param async_req bool
         :param str namespace: The name of the namespace. (required)
-        :param InlineObject inline_object:
+        :param CreateNamespace create_namespace:
         :return: Namespace
                  If the method is called asynchronously,
                  returns the request thread.
@@ -261,7 +261,7 @@ class NamespacesApi(object):
 
         local_var_params = locals()
 
-        all_params = ['namespace', 'inline_object']  # noqa: E501
+        all_params = ['namespace', 'create_namespace']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -297,8 +297,8 @@ class NamespacesApi(object):
         local_var_files = {}
 
         body_params = None
-        if 'inline_object' in local_var_params:
-            body_params = local_var_params['inline_object']
+        if 'create_namespace' in local_var_params:
+            body_params = local_var_params['create_namespace']
         # HTTP header `Accept`
         header_params['Accept'] = self.api_client.select_header_accept(
             ['application/json'])  # noqa: E501

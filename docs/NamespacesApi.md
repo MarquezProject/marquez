@@ -102,7 +102,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **namespaces_namespace_put**
-> Namespace namespaces_namespace_put(namespace, inline_object=inline_object)
+> Namespace namespaces_namespace_put(namespace, create_namespace=create_namespace)
 
 Create a namespace
 
@@ -119,11 +119,11 @@ from pprint import pprint
 # create an instance of the API class
 api_instance = marquez_client.NamespacesApi()
 namespace = wework # str | The name of the namespace. (default to 'wework')
-inline_object = marquez_client.InlineObject() # InlineObject |  (optional)
+create_namespace = marquez_client.CreateNamespace() # CreateNamespace |  (optional)
 
 try:
     # Create a namespace
-    api_response = api_instance.namespaces_namespace_put(namespace, inline_object=inline_object)
+    api_response = api_instance.namespaces_namespace_put(namespace, create_namespace=create_namespace)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling NamespacesApi->namespaces_namespace_put: %s\n" % e)
@@ -134,7 +134,7 @@ except ApiException as e:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **namespace** | **str**| The name of the namespace. | [default to &#39;wework&#39;]
- **inline_object** | [**InlineObject**](InlineObject.md)|  | [optional] 
+ **create_namespace** | [**CreateNamespace**](CreateNamespace.md)|  | [optional] 
 
 ### Return type
 

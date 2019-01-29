@@ -917,7 +917,7 @@ class JobsApi(object):
         :param async_req bool
         :param str namespace: The name of the namespace. (required)
         :param str job: The name of the job. (required)
-        :param InlineObject1 inline_object1:
+        :param CreateJob create_job:
         :return: Job
                  If the method is called asynchronously,
                  returns the request thread.
@@ -941,7 +941,7 @@ class JobsApi(object):
         :param async_req bool
         :param str namespace: The name of the namespace. (required)
         :param str job: The name of the job. (required)
-        :param InlineObject1 inline_object1:
+        :param CreateJob create_job:
         :return: Job
                  If the method is called asynchronously,
                  returns the request thread.
@@ -949,7 +949,7 @@ class JobsApi(object):
 
         local_var_params = locals()
 
-        all_params = ['namespace', 'job', 'inline_object1']  # noqa: E501
+        all_params = ['namespace', 'job', 'create_job']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -994,8 +994,8 @@ class JobsApi(object):
         local_var_files = {}
 
         body_params = None
-        if 'inline_object1' in local_var_params:
-            body_params = local_var_params['inline_object1']
+        if 'create_job' in local_var_params:
+            body_params = local_var_params['create_job']
         # HTTP header `Accept`
         header_params['Accept'] = self.api_client.select_header_accept(
             ['application/json'])  # noqa: E501
@@ -1145,7 +1145,7 @@ class JobsApi(object):
         :param async_req bool
         :param str namespace: The name of the namespace. (required)
         :param str job: The name of the job. (required)
-        :param InlineObject2 inline_object2:
+        :param CreateJobRun create_job_run:
         :return: JobRunId
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1169,7 +1169,7 @@ class JobsApi(object):
         :param async_req bool
         :param str namespace: The name of the namespace. (required)
         :param str job: The name of the job. (required)
-        :param InlineObject2 inline_object2:
+        :param CreateJobRun create_job_run:
         :return: JobRunId
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1177,7 +1177,7 @@ class JobsApi(object):
 
         local_var_params = locals()
 
-        all_params = ['namespace', 'job', 'inline_object2']  # noqa: E501
+        all_params = ['namespace', 'job', 'create_job_run']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -1222,8 +1222,8 @@ class JobsApi(object):
         local_var_files = {}
 
         body_params = None
-        if 'inline_object2' in local_var_params:
-            body_params = local_var_params['inline_object2']
+        if 'create_job_run' in local_var_params:
+            body_params = local_var_params['create_job_run']
         # HTTP header `Accept`
         header_params['Accept'] = self.api_client.select_header_accept(
             ['application/json'])  # noqa: E501

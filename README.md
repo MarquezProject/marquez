@@ -91,13 +91,13 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [CreateJob](docs/CreateJob.md)
+ - [CreateJobRun](docs/CreateJobRun.md)
+ - [CreateNamespace](docs/CreateNamespace.md)
  - [DB](docs/DB.md)
  - [Dataset](docs/Dataset.md)
  - [Datasets](docs/Datasets.md)
  - [ICEBERG](docs/ICEBERG.md)
- - [InlineObject](docs/InlineObject.md)
- - [InlineObject1](docs/InlineObject1.md)
- - [InlineObject2](docs/InlineObject2.md)
  - [Job](docs/Job.md)
  - [JobRun](docs/JobRun.md)
  - [JobRunId](docs/JobRunId.md)
