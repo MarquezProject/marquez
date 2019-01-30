@@ -145,7 +145,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   @Test
   public void testJobRunRetrievalWithMultipleJobRuns() throws UnexpectedException {
     JobRun secondCreatedJobRun =
-            jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
+        jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     final UUID secondJobRunUUID = secondCreatedJobRun.getGuid();
 
     try {
@@ -159,11 +159,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
               handle -> {
                 handle.execute(
                     format(
-                        "delete from job_run_states where job_run_guid = '%s'",
-                            secondJobRunUUID));
-                handle.execute(
-                        format("delete from job_runs where guid = '%s'", secondJobRunUUID));
-
+                        "delete from job_run_states where job_run_guid = '%s'", secondJobRunUUID));
+                handle.execute(format("delete from job_runs where guid = '%s'", secondJobRunUUID));
               });
     }
   }
