@@ -34,7 +34,7 @@ class JobRun(object):
         'nominal_start_time': 'datetime',
         'nominal_end_time': 'datetime',
         'run_id': 'str',
-        'run_state': 'Enum',
+        'run_state': 'str',
         'run_args': 'str',
         'started_at': 'datetime',
         'ended_at': 'datetime'
@@ -150,10 +150,10 @@ class JobRun(object):
     def run_state(self):
         """Gets the run_state of this JobRun.  # noqa: E501
 
-        The current state of the job.  # noqa: E501
+        The current state of the job [\"RUNNING\", \"ABORTED\", \"FAILED\",\"COMPLETED\"].  # noqa: E501
 
         :return: The run_state of this JobRun.  # noqa: E501
-        :rtype: Enum
+        :rtype: str
         """
         return self._run_state
 
@@ -161,10 +161,10 @@ class JobRun(object):
     def run_state(self, run_state):
         """Sets the run_state of this JobRun.
 
-        The current state of the job.  # noqa: E501
+        The current state of the job [\"RUNNING\", \"ABORTED\", \"FAILED\",\"COMPLETED\"].  # noqa: E501
 
         :param run_state: The run_state of this JobRun.  # noqa: E501
-        :type: Enum
+        :type: str
         """
 
         self._run_state = run_state
