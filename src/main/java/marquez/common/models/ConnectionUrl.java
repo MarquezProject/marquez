@@ -9,13 +9,15 @@ import lombok.ToString;
 @ToString
 public final class ConnectionUrl {
   @Getter private final DataSource dataSource;
-  @Getter private final Db db;
+  @Getter private final DbName dbName;
   @Getter private final String rawValue;
 
   private ConnectionUrl(
-      @NonNull final DataSource dataSource, @NonNull final Db db, @NonNull final String rawValue) {
+      @NonNull final DataSource dataSource,
+      @NonNull final DbName dbName,
+      @NonNull final String rawValue) {
     this.dataSource = dataSource;
-    this.db = db;
+    this.dbName = dbName;
     this.rawValue = rawValue;
   }
 
@@ -55,12 +57,12 @@ public final class ConnectionUrl {
         final String dataSourceString = urlParts[DATA_SOURCE_PART];
         final DataSource dataSource = DataSource.of(dataSourceString);
         final String dbString = urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
-        final Db db =
-            Db.of(
+        final DbName dbName =
+            DbName.of(
                 dbString.contains(DB_PART_DELIM)
                     ? dbString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
                     : dbString);
-        return new ConnectionUrl(dataSource, db, value);
+        return new ConnectionUrl(dataSource, dbName, value);
       }
     },
     UNKNOWN("") {

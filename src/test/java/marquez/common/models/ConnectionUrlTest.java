@@ -6,15 +6,15 @@ import org.junit.Test;
 
 public class ConnectionUrlTest {
   private static final DataSource DATA_SOURCE = DataSource.of("postgresql");
-  private static final Db DB = Db.of("marquez");
+  private static final DbName DB_NAME = DbName.of("test");
   private static final String CONNECTION_URL =
-      String.format("jdbc:%s://localhost:5432/%s", DATA_SOURCE.getValue(), DB.getValue());
+      String.format("jdbc:%s://localhost:5432/%s", DATA_SOURCE.getValue(), DB_NAME.getValue());
 
   @Test
   public void testNewConnectionUrl() {
     final ConnectionUrl connectionUrl = ConnectionUrl.of(CONNECTION_URL);
     assertEquals(DATA_SOURCE, connectionUrl.getDataSource());
-    assertEquals(DB, connectionUrl.getDb());
+    assertEquals(DB_NAME, connectionUrl.getDbName());
     assertEquals(CONNECTION_URL, connectionUrl.getRawValue());
   }
 
@@ -39,14 +39,14 @@ public class ConnectionUrlTest {
   @Test(expected = IllegalArgumentException.class)
   public void testConnectionUrlUnknownProtocol() {
     final String unknownProtocolConnectionUrl =
-        String.format("melquiades:postgresql://localhost:5432/%s", DB.getValue());
+        String.format("foo:postgresql://localhost:5432/%s", DB_NAME.getValue());
     ConnectionUrl.of(unknownProtocolConnectionUrl);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testConnectionUrlMissingParts() {
     final String missingPartsConnectionUrl =
-        String.format("jdbc:postgresql://localhost/%s", DB.getValue());
+        String.format("jdbc:postgresql://localhost/%s", DB_NAME.getValue());
     ConnectionUrl.of(missingPartsConnectionUrl);
   }
 }
