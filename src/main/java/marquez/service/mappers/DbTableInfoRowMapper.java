@@ -12,7 +12,7 @@ public final class DbTableInfoRowMapper {
     return DbTableInfoRow.builder()
         .uuid(UUID.randomUUID())
         .db(dbTableVersion.getConnectionUrl().getDbName().getValue())
-        .dbSchema(dbTableVersion.getDbSchema().getValue())
+        .dbSchema(dbTableVersion.getDbSchemaName().getValue())
         .build();
   }
 }

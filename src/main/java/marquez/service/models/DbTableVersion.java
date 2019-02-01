@@ -9,7 +9,7 @@ import lombok.ToString;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.Dataset;
 import marquez.common.models.DatasetUrn;
-import marquez.common.models.DbSchema;
+import marquez.common.models.DbSchemaName;
 import marquez.common.models.DbTable;
 import marquez.common.models.Description;
 import marquez.common.models.Namespace;
@@ -18,17 +18,17 @@ import marquez.common.models.Namespace;
 @ToString
 public final class DbTableVersion implements DatasetVersion {
   @Getter private final ConnectionUrl connectionUrl;
-  @Getter private final DbSchema dbSchema;
+  @Getter private final DbSchemaName dbSchemaName;
   @Getter private final DbTable dbTable;
   private final Description description;
 
   public DbTableVersion(
       @NonNull final ConnectionUrl connectionUrl,
-      @NonNull final DbSchema dbSchema,
+      @NonNull final DbSchemaName dbSchemaName,
       @NonNull final DbTable dbTable,
       @Nullable final Description description) {
     this.connectionUrl = connectionUrl;
-    this.dbSchema = dbSchema;
+    this.dbSchemaName = dbSchemaName;
     this.dbTable = dbTable;
     this.description = description;
   }
@@ -38,7 +38,7 @@ public final class DbTableVersion implements DatasetVersion {
   }
 
   public String getQualifiedName() {
-    return dbSchema.getValue() + '.' + dbTable.getValue();
+    return dbSchemaName.getValue() + '.' + dbTable.getValue();
   }
 
   @Override
