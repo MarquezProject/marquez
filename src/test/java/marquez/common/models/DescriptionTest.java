@@ -14,6 +14,6 @@ public class DescriptionTest {
   @Test(expected = NullPointerException.class)
   public void testDescriptionNull() {
     final String nullDescription = null;
-    Db.of(nullDescription);
+    Description.of(nullDescription);
   }
 }
