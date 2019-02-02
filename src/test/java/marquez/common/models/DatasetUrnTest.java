@@ -8,15 +8,15 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 public class DatasetUrnTest {
-  private static final String DATASET_URN_DELIM = ":";
-  private static final String DATASET_URN_PREFIX = "urn";
   private static final int ALLOWED_DATASET_URN_SIZE = 64;
   private static final int DATASET_URN_SIZE_GREATER_THAN_ALLOWED = ALLOWED_DATASET_URN_SIZE + 1;
+  private static final String DATASET_URN_DELIM = ":";
+  private static final String DATASET_URN_PREFIX = "urn";
 
   @Test
   public void testNewDatasetUrn() {
-    final String datasetUrn = "urn:a:b.c";
-    assertEquals(datasetUrn, DatasetUrn.fromString(datasetUrn).getValue());
+    final String value = "urn:a:b.c";
+    assertEquals(value, DatasetUrn.fromString(value).getValue());
   }
 
   @Test
