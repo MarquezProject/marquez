@@ -19,34 +19,34 @@ public class ConnectionUrlTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testConnectionUrlNull() {
-    final String nullConnectionUrl = null;
-    ConnectionUrl.fromString(nullConnectionUrl);
+  public void testNewConnectionUrl_throwsException_onNullRawValue() {
+    final String nullRawValue = null;
+    ConnectionUrl.fromString(nullRawValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testConnectionUrlEmpty() {
-    final String emptyConnectionUrl = "";
-    ConnectionUrl.fromString(emptyConnectionUrl);
+  public void testNewConnectionUrl_throwsException_onEmptyRawValue() {
+    final String emptyRawValue = "";
+    ConnectionUrl.fromString(emptyRawValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testConnectionUrlBlank() {
-    final String blankConnectionUrl = " ";
-    ConnectionUrl.fromString(blankConnectionUrl);
+  public void testNewConnectionUrl_throwsException_onBlankRawValue() {
+    final String blankRawValue = " ";
+    ConnectionUrl.fromString(blankRawValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testConnectionUrlUnknownProtocol() {
-    final String unknownProtocolConnectionUrl =
+  public void testNewConnectionUrl_throwsException_onUnknownProtocol() {
+    final String rawValueWithUnknownProtocol =
         String.format("foo:postgresql://localhost:5432/%s", DB_NAME.getValue());
-    ConnectionUrl.fromString(unknownProtocolConnectionUrl);
+    ConnectionUrl.fromString(rawValueWithUnknownProtocol);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testConnectionUrlMissingParts() {
-    final String missingPartsConnectionUrl =
+  public void testNewConnectionUrl_throwsException_onMissingParts() {
+    final String rawValueWithMissingParts =
         String.format("jdbc:postgresql://localhost/%s", DB_NAME.getValue());
-    ConnectionUrl.fromString(missingPartsConnectionUrl);
+    ConnectionUrl.fromString(rawValueWithMissingParts);
   }
 }
