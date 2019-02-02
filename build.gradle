@@ -40,6 +40,12 @@ compileTestJava {
   options.incremental = true
 }
 
+task testUnit(type: Test) {  
+  useJUnit {
+    includeCategories 'marquez.UnitTests'
+  }
+}
+
 mainClassName = 'marquez.MarquezApp'
 
 shadowJar {
@@ -90,12 +96,6 @@ checkstyleMain {
 
 checkstyleTest {
   source = 'src/test/java'
-}
-
-task testUnit(type: Test) {  
-  useJUnit {
-    includeCategories 'marquez.UnitTests'
-  }
 }
 
 def coverageDir = "${reportsDir}/coverage";

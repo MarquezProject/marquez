@@ -21,6 +21,16 @@ public final class DatasetUrn {
 
   @Getter private final String value;
 
+  private DatasetUrn(@NonNull final String value) {
+    if (!URN_PATTERN.matcher(value).matches()) {
+      throw new IllegalArgumentException(
+          "A urn must contain only letters (a-z, A-Z), numbers (0-9), and "
+              + "be sperated by colons (:) with each part having a maximum length of 64 characters.");
+    }
+
+    this.value = value;
+  }
+
   public static DatasetUrn of(
       @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
     final String value =
@@ -34,15 +44,5 @@ public final class DatasetUrn {
 
   public static DatasetUrn fromString(String value) {
     return new DatasetUrn(value);
-  }
-
-  private DatasetUrn(@NonNull final String value) {
-    if (!URN_PATTERN.matcher(value).matches()) {
-      throw new IllegalArgumentException(
-          "A urn must contain only letters (a-z, A-Z), numbers (0-9), and "
-              + "be sperated by colons (:) with each part having a maximum length of 64 characters.");
-    }
-
-    this.value = value;
   }
 }

@@ -18,11 +18,6 @@ public final class NamespaceName {
 
   @Getter private final String value;
 
-  @JsonCreator
-  public static NamespaceName fromString(String value) {
-    return new NamespaceName(value);
-  }
-
   private NamespaceName(@NonNull final String value) {
     if (!NAMESPACE_PATTERN.matcher(value).matches()) {
       throw new IllegalArgumentException(
@@ -31,5 +26,10 @@ public final class NamespaceName {
     }
 
     this.value = value;
+  }
+
+  @JsonCreator
+  public static NamespaceName fromString(String value) {
+    return new NamespaceName(value);
   }
 }

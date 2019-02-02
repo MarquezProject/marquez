@@ -14,11 +14,6 @@ public final class RunId {
 
   @Getter private final UUID value;
 
-  @JsonCreator
-  public static RunId fromString(String value) {
-    return new RunId(value);
-  }
-
   private RunId(@NonNull final String value) {
     if (value.trim().isEmpty()) {
       throw new IllegalArgumentException("value must not be blank or empty");
@@ -28,5 +23,10 @@ public final class RunId {
     }
 
     this.value = UUID.fromString(value);
+  }
+
+  @JsonCreator
+  public static RunId fromString(String value) {
+    return new RunId(value);
   }
 }
