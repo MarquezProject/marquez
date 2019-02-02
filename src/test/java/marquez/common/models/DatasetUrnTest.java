@@ -10,8 +10,8 @@ import org.junit.Test;
 public class DatasetUrnTest {
   private static final String DATASET_URN_DELIM = ":";
   private static final String DATASET_URN_PREFIX = "urn";
-  private static final Integer ALLOWED_DATASET_URN_SIZE = 64;
-  private static final Integer DATASET_URN_SIZE_GREATER_THAN_ALLOWED = ALLOWED_DATASET_URN_SIZE + 1;
+  private static final int ALLOWED_DATASET_URN_SIZE = 64;
+  private static final int DATASET_URN_SIZE_GREATER_THAN_ALLOWED = ALLOWED_DATASET_URN_SIZE + 1;
 
   @Test
   public void testNewDatasetUrn() {
@@ -20,59 +20,59 @@ public class DatasetUrnTest {
   }
 
   @Test
-  public void testNewDatasetUrnFromNamespaceAndDataset() {
+  public void testNewDatasetUrn_fromNamespaceAndDataset() {
     final DatasetUrn expected = DatasetUrn.fromString("urn:a:b.c");
     final DatasetUrn actual =
-        DatasetUrn.fromString(NamespaceName.fromString("a"), DatasetName.fromString("b.c"));
+        DatasetUrn.of(NamespaceName.fromString("a"), DatasetName.fromString("b.c"));
     assertEquals(expected, actual);
   }
 
   @Test(expected = NullPointerException.class)
-  public void testDatasetUrnNull() {
-    final String nullDatasetUrn = null;
-    DatasetUrn.fromString(nullDatasetUrn);
+  public void testNewDatasetUrn_throwsException_onNullValue() {
+    final String nullValue = null;
+    DatasetUrn.fromString(nullValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnEmpty() {
-    final String emptyDatasetUrn = "";
-    DatasetUrn.fromString(emptyDatasetUrn);
+  public void testNewDatasetUrn_throwsException_onEmptyValue() {
+    final String emptyValue = "";
+    DatasetUrn.fromString(emptyValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnBlank() {
-    final String blankDatasetUrn = " ";
-    DatasetUrn.fromString(blankDatasetUrn);
+  public void testNewDatasetUrn_throwsException_onBlankValue() {
+    final String blankValue = " ";
+    DatasetUrn.fromString(blankValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnNoPrefix() {
-    final String noPrefixDatasetUrn = "a:b";
-    DatasetUrn.fromString(noPrefixDatasetUrn);
+  public void testNewDatasetUrn_throwsException_onNoPrefixValue() {
+    final String noPrefixValue = "a:b";
+    DatasetUrn.fromString(noPrefixValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnMissingPart() {
-    final String missingPartDatasetUrn = "urn:a";
-    DatasetUrn.fromString(missingPartDatasetUrn);
+  public void testNewDatasetUrn_throwsException_onMissingPartValue() {
+    final String missingPartValue = "urn:a";
+    DatasetUrn.fromString(missingPartValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnExtraPart() {
-    final String extraPartDatasetUrn = "urn:a:b:c";
-    DatasetUrn.fromString(extraPartDatasetUrn);
+  public void testNewDatasetUrn_throwsException_onExtraPartValue() {
+    final String extraPartValue = "urn:a:b:c";
+    DatasetUrn.fromString(extraPartValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnNonAlphanumericPart() {
-    final String nonAlphanumericPartDatasetUrn = "urn:a:b$c^";
-    DatasetUrn.fromString(nonAlphanumericPartDatasetUrn);
+  public void testNewDatasetUrn_throwsException_onNonAlphanumericPartValue() {
+    final String nonAlphanumericPartValue = "urn:a:b$c^";
+    DatasetUrn.fromString(nonAlphanumericPartValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnWithPartGreaterThan64() {
-    final String partGreaterThan64DatasetUrn = newDatasetUrnWithPartGreaterThan64();
-    DatasetUrn.fromString(partGreaterThan64DatasetUrn);
+  public void testNewDatasetUrn_throwsException_onPartGreaterThan64Value() {
+    final String partGreaterThan64Value= newDatasetUrnWithPartGreaterThan64();
+    DatasetUrn.fromString(partGreaterThan64Value);
   }
 
   private String newDatasetUrnWithPartGreaterThan64() {

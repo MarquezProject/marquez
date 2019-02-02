@@ -21,7 +21,7 @@ public final class DatasetUrn {
 
   @Getter private final String value;
 
-  public static DatasetUrn fromString(
+  public static DatasetUrn of(
       @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
     final String value =
         new StringJoiner(URN_DELIM)
