@@ -30,10 +30,12 @@ public class DatasetService {
     this.datasetDao = datasetDao;
   }
 
-  public Dataset create(@NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
+  public Dataset create(
+      @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
       throws UnexpectedException {
     final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
-    final DatasetRow datasetRow = DatasetRowMapper.map(namespaceName, dataSourceRow, dbTableVersion);
+    final DatasetRow datasetRow =
+        DatasetRowMapper.map(namespaceName, dataSourceRow, dbTableVersion);
     final DbTableInfoRow dbTableInfoRow = DbTableInfoRowMapper.map(dbTableVersion);
     final DbTableVersionRow dbTableVersionRow =
         DbTableVersionRowMapper.map(datasetRow, dbTableInfoRow, dbTableVersion);
