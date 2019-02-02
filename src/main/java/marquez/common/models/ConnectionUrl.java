@@ -21,21 +21,21 @@ public final class ConnectionUrl {
     this.rawValue = rawValue;
   }
 
-  public static ConnectionUrl fromString(@NonNull String value) {
-    if (value.trim().isEmpty()) {
+  public static ConnectionUrl fromString(@NonNull String rawValue) {
+    if (rawValue.trim().isEmpty()) {
       throw new IllegalArgumentException("The connection url value must not be blank or empty.");
     }
 
-    final ValueParser valueParser = ValueParser.get(value);
-    if (valueParser == ValueParser.UNKNOWN) {
+    final RawValueParser rawValueParser = RawValueParser.get(rawValue);
+    if (rawValueParser == RawValueParser.UNKNOWN) {
       throw new IllegalArgumentException(
-          String.format("Failed to parse connection url value '%s', unknown data source.", value));
+          String.format("Failed to parse connection url value '%s', unknown data source.", rawValue));
     }
 
-    return valueParser.parse(value);
+    return rawValueParser.parse(rawValue);
   }
 
-  private enum ValueParser {
+  private enum RawValueParser {
     JDBC("jdbc") {
       private static final String URL_DELIM = ":";
       private static final int URL_PART_COUNT = 4;
@@ -78,7 +78,7 @@ public final class ConnectionUrl {
 
     private final String value;
 
-    private ValueParser(@NonNull final String value) {
+    private RawValueParser(@NonNull final String value) {
       this.value = value;
     }
 
@@ -86,8 +86,8 @@ public final class ConnectionUrl {
       return value;
     }
 
-    static ValueParser get(@NonNull String value) {
-      if (value.startsWith(JDBC.getValue())) {
+    static RawValueParser get(@NonNull String rawValue) {
+      if (rawValue.startsWith(JDBC.getValue())) {
         return JDBC;
       }
       return UNKNOWN;
