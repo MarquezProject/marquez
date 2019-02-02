@@ -18,6 +18,7 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+import marquez.common.models.Namespace;
 
 @RegisterRowMapper(DatasetRowMapper.class)
 public interface DatasetDao {
@@ -57,9 +58,14 @@ public interface DatasetDao {
   @SqlQuery("SELECT * FROM datasets WHERE urn = :urn.value")
   Optional<DatasetRow> findBy(@BindBean("urn") DatasetUrn urn);
 
-  @SqlQuery("SELECT * FROM datasets LIMIT :limit OFFSET :offset")
+  @SqlQuery(
+      "SELECT * "
+          + "FROM datasets d "
+          + "INNER JOIN namespaces n "
+          + "     ON (n.guid = d.namespace_guid AND n.name=:namespace.value)"
+          + "LIMIT :limit OFFSET :offset")
   List<DatasetRow> findAll(
-      @Bind("namespace") NamespaceName namespaceName,
+      @BindBean("namespace") NamespaceName namespaceName,
       @Bind("limit") Integer limit,
       @Bind("offset") Integer offset);
 }
