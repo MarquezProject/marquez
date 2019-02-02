@@ -7,13 +7,13 @@ import org.junit.Test;
 public class DataSourceTest {
   @Test
   public void testNewDataSource() {
-    final String dataSource = "postgresql";
-    assertEquals(dataSource, DataSource.fromString(dataSource).getValue());
+    final String value = "postgresql";
+    assertEquals(value, DataSource.fromString(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testDataSourceNull() {
-    final String nullDataSource = null;
-    DataSource.fromString(nullDataSource);
+  public void testNewDataSource_throwsException_onNullValue() {
+    final String nullValue = null;
+    DataSource.fromString(nullValue);
   }
 }
