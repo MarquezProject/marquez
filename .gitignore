@@ -62,3 +62,9 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+
+#IDE
+.idea*
+.idea/workspace.xml
+./.idea/workspace.xml
