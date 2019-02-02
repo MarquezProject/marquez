@@ -10,8 +10,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class DatasetUrn {
-  private static final Integer URN_MIN_SIZE = 1;
-  private static final Integer URN_MAX_SIZE = 64;
+  private static final int URN_MIN_SIZE = 1;
+  private static final int URN_MAX_SIZE = 64;
   private static final String URN_DELIM = ":";
   private static final String URN_PREFIX = "urn";
   private static final String URN_REGEX =
