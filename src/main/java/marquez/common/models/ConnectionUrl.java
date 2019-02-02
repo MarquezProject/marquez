@@ -29,7 +29,8 @@ public final class ConnectionUrl {
     final RawValueParser rawValueParser = RawValueParser.get(rawValue);
     if (rawValueParser == RawValueParser.UNKNOWN) {
       throw new IllegalArgumentException(
-          String.format("Failed to parse connection url value '%s', unknown data source.", rawValue));
+          String.format(
+              "Failed to parse connection url value '%s', unknown data source.", rawValue));
     }
 
     return rawValueParser.parse(rawValue);

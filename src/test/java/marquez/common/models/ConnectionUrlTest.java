@@ -10,12 +10,12 @@ public class ConnectionUrlTest {
 
   @Test
   public void testNewConnectionUrl() {
-    final String value =
+    final String rawValue =
         String.format("jdbc:%s://localhost:5432/%s", DATA_SOURCE.getValue(), DB_NAME.getValue());
-    final ConnectionUrl connectionUrl = ConnectionUrl.fromString(value);
+    final ConnectionUrl connectionUrl = ConnectionUrl.fromString(rawValue);
     assertEquals(DATA_SOURCE, connectionUrl.getDataSource());
     assertEquals(DB_NAME, connectionUrl.getDbName());
-    assertEquals(value, connectionUrl.getRawValue());
+    assertEquals(rawValue, connectionUrl.getRawValue());
   }
 
   @Test(expected = NullPointerException.class)
