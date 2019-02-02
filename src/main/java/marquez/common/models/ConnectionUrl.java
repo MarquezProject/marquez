@@ -22,16 +22,17 @@ public final class ConnectionUrl {
   }
 
   public static ConnectionUrl fromString(@NonNull String value) {
-    final String trimmed = value.trim();
-    if (trimmed.isEmpty()) {
+    if (value.trim().isEmpty()) {
       throw new IllegalArgumentException("The connection url value must not be blank or empty.");
     }
-    final ValueParser valueParser = ValueParser.get(trimmed);
+
+    final ValueParser valueParser = ValueParser.get(value);
     if (valueParser == ValueParser.UNKNOWN) {
       throw new IllegalArgumentException(
           String.format("Failed to parse connection url value '%s', unknown data source.", value));
     }
-    return valueParser.parse(trimmed);
+
+    return valueParser.parse(value);
   }
 
   private enum ValueParser {
@@ -46,8 +47,8 @@ public final class ConnectionUrl {
       private static final int DB_PART_NO_PARAMS = 0;
 
       @Override
-      public ConnectionUrl parse(@NonNull String value) {
-        final String[] urlParts = value.split(URL_DELIM);
+      public ConnectionUrl parse(@NonNull String rawValue) {
+        final String[] urlParts = rawValue.split(URL_DELIM);
         if (urlParts.length != URL_PART_COUNT) {
           throw new IllegalArgumentException(
               String.format(
@@ -56,23 +57,24 @@ public final class ConnectionUrl {
         }
         final String dataSourceString = urlParts[DATA_SOURCE_PART];
         final DataSource dataSource = DataSource.fromString(dataSourceString);
-        final String dbString = urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
+        final String dbNameString =
+            urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
         final DbName dbName =
             DbName.fromString(
-                dbString.contains(DB_PART_DELIM)
-                    ? dbString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
-                    : dbString);
-        return new ConnectionUrl(dataSource, dbName, value);
+                dbNameString.contains(DB_PART_DELIM)
+                    ? dbNameString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
+                    : dbNameString);
+        return new ConnectionUrl(dataSource, dbName, rawValue);
       }
     },
     UNKNOWN("") {
       @Override
-      public ConnectionUrl parse(@NonNull String value) {
+      public ConnectionUrl parse(@NonNull String rawValue) {
         throw new UnsupportedOperationException();
       }
     };
 
-    abstract ConnectionUrl parse(String value);
+    abstract ConnectionUrl parse(String rawValue);
 
     private final String value;
 
