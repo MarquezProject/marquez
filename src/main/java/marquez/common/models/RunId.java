@@ -1,5 +1,6 @@
 package marquez.common.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,7 +14,12 @@ public final class RunId {
 
   @Getter private final UUID value;
 
-  public RunId(@NonNull final String value) {
+  @JsonCreator
+  public static RunId fromString(String value) {
+    return new RunId(value);
+  }
+
+  private RunId(@NonNull final String value) {
     if (value.trim().isEmpty()) {
       throw new IllegalArgumentException("value must not be blank or empty");
     }
