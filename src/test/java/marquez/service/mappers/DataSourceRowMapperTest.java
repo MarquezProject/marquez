@@ -17,7 +17,8 @@ import org.junit.Test;
 public class DataSourceRowMapperTest {
   private static final DataSource DATA_SOURCE = DataSource.fromString("postgresql");
   private static final ConnectionUrl CONNECTION_URL =
-      ConnectionUrl.fromString(String.format("jdbc:%s://localhost:5432/novelists", DATA_SOURCE.getValue()));
+      ConnectionUrl.fromString(
+          String.format("jdbc:%s://localhost:5432/novelists", DATA_SOURCE.getValue()));
   private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.fromString("marquez");
   private static final DbTableName DB_TABLE_NAME = DbTableName.fromString("quotes");
   private static final Description DESCRIPTION =

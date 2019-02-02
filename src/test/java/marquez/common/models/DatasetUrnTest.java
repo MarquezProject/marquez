@@ -22,7 +22,8 @@ public class DatasetUrnTest {
   @Test
   public void testNewDatasetUrnFromNamespaceAndDataset() {
     final DatasetUrn expected = DatasetUrn.fromString("urn:a:b.c");
-    final DatasetUrn actual = DatasetUrn.fromString(NamespaceName.fromString("a"), DatasetName.fromString("b.c"));
+    final DatasetUrn actual =
+        DatasetUrn.fromString(NamespaceName.fromString("a"), DatasetName.fromString("b.c"));
     assertEquals(expected, actual);
   }
 
