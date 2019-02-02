@@ -15,9 +15,9 @@ public final class DbTableVersionMapper {
 
   public static DbTableVersion map(@NonNull DbTableVersionRequest request) {
     return new DbTableVersion(
-        ConnectionUrl.of(request.getConnectionUrl()),
-        DbSchemaName.of(request.getSchema()),
-        DbTableName.of(request.getTable()),
-        request.getDescription().map(Description::of).orElse(NO_DESCRIPTION));
+        ConnectionUrl.fromString(request.getConnectionUrl()),
+        DbSchemaName.fromString(request.getSchema()),
+        DbTableName.fromString(request.getTable()),
+        request.getDescription().map(Description::fromString).orElse(NO_DESCRIPTION));
   }
 }

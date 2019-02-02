@@ -8,12 +8,12 @@ public class DataSourceTest {
   @Test
   public void testNewDataSource() {
     final String dataSource = "postgresql";
-    assertEquals(dataSource, DataSource.of(dataSource).getValue());
+    assertEquals(dataSource, DataSource.fromString(dataSource).getValue());
   }
 
   @Test(expected = NullPointerException.class)
   public void testDataSourceNull() {
     final String nullDataSource = null;
-    DataSource.of(nullDataSource);
+    DataSource.fromString(nullDataSource);
   }
 }

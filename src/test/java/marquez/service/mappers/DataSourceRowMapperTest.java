@@ -15,13 +15,13 @@ import marquez.service.models.DbTableVersion;
 import org.junit.Test;
 
 public class DataSourceRowMapperTest {
-  private static final DataSource DATA_SOURCE = DataSource.of("postgresql");
+  private static final DataSource DATA_SOURCE = DataSource.fromString("postgresql");
   private static final ConnectionUrl CONNECTION_URL =
-      ConnectionUrl.of(String.format("jdbc:%s://localhost:5432/novelists", DATA_SOURCE.getValue()));
-  private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.of("marquez");
-  private static final DbTableName DB_TABLE_NAME = DbTableName.of("quotes");
+      ConnectionUrl.fromString(String.format("jdbc:%s://localhost:5432/novelists", DATA_SOURCE.getValue()));
+  private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.fromString("marquez");
+  private static final DbTableName DB_TABLE_NAME = DbTableName.fromString("quotes");
   private static final Description DESCRIPTION =
-      Description.of("It's enough for me to be sure that you and I exist as this moment.");
+      Description.fromString("It's enough for me to be sure that you and I exist as this moment.");
 
   @Test
   public void testMapDbTableVersion() {

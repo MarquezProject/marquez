@@ -19,7 +19,7 @@ public final class NamespaceName {
   @Getter private final String value;
 
   @JsonCreator
-  public static NamespaceName valueOf(String value) {
+  public static NamespaceName fromString(String value) {
     return new NamespaceName(value);
   }
 

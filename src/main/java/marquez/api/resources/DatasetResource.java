@@ -53,7 +53,7 @@ public final class DatasetResource {
           String.format("The namespace %s does not exist.", namespaceString), NOT_FOUND);
     }
     final List<Dataset> datasets =
-        datasetService.getAll(NamespaceName.valueOf(namespaceString), limit, offset);
+        datasetService.getAll(NamespaceName.fromString(namespaceString), limit, offset);
     final List<DatasetResponse> datasetResponses = map(datasets);
     return Response.ok(new DatasetsResponse(datasetResponses)).build();
   }

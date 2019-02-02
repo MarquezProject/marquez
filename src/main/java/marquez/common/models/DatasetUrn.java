@@ -21,7 +21,7 @@ public final class DatasetUrn {
 
   @Getter private final String value;
 
-  public static DatasetUrn of(
+  public static DatasetUrn fromString(
       @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
     final String value =
         new StringJoiner(URN_DELIM)
@@ -29,10 +29,10 @@ public final class DatasetUrn {
             .add(namespaceName.getValue())
             .add(datasetName.getValue())
             .toString();
-    return of(value);
+    return fromString(value);
   }
 
-  public static DatasetUrn of(String value) {
+  public static DatasetUrn fromString(String value) {
     return new DatasetUrn(value);
   }
 

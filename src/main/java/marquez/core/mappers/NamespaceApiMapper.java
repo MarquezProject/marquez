@@ -13,7 +13,7 @@ public class NamespaceApiMapper extends Mapper<NamespaceResponse, Namespace> {
         null, namespace.getName().toLowerCase(), namespace.getOwner(), namespace.getDescription());
   }
 
-  public Namespace of(String namespaceName, CreateNamespaceRequest request) {
+  public Namespace fromString(String namespaceName, CreateNamespaceRequest request) {
     return map(
         new NamespaceResponse(namespaceName, null, request.getOwner(), request.getDescription()));
   }

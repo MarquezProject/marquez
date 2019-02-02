@@ -16,62 +16,62 @@ public class DatasetUrnTest {
   @Test
   public void testNewDatasetUrn() {
     final String datasetUrn = "urn:a:b.c";
-    assertEquals(datasetUrn, DatasetUrn.of(datasetUrn).getValue());
+    assertEquals(datasetUrn, DatasetUrn.fromString(datasetUrn).getValue());
   }
 
   @Test
   public void testNewDatasetUrnFromNamespaceAndDataset() {
-    final DatasetUrn expected = DatasetUrn.of("urn:a:b.c");
-    final DatasetUrn actual = DatasetUrn.of(NamespaceName.valueOf("a"), DatasetName.of("b.c"));
+    final DatasetUrn expected = DatasetUrn.fromString("urn:a:b.c");
+    final DatasetUrn actual = DatasetUrn.fromString(NamespaceName.fromString("a"), DatasetName.fromString("b.c"));
     assertEquals(expected, actual);
   }
 
   @Test(expected = NullPointerException.class)
   public void testDatasetUrnNull() {
     final String nullDatasetUrn = null;
-    DatasetUrn.of(nullDatasetUrn);
+    DatasetUrn.fromString(nullDatasetUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDatasetUrnEmpty() {
     final String emptyDatasetUrn = "";
-    DatasetUrn.of(emptyDatasetUrn);
+    DatasetUrn.fromString(emptyDatasetUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDatasetUrnBlank() {
     final String blankDatasetUrn = " ";
-    DatasetUrn.of(blankDatasetUrn);
+    DatasetUrn.fromString(blankDatasetUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDatasetUrnNoPrefix() {
     final String noPrefixDatasetUrn = "a:b";
-    DatasetUrn.of(noPrefixDatasetUrn);
+    DatasetUrn.fromString(noPrefixDatasetUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDatasetUrnMissingPart() {
     final String missingPartDatasetUrn = "urn:a";
-    DatasetUrn.of(missingPartDatasetUrn);
+    DatasetUrn.fromString(missingPartDatasetUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDatasetUrnExtraPart() {
     final String extraPartDatasetUrn = "urn:a:b:c";
-    DatasetUrn.of(extraPartDatasetUrn);
+    DatasetUrn.fromString(extraPartDatasetUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDatasetUrnNonAlphanumericPart() {
     final String nonAlphanumericPartDatasetUrn = "urn:a:b$c^";
-    DatasetUrn.of(nonAlphanumericPartDatasetUrn);
+    DatasetUrn.fromString(nonAlphanumericPartDatasetUrn);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDatasetUrnWithPartGreaterThan64() {
     final String partGreaterThan64DatasetUrn = newDatasetUrnWithPartGreaterThan64();
-    DatasetUrn.of(partGreaterThan64DatasetUrn);
+    DatasetUrn.fromString(partGreaterThan64DatasetUrn);
   }
 
   private String newDatasetUrnWithPartGreaterThan64() {

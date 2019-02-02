@@ -8,12 +8,12 @@ public class DescriptionTest {
   @Test
   public void testNewDescription() {
     final String description = "marquez";
-    assertEquals(description, Description.of(description).getValue());
+    assertEquals(description, Description.fromString(description).getValue());
   }
 
   @Test(expected = NullPointerException.class)
   public void testDescriptionNull() {
     final String nullDescription = null;
-    Description.of(nullDescription);
+    Description.fromString(nullDescription);
   }
 }

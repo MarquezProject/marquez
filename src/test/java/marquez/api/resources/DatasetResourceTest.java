@@ -24,9 +24,9 @@ import marquez.service.models.Dataset;
 import org.junit.Test;
 
 public class DatasetResourceTest {
-  private static final DatasetUrn DATASET_URN = DatasetUrn.of("urn:a:b.c");
+  private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
   private static final Instant CREATED_AT = Instant.now();
-  private static final NamespaceName NAMESPACE_NAME = NamespaceName.valueOf("test");
+  private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final Integer LIMIT = 100;
   private static final Integer OFFSET = 0;
 

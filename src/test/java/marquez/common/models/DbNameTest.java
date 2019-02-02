@@ -8,12 +8,12 @@ public class DbNameTest {
   @Test
   public void testNewDbName() {
     final String value = "test";
-    assertEquals(value, DbName.of(value).getValue());
+    assertEquals(value, DbName.fromString(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
   public void testNewDbName_throwsException_onNullValue() {
     final String nullValue = null;
-    DbName.of(nullValue);
+    DbName.fromString(nullValue);
   }
 }

@@ -21,7 +21,7 @@ public final class ConnectionUrl {
     this.rawValue = rawValue;
   }
 
-  public static ConnectionUrl of(@NonNull String value) {
+  public static ConnectionUrl fromString(@NonNull String value) {
     final String trimmed = value.trim();
     if (trimmed.isEmpty()) {
       throw new IllegalArgumentException("The connection url value must not be blank or empty.");
@@ -55,10 +55,10 @@ public final class ConnectionUrl {
                   urlParts.length, URL_PART_COUNT));
         }
         final String dataSourceString = urlParts[DATA_SOURCE_PART];
-        final DataSource dataSource = DataSource.of(dataSourceString);
+        final DataSource dataSource = DataSource.fromString(dataSourceString);
         final String dbString = urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
         final DbName dbName =
-            DbName.of(
+            DbName.fromString(
                 dbString.contains(DB_PART_DELIM)
                     ? dbString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
                     : dbString);

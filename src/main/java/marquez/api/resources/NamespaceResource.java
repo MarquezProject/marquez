@@ -50,7 +50,7 @@ public final class NamespaceResource {
       throws ResourceException {
     try {
       final Namespace namespace =
-          namespaceService.create(namespaceApiMapper.of(namespaceString, request));
+          namespaceService.create(namespaceApiMapper.fromString(namespaceString, request));
       final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
       return Response.ok(response).build();
     } catch (UnexpectedException e) {

@@ -18,8 +18,8 @@ import org.junit.Test;
 public class DatasetMapperTest {
   private static final Instant CREATED_AT = Instant.now();
   private static final Instant UPDATED_AT = Instant.now();
-  private static final DatasetUrn DATASET_URN = DatasetUrn.of("urn:a:b.c");
-  private static final Description DESCRIPTION = Description.of("test description");
+  private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
+  private static final Description DESCRIPTION = Description.fromString("test description");
 
   @Test
   public void testMapDatasetRow() {

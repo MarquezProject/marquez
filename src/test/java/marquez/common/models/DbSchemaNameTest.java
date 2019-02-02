@@ -8,12 +8,12 @@ public class DbSchemaNameTest {
   @Test
   public void testNewDbSchemaName() {
     final String value = "test";
-    assertEquals(value, DbSchemaName.of(value).getValue());
+    assertEquals(value, DbSchemaName.fromString(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
   public void testNewDbSchemaName_throwsException_onNullvalue() {
     final String nullValue = null;
-    DbSchemaName.of(nullValue);
+    DbSchemaName.fromString(nullValue);
   }
 }

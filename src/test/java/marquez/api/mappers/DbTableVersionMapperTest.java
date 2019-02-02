@@ -17,11 +17,11 @@ import org.junit.Test;
 public class DbTableVersionMapperTest {
   private static final DatasetType DB_TYPE = DatasetType.DB;
   private static final ConnectionUrl CONNECTION_URL =
-      ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists");
-  private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.of("marquez");
-  private static final DbTableName DB_TABLE_NAME = DbTableName.of("quotes");
+      ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists");
+  private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.fromString("marquez");
+  private static final DbTableName DB_TABLE_NAME = DbTableName.fromString("quotes");
   private static final Description DESCRIPTION =
-      Description.of("It's enough for me to be sure that you and I exist as this moment.");
+      Description.fromString("It's enough for me to be sure that you and I exist as this moment.");
 
   @Test
   public void testMapDbTableVersionRequest() {
