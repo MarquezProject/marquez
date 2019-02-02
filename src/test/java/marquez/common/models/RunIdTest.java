@@ -10,7 +10,8 @@ public class RunIdTest {
   public void testNewRunId() {
     final String value = "f662a43d-ab87-4b4b-a9ba-828b53c3368b";
     final UUID expected = UUID.fromString(value);
-    assertEquals(expected, RunId.fromString(value).getValue());
+    final UUID actual = RunId.fromString(value).getValue();
+    assertEquals(expected, actual);
   }
 
   @Test(expected = NullPointerException.class)
