@@ -1,5 +1,6 @@
 package marquez.common.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -8,7 +9,7 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
-public final class Namespace {
+public final class NamespaceName {
   private static final Integer NAMESPACE_MIN_SIZE = 1;
   private static final Integer NAMESPACE_MAX_SIZE = 1024;
   private static final Pattern NAMESPACE_PATTERN =
@@ -17,11 +18,12 @@ public final class Namespace {
 
   @Getter private final String value;
 
-  public static Namespace of(String value) {
-    return new Namespace(value);
+  @JsonCreator
+  public static NamespaceName valueOf(String value) {
+    return new NamespaceName(value);
   }
 
-  private Namespace(@NonNull final String value) {
+  private NamespaceName(@NonNull final String value) {
     if (!NAMESPACE_PATTERN.matcher(value).matches()) {
       throw new IllegalArgumentException(
           "A namespaces must contain only letters (a-z, A-Z), numbers (0-9), or "

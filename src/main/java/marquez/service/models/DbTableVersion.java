@@ -7,12 +7,12 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.ConnectionUrl;
-import marquez.common.models.Dataset;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DbSchemaName;
 import marquez.common.models.DbTableName;
 import marquez.common.models.Description;
-import marquez.common.models.Namespace;
+import marquez.common.models.NamespaceName;
 
 @EqualsAndHashCode
 @ToString
@@ -42,7 +42,7 @@ public final class DbTableVersion implements DatasetVersion {
   }
 
   @Override
-  public DatasetUrn toDatasetUrn(Namespace namespace) {
-    return DatasetUrn.of(namespace, Dataset.of(getQualifiedName()));
+  public DatasetUrn toDatasetUrn(@NonNull NamespaceName namespaceName) {
+    return DatasetUrn.of(namespaceName, DatasetName.of(getQualifiedName()));
   }
 }

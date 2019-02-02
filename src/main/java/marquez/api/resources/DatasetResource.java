@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
-import marquez.common.models.Namespace;
+import marquez.common.models.NamespaceName;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
@@ -53,7 +53,7 @@ public final class DatasetResource {
           String.format("The namespace %s does not exist.", namespaceString), NOT_FOUND);
     }
     final List<Dataset> datasets =
-        datasetService.getAll(Namespace.of(namespaceString), limit, offset);
+        datasetService.getAll(NamespaceName.valueOf(namespaceString), limit, offset);
     final List<DatasetResponse> datasetResponses = map(datasets);
     return Response.ok(new DatasetsResponse(datasetResponses)).build();
   }

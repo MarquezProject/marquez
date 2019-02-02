@@ -9,6 +9,6 @@ import lombok.ToString;
 @RequiredArgsConstructor(staticName = "of")
 @EqualsAndHashCode
 @ToString
-public final class Dataset {
+public final class DatasetName {
   @Getter @NonNull private final String value;
 }

@@ -22,7 +22,7 @@ public class DatasetUrnTest {
   @Test
   public void testNewDatasetUrnFromNamespaceAndDataset() {
     final DatasetUrn expected = DatasetUrn.of("urn:a:b.c");
-    final DatasetUrn actual = DatasetUrn.of(Namespace.of("a"), Dataset.of("b.c"));
+    final DatasetUrn actual = DatasetUrn.of(NamespaceName.valueOf("a"), DatasetName.of("b.c"));
     assertEquals(expected, actual);
   }
 

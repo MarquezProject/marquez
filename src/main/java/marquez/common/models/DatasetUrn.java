@@ -21,12 +21,12 @@ public final class DatasetUrn {
 
   @Getter private final String value;
 
-  public static DatasetUrn of(@NonNull Namespace namespace, @NonNull Dataset dataset) {
+  public static DatasetUrn of(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
     final String value =
         new StringJoiner(URN_DELIM)
             .add(URN_PREFIX)
-            .add(namespace.getValue())
-            .add(dataset.getValue())
+            .add(namespaceName.getValue())
+            .add(datasetName.getValue())
             .toString();
     return of(value);
   }

@@ -1,8 +1,8 @@
 package marquez.service.models;
 
 import marquez.common.models.DatasetUrn;
-import marquez.common.models.Namespace;
+import marquez.common.models.NamespaceName;
 
 public interface DatasetVersion {
-  DatasetUrn toDatasetUrn(Namespace namespace);
+  DatasetUrn toDatasetUrn(NamespaceName namespace);
 }
