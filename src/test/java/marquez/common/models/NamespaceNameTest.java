@@ -17,19 +17,19 @@ public class NamespaceNameTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testNamespace_throwsException_onNullValue() {
+  public void testNewNamespace_throwsException_onNullValue() {
     final String nullValue = null;
     NamespaceName.fromString(nullValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNamespace_throwsException_onEmptyValue() {
+  public void testNewNamespace_throwsException_onEmptyValue() {
     final String emptyValue = "";
     NamespaceName.fromString(emptyValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNamespace_throwsException_onBlankValue() {
+  public void testNewNamespace_throwsException_onBlankValue() {
     final String blankValue = " ";
     NamespaceName.fromString(blankValue);
   }
@@ -41,7 +41,7 @@ public class NamespaceNameTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNamespace__throwsException_onGreaterThan1024Value() {
+  public void testNewNamespace_throwsException_onGreaterThan1024Value() {
     final String greaterThan1024Value = newGreaterThan1024Value();
     NamespaceName.fromString(greaterThan1024Value);
   }
