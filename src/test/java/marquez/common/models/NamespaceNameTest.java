@@ -35,7 +35,7 @@ public class NamespaceNameTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNamespace_throwsException_onNonAlphanumericValue() {
+  public void testNewNamespace_throwsException_onNonAlphanumericValue() {
     final String nonAlphanumericValue = "t@?t>";
     NamespaceName.fromString(nonAlphanumericValue);
   }
