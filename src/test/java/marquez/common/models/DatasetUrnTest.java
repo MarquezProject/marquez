@@ -5,8 +5,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.StringJoiner;
 import java.util.stream.Stream;
+import marquez.UnitTests;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DatasetUrnTest {
   private static final int ALLOWED_DATASET_URN_SIZE = 64;
   private static final int DATASET_URN_SIZE_GREATER_THAN_ALLOWED = ALLOWED_DATASET_URN_SIZE + 1;
@@ -71,7 +74,7 @@ public class DatasetUrnTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testNewDatasetUrn_throwsException_onPartGreaterThan64Value() {
-    final String partGreaterThan64Value= newDatasetUrnWithPartGreaterThan64();
+    final String partGreaterThan64Value = newDatasetUrnWithPartGreaterThan64();
     DatasetUrn.fromString(partGreaterThan64Value);
   }
 

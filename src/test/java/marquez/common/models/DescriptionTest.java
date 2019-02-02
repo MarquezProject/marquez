@@ -2,18 +2,21 @@ package marquez.common.models;
 
 import static org.junit.Assert.assertEquals;
 
+import marquez.UnitTests;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DescriptionTest {
   @Test
   public void testNewDescription() {
-    final String description = "marquez";
-    assertEquals(description, Description.fromString(description).getValue());
+    final String value = "test";
+    assertEquals(value, Description.fromString(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testDescriptionNull() {
-    final String nullDescription = null;
-    Description.fromString(nullDescription);
+  public void testNewDescription_throwsException_onNullValue() {
+    final String nullValue = null;
+    Description.fromString(nullValue);
   }
 }

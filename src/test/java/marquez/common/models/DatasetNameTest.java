@@ -2,8 +2,11 @@ package marquez.common.models;
 
 import static org.junit.Assert.assertEquals;
 
+import marquez.UnitTests;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DatasetNameTest {
   @Test
   public void testNewDatasetName() {

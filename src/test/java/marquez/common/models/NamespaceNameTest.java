@@ -4,8 +4,11 @@ import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertEquals;
 
 import java.util.stream.Stream;
+import marquez.UnitTests;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class NamespaceNameTest {
   private static final int ALLOWED_NAMESPACE_SIZE = 1024;
   private static final int NAMESPACE_SIZE_GREATER_THAN_ALLOWED = ALLOWED_NAMESPACE_SIZE + 1;
