@@ -10,7 +10,7 @@ import marquez.common.models.ConnectionUrl;
 import marquez.common.models.Dataset;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DbSchemaName;
-import marquez.common.models.DbTable;
+import marquez.common.models.DbTableName;
 import marquez.common.models.Description;
 import marquez.common.models.Namespace;
 
@@ -19,17 +19,17 @@ import marquez.common.models.Namespace;
 public final class DbTableVersion implements DatasetVersion {
   @Getter private final ConnectionUrl connectionUrl;
   @Getter private final DbSchemaName dbSchemaName;
-  @Getter private final DbTable dbTable;
+  @Getter private final DbTableName dbTableName;
   private final Description description;
 
   public DbTableVersion(
       @NonNull final ConnectionUrl connectionUrl,
       @NonNull final DbSchemaName dbSchemaName,
-      @NonNull final DbTable dbTable,
+      @NonNull final DbTableName dbTableName,
       @Nullable final Description description) {
     this.connectionUrl = connectionUrl;
     this.dbSchemaName = dbSchemaName;
-    this.dbTable = dbTable;
+    this.dbTableName = dbTableName;
     this.description = description;
   }
 
@@ -38,7 +38,7 @@ public final class DbTableVersion implements DatasetVersion {
   }
 
   public String getQualifiedName() {
-    return dbSchemaName.getValue() + '.' + dbTable.getValue();
+    return dbSchemaName.getValue() + '.' + dbTableName.getValue();
   }
 
   @Override

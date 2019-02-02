@@ -8,7 +8,7 @@ import java.util.Optional;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DataSource;
 import marquez.common.models.DbSchemaName;
-import marquez.common.models.DbTable;
+import marquez.common.models.DbTableName;
 import marquez.common.models.Description;
 import marquez.db.models.DataSourceRow;
 import marquez.service.models.DbTableVersion;
@@ -19,7 +19,7 @@ public class DataSourceRowMapperTest {
   private static final ConnectionUrl CONNECTION_URL =
       ConnectionUrl.of(String.format("jdbc:%s://localhost:5432/novelists", DATA_SOURCE.getValue()));
   private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.of("marquez");
-  private static final DbTable DB_TABLE = DbTable.of("quotes");
+  private static final DbTableName DB_TABLE_NAME = DbTableName.of("quotes");
   private static final Description DESCRIPTION =
       Description.of("It's enough for me to be sure that you and I exist as this moment.");
 
@@ -27,7 +27,7 @@ public class DataSourceRowMapperTest {
   public void testMapDbTableVersion() {
     final Optional<Description> nonEmptyDescription = Optional.of(DESCRIPTION);
     final DbTableVersion dbTableVersion =
-        new DbTableVersion(CONNECTION_URL, DB_SCHEMA_NAME, DB_TABLE, DESCRIPTION);
+        new DbTableVersion(CONNECTION_URL, DB_SCHEMA_NAME, DB_TABLE_NAME, DESCRIPTION);
     final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
     assertNotNull(dataSourceRow);
     assertNotNull(dataSourceRow.getUuid());
@@ -40,7 +40,7 @@ public class DataSourceRowMapperTest {
   public void testMapDbTableVersionNoDescription() {
     final Optional<Description> noDescription = Optional.of(NO_DESCRIPTION);
     final DbTableVersion dbTableVersion =
-        new DbTableVersion(CONNECTION_URL, DB_SCHEMA_NAME, DB_TABLE, NO_DESCRIPTION);
+        new DbTableVersion(CONNECTION_URL, DB_SCHEMA_NAME, DB_TABLE_NAME, NO_DESCRIPTION);
     final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
     assertNotNull(dataSourceRow);
     assertNotNull(dataSourceRow.getUuid());
