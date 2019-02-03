@@ -7,9 +7,9 @@ import static org.junit.Assert.assertNull;
 
 import java.util.UUID;
 import marquez.api.JobRunBaseTest;
-import marquez.core.exceptions.UnexpectedException;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.exceptions.UnexpectedException;
 import marquez.service.models.Generator;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
