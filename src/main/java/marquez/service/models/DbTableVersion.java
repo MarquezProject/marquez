@@ -45,6 +45,6 @@ public final class DbTableVersion implements DatasetVersion {
 
   @Override
   public DatasetUrn toDatasetUrn(@NonNull NamespaceName namespaceName) {
-    return DatasetUrn.of(namespaceName, DatasetName.fromString(getQualifiedName()));
+    return DatasetUrn.from(namespaceName, DatasetName.fromString(getQualifiedName()));
   }
 }
