@@ -1,8 +1,8 @@
 package marquez.db;
 
 import java.util.UUID;
-import marquez.core.models.JobRun;
-import marquez.core.models.RunArgs;
+import marquez.service.models.JobRun;
+import marquez.service.models.RunArgs;
 import marquez.db.mappers.JobRunRowMapper;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;

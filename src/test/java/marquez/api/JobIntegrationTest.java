@@ -21,10 +21,10 @@ import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
 import marquez.api.models.JobRunResponse;
 import marquez.core.exceptions.UnexpectedException;
-import marquez.core.models.Generator;
-import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
-import marquez.core.models.Namespace;
+import marquez.service.models.Generator;
+import marquez.service.models.JobRun;
+import marquez.service.models.JobRunState;
+import marquez.service.models.Namespace;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
@@ -66,8 +66,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 
-    marquez.core.models.Job job = Generator.genJob(generatedNamespace.getGuid());
-    marquez.core.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
+    marquez.service.models.Job job = Generator.genJob(generatedNamespace.getGuid());
+    marquez.service.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
 
     CREATED_JOB_NAME = createdJob.getName();
     CREATED_JOB_RUN_UUID = createdJob.getNamespaceGuid();

@@ -26,9 +26,9 @@ import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ApiJobToCoreJobMapper;
 import marquez.core.mappers.CoreJobRunToApiJobRunResponseMapper;
 import marquez.core.mappers.CoreJobToApiJobMapper;
-import marquez.core.models.Job;
-import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
+import marquez.service.models.Job;
+import marquez.service.models.JobRun;
+import marquez.service.models.JobRunState;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 

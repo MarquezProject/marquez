@@ -1,6 +1,6 @@
 package marquez.db;
 
-import marquez.core.models.RunArgs;
+import marquez.service.models.RunArgs;
 import marquez.db.mappers.JobRunArgsRowMapper;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;

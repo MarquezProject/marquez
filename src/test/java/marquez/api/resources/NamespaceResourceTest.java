@@ -24,7 +24,7 @@ import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.core.mappers.ResourceExceptionMapper;
-import marquez.core.models.Namespace;
+import marquez.service.models.Namespace;
 import marquez.service.NamespaceService;
 import org.junit.Before;
 import org.junit.ClassRule;

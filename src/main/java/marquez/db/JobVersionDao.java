@@ -2,7 +2,7 @@ package marquez.db;
 
 import java.util.List;
 import java.util.UUID;
-import marquez.core.models.JobVersion;
+import marquez.service.models.JobVersion;
 import marquez.db.mappers.JobVersionRowMapper;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
