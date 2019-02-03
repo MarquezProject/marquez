@@ -1,4 +1,4 @@
-package marquez.core.mappers;
+package marquez.api.mappers;
 
 import static java.util.Objects.requireNonNull;
 

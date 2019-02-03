@@ -1,4 +1,4 @@
-package marquez.core.mappers;
+package marquez.api.mappers;
 
 import marquez.api.models.Job;
 

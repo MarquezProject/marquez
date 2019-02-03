@@ -1,4 +1,4 @@
-package marquez.core.mappers;
+package marquez.api.exceptions;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
