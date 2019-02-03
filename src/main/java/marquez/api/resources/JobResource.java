@@ -26,11 +26,11 @@ import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ApiJobToCoreJobMapper;
 import marquez.core.mappers.CoreJobRunToApiJobRunResponseMapper;
 import marquez.core.mappers.CoreJobToApiJobMapper;
+import marquez.service.JobService;
+import marquez.service.NamespaceService;
 import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
-import marquez.service.JobService;
-import marquez.service.NamespaceService;
 
 @Path("/api/v1")
 @Slf4j

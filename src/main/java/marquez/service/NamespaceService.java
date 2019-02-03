@@ -5,8 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import marquez.core.exceptions.UnexpectedException;
-import marquez.service.models.Namespace;
 import marquez.db.NamespaceDao;
+import marquez.service.models.Namespace;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
