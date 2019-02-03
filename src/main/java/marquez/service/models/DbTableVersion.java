@@ -2,6 +2,7 @@ package marquez.service.models;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -16,6 +17,7 @@ import marquez.common.models.NamespaceName;
 
 @EqualsAndHashCode
 @ToString
+@Builder
 public final class DbTableVersion implements DatasetVersion {
   @Getter private final ConnectionUrl connectionUrl;
   @Getter private final DbSchemaName dbSchemaName;
