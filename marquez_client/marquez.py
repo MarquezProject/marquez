@@ -1,6 +1,7 @@
 import json
-import yaml
+import os
 
+import logging
 from marquez_client import Configuration, ApiClient, DatasetsApi, JobsApi, NamespacesApi, CreateNamespace, CreateJobRun, \
     CreateJob
 
@@ -13,17 +14,14 @@ class MarquezClient(object):
     jobs_api_client = None
     namespace_api_client = None
 
-    def __init__(self, config_path='./config.yml'):
-        if not config_path:
-            raise Exception("Please provide a configuration for the Marquez Client")
+    def __init__(self):
+        host_from_configs = os.environ['MQZ_HOST']
+        port_from_configs = os.environ['MQZ_PORT']
 
-        config = yaml.safe_load(open(config_path))
-        if 'marquez_host' not in config:
-            raise Exception("Must provide a marquez_host attribute in the config")
+        if not (host_from_configs and port_from_configs):
+            raise Exception("Please provide proper env vars in context: MQZ_HOSTNAME and MQZ_PORT")
 
-        host_from_configs = config['marquez_host']['hostname']
-        port_from_configs = config['marquez_host']['port']
-
+        logging.info("Connecting to Marquez at %s:%s", host_from_configs, port_from_configs)
         c = Configuration()
         c.host = "{0}:{1}/{2}".format(host_from_configs, port_from_configs, self.API_PATH)
 
@@ -73,3 +71,44 @@ class MarquezClient(object):
 
     def mark_job_run_aborted(self, job_run_id):
         self.jobs_api_client.jobs_runs_id_abort_put(job_run_id)
+
+
+if __name__ == "__main__":
+    # Namespace Params
+    new_namespace = "aleks_ns4"
+    owner = "aleks2"
+    ns_desc = "aleks_testing_ns"
+
+    # Job Params
+    job_name = "aleks_job"
+    location = "git://my_fav_project/5gfd53F892KJkx"
+    description = "a simple job"
+    input_data_set_urns = ["a://b/c", "d://e/f"]
+
+    output_data_set_urns = ["s3://i/j/k"]
+
+    my_app = MarquezClient()
+    my_app.set_namespace(new_namespace, owner=owner, description=None)
+
+    job_result = my_app.create_job(job_name, location, input_data_set_urns, output_data_set_urns, description)
+    print("Job Creation:")
+    print(job_result)
+
+    job_run = my_app.create_job_run(job_name, job_run_args=json.dumps({"k1" : "v1", "k2" : "v2"}))
+    run_id = job_run.run_id
+    print("Job Run Creation:")
+    print(job_run)
+
+    job_run = my_app.get_job_run(run_id)
+    print("Getting job run result:")
+    print(job_run)
+    my_app.mark_job_run_running(run_id)
+
+    job_run = my_app.get_job_run(run_id)
+    print("Getting job run result (after marked as running):")
+    print(job_run)
+
+    my_app.mark_job_run_completed(run_id)
+    job_run = my_app.get_job_run(run_id)
+    print("Getting job run result (after marked as completed):")
+    print(job_run)

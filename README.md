@@ -44,6 +44,12 @@ import marquez_client
 
 Please follow the [installation procedure](#installation--usage) and then run the following:
 
+Please be sure to set the environmental variables to connect with Marquez:
+```
+export MQZ_HOST='localhost'
+export MQZ_PORT='8080'
+```
+
 ```python
 from __future__ import print_function
 import time
