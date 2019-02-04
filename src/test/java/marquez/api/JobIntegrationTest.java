@@ -70,7 +70,6 @@ public class JobIntegrationTest extends JobRunBaseTest {
     marquez.core.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
 
     CREATED_JOB_NAME = createdJob.getName();
-    CREATED_JOB_RUN_UUID = createdJob.getNamespaceGuid();
   }
 
   @Test
@@ -141,6 +140,29 @@ public class JobIntegrationTest extends JobRunBaseTest {
     assertEquals(JobRunState.State.NEW.name(), responseBody.getRunState());
     assertNull(responseBody.getNominalStartTime());
     assertNull(responseBody.getNominalEndTime());
+  }
+
+  @Test
+  public void testJobRunRetrievalWithMultipleJobRuns() throws UnexpectedException {
+    JobRun secondCreatedJobRun =
+        jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
+    final UUID secondJobRunUUID = secondCreatedJobRun.getGuid();
+
+    try {
+      assertThat(jobService.getJobRun(CREATED_JOB_RUN_UUID).get().getGuid())
+          .isEqualByComparingTo(CREATED_JOB_RUN_UUID);
+      assertThat(jobService.getJobRun(secondJobRunUUID).get().getGuid())
+          .isEqualByComparingTo(secondJobRunUUID);
+    } finally {
+      APP.getJDBI()
+          .useHandle(
+              handle -> {
+                handle.execute(
+                    format(
+                        "delete from job_run_states where job_run_guid = '%s'", secondJobRunUUID));
+                handle.execute(format("delete from job_runs where guid = '%s'", secondJobRunUUID));
+              });
+    }
   }
 
   @Test
