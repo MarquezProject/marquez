@@ -1,4 +1,4 @@
-package marquez.common.base;
+package marquez.common;
 
 import javax.annotation.Nullable;
 
