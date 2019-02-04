@@ -1,5 +1,8 @@
 package marquez.common.models;
 
+import static marquez.common.Preconditions.checkArgument;
+import static marquez.common.Preconditions.checkNotBlank;
+
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,13 +17,8 @@ public final class RunId {
   @Getter private final UUID value;
 
   public RunId(@NonNull final String value) {
-    if (value.trim().isEmpty()) {
-      throw new IllegalArgumentException("value must not be blank or empty");
-    }
-    if (value.length() != ID_LENGTH) {
-      throw new IllegalArgumentException(String.format("value length must = %d", ID_LENGTH));
-    }
-
+    checkNotBlank(value, "value must not be blank or empty");
+    checkArgument(value.length() == ID_LENGTH, String.format("value length must = %d", ID_LENGTH));
     this.value = UUID.fromString(value);
   }
 }
