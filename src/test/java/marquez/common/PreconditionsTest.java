@@ -106,7 +106,7 @@ public class PreconditionsTest {
 
   @Test
   public void testCheckArgument_trueExpression_withErrorMessage() {
-    Preconditions.checkArgument(TRUE, NULL_ERROR_MESSAGE);
+    Preconditions.checkArgument(TRUE, NON_NULL_ERROR_MESSAGE);
   }
 
   @Test(expected = IllegalArgumentException.class)
