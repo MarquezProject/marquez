@@ -52,6 +52,7 @@ public interface JobRunDao {
       "SELECT jr.*, jra.args_json "
           + "FROM job_runs jr "
           + "LEFT JOIN job_run_args jra "
-          + " ON (jr.job_run_args_hex_digest = jra.hex_digest) where jr.guid = :guid")
+          + " ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest) "
+          + "WHERE jr.guid = :guid")
   JobRun findJobRunById(@Bind("guid") UUID guid);
 }
