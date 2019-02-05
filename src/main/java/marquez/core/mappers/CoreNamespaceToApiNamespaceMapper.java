@@ -3,7 +3,7 @@ package marquez.core.mappers;
 import static java.util.Objects.requireNonNull;
 
 import marquez.api.models.NamespaceResponse;
-import marquez.core.models.Namespace;
+import marquez.service.models.Namespace;
 
 // TODO: Move to marquez.api.mappers pgk
 // TODO: Rename class to NamespaceMapper

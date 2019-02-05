@@ -1,8 +1,8 @@
 package marquez.db;
 
 import java.util.List;
-import marquez.core.models.Namespace;
 import marquez.db.mappers.NamespaceRowMapper;
+import marquez.service.models.Namespace;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;

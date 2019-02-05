@@ -2,10 +2,10 @@ package marquez.core.mappers;
 
 import marquez.api.models.Job;
 
-public class ApiJobToCoreJobMapper extends Mapper<Job, marquez.core.models.Job> {
+public class ApiJobToCoreJobMapper extends Mapper<Job, marquez.service.models.Job> {
   @Override
-  public marquez.core.models.Job map(Job value) {
-    return new marquez.core.models.Job(
+  public marquez.service.models.Job map(Job value) {
+    return new marquez.service.models.Job(
         null,
         value.getName(),
         value.getLocation(),
