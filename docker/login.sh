@@ -16,4 +16,4 @@
 
 set -eu
 
-docker login --username "${DOCKER_LOGIN}" --password "${DOCKER_PASSWORD}"
+echo "${DOCKER_PASSWD}" |docker login --username "${DOCKER_USER}" --password-stdin quay.io/wework
