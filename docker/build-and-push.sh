@@ -1,13 +1,11 @@
 #!/bin/bash
 #
-# Usage: $ ./build-tag-push.sh <version>
+# Usage: $ ./build-and-push.sh <version>
 
 set -eu
 
-source common.sh
-
-readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}$" # X.Y.Z
-readonly ORG="marquezproject"
+readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}\.([0-9]){4}([0-9]){2}([0-9]){2}\.([0-9a-f]){7}$" # X.Y.Z.YYYMMDD.SHA-1
+readonly ORG="wework"
 readonly REPO="marquez"
 readonly NAME="${ORG}/${REPO}"
 
@@ -21,11 +19,11 @@ if [[ ! "${version}" =~ ${SEMVER_REGEX} ]]; then
   error "Version must match ${SEMVER_REGEX}"
 fi
 
-info "Building image (tag: ${version})..."
+echo "Building image (tag: ${version})..."
 
-docker build --no-cache --tag "${NAME}:${version}" .
-docker tag "${NAME}:${version}" "${NAME}:latest"
-docker push "${NAME}:${version}"
-docker push "${NAME}:latest"
+docker build --no-cache --tag "quay.io/${NAME}:${version}" .
+docker tag "quay.io/${NAME}:${version}" "quay.io/${NAME}:latest"
+docker push "quay.io/${NAME}:${version}"
+docker push "quay.io/${NAME}:latest"
 
-info "DONE!"
+echo "DONE!"
