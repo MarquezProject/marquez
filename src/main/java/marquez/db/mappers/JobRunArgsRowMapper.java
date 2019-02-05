@@ -2,7 +2,7 @@ package marquez.db.mappers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import marquez.core.models.RunArgs;
+import marquez.service.models.RunArgs;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 

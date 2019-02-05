@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.NonNull;
 import marquez.api.models.NamespaceResponse;
-import marquez.core.models.Namespace;
+import marquez.service.models.Namespace;
 
 public final class NamespaceResponseMapper {
   private NamespaceResponseMapper() {}

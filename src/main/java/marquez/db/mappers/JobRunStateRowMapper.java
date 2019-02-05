@@ -3,7 +3,7 @@ package marquez.db.mappers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-import marquez.core.models.JobRunState;
+import marquez.service.models.JobRunState;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 

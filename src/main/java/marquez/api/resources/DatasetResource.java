@@ -20,9 +20,9 @@ import lombok.NonNull;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.Namespace;
-import marquez.core.exceptions.UnexpectedException;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
+import marquez.service.exceptions.UnexpectedException;
 import marquez.service.models.Dataset;
 
 @Path("/api/v1")

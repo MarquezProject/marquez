@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import marquez.api.models.NamespaceResponse;
-import marquez.core.models.Namespace;
+import marquez.service.models.Namespace;
 import org.junit.Test;
 
 public class NamespaceResponseMapperTest {

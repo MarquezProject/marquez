@@ -1,10 +1,10 @@
-package marquez.core.mappers;
+package marquez.api.mappers;
 
 import marquez.api.models.Job;
 
-public class CoreJobToApiJobMapper extends Mapper<marquez.core.models.Job, Job> {
+public class CoreJobToApiJobMapper extends Mapper<marquez.service.models.Job, Job> {
   @Override
-  public Job map(marquez.core.models.Job value) {
+  public Job map(marquez.service.models.Job value) {
     return new Job(
         value.getName(),
         value.getCreatedAt(),

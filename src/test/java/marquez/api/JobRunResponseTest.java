@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 import marquez.api.models.JobRunResponse;
-import marquez.core.models.JobRunState;
+import marquez.service.models.JobRunState;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
 

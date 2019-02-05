@@ -1,3 +1,3 @@
-package marquez.core.exceptions;
+package marquez.api.exceptions;
 
 public class ResourceException extends Throwable {}

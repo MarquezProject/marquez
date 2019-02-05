@@ -1,8 +1,8 @@
 package marquez.db;
 
 import java.util.UUID;
-import marquez.core.models.JobRunState;
 import marquez.db.mappers.JobRunStateRowMapper;
+import marquez.service.models.JobRunState;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
