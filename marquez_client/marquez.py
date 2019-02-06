@@ -8,6 +8,8 @@ from marquez_client import Configuration, ApiClient, DatasetsApi, JobsApi, Names
 
 class MarquezClient(object):
     API_PATH = "api/v1"
+    MARQUEZ_HOST_KEY = "MQZ_HOST"
+    MARQUEZ_PORT_KEY = "MQZ_PORT"
     c = None
     namespace = None
     dataset_api_client = None
@@ -15,11 +17,12 @@ class MarquezClient(object):
     namespace_api_client = None
 
     def __init__(self):
-        host_from_configs = os.environ['MQZ_HOST']
-        port_from_configs = os.environ['MQZ_PORT']
-
-        if not (host_from_configs and port_from_configs):
-            raise Exception("Please provide proper env vars in context: MQZ_HOSTNAME and MQZ_PORT")
+        try:
+            host_from_configs = os.environ['MQZ_HOST']
+            port_from_configs = os.environ['MQZ_PORT']
+        except KeyError as ke:
+            msg = "Please provide proper env vars in context: MQZ_HOSTNAME and MQZ_PORT. Missing " + str(ke.args)
+            raise Exception(msg)
 
         logging.info("Connecting to Marquez at %s:%s", host_from_configs, port_from_configs)
         c = Configuration()
