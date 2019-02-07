@@ -23,7 +23,7 @@ workflows:
   version: 2
   marquez:
     jobs:
-      - build:
+      - build
       - test:
           requires:
             - build
