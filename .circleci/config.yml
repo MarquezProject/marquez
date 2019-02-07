@@ -11,7 +11,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: pip --user install -r requirements.txt
+      - run: pip install --user  -r requirements.txt
 
   test:
     <<: *defaults
