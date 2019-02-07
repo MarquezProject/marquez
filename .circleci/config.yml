@@ -2,7 +2,7 @@ version: 2
 
 defaults: &defaults
   docker:
-    - image: circleci/openjdk:8-jdk
+    - image: circleci/python:latest-node-browsers
   working_directory: ~/marquez_python
 
 
