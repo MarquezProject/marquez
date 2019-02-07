@@ -24,7 +24,7 @@ jobs:
 
 workflows:
   version: 2
-  marquez:
+  marquez_python:
     jobs:
       - build
       - test:
