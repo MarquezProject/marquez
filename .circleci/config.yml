@@ -17,7 +17,10 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: ./pytest ./test
+      - run:
+          command: pip install --user  -r requirements.txt
+      - run:
+          command: ./pytest ./test
 
 workflows:
   version: 2
