@@ -1,4 +1,4 @@
-version: 1.2.1
+version: 2
 
 defaults: &defaults
   docker:
@@ -20,7 +20,7 @@ jobs:
       - run: ./pytest ./test
 
 workflows:
-  version: 1.2.1
+  version: 2
   marquez:
     jobs:
       - test:
