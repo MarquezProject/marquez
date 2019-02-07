@@ -2,7 +2,7 @@ version: 2
 
 defaults: &defaults
   docker:
-    - image: circleci/python:latest-node-browsers
+    - image: circleci/python:3.6
   working_directory: ~/marquez_python
 
 
@@ -20,7 +20,7 @@ jobs:
       - run:
           command: pip install --user  -r test-requirements.txt
       - run:
-          command: pytest ./test
+          command: python -m pytest ./test
 
 workflows:
   version: 2
