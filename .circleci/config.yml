@@ -20,7 +20,7 @@ jobs:
       - run:
           command: pip install --user  -r test-requirements.txt
       - run:
-          command: ./pytest ./test
+          command: pytest ./test
 
 workflows:
   version: 2
