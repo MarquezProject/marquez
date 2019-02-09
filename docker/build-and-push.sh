@@ -19,6 +19,7 @@ version="${1}"
 # Ensure valid version 
 if [[ ! "${version}" =~ ${SEMVER_REGEX} ]]; then
   echo "Version must match ${SEMVER_REGEX}"
+  exit 1
 fi
 
 echo "Building image (tag: ${version})..."
