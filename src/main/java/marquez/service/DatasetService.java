@@ -7,7 +7,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
-import marquez.core.exceptions.UnexpectedException;
 import marquez.db.DatasetDao;
 import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;

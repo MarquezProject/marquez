@@ -17,7 +17,6 @@ import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
-import marquez.core.exceptions.UnexpectedException;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.UnexpectedException;
