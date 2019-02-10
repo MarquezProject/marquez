@@ -30,7 +30,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      - MARQUEZ_DB=marquez
+      - MARQUEZ_DB_NAME=marquez
       - MARQUEZ_USER=buendia
       - MARQUEZ_PASSWORD=macondo
     volumes:
