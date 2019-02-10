@@ -20,11 +20,6 @@ import marquez.api.models.CreateJobRequest;
 import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
 import marquez.api.models.JobRunResponse;
-import marquez.core.exceptions.UnexpectedException;
-import marquez.core.models.Generator;
-import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
-import marquez.core.models.Namespace;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
@@ -32,6 +27,11 @@ import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.exceptions.UnexpectedException;
+import marquez.service.models.Generator;
+import marquez.service.models.JobRun;
+import marquez.service.models.JobRunState;
+import marquez.service.models.Namespace;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -66,11 +66,10 @@ public class JobIntegrationTest extends JobRunBaseTest {
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 
-    marquez.core.models.Job job = Generator.genJob(generatedNamespace.getGuid());
-    marquez.core.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
+    marquez.service.models.Job job = Generator.genJob(generatedNamespace.getGuid());
+    marquez.service.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
 
     CREATED_JOB_NAME = createdJob.getName();
-    CREATED_JOB_RUN_UUID = createdJob.getNamespaceGuid();
   }
 
   @Test
@@ -141,6 +140,29 @@ public class JobIntegrationTest extends JobRunBaseTest {
     assertEquals(JobRunState.State.NEW.name(), responseBody.getRunState());
     assertNull(responseBody.getNominalStartTime());
     assertNull(responseBody.getNominalEndTime());
+  }
+
+  @Test
+  public void testJobRunRetrievalWithMultipleJobRuns() throws UnexpectedException {
+    JobRun secondCreatedJobRun =
+        jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
+    final UUID secondJobRunUUID = secondCreatedJobRun.getGuid();
+
+    try {
+      assertThat(jobService.getJobRun(CREATED_JOB_RUN_UUID).get().getGuid())
+          .isEqualByComparingTo(CREATED_JOB_RUN_UUID);
+      assertThat(jobService.getJobRun(secondJobRunUUID).get().getGuid())
+          .isEqualByComparingTo(secondJobRunUUID);
+    } finally {
+      APP.getJDBI()
+          .useHandle(
+              handle -> {
+                handle.execute(
+                    format(
+                        "delete from job_run_states where job_run_guid = '%s'", secondJobRunUUID));
+                handle.execute(format("delete from job_runs where guid = '%s'", secondJobRunUUID));
+              });
+    }
   }
 
   @Test

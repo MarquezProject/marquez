@@ -1,9 +1,9 @@
 package marquez.db;
 
 import java.util.UUID;
-import marquez.core.models.JobRun;
-import marquez.core.models.RunArgs;
 import marquez.db.mappers.JobRunRowMapper;
+import marquez.service.models.JobRun;
+import marquez.service.models.RunArgs;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -52,6 +52,7 @@ public interface JobRunDao {
       "SELECT jr.*, jra.args_json "
           + "FROM job_runs jr "
           + "LEFT JOIN job_run_args jra "
-          + " ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest)")
+          + " ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest) "
+          + "WHERE jr.guid = :guid")
   JobRun findJobRunById(@Bind("guid") UUID guid);
 }

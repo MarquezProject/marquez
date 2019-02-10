@@ -1,4 +1,4 @@
-package marquez.core.mappers;
+package marquez.api.mappers;
 
 import static java.util.Objects.requireNonNull;
 
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// TODO: Remove
 public abstract class Mapper<A, B> {
   public Optional<B> mapAsOptional(A value) {
     return Optional.ofNullable(map(value));

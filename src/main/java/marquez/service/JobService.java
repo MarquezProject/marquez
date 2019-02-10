@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import marquez.core.exceptions.UnexpectedException;
-import marquez.core.models.Job;
-import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
-import marquez.core.models.JobVersion;
-import marquez.core.models.RunArgs;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
+import marquez.service.exceptions.UnexpectedException;
+import marquez.service.models.Job;
+import marquez.service.models.JobRun;
+import marquez.service.models.JobRunState;
+import marquez.service.models.JobVersion;
+import marquez.service.models.RunArgs;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j

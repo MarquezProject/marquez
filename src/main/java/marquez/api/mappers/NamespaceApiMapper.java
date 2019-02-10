@@ -1,10 +1,10 @@
-package marquez.core.mappers;
+package marquez.api.mappers;
 
 import static java.util.Objects.requireNonNull;
 
 import marquez.api.models.CreateNamespaceRequest;
 import marquez.api.models.NamespaceResponse;
-import marquez.core.models.Namespace;
+import marquez.service.models.Namespace;
 
 public class NamespaceApiMapper extends Mapper<NamespaceResponse, Namespace> {
   public Namespace map(NamespaceResponse namespace) {

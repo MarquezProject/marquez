@@ -15,16 +15,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.exceptions.ResourceException;
+import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
+import marquez.api.mappers.NamespaceApiMapper;
 import marquez.api.mappers.NamespaceResponseMapper;
 import marquez.api.models.CreateNamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
-import marquez.core.exceptions.ResourceException;
-import marquez.core.exceptions.UnexpectedException;
-import marquez.core.mappers.CoreNamespaceToApiNamespaceMapper;
-import marquez.core.mappers.NamespaceApiMapper;
-import marquez.core.models.Namespace;
 import marquez.service.NamespaceService;
+import marquez.service.exceptions.UnexpectedException;
+import marquez.service.models.Namespace;
 import org.hibernate.validator.constraints.NotBlank;
 
 @Slf4j

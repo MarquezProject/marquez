@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import marquez.core.models.RunArgs;
 import marquez.db.fixtures.AppWithPostgresRule;
+import marquez.service.models.RunArgs;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;

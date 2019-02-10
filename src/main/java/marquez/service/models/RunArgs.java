@@ -1,4 +1,4 @@
-package marquez.core.models;
+package marquez.service.models;
 
 import java.sql.Timestamp;
 import lombok.Data;

@@ -1,8 +1,8 @@
-package marquez.core.mappers;
+package marquez.api.mappers;
 
 import marquez.api.models.JobRunResponse;
-import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
+import marquez.service.models.JobRun;
+import marquez.service.models.JobRunState;
 
 public class CoreJobRunToApiJobRunResponseMapper extends Mapper<JobRun, JobRunResponse> {
   @Override

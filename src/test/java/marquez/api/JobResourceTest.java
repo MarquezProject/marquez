@@ -20,18 +20,18 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import marquez.api.exceptions.ResourceExceptionMapper;
 import marquez.api.models.CreateJobRequest;
 import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobsResponse;
 import marquez.api.resources.JobResource;
-import marquez.core.exceptions.UnexpectedException;
-import marquez.core.mappers.ResourceExceptionMapper;
-import marquez.core.models.Generator;
-import marquez.core.models.JobRun;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.exceptions.UnexpectedException;
+import marquez.service.models.Generator;
+import marquez.service.models.JobRun;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -169,9 +169,9 @@ public class JobResourceTest {
 
   @Test
   public void testGetAllJobsInNamespace() throws UnexpectedException {
-    marquez.core.models.Job job1 = Generator.genJob();
-    marquez.core.models.Job job2 = Generator.genJob();
-    List<marquez.core.models.Job> jobsList = Arrays.asList(job1, job2);
+    marquez.service.models.Job job1 = Generator.genJob();
+    marquez.service.models.Job job2 = Generator.genJob();
+    List<marquez.service.models.Job> jobsList = Arrays.asList(job1, job2);
 
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
     when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME)).thenReturn(jobsList);

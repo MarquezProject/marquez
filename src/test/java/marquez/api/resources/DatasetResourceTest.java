@@ -20,6 +20,7 @@ import marquez.common.models.NamespaceName;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
+import marquez.service.exceptions.UnexpectedException;
 import marquez.service.models.Dataset;
 import org.junit.Test;
 

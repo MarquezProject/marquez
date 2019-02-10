@@ -13,6 +13,7 @@ import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
+import marquez.service.exceptions.UnexpectedException;
 import marquez.service.mappers.DataSourceRowMapper;
 import marquez.service.mappers.DatasetMapper;
 import marquez.service.mappers.DatasetRowMapper;
