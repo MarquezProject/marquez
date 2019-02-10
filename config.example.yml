@@ -8,7 +8,7 @@ server:
 
 db:
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
+  url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/${POSTGRES_DB_NAME}
   user: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}
 

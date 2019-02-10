@@ -13,7 +13,7 @@ services:
       - MARQUEZ_CONFIG=/usr/src/app/config.yml
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=marquez
+      - POSTGRES_DB_NAME=marquez
       - POSTGRES_USER=buendia
       - POSTGRES_PASSWORD=macondo
     volumes:
