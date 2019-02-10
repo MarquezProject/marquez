@@ -1,0 +1,32 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+html * {
+  font-size: 16px;
+}
+
+.page-header {
+  color: #f6f6f6;
+  background-color: #b94948;
+  background-image: none;
+}
+
+.main-content h2 {
+  font-size: 28px;
+  color: #888;
+}
+
+body {
+  color: black;
+  background-color: #f6f6f6;
+}
+
+a {
+  color: black;
+}
+
+.site-footer {
+  border-top: solid 1px #ccc;
+}
