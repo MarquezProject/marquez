@@ -16,9 +16,9 @@ public final class DatasetMapper {
 
   public static Dataset map(@NonNull DatasetRow datasetRow) {
     return new Dataset(
-        DatasetUrn.of(datasetRow.getUrn()),
+        DatasetUrn.fromString(datasetRow.getUrn()),
         datasetRow.getCreatedAt(),
-        datasetRow.getDescription().map(Description::of).orElse(NO_DESCRIPTION));
+        datasetRow.getDescription().map(Description::fromString).orElse(NO_DESCRIPTION));
   }
 
   public static List<Dataset> map(@NonNull List<DatasetRow> datasetRows) {

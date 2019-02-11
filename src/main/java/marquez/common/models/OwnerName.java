@@ -9,6 +9,6 @@ import lombok.ToString;
 @RequiredArgsConstructor(staticName = "fromString")
 @EqualsAndHashCode
 @ToString
-public final class DataSource {
+public final class OwnerName {
   @Getter @NonNull private final String value;
 }

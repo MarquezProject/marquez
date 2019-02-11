@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.DatasetUrn;
-import marquez.common.models.Namespace;
+import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.UnexpectedException;
@@ -24,9 +24,9 @@ import marquez.service.models.Dataset;
 import org.junit.Test;
 
 public class DatasetResourceTest {
-  private static final DatasetUrn DATASET_URN = DatasetUrn.of("urn:a:b.c");
+  private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
   private static final Instant CREATED_AT = Instant.now();
-  private static final Namespace NAMESPACE = Namespace.of("test");
+  private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final Integer LIMIT = 100;
   private static final Integer OFFSET = 0;
 
@@ -49,13 +49,13 @@ public class DatasetResourceTest {
 
   @Test
   public void testListDatasets200() throws UnexpectedException {
-    when(mockNamespaceService.exists(NAMESPACE.getValue())).thenReturn(true);
+    when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
 
     final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
     final List<Dataset> datasets = Arrays.asList(dataset);
-    when(mockDatasetService.getAll(NAMESPACE, LIMIT, OFFSET)).thenReturn(datasets);
+    when(mockDatasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasets);
 
-    final Response response = datasetResource.list(NAMESPACE.getValue(), LIMIT, OFFSET);
+    final Response response = datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);
     assertEquals(OK, response.getStatusInfo());
 
     final DatasetsResponse datasetsResponse = (DatasetsResponse) response.getEntity();
@@ -64,13 +64,13 @@ public class DatasetResourceTest {
     assertEquals(DATASET_URN.getValue(), datasetsResponses.get(0).getUrn());
     assertEquals(CREATED_AT.toString(), datasetsResponses.get(0).getCreatedAt());
 
-    verify(mockDatasetService, times(1)).getAll(NAMESPACE, LIMIT, OFFSET);
+    verify(mockDatasetService, times(1)).getAll(NAMESPACE_NAME, LIMIT, OFFSET);
   }
 
   @Test(expected = WebApplicationException.class)
   public void testListDatasetsNamespaceDoesNotExist() throws UnexpectedException {
-    when(mockNamespaceService.exists(NAMESPACE.getValue())).thenReturn(false);
+    when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
 
-    datasetResource.list(NAMESPACE.getValue(), LIMIT, OFFSET);
+    datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);
   }
 }

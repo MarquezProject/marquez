@@ -16,8 +16,8 @@ import org.junit.Test;
 
 public class DatasetResponseMapperTest {
   private static final Instant CREATED_AT = Instant.now();
-  private static final DatasetUrn DATASET_URN = DatasetUrn.of("urn:a:b.c");
-  private static final Description DESCRIPTION = Description.of("test description");
+  private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
+  private static final Description DESCRIPTION = Description.fromString("test description");
   private static final Dataset DATASET = new Dataset(DATASET_URN, CREATED_AT, DESCRIPTION);
 
   @Test

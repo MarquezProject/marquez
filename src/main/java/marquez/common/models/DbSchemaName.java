@@ -6,9 +6,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-@RequiredArgsConstructor(staticName = "of")
+@RequiredArgsConstructor(staticName = "fromString")
 @EqualsAndHashCode
 @ToString
-public final class Dataset {
+public final class DbSchemaName {
   @Getter @NonNull private final String value;
 }

@@ -7,16 +7,16 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DescriptionTest {
+public class DbTableNameTest {
   @Test
-  public void testNewDescription() {
+  public void testNewDbTableName() {
     final String value = "test";
-    assertEquals(value, Description.fromString(value).getValue());
+    assertEquals(value, DbTableName.fromString(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testNewDescription_throwsException_onNullValue() {
+  public void testNewDbTableName_throwsException_onNullValue() {
     final String nullValue = null;
-    Description.fromString(nullValue);
+    DbTableName.fromString(nullValue);
   }
 }

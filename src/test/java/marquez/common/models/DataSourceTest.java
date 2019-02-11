@@ -2,18 +2,21 @@ package marquez.common.models;
 
 import static org.junit.Assert.assertEquals;
 
+import marquez.UnitTests;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DataSourceTest {
   @Test
   public void testNewDataSource() {
-    final String dataSource = "postgresql";
-    assertEquals(dataSource, DataSource.of(dataSource).getValue());
+    final String value = "postgresql";
+    assertEquals(value, DataSource.fromString(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testDataSourceNull() {
-    final String nullDataSource = null;
-    DataSource.of(nullDataSource);
+  public void testNewDataSource_throwsException_onNullValue() {
+    final String nullValue = null;
+    DataSource.fromString(nullValue);
   }
 }
