@@ -18,7 +18,6 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
-import marquez.common.models.Namespace;
 
 @RegisterRowMapper(DatasetRowMapper.class)
 public interface DatasetDao {
@@ -29,8 +28,8 @@ public interface DatasetDao {
   DbTableVersionDao createDbTableVersionDao();
 
   @SqlUpdate(
-      "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, urn, description) "
-          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description)")
+      "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description) "
+          + "VALUES (:uuid, :namespaceUuid, :dataSourceUuid, :urn, :description)")
   void insert(@BindBean DatasetRow datasetRow);
 
   @Transaction
@@ -42,11 +41,12 @@ public interface DatasetDao {
     createDataSourceDao().insert(dataSourceRow);
     insert(datasetRow);
     createDbTableVersionDao().insertAll(dbTableInfoRow, dbTableVersionRow);
+    updateCurrentVersion(datasetRow.getUuid(), Instant.now(), dbTableVersionRow.getUuid());
   }
 
   @SqlUpdate(
-      "UPDATE datasets SET updated_at = :updatedAt, current_version = :currentVersion"
-          + "WHERE uuid = :uuid")
+      "UPDATE datasets SET updated_at = :updatedAt, current_version_uuid = :currentVersion "
+          + "WHERE guid = :uuid")
   void updateCurrentVersion(
       @Bind("uuid") UUID uuid,
       @Bind("updatedAt") Instant updatedAt,

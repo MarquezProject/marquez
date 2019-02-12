@@ -13,14 +13,20 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
   public DatasetRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
     return DatasetRow.builder()
-        .uuid(UUID.fromString(results.getString("uuid")))
-        .createdAt(results.getDate("created_at").toInstant())
-        .updatedAt(results.getDate("updated_at").toInstant())
-        .namespaceUuid(UUID.fromString(results.getString("namespace_uuid")))
-        .dataSourceUuid(UUID.fromString(results.getString("data_source_uuid")))
+        .uuid(UUID.fromString(results.getString("guid")))
+        .createdAt(results.getTimestamp("created_at").toInstant())
+        .updatedAt(
+            results.getTimestamp("updated_at") == null
+                ? null
+                : results.getTimestamp("updated_at").toInstant())
+        .namespaceUuid(UUID.fromString(results.getString("namespace_guid")))
+        .dataSourceUuid(UUID.fromString(results.getString("datasource_uuid")))
         .urn(results.getString("urn"))
         .description(results.getString("description"))
-        .currentVersion(UUID.fromString(results.getString("current_version")))
+        .currentVersion(
+            results.getString("current_version_uuid") == null
+                ? null
+                : UUID.fromString(results.getString("current_version_uuid")))
         .build();
   }
 }

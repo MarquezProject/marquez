@@ -10,7 +10,7 @@ import lombok.NonNull;
 @Builder
 public final class DbTableVersionRow {
   @NonNull private final UUID uuid;
-  @NonNull private final Instant createdAt;
+  private final Instant createdAt;
   @NonNull private final UUID datasetUuid;
   @NonNull private final UUID dbTableInfoUuid;
   @NonNull private final String dbTable;

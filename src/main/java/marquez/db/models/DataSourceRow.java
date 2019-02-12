@@ -17,5 +17,6 @@ public final class DataSourceRow {
   @Getter @NonNull private final UUID uuid;
   @Getter @NonNull private final String dataSource;
   @Getter @NonNull private final String connectionUrl;
+  @Getter private final String type;
   @Getter private final Instant createdAt;
 }

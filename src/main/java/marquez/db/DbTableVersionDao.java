@@ -15,7 +15,7 @@ public interface DbTableVersionDao {
   DbTableInfoDao createDbTableInfoDao();
 
   @SqlUpdate(
-      "INSERT INTO db_table_versions (uuid, dataset_uuid, db_table_info_uuid, db_table) "
+      "INSERT INTO db_table_versions (guid, dataset_guid, db_table_info_uuid, db_table_name) "
           + "VALUES (:uuid, :datasetUuid, :dbTableInfoUuid, :dbTable)")
   void insert(@BindBean DbTableVersionRow dbTableVersionRow);
 
