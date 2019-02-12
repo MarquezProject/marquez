@@ -1,9 +1,7 @@
 theme: jekyll-theme-cayman
 
 title: Marquez
-description:  >-
-  A metadata service for the collection, aggregation,
-  and visualization of a data ecosystem's metadata
+description: Collect, aggregate, and visualize a data ecosystem's metadata
 
 repository: MarquezProject/marquez
 theme: jekyll-theme-cayman
