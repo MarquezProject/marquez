@@ -40,6 +40,12 @@ compileTestJava {
   options.incremental = true
 }
 
+task testUnit(type: Test) {  
+  useJUnit {
+    includeCategories 'marquez.UnitTests'
+  }
+}
+
 mainClassName = 'marquez.MarquezApp'
 
 shadowJar {

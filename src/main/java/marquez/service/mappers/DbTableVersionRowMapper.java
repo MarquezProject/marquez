@@ -18,7 +18,7 @@ public final class DbTableVersionRowMapper {
         .uuid(UUID.randomUUID())
         .datasetUuid(datasetRow.getUuid())
         .dbTableInfoUuid(dbTableInfoRow.getUuid())
-        .dbTable(dbTableVersion.getDbTable().getValue())
+        .dbTable(dbTableVersion.getDbTableName().getValue())
         .build();
   }
 }

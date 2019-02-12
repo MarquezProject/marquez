@@ -7,16 +7,16 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DescriptionTest {
+public class OwnerNameTest {
   @Test
-  public void testNewDescription() {
+  public void testNewOwnerName() {
     final String value = "test";
-    assertEquals(value, Description.fromString(value).getValue());
+    assertEquals(value, OwnerName.fromString(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testNewDescription_throwsException_onNullValue() {
+  public void testNewOwnerName_throwsException_onNullValue() {
     final String nullValue = null;
-    Description.fromString(nullValue);
+    OwnerName.fromString(nullValue);
   }
 }

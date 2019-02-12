@@ -2,34 +2,36 @@ package marquez.service.models;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.ConnectionUrl;
-import marquez.common.models.Dataset;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
-import marquez.common.models.DbSchema;
-import marquez.common.models.DbTable;
+import marquez.common.models.DbSchemaName;
+import marquez.common.models.DbTableName;
 import marquez.common.models.Description;
-import marquez.common.models.Namespace;
+import marquez.common.models.NamespaceName;
 
 @EqualsAndHashCode
 @ToString
+@Builder
 public final class DbTableVersion implements DatasetVersion {
   @Getter private final ConnectionUrl connectionUrl;
-  @Getter private final DbSchema dbSchema;
-  @Getter private final DbTable dbTable;
+  @Getter private final DbSchemaName dbSchemaName;
+  @Getter private final DbTableName dbTableName;
   private final Description description;
 
   public DbTableVersion(
       @NonNull final ConnectionUrl connectionUrl,
-      @NonNull final DbSchema dbSchema,
-      @NonNull final DbTable dbTable,
+      @NonNull final DbSchemaName dbSchemaName,
+      @NonNull final DbTableName dbTableName,
       @Nullable final Description description) {
     this.connectionUrl = connectionUrl;
-    this.dbSchema = dbSchema;
-    this.dbTable = dbTable;
+    this.dbSchemaName = dbSchemaName;
+    this.dbTableName = dbTableName;
     this.description = description;
   }
 
@@ -38,11 +40,11 @@ public final class DbTableVersion implements DatasetVersion {
   }
 
   public String getQualifiedName() {
-    return dbSchema.getValue() + '.' + dbTable.getValue();
+    return dbSchemaName.getValue() + '.' + dbTableName.getValue();
   }
 
   @Override
-  public DatasetUrn toDatasetUrn(Namespace namespace) {
-    return DatasetUrn.of(namespace, Dataset.of(getQualifiedName()));
+  public DatasetUrn toDatasetUrn(@NonNull NamespaceName namespaceName) {
+    return DatasetUrn.from(namespaceName, DatasetName.fromString(getQualifiedName()));
   }
 }

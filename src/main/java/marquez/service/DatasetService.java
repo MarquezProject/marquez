@@ -6,7 +6,7 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetUrn;
-import marquez.common.models.Namespace;
+import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
 import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
@@ -30,10 +30,12 @@ public class DatasetService {
     this.datasetDao = datasetDao;
   }
 
-  public Dataset create(@NonNull Namespace namespace, @NonNull DbTableVersion dbTableVersion)
+  public Dataset create(
+      @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
       throws UnexpectedException {
     final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
-    final DatasetRow datasetRow = DatasetRowMapper.map(namespace, dataSourceRow, dbTableVersion);
+    final DatasetRow datasetRow =
+        DatasetRowMapper.map(namespaceName, dataSourceRow, dbTableVersion);
     final DbTableInfoRow dbTableInfoRow = DbTableInfoRowMapper.map(dbTableVersion);
     final DbTableVersionRow dbTableVersionRow =
         DbTableVersionRowMapper.map(datasetRow, dbTableInfoRow, dbTableVersion);
@@ -58,10 +60,10 @@ public class DatasetService {
   }
 
   public List<Dataset> getAll(
-      @NonNull Namespace namespace, @NonNull Integer limit, @NonNull Integer offset)
+      @NonNull NamespaceName namespaceName, @NonNull Integer limit, @NonNull Integer offset)
       throws UnexpectedException {
     try {
-      final List<DatasetRow> datasetRows = datasetDao.findAll(namespace, limit, offset);
+      final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, limit, offset);
       return Collections.unmodifiableList(DatasetMapper.map(datasetRows));
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());

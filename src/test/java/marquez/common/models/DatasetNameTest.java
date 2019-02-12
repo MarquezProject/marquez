@@ -7,16 +7,16 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DescriptionTest {
+public class DatasetNameTest {
   @Test
-  public void testNewDescription() {
-    final String value = "test";
-    assertEquals(value, Description.fromString(value).getValue());
+  public void testNewDatasetName() {
+    final String value = "b.c";
+    assertEquals(value, DatasetName.fromString(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testNewDescription_throwsException_onNullValue() {
+  public void testNewDatasetName_throwsException_onNullValue() {
     final String nullValue = null;
-    Description.fromString(nullValue);
+    DatasetName.fromString(nullValue);
   }
 }
