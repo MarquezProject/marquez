@@ -32,7 +32,7 @@ public class DataSourceRowMapperTest {
     final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
     assertNotNull(dataSourceRow);
     assertNotNull(dataSourceRow.getUuid());
-    assertEquals(DATA_SOURCE.getValue(), dataSourceRow.getDataSource());
+    assertEquals(DATA_SOURCE.getValue(), dataSourceRow.getName());
     assertEquals(CONNECTION_URL.getRawValue(), dataSourceRow.getConnectionUrl());
     assertEquals(nonEmptyDescription, dbTableVersion.getDescription());
   }
@@ -45,7 +45,7 @@ public class DataSourceRowMapperTest {
     final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
     assertNotNull(dataSourceRow);
     assertNotNull(dataSourceRow.getUuid());
-    assertEquals(DATA_SOURCE.getValue(), dataSourceRow.getDataSource());
+    assertEquals(DATA_SOURCE.getValue(), dataSourceRow.getName());
     assertEquals(CONNECTION_URL.getRawValue(), dataSourceRow.getConnectionUrl());
     assertEquals(noDescription, dbTableVersion.getDescription());
   }

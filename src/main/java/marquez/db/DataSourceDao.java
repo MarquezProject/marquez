@@ -14,8 +14,8 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(DataSourceRowMapper.class)
 public interface DataSourceDao {
   @SqlUpdate(
-      "INSERT INTO datasources (guid, name, connection_url, type) "
-          + "VALUES (:uuid, :dataSource, :connectionUrl, :type)")
+      "INSERT INTO datasources (guid, name, connection_url) "
+          + "VALUES (:uuid, :name, :connectionUrl)")
   void insert(@BindBean DataSourceRow dataSourceRow);
 
   @SqlQuery("SELECT * FROM datasources WHERE guid = :uuid")

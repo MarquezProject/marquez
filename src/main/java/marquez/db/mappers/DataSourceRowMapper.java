@@ -15,7 +15,7 @@ public final class DataSourceRowMapper implements RowMapper<DataSourceRow> {
     return DataSourceRow.builder()
         .uuid(UUID.fromString(results.getString("uuid")))
         .createdAt(results.getDate("created_at").toInstant())
-        .dataSource(results.getString("data_source"))
+        .name(results.getString("name"))
         .connectionUrl(results.getString("connection_url"))
         .build();
   }

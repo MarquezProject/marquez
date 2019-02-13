@@ -147,9 +147,8 @@ public class Generator {
     int dataSourceNum = randNum();
     return DataSourceRow.builder()
         .uuid(UUID.randomUUID())
-        .dataSource("Data Source" + dataSourceNum)
+        .name("Data Source" + dataSourceNum)
         .connectionUrl("conn://" + dataSourceNum)
-        .type("REDSHIFT")
         .build();
   }
 
