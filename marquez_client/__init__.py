@@ -14,7 +14,7 @@
 
 from __future__ import absolute_import
 
-__version__ = "1.2.1"
+__version__ = "0.1.0"
 
 # import apis into sdk package
 from marquez_client.api.datasets_api import DatasetsApi

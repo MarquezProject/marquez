@@ -1,9 +1,9 @@
-import json
+import logging
 import os
 
-import logging
-from marquez_client import Configuration, ApiClient, DatasetsApi, JobsApi, NamespacesApi, CreateNamespace, CreateJobRun, \
-    CreateJob
+from marquez_client import (ApiClient, Configuration, CreateJob, CreateJobRun,
+                            CreateNamespace, DatasetsApi, JobsApi,
+                            NamespacesApi)
 
 
 class MarquezClient(object):

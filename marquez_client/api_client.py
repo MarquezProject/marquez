@@ -13,18 +13,18 @@ from __future__ import absolute_import
 import datetime
 import json
 import mimetypes
-from multiprocessing.pool import ThreadPool
 import os
 import re
 import tempfile
+from multiprocessing.pool import ThreadPool
 
 # python 2 and python 3 compatibility library
 import six
 from six.moves.urllib.parse import quote
 
-from marquez_client.configuration import Configuration
 import marquez_client.models
 from marquez_client import rest
+from marquez_client.configuration import Configuration
 
 
 class ApiClient(object):
@@ -75,7 +75,7 @@ class ApiClient(object):
             self.default_headers[header_name] = header_value
         self.cookie = cookie
         # Set default User-Agent.
-        self.user_agent = 'OpenAPI-Generator/1.2.1/python'
+        self.user_agent = 'OpenAPI-Generator/0.1.0/python'
 
     def __del__(self):
         if self._pool:
