@@ -44,6 +44,11 @@ class SimpleTabs extends React.Component {
         const jobRows = jobData.jobs.map(job => [job.name, job.description, job.createdAt])
         this.setState({jobs: jobRows})
     })
+    axios.get('/api/v1/namespaces/demo/datasets/').then((response) => {
+      const datasetData = response.data
+      const datasetRows = datasetData.datasets.map(dataset => [dataset.name, dataset.createdAt])
+      this.setState({datasets: datasetRows})
+    })
   }
 
   handleChange = (event, value) => {
