@@ -17,10 +17,17 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run:
-          command: pip install --user  -r test-requirements.txt
-      - run:
-          command: python -m pytest ./test
+      - run: pip install --user  -r test-requirements.txt
+      - run: python -m pytest ./test
+
+  release:
+    <<: *defaults
+    working_directory: ~/marquez_python
+    steps:
+      - checkout
+      - run: pip install --user twine
+      - run: python setup.py sdist
+      - run: python -m twine upload --verbose dist/*
 
 workflows:
   version: 2
@@ -31,8 +38,6 @@ workflows:
           requires:
             - build
       - release:
-          requires:
-            - test
           filters:
             tags:
               only: /^[0-9]+(\.[0-9]+){2}$/
