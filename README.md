@@ -59,6 +59,7 @@ $ docker-compose up
 * Mailing Lists:
   * [marquez-user@googlegroups.com](https://groups.google.com/group/marquez-user) (_user support and questions_)
   * [marquez-dev@googlegroups.com](https://groups.google.com/group/marquez-dev) (_development discussions_)
+* Chat: https://gitter.im/marquez-project/community
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing
