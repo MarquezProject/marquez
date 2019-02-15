@@ -15,13 +15,13 @@ import lombok.ToString;
 @ToString
 @Builder
 public final class DatasetRow {
-  @Getter @NonNull private final UUID uuid;
-  @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final Instant updatedAt;
+  @Getter private final UUID uuid;
+  @Getter private final Instant createdAt;
+  @Getter private final Instant updatedAt;
   @Getter @NonNull private final UUID namespaceUuid;
   @Getter @NonNull private final UUID dataSourceUuid;
   @Getter @NonNull private final String urn;
-  @Getter @NonNull private final UUID currentVersion;
+  @Getter private final UUID currentVersion;
   private final String description;
 
   public Optional<String> getDescription() {

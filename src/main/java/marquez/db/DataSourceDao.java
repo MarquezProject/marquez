@@ -14,13 +14,13 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(DataSourceRowMapper.class)
 public interface DataSourceDao {
   @SqlUpdate(
-      "INSERT INTO data_sources (uuid, data_source, connection_url) "
-          + "VALUES (:uuid, :dataSource, :connectionUrl)")
+      "INSERT INTO datasources (guid, name, connection_url) "
+          + "VALUES (:uuid, :name, :connectionUrl)")
   void insert(@BindBean DataSourceRow dataSourceRow);
 
-  @SqlQuery("SELECT * FROM data_sources WHERE uuid = :uuid")
+  @SqlQuery("SELECT * FROM datasources WHERE guid = :uuid")
   Optional<DataSourceRow> findBy(@Bind("uuid") UUID uuid);
 
-  @SqlQuery("SELECT * FROM data_sources LIMIT :limit OFFSET :offset")
+  @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
   List<DataSourceRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);
 }

@@ -5,6 +5,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
+import marquez.common.models.DatasetUrn;
+import marquez.db.models.DataSourceRow;
+import marquez.db.models.DatasetRow;
+import marquez.db.models.DbTableInfoRow;
+import marquez.db.models.DbTableVersionRow;
 
 public class Generator {
   private static Random rand = new Random();
@@ -17,6 +22,7 @@ public class Generator {
     return String.format("urn:rand:%d.%d.%d", randNum(), randNum(), randNum());
   }
 
+  // Jobs
   public static Job genJob() {
     return genJob(UUID.randomUUID());
   }
@@ -45,6 +51,7 @@ public class Generator {
         job.getCreatedAt());
   }
 
+  // Job Runs
   public static JobRun genJobRun() {
     return new JobRun(
         UUID.randomUUID(),
@@ -69,6 +76,7 @@ public class Generator {
         null);
   }
 
+  // Job Run States
   public static JobRunState genJobRunState() {
     return new JobRunState(
         UUID.randomUUID(),
@@ -82,6 +90,7 @@ public class Generator {
         jrs.getGuid(), jrs.getTransitionedAt(), jrs.getJobRunGuid(), jrs.getState());
   }
 
+  // Job Versions
   public static JobVersion genJobVersion() {
     return new JobVersion(
         UUID.randomUUID(),
@@ -114,6 +123,7 @@ public class Generator {
         jv.getUpdatedAt());
   }
 
+  // Namespaces
   public static Namespace genNamespace() {
     int nsNum = randNum();
     return new Namespace(UUID.randomUUID(), "ns" + nsNum, "ns owner" + nsNum, "ns desc" + nsNum);
@@ -123,11 +133,52 @@ public class Generator {
     return new Namespace(n.getGuid(), n.getName(), n.getOwnerName(), n.getDescription());
   }
 
+  // Run Args
   public static RunArgs genRunArgs() {
     return new RunArgs("abc123", "{'foo': 1}", null);
   }
 
   public static RunArgs cloneRunArgs(RunArgs ra) {
     return new RunArgs(ra.getHexDigest(), ra.getJson(), ra.getCreatedAt());
+  }
+
+  // Data Source Rows
+  public static DataSourceRow genDataSourceRow() {
+    int dataSourceNum = randNum();
+    return DataSourceRow.builder()
+        .uuid(UUID.randomUUID())
+        .name("Data Source" + dataSourceNum)
+        .connectionUrl("conn://" + dataSourceNum)
+        .build();
+  }
+
+  // Dataset Rows
+  public static DatasetRow genDatasetRow(UUID namespaceID, UUID dataSourceID) {
+    return DatasetRow.builder()
+        .uuid(UUID.randomUUID())
+        .namespaceUuid(namespaceID)
+        .dataSourceUuid(dataSourceID)
+        .description("dataset " + randNum())
+        .urn(DatasetUrn.fromString(randUrn()).toString())
+        .build();
+  }
+
+  // DbTableInfo Rows
+  public static DbTableInfoRow genDbTableInfowRow() {
+    return DbTableInfoRow.builder()
+        .uuid(UUID.randomUUID())
+        .db("db" + randNum())
+        .dbSchema("schema" + randNum())
+        .build();
+  }
+
+  // DbTableVersion Rows
+  public static DbTableVersionRow genDbTableVersionRow(UUID datasetUuid, UUID dbTableInfoUuid) {
+    return DbTableVersionRow.builder()
+        .uuid(UUID.randomUUID())
+        .datasetUuid(datasetUuid)
+        .dbTableInfoUuid(dbTableInfoUuid)
+        .dbTable("table " + randNum())
+        .build();
   }
 }

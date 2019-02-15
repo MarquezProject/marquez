@@ -28,8 +28,8 @@ public interface DatasetDao {
   DbTableVersionDao createDbTableVersionDao();
 
   @SqlUpdate(
-      "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, urn, description) "
-          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description)")
+      "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description) "
+          + "VALUES (:uuid, :namespaceUuid, :dataSourceUuid, :urn, :description)")
   void insert(@BindBean DatasetRow datasetRow);
 
   @Transaction
@@ -41,11 +41,12 @@ public interface DatasetDao {
     createDataSourceDao().insert(dataSourceRow);
     insert(datasetRow);
     createDbTableVersionDao().insertAll(dbTableInfoRow, dbTableVersionRow);
+    updateCurrentVersion(datasetRow.getUuid(), Instant.now(), dbTableVersionRow.getUuid());
   }
 
   @SqlUpdate(
-      "UPDATE datasets SET updated_at = :updatedAt, current_version = :currentVersion"
-          + "WHERE uuid = :uuid")
+      "UPDATE datasets SET updated_at = :updatedAt, current_version_uuid = :currentVersion "
+          + "WHERE guid = :uuid")
   void updateCurrentVersion(
       @Bind("uuid") UUID uuid,
       @Bind("updatedAt") Instant updatedAt,
@@ -57,9 +58,14 @@ public interface DatasetDao {
   @SqlQuery("SELECT * FROM datasets WHERE urn = :urn.value")
   Optional<DatasetRow> findBy(@BindBean("urn") DatasetUrn urn);
 
-  @SqlQuery("SELECT * FROM datasets LIMIT :limit OFFSET :offset")
+  @SqlQuery(
+      "SELECT * "
+          + "FROM datasets d "
+          + "INNER JOIN namespaces n "
+          + "     ON (n.guid = d.namespace_guid AND n.name=:namespace.value)"
+          + "LIMIT :limit OFFSET :offset")
   List<DatasetRow> findAll(
-      @Bind("namespace") NamespaceName namespaceName,
+      @BindBean("namespace") NamespaceName namespaceName,
       @Bind("limit") Integer limit,
       @Bind("offset") Integer offset);
 }
