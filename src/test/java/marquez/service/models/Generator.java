@@ -159,7 +159,7 @@ public class Generator {
         .namespaceUuid(namespaceID)
         .dataSourceUuid(dataSourceID)
         .description("dataset " + randNum())
-        .urn(DatasetUrn.of(randUrn()).toString())
+        .urn(DatasetUrn.fromString(randUrn()).toString())
         .build();
   }
 

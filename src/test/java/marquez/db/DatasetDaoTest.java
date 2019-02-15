@@ -2,12 +2,12 @@ package marquez.db;
 
 import static org.junit.Assert.assertEquals;
 
-import marquez.common.models.Namespace;
-import marquez.core.models.Generator;
+import marquez.common.models.NamespaceName;
 import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
+import marquez.service.models.Generator;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class DatasetDaoTest {
   static final Logger logger = LoggerFactory.getLogger(DatasetDaoTest.class);
   private DatasetDao datasetDAO;
-  private marquez.core.models.Namespace namespace = Generator.genNamespace();
+  private marquez.service.models.Namespace namespace = Generator.genNamespace();
   private NamespaceDao namespaceDAO;
 
   @Rule
@@ -46,9 +46,11 @@ public class DatasetDaoTest {
 
   @Test
   public void testFindAll() throws Exception {
-    assertEquals(0, datasetDAO.findAll(Namespace.of(namespace.getName()), 10, 0).size());
+    assertEquals(
+        0, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
     insertRandomDataset();
     insertRandomDataset();
-    assertEquals(2, datasetDAO.findAll(Namespace.of(namespace.getName()), 10, 0).size());
+    assertEquals(
+        2, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
   }
 }
