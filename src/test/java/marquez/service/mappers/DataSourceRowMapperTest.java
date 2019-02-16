@@ -13,7 +13,10 @@ import marquez.common.models.Description;
 import marquez.db.models.DataSourceRow;
 import marquez.service.models.DbTableVersion;
 import org.junit.Test;
+import marquez.UnitTests;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DataSourceRowMapperTest {
   private static final DataSource DATA_SOURCE = DataSource.fromString("postgresql");
   private static final ConnectionUrl CONNECTION_URL =
