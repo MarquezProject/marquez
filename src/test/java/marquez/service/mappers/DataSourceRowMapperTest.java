@@ -1,17 +1,14 @@
 package marquez.service.mappers;
 
-import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Optional;
 import marquez.UnitTests;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DataSource;
 import marquez.common.models.DbName;
 import marquez.common.models.DbSchemaName;
 import marquez.common.models.DbTableName;
-import marquez.common.models.Description;
 import marquez.db.models.DataSourceRow;
 import marquez.service.models.DbTableVersion;
 import org.junit.Test;
@@ -26,19 +23,20 @@ public class DataSourceRowMapperTest {
           String.format("jdbc:%s://localhost:5432/%s", DATA_SOURCE.getValue(), DB_NAME.getValue()));
   private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.fromString("test_schema");
   private static final DbTableName DB_TABLE_NAME = DbTableName.fromString("test_table");
-  private static final Description DESCRIPTION = Description.fromString("test description");
 
   @Test
   public void testMap() {
-    final Optional<Description> expectedDescription = Optional.of(DESCRIPTION);
     final DbTableVersion dbTableVersion =
-        new DbTableVersion(CONNECTION_URL, DB_SCHEMA_NAME, DB_TABLE_NAME, DESCRIPTION);
+        DbTableVersion.builder()
+            .connectionUrl(CONNECTION_URL)
+            .dbSchemaName(DB_SCHEMA_NAME)
+            .dbTableName(DB_TABLE_NAME)
+            .build();
     final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
     assertNotNull(dataSourceRow);
     assertNotNull(dataSourceRow.getUuid());
     assertEquals(DATA_SOURCE.getValue(), dataSourceRow.getName());
     assertEquals(CONNECTION_URL.getRawValue(), dataSourceRow.getConnectionUrl());
-    assertEquals(expectedDescription, dbTableVersion.getDescription());
   }
 
   @Test(expected = NullPointerException.class)
