@@ -7,28 +7,18 @@ import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+@RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
 @Builder
 public final class DataSourceRow {
-  @Getter private final UUID uuid;
-  @Getter private final String name;
-  @Getter private final String connectionUrl;
-  private final Instant createdAt;
-
-  public DataSourceRow(
-      @NonNull final UUID uuid,
-      @NonNull final String name,
-      @NonNull final String connectionUrl,
-      @Nullable final Instant createdAt) {
-    this.uuid = uuid;
-    this.name = name;
-    this.connectionUrl = connectionUrl;
-    this.createdAt = createdAt;
-  }
+  @Getter @NonNull private final UUID uuid;
+  @Getter @NonNull private final String name;
+  @Getter @NonNull private final String connectionUrl;
+  @Nullable private final Instant createdAt;
 
   public Optional<Instant> getCreatedAt() {
     return Optional.ofNullable(createdAt);
