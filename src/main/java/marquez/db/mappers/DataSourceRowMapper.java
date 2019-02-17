@@ -2,6 +2,7 @@ package marquez.db.mappers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.models.DataSourceRow;
@@ -14,7 +15,10 @@ public final class DataSourceRowMapper implements RowMapper<DataSourceRow> {
       throws SQLException {
     return DataSourceRow.builder()
         .uuid(UUID.fromString(results.getString("uuid")))
-        .createdAt(results.getDate("created_at").toInstant())
+        .createdAt(
+            Optional.ofNullable(results.getTimestamp("created_at"))
+                .map(timestamp -> timestamp.toInstant())
+                .orElse(null))
         .name(results.getString("name"))
         .connectionUrl(results.getString("connection_url"))
         .build();
