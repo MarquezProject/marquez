@@ -14,7 +14,7 @@ public final class DataSourceRowMapper implements RowMapper<DataSourceRow> {
   public DataSourceRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
     return DataSourceRow.builder()
-        .uuid(UUID.fromString(results.getString("uuid")))
+        .uuid(results.getObject("guid", UUID.class))
         .createdAt(
             Optional.ofNullable(results.getTimestamp("created_at"))
                 .map(timestamp -> timestamp.toInstant())
