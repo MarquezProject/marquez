@@ -16,10 +16,10 @@ We feel that a welcoming community is important and we ask that you follow the [
 4. Make change on your cool new branch
 5. Write a test for your change
 6. Make sure `.java` files are formatted: `./gradlew spotlessJavaCheck`
-7. Update the [changelog](https://github.com/MarquezProject/marquez/blob/master/CHANGELOG.md)
-8. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
-9. Add the ["review"](https://github.com/MarquezProject/marquez/labels/review) label to your pull request
-10. Work with project maintainers to get your change reviewed and merged into the `master` branch
+7. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
+8. Add the ["review"](https://github.com/MarquezProject/marquez/labels/review) label to your pull request
+9. Work with project maintainers to get your change reviewed and merged into the `master` branch
+10. Delete your branch
 
 To ensure your pull request is accepted, follow these guidelines:
 
