@@ -41,6 +41,25 @@ public class DataSourceRowMapperTest {
     assertEquals(CONNECTION_URL, dataSourceRow.getConnectionUrl());
   }
 
+  @Test
+  public void testMap_noCreatedAt() throws SQLException {
+    final Timestamp noCreatedAt = null;
+    final ResultSet results = mock(ResultSet.class);
+    when(results.getObject("guid", UUID.class)).thenReturn(ROW_UUID);
+    when(results.getTimestamp("created_at")).thenReturn(noCreatedAt);
+    when(results.getString("name")).thenReturn(NAME);
+    when(results.getString("connection_url")).thenReturn(CONNECTION_URL);
+
+    final StatementContext context = mock(StatementContext.class);
+
+    final DataSourceRowMapper dataSourceRowMapper = new DataSourceRowMapper();
+    final DataSourceRow dataSourceRow = dataSourceRowMapper.map(results, context);
+    assertEquals(ROW_UUID, dataSourceRow.getUuid());
+    assertEquals(noCreatedAt, dataSourceRow.getCreatedAt());
+    assertEquals(NAME, dataSourceRow.getName());
+    assertEquals(CONNECTION_URL, dataSourceRow.getConnectionUrl());
+  }
+
   @Test(expected = NullPointerException.class)
   public void testMap_throwsException_onNullResults() throws SQLException {
     final ResultSet nullResults = null;
