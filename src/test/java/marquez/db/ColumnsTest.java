@@ -49,6 +49,18 @@ public class ColumnsTest {
     assertNull(uuid);
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testToUuidOrNull_throwsException_onEmptyUuidString() {
+    final String emptyUuidString = "";
+    Columns.toUuidOrNull(emptyUuidString);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testToUuidOrNull_throwsException_onBlankUuidString() {
+    final String blankUuidString = " ";
+    Columns.toUuidOrNull(blankUuidString);
+  }
+
   @Test
   public void testToListOrEmpty() throws SQLException {
     final String[] values = new String[] {"value0", "value1", "value2"};
