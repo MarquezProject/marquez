@@ -3,17 +3,20 @@ package marquez.db.mappers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import lombok.NonNull;
+import marquez.db.Columns;
 import marquez.service.models.JobRunState;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
 public class JobRunStateRowMapper implements RowMapper<JobRunState> {
   @Override
-  public JobRunState map(final ResultSet rs, final StatementContext ctx) throws SQLException {
+  public JobRunState map(@NonNull ResultSet results, @NonNull StatementContext context)
+      throws SQLException {
     return new JobRunState(
-        UUID.fromString(rs.getString("guid")),
-        rs.getTimestamp("transitioned_at"),
-        UUID.fromString(rs.getString("job_run_guid")),
-        JobRunState.State.fromInt(rs.getInt("state")));
+        results.getObject(Columns.ROW_UUID, UUID.class),
+        results.getTimestamp(Columns.TRANSITIONED_AT),
+        results.getObject(Columns.JOB_RUN_UUID, UUID.class),
+        JobRunState.State.fromInt(results.getInt(Columns.RUN_STATE)));
   }
 }
