@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 import marquez.UnitTests;
+import marquez.db.Columns;
 import marquez.db.models.DataSourceRow;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.junit.Test;
@@ -26,10 +27,10 @@ public class DataSourceRowMapperTest {
   @Test
   public void testMap() throws SQLException {
     final ResultSet results = mock(ResultSet.class);
-    when(results.getObject("guid", UUID.class)).thenReturn(ROW_UUID);
-    when(results.getTimestamp("created_at")).thenReturn(Timestamp.from(CREATED_AT));
-    when(results.getString("name")).thenReturn(NAME);
-    when(results.getString("connection_url")).thenReturn(CONNECTION_URL);
+    when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
+    when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
+    when(results.getString(Columns.NAME)).thenReturn(NAME);
+    when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL);
 
     final StatementContext context = mock(StatementContext.class);
 
