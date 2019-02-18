@@ -62,7 +62,7 @@ public class ColumnsTest {
   }
 
   @Test
-  public void testToListOrEmpty() throws SQLException {
+  public void testToList() throws SQLException {
     final String[] values = new String[] {"value0", "value1", "value2"};
     final Array array = mock(Array.class);
     when(array.getArray()).thenReturn(values);
@@ -73,7 +73,7 @@ public class ColumnsTest {
   }
 
   @Test
-  public void testToListOrEmpty_nullArray() throws SQLException {
+  public void testToList_nullArray() throws SQLException {
     final Array nullArray = null;
 
     final List<String> expected = Collections.emptyList();
