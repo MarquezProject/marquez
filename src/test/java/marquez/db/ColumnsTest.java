@@ -18,19 +18,19 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class UtilsTest {
+public class ColumnsTest {
   @Test
   public void testToInstantOrNull() {
     final Instant expected = Instant.now();
     final Timestamp timestamp = Timestamp.from(expected);
-    final Instant actual = Utils.toInstantOrNull(timestamp);
+    final Instant actual = Columns.toInstantOrNull(timestamp);
     assertEquals(expected, actual);
   }
 
   @Test
   public void testToInstantOrNull_nullTimestamp() {
     final Timestamp nullTimestamp = null;
-    final Instant instant = Utils.toInstantOrNull(nullTimestamp);
+    final Instant instant = Columns.toInstantOrNull(nullTimestamp);
     assertNull(instant);
   }
 
@@ -38,27 +38,15 @@ public class UtilsTest {
   public void testToUuidOrNull() {
     final String uuidString = "4f4c72c1-281a-4b82-a4e0-9c909a97832f";
     final UUID expected = UUID.fromString(uuidString);
-    final UUID actual = Utils.toUuidOrNull(uuidString);
+    final UUID actual = Columns.toUuidOrNull(uuidString);
     assertEquals(expected, actual);
   }
 
   @Test
   public void testToUuidOrNull_nullUuidString() {
     final String nullUuidString = null;
-    final UUID uuid = Utils.toUuidOrNull(nullUuidString);
+    final UUID uuid = Columns.toUuidOrNull(nullUuidString);
     assertNull(uuid);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testToUuidOrNull_throwsException_onEmptyUuidString() {
-    final String emptyUuidString = "";
-    Utils.toUuidOrNull(emptyUuidString);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testToUuidOrNull_throwsException_onBlankUuidString() {
-    final String blankUuidString = " ";
-    Utils.toUuidOrNull(blankUuidString);
   }
 
   @Test
@@ -68,7 +56,7 @@ public class UtilsTest {
     when(array.getArray()).thenReturn(values);
 
     final List<String> expected = Arrays.asList(values);
-    final List<String> actual = Utils.toList(array);
+    final List<String> actual = Columns.toList(array);
     assertEquals(expected, actual);
   }
 
@@ -77,7 +65,7 @@ public class UtilsTest {
     final Array nullArray = null;
 
     final List<String> expected = Collections.emptyList();
-    final List<String> actual = Utils.toList(nullArray);
+    final List<String> actual = Columns.toList(nullArray);
     assertEquals(expected, actual);
   }
 }

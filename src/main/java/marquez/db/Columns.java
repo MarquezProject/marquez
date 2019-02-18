@@ -1,5 +1,14 @@
 package marquez.db;
 
+import java.sql.Array;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
 public final class Columns {
   public static final String ROW_UUID = "guid";
   public static final String CREATED_AT = "created_at";
@@ -35,4 +44,16 @@ public final class Columns {
   public static final String DB_NAME = "db";
   public static final String DB_SCHEMA_NAME = "db_schema";
   public static final String DB_TABLE_NAME = "db_table_name";
+
+  public static Instant toInstantOrNull(Timestamp timestamp) {
+    return timestamp == null ? null : timestamp.toInstant();
+  }
+
+  public static UUID toUuidOrNull(String uuidString) {
+    return uuidString == null ? null : UUID.fromString(uuidString);
+  }
+
+  public static List<String> toList(Array array) throws SQLException {
+    return array == null ? Collections.emptyList() : Arrays.asList((String[]) array.getArray());
+  }
 }
