@@ -2,7 +2,6 @@ package marquez.db.mappers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
