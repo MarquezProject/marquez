@@ -75,11 +75,11 @@ public class ColumnsTest {
   @Test
   public void testToList_emptyArray() throws SQLException {
     final String[] values = new String[] {};
-    final Array array = mock(Array.class);
-    when(array.getArray()).thenReturn(values);
+    final Array emptyArray = mock(Array.class);
+    when(emptyArray.getArray()).thenReturn(values);
 
     final List<String> expected = Arrays.asList(values);
-    final List<String> actual = Columns.toList(array);
+    final List<String> actual = Columns.toList(emptyArray);
     assertEquals(expected, actual);
   }
 
