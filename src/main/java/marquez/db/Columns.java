@@ -1,5 +1,7 @@
 package marquez.db;
 
+import static marquez.common.Preconditions.checkNotBlank;
+
 import java.sql.Array;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -51,7 +53,7 @@ public final class Columns {
   }
 
   public static UUID toUuidOrNull(String uuidString) {
-    return uuidString == null ? null : UUID.fromString(uuidString);
+    return uuidString == null ? null : UUID.fromString(checkNotBlank(uuidString));
   }
 
   public static List<String> toList(Array array) throws SQLException {
