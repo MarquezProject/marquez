@@ -86,9 +86,7 @@ public class ColumnsTest {
   @Test
   public void testToList_nullArray() throws SQLException {
     final Array nullArray = null;
-
-    final List<String> expected = Collections.emptyList();
-    final List<String> actual = Columns.toList(nullArray);
-    assertEquals(expected, actual);
+    final List<String> arrayAsList = Columns.toList(nullArray);
+    assertEquals(Collections.EMPTY_LIST, arrayAsList);
   }
 }
