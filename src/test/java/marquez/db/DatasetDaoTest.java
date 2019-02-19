@@ -11,24 +11,24 @@ import marquez.service.models.Generator;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DatasetDaoTest {
   static final Logger logger = LoggerFactory.getLogger(DatasetDaoTest.class);
-  private DatasetDao datasetDAO;
-  private marquez.service.models.Namespace namespace = Generator.genNamespace();
-  private NamespaceDao namespaceDAO;
+  private static DatasetDao datasetDAO;
+  private static marquez.service.models.Namespace namespace = Generator.genNamespace();
+  private static NamespaceDao namespaceDAO;
 
-  @Rule
-  public final JdbiRule dbRule =
+  @ClassRule
+  public static final JdbiRule dbRule =
       JdbiRule.embeddedPostgres().withPlugin(new SqlObjectPlugin()).migrateWithFlyway();
 
-  @Before
-  public void setup() {
+  @BeforeClass
+  public static void setup() {
     Jdbi jdbi = dbRule.getJdbi();
     datasetDAO = jdbi.onDemand(DatasetDao.class);
     namespaceDAO = jdbi.onDemand(NamespaceDao.class);
