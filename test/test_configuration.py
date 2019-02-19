@@ -1,5 +1,5 @@
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from pytest import fixture
@@ -42,7 +42,9 @@ def test_set_namespace(set_valid_env):
 def test_namespace_not_set(set_valid_env):
     m = MarquezClient()
     with pytest.raises(Exception):
-        m.create_job('some_job', 'some_location', ['input1', 'input2'], ['output1', 'output2'])
+        m.create_job('some_job', 'some_location',
+                     ['input1', 'input2'],
+                     ['output1', 'output2'])
 
 
 if __name__ == "__main__":

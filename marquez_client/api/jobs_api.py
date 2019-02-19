@@ -1303,7 +1303,8 @@ class JobsApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method namespaces_namespace_jobs_job_versions_get" % key
+                    " to method "
+                    "namespaces_namespace_jobs_job_versions_get" % key
                 )
             local_var_params[key] = val
         del local_var_params['kwargs']
