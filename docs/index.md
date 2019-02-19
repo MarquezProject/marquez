@@ -6,19 +6,20 @@ layout: default
 
 Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the provenance of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
 
+![](./assets/images/design.png)
+
+
 ## Data Model
 
-**Owner**
+![](./assets/images/model.png)
 
-**Namespace**
+**Job:** It has a unique name and is owned by a team that can deploy versions of it in production. It has a current version.
 
-**Job**
+**Job Version:** it is an immutable version of a job, pointing to a unique versioned artifact and the metadata for a reproducible build from source.
 
-**Job Version**
+**Dataset:** it has a hierarchical unique name in its database. It has multiple versions as it gets mutated by changing the pointer to the current version.
 
-**Dataset**
-
-**Dataset Version**
+**Dataset Version:** A given version of a dataset. Each version can be read independently and has a unique version number for the corresponding dataset. A Version is immutable.
 
 ## Roadmap
 
@@ -34,4 +35,4 @@ We feel that a welcoming community is important and we ask that you follow the [
 
 ## Marquez Talks
 
-* [**Marquez: A Metadata Service for Data Abstraction, Data Lineage, and Event-based Triggers**](https://www.datacouncil.ai/speaker/marquez-a-metadata-service-for-data-abstraction-data-lineage-and-event-based-triggers) by [**@wslulciuc**](https://twitter.com/wslulciuc) at DataEngConf NYC '18
+* [**Marquez: A Metadata Service for Data Abstraction, Data Lineage, and Event-based Triggers**](https://www.datacouncil.ai/speaker/marquez-a-metadata-service-for-data-abstraction-data-lineage-and-event-based-triggers) by Willy Lulciuc at DataEngConf NYC '18
