@@ -8,14 +8,25 @@ html * {
 }
 
 .page-header {
-  color: #f6f6f6;
-  background-color: #b94948;
+  color: black;
+  background-color: #efefefff;
   background-image: none;
+}
+
+.btn {
+  color: black;
+  border-color: black;
+  border-width: 2px
+}
+
+.btn:hover {
+  color: #666666ff;
+  border-color: #666666ff;
 }
 
 .main-content h2 {
   font-size: 28px;
-  color: #888;
+  color: black;
 }
 
 body {
@@ -24,7 +35,7 @@ body {
 }
 
 a {
-  color: black;
+  color: #434343ff;
 }
 
 .site-footer {
