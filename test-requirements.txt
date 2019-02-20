@@ -6,3 +6,5 @@ randomize>=0.13
 pytest
 urllib3
 vcrpy
+pytest-cov
+codecov
