@@ -5,3 +5,4 @@ py>=1.4.31
 randomize>=0.13
 pytest
 urllib3
+vcrpy

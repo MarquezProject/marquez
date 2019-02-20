@@ -39,13 +39,5 @@ def test_set_namespace(set_valid_env):
     assert m.get_namespace() == ns_name
 
 
-def test_namespace_not_set(set_valid_env):
-    m = MarquezClient()
-    with pytest.raises(Exception):
-        m.create_job('some_job', 'some_location',
-                     ['input1', 'input2'],
-                     ['output1', 'output2'])
-
-
 if __name__ == "__main__":
-    pytest.main()
+    pytest.main(["./test_configuration.py", "-s"])
