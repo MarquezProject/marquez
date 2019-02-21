@@ -24,12 +24,14 @@ jobs:
     steps:
       - checkout
       - run: pip install --user pytest
+      - run: pip install --user pytest-cov
+      - run: pip install --user codecov
       - run:
           name: Install airflow from package
           environment:
             SLUGIFY_USES_TEXT_UNIDECODE: 'yes'
           command: pip install --user -e .
-      - run: python -m pytest ./test
+      - run: python -m pytest --cov=marquez --cov-report xml ./test
 
   integration-test:
     <<: *defaults
