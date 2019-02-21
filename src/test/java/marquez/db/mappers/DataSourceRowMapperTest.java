@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
 import marquez.db.Columns;
@@ -26,18 +27,18 @@ public class DataSourceRowMapperTest {
 
   @Test
   public void testMap() throws SQLException {
+    final Optional<Instant> expectedCreatedAt = Optional.of(CREATED_AT);
     final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
     when(results.getString(Columns.NAME)).thenReturn(NAME);
     when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL);
-
     final StatementContext context = mock(StatementContext.class);
 
     final DataSourceRowMapper dataSourceRowMapper = new DataSourceRowMapper();
     final DataSourceRow dataSourceRow = dataSourceRowMapper.map(results, context);
     assertEquals(ROW_UUID, dataSourceRow.getUuid());
-    assertEquals(CREATED_AT, dataSourceRow.getCreatedAt());
+    assertEquals(expectedCreatedAt, dataSourceRow.getCreatedAt());
     assertEquals(NAME, dataSourceRow.getName());
     assertEquals(CONNECTION_URL, dataSourceRow.getConnectionUrl());
   }
