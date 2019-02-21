@@ -13,6 +13,18 @@ html * {
   background-image: none;
 }
 
+.main-content h2 {
+  font-size: 28px;
+  font-weight: bold;
+  color: black;
+}
+
+.main-content h3 {
+  font-size: 19px;
+  font-weight: bold;
+  color: black;
+}
+
 .btn {
   color: black;
   border-color: black;
@@ -24,18 +36,13 @@ html * {
   border-color: #71ddbfff;
 }
 
-.main-content h2 {
-  font-size: 28px;
-  color: black;
-}
-
 body {
   color: black;
   background-color: #f6f6f6;
 }
 
 a {
-  color: #434343ff;
+  color:#337ab7;
 }
 
 .site-footer {
