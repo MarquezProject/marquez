@@ -16,6 +16,8 @@ jobs:
           environment:
             SLUGIFY_USES_TEXT_UNIDECODE: 'yes'
           command: pip install --user -e .
+      - run: pip install --user flake8
+      - run: python -m flake8
 
   test:
     <<: *defaults

@@ -7,7 +7,8 @@ class JobIdMapping:
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super(JobIdMapping, cls).__new__(cls, *args, **kwargs)
+            cls._instance = super(
+                JobIdMapping, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
     def set(self, key, val):
@@ -15,7 +16,8 @@ class JobIdMapping:
 
     @provide_session
     def pop(self, key, session=None):
-        q = session.query(airflow.models.Variable).filter(airflow.models.Variable.key == key)
+        q = session.query(airflow.models.Variable).filter(
+            airflow.models.Variable.key == key)
         if not q.first():
             return
         else:
