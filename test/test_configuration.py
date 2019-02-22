@@ -2,9 +2,8 @@ import os
 from unittest.mock import MagicMock
 
 import pytest
-from pytest import fixture
-
 from marquez_client.marquez import MarquezClient
+from pytest import fixture
 
 
 @fixture(scope='function')

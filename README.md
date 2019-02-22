@@ -3,8 +3,12 @@
 
 
 # marquez-python
+
+Marquez-Python is an open source client library package for python that users can use to help build applications that integrate with Marquez.
+
 Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata.
 The marquez-python package is a library that interacts with a running instance of the Marquez server.
+
 
 # Status
 This project is under active development at WeWork. The latest published version can be found [here](https://pypi.org/project/marquez-python/). 
@@ -51,72 +55,6 @@ Please be sure to set the environmental variables to connect with Marquez:
 export MQZ_HOST='localhost'
 export MQZ_PORT='8080'
 ```
-
-```python
-from __future__ import print_function
-import time
-import marquez_client
-from marquez_client.rest import ApiException
-from pprint import pprint
-
-# create an instance of the API class
-api_instance = marquez_client.DatasetsApi(marquez_client.ApiClient(configuration))
-namespace = wework # str | The name of the namespace. (default to 'wework')
-
-try:
-    # List all datasets
-    api_response = api_instance.namespaces_namespace_datasets_get(namespace)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling DatasetsApi->namespaces_namespace_datasets_get: %s\n" % e)
-
-```
-
-## Documentation for API Endpoints
-
-All URIs are relative to *http://localhost:5000/api/v1*
-
-Class | Method | HTTP request | Description
------------- | ------------- | ------------- | -------------
-*DatasetsApi* | [**namespaces_namespace_datasets_get**](docs/DatasetsApi.md#namespaces_namespace_datasets_get) | **GET** /namespaces/{namespace}/datasets | List all datasets
-*JobsApi* | [**jobs_runs_id_abort_put**](docs/JobsApi.md#jobs_runs_id_abort_put) | **PUT** /jobs/runs/{id}/abort | Abort a job run
-*JobsApi* | [**jobs_runs_id_complete_put**](docs/JobsApi.md#jobs_runs_id_complete_put) | **PUT** /jobs/runs/{id}/complete | Complete a job run
-*JobsApi* | [**jobs_runs_id_fail_put**](docs/JobsApi.md#jobs_runs_id_fail_put) | **PUT** /jobs/runs/{id}/fail | Fail a job run
-*JobsApi* | [**jobs_runs_id_get**](docs/JobsApi.md#jobs_runs_id_get) | **GET** /jobs/runs/{id} | Retrieve a job run
-*JobsApi* | [**jobs_runs_id_outputs_get**](docs/JobsApi.md#jobs_runs_id_outputs_get) | **GET** /jobs/runs/{id}/outputs | List all job run outputs
-*JobsApi* | [**jobs_runs_id_outputs_put**](docs/JobsApi.md#jobs_runs_id_outputs_put) | **PUT** /jobs/runs/{id}/outputs | Create multiple output datasets
-*JobsApi* | [**jobs_runs_id_run_put**](docs/JobsApi.md#jobs_runs_id_run_put) | **PUT** /jobs/runs/{id}/run | Start a job run
-*JobsApi* | [**namespaces_namespace_jobs_get**](docs/JobsApi.md#namespaces_namespace_jobs_get) | **GET** /namespaces/{namespace}/jobs | List all jobs
-*JobsApi* | [**namespaces_namespace_jobs_job_get**](docs/JobsApi.md#namespaces_namespace_jobs_job_get) | **GET** /namespaces/{namespace}/jobs/{job} | Retrieve a job
-*JobsApi* | [**namespaces_namespace_jobs_job_put**](docs/JobsApi.md#namespaces_namespace_jobs_job_put) | **PUT** /namespaces/{namespace}/jobs/{job} | Create a job
-*JobsApi* | [**namespaces_namespace_jobs_job_runs_get**](docs/JobsApi.md#namespaces_namespace_jobs_job_runs_get) | **GET** /namespaces/{namespace}/jobs/{job}/runs | List all job runs
-*JobsApi* | [**namespaces_namespace_jobs_job_runs_post**](docs/JobsApi.md#namespaces_namespace_jobs_job_runs_post) | **POST** /namespaces/{namespace}/jobs/{job}/runs | Create a job run
-*JobsApi* | [**namespaces_namespace_jobs_job_versions_get**](docs/JobsApi.md#namespaces_namespace_jobs_job_versions_get) | **GET** /namespaces/{namespace}/jobs/{job}/versions | List all job versions
-*NamespacesApi* | [**namespaces_get**](docs/NamespacesApi.md#namespaces_get) | **GET** /namespaces | List all namespaces
-*NamespacesApi* | [**namespaces_namespace_get**](docs/NamespacesApi.md#namespaces_namespace_get) | **GET** /namespaces/{namespace} | Retrieve a namespace
-*NamespacesApi* | [**namespaces_namespace_put**](docs/NamespacesApi.md#namespaces_namespace_put) | **PUT** /namespaces/{namespace} | Create a namespace
-
-
-## Documentation For Models
-
- - [CreateJob](docs/CreateJob.md)
- - [CreateJobRun](docs/CreateJobRun.md)
- - [CreateNamespace](docs/CreateNamespace.md)
- - [DB](docs/DB.md)
- - [Dataset](docs/Dataset.md)
- - [Datasets](docs/Datasets.md)
- - [ICEBERG](docs/ICEBERG.md)
- - [Job](docs/Job.md)
- - [JobRun](docs/JobRun.md)
- - [JobRunId](docs/JobRunId.md)
- - [JobRunOutputs](docs/JobRunOutputs.md)
- - [JobRuns](docs/JobRuns.md)
- - [JobVersion](docs/JobVersion.md)
- - [JobVersions](docs/JobVersions.md)
- - [Jobs](docs/Jobs.md)
- - [Namespace](docs/Namespace.md)
- - [Namespaces](docs/Namespaces.md)
-
 
 ## Documentation For Authorization
 

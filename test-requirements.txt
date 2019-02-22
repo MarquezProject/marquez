@@ -8,3 +8,4 @@ urllib3
 vcrpy
 pytest-cov
 codecov
+marquez-python-codegen

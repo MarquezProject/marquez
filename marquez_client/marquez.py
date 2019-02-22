@@ -1,9 +1,9 @@
 import logging
 import os
 
-from marquez_client import (ApiClient, Configuration, CreateJob, CreateJobRun,
-                            CreateNamespace, DatasetsApi, JobsApi,
-                            NamespacesApi)
+from marquez_codegen_client import (ApiClient, Configuration, CreateJob,
+                                    CreateJobRun, CreateNamespace, DatasetsApi,
+                                    JobsApi, NamespacesApi)
 
 
 class MarquezClient(object):
@@ -45,6 +45,11 @@ class MarquezClient(object):
         if not self.namespace:
             raise Exception("No namespace set.")
         return self.namespace
+
+    def get_namespace_info(self, ns_name):
+        if not ns_name:
+            raise Exception("Please provide a NS to investigate")
+        return self.namespace_api_client.namespaces_namespace_get(ns_name)
 
     def _create_namespace(self, namespace,
                           namespace_owner, namespace_description=None):

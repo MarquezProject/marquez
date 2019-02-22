@@ -13,7 +13,7 @@
 from setuptools import find_packages, setup  # noqa: H301
 
 NAME = "marquez-python"
-VERSION = "0.2.0"
+VERSION = "0.1.5"
 # To install the library, run the following
 #
 # python setup.py install
@@ -21,12 +21,13 @@ VERSION = "0.2.0"
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
 
-REQUIRES = ["urllib3 >= 1.15", "six >= 1.10", "certifi", "python-dateutil"]
+REQUIRES = ["urllib3 >= 1.15", "six >= 1.10", "certifi",
+            "python-dateutil", "marquez-python-codegen"]
 
 setup(
     name=NAME,
     version=VERSION,
-    description="Marquez",
+    description="Marquez Python Client",
     author_email="",
     url="",
     keywords=["OpenAPI", "OpenAPI-Generator", "Marquez"],
@@ -34,6 +35,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     long_description="""\
-    Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem&#39;s metadata.  # noqa: E501
+    Marquez-Python is an open source library for building clients that
+    interact with a running Marquez instance.
     """
 )

@@ -1,10 +1,9 @@
 import os
 
-from pytest import fixture
 import pytest
 import vcr
-
 from marquez_client.marquez import MarquezClient
+from pytest import fixture
 
 
 @fixture(scope='function')

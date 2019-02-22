@@ -1,0 +1,36 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+      User-Agent: [OpenAPI-Generator/0.1.5/python]
+    method: GET
+    uri: http://localhost:8080/api/v1/namespaces/ns_for_namespace_test_1
+  response:
+    body: {string: '{"name":"ns_for_namespace_test_1","createdAt":"2019-02-21 15:14:24.516878","owner":"ns_owner","description":"this
+        is a namespace for testing."}'}
+    headers:
+      Content-Length: ['143']
+      Content-Type: [application/json]
+      Date: ['Thu, 21 Feb 2019 23:45:08 GMT']
+      Vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+      User-Agent: [OpenAPI-Generator/0.1.5/python]
+    method: GET
+    uri: http://localhost:8080/api/v1/namespaces/ns_for_namespace_test_1
+  response:
+    body: {string: '{"name":"ns_for_namespace_test_1","createdAt":"2019-02-21 15:14:24.516878","owner":"ns_owner","description":"this
+        is a namespace for testing."}'}
+    headers:
+      Content-Length: ['143']
+      Content-Type: [application/json]
+      Date: ['Thu, 21 Feb 2019 23:45:08 GMT']
+      Vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+version: 1

@@ -1,0 +1,18 @@
+interactions:
+- request:
+    body: '{"owner": "some_owner", "description": "this is a very nice namespace."}'
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+      User-Agent: [OpenAPI-Generator/0.1.5/python]
+    method: PUT
+    uri: http://localhost:8080/api/v1/namespaces/ns_name_997
+  response:
+    body: {string: '{"name":"ns_name_997","createdAt":"2019-02-15 15:06:36.462325","owner":"some_owner","description":"this
+        is a very nice namespace."}'}
+    headers:
+      Content-Length: ['131']
+      Content-Type: [application/json]
+      Date: ['Thu, 21 Feb 2019 23:28:09 GMT']
+    status: {code: 200, message: OK}
+version: 1
