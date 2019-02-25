@@ -8,7 +8,7 @@ defaults: &defaults
 cache: &cache
   keys:
     - v1-deps-{{ .Branch }}-{{ .Revision }}
-    - v1-deps-
+    - v1-deps-{{ .Branch }}
 
 jobs:
   build:
