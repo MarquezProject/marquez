@@ -41,7 +41,7 @@ import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.JobsResponse;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
@@ -90,7 +90,7 @@ public final class JobResource {
       return Response.status(Response.Status.CREATED)
           .entity(coreJobToApiJobMapper.map(createdJob))
           .build();
-    } catch (UnexpectedException e) {
+    } catch (MarquezServiceException e) {
       log.error(format("Error creating the job <%s>:<%s>.", namespace, job), e);
       throw new ResourceException();
     }
@@ -112,7 +112,7 @@ public final class JobResource {
         return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
-    } catch (UnexpectedException e) {
+    } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }
@@ -131,7 +131,7 @@ public final class JobResource {
       final List<Job> jobList = jobService.getAllJobsInNamespace(namespace);
       final JobsResponse response = new JobsResponse(coreJobToApiJobMapper.map(jobList));
       return Response.ok().entity(response).build();
-    } catch (UnexpectedException e) {
+    } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }
@@ -168,7 +168,7 @@ public final class JobResource {
       return Response.status(Response.Status.CREATED)
           .entity(coreJobRunToApiJobRunMapper.map(createdJobRun))
           .build();
-    } catch (UnexpectedException | Exception e) {
+    } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }
@@ -185,7 +185,7 @@ public final class JobResource {
         return Response.ok().entity(coreJobRunToApiJobRunMapper.map(jobRun.get())).build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
-    } catch (UnexpectedException | Exception e) {
+    } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }
@@ -236,7 +236,7 @@ public final class JobResource {
         return Response.ok().build();
       }
       return Response.status(Response.Status.NOT_FOUND).build();
-    } catch (UnexpectedException | Exception e) {
+    } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }

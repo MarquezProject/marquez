@@ -41,7 +41,7 @@ import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
@@ -75,7 +75,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
       new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
   @BeforeClass
-  public static void setup() throws UnexpectedException {
+  public static void setup() throws MarquezServiceException {
     Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
@@ -115,7 +115,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   @Before
-  public void createJobRun() throws UnexpectedException {
+  public void createJobRun() throws MarquezServiceException {
     JobRun createdJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     CREATED_JOB_RUN_UUID = createdJobRun.getGuid();
@@ -157,7 +157,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   @Test
-  public void testJobRunRetrievalWithMultipleJobRuns() throws UnexpectedException {
+  public void testJobRunRetrievalWithMultipleJobRuns() throws MarquezServiceException {
     JobRun secondCreatedJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     final UUID secondJobRunUUID = secondCreatedJobRun.getGuid();
