@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.db.NamespaceDao;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
 import marquez.service.models.Namespace;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
@@ -33,7 +33,7 @@ public class NamespaceServiceTest {
   }
 
   @Test
-  public void testCreate() throws UnexpectedException {
+  public void testCreate() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
     when(namespaceDao.find(any(String.class)))
         .thenReturn(
@@ -45,15 +45,15 @@ public class NamespaceServiceTest {
     assertEquals(ns.getDescription(), nsReturned.getDescription());
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testCreate_findException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testCreate_findException() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
     doThrow(UnableToExecuteStatementException.class).when(namespaceDao).find(any(String.class));
     namespaceService.create(ns);
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testCreate_insertException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testCreate_insertException() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
     doThrow(UnableToExecuteStatementException.class)
         .when(namespaceDao)
@@ -62,22 +62,22 @@ public class NamespaceServiceTest {
   }
 
   @Test
-  public void testExists() throws UnexpectedException {
+  public void testExists() throws MarquezServiceException {
     when(namespaceDao.exists("ns_exists")).thenReturn(true);
     assertTrue(namespaceService.exists("ns_exists"));
     when(namespaceDao.exists("ns_doesnt_exist")).thenReturn(false);
     assertFalse(namespaceService.exists("ns_doesnt_exist"));
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testExists_findException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testExists_findException() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
     doThrow(UnableToExecuteStatementException.class).when(namespaceDao).exists(any(String.class));
     namespaceService.exists(ns.getName());
   }
 
   @Test
-  public void testGet_NsExists() throws UnexpectedException {
+  public void testGet_NsExists() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
     when(namespaceDao.find(ns.getName())).thenReturn(ns);
     Optional<Namespace> nsOptional = namespaceService.get(ns.getName());
@@ -85,22 +85,22 @@ public class NamespaceServiceTest {
   }
 
   @Test
-  public void testGet_NsNotFound() throws UnexpectedException {
+  public void testGet_NsNotFound() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
     when(namespaceDao.find(ns.getName())).thenReturn(null);
     Optional<Namespace> nsOptional = namespaceService.get(ns.getName());
     assertFalse(nsOptional.isPresent());
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testGet_findException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testGet_findException() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
     doThrow(UnableToExecuteStatementException.class).when(namespaceDao).find(any(String.class));
     namespaceService.get(ns.getName());
   }
 
   @Test
-  public void testListNamespaces() throws UnexpectedException {
+  public void testListNamespaces() throws MarquezServiceException {
     List<Namespace> namespaces =
         new ArrayList<Namespace>(Arrays.asList(Generator.genNamespace(), Generator.genNamespace()));
     when(namespaceDao.findAll()).thenReturn(namespaces);
@@ -109,14 +109,14 @@ public class NamespaceServiceTest {
   }
 
   @Test
-  public void testListNamespaces_Empty() throws UnexpectedException {
+  public void testListNamespaces_Empty() throws MarquezServiceException {
     when(namespaceDao.findAll()).thenReturn(new ArrayList<Namespace>());
     List<Namespace> namespacesFound = namespaceService.listNamespaces();
     assertEquals(0, namespacesFound.size());
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testListNamespaces_findAllException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testListNamespaces_findAllException() throws MarquezServiceException {
     doThrow(UnableToExecuteStatementException.class).when(namespaceDao).findAll();
     namespaceService.listNamespaces();
   }
