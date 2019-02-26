@@ -48,9 +48,7 @@ public class JobRunState {
       stateToIntMap.put(ABORTED, 4);
 
       intToStateMap =
-          stateToIntMap
-              .entrySet()
-              .stream()
+          stateToIntMap.entrySet().stream()
               .collect(Collectors.toMap(o -> o.getValue(), o -> o.getKey()));
     }
 
