@@ -23,7 +23,7 @@ import java.util.UUID;
 import marquez.api.JobRunBaseTest;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
@@ -70,7 +70,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
   }
 
   @BeforeClass
-  public static void setup() throws UnexpectedException {
+  public static void setup() throws MarquezServiceException {
     Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
@@ -83,7 +83,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
   }
 
   @Before
-  public void createJobRun() throws UnexpectedException {
+  public void createJobRun() throws MarquezServiceException {
     JobRun createdJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     CREATED_JOB_RUN_UUID = createdJobRun.getGuid();
