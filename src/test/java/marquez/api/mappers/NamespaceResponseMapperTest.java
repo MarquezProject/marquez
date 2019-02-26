@@ -70,8 +70,7 @@ public class NamespaceResponseMapperTest {
     List<NamespaceResponse> namespaceResponses = NamespaceResponseMapper.map(namespaces);
     assertThat(namespaceResponses).hasSize(2);
     namespaceResponses.stream().forEach(s -> assertThat(s.getName()).isEqualTo(name));
-    namespaceResponses
-        .stream()
+    namespaceResponses.stream()
         .forEach(s -> assertThat(Timestamp.valueOf(s.getCreatedAt())).isEqualTo(createdAt));
   }
 
