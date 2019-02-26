@@ -14,7 +14,7 @@ import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
 import marquez.db.fixtures.AppWithPostgresRule;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
 import marquez.service.models.Job;
 import marquez.service.models.JobRun;
@@ -64,7 +64,7 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void testCreate() throws UnexpectedException {
+  public void testCreate() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     Job jobCreateRet = jobService.createJob(namespaceName, job);
     assertNotNull(jobCreateRet.getCreatedAt());
@@ -78,7 +78,7 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void testCreateNewVersion() throws UnexpectedException {
+  public void testCreateNewVersion() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     jobService.createJob(namespaceName, job);
     Job jobWithNewLoc =
@@ -103,7 +103,7 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void testGetJob_JobFound() throws UnexpectedException {
+  public void testGetJob_JobFound() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     Job jobCreateRet = jobService.createJob(namespaceName, job);
     Optional<Job> jobGetRet = jobService.getJob(namespaceName, job.getName());
@@ -113,7 +113,7 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void testGetJob_JobNotFound() throws UnexpectedException {
+  public void testGetJob_JobNotFound() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     Job job2 = Generator.genJob(namespaceID);
     jobService.createJob(namespaceName, job);
@@ -122,7 +122,7 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void createAndUpdateJobRun() throws UnexpectedException {
+  public void createAndUpdateJobRun() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     String runArgsJson = "{'foo': 1}";
     jobService.createJob(namespaceName, job);
@@ -139,7 +139,7 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void testCreateJobRun_NullArgs() throws UnexpectedException {
+  public void testCreateJobRun_NullArgs() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     String nullRunArgsJson = null;
     jobService.createJob(namespaceName, job);
@@ -152,7 +152,7 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void testCreateJobRun_NonNullArgs() throws UnexpectedException {
+  public void testCreateJobRun_NonNullArgs() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     String argsJson = "{'foo': 1}";
     jobService.createJob(namespaceName, job);
@@ -164,7 +164,7 @@ public class JobServiceIntegrationTest {
   }
 
   @Test
-  public void testGetJobRun_NotFound() throws UnexpectedException {
+  public void testGetJobRun_NotFound() throws MarquezServiceException {
     Optional<JobRun> jobRunFound = jobService.getJobRun(UUID.randomUUID());
     assertFalse(jobRunFound.isPresent());
   }

@@ -26,7 +26,7 @@ import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.DataSourceRowMapper;
 import marquez.service.mappers.DatasetMapper;
 import marquez.service.mappers.DatasetRowMapper;
@@ -46,7 +46,7 @@ public class DatasetService {
 
   public Dataset create(
       @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
-      throws UnexpectedException {
+      throws MarquezServiceException {
     final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
     final DatasetRow datasetRow =
         DatasetRowMapper.map(namespaceName, dataSourceRow, dbTableVersion);
@@ -56,32 +56,32 @@ public class DatasetService {
     try {
       datasetDao.insertAll(dataSourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
       final Optional<DatasetRow> datasetRowIfFound = datasetDao.findBy(datasetRow.getUuid());
-      return datasetRowIfFound.map(DatasetMapper::map).orElseThrow(UnexpectedException::new);
+      return datasetRowIfFound.map(DatasetMapper::map).orElseThrow(MarquezServiceException::new);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 
-  public Optional<Dataset> get(@NonNull DatasetUrn urn) throws UnexpectedException {
+  public Optional<Dataset> get(@NonNull DatasetUrn urn) throws MarquezServiceException {
     try {
       final Optional<DatasetRow> datasetRowIfFound = datasetDao.findBy(urn);
       return datasetRowIfFound.map(DatasetMapper::map);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 
   public List<Dataset> getAll(
       @NonNull NamespaceName namespaceName, @NonNull Integer limit, @NonNull Integer offset)
-      throws UnexpectedException {
+      throws MarquezServiceException {
     try {
       final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, limit, offset);
       return Collections.unmodifiableList(DatasetMapper.map(datasetRows));
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 }
