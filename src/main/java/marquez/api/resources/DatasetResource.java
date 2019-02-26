@@ -37,7 +37,7 @@ import marquez.api.models.DatasetsResponse;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 
 @Path("/api/v1")
@@ -62,7 +62,7 @@ public final class DatasetResource {
       @PathParam("namespace") String namespaceString,
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset)
-      throws UnexpectedException, WebApplicationException {
+      throws MarquezServiceException, WebApplicationException {
     if (!namespaceService.exists(namespaceString)) {
       throw new WebApplicationException(
           String.format("The namespace %s does not exist.", namespaceString), NOT_FOUND);
