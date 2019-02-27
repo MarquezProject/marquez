@@ -36,8 +36,8 @@ import marquez.api.exceptions.ResourceException;
 import marquez.api.mappers.ApiJobToCoreJobMapper;
 import marquez.api.mappers.CoreJobRunToApiJobRunResponseMapper;
 import marquez.api.mappers.CoreJobToApiJobMapper;
-import marquez.api.models.JobRequest;
 import marquez.api.models.CreateJobRunRequest;
+import marquez.api.models.JobRequest;
 import marquez.api.models.JobsResponse;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -81,10 +81,10 @@ public final class JobResource {
               new marquez.api.models.Job(
                   job,
                   null,
-                  request.getInputDataSetUrns(),
+                  request.getInputDatasetUrns(),
                   request.getOutputDatasetUrns(),
                   request.getLocation(),
-                  request.getDescription()));
+                  request.getDescription().orElse(null)));
       jobToCreate.setNamespaceGuid(namespaceService.get(namespace).get().getGuid());
       final Job createdJob = jobService.createJob(namespace, jobToCreate);
       return Response.status(Response.Status.CREATED)
