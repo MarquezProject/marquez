@@ -19,9 +19,9 @@ jobs:
           <<: *cache
       - run: ./gradlew --no-daemon --stacktrace build -x test
       - save_cache:
+          key: v1-deps-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.gradle
-          key: v1-deps-{{ .Branch }}-{{ .Revision }}
 
   test:
     <<: *defaults
@@ -51,6 +51,8 @@ workflows:
       - test:
           requires:
             - build
+  deploy:
+    jobs:
       - release:
           filters:
             tags:
