@@ -333,7 +333,7 @@ public class JobResourceTest {
   }
 
   private Response insertJob(Job job) {
-    JobRequest createJobRequest =
+    JobRequest jobRequest =
         new JobRequest(
             job.getInputDataSetUrns(),
             job.getOutputDataSetUrns(),
@@ -344,11 +344,11 @@ public class JobResourceTest {
         .client()
         .target(path)
         .request(MediaType.APPLICATION_JSON)
-        .put(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        .put(entity(jobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
   }
 
   private Response insertJobRun(JobRunResponse jobRun) {
-    CreateJobRunRequest createJobRequest =
+    CreateJobRunRequest jobRequest =
         new CreateJobRunRequest(
             jobRun.getNominalStartTime(), jobRun.getNominalEndTime(), jobRun.getRunArgs());
     String path = format("/api/v1/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME, "somejob");
@@ -356,7 +356,7 @@ public class JobResourceTest {
         .client()
         .target(path)
         .request(MediaType.APPLICATION_JSON)
-        .post(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        .post(entity(jobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
   }
 
   private Response markJobRunAsRunning(UUID jobRunId) {

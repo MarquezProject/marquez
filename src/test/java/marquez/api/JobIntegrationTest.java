@@ -255,7 +255,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   private Response createJobOnNamespace(String namespace, Job job) {
-    JobRequest createJobRequest =
+    JobRequest jobRequest =
         new JobRequest(
             job.getInputDataSetUrns(),
             job.getOutputDataSetUrns(),
@@ -267,7 +267,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
         .target(URI.create("http://localhost:" + APP.getLocalPort()))
         .path(path)
         .request(MediaType.APPLICATION_JSON)
-        .put(Entity.json(createJobRequest));
+        .put(Entity.json(jobRequest));
   }
 
   static Job generateApiJob() {
