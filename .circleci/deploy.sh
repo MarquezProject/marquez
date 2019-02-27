@@ -2,7 +2,7 @@
 #
 # A script used to deploy Marquez
 #
-# Usage: $ ./deploy.sh [OPTIONS] <version>
+# Usage: $ ./deploy.sh [OPTIONS] -v <version>
 
 readonly VERSION_REGEX="^[0-9]+(\\.[0-9]+){2}\\.([0-9]){4}([0-9]){2}([0-9]){2}\\.([0-9a-f]){7}$" # X.Y.Z.YYYMMDD.SHA-1
 readonly WEK8S_PHOENIX="wek8s-phoenix"
@@ -15,11 +15,10 @@ usage() {
 cat << EOF
 Marquez deployment script
 
-Usage: ./$(basename "${0}") [OPTIONS] <version>
+Usage: ./$(basename "${0}") [OPTIONS] -v <version>
 
 OPTIONS:
-  -p         deploy to production (default: staging)
-  -t int     the duration (in seconds) to wait (default: 300)
+  -p         deploy to kraken (default: phoenix)
   -v string  version (format: X.Y.Z.YYYMMDD.SHA-1)
   -h         show this help message
 EOF
