@@ -30,9 +30,9 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.api.models.CreateJobRequest;
 import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
+import marquez.api.models.JobRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
@@ -255,19 +255,19 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   private Response createJobOnNamespace(String namespace, Job job) {
-    CreateJobRequest createJobRequest =
-        new CreateJobRequest(
-            job.getLocation(),
-            job.getDescription(),
+    JobRequest jobRequest =
+        new JobRequest(
             job.getInputDataSetUrns(),
-            job.getOutputDataSetUrns());
+            job.getOutputDataSetUrns(),
+            job.getLocation(),
+            job.getDescription());
 
     String path = format("/api/v1/namespaces/%s/jobs/%s", namespace, job.getName());
     return APP.client()
         .target(URI.create("http://localhost:" + APP.getLocalPort()))
         .path(path)
         .request(MediaType.APPLICATION_JSON)
-        .put(Entity.json(createJobRequest));
+        .put(Entity.json(jobRequest));
   }
 
   static Job generateApiJob() {

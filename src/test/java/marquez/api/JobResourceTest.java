@@ -35,9 +35,9 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.api.exceptions.ResourceExceptionMapper;
-import marquez.api.models.CreateJobRequest;
 import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
+import marquez.api.models.JobRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobsResponse;
 import marquez.api.resources.JobResource;
@@ -333,22 +333,22 @@ public class JobResourceTest {
   }
 
   private Response insertJob(Job job) {
-    CreateJobRequest createJobRequest =
-        new CreateJobRequest(
-            job.getLocation(),
-            job.getDescription(),
+    JobRequest jobRequest =
+        new JobRequest(
             job.getInputDataSetUrns(),
-            job.getOutputDataSetUrns());
+            job.getOutputDataSetUrns(),
+            job.getLocation(),
+            job.getDescription());
     String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, job.getName());
     return resources
         .client()
         .target(path)
         .request(MediaType.APPLICATION_JSON)
-        .put(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        .put(entity(jobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
   }
 
   private Response insertJobRun(JobRunResponse jobRun) {
-    CreateJobRunRequest createJobRequest =
+    CreateJobRunRequest jobRequest =
         new CreateJobRunRequest(
             jobRun.getNominalStartTime(), jobRun.getNominalEndTime(), jobRun.getRunArgs());
     String path = format("/api/v1/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME, "somejob");
@@ -356,7 +356,7 @@ public class JobResourceTest {
         .client()
         .target(path)
         .request(MediaType.APPLICATION_JSON)
-        .post(entity(createJobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        .post(entity(jobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
   }
 
   private Response markJobRunAsRunning(UUID jobRunId) {
