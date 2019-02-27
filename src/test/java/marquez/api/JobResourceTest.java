@@ -35,9 +35,9 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.api.exceptions.ResourceExceptionMapper;
-import marquez.api.models.JobRequest;
 import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
+import marquez.api.models.JobRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobsResponse;
 import marquez.api.resources.JobResource;
@@ -335,10 +335,10 @@ public class JobResourceTest {
   private Response insertJob(Job job) {
     JobRequest createJobRequest =
         new JobRequest(
-            job.getLocation(),
-            job.getDescription(),
             job.getInputDataSetUrns(),
-            job.getOutputDataSetUrns());
+            job.getOutputDataSetUrns(),
+            job.getLocation(),
+            job.getDescription());
     String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, job.getName());
     return resources
         .client()
