@@ -1,0 +1,65 @@
+appName: marquez
+namespace: dataplatform
+
+releaseVersion: 1.0.0
+
+replicaCount: 1
+
+command:
+  - /usr/src/app/entrypoint.sh
+args:
+
+healthPath: /health
+healthPort: 5000
+
+image:
+  repository: quay.io/wework/marquez
+
+service:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      containerPort: 5000
+      name: http
+      protocol: TCP
+
+vault:
+  enabled: true
+
+envVars:
+  - Name: MARQUEZ_PORT
+    Value: 5000
+  - Name: MARQUEZ_CONFIG
+    Value: "/usr/src/app/config.yml"
+  - Name: POSTGRES_HOST
+    Value: "vault:secret/dataplatform/marquez/database-vars#ENDPOINT"
+  - Name: POSTGRES_PORT
+    Value: 5432
+  - Name: POSTGRES_DB
+    Value: "vault:secret/dataplatform/marquez/database-vars#NAME"
+  - Name: POSTGRES_USER
+    Value: "vault:database/creds/dataplatform-marquez-role#username"
+  - Name: POSTGRES_PASSWORD
+    Value: "vault:database/creds/dataplatform-marquez-role#password"
+
+configMaps:
+  - name: marquez-config
+    data:
+      config.yml: |-
+        server:
+          applicationConnectors:
+          - type: http
+            port: ${MARQUEZ_PORT:-5000}
+        db:
+          driverClass: org.postgresql.Driver
+          url: jdbc:postgresql://${POSTGRES_HOST:-localhost}/${POSTGRES_DB}
+          user: ${POSTGRES_USER}
+          password: ${POSTGRES_PASSWORD}
+
+volumes:
+  - name: config-vol
+    configMap:
+      name: marquez-config
+    mountPath: /usr/src/app/config.yml
+    readOnly: true
+    subPath: config.yml

@@ -8,7 +8,23 @@ defaults: &defaults
 cache: &cache
   keys:
     - v1-deps-{{ .Branch }}-{{ .Revision }}
-    - v1-deps-
+    - v1-deps-{{ .Branch }}
+
+deploy_context: &deploy_context
+  context: org-global
+  filters:
+    tags:
+      only: /^[0-9]+(\.[0-9]+){2}\.([0-9]){4}([0-9]){2}([0-9]){2}\.([0-9a-f]){7}$/ # X.Y.Z.YYYMMDD.SHA-1
+    branches:
+      ignore: /.*/
+
+wek8s_deploy: &wek8s_deploy
+  docker:
+    - image: quay.io/wework/wek8s-tools:0.2
+      auth:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWD
+  working_directory: ~/marquez
 
 jobs:
   build:
@@ -19,9 +35,9 @@ jobs:
           <<: *cache
       - run: ./gradlew --no-daemon --stacktrace build -x test
       - save_cache:
+          key: v1-deps-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.gradle
-          key: v1-deps-{{ .Branch }}-{{ .Revision }}
 
   test:
     <<: *defaults
@@ -43,6 +59,18 @@ jobs:
       - run: ./docker/login.sh
       - run: ./docker/build-and-push.sh $CIRCLE_TAG
 
+  wek8s_phoenix:
+    <<: *wek8s_deploy
+    steps:
+      - checkout
+      - run: ./.circleci/deploy.sh -v $CIRCLE_TAG
+
+  wek8s_kraken:
+    <<: *wek8s_deploy
+    steps:
+      - checkout
+      - run: ./.circleci/deploy.sh -p -v $CIRCLE_TAG
+
 workflows:
   version: 2
   marquez:
@@ -51,10 +79,20 @@ workflows:
       - test:
           requires:
             - build
+  deploy:
+    jobs:
       - release:
-          context: org-global
-          filters:
-            tags:
-              only: /^[0-9]+(\.[0-9]+){2}\.([0-9]){4}([0-9]){2}([0-9]){2}\.([0-9a-f]){7}$/
-            branches:
-              ignore: /.*/
+          <<: *deploy_context
+      - wek8s_phoenix:
+          requires:
+            - release
+          <<: *deploy_context
+      - wek8s_approval:
+          type: approval
+          requires:
+            - wek8s_phoenix
+          <<: *deploy_context
+      - wek8s_kraken:
+          requires:
+            - wek8s_approval
+          <<: *deploy_context

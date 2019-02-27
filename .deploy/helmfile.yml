@@ -1,0 +1,25 @@
+repositories:
+  - name: stable
+    url: https://kubernetes-charts.storage.googleapis.com/
+  - name: wework
+    url: https://wework.jfrog.io/wework/helm
+    username: {{ requiredEnv "ARTIFACTORY_USER" }}
+    password: {{ requiredEnv "ARTIFACTORY_APIKEY" }}
+
+helmDefaults:
+  tillerNamespace: dataplatform
+  args:
+    - "--tls"
+
+releases:
+  - name: marquez
+    namespace: dataplatform
+    chart: wework/wek8s-generic-service
+    version: ~0.2.0
+    values:
+      - "../.deploy/values.yml"
+    set:
+      - name: ingress.hosts[0]
+        value: {{ requiredEnv "INGRESS_HOST" }}
+      - name: ingress.tls[0].hosts[0]
+        value: {{ requiredEnv "INGRESS_HOST" }}
