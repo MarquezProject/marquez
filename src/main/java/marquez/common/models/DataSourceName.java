@@ -1,3 +1,14 @@
 package marquez.common.models;
 
-public enum DataSourceName {}
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
+@RequiredArgsConstructor(staticName = "fromString")
+@EqualsAndHashCode
+@ToString
+public final class DataSourceName {
+  @Getter @NonNull private final String value;
+}
