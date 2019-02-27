@@ -11,7 +11,7 @@ import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class DatasourceIntegrationTest {
+public class DataSourceIntegrationTest {
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
