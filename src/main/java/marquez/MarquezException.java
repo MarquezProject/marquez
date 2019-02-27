@@ -19,15 +19,15 @@ public class MarquezException extends Exception {
 
   public MarquezException() {}
 
-  public MarquezException(final Throwable throwable) {
-    super(throwable);
+  public MarquezException(final Throwable cause) {
+    super(cause);
   }
 
   public MarquezException(final String message) {
     super(message);
   }
 
-  public MarquezException(final String message, final Throwable throwable) {
-    super(message, throwable);
+  public MarquezException(final String message, final Throwable cause) {
+    super(message, cause);
   }
 }
