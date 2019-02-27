@@ -12,8 +12,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class DataSourcesResponse {
-  @JsonProperty("dataSources")
+public class DatasourcesResponse {
+  @JsonProperty("datasources")
   @Getter
-  private List<DataSourceResponse> dataSources;
+  private List<DatasourceResponse> dataSources;
 }

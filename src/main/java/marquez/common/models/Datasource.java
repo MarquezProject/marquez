@@ -14,23 +14,15 @@
 
 package marquez.common.models;
 
-import static org.junit.Assert.assertEquals;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import marquez.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
-@Category(UnitTests.class)
-public class DataSourceTest {
-  @Test
-  public void testNewDataSource() {
-    final String value = "postgresql";
-    assertEquals(value, DataSource.fromString(value).getValue());
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewDataSource_throwsException_onNullValue() {
-    final String nullValue = null;
-    DataSource.fromString(nullValue);
-  }
+@RequiredArgsConstructor(staticName = "fromString")
+@EqualsAndHashCode
+@ToString
+public final class Datasource {
+  @Getter @NonNull private final String value;
 }

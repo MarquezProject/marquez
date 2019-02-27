@@ -6,12 +6,12 @@ import static org.junit.Assert.assertEquals;
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.api.models.DataSourcesResponse;
+import marquez.api.models.DatasourcesResponse;
 import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class DataSourceIntegrationTest {
+public class DatasourceIntegrationTest {
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
@@ -25,7 +25,7 @@ public class DataSourceIntegrationTest {
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
 
-    DataSourcesResponse responseBody = res.readEntity(DataSourcesResponse.class);
+    DatasourcesResponse responseBody = res.readEntity(DatasourcesResponse.class);
     assertThat(responseBody.getDataSources().isEmpty());
   }
 }

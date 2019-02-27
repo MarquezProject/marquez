@@ -16,14 +16,14 @@ package marquez.service.mappers;
 
 import java.util.UUID;
 import lombok.NonNull;
-import marquez.db.models.DataSourceRow;
+import marquez.db.models.DatasourceRow;
 import marquez.service.models.DbTableVersion;
 
-public final class DataSourceRowMapper {
-  private DataSourceRowMapper() {}
+public final class DatasourceRowMapper {
+  private DatasourceRowMapper() {}
 
-  public static DataSourceRow map(@NonNull DbTableVersion dbTableVersion) {
-    return DataSourceRow.builder()
+  public static DatasourceRow map(@NonNull DbTableVersion dbTableVersion) {
+    return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .name(dbTableVersion.getConnectionUrl().getDataSource().getValue())
         .connectionUrl(dbTableVersion.getConnectionUrl().getRawValue())

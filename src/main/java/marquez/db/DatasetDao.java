@@ -21,7 +21,7 @@ import java.util.UUID;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
 import marquez.db.mappers.DatasetRowMapper;
-import marquez.db.models.DataSourceRow;
+import marquez.db.models.DatasourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
@@ -36,7 +36,7 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 @RegisterRowMapper(DatasetRowMapper.class)
 public interface DatasetDao {
   @CreateSqlObject
-  DataSourceDao createDataSourceDao();
+  DatasourceDao createDataSourceDao();
 
   @CreateSqlObject
   DbTableVersionDao createDbTableVersionDao();
@@ -48,7 +48,7 @@ public interface DatasetDao {
 
   @Transaction
   default void insertAll(
-      DataSourceRow dataSourceRow,
+      DatasourceRow dataSourceRow,
       DatasetRow datasetRow,
       DbTableInfoRow dbTableInfoRow,
       DbTableVersionRow dbTableVersionRow) {

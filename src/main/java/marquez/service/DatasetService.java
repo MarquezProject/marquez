@@ -22,12 +22,12 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
-import marquez.db.models.DataSourceRow;
+import marquez.db.models.DatasourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
 import marquez.service.exceptions.UnexpectedException;
-import marquez.service.mappers.DataSourceRowMapper;
+import marquez.service.mappers.DatasourceRowMapper;
 import marquez.service.mappers.DatasetMapper;
 import marquez.service.mappers.DatasetRowMapper;
 import marquez.service.mappers.DbTableInfoRowMapper;
@@ -47,7 +47,7 @@ public class DatasetService {
   public Dataset create(
       @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
       throws UnexpectedException {
-    final DataSourceRow dataSourceRow = DataSourceRowMapper.map(dbTableVersion);
+    final DatasourceRow dataSourceRow = DatasourceRowMapper.map(dbTableVersion);
     final DatasetRow datasetRow =
         DatasetRowMapper.map(namespaceName, dataSourceRow, dbTableVersion);
     final DbTableInfoRow dbTableInfoRow = DbTableInfoRowMapper.map(dbTableVersion);

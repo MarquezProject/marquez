@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DataSourceRowTest {
+public class DatasourceRowTest {
   private static final UUID ROW_UUID = UUID.randomUUID();
   private static final Instant CREATED_AT = Instant.now();
   private static final String NAME = "postgresql";
@@ -34,8 +34,8 @@ public class DataSourceRowTest {
   @Test
   public void testNewDataSourceRow() {
     final Optional<Instant> expectedCreatedAt = Optional.of(CREATED_AT);
-    final DataSourceRow dataSourceRow =
-        DataSourceRow.builder()
+    final DatasourceRow dataSourceRow =
+        DatasourceRow.builder()
             .uuid(ROW_UUID)
             .createdAt(CREATED_AT)
             .name(NAME)
@@ -50,8 +50,8 @@ public class DataSourceRowTest {
   @Test
   public void testNewDataSourceRow_noCreatedAt() {
     final Optional<Instant> noCreatedAt = Optional.empty();
-    final DataSourceRow dataSourceRow =
-        DataSourceRow.builder().uuid(ROW_UUID).name(NAME).connectionUrl(CONNECTION_URL).build();
+    final DatasourceRow dataSourceRow =
+        DatasourceRow.builder().uuid(ROW_UUID).name(NAME).connectionUrl(CONNECTION_URL).build();
     assertEquals(ROW_UUID, dataSourceRow.getUuid());
     assertEquals(noCreatedAt, dataSourceRow.getCreatedAt());
     assertEquals(NAME, dataSourceRow.getName());
@@ -61,18 +61,18 @@ public class DataSourceRowTest {
   @Test(expected = NullPointerException.class)
   public void testNewDataSourceRow_throwsException_onNullUuid() {
     final UUID nullUuid = null;
-    DataSourceRow.builder().uuid(nullUuid).name(NAME).connectionUrl(CONNECTION_URL).build();
+    DatasourceRow.builder().uuid(nullUuid).name(NAME).connectionUrl(CONNECTION_URL).build();
   }
 
   @Test(expected = NullPointerException.class)
   public void testNewDataSourceRow_throwsException_onNullName() {
     final String nullName = null;
-    DataSourceRow.builder().uuid(ROW_UUID).name(nullName).connectionUrl(CONNECTION_URL).build();
+    DatasourceRow.builder().uuid(ROW_UUID).name(nullName).connectionUrl(CONNECTION_URL).build();
   }
 
   @Test(expected = NullPointerException.class)
   public void testNewDataSourceRow_throwsException_onNullConnectionUrl() {
     final String nullConnectionUrl = null;
-    DataSourceRow.builder().uuid(ROW_UUID).name(NAME).connectionUrl(nullConnectionUrl).build();
+    DatasourceRow.builder().uuid(ROW_UUID).name(NAME).connectionUrl(nullConnectionUrl).build();
   }
 }

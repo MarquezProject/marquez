@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 import marquez.common.models.DatasetUrn;
-import marquez.db.models.DataSourceRow;
+import marquez.db.models.DatasourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
@@ -157,9 +157,9 @@ public class Generator {
   }
 
   // Data Source Rows
-  public static DataSourceRow genDataSourceRow() {
+  public static DatasourceRow genDataSourceRow() {
     int dataSourceNum = randNum();
-    return DataSourceRow.builder()
+    return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .name("Data Source" + dataSourceNum)
         .connectionUrl("conn://" + dataSourceNum)

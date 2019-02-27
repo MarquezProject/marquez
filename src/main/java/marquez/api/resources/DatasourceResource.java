@@ -12,16 +12,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import marquez.api.models.DataSourcesResponse;
-import marquez.service.DataSourceService;
+import marquez.api.models.DatasourcesResponse;
+import marquez.service.DatasourceService;
 
 @Path("/api/v1")
-public final class DataSourceResource {
+public final class DatasourceResource {
 
-  private final DataSourceService dataSourceService;
+  private final DatasourceService datasourceService;
 
-  public DataSourceResource(DataSourceService dataSourceService) {
-    this.dataSourceService = dataSourceService;
+  public DatasourceResource(DatasourceService dataSourceService) {
+    this.datasourceService = dataSourceService;
   }
 
   @GET
@@ -33,6 +33,6 @@ public final class DataSourceResource {
   public Response list(
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
-    return Response.ok(new DataSourcesResponse(Collections.emptyList())).build();
+    return Response.ok(new DatasourcesResponse(Collections.emptyList())).build();
   }
 }

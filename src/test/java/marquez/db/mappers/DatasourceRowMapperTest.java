@@ -26,13 +26,13 @@ import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
 import marquez.db.Columns;
-import marquez.db.models.DataSourceRow;
+import marquez.db.models.DatasourceRow;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DataSourceRowMapperTest {
+public class DatasourceRowMapperTest {
   private static final UUID ROW_UUID = UUID.randomUUID();
   private static final Instant CREATED_AT = Instant.now();
   private static final String NAME = "postgresql";
@@ -49,8 +49,8 @@ public class DataSourceRowMapperTest {
     when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL);
     final StatementContext context = mock(StatementContext.class);
 
-    final DataSourceRowMapper dataSourceRowMapper = new DataSourceRowMapper();
-    final DataSourceRow dataSourceRow = dataSourceRowMapper.map(results, context);
+    final DatasourceRowMapper dataSourceRowMapper = new DatasourceRowMapper();
+    final DatasourceRow dataSourceRow = dataSourceRowMapper.map(results, context);
     assertEquals(ROW_UUID, dataSourceRow.getUuid());
     assertEquals(expectedCreatedAt, dataSourceRow.getCreatedAt());
     assertEquals(NAME, dataSourceRow.getName());
@@ -61,7 +61,7 @@ public class DataSourceRowMapperTest {
   public void testMap_throwsException_onNullResults() throws SQLException {
     final ResultSet nullResults = null;
     final StatementContext context = mock(StatementContext.class);
-    final DataSourceRowMapper dataSourceRowMapper = new DataSourceRowMapper();
+    final DatasourceRowMapper dataSourceRowMapper = new DatasourceRowMapper();
     dataSourceRowMapper.map(nullResults, context);
   }
 
@@ -69,7 +69,7 @@ public class DataSourceRowMapperTest {
   public void testMap_throwsException_onNullContext() throws SQLException {
     final ResultSet results = mock(ResultSet.class);
     final StatementContext nullContext = null;
-    final DataSourceRowMapper dataSourceRowMapper = new DataSourceRowMapper();
+    final DatasourceRowMapper dataSourceRowMapper = new DatasourceRowMapper();
     dataSourceRowMapper.map(results, nullContext);
   }
 }

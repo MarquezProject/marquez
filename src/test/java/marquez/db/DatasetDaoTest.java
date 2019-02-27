@@ -17,7 +17,7 @@ package marquez.db;
 import static org.junit.Assert.assertEquals;
 
 import marquez.common.models.NamespaceName;
-import marquez.db.models.DataSourceRow;
+import marquez.db.models.DatasourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
@@ -56,7 +56,7 @@ public class DatasetDaoTest {
   }
 
   private void insertRandomDataset() {
-    DataSourceRow dataSourceRow = Generator.genDataSourceRow();
+    DatasourceRow dataSourceRow = Generator.genDataSourceRow();
     DatasetRow datasetRow = Generator.genDatasetRow(namespace.getGuid(), dataSourceRow.getUuid());
     DbTableInfoRow dbTableInfoRow = Generator.genDbTableInfowRow();
     DbTableVersionRow dbTableVersionRow =
