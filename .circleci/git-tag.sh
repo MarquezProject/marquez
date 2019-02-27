@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# A script used to tag a commit and kickoff CI deploy workflow
+# A script used to tag a commit and kickoff CircleCI deploy workflow
 #
 # Release tag: VERSION.YYYYMMDD.SHA-1
 #
@@ -55,7 +55,7 @@ sha=$(git log --pretty=format:'%h' -n 1)
 # Tag in the format VERSION.YYYYMMDD.SHA-1 (ex: 0.1.0.20190213.a9e469e)
 tag="${release}.${date}.${sha}"
 
-# Tag branch
+# Tag commit
 git tag -a "${tag}" -m "marquez ${tag}"
 
 # Push tag to Github

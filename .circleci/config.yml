@@ -87,12 +87,12 @@ workflows:
           requires:
             - release
           <<: *deploy_context
-      - wek8s_approval:
+      - wek8s_kraken_approval:
           type: approval
           requires:
             - wek8s_phoenix
           <<: *deploy_context
       - wek8s_kraken:
           requires:
-            - wek8s_approval
+            - wek8s_kraken_approval
           <<: *deploy_context
