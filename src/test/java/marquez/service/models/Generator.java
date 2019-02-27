@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
-
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceName;
@@ -144,7 +143,8 @@ public class Generator {
   // Namespaces
   public static Namespace genNamespace() {
     int nsNum = randNum();
-    return new Namespace(UUID.randomUUID(), "ns" + nsNum, "ns connectionUrl" + nsNum, "ns desc" + nsNum);
+    return new Namespace(
+        UUID.randomUUID(), "ns" + nsNum, "ns connectionUrl" + nsNum, "ns desc" + nsNum);
   }
 
   public static Namespace cloneNamespace(Namespace n) {
@@ -162,12 +162,13 @@ public class Generator {
 
   // Datasource
   public static Datasource genDatasource() {
-    int random = (int)(Math.random() * 50 + 1);
-    int random2 = (int)(Math.random() * 50 + 1);
-    return new Datasource(Instant.now(), DatasourceName.fromString("mysql_cluster_" + random),
-            ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists"));
+    int random = (int) (Math.random() * 50 + 1);
+    int random2 = (int) (Math.random() * 50 + 1);
+    return new Datasource(
+        Instant.now(),
+        DatasourceName.fromString("mysql_cluster_" + random),
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists"));
   }
-
 
   // Data Source Rows
   public static DatasourceRow genDatasourceRow() {

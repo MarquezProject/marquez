@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
 import marquez.db.DatasourceDao;
@@ -25,12 +24,11 @@ public class DatasourceIntegrationTest {
 
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
-
   protected static DatasourceDao datasourceDao;
   protected static DatasourceService datasourceService;
 
   @BeforeClass
-  public static void setup(){
+  public static void setup() {
     datasourceDao = APP.onDemand(DatasourceDao.class);
     datasourceService = new DatasourceService(datasourceDao);
   }
@@ -38,11 +36,10 @@ public class DatasourceIntegrationTest {
   @After
   public void deleteDatasources() {
     APP.getJDBI()
-            .useHandle(
-                    handle -> {
-                      handle.execute(
-                              format("delete from datasources"));
-                    });
+        .useHandle(
+            handle -> {
+              handle.execute(format("delete from datasources"));
+            });
   }
 
   @Test
@@ -59,7 +56,6 @@ public class DatasourceIntegrationTest {
     assertThat(responseBody.getDatasources().isEmpty());
   }
 
-
   @Test
   public void testListDatasourceResponseCorrect() throws UnexpectedException {
     Datasource ds1 = Generator.genDatasource();
@@ -67,11 +63,11 @@ public class DatasourceIntegrationTest {
     datasourceService.create(ds1.getConnectionUrl(), ds1.getDataSourceName());
 
     final Response res =
-            APP.client()
-                    .target(URI.create("http://localhost:" + APP.getLocalPort()))
-                    .path("/api/v1/datasources")
-                    .request(MediaType.APPLICATION_JSON)
-                    .get();
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path("/api/v1/datasources")
+            .request(MediaType.APPLICATION_JSON)
+            .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
 
     DatasourcesResponse responseBody = res.readEntity(DatasourcesResponse.class);
@@ -80,7 +76,8 @@ public class DatasourceIntegrationTest {
 
     assertThat(returnedDatasource.getName()).isEqualTo(ds1.getDataSourceName().getValue());
     System.out.println(returnedDatasource.getConnectionUrl());
-    assertThat(returnedDatasource.getConnectionUrl()).isEqualTo(ds1.getConnectionUrl().getRawValue());
+    assertThat(returnedDatasource.getConnectionUrl())
+        .isEqualTo(ds1.getConnectionUrl().getRawValue());
   }
 
   @Test
@@ -92,11 +89,11 @@ public class DatasourceIntegrationTest {
     datasourceService.create(ds2.getConnectionUrl(), ds2.getDataSourceName());
 
     final Response res =
-            APP.client()
-                    .target(URI.create("http://localhost:" + APP.getLocalPort()))
-                    .path("/api/v1/datasources")
-                    .request(MediaType.APPLICATION_JSON)
-                    .get();
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path("/api/v1/datasources")
+            .request(MediaType.APPLICATION_JSON)
+            .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
 
     DatasourcesResponse responseBody = res.readEntity(DatasourcesResponse.class);
