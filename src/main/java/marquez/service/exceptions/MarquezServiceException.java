@@ -21,15 +21,15 @@ public final class MarquezServiceException extends MarquezException {
 
   public MarquezServiceException() {}
 
-  public MarquezServiceException(final Throwable throwable) {
-    super(throwable);
+  public MarquezServiceException(final Throwable cause) {
+    super(cause);
   }
 
   public MarquezServiceException(final String message) {
     super(message);
   }
 
-  public MarquezServiceException(final String message, final Throwable throwable) {
-    super(message, throwable);
+  public MarquezServiceException(final String message, final Throwable cause) {
+    super(message, cause);
   }
 }
