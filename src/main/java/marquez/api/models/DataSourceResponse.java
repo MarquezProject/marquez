@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DatasourceResponse {
+public class DataSourceResponse {
 
   @JsonProperty("name")
   String name;

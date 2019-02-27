@@ -1,4 +1,3 @@
 package marquez.common.models;
 
-public enum DatasourceName {
-}
+public enum DataSourceName {}
