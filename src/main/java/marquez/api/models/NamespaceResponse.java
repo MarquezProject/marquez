@@ -30,7 +30,7 @@ public class NamespaceResponse {
   @JsonProperty("createdAt")
   String createdAt;
 
-  @JsonProperty("owner")
+  @JsonProperty("connectionUrl")
   String owner;
 
   @JsonProperty("description")

@@ -15,5 +15,5 @@ import lombok.ToString;
 public class DatasourcesResponse {
   @JsonProperty("datasources")
   @Getter
-  private List<DatasourceResponse> dataSources;
+  private List<DatasourceResponse> datasources;
 }

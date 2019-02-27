@@ -27,7 +27,7 @@ public class DatasourceService {
     UUID datasourceUUID = UUID.randomUUID();
     dataSourceDao.insert(
         new DatasourceRow(
-            datasourceUUID, name.getValue(), connectionUrl.getDataSource().getValue(), null));
+            datasourceUUID, name.getValue(), connectionUrl.getRawValue(), null));
     final Optional<DatasourceRow> datasourceRowIfFound = dataSourceDao.findBy(datasourceUUID);
     try {
       return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(UnexpectedException::new);

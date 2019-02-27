@@ -15,13 +15,17 @@
 package marquez.service.models;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
+
+import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasetUrn;
-import marquez.db.models.DatasourceRow;
+import marquez.common.models.DatasourceName;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
 
@@ -140,7 +144,7 @@ public class Generator {
   // Namespaces
   public static Namespace genNamespace() {
     int nsNum = randNum();
-    return new Namespace(UUID.randomUUID(), "ns" + nsNum, "ns owner" + nsNum, "ns desc" + nsNum);
+    return new Namespace(UUID.randomUUID(), "ns" + nsNum, "ns connectionUrl" + nsNum, "ns desc" + nsNum);
   }
 
   public static Namespace cloneNamespace(Namespace n) {
@@ -156,13 +160,22 @@ public class Generator {
     return new RunArgs(ra.getHexDigest(), ra.getJson(), ra.getCreatedAt());
   }
 
+  // Datasource
+  public static Datasource genDatasource() {
+    int random = (int)(Math.random() * 50 + 1);
+    int random2 = (int)(Math.random() * 50 + 1);
+    return new Datasource(Instant.now(), DatasourceName.fromString("mysql_cluster_" + random),
+            ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists"));
+  }
+
+
   // Data Source Rows
-  public static DatasourceRow genDataSourceRow() {
-    int dataSourceNum = randNum();
+  public static DatasourceRow genDatasourceRow() {
+    int datasourceNum = randNum();
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
-        .name("Data Source" + dataSourceNum)
-        .connectionUrl("conn://" + dataSourceNum)
+        .name("Data Source" + datasourceNum)
+        .connectionUrl("conn://" + datasourceNum)
         .build();
   }
 

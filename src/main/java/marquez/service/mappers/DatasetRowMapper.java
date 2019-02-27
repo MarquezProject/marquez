@@ -19,8 +19,8 @@ import static marquez.common.models.Description.NO_VALUE;
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.models.NamespaceName;
-import marquez.db.models.DatasourceRow;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasourceRow;
 import marquez.service.models.DbTableVersion;
 
 public final class DatasetRowMapper {
