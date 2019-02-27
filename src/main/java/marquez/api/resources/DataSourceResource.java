@@ -13,11 +13,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import marquez.api.models.DataSourcesResponse;
+import marquez.service.DataSourceService;
 
 @Path("/api/v1")
 public final class DataSourceResource {
 
-  public DataSourceResource() {}
+  private final DataSourceService dataSourceService;
+
+  public DataSourceResource(DataSourceService dataSourceService) {
+    this.dataSourceService = dataSourceService;
+  }
 
   @GET
   @ResponseMetered

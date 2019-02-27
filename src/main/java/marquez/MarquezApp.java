@@ -33,12 +33,14 @@ import marquez.api.resources.HealthResource;
 import marquez.api.resources.JobResource;
 import marquez.api.resources.NamespaceResource;
 import marquez.api.resources.PingResource;
+import marquez.db.DataSourceDao;
 import marquez.db.DatasetDao;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
+import marquez.service.DataSourceService;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -127,6 +129,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JobRunDao jobRunDao = jdbi.onDemand(JobRunDao.class);
     final JobRunArgsDao jobRunArgsDao = jdbi.onDemand(JobRunArgsDao.class);
     final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
+    final DataSourceDao dataSourceDao = jdbi.onDemand(DataSourceDao.class);
 
     final NamespaceService namespaceService = new NamespaceService(namespaceDao);
     final JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
@@ -136,7 +139,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new JobResource(namespaceService, jobService));
     env.jersey().register(new DatasetResource(namespaceService, new DatasetService(datasetDao)));
-    env.jersey().register(new DataSourceResource());
+    env.jersey().register(new DataSourceResource(new DataSourceService(dataSourceDao)));
 
     env.jersey().register(new ResourceExceptionMapper());
   }

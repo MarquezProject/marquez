@@ -2,6 +2,7 @@ package marquez.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +24,17 @@ public class DataSourceService {
 
   public DataSource create(@NonNull ConnectionUrl connectionUrl, @NonNull DataSourceName name)
       throws UnexpectedException {
+    UUID datasourceUUID = UUID.randomUUID();
     dataSourceDao.insert(
         new DataSourceRow(
-            UUID.randomUUID(), name.getValue(), connectionUrl.getDataSource().getValue(), null));
+            datasourceUUID, name.getValue(), connectionUrl.getDataSource().getValue(), null));
+    final Optional<DataSourceRow> datasourceRowIfFound = dataSourceDao.findBy(datasourceUUID);
+    try {
+      return datasourceRowIfFound.map(DataSourceMapper::map).orElseThrow(UnexpectedException::new);
+    } catch (UnexpectedException e) {
+      log.error(e.getMessage());
+      throw new UnexpectedException();
+    }
   }
 
   public List<DataSource> list(@NonNull Integer limit, @NonNull Integer offset) {
