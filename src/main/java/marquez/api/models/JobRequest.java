@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public final class CreateJobRequest {
+public final class JobRequest {
 
   @JsonProperty("location")
   @NotNull

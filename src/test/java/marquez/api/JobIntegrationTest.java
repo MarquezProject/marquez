@@ -30,7 +30,7 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.api.models.CreateJobRequest;
+import marquez.api.models.JobRequest;
 import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
 import marquez.api.models.JobRunResponse;
@@ -255,8 +255,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   private Response createJobOnNamespace(String namespace, Job job) {
-    CreateJobRequest createJobRequest =
-        new CreateJobRequest(
+    JobRequest createJobRequest =
+        new JobRequest(
             job.getLocation(),
             job.getDescription(),
             job.getInputDataSetUrns(),
