@@ -34,8 +34,8 @@ public final class DatasourceResource {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
 
-    List<marquez.service.models.Datasource> datasourceList = datasourceService.getAll(limit, offset);
-    return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasourceList))
-        .build();
+    List<marquez.service.models.Datasource> datasourceList =
+        datasourceService.getAll(limit, offset);
+    return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasourceList)).build();
   }
 }
