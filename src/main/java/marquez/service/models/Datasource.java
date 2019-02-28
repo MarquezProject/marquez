@@ -14,6 +14,6 @@ import marquez.common.models.DatasourceName;
 @ToString
 public class Datasource {
   @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final DatasourceName dataSourceName;
+  @Getter @NonNull private final DatasourceName datasourceName;
   @Getter @NonNull private final ConnectionUrl connectionUrl;
 }

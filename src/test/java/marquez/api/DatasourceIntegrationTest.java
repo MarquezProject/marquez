@@ -60,7 +60,7 @@ public class DatasourceIntegrationTest {
   public void testListDatasourceResponseCorrect() throws UnexpectedException {
     Datasource ds1 = Generator.genDatasource();
 
-    datasourceService.create(ds1.getConnectionUrl(), ds1.getDataSourceName());
+    datasourceService.create(ds1.getConnectionUrl(), ds1.getDatasourceName());
 
     final Response res =
         APP.client()
@@ -74,7 +74,7 @@ public class DatasourceIntegrationTest {
     assertThat(responseBody.getDatasources().size()).isEqualTo(1);
     DatasourceResponse returnedDatasource = responseBody.getDatasources().get(0);
 
-    assertThat(returnedDatasource.getName()).isEqualTo(ds1.getDataSourceName().getValue());
+    assertThat(returnedDatasource.getName()).isEqualTo(ds1.getDatasourceName().getValue());
     System.out.println(returnedDatasource.getConnectionUrl());
     assertThat(returnedDatasource.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
@@ -85,8 +85,8 @@ public class DatasourceIntegrationTest {
     Datasource ds1 = Generator.genDatasource();
     Datasource ds2 = Generator.genDatasource();
 
-    datasourceService.create(ds1.getConnectionUrl(), ds1.getDataSourceName());
-    datasourceService.create(ds2.getConnectionUrl(), ds2.getDataSourceName());
+    datasourceService.create(ds1.getConnectionUrl(), ds1.getDatasourceName());
+    datasourceService.create(ds2.getConnectionUrl(), ds2.getDatasourceName());
 
     final Response res =
         APP.client()
