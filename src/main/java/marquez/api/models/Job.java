@@ -31,11 +31,11 @@ public final class Job {
   @JsonProperty("createdAt")
   private Timestamp createdAt;
 
-  @JsonProperty("inputDataSetUrns")
-  private List<String> inputDataSetUrns;
+  @JsonProperty("inputDatasetUrns")
+  private List<String> inputDatasetUrns;
 
-  @JsonProperty("outputDataSetUrns")
-  private List<String> outputDataSetUrns;
+  @JsonProperty("outputDatasetUrns")
+  private List<String> outputDatasetUrns;
 
   @JsonProperty("location")
   private String location;
