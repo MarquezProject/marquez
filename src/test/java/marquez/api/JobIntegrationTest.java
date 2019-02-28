@@ -30,9 +30,9 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
 import marquez.api.models.JobRequest;
+import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
@@ -124,7 +124,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   @Test
   public void testJobRunCreationEndToEnd() throws JsonProcessingException {
     Entity createJobRunRequestEntity =
-        Entity.json(MAPPER.writeValueAsString(new CreateJobRunRequest(null, null, JOB_RUN_ARGS)));
+        Entity.json(MAPPER.writeValueAsString(new JobRunRequest(null, null, JOB_RUN_ARGS)));
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))

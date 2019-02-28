@@ -18,7 +18,7 @@ import static java.time.Instant.now;
 
 import java.sql.Timestamp;
 import java.util.UUID;
-import marquez.api.models.CreateNamespaceRequest;
+import marquez.api.models.NamespaceRequest;
 import marquez.service.models.Namespace;
 import org.junit.BeforeClass;
 
@@ -32,12 +32,12 @@ public class NamespaceBaseTest {
   public static final Namespace TEST_NAMESPACE =
       new Namespace(NAMESPACE_UUID, START_TIME, NAMESPACE_NAME, OWNER, DESCRIPTION);
 
-  public static CreateNamespaceRequest createNamespaceRequest;
+  public static NamespaceRequest createNamespaceRequest;
 
   public final int HTTP_UNPROCESSABLE_ENTITY = 422;
 
   @BeforeClass
   public static void setup() {
-    createNamespaceRequest = new CreateNamespaceRequest(OWNER, DESCRIPTION);
+    createNamespaceRequest = new NamespaceRequest(OWNER, DESCRIPTION);
   }
 }

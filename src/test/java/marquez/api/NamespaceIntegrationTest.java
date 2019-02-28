@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.api.models.CreateNamespaceRequest;
+import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
 import marquez.api.resources.NamespaceBaseTest;
@@ -78,7 +78,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
             .path("/api/v1/namespaces/" + "abc123")
             .request(MediaType.APPLICATION_JSON)
-            .put(Entity.json(new CreateNamespaceRequest(null, "someDesc")));
+            .put(Entity.json(new NamespaceRequest(null, "someDesc")));
     assertEquals(HTTP_UNPROCESSABLE_ENTITY, res.getStatus());
   }
 

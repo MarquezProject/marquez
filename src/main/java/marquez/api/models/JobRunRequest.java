@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public final class CreateJobRunRequest {
+public final class JobRunRequest {
 
   @JsonProperty("nominalStartTime")
   private String nominalStartTime;

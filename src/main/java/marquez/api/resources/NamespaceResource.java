@@ -33,7 +33,7 @@ import marquez.api.exceptions.ResourceException;
 import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.api.mappers.NamespaceApiMapper;
 import marquez.api.mappers.NamespaceResponseMapper;
-import marquez.api.models.CreateNamespaceRequest;
+import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
 import marquez.service.NamespaceService;
@@ -59,8 +59,7 @@ public final class NamespaceResource {
   @Timed
   @Path("/namespaces/{namespace}")
   public Response create(
-      @PathParam("namespace") @NotBlank String namespaceString,
-      @Valid CreateNamespaceRequest request)
+      @PathParam("namespace") @NotBlank String namespaceString, @Valid NamespaceRequest request)
       throws ResourceException {
     try {
       final Namespace namespace =
