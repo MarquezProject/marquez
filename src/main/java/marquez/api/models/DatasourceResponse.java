@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 public class DatasourceResponse {
 
   @JsonProperty("createdAt")
-  String createdAt;
+  private String createdAt;
 
   @JsonProperty("name")
-  String name;
+  private String name;
 
   @JsonProperty("connectionUrl")
-  String connectionUrl;
+  private String connectionUrl;
 }
