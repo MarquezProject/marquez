@@ -335,8 +335,8 @@ public class JobResourceTest {
   private Response insertJob(Job job) {
     JobRequest jobRequest =
         new JobRequest(
-            job.getInputDataSetUrns(),
-            job.getOutputDataSetUrns(),
+            job.getInputDatasetUrns(),
+            job.getOutputDatasetUrns(),
             job.getLocation(),
             job.getDescription());
     String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, job.getName());
