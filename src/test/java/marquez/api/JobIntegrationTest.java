@@ -248,8 +248,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
     assertEquals(inputJob.getDescription(), responseJob.getDescription());
     assertEquals(inputJob.getLocation(), responseJob.getLocation());
 
-    assertEquals(inputJob.getInputDataSetUrns(), responseJob.getInputDataSetUrns());
-    assertEquals(inputJob.getOutputDataSetUrns(), responseJob.getOutputDataSetUrns());
+    assertEquals(inputJob.getInputDatasetUrns(), responseJob.getInputDatasetUrns());
+    assertEquals(inputJob.getOutputDatasetUrns(), responseJob.getOutputDatasetUrns());
 
     assertNotNull(responseJob.getCreatedAt());
   }
@@ -257,8 +257,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
   private Response createJobOnNamespace(String namespace, Job job) {
     JobRequest jobRequest =
         new JobRequest(
-            job.getInputDataSetUrns(),
-            job.getOutputDataSetUrns(),
+            job.getInputDatasetUrns(),
+            job.getOutputDatasetUrns(),
             job.getLocation(),
             job.getDescription());
 
