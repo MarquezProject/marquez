@@ -12,16 +12,19 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+
+import lombok.NonNull;
 import marquez.api.mappers.DatasourceResponseMapper;
 import marquez.service.DatasourceService;
+import marquez.service.models.Datasource;
 
 @Path("/api/v1")
 public final class DatasourceResource {
 
   private final DatasourceService datasourceService;
 
-  public DatasourceResource(DatasourceService dataSourceService) {
-    this.datasourceService = dataSourceService;
+  public DatasourceResource(@NonNull final DatasourceService datasourceService) {
+    this.datasourceService = datasourceService;
   }
 
   @GET
@@ -34,8 +37,8 @@ public final class DatasourceResource {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
 
-    List<marquez.service.models.Datasource> datasourceList =
+    List<Datasource> datasources =
         datasourceService.getAll(limit, offset);
-    return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasourceList)).build();
+    return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasources)).build();
   }
 }

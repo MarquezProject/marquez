@@ -23,7 +23,7 @@ import org.junit.Test;
 public class OwnerRowTest {
   private static final UUID ROW_UUID = UUID.randomUUID();
   private static final Instant CREATED_AT = Instant.now();
-  private static final String NAME = "test connectionUrl";
+  private static final String NAME = "test owner";
 
   @Test
   public void testNewOwnerRow() {

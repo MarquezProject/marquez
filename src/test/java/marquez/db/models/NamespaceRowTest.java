@@ -26,7 +26,7 @@ public class NamespaceRowTest {
   private static final Instant CREATED_AT = Instant.now();
   private static final Instant UPDATED_AT = Instant.now();
   private static final String NAME = "test_namespace";
-  private static final String CURRENT_OWNER_NAME = "test connectionUrl";
+  private static final String CURRENT_OWNER_NAME = "test owner";
 
   @Test
   public void testNewNamespaceOwnershipRow() {

@@ -32,7 +32,7 @@ public class ConnectionUrlTest {
         String.format(
             "jdbc:%s://localhost:%d/%s", DATA_SOURCE.getValue(), DB_PORT, DB_NAME.getValue());
     final ConnectionUrl connectionUrl = ConnectionUrl.fromString(rawValue);
-    assertEquals(DATA_SOURCE, connectionUrl.getDataSource());
+    assertEquals(DATA_SOURCE, connectionUrl.getDatasource());
     assertEquals(DB_NAME, connectionUrl.getDbName());
     assertEquals(rawValue, connectionUrl.getRawValue());
   }

@@ -22,15 +22,15 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class ConnectionUrl {
-  @Getter private final Datasource dataSource;
+  @Getter private final Datasource datasource;
   @Getter private final DbName dbName;
   @Getter private final String rawValue;
 
   private ConnectionUrl(
-      @NonNull final Datasource dataSource,
+      @NonNull final Datasource datasource,
       @NonNull final DbName dbName,
       @NonNull final String rawValue) {
-    this.dataSource = dataSource;
+    this.datasource = datasource;
     this.dbName = dbName;
     this.rawValue = rawValue;
   }
