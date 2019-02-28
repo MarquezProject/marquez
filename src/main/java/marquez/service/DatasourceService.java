@@ -36,7 +36,7 @@ public class DatasourceService {
     }
   }
 
-  public List<Datasource> list(@NonNull Integer limit, @NonNull Integer offset) {
+  public List<Datasource> getAll(@NonNull Integer limit, @NonNull Integer offset) {
     List<DatasourceRow> dataSources = dataSourceDao.findAll(limit, offset);
     return Collections.unmodifiableList(DatasourceMapper.map(dataSources));
   }

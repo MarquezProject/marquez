@@ -13,7 +13,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import marquez.api.mappers.DatasourceResponseMapper;
-import marquez.api.models.DatasourcesResponse;
 import marquez.service.DatasourceService;
 
 @Path("/api/v1")
@@ -35,8 +34,8 @@ public final class DatasourceResource {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
 
-    List<marquez.service.models.Datasource> datasourceList = datasourceService.list(limit, offset);
-    return Response.ok(new DatasourcesResponse(DatasourceResponseMapper.map(datasourceList)))
+    List<marquez.service.models.Datasource> datasourceList = datasourceService.getAll(limit, offset);
+    return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasourceList))
         .build();
   }
 }

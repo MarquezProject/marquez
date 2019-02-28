@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.NonNull;
 import marquez.api.models.DatasourceResponse;
+import marquez.api.models.DatasourcesResponse;
 import marquez.service.models.Datasource;
 
 public final class DatasourceResponseMapper {
@@ -36,6 +37,11 @@ public final class DatasourceResponseMapper {
     return datasources.isEmpty()
         ? Collections.emptyList()
         : Collections.unmodifiableList(
-            datasources.stream().map(dataset -> map(dataset)).collect(toList()));
+            datasources.stream().map(datasource -> map(datasource)).collect(toList()));
+  }
+
+  public static DatasourcesResponse toDatasourcesResponse(@NonNull List<Datasource> datasources) {
+    List<DatasourceResponse> datasourceResponses = map(datasources);
+    return new DatasourcesResponse(datasourceResponses);
   }
 }

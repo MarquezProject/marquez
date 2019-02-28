@@ -314,13 +314,13 @@ components:
       type: object
       properties:
         owner:
-          description: The connectionUrl of the namespace.
+          description: The owner of the namespace.
           type: string
         description:
           description: The description of the namespace.
           type: string
       required:
-        - connectionUrl
+        - owner
       example:
         owner: dataengineering
         description: A namespace for core jobs and datasets at wework.
@@ -336,7 +336,7 @@ components:
           type: string
           format: date-time
         owner:
-          description: The connectionUrl of the namespace.
+          description: The owner of the namespace.
           type: string
         description:
           description: The description of the namespace.
