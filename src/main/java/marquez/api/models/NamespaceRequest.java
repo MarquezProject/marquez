@@ -22,7 +22,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public final class CreateNamespaceRequest {
+public final class NamespaceRequest {
   @NotBlank private String owner;
   private String description;
 }

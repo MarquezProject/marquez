@@ -36,8 +36,8 @@ import marquez.api.exceptions.ResourceException;
 import marquez.api.mappers.ApiJobToCoreJobMapper;
 import marquez.api.mappers.CoreJobRunToApiJobRunResponseMapper;
 import marquez.api.mappers.CoreJobToApiJobMapper;
-import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.JobRequest;
+import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobsResponse;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -144,7 +144,7 @@ public final class JobResource {
   public Response create(
       @PathParam("namespace") final String namespace,
       @PathParam("job") final String job,
-      @Valid final CreateJobRunRequest request)
+      @Valid final JobRunRequest request)
       throws ResourceException {
     try {
       if (!namespaceService.exists(namespace)) {

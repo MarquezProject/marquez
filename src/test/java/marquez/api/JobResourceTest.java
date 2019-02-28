@@ -35,9 +35,9 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.api.exceptions.ResourceExceptionMapper;
-import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
 import marquez.api.models.JobRequest;
+import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobsResponse;
 import marquez.api.resources.JobResource;
@@ -348,8 +348,8 @@ public class JobResourceTest {
   }
 
   private Response insertJobRun(JobRunResponse jobRun) {
-    CreateJobRunRequest jobRequest =
-        new CreateJobRunRequest(
+    JobRunRequest jobRequest =
+        new JobRunRequest(
             jobRun.getNominalStartTime(), jobRun.getNominalEndTime(), jobRun.getRunArgs());
     String path = format("/api/v1/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME, "somejob");
     return resources
