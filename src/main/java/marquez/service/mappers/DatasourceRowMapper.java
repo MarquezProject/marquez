@@ -16,6 +16,8 @@ package marquez.service.mappers;
 
 import java.util.UUID;
 import lombok.NonNull;
+import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasourceName;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.DbTableVersion;
 
@@ -27,6 +29,15 @@ public final class DatasourceRowMapper {
         .uuid(UUID.randomUUID())
         .name(dbTableVersion.getConnectionUrl().getDatasource().getValue())
         .connectionUrl(dbTableVersion.getConnectionUrl().getRawValue())
+        .build();
+  }
+
+  public static DatasourceRow map(
+      @NonNull ConnectionUrl connectionUrl, @NonNull DatasourceName datasourceName) {
+    return DatasourceRow.builder()
+        .uuid(UUID.randomUUID())
+        .name(datasourceName.getValue())
+        .connectionUrl(connectionUrl.getRawValue())
         .build();
   }
 }

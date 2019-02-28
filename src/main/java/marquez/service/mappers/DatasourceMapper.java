@@ -27,11 +27,11 @@ import marquez.service.models.Datasource;
 public class DatasourceMapper {
   private DatasourceMapper() {}
 
-  public static Datasource map(@NonNull DatasourceRow dataSourceRow) {
+  public static Datasource map(@NonNull DatasourceRow datasourceRow) {
     return new Datasource(
-        dataSourceRow.getCreatedAt().get(),
-        DatasourceName.fromString(dataSourceRow.getName()),
-        ConnectionUrl.fromString(dataSourceRow.getConnectionUrl()));
+        datasourceRow.getCreatedAt().get(),
+        DatasourceName.fromString(datasourceRow.getName()),
+        ConnectionUrl.fromString(datasourceRow.getConnectionUrl()));
   }
 
   public static List<Datasource> map(@NonNull List<DatasourceRow> datasourceRows) {
