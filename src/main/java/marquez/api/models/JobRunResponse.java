@@ -25,19 +25,14 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public final class JobRunResponse {
-  @JsonProperty("runId")
   @NotBlank
   private UUID runId;
 
-  @JsonProperty("nominalStartTime")
   private String nominalStartTime;
 
-  @JsonProperty("nominalEndTime")
   private String nominalEndTime;
 
-  @JsonProperty("runArgs")
   private String runArgs;
 
-  @JsonProperty("runState")
   private String runState;
 }

@@ -21,6 +21,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public final class ErrorResponse {
-  @JsonProperty("error")
+
   private String error;
 }

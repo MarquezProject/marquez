@@ -27,7 +27,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class NamespacesResponse {
-  @JsonProperty("namespaces")
   @Getter
   private List<NamespaceResponse> namespaces;
 }

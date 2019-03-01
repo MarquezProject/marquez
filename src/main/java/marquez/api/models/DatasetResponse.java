@@ -28,15 +28,12 @@ import lombok.ToString;
 public class DatasetResponse {
   @Getter
   @NonNull
-  @JsonProperty("urn")
   private final String urn;
 
   @Getter
   @NonNull
-  @JsonProperty("createdAt")
   private final String createdAt;
 
-  @JsonProperty("description")
   private final String description;
 
   public Optional<String> getDescription() {

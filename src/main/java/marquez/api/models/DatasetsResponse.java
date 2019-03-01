@@ -22,6 +22,5 @@ import lombok.NonNull;
 @Data
 public final class DatasetsResponse {
   @NonNull
-  @JsonProperty("datasets")
   private final List<DatasetResponse> datasetResponses;
 }

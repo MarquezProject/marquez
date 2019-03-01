@@ -24,15 +24,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NamespaceResponse {
 
-  @JsonProperty("name")
   String name;
 
-  @JsonProperty("createdAt")
   String createdAt;
 
-  @JsonProperty("owner")
   String owner;
 
-  @JsonProperty("description")
   String description;
 }

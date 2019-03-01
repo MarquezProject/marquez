@@ -25,21 +25,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public final class Job {
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("createdAt")
   private Timestamp createdAt;
 
-  @JsonProperty("inputDatasetUrns")
   private List<String> inputDatasetUrns;
 
-  @JsonProperty("outputDatasetUrns")
   private List<String> outputDatasetUrns;
 
-  @JsonProperty("location")
   private String location;
 
-  @JsonProperty("description")
   private String description;
 }
