@@ -7,20 +7,20 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
-public final class DatasetUrn extends Urn {
+public final class DatasourceUrn extends Urn {
   private static final int NUM_COMPONENTS = 2;
   private static final Pattern REGEX = Urn.buildPattern(NUM_COMPONENTS);
 
-  public static DatasetUrn of(@NonNull Namespace namespace, @NonNull Dataset dataset) {
-    final String value = of(namespace.getValue(), dataset.getValue());
+  public static DatasourceUrn of(@NonNull String type, @NonNull String name) {
+    final String value = Urn.of(type, name);
     return of(value);
   }
 
-  public static DatasetUrn of(String value) {
-    return new DatasetUrn(value);
+  public static DatasourceUrn of(String value) {
+    return new DatasourceUrn(value);
   }
 
-  public DatasetUrn(@NonNull String value) {
+  public DatasourceUrn(@NonNull String value) {
     super(value, REGEX);
   }
 }
