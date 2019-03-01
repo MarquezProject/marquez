@@ -25,10 +25,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class JobRunRequest {
 
+  @JsonProperty("nominalStartTime")
   private String nominalStartTime;
 
+  @JsonProperty("nominalEndTime")
   private String nominalEndTime;
 
+  @JsonProperty("runArgs")
   @NotNull
   private String runArgs;
 }
