@@ -1,10 +1,17 @@
 package marquez.api.models;
 
-import lombok.Value;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
 
-@Value
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@EqualsAndHashCode
+@ToString
 public class DatasourceResponse {
-  private String name;
-  private String createdAt;
-  private String connectionUrl;
+  @Getter @NonNull private String name;
+  @Getter @NonNull private String createdAt;
+  @Getter @NonNull private String connectionUrl;
 }
