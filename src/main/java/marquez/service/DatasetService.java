@@ -46,7 +46,6 @@ public class DatasetService {
 
   public Dataset create(
       @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
-
       throws MarquezServiceException {
     final DatasourceRow dataSourceRow = DatasourceRowMapper.map(dbTableVersion);
     final DatasetRow datasetRow =

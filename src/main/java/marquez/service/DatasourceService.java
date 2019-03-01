@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.MarquezException;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
 import marquez.db.DatasourceDao;
@@ -23,16 +24,16 @@ public class DatasourceService {
   }
 
   public Datasource create(@NonNull ConnectionUrl connectionUrl, @NonNull DatasourceName name)
-      throws UnexpectedException {
+      throws MarquezException {
     DatasourceRow datasourceRow = DatasourceRowMapper.map(connectionUrl, name);
     datasourceDao.insert(datasourceRow);
     final Optional<DatasourceRow> datasourceRowIfFound =
         datasourceDao.findBy(datasourceRow.getUuid());
     try {
-      return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(UnexpectedException::new);
-    } catch (UnexpectedException e) {
+      return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezException::new);
+    } catch (MarquezException e) {
       log.error(e.getMessage());
-      throw new UnexpectedException();
+      throw new MarquezException();
     }
   }
 
