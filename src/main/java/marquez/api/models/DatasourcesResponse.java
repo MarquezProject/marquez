@@ -1,19 +1,15 @@
 package marquez.api.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
 public class DatasourcesResponse {
-  @JsonProperty("datasources")
-  @Getter
-  private List<DatasourceResponse> datasources;
+  @Getter private final List<DatasourceResponse> datasources;
 }

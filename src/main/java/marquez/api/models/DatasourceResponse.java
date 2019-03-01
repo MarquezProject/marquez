@@ -11,7 +11,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class DatasourceResponse {
-  @Getter @NonNull private String name;
-  @Getter @NonNull private String connectionUrl;
-  @Getter @NonNull private String createdAt;
+  @Getter @NonNull private final String name;
+  @Getter @NonNull private final String connectionUrl;
+  @Getter @NonNull private final String createdAt;
 }
