@@ -12,26 +12,22 @@
  * limitations under the License.
  */
 
-package marquez.api.models;
+package marquez;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public class MarquezException extends Exception {
+  private static final long serialVersionUID = 1L;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public final class CreateJobRunRequest {
+  public MarquezException() {}
 
-  @JsonProperty("nominalStartTime")
-  private String nominalStartTime;
+  public MarquezException(final Throwable cause) {
+    super(cause);
+  }
 
-  @JsonProperty("nominalEndTime")
-  private String nominalEndTime;
+  public MarquezException(final String message) {
+    super(message);
+  }
 
-  @JsonProperty("runArgs")
-  @NotNull
-  private String runArgs;
+  public MarquezException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
 }

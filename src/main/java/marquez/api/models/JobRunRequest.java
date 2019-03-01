@@ -14,15 +14,24 @@
 
 package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public final class CreateNamespaceRequest {
-  @NotBlank private String owner;
-  private String description;
+public final class JobRunRequest {
+
+  @JsonProperty("nominalStartTime")
+  private String nominalStartTime;
+
+  @JsonProperty("nominalEndTime")
+  private String nominalEndTime;
+
+  @JsonProperty("runArgs")
+  @NotNull
+  private String runArgs;
 }

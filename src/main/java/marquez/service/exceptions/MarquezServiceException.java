@@ -14,4 +14,22 @@
 
 package marquez.service.exceptions;
 
-public class UnexpectedException extends Throwable {}
+import marquez.MarquezException;
+
+public final class MarquezServiceException extends MarquezException {
+  private static final long serialVersionUID = 1L;
+
+  public MarquezServiceException() {}
+
+  public MarquezServiceException(final Throwable cause) {
+    super(cause);
+  }
+
+  public MarquezServiceException(final String message) {
+    super(message);
+  }
+
+  public MarquezServiceException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
+}

@@ -33,7 +33,7 @@ import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 import org.junit.Test;
 
@@ -62,7 +62,7 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testListDatasets200() throws UnexpectedException {
+  public void testListDatasets200() throws MarquezServiceException {
     when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
 
     final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
@@ -82,7 +82,7 @@ public class DatasetResourceTest {
   }
 
   @Test(expected = WebApplicationException.class)
-  public void testListDatasetsNamespaceDoesNotExist() throws UnexpectedException {
+  public void testListDatasetsNamespaceDoesNotExist() throws MarquezServiceException {
     when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
 
     datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);

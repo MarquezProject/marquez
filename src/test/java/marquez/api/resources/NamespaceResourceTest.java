@@ -38,7 +38,7 @@ import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
 import marquez.service.NamespaceService;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -62,8 +62,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testCreateNamespaceErrorHandling() throws UnexpectedException {
-    doThrow(new UnexpectedException()).when(NAMESPACE_SERVICE).create(any(Namespace.class));
+  public void testCreateNamespaceErrorHandling() throws MarquezServiceException {
+    doThrow(new MarquezServiceException()).when(NAMESPACE_SERVICE).create(any(Namespace.class));
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
@@ -75,7 +75,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testValidNamespace() throws ResourceException, UnexpectedException {
+  public void testValidNamespace() throws ResourceException, MarquezServiceException {
     Optional<Namespace> returnedOptionalNamespace = Optional.of(TEST_NAMESPACE);
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
@@ -93,7 +93,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Test
   public void testGetNamespaceRequestErrorHandling() throws Throwable {
-    doThrow(new UnexpectedException()).when(NAMESPACE_SERVICE).get(any());
+    doThrow(new MarquezServiceException()).when(NAMESPACE_SERVICE).get(any());
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
@@ -101,7 +101,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testListNamespaceWithSingleResultSet() throws UnexpectedException, ResourceException {
+  public void testListNamespaceWithSingleResultSet()
+      throws MarquezServiceException, ResourceException {
     final List<Namespace> existingCoreModelNamespaces = Collections.singletonList(TEST_NAMESPACE);
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
@@ -116,7 +117,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Test
   public void testAllNamespaceFieldsPresentInListNamespacesResponse()
-      throws UnexpectedException, ResourceException {
+      throws MarquezServiceException, ResourceException {
     final List<Namespace> existingNamespaces = Collections.singletonList(TEST_NAMESPACE);
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
@@ -134,7 +135,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Test
   public void testListNamespaceWithMultipleResultSet()
-      throws UnexpectedException, ResourceException {
+      throws MarquezServiceException, ResourceException {
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
@@ -159,8 +160,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testListNamespacesErrorHandling() throws UnexpectedException {
-    doThrow(new UnexpectedException()).when(NAMESPACE_SERVICE).listNamespaces();
+  public void testListNamespacesErrorHandling() throws MarquezServiceException {
+    doThrow(new MarquezServiceException()).when(NAMESPACE_SERVICE).listNamespaces();
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),

@@ -30,9 +30,9 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.api.models.CreateJobRequest;
-import marquez.api.models.CreateJobRunRequest;
 import marquez.api.models.Job;
+import marquez.api.models.JobRequest;
+import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
@@ -41,7 +41,7 @@ import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
@@ -75,7 +75,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
       new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
   @BeforeClass
-  public static void setup() throws UnexpectedException {
+  public static void setup() throws MarquezServiceException {
     Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
@@ -115,7 +115,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   @Before
-  public void createJobRun() throws UnexpectedException {
+  public void createJobRun() throws MarquezServiceException {
     JobRun createdJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     CREATED_JOB_RUN_UUID = createdJobRun.getGuid();
@@ -124,7 +124,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   @Test
   public void testJobRunCreationEndToEnd() throws JsonProcessingException {
     Entity createJobRunRequestEntity =
-        Entity.json(MAPPER.writeValueAsString(new CreateJobRunRequest(null, null, JOB_RUN_ARGS)));
+        Entity.json(MAPPER.writeValueAsString(new JobRunRequest(null, null, JOB_RUN_ARGS)));
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
@@ -157,7 +157,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   }
 
   @Test
-  public void testJobRunRetrievalWithMultipleJobRuns() throws UnexpectedException {
+  public void testJobRunRetrievalWithMultipleJobRuns() throws MarquezServiceException {
     JobRun secondCreatedJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     final UUID secondJobRunUUID = secondCreatedJobRun.getGuid();
@@ -248,26 +248,26 @@ public class JobIntegrationTest extends JobRunBaseTest {
     assertEquals(inputJob.getDescription(), responseJob.getDescription());
     assertEquals(inputJob.getLocation(), responseJob.getLocation());
 
-    assertEquals(inputJob.getInputDataSetUrns(), responseJob.getInputDataSetUrns());
-    assertEquals(inputJob.getOutputDataSetUrns(), responseJob.getOutputDataSetUrns());
+    assertEquals(inputJob.getInputDatasetUrns(), responseJob.getInputDatasetUrns());
+    assertEquals(inputJob.getOutputDatasetUrns(), responseJob.getOutputDatasetUrns());
 
     assertNotNull(responseJob.getCreatedAt());
   }
 
   private Response createJobOnNamespace(String namespace, Job job) {
-    CreateJobRequest createJobRequest =
-        new CreateJobRequest(
+    JobRequest jobRequest =
+        new JobRequest(
+            job.getInputDatasetUrns(),
+            job.getOutputDatasetUrns(),
             job.getLocation(),
-            job.getDescription(),
-            job.getInputDataSetUrns(),
-            job.getOutputDataSetUrns());
+            job.getDescription());
 
     String path = format("/api/v1/namespaces/%s/jobs/%s", namespace, job.getName());
     return APP.client()
         .target(URI.create("http://localhost:" + APP.getLocalPort()))
         .path(path)
         .request(MediaType.APPLICATION_JSON)
-        .put(Entity.json(createJobRequest));
+        .put(Entity.json(jobRequest));
   }
 
   static Job generateApiJob() {

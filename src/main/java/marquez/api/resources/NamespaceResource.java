@@ -33,11 +33,11 @@ import marquez.api.exceptions.ResourceException;
 import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.api.mappers.NamespaceApiMapper;
 import marquez.api.mappers.NamespaceResponseMapper;
-import marquez.api.models.CreateNamespaceRequest;
+import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
 import marquez.service.NamespaceService;
-import marquez.service.exceptions.UnexpectedException;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -59,15 +59,14 @@ public final class NamespaceResource {
   @Timed
   @Path("/namespaces/{namespace}")
   public Response create(
-      @PathParam("namespace") @NotBlank String namespaceString,
-      @Valid CreateNamespaceRequest request)
+      @PathParam("namespace") @NotBlank String namespaceString, @Valid NamespaceRequest request)
       throws ResourceException {
     try {
       final Namespace namespace =
           namespaceService.create(namespaceApiMapper.of(namespaceString, request));
       final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
       return Response.ok(response).build();
-    } catch (UnexpectedException e) {
+    } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }
@@ -86,7 +85,7 @@ public final class NamespaceResource {
       } else {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-    } catch (UnexpectedException e) {
+    } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }
@@ -102,7 +101,7 @@ public final class NamespaceResource {
       final List<NamespaceResponse> namespaceResponses =
           coreNamespaceToApiNamespaceMapper.map(namespaces);
       return Response.ok(new NamespacesResponse(namespaceResponses)).build();
-    } catch (UnexpectedException e) {
+    } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }

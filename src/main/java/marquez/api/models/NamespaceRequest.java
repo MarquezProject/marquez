@@ -12,6 +12,17 @@
  * limitations under the License.
  */
 
-package marquez.service.exceptions;
+package marquez.api.models;
 
-public class NamespaceException extends Exception {}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.NotBlank;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public final class NamespaceRequest {
+  @NotBlank private String owner;
+  private String description;
+}
