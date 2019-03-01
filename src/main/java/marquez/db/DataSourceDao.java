@@ -20,7 +20,6 @@ import java.util.UUID;
 import marquez.db.mappers.DataSourceRowMapper;
 import marquez.db.models.DataSourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -33,8 +32,8 @@ public interface DataSourceDao {
   void insert(@BindBean DataSourceRow dataSourceRow);
 
   @SqlQuery("SELECT * FROM datasources WHERE guid = :uuid")
-  Optional<DataSourceRow> findBy(@Bind("uuid") UUID uuid);
+  Optional<DataSourceRow> findBy(UUID uuid);
 
   @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
-  List<DataSourceRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);
+  List<DataSourceRow> findAll(Integer limit, Integer offset);
 }
