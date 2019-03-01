@@ -7,6 +7,8 @@ import static org.junit.Assert.assertEquals;
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import marquez.MarquezException;
 import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
 import marquez.db.DatasourceDao;
@@ -57,7 +59,7 @@ public class DatasourceIntegrationTest {
   }
 
   @Test
-  public void testListDatasourceResponseCorrect() throws UnexpectedException {
+  public void testListDatasourceResponseCorrect() throws MarquezException {
     Datasource ds1 = Generator.genDatasource();
 
     datasourceService.create(ds1.getConnectionUrl(), ds1.getDatasourceName());
@@ -81,7 +83,7 @@ public class DatasourceIntegrationTest {
   }
 
   @Test
-  public void testListDatasourcesWithMultipleResults() throws UnexpectedException {
+  public void testListDatasourcesWithMultipleResults() throws MarquezException {
     Datasource ds1 = Generator.genDatasource();
     Datasource ds2 = Generator.genDatasource();
 

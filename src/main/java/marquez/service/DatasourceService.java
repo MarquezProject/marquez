@@ -10,7 +10,6 @@ import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
 import marquez.db.DatasourceDao;
 import marquez.db.models.DatasourceRow;
-import marquez.service.exceptions.UnexpectedException;
 import marquez.service.mappers.DatasourceMapper;
 import marquez.service.mappers.DatasourceRowMapper;
 import marquez.service.models.Datasource;
