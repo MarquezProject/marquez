@@ -28,6 +28,5 @@ public final class JobRunRequest {
 
   private String nominalEndTime;
 
-  @NotNull
-  private String runArgs;
+  @NotNull private String runArgs;
 }

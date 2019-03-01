@@ -25,13 +25,9 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class DatasetResponse {
-  @Getter
-  @NonNull
-  private final String urn;
+  @Getter @NonNull private final String urn;
 
-  @Getter
-  @NonNull
-  private final String createdAt;
+  @Getter @NonNull private final String createdAt;
 
   private final String description;
 

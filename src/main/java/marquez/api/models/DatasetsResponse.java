@@ -20,6 +20,5 @@ import lombok.NonNull;
 
 @Data
 public final class DatasetsResponse {
-  @NonNull
-  private final List<DatasetResponse> datasetResponses;
+  @NonNull private final List<DatasetResponse> datasets;
 }

@@ -24,8 +24,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public final class JobRunResponse {
-  @NotBlank
-  private UUID runId;
+  @NotBlank private UUID runId;
 
   private String nominalStartTime;
 
