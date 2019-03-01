@@ -91,7 +91,7 @@ public class JobRunResponseTest {
   }
 
   @Test
-  public void testJobRunInequalityOnNonIDField() {
+  public void testJobRunInequalityOnNonIdField() {
     JobRunResponse jr2 =
         new JobRunResponse(
             JOB_RUN_UUID,
