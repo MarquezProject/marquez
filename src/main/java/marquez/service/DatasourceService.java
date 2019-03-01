@@ -3,6 +3,7 @@ package marquez.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.MarquezException;
@@ -24,10 +25,10 @@ public class DatasourceService {
 
   public Datasource create(@NonNull ConnectionUrl connectionUrl, @NonNull DatasourceName name)
       throws MarquezException {
-    DatasourceRow datasourceRow = DatasourceRowMapper.map(connectionUrl, name);
+    UUID uuid = UUID.randomUUID();
+    DatasourceRow datasourceRow = DatasourceRowMapper.map(uuid, connectionUrl, name);
     datasourceDao.insert(datasourceRow);
-    final Optional<DatasourceRow> datasourceRowIfFound =
-        datasourceDao.findBy(datasourceRow.getUuid());
+    final Optional<DatasourceRow> datasourceRowIfFound = datasourceDao.findBy(uuid);
     try {
       return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezException::new);
     } catch (MarquezException e) {

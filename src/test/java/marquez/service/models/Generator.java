@@ -165,9 +165,9 @@ public class Generator {
     int random = (int) (Math.random() * 50 + 1);
     int random2 = (int) (Math.random() * 50 + 1);
     return new Datasource(
-        Instant.now(),
         DatasourceName.fromString("mysql_cluster_" + random),
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists"));
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_" + random2),
+        Instant.now());
   }
 
   // Data Source Rows

@@ -7,14 +7,12 @@ import static org.junit.Assert.assertEquals;
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import marquez.MarquezException;
 import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
 import marquez.db.DatasourceDao;
 import marquez.db.fixtures.AppWithPostgresRule;
 import marquez.service.DatasourceService;
-import marquez.service.exceptions.UnexpectedException;
 import marquez.service.models.Datasource;
 import marquez.service.models.Generator;
 import org.junit.After;
@@ -61,7 +59,6 @@ public class DatasourceIntegrationTest {
   @Test
   public void testListDatasourceResponseCorrect() throws MarquezException {
     Datasource ds1 = Generator.genDatasource();
-
     datasourceService.create(ds1.getConnectionUrl(), ds1.getDatasourceName());
 
     final Response res =

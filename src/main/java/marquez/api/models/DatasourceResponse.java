@@ -12,6 +12,6 @@ import lombok.ToString;
 @ToString
 public class DatasourceResponse {
   @Getter @NonNull private String name;
-  @Getter @NonNull private String createdAt;
   @Getter @NonNull private String connectionUrl;
+  @Getter @NonNull private String createdAt;
 }

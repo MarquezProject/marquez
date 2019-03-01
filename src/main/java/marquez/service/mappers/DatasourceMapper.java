@@ -29,9 +29,9 @@ public class DatasourceMapper {
 
   public static Datasource map(@NonNull DatasourceRow datasourceRow) {
     return new Datasource(
-        datasourceRow.getCreatedAt().get(),
         DatasourceName.fromString(datasourceRow.getName()),
-        ConnectionUrl.fromString(datasourceRow.getConnectionUrl()));
+        ConnectionUrl.fromString(datasourceRow.getConnectionUrl()),
+        datasourceRow.getCreatedAt().get());
   }
 
   public static List<Datasource> map(@NonNull List<DatasourceRow> datasourceRows) {
