@@ -54,7 +54,7 @@ public class JobTest {
   }
 
   @Test
-  public void testJobInequalityOnNonIDField() {
+  public void testJobInequalityOnNonIdField() {
     Job j2 =
         new Job(
             JOB_NAME,

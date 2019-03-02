@@ -14,7 +14,6 @@
 
 package marquez.api.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -27,7 +26,5 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class NamespacesResponse {
-  @JsonProperty("namespaces")
-  @Getter
-  private List<NamespaceResponse> namespaces;
+  @Getter private List<NamespaceResponse> namespaces;
 }
