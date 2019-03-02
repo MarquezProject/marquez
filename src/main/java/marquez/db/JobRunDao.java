@@ -52,7 +52,7 @@ public interface JobRunDao {
     insert(jobRun);
   }
 
-  @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE guid = :job_run_id")
+  @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE guid = :jobRunID")
   void updateCurrentState(UUID jobRunID, Integer state);
 
   @Transaction

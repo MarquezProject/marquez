@@ -26,9 +26,9 @@ public interface JobRunArgsDao {
   @SqlUpdate("INSERT INTO job_run_args(hex_digest, args_json) VALUES (:hexDigest, :json)")
   void insert(@BindBean RunArgs runArgs);
 
-  @SqlQuery("SELECT COUNT(*) > 0 FROM job_run_args WHERE hex_digest=:digest")
+  @SqlQuery("SELECT COUNT(*) > 0 FROM job_run_args WHERE hex_digest=:hexDigest")
   boolean digestExists(String hexDigest);
 
-  @SqlQuery("SELECT * FROM job_run_args WHERE hex_digest=:digest LIMIT 1")
+  @SqlQuery("SELECT * FROM job_run_args WHERE hex_digest=:hexDigest LIMIT 1")
   RunArgs findByDigest(String hexDigest);
 }

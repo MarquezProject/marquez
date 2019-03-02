@@ -37,9 +37,9 @@ public interface JobVersionDao {
       "SELECT jv.* \n"
           + "FROM job_versions jv\n"
           + "INNER JOIN jobs j "
-          + " ON (j.guid = jv.job_guid AND j.name=:job_name)"
+          + " ON (j.guid = jv.job_guid AND j.name=:jobName)"
           + "INNER JOIN namespaces n "
-          + " ON (n.guid = j.namespace_guid AND n.name=:namespace_name)\n"
+          + " ON (n.guid = j.namespace_guid AND n.name=:namespace)\n"
           + "ORDER BY created_at")
   List<JobVersion> find(String namespace, String jobName);
 
@@ -47,9 +47,9 @@ public interface JobVersionDao {
       "SELECT jv.* \n"
           + "FROM job_versions jv\n"
           + "INNER JOIN jobs j "
-          + " ON (j.guid = jv.job_guid AND j.name=:job_name)"
+          + " ON (j.guid = jv.job_guid AND j.name=:jobName)"
           + "INNER JOIN namespaces n "
-          + " ON (n.guid = j.namespace_guid AND n.name=:namespace_name)\n"
+          + " ON (n.guid = j.namespace_guid AND n.name=:namespace)\n"
           + "ORDER BY created_at DESC \n"
           + "LIMIT 1")
   JobVersion findLatest(String namespace, String jobName);

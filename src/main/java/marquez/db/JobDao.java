@@ -36,7 +36,7 @@ public interface JobDao {
           + " VALUES (:guid, :name, :namespaceGuid, :description, :inputDatasetUrns, :outputDatasetUrns)")
   public void insert(@BindBean Job job);
 
-  @SqlUpdate("UPDATE jobs SET current_version_guid = :version_guid WHERE guid = :job_guid")
+  @SqlUpdate("UPDATE jobs SET current_version_guid = :currentVersionGuid WHERE guid = :jobGuid")
   public void setCurrentVersionGuid(UUID jobGuid, UUID currentVersionGuid);
 
   @Transaction
@@ -56,7 +56,7 @@ public interface JobDao {
           + "INNER JOIN job_versions jv "
           + "    ON (j.current_version_guid = jv.guid) "
           + "INNER JOIN namespaces n "
-          + "    ON (j.namespace_guid = n.guid AND n.name = :ns_name AND j.name = :job_name)")
+          + "    ON (j.namespace_guid = n.guid AND n.name = :namespace AND j.name = :name)")
   Job findByName(String namespace, String name);
 
   @SqlQuery(
@@ -65,6 +65,6 @@ public interface JobDao {
           + "INNER JOIN job_versions jv "
           + " ON (j.current_version_guid = jv.guid) "
           + "INNER JOIN namespaces n "
-          + " ON (j.namespace_guid = n.guid AND n.name = :ns_name)")
+          + " ON (j.namespace_guid = n.guid AND n.name = :namespaceName)")
   List<Job> findAllInNamespace(String namespaceName);
 }
