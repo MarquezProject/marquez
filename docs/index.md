@@ -20,8 +20,8 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 Marquez consists of the following core architectural components:
 
-* **Metadata Repository**: stores all dataset metadata, including job state (total execution time, success/failure, etc).
-* **Metadata API**: RESTful API enabling a diverse set of clients to begin collecting metadata around data production and consumption.
+* **Metadata Repository**: stores all job and dataset metadata, including previous job run history [ ] statistics (i.e. total runs, average execution time, success/failure, etc).
+* **Metadata API**: RESTful API enabling a diverse set of clients to begin collecting metadata around dataset production and consumption.
 * **Metadata UI**: used for dataset discovery, connecting multiple datasets and exploring their dependency graph.
 
 <br/>
@@ -38,14 +38,15 @@ Metadata needs to be collected, organized and stored in a way to allow for rich 
 
 ## Data Model
 
-The diagram below shows the metadata collected by Marquez at different points i 
- ensuring mutations are track of job and dataset mutations.
+The diagram below shows the metadata collected by Marquez 
+
+ different points i ensuring mutations are track of job and dataset mutations.
 
 <p align="center">
   <img src="./assets/images/model.png">
 </p>
 
-**Job**: A job has a unique _name_, a _description_ and an _owner_ (team-based), with one or more input/out _datasets_. It's possible for a job to have only a input datasets
+**Job**: A job has a unique _name_, a _description_ and an _owner_, with one or more input / out _datasets_. It's possible for a job to have only input datasets. Marquez will create _versions_ of a job each time the contents of the object is modified.
 
 **Job Version:** A read-only immutable _version_ of a job, with a unique referenceable versioned artifact preserving the reproducibility of builds from source. Marquez uses versio []. In the digram above, `v1` to `v2`
 
@@ -55,11 +56,10 @@ The diagram below shows the metadata collected by Marquez at different points i
 
 ## Roadmap
 
-* [Airflow](https://airflow.apache.org) interfation
-* [Icerberg](http://iceberg.incubator.apache.org) support
-* Steaming integration ([Kafka](https://kafka.apache.org))
-* Event-based triggers
-* Define modules
+* Add Marquez support for [Airflow](https://airflow.apache.org)
+* Add Marquez support for [Kafka](https://kafka.apache.org)
+* Datasets [Icerberg](http://iceberg.incubator.apache.org) support
+* Begin [modules] 
 
 
 ## Contributing
