@@ -7,6 +7,8 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import DatasetTable from './DatasetTable';
 import MUIDataTable from "mui-datatables";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 import axios from 'axios'
 
 function TabContainer(props) {
@@ -63,7 +65,18 @@ class SimpleTabs extends React.Component {
 
     const options = {
         filter: true,
-        filterType: 'dropdown'
+        filterType: 'dropdown',
+        expandableRows: true,
+        renderExpandableRow: (rowData, rowMeta) => {
+          const colSpan = rowData.length + 1;
+          return (
+            <TableRow>
+              <TableCell colSpan={colSpan}>
+                Custom expandable row option. Data: {JSON.stringify(rowData)}
+              </TableCell>
+            </TableRow>
+          );
+        }   
     };
 
     return (
