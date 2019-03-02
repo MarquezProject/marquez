@@ -24,7 +24,7 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
 
 Marquez consists of the following system components:
 
-* **Metadata Repository**: stores all job and dataset metadata, including previous job run history [ ] statistics (i.e. total runs, average execution time, success/failure, etc).
+* **Metadata Repository**: stores all job and dataset metadata, including a complete history of job runs and job-level statistics (i.e. total runs, average execution time, success/failures, etc).
 * **Metadata API**: RESTful API enabling a diverse set of clients to begin collecting metadata around dataset production and consumption.
 * **Metadata UI**: used for dataset discovery, connecting multiple datasets and exploring their dependency graph.
 
@@ -34,11 +34,11 @@ Marquez consists of the following system components:
   <img src="./assets/images/design.png">
 </p>
 
-To ease adoption and enable a diverse set of data processing applications (Clients) to build metadata collection as a core requirement into their design, we will provide language-specific SDKs that implement the Metadata API. In our initial release, we will provide support for Python.
+To ease adoption and enable a diverse set of data processing applications to build metadata collection as a core requirement into their design, Marquez provides language-specific SDKs that implement the **Metadata API**. As part of our initial release, we have provided support for Python.
 
-The Metadata API is an abstraction for recording information around the production and consumption of datasets. It needs to be a low-latency, highly-available stateless layer responsible for encapsulating both metadata persistence and aggregation of lineage information. The API will allow clients to collect and/or obtain dataset information to/from the Metadata Repository.
+The Metadata API is an abstraction for recording information around the production and consumption of datasets. It's a low-latency, highly-available stateless layer responsible for encapsulating both metadata persistence and aggregation of lineage information. The API allows clients to collect and/or obtain dataset information to/from the **Metadata Repository**.
 
-Metadata needs to be collected, organized and stored in a way to allow for rich exploratory queries via the [Marquez UI](https://github.com/MarquezProject/marquez-web). The **Metadata Repository** will serve as a catalog of dataset information encapsulated and cleanly abstracted away by the [Marquez API]().
+Metadata needs to be collected, organized and stored in a way to allow for rich exploratory queries via the **Marquez UI**. The Metadata Repository serves as a catalog of dataset information encapsulated and cleanly abstracted away by the Metadata API.
 
 ## Data Model
 
