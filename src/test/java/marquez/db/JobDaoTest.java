@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import marquez.db.fixtures.AppWithPostgresRule;
 import marquez.service.models.Generator;
-import marquez.service.models.Job;
+import marquez.service.models.JobResponse;
 import marquez.service.models.JobVersion;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
