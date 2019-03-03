@@ -45,30 +45,30 @@ public class DatasetResourceTest {
   private static final Integer LIMIT = 100;
   private static final Integer OFFSET = 0;
 
-  private final NamespaceService mockNamespaceService = mock(NamespaceService.class);
-  private final DatasetService mockDatasetService = mock(DatasetService.class);
+  private final NamespaceService namespaceService = mock(NamespaceService.class);
+  private final DatasetService datasetService = mock(DatasetService.class);
   private final DatasetResource datasetResource =
-      new DatasetResource(mockNamespaceService, mockDatasetService);
+      new DatasetResource(namespaceService, datasetService);
 
   @Test(expected = NullPointerException.class)
-  public void testNamespaceServiceNull() {
+  public void testNewDatasetResource_throwsException_onNullNamespaceService() {
     final NamespaceService nullNamespaceService = null;
-    new DatasetResource(nullNamespaceService, mockDatasetService);
+    new DatasetResource(nullNamespaceService, datasetService);
   }
 
   @Test(expected = NullPointerException.class)
-  public void testDatasetServiceNull() {
+  public void testNewDatasetResource_throwsException_onNullDatasetService() {
     final DatasetService nullDatasetService = null;
-    new DatasetResource(mockNamespaceService, nullDatasetService);
+    new DatasetResource(namespaceService, nullDatasetService);
   }
 
   @Test
-  public void testListDatasets200() throws MarquezServiceException {
-    when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
+  public void testList_http200() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
 
     final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
     final List<Dataset> datasets = Arrays.asList(dataset);
-    when(mockDatasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasets);
+    when(datasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasets);
 
     final Response response = datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
     assertEquals(OK, response.getStatusInfo());
@@ -79,12 +79,12 @@ public class DatasetResourceTest {
     assertEquals(DATASET_URN.getValue(), datasetsResponses.get(0).getUrn());
     assertEquals(CREATED_AT.toString(), datasetsResponses.get(0).getCreatedAt());
 
-    verify(mockDatasetService, times(1)).getAll(NAMESPACE_NAME, LIMIT, OFFSET);
+    verify(datasetService, times(1)).getAll(NAMESPACE_NAME, LIMIT, OFFSET);
   }
 
   @Test(expected = WebApplicationException.class)
-  public void testListDatasetsNamespaceDoesNotExist() throws MarquezServiceException {
-    when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
+  public void testList_throwsException_onNamespaceDoesNotExist() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
 
     datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
   }
