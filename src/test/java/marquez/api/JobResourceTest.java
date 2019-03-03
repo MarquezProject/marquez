@@ -76,7 +76,7 @@ public class JobResourceTest {
 
   @Test
   public void testJobCreationWithInvalidNamespace() throws MarquezServiceException {
-    Job jobForJobCreationRequest = generateApiJob();
+    JobResponse jobForJobCreationRequest = generateApiJob();
 
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
@@ -90,14 +90,14 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
 
-    Job jobForJobCreationRequest = generateApiJob();
+    JobResponse jobForJobCreationRequest = generateApiJob();
     Response res = insertJob(jobForJobCreationRequest);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
 
   @Test
   public void testGetJobWithInvalidNamespace() throws MarquezServiceException {
-    Job jobForJobCreationRequest = generateApiJob();
+    JobResponse jobForJobCreationRequest = generateApiJob();
 
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
@@ -121,7 +121,7 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
 
-    Job jobForJobCreationRequest = generateApiJob();
+    JobResponse jobForJobCreationRequest = generateApiJob();
     jobForJobCreationRequest.setLocation(null);
 
     Response res = insertJob(jobForJobCreationRequest);
@@ -133,7 +133,7 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
 
-    Job jobForJobCreationRequest = generateApiJob();
+    JobResponse jobForJobCreationRequest = generateApiJob();
     jobForJobCreationRequest.setDescription(null);
 
     insertJob(jobForJobCreationRequest);
@@ -183,9 +183,9 @@ public class JobResourceTest {
 
   @Test
   public void testGetAllJobsInNamespace() throws MarquezServiceException {
-    marquez.service.models.Job job1 = Generator.genJob();
-    marquez.service.models.Job job2 = Generator.genJob();
-    List<marquez.service.models.Job> jobsList = Arrays.asList(job1, job2);
+    marquez.service.models.JobResponse job1 = Generator.genJob();
+    marquez.service.models.JobResponse job2 = Generator.genJob();
+    List<marquez.service.models.JobResponse> jobsList = Arrays.asList(job1, job2);
 
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
     when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME)).thenReturn(jobsList);
@@ -193,7 +193,7 @@ public class JobResourceTest {
     String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    List<Job> returnedJobs = res.readEntity(JobsResponse.class).getJobs();
+    List<JobResponse> returnedJobs = res.readEntity(JobsResponse.class).getJobs();
     assertThat(returnedJobs).hasSize(jobsList.size());
   }
 
@@ -332,7 +332,7 @@ public class JobResourceTest {
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
   }
 
-  private Response insertJob(Job job) {
+  private Response insertJob(JobResponse job) {
     JobRequest jobRequest =
         new JobRequest(
             job.getInputDatasetUrns(),
@@ -396,13 +396,13 @@ public class JobResourceTest {
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).put(EMPTY_PUT_BODY);
   }
 
-  Job generateApiJob() {
+  JobResponse generateApiJob() {
     String jobName = "myJob" + System.currentTimeMillis();
     final String location = "someLocation";
     final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    return new Job(jobName, null, inputList, outputList, location, description);
+    return new JobResponse(jobName, null, inputList, outputList, location, description);
   }
 
   JobRunResponse generateApiJobRun() {
