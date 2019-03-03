@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import marquez.db.fixtures.AppWithPostgresRule;
 import marquez.service.models.Generator;
-import marquez.service.models.Job;
+import marquez.service.models.JobResponse;
 import marquez.service.models.JobVersion;
 import org.junit.After;
 import org.junit.Before;
