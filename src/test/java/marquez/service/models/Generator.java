@@ -36,14 +36,14 @@ public class Generator {
     return String.format("urn:rand:%d.%d.%d", randNum(), randNum(), randNum());
   }
 
-  // Jobs
-  public static Job genJob() {
+  // JobResponse
+  public static JobResponse genJob() {
     return genJob(UUID.randomUUID());
   }
 
-  public static Job genJob(UUID namespaceID) {
+  public static JobResponse genJob(UUID namespaceID) {
     int jobNum = randNum();
-    return new Job(
+    return new JobResponse(
         UUID.randomUUID(),
         "job" + jobNum,
         "http://foo.bar/" + jobNum,
@@ -53,8 +53,8 @@ public class Generator {
         Arrays.asList(randUrn(), randUrn()));
   }
 
-  public static Job cloneJob(Job job) {
-    return new Job(
+  public static JobResponse cloneJob(JobResponse job) {
+    return new JobResponse(
         job.getGuid(),
         job.getName(),
         job.getLocation(),
@@ -121,7 +121,7 @@ public class Generator {
         UUID.randomUUID(), jobID, "http://foo.bar", UUID.randomUUID(), null, null, null);
   }
 
-  public static JobVersion genJobVersion(Job job) {
+  public static JobVersion genJobVersion(JobResponse job) {
     return new JobVersion(
         UUID.randomUUID(), job.getGuid(), job.getLocation(), UUID.randomUUID(), null, null, null);
   }
