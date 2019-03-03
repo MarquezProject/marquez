@@ -80,15 +80,15 @@ public class JobIntegrationTest extends JobRunBaseTest {
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 
-    marquez.service.models.Job job = Generator.genJob(generatedNamespace.getGuid());
-    marquez.service.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
+    marquez.service.models.JobResponse job = Generator.genJob(generatedNamespace.getGuid());
+    marquez.service.models.JobResponse createdJob = jobService.createJob(NAMESPACE_NAME, job);
 
     CREATED_JOB_NAME = createdJob.getName();
   }
 
   @Test
   public void testJobCreationResponseEndToEnd() {
-    Job jobForJobCreationRequest = generateApiJob();
+    JobResponse jobForJobCreationRequest = generateApiJob();
 
     Response res = createJobOnNamespace(NAMESPACE_NAME, jobForJobCreationRequest);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
@@ -97,7 +97,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
   @Test
   public void testJobGetterResponseEndToEnd() {
-    Job jobForJobCreationRequest = generateApiJob();
+    JobResponse jobForJobCreationRequest = generateApiJob();
 
     Response res = createJobOnNamespace(NAMESPACE_NAME, jobForJobCreationRequest);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
@@ -242,8 +242,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
     assertThat(getJobRunResponse.getRunState()).isEqualTo(JobRunState.State.ABORTED.name());
   }
 
-  private void evaluateResponse(Response res, Job inputJob) {
-    Job responseJob = res.readEntity(Job.class);
+  private void evaluateResponse(Response res, JobResponse inputJob) {
+    JobResponse responseJob = res.readEntity(JobResponse.class);
     assertEquals(inputJob.getName(), responseJob.getName());
     assertEquals(inputJob.getDescription(), responseJob.getDescription());
     assertEquals(inputJob.getLocation(), responseJob.getLocation());
@@ -254,7 +254,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
     assertNotNull(responseJob.getCreatedAt());
   }
 
-  private Response createJobOnNamespace(String namespace, Job job) {
+  private Response createJobOnNamespace(String namespace, JobResponse job) {
     JobRequest jobRequest =
         new JobRequest(
             job.getInputDatasetUrns(),
@@ -270,13 +270,13 @@ public class JobIntegrationTest extends JobRunBaseTest {
         .put(Entity.json(jobRequest));
   }
 
-  static Job generateApiJob() {
+  static JobResponse generateApiJob() {
     String jobName = "myJob" + System.currentTimeMillis();
     final String location = "someLocation";
     final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    return new Job(jobName, null, inputList, outputList, location, description);
+    return new JobResponse(jobName, null, inputList, outputList, location, description);
   }
 
   private JobRunResponse getJobRunApiResponse(UUID jobRunGuid) {
