@@ -42,8 +42,8 @@ public class DatasetResourceTest {
   private static final DatasetUrn DATASET_URN = Generator.genDatasetUrn();
   private static final Instant CREATED_AT = Instant.now();
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
-  private static final Integer LIMIT = 100;
-  private static final Integer OFFSET = 0;
+  private static final int LIMIT = 100;
+  private static final int OFFSET = 0;
 
   private final NamespaceService namespaceService = mock(NamespaceService.class);
   private final DatasetService datasetService = mock(DatasetService.class);
