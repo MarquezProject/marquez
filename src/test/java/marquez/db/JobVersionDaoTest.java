@@ -37,7 +37,7 @@ public class JobVersionDaoTest {
   final JobVersionDao jobVersionDao = APP.onDemand(JobVersionDao.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
-  final Job job = Generator.genJob(nsID);
+  final JobResponse job = Generator.genJob(nsID);
 
   @Before
   public void setUp() {
@@ -98,7 +98,7 @@ public class JobVersionDaoTest {
   @Test
   public void testFind_Multi() {
     // add some unrelated jobs and job versions
-    Job unrelatedJob = Generator.genJob(nsID);
+    JobResponse unrelatedJob = Generator.genJob(nsID);
     jobDao.insert(unrelatedJob);
     JobVersion dontWant1 = Generator.genJobVersion(unrelatedJob);
     JobVersion dontWant2 = Generator.genJobVersion(unrelatedJob);
