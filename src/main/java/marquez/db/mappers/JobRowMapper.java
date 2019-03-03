@@ -19,15 +19,15 @@ import java.sql.SQLException;
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
-import marquez.service.models.Job;
+import marquez.service.models.JobResponse;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public final class JobRowMapper implements RowMapper<Job> {
+public final class JobRowMapper implements RowMapper<JobResponse> {
   @Override
-  public Job map(@NonNull ResultSet results, @NonNull StatementContext context)
+  public JobResponse map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    return new Job(
+    return new JobResponse(
         results.getObject(Columns.ROW_UUID, UUID.class),
         results.getString(Columns.NAME),
         results.getString(Columns.LOCATION),
