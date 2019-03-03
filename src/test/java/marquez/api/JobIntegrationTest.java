@@ -30,7 +30,7 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.api.models.Job;
+import marquez.api.models.JobResponse;
 import marquez.api.models.JobRequest;
 import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
