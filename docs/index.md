@@ -4,11 +4,11 @@ layout: default
 
 ## Overview
 
-Marquez is an open source platform-agnostic **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the provenance of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
+Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the provenance of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
 
 ## Why Marquez?
 
-Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Data_lineage) queries accross _all datasets_, while reliably and efficiently associating (upstream, downstream) dependencies between jobs and the datasets they produce and consume. Marquez is a modular system and has been designed to scalably collect and catalog metadata.
+Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Data_lineage) queries accross _all datasets_, while reliably and efficiently associating (_upstream_, _downstream_) dependencies between jobs and the datasets they produce and consume.
 
 ### Key Features
 
@@ -22,11 +22,11 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
 
 ## Design
 
-Marquez consists of the following system components:
+Marquez is a modular system and has been designed as a highly scalable, highly extensible platform-agnostic solution for metadata management. It consists of the following system components:
 
-* **Metadata Repository**: stores all job and dataset metadata, including a complete history of job runs and job-level statistics (i.e. total runs, average execution time, success/failures, etc).
+* **Metadata Repository**: Stores all job and dataset metadata, including a complete history of job runs and job-level statistics (i.e. total runs, average runtimes, success/failures, etc).
 * **Metadata API**: RESTful API enabling a diverse set of clients to begin collecting metadata around dataset production and consumption.
-* **Metadata UI**: used for dataset discovery, connecting multiple datasets and exploring their dependency graph.
+* **Metadata UI**: Used for dataset discovery, connecting multiple datasets and exploring their dependency graph.
 
 <br/>
 
@@ -38,11 +38,11 @@ To ease adoption and enable a diverse set of data processing applications to bui
 
 The Metadata API is an abstraction for recording information around the production and consumption of datasets. It's a low-latency, highly-available stateless layer responsible for encapsulating both metadata persistence and aggregation of lineage information. The API allows clients to collect and/or obtain dataset information to/from the **Metadata Repository**.
 
-Metadata needs to be collected, organized and stored in a way to allow for rich exploratory queries via the **Marquez UI**. The Metadata Repository serves as a catalog of dataset information encapsulated and cleanly abstracted away by the Metadata API.
+Metadata needs to be collected, organized and stored in a way to allow for rich exploratory queries via the **Metadata UI**. The Metadata Repository serves as a catalog of dataset information encapsulated and cleanly abstracted away by the Metadata API.
 
 ## Data Model
 
-The diagram below shows the metadata collected by Marquez 
+The diagram below shows the metadata collected by Marquez. 
 
  different points i ensuring mutations are track of job and dataset mutations.
 
@@ -50,7 +50,7 @@ The diagram below shows the metadata collected by Marquez
   <img src="./assets/images/model.png">
 </p>
 
-**Job**: A job has a unique _name_, a _description_ and an _owner_, with one or more input / out _datasets_. It's possible for a job to have only input datasets. Marquez will create _versions_ of a job each time the contents of the object is modified.
+**Job**: A job has a unique _name_, a _description_ and an _owner_, with one or more input / out _datasets_. It's possible for a job to have only input datasets. Marquez will create a _version_ of a job each time the job has been modified.
 
 **Job Version:** A read-only immutable _version_ of a job, with a unique referenceable versioned artifact preserving the reproducibility of builds from source. Marquez uses versio []. In the digram above, `v1` to `v2`
 
