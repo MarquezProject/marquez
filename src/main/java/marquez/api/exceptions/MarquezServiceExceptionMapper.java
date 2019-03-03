@@ -19,13 +19,14 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import lombok.NonNull;
 import marquez.api.models.ErrorResponse;
 import marquez.service.exceptions.MarquezServiceException;
 
 public final class MarquezServiceExceptionMapper
     implements ExceptionMapper<MarquezServiceException> {
   @Override
-  public Response toResponse(MarquezServiceException e) {
+  public Response toResponse(@NonNull MarquezServiceException e) {
     return Response.status(INTERNAL_SERVER_ERROR)
         .type(APPLICATION_JSON_TYPE)
         .entity(new ErrorResponse(INTERNAL_SERVER_ERROR.getStatusCode(), e.getMessage()))
