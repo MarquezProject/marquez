@@ -24,7 +24,6 @@ import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -67,12 +66,8 @@ public final class DatasetResource {
       throw new WebApplicationException(
           String.format("The namespace %s does not exist.", namespaceName.getValue()), NOT_FOUND);
     }
-    try {
-      final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
-      final List<DatasetResponse> datasetResponses = map(datasets);
-      return Response.ok(new DatasetsResponse(datasetResponses)).build();
-    } catch (Exception e) {
-      throw new InternalServerErrorException("unexpected error while fetching datasets", e);
-    }
+    final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
+    final List<DatasetResponse> datasetResponses = map(datasets);
+    return Response.ok(new DatasetsResponse(datasetResponses)).build();
   }
 }
