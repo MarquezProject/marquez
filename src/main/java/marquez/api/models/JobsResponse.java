@@ -24,5 +24,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JobsResponse {
-  @Getter private List<JobsResponsegit > jobs;
+  @Getter private List<JobsResponse> jobs;
 }

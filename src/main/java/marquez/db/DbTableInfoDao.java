@@ -20,7 +20,6 @@ import java.util.UUID;
 import marquez.db.mappers.DbTableInfoRowMapper;
 import marquez.db.models.DbTableInfoRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -32,8 +31,8 @@ public interface DbTableInfoDao {
   void insert(@BindBean DbTableInfoRow dbTableInfoRow);
 
   @SqlQuery("SELECT * FROM db_table_info WHERE uuid = :uuid")
-  Optional<DbTableInfoRow> findBy(@Bind("uuid") UUID uuid);
+  Optional<DbTableInfoRow> findBy(UUID uuid);
 
   @SqlQuery("SELECT * FROM db_table_info LIMIT :limit OFFSET :offset")
-  List<DbTableInfoRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);
+  List<DbTableInfoRow> findAll(Integer limit, Integer offset);
 }
