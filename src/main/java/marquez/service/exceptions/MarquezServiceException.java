@@ -14,12 +14,12 @@
 
 package marquez.service.exceptions;
 
+import lombok.NoArgsConstructor;
 import marquez.MarquezException;
 
+@NoArgsConstructor
 public final class MarquezServiceException extends MarquezException {
   private static final long serialVersionUID = 1L;
-
-  public MarquezServiceException() {}
 
   public MarquezServiceException(final Throwable cause) {
     super(cause);
