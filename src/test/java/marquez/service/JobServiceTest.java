@@ -23,7 +23,7 @@ import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
-import marquez.service.models.Job;
+import marquez.service.models.JobResponse;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
 import marquez.service.models.JobVersion;
@@ -57,7 +57,7 @@ public class JobServiceTest {
     reset(jobRunArgsDao);
   }
 
-  private void assertJobFieldsMatch(Job job1, Job job2) {
+  private void assertJobFieldsMatch(JobResponse job1, JobResponse job2) {
     assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
     assertEquals(job1.getGuid(), job2.getGuid());
     assertEquals(job1.getName(), job2.getName());
@@ -69,7 +69,7 @@ public class JobServiceTest {
 
   @Test
   public void testGetAll_OK() throws MarquezServiceException {
-    List<Job> jobs = new ArrayList<Job>();
+    List<JobResponse> jobs = new ArrayList<JobResponse>();
     jobs.add(Generator.genJob(namespaceID));
     jobs.add(Generator.genJob(namespaceID));
     when(jobDao.findAllInNamespace(TEST_NS)).thenReturn(jobs);
@@ -78,7 +78,7 @@ public class JobServiceTest {
 
   @Test
   public void testGetAll_NoJobs_OK() throws MarquezServiceException {
-    List<Job> jobs = new ArrayList<Job>();
+    List<JobResponse> jobs = new ArrayList<JobResponse>();
     when(jobDao.findAllInNamespace(TEST_NS)).thenReturn(jobs);
     Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS));
   }
@@ -111,12 +111,12 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_NewJob_OK() throws MarquezServiceException {
-    ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
+    ArgumentCaptor<JobResponse> jobCaptor = ArgumentCaptor.forClass(JobResponse.class);
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
-    Job job = Generator.genJob(namespaceID);
+    JobResponse job = Generator.genJob(namespaceID);
     when(jobDao.findByName(TEST_NS, job.getName())).thenReturn(null);
     when(jobDao.findByID(any(UUID.class))).thenReturn(job);
-    Job jobReturned = jobService.createJob(TEST_NS, job);
+    JobResponse jobReturned = jobService.createJob(TEST_NS, job);
     verify(jobDao).insertJobAndVersion(jobCaptor.capture(), jobVersionCaptor.capture());
     assertEquals(job.getNamespaceGuid(), jobReturned.getNamespaceGuid());
     assertEquals(job.getName(), jobReturned.getName());
@@ -128,12 +128,12 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_JobFound_OK() throws MarquezServiceException {
-    Job existingJob = Generator.genJob(namespaceID);
+    JobResponse existingJob = Generator.genJob(namespaceID);
     JobVersion existingJobVersion = Generator.genJobVersion(existingJob);
-    Job newJob = Generator.cloneJob(existingJob);
+    JobResponse newJob = Generator.cloneJob(existingJob);
     when(jobDao.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
     when(jobVersionDao.findByVersion(any(UUID.class))).thenReturn(existingJobVersion);
-    Job jobCreated = jobService.createJob(TEST_NS, newJob);
+    JobResponse jobCreated = jobService.createJob(TEST_NS, newJob);
     verify(jobDao, never()).insert(newJob);
     assertNotNull(jobCreated);
     assertJobFieldsMatch(existingJob, jobCreated);
@@ -142,12 +142,12 @@ public class JobServiceTest {
   @Test
   public void testCreate_NewVersion_OK() throws MarquezServiceException {
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
-    Job existingJob = Generator.genJob(namespaceID);
-    Job newJob = Generator.genJob(namespaceID);
+    JobResponse existingJob = Generator.genJob(namespaceID);
+    JobResponse newJob = Generator.genJob(namespaceID);
     when(jobDao.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
     when(jobVersionDao.findByVersion(any(UUID.class))).thenReturn(null);
     when(jobDao.findByID(existingJob.getGuid())).thenReturn(existingJob);
-    Job jobCreated = jobService.createJob(TEST_NS, newJob);
+    JobResponse jobCreated = jobService.createJob(TEST_NS, newJob);
     verify(jobDao, never()).insert(newJob);
     verify(jobVersionDao).insert(jobVersionCaptor.capture());
     assertEquals(jobCreated.getGuid(), jobVersionCaptor.getValue().getJobGuid());
@@ -156,8 +156,8 @@ public class JobServiceTest {
 
   @Test
   public void testCreate_JobAndVersionFound_NoInsert_OK() throws MarquezServiceException {
-    Job existingJob = Generator.genJob(namespaceID);
-    Job newJob = Generator.cloneJob(existingJob);
+    JobResponse existingJob = Generator.genJob(namespaceID);
+    JobResponse newJob = Generator.cloneJob(existingJob);
     UUID existingJobVersionID = JobService.computeVersion(existingJob);
     JobVersion existingJobVersion =
         new JobVersion(
@@ -184,7 +184,7 @@ public class JobServiceTest {
 
   @Test(expected = MarquezServiceException.class)
   public void testCreate_JobDaoException() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
+    JobResponse job = Generator.genJob(namespaceID);
     when(jobDao.findByName(eq(TEST_NS), any(String.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.createJob(TEST_NS, job);
@@ -201,7 +201,7 @@ public class JobServiceTest {
 
   @Test(expected = MarquezServiceException.class)
   public void testCreate_JobVersionDaoException() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
+    JobResponse job = Generator.genJob(namespaceID);
     UUID jobVersionID = JobService.computeVersion(job);
     when(jobDao.findByName(TEST_NS, job.getName())).thenReturn(job);
     when(jobVersionDao.findByVersion(jobVersionID))
@@ -211,7 +211,7 @@ public class JobServiceTest {
 
   @Test(expected = MarquezServiceException.class)
   public void testCreate_JobVersionInsertException() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
+    JobResponse job = Generator.genJob(namespaceID);
     when(jobDao.findByName(TEST_NS, job.getName())).thenReturn(job);
     when(jobVersionDao.findByVersion(any(UUID.class))).thenReturn(null);
     doThrow(UnableToExecuteStatementException.class)
