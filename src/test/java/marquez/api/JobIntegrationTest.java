@@ -124,7 +124,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   @Test
   public void testJobRunCreationEndToEnd() throws JsonProcessingException {
     Entity createJobRunRequestEntity =
-        Entity.json(MAPPER.writeValueAsString(new JobRunRequest(JOB_RUN_ARGS, null, null)));
+        Entity.json(MAPPER.writeValueAsString(new JobRunRequest(null, null, JOB_RUN_ARGS)));
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))

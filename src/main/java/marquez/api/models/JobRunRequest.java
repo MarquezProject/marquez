@@ -19,17 +19,15 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.NotBlank;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
 public final class JobRunRequest {
-  @Getter @NotBlank private final String runArgs;
   @Nullable private final String nominalStartTime;
   @Nullable private final String nominalEndTime;
+  @Nullable private final String runArgs;
 
   public Optional<String> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
@@ -37,5 +35,9 @@ public final class JobRunRequest {
 
   public Optional<String> getNominalEndTime() {
     return Optional.ofNullable(nominalEndTime);
+  }
+
+  public Optional<String> getRunArgs() {
+    return Optional.ofNullable(runArgs);
   }
 }

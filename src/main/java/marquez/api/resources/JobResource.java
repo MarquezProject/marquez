@@ -158,7 +158,7 @@ public final class JobResource {
           jobService.createJobRun(
               namespace,
               job,
-              request.getRunArgs(),
+              request.getRunArgs().orElse(null),
               request.getNominalStartTime().map(Timestamp::valueOf).orElse(null),
               request.getNominalEndTime().map(Timestamp::valueOf).orElse(null));
       return Response.status(Response.Status.CREATED)
