@@ -35,12 +35,14 @@ public class JobTest {
   private static final String LOCATION = "git://some/path/123";
 
   private static final JobResponse JOB =
-      new JobResponse(JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
+      new JobResponse(
+          JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
 
   @Test
   public void testJobEquality() {
     JobResponse j2 =
-        new JobResponse(JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
+        new JobResponse(
+            JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
     AssertionsForClassTypes.assertThat(JOB.equals(JOB));
     AssertionsForClassTypes.assertThat(JOB.equals(j2));
     AssertionsForClassTypes.assertThat(j2.equals(JOB));
@@ -49,7 +51,8 @@ public class JobTest {
   @Test
   public void testHashCodeEquality() {
     JobResponse j2 =
-        new JobResponse(JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
+        new JobResponse(
+            JOB_NAME, CREATED_AT, INPUT_DATA_SETS, OUTPUT_DATA_SETS, LOCATION, DESCRIPTION);
     assertEquals(JOB.hashCode(), j2.hashCode());
   }
 
