@@ -28,7 +28,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @ToString
 public final class NamespaceRequest {
   @Getter @NotBlank private final String owner;
-  @Nullable private String description;
+  @Nullable private final String description;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
