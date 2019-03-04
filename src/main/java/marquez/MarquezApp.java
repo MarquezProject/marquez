@@ -129,7 +129,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JobRunDao jobRunDao = jdbi.onDemand(JobRunDao.class);
     final JobRunArgsDao jobRunArgsDao = jdbi.onDemand(JobRunArgsDao.class);
     final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
-    final DatasourceDao dataSourceDao = jdbi.onDemand(DatasourceDao.class);
+    final DatasourceDao datasourceDao = jdbi.onDemand(DatasourceDao.class);
 
     final NamespaceService namespaceService = new NamespaceService(namespaceDao);
     final JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
@@ -139,7 +139,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new JobResource(namespaceService, jobService));
     env.jersey().register(new DatasetResource(namespaceService, new DatasetService(datasetDao)));
-    env.jersey().register(new DatasourceResource(new DatasourceService(dataSourceDao)));
+    env.jersey().register(new DatasourceResource(new DatasourceService(datasourceDao)));
 
     env.jersey().register(new ResourceExceptionMapper());
   }
