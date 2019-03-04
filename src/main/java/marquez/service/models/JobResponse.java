@@ -25,7 +25,7 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @EqualsAndHashCode
-public final class Job {
+public final class JobResponse {
   @NonNull @Getter private final UUID guid;
   @NonNull @Getter private final String name;
   @NonNull @Getter private final String location;
@@ -35,7 +35,7 @@ public final class Job {
   @Getter private final List<String> outputDatasetUrns;
   @Getter private final Timestamp createdAt;
 
-  public Job(
+  public JobResponse(
       final UUID guid,
       final String name,
       final String location,
