@@ -27,7 +27,7 @@ import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
 import marquez.service.exceptions.MarquezServiceException;
-import marquez.service.models.Job;
+import marquez.service.models.JobResponse;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
 import marquez.service.models.JobVersion;
@@ -52,7 +52,7 @@ public class JobService {
     this.jobRunArgsDao = jobRunArgsDao;
   }
 
-  public Optional<Job> getJob(String namespace, String jobName) throws MarquezServiceException {
+  public Optional<JobResponse> getJob(String namespace, String jobName) throws MarquezServiceException {
     try {
       return Optional.ofNullable(jobDao.findByName(namespace, jobName));
     } catch (UnableToExecuteStatementException e) {
@@ -62,12 +62,12 @@ public class JobService {
     }
   }
 
-  public Job createJob(String namespace, Job job) throws MarquezServiceException {
+  public JobResponse createJob(String namespace, JobResponse job) throws MarquezServiceException {
     try {
-      Job existingJob = this.jobDao.findByName(namespace, job.getName());
+      JobResponse existingJob = this.jobDao.findByName(namespace, job.getName());
       if (existingJob == null) {
-        Job newJob =
-            new Job(
+        JobResponse newJob =
+            new JobResponse(
                 UUID.randomUUID(),
                 job.getName(),
                 job.getLocation(),
@@ -78,8 +78,8 @@ public class JobService {
         jobDao.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
         return jobDao.findByID(newJob.getGuid());
       } else {
-        Job existingJobWithNewUri =
-            new Job(
+        JobResponse existingJobWithNewUri =
+            new JobResponse(
                 existingJob.getGuid(),
                 existingJob.getName(),
                 job.getLocation(),
@@ -102,7 +102,7 @@ public class JobService {
     }
   }
 
-  public List<Job> getAllJobsInNamespace(String namespace) throws MarquezServiceException {
+  public List<JobResponse> getAllJobsInNamespace(String namespace) throws MarquezServiceException {
     try {
       return jobDao.findAllInNamespace(namespace);
     } catch (UnableToExecuteStatementException e) {
@@ -208,7 +208,7 @@ public class JobService {
     }
   }
 
-  private static JobVersion createJobVersion(Job job) {
+  private static JobVersion createJobVersion(JobResponse job) {
     return new JobVersion(
         UUID.randomUUID(),
         job.getGuid(),
@@ -219,7 +219,7 @@ public class JobService {
         null);
   }
 
-  protected static UUID computeVersion(Job job) {
+  protected static UUID computeVersion(JobResponse job) {
     return UUID.nameUUIDFromBytes(
         String.format("%s:%s", job.getGuid(), job.getLocation()).getBytes());
   }
