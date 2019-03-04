@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public final class Job {
+public final class JobResponse {
   private String name;
 
   private Timestamp createdAt;

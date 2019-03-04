@@ -78,7 +78,7 @@ public final class JobResource {
       }
       final Job jobToCreate =
           apiJobToCoreJobMapper.map(
-              new marquez.api.models.Job(
+              new marquez.api.models.JobResponse(
                   job,
                   null,
                   request.getInputDatasetUrns(),
