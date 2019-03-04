@@ -14,19 +14,28 @@
 
 package marquez.api.models;
 
-import javax.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@EqualsAndHashCode
+@ToString
 public final class JobRunRequest {
+  @Getter @NotBlank private final String runArgs;
+  @Nullable private final String nominalStartTime;
+  @Nullable private final String nominalEndTime;
 
-  private String nominalStartTime;
+  public Optional<String> getNominalStartTime() {
+    return Optional.ofNullable(nominalStartTime);
+  }
 
-  private String nominalEndTime;
-
-  @NotNull private String runArgs;
+  public Optional<String> getNominalEndTime() {
+    return Optional.ofNullable(nominalEndTime);
+  }
 }
