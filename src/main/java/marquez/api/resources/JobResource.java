@@ -42,7 +42,7 @@ import marquez.api.models.JobsResponse;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
-import marquez.service.models.Job;
+import marquez.service.models.JobResponse;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
 
@@ -76,9 +76,9 @@ public final class JobResource {
       if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      final Job jobToCreate =
+      final JobResponse jobToCreate =
           apiJobToCoreJobMapper.map(
-              new marquez.api.models.Job(
+              new marquez.api.models.JobResponse(
                   job,
                   null,
                   request.getInputDatasetUrns(),
@@ -86,7 +86,7 @@ public final class JobResource {
                   request.getLocation(),
                   request.getDescription().orElse(null)));
       jobToCreate.setNamespaceGuid(namespaceService.get(namespace).get().getGuid());
-      final Job createdJob = jobService.createJob(namespace, jobToCreate);
+      final JobResponse createdJob = jobService.createJob(namespace, jobToCreate);
       return Response.status(Response.Status.CREATED)
           .entity(coreJobToApiJobMapper.map(createdJob))
           .build();
@@ -107,7 +107,7 @@ public final class JobResource {
       if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
       }
-      final Optional<Job> returnedJob = jobService.getJob(namespace, job);
+      final Optional<JobResponse> returnedJob = jobService.getJob(namespace, job);
       if (returnedJob.isPresent()) {
         return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
       }
@@ -128,7 +128,7 @@ public final class JobResource {
       if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      final List<Job> jobList = jobService.getAllJobsInNamespace(namespace);
+      final List<JobResponse> jobList = jobService.getAllJobsInNamespace(namespace);
       final JobsResponse response = new JobsResponse(coreJobToApiJobMapper.map(jobList));
       return Response.ok().entity(response).build();
     } catch (MarquezServiceException e) {
