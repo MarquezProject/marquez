@@ -20,7 +20,6 @@ import marquez.service.models.JobRun;
 import marquez.service.models.RunArgs;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -53,8 +52,8 @@ public interface JobRunDao {
     insert(jobRun);
   }
 
-  @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE guid = :job_run_id")
-  void updateCurrentState(@Bind("job_run_id") UUID jobRunID, @Bind("state") Integer state);
+  @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE guid = :jobRunID")
+  void updateCurrentState(UUID jobRunID, Integer state);
 
   @Transaction
   default void updateState(UUID jobRunID, Integer state) {
@@ -68,5 +67,5 @@ public interface JobRunDao {
           + "LEFT JOIN job_run_args jra "
           + " ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest) "
           + "WHERE jr.guid = :guid")
-  JobRun findJobRunById(@Bind("guid") UUID guid);
+  JobRun findJobRunById(UUID guid);
 }

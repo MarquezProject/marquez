@@ -21,7 +21,6 @@ import marquez.service.models.JobResponse;
 import marquez.service.models.JobVersion;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -37,9 +36,8 @@ public interface JobDao {
           + " VALUES (:guid, :name, :namespaceGuid, :description, :inputDatasetUrns, :outputDatasetUrns)")
   public void insert(@BindBean JobResponse job);
 
-  @SqlUpdate("UPDATE jobs SET current_version_guid = :version_guid WHERE guid = :job_guid")
-  public void setCurrentVersionGuid(
-      @Bind("job_guid") UUID jobGuid, @Bind("version_guid") UUID currentVersionGuid);
+  @SqlUpdate("UPDATE jobs SET current_version_guid = :currentVersionGuid WHERE guid = :jobGuid")
+  public void setCurrentVersionGuid(UUID jobGuid, UUID currentVersionGuid);
 
   @Transaction
   default void insertJobAndVersion(final JobResponse job, final JobVersion jobVersion) {
