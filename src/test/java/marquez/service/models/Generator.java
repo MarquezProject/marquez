@@ -185,7 +185,7 @@ public class Generator {
     return DatasetRow.builder()
         .uuid(UUID.randomUUID())
         .namespaceUuid(namespaceID)
-        .dataSourceUuid(dataSourceID)
+        .datasourceUuid(dataSourceID)
         .description("dataset " + randNum())
         .urn(DatasetUrn.fromString(randUrn()).toString())
         .build();
