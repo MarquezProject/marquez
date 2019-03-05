@@ -162,11 +162,9 @@ public class Generator {
 
   // Datasource
   public static Datasource genDatasource() {
-    int random = (int) (Math.random() * 50 + 1);
-    int random2 = (int) (Math.random() * 50 + 1);
     return new Datasource(
-        DatasourceName.fromString("mysql_cluster_" + random),
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_" + random2),
+        DatasourceName.fromString("mysql_cluster_" + randNum()),
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum()),
         Instant.now());
   }
 
@@ -176,7 +174,8 @@ public class Generator {
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .name("Data Source" + datasourceNum)
-        .connectionUrl("conn://" + datasourceNum)
+        .connectionUrl("jdbc:postgresql://localhost:5431/novelists_" + randNum())
+        .createdAt(Instant.now())
         .build();
   }
 

@@ -43,7 +43,8 @@ public class DatasourceService {
 
     try {
       datasourceDao.insert(datasourceRow);
-      final Optional<DatasourceRow> datasourceRowIfFound = datasourceDao.findBy(datasourceRow.getUuid());
+      final Optional<DatasourceRow> datasourceRowIfFound =
+          datasourceDao.findBy(datasourceRow.getUuid());
       return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezException::new);
     } catch (MarquezException e) {
       log.error(e.getMessage());

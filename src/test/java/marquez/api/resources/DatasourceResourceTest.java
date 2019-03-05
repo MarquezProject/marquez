@@ -1,78 +1,158 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.api.resources;
 
-import marquez.api.models.DatasetResponse;
-import marquez.api.models.DatasetsResponse;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.NamespaceName;
-import marquez.service.DatasetService;
-import marquez.service.NamespaceService;
-import marquez.service.exceptions.MarquezServiceException;
-import marquez.service.models.Dataset;
-import org.junit.Test;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-
 import static javax.ws.rs.core.Response.Status.OK;
-import static marquez.common.models.Description.NO_DESCRIPTION;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import io.dropwizard.testing.junit.ResourceTestRule;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.ws.rs.core.Response;
+import marquez.api.exceptions.ResourceException;
+import marquez.api.exceptions.ResourceExceptionMapper;
+import marquez.api.models.DatasourceRequest;
+import marquez.api.models.DatasourceResponse;
+import marquez.api.models.DatasourcesResponse;
+import marquez.service.DatasourceService;
+import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.models.Datasource;
+import marquez.service.models.Generator;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
 
 public class DatasourceResourceTest {
-    private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
-    private static final Instant CREATED_AT = Instant.now();
-    private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
-    private static final Integer LIMIT = 100;
-    private static final Integer OFFSET = 0;
 
-    private final NamespaceService mockNamespaceService = mock(NamespaceService.class);
-    private final DatasetService mockDatasetService = mock(DatasetService.class);
-    private final DatasetResource datasetResource =
-            new DatasetResource(mockNamespaceService, mockDatasetService);
+  private static final DatasourceService mockDatasourceService = mock(DatasourceService.class);
 
-    @Test(expected = NullPointerException.class)
-    public void testNamespaceServiceNull() {
-        final NamespaceService nullNamespaceService = null;
-        new DatasetResource(nullNamespaceService, mockDatasetService);
-    }
+  private static final DatasourceResource datasourceResource =
+      new DatasourceResource(mockDatasourceService);
 
-    @Test(expected = NullPointerException.class)
-    public void testDatasetServiceNull() {
-        final DatasetService nullDatasetService = null;
-        new DatasetResource(mockNamespaceService, nullDatasetService);
-    }
+  @ClassRule
+  public static final ResourceTestRule resources =
+      ResourceTestRule.builder()
+          .addResource(datasourceResource)
+          .addProvider(ResourceExceptionMapper.class)
+          .build();
 
-    @Test
-    public void testListDatasets200() throws MarquezServiceException {
-        when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
+  @Test(expected = NullPointerException.class)
+  public void testDatasourceServiceNull() {
+    final DatasourceService nullDatasourceService = null;
+    new DatasourceResource(nullDatasourceService);
+  }
 
-        final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
-        final List<Dataset> datasets = Arrays.asList(dataset);
-        when(mockDatasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasets);
+  @Before
+  public void setup() {
+    reset(mockDatasourceService);
+  }
 
-        final Response response = datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);
-        assertEquals(OK, response.getStatusInfo());
+  @Test
+  public void testListDatasources200_emptyset() {
+    when(mockDatasourceService.getAll(any(), any())).thenReturn(Collections.emptyList());
+    final Response datasourceResponse = datasourceResource.list(100, 0);
+    assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
-        final DatasetsResponse datasetsResponse = (DatasetsResponse) response.getEntity();
-        final List<DatasetResponse> datasetsResponses = datasetsResponse.getDatasetResponses();
-        assertEquals(1, datasetsResponses.size());
-        assertEquals(DATASET_URN.getValue(), datasetsResponses.get(0).getUrn());
-        assertEquals(CREATED_AT.toString(), datasetsResponses.get(0).getCreatedAt());
+    final DatasourcesResponse datasourcesResponse =
+        (DatasourcesResponse) datasourceResponse.getEntity();
+    assertThat(datasourcesResponse.getDatasources().size()).isEqualTo(0);
+  }
 
-        verify(mockDatasetService, times(1)).getAll(NAMESPACE_NAME, LIMIT, OFFSET);
-    }
+  @Test
+  public void testListDatasources200_singleset() {
+    when(mockDatasourceService.getAll(any(), any()))
+        .thenReturn(Collections.singletonList(Generator.genDatasource()));
+    final Response datasourceResponse = datasourceResource.list(100, 0);
+    assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
-    @Test(expected = WebApplicationException.class)
-    public void testListDatasetsNamespaceDoesNotExist() throws MarquezServiceException {
-        when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
+    final DatasourcesResponse datasourcesResponse =
+        (DatasourcesResponse) datasourceResponse.getEntity();
+    assertThat(datasourcesResponse.getDatasources().size()).isEqualTo(1);
+  }
 
-        datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);
-    }
+  @Test
+  public void testListDatasources200_multipleItems() {
+    final List<Datasource> resultSet = new ArrayList<>();
+    resultSet.add(Generator.genDatasource());
+    resultSet.add(Generator.genDatasource());
+
+    when(mockDatasourceService.getAll(any(), any())).thenReturn(resultSet);
+    final Response datasourceResponse = datasourceResource.list(100, 0);
+    assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
+
+    final DatasourcesResponse datasourcesResponse =
+        (DatasourcesResponse) datasourceResponse.getEntity();
+    assertThat(datasourcesResponse.getDatasources().size()).isEqualTo(2);
+  }
+
+  @Test
+  public void testListDatasourceResponseCorrect() {
+    final Datasource ds1 = Generator.genDatasource();
+    final List<Datasource> resultSet = Collections.singletonList(ds1);
+
+    when(mockDatasourceService.getAll(any(), any())).thenReturn(resultSet);
+
+    final Response datasourceResponse = datasourceResource.list(100, 0);
+    assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
+
+    final DatasourcesResponse datasourcesResponse =
+        (DatasourcesResponse) datasourceResponse.getEntity();
+    assertThat(datasourcesResponse.getDatasources().size()).isEqualTo(1);
+    final DatasourceResponse returnedDatasource = datasourcesResponse.getDatasources().get(0);
+
+    assertThat(returnedDatasource.getName()).isEqualTo(ds1.getDatasourceName().getValue());
+    assertThat(returnedDatasource.getConnectionUrl())
+        .isEqualTo(ds1.getConnectionUrl().getRawValue());
+  }
+
+  @Test
+  public void testCreateDatasource() throws MarquezServiceException, ResourceException {
+    final Datasource ds1 = Generator.genDatasource();
+
+    final DatasourceRequest validRequest =
+        new DatasourceRequest(
+            ds1.getConnectionUrl().getRawValue(), ds1.getDatasourceName().getValue());
+
+    when(mockDatasourceService.create(ds1.getConnectionUrl(), ds1.getDatasourceName()))
+        .thenReturn(ds1);
+
+    // When we submit it
+    final Response createDatasourceResponse = datasourceResource.create(validRequest);
+    assertThat(createDatasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
+    final DatasourceResponse returnedDatasource =
+        (DatasourceResponse) createDatasourceResponse.getEntity();
+
+    assertThat(returnedDatasource.getName()).isEqualTo(ds1.getDatasourceName().getValue());
+    assertThat(returnedDatasource.getConnectionUrl())
+        .isEqualTo(ds1.getConnectionUrl().getRawValue());
+  }
+
+  @Test(expected = ResourceException.class)
+  public void testInternalErrorHandling() throws MarquezServiceException, ResourceException {
+    final Datasource ds1 = Generator.genDatasource();
+
+    final DatasourceRequest validRequest =
+        new DatasourceRequest(
+            ds1.getConnectionUrl().getRawValue(), ds1.getDatasourceName().getValue());
+
+    when(mockDatasourceService.create(any(), any())).thenThrow(new MarquezServiceException());
+    datasourceResource.create(validRequest);
+  }
 }

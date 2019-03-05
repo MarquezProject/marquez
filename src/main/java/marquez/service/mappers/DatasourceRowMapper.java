@@ -33,8 +33,7 @@ public final class DatasourceRowMapper {
   }
 
   public static DatasourceRow map(
-      @NonNull ConnectionUrl connectionUrl,
-      @NonNull DatasourceName datasourceName) {
+      @NonNull ConnectionUrl connectionUrl, @NonNull DatasourceName datasourceName) {
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .name(datasourceName.getValue())
