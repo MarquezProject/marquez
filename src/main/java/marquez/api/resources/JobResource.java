@@ -158,13 +158,9 @@ public final class JobResource {
           jobService.createJobRun(
               namespace,
               job,
-              request.getRunArgs(),
-              request.getNominalStartTime() == null
-                  ? null
-                  : Timestamp.valueOf(request.getNominalStartTime()),
-              request.getNominalEndTime() == null
-                  ? null
-                  : Timestamp.valueOf(request.getNominalEndTime()));
+              request.getRunArgs().orElse(null),
+              request.getNominalStartTime().map(Timestamp::valueOf).orElse(null),
+              request.getNominalEndTime().map(Timestamp::valueOf).orElse(null));
       return Response.status(Response.Status.CREATED)
           .entity(coreJobRunToApiJobRunMapper.map(createdJobRun))
           .build();

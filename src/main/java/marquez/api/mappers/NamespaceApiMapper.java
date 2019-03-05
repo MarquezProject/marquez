@@ -29,6 +29,7 @@ public class NamespaceApiMapper extends Mapper<NamespaceResponse, Namespace> {
 
   public Namespace of(String namespaceName, NamespaceRequest request) {
     return map(
-        new NamespaceResponse(namespaceName, null, request.getOwner(), request.getDescription()));
+        new NamespaceResponse(
+            namespaceName, null, request.getOwner(), request.getDescription().orElse(null)));
   }
 }
