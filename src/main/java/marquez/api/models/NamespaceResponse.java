@@ -22,12 +22,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NamespaceResponse {
-
   String name;
-
   String createdAt;
-
   String owner;
-
   String description;
 }
