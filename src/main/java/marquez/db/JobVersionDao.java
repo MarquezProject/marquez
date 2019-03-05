@@ -20,7 +20,6 @@ import marquez.db.mappers.JobVersionRowMapper;
 import marquez.service.models.JobVersion;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -32,28 +31,28 @@ public interface JobVersionDao {
   JobDao createJobDao();
 
   @SqlQuery("SELECT * FROM job_versions WHERE version = :version")
-  JobVersion findByVersion(@Bind("version") UUID version);
+  JobVersion findByVersion(UUID version);
 
   @SqlQuery(
       "SELECT jv.* \n"
           + "FROM job_versions jv\n"
           + "INNER JOIN jobs j "
-          + " ON (j.guid = jv.job_guid AND j.name=:job_name)"
+          + " ON (j.guid = jv.job_guid AND j.name=:jobName)"
           + "INNER JOIN namespaces n "
-          + " ON (n.guid = j.namespace_guid AND n.name=:namespace_name)\n"
+          + " ON (n.guid = j.namespace_guid AND n.name=:namespace)\n"
           + "ORDER BY created_at")
-  List<JobVersion> find(@Bind("namespace_name") String namespace, @Bind("job_name") String jobName);
+  List<JobVersion> find(String namespace, String jobName);
 
   @SqlQuery(
       "SELECT jv.* \n"
           + "FROM job_versions jv\n"
           + "INNER JOIN jobs j "
-          + " ON (j.guid = jv.job_guid AND j.name=:job_name)"
+          + " ON (j.guid = jv.job_guid AND j.name=:jobName)"
           + "INNER JOIN namespaces n "
-          + " ON (n.guid = j.namespace_guid AND n.name=:namespace_name)\n"
+          + " ON (n.guid = j.namespace_guid AND n.name=:namespace)\n"
           + "ORDER BY created_at DESC \n"
           + "LIMIT 1")
-  JobVersion findLatest(@Bind("namespace_name") String namespace, @Bind("job_name") String jobName);
+  JobVersion findLatest(String namespace, String jobName);
 
   @SqlUpdate(
       "INSERT INTO job_versions(guid, version, job_guid, uri) VALUES (:guid, :version, :jobGuid, :uri)")

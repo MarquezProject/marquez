@@ -73,7 +73,7 @@ public class DatasetResourceTest {
     assertEquals(OK, response.getStatusInfo());
 
     final DatasetsResponse datasetsResponse = (DatasetsResponse) response.getEntity();
-    final List<DatasetResponse> datasetsResponses = datasetsResponse.getDatasetResponses();
+    final List<DatasetResponse> datasetsResponses = datasetsResponse.getDatasets();
     assertEquals(1, datasetsResponses.size());
     assertEquals(DATASET_URN.getValue(), datasetsResponses.get(0).getUrn());
     assertEquals(CREATED_AT.toString(), datasetsResponses.get(0).getCreatedAt());
