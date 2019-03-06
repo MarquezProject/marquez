@@ -71,7 +71,7 @@ public final class ConnectionUrl {
                   urlParts.length, URL_PART_COUNT));
         }
         final String datasourceString = urlParts[DATA_SOURCE_PART];
-        final DatasourceType datasourcType = DatasourceType.valueOf(datasourceString);
+        final DatasourceType datasourceType = DatasourceType.valueOf(datasourceString);
         final String dbNameString =
             urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
         final DbName dbName =
@@ -79,7 +79,7 @@ public final class ConnectionUrl {
                 dbNameString.contains(DB_PART_DELIM)
                     ? dbNameString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
                     : dbNameString);
-        return new ConnectionUrl(datasourcType, dbName, rawValue);
+        return new ConnectionUrl(datasourceType, dbName, rawValue);
       }
     },
     UNKNOWN("") {

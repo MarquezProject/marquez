@@ -21,6 +21,7 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import java.util.Optional;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -96,11 +97,19 @@ public final class DatasourceResource {
   @Produces(APPLICATION_JSON)
   public Response create(@NonNull final DatasourceRequest datasourceRequest)
       throws ResourceException {
+
+    final ConnectionUrl connectionUrl;
+    try {
+      connectionUrl = ConnectionUrl.fromString(datasourceRequest.getConnectionUrl());
+    } catch (IllegalArgumentException e) {
+      log.error(e.getMessage(), e);
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
     try {
       final Datasource createdDatasource =
           datasourceService.create(
-              ConnectionUrl.fromString(datasourceRequest.getConnectionUrl()),
-              DatasourceName.fromString(datasourceRequest.getName()));
+              connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
       return Response.ok(DatasourceResponseMapper.map(createdDatasource)).build();
     } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);

@@ -14,6 +14,7 @@
 
 package marquez.api.resources;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +37,9 @@ import marquez.api.exceptions.ResourceExceptionMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
+import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceId;
+import marquez.common.models.DatasourceName;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
@@ -180,6 +185,20 @@ public class DatasourceResourceTest {
     assertThat(returnedDatasource.getName()).isEqualTo(ds1.getName().getValue());
     assertThat(returnedDatasource.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
+  }
+
+  @Test
+  public void testCreateDatasource_invalidDatasource() throws ResourceException {
+    final String invalidDatasourceType = "xyz_postgres_999";
+
+    final String invalidConnectionUrl = "jdbc:" + invalidDatasourceType + "://localhost:5431/novelists";
+    final DatasourceRequest invalidDatasourceRequest = mock(DatasourceRequest.class);
+    when(invalidDatasourceRequest.getConnectionUrl()).thenReturn(invalidConnectionUrl);
+    when(invalidDatasourceRequest.getName()).thenReturn("mysql_cluster_2");
+
+    // When we submit it
+    final Response createDatasourceResponse = datasourceResource.create(invalidDatasourceRequest);
+    assertThat(createDatasourceResponse.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
   }
 
   @Test(expected = ResourceException.class)
