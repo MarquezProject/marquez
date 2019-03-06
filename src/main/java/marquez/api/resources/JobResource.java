@@ -45,6 +45,9 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
+import marquez.common.models.JobName;
+
+//main\java\marquez\common\models\JobName.java
 
 @Path("/api/v1")
 @Slf4j
@@ -79,7 +82,7 @@ public final class JobResource {
       final Job jobToCreate =
           apiJobToCoreJobMapper.map(
               new marquez.api.models.JobResponse(
-                  job,
+                  job.getVal(),
                   null,
                   request.getInputDatasetUrns(),
                   request.getOutputDatasetUrns(),
@@ -91,7 +94,7 @@ public final class JobResource {
           .entity(coreJobToApiJobMapper.map(createdJob))
           .build();
     } catch (MarquezServiceException e) {
-      log.error(format("Error creating the job <%s>:<%s>.", namespace, job), e);
+      log.error(format("Error creating the job <%s>:<%s>.", namespace, job.getVal()), e);
       throw new ResourceException();
     }
   }
@@ -107,7 +110,7 @@ public final class JobResource {
       if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
       }
-      final Optional<Job> returnedJob = jobService.getJob(namespace, job);
+      final Optional<Job> returnedJob = jobService.getJob(namespace, job.getVal());
       if (returnedJob.isPresent()) {
         return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
       }
@@ -150,14 +153,14 @@ public final class JobResource {
       if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      if (!jobService.getJob(namespace, job).isPresent()) {
-        log.error("Could not find job: " + job);
+      if (!jobService.getJob(namespace, job.getVal()).isPresent()) {
+        log.error("Could not find job: " + job.getVal());
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       JobRun createdJobRun =
           jobService.createJobRun(
               namespace,
-              job,
+              job.getVal(),
               request.getRunArgs().orElse(null),
               request.getNominalStartTime().map(Timestamp::valueOf).orElse(null),
               request.getNominalEndTime().map(Timestamp::valueOf).orElse(null));
