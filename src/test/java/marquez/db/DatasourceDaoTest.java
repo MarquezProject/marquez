@@ -39,12 +39,17 @@ public class DatasourceDaoTest {
   public static void setup() {
     final Jdbi jdbi = dbRule.getJdbi();
     datasourceDAO = jdbi.onDemand(DatasourceDao.class);
+
+    datasourceDAO.insert(Generator.genDatasourceRow());
+    datasourceDAO.insert(Generator.genDatasourceRow());
+    datasourceDAO.insert(Generator.genDatasourceRow());
   }
 
   @Test
   public void testCreate() {
     final DatasourceRow datasourceRow = Generator.genDatasourceRow();
     datasourceDAO.insert(datasourceRow);
+
     final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUuid());
     assertThat(returnedRow).isPresent();
 
@@ -62,24 +67,12 @@ public class DatasourceDaoTest {
 
   @Test
   public void testLimit() {
-    final DatasourceRow datasourceRow1 = Generator.genDatasourceRow();
-    final DatasourceRow datasourceRow2 = Generator.genDatasourceRow();
-    final DatasourceRow datasourceRow3 = Generator.genDatasourceRow();
-    datasourceDAO.insert(datasourceRow1);
-    datasourceDAO.insert(datasourceRow2);
-    datasourceDAO.insert(datasourceRow3);
     final List<DatasourceRow> returnedRows = datasourceDAO.findAll(2, 0);
     assertThat(returnedRows.size()).isEqualTo(2);
   }
 
   @Test
   public void testOffset() {
-    final DatasourceRow datasourceRow1 = Generator.genDatasourceRow();
-    final DatasourceRow datasourceRow2 = Generator.genDatasourceRow();
-    final DatasourceRow datasourceRow3 = Generator.genDatasourceRow();
-    datasourceDAO.insert(datasourceRow1);
-    datasourceDAO.insert(datasourceRow2);
-    datasourceDAO.insert(datasourceRow3);
     final List<DatasourceRow> returnedRows = datasourceDAO.findAll(100, 0);
     int returnedRowCount = returnedRows.size();
 
