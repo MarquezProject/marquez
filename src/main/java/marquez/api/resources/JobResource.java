@@ -102,13 +102,13 @@ public final class JobResource {
   @Produces(APPLICATION_JSON)
   @Timed
   public Response getJob(
-      @PathParam("namespace") final String namespace, @PathParam("job") JobName job)
+      @PathParam("namespace") final String namespace, @PathParam("job") JobName jobName)
       throws ResourceException {
     try {
       if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
       }
-      final Optional<Job> returnedJob = jobService.getJob(namespace, job.getVal());
+      final Optional<Job> returnedJob = jobService.getJob(namespace,  jobName.getVal());
       if (returnedJob.isPresent()) {
         return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
       }
@@ -144,21 +144,21 @@ public final class JobResource {
   @Path("namespaces/{namespace}/jobs/{job}/runs")
   public Response create(
       @PathParam("namespace") final String namespace,
-      @PathParam("job") JobName job,
+      @PathParam("job") JobName jobName,
       @Valid final JobRunRequest request)
       throws ResourceException {
     try {
       if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      if (!jobService.getJob(namespace, job.getVal()).isPresent()) {
-        log.error("Could not find job: " + job.getVal());
+      if (!jobService.getJob(namespace,  jobName.getVal()).isPresent()) {
+        log.error("Could not find job: " +  jobName.getVal());
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       JobRun createdJobRun =
           jobService.createJobRun(
               namespace,
-              job.getVal(),
+              jobName.getVal(),
               request.getRunArgs().orElse(null),
               request.getNominalStartTime().map(Timestamp::valueOf).orElse(null),
               request.getNominalEndTime().map(Timestamp::valueOf).orElse(null));
