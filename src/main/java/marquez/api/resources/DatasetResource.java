@@ -15,7 +15,6 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static marquez.api.mappers.DatasetResponseMapper.map;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
@@ -30,10 +29,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.mappers.DatasetMapper;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetRequest;
@@ -64,7 +63,7 @@ public final class DatasetResource {
   @Timed
   @Path("/datasets")
   @Produces(APPLICATION_JSON)
-  public Response create(@Valid DatasetRequest request) {
+  public Response create(@Valid DatasetRequest request) throws MarquezServiceException {
     return create(NamespaceName.DEFAULT, request);
   }
 
@@ -75,7 +74,11 @@ public final class DatasetResource {
   @Path("/namespaces/{namespace}/datasets")
   @Produces(APPLICATION_JSON)
   public Response create(
-      @PathParam("namespace") NamespaceName namespaceName, @Valid DatasetRequest request) {
+      @PathParam("namespace") NamespaceName namespaceName, @Valid DatasetRequest request)
+      throws MarquezServiceException {
+    if (!namespaceService.exists(namespaceName.getValue())) {
+      throw new NamespaceNotFoundException(namespaceName);
+    }
     final String datasourceUrn = request.getDatasourceUrn();
     final Dataset newDataset = DatasetMapper.map(request);
     final Dataset dataset = datasetService.create(datasourceUrn, newDataset);
@@ -93,10 +96,9 @@ public final class DatasetResource {
       @PathParam("namespace") NamespaceName namespaceName,
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset)
-      throws MarquezServiceException, WebApplicationException {
+      throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName.getValue())) {
-      throw new WebApplicationException(
-          String.format("The namespace %s does not exist.", namespaceName.getValue()), NOT_FOUND);
+      throw new NamespaceNotFoundException(namespaceName);
     }
     final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
     final List<DatasetResponse> datasetResponses = map(datasets);
