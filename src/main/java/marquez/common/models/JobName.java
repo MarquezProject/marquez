@@ -28,6 +28,6 @@ public final class JobName {
 
   public String getVal()
   {
-    return value;
+    return this.value;
   }
 }
