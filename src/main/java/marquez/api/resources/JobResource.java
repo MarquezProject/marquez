@@ -69,7 +69,7 @@ public final class JobResource {
   @Timed
   public Response create(
       @PathParam("namespace") final String namespace,
-      @PathParam("job") final String job,
+      @PathParam("job") JobName jobName,
       @Valid final JobRequest request)
       throws ResourceException {
     try {
