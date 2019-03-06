@@ -69,7 +69,7 @@ public final class JobResource {
   @Timed
   public Response create(
       @PathParam("namespace") final String namespace,
-      @PathParam("job") JobName jobName,
+      @PathParam("job") JobName job,
       @Valid final JobRequest request)
       throws ResourceException {
     try {
@@ -101,7 +101,7 @@ public final class JobResource {
   @Produces(APPLICATION_JSON)
   @Timed
   public Response getJob(
-      @PathParam("namespace") final String namespace, @PathParam("job") final String job)
+      @PathParam("namespace") final String namespace, @PathParam("job") JobName job)
       throws ResourceException {
     try {
       if (!namespaceService.exists(namespace)) {
@@ -143,7 +143,7 @@ public final class JobResource {
   @Path("namespaces/{namespace}/jobs/{job}/runs")
   public Response create(
       @PathParam("namespace") final String namespace,
-      @PathParam("job") final String job,
+      @PathParam("job") JobName job,
       @Valid final JobRunRequest request)
       throws ResourceException {
     try {
