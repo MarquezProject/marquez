@@ -72,7 +72,7 @@ public class NamespaceService {
     try {
       return namespaceDao.findAll();
     } catch (UnableToExecuteStatementException e) {
-      String err = "error fetching getAll of namespaces";
+      String err = "error fetching list of namespaces";
       log.error(err);
       throw new MarquezServiceException();
     }
