@@ -22,8 +22,10 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
+import javax.validation.Valid;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -31,6 +33,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import marquez.api.mappers.DatasetMapper;
+import marquez.api.mappers.DatasetResponseMapper;
+import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.NamespaceName;
@@ -39,6 +45,7 @@ import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 
+@Slf4j
 @Path("/api/v1")
 public final class DatasetResource {
   private final NamespaceService namespaceService;
@@ -49,6 +56,31 @@ public final class DatasetResource {
       @NonNull final DatasetService datasetService) {
     this.namespaceService = namespaceService;
     this.datasetService = datasetService;
+  }
+
+  @POST
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Path("/datasets")
+  @Produces(APPLICATION_JSON)
+  public Response create(@Valid DatasetRequest request) {
+    return create(NamespaceName.DEFAULT, request);
+  }
+
+  @POST
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Path("/namespaces/{namespace}/datasets")
+  @Produces(APPLICATION_JSON)
+  public Response create(
+      @PathParam("namespace") NamespaceName namespaceName, @Valid DatasetRequest request) {
+    final String datasourceUrn = request.getDatasourceUrn();
+    final Dataset newDataset = DatasetMapper.map(request);
+    final Dataset dataset = datasetService.create(datasourceUrn, newDataset);
+    final DatasetResponse response = DatasetResponseMapper.map(dataset);
+    return Response.ok(response).build();
   }
 
   @GET
