@@ -24,6 +24,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class NamespaceName {
+  public static final NamespaceName DEFAULT = NamespaceName.fromString("default");
+
   private static final int NAMESPACE_MIN_SIZE = 1;
   private static final int NAMESPACE_MAX_SIZE = 1024;
   private static final Pattern NAMESPACE_PATTERN =
