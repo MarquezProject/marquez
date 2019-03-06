@@ -36,7 +36,7 @@ import org.junit.experimental.categories.Category;
 public class DatasetResponseMapperTest {
   private static final DatasetName NAME = DatasetName.fromString("b.c");
   private static final Instant CREATED_AT = Instant.now();
-  private static final DatasetUrn URN = DatasetUrn.fromString(String.format("urn:a:%s", NAME));
+  private static final DatasetUrn URN = DatasetUrn.fromString(String.format("urn:a:%s", NAME.getValue()));
   private static final Description DESCRIPTION = Description.fromString("test description");
   private static final Dataset DATASET =
       Dataset.builder().name(NAME).createdAt(CREATED_AT).urn(URN).description(DESCRIPTION).build();
@@ -47,7 +47,7 @@ public class DatasetResponseMapperTest {
 
     final DatasetResponse response = DatasetResponseMapper.map(DATASET);
     assertNotNull(response);
-    assertEquals(NAME.toString(), response.getName());
+    assertEquals(NAME.getValue(), response.getName());
     assertEquals(CREATED_AT.toString(), response.getCreatedAt());
     assertEquals(URN.getValue(), response.getUrn());
     assertEquals(expectedDescription, response.getDescription());
@@ -60,7 +60,7 @@ public class DatasetResponseMapperTest {
     final Dataset dataset = Dataset.builder().name(NAME).createdAt(CREATED_AT).urn(URN).build();
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     assertNotNull(response);
-    assertEquals(NAME.toString(), response.getName());
+    assertEquals(NAME.getValue(), response.getName());
     assertEquals(URN.getValue(), response.getUrn());
     assertEquals(CREATED_AT.toString(), response.getCreatedAt());
     assertEquals(noDescription, response.getDescription());

@@ -30,8 +30,8 @@ public final class DatasetResponseMapper {
   public static DatasetResponse map(@NonNull Dataset dataset) {
     return new DatasetResponse(
         dataset.getName().getValue(),
-        dataset.getUrn().getValue(),
         dataset.getCreatedAt().toString(),
+        dataset.getUrn().getValue(),
         dataset
             .getDescription()
             .map(description -> description.getValue())
