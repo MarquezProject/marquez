@@ -39,7 +39,7 @@ public class DatasourceMapperTest {
 
     assertNotNull(datasourceRow);
     assertEquals(CONNECTION_URL, datasource.getConnectionUrl().getRawValue());
-    assertEquals(DATASOURCE_NAME, datasource.getDatasourceName().getValue());
+    assertEquals(DATASOURCE_NAME, datasource.getName().getValue());
     assertEquals(CREATED_AT, datasource.getCreatedAt());
   }
 

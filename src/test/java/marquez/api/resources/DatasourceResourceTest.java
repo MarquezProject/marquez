@@ -117,7 +117,7 @@ public class DatasourceResourceTest {
     assertThat(datasourcesResponse.getDatasources().size()).isEqualTo(1);
     final DatasourceResponse returnedDatasource = datasourcesResponse.getDatasources().get(0);
 
-    assertThat(returnedDatasource.getName()).isEqualTo(ds1.getDatasourceName().getValue());
+    assertThat(returnedDatasource.getName()).isEqualTo(ds1.getName().getValue());
     assertThat(returnedDatasource.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
   }
@@ -127,11 +127,9 @@ public class DatasourceResourceTest {
     final Datasource ds1 = Generator.genDatasource();
 
     final DatasourceRequest validRequest =
-        new DatasourceRequest(
-            ds1.getConnectionUrl().getRawValue(), ds1.getDatasourceName().getValue());
+        new DatasourceRequest(ds1.getConnectionUrl().getRawValue(), ds1.getName().getValue());
 
-    when(mockDatasourceService.create(ds1.getConnectionUrl(), ds1.getDatasourceName()))
-        .thenReturn(ds1);
+    when(mockDatasourceService.create(ds1.getConnectionUrl(), ds1.getName())).thenReturn(ds1);
 
     // When we submit it
     final Response createDatasourceResponse = datasourceResource.create(validRequest);
@@ -139,7 +137,7 @@ public class DatasourceResourceTest {
     final DatasourceResponse returnedDatasource =
         (DatasourceResponse) createDatasourceResponse.getEntity();
 
-    assertThat(returnedDatasource.getName()).isEqualTo(ds1.getDatasourceName().getValue());
+    assertThat(returnedDatasource.getName()).isEqualTo(ds1.getName().getValue());
     assertThat(returnedDatasource.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
   }
@@ -149,8 +147,7 @@ public class DatasourceResourceTest {
     final Datasource ds1 = Generator.genDatasource();
 
     final DatasourceRequest validRequest =
-        new DatasourceRequest(
-            ds1.getConnectionUrl().getRawValue(), ds1.getDatasourceName().getValue());
+        new DatasourceRequest(ds1.getConnectionUrl().getRawValue(), ds1.getName().getValue());
 
     when(mockDatasourceService.create(any(), any())).thenThrow(new MarquezServiceException());
     datasourceResource.create(validRequest);

@@ -27,7 +27,7 @@ import marquez.common.models.DatasourceName;
 @EqualsAndHashCode
 @ToString
 public class Datasource {
-  @Getter @NonNull private final DatasourceName datasourceName;
+  @Getter @NonNull private final DatasourceName name;
   @Getter @NonNull private final ConnectionUrl connectionUrl;
   @Getter @NonNull private final Instant createdAt;
 }
