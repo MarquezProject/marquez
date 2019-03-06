@@ -108,7 +108,7 @@ public final class JobResource {
       if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
       }
-      final Optional<Job> returnedJob = jobService.getJob(namespace,  jobName.getVal());
+      final Optional<Job> returnedJob = jobService.getJob(namespace, jobName.getVal());
       if (returnedJob.isPresent()) {
         return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
       }
@@ -151,8 +151,8 @@ public final class JobResource {
       if (!namespaceService.exists(namespace)) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      if (!jobService.getJob(namespace,  jobName.getVal()).isPresent()) {
-        log.error("Could not find job: " +  jobName.getVal());
+      if (!jobService.getJob(namespace, jobName.getVal()).isPresent()) {
+        log.error("Could not find job: " + jobName.getVal());
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       JobRun createdJobRun =
