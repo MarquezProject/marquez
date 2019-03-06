@@ -27,8 +27,14 @@ public class DatasourceTypeTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidName() {
+  public void testNewDatasourceType_throwsException_onInvalidValue() {
     final String invalidDatasourceType = "xyz_postgresql";
     DatasourceType.valueOf(invalidDatasourceType);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testNewDatasourceType_throwsException_onNullValue() {
+    final String nullValue = null;
+    DatasourceType.valueOf(nullValue);
   }
 }
