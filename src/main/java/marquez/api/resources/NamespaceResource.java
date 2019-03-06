@@ -40,7 +40,6 @@ import marquez.common.models.NamespaceName;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
-import org.hibernate.validator.constraints.NotBlank;
 
 @Slf4j
 @Path("/api/v1")
@@ -77,7 +76,8 @@ public final class NamespaceResource {
   @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces/{namespace}")
-  public Response get(@PathParam("namespace") NamespaceName namespaceName) throws ResourceException {
+  public Response get(@PathParam("namespace") NamespaceName namespaceName)
+      throws ResourceException {
     try {
       final Optional<NamespaceResponse> namespaceResponse =
           namespaceService.get(namespaceName.getValue()).map(NamespaceResponseMapper::map);

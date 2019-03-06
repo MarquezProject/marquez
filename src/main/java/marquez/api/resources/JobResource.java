@@ -93,7 +93,9 @@ public final class JobResource {
           .entity(coreJobToApiJobMapper.map(createdJob))
           .build();
     } catch (MarquezServiceException e) {
-      log.error(format("Error creating the job <%s>:<%s>.", namespaceName.getValue(), jobName.getValue()), e);
+      log.error(
+          format("Error creating the job <%s>:<%s>.", namespaceName.getValue(), jobName.getValue()),
+          e);
       throw new ResourceException();
     }
   }
@@ -109,7 +111,8 @@ public final class JobResource {
       if (!namespaceService.exists(namespaceName.getValue())) {
         return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
       }
-      final Optional<Job> returnedJob = jobService.getJob(namespaceName.getValue(), jobName.getValue());
+      final Optional<Job> returnedJob =
+          jobService.getJob(namespaceName.getValue(), jobName.getValue());
       if (returnedJob.isPresent()) {
         return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
       }
