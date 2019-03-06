@@ -70,8 +70,8 @@ public final class ConnectionUrl {
                   "The connection url value has missing parts: %d != %d.",
                   urlParts.length, URL_PART_COUNT));
         }
-        final String dataSourceString = urlParts[DATA_SOURCE_PART];
-        final Datasource dataSource = Datasource.fromString(dataSourceString);
+        final String datasourceString = urlParts[DATA_SOURCE_PART];
+        final Datasource datasource = Datasource.fromString(datasourceString);
         final String dbNameString =
             urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
         final DbName dbName =
@@ -79,7 +79,7 @@ public final class ConnectionUrl {
                 dbNameString.contains(DB_PART_DELIM)
                     ? dbNameString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
                     : dbNameString);
-        return new ConnectionUrl(dataSource, dbName, rawValue);
+        return new ConnectionUrl(datasource, dbName, rawValue);
       }
     },
     UNKNOWN("") {
