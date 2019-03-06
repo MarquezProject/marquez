@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
 
@@ -31,7 +32,7 @@ import marquez.common.models.Description;
 @ToString
 @Builder
 public final class Dataset {
-  @Getter @NonNull private final String name;
+  @Getter @NonNull private final DatasetName name;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final DatasetUrn urn;
   @Nullable private final Description description;

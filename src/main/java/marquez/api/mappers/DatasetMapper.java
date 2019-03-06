@@ -18,6 +18,7 @@ import static marquez.common.models.Description.NO_DESCRIPTION;
 
 import lombok.NonNull;
 import marquez.api.models.DatasetRequest;
+import marquez.common.models.DatasetName;
 import marquez.common.models.Description;
 import marquez.service.models.Dataset;
 
@@ -26,7 +27,7 @@ public final class DatasetMapper {
 
   public static Dataset map(@NonNull DatasetRequest request) {
     return Dataset.builder()
-        .name(request.getName())
+        .name(DatasetName.fromString(request.getName()))
         .description(request.getDescription().map(Description::fromString).orElse(NO_DESCRIPTION))
         .build();
   }

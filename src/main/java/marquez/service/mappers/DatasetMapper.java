@@ -20,6 +20,7 @@ import static marquez.common.models.Description.NO_DESCRIPTION;
 
 import java.util.List;
 import lombok.NonNull;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
 import marquez.db.models.DatasetRow;
@@ -30,7 +31,7 @@ public final class DatasetMapper {
 
   public static Dataset map(@NonNull DatasetRow row) {
     return Dataset.builder()
-        .name(row.getName())
+        .name(DatasetName.fromString(row.getName()))
         .createdAt(row.getCreatedAt())
         .urn(DatasetUrn.fromString(row.getUrn()))
         .description(row.getDescription().map(Description::fromString).orElse(NO_DESCRIPTION))
