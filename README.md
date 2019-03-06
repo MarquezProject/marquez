@@ -1,5 +1,8 @@
 # marquez-airflow
-Is a library that integrates Airflow DAGs with Marquez for automatic metadata collection.
+
+[![CircleCI](https://circleci.com/gh/MarquezProject/marquez-airflow/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez-airflow/tree/master)
+
+A library that integrates Airflow DAGs with Marquez for automatic metadata collection.
 
 # Requirements
  - Python 3.5+
