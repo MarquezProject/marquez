@@ -17,18 +17,22 @@ package marquez.api.mappers;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import marquez.UnitTests;
 import marquez.api.models.DatasetResponse;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
 import marquez.service.models.Dataset;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DatasetResponseMapperTest {
   private static final DatasetName NAME = DatasetName.fromString("b.c");
   private static final Instant CREATED_AT = Instant.now();
@@ -81,7 +85,7 @@ public class DatasetResponseMapperTest {
     final List<Dataset> emptyList = Arrays.asList();
     final List<DatasetResponse> datasets = DatasetResponseMapper.map(emptyList);
     assertNotNull(datasets);
-    assertEquals(0, datasets.size());
+    assertTrue(datasets.isEmpty());
   }
 
   @Test(expected = NullPointerException.class)
