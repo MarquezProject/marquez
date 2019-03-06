@@ -25,8 +25,4 @@ import lombok.ToString;
 @ToString
 public final class JobName {
   @Getter @NonNull private final String value;
-
-  public String getVal() {
-    return this.value;
-  }
 }
