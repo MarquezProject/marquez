@@ -14,6 +14,7 @@
 
 package marquez.api.resources;
 
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,12 +26,15 @@ import io.dropwizard.testing.junit.ResourceTestRule;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import javax.ws.rs.core.Response;
 import marquez.api.exceptions.ResourceException;
 import marquez.api.exceptions.ResourceExceptionMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
+import marquez.common.models.DatasourceId;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
@@ -120,6 +124,42 @@ public class DatasourceResourceTest {
     assertThat(returnedDatasource.getName()).isEqualTo(ds1.getName().getValue());
     assertThat(returnedDatasource.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
+  }
+
+  @Test
+  public void testGetDatasource() throws MarquezServiceException, ResourceException {
+    final Datasource ds1 = Generator.genDatasource();
+    final UUID requestUuid = UUID.randomUUID();
+    when(mockDatasourceService.get(requestUuid)).thenReturn(Optional.of(ds1));
+
+    final Response datasourceResponse =
+        datasourceResource.get(DatasourceId.fromString(requestUuid.toString()));
+    assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
+
+    final DatasourceResponse datasourcesResponse =
+        (DatasourceResponse) datasourceResponse.getEntity();
+
+    assertThat(datasourcesResponse.getName()).isEqualTo(ds1.getName().getValue());
+    assertThat(datasourcesResponse.getConnectionUrl())
+        .isEqualTo(ds1.getConnectionUrl().getRawValue());
+  }
+
+  @Test
+  public void testGetNoSuchDatasource() throws MarquezServiceException, ResourceException {
+    final UUID requestUuid = UUID.randomUUID();
+    when(mockDatasourceService.get(requestUuid)).thenReturn(Optional.empty());
+
+    final Response datasourceResponse =
+        datasourceResource.get(DatasourceId.fromString(requestUuid.toString()));
+    assertThat(datasourceResponse.getStatus()).isEqualTo(NOT_FOUND.getStatusCode());
+  }
+
+  @Test(expected = ResourceException.class)
+  public void testGetInternalError() throws MarquezServiceException, ResourceException {
+    final UUID requestUuid = UUID.randomUUID();
+    when(mockDatasourceService.get(requestUuid)).thenThrow(MarquezServiceException.class);
+
+    datasourceResource.get(DatasourceId.fromString(requestUuid.toString()));
   }
 
   @Test

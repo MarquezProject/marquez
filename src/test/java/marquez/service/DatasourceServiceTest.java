@@ -50,14 +50,36 @@ public class DatasourceServiceTest {
 
   @Test
   public void testCreateDatasource() throws MarquezServiceException {
-    DatasourceRow row = Generator.genDatasourceRow();
+    final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.findBy(any())).thenReturn(Optional.of(row));
 
-    Datasource response =
+    final Datasource response =
         datasourceService.create(
             ConnectionUrl.fromString(row.getConnectionUrl()),
             DatasourceName.fromString(row.getName()));
     assertThat(response.getConnectionUrl())
         .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
+
+    assertThat(response.getName()).isEqualTo(DatasourceName.fromString(row.getName()));
+  }
+
+  @Test
+  public void testGetDatasource() throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any())).thenReturn(Optional.of(row));
+    final Optional<Datasource> response = datasourceService.get(row.getUuid());
+    assertThat(response.isPresent()).isTrue();
+
+    assertThat(response.get().getConnectionUrl())
+        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
+    assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
+  }
+
+  @Test
+  public void testGetNoSuchDatasource() throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any())).thenReturn(Optional.empty());
+    final Optional<Datasource> response = datasourceService.get(row.getUuid());
+    assertThat(response.isPresent()).isFalse();
   }
 }
