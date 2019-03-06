@@ -24,8 +24,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
-
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,9 +35,7 @@ import marquez.api.exceptions.ResourceExceptionMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
-import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceId;
-import marquez.common.models.DatasourceName;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
@@ -191,7 +187,8 @@ public class DatasourceResourceTest {
   public void testCreateDatasource_invalidDatasource() throws ResourceException {
     final String invalidDatasourceType = "xyz_postgres_999";
 
-    final String invalidConnectionUrl = "jdbc:" + invalidDatasourceType + "://localhost:5431/novelists";
+    final String invalidConnectionUrl =
+        "jdbc:" + invalidDatasourceType + "://localhost:5431/novelists";
     final DatasourceRequest invalidDatasourceRequest = mock(DatasourceRequest.class);
     when(invalidDatasourceRequest.getConnectionUrl()).thenReturn(invalidConnectionUrl);
     when(invalidDatasourceRequest.getName()).thenReturn("mysql_cluster_2");
