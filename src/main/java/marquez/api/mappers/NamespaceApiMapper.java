@@ -20,8 +20,10 @@ import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.service.models.Namespace;
 
-public class NamespaceApiMapper extends Mapper<NamespaceResponse, Namespace> {
-  public Namespace map(NamespaceResponse namespace) {
+public final class NamespaceApiMapper extends Mapper<NamespaceResponse, Namespace> {
+  private NamespaceApiMapper() {}
+
+  public static Namespace map(NamespaceResponse namespace) {
     requireNonNull(namespace, "namespace must not be null");
     return new Namespace(
         null, namespace.getName().toLowerCase(), namespace.getOwner(), namespace.getDescription());
