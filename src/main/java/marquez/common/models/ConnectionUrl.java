@@ -22,15 +22,15 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class ConnectionUrl {
-  @Getter private final Datasource datasource;
+  @Getter private final DatasourceType datasourceType;
   @Getter private final DbName dbName;
   @Getter private final String rawValue;
 
   private ConnectionUrl(
-      @NonNull final Datasource datasource,
+      @NonNull final DatasourceType datasourceType,
       @NonNull final DbName dbName,
       @NonNull final String rawValue) {
-    this.datasource = datasource;
+    this.datasourceType = datasourceType;
     this.dbName = dbName;
     this.rawValue = rawValue;
   }
@@ -71,7 +71,7 @@ public final class ConnectionUrl {
                   urlParts.length, URL_PART_COUNT));
         }
         final String datasourceString = urlParts[DATA_SOURCE_PART];
-        final Datasource datasource = Datasource.fromString(datasourceString);
+        final DatasourceType datasourcType = DatasourceType.valueOf(datasourceString);
         final String dbNameString =
             urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
         final DbName dbName =
@@ -79,7 +79,7 @@ public final class ConnectionUrl {
                 dbNameString.contains(DB_PART_DELIM)
                     ? dbNameString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
                     : dbNameString);
-        return new ConnectionUrl(datasource, dbName, rawValue);
+        return new ConnectionUrl(datasourcType, dbName, rawValue);
       }
     },
     UNKNOWN("") {
