@@ -33,8 +33,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.jnlp.UnavailableServiceException;
-
 public class DatasourceServiceTest {
 
   private static DatasourceService datasourceService;
