@@ -20,11 +20,13 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
+import java.util.Optional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -34,6 +36,7 @@ import marquez.api.exceptions.ResourceException;
 import marquez.api.mappers.DatasourceResponseMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasourceId;
 import marquez.common.models.DatasourceName;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
@@ -60,6 +63,29 @@ public final class DatasourceResource {
 
     final List<Datasource> datasources = datasourceService.getAll(limit, offset);
     return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasources)).build();
+  }
+
+  @GET
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Path("/{datasourceId}")
+  @Produces(APPLICATION_JSON)
+  public Response get(@PathParam("datasourceId") final DatasourceId datasourceId)
+      throws ResourceException {
+
+    final Optional<Datasource> datasource;
+    try {
+      datasource = datasourceService.get(datasourceId.getValue());
+    } catch (MarquezServiceException e) {
+      log.error(e.getMessage(), e);
+      throw new ResourceException();
+    }
+    if (datasource.isPresent()) {
+      return Response.ok(DatasourceResponseMapper.map(datasource.get())).build();
+    } else {
+      return Response.status(Response.Status.NOT_FOUND).entity("Datasource not found").build();
+    }
   }
 
   @POST

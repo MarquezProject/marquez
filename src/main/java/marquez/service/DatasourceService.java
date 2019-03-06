@@ -17,6 +17,7 @@ package marquez.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.MarquezException;
@@ -28,6 +29,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.DatasourceMapper;
 import marquez.service.mappers.DatasourceRowMapper;
 import marquez.service.models.Datasource;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class DatasourceService {
@@ -47,6 +49,16 @@ public class DatasourceService {
           datasourceDao.findBy(datasourceRow.getUuid());
       return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezException::new);
     } catch (MarquezException e) {
+      log.error(e.getMessage());
+      throw new MarquezServiceException();
+    }
+  }
+
+  public Optional<Datasource> get(@NonNull final UUID uuid) throws MarquezServiceException {
+    try {
+      final Optional<DatasourceRow> datasourceRowIfFound = datasourceDao.findBy(uuid);
+      return datasourceRowIfFound.map(DatasourceMapper::map);
+    } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
       throw new MarquezServiceException();
     }
