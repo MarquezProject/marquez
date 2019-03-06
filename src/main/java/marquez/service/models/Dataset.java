@@ -16,6 +16,8 @@ package marquez.service.models;
 
 import java.time.Instant;
 import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -27,10 +29,12 @@ import marquez.common.models.Description;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
+@Builder
 public final class Dataset {
-  @Getter @NonNull private final DatasetUrn urn;
+  @Getter @NonNull private final String name;
   @Getter @NonNull private final Instant createdAt;
-  private final Description description;
+  @Getter @NonNull private final DatasetUrn urn;
+  @Nullable private final Description description;
 
   public Optional<Description> getDescription() {
     return Optional.ofNullable(description);
