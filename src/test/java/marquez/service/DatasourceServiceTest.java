@@ -28,9 +28,12 @@ import marquez.db.models.DatasourceRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
 import marquez.service.models.Generator;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.jnlp.UnavailableServiceException;
 
 public class DatasourceServiceTest {
 
@@ -73,6 +76,13 @@ public class DatasourceServiceTest {
     assertThat(response.get().getConnectionUrl())
         .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
     assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
+  }
+
+  @Test(expected = MarquezServiceException.class)
+  public void testGetDatasourceError() throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any())).thenThrow(UnableToExecuteStatementException.class);
+    datasourceService.get(row.getUuid());
   }
 
   @Test
