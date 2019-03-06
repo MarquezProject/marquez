@@ -16,6 +16,7 @@ package marquez.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.db.models.DatasourceRow;
@@ -57,5 +58,35 @@ public class DatasourceDaoTest {
   public void testDatasourceNotPresent() {
     final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(UUID.randomUUID());
     assertThat(returnedRow).isNotPresent();
+  }
+
+  @Test
+  public void testLimit() {
+    final DatasourceRow datasourceRow1 = Generator.genDatasourceRow();
+    final DatasourceRow datasourceRow2 = Generator.genDatasourceRow();
+    final DatasourceRow datasourceRow3 = Generator.genDatasourceRow();
+    datasourceDAO.insert(datasourceRow1);
+    datasourceDAO.insert(datasourceRow2);
+    datasourceDAO.insert(datasourceRow3);
+    final List<DatasourceRow> returnedRows = datasourceDAO.findAll(2, 0);
+    assertThat(returnedRows.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void testOffset() {
+    final DatasourceRow datasourceRow1 = Generator.genDatasourceRow();
+    final DatasourceRow datasourceRow2 = Generator.genDatasourceRow();
+    final DatasourceRow datasourceRow3 = Generator.genDatasourceRow();
+    datasourceDAO.insert(datasourceRow1);
+    datasourceDAO.insert(datasourceRow2);
+    datasourceDAO.insert(datasourceRow3);
+    final List<DatasourceRow> returnedRows = datasourceDAO.findAll(100, 0);
+    int returnedRowCount = returnedRows.size();
+
+    final int offset = 1;
+
+    final List<DatasourceRow> returnedRowsWithOffset = datasourceDAO.findAll(100, offset);
+    int returnedRowsWithOffsetSize = returnedRowsWithOffset.size();
+    assertThat(returnedRowCount - returnedRowsWithOffsetSize).isEqualTo(offset);
   }
 }

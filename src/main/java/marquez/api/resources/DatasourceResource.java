@@ -40,7 +40,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
 
 @Slf4j
-@Path("/")
+@Path("/api/v1/datasources")
 public final class DatasourceResource {
 
   private final DatasourceService datasourceService;
@@ -53,7 +53,6 @@ public final class DatasourceResource {
   @ResponseMetered
   @ExceptionMetered
   @Timed
-  @Path("/api/v1/datasources")
   @Produces(APPLICATION_JSON)
   public Response list(
       @QueryParam("limit") @DefaultValue("100") Integer limit,
@@ -67,7 +66,6 @@ public final class DatasourceResource {
   @ResponseMetered
   @ExceptionMetered
   @Timed
-  @Path("/api/v1/datasources")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(@NonNull final DatasourceRequest datasourceRequest)
