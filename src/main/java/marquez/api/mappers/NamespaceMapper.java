@@ -20,16 +20,16 @@ import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.service.models.Namespace;
 
-public final class NamespaceMapper extends Mapper<NamespaceResponse, Namespace> {
+public final class NamespaceMapper {
   private NamespaceMapper() {}
 
-  public static Namespace map(NamespaceResponse namespace) {
+/*  public static Namespace map(NamespaceResponse namespace) {
     requireNonNull(namespace, "namespace must not be null");
     return new Namespace(
         null, namespace.getName().toLowerCase(), namespace.getOwner(), namespace.getDescription());
-  }
+  }*/
 
-  public Namespace of(String namespaceName, NamespaceRequest request) {
+  public static Namespace map(@NonNull NamespaceName namespaceName, @NonNull NamespaceRequest request) {
     return map(
         new NamespaceResponse(
             namespaceName, null, request.getOwner(), request.getDescription().orElse(null)));
