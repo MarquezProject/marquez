@@ -39,15 +39,13 @@ import marquez.api.mappers.CoreJobToApiJobMapper;
 import marquez.api.models.JobRequest;
 import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobsResponse;
+import marquez.common.models.JobName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
-import marquez.common.models.JobName;
-
-//main\java\marquez\common\models\JobName.java
 
 @Path("/api/v1")
 @Slf4j
