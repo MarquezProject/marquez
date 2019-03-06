@@ -37,6 +37,7 @@ import marquez.api.exceptions.ResourceExceptionMapper;
 import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
+import marquez.common.models.NamespaceName;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
@@ -46,6 +47,7 @@ import org.junit.Test;
 
 public class NamespaceResourceTest extends NamespaceBaseTest {
 
+  NamespaceName namespaceName = NamespaceName.fromString(NAMESPACE_NAME);
   CoreNamespaceToApiNamespaceMapper namespaceMapper = new CoreNamespaceToApiNamespaceMapper();
   private static final NamespaceService NAMESPACE_SERVICE = mock(NamespaceService.class);
 
@@ -81,7 +83,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
     when(namespaceService.get(NAMESPACE_NAME)).thenReturn(returnedOptionalNamespace);
-    Response res = namespaceResource.get(NAMESPACE_NAME);
+    Response res = namespaceResource.get(namespaceName);
     NamespaceResponse responseBody = (NamespaceResponse) res.getEntity();
 
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
