@@ -36,6 +36,7 @@ import marquez.api.mappers.NamespaceResponseMapper;
 import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
+import marquez.common.models.NamespaceName;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
@@ -59,11 +60,11 @@ public final class NamespaceResource {
   @Timed
   @Path("/namespaces/{namespace}")
   public Response create(
-      @PathParam("namespace") @NotBlank String namespaceString, @Valid NamespaceRequest request)
+      @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceRequest request)
       throws ResourceException {
     try {
       final Namespace namespace =
-          namespaceService.create(namespaceApiMapper.of(namespaceString, request));
+          namespaceService.create(namespaceApiMapper.of(namespaceName.getValue(), request));
       final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
       return Response.ok(response).build();
     } catch (MarquezServiceException e) {
@@ -76,10 +77,10 @@ public final class NamespaceResource {
   @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces/{namespace}")
-  public Response get(@PathParam("namespace") String namespaceString) throws ResourceException {
+  public Response get(@PathParam("namespace") NamespaceName namespaceName) throws ResourceException {
     try {
       final Optional<NamespaceResponse> namespaceResponse =
-          namespaceService.get(namespaceString).map(NamespaceResponseMapper::map);
+          namespaceService.get(namespaceName.getValue()).map(NamespaceResponseMapper::map);
       if (namespaceResponse.isPresent()) {
         return Response.ok(namespaceResponse.get()).build();
       } else {
