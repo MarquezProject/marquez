@@ -15,7 +15,6 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static marquez.api.mappers.DatasetResponseMapper.map;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -101,7 +100,7 @@ public final class DatasetResource {
       throw new NamespaceNotFoundException(namespaceName);
     }
     final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
-    final List<DatasetResponse> datasetResponses = map(datasets);
-    return Response.ok(new DatasetsResponse(datasetResponses)).build();
+    final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(datasets);
+    return Response.ok(response).build();
   }
 }

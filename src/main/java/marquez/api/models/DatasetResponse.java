@@ -15,6 +15,7 @@
 package marquez.api.models;
 
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -24,12 +25,11 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class DatasetResponse {
-  @Getter @NonNull private final String urn;
-
+public final class DatasetResponse {
+  @Getter @NonNull private final String name;
   @Getter @NonNull private final String createdAt;
-
-  private final String description;
+  @Getter @NonNull private final String urn;
+  @Nullable private final String description;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
