@@ -36,6 +36,7 @@ import marquez.api.mappers.DatasetMapper;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
+import javax.ws.rs.Consumes;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
@@ -61,6 +62,7 @@ public final class DatasetResource {
   @ExceptionMetered
   @Timed
   @Path("/datasets")
+  @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(@Valid DatasetRequest request) throws MarquezServiceException {
     return create(NamespaceName.DEFAULT, request);
@@ -71,6 +73,7 @@ public final class DatasetResource {
   @ExceptionMetered
   @Timed
   @Path("/namespaces/{namespace}/datasets")
+  @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(
       @PathParam("namespace") NamespaceName namespaceName, @Valid DatasetRequest request)
