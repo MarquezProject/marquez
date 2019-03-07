@@ -17,17 +17,17 @@ package marquez.service.models;
 import java.time.Instant;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 @Builder
