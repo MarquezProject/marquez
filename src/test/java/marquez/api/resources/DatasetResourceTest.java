@@ -69,7 +69,7 @@ public class DatasetResourceTest {
     final List<Dataset> datasets = Arrays.asList(dataset);
     when(mockDatasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasets);
 
-    final Response response = datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);
+    final Response response = datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
     assertEquals(OK, response.getStatusInfo());
 
     final DatasetsResponse datasetsResponse = (DatasetsResponse) response.getEntity();
@@ -85,6 +85,6 @@ public class DatasetResourceTest {
   public void testListDatasetsNamespaceDoesNotExist() throws MarquezServiceException {
     when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
 
-    datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);
+    datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
   }
 }
