@@ -68,9 +68,7 @@ public final class DatasetResource {
           String.format("The namespace %s does not exist.", namespaceName.getValue()), NOT_FOUND);
     }
     try {
-      String namespaceNameString = namespaceName.getValue();
-      final List<Dataset> datasets =
-          datasetService.getAll(NamespaceName.fromString(namespaceNameString), limit, offset);
+      final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
       final List<DatasetResponse> datasetResponses = map(datasets);
       return Response.ok(new DatasetsResponse(datasetResponses)).build();
     } catch (Exception e) {
