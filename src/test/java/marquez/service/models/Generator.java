@@ -176,8 +176,10 @@ public class Generator {
 
   // Dataset Rows
   public static DatasetRow genDatasetRow(UUID namespaceID, UUID dataSourceID) {
+    int dataSourceNum = randNum();
     return DatasetRow.builder()
         .uuid(UUID.randomUUID())
+        .name("DatasetRow" + dataSourceNum)
         .namespaceUuid(namespaceID)
         .dataSourceUuid(dataSourceID)
         .description("dataset " + randNum())
