@@ -34,7 +34,7 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.api.exceptions.ResourceExceptionMapper;
+import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.api.models.JobRequest;
 import marquez.api.models.JobResponse;
 import marquez.api.models.JobRunRequest;
@@ -65,7 +65,7 @@ public class JobResourceTest {
   public static final ResourceTestRule resources =
       ResourceTestRule.builder()
           .addResource(JOB_RESOURCE)
-          .addProvider(ResourceExceptionMapper.class)
+          .addProvider(MarquezServiceExceptionMapper.class)
           .build();
 
   @Before
