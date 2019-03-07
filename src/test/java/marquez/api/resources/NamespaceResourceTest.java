@@ -32,8 +32,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
-import marquez.api.exceptions.ResourceException;
-import marquez.api.exceptions.ResourceExceptionMapper;
+import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
@@ -53,7 +52,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   public static final ResourceTestRule resources =
       ResourceTestRule.builder()
           .addResource(new NamespaceResource(NAMESPACE_SERVICE))
-          .addProvider(ResourceExceptionMapper.class)
+          .addProvider(MarquezServiceExceptionMapper.class)
           .build();
 
   @Before
@@ -75,7 +74,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testValidNamespace() throws ResourceException, MarquezServiceException {
+  public void testValidNamespace() throws MarquezServiceException {
     Optional<Namespace> returnedOptionalNamespace = Optional.of(TEST_NAMESPACE);
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
@@ -101,8 +100,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testListNamespaceWithSingleResultSet()
-      throws MarquezServiceException, ResourceException {
+  public void testListNamespaceWithSingleResultSet() throws MarquezServiceException {
     final List<Namespace> existingCoreModelNamespaces = Collections.singletonList(TEST_NAMESPACE);
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
@@ -117,7 +115,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Test
   public void testAllNamespaceFieldsPresentInListNamespacesResponse()
-      throws MarquezServiceException, ResourceException {
+      throws MarquezServiceException {
     final List<Namespace> existingNamespaces = Collections.singletonList(TEST_NAMESPACE);
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
@@ -134,8 +132,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testListNamespaceWithMultipleResultSet()
-      throws MarquezServiceException, ResourceException {
+  public void testListNamespaceWithMultipleResultSet() throws MarquezServiceException {
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
