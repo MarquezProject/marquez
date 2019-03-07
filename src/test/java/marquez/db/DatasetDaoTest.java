@@ -14,9 +14,6 @@
 
 package marquez.db;
 
-import static org.junit.Assert.assertEquals;
-
-import marquez.common.models.NamespaceName;
 import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
@@ -28,7 +25,6 @@ import org.jdbi.v3.testing.JdbiRule;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,25 +60,26 @@ public class DatasetDaoTest {
     datasetDAO.insertAll(dataSourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
   }
 
-// TODO: Need to add the 'name' column to datasets table
-// @Test
-// public void testFindAll() {
-//   assertEquals(
-//       0, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
-//   insertRandomDataset();
-//   insertRandomDataset();
-//   assertEquals(
-//       2, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
-// }
-//
-// @Test
-// public void testFindAllWithLimit() {
-//   final int limit = 1;
-//   assertEquals(
-//       0, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), limit, 0).size());
-//   insertRandomDataset();
-//   insertRandomDataset();
-//   assertEquals(
-//       limit, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), limit, 0).size());
-// }
+  // TODO: Need to add the 'name' column to datasets table
+  // @Test
+  // public void testFindAll() {
+  //   assertEquals(
+  //       0, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
+  //   insertRandomDataset();
+  //   insertRandomDataset();
+  //   assertEquals(
+  //       2, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
+  // }
+  //
+  // @Test
+  // public void testFindAllWithLimit() {
+  //   final int limit = 1;
+  //   assertEquals(
+  //       0, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), limit, 0).size());
+  //   insertRandomDataset();
+  //   insertRandomDataset();
+  //   assertEquals(
+  //       limit, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), limit,
+  // 0).size());
+  // }
 }
