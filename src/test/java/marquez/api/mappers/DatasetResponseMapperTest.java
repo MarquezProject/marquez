@@ -44,7 +44,7 @@ public class DatasetResponseMapperTest {
       Dataset.builder().name(NAME).createdAt(CREATED_AT).urn(URN).description(DESCRIPTION).build();
 
   @Test
-  public void testMap() {
+  public void testMap_dataset() {
     final Optional<String> expectedDescription = Optional.of(DESCRIPTION.getValue());
 
     final DatasetResponse response = DatasetResponseMapper.map(DATASET);
@@ -56,7 +56,7 @@ public class DatasetResponseMapperTest {
   }
 
   @Test
-  public void testMap_noDescription() {
+  public void testMap_datasetWithNoDescription() {
     final Optional<String> noDescription = Optional.of(NO_DESCRIPTION.getValue());
 
     final Dataset dataset = Dataset.builder().name(NAME).createdAt(CREATED_AT).urn(URN).build();
@@ -75,7 +75,7 @@ public class DatasetResponseMapperTest {
   }
 
   @Test
-  public void testMap_list() {
+  public void testMap_datasets() {
     final List<Dataset> datasets = Arrays.asList(DATASET);
     final List<DatasetResponse> responses = DatasetResponseMapper.map(datasets);
     assertNotNull(responses);
@@ -83,17 +83,17 @@ public class DatasetResponseMapperTest {
   }
 
   @Test
-  public void testMap_emptyList() {
-    final List<Dataset> emptyList = Arrays.asList();
-    final List<DatasetResponse> responses = DatasetResponseMapper.map(emptyList);
+  public void testMap_emptyDatasets() {
+    final List<Dataset> emptyDatasets = Arrays.asList();
+    final List<DatasetResponse> responses = DatasetResponseMapper.map(emptyDatasets);
     assertNotNull(responses);
     assertTrue(responses.isEmpty());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testMap_throwsException_onNullList() {
-    final List<Dataset> nullList = null;
-    DatasetResponseMapper.map(nullList);
+  public void testMap_throwsException_onNullDatasets() {
+    final List<Dataset> nullDatasets = null;
+    DatasetResponseMapper.map(nullDatasets);
   }
 
   @Test
@@ -105,16 +105,16 @@ public class DatasetResponseMapperTest {
   }
 
   @Test
-  public void testToDatasetsResponse_emptyList() {
-    final List<Dataset> emptyList = Arrays.asList();
-    final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(emptyList);
+  public void testToDatasetsResponse_emptyDatasets() {
+    final List<Dataset> emptyDatasets = Arrays.asList();
+    final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(emptyDatasets);
     assertNotNull(response);
     assertTrue(response.getDatasets().isEmpty());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testToDatasetsResponse_throwsException_onNullList() {
-    final List<Dataset> nullList = null;
-    DatasetResponseMapper.toDatasetsResponse(nullList);
+  public void testToDatasetsResponse_throwsException_onNullDatasets() {
+    final List<Dataset> nullDatasets = null;
+    DatasetResponseMapper.toDatasetsResponse(nullDatasets);
   }
 }
