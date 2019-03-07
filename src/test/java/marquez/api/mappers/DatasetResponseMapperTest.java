@@ -96,6 +96,7 @@ public class DatasetResponseMapperTest {
     DatasetResponseMapper.map(nullList);
   }
 
+  @Test
   public void testToDatasetsResponse() {
     final List<Dataset> datasets = Arrays.asList(DATASET);
     final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(datasets);
