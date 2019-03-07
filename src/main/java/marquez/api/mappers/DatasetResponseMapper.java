@@ -16,12 +16,12 @@ package marquez.api.mappers;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static marquez.common.models.Description.NO_VALUE;
 
 import java.util.List;
 import lombok.NonNull;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
-import marquez.common.models.Description;
 import marquez.service.models.Dataset;
 
 public final class DatasetResponseMapper {
@@ -32,10 +32,7 @@ public final class DatasetResponseMapper {
         dataset.getName().getValue(),
         dataset.getCreatedAt().toString(),
         dataset.getUrn().getValue(),
-        dataset
-            .getDescription()
-            .map(description -> description.getValue())
-            .orElse(Description.NO_VALUE));
+        dataset.getDescription().map(description -> description.getValue()).orElse(NO_VALUE));
   }
 
   public static List<DatasetResponse> map(@NonNull List<Dataset> datasets) {
