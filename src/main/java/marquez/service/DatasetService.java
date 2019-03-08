@@ -22,6 +22,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
@@ -50,9 +51,9 @@ public class DatasetService {
   public Dataset create(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName name,
-      @NonNull String datasourceUrn,
+      @NonNull DatasourceUrn datasourceUrn,
       @Nullable Description description) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   public Dataset create(

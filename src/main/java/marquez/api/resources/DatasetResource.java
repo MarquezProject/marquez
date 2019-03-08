@@ -41,6 +41,7 @@ import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
@@ -89,7 +90,7 @@ public final class DatasetResource {
         datasetService.create(
             namespaceName,
             DatasetName.fromString(request.getName()),
-            request.getDatasourceUrn(),
+            DatasourceUrn.fromString(request.getDatasourceUrn()),
             request
                 .getDescription()
                 .map(Description::fromString)

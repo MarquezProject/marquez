@@ -30,7 +30,6 @@ import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
 import marquez.db.models.DatasetRow;
 import marquez.service.models.Dataset;
-import marquez.service.models.Generator;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
