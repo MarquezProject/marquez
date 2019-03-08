@@ -21,6 +21,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceType;
@@ -66,8 +67,36 @@ public class DatasourceServiceTest {
     assertThat(response.getName()).isEqualTo(DatasourceName.fromString(row.getName()));
   }
 
+  @Test(expected = NullPointerException.class)
+  public void testCreateDatasource_throwsException_onNullConnectionUrl()
+      throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
+
+    final Datasource response =
+        datasourceService.create(null, DatasourceName.fromString(row.getName()));
+    assertThat(response.getConnectionUrl())
+        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
+
+    assertThat(response.getName()).isEqualTo(DatasourceName.fromString(row.getName()));
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testCreateDatasource_throwsException_onNullDatasourceName()
+      throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
+
+    final Datasource response =
+        datasourceService.create(ConnectionUrl.fromString(row.getConnectionUrl()), null);
+    assertThat(response.getConnectionUrl())
+        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
+
+    assertThat(response.getName()).isEqualTo(DatasourceName.fromString(row.getName()));
+  }
+
   @Test
-  public void testGetDatasource() throws MarquezServiceException {
+  public void testGetDatasourceByUrn() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
 
@@ -75,6 +104,19 @@ public class DatasourceServiceTest {
         ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
     final Optional<Datasource> response =
         datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
+    assertThat(response.isPresent()).isTrue();
+
+    assertThat(response.get().getConnectionUrl())
+        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
+    assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
+  }
+
+  @Test
+  public void testGetDatasourceByUuid() throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any(UUID.class))).thenReturn(Optional.of(row));
+
+    final Optional<Datasource> response = datasourceService.get(row.getUuid());
     assertThat(response.isPresent()).isTrue();
 
     assertThat(response.get().getConnectionUrl())

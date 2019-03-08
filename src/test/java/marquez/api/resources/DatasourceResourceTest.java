@@ -154,7 +154,7 @@ public class DatasourceResourceTest {
         (DatasourceResponse) datasourceResourceResponse.getEntity();
 
     assertThat(datasourceResponse.getName()).isEqualTo(ds1.getName().getValue());
-    assertThat(datasourceResponse.getUrn()).isEqualTo(datasourceUrn);
+    assertThat(datasourceResponse.getUrn()).isEqualTo(datasourceUrn.toString());
     assertThat(datasourceResponse.getCreatedAt()).isNotEmpty();
     assertThat(datasourceResponse.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
