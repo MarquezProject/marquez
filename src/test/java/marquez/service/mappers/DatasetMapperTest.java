@@ -71,7 +71,7 @@ public class DatasetMapperTest {
   public void testMap_rowWithNoDescription() {
     final Optional<Description> noDescription = Optional.of(NO_DESCRIPTION);
 
-    final DatasetRow row =
+    final DatasetRow rowWithNoDescription =
         DatasetRow.builder()
             .uuid(UUID.randomUUID())
             .name(NAME.getValue())
@@ -83,7 +83,7 @@ public class DatasetMapperTest {
             .currentVersion(UUID.randomUUID())
             .build();
 
-    final Dataset dataset = DatasetMapper.map(row);
+    final Dataset dataset = DatasetMapper.map(rowWithNoDescription);
     assertNotNull(dataset);
     assertEquals(NAME, dataset.getName());
     assertEquals(CREATED_AT, dataset.getCreatedAt());
