@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.MarquezException;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.DatasourceDao;
 import marquez.db.models.DatasourceRow;
 import marquez.service.exceptions.MarquezServiceException;
@@ -46,7 +47,7 @@ public class DatasourceService {
     try {
       datasourceDao.insert(datasourceRow);
       final Optional<DatasourceRow> datasourceRowIfFound =
-          datasourceDao.findBy(datasourceRow.getName());
+          datasourceDao.findBy(datasourceRow.getUrn());
       return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezException::new);
     } catch (MarquezException e) {
       log.error(e.getMessage());
@@ -54,11 +55,11 @@ public class DatasourceService {
     }
   }
 
-  public Optional<Datasource> get(@NonNull final DatasourceName datasourceName)
+  public Optional<Datasource> get(@NonNull final DatasourceUrn datasourceUrn)
       throws MarquezServiceException {
     try {
       final Optional<DatasourceRow> datasourceRowIfFound =
-          datasourceDao.findBy(datasourceName.getValue());
+          datasourceDao.findBy(datasourceUrn.getValue());
       return datasourceRowIfFound.map(DatasourceMapper::map);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());

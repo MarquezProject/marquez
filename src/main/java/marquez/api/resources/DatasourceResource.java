@@ -76,7 +76,7 @@ public final class DatasourceResource {
 
     final Optional<Datasource> datasource;
     try {
-      datasource = datasourceService.get(datasourceUrn.getDatasourceName());
+      datasource = datasourceService.get(datasourceUrn);
     } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();

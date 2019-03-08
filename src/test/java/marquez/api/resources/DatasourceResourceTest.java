@@ -143,17 +143,14 @@ public class DatasourceResourceTest {
 
   @Test
   public void testGetDatasource() throws MarquezServiceException, ResourceException {
+    final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
+    final ConnectionUrl connectionUrl =
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+
     final Datasource ds1 =
-        new Datasource(
-            DatasourceName.fromString("mysqlcluster"),
-            ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_"),
-            Instant.now());
-
-    final String datasourceTypeStr = ds1.getConnectionUrl().getDatasourceType().toString();
-    final DatasourceUrn datasourceUrn =
-        DatasourceUrn.from(datasourceTypeStr, ds1.getName().getValue());
-
-    when(mockDatasourceService.get(ds1.getName())).thenReturn(Optional.of(ds1));
+        new Datasource(datasourceName, datasourceUrn, connectionUrl, Instant.now());
+    when(mockDatasourceService.get(datasourceUrn)).thenReturn(Optional.of(ds1));
 
     final Response datasourceResponse = datasourceResource.get(datasourceUrn);
     assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
@@ -179,15 +176,14 @@ public class DatasourceResourceTest {
 
   @Test(expected = ResourceException.class)
   public void testGetInternalError() throws MarquezServiceException, ResourceException {
-    final Datasource ds1 =
-        new Datasource(
-            DatasourceName.fromString("mysqlcluster"),
-            ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_"),
-            Instant.now());
-    when(mockDatasourceService.get(ds1.getName())).thenThrow(MarquezServiceException.class);
-    DatasourceUrn datasourceUrn =
-        DatasourceUrn.from(DatasourceType.REDSHIFT.toString(), ds1.getName().getValue());
+    final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
+    final ConnectionUrl connectionUrl =
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
+    final Datasource ds1 =
+        new Datasource(datasourceName, datasourceUrn, connectionUrl, Instant.now());
+    when(mockDatasourceService.get(ds1.getUrn())).thenThrow(MarquezServiceException.class);
     datasourceResource.get(datasourceUrn);
   }
 
@@ -207,6 +203,7 @@ public class DatasourceResourceTest {
         (DatasourceResponse) createDatasourceResponse.getEntity();
 
     assertThat(returnedDatasource.getName()).isEqualTo(ds1.getName().getValue());
+    assertThat(returnedDatasource.getUrn()).isEqualTo(ds1.getUrn().getValue());
     assertThat(returnedDatasource.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
   }

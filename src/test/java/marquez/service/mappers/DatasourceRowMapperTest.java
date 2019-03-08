@@ -19,7 +19,9 @@ import static org.junit.Assert.assertNotNull;
 
 import marquez.UnitTests;
 import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceType;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.DbName;
 import marquez.common.models.DbSchemaName;
 import marquez.common.models.DbTableName;
@@ -31,12 +33,15 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTests.class)
 public class DatasourceRowMapperTest {
   private static final DatasourceType DATASOURCE_TYPE = DatasourceType.POSTGRESQL;
+  private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("mydatabase123");
   private static final DbName DB_NAME = DbName.fromString("test_db");
   private static final ConnectionUrl CONNECTION_URL =
       ConnectionUrl.fromString(
           String.format(
               "jdbc:%s://localhost:5432/%s",
               DATASOURCE_TYPE.toString().toLowerCase(), DB_NAME.getValue()));
+  private static final DatasourceUrn DATASOURCE_URN =
+      DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
   private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.fromString("test_schema");
   private static final DbTableName DB_TABLE_NAME = DbTableName.fromString("test_table");
 

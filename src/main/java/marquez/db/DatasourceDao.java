@@ -28,15 +28,15 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(DatasourceRowMapper.class)
 public interface DatasourceDao {
   @SqlUpdate(
-      "INSERT INTO datasources (guid, name, connection_url) "
-          + "VALUES (:uuid, :name, :connectionUrl)")
-  void insert(@BindBean DatasourceRow dataSourceRow);
+      "INSERT INTO datasources (guid, urn, name, connection_url) "
+          + "VALUES (:uuid, :urn, :name, :connectionUrl)")
+  void insert(@BindBean DatasourceRow datasourceRow);
 
   @SqlQuery("SELECT * FROM datasources WHERE guid = :uuid")
   Optional<DatasourceRow> findBy(@Bind("uuid") UUID uuid);
 
-  @SqlQuery("SELECT * FROM datasources WHERE name = :name")
-  Optional<DatasourceRow> findBy(@Bind("name") String name);
+  @SqlQuery("SELECT * FROM datasources WHERE urn = :urn")
+  Optional<DatasourceRow> findBy(@Bind("urn") String urn);
 
   @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
   List<DatasourceRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);

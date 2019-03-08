@@ -29,6 +29,7 @@ public final class DatasourceResponseMapper {
   public static DatasourceResponse map(@NonNull Datasource datasource) {
     return new DatasourceResponse(
         datasource.getName().getValue(),
+        datasource.getUrn().getValue(),
         datasource.getConnectionUrl().getRawValue(),
         datasource.getCreatedAt().toString());
   }

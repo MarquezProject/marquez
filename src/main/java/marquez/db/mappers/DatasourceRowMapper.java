@@ -29,6 +29,7 @@ public final class DatasourceRowMapper implements RowMapper<DatasourceRow> {
       throws SQLException {
     return DatasourceRow.builder()
         .uuid(results.getObject(Columns.ROW_UUID, UUID.class))
+        .urn(results.getString(Columns.URN))
         .createdAt(results.getTimestamp(Columns.CREATED_AT).toInstant())
         .name(results.getString(Columns.NAME))
         .connectionUrl(results.getString(Columns.CONNECTION_URL))

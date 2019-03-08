@@ -23,6 +23,8 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceType;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.DatasourceDao;
 import marquez.db.models.DatasourceRow;
 import marquez.service.exceptions.MarquezServiceException;
@@ -68,8 +70,10 @@ public class DatasourceServiceTest {
   public void testGetDatasource() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
+
+    DatasourceType type = ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
     final Optional<Datasource> response =
-        datasourceService.get(DatasourceName.fromString(row.getName()));
+        datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
     assertThat(response.isPresent()).isTrue();
 
     assertThat(response.get().getConnectionUrl())
@@ -82,7 +86,9 @@ public class DatasourceServiceTest {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.findBy(any(String.class)))
         .thenThrow(UnableToExecuteStatementException.class);
-    datasourceService.get(DatasourceName.fromString(row.getName()));
+    DatasourceType type = ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
+
+    datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
   }
 
   @Test
