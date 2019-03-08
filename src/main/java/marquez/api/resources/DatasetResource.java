@@ -140,7 +140,8 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  private void checkNamespaceExists(@NonNull NamespaceName namespaceName) throws MarquezServiceException {
+  private void checkNamespaceExists(@NonNull NamespaceName namespaceName)
+      throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName.getValue())) {
       throw new NamespaceNotFoundException(namespaceName);
     }
