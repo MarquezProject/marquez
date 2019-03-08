@@ -100,6 +100,23 @@ public class DatasetResourceTest {
   }
 
   @Test
+  public void testGet() throws MarquezServiceException {
+    final Optional<String> expectedDescription = Optional.of(DESCRIPTION.getValue());
+
+    when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
+    when(datasetService.get(URN)).thenReturn(Optional.of(DATASET));
+
+    final Response response = datasetResource.get(NAMESPACE_NAME, URN);
+    assertEquals(OK, response.getStatusInfo());
+
+    final DatasetResponse datasetResponse = (DatasetResponse) response.getEntity();
+    assertEquals(NAME.getValue(), datasetResponse.getName());
+    assertEquals(CREATED_AT.toString(), datasetResponse.getCreatedAt());
+    assertEquals(URN.getValue(), datasetResponse.getUrn());
+    assertEquals(expectedDescription, datasetResponse.getDescription());
+  }
+
+  @Test
   public void testList() throws MarquezServiceException {
     final Optional<String> expectedDescription = Optional.of(DESCRIPTION.getValue());
 
