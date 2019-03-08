@@ -20,6 +20,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.common.models.ConnectionUrl;
@@ -164,5 +167,47 @@ public class DatasourceServiceTest {
     when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.empty());
     final Optional<Datasource> response = datasourceService.get(row.getUuid());
     assertThat(response.isPresent()).isFalse();
+  }
+
+  @Test
+  public void testGetAll_multipleResults() {
+    List<DatasourceRow> datasourceRowList = new ArrayList();
+    datasourceRowList.add(Generator.genDatasourceRow());
+    datasourceRowList.add(Generator.genDatasourceRow());
+
+    when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
+
+    List<Datasource> datasources = datasourceService.getAll(100, 0);
+    assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
+
+    assertThat(datasources.get(0).getUrn()).isNotEqualTo(datasources.get(1).getUrn());
+  }
+
+  @Test
+  public void testGetAll_singleResult() {
+    DatasourceRow generatedDatasourceRow = Generator.genDatasourceRow();
+    List<DatasourceRow> datasourceRowList = Collections.singletonList(generatedDatasourceRow);
+
+    when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
+
+    List<Datasource> datasources = datasourceService.getAll(100, 0);
+    assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
+
+    Datasource returnedDatasource = datasources.get(0);
+
+    assertThat(returnedDatasource.getUrn().toString()).isEqualTo(generatedDatasourceRow.getUrn());
+    assertThat(returnedDatasource.getConnectionUrl().getRawValue())
+        .isEqualTo(generatedDatasourceRow.getConnectionUrl());
+    assertThat(returnedDatasource.getName().getValue()).isEqualTo(generatedDatasourceRow.getName());
+  }
+
+  @Test
+  public void testGetAll_noResults() {
+    List<DatasourceRow> datasourceRowList = Collections.emptyList();
+
+    when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
+
+    List<Datasource> datasources = datasourceService.getAll(100, 0);
+    assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
   }
 }

@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public final class DatasourceUrn extends Urn {
   private static final int NUM_COMPONENTS = 2;
   private static final String URN_TYPE = "datasource";
