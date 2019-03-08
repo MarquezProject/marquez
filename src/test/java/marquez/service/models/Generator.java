@@ -19,7 +19,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.NamespaceName;
 import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
@@ -166,6 +168,12 @@ public class Generator {
         .build();
   }
 
+  // DatasetUrn
+  public static DatasetUrn genDatasetUrn() {
+    return DatasetUrn.from(
+        NamespaceName.fromString("ns" + randNum()), DatasetName.fromString("dataset" + randNum()));
+  }
+
   // Dataset Rows
   public static DatasetRow genDatasetRow(UUID namespaceID, UUID dataSourceID) {
     return DatasetRow.builder()
@@ -173,7 +181,7 @@ public class Generator {
         .namespaceUuid(namespaceID)
         .dataSourceUuid(dataSourceID)
         .description("dataset " + randNum())
-        .urn(DatasetUrn.fromString(randUrn()).toString())
+        .urn(genDatasetUrn().toString())
         .build();
   }
 
