@@ -171,6 +171,13 @@ public class DatasourceResourceTest {
     assertThat(datasourceResponse.getStatus()).isEqualTo(NOT_FOUND.getStatusCode());
   }
 
+  @Test(expected = NullPointerException.class)
+  public void testGet_throwsException_onNullDatasourceUrn()
+      throws MarquezServiceException, ResourceException {
+    DatasourceUrn nullUrn = null;
+    datasourceResource.get(nullUrn);
+  }
+
   @Test(expected = ResourceException.class)
   public void testGetInternalError() throws MarquezServiceException, ResourceException {
     final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
