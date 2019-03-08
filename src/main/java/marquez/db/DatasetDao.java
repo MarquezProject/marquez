@@ -27,7 +27,6 @@ import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -61,13 +60,10 @@ public interface DatasetDao {
   @SqlUpdate(
       "UPDATE datasets SET updated_at = :updatedAt, current_version_uuid = :currentVersion "
           + "WHERE guid = :uuid")
-  void updateCurrentVersion(
-      @Bind("uuid") UUID uuid,
-      @Bind("updatedAt") Instant updatedAt,
-      @Bind("currentVersion") UUID currentVersion);
+  void updateCurrentVersion(UUID uuid, Instant updatedAt, UUID currentVersion);
 
   @SqlQuery("SELECT * FROM datasets WHERE uuid = :uuid")
-  Optional<DatasetRow> findBy(@Bind("uuid") UUID uuid);
+  Optional<DatasetRow> findBy(UUID uuid);
 
   @SqlQuery("SELECT * FROM datasets WHERE urn = :urn.value")
   Optional<DatasetRow> findBy(@BindBean("urn") DatasetUrn urn);
@@ -79,7 +75,5 @@ public interface DatasetDao {
           + "     ON (n.guid = d.namespace_guid AND n.name=:namespace.value)"
           + "LIMIT :limit OFFSET :offset")
   List<DatasetRow> findAll(
-      @BindBean("namespace") NamespaceName namespaceName,
-      @Bind("limit") Integer limit,
-      @Bind("offset") Integer offset);
+      @BindBean("namespace") NamespaceName namespaceName, Integer limit, Integer offset);
 }

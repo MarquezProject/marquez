@@ -14,10 +14,10 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class JobRequest {
-  @Getter @NotNull private List<String> inputDatasetUrns;
-  @Getter @NotNull private List<String> outputDatasetUrns;
-  @Getter @NotNull private String location;
-  @Nullable private String description;
+  @Getter @NotNull private final List<String> inputDatasetUrns;
+  @Getter @NotNull private final List<String> outputDatasetUrns;
+  @Getter @NotNull private final String location;
+  @Nullable private final String description;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

@@ -14,12 +14,12 @@
 
 package marquez.api.mappers;
 
-import marquez.api.models.Job;
+import marquez.api.models.JobResponse;
 
-public class CoreJobToApiJobMapper extends Mapper<marquez.service.models.Job, Job> {
+public class CoreJobToApiJobMapper extends Mapper<marquez.service.models.Job, JobResponse> {
   @Override
-  public Job map(marquez.service.models.Job value) {
-    return new Job(
+  public JobResponse map(marquez.service.models.Job value) {
+    return new JobResponse(
         value.getName(),
         value.getCreatedAt(),
         value.getInputDatasetUrns(),

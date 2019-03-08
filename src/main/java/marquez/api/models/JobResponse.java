@@ -12,6 +12,27 @@
  * limitations under the License.
  */
 
-package marquez.api.exceptions;
+package marquez.api.models;
 
-public class ResourceException extends Throwable {}
+import java.sql.Timestamp;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public final class JobResponse {
+  private String name;
+
+  private Timestamp createdAt;
+
+  private List<String> inputDatasetUrns;
+
+  private List<String> outputDatasetUrns;
+
+  private String location;
+
+  private String description;
+}

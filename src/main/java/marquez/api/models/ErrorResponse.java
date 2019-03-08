@@ -14,13 +14,16 @@
 
 package marquez.api.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
 
-@Data
 @AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public final class ErrorResponse {
-  @JsonProperty("error")
-  private String error;
+  @Getter @NonNull private final Integer status;
+  @Getter @NonNull private final String message;
 }
