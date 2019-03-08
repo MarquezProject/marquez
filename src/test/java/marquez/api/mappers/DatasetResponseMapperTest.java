@@ -38,7 +38,7 @@ public class DatasetResponseMapperTest {
   private static final DatasetName NAME = DatasetName.fromString("b.c");
   private static final Instant CREATED_AT = Instant.now();
   private static final DatasetUrn URN =
-      DatasetUrn.fromString(String.format("urn:a:%s", NAME.getValue()));
+      DatasetUrn.fromString(String.format("urn:dataset:a:%s", NAME.getValue()));
   private static final Description DESCRIPTION = Description.fromString("test description");
   private static final Dataset DATASET =
       Dataset.builder().name(NAME).createdAt(CREATED_AT).urn(URN).description(DESCRIPTION).build();

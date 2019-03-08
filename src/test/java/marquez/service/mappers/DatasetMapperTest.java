@@ -39,7 +39,7 @@ public class DatasetMapperTest {
   private static final Instant CREATED_AT = Instant.now();
   private static final Instant UPDATED_AT = Instant.now();
   private static final DatasetUrn URN =
-      DatasetUrn.fromString(String.format("urn:a:%s", NAME.getValue()));
+      DatasetUrn.fromString(String.format("urn:dataset:a:%s", NAME.getValue()));
   private static final Description DESCRIPTION = Description.fromString("test description");
   private static final DatasetRow ROW =
       DatasetRow.builder()

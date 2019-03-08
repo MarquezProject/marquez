@@ -34,6 +34,7 @@ import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
@@ -46,12 +47,13 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTests.class)
 public class DatasetResourceTest {
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
-  private static final String DATASOURCE_URN = "urn:a:b";
+  private static final DatasourceUrn DATASOURCE_URN =
+      DatasourceUrn.fromString("urn:datasource:a:b");
 
   private static final DatasetName NAME = DatasetName.fromString("b.c");
   private static final Instant CREATED_AT = Instant.now();
   private static final DatasetUrn URN =
-      DatasetUrn.fromString(String.format("urn:a:%s", NAME.getValue()));
+      DatasetUrn.fromString(String.format("urn:dataset:a:%s", NAME.getValue()));
   private static final Description DESCRIPTION = Description.fromString("test description");
   private static final Dataset DATASET =
       Dataset.builder().name(NAME).createdAt(CREATED_AT).urn(URN).description(DESCRIPTION).build();
@@ -85,7 +87,7 @@ public class DatasetResourceTest {
         .thenReturn(DATASET);
 
     final DatasetRequest datasetRequest =
-        new DatasetRequest(NAME.getValue(), DATASOURCE_URN, DESCRIPTION.getValue());
+        new DatasetRequest(NAME.getValue(), DATASOURCE_URN.getValue(), DESCRIPTION.getValue());
 
     final Response response = datasetResource.create(NAMESPACE_NAME, datasetRequest);
     assertEquals(CREATED, response.getStatusInfo());
