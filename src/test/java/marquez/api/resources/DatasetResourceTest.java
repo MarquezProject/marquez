@@ -14,8 +14,8 @@
 
 package marquez.api.resources;
 
+import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.OK;
-import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -25,12 +25,15 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import javax.ws.rs.WebApplicationException;
+import java.util.Optional;
 import javax.ws.rs.core.Response;
+import marquez.api.exceptions.NamespaceNotFoundException;
+import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
@@ -39,10 +42,17 @@ import marquez.service.models.Dataset;
 import org.junit.Test;
 
 public class DatasetResourceTest {
-  private static final DatasetName DATASET_NAME = DatasetName.fromString("b.c");
-  private static final Instant CREATED_AT = Instant.now();
-  private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
+  private static final String DATASOURCE_URN = "urn:a:b";
+
+  private static final DatasetName NAME = DatasetName.fromString("b.c");
+  private static final Instant CREATED_AT = Instant.now();
+  private static final DatasetUrn URN =
+      DatasetUrn.fromString(String.format("urn:a:%s", NAME.getValue()));
+  private static final Description DESCRIPTION = Description.fromString("test description");
+  private static final Dataset DATASET =
+      Dataset.builder().name(NAME).createdAt(CREATED_AT).urn(URN).description(DESCRIPTION).build();
+
   private static final int LIMIT = 100;
   private static final int OFFSET = 0;
 
@@ -64,11 +74,33 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testList_http200() throws MarquezServiceException {
+  public void testCreate() throws MarquezServiceException {
+    final Optional<String> expectedDescription = Optional.of(DESCRIPTION.getValue());
+
+    when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
+    when(datasetService.create(NAMESPACE_NAME, NAME, DATASOURCE_URN, DESCRIPTION))
+        .thenReturn(DATASET);
+
+    final DatasetRequest datasetRequest =
+        new DatasetRequest(NAME.getValue(), DATASOURCE_URN, DESCRIPTION.getValue());
+
+    final Response response = datasetResource.create(NAMESPACE_NAME, datasetRequest);
+    assertEquals(CREATED, response.getStatusInfo());
+
+    final DatasetResponse datasetResponse = (DatasetResponse) response.getEntity();
+    assertEquals(NAME.getValue(), datasetResponse.getName());
+    assertEquals(CREATED_AT.toString(), datasetResponse.getCreatedAt());
+    assertEquals(URN.getValue(), datasetResponse.getUrn());
+    assertEquals(expectedDescription, datasetResponse.getDescription());
+  }
+
+  @Test
+  public void testList() throws MarquezServiceException {
+    final Optional<String> expectedDescription = Optional.of(DESCRIPTION.getValue());
+
     when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
 
-    final Dataset dataset = new Dataset(DATASET_NAME, CREATED_AT, DATASET_URN, NO_DESCRIPTION);
-    final List<Dataset> datasets = Arrays.asList(dataset);
+    final List<Dataset> datasets = Arrays.asList(DATASET);
     when(datasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasets);
 
     final Response response = datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
@@ -77,16 +109,17 @@ public class DatasetResourceTest {
     final DatasetsResponse datasetsResponse = (DatasetsResponse) response.getEntity();
     final List<DatasetResponse> datasetsResponses = datasetsResponse.getDatasets();
     assertEquals(1, datasetsResponses.size());
-    assertEquals(DATASET_URN.getValue(), datasetsResponses.get(0).getUrn());
+    assertEquals(NAME.getValue(), datasetsResponses.get(0).getName());
     assertEquals(CREATED_AT.toString(), datasetsResponses.get(0).getCreatedAt());
+    assertEquals(URN.getValue(), datasetsResponses.get(0).getUrn());
+    assertEquals(expectedDescription, datasetsResponses.get(0).getDescription());
 
     verify(datasetService, times(1)).getAll(NAMESPACE_NAME, LIMIT, OFFSET);
   }
 
-  @Test(expected = WebApplicationException.class)
-  public void testList_throwsException_onNamespaceDoesNotExist() throws MarquezServiceException {
+  @Test(expected = NamespaceNotFoundException.class)
+  public void testList_throwsException_onNamespaceNotFound() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
-
     datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
   }
 }

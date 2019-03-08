@@ -17,9 +17,12 @@ package marquez.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
 import marquez.db.models.DataSourceRow;
@@ -44,7 +47,11 @@ public class DatasetService {
     this.datasetDao = datasetDao;
   }
 
-  public Dataset create(@NonNull String datasourceUrn, @NonNull Dataset dataset) {
+  public Dataset create(
+      @NonNull NamespaceName namespaceName,
+      @NonNull DatasetName name,
+      @NonNull String datasourceUrn,
+      @Nullable Description description) {
     return null;
   }
 

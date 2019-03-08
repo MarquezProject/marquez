@@ -16,6 +16,7 @@ package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.CREATED;
+import static marquez.common.models.Description.NO_DESCRIPTION;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -34,11 +35,12 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.NamespaceNotFoundException;
-import marquez.api.mappers.DatasetMapper;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
+import marquez.common.models.DatasetName;
+import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
@@ -82,9 +84,12 @@ public final class DatasetResource {
     if (!namespaceService.exists(namespaceName.getValue())) {
       throw new NamespaceNotFoundException(namespaceName);
     }
-    final String datasourceUrn = request.getDatasourceUrn();
-    final Dataset newDataset = DatasetMapper.map(request);
-    final Dataset dataset = datasetService.create(datasourceUrn, newDataset);
+    final Dataset dataset =
+        datasetService.create(
+            namespaceName,
+            DatasetName.fromString(request.getName()),
+            request.getDatasourceUrn(),
+            request.getDescription().map(Description::fromString).orElse(NO_DESCRIPTION));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     return Response.status(CREATED).entity(response).build();
   }
