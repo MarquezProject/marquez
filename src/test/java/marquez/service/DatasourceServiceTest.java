@@ -71,7 +71,8 @@ public class DatasourceServiceTest {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
 
-    final DatasourceType type = ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
+    final DatasourceType type =
+        ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
     final Optional<Datasource> response =
         datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
     assertThat(response.isPresent()).isTrue();
@@ -86,7 +87,8 @@ public class DatasourceServiceTest {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.findBy(any(String.class)))
         .thenThrow(UnableToExecuteStatementException.class);
-    final DatasourceType type = ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
+    final DatasourceType type =
+        ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
 
     datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
   }

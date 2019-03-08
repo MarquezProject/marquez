@@ -32,7 +32,7 @@ public enum DatasourceType {
     return value;
   }
 
-  public final static DatasourceType fromString(@NonNull String value) {
+  public static final DatasourceType fromString(@NonNull String value) {
     for (DatasourceType type : DatasourceType.values()) {
       if (type.value.equals(value)) {
         return type;
