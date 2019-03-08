@@ -93,7 +93,7 @@ public final class DatasetResource {
             request
                 .getDescription()
                 .map(Description::fromString)
-		.orElse(Description.NO_DESCRIPTION));
+                .orElse(Description.NO_DESCRIPTION));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     return Response.status(CREATED).entity(response).build();
   }
