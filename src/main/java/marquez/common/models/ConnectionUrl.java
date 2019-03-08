@@ -71,7 +71,8 @@ public final class ConnectionUrl {
                   urlParts.length, URL_PART_COUNT));
         }
         final String datasourceString = urlParts[DATA_SOURCE_PART];
-        final DatasourceType datasourceType = DatasourceType.valueOf(datasourceString);
+        final DatasourceType datasourceType =
+            DatasourceType.valueOf(datasourceString.toUpperCase());
         final String dbNameString =
             urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
         final DbName dbName =

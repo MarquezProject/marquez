@@ -46,9 +46,21 @@ public class DatasourceService {
     try {
       datasourceDao.insert(datasourceRow);
       final Optional<DatasourceRow> datasourceRowIfFound =
-          datasourceDao.findBy(datasourceRow.getUuid());
+          datasourceDao.findBy(datasourceRow.getName());
       return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezException::new);
     } catch (MarquezException e) {
+      log.error(e.getMessage());
+      throw new MarquezServiceException();
+    }
+  }
+
+  public Optional<Datasource> get(@NonNull final DatasourceName datasourceName)
+      throws MarquezServiceException {
+    try {
+      final Optional<DatasourceRow> datasourceRowIfFound =
+          datasourceDao.findBy(datasourceName.getValue());
+      return datasourceRowIfFound.map(DatasourceMapper::map);
+    } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
       throw new MarquezServiceException();
     }

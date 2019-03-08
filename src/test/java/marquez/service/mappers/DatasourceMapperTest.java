@@ -29,7 +29,7 @@ public class DatasourceMapperTest {
   private static final Instant CREATED_AT = Instant.now();
 
   private static final String CONNECTION_URL = "jdbc:postgresql://localhost:5431/novelists";
-  private static final String DATASOURCE_NAME = "datasourcerow";
+  private static final String DATASOURCE_NAME = "my_database";
 
   @Test
   public void testMapDatasourceRow() {

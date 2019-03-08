@@ -52,7 +52,7 @@ public class DatasourceServiceTest {
   @Test
   public void testCreateDatasource() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any())).thenReturn(Optional.of(row));
+    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
 
     final Datasource response =
         datasourceService.create(
@@ -67,8 +67,9 @@ public class DatasourceServiceTest {
   @Test
   public void testGetDatasource() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any())).thenReturn(Optional.of(row));
-    final Optional<Datasource> response = datasourceService.get(row.getUuid());
+    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
+    final Optional<Datasource> response =
+        datasourceService.get(DatasourceName.fromString(row.getName()));
     assertThat(response.isPresent()).isTrue();
 
     assertThat(response.get().getConnectionUrl())
@@ -79,14 +80,15 @@ public class DatasourceServiceTest {
   @Test(expected = MarquezServiceException.class)
   public void testGetDatasourceError() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any())).thenThrow(UnableToExecuteStatementException.class);
-    datasourceService.get(row.getUuid());
+    when(datasourceDao.findBy(any(String.class)))
+        .thenThrow(UnableToExecuteStatementException.class);
+    datasourceService.get(DatasourceName.fromString(row.getName()));
   }
 
   @Test
   public void testGetNoSuchDatasource() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any())).thenReturn(Optional.empty());
+    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.empty());
     final Optional<Datasource> response = datasourceService.get(row.getUuid());
     assertThat(response.isPresent()).isFalse();
   }

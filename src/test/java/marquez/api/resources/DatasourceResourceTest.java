@@ -24,6 +24,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +36,10 @@ import marquez.api.exceptions.ResourceExceptionMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
-import marquez.common.models.DatasourceId;
+import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceType;
+import marquez.common.models.DatasourceUrn;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
@@ -50,6 +54,16 @@ public class DatasourceResourceTest {
 
   private static final DatasourceResource datasourceResource =
       new DatasourceResource(mockDatasourceService);
+
+  private static final DatasourceType TEST_DATA_SOURCE_TYPE = DatasourceType.REDSHIFT;
+  private static final String TEST_DATASOURCE_TYPE_STR = TEST_DATA_SOURCE_TYPE.toString();
+
+  private static final String TEST_DATASOURCE_NAME_STR = "finance_team_mysql_server_1";
+  private static final DatasourceName TEST_DATASOURCE_NAME =
+      DatasourceName.fromString(TEST_DATASOURCE_NAME_STR);
+
+  private static final String TEST_DATASOURCE_URN =
+      "urn:datasource:" + TEST_DATASOURCE_TYPE_STR + ":" + TEST_DATASOURCE_NAME_STR;
 
   @ClassRule
   public static final ResourceTestRule resources =
@@ -129,12 +143,19 @@ public class DatasourceResourceTest {
 
   @Test
   public void testGetDatasource() throws MarquezServiceException, ResourceException {
-    final Datasource ds1 = Generator.genDatasource();
-    final UUID requestUuid = UUID.randomUUID();
-    when(mockDatasourceService.get(requestUuid)).thenReturn(Optional.of(ds1));
+    final Datasource ds1 =
+        new Datasource(
+            DatasourceName.fromString("mysqlcluster"),
+            ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_"),
+            Instant.now());
 
-    final Response datasourceResponse =
-        datasourceResource.get(DatasourceId.fromString(requestUuid.toString()));
+    final String datasourceTypeStr = ds1.getConnectionUrl().getDatasourceType().toString();
+    final DatasourceUrn datasourceUrn =
+        DatasourceUrn.from(datasourceTypeStr, ds1.getName().getValue());
+
+    when(mockDatasourceService.get(ds1.getName())).thenReturn(Optional.of(ds1));
+
+    final Response datasourceResponse = datasourceResource.get(datasourceUrn);
     assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
     final DatasourceResponse datasourcesResponse =
@@ -151,16 +172,23 @@ public class DatasourceResourceTest {
     when(mockDatasourceService.get(requestUuid)).thenReturn(Optional.empty());
 
     final Response datasourceResponse =
-        datasourceResource.get(DatasourceId.fromString(requestUuid.toString()));
+        datasourceResource.get(
+            DatasourceUrn.from(TEST_DATASOURCE_TYPE_STR, TEST_DATASOURCE_NAME_STR));
     assertThat(datasourceResponse.getStatus()).isEqualTo(NOT_FOUND.getStatusCode());
   }
 
   @Test(expected = ResourceException.class)
   public void testGetInternalError() throws MarquezServiceException, ResourceException {
-    final UUID requestUuid = UUID.randomUUID();
-    when(mockDatasourceService.get(requestUuid)).thenThrow(MarquezServiceException.class);
+    final Datasource ds1 =
+        new Datasource(
+            DatasourceName.fromString("mysqlcluster"),
+            ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_"),
+            Instant.now());
+    when(mockDatasourceService.get(ds1.getName())).thenThrow(MarquezServiceException.class);
+    DatasourceUrn datasourceUrn =
+        DatasourceUrn.from(DatasourceType.REDSHIFT.toString(), ds1.getName().getValue());
 
-    datasourceResource.get(DatasourceId.fromString(requestUuid.toString()));
+    datasourceResource.get(datasourceUrn);
   }
 
   @Test

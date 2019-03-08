@@ -30,11 +30,13 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasourceRowMapperTest {
-  private static final DatasourceType DATASOURCE_TYPE = DatasourceType.valueOf("postgresql");
+  private static final DatasourceType DATASOURCE_TYPE = DatasourceType.POSTGRESQL;
   private static final DbName DB_NAME = DbName.fromString("test_db");
   private static final ConnectionUrl CONNECTION_URL =
       ConnectionUrl.fromString(
-          String.format("jdbc:%s://localhost:5432/%s", DATASOURCE_TYPE.name(), DB_NAME.getValue()));
+          String.format(
+              "jdbc:%s://localhost:5432/%s",
+              DATASOURCE_TYPE.toString().toLowerCase(), DB_NAME.getValue()));
   private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.fromString("test_schema");
   private static final DbTableName DB_TABLE_NAME = DbTableName.fromString("test_table");
 

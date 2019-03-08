@@ -36,8 +36,8 @@ import marquez.api.exceptions.ResourceException;
 import marquez.api.mappers.DatasourceResponseMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DatasourceId;
 import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
@@ -69,14 +69,14 @@ public final class DatasourceResource {
   @ResponseMetered
   @ExceptionMetered
   @Timed
-  @Path("/{datasourceId}")
   @Produces(APPLICATION_JSON)
-  public Response get(@PathParam("datasourceId") final DatasourceId datasourceId)
+  @Path("/{urn}")
+  public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
       throws ResourceException {
 
     final Optional<Datasource> datasource;
     try {
-      datasource = datasourceService.get(datasourceId.getValue());
+      datasource = datasourceService.get(datasourceUrn.getDatasourceName());
     } catch (MarquezServiceException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();

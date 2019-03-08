@@ -35,6 +35,9 @@ public interface DatasourceDao {
   @SqlQuery("SELECT * FROM datasources WHERE guid = :uuid")
   Optional<DatasourceRow> findBy(@Bind("uuid") UUID uuid);
 
+  @SqlQuery("SELECT * FROM datasources WHERE name = :name")
+  Optional<DatasourceRow> findBy(@Bind("name") String name);
+
   @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
   List<DatasourceRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);
 }

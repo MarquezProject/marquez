@@ -23,18 +23,46 @@ public class DatasourceTypeTest {
   @Test
   public void testValidName() {
     final String datasourceType = "postgresql";
-    assertThat(DatasourceType.valueOf(datasourceType).name()).isEqualTo(datasourceType);
+    final DatasourceType myDatasourceType = DatasourceType.fromString(datasourceType);
+    assertThat(myDatasourceType.toString()).isEqualTo(datasourceType);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
+  public void testToValue() {
+    final String expectedValue = "postgresql";
+    assertThat(DatasourceType.POSTGRESQL.toString()).isEqualTo(expectedValue);
+  }
+
+  @Test
+  public void testFromString() {
+    final String expectedValue = "postgresql";
+    assertThat(DatasourceType.fromString(expectedValue)).isEqualTo(DatasourceType.POSTGRESQL);
+  }
+
+  @Test
   public void testNewDatasourceType_throwsException_onInvalidValue() {
     final String invalidDatasourceType = "xyz_postgresql";
-    DatasourceType.valueOf(invalidDatasourceType);
+    final DatasourceType datasourceType = DatasourceType.fromString(invalidDatasourceType);
+    assertThat(datasourceType).isNull();
   }
 
   @Test(expected = NullPointerException.class)
   public void testNewDatasourceType_throwsException_onNullValue() {
     final String nullValue = null;
-    DatasourceType.valueOf(nullValue);
+    DatasourceType.fromString(nullValue);
+  }
+
+  @Test
+  public void testValueOf_validValue() {
+    final String datasourceType = "mysql";
+    final DatasourceType myDatasourceType = DatasourceType.valueOf(datasourceType.toUpperCase());
+    assertThat(myDatasourceType.toString()).isEqualTo(datasourceType);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testValueOf_invalidValue() {
+    final String datasourceType = "mysql_";
+    final DatasourceType myDatasourceType = DatasourceType.valueOf(datasourceType.toUpperCase());
+    assertThat(myDatasourceType.toString()).isEqualTo(datasourceType);
   }
 }

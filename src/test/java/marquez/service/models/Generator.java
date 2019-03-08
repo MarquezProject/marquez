@@ -21,9 +21,9 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
@@ -175,7 +175,7 @@ public class Generator {
     int datasourceNum = randNum();
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
-        .name("Data Source" + datasourceNum)
+        .name("Datasource" + datasourceNum)
         .connectionUrl("jdbc:postgresql://localhost:5431/novelists_" + randNum())
         .createdAt(Instant.now())
         .build();
