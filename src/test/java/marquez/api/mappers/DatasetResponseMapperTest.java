@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import marquez.api.models.DatasetResponse;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
 import marquez.service.models.Dataset;
@@ -30,10 +31,12 @@ import marquez.service.models.Generator;
 import org.junit.Test;
 
 public class DatasetResponseMapperTest {
+  private static final DatasetName DATASET_NAME = DatasetName.fromString("b.c");
   private static final Instant CREATED_AT = Instant.now();
   private static final DatasetUrn DATASET_URN = Generator.genDatasetUrn();
   private static final Description DESCRIPTION = Description.fromString("test description");
-  private static final Dataset DATASET = new Dataset(DATASET_URN, CREATED_AT, DESCRIPTION);
+  private static final Dataset DATASET =
+      new Dataset(DATASET_NAME, CREATED_AT, DATASET_URN, DESCRIPTION);
 
   @Test
   public void testMapDataset() {
@@ -48,7 +51,7 @@ public class DatasetResponseMapperTest {
   @Test
   public void testMapDatasetNoDescription() {
     final Optional<String> noDescriptionString = Optional.of(NO_DESCRIPTION.getValue());
-    final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
+    final Dataset dataset = new Dataset(DATASET_NAME, CREATED_AT, DATASET_URN, NO_DESCRIPTION);
     final DatasetResponse datasetResponse = DatasetResponseMapper.map(dataset);
     assertNotNull(datasetResponse);
     assertEquals(DATASET_URN.getValue(), datasetResponse.getUrn());

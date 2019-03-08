@@ -29,18 +29,19 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
-import marquez.service.models.Generator;
 import org.junit.Test;
 
 public class DatasetResourceTest {
-  private static final DatasetUrn DATASET_URN = Generator.genDatasetUrn();
+  private static final DatasetName DATASET_NAME = DatasetName.fromString("b.c");
   private static final Instant CREATED_AT = Instant.now();
+  private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final int LIMIT = 100;
   private static final int OFFSET = 0;
@@ -66,7 +67,7 @@ public class DatasetResourceTest {
   public void testList_http200() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
 
-    final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
+    final Dataset dataset = new Dataset(DATASET_NAME, CREATED_AT, DATASET_URN, NO_DESCRIPTION);
     final List<Dataset> datasets = Arrays.asList(dataset);
     when(datasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasets);
 

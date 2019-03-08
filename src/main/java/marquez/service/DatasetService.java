@@ -44,6 +44,10 @@ public class DatasetService {
     this.datasetDao = datasetDao;
   }
 
+  public Dataset create(@NonNull String datasourceUrn, @NonNull Dataset dataset) {
+    return null;
+  }
+
   public Dataset create(
       @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
       throws MarquezServiceException {
