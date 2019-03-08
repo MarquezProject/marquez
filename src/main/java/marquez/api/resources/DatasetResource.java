@@ -15,6 +15,7 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.CREATED;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -85,7 +86,7 @@ public final class DatasetResource {
     final Dataset newDataset = DatasetMapper.map(request);
     final Dataset dataset = datasetService.create(datasourceUrn, newDataset);
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
-    return Response.ok(response).build();
+    return Response.status(CREATED).entity(response).build();
   }
 
   @GET
