@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
+import marquez.UnitTests;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
@@ -40,7 +41,9 @@ import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DatasetResourceTest {
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final String DATASOURCE_URN = "urn:a:b";
