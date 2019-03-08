@@ -37,7 +37,7 @@ public class DatasourceUrnTest {
     DatasourceUrn.fromString(nullUrn);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testGetDatasourceName() {
     assertThat(DatasourceUrn.fromString(URN).getDatasourceName().getValue()).isEqualTo("myteamdb");
   }

@@ -59,11 +59,6 @@ public class DatasourceResourceTest {
   private static final String TEST_DATASOURCE_TYPE_STR = TEST_DATA_SOURCE_TYPE.toString();
 
   private static final String TEST_DATASOURCE_NAME_STR = "finance_team_mysql_server_1";
-  private static final DatasourceName TEST_DATASOURCE_NAME =
-      DatasourceName.fromString(TEST_DATASOURCE_NAME_STR);
-
-  private static final String TEST_DATASOURCE_URN =
-      "urn:datasource:" + TEST_DATASOURCE_TYPE_STR + ":" + TEST_DATASOURCE_NAME_STR;
 
   @ClassRule
   public static final ResourceTestRule resources =
@@ -152,14 +147,16 @@ public class DatasourceResourceTest {
         new Datasource(datasourceName, datasourceUrn, connectionUrl, Instant.now());
     when(mockDatasourceService.get(datasourceUrn)).thenReturn(Optional.of(ds1));
 
-    final Response datasourceResponse = datasourceResource.get(datasourceUrn);
-    assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
+    final Response datasourceResourceResponse = datasourceResource.get(datasourceUrn);
+    assertThat(datasourceResourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
-    final DatasourceResponse datasourcesResponse =
-        (DatasourceResponse) datasourceResponse.getEntity();
+    final DatasourceResponse datasourceResponse =
+        (DatasourceResponse) datasourceResourceResponse.getEntity();
 
-    assertThat(datasourcesResponse.getName()).isEqualTo(ds1.getName().getValue());
-    assertThat(datasourcesResponse.getConnectionUrl())
+    assertThat(datasourceResponse.getName()).isEqualTo(ds1.getName().getValue());
+    assertThat(datasourceResponse.getUrn()).isEqualTo(datasourceUrn);
+    assertThat(datasourceResponse.getCreatedAt()).isNotEmpty();
+    assertThat(datasourceResponse.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
   }
 
