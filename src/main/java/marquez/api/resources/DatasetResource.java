@@ -93,7 +93,7 @@ public final class DatasetResource {
             request
                 .getDescription()
                 .map(Description::fromString)
-                .orElse(Description.NO_DESCRIPTION));
+		.orElse(Description.NO_DESCRIPTION));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     return Response.status(CREATED).entity(response).build();
   }
@@ -103,7 +103,6 @@ public final class DatasetResource {
   @ExceptionMetered
   @Timed
   @Path("/datasets/{urn}")
-  @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("urn") DatasetUrn urn) throws MarquezServiceException {
     return get(NamespaceName.DEFAULT, urn);
@@ -114,7 +113,6 @@ public final class DatasetResource {
   @ExceptionMetered
   @Timed
   @Path("/namespaces/{namespace}/datasets/{urn}")
-  @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response get(
       @PathParam("namespace") NamespaceName namespaceName, @PathParam("urn") DatasetUrn urn)
