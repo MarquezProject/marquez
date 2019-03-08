@@ -22,6 +22,6 @@ public final class DatasetUrnNotFoundException extends NotFoundException {
   private static final long serialVersionUID = 1L;
 
   public DatasetUrnNotFoundException(@NonNull final DatasetUrn urn) {
-    super(String.format("Dataset '%s' not found.", urn.getValue()));
+    super(String.format("Dataset urn '%s' not found.", urn.getValue()));
   }
 }
