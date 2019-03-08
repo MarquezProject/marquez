@@ -29,9 +29,9 @@ public class DatasourceMapper {
   private DatasourceMapper() {}
 
   public static Datasource map(@NonNull DatasourceRow datasourceRow) {
-    DatasourceName datasourceName = DatasourceName.fromString(datasourceRow.getName());
-    ConnectionUrl connectionUrl = ConnectionUrl.fromString(datasourceRow.getConnectionUrl());
-    DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+    final DatasourceName datasourceName = DatasourceName.fromString(datasourceRow.getName());
+    final ConnectionUrl connectionUrl = ConnectionUrl.fromString(datasourceRow.getConnectionUrl());
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
     return new Datasource(
         datasourceName,
         datasourceUrn,

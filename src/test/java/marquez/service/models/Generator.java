@@ -145,7 +145,7 @@ public class Generator {
 
   // Namespaces
   public static Namespace genNamespace() {
-    int nsNum = randNum();
+    final int nsNum = randNum();
     return new Namespace(
         UUID.randomUUID(), "ns" + nsNum, "ns connectionUrl" + nsNum, "ns desc" + nsNum);
   }
@@ -165,18 +165,18 @@ public class Generator {
 
   // Datasource
   public static Datasource genDatasource() {
-    ConnectionUrl connectionUrl =
+    final ConnectionUrl connectionUrl =
         ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum());
-    DatasourceName datasourceName =
+    final DatasourceName datasourceName =
         DatasourceName.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum());
-    DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
     return new Datasource(datasourceName, datasourceUrn, connectionUrl, Instant.now());
   }
 
   // Data Source Rows
   public static DatasourceRow genDatasourceRow() {
-    int datasourceNum = randNum();
+    final int datasourceNum = randNum();
     final String connectionUrl = "jdbc:postgresql://localhost:5431/novelists_" + randNum();
     final String datasourceName = "Datasource" + datasourceNum;
     final String datasourceType =

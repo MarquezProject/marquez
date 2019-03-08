@@ -24,7 +24,7 @@ public final class DatasourceUrn extends Urn {
     return from(connectionUrl.getDatasourceType().toString(), name.getValue());
   }
 
-  public static DatasourceUrn fromString(String value) {
+  public static DatasourceUrn fromString(@NonNull final String value) {
     return new DatasourceUrn(value);
   }
 

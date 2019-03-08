@@ -25,13 +25,19 @@ public class DatasourceUrnTest {
   }
 
   @Test
-  public void testGetType() {
+  public void testGetDatasourceType() {
     final DatasourceUrn datasourceUrn = DatasourceUrn.fromString(URN);
     final DatasourceType datasourceType = datasourceUrn.getDatasourceType();
     assertThat(datasourceType.toString()).isEqualTo("postgresql");
   }
 
-  @Test
+  @Test(expected = NullPointerException.class)
+  public void testDatasourceUrn_throwsException_onNullInput() {
+    final String nullUrn = null;
+    DatasourceUrn.fromString(nullUrn);
+  }
+
+  @Test(expected = NullPointerException.class)
   public void testGetDatasourceName() {
     assertThat(DatasourceUrn.fromString(URN).getDatasourceName().getValue()).isEqualTo("myteamdb");
   }
