@@ -64,6 +64,9 @@ public class DatasetResourceTest {
   private static final Dataset DATASET =
       Dataset.builder().name(NAME).createdAt(CREATED_AT).urn(URN).description(DESCRIPTION).build();
 
+  private static final DatasetRequest REQUEST =
+      new DatasetRequest(NAME.getValue(), DATASOURCE_URN.getValue(), DESCRIPTION.getValue());
+
   private static final int LIMIT = 100;
   private static final int OFFSET = 0;
 
@@ -88,17 +91,13 @@ public class DatasetResourceTest {
   public void testCreate() throws MarquezServiceException {
     final URI expectedLocation =
         UriBuilder.fromPath(LOCATION_PATH).build(NAMESPACE_NAME.getValue(), DATASET.getUrn());
-
     final Optional<String> expectedDescription = Optional.of(DESCRIPTION.getValue());
 
     when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
     when(datasetService.create(NAMESPACE_NAME, NAME, DATASOURCE_URN, DESCRIPTION))
         .thenReturn(DATASET);
 
-    final DatasetRequest datasetRequest =
-        new DatasetRequest(NAME.getValue(), DATASOURCE_URN.getValue(), DESCRIPTION.getValue());
-
-    final Response response = datasetResource.create(NAMESPACE_NAME, datasetRequest);
+    final Response response = datasetResource.create(NAMESPACE_NAME, REQUEST);
     assertEquals(CREATED, response.getStatusInfo());
     assertTrue(response.getHeaders().containsKey(LOCATION));
     assertEquals(expectedLocation, URI.create(response.getHeaderString(LOCATION)));
@@ -108,6 +107,12 @@ public class DatasetResourceTest {
     assertEquals(CREATED_AT.toString(), datasetResponse.getCreatedAt());
     assertEquals(URN.getValue(), datasetResponse.getUrn());
     assertEquals(expectedDescription, datasetResponse.getDescription());
+  }
+
+  @Test(expected = NamespaceNotFoundException.class)
+  public void testCreate_throwsException_onNamespaceDoesNotExist() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
+    datasetResource.create(NAMESPACE_NAME, REQUEST);
   }
 
   @Test
@@ -125,6 +130,12 @@ public class DatasetResourceTest {
     assertEquals(CREATED_AT.toString(), datasetResponse.getCreatedAt());
     assertEquals(URN.getValue(), datasetResponse.getUrn());
     assertEquals(expectedDescription, datasetResponse.getDescription());
+  }
+
+  @Test(expected = NamespaceNotFoundException.class)
+  public void testGet_throwsException_onNamespaceDoesNotExist() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
+    datasetResource.get(NAMESPACE_NAME, URN);
   }
 
   @Test
@@ -151,7 +162,7 @@ public class DatasetResourceTest {
   }
 
   @Test(expected = NamespaceNotFoundException.class)
-  public void testList_throwsException_onNamespaceNotFound() throws MarquezServiceException {
+  public void testList_throwsException_onNamespaceDoesNotExist() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
     datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
   }

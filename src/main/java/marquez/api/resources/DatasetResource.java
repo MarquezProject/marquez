@@ -86,7 +86,9 @@ public final class DatasetResource {
   public Response create(
       @PathParam("namespace") NamespaceName namespaceName, @Valid DatasetRequest request)
       throws MarquezServiceException {
-    checkNamespaceExists(namespaceName);
+    if (!namespaceService.exists(namespaceName.getValue())) {
+      throw new NamespaceNotFoundException(namespaceName);
+    }
     final Dataset dataset =
         datasetService.create(
             namespaceName,
@@ -122,7 +124,9 @@ public final class DatasetResource {
   public Response get(
       @PathParam("namespace") NamespaceName namespaceName, @PathParam("urn") DatasetUrn urn)
       throws MarquezServiceException {
-    checkNamespaceExists(namespaceName);
+    if (!namespaceService.exists(namespaceName.getValue())) {
+      throw new NamespaceNotFoundException(namespaceName);
+    }
     final Dataset dataset =
         datasetService.get(urn).orElseThrow(() -> new DatasetUrnNotFoundException(urn));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
@@ -140,16 +144,11 @@ public final class DatasetResource {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset)
       throws MarquezServiceException {
-    checkNamespaceExists(namespaceName);
-    final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
-    final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(datasets);
-    return Response.ok(response).build();
-  }
-
-  private void checkNamespaceExists(@NonNull NamespaceName namespaceName)
-      throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName.getValue())) {
       throw new NamespaceNotFoundException(namespaceName);
     }
+    final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
+    final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(datasets);
+    return Response.ok(response).build();
   }
 }
