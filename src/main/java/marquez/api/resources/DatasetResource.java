@@ -98,7 +98,8 @@ public final class DatasetResource {
                 .orElse(Description.NO_DESCRIPTION));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     final URI location =
-        UriBuilder.fromPath(LOCATION_PATH).build(namespaceName.getValue(), dataset.getUrn());
+        UriBuilder.fromPath(LOCATION_PATH)
+            .build(namespaceName.getValue(), dataset.getUrn().getValue());
     return Response.created(location).entity(response).build();
   }
 
