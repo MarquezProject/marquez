@@ -52,6 +52,8 @@ import marquez.service.models.Dataset;
 @Slf4j
 @Path("/api/v1")
 public final class DatasetResource {
+  private static final String LOCATION_PATH = "/namespaces/{namespace}/datasets/{urn}";
+
   private final NamespaceService namespaceService;
   private final DatasetService datasetService;
 
@@ -95,8 +97,7 @@ public final class DatasetResource {
                 .orElse(Description.NO_DESCRIPTION));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     return Response.created(
-            UriBuilder.fromUri("/namespaces/{namespace}/datasets/{urn}")
-                .build(namespaceName.getValue(), dataset.getUrn()))
+            UriBuilder.fromPath(LOCATION_PATH).build(namespaceName.getValue(), dataset.getUrn()))
         .entity(response)
         .build();
   }
