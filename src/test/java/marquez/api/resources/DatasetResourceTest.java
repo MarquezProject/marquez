@@ -14,19 +14,23 @@
 
 package marquez.api.resources;
 
+import static javax.ws.rs.core.HttpHeaders.LOCATION;
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import marquez.UnitTests;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.models.DatasetRequest;
@@ -80,6 +84,10 @@ public class DatasetResourceTest {
 
   @Test
   public void testCreate() throws MarquezServiceException {
+    final URI expectedLocation =
+        UriBuilder.fromUri("/namespaces/{namespace}/datasets/{urn}")
+            .build(NAMESPACE_NAME.getValue(), DATASET.getUrn());
+
     final Optional<String> expectedDescription = Optional.of(DESCRIPTION.getValue());
 
     when(namespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(true);
@@ -91,6 +99,8 @@ public class DatasetResourceTest {
 
     final Response response = datasetResource.create(NAMESPACE_NAME, datasetRequest);
     assertEquals(CREATED, response.getStatusInfo());
+    assertTrue(response.getHeaders().containsKey(LOCATION));
+    assertEquals(expectedLocation, URI.create(response.getHeaderString(LOCATION)));
 
     final DatasetResponse datasetResponse = (DatasetResponse) response.getEntity();
     assertEquals(NAME.getValue(), datasetResponse.getName());

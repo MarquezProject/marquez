@@ -15,7 +15,6 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.CREATED;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -31,6 +30,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetUrnNotFoundException;
@@ -94,7 +94,11 @@ public final class DatasetResource {
                 .map(Description::fromString)
                 .orElse(Description.NO_DESCRIPTION));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
-    return Response.status(CREATED).entity(response).build();
+    return Response.created(
+            UriBuilder.fromUri("/namespaces/{namespace}/datasets/{urn}")
+                .build(namespaceName.getValue(), dataset.getUrn()))
+        .entity(response)
+        .build();
   }
 
   @GET
