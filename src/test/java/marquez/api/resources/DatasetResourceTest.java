@@ -50,6 +50,8 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetResourceTest {
+  private static final String LOCATION_PATH = "/namespaces/{namespace}/datasets/{urn}";
+
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final DatasourceUrn DATASOURCE_URN =
       DatasourceUrn.fromString("urn:datasource:a:b");
@@ -85,8 +87,7 @@ public class DatasetResourceTest {
   @Test
   public void testCreate() throws MarquezServiceException {
     final URI expectedLocation =
-        UriBuilder.fromUri("/namespaces/{namespace}/datasets/{urn}")
-            .build(NAMESPACE_NAME.getValue(), DATASET.getUrn());
+        UriBuilder.fromPath(LOCATION_PATH).build(NAMESPACE_NAME.getValue(), DATASET.getUrn());
 
     final Optional<String> expectedDescription = Optional.of(DESCRIPTION.getValue());
 
