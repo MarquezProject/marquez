@@ -19,6 +19,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
+import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -96,10 +97,9 @@ public final class DatasetResource {
                 .map(Description::fromString)
                 .orElse(Description.NO_DESCRIPTION));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
-    return Response.created(
-            UriBuilder.fromPath(LOCATION_PATH).build(namespaceName.getValue(), dataset.getUrn()))
-        .entity(response)
-        .build();
+    final URI location =
+        UriBuilder.fromPath(LOCATION_PATH).build(namespaceName.getValue(), dataset.getUrn());
+    return Response.created(location).entity(response).build();
   }
 
   @GET
