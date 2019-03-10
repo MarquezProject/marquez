@@ -1,7 +1,7 @@
 #!/bin/bash
 function does_package_version_match()
 {
-  expected_version=$(git describe --tags)
+  expected_version=$(git describe --tags | head -n 1)
   current_version=$(python ./setup.py --version)
   echo "current_version is ${current_version}"
   echo "expected_version is ${expected_version}"
