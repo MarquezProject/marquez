@@ -56,7 +56,6 @@ public class DatasourceResourceTest {
 
   private static final DatasourceType TEST_DATA_SOURCE_TYPE = DatasourceType.REDSHIFT;
   private static final String TEST_DATASOURCE_TYPE_STR = TEST_DATA_SOURCE_TYPE.toString();
-
   private static final String TEST_DATASOURCE_NAME_STR = "finance_team_mysql_server_1";
 
   @ClassRule
@@ -172,7 +171,7 @@ public class DatasourceResourceTest {
 
   @Test(expected = NullPointerException.class)
   public void testGet_throwsException_onNullDatasourceUrn() throws MarquezServiceException {
-    DatasourceUrn nullUrn = null;
+    final DatasourceUrn nullUrn = null;
     datasourceResource.get(nullUrn);
   }
 

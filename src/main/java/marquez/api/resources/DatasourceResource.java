@@ -73,8 +73,7 @@ public final class DatasourceResource {
   public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
       throws MarquezServiceException {
 
-    final Optional<Datasource> datasource;
-    datasource = datasourceService.get(datasourceUrn);
+    final Optional<Datasource> datasource = datasourceService.get(datasourceUrn);
     if (datasource.isPresent()) {
       return Response.ok(DatasourceResponseMapper.map(datasource.get())).build();
     } else {

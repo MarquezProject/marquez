@@ -36,7 +36,7 @@ import marquez.service.models.Datasource;
 import marquez.service.models.Generator;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DatasourceServiceTest {
@@ -45,8 +45,8 @@ public class DatasourceServiceTest {
 
   private static final DatasourceDao datasourceDao = mock(DatasourceDao.class);
 
-  @Before
-  public void setUp() {
+  @BeforeClass
+  public static void setUp() {
     datasourceService = new DatasourceService(datasourceDao);
   }
 
@@ -130,13 +130,13 @@ public class DatasourceServiceTest {
 
   @Test(expected = NullPointerException.class)
   public void testGetDatasourceByUuid_throwsNpe_onNullInput() throws MarquezServiceException {
-    UUID myNullUuid = null;
+    final UUID myNullUuid = null;
     datasourceService.get(myNullUuid);
   }
 
   @Test(expected = NullPointerException.class)
   public void testGetDatasourceByUrn_throwsNpe_onNullInput() throws MarquezServiceException {
-    DatasourceUrn myNullDatasourceUrn = null;
+    final DatasourceUrn myNullDatasourceUrn = null;
     datasourceService.get(myNullDatasourceUrn);
   }
 
@@ -166,34 +166,35 @@ public class DatasourceServiceTest {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.empty());
     final Optional<Datasource> response = datasourceService.get(row.getUuid());
+
     assertThat(response.isPresent()).isFalse();
   }
 
   @Test
   public void testGetAll_multipleResults() {
-    List<DatasourceRow> datasourceRowList = new ArrayList();
+    final List<DatasourceRow> datasourceRowList = new ArrayList();
     datasourceRowList.add(Generator.genDatasourceRow());
     datasourceRowList.add(Generator.genDatasourceRow());
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
-    List<Datasource> datasources = datasourceService.getAll(100, 0);
-    assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
+    final List<Datasource> datasources = datasourceService.getAll(100, 0);
 
+    assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
     assertThat(datasources.get(0).getUrn()).isNotEqualTo(datasources.get(1).getUrn());
   }
 
   @Test
   public void testGetAll_singleResult() {
-    DatasourceRow generatedDatasourceRow = Generator.genDatasourceRow();
-    List<DatasourceRow> datasourceRowList = Collections.singletonList(generatedDatasourceRow);
+    final DatasourceRow generatedDatasourceRow = Generator.genDatasourceRow();
+    final List<DatasourceRow> datasourceRowList = Collections.singletonList(generatedDatasourceRow);
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
-    List<Datasource> datasources = datasourceService.getAll(100, 0);
+    final List<Datasource> datasources = datasourceService.getAll(100, 0);
     assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
 
-    Datasource returnedDatasource = datasources.get(0);
+    final Datasource returnedDatasource = datasources.get(0);
 
     assertThat(returnedDatasource.getUrn().toString()).isEqualTo(generatedDatasourceRow.getUrn());
     assertThat(returnedDatasource.getConnectionUrl().getRawValue())
@@ -203,7 +204,7 @@ public class DatasourceServiceTest {
 
   @Test
   public void testGetAll_noResults() {
-    List<DatasourceRow> datasourceRowList = Collections.emptyList();
+    final List<DatasourceRow> datasourceRowList = Collections.emptyList();
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
