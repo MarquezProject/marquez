@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -38,7 +39,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
 
 @Slf4j
-@Path("/api/v1")
+@Path("/api/v1/datasources")
 public final class DatasourceResource {
 
   private final DatasourceService datasourceService;
@@ -51,7 +52,6 @@ public final class DatasourceResource {
   @ResponseMetered
   @ExceptionMetered
   @Timed
-  @Path("/datasources")
   @Produces(APPLICATION_JSON)
   public Response list(
       @QueryParam("limit") @DefaultValue("100") Integer limit,
@@ -65,7 +65,7 @@ public final class DatasourceResource {
   @ResponseMetered
   @ExceptionMetered
   @Timed
-  @Path("/datasources")
+  @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(@NonNull final DatasourceRequest datasourceRequest)
       throws MarquezServiceException {
