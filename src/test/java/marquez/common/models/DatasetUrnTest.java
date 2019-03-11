@@ -32,13 +32,13 @@ public class DatasetUrnTest {
 
   @Test
   public void testNewDatasetUrn() {
-    final String value = "urn:a:b.c";
+    final String value = "urn:dataset:a:b.c";
     assertEquals(value, DatasetUrn.fromString(value).getValue());
   }
 
   @Test
   public void testNewDatasetUrn_fromNamespaceAndDataset() {
-    final DatasetUrn expected = DatasetUrn.fromString("urn:a:b.c");
+    final DatasetUrn expected = DatasetUrn.fromString("urn:dataset:a:b.c");
     final DatasetUrn actual =
         DatasetUrn.from(NamespaceName.fromString("a"), DatasetName.fromString("b.c"));
     assertEquals(expected, actual);
@@ -70,19 +70,19 @@ public class DatasetUrnTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testNewDatasetUrn_throwsException_onMissingPartValue() {
-    final String missingPartValue = "urn:a";
+    final String missingPartValue = "urn:dataset:a";
     DatasetUrn.fromString(missingPartValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNewDatasetUrn_throwsException_onExtraPartValue() {
-    final String extraPartValue = "urn:a:b:c";
+    final String extraPartValue = "urn:dataset:a:b:c";
     DatasetUrn.fromString(extraPartValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNewDatasetUrn_throwsException_onNonAlphanumericPartValue() {
-    final String nonAlphanumericPartValue = "urn:a:b$c^";
+    final String nonAlphanumericPartValue = "urn:dataset:a:b$c^";
     DatasetUrn.fromString(nonAlphanumericPartValue);
   }
 
