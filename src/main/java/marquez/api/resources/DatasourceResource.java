@@ -71,15 +71,11 @@ public final class DatasourceResource {
   @Path("/{datasourceId}")
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("datasourceId") final DatasourceId datasourceId)
-      throws ResourceException {
+      throws MarquezServiceException {
 
     final Optional<Datasource> datasource;
-    try {
-      datasource = datasourceService.get(datasourceId.getValue());
-    } catch (MarquezServiceException e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
+    datasource = datasourceService.get(datasourceId.getValue());
+
     if (datasource.isPresent()) {
       return Response.ok(DatasourceResponseMapper.map(datasource.get())).build();
     } else {
