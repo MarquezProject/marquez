@@ -26,7 +26,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.exceptions.ResourceExceptionMapper;
+import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.api.resources.DatasetResource;
 import marquez.api.resources.DatasourceResource;
 import marquez.api.resources.HealthResource;
@@ -141,6 +141,6 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey().register(new DatasetResource(namespaceService, new DatasetService(datasetDao)));
     env.jersey().register(new DatasourceResource(new DatasourceService(datasourceDao)));
 
-    env.jersey().register(new ResourceExceptionMapper());
+    env.jersey().register(new MarquezServiceExceptionMapper());
   }
 }

@@ -35,10 +35,11 @@ import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
+import marquez.service.models.Generator;
 import org.junit.Test;
 
 public class DatasetResourceTest {
-  private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
+  private static final DatasetUrn DATASET_URN = Generator.genDatasetUrn();
   private static final Instant CREATED_AT = Instant.now();
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final Integer LIMIT = 100;
@@ -69,7 +70,7 @@ public class DatasetResourceTest {
     final List<Dataset> datasets = Arrays.asList(dataset);
     when(mockDatasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasets);
 
-    final Response response = datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);
+    final Response response = datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
     assertEquals(OK, response.getStatusInfo());
 
     final DatasetsResponse datasetsResponse = (DatasetsResponse) response.getEntity();
@@ -85,6 +86,6 @@ public class DatasetResourceTest {
   public void testListDatasetsNamespaceDoesNotExist() throws MarquezServiceException {
     when(mockNamespaceService.exists(NAMESPACE_NAME.getValue())).thenReturn(false);
 
-    datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);
+    datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
   }
 }

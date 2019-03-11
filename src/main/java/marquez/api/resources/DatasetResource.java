@@ -59,17 +59,18 @@ public final class DatasetResource {
   @Path("/namespaces/{namespace}/datasets")
   @Produces(APPLICATION_JSON)
   public Response list(
-      @PathParam("namespace") String namespaceString,
+      @PathParam("namespace") NamespaceName namespaceName,
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset)
       throws MarquezServiceException, WebApplicationException {
-    if (!namespaceService.exists(namespaceString)) {
+    if (!namespaceService.exists(namespaceName.getValue())) {
       throw new WebApplicationException(
-          String.format("The namespace %s does not exist.", namespaceString), NOT_FOUND);
+          String.format("The namespace %s does not exist.", namespaceName.getValue()), NOT_FOUND);
     }
     try {
+      String namespaceNameString = namespaceName.getValue();
       final List<Dataset> datasets =
-          datasetService.getAll(NamespaceName.fromString(namespaceString), limit, offset);
+          datasetService.getAll(NamespaceName.fromString(namespaceNameString), limit, offset);
       final List<DatasetResponse> datasetResponses = map(datasets);
       return Response.ok(new DatasetsResponse(datasetResponses)).build();
     } catch (Exception e) {
