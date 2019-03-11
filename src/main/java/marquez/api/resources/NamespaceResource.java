@@ -29,17 +29,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.exceptions.ResourceException;
 import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.api.mappers.NamespaceApiMapper;
 import marquez.api.mappers.NamespaceResponseMapper;
 import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
+import marquez.common.models.NamespaceName;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
-import org.hibernate.validator.constraints.NotBlank;
 
 @Slf4j
 @Path("/api/v1")
@@ -59,35 +58,26 @@ public final class NamespaceResource {
   @Timed
   @Path("/namespaces/{namespace}")
   public Response create(
-      @PathParam("namespace") @NotBlank String namespaceString, @Valid NamespaceRequest request)
-      throws ResourceException {
-    try {
-      final Namespace namespace =
-          namespaceService.create(namespaceApiMapper.of(namespaceString, request));
-      final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
-      return Response.ok(response).build();
-    } catch (MarquezServiceException e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
+      @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceRequest request)
+      throws MarquezServiceException {
+    final Namespace namespace =
+        namespaceService.create(namespaceApiMapper.of(namespaceName.getValue(), request));
+    final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
+    return Response.ok(response).build();
   }
 
   @GET
   @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces/{namespace}")
-  public Response get(@PathParam("namespace") String namespaceString) throws ResourceException {
-    try {
-      final Optional<NamespaceResponse> namespaceResponse =
-          namespaceService.get(namespaceString).map(NamespaceResponseMapper::map);
-      if (namespaceResponse.isPresent()) {
-        return Response.ok(namespaceResponse.get()).build();
-      } else {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-    } catch (MarquezServiceException e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
+  public Response get(@PathParam("namespace") NamespaceName namespaceName)
+      throws MarquezServiceException {
+    final Optional<NamespaceResponse> namespaceResponse =
+        namespaceService.get(namespaceName.getValue()).map(NamespaceResponseMapper::map);
+    if (namespaceResponse.isPresent()) {
+      return Response.ok(namespaceResponse.get()).build();
+    } else {
+      return Response.status(Response.Status.NOT_FOUND).build();
     }
   }
 
@@ -95,15 +85,10 @@ public final class NamespaceResource {
   @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces")
-  public Response listNamespaces() throws ResourceException {
-    try {
-      final List<Namespace> namespaces = namespaceService.listNamespaces();
-      final List<NamespaceResponse> namespaceResponses =
-          coreNamespaceToApiNamespaceMapper.map(namespaces);
-      return Response.ok(new NamespacesResponse(namespaceResponses)).build();
-    } catch (MarquezServiceException e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
+  public Response listNamespaces() throws MarquezServiceException {
+    final List<Namespace> namespaces = namespaceService.listNamespaces();
+    final List<NamespaceResponse> namespaceResponses =
+        coreNamespaceToApiNamespaceMapper.map(namespaces);
+    return Response.ok(new NamespacesResponse(namespaceResponses)).build();
   }
 }

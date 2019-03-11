@@ -31,8 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.ws.rs.core.Response;
-import marquez.api.exceptions.ResourceException;
-import marquez.api.exceptions.ResourceExceptionMapper;
+import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
@@ -64,7 +63,7 @@ public class DatasourceResourceTest {
   public static final ResourceTestRule resources =
       ResourceTestRule.builder()
           .addResource(datasourceResource)
-          .addProvider(ResourceExceptionMapper.class)
+          .addProvider(MarquezServiceExceptionMapper.class)
           .build();
 
   @Test(expected = NullPointerException.class)
@@ -137,7 +136,7 @@ public class DatasourceResourceTest {
   }
 
   @Test
-  public void testGetDatasource() throws MarquezServiceException, ResourceException {
+  public void testGetDatasource() throws MarquezServiceException {
     final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
     final ConnectionUrl connectionUrl =
         ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
@@ -161,7 +160,7 @@ public class DatasourceResourceTest {
   }
 
   @Test
-  public void testGetNoSuchDatasource() throws MarquezServiceException, ResourceException {
+  public void testGetNoSuchDatasource() throws MarquezServiceException {
     final UUID requestUuid = UUID.randomUUID();
     when(mockDatasourceService.get(requestUuid)).thenReturn(Optional.empty());
 
@@ -172,14 +171,13 @@ public class DatasourceResourceTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testGet_throwsException_onNullDatasourceUrn()
-      throws MarquezServiceException, ResourceException {
+  public void testGet_throwsException_onNullDatasourceUrn() throws MarquezServiceException {
     DatasourceUrn nullUrn = null;
     datasourceResource.get(nullUrn);
   }
 
-  @Test(expected = ResourceException.class)
-  public void testGetInternalError() throws MarquezServiceException, ResourceException {
+  @Test(expected = MarquezServiceException.class)
+  public void testGetInternalError() throws MarquezServiceException {
     final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
     final ConnectionUrl connectionUrl =
         ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
@@ -192,7 +190,7 @@ public class DatasourceResourceTest {
   }
 
   @Test
-  public void testCreateDatasource() throws MarquezServiceException, ResourceException {
+  public void testCreateDatasource() throws MarquezServiceException {
     final Datasource ds1 = Generator.genDatasource();
 
     final DatasourceRequest validRequest =
@@ -213,7 +211,7 @@ public class DatasourceResourceTest {
   }
 
   @Test
-  public void testCreateDatasource_invalidDatasource() throws ResourceException {
+  public void testCreateDatasource_invalidDatasource() throws MarquezServiceException {
     final String invalidDatasourceType = "xyz_postgres_999";
 
     final String invalidConnectionUrl =
@@ -227,8 +225,8 @@ public class DatasourceResourceTest {
     assertThat(createDatasourceResponse.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
   }
 
-  @Test(expected = ResourceException.class)
-  public void testInternalErrorHandling() throws MarquezServiceException, ResourceException {
+  @Test(expected = MarquezServiceException.class)
+  public void testInternalErrorHandling() throws MarquezServiceException {
     final Datasource ds1 = Generator.genDatasource();
 
     final DatasourceRequest validRequest =

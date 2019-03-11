@@ -12,7 +12,7 @@ public class UrnTest {
 
   @Test(expected = Test.None.class /* no exception expected */)
   public void testCreate() {
-    final String urn = "urn:foo:1st:2nd:3rd";
+    String urn = "urn:foo:1st:2nd:3rd";
     new Urn(urn, pattern);
   }
 

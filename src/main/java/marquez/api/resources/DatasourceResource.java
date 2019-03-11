@@ -32,7 +32,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.exceptions.ResourceException;
 import marquez.api.mappers.DatasourceResponseMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.common.models.ConnectionUrl;
@@ -72,15 +71,10 @@ public final class DatasourceResource {
   @Produces(APPLICATION_JSON)
   @Path("/{urn}")
   public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
-      throws ResourceException {
+      throws MarquezServiceException {
 
     final Optional<Datasource> datasource;
-    try {
-      datasource = datasourceService.get(datasourceUrn);
-    } catch (MarquezServiceException e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
+    datasource = datasourceService.get(datasourceUrn);
     if (datasource.isPresent()) {
       return Response.ok(DatasourceResponseMapper.map(datasource.get())).build();
     } else {
@@ -95,7 +89,7 @@ public final class DatasourceResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(@NonNull final DatasourceRequest datasourceRequest)
-      throws ResourceException {
+      throws MarquezServiceException {
 
     final ConnectionUrl connectionUrl;
     try {
@@ -105,14 +99,9 @@ public final class DatasourceResource {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    try {
-      final Datasource createdDatasource =
-          datasourceService.create(
-              connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
-      return Response.ok(DatasourceResponseMapper.map(createdDatasource)).build();
-    } catch (MarquezServiceException e) {
-      log.error(e.getMessage(), e);
-      throw new ResourceException();
-    }
+    final Datasource createdDatasource =
+        datasourceService.create(
+            connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
+    return Response.ok(DatasourceResponseMapper.map(createdDatasource)).build();
   }
 }
