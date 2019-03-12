@@ -42,7 +42,7 @@ public final class DatasourceResponseMapper {
   }
 
   public static DatasourcesResponse toDatasourcesResponse(@NonNull List<Datasource> datasources) {
-    List<DatasourceResponse> datasourceResponses = map(datasources);
+    final List<DatasourceResponse> datasourceResponses = map(datasources);
     return new DatasourcesResponse(datasourceResponses);
   }
 }
