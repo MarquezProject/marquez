@@ -15,6 +15,7 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -199,7 +200,7 @@ public class DatasourceResourceTest {
 
     // When we submit it
     final Response createDatasourceResponse = datasourceResource.create(validRequest);
-    assertThat(createDatasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
+    assertThat(createDatasourceResponse.getStatus()).isEqualTo(CREATED.getStatusCode());
     final DatasourceResponse returnedDatasource =
         (DatasourceResponse) createDatasourceResponse.getEntity();
 
