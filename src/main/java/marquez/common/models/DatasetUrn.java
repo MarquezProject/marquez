@@ -27,7 +27,9 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class DatasetUrn {
-  private static final UrnPattern URN_PATTERN = UrnPattern.from(UrnType.DATASET);
+  private static final int NUM_OF_PARTS = 2;
+  private static final String URN_TYPE = "dataset";
+  private static final UrnPattern URN_PATTERN = UrnPattern.from(URN_TYPE, NUM_OF_PARTS);
 
   @Getter private final String value;
 
@@ -41,7 +43,7 @@ public final class DatasetUrn {
     final String value =
         new StringJoiner(URN_DELIM)
             .add(URN_PREFIX)
-            .add(UrnType.DATASOURCE.toString())
+            .add(URN_TYPE)
             .add(datasourceName.getValue())
             .add(datasetName.getValue())
             .toString();

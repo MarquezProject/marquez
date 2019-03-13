@@ -32,17 +32,11 @@ public final class UrnPattern {
     this.pattern = Pattern.compile(checkNotBlank(value));
   }
 
-  public static UrnPattern from(@NonNull UrnType type) {
+  public static UrnPattern from(@NonNull String type, @NonNull Integer numOfParts) {
     final String value =
         String.format(
             "^%s%s%s(%s[a-zA-Z0-9._]{%d,%d}){%d}$",
-            URN_PREFIX,
-            URN_DELIM,
-            type.toString(),
-            URN_DELIM,
-            URN_MIN_SIZE,
-            URN_MAX_SIZE,
-            type.numberOfParts());
+            URN_PREFIX, URN_DELIM, type, URN_DELIM, URN_MIN_SIZE, URN_MAX_SIZE, numOfParts);
     return new UrnPattern(value);
   }
 
