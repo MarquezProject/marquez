@@ -32,14 +32,21 @@ public final class UrnPattern {
     this.pattern = Pattern.compile(checkNotBlank(value));
   }
 
-  public static UrnPattern of(@NonNull UrnType type, @NonNull Integer parts) {
-    return new UrnPattern(
+  public static UrnPattern from(@NonNull UrnType type) {
+    final String value =
         String.format(
             "^%s%s%s(%s[a-zA-Z0-9._]{%d,%d}){%d}$",
-            URN_PREFIX, URN_DELIM, type.toString(), URN_DELIM, URN_MIN_SIZE, URN_MAX_SIZE, parts));
+            URN_PREFIX,
+            URN_DELIM,
+            type.toString(),
+            URN_DELIM,
+            URN_MIN_SIZE,
+            URN_MAX_SIZE,
+            type.numberOfParts());
+    return new UrnPattern(value);
   }
 
-  public void throwIfNoMatch(String value) {
+  public void throwIfNoMatch(@NonNull String value) {
     if (!pattern.matcher(value).matches()) {
       throw new IllegalArgumentException(
           "A urn must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_) and "

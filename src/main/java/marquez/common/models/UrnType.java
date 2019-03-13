@@ -14,9 +14,21 @@
 
 package marquez.common.models;
 
+import lombok.NonNull;
+
 public enum UrnType {
-  DATASET,
-  DATASOURCE;
+  DATASET(2),
+  DATASOURCE(2);
+
+  private final Integer value;
+
+  private UrnType(@NonNull final Integer value) {
+    this.value = value;
+  }
+
+  public Integer numberOfParts() {
+    return value;
+  }
 
   @Override
   public String toString() {

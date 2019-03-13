@@ -14,7 +14,6 @@
 
 package marquez.common.models;
 
-import static marquez.common.Preconditions.checkNotBlank;
 import static marquez.common.models.UrnPattern.URN_DELIM;
 import static marquez.common.models.UrnPattern.URN_PREFIX;
 
@@ -28,23 +27,22 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class DatasetUrn {
-  private static final int URN_PARTS = 2;
-  private static final UrnPattern URN_PATTERN = UrnPattern.of(UrnType.DATASET, URN_PARTS);
+  private static final UrnPattern URN_PATTERN = UrnPattern.from(UrnType.DATASET);
 
   @Getter private final String value;
 
   private DatasetUrn(@NonNull final String value) {
-    URN_PATTERN.throwIfNoMatch(checkNotBlank(value));
+    URN_PATTERN.throwIfNoMatch(value);
     this.value = value;
   }
 
   public static DatasetUrn from(
-      @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
+      @NonNull DatasourceName datasourceName, @NonNull DatasetName datasetName) {
     final String value =
         new StringJoiner(URN_DELIM)
             .add(URN_PREFIX)
             .add(UrnType.DATASOURCE.toString())
-            .add(namespaceName.getValue())
+            .add(datasourceName.getValue())
             .add(datasetName.getValue())
             .toString();
     return fromString(value);
