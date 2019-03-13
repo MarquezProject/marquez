@@ -14,25 +14,43 @@
 
 package marquez.common.models;
 
-import java.util.regex.Pattern;
+import static marquez.common.Preconditions.checkNotBlank;
+import static marquez.common.models.UrnPattern.URN_DELIM;
+import static marquez.common.models.UrnPattern.URN_PREFIX;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.StringJoiner;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
-@EqualsAndHashCode(callSuper = false)
-public final class DatasetUrn extends Urn {
-  private static final int NUM_COMPONENTS = 2;
-  private static final String URN_TYPE = "dataset";
-  private static final Pattern REGEX = buildPattern(URN_TYPE, NUM_COMPONENTS);
+@EqualsAndHashCode
+@ToString
+public final class DatasetUrn {
+  private static final int URN_PARTS = 2;
+  private static final UrnPattern URN_PATTERN = UrnPattern.of(UrnType.DATASET, URN_PARTS);
 
-  public DatasetUrn(@NonNull String value) {
-    super(value, REGEX);
+  @Getter private final String value;
+
+  private DatasetUrn(@NonNull final String value) {
+    URN_PATTERN.throwIfNoMatch(checkNotBlank(value));
+    this.value = value;
   }
 
-  public static DatasetUrn from(@NonNull NamespaceName namespace, @NonNull DatasetName dataset) {
-    final String value = fromComponents(URN_TYPE, namespace.getValue(), dataset.getValue());
+  public static DatasetUrn from(
+      @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
+    final String value =
+        new StringJoiner(URN_DELIM)
+            .add(URN_PREFIX)
+            .add(UrnType.DATASOURCE.toString())
+            .add(namespaceName.getValue())
+            .add(datasetName.getValue())
+            .toString();
     return fromString(value);
   }
 
+  @JsonProperty
   public static DatasetUrn fromString(String value) {
     return new DatasetUrn(value);
   }
