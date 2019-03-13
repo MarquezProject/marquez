@@ -1,8 +1,6 @@
 version: '3'
 services:
   app:
-    networks:
-      - net
     build: .
     ports:
       - '5000:5000'
@@ -22,8 +20,6 @@ services:
       - db
 
   db:
-    networks:
-      - net
     image: 'postgres:9.6'
     ports:
       - '5432:5432'
@@ -35,6 +31,3 @@ services:
       - MARQUEZ_PASSWORD=macondo
     volumes:
       - ./docker/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
-
-networks:
-    net:
