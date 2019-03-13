@@ -17,7 +17,7 @@ package marquez.common.models;
 import static marquez.common.models.UrnPattern.URN_DELIM;
 import static marquez.common.models.UrnPattern.URN_PREFIX;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.StringJoiner;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -48,7 +48,7 @@ public final class DatasetUrn {
     return fromString(value);
   }
 
-  @JsonProperty
+  @JsonCreator
   public static DatasetUrn fromString(String value) {
     return new DatasetUrn(value);
   }
