@@ -17,6 +17,7 @@ package marquez.service.models;
 import java.sql.Timestamp;
 import java.util.UUID;
 import lombok.Data;
+import marquez.common.models.NamespaceName;
 
 @Data
 public class Namespace {
@@ -39,6 +40,13 @@ public class Namespace {
       UUID guid, Timestamp createdAt, String name, String ownerName, String description) {
     this.guid = guid;
     this.createdAt = createdAt;
+    this.name = name;
+    this.ownerName = ownerName;
+    this.description = description;
+  }
+
+  public Namespace(
+      String name, String ownerName, String description) {
     this.name = name;
     this.ownerName = ownerName;
     this.description = description;

@@ -16,3 +16,4 @@ build/
 
 # Marquez configuration
 config.yml
+/.metadata/
