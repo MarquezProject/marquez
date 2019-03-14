@@ -19,12 +19,12 @@ import static marquez.common.Preconditions.checkNotBlank;
 import java.util.regex.Pattern;
 import lombok.NonNull;
 
-public final class UrnPattern {
+final class UrnPattern {
   private static final int URN_MIN_SIZE = 1;
   private static final int URN_MAX_SIZE = 64;
 
-  public static final String URN_DELIM = ":";
-  public static final String URN_PREFIX = "urn";
+  static final String URN_DELIM = ":";
+  static final String URN_PREFIX = "urn";
 
   private final Pattern pattern;
 
@@ -32,7 +32,8 @@ public final class UrnPattern {
     this.pattern = Pattern.compile(checkNotBlank(value));
   }
 
-  public static UrnPattern from(@NonNull String type, @NonNull Integer numOfParts) {
+  static UrnPattern from(@NonNull String type, @NonNull Integer numOfParts) {
+    checkNotBlank(type);
     final String value =
         String.format(
             "^%s%s%s(%s[a-zA-Z0-9._]{%d,%d}){%d}$",
@@ -40,8 +41,8 @@ public final class UrnPattern {
     return new UrnPattern(value);
   }
 
-  public void throwIfNoMatch(@NonNull String value) {
-    if (!pattern.matcher(value).matches()) {
+  void throwIfNoMatch(@NonNull String value) {
+    if (!pattern.matcher(checkNotBlank(value)).matches()) {
       throw new IllegalArgumentException(
           "A urn must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_) and "
               + "be sperated by colons (:) with each part having a maximum length of 64 characters.");
