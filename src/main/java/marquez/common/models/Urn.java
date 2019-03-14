@@ -20,6 +20,7 @@ import static marquez.common.models.UrnPattern.URN_PREFIX;
 
 import java.util.StringJoiner;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
