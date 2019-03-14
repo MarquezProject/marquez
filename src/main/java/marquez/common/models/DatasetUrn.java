@@ -14,39 +14,22 @@
 
 package marquez.common.models;
 
-import static marquez.common.models.UrnPattern.URN_DELIM;
-import static marquez.common.models.UrnPattern.URN_PREFIX;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.StringJoiner;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
 
-@EqualsAndHashCode
-@ToString
-public final class DatasetUrn {
+public final class DatasetUrn extends Urn {
   private static final int NUM_OF_PARTS = 2;
   private static final String URN_TYPE = "dataset";
   private static final UrnPattern URN_PATTERN = UrnPattern.from(URN_TYPE, NUM_OF_PARTS);
 
-  @Getter private final String value;
-
   private DatasetUrn(@NonNull final String value) {
+    super(value);
     URN_PATTERN.throwIfNoMatch(value);
-    this.value = value;
   }
 
   public static DatasetUrn from(
       @NonNull DatasourceName datasourceName, @NonNull DatasetName datasetName) {
-    final String value =
-        new StringJoiner(URN_DELIM)
-            .add(URN_PREFIX)
-            .add(URN_TYPE)
-            .add(datasourceName.getValue())
-            .add(datasetName.getValue())
-            .toString();
+    final String value = fromParts(URN_TYPE, datasourceName.toString(), datasetName.getValue());
     return fromString(value);
   }
 
