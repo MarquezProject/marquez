@@ -14,6 +14,8 @@
 
 package marquez.common.models;
 
+import static marquez.common.Preconditions.checkNotBlank;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.NonNull;
 
@@ -23,8 +25,7 @@ public final class DatasourceUrn extends Urn {
   private static final UrnPattern URN_PATTERN = UrnPattern.from(URN_TYPE, NUM_OF_PARTS);
 
   private DatasourceUrn(@NonNull final String value) {
-    super(value);
-    URN_PATTERN.throwIfNoMatch(value);
+    super(checkNotBlank(value));
   }
 
   public static DatasourceUrn from(@NonNull DatasourceType type, @NonNull DatasourceName name) {
@@ -35,5 +36,10 @@ public final class DatasourceUrn extends Urn {
   @JsonCreator
   public static DatasourceUrn fromString(String value) {
     return new DatasourceUrn(value);
+  }
+
+  @Override
+  UrnPattern pattern() {
+    return URN_PATTERN;
   }
 }

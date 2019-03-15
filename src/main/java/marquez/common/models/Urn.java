@@ -26,11 +26,12 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
-public class Urn {
+public abstract class Urn {
   @Getter private final String value;
 
   protected Urn(@NonNull final String value) {
-    this.value = checkNotBlank(value);
+    pattern().throwIfNoMatch(checkNotBlank(value));
+    this.value = value;
   }
 
   protected static String fromParts(@NonNull String... parts) {
@@ -39,4 +40,6 @@ public class Urn {
         .add(String.join(URN_DELIM, parts))
         .toString();
   }
+
+  abstract UrnPattern pattern();
 }
