@@ -15,7 +15,6 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.ws.rs.core.Response;
+import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.api.models.DatasourceResponse;
@@ -158,15 +158,12 @@ public class DatasourceResourceTest {
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
   }
 
-  @Test
+  @Test(expected = DatasourceUrnNotFoundException.class)
   public void testGetNoSuchDatasource() throws MarquezServiceException {
     final UUID requestUuid = UUID.randomUUID();
     when(mockDatasourceService.get(requestUuid)).thenReturn(Optional.empty());
 
-    final Response datasourceResponse =
-        datasourceResource.get(
-            DatasourceUrn.from(TEST_DATASOURCE_TYPE_STR, TEST_DATASOURCE_NAME_STR));
-    assertThat(datasourceResponse.getStatus()).isEqualTo(NOT_FOUND.getStatusCode());
+    datasourceResource.get(DatasourceUrn.from(TEST_DATASOURCE_TYPE_STR, TEST_DATASOURCE_NAME_STR));
   }
 
   @Test(expected = NullPointerException.class)
