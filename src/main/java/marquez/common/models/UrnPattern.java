@@ -18,9 +18,7 @@ import static marquez.common.Preconditions.checkNotBlank;
 
 import java.util.regex.Pattern;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 final class UrnPattern {
   private static final int MIN_SIZE = 1;
   private static final int MAX_SIZE = 64;
@@ -40,7 +38,6 @@ final class UrnPattern {
         String.format(
             "^%s%s%s(%s[a-zA-Z0-9._]{%d,%d}){%d}$",
             PREFIX, DELIM, namespace, DELIM, MIN_SIZE, MAX_SIZE, numOfParts);
-    log.info(value);
     return new UrnPattern(value);
   }
 
