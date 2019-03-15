@@ -27,14 +27,4 @@ public final class DatasourceUrn extends Urn {
   public static DatasourceUrn fromString(@NonNull final String value) {
     return new DatasourceUrn(value);
   }
-
-  public DatasourceType getDatasourceType() {
-    final String datasourceType = value.split(":")[2];
-    return DatasourceType.fromString(datasourceType);
-  }
-
-  public DatasourceName getDatasourceName() {
-    final String datasourceName = value.split(":")[3];
-    return DatasourceName.fromString(datasourceName);
-  }
 }

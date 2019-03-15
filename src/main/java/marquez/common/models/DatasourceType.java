@@ -14,30 +14,13 @@
 
 package marquez.common.models;
 
-import lombok.NonNull;
-
 public enum DatasourceType {
-  REDSHIFT("redshift"),
-  MYSQL("mysql"),
-  POSTGRESQL("postgresql");
-
-  private final String value;
-
-  DatasourceType(@NonNull final String value) {
-    this.value = value;
-  }
+  REDSHIFT,
+  MYSQL,
+  POSTGRESQL;
 
   @Override
-  public final String toString() {
-    return value;
-  }
-
-  public static final DatasourceType fromString(@NonNull String value) {
-    for (DatasourceType type : DatasourceType.values()) {
-      if (type.value.equals(value)) {
-        return type;
-      }
-    }
-    return null;
+  public String toString() {
+    return name().toLowerCase();
   }
 }
