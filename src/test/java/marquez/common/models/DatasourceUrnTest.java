@@ -8,7 +8,7 @@ public class DatasourceUrnTest {
   @Test
   public void testFromString() {
     String urn = "urn:datasource:a:b";
-    assertEquals(urn, DatasourceUrn.fromString(urn).toString());
+    assertEquals(urn, DatasourceUrn.fromString(urn).getValue());
   }
 
   @Test(expected = IllegalArgumentException.class)
