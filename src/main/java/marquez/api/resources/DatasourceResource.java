@@ -53,35 +53,6 @@ public final class DatasourceResource {
     this.datasourceService = datasourceService;
   }
 
-  @GET
-  @ResponseMetered
-  @ExceptionMetered
-  @Timed
-  @Produces(APPLICATION_JSON)
-  public Response list(
-      @QueryParam("limit") @DefaultValue("100") Integer limit,
-      @QueryParam("offset") @DefaultValue("0") Integer offset) {
-
-    final List<Datasource> datasources = datasourceService.list(limit, offset);
-    return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasources)).build();
-  }
-
-  @GET
-  @ResponseMetered
-  @ExceptionMetered
-  @Timed
-  @Produces(APPLICATION_JSON)
-  @Path("/{urn}")
-  public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
-      throws MarquezServiceException {
-
-    final Datasource datasource =
-        datasourceService
-            .get(datasourceUrn)
-            .orElseThrow(() -> new DatasourceUrnNotFoundException(datasourceUrn));
-    return Response.ok(DatasourceResponseMapper.map(datasource)).build();
-  }
-
   @POST
   @ResponseMetered
   @ExceptionMetered
@@ -102,7 +73,35 @@ public final class DatasourceResource {
     final Datasource createdDatasource =
         datasourceService.create(
             connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
-    DatasourceResponse datasourceResponse = DatasourceResponseMapper.map(createdDatasource);
-    return Response.status(CREATED).entity(datasourceResponse).build();
+    return Response.ok(DatasourceResponseMapper.map(createdDatasource)).build();
+  }
+
+  @GET
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Produces(APPLICATION_JSON)
+  @Path("/{urn}")
+  public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
+      throws MarquezServiceException {
+
+    final Datasource datasource =
+        datasourceService
+            .get(datasourceUrn)
+            .orElseThrow(() -> new DatasourceUrnNotFoundException(datasourceUrn));
+    return Response.ok(DatasourceResponseMapper.map(datasource)).build();
+  }
+
+  @GET
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Produces(APPLICATION_JSON)
+  public Response list(
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset) {
+
+    final List<Datasource> datasources = datasourceService.getAll(limit, offset);
+    return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasources)).build();
   }
 }

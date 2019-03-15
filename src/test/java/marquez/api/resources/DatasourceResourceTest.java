@@ -79,7 +79,7 @@ public class DatasourceResourceTest {
 
   @Test
   public void testListDatasources200_emptyset() {
-    when(mockDatasourceService.list(any(), any())).thenReturn(Collections.emptyList());
+    when(mockDatasourceService.getAll(any(), any())).thenReturn(Collections.emptyList());
     final Response datasourceResponse = datasourceResource.list(100, 0);
     assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
@@ -90,7 +90,7 @@ public class DatasourceResourceTest {
 
   @Test
   public void testListDatasources200_singleset() {
-    when(mockDatasourceService.list(any(), any()))
+    when(mockDatasourceService.getAll(any(), any()))
         .thenReturn(Collections.singletonList(Generator.genDatasource()));
     final Response datasourceResponse = datasourceResource.list(100, 0);
     assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
@@ -106,7 +106,7 @@ public class DatasourceResourceTest {
     resultSet.add(Generator.genDatasource());
     resultSet.add(Generator.genDatasource());
 
-    when(mockDatasourceService.list(any(), any())).thenReturn(resultSet);
+    when(mockDatasourceService.getAll(any(), any())).thenReturn(resultSet);
     final Response datasourceResponse = datasourceResource.list(100, 0);
     assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
@@ -120,7 +120,7 @@ public class DatasourceResourceTest {
     final Datasource ds1 = Generator.genDatasource();
     final List<Datasource> resultSet = Collections.singletonList(ds1);
 
-    when(mockDatasourceService.list(any(), any())).thenReturn(resultSet);
+    when(mockDatasourceService.getAll(any(), any())).thenReturn(resultSet);
 
     final Response datasourceResponse = datasourceResource.list(100, 0);
     assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
