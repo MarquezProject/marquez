@@ -51,6 +51,45 @@ public final class DatasourceResource {
     this.datasourceService = datasourceService;
   }
 
+  @POST
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  public Response create(@NonNull final DatasourceRequest datasourceRequest)
+          throws MarquezServiceException {
+
+    final ConnectionUrl connectionUrl;
+    try {
+      connectionUrl = ConnectionUrl.fromString(datasourceRequest.getConnectionUrl());
+    } catch (IllegalArgumentException e) {
+      log.error(e.getMessage(), e);
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    final Datasource createdDatasource =
+            datasourceService.create(
+                    connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
+    return Response.ok(DatasourceResponseMapper.map(createdDatasource)).build();
+  }
+  
+  @GET
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Produces(APPLICATION_JSON)
+  @Path("/{urn}")
+  public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
+          throws MarquezServiceException {
+
+    final Datasource datasource =
+            datasourceService
+                    .get(datasourceUrn)
+                    .orElseThrow(() -> new DatasourceUrnNotFoundException(datasourceUrn));
+    return Response.ok(DatasourceResponseMapper.map(datasource)).build();
+  }
+
   @GET
   @ResponseMetered
   @ExceptionMetered
@@ -64,42 +103,4 @@ public final class DatasourceResource {
     return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasources)).build();
   }
 
-  @GET
-  @ResponseMetered
-  @ExceptionMetered
-  @Timed
-  @Produces(APPLICATION_JSON)
-  @Path("/{urn}")
-  public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
-      throws MarquezServiceException {
-
-    final Datasource datasource =
-        datasourceService
-            .get(datasourceUrn)
-            .orElseThrow(() -> new DatasourceUrnNotFoundException(datasourceUrn));
-    return Response.ok(DatasourceResponseMapper.map(datasource)).build();
-  }
-
-  @POST
-  @ResponseMetered
-  @ExceptionMetered
-  @Timed
-  @Consumes(APPLICATION_JSON)
-  @Produces(APPLICATION_JSON)
-  public Response create(@NonNull final DatasourceRequest datasourceRequest)
-      throws MarquezServiceException {
-
-    final ConnectionUrl connectionUrl;
-    try {
-      connectionUrl = ConnectionUrl.fromString(datasourceRequest.getConnectionUrl());
-    } catch (IllegalArgumentException e) {
-      log.error(e.getMessage(), e);
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    }
-
-    final Datasource createdDatasource =
-        datasourceService.create(
-            connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
-    return Response.ok(DatasourceResponseMapper.map(createdDatasource)).build();
-  }
 }
