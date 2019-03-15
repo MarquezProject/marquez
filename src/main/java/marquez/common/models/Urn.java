@@ -15,8 +15,8 @@
 package marquez.common.models;
 
 import static marquez.common.Preconditions.checkNotBlank;
-import static marquez.common.models.UrnPattern.URN_DELIM;
-import static marquez.common.models.UrnPattern.URN_PREFIX;
+import static marquez.common.models.UrnPattern.DELIM;
+import static marquez.common.models.UrnPattern.PREFIX;
 
 import java.util.StringJoiner;
 import lombok.EqualsAndHashCode;
@@ -34,14 +34,16 @@ public abstract class Urn {
     this.value = value;
   }
 
-  protected static String fromTypeAndParts(@NonNull String type, @NonNull String... parts) {
-    checkNotBlank(type);
-    return new StringJoiner(URN_DELIM)
-        .add(URN_PREFIX)
-        .add(type)
-        .add(String.join(URN_DELIM, parts))
+  protected static String valueFrom(@NonNull String namespace, @NonNull String... parts) {
+    checkNotBlank(namespace);
+    return new StringJoiner(DELIM)
+        .add(PREFIX)
+        .add(namespace)
+        .add(String.join(DELIM, parts))
         .toString();
   }
+
+  public abstract String namespace();
 
   abstract UrnPattern pattern();
 }

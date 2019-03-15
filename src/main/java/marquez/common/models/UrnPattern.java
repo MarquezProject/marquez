@@ -18,13 +18,15 @@ import static marquez.common.Preconditions.checkNotBlank;
 
 import java.util.regex.Pattern;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 final class UrnPattern {
-  private static final int URN_MIN_SIZE = 1;
-  private static final int URN_MAX_SIZE = 64;
+  private static final int MIN_SIZE = 1;
+  private static final int MAX_SIZE = 64;
 
-  static final String URN_DELIM = ":";
-  static final String URN_PREFIX = "urn";
+  static final String DELIM = ":";
+  static final String PREFIX = "urn";
 
   private final Pattern pattern;
 
@@ -32,12 +34,13 @@ final class UrnPattern {
     this.pattern = Pattern.compile(checkNotBlank(value));
   }
 
-  static UrnPattern from(@NonNull String type, @NonNull Integer numOfParts) {
-    checkNotBlank(type);
+  static UrnPattern from(@NonNull String namespace, @NonNull Integer numOfParts) {
+    checkNotBlank(namespace);
     final String value =
         String.format(
             "^%s%s%s(%s[a-zA-Z0-9._]{%d,%d}){%d}$",
-            URN_PREFIX, URN_DELIM, type, URN_DELIM, URN_MIN_SIZE, URN_MAX_SIZE, numOfParts);
+            PREFIX, DELIM, namespace, DELIM, MIN_SIZE, MAX_SIZE, numOfParts);
+    log.info(value);
     return new UrnPattern(value);
   }
 
