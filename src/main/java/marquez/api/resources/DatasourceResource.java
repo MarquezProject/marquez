@@ -99,7 +99,7 @@ public final class DatasourceResource {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
 
-    final List<Datasource> datasources = datasourceService.list(limit, offset);
+    final List<Datasource> datasources = datasourceService.getAll(limit, offset);
     return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasources)).build();
   }
 }
