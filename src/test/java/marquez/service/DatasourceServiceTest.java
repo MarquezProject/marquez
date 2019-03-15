@@ -58,7 +58,7 @@ public class DatasourceServiceTest {
   @Test
   public void testCreateDatasource() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
+    when(datasourceDao.findBy(any(DatasourceUrn.class))).thenReturn(Optional.of(row));
 
     final Datasource response =
         datasourceService.create(
@@ -89,7 +89,7 @@ public class DatasourceServiceTest {
   @Test(expected = MarquezServiceException.class)
   public void testCreateDatasource_throwsException_onDaoException() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.empty());
+    when(datasourceDao.findBy(any(DatasourceUrn.class))).thenReturn(Optional.empty());
     datasourceService.create(
         ConnectionUrl.fromString(row.getConnectionUrl()), DatasourceName.fromString(row.getName()));
   }
@@ -102,7 +102,7 @@ public class DatasourceServiceTest {
   @Test
   public void testGetDatasourceByUrn() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
+    when(datasourceDao.findBy(any(DatasourceUrn.class))).thenReturn(Optional.of(row));
 
     final DatasourceType type =
         ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
@@ -144,7 +144,7 @@ public class DatasourceServiceTest {
   public void testGetDatasourceByUrn_throwMarquezServiceException_onDaoException()
       throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(String.class)))
+    when(datasourceDao.findBy(any(DatasourceUrn.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     final DatasourceType type =
         ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
@@ -164,7 +164,7 @@ public class DatasourceServiceTest {
   @Test
   public void testGetNoSuchDatasource() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.empty());
+    when(datasourceDao.findBy(any(UUID.class))).thenReturn(Optional.empty());
     final Optional<Datasource> response = datasourceService.get(row.getUuid());
 
     assertThat(response.isPresent()).isFalse();
@@ -178,7 +178,7 @@ public class DatasourceServiceTest {
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
-    final List<Datasource> datasources = datasourceService.getAll(100, 0);
+    final List<Datasource> datasources = datasourceService.list(100, 0);
 
     assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
     assertThat(datasources.get(0).getUrn()).isNotEqualTo(datasources.get(1).getUrn());
@@ -191,7 +191,7 @@ public class DatasourceServiceTest {
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
-    final List<Datasource> datasources = datasourceService.getAll(100, 0);
+    final List<Datasource> datasources = datasourceService.list(100, 0);
     assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
 
     final Datasource returnedDatasource = datasources.get(0);
@@ -208,7 +208,7 @@ public class DatasourceServiceTest {
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
-    List<Datasource> datasources = datasourceService.getAll(100, 0);
+    List<Datasource> datasources = datasourceService.list(100, 0);
     assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
   }
 }

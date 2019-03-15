@@ -21,7 +21,6 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
-import java.util.Optional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -33,6 +32,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.mappers.DatasourceResponseMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.api.models.DatasourceResponse;
@@ -62,7 +62,7 @@ public final class DatasourceResource {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
 
-    final List<Datasource> datasources = datasourceService.getAll(limit, offset);
+    final List<Datasource> datasources = datasourceService.list(limit, offset);
     return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasources)).build();
   }
 
@@ -75,12 +75,11 @@ public final class DatasourceResource {
   public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
       throws MarquezServiceException {
 
-    final Optional<Datasource> datasource = datasourceService.get(datasourceUrn);
-    if (datasource.isPresent()) {
-      return Response.ok(DatasourceResponseMapper.map(datasource.get())).build();
-    } else {
-      return Response.status(Response.Status.NOT_FOUND).entity("Datasource not found").build();
-    }
+    final Datasource datasource =
+        datasourceService
+            .get(datasourceUrn)
+            .orElseThrow(() -> new DatasourceUrnNotFoundException(datasourceUrn));
+    return Response.ok(DatasourceResponseMapper.map(datasource)).build();
   }
 
   @POST

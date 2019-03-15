@@ -21,35 +21,9 @@ import org.junit.Test;
 public class DatasourceTypeTest {
 
   @Test
-  public void testValidName() {
-    final String datasourceType = "postgresql";
-    final DatasourceType myDatasourceType = DatasourceType.fromString(datasourceType);
-    assertThat(myDatasourceType.toString()).isEqualTo(datasourceType);
-  }
-
-  @Test
   public void testToValue() {
     final String expectedValue = "postgresql";
     assertThat(DatasourceType.POSTGRESQL.toString()).isEqualTo(expectedValue);
-  }
-
-  @Test
-  public void testFromString() {
-    final String expectedValue = "postgresql";
-    assertThat(DatasourceType.fromString(expectedValue)).isEqualTo(DatasourceType.POSTGRESQL);
-  }
-
-  @Test
-  public void testNewDatasourceType_throwsException_onInvalidValue() {
-    final String invalidDatasourceType = "xyz_postgresql";
-    final DatasourceType datasourceType = DatasourceType.fromString(invalidDatasourceType);
-    assertThat(datasourceType).isNull();
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewDatasourceType_throwsException_onNullValue() {
-    final String nullValue = null;
-    DatasourceType.fromString(nullValue);
   }
 
   @Test

@@ -12,15 +12,16 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.exceptions;
 
-public enum DatasourceType {
-  REDSHIFT,
-  MYSQL,
-  POSTGRESQL;
+import javax.ws.rs.NotFoundException;
+import lombok.NonNull;
+import marquez.common.models.DatasourceUrn;
 
-  @Override
-  public String toString() {
-    return name().toLowerCase();
+public final class DatasourceUrnNotFoundException extends NotFoundException {
+  private static final long serialVersionUID = 1L;
+
+  public DatasourceUrnNotFoundException(@NonNull final DatasourceUrn urn) {
+    super(String.format("Datasource urn '%s' not found.", urn.getValue()));
   }
 }
