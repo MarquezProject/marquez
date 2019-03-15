@@ -15,6 +15,7 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.CREATED;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -34,6 +35,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.mappers.DatasourceResponseMapper;
 import marquez.api.models.DatasourceRequest;
+import marquez.api.models.DatasourceResponse;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
@@ -101,8 +103,9 @@ public final class DatasourceResource {
     final Datasource createdDatasource =
         datasourceService.create(
             connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
-    return Response.status(Response.Status.CREATED)
-        .entity(DatasourceResponseMapper.map(createdDatasource))
+    DatasourceResponse datasourceResponse = DatasourceResponseMapper.map(createdDatasource);
+    return Response.status(CREATED)
+        .entity(datasourceResponse)
         .build();
   }
 }
