@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.mappers.DatasourceResponseMapper;
 import marquez.api.models.DatasourceRequest;
-import marquez.api.models.DatasourceResponse;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
@@ -73,7 +72,7 @@ public final class DatasourceResource {
     final Datasource createdDatasource =
         datasourceService.create(
             connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
-    return Response.ok(DatasourceResponseMapper.map(createdDatasource)).build();
+    return Response.status(CREATED).entity(DatasourceResponseMapper.map(createdDatasource)).build();
   }
 
   @GET
