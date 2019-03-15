@@ -47,7 +47,7 @@ final class UrnPattern {
           String.format(
               "urn (%s) must contain only letters (a-z, A-Z), numbers (0-9), periods (.), "
                   + "or underscores (_) and be sperated by colons (:) with each part "
-                  + "having a maximum length of 64 characters.",
+                  + "having a maximum length of 64 characters",
               value));
     }
   }
