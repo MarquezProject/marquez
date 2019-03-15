@@ -1,6 +1,8 @@
 package marquez.common.models;
 
 import static java.util.stream.Collectors.joining;
+import static marquez.common.models.UrnPattern.DELIM;
+import static marquez.common.models.UrnPattern.PREFIX;
 
 import java.util.StringJoiner;
 import java.util.stream.Stream;
@@ -39,6 +41,7 @@ public class UrnPatternTest {
     final Integer nullNumOfParts = null;
     UrnPattern.from(NAMESPACE, nullNumOfParts);
   }
+
   @Test
   public void testThrowIfNoMatch() {
     final String value = "urn:test:a:b";
@@ -91,11 +94,7 @@ public class UrnPatternTest {
     final String part0 = newUrnPart("a", ALLOWED_PART_SIZE);
     final String part1GreaterThan64 = newUrnPart("b", PART_SIZE_GREATER_THAN_ALLOWED);
 
-    return new StringJoiner(UrnPattern.DELIM)
-        .add(UrnPattern.PREFIX)
-        .add(part0)
-        .add(part1GreaterThan64)
-        .toString();
+    return new StringJoiner(DELIM).add(PREFIX).add(part0).add(part1GreaterThan64).toString();
   }
 
   private String newUrnPart(String part, Integer limit) {
