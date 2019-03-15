@@ -42,7 +42,7 @@ public class UrnPatternTest {
   }
 
   @Test
-  public void testThrowIfNoMatch_match() {
+  public void testThrowIfNoMatch() {
     final String value = "urn:test:a:b";
     final UrnPattern pattern = UrnPattern.from(NAMESPACE, NUM_OF_PARTS);
     pattern.throwIfNoMatch(value);
@@ -68,7 +68,7 @@ public class UrnPatternTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testThrowIfNoMatch_throwsException_onNoMatch() {
+  public void testThrowIfNoMatch_throwsException_onNoMatchValue() {
     final String noMatchValue = "urn:a:b";
     final UrnPattern pattern = UrnPattern.from(NAMESPACE, NUM_OF_PARTS);
     pattern.throwIfNoMatch(noMatchValue);
