@@ -31,13 +31,15 @@ public final class DatasetUrn extends Urn {
   @Deprecated
   public static DatasetUrn from(
       @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
-    final String value = fromParts(URN_TYPE, namespaceName.toString(), datasetName.getValue());
+    final String value =
+        fromTypeAndParts(URN_TYPE, namespaceName.toString(), datasetName.getValue());
     return fromString(value);
   }
 
   public static DatasetUrn from(
       @NonNull DatasourceName datasourceName, @NonNull DatasetName datasetName) {
-    final String value = fromParts(URN_TYPE, datasourceName.toString(), datasetName.getValue());
+    final String value =
+        fromTypeAndParts(URN_TYPE, datasourceName.toString(), datasetName.getValue());
     return fromString(value);
   }
 

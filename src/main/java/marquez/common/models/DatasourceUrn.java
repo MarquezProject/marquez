@@ -29,7 +29,7 @@ public final class DatasourceUrn extends Urn {
   }
 
   public static DatasourceUrn from(@NonNull DatasourceType type, @NonNull DatasourceName name) {
-    final String value = fromParts(URN_TYPE, type.toString(), name.getValue());
+    final String value = fromTypeAndParts(URN_TYPE, type.toString(), name.getValue());
     return fromString(value);
   }
 

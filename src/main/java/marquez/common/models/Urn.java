@@ -34,9 +34,11 @@ public abstract class Urn {
     this.value = value;
   }
 
-  protected static String fromParts(@NonNull String... parts) {
+  protected static String fromTypeAndParts(@NonNull String type, @NonNull String... parts) {
+    checkNotBlank(type);
     return new StringJoiner(URN_DELIM)
         .add(URN_PREFIX)
+        .add(type)
         .add(String.join(URN_DELIM, parts))
         .toString();
   }
