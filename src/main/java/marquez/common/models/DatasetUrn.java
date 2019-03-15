@@ -20,8 +20,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.NonNull;
 
 public final class DatasetUrn extends Urn {
-  private static final int NUM_OF_PARTS = 2;
   private static final String NAMESPACE = "dataset";
+  private static final int NUM_OF_PARTS = 2;
   private static final UrnPattern PATTERN = UrnPattern.from(NAMESPACE, NUM_OF_PARTS);
 
   private DatasetUrn(@NonNull final String value) {
