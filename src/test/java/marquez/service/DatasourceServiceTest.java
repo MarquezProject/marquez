@@ -178,7 +178,7 @@ public class DatasourceServiceTest {
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
-    final List<Datasource> datasources = datasourceService.getAll(100, 0);
+    final List<Datasource> datasources = datasourceService.list(100, 0);
 
     assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
     assertThat(datasources.get(0).getUrn()).isNotEqualTo(datasources.get(1).getUrn());
@@ -191,7 +191,7 @@ public class DatasourceServiceTest {
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
-    final List<Datasource> datasources = datasourceService.getAll(100, 0);
+    final List<Datasource> datasources = datasourceService.list(100, 0);
     assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
 
     final Datasource returnedDatasource = datasources.get(0);
@@ -208,7 +208,7 @@ public class DatasourceServiceTest {
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
-    List<Datasource> datasources = datasourceService.getAll(100, 0);
+    List<Datasource> datasources = datasourceService.list(100, 0);
     assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
   }
 }
