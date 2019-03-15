@@ -58,7 +58,7 @@ public final class DatasourceResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(@NonNull final DatasourceRequest datasourceRequest)
-          throws MarquezServiceException {
+      throws MarquezServiceException {
 
     final ConnectionUrl connectionUrl;
     try {
@@ -69,11 +69,11 @@ public final class DatasourceResource {
     }
 
     final Datasource createdDatasource =
-            datasourceService.create(
-                    connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
+        datasourceService.create(
+            connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
     return Response.ok(DatasourceResponseMapper.map(createdDatasource)).build();
   }
-  
+
   @GET
   @ResponseMetered
   @ExceptionMetered
@@ -81,12 +81,12 @@ public final class DatasourceResource {
   @Produces(APPLICATION_JSON)
   @Path("/{urn}")
   public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
-          throws MarquezServiceException {
+      throws MarquezServiceException {
 
     final Datasource datasource =
-            datasourceService
-                    .get(datasourceUrn)
-                    .orElseThrow(() -> new DatasourceUrnNotFoundException(datasourceUrn));
+        datasourceService
+            .get(datasourceUrn)
+            .orElseThrow(() -> new DatasourceUrnNotFoundException(datasourceUrn));
     return Response.ok(DatasourceResponseMapper.map(datasource)).build();
   }
 
@@ -102,5 +102,4 @@ public final class DatasourceResource {
     final List<Datasource> datasources = datasourceService.list(limit, offset);
     return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasources)).build();
   }
-
 }
