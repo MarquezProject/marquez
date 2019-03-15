@@ -44,8 +44,9 @@ final class UrnPattern {
   void throwIfNoMatch(@NonNull String value) {
     if (!pattern.matcher(checkNotBlank(value)).matches()) {
       throw new IllegalArgumentException(
-          "A urn must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_) and "
-              + "be sperated by colons (:) with each part having a maximum length of 64 characters.");
+          "A urn must contain only letters (a-z, A-Z), numbers (0-9), periods (.), "
+              + "or underscores (_) and be sperated by colons (:) with each part "
+              + "having a maximum length of 64 characters.");
     }
   }
 }
