@@ -33,7 +33,7 @@ public final class DatasourceRowMapper {
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .urn(datasourceUrn.getValue())
-        .name(dbTableVersion.getConnectionUrl().getDatasourceType().name())
+        .name(dbTableVersion.getConnectionUrl().getDbName().getValue())
         .connectionUrl(dbTableVersion.getConnectionUrl().getRawValue())
         .build();
   }

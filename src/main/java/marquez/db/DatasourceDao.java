@@ -17,6 +17,7 @@ package marquez.db;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.mappers.DatasourceRowMapper;
 import marquez.db.models.DatasourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -36,7 +37,7 @@ public interface DatasourceDao {
   Optional<DatasourceRow> findBy(@Bind("uuid") UUID uuid);
 
   @SqlQuery("SELECT * FROM datasources WHERE urn = :urn")
-  Optional<DatasourceRow> findBy(@Bind("urn") String urn);
+  Optional<DatasourceRow> findBy(@Bind("urn") DatasourceUrn urn);
 
   @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
   List<DatasourceRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);

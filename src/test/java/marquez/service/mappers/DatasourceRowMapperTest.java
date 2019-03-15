@@ -53,11 +53,11 @@ public class DatasourceRowMapperTest {
             .dbSchemaName(DB_SCHEMA_NAME)
             .dbTableName(DB_TABLE_NAME)
             .build();
-    final DatasourceRow dataSourceRow = DatasourceRowMapper.map(dbTableVersion);
-    assertNotNull(dataSourceRow);
-    assertNotNull(dataSourceRow.getUuid());
-    assertEquals(DATASOURCE_TYPE.name(), dataSourceRow.getName());
-    assertEquals(CONNECTION_URL.getRawValue(), dataSourceRow.getConnectionUrl());
+    final DatasourceRow datasourceRow = DatasourceRowMapper.map(dbTableVersion);
+    assertNotNull(datasourceRow);
+    assertNotNull(datasourceRow.getUuid());
+    assertEquals(DB_NAME.getValue(), datasourceRow.getName());
+    assertEquals(CONNECTION_URL.getRawValue(), datasourceRow.getConnectionUrl());
   }
 
   @Test(expected = NullPointerException.class)

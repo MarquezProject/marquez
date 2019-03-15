@@ -46,8 +46,8 @@ public class DatasourceService {
 
     try {
       datasourceDao.insert(datasourceRow);
-      final Optional<DatasourceRow> datasourceRowIfFound =
-          datasourceDao.findBy(datasourceRow.getUrn());
+      DatasourceUrn datasourceUrn = DatasourceUrn.fromString(datasourceRow.getUrn());
+      final Optional<DatasourceRow> datasourceRowIfFound = datasourceDao.findBy(datasourceUrn);
       return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezException::new);
     } catch (MarquezException e) {
       log.error(e.getMessage());
@@ -58,8 +58,7 @@ public class DatasourceService {
   public Optional<Datasource> get(@NonNull final DatasourceUrn datasourceUrn)
       throws MarquezServiceException {
     try {
-      final Optional<DatasourceRow> datasourceRowIfFound =
-          datasourceDao.findBy(datasourceUrn.getValue());
+      final Optional<DatasourceRow> datasourceRowIfFound = datasourceDao.findBy(datasourceUrn);
       return datasourceRowIfFound.map(DatasourceMapper::map);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
