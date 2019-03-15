@@ -46,9 +46,15 @@ jobs:
 
   update-python-client:
     docker:
-      <<: *defaults
-      steps:
-        - checkout
+      - image: docker:git
+    working_directory: ~/marquez
+    steps:
+      - checkout
+      - run: whoami
+      - run: pwd
+      - run: echo 'export MY_VAR="999"' >> $BASH_ENV
+      - run: source $BASH_ENV; echo $MY_VAR
+      - run: source ./client_utils.sh; echo $MARQUEZ_PYTHON_CLIENT_CLONE_DIR; clone_openapi_generator; ls $OPEN_API_GENERATOR_CLONE_DIR
 
 workflows:
   version: 2
