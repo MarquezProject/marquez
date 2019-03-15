@@ -44,6 +44,12 @@ jobs:
       - run: ./docker/login.sh
       - run: ./docker/build-and-push.sh $CIRCLE_TAG
 
+  update-python-client:
+    docker:
+      <<: *defaults
+      steps:
+        - checkout
+
 workflows:
   version: 2
   marquez:
