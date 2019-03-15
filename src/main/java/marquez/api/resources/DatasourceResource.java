@@ -104,8 +104,6 @@ public final class DatasourceResource {
         datasourceService.create(
             connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
     DatasourceResponse datasourceResponse = DatasourceResponseMapper.map(createdDatasource);
-    return Response.status(CREATED)
-        .entity(datasourceResponse)
-        .build();
+    return Response.status(CREATED).entity(datasourceResponse).build();
   }
 }
