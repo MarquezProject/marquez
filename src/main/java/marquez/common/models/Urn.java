@@ -36,6 +36,9 @@ public abstract class Urn {
 
   protected static String valueFrom(@NonNull String namespace, @NonNull String... parts) {
     checkNotBlank(namespace);
+    for (String part : parts) {
+      checkNotBlank(part);
+    }
     return new StringJoiner(DELIM)
         .add(PREFIX)
         .add(namespace)
