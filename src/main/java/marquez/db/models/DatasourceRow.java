@@ -31,6 +31,7 @@ import lombok.ToString;
 @Builder
 public final class DatasourceRow {
   @Getter @NonNull private final UUID uuid;
+  @Getter @NonNull private final String urn;
   @Getter @NonNull private final String name;
   @Getter @NonNull private final String connectionUrl;
   @Nullable private final Instant createdAt;

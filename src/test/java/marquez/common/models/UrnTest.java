@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 import org.junit.Test;
 
 public class UrnTest {
-  private String urnType = "foo";
-  private int numComponents = 3;
-  private Pattern pattern = Urn.buildPattern(urnType, numComponents);
+  private final String urnType = "foo";
+  private final int numComponents = 3;
+  private final Pattern pattern = Urn.buildPattern(urnType, numComponents);
 
   @Test(expected = Test.None.class /* no exception expected */)
   public void testCreate() {

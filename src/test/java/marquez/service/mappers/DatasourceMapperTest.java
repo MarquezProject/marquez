@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Datasource;
 import org.junit.Test;
@@ -29,12 +31,17 @@ public class DatasourceMapperTest {
   private static final Instant CREATED_AT = Instant.now();
 
   private static final String CONNECTION_URL = "jdbc:postgresql://localhost:5431/novelists";
-  private static final String DATASOURCE_NAME = "datasourcerow";
+  private static final String DATASOURCE_NAME = "my_database";
+  private static final String DATASOURCE_TYPE =
+      ConnectionUrl.fromString(CONNECTION_URL).getDatasourceType().toString();
+  private static final String DATASOURCE_URN =
+      DatasourceUrn.from(DATASOURCE_TYPE, DATASOURCE_NAME).toString();
 
   @Test
   public void testMapDatasourceRow() {
     final DatasourceRow datasourceRow =
-        new DatasourceRow(UUID.randomUUID(), DATASOURCE_NAME, CONNECTION_URL, CREATED_AT);
+        new DatasourceRow(
+            UUID.randomUUID(), DATASOURCE_URN, DATASOURCE_NAME, CONNECTION_URL, CREATED_AT);
     final Datasource datasource = DatasourceMapper.map(datasourceRow);
 
     assertNotNull(datasourceRow);
@@ -53,7 +60,8 @@ public class DatasourceMapperTest {
   public void testMapDatasourceRowList() {
     final List<DatasourceRow> datasourceRows =
         Arrays.asList(
-            new DatasourceRow(UUID.randomUUID(), DATASOURCE_NAME, CONNECTION_URL, CREATED_AT));
+            new DatasourceRow(
+                UUID.randomUUID(), DATASOURCE_URN, DATASOURCE_NAME, CONNECTION_URL, CREATED_AT));
     final List<Datasource> datasources = DatasourceMapper.map(datasourceRows);
 
     assertNotNull(datasources);

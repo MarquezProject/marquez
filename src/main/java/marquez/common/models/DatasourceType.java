@@ -14,23 +14,13 @@
 
 package marquez.common.models;
 
-import static org.junit.Assert.assertEquals;
+public enum DatasourceType {
+  REDSHIFT,
+  MYSQL,
+  POSTGRESQL;
 
-import marquez.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
-@Category(UnitTests.class)
-public class DatasourceTest {
-  @Test
-  public void testNewDataSource() {
-    final String value = "postgresql";
-    assertEquals(value, Datasource.fromString(value).getValue());
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewDataSource_throwsException_onNullValue() {
-    final String nullValue = null;
-    Datasource.fromString(nullValue);
+  @Override
+  public String toString() {
+    return name().toLowerCase();
   }
 }

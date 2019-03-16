@@ -22,12 +22,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class Datasource {
   @Getter @NonNull private final DatasourceName name;
+  @Getter @NonNull private final DatasourceUrn urn;
   @Getter @NonNull private final ConnectionUrl connectionUrl;
   @Getter @NonNull private final Instant createdAt;
 }

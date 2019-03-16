@@ -35,7 +35,7 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 @RegisterRowMapper(DatasetRowMapper.class)
 public interface DatasetDao {
   @CreateSqlObject
-  DatasourceDao createDataSourceDao();
+  DatasourceDao createDatasourceDao();
 
   @CreateSqlObject
   DbTableVersionDao createDbTableVersionDao();
@@ -47,11 +47,11 @@ public interface DatasetDao {
 
   @Transaction
   default void insertAll(
-      DatasourceRow dataSourceRow,
+      DatasourceRow datasourceRow,
       DatasetRow datasetRow,
       DbTableInfoRow dbTableInfoRow,
       DbTableVersionRow dbTableVersionRow) {
-    createDataSourceDao().insert(dataSourceRow);
+    createDatasourceDao().insert(datasourceRow);
     insert(datasetRow);
     createDbTableVersionDao().insertAll(dbTableInfoRow, dbTableVersionRow);
     updateCurrentVersion(datasetRow.getUuid(), Instant.now(), dbTableVersionRow.getUuid());

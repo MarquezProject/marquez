@@ -21,7 +21,7 @@ public class Urn {
       "A urn must contain only letters (a-z, A-Z), numbers (0-9), and "
           + "be sperated by colons (:) with each part having a maximum length of 64 characters.";
 
-  @Getter private final String value;
+  @Getter protected final String value;
 
   protected static String fromComponents(String urnType, String... components) {
     List<String> sanitizedComponents =

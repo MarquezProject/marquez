@@ -24,6 +24,7 @@ import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
@@ -144,7 +145,7 @@ public class Generator {
 
   // Namespaces
   public static Namespace genNamespace() {
-    int nsNum = randNum();
+    final int nsNum = randNum();
     return new Namespace(
         UUID.randomUUID(), "ns" + nsNum, "ns connectionUrl" + nsNum, "ns desc" + nsNum);
   }
@@ -164,19 +165,28 @@ public class Generator {
 
   // Datasource
   public static Datasource genDatasource() {
-    return new Datasource(
-        DatasourceName.fromString("mysql_cluster_" + randNum()),
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum()),
-        Instant.now());
+    final ConnectionUrl connectionUrl =
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum());
+    final DatasourceName datasourceName =
+        DatasourceName.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum());
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+
+    return new Datasource(datasourceName, datasourceUrn, connectionUrl, Instant.now());
   }
 
   // Data Source Rows
   public static DatasourceRow genDatasourceRow() {
-    int datasourceNum = randNum();
+    final int datasourceNum = randNum();
+    final String connectionUrl = "jdbc:postgresql://localhost:5431/novelists_" + randNum();
+    final String datasourceName = "Datasource" + datasourceNum;
+    final String datasourceType =
+        ConnectionUrl.fromString(connectionUrl).getDatasourceType().toString();
+    final String datasourceUrn = DatasourceUrn.from(datasourceType, datasourceName).getValue();
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
-        .name("Data Source" + datasourceNum)
-        .connectionUrl("jdbc:postgresql://localhost:5431/novelists_" + randNum())
+        .urn(datasourceUrn)
+        .name(datasourceName)
+        .connectionUrl(connectionUrl)
         .createdAt(Instant.now())
         .build();
   }

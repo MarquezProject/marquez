@@ -15,6 +15,7 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.CREATED;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -25,15 +26,18 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.mappers.DatasourceResponseMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
@@ -48,6 +52,45 @@ public final class DatasourceResource {
     this.datasourceService = datasourceService;
   }
 
+  @POST
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  public Response create(@NonNull final DatasourceRequest datasourceRequest)
+      throws MarquezServiceException {
+
+    final ConnectionUrl connectionUrl;
+    try {
+      connectionUrl = ConnectionUrl.fromString(datasourceRequest.getConnectionUrl());
+    } catch (IllegalArgumentException e) {
+      log.error(e.getMessage(), e);
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    final Datasource createdDatasource =
+        datasourceService.create(
+            connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
+    return Response.status(CREATED).entity(DatasourceResponseMapper.map(createdDatasource)).build();
+  }
+
+  @GET
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Produces(APPLICATION_JSON)
+  @Path("/{urn}")
+  public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
+      throws MarquezServiceException {
+
+    final Datasource datasource =
+        datasourceService
+            .get(datasourceUrn)
+            .orElseThrow(() -> new DatasourceUrnNotFoundException(datasourceUrn));
+    return Response.ok(DatasourceResponseMapper.map(datasource)).build();
+  }
+
   @GET
   @ResponseMetered
   @ExceptionMetered
@@ -59,20 +102,5 @@ public final class DatasourceResource {
 
     final List<Datasource> datasources = datasourceService.getAll(limit, offset);
     return Response.ok(DatasourceResponseMapper.toDatasourcesResponse(datasources)).build();
-  }
-
-  @POST
-  @ResponseMetered
-  @ExceptionMetered
-  @Timed
-  @Consumes(APPLICATION_JSON)
-  @Produces(APPLICATION_JSON)
-  public Response create(@NonNull final DatasourceRequest datasourceRequest)
-      throws MarquezServiceException {
-    final Datasource createdDatasource =
-        datasourceService.create(
-            ConnectionUrl.fromString(datasourceRequest.getConnectionUrl()),
-            DatasourceName.fromString(datasourceRequest.getName()));
-    return Response.ok(DatasourceResponseMapper.map(createdDatasource)).build();
   }
 }
