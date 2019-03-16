@@ -57,7 +57,7 @@ public class UrnPatternTest {
   }
 
   @Test
-  public void testThrowIfNoMatch() {
+  public void testThrowIfNoMatch_noExceptionThrown() {
     final String value = "urn:test:a:b";
     PATTERN.throwIfNoMatch(value);
   }
