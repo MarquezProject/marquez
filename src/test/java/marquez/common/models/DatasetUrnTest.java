@@ -43,13 +43,13 @@ public class DatasetUrnTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void tesFrom_throwsException_onNullDatasourceName() {
+  public void testFrom_throwsException_onNullDatasourceName() {
     final DatasourceName nullDatasourceName = null;
     DatasetUrn.from(nullDatasourceName, DATASET_NAME);
   }
 
   @Test(expected = NullPointerException.class)
-  public void tesFrom_throwsException_onNullDatasetName() {
+  public void testFrom_throwsException_onNullDatasetName() {
     final DatasetName nullDatasetName = null;
     DatasetUrn.from(DATASOURCE_NAME, nullDatasetName);
   }
