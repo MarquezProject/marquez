@@ -86,12 +86,12 @@ public class DatasourceDaoTest {
   @Test
   public void testOffset() {
     final List<DatasourceRow> returnedRows = datasourceDAO.findAll(100, 0);
-    int returnedRowCount = returnedRows.size();
+    final int returnedRowCount = returnedRows.size();
 
     final int offset = 1;
 
     final List<DatasourceRow> returnedRowsWithOffset = datasourceDAO.findAll(100, offset);
-    int returnedRowsWithOffsetSize = returnedRowsWithOffset.size();
+    final int returnedRowsWithOffsetSize = returnedRowsWithOffset.size();
     assertThat(returnedRowCount - returnedRowsWithOffsetSize).isEqualTo(offset);
   }
 }
