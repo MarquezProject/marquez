@@ -23,7 +23,7 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTests.class)
 public class DatasourceUrnTest {
   private static final String NAMESPACE = "datasource";
-  private static final String VALUE = "urn:datasource:postgresql:test";
+  private static final String VALUE = String.format("urn:%s:postgresql:test", NAMESPACE);
 
   private static final DatasourceType DATASOURCE_TYPE = DatasourceType.POSTGRESQL;
   private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("test");
