@@ -208,7 +208,7 @@ public class DatasourceServiceTest {
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
-    List<Datasource> datasources = datasourceService.getAll(100, 0);
+    final List<Datasource> datasources = datasourceService.getAll(100, 0);
     assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
   }
 }
