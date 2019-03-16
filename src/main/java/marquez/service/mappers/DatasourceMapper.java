@@ -21,6 +21,7 @@ import java.util.List;
 import lombok.NonNull;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Datasource;
 
@@ -28,8 +29,12 @@ public class DatasourceMapper {
   private DatasourceMapper() {}
 
   public static Datasource map(@NonNull DatasourceRow datasourceRow) {
+    final DatasourceName datasourceName = DatasourceName.fromString(datasourceRow.getName());
+    final ConnectionUrl connectionUrl = ConnectionUrl.fromString(datasourceRow.getConnectionUrl());
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
     return new Datasource(
-        DatasourceName.fromString(datasourceRow.getName()),
+        datasourceName,
+        datasourceUrn,
         ConnectionUrl.fromString(datasourceRow.getConnectionUrl()),
         datasourceRow.getCreatedAt().get());
   }

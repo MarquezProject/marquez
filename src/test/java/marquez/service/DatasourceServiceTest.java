@@ -20,9 +20,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceType;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.DatasourceDao;
 import marquez.db.models.DatasourceRow;
 import marquez.service.exceptions.MarquezServiceException;
@@ -30,7 +36,7 @@ import marquez.service.models.Datasource;
 import marquez.service.models.Generator;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DatasourceServiceTest {
@@ -39,8 +45,8 @@ public class DatasourceServiceTest {
 
   private static final DatasourceDao datasourceDao = mock(DatasourceDao.class);
 
-  @Before
-  public void setUp() {
+  @BeforeClass
+  public static void setUp() {
     datasourceService = new DatasourceService(datasourceDao);
   }
 
@@ -52,7 +58,7 @@ public class DatasourceServiceTest {
   @Test
   public void testCreateDatasource() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any())).thenReturn(Optional.of(row));
+    when(datasourceDao.findBy(any(DatasourceUrn.class))).thenReturn(Optional.of(row));
 
     final Datasource response =
         datasourceService.create(
@@ -64,10 +70,56 @@ public class DatasourceServiceTest {
     assertThat(response.getName()).isEqualTo(DatasourceName.fromString(row.getName()));
   }
 
-  @Test
-  public void testGetDatasource() throws MarquezServiceException {
+  @Test(expected = NullPointerException.class)
+  public void testCreateDatasource_throwsException_onNullConnectionUrl()
+      throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any())).thenReturn(Optional.of(row));
+
+    datasourceService.create(null, DatasourceName.fromString(row.getName()));
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testCreateDatasource_throwsException_onNullDatasourceName()
+      throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+
+    datasourceService.create(ConnectionUrl.fromString(row.getConnectionUrl()), null);
+  }
+
+  @Test(expected = MarquezServiceException.class)
+  public void testCreateDatasource_throwsException_onDaoException() throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any(DatasourceUrn.class))).thenReturn(Optional.empty());
+    datasourceService.create(
+        ConnectionUrl.fromString(row.getConnectionUrl()), DatasourceName.fromString(row.getName()));
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testDatasourceService_throwsException_onNullDatasourceDao() {
+    new DatasourceService(null);
+  }
+
+  @Test
+  public void testGetDatasourceByUrn() throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any(DatasourceUrn.class))).thenReturn(Optional.of(row));
+
+    final DatasourceType type =
+        ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
+    final Optional<Datasource> response =
+        datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
+    assertThat(response.isPresent()).isTrue();
+
+    assertThat(response.get().getConnectionUrl())
+        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
+    assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
+  }
+
+  @Test
+  public void testGetDatasourceByUuid() throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any(UUID.class))).thenReturn(Optional.of(row));
+
     final Optional<Datasource> response = datasourceService.get(row.getUuid());
     assertThat(response.isPresent()).isTrue();
 
@@ -76,18 +128,87 @@ public class DatasourceServiceTest {
     assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
   }
 
+  @Test(expected = NullPointerException.class)
+  public void testGetDatasourceByUuid_throwsNpe_onNullInput() throws MarquezServiceException {
+    final UUID myNullUuid = null;
+    datasourceService.get(myNullUuid);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testGetDatasourceByUrn_throwsNpe_onNullInput() throws MarquezServiceException {
+    final DatasourceUrn myNullDatasourceUrn = null;
+    datasourceService.get(myNullDatasourceUrn);
+  }
+
   @Test(expected = MarquezServiceException.class)
-  public void testGetDatasourceError() throws MarquezServiceException {
+  public void testGetDatasourceByUrn_throwMarquezServiceException_onDaoException()
+      throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any())).thenThrow(UnableToExecuteStatementException.class);
+    when(datasourceDao.findBy(any(DatasourceUrn.class)))
+        .thenThrow(UnableToExecuteStatementException.class);
+    final DatasourceType type =
+        ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
+
+    datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
+  }
+
+  @Test(expected = MarquezServiceException.class)
+  public void testGetDatasourceByUuid_throwMarquezServiceException_onDaoException()
+      throws MarquezServiceException {
+    final DatasourceRow row = Generator.genDatasourceRow();
+    when(datasourceDao.findBy(any(UUID.class))).thenThrow(UnableToExecuteStatementException.class);
+
     datasourceService.get(row.getUuid());
   }
 
   @Test
   public void testGetNoSuchDatasource() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any())).thenReturn(Optional.empty());
+    when(datasourceDao.findBy(any(UUID.class))).thenReturn(Optional.empty());
     final Optional<Datasource> response = datasourceService.get(row.getUuid());
+
     assertThat(response.isPresent()).isFalse();
+  }
+
+  @Test
+  public void testGetAll_multipleResults() {
+    final List<DatasourceRow> datasourceRowList = new ArrayList();
+    datasourceRowList.add(Generator.genDatasourceRow());
+    datasourceRowList.add(Generator.genDatasourceRow());
+
+    when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
+
+    final List<Datasource> datasources = datasourceService.getAll(100, 0);
+
+    assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
+    assertThat(datasources.get(0).getUrn()).isNotEqualTo(datasources.get(1).getUrn());
+  }
+
+  @Test
+  public void testGetAll_singleResult() {
+    final DatasourceRow generatedDatasourceRow = Generator.genDatasourceRow();
+    final List<DatasourceRow> datasourceRowList = Collections.singletonList(generatedDatasourceRow);
+
+    when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
+
+    final List<Datasource> datasources = datasourceService.getAll(100, 0);
+    assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
+
+    final Datasource returnedDatasource = datasources.get(0);
+
+    assertThat(returnedDatasource.getUrn().toString()).isEqualTo(generatedDatasourceRow.getUrn());
+    assertThat(returnedDatasource.getConnectionUrl().getRawValue())
+        .isEqualTo(generatedDatasourceRow.getConnectionUrl());
+    assertThat(returnedDatasource.getName().getValue()).isEqualTo(generatedDatasourceRow.getName());
+  }
+
+  @Test
+  public void testGetAll_noResults() {
+    final List<DatasourceRow> datasourceRowList = Collections.emptyList();
+
+    when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
+
+    List<Datasource> datasources = datasourceService.getAll(100, 0);
+    assertThat(datasources.size()).isEqualTo(datasourceRowList.size());
   }
 }

@@ -18,6 +18,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.DbTableVersion;
 
@@ -25,17 +26,24 @@ public final class DatasourceRowMapper {
   private DatasourceRowMapper() {}
 
   public static DatasourceRow map(@NonNull DbTableVersion dbTableVersion) {
+    final DatasourceName datasourceName =
+        DatasourceName.fromString(dbTableVersion.getConnectionUrl().getDatasourceType().name());
+    final DatasourceUrn datasourceUrn =
+        DatasourceUrn.from(dbTableVersion.getConnectionUrl(), datasourceName);
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
-        .name(dbTableVersion.getConnectionUrl().getDatasource().getValue())
+        .urn(datasourceUrn.getValue())
+        .name(dbTableVersion.getConnectionUrl().getDbName().getValue())
         .connectionUrl(dbTableVersion.getConnectionUrl().getRawValue())
         .build();
   }
 
   public static DatasourceRow map(
       @NonNull ConnectionUrl connectionUrl, @NonNull DatasourceName datasourceName) {
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
+        .urn(datasourceUrn.getValue())
         .name(datasourceName.getValue())
         .connectionUrl(connectionUrl.getRawValue())
         .build();

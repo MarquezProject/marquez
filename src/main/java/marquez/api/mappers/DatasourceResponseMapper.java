@@ -29,6 +29,7 @@ public final class DatasourceResponseMapper {
   public static DatasourceResponse map(@NonNull Datasource datasource) {
     return new DatasourceResponse(
         datasource.getName().getValue(),
+        datasource.getUrn().getValue(),
         datasource.getConnectionUrl().getRawValue(),
         datasource.getCreatedAt().toString());
   }
@@ -41,7 +42,6 @@ public final class DatasourceResponseMapper {
   }
 
   public static DatasourcesResponse toDatasourcesResponse(@NonNull List<Datasource> datasources) {
-    List<DatasourceResponse> datasourceResponses = map(datasources);
-    return new DatasourcesResponse(datasourceResponses);
+    return new DatasourcesResponse(map(datasources));
   }
 }

@@ -56,12 +56,12 @@ public class DatasetDaoTest {
   }
 
   private void insertRandomDataset() {
-    DatasourceRow dataSourceRow = Generator.genDatasourceRow();
-    DatasetRow datasetRow = Generator.genDatasetRow(namespace.getGuid(), dataSourceRow.getUuid());
+    DatasourceRow datasourceRow = Generator.genDatasourceRow();
+    DatasetRow datasetRow = Generator.genDatasetRow(namespace.getGuid(), datasourceRow.getUuid());
     DbTableInfoRow dbTableInfoRow = Generator.genDbTableInfowRow();
     DbTableVersionRow dbTableVersionRow =
         Generator.genDbTableVersionRow(datasetRow.getUuid(), dbTableInfoRow.getUuid());
-    datasetDAO.insertAll(dataSourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
+    datasetDAO.insertAll(datasourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
   }
 
   @Test

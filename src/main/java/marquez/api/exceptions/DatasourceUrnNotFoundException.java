@@ -12,17 +12,16 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.exceptions;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import javax.ws.rs.NotFoundException;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import marquez.common.models.DatasourceUrn;
 
-@RequiredArgsConstructor(staticName = "fromString")
-@EqualsAndHashCode
-@ToString
-public final class Datasource {
-  @Getter @NonNull private final String value;
+public final class DatasourceUrnNotFoundException extends NotFoundException {
+  private static final long serialVersionUID = 1L;
+
+  public DatasourceUrnNotFoundException(@NonNull final DatasourceUrn urn) {
+    super(String.format("Datasource urn '%s' not found.", urn.getValue()));
+  }
 }

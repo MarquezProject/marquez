@@ -22,6 +22,7 @@ import java.util.UUID;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Generator;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
 import org.junit.BeforeClass;
@@ -57,6 +58,17 @@ public class DatasourceDaoTest {
     assertThat(row.getConnectionUrl()).isEqualTo(datasourceRow.getConnectionUrl());
     assertThat(row.getName()).isEqualTo(datasourceRow.getName());
     assertThat(row.getCreatedAt()).isPresent();
+  }
+
+  @Test(expected = UnableToExecuteStatementException.class)
+  public void testInsertDuplicateRow() {
+    final DatasourceRow datasourceRow = Generator.genDatasourceRow();
+    datasourceDAO.insert(datasourceRow);
+
+    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUuid());
+    assertThat(returnedRow).isPresent();
+
+    datasourceDAO.insert(datasourceRow);
   }
 
   @Test

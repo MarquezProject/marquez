@@ -14,7 +14,8 @@
 
 package marquez.api.resources;
 
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,17 +24,22 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.ws.rs.core.Response;
+import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.api.models.DatasourceRequest;
 import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
-import marquez.common.models.DatasourceId;
+import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceType;
+import marquez.common.models.DatasourceUrn;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
@@ -48,6 +54,10 @@ public class DatasourceResourceTest {
 
   private static final DatasourceResource datasourceResource =
       new DatasourceResource(mockDatasourceService);
+
+  private static final DatasourceType TEST_DATA_SOURCE_TYPE = DatasourceType.REDSHIFT;
+  private static final String TEST_DATASOURCE_TYPE_STR = TEST_DATA_SOURCE_TYPE.toString();
+  private static final String TEST_DATASOURCE_NAME_STR = "finance_team_mysql_server_1";
 
   @ClassRule
   public static final ResourceTestRule resources =
@@ -127,38 +137,53 @@ public class DatasourceResourceTest {
 
   @Test
   public void testGetDatasource() throws MarquezServiceException {
-    final Datasource ds1 = Generator.genDatasource();
-    final UUID requestUuid = UUID.randomUUID();
-    when(mockDatasourceService.get(requestUuid)).thenReturn(Optional.of(ds1));
+    final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
+    final ConnectionUrl connectionUrl =
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
-    final Response datasourceResponse =
-        datasourceResource.get(DatasourceId.fromString(requestUuid.toString()));
-    assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
+    final Datasource ds1 =
+        new Datasource(datasourceName, datasourceUrn, connectionUrl, Instant.now());
+    when(mockDatasourceService.get(datasourceUrn)).thenReturn(Optional.of(ds1));
 
-    final DatasourceResponse datasourcesResponse =
-        (DatasourceResponse) datasourceResponse.getEntity();
+    final Response datasourceResourceResponse = datasourceResource.get(datasourceUrn);
+    assertThat(datasourceResourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
-    assertThat(datasourcesResponse.getName()).isEqualTo(ds1.getName().getValue());
-    assertThat(datasourcesResponse.getConnectionUrl())
+    final DatasourceResponse datasourceResponse =
+        (DatasourceResponse) datasourceResourceResponse.getEntity();
+
+    assertThat(datasourceResponse.getName()).isEqualTo(ds1.getName().getValue());
+    assertThat(datasourceResponse.getUrn()).isEqualTo(datasourceUrn.toString());
+    assertThat(datasourceResponse.getCreatedAt()).isNotEmpty();
+    assertThat(datasourceResponse.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
   }
 
-  @Test
+  @Test(expected = DatasourceUrnNotFoundException.class)
   public void testGetNoSuchDatasource() throws MarquezServiceException {
     final UUID requestUuid = UUID.randomUUID();
     when(mockDatasourceService.get(requestUuid)).thenReturn(Optional.empty());
 
-    final Response datasourceResponse =
-        datasourceResource.get(DatasourceId.fromString(requestUuid.toString()));
-    assertThat(datasourceResponse.getStatus()).isEqualTo(NOT_FOUND.getStatusCode());
+    datasourceResource.get(DatasourceUrn.from(TEST_DATASOURCE_TYPE_STR, TEST_DATASOURCE_NAME_STR));
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testGet_throwsException_onNullDatasourceUrn() throws MarquezServiceException {
+    final DatasourceUrn nullUrn = null;
+    datasourceResource.get(nullUrn);
   }
 
   @Test(expected = MarquezServiceException.class)
   public void testGetInternalError() throws MarquezServiceException {
-    final UUID requestUuid = UUID.randomUUID();
-    when(mockDatasourceService.get(requestUuid)).thenThrow(MarquezServiceException.class);
+    final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
+    final ConnectionUrl connectionUrl =
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
-    datasourceResource.get(DatasourceId.fromString(requestUuid.toString()));
+    final Datasource ds1 =
+        new Datasource(datasourceName, datasourceUrn, connectionUrl, Instant.now());
+    when(mockDatasourceService.get(ds1.getUrn())).thenThrow(MarquezServiceException.class);
+    datasourceResource.get(datasourceUrn);
   }
 
   @Test
@@ -172,13 +197,29 @@ public class DatasourceResourceTest {
 
     // When we submit it
     final Response createDatasourceResponse = datasourceResource.create(validRequest);
-    assertThat(createDatasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
+    assertThat(createDatasourceResponse.getStatus()).isEqualTo(CREATED.getStatusCode());
     final DatasourceResponse returnedDatasource =
         (DatasourceResponse) createDatasourceResponse.getEntity();
 
     assertThat(returnedDatasource.getName()).isEqualTo(ds1.getName().getValue());
+    assertThat(returnedDatasource.getUrn()).isEqualTo(ds1.getUrn().getValue());
     assertThat(returnedDatasource.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
+  }
+
+  @Test
+  public void testCreateDatasource_invalidDatasource() throws MarquezServiceException {
+    final String invalidDatasourceType = "xyz_postgres_999";
+
+    final String invalidConnectionUrl =
+        "jdbc:" + invalidDatasourceType + "://localhost:5431/novelists";
+    final DatasourceRequest invalidDatasourceRequest = mock(DatasourceRequest.class);
+    when(invalidDatasourceRequest.getConnectionUrl()).thenReturn(invalidConnectionUrl);
+    when(invalidDatasourceRequest.getName()).thenReturn("mysql_cluster_2");
+
+    // When we submit it
+    final Response createDatasourceResponse = datasourceResource.create(invalidDatasourceRequest);
+    assertThat(createDatasourceResponse.getStatus()).isEqualTo(BAD_REQUEST.getStatusCode());
   }
 
   @Test(expected = MarquezServiceException.class)
