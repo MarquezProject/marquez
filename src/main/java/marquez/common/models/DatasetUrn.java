@@ -37,7 +37,7 @@ public final class DatasetUrn extends Urn {
 
   public static DatasetUrn from(
       @NonNull DatasourceName datasourceName, @NonNull DatasetName datasetName) {
-    final String value = valueFrom(NAMESPACE, datasourceName.toString(), datasetName.getValue());
+    final String value = valueFrom(NAMESPACE, datasourceName.getValue(), datasetName.getValue());
     return fromString(value);
   }
 

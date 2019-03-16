@@ -14,34 +14,44 @@
 
 package marquez.common.models;
 
-import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertEquals;
 
-import java.util.StringJoiner;
-import java.util.stream.Stream;
 import marquez.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetUrnTest {
-  private static final int ALLOWED_DATASET_URN_SIZE = 64;
-  private static final int DATASET_URN_SIZE_GREATER_THAN_ALLOWED = ALLOWED_DATASET_URN_SIZE + 1;
-  private static final String DATASET_URN_DELIM = ":";
-  private static final String DATASET_URN_PREFIX = "urn";
+  private static final String NAMESPACE = "dataset";
+  private static final String VALUE = "urn:dataset:postgresql:public.foo";
+
+  private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("postgresql");
+  private static final DatasetName DATASET_NAME = DatasetName.fromString("public.foo");
 
   @Test
   public void testNewDatasetUrn() {
-    final String value = "urn:dataset:a:b.c";
-    assertEquals(value, DatasetUrn.fromString(value).getValue());
+    final DatasetUrn urn = DatasetUrn.fromString(VALUE);
+    assertEquals(VALUE, urn.getValue());
+    assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test
-  public void testNewDatasetUrn_fromNamespaceAndDataset() {
-    final DatasetUrn expected = DatasetUrn.fromString("urn:dataset:a:b.c");
-    final DatasetUrn actual =
-        DatasetUrn.from(NamespaceName.fromString("a"), DatasetName.fromString("b.c"));
+  public void tesFrom() {
+    final DatasetUrn expected = DatasetUrn.fromString(VALUE);
+    final DatasetUrn actual = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
     assertEquals(expected, actual);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void tesFrom_throwsException_onNullDatasourceName() {
+    final DatasourceName nullDatasourceName = null;
+    DatasetUrn.from(nullDatasourceName, DATASET_NAME);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void tesFrom_throwsException_onNullDatasetName() {
+    final DatasetName nullDatasetName = null;
+    DatasetUrn.from(DATASOURCE_NAME, nullDatasetName);
   }
 
   @Test(expected = NullPointerException.class)
@@ -60,50 +70,5 @@ public class DatasetUrnTest {
   public void testNewDatasetUrn_throwsException_onBlankValue() {
     final String blankValue = " ";
     DatasetUrn.fromString(blankValue);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testNewDatasetUrn_throwsException_onNoPrefixValue() {
-    final String noPrefixValue = "a:b";
-    DatasetUrn.fromString(noPrefixValue);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testNewDatasetUrn_throwsException_onMissingPartValue() {
-    final String missingPartValue = "urn:dataset:a";
-    DatasetUrn.fromString(missingPartValue);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testNewDatasetUrn_throwsException_onExtraPartValue() {
-    final String extraPartValue = "urn:dataset:a:b:c";
-    DatasetUrn.fromString(extraPartValue);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testNewDatasetUrn_throwsException_onNonAlphanumericPartValue() {
-    final String nonAlphanumericPartValue = "urn:dataset:a:b$c^";
-    DatasetUrn.fromString(nonAlphanumericPartValue);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testNewDatasetUrn_throwsException_onPartGreaterThan64Value() {
-    final String partGreaterThan64Value = newDatasetUrnWithPartGreaterThan64();
-    DatasetUrn.fromString(partGreaterThan64Value);
-  }
-
-  private String newDatasetUrnWithPartGreaterThan64() {
-    final String part0 = newDatasetUrnPart("a", ALLOWED_DATASET_URN_SIZE);
-    final String part1GreaterThan64 = newDatasetUrnPart("b", DATASET_URN_SIZE_GREATER_THAN_ALLOWED);
-
-    return new StringJoiner(DATASET_URN_DELIM)
-        .add(DATASET_URN_PREFIX)
-        .add(part0)
-        .add(part1GreaterThan64)
-        .toString();
-  }
-
-  private String newDatasetUrnPart(String s, Integer limit) {
-    return Stream.generate(() -> s).limit(limit).collect(joining());
   }
 }

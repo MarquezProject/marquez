@@ -93,7 +93,6 @@ public class UrnPatternTest {
   private String newUrnWithPartGreaterThan64() {
     final String part0 = newUrnPart("a", ALLOWED_PART_SIZE);
     final String part1GreaterThan64 = newUrnPart("b", PART_SIZE_GREATER_THAN_ALLOWED);
-
     return new StringJoiner(DELIM).add(PREFIX).add(part0).add(part1GreaterThan64).toString();
   }
 
