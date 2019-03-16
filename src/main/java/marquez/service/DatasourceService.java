@@ -46,7 +46,7 @@ public class DatasourceService {
 
     try {
       datasourceDao.insert(datasourceRow);
-      DatasourceUrn datasourceUrn = DatasourceUrn.fromString(datasourceRow.getUrn());
+      final DatasourceUrn datasourceUrn = DatasourceUrn.fromString(datasourceRow.getUrn());
       final Optional<DatasourceRow> datasourceRowIfFound = datasourceDao.findBy(datasourceUrn);
       return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezException::new);
     } catch (MarquezException e) {
