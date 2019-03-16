@@ -55,19 +55,19 @@ public class DatasetUrnTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testNewDatasetUrn_throwsException_onNullValue() {
+  public void testFromStringn_throwsException_onNullValue() {
     final String nullValue = null;
     DatasetUrn.fromString(nullValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNewDatasetUrn_throwsException_onEmptyValue() {
+  public void testFromString_throwsException_onEmptyValue() {
     final String emptyValue = "";
     DatasetUrn.fromString(emptyValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNewDatasetUrn_throwsException_onBlankValue() {
+  public void testFromStringn_throwsException_onBlankValue() {
     final String blankValue = " ";
     DatasetUrn.fromString(blankValue);
   }
