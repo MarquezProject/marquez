@@ -29,17 +29,17 @@ public class DatasourceUrnTest {
   private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("test");
 
   @Test
-  public void testNewDatasourceUrn() {
-    final DatasourceUrn urn = DatasourceUrn.fromString(VALUE);
+  public void testNewDatasourceUrn_from() {
+    final DatasourceUrn urn = DatasourceUrn.from(DATASOURCE_TYPE, DATASOURCE_NAME);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test
-  public void testFrom() {
-    final DatasourceUrn expected = DatasourceUrn.fromString(VALUE);
-    final DatasourceUrn actual = DatasourceUrn.from(DATASOURCE_TYPE, DATASOURCE_NAME);
-    assertEquals(expected, actual);
+  public void testNewDatasourceUrn_fromString() {
+    final DatasourceUrn urn = DatasourceUrn.fromString(VALUE);
+    assertEquals(VALUE, urn.getValue());
+    assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test(expected = NullPointerException.class)

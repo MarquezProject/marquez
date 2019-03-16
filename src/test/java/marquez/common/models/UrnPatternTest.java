@@ -33,25 +33,25 @@ public class UrnPatternTest {
   private static final UrnPattern PATTERN = UrnPattern.from(NAMESPACE, NUM_OF_PARTS);
 
   @Test(expected = NullPointerException.class)
-  public void testNewUrnPattern_throwsException_onNullNamespace() {
+  public void testFrom_throwsException_onNullNamespace() {
     final String nullNamespace = null;
     UrnPattern.from(nullNamespace, NUM_OF_PARTS);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNewUrnPattern_throwsException_onEmptyNamespace() {
+  public void testFrom_throwsException_onEmptyNamespace() {
     final String emptyNamespace = "";
     UrnPattern.from(emptyNamespace, NUM_OF_PARTS);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNewUrnPattern_throwsException_onBlankNamespace() {
+  public void testFrom_throwsException_onBlankNamespace() {
     final String blankNamespace = " ";
     UrnPattern.from(blankNamespace, NUM_OF_PARTS);
   }
 
   @Test(expected = NullPointerException.class)
-  public void testNewUrnPattern_throwsException_onNullNumOfParts() {
+  public void testFrom_throwsException_onNullNumOfParts() {
     final Integer nullNumOfParts = null;
     UrnPattern.from(NAMESPACE, nullNumOfParts);
   }

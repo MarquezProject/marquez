@@ -29,17 +29,17 @@ public class DatasetUrnTest {
   private static final DatasetName DATASET_NAME = DatasetName.fromString("public.foo");
 
   @Test
-  public void testNewDatasetUrn() {
-    final DatasetUrn urn = DatasetUrn.fromString(VALUE);
+  public void testNewDatasetUrn_from() {
+    final DatasetUrn urn = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test
-  public void tesFrom() {
-    final DatasetUrn expected = DatasetUrn.fromString(VALUE);
-    final DatasetUrn actual = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
-    assertEquals(expected, actual);
+  public void testNewDatasetUrn_fromString() {
+    final DatasetUrn urn = DatasetUrn.fromString(VALUE);
+    assertEquals(VALUE, urn.getValue());
+    assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test(expected = NullPointerException.class)
