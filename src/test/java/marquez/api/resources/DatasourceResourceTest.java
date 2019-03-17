@@ -161,9 +161,7 @@ public class DatasourceResourceTest {
 
   @Test(expected = DatasourceUrnNotFoundException.class)
   public void testGetNoSuchDatasource() throws MarquezServiceException {
-    final UUID requestUuid = UUID.randomUUID();
-    when(mockDatasourceService.get(requestUuid)).thenReturn(Optional.empty());
-
+    when(mockDatasourceService.get(any(DatasourceUrn.class))).thenReturn(Optional.empty());
     datasourceResource.get(DatasourceUrn.from(TEST_DATASOURCE_TYPE_STR, TEST_DATASOURCE_NAME_STR));
   }
 

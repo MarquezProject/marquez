@@ -115,24 +115,6 @@ public class DatasourceServiceTest {
     assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
   }
 
-  @Test
-  public void testGetDatasourceByUuid() throws MarquezServiceException {
-    final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(UUID.class))).thenReturn(Optional.of(row));
-
-    final Optional<Datasource> response = datasourceService.get(row.getUuid());
-    assertThat(response.isPresent()).isTrue();
-
-    assertThat(response.get().getConnectionUrl())
-        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
-    assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testGetDatasourceByUuid_throwsNpe_onNullInput() throws MarquezServiceException {
-    final UUID myNullUuid = null;
-    datasourceService.get(myNullUuid);
-  }
 
   @Test(expected = NullPointerException.class)
   public void testGetDatasourceByUrn_throwsNpe_onNullInput() throws MarquezServiceException {
@@ -152,23 +134,6 @@ public class DatasourceServiceTest {
     datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
   }
 
-  @Test(expected = MarquezServiceException.class)
-  public void testGetDatasourceByUuid_throwMarquezServiceException_onDaoException()
-      throws MarquezServiceException {
-    final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(UUID.class))).thenThrow(UnableToExecuteStatementException.class);
-
-    datasourceService.get(row.getUuid());
-  }
-
-  @Test
-  public void testGetNoSuchDatasource() throws MarquezServiceException {
-    final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(UUID.class))).thenReturn(Optional.empty());
-    final Optional<Datasource> response = datasourceService.get(row.getUuid());
-
-    assertThat(response.isPresent()).isFalse();
-  }
 
   @Test
   public void testGetAll_multipleResults() {

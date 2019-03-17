@@ -66,15 +66,6 @@ public class DatasourceService {
     }
   }
 
-  public Optional<Datasource> get(@NonNull final UUID uuid) throws MarquezServiceException {
-    try {
-      final Optional<DatasourceRow> datasourceRowIfFound = datasourceDao.findBy(uuid);
-      return datasourceRowIfFound.map(DatasourceMapper::map);
-    } catch (UnableToExecuteStatementException e) {
-      log.error(e.getMessage());
-      throw new MarquezServiceException();
-    }
-  }
 
   public List<Datasource> getAll(@NonNull Integer limit, @NonNull Integer offset) {
     final List<DatasourceRow> datasources = datasourceDao.findAll(limit, offset);
