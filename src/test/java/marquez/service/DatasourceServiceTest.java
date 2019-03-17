@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceType;
@@ -115,7 +114,6 @@ public class DatasourceServiceTest {
     assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
   }
 
-
   @Test(expected = NullPointerException.class)
   public void testGetDatasourceByUrn_throwsNpe_onNullInput() throws MarquezServiceException {
     final DatasourceUrn myNullDatasourceUrn = null;
@@ -133,7 +131,6 @@ public class DatasourceServiceTest {
 
     datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
   }
-
 
   @Test
   public void testGetAll_multipleResults() {
