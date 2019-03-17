@@ -47,14 +47,14 @@ public class DatasetService {
   public Dataset create(
       @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
       throws MarquezServiceException {
-    final DatasourceRow dataSourceRow = DatasourceRowMapper.map(dbTableVersion);
+    final DatasourceRow datasourceRow = DatasourceRowMapper.map(dbTableVersion);
     final DatasetRow datasetRow =
-        DatasetRowMapper.map(namespaceName, dataSourceRow, dbTableVersion);
+        DatasetRowMapper.map(namespaceName, datasourceRow, dbTableVersion);
     final DbTableInfoRow dbTableInfoRow = DbTableInfoRowMapper.map(dbTableVersion);
     final DbTableVersionRow dbTableVersionRow =
         DbTableVersionRowMapper.map(datasetRow, dbTableInfoRow, dbTableVersion);
     try {
-      datasetDao.insertAll(dataSourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
+      datasetDao.insertAll(datasourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
       final Optional<DatasetRow> datasetRowIfFound = datasetDao.findBy(datasetRow.getUuid());
       return datasetRowIfFound.map(DatasetMapper::map).orElseThrow(MarquezServiceException::new);
     } catch (UnableToExecuteStatementException e) {
