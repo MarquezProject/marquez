@@ -224,7 +224,7 @@ public class DatasourceResourceTest {
     final Datasource ds1 = Generator.genDatasource();
 
     final DatasourceRequest validRequest =
-        new DatasourceRequest(ds1.getConnectionUrl().getRawValue(), ds1.getName().getValue());
+        new DatasourceRequest(ds1.getName().getValue(), ds1.getConnectionUrl().getRawValue());
 
     when(mockDatasourceService.create(any(), any())).thenThrow(new MarquezServiceException());
     datasourceResource.create(validRequest);
