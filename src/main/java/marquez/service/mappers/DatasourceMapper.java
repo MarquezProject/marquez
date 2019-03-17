@@ -40,9 +40,7 @@ public class DatasourceMapper {
   }
 
   public static List<Datasource> map(@NonNull List<DatasourceRow> datasourceRows) {
-    return datasourceRows.isEmpty()
-        ? Collections.emptyList()
-        : Collections.unmodifiableList(
-            datasourceRows.stream().map(row -> map(row)).collect(toList()));
+    return Collections.unmodifiableList(
+        datasourceRows.stream().map(datasourceRow -> map(datasourceRow)).collect(toList()));
   }
 }
