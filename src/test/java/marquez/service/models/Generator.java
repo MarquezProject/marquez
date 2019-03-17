@@ -168,10 +168,10 @@ public class Generator {
     final ConnectionUrl connectionUrl =
         ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum());
     final DatasourceName datasourceName =
-        DatasourceName.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum());
+        DatasourceName.fromString("postgresqllocalhost" + randNum());
     final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
-    return new Datasource(datasourceName, datasourceUrn, connectionUrl, Instant.now());
+    return new Datasource(datasourceName, Instant.now(), datasourceUrn, connectionUrl);
   }
 
   // Data Source Rows

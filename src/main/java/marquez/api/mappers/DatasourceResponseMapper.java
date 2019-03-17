@@ -14,9 +14,9 @@
 
 package marquez.api.mappers;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
-import java.util.Collections;
 import java.util.List;
 import lombok.NonNull;
 import marquez.api.models.DatasourceResponse;
@@ -29,16 +29,14 @@ public final class DatasourceResponseMapper {
   public static DatasourceResponse map(@NonNull Datasource datasource) {
     return new DatasourceResponse(
         datasource.getName().getValue(),
+        datasource.getCreatedAt().toString(),
         datasource.getUrn().getValue(),
-        datasource.getConnectionUrl().getRawValue(),
-        datasource.getCreatedAt().toString());
+        datasource.getConnectionUrl().getRawValue());
   }
 
   public static List<DatasourceResponse> map(@NonNull List<Datasource> datasources) {
-    return datasources.isEmpty()
-        ? Collections.emptyList()
-        : Collections.unmodifiableList(
-            datasources.stream().map(datasource -> map(datasource)).collect(toList()));
+    return unmodifiableList(
+        datasources.stream().map(datasource -> map(datasource)).collect(toList()));
   }
 
   public static DatasourcesResponse toDatasourcesResponse(@NonNull List<Datasource> datasources) {

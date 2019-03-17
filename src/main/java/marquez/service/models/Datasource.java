@@ -29,7 +29,7 @@ import marquez.common.models.DatasourceUrn;
 @ToString
 public class Datasource {
   @Getter @NonNull private final DatasourceName name;
+  @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final DatasourceUrn urn;
   @Getter @NonNull private final ConnectionUrl connectionUrl;
-  @Getter @NonNull private final Instant createdAt;
 }

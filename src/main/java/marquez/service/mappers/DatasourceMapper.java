@@ -34,9 +34,9 @@ public class DatasourceMapper {
     final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
     return new Datasource(
         datasourceName,
+        datasourceRow.getCreatedAt().get(),
         datasourceUrn,
-        ConnectionUrl.fromString(datasourceRow.getConnectionUrl()),
-        datasourceRow.getCreatedAt().get());
+        ConnectionUrl.fromString(datasourceRow.getConnectionUrl()));
   }
 
   public static List<Datasource> map(@NonNull List<DatasourceRow> datasourceRows) {

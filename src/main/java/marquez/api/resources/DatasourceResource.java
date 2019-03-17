@@ -21,6 +21,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -58,20 +59,19 @@ public final class DatasourceResource {
   @Timed
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
-  public Response create(@NonNull final DatasourceRequest datasourceRequest)
+  public Response create(@Valid @NonNull final DatasourceRequest request)
       throws MarquezServiceException {
 
     final ConnectionUrl connectionUrl;
     try {
-      connectionUrl = ConnectionUrl.fromString(datasourceRequest.getConnectionUrl());
+      connectionUrl = ConnectionUrl.fromString(request.getConnectionUrl());
     } catch (IllegalArgumentException e) {
       log.error(e.getMessage(), e);
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     final Datasource createdDatasource =
-        datasourceService.create(
-            connectionUrl, DatasourceName.fromString(datasourceRequest.getName()));
+        datasourceService.create(connectionUrl, DatasourceName.fromString(request.getName()));
     return Response.status(CREATED).entity(DatasourceResponseMapper.map(createdDatasource)).build();
   }
 
@@ -81,13 +81,11 @@ public final class DatasourceResource {
   @Timed
   @Produces(APPLICATION_JSON)
   @Path("/{urn}")
-  public Response get(@PathParam("urn") @NonNull final DatasourceUrn datasourceUrn)
+  public Response get(@PathParam("urn") @NonNull final DatasourceUrn urn)
       throws MarquezServiceException {
 
     final Datasource datasource =
-        datasourceService
-            .get(datasourceUrn)
-            .orElseThrow(() -> new DatasourceUrnNotFoundException(datasourceUrn));
+        datasourceService.get(urn).orElseThrow(() -> new DatasourceUrnNotFoundException(urn));
     return Response.ok(DatasourceResponseMapper.map(datasource)).build();
   }
 
