@@ -55,7 +55,7 @@ public class DatasetUrnTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testFromStringn_throwsException_onNullValue() {
+  public void testFromString_throwsException_onNullValue() {
     final String nullValue = null;
     DatasetUrn.fromString(nullValue);
   }
