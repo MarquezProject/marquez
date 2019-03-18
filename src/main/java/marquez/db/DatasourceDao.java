@@ -19,7 +19,6 @@ import java.util.Optional;
 import marquez.db.mappers.DatasourceRowMapper;
 import marquez.db.models.DatasourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -35,5 +34,5 @@ public interface DatasourceDao {
   Optional<DatasourceRow> findBy(String urn);
 
   @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
-  List<DatasourceRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);
+  List<DatasourceRow> findAll(Integer limit, Integer offset);
 }
