@@ -14,7 +14,6 @@
 
 package marquez.api.mappers;
 
-import static java.util.Objects.requireNonNull;
 import lombok.NonNull;
 import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
