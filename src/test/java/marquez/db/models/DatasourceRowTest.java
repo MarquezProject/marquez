@@ -32,7 +32,7 @@ public class DatasourceRowTest {
   private static final String NAME = "mydatabase123";
   private static final String CONNECTION_URL =
       String.format("jdbc:%s://localhost:5432/test_db", TYPE);
-  private static final String DATASOURCE_URN = DatasourceUrn.from(TYPE, NAME).toString();
+  private static final String DATASOURCE_URN = DatasourceUrn.from(CONNECTION_URL, NAME).toString();
 
   @Test
   public void testNewDatasourceRow() {

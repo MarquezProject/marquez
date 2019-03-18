@@ -25,7 +25,6 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
-import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceUrn;
 import marquez.db.Columns;
 import marquez.db.models.DatasourceRow;
@@ -41,9 +40,7 @@ public class DatasourceRowMapperTest {
   private static final String DB_TYPE = "postgresql";
   private static final String CONNECTION_URL =
       String.format("jdbc:%s://localhost:5432/test_db", DB_TYPE);
-  private static final String CONNECTION_TYPE =
-      ConnectionUrl.fromString(CONNECTION_URL).getDatasourceType().toString();
-  private static final String URN = DatasourceUrn.from(CONNECTION_TYPE, NAME).getValue();
+  private static final String URN = DatasourceUrn.from(CONNECTION_URL, NAME).getValue();
 
   @Test
   public void testMap() throws SQLException {

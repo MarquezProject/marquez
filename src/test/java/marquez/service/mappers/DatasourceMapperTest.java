@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Datasource;
@@ -32,10 +33,11 @@ public class DatasourceMapperTest {
 
   private static final String CONNECTION_URL = "jdbc:postgresql://localhost:5431/novelists";
   private static final String DATASOURCE_NAME = "my_database";
-  private static final String DATASOURCE_TYPE =
-      ConnectionUrl.fromString(CONNECTION_URL).getDatasourceType().toString();
   private static final String DATASOURCE_URN =
-      DatasourceUrn.from(DATASOURCE_TYPE, DATASOURCE_NAME).toString();
+      DatasourceUrn.from(
+              ConnectionUrl.fromString(CONNECTION_URL).getDatasourceType(),
+              DatasourceName.fromString(DATASOURCE_NAME))
+          .toString();
 
   @Test
   public void testMapDatasourceRow() {

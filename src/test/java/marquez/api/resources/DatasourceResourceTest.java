@@ -37,7 +37,6 @@ import marquez.api.models.DatasourceResponse;
 import marquez.api.models.DatasourcesResponse;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceType;
 import marquez.common.models.DatasourceUrn;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
@@ -54,8 +53,8 @@ public class DatasourceResourceTest {
   private static final DatasourceResource datasourceResource =
       new DatasourceResource(mockDatasourceService);
 
-  private static final DatasourceType TEST_DATA_SOURCE_TYPE = DatasourceType.REDSHIFT;
-  private static final String TEST_DATASOURCE_TYPE_STR = TEST_DATA_SOURCE_TYPE.toString();
+  private static final String TEST_DATASOURCE_CONNECTION_STR =
+      "jdbc:redshift://localhost:5431/finance";
   private static final String TEST_DATASOURCE_NAME_STR = "finance_team_mysql_server_1";
 
   @ClassRule
@@ -152,7 +151,7 @@ public class DatasourceResourceTest {
         (DatasourceResponse) datasourceResourceResponse.getEntity();
 
     assertThat(datasourceResponse.getName()).isEqualTo(ds1.getName().getValue());
-    assertThat(datasourceResponse.getUrn()).isEqualTo(datasourceUrn.toString());
+    assertThat(datasourceResponse.getUrn()).isEqualTo(datasourceUrn.getValue());
     assertThat(datasourceResponse.getCreatedAt()).isNotEmpty();
     assertThat(datasourceResponse.getConnectionUrl())
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
@@ -161,7 +160,8 @@ public class DatasourceResourceTest {
   @Test(expected = DatasourceUrnNotFoundException.class)
   public void testGetNoSuchDatasource() throws MarquezServiceException {
     when(mockDatasourceService.get(any(DatasourceUrn.class))).thenReturn(Optional.empty());
-    datasourceResource.get(DatasourceUrn.from(TEST_DATASOURCE_TYPE_STR, TEST_DATASOURCE_NAME_STR));
+    datasourceResource.get(
+        DatasourceUrn.from(TEST_DATASOURCE_CONNECTION_STR, TEST_DATASOURCE_NAME_STR));
   }
 
   @Test(expected = NullPointerException.class)

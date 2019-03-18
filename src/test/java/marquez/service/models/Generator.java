@@ -179,9 +179,7 @@ public class Generator {
     final int datasourceNum = randNum();
     final String connectionUrl = "jdbc:postgresql://localhost:5431/novelists_" + randNum();
     final String datasourceName = "Datasource" + datasourceNum;
-    final String datasourceType =
-        ConnectionUrl.fromString(connectionUrl).getDatasourceType().toString();
-    final String datasourceUrn = DatasourceUrn.from(datasourceType, datasourceName).getValue();
+    final String datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName).getValue();
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .urn(datasourceUrn)

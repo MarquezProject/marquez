@@ -44,7 +44,7 @@ public class DatasourceUrnTest {
 
   @Test
   public void testFromString() {
-    assertEquals(URN, DatasourceUrn.fromString(URN).toString());
+    assertEquals(URN, DatasourceUrn.fromString(URN).getValue());
   }
 
   @Test

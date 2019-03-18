@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceType;
 import marquez.common.models.DatasourceUrn;
 import marquez.db.DatasourceDao;
 import marquez.db.models.DatasourceRow;
@@ -103,10 +102,8 @@ public class DatasourceServiceTest {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.findBy(any(DatasourceUrn.class))).thenReturn(Optional.of(row));
 
-    final DatasourceType type =
-        ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
     final Optional<Datasource> response =
-        datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
+        datasourceService.get(DatasourceUrn.from(row.getConnectionUrl(), row.getName()));
     assertThat(response.isPresent()).isTrue();
 
     assertThat(response.get().getConnectionUrl())
@@ -126,10 +123,7 @@ public class DatasourceServiceTest {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.findBy(any(DatasourceUrn.class)))
         .thenThrow(UnableToExecuteStatementException.class);
-    final DatasourceType type =
-        ConnectionUrl.fromString(row.getConnectionUrl()).getDatasourceType();
-
-    datasourceService.get(DatasourceUrn.from(type.toString(), row.getName()));
+    datasourceService.get(DatasourceUrn.from(row.getConnectionUrl(), row.getName()));
   }
 
   @Test
@@ -158,7 +152,7 @@ public class DatasourceServiceTest {
 
     final Datasource returnedDatasource = datasources.get(0);
 
-    assertThat(returnedDatasource.getUrn().toString()).isEqualTo(generatedDatasourceRow.getUrn());
+    assertThat(returnedDatasource.getUrn().getValue()).isEqualTo(generatedDatasourceRow.getUrn());
     assertThat(returnedDatasource.getConnectionUrl().getRawValue())
         .isEqualTo(generatedDatasourceRow.getConnectionUrl());
     assertThat(returnedDatasource.getName().getValue()).isEqualTo(generatedDatasourceRow.getName());
