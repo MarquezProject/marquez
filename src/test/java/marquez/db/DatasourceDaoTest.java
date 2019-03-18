@@ -16,9 +16,11 @@ package marquez.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Generator;
 import org.jdbi.v3.core.Jdbi;
@@ -51,7 +53,7 @@ public class DatasourceDaoTest {
     final DatasourceRow datasourceRow = Generator.genDatasourceRow();
     datasourceDAO.insert(datasourceRow);
 
-    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUuid());
+    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUrn());
     assertThat(returnedRow).isPresent();
 
     final DatasourceRow row = returnedRow.get();
@@ -65,15 +67,51 @@ public class DatasourceDaoTest {
     final DatasourceRow datasourceRow = Generator.genDatasourceRow();
     datasourceDAO.insert(datasourceRow);
 
-    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUuid());
+    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUrn());
     assertThat(returnedRow).isPresent();
 
     datasourceDAO.insert(datasourceRow);
   }
 
+  @Test(expected = UnableToExecuteStatementException.class)
+  public void testUniquenessConstraintOnName() {
+    final String connectionUrl = "jdbc:postgresql://localhost:5431/novelists_";
+    final String connectionUrl2 = "jdbc:postgresql://localhost:9999/novelists_";
+
+    final String datasourceName = "Datasource";
+    final String datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName).getValue();
+
+    final DatasourceRow datasourceRow =
+        DatasourceRow.builder()
+            .uuid(UUID.randomUUID())
+            .urn(datasourceUrn)
+            .name(datasourceName)
+            .connectionUrl(connectionUrl)
+            .createdAt(Instant.now())
+            .build();
+
+    final DatasourceRow sameNameRow =
+        DatasourceRow.builder()
+            .uuid(UUID.randomUUID())
+            .urn(DatasourceUrn.from(connectionUrl2, datasourceName).getValue())
+            .name(datasourceName)
+            .connectionUrl(connectionUrl)
+            .createdAt(Instant.now())
+            .build();
+
+    datasourceDAO.insert(datasourceRow);
+
+    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUrn());
+    assertThat(returnedRow).isPresent();
+
+    datasourceDAO.insert(sameNameRow);
+  }
+
   @Test
   public void testDatasourceNotPresent() {
-    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(UUID.randomUUID());
+    Generator.genDatasourceRow();
+    final Optional<DatasourceRow> returnedRow =
+        datasourceDAO.findBy(Generator.genDatasourceRow().getUrn());
     assertThat(returnedRow).isNotPresent();
   }
 

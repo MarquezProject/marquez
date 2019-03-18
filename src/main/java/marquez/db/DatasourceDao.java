@@ -32,7 +32,7 @@ public interface DatasourceDao {
   void insert(@BindBean DatasourceRow datasourceRow);
 
   @SqlQuery("SELECT * FROM datasources WHERE urn = :urn")
-  Optional<DatasourceRow> findBy(@Bind("urn") String urn);
+  Optional<DatasourceRow> findBy(String urn);
 
   @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
   List<DatasourceRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);
