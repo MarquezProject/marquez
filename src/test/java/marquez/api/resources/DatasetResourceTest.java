@@ -35,10 +35,11 @@ import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
+import marquez.service.models.Generator;
 import org.junit.Test;
 
 public class DatasetResourceTest {
-  private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
+  private static final DatasetUrn DATASET_URN = Generator.genDatasetUrn();
   private static final Instant CREATED_AT = Instant.now();
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final Integer LIMIT = 100;
