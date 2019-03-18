@@ -57,8 +57,8 @@ public class UrnPatternTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testFrom_throwsException_onNumOfPartsEqToZero() {
-    final Integer negativeNumOfParts = 0;
+  public void testFrom_throwsException_onNegativeNumOfParts() {
+    final Integer negativeNumOfParts = -1;
     UrnPattern.from(NAMESPACE, negativeNumOfParts);
   }
 
