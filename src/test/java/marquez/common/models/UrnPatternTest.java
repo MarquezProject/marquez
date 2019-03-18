@@ -56,6 +56,12 @@ public class UrnPatternTest {
     UrnPattern.from(NAMESPACE, nullNumOfParts);
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testFrom_throwsException_onNumOfPartsEqToZero() {
+    final Integer negativeNumOfParts = 0;
+    UrnPattern.from(NAMESPACE, negativeNumOfParts);
+  }
+
   @Test
   public void testThrowIfNoMatch_noExceptionThrown() {
     final String value = "urn:test:a:b";

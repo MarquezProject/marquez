@@ -14,6 +14,7 @@
 
 package marquez.common.models;
 
+import static marquez.common.Preconditions.checkArgument;
 import static marquez.common.Preconditions.checkNotBlank;
 
 import java.util.regex.Pattern;
@@ -34,6 +35,7 @@ final class UrnPattern {
 
   static UrnPattern from(@NonNull String namespace, @NonNull Integer numOfParts) {
     checkNotBlank(namespace);
+    checkArgument(numOfParts > 0, "numOfParts must be > 0");
     final String value =
         String.format(
             "^%s%s%s(%s[a-zA-Z0-9._]{%d,%d}){%d}$",
