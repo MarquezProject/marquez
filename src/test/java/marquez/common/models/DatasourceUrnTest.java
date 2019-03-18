@@ -17,9 +17,9 @@ package marquez.common.models;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import marquez.UnitTests;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Generator;
-import marquez.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -41,6 +41,11 @@ public class DatasourceUrnTest {
 
   private static final DatasourceType DATASOURCE_TYPE = DatasourceType.POSTGRESQL;
   private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("test");
+
+  @Test
+  public void testFromString() {
+    assertEquals(URN, DatasourceUrn.fromString(URN).toString());
+  }
 
   @Test
   public void testNewDatasourceUrn_from() {

@@ -35,15 +35,15 @@ public final class DatasourceUrn extends Urn {
     return fromString(value);
   }
 
-
   public static DatasourceUrn from(
       @NonNull ConnectionUrl connectionUrl, @NonNull DatasourceName name) {
     return from(connectionUrl.getDatasourceType(), name);
   }
 
-  public static DatasourceUrn from(
-          @NonNull String connectionUrl, @NonNull String name) {
-    return from(ConnectionUrl.fromString(connectionUrl).getDatasourceType(), DatasourceName.fromString(name));
+  public static DatasourceUrn from(@NonNull String connectionUrl, @NonNull String name) {
+    return from(
+        ConnectionUrl.fromString(connectionUrl).getDatasourceType(),
+        DatasourceName.fromString(name));
   }
 
   @JsonCreator
