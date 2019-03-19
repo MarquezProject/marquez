@@ -44,9 +44,8 @@ public class Namespace {
     this.description = description;
   }
 
-  public Namespace(
-      String name, String ownerName, String description) {
-    this.guid = null;    
+  public Namespace(String name, String ownerName, String description) {
+    this.guid = null;
     this.name = name;
     this.createdAt = null;
     this.ownerName = ownerName;

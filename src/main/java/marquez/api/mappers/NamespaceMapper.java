@@ -16,18 +16,15 @@ package marquez.api.mappers;
 
 import lombok.NonNull;
 import marquez.api.models.NamespaceRequest;
-import marquez.api.models.NamespaceResponse;
-import marquez.service.models.Namespace;
 import marquez.common.models.NamespaceName;
+import marquez.service.models.Namespace;
 
 public final class NamespaceMapper {
   private NamespaceMapper() {}
 
-  public static Namespace map(@NonNull NamespaceName namespaceName, @NonNull NamespaceRequest request) {
+  public static Namespace map(
+      @NonNull NamespaceName namespaceName, @NonNull NamespaceRequest request) {
     return new Namespace(
-            namespaceName.getValue(),
-            request.getOwner(),
-            request.getDescription().orElse(null)
-            );
+        namespaceName.getValue(), request.getOwner(), request.getDescription().orElse(null));
   }
 }
