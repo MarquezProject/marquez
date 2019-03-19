@@ -21,54 +21,54 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DatasetUrnTest {
-  private static final String NAMESPACE = "dataset";
-  private static final String VALUE = String.format("urn:%s:postgresql:public.foo", NAMESPACE);
+public class DatasourceUrnTest {
+  private static final String NAMESPACE = "datasource";
+  private static final String VALUE = String.format("urn:%s:postgresql:test", NAMESPACE);
 
-  private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("postgresql");
-  private static final DatasetName DATASET_NAME = DatasetName.fromString("public.foo");
+  private static final DatasourceType DATASOURCE_TYPE = DatasourceType.POSTGRESQL;
+  private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("test");
 
   @Test
-  public void testNewDatasetUrn_from() {
-    final DatasetUrn urn = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
+  public void testNewDatasourceUrn_from() {
+    final DatasourceUrn urn = DatasourceUrn.from(DATASOURCE_TYPE, DATASOURCE_NAME);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test
-  public void testNewDatasetUrn_fromString() {
-    final DatasetUrn urn = DatasetUrn.fromString(VALUE);
+  public void testNewDatasourceUrn_fromString() {
+    final DatasourceUrn urn = DatasourceUrn.fromString(VALUE);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testFrom_throwsException_onNullDatasourceName() {
+  public void testFrom_throwsException_onNullDatasourceType() {
+    final DatasourceType nullDatasourceType = null;
+    DatasourceUrn.from(nullDatasourceType, DATASOURCE_NAME);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void tesFrom_throwsException_onNullDatasourceName() {
     final DatasourceName nullDatasourceName = null;
-    DatasetUrn.from(nullDatasourceName, DATASET_NAME);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testFrom_throwsException_onNullDatasetName() {
-    final DatasetName nullDatasetName = null;
-    DatasetUrn.from(DATASOURCE_NAME, nullDatasetName);
+    DatasourceUrn.from(DATASOURCE_TYPE, nullDatasourceName);
   }
 
   @Test(expected = NullPointerException.class)
   public void testFromString_throwsException_onNullValue() {
     final String nullValue = null;
-    DatasetUrn.fromString(nullValue);
+    DatasourceUrn.fromString(nullValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFromString_throwsException_onEmptyValue() {
     final String emptyValue = "";
-    DatasetUrn.fromString(emptyValue);
+    DatasourceUrn.fromString(emptyValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testFromStringn_throwsException_onBlankValue() {
+  public void testFromString_throwsException_onBlankValue() {
     final String blankValue = " ";
-    DatasetUrn.fromString(blankValue);
+    DatasourceUrn.fromString(blankValue);
   }
 }

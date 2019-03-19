@@ -26,11 +26,12 @@ import marquez.api.models.DatasetResponse;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
 import marquez.service.models.Dataset;
+import marquez.service.models.Generator;
 import org.junit.Test;
 
 public class DatasetResponseMapperTest {
   private static final Instant CREATED_AT = Instant.now();
-  private static final DatasetUrn DATASET_URN = DatasetUrn.fromString("urn:a:b.c");
+  private static final DatasetUrn DATASET_URN = Generator.genDatasetUrn();
   private static final Description DESCRIPTION = Description.fromString("test description");
   private static final Dataset DATASET = new Dataset(DATASET_URN, CREATED_AT, DESCRIPTION);
 

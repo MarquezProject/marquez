@@ -39,6 +39,7 @@ compileJava {
 
 compileTestJava {
   options.incremental = true
+  options.compilerArgs << '-parameters'
 }
 
 task testUnit(type: Test) {  
