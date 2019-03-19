@@ -27,7 +27,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public abstract class Urn {
-
   @Getter private final String value;
 
   protected Urn(@NonNull final String value) {

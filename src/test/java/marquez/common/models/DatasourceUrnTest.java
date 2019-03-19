@@ -25,7 +25,6 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasourceUrnTest {
-
   private static final String URN = "urn:datasource:postgresql:myteamdb";
 
   private static final DatasourceRow DATASOURCE_ROW_1 = Generator.genDatasourceRow();
@@ -50,6 +49,23 @@ public class DatasourceUrnTest {
   @Test
   public void testNewDatasourceUrn_from() {
     final DatasourceUrn urn = DatasourceUrn.from(DATASOURCE_TYPE, DATASOURCE_NAME);
+    assertEquals(VALUE, urn.getValue());
+    assertEquals(NAMESPACE, urn.namespace());
+  }
+
+  @Test
+  public void testNewDatasourceUrn_fromConnectionUrlAndName() {
+    final ConnectionUrl connectionUrl =
+        ConnectionUrl.fromString(DATASOURCE_ROW_1.getConnectionUrl());
+    final DatasourceUrn urn = DatasourceUrn.from(connectionUrl, DATASOURCE_NAME);
+    assertEquals(VALUE, urn.getValue());
+    assertEquals(NAMESPACE, urn.namespace());
+  }
+
+  @Test
+  public void testNewDatasourceUrn_fromConnectionUrlAndNameStrings() {
+    final DatasourceUrn urn =
+        DatasourceUrn.from(DATASOURCE_ROW_1.getConnectionUrl(), DATASOURCE_NAME.getValue());
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
