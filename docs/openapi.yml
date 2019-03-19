@@ -309,7 +309,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/datasources'
 
-  /datasources/{datasourceUrn}:
+  /datasources/{urn}:
     parameters:
       - $ref: '#/components/parameters/datasourceUrn'
     get:
@@ -365,7 +365,7 @@ components:
         type: string
         format: URN
         maxLength: 1024
-        example: urn:datasource:jdbcpostgresqllocalhost5431novelists834:Datasource2168
+        example: urn:datasource:postgresql:financialsDB
 
   schemas:
     createNamespace:
@@ -645,8 +645,8 @@ components:
         - name
         - connectionUrl
       example:
-        name: Datasource2168
-        connectionUrl: jdbc:postgresql://localhost:5431/novelists_834
+        name: financialsDB
+        connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
 
     datasource:
       type: object
@@ -665,10 +665,10 @@ components:
         connectionUrl:
           description: The url to be used to connect to the datasource
       example:
-        name: Datasource2168
+        name: financialsDB
         createdAt: 2018-09-02T11:01:12.022Z
-        urn: urn:datasource:jdbcpostgresqllocalhost5431novelists834:Datasource2168
-        connectionUrl: jdbc:postgresql://localhost:5431/novelists_834
+        urn: urn:datasource:postgresql:financialsDB
+        connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
 
     datasources:
       type: object
