@@ -292,8 +292,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/datasources'
     post:
-      summary: Create a new datasource
-      description: Creates a new datasource and returns the created datasource
+      summary: Create a datasource
+      description: "Creates a new datasource and returns the created datasource.
+      All datasource objects are immutable and are uniquely identified by their URN.
+        The name must also be globally unique.
+        The `connectionUrl` must consist of the following components separated by a colon:\n
+        * Access method (usually `jdbc:`)\n
+        * The datasource type, valid values of which are whitelisted in `DatasourceType.java`\n
+        * A host & port\n
+        * The scheme the scheme used"
+
       tags:
         - Datasources
       requestBody:
@@ -314,7 +322,8 @@ paths:
       - $ref: '#/components/parameters/datasourceUrn'
     get:
       summary: Get a datasource
-      description: Returns a datasource response.
+      description: 'Returns a datasource response for the supplied urn.
+      The urn is unique in the database and a single urn will map to a single datasource.'
       tags:
         - Datasources
       responses:
