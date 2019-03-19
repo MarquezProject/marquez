@@ -25,7 +25,7 @@ public final class NamespaceMapper {
 
   public static Namespace map(@NonNull NamespaceName namespaceName, @NonNull NamespaceRequest request) {
     return new Namespace(
-            namespaceName,
+            namespaceName.getValue(),
             request.getOwner(),
             request.getDescription().orElse(null)
             );
