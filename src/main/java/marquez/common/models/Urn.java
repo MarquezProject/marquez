@@ -28,7 +28,7 @@ import lombok.ToString;
 @ToString
 public abstract class Urn {
 
-  @Getter protected final String value;
+  @Getter private final String value;
 
   protected Urn(@NonNull final String value) {
     pattern().throwIfNoMatch(checkNotBlank(value));

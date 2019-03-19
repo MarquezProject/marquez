@@ -53,28 +53,28 @@ public class DatasourceRowMapperTest {
     when(results.getString(Columns.URN)).thenReturn(URN);
     final StatementContext context = mock(StatementContext.class);
 
-    final DatasourceRowMapper dataSourceRowMapper = new DatasourceRowMapper();
-    final DatasourceRow dataSourceRow = dataSourceRowMapper.map(results, context);
-    assertEquals(ROW_UUID, dataSourceRow.getUuid());
-    assertEquals(expectedCreatedAt, dataSourceRow.getCreatedAt());
-    assertEquals(URN, dataSourceRow.getUrn());
-    assertEquals(NAME, dataSourceRow.getName());
-    assertEquals(CONNECTION_URL, dataSourceRow.getConnectionUrl());
+    final DatasourceRowMapper datasourceRowMapper = new DatasourceRowMapper();
+    final DatasourceRow datasourceRow = datasourceRowMapper.map(results, context);
+    assertEquals(ROW_UUID, datasourceRow.getUuid());
+    assertEquals(expectedCreatedAt, datasourceRow.getCreatedAt());
+    assertEquals(URN, datasourceRow.getUrn());
+    assertEquals(NAME, datasourceRow.getName());
+    assertEquals(CONNECTION_URL, datasourceRow.getConnectionUrl());
   }
 
   @Test(expected = NullPointerException.class)
   public void testMap_throwsException_onNullResults() throws SQLException {
     final ResultSet nullResults = null;
     final StatementContext context = mock(StatementContext.class);
-    final DatasourceRowMapper dataSourceRowMapper = new DatasourceRowMapper();
-    dataSourceRowMapper.map(nullResults, context);
+    final DatasourceRowMapper datasourceRowMapper = new DatasourceRowMapper();
+    datasourceRowMapper.map(nullResults, context);
   }
 
   @Test(expected = NullPointerException.class)
   public void testMap_throwsException_onNullContext() throws SQLException {
     final ResultSet results = mock(ResultSet.class);
     final StatementContext nullContext = null;
-    final DatasourceRowMapper dataSourceRowMapper = new DatasourceRowMapper();
-    dataSourceRowMapper.map(results, nullContext);
+    final DatasourceRowMapper datasourceRowMapper = new DatasourceRowMapper();
+    datasourceRowMapper.map(results, nullContext);
   }
 }

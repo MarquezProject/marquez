@@ -17,10 +17,8 @@ package marquez.common.models;
 import static marquez.common.Preconditions.checkNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
-@EqualsAndHashCode(callSuper = true)
 public final class DatasourceUrn extends Urn {
   private static final String NAMESPACE = "datasource";
   private static final int NUM_OF_PARTS = 2;
