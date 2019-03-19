@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.MarquezException;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
@@ -41,26 +40,23 @@ public class DatasourceService {
 
   public Datasource create(@NonNull ConnectionUrl connectionUrl, @NonNull DatasourceName name)
       throws MarquezServiceException {
-    final DatasourceRow datasourceRow = DatasourceRowMapper.map(connectionUrl, name);
+    final DatasourceRow row = DatasourceRowMapper.map(connectionUrl, name);
 
     try {
-      datasourceDao.insert(datasourceRow);
-      final DatasourceUrn datasourceUrn = DatasourceUrn.fromString(datasourceRow.getUrn());
-      final Optional<DatasourceRow> datasourceRowIfFound =
-          datasourceDao.findBy(datasourceUrn.getValue());
-      return datasourceRowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezException::new);
-    } catch (MarquezException e) {
+      datasourceDao.insert(row);
+      final DatasourceUrn urn = DatasourceUrn.fromString(row.getUrn());
+      final Optional<DatasourceRow> rowIfFound = datasourceDao.findBy(urn.getValue());
+      return rowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezServiceException::new);
+    } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
       throw new MarquezServiceException();
     }
   }
 
-  public Optional<Datasource> get(@NonNull final DatasourceUrn datasourceUrn)
-      throws MarquezServiceException {
+  public Optional<Datasource> get(@NonNull final DatasourceUrn urn) throws MarquezServiceException {
     try {
-      final Optional<DatasourceRow> datasourceRowIfFound =
-          datasourceDao.findBy(datasourceUrn.getValue());
-      return datasourceRowIfFound.map(DatasourceMapper::map);
+      final Optional<DatasourceRow> rowIfFound = datasourceDao.findBy(urn.getValue());
+      return rowIfFound.map(DatasourceMapper::map);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
       throw new MarquezServiceException();
@@ -68,7 +64,7 @@ public class DatasourceService {
   }
 
   public List<Datasource> getAll(@NonNull Integer limit, @NonNull Integer offset) {
-    final List<DatasourceRow> datasources = datasourceDao.findAll(limit, offset);
-    return Collections.unmodifiableList(DatasourceMapper.map(datasources));
+    final List<DatasourceRow> rows = datasourceDao.findAll(limit, offset);
+    return Collections.unmodifiableList(DatasourceMapper.map(rows));
   }
 }
