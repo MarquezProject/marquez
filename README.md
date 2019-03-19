@@ -52,8 +52,8 @@ Please follow the [installation procedure](#installation--usage) and then run th
 
 Please be sure to set the environmental variables to connect with Marquez:
 ```
-export MQZ_HOST='localhost'
-export MQZ_PORT='8080'
+export MARQUEZ_HOST='localhost'
+export MARQUEZ_PORT='8080'
 ```
 
 ## Documentation For Authorization

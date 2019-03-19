@@ -1,4 +1,14 @@
-import os
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import pytest
 import vcr
@@ -7,14 +17,9 @@ from pytest import fixture
 
 
 @fixture(scope='function')
-def set_valid_env():
-    os.environ[MarquezClient.MARQUEZ_HOST_KEY] = "localhost"
-    os.environ[MarquezClient.MARQUEZ_PORT_KEY] = "8080"
-
-
-@fixture(scope='function')
-def marquez_client(set_valid_env):
-    return MarquezClient()
+def marquez_client():
+    return MarquezClient(host="localhost",
+                         port=8080)
 
 
 @fixture(scope='function')
@@ -41,10 +46,9 @@ def test_create_job(marquez_client, namespace):
     assert created_job.name == "some_job"
 
 
-def test_namespace_not_set(set_valid_env):
-    m = MarquezClient()
+def test_namespace_not_set(marquez_client):
     with pytest.raises(Exception):
-        m.create_job(
+        marquez_client.create_job(
             'some_job', 'some_location',
             ['input1', 'input2'],
             ['output1', 'output2'])
