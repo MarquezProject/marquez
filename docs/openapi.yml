@@ -366,7 +366,7 @@ components:
         format: uuid
 
     datasourceUrn:
-      name: datasourceUrn
+      name: urn
       in: path
       description: The URN of the datasource.
       required: true
