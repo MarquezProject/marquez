@@ -638,7 +638,7 @@ components:
           description: The name of the datasource.
           type: string
         connectionUrl:
-          description: The url used to access the datasource.
+          description: The url to be used to connect to the datasource.
           type: string
           format: URL
       required:
@@ -652,7 +652,7 @@ components:
       type: object
       properties:
         urn:
-          description: The URN of the datasource
+          description: The URN of the datasource.
           type: string
           format: URN
         createdAt:
@@ -660,10 +660,10 @@ components:
           type: string
           format: date-time
         name:
-          description: The name of the datasource
+          description: The name of the datasource.
           type: string
         connectionUrl:
-          description: The url to be used to connect to the datasource
+          description: The url to be used to connect to the datasource.
       example:
         name: financialsDB
         createdAt: 2018-09-02T11:01:12.022Z
