@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,25 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import setuptools
+set -e -x -u
 
-with open("README.md", "r") as f:
-    long_description = f.read()
+expected_version=$CIRCLE_TAG
+current_version=$(python ./setup.py --version)
+echo "current_version is ${current_version}"
+echo "expected_version is ${expected_version}"
 
-NAME = "marquez-airflow"
-VERSION = "0.0.2"
-
-setuptools.setup(
-    name=NAME,
-    version=VERSION,
-    author="Marquez Team",
-    author_email="",
-    description="Marquez integration with Airflow",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/MarquezProject/marquez-airflow",
-    packages=setuptools.find_packages(),
-    install_requires=[
-        "marquez-python==0.1.11",
-    ],
-)
+if [[ "${current_version}" != "${expected_version}" ]]; then
+  echo "Packaging code ${current_version} does not equal to tagged version, ${expected_version}"
+  exit 1
+else
+  exit 0
+fi
