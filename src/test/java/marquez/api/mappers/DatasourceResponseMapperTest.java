@@ -61,7 +61,7 @@ public class DatasourceResponseMapperTest {
   public void testDatasourceResponseNameMissing() {
     final DatasourceName nullDatasourceName = null;
 
-    Datasource nullNameDatasource = mock(Datasource.class);
+    final Datasource nullNameDatasource = mock(Datasource.class);
     when(nullNameDatasource.getConnectionUrl()).thenReturn(CONNECTION_URL);
     when(nullNameDatasource.getUrn()).thenReturn(DATASOURCE_URN);
     when(nullNameDatasource.getCreatedAt()).thenReturn(CREATED_AT);
@@ -75,7 +75,7 @@ public class DatasourceResponseMapperTest {
   public void testDatasourceResponseUrnMissing() {
     final DatasourceUrn nullDatasourceUrn = null;
 
-    Datasource nullNameDatasource = mock(Datasource.class);
+    final Datasource nullNameDatasource = mock(Datasource.class);
     when(nullNameDatasource.getName()).thenReturn(NAME);
     when(nullNameDatasource.getConnectionUrl()).thenReturn(CONNECTION_URL);
     when(nullNameDatasource.getCreatedAt()).thenReturn(CREATED_AT);
