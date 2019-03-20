@@ -1,99 +1,149 @@
-from datetime import datetime
-from unittest.mock import Mock, create_autospec, patch
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import pytest
+from airflow.utils.state import State
+from contextlib import contextmanager
+from datetime import datetime
+from marquez.airflow import MarquezDag
+from marquez_client.marquez import MarquezClient
+from unittest.mock import Mock, create_autospec, patch
 
 import airflow.models
 import marquez.utils
-import pendulum
-from airflow.utils.state import State
-from croniter import croniter
-from marquez.airflow import MarquezDag
-from marquez_client.marquez import MarquezClient
+import os
+import pytest
 
 
-class Context:
-    location = 'github://test_dag_location'
-    dag_id = 'test-dag-1'
-    namespace = 'test-namespace-1'
-    data_inputs = ["s3://data_input_1", "s3://data_input_2"]
-    data_outputs = ["s3://some_output_data"]
-    owner = 'test_owner'
-    description = 'this is a test DAG'
-    airflow_run_id = 'airflow_run_id_123456'
-    mqz_run_id = '71d29487-0b54-4ae1-9295-efd87f190c57'
-    start_date = datetime(2019, 1, 31, 0, 0, 0)
-    execution_date = datetime(2019, 2, 2, 0, 0, 0)
-    schedule_interval = '*/10 * * * *'
+class MockMarquezDag:
+    def __init__(self, dag_id, schedule_interval=None, location=None,
+                 input_urns=None, output_urns=None,
+                 start_date=None, description=None,
+                 marquez_run_id=None, airflow_run_id=None,
+                 mock_marquez_client=True):
+        self.dag_id = dag_id
+        self.schedule_interval = schedule_interval or '*/10 * * * *'
+        self.location = location or 'test_location'
+        self.input_urns = input_urns or []
+        self.output_urns = output_urns or []
+        self.start_date = start_date or datetime(2019, 1, 31, 0, 0, 0)
+        self.description = description or 'test description'
 
-    dag = None
+        self.marquez_run_id = marquez_run_id or '71d29487-0b54-4ae1-9295'
+        self.airflow_run_id = airflow_run_id or 'airflow_run_id_123456'
 
-    def __init__(self):
-        self.dag = MarquezDag(
+        self.marquez_dag = MarquezDag(
             self.dag_id,
             schedule_interval=self.schedule_interval,
-            default_args={'mqz_namespace': self.namespace,
-                          'mqz_location': self.location,
-                          'mqz_input_datasets': self.data_inputs,
-                          'mqz_output_datasets': self.data_outputs,
-                          'owner': self.owner,
+            default_args={'marquez_location': self.location,
+                          'marquez_input_urns': self.input_urns,
+                          'marquez_output_urns': self.output_urns,
+                          'owner': 'na',
                           'depends_on_past': False,
                           'start_date': self.start_date},
             description=self.description)
+        if mock_marquez_client:
+            self.marquez_dag._marquez_client = \
+                make_mock_marquez_client(self.marquez_run_id)
 
 
-@pytest.fixture(scope="module")
-def context():
-    return Context()
+@contextmanager
+def execute_test(test_dag, mock_dag_run, mock_set):
+    mock_dag_run.return_value = make_mock_airflow_jobrun(
+        test_dag.dag_id,
+        test_dag.airflow_run_id)
+    yield
+    # Test the corresponding marquez calls
+    assert_marquez_calls_for_dagrun(test_dag)
+
+    # Assert there is a job_id mapping being created
+    mock_set.assert_called_once_with(
+        marquez.utils.JobIdMapping.make_key(test_dag.dag_id,
+                                            test_dag.airflow_run_id),
+        test_dag.marquez_run_id)
 
 
 @patch.object(airflow.models.DAG, 'create_dagrun')
 @patch.object(marquez.utils.JobIdMapping, 'set')
-def test_create_dagrun(mock_set, mock_dag_run, context):
+def test_create_dagrun(mock_set, mock_dag_run):
 
-    dag = context.dag
-    mock_mqz_client = make_mock_mqz_client(context.mqz_run_id)
-    dag._mqz_client = mock_mqz_client  # Use a mock marquez-python client
+    test_dag = MockMarquezDag('test_dag_id')
+    with execute_test(test_dag, mock_dag_run, mock_set):
+        test_dag.marquez_dag.create_dagrun(state=State.RUNNING,
+                                           run_id=test_dag.airflow_run_id,
+                                           execution_date=test_dag.start_date)
+
+
+@patch.object(airflow.models.DAG, 'create_dagrun')
+@patch.object(marquez.utils.JobIdMapping, 'set')
+def test_dag_once_schedule(mock_set, mock_dag_run):
+    test_dag = MockMarquezDag('test_dag_id', schedule_interval="@once")
+
+    with execute_test(test_dag, mock_dag_run, mock_set):
+        test_dag.marquez_dag.create_dagrun(state=State.RUNNING,
+                                           run_id=test_dag.airflow_run_id,
+                                           execution_date=test_dag.start_date)
+
+
+@patch.object(airflow.models.DAG, 'create_dagrun')
+@patch.object(marquez.utils.JobIdMapping, 'set')
+def test_no_marquez_connection(mock_set, mock_dag_run):
+    test_dag = MockMarquezDag('test_dag_id', mock_marquez_client=False)
+
     mock_dag_run.return_value = make_mock_airflow_jobrun(
-        dag.dag_id, context.airflow_run_id)
+            test_dag.dag_id,
+            test_dag.airflow_run_id)
 
-    # trigger an airflow DagRun
-    dag.create_dagrun(state=State.RUNNING,
-                      run_id=context.airflow_run_id,
-                      execution_date=context.execution_date)
+    test_dag.marquez_dag.create_dagrun(state=State.RUNNING,
+                                       run_id=test_dag.airflow_run_id,
+                                       execution_date=test_dag.start_date)
 
-    # check Marquez client was called with expected arguments
-    mock_mqz_client.set_namespace.assert_called_with(context.namespace)
-    mock_mqz_client.create_job.assert_called_once_with(
-        context.dag_id, context.location,
-        context.data_inputs, context.data_outputs,
-        context.description)
-    mock_mqz_client.create_job_run.assert_called_once_with(
-        context.dag_id,
-        "{}",
-        to_airflow_datetime_str(context.execution_date),
-        to_airflow_datetime_str(compute_end_time(
-            context.schedule_interval, context.execution_date)))
-
-    # Test if airflow's create_dagrun() is called with the expected arguments
-    mock_dag_run.assert_called_once_with(state=State.RUNNING,
-                                         run_id=context.airflow_run_id,
-                                         execution_date=context.execution_date)
-
-    # Assert there is a job_id mapping being created
-    mock_set.assert_called_once_with(
-        marquez.utils.JobIdMapping.make_key(
-            context.dag_id,
-            context.airflow_run_id),
-        context.mqz_run_id)
+    mock_set.assert_not_called()
 
 
-def make_mock_mqz_client(run_id):
-    mock_mqz_run = Mock()
-    mock_mqz_run.run_id = run_id
-    mock_mqz_client = create_autospec(MarquezClient)
-    mock_mqz_client.create_job_run.return_value = mock_mqz_run
-    return mock_mqz_client
+def test_custom_namespace():
+    os.environ['MARQUEZ_NAMESPACE'] = 'test_namespace'
+    test_dag = MockMarquezDag('test_dag_id')
+    assert test_dag.marquez_dag.marquez_namespace == 'test_namespace'
+
+
+def test_default_namespace():
+    os.environ.clear()
+    test_dag = MockMarquezDag('test_dag_id')
+    assert test_dag.marquez_dag.marquez_namespace == \
+        MarquezDag.DEFAULT_NAMESPACE
+
+
+def assert_marquez_calls_for_dagrun(test_dag):
+    marquez_client = test_dag.marquez_dag._marquez_client
+
+    marquez_client.set_namespace.assert_called_with(
+        test_dag.marquez_dag.marquez_namespace)
+
+    marquez_client.create_job.assert_called_once_with(
+        test_dag.dag_id, test_dag.location, test_dag.input_urns,
+        test_dag.output_urns, test_dag.description)
+
+    marquez_client.create_job_run.assert_called_once_with(
+        test_dag.dag_id, "{}",
+        MarquezDag.to_airflow_time(test_dag.start_date),
+        test_dag.marquez_dag.compute_endtime(test_dag.start_date))
+
+
+def make_mock_marquez_client(run_id):
+    mock_marquez_jobrun = Mock()
+    mock_marquez_jobrun.run_id = run_id
+    mock_marquez_client = create_autospec(MarquezClient)
+    mock_marquez_client.create_job_run.return_value = mock_marquez_jobrun
+    return mock_marquez_client
 
 
 def make_mock_airflow_jobrun(dag_id, airflow_run_id):
@@ -101,15 +151,6 @@ def make_mock_airflow_jobrun(dag_id, airflow_run_id):
     mock_airflow_jobrun.run_id = airflow_run_id
     mock_airflow_jobrun.dag_id = dag_id
     return mock_airflow_jobrun
-
-
-def compute_end_time(schedule_interval, start_time):
-    return datetime.utcfromtimestamp(
-        croniter(schedule_interval, start_time).get_next())
-
-
-def to_airflow_datetime_str(dt):
-    return pendulum.instance(dt).to_datetime_string()
 
 
 if __name__ == "__main__":

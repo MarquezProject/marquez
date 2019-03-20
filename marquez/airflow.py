@@ -1,4 +1,17 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
+import os
 import pendulum
 from airflow.models import DAG
 from marquez_client.marquez import MarquezClient
@@ -6,75 +19,104 @@ from marquez.utils import JobIdMapping
 
 
 class MarquezDag(DAG):
+    DEFAULT_NAMESPACE = 'default'
     _job_id_mapping = None
-    _mqz_client = None
+    _marquez_client = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.mqz_namespace = kwargs['default_args'].get(
-            'mqz_namespace', 'unknown')
-        self.mqz_location = kwargs['default_args'].get(
-            'mqz_location', 'unknown')
-        self.mqz_input_datasets = kwargs['default_args'].get(
-            'mqz_input_datasets', [])
-        self.mqz_output_datasets = kwargs['default_args'].get(
-            'mqz_output_datasets', [])
+        self.marquez_namespace = os.environ.get('MARQUEZ_NAMESPACE') or \
+            MarquezDag.DEFAULT_NAMESPACE
+        self.marquez_location = kwargs['default_args'].get(
+            'marquez_location', 'unknown')
+        self.marquez_input_urns = kwargs['default_args'].get(
+            'marquez_input_urns', [])
+        self.marquez_output_urns = kwargs['default_args'].get(
+            'marquez_output_urns', [])
         self._job_id_mapping = JobIdMapping()
 
     def create_dagrun(self, *args, **kwargs):
         run_args = "{}"  # TODO extract the run Args from the tasks
-        mqz_job_run_id = self.report_jobrun(run_args, kwargs['execution_date'])
+        marquez_jobrun_id = None
+        try:
+            marquez_jobrun_id = self.report_jobrun(run_args,
+                                                   kwargs['execution_date'])
+        except Exception as e:
+            logging.warning("[Marquez]\t{}".format(e))
         run = super(MarquezDag, self).create_dagrun(*args, **kwargs)
-        self._job_id_mapping.set(
-            JobIdMapping.make_key(run.dag_id, run.run_id), mqz_job_run_id)
+
+        if marquez_jobrun_id:
+            try:
+                self._job_id_mapping.set(
+                    JobIdMapping.make_key(run.dag_id, run.run_id),
+                    marquez_jobrun_id)
+            except Exception as e:
+                logging.warning("[Marquez]\t{}".format(e))
         return run
 
     def handle_callback(self, *args, **kwargs):
-        self.report_jobrun_change(args[0], **kwargs)
+        try:
+            self.report_jobrun_change(args[0], **kwargs)
+        except Exception as e:
+            logging.warning("[Marquez]\t{}".format(e))
         return super().handle_callback(*args, **kwargs)
 
     def report_jobrun(self, run_args, execution_date):
         job_name = self.dag_id
         job_run_args = run_args
-        start_time = pendulum.instance(execution_date).to_datetime_string()
-        end_time = pendulum.instance(
-            self.following_schedule(execution_date)).to_datetime_string()
-        mqz_client = self.get_mqz_client()
-        mqz_client.set_namespace(self.mqz_namespace)
-        mqz_client.create_job(
-            job_name, self.mqz_location,
-            self.mqz_input_datasets, self.mqz_output_datasets,
+        start_time = MarquezDag.to_airflow_time(execution_date)
+        end_time = self.compute_endtime(execution_date)
+        marquez_client = self.get_marquez_client()
+        marquez_client.set_namespace(self.marquez_namespace)
+        marquez_client.create_job(
+            job_name, self.marquez_location,
+            self.marquez_input_urns, self.marquez_output_urns,
             self.description)
-        mqz_job_run_id = str(mqz_client.create_job_run(
+        marquez_jobrun = marquez_client.create_job_run(
             job_name, job_run_args=job_run_args,
             nominal_start_time=start_time,
-            nominal_end_time=end_time).run_id)
-        mqz_client.mark_job_run_running(mqz_job_run_id)
+            nominal_end_time=end_time)
+
+        marquez_jobrun_id = str(marquez_jobrun.run_id)
+
+        marquez_client.mark_job_run_running(marquez_jobrun_id)
         self.log_marquez_event(['job_running',
-                                mqz_job_run_id,
+                                marquez_jobrun_id,
                                 start_time])
-        return mqz_job_run_id
+        return marquez_jobrun_id
+
+    @staticmethod
+    def to_airflow_time(execution_date):
+        return pendulum.instance(execution_date).to_datetime_string()
+
+    def compute_endtime(self, execution_date):
+        end_time = self.following_schedule(execution_date)
+        if end_time:
+            end_time = MarquezDag.to_airflow_time(end_time)
+        return end_time
 
     def report_jobrun_change(self, dagrun, **kwargs):
-        mqz_job_run_id = self._job_id_mapping.pop(
+        marquez_job_run_id = self._job_id_mapping.pop(
             JobIdMapping.make_key(dagrun.dag_id, dagrun.run_id))
-        if mqz_job_run_id:
+        if marquez_job_run_id:
             if kwargs.get('success'):
-                self.get_mqz_client().mark_job_run_completed(mqz_job_run_id)
+                self.get_marquez_client().mark_job_run_completed(
+                    marquez_job_run_id)
             else:
-                self.get_mqz_client().mark_job_run_failed(mqz_job_run_id)
+                self.get_marquez_client().mark_job_run_failed(
+                    marquez_job_run_id)
         state = 'COMPLETED' if kwargs.get('success') else 'FAILED'
         self.log_marquez_event(['job_state_change',
-                               mqz_job_run_id,
+                                marquez_job_run_id,
                                state])
 
     def log_marquez_event(self, args):
-        logging.info("\t".join(["[marquez]",
-                                self.mqz_namespace,
+        logging.info("\t".join(["[Marquez]",
+                                self.marquez_namespace,
                                 self.dag_id,
                                 ] + args))
 
-    def get_mqz_client(self):
-        if not self._mqz_client:
-            self._mqz_client = MarquezClient()
-        return self._mqz_client
+    def get_marquez_client(self):
+        if not self._marquez_client:
+            self._marquez_client = MarquezClient()
+        return self._marquez_client

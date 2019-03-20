@@ -5,10 +5,9 @@ from datetime import datetime
 DAG_NAME = 'test_dag_v2'
 
 default_args = {
-    'mqz_namespace': 'demo',
-    'mqz_location': 'github://my_dag_location',
-    'mqz_input_datasets': ["s3://great_data", "s3://not_so_good_data"],
-    'mqz_output_datasets': ["s3://amazing_data"],
+    'marquez_location': 'github://my_dag_location',
+    'marquez_input_urns': ["s3://great_data", "s3://not_so_good_data"],
+    'marquez_output_urns': ["s3://amazing_data"],
     'owner': 'some dag developer',
     'depends_on_past': False,
     'start_date': datetime(2019, 1, 31),

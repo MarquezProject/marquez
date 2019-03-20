@@ -23,13 +23,13 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: pip install --user pytest
-      - run: pip install --user pytest-cov
-      - run: pip install --user codecov
       - run:
-          name: Install airflow from package
+          name: Install test dependencies
           environment:
             SLUGIFY_USES_TEXT_UNIDECODE: 'yes'
+          command: pip install --user -r test-requirements.txt
+      - run:
+          name: Install marquez-airflow package
           command: pip install --user -e .
       - run: python -m pytest --cov=marquez --cov-report xml ./test
 

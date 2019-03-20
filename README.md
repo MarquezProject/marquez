@@ -22,16 +22,14 @@ pip install marquez-airflow
 ```python
 from marquez.airflow import MarquezDag as DAG
 from airflow.operators.dummy_operator import DummyOperator
-from datetime import datetime
 
 
 DAG_NAME = 'my_DAG_name'
 
 default_args = {
-    'mqz_namespace': 'namespace_1',
-    'mqz_location': 'github://data-dags/dag_location/',
-    'mqz_input_datasets': ["s3://some_data", "s3://more_data"],
-    'mqz_output_datasets': ["s3://output_data"],
+    'marquez_location': 'github://data-dags/dag_location/',
+    'marquez_input_urns': ["s3://some_data", "s3://more_data"],
+    'marquez_output_urns': ["s3://output_data"],
     
     'owner': ...,
     'depends_on_past': False,
