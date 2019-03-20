@@ -25,7 +25,7 @@
 from setuptools import find_packages, setup  # noqa: H301
 
 NAME = "marquez-python"
-VERSION = "0.1.9"
+VERSION = "0.1.10"
 # To install the library, run the following
 #
 # python setup.py install
