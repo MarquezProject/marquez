@@ -38,6 +38,7 @@ jobs:
     working_directory: ~/marquez_python
     steps:
       - checkout
+      - run: ./.circleci/release_check.sh
       - run: pip install --user twine
       - run: python setup.py sdist
       - run: python -m twine upload --verbose dist/*
