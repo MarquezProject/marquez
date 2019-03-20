@@ -20,6 +20,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Generator;
@@ -75,18 +77,20 @@ public class DatasourceDaoTest {
 
   @Test(expected = UnableToExecuteStatementException.class)
   public void testUniquenessConstraintOnName() {
-    final String connectionUrl = "jdbc:postgresql://localhost:5431/novelists_";
-    final String connectionUrl2 = "jdbc:postgresql://localhost:9999/novelists_";
+    final ConnectionUrl connectionUrl =
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+    final ConnectionUrl connectionUrl2 =
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:9999/novelists_");
 
-    final String datasourceName = "Datasource";
+    final DatasourceName datasourceName = DatasourceName.fromString("Datasource");
     final String datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName).getValue();
 
     final DatasourceRow datasourceRow =
         DatasourceRow.builder()
             .uuid(UUID.randomUUID())
             .urn(datasourceUrn)
-            .name(datasourceName)
-            .connectionUrl(connectionUrl)
+            .name(datasourceName.getValue())
+            .connectionUrl(connectionUrl.getRawValue())
             .createdAt(Instant.now())
             .build();
 
@@ -94,8 +98,8 @@ public class DatasourceDaoTest {
         DatasourceRow.builder()
             .uuid(UUID.randomUUID())
             .urn(DatasourceUrn.from(connectionUrl2, datasourceName).getValue())
-            .name(datasourceName)
-            .connectionUrl(connectionUrl)
+            .name(datasourceName.getValue())
+            .connectionUrl(connectionUrl.getRawValue())
             .createdAt(Instant.now())
             .build();
 

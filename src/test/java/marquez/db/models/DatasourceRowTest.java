@@ -20,6 +20,8 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
+import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -32,7 +34,9 @@ public class DatasourceRowTest {
   private static final String NAME = "mydatabase123";
   private static final String CONNECTION_URL =
       String.format("jdbc:%s://localhost:5432/test_db", TYPE);
-  private static final String DATASOURCE_URN = DatasourceUrn.from(CONNECTION_URL, NAME).toString();
+  private static final String DATASOURCE_URN =
+      DatasourceUrn.from(ConnectionUrl.fromString(CONNECTION_URL), DatasourceName.fromString(NAME))
+          .toString();
 
   @Test
   public void testNewDatasourceRow() {

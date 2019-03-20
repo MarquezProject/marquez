@@ -55,7 +55,12 @@ public class DatasourceResourceTest {
 
   private static final String TEST_DATASOURCE_CONNECTION_STR =
       "jdbc:redshift://localhost:5431/finance";
+  private static final ConnectionUrl CONNECTION_URL =
+      ConnectionUrl.fromString(TEST_DATASOURCE_CONNECTION_STR);
+
   private static final String TEST_DATASOURCE_NAME_STR = "finance_team_mysql_server_1";
+  private static final DatasourceName TEST_DATASOURCE_NAME =
+      DatasourceName.fromString(TEST_DATASOURCE_NAME_STR);
 
   @ClassRule
   public static final ResourceTestRule resources =
@@ -160,8 +165,7 @@ public class DatasourceResourceTest {
   @Test(expected = DatasourceUrnNotFoundException.class)
   public void testGetNoSuchDatasource() throws MarquezServiceException {
     when(mockDatasourceService.get(any(DatasourceUrn.class))).thenReturn(Optional.empty());
-    datasourceResource.get(
-        DatasourceUrn.from(TEST_DATASOURCE_CONNECTION_STR, TEST_DATASOURCE_NAME_STR));
+    datasourceResource.get(DatasourceUrn.from(CONNECTION_URL, TEST_DATASOURCE_NAME));
   }
 
   @Test(expected = NullPointerException.class)
