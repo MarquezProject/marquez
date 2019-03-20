@@ -33,9 +33,6 @@ VERSION = "0.1.10"
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
 
-with open('requirements.txt') as f:
-    REQUIRES = f.read().splitlines()
-
 setup(
     name=NAME,
     version=VERSION,
@@ -43,7 +40,9 @@ setup(
     author_email="",
     url="",
     keywords=["OpenAPI", "OpenAPI-Generator", "Marquez"],
-    install_requires=REQUIRES,
+    install_requires=[
+        "marquez-python-codegen==0.1.6"
+    ],
     packages=find_packages(),
     include_package_data=True,
     long_description="""\

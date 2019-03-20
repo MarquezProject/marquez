@@ -12,7 +12,8 @@ jobs:
     steps:
       - checkout
       - run: pip install --user coverage
-      - run: pip install --user  -r requirements.txt
+      - run: pip install --user -e .
+      - run: pip install --user flake8
       - run: python -m flake8
 
   test:
