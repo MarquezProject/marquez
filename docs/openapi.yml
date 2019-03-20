@@ -324,7 +324,7 @@ paths:
       - $ref: '#/components/parameters/datasourceUrn'
     get:
       summary: Get a datasource
-      description: 'Returns a datasource response for the supplied urn.
+      description: 'Returns a datasource'
       The urn is unique in the database and a single urn will map to a single datasource.'
       tags:
         - Datasources
