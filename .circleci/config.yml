@@ -52,10 +52,9 @@ jobs:
       - checkout
       - run: whoami
       - run: pwd
-      - run: echo 'export MY_VAR="999"' >> $BASH_ENV
-      - run: source $BASH_ENV; echo $MY_VAR
-      - run: source ./client_utils.sh; echo $MARQUEZ_PYTHON_CLIENT_CLONE_DIR; clone_openapi_generator; ls $OPEN_API_GENERATOR_CLONE_DIR
-
+      - which python
+      - run: source ./client_utils.sh; echo $MARQUEZ_PYTHON_CLIENT_CLONE_DIR; clone_openapi_generator; ls $OPEN_API_GENERATOR_CLONE_DIR;
+      - run: source ./client_utils.sh; clone_marquez_python_client_codegen;  echo "current package version is $(get_current_marquez_python_client_codegen_version)"
 workflows:
   version: 2
   marquez:
