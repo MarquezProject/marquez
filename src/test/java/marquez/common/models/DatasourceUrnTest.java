@@ -22,6 +22,10 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasourceUrnTest {
+
+  private static final ConnectionUrl CONNECTION_URL =
+      ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+
   private static final String NAMESPACE = "datasource";
   private static final String VALUE = String.format("urn:%s:postgresql:test", NAMESPACE);
 
@@ -31,6 +35,13 @@ public class DatasourceUrnTest {
   @Test
   public void testNewDatasourceUrn_from() {
     final DatasourceUrn urn = DatasourceUrn.from(DATASOURCE_TYPE, DATASOURCE_NAME);
+    assertEquals(VALUE, urn.getValue());
+    assertEquals(NAMESPACE, urn.namespace());
+  }
+
+  @Test
+  public void testNewDatasourceUrn_fromConnectionUrlAndName() {
+    final DatasourceUrn urn = DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
@@ -54,12 +65,6 @@ public class DatasourceUrnTest {
     DatasourceUrn.from(DATASOURCE_TYPE, nullDatasourceName);
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testFromString_throwsException_onNullValue() {
-    final String nullValue = null;
-    DatasourceUrn.fromString(nullValue);
-  }
-
   @Test(expected = IllegalArgumentException.class)
   public void testFromString_throwsException_onEmptyValue() {
     final String emptyValue = "";
@@ -70,5 +75,11 @@ public class DatasourceUrnTest {
   public void testFromString_throwsException_onBlankValue() {
     final String blankValue = " ";
     DatasourceUrn.fromString(blankValue);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testDatasourceUrn_throwsException_onNullInput() {
+    final String nullUrn = null;
+    DatasourceUrn.fromString(nullUrn);
   }
 }

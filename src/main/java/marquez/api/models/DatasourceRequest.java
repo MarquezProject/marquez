@@ -14,16 +14,17 @@
 
 package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class NamespaceResponse {
-  String name;
-  String createdAt;
-  String owner;
-  String description;
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@EqualsAndHashCode
+@ToString
+public class DatasourceRequest {
+  @Getter @NotBlank private String name;
+  @Getter @NotBlank private String connectionUrl;
 }

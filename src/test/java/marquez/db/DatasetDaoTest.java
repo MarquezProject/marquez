@@ -17,8 +17,8 @@ package marquez.db;
 import static org.junit.Assert.assertEquals;
 
 import marquez.common.models.NamespaceName;
-import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
 import marquez.service.models.Generator;
@@ -29,11 +29,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DatasetDaoTest {
-  static final Logger logger = LoggerFactory.getLogger(DatasetDaoTest.class);
   private static DatasetDao datasetDAO;
   private static marquez.service.models.Namespace namespace;
   private static NamespaceDao namespaceDAO;
@@ -44,7 +41,7 @@ public class DatasetDaoTest {
 
   @BeforeClass
   public static void setup() {
-    Jdbi jdbi = dbRule.getJdbi();
+    final Jdbi jdbi = dbRule.getJdbi();
     namespaceDAO = jdbi.onDemand(NamespaceDao.class);
     datasetDAO = jdbi.onDemand(DatasetDao.class);
   }
@@ -56,12 +53,13 @@ public class DatasetDaoTest {
   }
 
   private void insertRandomDataset() {
-    DataSourceRow dataSourceRow = Generator.genDataSourceRow();
-    DatasetRow datasetRow = Generator.genDatasetRow(namespace.getGuid(), dataSourceRow.getUuid());
-    DbTableInfoRow dbTableInfoRow = Generator.genDbTableInfowRow();
-    DbTableVersionRow dbTableVersionRow =
+    final DatasourceRow datasourceRow = Generator.genDatasourceRow();
+    final DatasetRow datasetRow =
+        Generator.genDatasetRow(namespace.getGuid(), datasourceRow.getUuid());
+    final DbTableInfoRow dbTableInfoRow = Generator.genDbTableInfowRow();
+    final DbTableVersionRow dbTableVersionRow =
         Generator.genDbTableVersionRow(datasetRow.getUuid(), dbTableInfoRow.getUuid());
-    datasetDAO.insertAll(dataSourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
+    datasetDAO.insertAll(datasourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
   }
 
   @Test

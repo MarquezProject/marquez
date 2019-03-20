@@ -32,7 +32,7 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
         .createdAt(results.getTimestamp(Columns.CREATED_AT).toInstant())
         .updatedAt(Columns.toInstantOrNull(results.getTimestamp(Columns.UPDATED_AT)))
         .namespaceUuid(results.getObject(Columns.NAMESPACE_UUID, UUID.class))
-        .dataSourceUuid(results.getObject(Columns.DATA_SOURCE_UUID, UUID.class))
+        .datasourceUuid(results.getObject(Columns.DATA_SOURCE_UUID, UUID.class))
         .urn(results.getString(Columns.URN))
         .description(results.getString(Columns.DESCRIPTION))
         .currentVersion(Columns.toUuidOrNull(results.getString(Columns.CURRENT_VERSION_UUID)))

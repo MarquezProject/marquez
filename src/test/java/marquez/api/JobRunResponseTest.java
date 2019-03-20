@@ -78,7 +78,7 @@ public class JobRunResponseTest {
   }
 
   @Test
-  public void testJobRunInequalityOnUUID() {
+  public void testJobRunInequalityOnUuid() {
     JobRunResponse jr2 =
         new JobRunResponse(
             UUID.randomUUID(),
