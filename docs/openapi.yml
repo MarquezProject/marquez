@@ -293,10 +293,12 @@ paths:
                 $ref: '#/components/schemas/datasources'
     post:
       summary: Create a datasource
-      description: "Creates a new datasource and returns the created datasource.
+      description: "Creates a new datasource object. A datasource is the physical location of a dataset such as a table in PostgreSQL, or topic in Kafka.
+      A datasource enables the grouping of physical datasets to their physical source.
+
       All datasource objects are immutable and are uniquely identified by their URN.
-        The name must also be globally unique.
-        The `connectionUrl` must consist of the following components separated by a colon:\n
+      The name must also be globally unique.
+      The `connectionUrl` must consist of the following components separated by a colon:\n
         * Access method (usually `jdbc:`)\n
         * The datasource type, valid values of which are whitelisted in `DatasourceType.java`\n
         * A host & port\n
