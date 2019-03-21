@@ -12,17 +12,21 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-@RequiredArgsConstructor(staticName = "fromString")
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
-public final class DataSource {
-  @Getter @NonNull private final String value;
+public class DatasourceResponse {
+  @Getter @NonNull private final String name;
+  @Getter @NonNull private final String createdAt;
+  @Getter @NonNull private final String urn;
+  @Getter @NonNull private final String connectionUrl;
 }

@@ -33,8 +33,13 @@ public final class DatasourceUrn extends Urn {
     return fromString(value);
   }
 
+  public static DatasourceUrn from(
+      @NonNull ConnectionUrl connectionUrl, @NonNull DatasourceName name) {
+    return from(connectionUrl.getDatasourceType(), name);
+  }
+
   @JsonCreator
-  public static DatasourceUrn fromString(String value) {
+  public static DatasourceUrn fromString(@NonNull final String value) {
     return new DatasourceUrn(value);
   }
 

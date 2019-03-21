@@ -21,8 +21,8 @@ import java.util.UUID;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
 import marquez.db.mappers.DatasetRowMapper;
-import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
@@ -35,23 +35,23 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 @RegisterRowMapper(DatasetRowMapper.class)
 public interface DatasetDao {
   @CreateSqlObject
-  DataSourceDao createDataSourceDao();
+  DatasourceDao createDatasourceDao();
 
   @CreateSqlObject
   DbTableVersionDao createDbTableVersionDao();
 
   @SqlUpdate(
       "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description) "
-          + "VALUES (:uuid, :namespaceUuid, :dataSourceUuid, :urn, :description)")
+          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description)")
   void insert(@BindBean DatasetRow datasetRow);
 
   @Transaction
   default void insertAll(
-      DataSourceRow dataSourceRow,
+      DatasourceRow datasourceRow,
       DatasetRow datasetRow,
       DbTableInfoRow dbTableInfoRow,
       DbTableVersionRow dbTableVersionRow) {
-    createDataSourceDao().insert(dataSourceRow);
+    createDatasourceDao().insert(datasourceRow);
     insert(datasetRow);
     createDbTableVersionDao().insertAll(dbTableInfoRow, dbTableVersionRow);
     updateCurrentVersion(datasetRow.getUuid(), Instant.now(), dbTableVersionRow.getUuid());
