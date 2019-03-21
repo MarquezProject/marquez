@@ -28,7 +28,7 @@ clone_marquez()
   clone_dir=${MARQUEZ_CLONE_DIR}
   rm -rf ${clone_dir} || true
 
-  git clone --depth=1 https://github.com/ashulmanwework/marquez.git ${clone_dir}
+  git clone --depth=1 https://github.com/MarquezProject/marquez.git ${clone_dir}
 }
 
 clone_openapi_generator()
@@ -54,6 +54,12 @@ EOF
 
 }
 
+get_latest_marquez_git_hash()
+{
+  cd ${MARQUEZ_CLONE_DIR}
+  echo $(git rev-parse HEAD)
+}
+
 regenerate_api_spec()
 {
   cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}  
@@ -69,10 +75,14 @@ regenerate_api_spec()
   
   cat ./config.json
   java -jar ${OPEN_API_GENERATOR_CLONE_DIR}/modules/openapi-generator-cli/target/openapi-generator-cli.jar generate \
-   -i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
+   -i ~/Desktop/openapi.yml \
    -g python \
-   -o /tmp/${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${OPEN_API_GENERATOR_CLONE_DIR}/config.json \
-   --skip-validate-spec  
+   -o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${OPEN_API_GENERATOR_CLONE_DIR}/config.json \
+   --skip-validate-spec
+
+  marquez_latest_hash=$(get_latest_marquez_git_hash)
+  git add -A
+  git commit -a -m "Auto-updating marquez python codegen client based on Marquez commit ${marquez_latest_hash}"
 }
 
 refresh_codegen()
