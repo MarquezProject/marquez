@@ -4,7 +4,7 @@ set +x
 
 export MARQUEZ_CLONE_DIR="/tmp/marquez"
 export MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR="/tmp/marquez-python-client-codegen"
-export OPEN_API_GENERATOR_CLONE_DIR="/tmp/marquez-python-client-codegen"
+export OPEN_API_GENERATOR_CLONE_DIR="/tmp/openapi_generator"
 
 get_current_package_version()
 {
@@ -28,14 +28,30 @@ clone_marquez()
   clone_dir=${MARQUEZ_CLONE_DIR}
   rm -rf ${clone_dir} || true
 
-  git clone https://github.com/ashulmanwework/marquez.git ${clone_dir}
+  git clone --depth=1 https://github.com/ashulmanwework/marquez.git ${clone_dir}
+}
 
 clone_openapi_generator()
 {
   clone_dir=${OPEN_API_GENERATOR_CLONE_DIR}
   rm -rf ${clone_dir} || true
 
-  git clone https://github.com/OpenAPITools/openapi-generator.git ${clone_dir}
+  echo "cloning API generator into ${OPEN_API_GENERATOR_CLONE_DIR}"
+  git clone --depth=1 https://github.com/OpenAPITools/openapi-generator.git ${clone_dir}
+}
+
+generate_config_file()
+{
+
+cat <<EOF | tee ${OPEN_API_GENERATOR_CLONE_DIR}/config.json
+{
+  "projectName": "marquez-python-codegen",
+  "packageName": "marquez_codegen_client",
+  "packageVersion": "${1}",
+   "generateSourceCodeOnly" : "true"
+}
+EOF
+
 }
 
 regenerate_api_spec()
@@ -43,16 +59,19 @@ regenerate_api_spec()
   cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}  
   CURRENT_VERSION=$(get_current_package_version)
   
-  clone_openapi-generator
-  cd ${OPEN_API_GENERATOR_CLONE_DIR}
+  echo "About to clone the API generator"
+  clone_openapi_generator
+  echo "Done cloning api generator"
   generate_config_file ${CURRENT_VERSION}
+  echo "Done creating config file"
+  cd ${OPEN_API_GENERATOR_CLONE_DIR}
   mvn install -DskipTests
   
   cat ./config.json
-  java -jar modules/openapi-generator-cli/target/openapi-generator-cli.jar generate \
-   -i ~/git-projects/marquez/docs/openapi.yml \
+  java -jar ${OPEN_API_GENERATOR_CLONE_DIR}/modules/openapi-generator-cli/target/openapi-generator-cli.jar generate \
+   -i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
    -g python \
-   -o /tmp/${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ./config.json \
+   -o /tmp/${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${OPEN_API_GENERATOR_CLONE_DIR}/config.json \
    --skip-validate-spec  
 }
 
@@ -60,7 +79,11 @@ refresh_codegen()
 {
   clone_marquez_python_client_codegen
   clone_marquez
-  #rege
-  
+  echo "Regenerating API spec"
+  regenerate_api_spec
+  echo "Done regenerating spec" 
+}
 
+
+refresh_codegen
 
