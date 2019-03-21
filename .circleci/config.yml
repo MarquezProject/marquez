@@ -46,15 +46,14 @@ jobs:
 
   update-python-client:
     docker:
-      - image: docker:git
+      - image: circleci/python:3.6
     working_directory: ~/marquez
     steps:
       - checkout
       - run: whoami
       - run: pwd
-      - which python
-      - run: source ./client_utils.sh; echo $MARQUEZ_PYTHON_CLIENT_CLONE_DIR; clone_openapi_generator; ls $OPEN_API_GENERATOR_CLONE_DIR;
-      - run: source ./client_utils.sh; clone_marquez_python_client_codegen;  echo "current package version is $(get_current_marquez_python_client_codegen_version)"
+      - run: which python
+      - run: ./client_utils.sh
 workflows:
   version: 2
   marquez:

@@ -60,6 +60,23 @@ get_latest_marquez_git_hash()
   echo $(git rev-parse HEAD)
 }
 
+install_maven_if_necessary()
+{
+  set +e
+  which mvn
+  result=$?
+  set -e
+  if [[ "${result}" == 0 ]]; then
+    echo "maven already installed"
+    return 0
+  else
+    wget http://mirror.cc.columbia.edu/pub/software/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz
+    tar -xvf ./apache-maven-3.6.0-bin.tar.gz
+    export PATH=$PATH:./apache-maven-3.6.0/bin/
+    which mvn
+  fi
+}
+
 regenerate_api_spec()
 {
   cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}  
@@ -81,12 +98,16 @@ regenerate_api_spec()
    --skip-validate-spec
 
   marquez_latest_hash=$(get_latest_marquez_git_hash)
+
+  cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
   git add -A
   git commit -a -m "Auto-updating marquez python codegen client based on Marquez commit ${marquez_latest_hash}"
 }
 
 refresh_codegen()
 {
+  install_maven_if_necessary
+
   clone_marquez_python_client_codegen
   clone_marquez
   echo "Regenerating API spec"
