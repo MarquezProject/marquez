@@ -24,7 +24,8 @@ dependencies {
   compile 'org.jdbi:jdbi3-postgres:3.6.0'
   compile 'org.jdbi:jdbi3-sqlobject:3.6.0'
   compile 'org.postgresql:postgresql:42.2.5'
-  compileOnly 'org.projectlombok:lombok:1.18.4'
+  compileOnly 'org.projectlombok:lombok:1.18.6'
+  annotationProcessor 'org.projectlombok:lombok:1.18.6'
 
   testCompile 'junit:junit:4.12'
   testCompile 'io.dropwizard:dropwizard-testing:1.3.9'
