@@ -70,10 +70,12 @@ install_maven_if_necessary()
     echo "maven already installed"
     return 0
   else
+    echo "installing maven"
     wget http://mirror.cc.columbia.edu/pub/software/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz
     tar -xvf ./apache-maven-3.6.0-bin.tar.gz
-    export PATH=$PATH:./apache-maven-3.6.0/bin/
-    which mvn
+    export PATH=$PATH:./apache-maven-3.6.0/bin
+    echo "$PATH"
+    echo "mvn installed at $(which mvn)"
   fi
 }
 
