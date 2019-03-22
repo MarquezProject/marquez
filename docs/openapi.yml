@@ -1,6 +1,6 @@
 openapi: 3.0.2
 info:
-  title: Marquez 
+  title: Marquez
   version: 0.1.0
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
@@ -60,7 +60,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/namespaces'
- 
+
   /namespaces/{namespace}/jobs/{job}:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -293,16 +293,9 @@ paths:
                 $ref: '#/components/schemas/datasources'
     post:
       summary: Create a datasource
-      description: "Creates a new datasource object. A datasource is the physical location of a dataset such as a table in PostgreSQL, or topic in Kafka.
-      A datasource enables the grouping of physical datasets to their physical source.
-
-      All datasource objects are immutable and are uniquely identified by their URN.
-      The name must also be globally unique.
-      The `connectionUrl` must consist of the following components separated by a colon:\n
-        * Access method (usually `jdbc:`)\n
-        * The datasource type, valid values of which are whitelisted in `DatasourceType.java`\n
-        * A host & port\n
-        * The scheme the scheme used"
+      description: Creates a new datasource object. A datasource is the physical location of a dataset such as
+        a table in PostgreSQL, or topic in Kafka. A datasource enables the grouping of physical datasets
+        to their physical source.
 
       tags:
         - Datasources
@@ -324,8 +317,7 @@ paths:
       - $ref: '#/components/parameters/datasourceUrn'
     get:
       summary: Get a datasource
-      description: 'Returns a datasource'
-      The urn is unique in the database and a single urn will map to a single datasource.'
+      description: Returns a datasource. An individual datasource object is identifiable by its Marquez-generated unique URN.
       tags:
         - Datasources
       responses:
@@ -376,7 +368,7 @@ components:
         type: string
         format: URN
         maxLength: 1024
-        example: urn:datasource:postgresql:financialsDB
+        example: urn:datasource:postgresql:financials_db
 
   schemas:
     createNamespace:
@@ -656,7 +648,7 @@ components:
         - name
         - connectionUrl
       example:
-        name: financialsDB
+        name: financials_db
         connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
 
     datasource:
@@ -676,9 +668,9 @@ components:
         connectionUrl:
           description: The url to be used to connect to the datasource.
       example:
-        name: financialsDB
+        name: financials_db
         createdAt: 2018-09-02T11:01:12.022Z
-        urn: urn:datasource:postgresql:financialsDB
+        urn: urn:datasource:postgresql:financials_db
         connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
 
     datasources:
@@ -718,7 +710,7 @@ components:
         connectionUrl: jdbc:postgresql://localhost:5432/wework
         schema: wedata
         table: room_bookings
-        
+
     ICEBERG:
       type: object
       properties:
@@ -738,8 +730,8 @@ components:
           description: The description of the output dataset.
           type: string
       required:
-         - type 
-         - snapshotId 
+         - type
+         - snapshotId
          - location
       example:
         type: ICEBERG
