@@ -15,15 +15,19 @@
 package marquez.service.models;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
+import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.NamespaceName;
-import marquez.db.models.DataSourceRow;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
 
@@ -141,8 +145,9 @@ public class Generator {
 
   // Namespaces
   public static Namespace genNamespace() {
-    int nsNum = randNum();
-    return new Namespace(UUID.randomUUID(), "ns" + nsNum, "ns owner" + nsNum, "ns desc" + nsNum);
+    final int nsNum = randNum();
+    return new Namespace(
+        UUID.randomUUID(), "ns" + nsNum, "ns connectionUrl" + nsNum, "ns desc" + nsNum);
   }
 
   public static Namespace cloneNamespace(Namespace n) {
@@ -158,13 +163,32 @@ public class Generator {
     return new RunArgs(ra.getHexDigest(), ra.getJson(), ra.getCreatedAt());
   }
 
+  // Datasource
+  public static Datasource genDatasource() {
+    final ConnectionUrl connectionUrl =
+        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum());
+    final DatasourceName datasourceName =
+        DatasourceName.fromString("postgresqllocalhost" + randNum());
+    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+
+    return new Datasource(datasourceName, Instant.now(), datasourceUrn, connectionUrl);
+  }
+
   // Data Source Rows
-  public static DataSourceRow genDataSourceRow() {
-    int dataSourceNum = randNum();
-    return DataSourceRow.builder()
+  public static DatasourceRow genDatasourceRow() {
+    final int datasourceNum = randNum();
+    final String connectionUrl = "jdbc:postgresql://localhost:5431/novelists_" + randNum();
+    final String datasourceName = "Datasource" + datasourceNum;
+    final String datasourceUrn =
+        DatasourceUrn.from(
+                ConnectionUrl.fromString(connectionUrl), DatasourceName.fromString(datasourceName))
+            .getValue();
+    return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
-        .name("Data Source" + dataSourceNum)
-        .connectionUrl("conn://" + dataSourceNum)
+        .urn(datasourceUrn)
+        .name(datasourceName)
+        .connectionUrl(connectionUrl)
+        .createdAt(Instant.now())
         .build();
   }
 
@@ -179,7 +203,7 @@ public class Generator {
     return DatasetRow.builder()
         .uuid(UUID.randomUUID())
         .namespaceUuid(namespaceID)
-        .dataSourceUuid(dataSourceID)
+        .datasourceUuid(dataSourceID)
         .description("dataset " + randNum())
         .urn(genDatasetUrn().toString())
         .build();

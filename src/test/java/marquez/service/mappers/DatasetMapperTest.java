@@ -90,7 +90,7 @@ public class DatasetMapperTest {
         .createdAt(CREATED_AT)
         .updatedAt(UPDATED_AT)
         .namespaceUuid(UUID.randomUUID())
-        .dataSourceUuid(UUID.randomUUID())
+        .datasourceUuid(UUID.randomUUID())
         .urn(DATASET_URN.getValue())
         .description(description.getValue())
         .currentVersion(UUID.randomUUID())

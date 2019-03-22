@@ -195,17 +195,17 @@ public final class JobResource {
 
   private Response processJobRunStateUpdate(String runId, JobRunState.State state)
       throws MarquezServiceException {
-    final UUID jobRunUUID;
+    final UUID jobRunUuid;
     try {
-      jobRunUUID = UUID.fromString(runId);
+      jobRunUuid = UUID.fromString(runId);
     } catch (IllegalArgumentException e) {
       final String errorMsg = "Could not parse " + runId + " into a UUID!";
       log.error(errorMsg, e);
       return Response.status(Response.Status.BAD_REQUEST).entity(errorMsg).build();
     }
-    final Optional<JobRun> jobRun = jobService.getJobRun(jobRunUUID);
+    final Optional<JobRun> jobRun = jobService.getJobRun(jobRunUuid);
     if (jobRun.isPresent()) {
-      jobService.updateJobRunState(jobRunUUID, state);
+      jobService.updateJobRunState(jobRunUuid, state);
       return Response.ok().build();
     }
     return Response.status(Response.Status.NOT_FOUND).build();
