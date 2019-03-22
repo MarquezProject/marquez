@@ -81,20 +81,15 @@ install_maven_if_necessary()
 
 regenerate_api_spec()
 {
-  cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}  
-  CURRENT_VERSION=$(get_current_package_version)
-  
-  generate_config_file ${CURRENT_VERSION}
-  echo "Done creating config file"
-
-  ls -la ${OPEN_API_GENERATOR_CLONE_DIR}/config.json
-
   docker run --rm -v /tmp:/tmp openapitools/openapi-generator-cli generate \
 -i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
 -g python \
 -o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${OPEN_API_GENERATOR_CLONE_DIR}/config.json \
  --skip-validate-spec
+}
 
+tag_commit()
+{
   marquez_latest_hash=$(get_latest_marquez_git_hash)
 
   cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
@@ -102,15 +97,30 @@ regenerate_api_spec()
   git commit -a -m "Auto-updating marquez python codegen client based on Marquez commit ${marquez_latest_hash}"
 }
 
-refresh_codegen()
+setup_repos()
 {
-  install_maven_if_necessary
   clone_marquez_python_client_codegen
   clone_marquez
+
+  echo "Producing the config file"
+  cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
+  CURRENT_VERSION=$(get_current_package_version)
+
+  generate_config_file ${CURRENT_VERSION}
+  echo "Done creating config file"
+}
+
+refresh_codegen()
+{
+  echo "Setting up repos"
+  setup_repos
   echo "Regenerating API spec"
   regenerate_api_spec
   echo "Done regenerating spec" 
+  echo "Tagging commit"
+  tag_commit
+  echo "Done"
 }
 
-refresh_codegen
+#refresh_codegen
 

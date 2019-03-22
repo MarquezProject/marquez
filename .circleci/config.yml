@@ -53,7 +53,9 @@ jobs:
       - run: whoami
       - run: pwd
       - run: which python
-      - run: ./client_utils.sh
+      - run: source ./client_utils.sh; setup_repos
+    
+
 workflows:
   version: 2
   marquez:
