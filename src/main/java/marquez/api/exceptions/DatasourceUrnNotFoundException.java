@@ -12,25 +12,16 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.exceptions;
 
-import static org.junit.Assert.assertEquals;
+import javax.ws.rs.NotFoundException;
+import lombok.NonNull;
+import marquez.common.models.DatasourceUrn;
 
-import marquez.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+public final class DatasourceUrnNotFoundException extends NotFoundException {
+  private static final long serialVersionUID = 1L;
 
-@Category(UnitTests.class)
-public class DataSourceTest {
-  @Test
-  public void testNewDataSource() {
-    final String value = "postgresql";
-    assertEquals(value, DataSource.fromString(value).getValue());
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewDataSource_throwsException_onNullValue() {
-    final String nullValue = null;
-    DataSource.fromString(nullValue);
+  public DatasourceUrnNotFoundException(@NonNull final DatasourceUrn urn) {
+    super(String.format("Datasource urn '%s' not found.", urn.getValue()));
   }
 }
