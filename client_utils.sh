@@ -48,7 +48,7 @@ cat <<EOF | tee ${OPEN_API_GENERATOR_CLONE_DIR}/config.json
   "projectName": "marquez-python-codegen",
   "packageName": "marquez_codegen_client",
   "packageVersion": "${1}",
-   "generateSourceCodeOnly" : "true"
+  "generateSourceCodeOnly" : "true"
 }
 EOF
 
@@ -73,7 +73,7 @@ install_maven_if_necessary()
     echo "installing maven"
     wget http://mirror.cc.columbia.edu/pub/software/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz
     tar -xvf ./apache-maven-3.6.0-bin.tar.gz
-    export PATH=$PATH:./apache-maven-3.6.0/bin
+    export PATH=$PATH:$(pwd)/apache-maven-3.6.0/bin
     echo "$PATH"
     echo "mvn installed at $(which mvn)"
   fi
@@ -90,6 +90,11 @@ regenerate_api_spec()
   generate_config_file ${CURRENT_VERSION}
   echo "Done creating config file"
   cd ${OPEN_API_GENERATOR_CLONE_DIR}
+
+
+  echo "Path is $PATH"
+  echo "right before use, Maven is at: $(which mvn)"
+
   mvn install -DskipTests
   
   cat ./config.json
@@ -108,15 +113,16 @@ regenerate_api_spec()
 
 refresh_codegen()
 {
-  install_maven_if_necessary
+  echo "getting java location"
+  which java
 
+  install_maven_if_necessary
   clone_marquez_python_client_codegen
   clone_marquez
   echo "Regenerating API spec"
   regenerate_api_spec
   echo "Done regenerating spec" 
 }
-
 
 refresh_codegen
 
