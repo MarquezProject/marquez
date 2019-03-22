@@ -42,8 +42,9 @@ clone_openapi_generator()
 
 generate_config_file()
 {
+rm -f /tmp/config.json
 
-cat <<EOF | tee ${OPEN_API_GENERATOR_CLONE_DIR}/config.json
+cat <<EOF | tee /tmp/config.json
 {
   "projectName": "marquez-python-codegen",
   "packageName": "marquez_codegen_client",
@@ -84,7 +85,7 @@ regenerate_api_spec()
   docker run --rm -v /tmp:/tmp openapitools/openapi-generator-cli generate \
 -i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
 -g python \
--o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${OPEN_API_GENERATOR_CLONE_DIR}/config.json \
+-o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c /tmp/config.json \
  --skip-validate-spec
 }
 
