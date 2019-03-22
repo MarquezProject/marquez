@@ -90,9 +90,9 @@ regenerate_api_spec()
   ls -la ${OPEN_API_GENERATOR_CLONE_DIR}/config.json
 
   docker run --rm -v /tmp:/tmp openapitools/openapi-generator-cli generate \
--i ${MARQUEZ_CLONE_DIR}/docs/openapi.json \
+-i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
 -g python \
--o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${OPEN_API_GENERATOR_CLONE_DIR}/config.yml \
+-o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${OPEN_API_GENERATOR_CLONE_DIR}/config.json \
  --skip-validate-spec
 
   marquez_latest_hash=$(get_latest_marquez_git_hash)
@@ -104,9 +104,6 @@ regenerate_api_spec()
 
 refresh_codegen()
 {
-  echo "getting java location"
-  which java
-
   install_maven_if_necessary
   clone_marquez_python_client_codegen
   clone_marquez
