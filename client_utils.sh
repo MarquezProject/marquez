@@ -84,25 +84,16 @@ regenerate_api_spec()
   cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}  
   CURRENT_VERSION=$(get_current_package_version)
   
-  echo "About to clone the API generator"
-  clone_openapi_generator
-  echo "Done cloning api generator"
   generate_config_file ${CURRENT_VERSION}
   echo "Done creating config file"
-  cd ${OPEN_API_GENERATOR_CLONE_DIR}
 
+  ls -la ${OPEN_API_GENERATOR_CLONE_DIR}/config.json
 
-  echo "Path is $PATH"
-  echo "right before use, Maven is at: $(which mvn)"
-
-  mvn install -DskipTests
-  
-  cat ./config.json
-  java -jar ${OPEN_API_GENERATOR_CLONE_DIR}/modules/openapi-generator-cli/target/openapi-generator-cli.jar generate \
-   -i ~/Desktop/openapi.yml \
-   -g python \
-   -o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${OPEN_API_GENERATOR_CLONE_DIR}/config.json \
-   --skip-validate-spec
+  docker run --rm -v /tmp:/tmp openapitools/openapi-generator-cli generate \
+-i ${MARQUEZ_CLONE_DIR}/docs/openapi.json \
+-g python \
+-o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${OPEN_API_GENERATOR_CLONE_DIR}/config.yml \
+ --skip-validate-spec
 
   marquez_latest_hash=$(get_latest_marquez_git_hash)
 
