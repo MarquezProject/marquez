@@ -49,7 +49,7 @@ class SimpleTabs extends React.Component {
     });
     axios.get('/api/v1/namespaces/' + namespace + '/datasets/').then((response) => {
       const datasetData = response.data
-      const datasetRows = datasetData.datasets.map(dataset => [dataset.name, dataset.createdAt])
+      const datasetRows = datasetData.datasets.map(dataset => [dataset.name, dataset.urn, dataset.createdAt])
       this.setState({datasets: datasetRows})
     }); 
   }
@@ -73,7 +73,7 @@ class SimpleTabs extends React.Component {
     const { classes } = this.props;
     const { value } = this.state;
     const jobColumns = ["Name", "Description", "Created At"];
-    const datasetColumns = ["URN", "Created At"];
+    const datasetColumns = ["Name", "urn", "Created At"];
 
     const options = {
         filter: true,
