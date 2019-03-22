@@ -13,12 +13,12 @@
 import logging
 import os
 import pendulum
-from airflow.models import DAG
+from airflow.models import DAG as AirflowDAG
 from marquez_client.marquez import MarquezClient
 from marquez.utils import JobIdMapping
 
 
-class MarquezDag(DAG):
+class DAG(AirflowDAG):
     DEFAULT_NAMESPACE = 'default'
     _job_id_mapping = None
     _marquez_client = None
@@ -26,7 +26,7 @@ class MarquezDag(DAG):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.marquez_namespace = os.environ.get('MARQUEZ_NAMESPACE') or \
-            MarquezDag.DEFAULT_NAMESPACE
+            DAG.DEFAULT_NAMESPACE
         self.marquez_location = kwargs['default_args'].get(
             'marquez_location', 'unknown')
         self.marquez_input_urns = kwargs['default_args'].get(
@@ -43,7 +43,7 @@ class MarquezDag(DAG):
                                                    kwargs['execution_date'])
         except Exception as e:
             logging.warning("[Marquez]\t{}".format(e))
-        run = super(MarquezDag, self).create_dagrun(*args, **kwargs)
+        run = super(DAG, self).create_dagrun(*args, **kwargs)
 
         if marquez_jobrun_id:
             try:
@@ -64,7 +64,7 @@ class MarquezDag(DAG):
     def report_jobrun(self, run_args, execution_date):
         job_name = self.dag_id
         job_run_args = run_args
-        start_time = MarquezDag.to_airflow_time(execution_date)
+        start_time = DAG.to_airflow_time(execution_date)
         end_time = self.compute_endtime(execution_date)
         marquez_client = self.get_marquez_client()
         marquez_client.set_namespace(self.marquez_namespace)
@@ -92,7 +92,7 @@ class MarquezDag(DAG):
     def compute_endtime(self, execution_date):
         end_time = self.following_schedule(execution_date)
         if end_time:
-            end_time = MarquezDag.to_airflow_time(end_time)
+            end_time = DAG.to_airflow_time(end_time)
         return end_time
 
     def report_jobrun_change(self, dagrun, **kwargs):

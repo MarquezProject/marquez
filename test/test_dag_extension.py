@@ -13,7 +13,7 @@
 from airflow.utils.state import State
 from contextlib import contextmanager
 from datetime import datetime
-from marquez.airflow import MarquezDag
+from marquez.airflow import DAG
 from marquez_client.marquez import MarquezClient
 from unittest.mock import Mock, create_autospec, patch
 
@@ -23,7 +23,7 @@ import os
 import pytest
 
 
-class MockMarquezDag:
+class MockDag:
     def __init__(self, dag_id, schedule_interval=None, location=None,
                  input_urns=None, output_urns=None,
                  start_date=None, description=None,
@@ -40,7 +40,7 @@ class MockMarquezDag:
         self.marquez_run_id = marquez_run_id or '71d29487-0b54-4ae1-9295'
         self.airflow_run_id = airflow_run_id or 'airflow_run_id_123456'
 
-        self.marquez_dag = MarquezDag(
+        self.marquez_dag = DAG(
             self.dag_id,
             schedule_interval=self.schedule_interval,
             default_args={'marquez_location': self.location,
@@ -75,7 +75,7 @@ def execute_test(test_dag, mock_dag_run, mock_set):
 @patch.object(marquez.utils.JobIdMapping, 'set')
 def test_create_dagrun(mock_set, mock_dag_run):
 
-    test_dag = MockMarquezDag('test_dag_id')
+    test_dag = MockDag('test_dag_id')
     with execute_test(test_dag, mock_dag_run, mock_set):
         test_dag.marquez_dag.create_dagrun(state=State.RUNNING,
                                            run_id=test_dag.airflow_run_id,
@@ -85,7 +85,7 @@ def test_create_dagrun(mock_set, mock_dag_run):
 @patch.object(airflow.models.DAG, 'create_dagrun')
 @patch.object(marquez.utils.JobIdMapping, 'set')
 def test_dag_once_schedule(mock_set, mock_dag_run):
-    test_dag = MockMarquezDag('test_dag_id', schedule_interval="@once")
+    test_dag = MockDag('test_dag_id', schedule_interval="@once")
 
     with execute_test(test_dag, mock_dag_run, mock_set):
         test_dag.marquez_dag.create_dagrun(state=State.RUNNING,
@@ -96,7 +96,7 @@ def test_dag_once_schedule(mock_set, mock_dag_run):
 @patch.object(airflow.models.DAG, 'create_dagrun')
 @patch.object(marquez.utils.JobIdMapping, 'set')
 def test_no_marquez_connection(mock_set, mock_dag_run):
-    test_dag = MockMarquezDag('test_dag_id', mock_marquez_client=False)
+    test_dag = MockDag('test_dag_id', mock_marquez_client=False)
 
     mock_dag_run.return_value = make_mock_airflow_jobrun(
             test_dag.dag_id,
@@ -111,15 +111,15 @@ def test_no_marquez_connection(mock_set, mock_dag_run):
 
 def test_custom_namespace():
     os.environ['MARQUEZ_NAMESPACE'] = 'test_namespace'
-    test_dag = MockMarquezDag('test_dag_id')
+    test_dag = MockDag('test_dag_id')
     assert test_dag.marquez_dag.marquez_namespace == 'test_namespace'
 
 
 def test_default_namespace():
     os.environ.clear()
-    test_dag = MockMarquezDag('test_dag_id')
+    test_dag = MockDag('test_dag_id')
     assert test_dag.marquez_dag.marquez_namespace == \
-        MarquezDag.DEFAULT_NAMESPACE
+        DAG.DEFAULT_NAMESPACE
 
 
 def assert_marquez_calls_for_dagrun(test_dag):
@@ -134,7 +134,7 @@ def assert_marquez_calls_for_dagrun(test_dag):
 
     marquez_client.create_job_run.assert_called_once_with(
         test_dag.dag_id, "{}",
-        MarquezDag.to_airflow_time(test_dag.start_date),
+        DAG.to_airflow_time(test_dag.start_date),
         test_dag.marquez_dag.compute_endtime(test_dag.start_date))
 
 
