@@ -32,7 +32,7 @@ public interface NamespaceDao {
           + "ON CONFLICT DO NOTHING")
   void insert(@BindBean Namespace namespace);
 
-  @SqlQuery("SELECT COUNT(*) > 0 FROM namespaces WHERE name = :value")
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM namespaces WHERE name = :value)")
   boolean exists(@BindBean NamespaceName namespaceName);
 
   @SqlQuery("SELECT * FROM namespaces WHERE name = :value")
