@@ -40,7 +40,6 @@ public class DbTableInfoRowMapperTest {
 
   @Test
   public void testMap() throws SQLException {
-    final Optional<Instant> expectedCreatedAt = Optional.of(CREATED_AT);
     final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
@@ -51,7 +50,7 @@ public class DbTableInfoRowMapperTest {
     final DbTableInfoRowMapper dbTableInfoRowMapper = new DbTableInfoRowMapper();
     final DbTableInfoRow dbTableInfoRow = dbTableInfoRowMapper.map(results, context);
     assertEquals(ROW_UUID, dbTableInfoRow.getUuid());
-    assertEquals(expectedCreatedAt, dbTableInfoRow.getCreatedAt());
+    assertEquals(CREATED_AT, dbTableInfoRow.getCreatedAt());
     assertEquals(DBNAME, dbTableInfoRow.getDb());
     assertEquals(DBSCHEMA, dbTableInfoRow.getDbSchema());
   }
