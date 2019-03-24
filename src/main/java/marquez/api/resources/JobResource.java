@@ -120,7 +120,6 @@ public final class JobResource {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
     final List<Job> jobList = jobService.getAllJobsInNamespace(namespaceName.getValue());
-    log.info("%s", jobList);
     final JobsResponse response = new JobsResponse(coreJobToApiJobMapper.map(jobList));
     return Response.ok().entity(response).build();
   }

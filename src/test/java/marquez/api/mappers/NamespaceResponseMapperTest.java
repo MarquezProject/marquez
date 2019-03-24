@@ -44,7 +44,8 @@ public class NamespaceResponseMapperTest {
     assertThat(Timestamp.valueOf(mappedResponse.getCreatedAt()))
         .isEqualTo(descriptionNamespace.getCreatedAt());
     assertThat(mappedResponse.getOwner()).isEqualTo(descriptionNamespace.getOwnerName());
-    assertThat(mappedResponse.getDescription().orElse(null)).isEqualTo(descriptionNamespace.getDescription());
+    assertThat(mappedResponse.getDescription().orElse(null))
+        .isEqualTo(descriptionNamespace.getDescription());
   }
 
   @Test
