@@ -20,10 +20,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
 public class JobRunState {
   private final UUID guid;
   private final Timestamp transitionedAt;

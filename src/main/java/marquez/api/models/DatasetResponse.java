@@ -15,13 +15,13 @@
 package marquez.api.models;
 
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class DatasetResponse {

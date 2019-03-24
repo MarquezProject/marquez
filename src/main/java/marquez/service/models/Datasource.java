@@ -15,16 +15,16 @@
 package marquez.service.models;
 
 import java.time.Instant;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class Datasource {

@@ -16,15 +16,21 @@ package marquez.db.models;
 
 import java.time.Instant;
 import java.util.UUID;
+import javax.annotation.Nullable;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
-@Data
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 @Builder
 public final class DbTableInfoRow {
-  @NonNull private final UUID uuid;
-  private final Instant createdAt;
-  @NonNull private final String db;
-  @NonNull private final String dbSchema;
+  @Getter @NonNull private final UUID uuid;
+  @Getter @Nullable private final Instant createdAt;
+  @Getter @NonNull private final String db;
+  @Getter @NonNull private final String dbSchema;
 }

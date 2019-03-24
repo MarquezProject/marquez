@@ -16,15 +16,15 @@ package marquez.service.models;
 
 import java.time.Instant;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public final class Dataset {

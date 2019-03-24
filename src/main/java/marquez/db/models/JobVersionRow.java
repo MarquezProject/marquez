@@ -18,14 +18,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 @Builder

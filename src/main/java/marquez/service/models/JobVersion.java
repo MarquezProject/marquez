@@ -17,10 +17,8 @@ package marquez.service.models;
 import java.sql.Timestamp;
 import java.util.UUID;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
 public final class JobVersion {
   private final UUID guid;
   private final UUID jobGuid;
