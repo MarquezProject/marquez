@@ -22,15 +22,18 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DescriptionTest {
+  private static final String VALUE = "test";
+
   @Test
   public void testNewDescription() {
-    final String value = "test";
-    assertEquals(value, Description.fromString(value).getValue());
+    final Description description = Description.fromString(VALUE);
+    assertEquals(VALUE, description.getValue());
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testNewDescription_throwsException_onNullValue() {
+  @Test
+  public void testNewDescription_nullValue() {
     final String nullValue = null;
-    Description.fromString(nullValue);
+    final Description description = Description.fromString(nullValue);
+    assertEquals(nullValue, description.getValue());
   }
 }

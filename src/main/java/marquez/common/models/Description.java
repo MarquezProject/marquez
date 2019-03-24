@@ -16,7 +16,6 @@ package marquez.common.models;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
@@ -24,8 +23,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class Description {
-  public static final String NO_VALUE = "";
+  public static final String NO_VALUE = null;
   public static final Description NO_DESCRIPTION = new Description(NO_VALUE);
 
-  @Getter @NonNull private final String value;
+  @Getter private final String value;
 }
