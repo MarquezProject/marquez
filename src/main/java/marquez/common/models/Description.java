@@ -14,6 +14,7 @@
 
 package marquez.common.models;
 
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,5 +27,5 @@ public final class Description {
   public static final String NO_VALUE = null;
   public static final Description NO_DESCRIPTION = new Description(NO_VALUE);
 
-  @Getter private final String value;
+  @Getter @Nullable private final String value;
 }
