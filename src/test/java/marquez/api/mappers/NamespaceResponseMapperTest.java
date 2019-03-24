@@ -44,14 +44,14 @@ public class NamespaceResponseMapperTest {
     assertThat(Timestamp.valueOf(mappedResponse.getCreatedAt()))
         .isEqualTo(descriptionNamespace.getCreatedAt());
     assertThat(mappedResponse.getOwner()).isEqualTo(descriptionNamespace.getOwnerName());
-    assertThat(mappedResponse.getDescription()).isEqualTo(descriptionNamespace.getDescription());
+    assertThat(mappedResponse.getDescription().orElse(null)).isEqualTo(descriptionNamespace.getDescription());
   }
 
   @Test
   public void testDescriptionOptional() {
     NamespaceResponse mappedResponse = NamespaceResponseMapper.map(descriptionlessNamespace);
 
-    assertThat(mappedResponse.getDescription()).isNullOrEmpty();
+    assertThat(mappedResponse.getDescription().orElse(null)).isNullOrEmpty();
   }
 
   @Test(expected = NullPointerException.class)

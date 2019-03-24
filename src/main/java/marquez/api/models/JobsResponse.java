@@ -14,15 +14,17 @@
 
 package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class JobsResponse {
-  @Getter private List<JobResponse> jobs;
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@EqualsAndHashCode
+@ToString
+public final class JobsResponse {
+  @Getter @NonNull private final List<JobResponse> jobs;
 }

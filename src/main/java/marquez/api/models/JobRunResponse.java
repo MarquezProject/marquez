@@ -14,23 +14,34 @@
 
 package marquez.api.models;
 
+import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotBlank;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
 
-@Data
 @AllArgsConstructor
-@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 public final class JobRunResponse {
-  @NotBlank private UUID runId;
+  @Getter @NonNull private final UUID runId;
+  @Nullable private final String nominalStartTime;
+  @Nullable private final String nominalEndTime;
+  @Nullable private final String runArgs;
+  @Getter @NonNull private final String runState;
 
-  private String nominalStartTime;
+  public Optional<String> getNominalStartTime() {
+    return Optional.ofNullable(nominalStartTime);
+  }
 
-  private String nominalEndTime;
+  public Optional<String> getNominalEndTime() {
+    return Optional.ofNullable(nominalEndTime);
+  }
 
-  private String runArgs;
-
-  private String runState;
+  public Optional<String> getRunArgs() {
+    return Optional.ofNullable(runArgs);
+  }
 }

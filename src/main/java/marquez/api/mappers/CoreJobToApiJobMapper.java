@@ -14,17 +14,19 @@
 
 package marquez.api.mappers;
 
+import java.util.Optional;
 import marquez.api.models.JobResponse;
+import marquez.service.models.Job;
 
-public class CoreJobToApiJobMapper extends Mapper<marquez.service.models.Job, JobResponse> {
+public class CoreJobToApiJobMapper extends Mapper<Job, JobResponse> {
   @Override
-  public JobResponse map(marquez.service.models.Job value) {
+  public JobResponse map(Job job) {
     return new JobResponse(
-        value.getName(),
-        value.getCreatedAt(),
-        value.getInputDatasetUrns(),
-        value.getOutputDatasetUrns(),
-        value.getLocation(),
-        value.getDescription());
+        job.getName(),
+        Optional.ofNullable(job.getCreatedAt()).map(time -> time.toString()).orElse(null),
+        job.getInputDatasetUrns(),
+        job.getOutputDatasetUrns(),
+        job.getLocation(),
+        job.getDescription());
   }
 }

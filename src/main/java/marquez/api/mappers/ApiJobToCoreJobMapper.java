@@ -24,7 +24,7 @@ public class ApiJobToCoreJobMapper extends Mapper<JobResponse, marquez.service.m
         value.getName(),
         value.getLocation(),
         null,
-        value.getDescription(),
+        value.getDescription().orElse(null),
         value.getInputDatasetUrns(),
         value.getOutputDatasetUrns());
   }

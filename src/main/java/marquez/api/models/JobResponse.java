@@ -14,25 +14,27 @@
 
 package marquez.api.models;
 
-import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
 
-@Data
 @AllArgsConstructor
-@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 public final class JobResponse {
-  private String name;
+  @Getter @NonNull private final String name;
+  @Getter private final String createdAt;
+  @Getter @NonNull private final List<String> inputDatasetUrns;
+  @Getter @NonNull private final List<String> outputDatasetUrns;
+  @Getter @NonNull private final String location;
+  @Nullable private final String description;
 
-  private Timestamp createdAt;
-
-  private List<String> inputDatasetUrns;
-
-  private List<String> outputDatasetUrns;
-
-  private String location;
-
-  private String description;
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
+  }
 }

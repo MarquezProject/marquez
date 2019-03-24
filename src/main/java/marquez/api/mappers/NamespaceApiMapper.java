@@ -24,7 +24,10 @@ public class NamespaceApiMapper extends Mapper<NamespaceResponse, Namespace> {
   public Namespace map(NamespaceResponse namespace) {
     requireNonNull(namespace, "namespace must not be null");
     return new Namespace(
-        null, namespace.getName().toLowerCase(), namespace.getOwner(), namespace.getDescription());
+        null,
+        namespace.getName().toLowerCase(),
+        namespace.getOwner(),
+        namespace.getDescription().orElse(null));
   }
 
   public Namespace of(String namespaceName, NamespaceRequest request) {

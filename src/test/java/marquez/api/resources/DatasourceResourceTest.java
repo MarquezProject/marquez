@@ -210,13 +210,12 @@ public class DatasourceResourceTest {
 
   @Test
   public void testCreateDatasource_invalidDatasource() throws MarquezServiceException {
+    final String invalidDatasourceName = "invalid";
     final String invalidDatasourceType = "xyz_postgres_999";
-
     final String invalidConnectionUrl =
         "jdbc:" + invalidDatasourceType + "://localhost:5431/novelists";
-    final DatasourceRequest invalidDatasourceRequest = mock(DatasourceRequest.class);
-    when(invalidDatasourceRequest.getConnectionUrl()).thenReturn(invalidConnectionUrl);
-    when(invalidDatasourceRequest.getName()).thenReturn("mysql_cluster_2");
+    final DatasourceRequest invalidDatasourceRequest =
+        new DatasourceRequest(invalidDatasourceName, invalidConnectionUrl);
 
     // When we submit it
     final Response createDatasourceResponse = datasourceResource.create(invalidDatasourceRequest);

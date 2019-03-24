@@ -17,8 +17,8 @@ package marquez.api;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -152,8 +152,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
     JobRunResponse responseBody = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
 
     assertEquals(JobRunState.State.NEW.name(), responseBody.getRunState());
-    assertNull(responseBody.getNominalStartTime());
-    assertNull(responseBody.getNominalEndTime());
+    assertFalse(responseBody.getNominalStartTime().isPresent());
+    assertFalse(responseBody.getNominalEndTime().isPresent());
   }
 
   @Test
@@ -260,7 +260,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
             job.getInputDatasetUrns(),
             job.getOutputDatasetUrns(),
             job.getLocation(),
-            job.getDescription());
+            job.getDescription().orElse(null));
 
     String path = format("/api/v1/namespaces/%s/jobs/%s", namespace, job.getName());
     return APP.client()

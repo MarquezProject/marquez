@@ -24,7 +24,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
-public class DatasourceRequest {
-  @Getter @NotBlank private String name;
-  @Getter @NotBlank private String connectionUrl;
+public final class DatasourceRequest {
+  @Getter @NotBlank private final String name;
+  @Getter @NotBlank private final String connectionUrl;
 }

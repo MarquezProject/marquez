@@ -89,7 +89,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     assertThat(responseBody.getName()).isEqualTo(NAMESPACE_NAME);
     assertThat(responseBody.getCreatedAt()).isNotEmpty();
     assertThat(responseBody.getOwner()).isEqualTo(OWNER);
-    assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(responseBody.getDescription().orElse(null)).isEqualTo(DESCRIPTION);
   }
 
   @Test
@@ -130,7 +130,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
     assertThat(nsResponseFromList.getName()).isEqualTo(TEST_NAMESPACE.getName());
     assertThat(nsResponseFromList.getOwner()).isEqualTo(TEST_NAMESPACE.getOwnerName());
-    assertThat(nsResponseFromList.getDescription()).isEqualTo(TEST_NAMESPACE.getDescription());
+    assertThat(nsResponseFromList.getDescription().orElse(null))
+        .isEqualTo(TEST_NAMESPACE.getDescription());
   }
 
   @Test

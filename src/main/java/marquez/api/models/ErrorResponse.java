@@ -14,6 +14,8 @@
 
 package marquez.api.models;
 
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,5 +27,9 @@ import lombok.ToString;
 @ToString
 public final class ErrorResponse {
   @Getter @NonNull private final Integer status;
-  @Getter @NonNull private final String message;
+  @Nullable private final String message;
+
+  public Optional<String> getMessage() {
+    return Optional.ofNullable(message);
+  }
 }

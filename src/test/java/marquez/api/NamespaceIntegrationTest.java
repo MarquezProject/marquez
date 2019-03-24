@@ -48,7 +48,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
 
     assertThat(Timestamp.valueOf(responseBody.getCreatedAt())).isAfter(START_TIME);
     assertThat(responseBody.getOwner()).isEqualTo(OWNER);
-    assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(responseBody.getDescription().orElse(null)).isEqualTo(DESCRIPTION);
   }
 
   @Test
@@ -68,7 +68,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
     assertThat(Timestamp.valueOf(responseBody.getCreatedAt())).isAfter(START_TIME);
     assertThat(responseBody.getOwner()).isEqualTo(OWNER);
-    assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(responseBody.getDescription().orElse(null)).isEqualTo(DESCRIPTION);
   }
 
   @Test

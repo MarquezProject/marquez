@@ -17,7 +17,6 @@ package marquez.api;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +28,7 @@ public class JobTest {
 
   private static final String JOB_NAME = "myJob";
   private static final String DESCRIPTION = "the first job";
-  private static final Timestamp CREATED_AT = Timestamp.from(Instant.now());
+  private static final String CREATED_AT = Instant.now().toString();
   private static final List<String> INPUT_DATA_SETS = Collections.EMPTY_LIST;
   private static final List<String> OUTPUT_DATA_SETS = Collections.EMPTY_LIST;
   private static final String LOCATION = "git://some/path/123";

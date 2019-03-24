@@ -122,10 +122,9 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
 
     JobResponse jobForJobCreationRequest = generateApiJob();
-    jobForJobCreationRequest.setLocation(null);
 
     Response res = insertJob(jobForJobCreationRequest);
-    assertEquals(UNPROCESSABLE_ENTRY_STATUS_CODE, res.getStatus());
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
 
   @Test
@@ -134,7 +133,6 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
 
     JobResponse jobForJobCreationRequest = generateApiJob();
-    jobForJobCreationRequest.setDescription(null);
 
     insertJob(jobForJobCreationRequest);
     verify(MOCK_JOB_SERVICE, times(1)).createJob(any(), any());
@@ -338,7 +336,7 @@ public class JobResourceTest {
             job.getInputDatasetUrns(),
             job.getOutputDatasetUrns(),
             job.getLocation(),
-            job.getDescription());
+            job.getDescription().orElse(null));
     String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, job.getName());
     return resources
         .client()
@@ -350,7 +348,9 @@ public class JobResourceTest {
   private Response insertJobRun(JobRunResponse jobRun) {
     JobRunRequest jobRequest =
         new JobRunRequest(
-            jobRun.getNominalStartTime(), jobRun.getNominalEndTime(), jobRun.getRunArgs());
+            jobRun.getNominalStartTime().orElse(null),
+            jobRun.getNominalEndTime().orElse(null),
+            jobRun.getRunArgs().orElse(null));
     String path = format("/api/v1/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME, "somejob");
     return resources
         .client()

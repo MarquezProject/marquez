@@ -14,16 +14,25 @@
 
 package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class NamespaceResponse {
-  String name;
-  String createdAt;
-  String owner;
-  String description;
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@EqualsAndHashCode
+@ToString
+public final class NamespaceResponse {
+  @Getter @NotBlank private final String name;
+  @Getter @NotBlank private final String createdAt;
+  @Getter @NotBlank private final String owner;
+  @Nullable final String description;
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
+  }
 }

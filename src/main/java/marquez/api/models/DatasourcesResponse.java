@@ -19,11 +19,12 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
-public class DatasourcesResponse {
-  @Getter private final List<DatasourceResponse> datasources;
+public final class DatasourcesResponse {
+  @Getter @NonNull private final List<DatasourceResponse> datasources;
 }

@@ -15,21 +15,20 @@
 package marquez.api.models;
 
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class DatasetResponse {
-  @Getter @NonNull private final String urn;
-
-  @Getter @NonNull private final String createdAt;
-
-  private final String description;
+public final class DatasetResponse {
+  @Getter @NotBlank private final String urn;
+  @Getter @NotBlank private final String createdAt;
+  @Nullable private final String description;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
