@@ -15,7 +15,7 @@
 # Usage: $ source ./common_packaging_utils.sh
 
 set -e
-set -x
+set +x
 
 export MARQUEZ_CLONE_DIR="/tmp/marquez"
 export MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR="/tmp/marquez-python-client-codegen"
@@ -39,9 +39,10 @@ clone_marquez()
 
 generate_config_file()
 {
-rm -f ${CONFIG_FILE_LOCATION}
-version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
-echo "About to generate config with version ${version}"
+  rm -f ${CONFIG_FILE_LOCATION}
+  version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
+  echo "About to generate config with version ${version}"
+
 cat <<EOF | tee ${CONFIG_FILE_LOCATION}
 {
   "projectName": "marquez-python-codegen",
@@ -61,10 +62,10 @@ get_latest_marquez_git_hash()
 regenerate_api_spec()
 {
   docker run --rm -v /tmp:/tmp openapitools/openapi-generator-cli generate \
--i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
--g python \
--o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${CONFIG_FILE_LOCATION} \
- --skip-validate-spec
+  -i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
+  -g python \
+  -o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${CONFIG_FILE_LOCATION} \
+  --skip-validate-spec
 }
 
 commit_changes()
@@ -104,5 +105,4 @@ refresh_codegen()
   cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
   git tag ${version}
   git push --tags origin master
-} 
-
+}
