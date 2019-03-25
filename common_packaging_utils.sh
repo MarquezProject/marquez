@@ -1,15 +1,25 @@
 #!/bin/bash
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Usage: $ source ./common_packaging_utils.sh
+
 set -e
 set +x
 
 export MARQUEZ_CLONE_DIR="/tmp/marquez"
 export MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR="/tmp/marquez-python-client-codegen"
 export OPEN_API_GENERATOR_CLONE_DIR="/tmp/openapi_generator"
-
-get_current_package_version()
-{
-  echo $(python ./setup.py --version)
-}
 
 get_current_marquez_python_client_codegen_version()
 {
@@ -43,12 +53,12 @@ clone_openapi_generator()
 generate_config_file()
 {
 rm -f /tmp/config.json
-
+version=$(python ${MARQUEZ_PYTHON_CLIENT_CLONE_DIR}/setup.py --version)
 cat <<EOF | tee /tmp/config.json
 {
   "projectName": "marquez-python-codegen",
   "packageName": "marquez_codegen_client",
-  "packageVersion": "${1}",
+  "packageVersion": "${version}",
   "generateSourceCodeOnly" : "true"
 }
 EOF
@@ -59,25 +69,6 @@ get_latest_marquez_git_hash()
 {
   cd ${MARQUEZ_CLONE_DIR}
   echo $(git rev-parse HEAD)
-}
-
-install_maven_if_necessary()
-{
-  set +e
-  which mvn
-  result=$?
-  set -e
-  if [[ "${result}" == 0 ]]; then
-    echo "maven already installed"
-    return 0
-  else
-    echo "installing maven"
-    wget http://mirror.cc.columbia.edu/pub/software/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz
-    tar -xvf ./apache-maven-3.6.0-bin.tar.gz
-    export PATH=$PATH:$(pwd)/apache-maven-3.6.0/bin
-    echo "$PATH"
-    echo "mvn installed at $(which mvn)"
-  fi
 }
 
 regenerate_api_spec()
@@ -102,26 +93,13 @@ setup_repos()
 {
   clone_marquez_python_client_codegen
   clone_marquez
-
-  echo "Producing the config file"
-  cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
-  CURRENT_VERSION=$(get_current_package_version)
-
-  generate_config_file ${CURRENT_VERSION}
-  echo "Done creating config file"
+  generate_config_file
 }
 
 refresh_codegen()
 {
-  echo "Setting up repos"
   setup_repos
-  echo "Regenerating API spec"
   regenerate_api_spec
-  echo "Done regenerating spec" 
-  echo "Tagging commit"
   tag_commit
-  echo "Done"
 }
-
-#refresh_codegen
 
