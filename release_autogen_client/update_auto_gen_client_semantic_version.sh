@@ -12,5 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./update_semantic_version_autogen_client.sh
+# Usage: $ ./update_semantic_version_autogen_client.sh [ major | minor | patch ]
+# This script will update the semantic versioning for a client
+# based on the type specified. Default is 'patch'
+set -e
+set +x
 
+source ./common_packaging_utils.sh
+
+setup_repos
+
+export type=${1}
+if [ -z "${type}" ]
+then
+  echo "defaulting to 'patch'"
+  type="patch"
+else
+  echo "update type is: ${type}"
+fi
+
+version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
+refresh_codegen

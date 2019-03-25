@@ -15,11 +15,12 @@
 # Usage: $ source ./common_packaging_utils.sh
 
 set -e
-set +x
+set -x
 
 export MARQUEZ_CLONE_DIR="/tmp/marquez"
 export MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR="/tmp/marquez-python-client-codegen"
 export OPEN_API_GENERATOR_CLONE_DIR="/tmp/openapi_generator"
+export CONFIG_FILE_LOCATION="/tmp/config.json"
 
 get_current_marquez_python_client_codegen_version()
 {
@@ -52,9 +53,10 @@ clone_openapi_generator()
 
 generate_config_file()
 {
-rm -f /tmp/config.json
-version=$(python ${MARQUEZ_PYTHON_CLIENT_CLONE_DIR}/setup.py --version)
-cat <<EOF | tee /tmp/config.json
+rm -f ${CONFIG_FILE_LOCATION}
+version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
+echo "About to generate config with version ${version}"
+cat <<EOF | tee ${CONFIG_FILE_LOCATION}
 {
   "projectName": "marquez-python-codegen",
   "packageName": "marquez_codegen_client",
@@ -76,11 +78,11 @@ regenerate_api_spec()
   docker run --rm -v /tmp:/tmp openapitools/openapi-generator-cli generate \
 -i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
 -g python \
--o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c /tmp/config.json \
+-o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${CONFIG_FILE_LOCATION} \
  --skip-validate-spec
 }
 
-tag_commit()
+commit_changes()
 {
   marquez_latest_hash=$(get_latest_marquez_git_hash)
 
@@ -93,13 +95,29 @@ setup_repos()
 {
   clone_marquez_python_client_codegen
   clone_marquez
-  generate_config_file
 }
 
 refresh_codegen()
 {
-  setup_repos
+  # The {new_version} is not a bash variable - it's a bumpversion notation for the new version.
+  # Please see bumpversion --help for more information.
+  cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
+  version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
+  if [ -n "${new_version}" ]; then
+    echo "Upping the version to be ${new_version}"
+    # Note: the type here, patch, does not matter as we are just upgrading
+    # to a specified version. It's required to satisfy the arg parsing.
+    bumpversion --current-version ${version} --new-version ${new_version} --commit patch ./setup.py
+  else
+    bumpversion --current-version ${version} --commit ${type} ./setup.py
+  fi
+
+  generate_config_file
   regenerate_api_spec
-  tag_commit
-}
+  commit_changes
+
+  cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
+  git tag ${version}
+  git push --tags origin master
+} 
 
