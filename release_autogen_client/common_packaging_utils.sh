@@ -18,7 +18,7 @@ set -e
 set +x
 
 export MARQUEZ_CLONE_DIR="/tmp/marquez"
-export MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR="/tmp/marquez-python-client-codegen"
+export MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR="/tmp/marquez-python-codegen"
 export OPEN_API_GENERATOR_CLONE_DIR="/tmp/openapi_generator"
 export CONFIG_FILE_LOCATION="${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/config.json"
 
@@ -39,7 +39,7 @@ clone_marquez()
 
 update_config_file()
 {
-  sed -i '' "s/packageVersion.*/packageVersion: \"${version}\"/g" ${CONFIG_FILE_LOCATION}
+  sed -i '' "s/packageVersion.*/packageVersion\": \"${version}\",/g" ${CONFIG_FILE_LOCATION}
 }
 
 get_latest_marquez_git_hash()
@@ -86,6 +86,8 @@ refresh_codegen()
   else
     bumpversion --current-version ${version} --commit ${type} ./setup.py
   fi
+
+  version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
 
   update_config_file
   regenerate_api_spec
