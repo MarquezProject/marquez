@@ -50,7 +50,6 @@ cat <<EOF | tee ${CONFIG_FILE_LOCATION}
   "generateSourceCodeOnly" : "true"
 }
 EOF
-
 }
 
 get_latest_marquez_git_hash()
