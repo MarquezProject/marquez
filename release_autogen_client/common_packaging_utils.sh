@@ -20,7 +20,7 @@ set +x
 export MARQUEZ_CLONE_DIR="/tmp/marquez"
 export MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR="/tmp/marquez-python-client-codegen"
 export OPEN_API_GENERATOR_CLONE_DIR="/tmp/openapi_generator"
-export CONFIG_FILE_LOCATION="/tmp/config.json"
+export CONFIG_FILE_LOCATION="${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/config.json"
 
 clone_marquez_python_client_codegen()
 {
@@ -37,20 +37,9 @@ clone_marquez()
   git clone --depth=1 https://github.com/MarquezProject/marquez.git ${clone_dir}
 }
 
-generate_config_file()
+update_config_file()
 {
-  rm -f ${CONFIG_FILE_LOCATION}
-  version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
-  echo "About to generate config with version ${version}"
-
-cat <<EOF | tee ${CONFIG_FILE_LOCATION}
-{
-  "projectName": "marquez-python-codegen",
-  "packageName": "marquez_codegen_client",
-  "packageVersion": "${version}",
-  "generateSourceCodeOnly" : "true"
-}
-EOF
+  sed -i '' "s/packageVersion.*/packageVersion: \"${version}\"/g" ${CONFIG_FILE_LOCATION}
 }
 
 get_latest_marquez_git_hash()
@@ -98,11 +87,11 @@ refresh_codegen()
     bumpversion --current-version ${version} --commit ${type} ./setup.py
   fi
 
-  generate_config_file
+  update_config_file
   regenerate_api_spec
   commit_changes
 
   cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
   git tag ${version}
-  git push --tags origin master
+  #git push --tags origin master
 }
