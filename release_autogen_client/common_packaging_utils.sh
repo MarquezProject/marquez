@@ -37,15 +37,6 @@ clone_marquez()
   git clone --depth=1 https://github.com/MarquezProject/marquez.git ${clone_dir}
 }
 
-clone_openapi_generator()
-{
-  clone_dir=${OPEN_API_GENERATOR_CLONE_DIR}
-  rm -rf ${clone_dir} || true
-
-  echo "cloning API generator into ${OPEN_API_GENERATOR_CLONE_DIR}"
-  git clone --depth=1 https://github.com/OpenAPITools/openapi-generator.git ${clone_dir}
-}
-
 generate_config_file()
 {
 rm -f ${CONFIG_FILE_LOCATION}
