@@ -22,11 +22,6 @@ export MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR="/tmp/marquez-python-client-codeg
 export OPEN_API_GENERATOR_CLONE_DIR="/tmp/openapi_generator"
 export CONFIG_FILE_LOCATION="/tmp/config.json"
 
-get_current_marquez_python_client_codegen_version()
-{
-  echo $(python ${MARQUEZ_PYTHON_CLIENT_CLONE_DIR}/setup.py --version)
-}
-
 clone_marquez_python_client_codegen()
 {
   clone_dir=${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
