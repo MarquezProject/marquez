@@ -41,6 +41,7 @@ import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobsResponse;
 import marquez.api.resources.JobResource;
+import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
@@ -56,7 +57,7 @@ public class JobResourceTest {
   private static final NamespaceService MOCK_NAMESPACE_SERVICE = mock(NamespaceService.class);
   private static final JobResource JOB_RESOURCE =
       new JobResource(MOCK_NAMESPACE_SERVICE, MOCK_JOB_SERVICE);
-  private static final String NAMESPACE_NAME = "someNamespace";
+  private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final Entity<?> EMPTY_PUT_BODY = Entity.json("");
 
   final int UNPROCESSABLE_ENTRY_STATUS_CODE = 422;
@@ -147,7 +148,7 @@ public class JobResourceTest {
 
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
 
-    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, "nosuchjob");
+    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME.getValue(), "nosuchjob");
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
@@ -165,7 +166,7 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
 
-    String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
+    String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
   }
@@ -173,10 +174,10 @@ public class JobResourceTest {
   @Test
   public void testGetAllJobsInNamespaceErrorHandling() throws MarquezServiceException {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME))
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME.getValue()))
         .thenThrow(new MarquezServiceException());
 
-    String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
+    String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
@@ -188,9 +189,9 @@ public class JobResourceTest {
     List<marquez.service.models.Job> jobsList = Arrays.asList(job1, job2);
 
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME)).thenReturn(jobsList);
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME.getValue())).thenReturn(jobsList);
 
-    String path = format("/api/v1/namespaces/%s/jobs/", NAMESPACE_NAME);
+    String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
     List<JobResponse> returnedJobs = res.readEntity(JobsResponse.class).getJobs();
@@ -323,12 +324,12 @@ public class JobResourceTest {
   }
 
   private Response getJobRun(String jobRunId) {
-    String path = format("/api/v1/jobs/runs/%s", NAMESPACE_NAME, jobRunId);
+    String path = format("/api/v1/jobs/runs/%s", NAMESPACE_NAME.getValue(), jobRunId);
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
   }
 
   private Response getJob(String jobName) {
-    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, jobName);
+    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME.getValue(), jobName);
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
   }
 
@@ -339,7 +340,7 @@ public class JobResourceTest {
             job.getOutputDatasetUrns(),
             job.getLocation(),
             job.getDescription());
-    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME, job.getName());
+    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME.getValue(), job.getName());
     return resources
         .client()
         .target(path)
@@ -351,7 +352,8 @@ public class JobResourceTest {
     JobRunRequest jobRequest =
         new JobRunRequest(
             jobRun.getNominalStartTime(), jobRun.getNominalEndTime(), jobRun.getRunArgs());
-    String path = format("/api/v1/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME, "somejob");
+    String path =
+        format("/api/v1/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME.getValue(), "somejob");
     return resources
         .client()
         .target(path)
