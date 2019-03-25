@@ -31,5 +31,5 @@ else
   echo "update type is: ${type}"
 fi
 
-version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
+version=$(python ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}/setup.py --version)
 refresh_codegen

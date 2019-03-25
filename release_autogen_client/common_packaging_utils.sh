@@ -15,18 +15,18 @@
 # Usage: $ source ./common_packaging_utils.sh
 
 set -e
-set +x
+set -x
 
 export MARQUEZ_CLONE_DIR="/tmp/marquez"
-export MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR="/tmp/marquez-python-codegen"
+export MARQUEZ_PYTHON_CODEGEN_CLONE_DIR="/tmp/marquez-python-codegen"
 export OPEN_API_GENERATOR_CLONE_DIR="/tmp/openapi_generator"
-export CONFIG_FILE_LOCATION="${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/config.json"
+export CONFIG_FILE_LOCATION="${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}/config.json"
 
 clone_marquez_python_client_codegen()
 {
-  clone_dir=${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
+  clone_dir=${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}
   rm -rf ${clone_dir} || true
-  git clone https://github.com/MarquezProject/marquez-python-client-codegen.git ${clone_dir}
+  git clone https://github.com/MarquezProject/marquez-python-codegen.git ${clone_dir}
 }
 
 clone_marquez()
@@ -53,7 +53,7 @@ regenerate_api_spec()
   docker run --rm -v /tmp:/tmp openapitools/openapi-generator-cli generate \
   -i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
   -g python \
-  -o ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR} -c ${CONFIG_FILE_LOCATION} \
+  -o ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR} -c ${CONFIG_FILE_LOCATION} \
   --skip-validate-spec
 }
 
@@ -61,7 +61,7 @@ commit_changes()
 {
   marquez_latest_hash=$(get_latest_marquez_git_hash)
 
-  cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
+  cd ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}
   git add -A
   git commit -a -m "Auto-updating marquez python codegen client based on Marquez commit ${marquez_latest_hash}"
 }
@@ -76,24 +76,24 @@ refresh_codegen()
 {
   # The {new_version} is not a bash variable - it's a bumpversion notation for the new version.
   # Please see bumpversion --help for more information.
-  cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
-  version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
+  cd ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}
+  current_version=$(python ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}/setup.py --version)
   if [ -n "${new_version}" ]; then
     echo "Upping the version to be ${new_version}"
     # Note: the type here, patch, does not matter as we are just upgrading
     # to a specified version. It's required to satisfy the arg parsing.
-    bumpversion --current-version ${version} --new-version ${new_version} --commit patch ./setup.py
+    bumpversion --current-version ${current_version} --new-version ${new_version} --commit patch ./setup.py
   else
-    bumpversion --current-version ${version} --commit ${type} ./setup.py
+    bumpversion --current-version ${current_version} --commit ${type} ./setup.py
   fi
 
-  version=$(python ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}/setup.py --version)
+  version=$(python ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}/setup.py --version)
 
   update_config_file
   regenerate_api_spec
   commit_changes
 
-  cd ${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
+  cd ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}
   git tag ${version}
-  #git push --tags origin master
+  git push --tags origin master
 }
