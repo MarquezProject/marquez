@@ -26,7 +26,7 @@ clone_marquez_python_client_codegen()
 {
   clone_dir=${MARQUEZ_PYTHON_CLIENT_CODEGEN_CLONE_DIR}
   rm -rf ${clone_dir} || true
-  git clone https://github.com/ashulmanwework/marquez-python-client-codegen.git ${clone_dir}
+  git clone https://github.com/MarquezProject/marquez-python-client-codegen.git ${clone_dir}
 }
 
 clone_marquez()
