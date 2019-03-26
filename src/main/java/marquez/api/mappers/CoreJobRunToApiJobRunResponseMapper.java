@@ -23,9 +23,10 @@ public class CoreJobRunToApiJobRunResponseMapper extends Mapper<JobRun, JobRunRe
   public JobRunResponse map(JobRun value) {
     return new JobRunResponse(
         value.getGuid(),
+        value.getCreatedAt() == null ? null : value.getCreatedAt().toString(),
+        JobRunState.State.fromInt(value.getCurrentState()).name(),
         value.getNominalStartTime() == null ? null : value.getNominalStartTime().toString(),
         value.getNominalEndTime() == null ? null : value.getNominalEndTime().toString(),
-        value.getRunArgs(),
-        JobRunState.State.fromInt(value.getCurrentState()).name());
+        value.getRunArgs());
   }
 }

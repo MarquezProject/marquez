@@ -26,6 +26,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -408,9 +410,10 @@ public class JobResourceTest {
   JobRunResponse generateApiJobRun() {
     return new JobRunResponse(
         UUID.randomUUID(),
+        Timestamp.from(Instant.now()).toString(),
+        "NEW",
         "2018-07-14T19:43:37+0000",
         "2018-07-14T19:43:37+0000",
-        "{'key': 'value'}",
-        "NEW");
+        "{'key': 'value'}");
   }
 }

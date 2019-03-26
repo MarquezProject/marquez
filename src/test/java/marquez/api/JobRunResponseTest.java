@@ -31,6 +31,7 @@ import org.junit.Test;
 public class JobRunResponseTest {
 
   private static final UUID JOB_RUN_UUID = UUID.randomUUID();
+  private static final Timestamp CREATED_AT = Timestamp.from(Instant.now());
   private static final Timestamp STARTED_AT_TIME = Timestamp.from(Instant.now());
   private static final Timestamp ENDED_AT_TIME = Timestamp.from(Instant.now());
   private static final JobRunState.State CURRENT_STATE = JobRunState.State.NEW;
@@ -39,10 +40,11 @@ public class JobRunResponseTest {
   private static final JobRunResponse JOB_RUN =
       new JobRunResponse(
           JOB_RUN_UUID,
+          CREATED_AT.toString(),
+          CURRENT_STATE.name(),
           STARTED_AT_TIME.toString(),
           ENDED_AT_TIME.toString(),
-          RUN_ARGS,
-          CURRENT_STATE.name());
+          RUN_ARGS);
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
@@ -56,10 +58,11 @@ public class JobRunResponseTest {
     JobRunResponse jr2 =
         new JobRunResponse(
             JOB_RUN_UUID,
+            CREATED_AT.toString(),
+            CURRENT_STATE.name(),
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
-            RUN_ARGS,
-            CURRENT_STATE.name());
+            RUN_ARGS);
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(jr2.equals(JOB_RUN));
@@ -70,10 +73,11 @@ public class JobRunResponseTest {
     JobRunResponse jr2 =
         new JobRunResponse(
             JOB_RUN_UUID,
+            CREATED_AT.toString(),
+            CURRENT_STATE.name(),
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
-            RUN_ARGS,
-            CURRENT_STATE.name());
+            RUN_ARGS);
     assertEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
@@ -82,10 +86,11 @@ public class JobRunResponseTest {
     JobRunResponse jr2 =
         new JobRunResponse(
             UUID.randomUUID(),
+            CREATED_AT.toString(),
+            CURRENT_STATE.name(),
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
-            RUN_ARGS,
-            CURRENT_STATE.name());
+            RUN_ARGS);
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
     AssertionsForClassTypes.assertThat(JOB_RUN.equals(JOB_RUN));
   }
@@ -95,10 +100,11 @@ public class JobRunResponseTest {
     JobRunResponse jr2 =
         new JobRunResponse(
             JOB_RUN_UUID,
+            CREATED_AT.toString(),
+            CURRENT_STATE.name(),
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
-            RUN_ARGS,
-            CURRENT_STATE.name());
+            RUN_ARGS);
     AssertionsForClassTypes.assertThat(!JOB_RUN.equals(jr2));
   }
 
@@ -107,10 +113,11 @@ public class JobRunResponseTest {
     JobRunResponse jr2 =
         new JobRunResponse(
             UUID.randomUUID(),
+            CREATED_AT.toString(),
+            CURRENT_STATE.name(),
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
-            RUN_ARGS,
-            CURRENT_STATE.name());
+            RUN_ARGS);
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 
@@ -119,10 +126,11 @@ public class JobRunResponseTest {
     JobRunResponse jr2 =
         new JobRunResponse(
             JOB_RUN_UUID,
+            CREATED_AT.toString(),
+            "RUNNING",
             STARTED_AT_TIME.toString(),
             ENDED_AT_TIME.toString(),
-            RUN_ARGS,
-            "RUNNING");
+            RUN_ARGS);
     assertNotEquals(JOB_RUN.hashCode(), jr2.hashCode());
   }
 }
