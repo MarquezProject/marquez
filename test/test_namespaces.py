@@ -23,7 +23,8 @@ def marquez_client():
 
 
 @fixture(scope='function')
-@vcr.use_cassette('fixtures/vcr/test_job/namespace_for_namespace_tests.yaml')
+@vcr.use_cassette(
+    'test/fixtures/vcr/test_job/namespace_for_namespace_tests.yaml')
 def namespace(marquez_client):
     ns_name = "ns_for_namespace_test_1"
     owner_name = "ns_owner"
@@ -32,7 +33,8 @@ def namespace(marquez_client):
     return marquez_client._create_namespace(ns_name, owner_name, description)
 
 
-@vcr.use_cassette('fixtures/vcr/test_namespaces/test_create_namespace.yaml')
+@vcr.use_cassette(
+    'test/fixtures/vcr/test_namespaces/test_create_namespace.yaml')
 def test_create_namespace(marquez_client):
     ns_name = "ns_name_997"
     owner_name = "some_owner"
@@ -44,7 +46,7 @@ def test_create_namespace(marquez_client):
     assert client_ns == ns_name, assert_str
 
 
-@vcr.use_cassette('fixtures/vcr/test_namespaces/test_get_namespace.yaml')
+@vcr.use_cassette('test/fixtures/vcr/test_namespaces/test_get_namespace.yaml')
 def test_get_namespace(marquez_client, namespace):
     returned_ns = marquez_client.get_namespace_info(namespace.name)
     assert returned_ns.name == namespace.name

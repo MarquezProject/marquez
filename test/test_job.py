@@ -23,7 +23,7 @@ def marquez_client():
 
 
 @fixture(scope='function')
-@vcr.use_cassette('fixtures/vcr/test_job/namespace_for_job.yaml')
+@vcr.use_cassette('test/fixtures/vcr/test_job/namespace_for_job.yaml')
 def namespace(marquez_client):
     ns_name = "ns_for_job_test_1"
     owner_name = "some_owner"
@@ -34,7 +34,7 @@ def namespace(marquez_client):
     return client_ns
 
 
-@vcr.use_cassette('fixtures/vcr/test_job/test_create_job.yaml')
+@vcr.use_cassette('test/fixtures/vcr/test_job/test_create_job.yaml')
 def test_create_job(marquez_client, namespace):
     marquez_client.set_namespace(namespace)
     created_job = marquez_client.create_job(
