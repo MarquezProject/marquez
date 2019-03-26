@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.api;
+package marquez.api.resources;
 
 import static java.lang.String.format;
 import static javax.ws.rs.client.Entity.entity;
@@ -40,7 +40,6 @@ import marquez.api.models.JobResponse;
 import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobsResponse;
-import marquez.api.resources.JobResource;
 import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;

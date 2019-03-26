@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.api;
+package marquez.api.resources;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,7 +53,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JobIntegrationTest extends JobRunBaseTest {
-
   protected static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
   protected static String NAMESPACE_NAME;
