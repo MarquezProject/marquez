@@ -81,7 +81,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
-    when(namespaceService.get(NAMESPACE_NAME)).thenReturn(returnedOptionalNamespace);
+    when(namespaceService.get(namespaceName)).thenReturn(returnedOptionalNamespace);
     Response res = namespaceResource.get(namespaceName);
     NamespaceResponse responseBody = (NamespaceResponse) res.getEntity();
 
@@ -106,9 +106,9 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     final List<Namespace> existingCoreModelNamespaces = Collections.singletonList(TEST_NAMESPACE);
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
-    when(namespaceService.listNamespaces()).thenReturn(existingCoreModelNamespaces);
+    when(namespaceService.getAll()).thenReturn(existingCoreModelNamespaces);
 
-    Response res = namespaceResource.listNamespaces();
+    Response res = namespaceResource.list();
     NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
 
     NamespaceResponse expectedApiNamespace = namespaceMapper.map(TEST_NAMESPACE);
@@ -122,8 +122,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
-    when(namespaceService.listNamespaces()).thenReturn(existingNamespaces);
-    Response res = namespaceResource.listNamespaces();
+    when(namespaceService.getAll()).thenReturn(existingNamespaces);
+    Response res = namespaceResource.list();
 
     NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
     NamespaceResponse nsResponseFromList = responseBody.getNamespaces().get(0);
@@ -148,9 +148,9 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
             "a second ns for testing");
     existingCoreModelNamespaces.add(TEST_NAMESPACE);
     existingCoreModelNamespaces.add(secondNamespace);
-    when(namespaceService.listNamespaces()).thenReturn(existingCoreModelNamespaces);
+    when(namespaceService.getAll()).thenReturn(existingCoreModelNamespaces);
 
-    Response res = namespaceResource.listNamespaces();
+    Response res = namespaceResource.list();
     NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
     NamespaceResponse nsResponse = namespaceMapper.map(TEST_NAMESPACE);
     NamespaceResponse secondNsResponse = namespaceMapper.map(secondNamespace);
@@ -160,7 +160,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Test
   public void testListNamespacesErrorHandling() throws MarquezServiceException {
-    doThrow(new MarquezServiceException()).when(NAMESPACE_SERVICE).listNamespaces();
+    doThrow(new MarquezServiceException()).when(NAMESPACE_SERVICE).getAll();
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),

@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.NamespaceName;
 import marquez.db.NamespaceDao;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
@@ -24,6 +25,8 @@ import org.junit.After;
 import org.junit.Test;
 
 public class NamespaceServiceTest {
+  private final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
+
   private static final NamespaceDao namespaceDao = mock(NamespaceDao.class);
   NamespaceService namespaceService = new NamespaceService(namespaceDao);
 
@@ -35,9 +38,12 @@ public class NamespaceServiceTest {
   @Test
   public void testCreate() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
-    when(namespaceDao.find(any(String.class)))
+    final NamespaceName namespaceName = NamespaceName.fromString(ns.getName());
+    when(namespaceDao.findBy(namespaceName))
         .thenReturn(
-            new Namespace(UUID.randomUUID(), ns.getName(), ns.getOwnerName(), ns.getDescription()));
+            Optional.of(
+                new Namespace(
+                    UUID.randomUUID(), ns.getName(), ns.getOwnerName(), ns.getDescription())));
     Namespace nsReturned = namespaceService.create(ns);
     verify(namespaceDao).insert(any(Namespace.class));
     assertEquals(ns.getName(), nsReturned.getName());
@@ -48,7 +54,7 @@ public class NamespaceServiceTest {
   @Test(expected = MarquezServiceException.class)
   public void testCreate_findException() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
-    doThrow(UnableToExecuteStatementException.class).when(namespaceDao).find(any(String.class));
+    doThrow(UnableToExecuteStatementException.class).when(namespaceDao).findBy(NAMESPACE_NAME);
     namespaceService.create(ns);
   }
 
@@ -63,40 +69,43 @@ public class NamespaceServiceTest {
 
   @Test
   public void testExists() throws MarquezServiceException {
-    when(namespaceDao.exists("ns_exists")).thenReturn(true);
-    assertTrue(namespaceService.exists("ns_exists"));
-    when(namespaceDao.exists("ns_doesnt_exist")).thenReturn(false);
-    assertFalse(namespaceService.exists("ns_doesnt_exist"));
+    final NamespaceName found = NamespaceName.fromString("test0");
+    final NamespaceName notFound = NamespaceName.fromString("test1");
+
+    when(namespaceDao.exists(found)).thenReturn(true);
+    assertTrue(namespaceService.exists(found));
+    when(namespaceDao.exists(notFound)).thenReturn(false);
+    assertFalse(namespaceService.exists(notFound));
   }
 
   @Test(expected = MarquezServiceException.class)
   public void testExists_findException() throws MarquezServiceException {
-    Namespace ns = Generator.genNamespace();
-    doThrow(UnableToExecuteStatementException.class).when(namespaceDao).exists(any(String.class));
-    namespaceService.exists(ns.getName());
+    doThrow(UnableToExecuteStatementException.class).when(namespaceDao).exists(NAMESPACE_NAME);
+    namespaceService.exists(NAMESPACE_NAME);
   }
 
   @Test
   public void testGet_NsExists() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
-    when(namespaceDao.find(ns.getName())).thenReturn(ns);
-    Optional<Namespace> nsOptional = namespaceService.get(ns.getName());
+    final NamespaceName namespaceName = NamespaceName.fromString(ns.getName());
+    when(namespaceDao.findBy(namespaceName)).thenReturn(Optional.of(ns));
+    Optional<Namespace> nsOptional = namespaceService.get(namespaceName);
     assertTrue(nsOptional.isPresent());
   }
 
   @Test
   public void testGet_NsNotFound() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
-    when(namespaceDao.find(ns.getName())).thenReturn(null);
-    Optional<Namespace> nsOptional = namespaceService.get(ns.getName());
-    assertFalse(nsOptional.isPresent());
+    final NamespaceName namespaceName = NamespaceName.fromString(ns.getName());
+    when(namespaceDao.findBy(namespaceName)).thenReturn(Optional.empty());
+    Optional<Namespace> namespaceIfFound = namespaceService.get(namespaceName);
+    assertFalse(namespaceIfFound.isPresent());
   }
 
   @Test(expected = MarquezServiceException.class)
   public void testGet_findException() throws MarquezServiceException {
-    Namespace ns = Generator.genNamespace();
-    doThrow(UnableToExecuteStatementException.class).when(namespaceDao).find(any(String.class));
-    namespaceService.get(ns.getName());
+    doThrow(UnableToExecuteStatementException.class).when(namespaceDao).findBy(NAMESPACE_NAME);
+    namespaceService.get(NAMESPACE_NAME);
   }
 
   @Test
@@ -104,20 +113,20 @@ public class NamespaceServiceTest {
     List<Namespace> namespaces =
         new ArrayList<Namespace>(Arrays.asList(Generator.genNamespace(), Generator.genNamespace()));
     when(namespaceDao.findAll()).thenReturn(namespaces);
-    List<Namespace> namespacesFound = namespaceService.listNamespaces();
+    List<Namespace> namespacesFound = namespaceService.getAll();
     assertEquals(namespaces.size(), namespacesFound.size());
   }
 
   @Test
   public void testListNamespaces_Empty() throws MarquezServiceException {
     when(namespaceDao.findAll()).thenReturn(new ArrayList<Namespace>());
-    List<Namespace> namespacesFound = namespaceService.listNamespaces();
+    List<Namespace> namespacesFound = namespaceService.getAll();
     assertEquals(0, namespacesFound.size());
   }
 
   @Test(expected = MarquezServiceException.class)
   public void testListNamespaces_findAllException() throws MarquezServiceException {
     doThrow(UnableToExecuteStatementException.class).when(namespaceDao).findAll();
-    namespaceService.listNamespaces();
+    namespaceService.getAll();
   }
 }
