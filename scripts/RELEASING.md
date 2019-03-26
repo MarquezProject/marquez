@@ -13,10 +13,10 @@ CircleCI will then release a PyPi artifact with that tagged version.
 
 Example usage:
 1. We want to release a Marquez-Python-Codegen client with version 1.2.0, perhaps because Marquez is now versioned to that value:
-`./update_auto_gen_client_specific_version.sh 1.2.0`
+`./autogen.sh --set-version 1.2.0`
 
 2. We want to do a patch increment of the Marquez-Python-Codegen client to incorporate some new, non-breaking functionality:
-`./update_auto_gen_client_semantic_version.sh patch`
+`./autogen.sh --semantic-bump patch`
 
-3. We want to do a patch increment of the Marquez-Python-Codegen client to incorporate a new breaking change:
-`./update_auto_gen_client_semantic_version.sh major`
+3. We want to do a major increment of the Marquez-Python-Codegen client to incorporate a new breaking change:
+`./autogen.sh --semantic-bump major`
