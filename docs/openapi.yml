@@ -151,7 +151,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jobRunId'
+                $ref: '#/components/schemas/jobRun'
     get:
       summary: List all job runs
       description: Returns a list of job runs.
@@ -560,6 +560,18 @@ components:
     jobRun:
       type: object
       properties:
+        runId:
+          description: The unique ID assigned to the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
+          type: string
+          format: date-time
+        runState:
+          description: The current state of the job.
+          type: enum
+          enum: [STARTED, COMPLETED, FAILED]
         nominalStartTime:
           description: The nominal start time of the job.
           type: string
@@ -568,31 +580,14 @@ components:
           description: The nominal end time of the job.
           type: string
           format: date-time
-        runId:
-          description: The unique ID assigned to the run.
-          type: string
-          format: uuid
-        runState:
-          description: The current state of the job.
-          type: enum
-          enum: [STARTED, COMPLETED, FAILED]
         runArgs:
           description: The runtime arguments of the job. JSON encoded.
           type: string
-        startedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job started.
-          type: string
-          format: date-time
-        endedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job ended.
-          type: string
-          format: date-time
       example:
         runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2018-10-04T15:01:23.045Z
         runState: COMPLETED
         runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
-        startedAt: 2018-10-04T15:01:23.045Z
-        endedAt: 2018-10-04T15:01:30.045Z
 
     jobRuns:
       type: object
