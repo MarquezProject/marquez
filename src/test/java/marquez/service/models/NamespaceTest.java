@@ -12,14 +12,13 @@
  * limitations under the License.
  */
 
-package marquez.api;
+package marquez.service.models;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
-import marquez.service.models.Namespace;
 import org.junit.Test;
 
 public class NamespaceTest {

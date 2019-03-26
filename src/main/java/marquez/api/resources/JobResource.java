@@ -73,7 +73,7 @@ public final class JobResource {
       @PathParam("job") JobName jobName,
       @Valid final JobRequest request)
       throws MarquezServiceException {
-    if (!namespaceService.exists(namespaceName.getValue())) {
+    if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
     final Job jobToCreate =
@@ -85,7 +85,7 @@ public final class JobResource {
                 request.getOutputDatasetUrns(),
                 request.getLocation(),
                 request.getDescription().orElse(null)));
-    jobToCreate.setNamespaceGuid(namespaceService.get(namespaceName.getValue()).get().getGuid());
+    jobToCreate.setNamespaceGuid(namespaceService.get(namespaceName).get().getGuid());
     final Job createdJob = jobService.createJob(namespaceName.getValue(), jobToCreate);
     return Response.status(Response.Status.CREATED)
         .entity(coreJobToApiJobMapper.map(createdJob))
@@ -99,7 +99,7 @@ public final class JobResource {
   public Response getJob(
       @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") final JobName jobName)
       throws MarquezServiceException {
-    if (!namespaceService.exists(namespaceName.getValue())) {
+    if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
     }
     final Optional<Job> returnedJob =
@@ -116,7 +116,7 @@ public final class JobResource {
   @Path("/namespaces/{namespace}/jobs")
   public Response listJobs(@PathParam("namespace") NamespaceName namespaceName)
       throws MarquezServiceException {
-    if (!namespaceService.exists(namespaceName.getValue())) {
+    if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
     final List<Job> jobList = jobService.getAllJobsInNamespace(namespaceName.getValue());
@@ -133,7 +133,7 @@ public final class JobResource {
       @PathParam("job") JobName jobName,
       @Valid final JobRunRequest request)
       throws MarquezServiceException {
-    if (!namespaceService.exists(namespaceName.getValue())) {
+    if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
     if (!jobService.getJob(namespaceName.getValue(), jobName.getValue()).isPresent()) {
