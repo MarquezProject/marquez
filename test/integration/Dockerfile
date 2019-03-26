@@ -2,7 +2,7 @@ FROM python:3.6
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     iptables
-RUN pip install pytest
+RUN pip install pytest requests
 COPY . /marquez-python
 
 RUN cd marquez-python && \
