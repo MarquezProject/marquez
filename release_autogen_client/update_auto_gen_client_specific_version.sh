@@ -28,5 +28,5 @@ if [ -z "${new_version}" ]; then
 fi
 
 verify_bumpversion_installed
-setup_repos
+clone_marquez_python_client_codegen
 refresh_codegen

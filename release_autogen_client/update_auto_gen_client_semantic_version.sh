@@ -20,7 +20,7 @@ set +x
 
 source ./common_packaging_utils.sh
 
-setup_repos
+clone_marquez_python_client_codegen
 
 export type=${1}
 if [ -z "${type}" ]

@@ -17,7 +17,7 @@
 set -e
 set -x
 
-export MARQUEZ_CLONE_DIR="/tmp/marquez"
+export MARQUEZ_DIR=".."
 export MARQUEZ_PYTHON_CODEGEN_CLONE_DIR="/tmp/marquez-python-codegen"
 export OPEN_API_GENERATOR_CLONE_DIR="/tmp/openapi_generator"
 export CONFIG_FILE_LOCATION="${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}/config.json"
@@ -29,14 +29,6 @@ clone_marquez_python_client_codegen()
   git clone git@github.com:MarquezProject/marquez-python-codegen.git ${clone_dir}
 }
 
-clone_marquez()
-{
-  clone_dir=${MARQUEZ_CLONE_DIR}
-  rm -rf ${clone_dir} || true
-
-  git clone --depth=1 https://github.com/MarquezProject/marquez.git ${clone_dir}
-}
-
 update_config_file()
 {
   sed -i '' "s/packageVersion.*/packageVersion\": \"${version}\",/g" ${CONFIG_FILE_LOCATION}
@@ -44,14 +36,14 @@ update_config_file()
 
 get_latest_marquez_git_hash()
 {
-  cd ${MARQUEZ_CLONE_DIR}
+  cd ${MARQUEZ_DIR}
   echo $(git rev-parse HEAD)
 }
 
 regenerate_api_spec()
 {
   docker run --rm -v /tmp:/tmp openapitools/openapi-generator-cli generate \
-  -i ${MARQUEZ_CLONE_DIR}/docs/openapi.yml \
+  -i ${MARQUEZ_DIR}/docs/openapi.yml \
   -g python \
   -o ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR} -c ${CONFIG_FILE_LOCATION} \
   --skip-validate-spec
@@ -64,12 +56,6 @@ commit_changes()
   cd ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}
   git add -A
   git commit -a -m "Auto-updating marquez python codegen client based on Marquez commit ${marquez_latest_hash}"
-}
-
-setup_repos()
-{
-  clone_marquez_python_client_codegen
-  clone_marquez
 }
 
 verify_bumpversion_installed() {
