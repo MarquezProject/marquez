@@ -28,10 +28,11 @@ import lombok.ToString;
 @ToString
 public final class JobRunResponse {
   @Getter @NonNull private final UUID runId;
+  @Getter @NonNull private final String createdAt;
+  @Getter @NonNull private final String runState;
   @Nullable private final String nominalStartTime;
   @Nullable private final String nominalEndTime;
   @Nullable private final String runArgs;
-  @Getter @NonNull private final String runState;
 
   public Optional<String> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
