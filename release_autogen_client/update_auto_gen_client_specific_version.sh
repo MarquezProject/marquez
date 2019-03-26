@@ -27,5 +27,6 @@ if [ -z "${new_version}" ]; then
   exit 1
 fi
 
+verify_bumpversion_installed
 setup_repos
 refresh_codegen

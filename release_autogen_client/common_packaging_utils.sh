@@ -72,6 +72,18 @@ setup_repos()
   clone_marquez
 }
 
+verify_bumpversion_installed() {
+  set +e
+  which bumpversion
+  result=$?
+  set -e
+  if [[ "result" != "0" ]]; then
+    echo "Please install bumpversion in order to use this script"
+    exit 1
+  fi
+  echo "Dependency check for bumpversion passed."
+}
+
 refresh_codegen()
 {
   # The {new_version} is not a bash variable - it's a bumpversion notation for the new version.
