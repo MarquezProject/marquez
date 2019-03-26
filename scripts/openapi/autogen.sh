@@ -15,9 +15,15 @@
 # Usage: $ ./autogen.sh [--semantic-bump [patch | minor | major] | --set-version <version>] 
 
 set -e
-set -x
+set +x
 
 POSITIONAL=()
+if [[ $# -eq 0 ]]; then
+    echo 'No options chosen - please see usage.'
+    echo 'Usage: $ ./autogen.sh [--semantic-bump [patch | minor | major] | --set-version <version>]'
+    exit 1
+fi
+
 while [[ $# -gt 0 ]]
 do
 key="$1"
@@ -38,6 +44,11 @@ case $key in
     -h | --help)
     echo 'Usage: $ ./autogen.sh [--semantic-bump [patch | minor | major] | --set-version <version>]'
     exit 0
+    ;;
+    *)
+    echo 'Unrecognized options chosen - please see usage.'
+    echo 'Usage: $ ./autogen.sh [--semantic-bump [patch | minor | major] | --set-version <version>]'
+    exit 1
     ;;
 esac
 done
@@ -128,6 +139,6 @@ commit_changes
 
 cd ${MARQUEZ_PYTHON_CODEGEN_CLONE_DIR}
 git tag ${version}
-#git push --tags origin master
+git push --tags origin master
 
 echo "Finished versioning. Please check CircleCI and PyPi for published artifacts."
