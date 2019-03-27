@@ -15,6 +15,8 @@
 package marquez.db;
 
 import java.util.List;
+import java.util.Optional;
+import marquez.common.models.NamespaceName;
 import marquez.db.mappers.NamespaceRowMapper;
 import marquez.service.models.Namespace;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -30,12 +32,12 @@ public interface NamespaceDao {
           + "ON CONFLICT DO NOTHING")
   void insert(@BindBean Namespace namespace);
 
-  @SqlQuery("SELECT * FROM namespaces WHERE name = :name")
-  Namespace find(String name);
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM namespaces WHERE name = :value)")
+  boolean exists(@BindBean NamespaceName namespaceName);
+
+  @SqlQuery("SELECT * FROM namespaces WHERE name = :value")
+  Optional<Namespace> findBy(@BindBean NamespaceName namespaceName);
 
   @SqlQuery("SELECT * FROM namespaces")
   List<Namespace> findAll();
-
-  @SqlQuery("SELECT COUNT(*) > 0 FROM namespaces WHERE name = :name")
-  boolean exists(String name);
 }

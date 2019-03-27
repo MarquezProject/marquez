@@ -73,7 +73,7 @@ public final class NamespaceResource {
   public Response get(@PathParam("namespace") NamespaceName namespaceName)
       throws MarquezServiceException {
     final Optional<NamespaceResponse> namespaceResponse =
-        namespaceService.get(namespaceName.getValue()).map(NamespaceResponseMapper::map);
+        namespaceService.get(namespaceName).map(NamespaceResponseMapper::map);
     if (namespaceResponse.isPresent()) {
       return Response.ok(namespaceResponse.get()).build();
     } else {
@@ -85,8 +85,8 @@ public final class NamespaceResource {
   @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces")
-  public Response listNamespaces() throws MarquezServiceException {
-    final List<Namespace> namespaces = namespaceService.listNamespaces();
+  public Response list() throws MarquezServiceException {
+    final List<Namespace> namespaces = namespaceService.getAll();
     final List<NamespaceResponse> namespaceResponses =
         coreNamespaceToApiNamespaceMapper.map(namespaces);
     return Response.ok(new NamespacesResponse(namespaceResponses)).build();
