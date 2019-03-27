@@ -14,14 +14,15 @@
 
 package marquez.api.exceptions;
 
+import static marquez.common.Preconditions.checkNotNull;
+
 import javax.ws.rs.NotFoundException;
-import lombok.NonNull;
 import marquez.common.models.DatasourceUrn;
 
 public final class DatasourceUrnNotFoundException extends NotFoundException {
   private static final long serialVersionUID = 1L;
 
-  public DatasourceUrnNotFoundException(@NonNull final DatasourceUrn urn) {
-    super(String.format("Datasource urn '%s' not found.", urn.getValue()));
+  public DatasourceUrnNotFoundException(final DatasourceUrn urn) {
+    super(String.format("Datasource urn '%s' not found.", checkNotNull(urn).getValue()));
   }
 }
