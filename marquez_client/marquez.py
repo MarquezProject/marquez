@@ -13,9 +13,10 @@
 import logging
 import os
 
-from marquez_codegen_client import (ApiClient, Configuration, CreateJob,
-                                    CreateJobRun, CreateNamespace, DatasetsApi,
-                                    JobsApi, NamespacesApi)
+from marquez_codegen_client import (
+    ApiClient, Configuration, CreateJob,
+    CreateJobRun, CreateNamespace, DatasetsApi, DatasourcesApi,
+    JobsApi, NamespacesApi)
 
 
 class MarquezClient(object):
@@ -23,7 +24,9 @@ class MarquezClient(object):
     DEFAULT_TIMEOUT_SEC = 5
     c = None
     namespace = None
+
     dataset_api_client = None
+    datasource_api_client = None
     jobs_api_client = None
     namespace_api_client = None
 
@@ -47,6 +50,7 @@ class MarquezClient(object):
         # create an instance of the API class
         marquez_client_instance = ApiClient(c)
         self.dataset_api_client = DatasetsApi(marquez_client_instance)
+        self.datasource_api_client = DatasourcesApi(marquez_client_instance)
         self.jobs_api_client = JobsApi(marquez_client_instance)
         self.namespace_api_client = NamespacesApi(marquez_client_instance)
 
@@ -130,3 +134,17 @@ class MarquezClient(object):
             job_run_id,
             _request_timeout=self.timeout
         )
+
+    def get_all_datasources(self):
+        return self.datasource_api_client.datasources_get(
+            _request_timeout=self.timeout)
+
+    def get_datasource(self, urn):
+        return self.datasource_api_client.datasources_urn_get(
+            urn=urn,
+            _request_timeout=self.timeout)
+
+    def create_datasource(self, create_datasource_request):
+        return self.datasource_api_client.datasources_post(
+            create_datasource=create_datasource_request,
+            _request_timeout=self.timeout)

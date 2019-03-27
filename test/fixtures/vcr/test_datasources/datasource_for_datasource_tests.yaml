@@ -1,0 +1,17 @@
+interactions:
+- request:
+    body: '{"name": "financials_db200", "connectionUrl": "jdbc:postgresql://localhost:5431/reporting_system"}'
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+      User-Agent: [OpenAPI-Generator/0.1.8/python]
+    method: POST
+    uri: http://localhost:8080/api/v1/datasources
+  response:
+    body: {string: '{"name":"financials_db200","createdAt":"2019-03-26T19:26:26.418647Z","urn":"urn:datasource:postgresql:financials_db200","connectionUrl":"jdbc:postgresql://localhost:5431/reporting_system"}'}
+    headers:
+      Content-Length: ['188']
+      Content-Type: [application/json]
+      Date: ['Tue, 26 Mar 2019 19:26:26 GMT']
+    status: {code: 201, message: Created}
+version: 1

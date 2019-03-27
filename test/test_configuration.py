@@ -75,7 +75,3 @@ def test_timeout_override(clear_env):
     os.environ["MARQUEZ_TIMEOUT"] = "3"
     m = MarquezClient(host="localhost", port=8080, timeout=7)
     assert m.timeout == 3
-
-
-if __name__ == "__main__":
-    pytest.main(["./test_configuration.py", "-s"])

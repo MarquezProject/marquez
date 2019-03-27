@@ -52,7 +52,3 @@ def test_namespace_not_set(marquez_client):
             'some_job', 'some_location',
             ['input1', 'input2'],
             ['output1', 'output2'])
-
-
-if __name__ == "__main__":
-    pytest.main(["./test_job.py", "-s"])
