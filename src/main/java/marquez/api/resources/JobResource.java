@@ -20,7 +20,9 @@ import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.CreateJobRequest;
 import marquez.api.models.CreateJobRunRequest;
+import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobsResponse;
+import marquez.common.models.Namespace;
 import marquez.core.exceptions.ResourceException;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.mappers.ApiJobToCoreJobMapper;
@@ -126,7 +128,7 @@ public final class JobResource {
   @POST
   @Produces(APPLICATION_JSON)
   @Consumes(APPLICATION_JSON)
-  @Path("namespaces/{namespace}/jobs/{job}/runs")
+  @Path("/namespaces/{namespace}/jobs/{job}/runs")
   public Response create(
       @PathParam("namespace") final String namespace,
       @PathParam("job") final String job,
@@ -155,6 +157,30 @@ public final class JobResource {
           .entity(coreJobRunToApiJobRunMapper.map(createdJobRun))
           .build();
     } catch (UnexpectedException | Exception e) {
+      log.error(e.getMessage(), e);
+      throw new ResourceException();
+    }
+  }
+
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Timed
+  @Path("/namespaces/{namespace}/jobs/{job}/runs")
+  public Response getJobRuns(
+      @PathParam("namespace") final String namespace, @PathParam("job") final String job)
+      throws ResourceException {
+    try {
+      if (!namespaceService.exists(namespace)) {
+        return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
+      }
+      final Optional<List<JobRun>> jobRuns =
+          jobService.getAllRunsOfJob(Namespace.of(namespace), job);
+      if (jobRuns.isPresent()) {
+        final List<JobRunResponse> jobRunResponses = coreJobRunToApiJobRunMapper.map(jobRuns.get());
+        return Response.ok().entity(jobRunResponses).build();
+      }
+      return Response.status(Response.Status.NOT_FOUND).build();
+    } catch (UnexpectedException e) {
       log.error(e.getMessage(), e);
       throw new ResourceException();
     }

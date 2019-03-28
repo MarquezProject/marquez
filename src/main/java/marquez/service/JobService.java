@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.models.Namespace;
 import marquez.core.exceptions.UnexpectedException;
 import marquez.core.models.Job;
 import marquez.core.models.JobRun;
@@ -136,6 +137,21 @@ public class JobService {
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching job run";
       log.error(err, e);
+      throw new UnexpectedException();
+    }
+  }
+
+  public Optional<List<JobRun>> getAllRunsOfJob(Namespace namespace, String jobName)
+      throws UnexpectedException {
+    try {
+      final Optional<Job> job =
+          Optional.ofNullable(jobDao.findByName(namespace.getValue(), jobName));
+      if (job.isPresent()) {
+        return Optional.ofNullable(jobRunDao.findAllByJobUuid(job.get().getGuid()));
+      }
+      return Optional.of(null);
+    } catch (UnableToExecuteStatementException e) {
+      log.error(e.getMessage());
       throw new UnexpectedException();
     }
   }
