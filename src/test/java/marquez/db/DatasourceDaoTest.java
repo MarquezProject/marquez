@@ -64,6 +64,16 @@ public class DatasourceDaoTest {
     assertThat(row.getCreatedAt()).isPresent();
   }
 
+  @Test
+  public void testFindByDatasourceName() {
+    DatasourceRow row = Generator.genDatasourceRow();
+    datasourceDAO.insert(row);
+    DatasourceName name = DatasourceName.fromString(row.getName());
+    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(name);
+    assertThat(returnedRow).isPresent();
+    assertThat(returnedRow.get().getName()).isEqualTo(row.getName());
+  }
+
   @Test()
   public void testInsertDuplicateRow_doesNotThrowException() {
     final DatasourceRow datasourceRow = Generator.genDatasourceRow();
@@ -119,7 +129,6 @@ public class DatasourceDaoTest {
 
   @Test
   public void testDatasourceNotPresent() {
-    Generator.genDatasourceRow();
     DatasourceUrn datasourceUrn = DatasourceUrn.fromString(Generator.genDatasourceRow().getUrn());
     final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceUrn);
     assertThat(returnedRow).isNotPresent();

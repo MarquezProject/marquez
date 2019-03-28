@@ -16,6 +16,7 @@ package marquez.db;
 
 import java.util.List;
 import java.util.Optional;
+import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import marquez.db.mappers.DatasourceRowMapper;
 import marquez.db.models.DatasourceRow;
@@ -33,6 +34,9 @@ public interface DatasourceDao {
 
   @SqlQuery("SELECT * FROM datasources WHERE urn = :value")
   Optional<DatasourceRow> findBy(@BindBean DatasourceUrn urn);
+
+  @SqlQuery("SELECT * FROM datasources WHERE name = :value")
+  Optional<DatasourceRow> findBy(@BindBean DatasourceName name);
 
   @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
   List<DatasourceRow> findAll(Integer limit, Integer offset);
