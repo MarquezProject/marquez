@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.api;
+package marquez.api.resources;
 
 import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.ClassRule;

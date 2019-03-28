@@ -27,7 +27,7 @@ public final class MarquezServiceExceptionMapper
     implements ExceptionMapper<MarquezServiceException> {
   @Override
   public Response toResponse(@NonNull MarquezServiceException e) {
-    return Response.status(INTERNAL_SERVER_ERROR)
+    return Response.serverError()
         .type(APPLICATION_JSON_TYPE)
         .entity(new ErrorResponse(INTERNAL_SERVER_ERROR.getStatusCode(), e.getMessage()))
         .build();

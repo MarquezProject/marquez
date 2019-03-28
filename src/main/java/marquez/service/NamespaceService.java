@@ -17,7 +17,9 @@ package marquez.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.models.NamespaceName;
 import marquez.db.NamespaceDao;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
@@ -25,13 +27,13 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class NamespaceService {
-  private NamespaceDao namespaceDao;
+  private final NamespaceDao namespaceDao;
 
-  public NamespaceService(NamespaceDao namespaceDao) {
+  public NamespaceService(@NonNull final NamespaceDao namespaceDao) {
     this.namespaceDao = namespaceDao;
   }
 
-  public Namespace create(Namespace namespace) throws MarquezServiceException {
+  public Namespace create(@NonNull Namespace namespace) throws MarquezServiceException {
     try {
       Namespace newNamespace =
           new Namespace(
@@ -40,40 +42,39 @@ public class NamespaceService {
               namespace.getOwnerName(),
               namespace.getDescription());
       namespaceDao.insert(newNamespace);
-      return namespaceDao.find(newNamespace.getName());
+      return namespaceDao
+          .findBy(NamespaceName.fromString(newNamespace.getName()))
+          .orElseThrow(MarquezServiceException::new);
     } catch (UnableToExecuteStatementException e) {
-      String err = "error creating namespace";
-      log.error(err);
+      log.error(e.getMessage());
       throw new MarquezServiceException();
     }
   }
 
-  public boolean exists(String namespaceName) throws MarquezServiceException {
+  public boolean exists(@NonNull NamespaceName namespaceName) throws MarquezServiceException {
     try {
-      return namespaceDao.exists(namespaceName.toLowerCase());
+      return namespaceDao.exists(namespaceName);
     } catch (UnableToExecuteStatementException e) {
-      String err = "error checking namespace existence";
-      log.error(err);
+      log.error(e.getMessage());
       throw new MarquezServiceException();
     }
   }
 
-  public Optional<Namespace> get(String name) throws MarquezServiceException {
+  public Optional<Namespace> get(@NonNull NamespaceName namespaceName)
+      throws MarquezServiceException {
     try {
-      return Optional.ofNullable(namespaceDao.find(name));
+      return namespaceDao.findBy(namespaceName);
     } catch (UnableToExecuteStatementException e) {
-      String err = "error fetching namespace";
-      log.error(err);
+      log.error(e.getMessage());
       throw new MarquezServiceException();
     }
   }
 
-  public List<Namespace> listNamespaces() throws MarquezServiceException {
+  public List<Namespace> getAll() throws MarquezServiceException {
     try {
       return namespaceDao.findAll();
     } catch (UnableToExecuteStatementException e) {
-      String err = "error fetching list of namespaces";
-      log.error(err);
+      log.error(e.getMessage());
       throw new MarquezServiceException();
     }
   }
