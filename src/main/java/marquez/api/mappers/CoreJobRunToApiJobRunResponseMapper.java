@@ -14,6 +14,10 @@
 
 package marquez.api.mappers;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.Collections;
+import java.util.List;
 import marquez.api.models.JobRunResponse;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
@@ -27,5 +31,10 @@ public class CoreJobRunToApiJobRunResponseMapper extends Mapper<JobRun, JobRunRe
         value.getNominalEndTime() == null ? null : value.getNominalEndTime().toString(),
         value.getRunArgs(),
         JobRunState.State.fromInt(value.getCurrentState()).name());
+  }
+
+  public List<JobRunResponse> map(List<JobRun> jobRuns) {
+    return Collections.unmodifiableList(
+        jobRuns.stream().map(jobRun -> map(jobRun)).collect(toList()));
   }
 }
