@@ -164,6 +164,7 @@ public final class JobResource {
     return Response.status(Response.Status.NOT_FOUND).build();
   }
 
+  @Timed
   @GET
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
   @Produces(APPLICATION_JSON)
