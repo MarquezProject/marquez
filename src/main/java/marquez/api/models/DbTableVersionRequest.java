@@ -14,6 +14,7 @@
 
 package marquez.api.models;
 
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -31,7 +32,7 @@ public final class DbTableVersionRequest extends DatasetVersionRequest {
       @NonNull final String connectionUrl,
       @NonNull final String schema,
       @NonNull final String table,
-      @NonNull final String description) {
+      @Nullable final String description) {
     super(type, description);
     this.connectionUrl = connectionUrl;
     this.schema = schema;
