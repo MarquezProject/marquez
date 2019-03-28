@@ -26,6 +26,7 @@ import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Generator;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
 import org.junit.BeforeClass;
@@ -74,8 +75,8 @@ public class DatasourceDaoTest {
     assertThat(returnedRow.get().getName()).isEqualTo(row.getName());
   }
 
-  @Test()
-  public void testInsertDuplicateRow_doesNotThrowException() {
+  @Test(expected = UnableToExecuteStatementException.class)
+  public void testInsertDuplicateRow_ThrowsDaoException() {
     final DatasourceRow datasourceRow = Generator.genDatasourceRow();
     datasourceDAO.insert(datasourceRow);
 
@@ -88,7 +89,7 @@ public class DatasourceDaoTest {
         .isEqualTo(returnedRow);
   }
 
-  @Test()
+  @Test(expected = UnableToExecuteStatementException.class)
   public void testUniquenessConstraintOnName() {
     final ConnectionUrl connectionUrl =
         ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
@@ -120,7 +121,7 @@ public class DatasourceDaoTest {
     assertThat(insertedRow).isPresent();
     assertThat(insertedRow.get().getConnectionUrl()).isEqualTo(connectionUrl.getRawValue());
 
-    assertThat(datasourceDAO.insert(sameNameRow)).isEmpty();
+    datasourceDAO.insert(sameNameRow);
   }
 
   @Test

@@ -28,7 +28,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 public interface DatasourceDao {
   @SqlQuery(
       "INSERT INTO datasources (guid, urn, name, connection_url) "
-          + "VALUES (:uuid, :urn, :name, :connectionUrl) ON CONFLICT DO NOTHING RETURNING * ")
+          + "VALUES (:uuid, :urn, :name, :connectionUrl) RETURNING * ")
   Optional<DatasourceRow> insert(@BindBean DatasourceRow datasourceRow);
 
   @SqlQuery("SELECT * FROM datasources WHERE urn = :value")

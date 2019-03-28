@@ -52,7 +52,7 @@ public class DatasourceService {
       Optional<DatasourceRow> insertedRow = datasourceDao.insert(row);
       return insertedRow.map(DatasourceMapper::map).orElseThrow(MarquezServiceException::new);
     } catch (UnableToExecuteStatementException e) {
-      log.error(e.getMessage());
+      log.error("Database issue while trying to create datasource " + name, e.getMessage());
       throw new MarquezServiceException();
     }
   }
