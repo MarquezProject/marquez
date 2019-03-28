@@ -23,14 +23,13 @@ import marquez.db.models.DatasourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(DatasourceRowMapper.class)
 public interface DatasourceDao {
-  @SqlUpdate(
+  @SqlQuery(
       "INSERT INTO datasources (guid, urn, name, connection_url) "
-          + "VALUES (:uuid, :urn, :name, :connectionUrl) ON CONFLICT DO NOTHING")
-  void insert(@BindBean DatasourceRow datasourceRow);
+          + "VALUES (:uuid, :urn, :name, :connectionUrl) ON CONFLICT DO NOTHING RETURNING * ")
+  Optional<DatasourceRow> insert(@BindBean DatasourceRow datasourceRow);
 
   @SqlQuery("SELECT * FROM datasources WHERE urn = :value")
   Optional<DatasourceRow> findBy(@BindBean DatasourceUrn urn);

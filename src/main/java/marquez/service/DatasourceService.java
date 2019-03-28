@@ -43,10 +43,14 @@ public class DatasourceService {
     final DatasourceRow row = DatasourceRowMapper.map(connectionUrl, name);
 
     try {
-      datasourceDao.insert(row);
-      final DatasourceUrn urn = DatasourceUrn.fromString(row.getUrn());
-      final Optional<DatasourceRow> rowIfFound = datasourceDao.findBy(urn);
-      return rowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezServiceException::new);
+      // Check if its already there based on its name. If so, return
+      final Optional<DatasourceRow> existingRowIfFound = datasourceDao.findBy(name);
+      if (existingRowIfFound.isPresent()) {
+        return DatasourceMapper.map(existingRowIfFound.get());
+      }
+
+      Optional<DatasourceRow> insertedRow = datasourceDao.insert(row);
+      return insertedRow.map(DatasourceMapper::map).orElseThrow(MarquezServiceException::new);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
       throw new MarquezServiceException();
