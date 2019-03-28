@@ -26,7 +26,6 @@ import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Generator;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
 import org.junit.BeforeClass;
@@ -55,7 +54,8 @@ public class DatasourceDaoTest {
     final DatasourceRow datasourceRow = Generator.genDatasourceRow();
     datasourceDAO.insert(datasourceRow);
 
-    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUrn());
+    final Optional<DatasourceRow> returnedRow =
+        datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn()));
     assertThat(returnedRow).isPresent();
 
     final DatasourceRow row = returnedRow.get();
@@ -64,18 +64,21 @@ public class DatasourceDaoTest {
     assertThat(row.getCreatedAt()).isPresent();
   }
 
-  @Test(expected = UnableToExecuteStatementException.class)
-  public void testInsertDuplicateRow() {
+  @Test()
+  public void testInsertDuplicateRow_doesNotThrowException() {
     final DatasourceRow datasourceRow = Generator.genDatasourceRow();
     datasourceDAO.insert(datasourceRow);
 
-    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUrn());
+    final Optional<DatasourceRow> returnedRow =
+        datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn()));
     assertThat(returnedRow).isPresent();
 
     datasourceDAO.insert(datasourceRow);
+    assertThat(datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn())))
+        .isEqualTo(returnedRow);
   }
 
-  @Test(expected = UnableToExecuteStatementException.class)
+  @Test()
   public void testUniquenessConstraintOnName() {
     final ConnectionUrl connectionUrl =
         ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
@@ -105,17 +108,20 @@ public class DatasourceDaoTest {
 
     datasourceDAO.insert(datasourceRow);
 
-    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUrn());
+    final Optional<DatasourceRow> returnedRow =
+        datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn()));
     assertThat(returnedRow).isPresent();
 
     datasourceDAO.insert(sameNameRow);
+    assertThat(datasourceDAO.findBy(DatasourceUrn.fromString(sameNameRow.getUrn())))
+        .isEqualTo(returnedRow);
   }
 
   @Test
   public void testDatasourceNotPresent() {
     Generator.genDatasourceRow();
-    final Optional<DatasourceRow> returnedRow =
-        datasourceDAO.findBy(Generator.genDatasourceRow().getUrn());
+    DatasourceUrn datasourceUrn = DatasourceUrn.fromString(Generator.genDatasourceRow().getUrn());
+    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceUrn);
     assertThat(returnedRow).isNotPresent();
   }
 
