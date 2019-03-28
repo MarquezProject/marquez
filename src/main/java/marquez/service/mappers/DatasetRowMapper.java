@@ -32,8 +32,7 @@ public final class DatasetRowMapper {
         .uuid(UUID.randomUUID())
         .datasourceUuid(dataSourceRow.getUuid())
         .urn(dbTableVersion.toDatasetUrn(namespaceName).getValue())
-        .description(
-            dbTableVersion.getDescription().map((desc) -> desc.getValue()).orElse(null))
+        .description(dbTableVersion.getDescription().map((desc) -> desc.getValue()).orElse(null))
         .build();
   }
 }
