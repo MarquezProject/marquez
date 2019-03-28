@@ -127,7 +127,7 @@ public final class JobResource {
   @POST
   @Produces(APPLICATION_JSON)
   @Consumes(APPLICATION_JSON)
-  @Path("namespaces/{namespace}/jobs/{job}/runs")
+  @Path("/namespaces/{namespace}/jobs/{job}/runs")
   public Response create(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,
@@ -150,6 +150,23 @@ public final class JobResource {
     return Response.status(Response.Status.CREATED)
         .entity(coreJobRunToApiJobRunMapper.map(createdJobRun))
         .build();
+  }
+
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Timed
+  @Path("/namespaces/{namespace}/jobs/{job}/runs")
+  public Response getJobRuns(
+      @PathParam("namespace") final NamespaceName namespaceName, @PathParam("job") final String job)
+      throws MarquezServiceException {
+    if (!namespaceService.exists(namespaceName)) {
+      return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
+    }
+    final Optional<List<JobRun>> jobRuns = jobService.getAllRunsOfJob(namespaceName, job);
+    if (jobRuns.isPresent()) {
+      return Response.ok().entity(coreJobRunToApiJobRunMapper.map(jobRuns.get())).build();
+    }
+    return Response.status(Response.Status.NOT_FOUND).build();
   }
 
   @GET
