@@ -5,7 +5,6 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
-import DatasetTable from './DatasetTable';
 import MUIDataTable from "mui-datatables";
 import axios from 'axios'
 
@@ -19,6 +18,7 @@ function TabContainer(props) {
 
 TabContainer.propTypes = {
   children: PropTypes.node.isRequired,
+  selectedNamespace: PropTypes.node.isRequired
 };
 
 const styles = theme => ({
@@ -35,20 +35,32 @@ class SimpleTabs extends React.Component {
         value: 0,
         jobs: [],
         datasets: [],
+        namespace: null
       };
   }
 
-  componentDidMount(){
-    axios.get('/api/v1/namespaces/demo/jobs/').then((response) => {
-        const jobData = response.data
-        const jobRows = jobData.jobs.map(job => [job.name, job.description, job.createdAt])
-        this.setState({jobs: jobRows})
-    })
-    axios.get('/api/v1/namespaces/demo/datasets/').then((response) => {
+  fetchData(namespace) {
+    axios.get('/api/v1/namespaces/' + namespace + '/jobs/').then((response) => {
+      const jobData = response.data
+      const jobRows = jobData.jobs.map(job => [job.name, job.description, job.createdAt])
+      this.setState({jobs: jobRows})
+    });
+    axios.get('/api/v1/namespaces/' + namespace + '/datasets/').then((response) => {
       const datasetData = response.data
       const datasetRows = datasetData.datasets.map(dataset => [dataset.name, dataset.createdAt])
       this.setState({datasets: datasetRows})
-    })
+    }); 
+  }
+
+  componentDidMount(){
+    this.fetchData(this.state.selectedNamespace); 
+  }
+
+  componentDidUpdate(prevProps) {
+    if(this.props.namespace != prevProps.namespace) {
+      this.setState({namespace: this.props.namespace});
+      this.fetchData(this.props.namespace);
+    }
   }
 
   handleChange = (event, value) => {
