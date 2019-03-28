@@ -14,21 +14,22 @@
 
 package marquez;
 
+import javax.annotation.Nullable;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class MarquezException extends Exception {
   private static final long serialVersionUID = 1L;
 
-  public MarquezException(final Throwable cause) {
-    super(cause);
-  }
-
-  public MarquezException(final String message) {
+  public MarquezException(@Nullable final String message) {
     super(message);
   }
 
-  public MarquezException(final String message, final Throwable cause) {
+  public MarquezException(@Nullable final Throwable cause) {
+    super(cause);
+  }
+
+  public MarquezException(@Nullable final String message, @Nullable final Throwable cause) {
     super(message, cause);
   }
 }
