@@ -84,6 +84,21 @@ public class DatasourceServiceTest {
     datasourceService.create(ConnectionUrl.fromString(row.getConnectionUrl()), null);
   }
 
+  @Test()
+  public void testCreateDatasourceDuplicateName() throws MarquezServiceException {
+    final DatasourceRow existingRow = Generator.genDatasourceRow();
+    final String newConnectionUrl = "jdbc:postgresql://localhost:9999/different_novelists_";
+
+    when(datasourceDao.findBy(DatasourceName.fromString(existingRow.getName())))
+        .thenReturn(Optional.of(existingRow));
+    Datasource createdDatasource =
+        datasourceService.create(
+            ConnectionUrl.fromString(newConnectionUrl),
+            DatasourceName.fromString(existingRow.getName()));
+    assertThat(createdDatasource.getConnectionUrl().getRawValue())
+        .isEqualTo(existingRow.getConnectionUrl());
+  }
+
   @Test(expected = MarquezServiceException.class)
   public void testCreateDatasource_throwsException_onDaoException() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();

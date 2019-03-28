@@ -116,15 +116,11 @@ public class DatasourceDaoTest {
             .createdAt(Instant.now())
             .build();
 
-    datasourceDAO.insert(datasourceRow);
+    Optional<DatasourceRow> insertedRow = datasourceDAO.insert(datasourceRow);
+    assertThat(insertedRow).isPresent();
+    assertThat(insertedRow.get().getConnectionUrl()).isEqualTo(connectionUrl.getRawValue());
 
-    final Optional<DatasourceRow> returnedRow =
-        datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn()));
-    assertThat(returnedRow).isPresent();
-
-    datasourceDAO.insert(sameNameRow);
-    assertThat(datasourceDAO.findBy(DatasourceUrn.fromString(sameNameRow.getUrn())))
-        .isEqualTo(returnedRow);
+    assertThat(datasourceDAO.insert(sameNameRow)).isEmpty();
   }
 
   @Test
