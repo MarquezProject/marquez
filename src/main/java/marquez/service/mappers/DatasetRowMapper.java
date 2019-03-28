@@ -14,8 +14,6 @@
 
 package marquez.service.mappers;
 
-import static marquez.common.models.Description.NO_VALUE;
-
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.models.NamespaceName;
@@ -35,7 +33,7 @@ public final class DatasetRowMapper {
         .datasourceUuid(dataSourceRow.getUuid())
         .urn(dbTableVersion.toDatasetUrn(namespaceName).getValue())
         .description(
-            dbTableVersion.getDescription().map((desc) -> desc.getValue()).orElse(NO_VALUE))
+            dbTableVersion.getDescription().map((desc) -> desc.getValue()).orElse(null))
         .build();
   }
 }
