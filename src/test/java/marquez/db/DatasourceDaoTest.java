@@ -55,7 +55,8 @@ public class DatasourceDaoTest {
     final DatasourceRow datasourceRow = Generator.genDatasourceRow();
     datasourceDAO.insert(datasourceRow);
 
-    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUrn());
+    final Optional<DatasourceRow> returnedRow =
+        datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn()));
     assertThat(returnedRow).isPresent();
 
     final DatasourceRow row = returnedRow.get();
@@ -64,15 +65,28 @@ public class DatasourceDaoTest {
     assertThat(row.getCreatedAt()).isPresent();
   }
 
+  @Test
+  public void testFindByDatasourceName() {
+    DatasourceRow row = Generator.genDatasourceRow();
+    datasourceDAO.insert(row);
+    DatasourceName name = DatasourceName.fromString(row.getName());
+    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(name);
+    assertThat(returnedRow).isPresent();
+    assertThat(returnedRow.get().getName()).isEqualTo(row.getName());
+  }
+
   @Test(expected = UnableToExecuteStatementException.class)
-  public void testInsertDuplicateRow() {
+  public void testInsertDuplicateRow_ThrowsDaoException() {
     final DatasourceRow datasourceRow = Generator.genDatasourceRow();
     datasourceDAO.insert(datasourceRow);
 
-    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUrn());
+    final Optional<DatasourceRow> returnedRow =
+        datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn()));
     assertThat(returnedRow).isPresent();
 
     datasourceDAO.insert(datasourceRow);
+    assertThat(datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn())))
+        .isEqualTo(returnedRow);
   }
 
   @Test(expected = UnableToExecuteStatementException.class)
@@ -103,19 +117,17 @@ public class DatasourceDaoTest {
             .createdAt(Instant.now())
             .build();
 
-    datasourceDAO.insert(datasourceRow);
-
-    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceRow.getUrn());
-    assertThat(returnedRow).isPresent();
+    Optional<DatasourceRow> insertedRow = datasourceDAO.insert(datasourceRow);
+    assertThat(insertedRow).isPresent();
+    assertThat(insertedRow.get().getConnectionUrl()).isEqualTo(connectionUrl.getRawValue());
 
     datasourceDAO.insert(sameNameRow);
   }
 
   @Test
   public void testDatasourceNotPresent() {
-    Generator.genDatasourceRow();
-    final Optional<DatasourceRow> returnedRow =
-        datasourceDAO.findBy(Generator.genDatasourceRow().getUrn());
+    DatasourceUrn datasourceUrn = DatasourceUrn.fromString(Generator.genDatasourceRow().getUrn());
+    final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceUrn);
     assertThat(returnedRow).isNotPresent();
   }
 

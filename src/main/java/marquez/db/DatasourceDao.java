@@ -16,22 +16,26 @@ package marquez.db;
 
 import java.util.List;
 import java.util.Optional;
+import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.mappers.DatasourceRowMapper;
 import marquez.db.models.DatasourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(DatasourceRowMapper.class)
 public interface DatasourceDao {
-  @SqlUpdate(
+  @SqlQuery(
       "INSERT INTO datasources (guid, urn, name, connection_url) "
-          + "VALUES (:uuid, :urn, :name, :connectionUrl)")
-  void insert(@BindBean DatasourceRow datasourceRow);
+          + "VALUES (:uuid, :urn, :name, :connectionUrl) RETURNING * ")
+  Optional<DatasourceRow> insert(@BindBean DatasourceRow datasourceRow);
 
-  @SqlQuery("SELECT * FROM datasources WHERE urn = :urn")
-  Optional<DatasourceRow> findBy(String urn);
+  @SqlQuery("SELECT * FROM datasources WHERE urn = :value")
+  Optional<DatasourceRow> findBy(@BindBean DatasourceUrn urn);
+
+  @SqlQuery("SELECT * FROM datasources WHERE name = :value")
+  Optional<DatasourceRow> findBy(@BindBean DatasourceName name);
 
   @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
   List<DatasourceRow> findAll(Integer limit, Integer offset);

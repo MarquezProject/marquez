@@ -56,7 +56,7 @@ public class DatasourceServiceTest {
   @Test
   public void testCreateDatasource() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
+    when(datasourceDao.insert(any(DatasourceRow.class))).thenReturn(Optional.of(row));
 
     final Datasource response =
         datasourceService.create(
@@ -84,10 +84,25 @@ public class DatasourceServiceTest {
     datasourceService.create(ConnectionUrl.fromString(row.getConnectionUrl()), null);
   }
 
+  @Test()
+  public void testCreateDatasourceDuplicateName() throws MarquezServiceException {
+    final DatasourceRow existingRow = Generator.genDatasourceRow();
+    final String newConnectionUrl = "jdbc:postgresql://localhost:9999/different_novelists_";
+
+    when(datasourceDao.findBy(DatasourceName.fromString(existingRow.getName())))
+        .thenReturn(Optional.of(existingRow));
+    Datasource createdDatasource =
+        datasourceService.create(
+            ConnectionUrl.fromString(newConnectionUrl),
+            DatasourceName.fromString(existingRow.getName()));
+    assertThat(createdDatasource.getConnectionUrl().getRawValue())
+        .isEqualTo(existingRow.getConnectionUrl());
+  }
+
   @Test(expected = MarquezServiceException.class)
   public void testCreateDatasource_throwsException_onDaoException() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.empty());
+    when(datasourceDao.insert(any(DatasourceRow.class))).thenReturn(Optional.empty());
     datasourceService.create(
         ConnectionUrl.fromString(row.getConnectionUrl()), DatasourceName.fromString(row.getName()));
   }
@@ -100,7 +115,7 @@ public class DatasourceServiceTest {
   @Test
   public void testGetDatasourceByUrn() throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(String.class))).thenReturn(Optional.of(row));
+    when(datasourceDao.findBy(any(DatasourceUrn.class))).thenReturn(Optional.of(row));
 
     final Optional<Datasource> response =
         datasourceService.get(
@@ -124,7 +139,7 @@ public class DatasourceServiceTest {
   public void testGetDatasourceByUrn_throwMarquezServiceException_onDaoException()
       throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
-    when(datasourceDao.findBy(any(String.class)))
+    when(datasourceDao.findBy(any(DatasourceUrn.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     datasourceService.get(
         DatasourceUrn.from(

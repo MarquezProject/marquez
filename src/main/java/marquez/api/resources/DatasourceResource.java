@@ -15,7 +15,7 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.CREATED;
+import static javax.ws.rs.core.Response.Status.OK;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -72,7 +72,7 @@ public final class DatasourceResource {
 
     final Datasource createdDatasource =
         datasourceService.create(connectionUrl, DatasourceName.fromString(request.getName()));
-    return Response.status(CREATED).entity(DatasourceResponseMapper.map(createdDatasource)).build();
+    return Response.status(OK).entity(DatasourceResponseMapper.map(createdDatasource)).build();
   }
 
   @GET
