@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import marquez.common.models.NamespaceName;
 import marquez.db.fixtures.AppWithPostgresRule;
 import marquez.service.models.Generator;
 import marquez.service.models.Namespace;
@@ -61,15 +62,18 @@ public class NamespaceDaoTest {
                   namespace.getDescription(),
                   namespace.getOwnerName());
             });
-    assertFieldsMatchExceptTS(namespace, namespaceDao.find(namespace.getName()));
-    assertEquals(null, namespaceDao.find("nonexistent_namespace"));
+    assertFieldsMatchExceptTS(
+        namespace, namespaceDao.findBy(NamespaceName.fromString(namespace.getName())).get());
+    assertEquals(
+        null, namespaceDao.findBy(NamespaceName.fromString("nonexistent_namespace")).orElse(null));
   }
 
   @Test
   public void testInsert() {
     Namespace newNs = Generator.genNamespace();
     namespaceDao.insert(newNs);
-    assertFieldsMatchExceptTS(newNs, namespaceDao.find(newNs.getName()));
+    assertFieldsMatchExceptTS(
+        newNs, namespaceDao.findBy(NamespaceName.fromString(newNs.getName())).get());
   }
 
   @Test
@@ -89,10 +93,12 @@ public class NamespaceDaoTest {
 
   @Test
   public void testExists() {
-    Namespace nonexistentNs = Generator.genNamespace();
-    assertFalse(namespaceDao.exists(nonexistentNs.getName()));
-    Namespace existingNs = Generator.genNamespace();
-    namespaceDao.insert(existingNs);
-    assertTrue(namespaceDao.exists(existingNs.getName()));
+    final Namespace newNamespace = Generator.genNamespace();
+    final NamespaceName found = NamespaceName.fromString(newNamespace.getName());
+    namespaceDao.insert(newNamespace);
+    assertTrue(namespaceDao.exists(found));
+
+    final NamespaceName notFound = NamespaceName.fromString("test");
+    assertFalse(namespaceDao.exists(notFound));
   }
 }
