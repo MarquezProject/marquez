@@ -14,6 +14,8 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.arrayOrThrow;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -33,8 +35,8 @@ public final class JobRowMapper implements RowMapper<Job> {
         results.getString(Columns.LOCATION),
         results.getObject(Columns.NAMESPACE_UUID, UUID.class),
         results.getString(Columns.DESCRIPTION),
-        Columns.toList(results.getArray(Columns.INPUT_DATASET_URNS)),
-        Columns.toList(results.getArray(Columns.OUTPUT_DATASET_URNS)),
+        arrayOrThrow(results, Columns.INPUT_DATASET_URNS),
+        arrayOrThrow(results, Columns.OUTPUT_DATASET_URNS),
         results.getTimestamp(Columns.CREATED_AT));
   }
 }
