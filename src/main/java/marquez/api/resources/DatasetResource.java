@@ -63,7 +63,7 @@ public final class DatasetResource {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset)
       throws MarquezServiceException, WebApplicationException {
-    if (!namespaceService.exists(namespaceName.getValue())) {
+    if (!namespaceService.exists(namespaceName)) {
       throw new WebApplicationException(
           String.format("The namespace %s does not exist.", namespaceName.getValue()), NOT_FOUND);
     }

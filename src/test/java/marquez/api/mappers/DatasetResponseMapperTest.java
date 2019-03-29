@@ -47,7 +47,7 @@ public class DatasetResponseMapperTest {
 
   @Test
   public void testMapDatasetNoDescription() {
-    final Optional<String> noDescriptionString = Optional.of(NO_DESCRIPTION.getValue());
+    final Optional<String> noDescriptionString = Optional.ofNullable(NO_DESCRIPTION.getValue());
     final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
     final DatasetResponse datasetResponse = DatasetResponseMapper.map(dataset);
     assertNotNull(datasetResponse);

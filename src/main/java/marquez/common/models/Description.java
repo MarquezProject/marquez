@@ -14,18 +14,17 @@
 
 package marquez.common.models;
 
+import javax.annotation.Nullable;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-@RequiredArgsConstructor(staticName = "fromString")
+@AllArgsConstructor(staticName = "fromString")
 @EqualsAndHashCode
 @ToString
 public final class Description {
-  public static final String NO_VALUE = "";
-  public static final Description NO_DESCRIPTION = new Description(NO_VALUE);
+  public static final Description NO_DESCRIPTION = new Description(null);
 
-  @Getter @NonNull private final String value;
+  @Getter @Nullable private final String value;
 }
