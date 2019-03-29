@@ -16,6 +16,7 @@ package marquez.api.mappers;
 
 import static marquez.common.models.Description.NO_DESCRIPTION;
 
+import lombok.NonNull;
 import marquez.api.models.DatasetRequest;
 import marquez.service.models.Dataset;
 
