@@ -57,7 +57,7 @@ public class DatasetResponseMapperTest {
 
   @Test
   public void testMap_datasetWithNoDescription() {
-    final Optional<String> noDescription = Optional.of(NO_DESCRIPTION.getValue());
+    final Optional<String> noDescription = Optional.empty();
 
     final Dataset dataset = Dataset.builder().name(NAME).createdAt(CREATED_AT).urn(URN).build();
     final DatasetResponse response = DatasetResponseMapper.map(dataset);

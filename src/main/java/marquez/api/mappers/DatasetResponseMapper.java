@@ -35,7 +35,7 @@ public final class DatasetResponseMapper {
         dataset
             .getDescription()
             .map(description -> description.getValue())
-            .orElse(Description.NO_VALUE));
+            .orElse(null));
   }
 
   public static List<DatasetResponse> map(@NonNull List<Dataset> datasets) {
