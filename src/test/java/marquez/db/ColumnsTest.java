@@ -23,6 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import marquez.UnitTests;
 import org.junit.Test;
@@ -166,24 +168,26 @@ public class ColumnsTest {
   }
 
   @Test
-  public void testArrayOrThrow_array() throws SQLException {
+  public void testArrayOrEmpty_array() throws SQLException {
     final String column = "with_array";
-    final Array expected = mock(Array.class);
+    final String[] values = new String[] {"test_value0", "test_value1", "test_value2"};
+    final Array emptyArray = mock(Array.class);
+    when(emptyArray.getArray()).thenReturn(values);
     final ResultSet results = mock(ResultSet.class);
-    when(results.getObject(column)).thenReturn(expected);
-    when(results.getArray(column)).thenReturn(expected);
+    when(results.getArray(column)).thenReturn(emptyArray);
 
-    final Array actual = Columns.arrayOrThrow(results, column);
+    final List<String> expected = Arrays.asList(values);
+    final List<String> actual = Columns.arrayOrEmpty(results, column);
     assertThat(actual).isEqualTo(expected);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testArrayOrThrow_throw() throws SQLException {
+  public void testArrayOrEmpty_empty() throws SQLException {
     final String column = "with_null_array";
     final Array nullArray = null;
     final ResultSet results = mock(ResultSet.class);
-    when(results.getObject(column)).thenReturn(nullArray);
+    when(results.getArray(column)).thenReturn(nullArray);
 
-    Columns.arrayOrThrow(results, column);
+    final List<String> arrayAsList = Columns.arrayOrEmpty(results, column);
+    assertThat(arrayAsList).isEmpty();
   }
 }

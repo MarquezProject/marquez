@@ -18,6 +18,9 @@ import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public final class Columns {
@@ -112,10 +115,8 @@ public final class Columns {
     return results.getString(column);
   }
 
-  public static Array arrayOrThrow(ResultSet results, String column) throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
-    return results.getArray(column);
+  public static List<String> arrayOrEmpty(ResultSet results, String column) throws SQLException {
+    final Array array = results.getArray(column);
+    return (array == null) ? Collections.emptyList() : Arrays.asList((String[]) array.getArray());
   }
 }
