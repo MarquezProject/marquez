@@ -14,14 +14,15 @@
 
 package marquez.api.exceptions;
 
+import static marquez.common.Preconditions.checkNotNull;
+
 import javax.ws.rs.NotFoundException;
-import lombok.NonNull;
 import marquez.common.models.NamespaceName;
 
 public final class NamespaceNotFoundException extends NotFoundException {
   private static final long serialVersionUID = 1L;
 
-  public NamespaceNotFoundException(@NonNull final NamespaceName namespaceName) {
-    super(String.format("Namespace '%s' not found.", namespaceName.getValue()));
+  public NamespaceNotFoundException(final NamespaceName name) {
+    super(String.format("Namespace '%s' not found.", checkNotNull(name).getValue()));
   }
 }
