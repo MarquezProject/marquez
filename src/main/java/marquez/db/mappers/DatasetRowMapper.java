@@ -14,6 +14,9 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.timestampOrNull;
+import static marquez.db.Columns.uuidOrNull;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -30,12 +33,12 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
     return DatasetRow.builder()
         .uuid(results.getObject(Columns.ROW_UUID, UUID.class))
         .createdAt(results.getTimestamp(Columns.CREATED_AT).toInstant())
-        .updatedAt(Columns.toInstantOrNull(results.getTimestamp(Columns.UPDATED_AT)))
+        .updatedAt(timestampOrNull(results, Columns.UPDATED_AT))
         .namespaceUuid(results.getObject(Columns.NAMESPACE_UUID, UUID.class))
         .datasourceUuid(results.getObject(Columns.DATA_SOURCE_UUID, UUID.class))
         .urn(results.getString(Columns.URN))
         .description(results.getString(Columns.DESCRIPTION))
-        .currentVersion(Columns.toUuidOrNull(results.getString(Columns.CURRENT_VERSION_UUID)))
+        .currentVersion(uuidOrNull(results, Columns.CURRENT_VERSION_UUID))
         .build();
   }
 }
