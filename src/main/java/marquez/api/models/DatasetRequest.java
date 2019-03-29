@@ -1,5 +1,6 @@
 package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
 public final class DatasetRequest {
