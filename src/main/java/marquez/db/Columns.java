@@ -14,12 +14,10 @@
 
 package marquez.db;
 
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -115,8 +113,10 @@ public final class Columns {
     return results.getString(column);
   }
 
-  public static List<String> arrayOrEmpty(ResultSet results, String column) throws SQLException {
-    final Array array = results.getArray(column);
-    return (array == null) ? Collections.emptyList() : Arrays.asList((String[]) array.getArray());
+  public static List<String> arrayOrThrow(ResultSet results, String column) throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
+    }
+    return Arrays.asList((String[]) results.getArray(column).getArray());
   }
 }
