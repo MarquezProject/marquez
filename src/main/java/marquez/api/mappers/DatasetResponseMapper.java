@@ -21,7 +21,6 @@ import java.util.List;
 import lombok.NonNull;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
-import marquez.common.models.Description;
 import marquez.service.models.Dataset;
 
 public final class DatasetResponseMapper {
@@ -32,10 +31,7 @@ public final class DatasetResponseMapper {
         dataset.getName().getValue(),
         dataset.getCreatedAt().toString(),
         dataset.getUrn().getValue(),
-        dataset
-            .getDescription()
-            .map(description -> description.getValue())
-            .orElse(null));
+        dataset.getDescription().map(description -> description.getValue()).orElse(null));
   }
 
   public static List<DatasetResponse> map(@NonNull List<Dataset> datasets) {

@@ -14,9 +14,6 @@
 
 package marquez.db;
 
-import static org.junit.Assert.assertEquals;
-
-import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
@@ -28,7 +25,6 @@ import org.jdbi.v3.testing.JdbiRule;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Test;
 
 public class DatasetDaoTest {
   private static DatasetDao datasetDAO;
@@ -62,24 +58,25 @@ public class DatasetDaoTest {
     datasetDAO.insertAll(datasourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
   }
 
- //@Test
- //public void testFindAll() {
- //  assertEquals(
- //      0, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
- //  insertRandomDataset();
- //  insertRandomDataset();
- //  assertEquals(
- //      2, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
- //}
+  // @Test
+  // public void testFindAll() {
+  //  assertEquals(
+  //      0, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
+  //  insertRandomDataset();
+  //  insertRandomDataset();
+  //  assertEquals(
+  //      2, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), 10, 0).size());
+  // }
 
- //@Test
- //public void testFindAllWithLimit() {
- //  final int limit = 1;
- //  assertEquals(
- //      0, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), limit, 0).size());
- //  insertRandomDataset();
- //  insertRandomDataset();
- //  assertEquals(
- //      limit, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), limit, 0).size());
- //}
+  // @Test
+  // public void testFindAllWithLimit() {
+  //  final int limit = 1;
+  //  assertEquals(
+  //      0, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), limit, 0).size());
+  //  insertRandomDataset();
+  //  insertRandomDataset();
+  //  assertEquals(
+  //      limit, datasetDAO.findAll(NamespaceName.fromString(namespace.getName()), limit,
+  // 0).size());
+  // }
 }
