@@ -15,7 +15,6 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -198,7 +197,7 @@ public class DatasourceResourceTest {
 
     // When we submit it
     final Response createDatasourceResponse = datasourceResource.create(validRequest);
-    assertThat(createDatasourceResponse.getStatus()).isEqualTo(CREATED.getStatusCode());
+    assertThat(createDatasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
     final DatasourceResponse returnedDatasource =
         (DatasourceResponse) createDatasourceResponse.getEntity();
 

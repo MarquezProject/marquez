@@ -1,0 +1,2 @@
+ALTER TABLE jobs ALTER COLUMN description DROP NOT NULL;
+ALTER TABLE datasets ALTER COLUMN description DROP NOT NULL;
