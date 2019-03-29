@@ -22,54 +22,51 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
 import marquez.db.Columns;
-import marquez.db.models.DataSourceRow;
+import marquez.db.models.DbTableInfoRow;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DataSourceRowMapperTest {
+public class DbTableInfoRowMapperTest {
   private static final UUID ROW_UUID = UUID.randomUUID();
   private static final Instant CREATED_AT = Instant.now();
-  private static final String NAME = "postgresql";
-  private static final String CONNECTION_URL =
-      String.format("jdbc:%s://localhost:5432/test_db", NAME);
+  private static final String DBNAME = "db";
+  private static final String DBSCHEMA = "db_schema";
 
   @Test
   public void testMap() throws SQLException {
-    final Optional<Instant> expectedCreatedAt = Optional.of(CREATED_AT);
     final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
-    when(results.getString(Columns.NAME)).thenReturn(NAME);
-    when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL);
+    when(results.getString(Columns.DB_NAME)).thenReturn(DBNAME);
+    when(results.getString(Columns.DB_SCHEMA_NAME)).thenReturn(DBSCHEMA);
     final StatementContext context = mock(StatementContext.class);
 
-    final DataSourceRowMapper dataSourceRowMapper = new DataSourceRowMapper();
-    final DataSourceRow dataSourceRow = dataSourceRowMapper.map(results, context);
-    assertEquals(ROW_UUID, dataSourceRow.getUuid());
-    assertEquals(expectedCreatedAt, dataSourceRow.getCreatedAt());
-    assertEquals(NAME, dataSourceRow.getName());
-    assertEquals(CONNECTION_URL, dataSourceRow.getConnectionUrl());
+    final DbTableInfoRowMapper dbTableInfoRowMapper = new DbTableInfoRowMapper();
+    final DbTableInfoRow dbTableInfoRow = dbTableInfoRowMapper.map(results, context);
+    assertEquals(ROW_UUID, dbTableInfoRow.getUuid());
+    assertEquals(CREATED_AT, dbTableInfoRow.getCreatedAt());
+    assertEquals(DBNAME, dbTableInfoRow.getDb());
+    assertEquals(DBSCHEMA, dbTableInfoRow.getDbSchema());
   }
 
   @Test(expected = NullPointerException.class)
   public void testMap_throwsException_onNullResults() throws SQLException {
     final ResultSet nullResults = null;
     final StatementContext context = mock(StatementContext.class);
-    final DataSourceRowMapper dataSourceRowMapper = new DataSourceRowMapper();
-    dataSourceRowMapper.map(nullResults, context);
+    final DbTableInfoRowMapper datasourceRowMapper = new DbTableInfoRowMapper();
+    datasourceRowMapper.map(nullResults, context);
   }
 
   @Test(expected = NullPointerException.class)
   public void testMap_throwsException_onNullContext() throws SQLException {
     final ResultSet results = mock(ResultSet.class);
     final StatementContext nullContext = null;
-    final DataSourceRowMapper dataSourceRowMapper = new DataSourceRowMapper();
-    dataSourceRowMapper.map(results, nullContext);
+    final DbTableInfoRowMapper datasourceRowMapper = new DbTableInfoRowMapper();
+    datasourceRowMapper.map(results, nullContext);
   }
 }

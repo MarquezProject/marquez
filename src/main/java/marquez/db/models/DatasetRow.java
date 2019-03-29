@@ -35,7 +35,7 @@ public final class DatasetRow {
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter @NonNull private final UUID namespaceUuid;
-  @Getter @NonNull private final UUID dataSourceUuid;
+  @Getter @NonNull private final UUID datasourceUuid;
   @Getter @NonNull private final String urn;
   @Getter private final UUID currentVersion;
   @Nullable private final String description;

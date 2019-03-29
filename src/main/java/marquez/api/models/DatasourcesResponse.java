@@ -12,11 +12,18 @@
  * limitations under the License.
  */
 
-package marquez.api;
+package marquez.api.models;
 
-import marquez.db.fixtures.AppWithPostgresRule;
-import org.junit.ClassRule;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-public class JobRunBaseTest {
-  @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@EqualsAndHashCode
+@ToString
+public class DatasourcesResponse {
+  @Getter private final List<DatasourceResponse> datasources;
 }

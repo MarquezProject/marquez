@@ -48,7 +48,7 @@ public class DatasetMapperTest {
           .createdAt(CREATED_AT)
           .updatedAt(UPDATED_AT)
           .namespaceUuid(UUID.randomUUID())
-          .dataSourceUuid(UUID.randomUUID())
+          .datasourceUuid(UUID.randomUUID())
           .urn(URN.getValue())
           .description(DESCRIPTION.getValue())
           .currentVersion(UUID.randomUUID())
@@ -77,7 +77,7 @@ public class DatasetMapperTest {
             .createdAt(CREATED_AT)
             .updatedAt(UPDATED_AT)
             .namespaceUuid(UUID.randomUUID())
-            .dataSourceUuid(UUID.randomUUID())
+            .datasourceUuid(UUID.randomUUID())
             .urn(URN.getValue())
             .currentVersion(UUID.randomUUID())
             .build();

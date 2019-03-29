@@ -12,18 +12,15 @@
  * limitations under the License.
  */
 
-package marquez.api.models;
+package marquez.common.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public enum DatasourceType {
+  REDSHIFT,
+  MYSQL,
+  POSTGRESQL;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class NamespaceResponse {
-  String name;
-  String createdAt;
-  String owner;
-  String description;
+  @Override
+  public String toString() {
+    return name().toLowerCase();
+  }
 }

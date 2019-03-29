@@ -12,21 +12,17 @@
  * limitations under the License.
  */
 
-package marquez.service.mappers;
+package marquez.api.exceptions;
 
-import java.util.UUID;
-import lombok.NonNull;
-import marquez.db.models.DataSourceRow;
-import marquez.service.models.DbTableVersion;
+import static marquez.common.Preconditions.checkNotNull;
 
-public final class DataSourceRowMapper {
-  private DataSourceRowMapper() {}
+import javax.ws.rs.NotFoundException;
+import marquez.common.models.DatasourceUrn;
 
-  public static DataSourceRow map(@NonNull DbTableVersion dbTableVersion) {
-    return DataSourceRow.builder()
-        .uuid(UUID.randomUUID())
-        .name(dbTableVersion.getConnectionUrl().getDataSource().getValue())
-        .connectionUrl(dbTableVersion.getConnectionUrl().getRawValue())
-        .build();
+public final class DatasourceUrnNotFoundException extends NotFoundException {
+  private static final long serialVersionUID = 1L;
+
+  public DatasourceUrnNotFoundException(final DatasourceUrn urn) {
+    super(String.format("Datasource urn '%s' not found.", checkNotNull(urn).getValue()));
   }
 }

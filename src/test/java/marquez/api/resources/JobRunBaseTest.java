@@ -12,18 +12,11 @@
  * limitations under the License.
  */
 
-package marquez.api.models;
+package marquez.api.resources;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import marquez.db.fixtures.AppWithPostgresRule;
+import org.junit.ClassRule;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class NamespaceResponse {
-  String name;
-  String createdAt;
-  String owner;
-  String description;
+public class JobRunBaseTest {
+  @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 }

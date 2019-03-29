@@ -14,26 +14,45 @@
 
 package marquez.common.models;
 
-import java.util.regex.Pattern;
-import lombok.EqualsAndHashCode;
+import static marquez.common.Preconditions.checkNotBlank;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.NonNull;
 
-@EqualsAndHashCode(callSuper = false)
 public final class DatasetUrn extends Urn {
-  private static final int NUM_COMPONENTS = 2;
-  private static final String URN_TYPE = "dataset";
-  private static final Pattern REGEX = buildPattern(URN_TYPE, NUM_COMPONENTS);
+  private static final String NAMESPACE = "dataset";
+  private static final int NUM_OF_PARTS = 2;
+  private static final UrnPattern PATTERN = UrnPattern.from(NAMESPACE, NUM_OF_PARTS);
 
-  public DatasetUrn(@NonNull String value) {
-    super(value, REGEX);
+  private DatasetUrn(@NonNull final String value) {
+    super(checkNotBlank(value));
   }
 
-  public static DatasetUrn from(@NonNull NamespaceName namespace, @NonNull DatasetName dataset) {
-    final String value = fromComponents(URN_TYPE, namespace.getValue(), dataset.getValue());
+  @Deprecated
+  public static DatasetUrn from(
+      @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
+    final String value = valueFrom(NAMESPACE, namespaceName.getValue(), datasetName.getValue());
     return fromString(value);
   }
 
+  public static DatasetUrn from(
+      @NonNull DatasourceName datasourceName, @NonNull DatasetName datasetName) {
+    final String value = valueFrom(NAMESPACE, datasourceName.getValue(), datasetName.getValue());
+    return fromString(value);
+  }
+
+  @JsonCreator
   public static DatasetUrn fromString(String value) {
     return new DatasetUrn(value);
+  }
+
+  @Override
+  public String namespace() {
+    return NAMESPACE;
+  }
+
+  @Override
+  UrnPattern pattern() {
+    return PATTERN;
   }
 }

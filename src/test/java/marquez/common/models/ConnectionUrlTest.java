@@ -22,17 +22,16 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class ConnectionUrlTest {
-  private static final DataSource DATA_SOURCE = DataSource.fromString("postgresql");
+  private static final DatasourceType DATASOURCE_TYPE = DatasourceType.POSTGRESQL;
   private static final int DB_PORT = 5432;
   private static final DbName DB_NAME = DbName.fromString("test");
 
   @Test
   public void testNewConnectionUrl() {
     final String rawValue =
-        String.format(
-            "jdbc:%s://localhost:%d/%s", DATA_SOURCE.getValue(), DB_PORT, DB_NAME.getValue());
+        String.format("jdbc:%s://localhost:%d/%s", DATASOURCE_TYPE, DB_PORT, DB_NAME.getValue());
     final ConnectionUrl connectionUrl = ConnectionUrl.fromString(rawValue);
-    assertEquals(DATA_SOURCE, connectionUrl.getDataSource());
+    assertEquals(DATASOURCE_TYPE, connectionUrl.getDatasourceType());
     assertEquals(DB_NAME, connectionUrl.getDbName());
     assertEquals(rawValue, connectionUrl.getRawValue());
   }
