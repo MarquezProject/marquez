@@ -89,7 +89,7 @@ public class MarquezApp extends Application<MarquezConfig> {
   }
 
   @Override
-  public void run(@NonNull MarquezConfig config, @NonNull Environment env) {
+  public void run(@NonNull MarquezConfig config, @NonNull Environment env) throws MarquezException {
     migrateDbOrError(config);
     registerResources(config, env);
   }
@@ -114,7 +114,8 @@ public class MarquezApp extends Application<MarquezConfig> {
     }
   }
 
-  private void registerResources(@NonNull MarquezConfig config, @NonNull Environment env) {
+  private void registerResources(@NonNull MarquezConfig config, @NonNull Environment env)
+      throws MarquezException {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
@@ -133,13 +134,17 @@ public class MarquezApp extends Application<MarquezConfig> {
 
     final NamespaceService namespaceService = new NamespaceService(namespaceDao);
     final JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
+    final DatasourceService datasourceService = new DatasourceService(datasourceDao);
 
     env.jersey().register(new PingResource());
     env.jersey().register(new HealthResource());
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new JobResource(namespaceService, jobService));
-    env.jersey().register(new DatasetResource(namespaceService, new DatasetService(datasetDao)));
-    env.jersey().register(new DatasourceResource(new DatasourceService(datasourceDao)));
+    env.jersey().register(new DatasourceResource(datasourceService));
+    env.jersey()
+        .register(
+            new DatasetResource(
+                namespaceService, datasourceService, new DatasetService(datasetDao)));
 
     env.jersey().register(new MarquezServiceExceptionMapper());
   }
