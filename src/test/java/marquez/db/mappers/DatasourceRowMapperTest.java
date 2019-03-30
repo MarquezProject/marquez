@@ -14,7 +14,10 @@
 
 package marquez.db.mappers;
 
-import static org.junit.Assert.assertEquals;
+import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
+import static marquez.common.models.CommonModelGenerator.newDatasourceName;
+import static marquez.common.models.CommonModelGenerator.newDatasourceUrnWith;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,7 +25,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
 import marquez.common.models.ConnectionUrl;
@@ -38,47 +40,43 @@ import org.junit.experimental.categories.Category;
 public class DatasourceRowMapperTest {
   private static final UUID ROW_UUID = UUID.randomUUID();
   private static final Instant CREATED_AT = Instant.now();
-  private static final String NAME = "mypostgresqldb";
-  private static final String DB_TYPE = "postgresql";
-  private static final String CONNECTION_URL =
-      String.format("jdbc:%s://localhost:5432/test_db", DB_TYPE);
-  private static final String URN =
-      DatasourceUrn.from(ConnectionUrl.fromString(CONNECTION_URL), DatasourceName.fromString(NAME))
-          .getValue();
+  private static final DatasourceName NAME = newDatasourceName();
+  private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
+  private static final DatasourceUrn URN =
+      newDatasourceUrnWith(CONNECTION_URL.getDatasourceType(), NAME);
 
   @Test
   public void testMap() throws SQLException {
-    final Optional<Instant> expectedCreatedAt = Optional.of(CREATED_AT);
     final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
-    when(results.getString(Columns.NAME)).thenReturn(NAME);
-    when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL);
-    when(results.getString(Columns.URN)).thenReturn(URN);
+    when(results.getString(Columns.NAME)).thenReturn(NAME.getValue());
+    when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL.getRawValue());
+    when(results.getString(Columns.URN)).thenReturn(URN.getValue());
     final StatementContext context = mock(StatementContext.class);
 
-    final DatasourceRowMapper datasourceRowMapper = new DatasourceRowMapper();
-    final DatasourceRow datasourceRow = datasourceRowMapper.map(results, context);
-    assertEquals(ROW_UUID, datasourceRow.getUuid());
-    assertEquals(expectedCreatedAt, datasourceRow.getCreatedAt());
-    assertEquals(URN, datasourceRow.getUrn());
-    assertEquals(NAME, datasourceRow.getName());
-    assertEquals(CONNECTION_URL, datasourceRow.getConnectionUrl());
+    final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
+    final DatasourceRow row = rowMapper.map(results, context);
+    assertThat(ROW_UUID).isEqualTo(row.getUuid());
+    assertThat(CREATED_AT).isEqualTo(row.getCreatedAt());
+    assertThat(NAME.getValue()).isEqualTo(row.getName());
+    assertThat(URN.getValue()).isEqualTo(row.getUrn());
+    assertThat(CONNECTION_URL.getRawValue()).isEqualTo(row.getConnectionUrl());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testMap_throwsException_onNullResults() throws SQLException {
+  public void testMap_throwsException_onNullResultSet() throws SQLException {
     final ResultSet nullResults = null;
     final StatementContext context = mock(StatementContext.class);
-    final DatasourceRowMapper datasourceRowMapper = new DatasourceRowMapper();
-    datasourceRowMapper.map(nullResults, context);
+    final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
+    rowMapper.map(nullResults, context);
   }
 
   @Test(expected = NullPointerException.class)
   public void testMap_throwsException_onNullContext() throws SQLException {
     final ResultSet results = mock(ResultSet.class);
     final StatementContext nullContext = null;
-    final DatasourceRowMapper datasourceRowMapper = new DatasourceRowMapper();
-    datasourceRowMapper.map(results, nullContext);
+    final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
+    rowMapper.map(results, nullContext);
   }
 }
