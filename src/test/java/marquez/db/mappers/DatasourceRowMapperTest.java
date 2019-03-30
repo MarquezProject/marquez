@@ -51,8 +51,8 @@ public class DatasourceRowMapperTest {
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
     when(results.getString(Columns.NAME)).thenReturn(NAME.getValue());
-    when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL.getRawValue());
     when(results.getString(Columns.URN)).thenReturn(URN.getValue());
+    when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL.getRawValue());
     final StatementContext context = mock(StatementContext.class);
 
     final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
@@ -66,10 +66,10 @@ public class DatasourceRowMapperTest {
 
   @Test(expected = NullPointerException.class)
   public void testMap_throwsException_onNullResultSet() throws SQLException {
-    final ResultSet nullResults = null;
+    final ResultSet nullResultSet = null;
     final StatementContext context = mock(StatementContext.class);
     final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
-    rowMapper.map(nullResults, context);
+    rowMapper.map(nullResultSet, context);
   }
 
   @Test(expected = NullPointerException.class)
