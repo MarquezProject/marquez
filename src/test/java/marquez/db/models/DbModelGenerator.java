@@ -14,6 +14,7 @@
 
 package marquez.db.models;
 
+import static java.util.stream.Collectors.toList;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
@@ -23,7 +24,9 @@ import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public final class DbModelGenerator {
   private DbModelGenerator() {}
@@ -48,6 +51,10 @@ public final class DbModelGenerator {
     }
 
     return builder.build();
+  }
+
+  public static List<DatasourceRow> newDatasourceRows(int limit) {
+    return Stream.generate(() -> newDatasourceRow()).limit(limit).collect(toList());
   }
 
   public static DatasourceRow newDatasourceRow() {

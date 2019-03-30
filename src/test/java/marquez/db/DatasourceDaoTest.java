@@ -62,7 +62,7 @@ public class DatasourceDaoTest {
     final DatasourceRow row = returnedRow.get();
     assertThat(row.getConnectionUrl()).isEqualTo(datasourceRow.getConnectionUrl());
     assertThat(row.getName()).isEqualTo(datasourceRow.getName());
-    assertThat(row.getCreatedAt()).isPresent();
+    assertThat(row.getCreatedAt()).isNotNull();
   }
 
   @Test
