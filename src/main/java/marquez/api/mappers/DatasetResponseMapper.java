@@ -31,7 +31,7 @@ public final class DatasetResponseMapper {
         dataset.getName().getValue(),
         dataset.getCreatedAt().toString(),
         dataset.getUrn().getValue(),
-        dataset.getDescription().map(description -> description.getValue()).orElse(null));
+        dataset.getDescription().getValue());
   }
 
   public static List<DatasetResponse> map(@NonNull List<Dataset> datasets) {
