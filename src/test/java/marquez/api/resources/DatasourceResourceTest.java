@@ -145,7 +145,12 @@ public class DatasourceResourceTest {
     final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
     final Datasource ds1 =
-        new Datasource(datasourceName, Instant.now(), datasourceUrn, connectionUrl);
+        Datasource.builder()
+            .name(datasourceName)
+            .createdAt(Instant.now())
+            .urn(datasourceUrn)
+            .connectionUrl(connectionUrl)
+            .build();
     when(mockDatasourceService.get(datasourceUrn)).thenReturn(Optional.of(ds1));
 
     final Response datasourceResourceResponse = datasourceResource.get(datasourceUrn);
@@ -181,7 +186,12 @@ public class DatasourceResourceTest {
     final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
     final Datasource ds1 =
-        new Datasource(datasourceName, Instant.now(), datasourceUrn, connectionUrl);
+        Datasource.builder()
+            .name(datasourceName)
+            .createdAt(Instant.now())
+            .urn(datasourceUrn)
+            .connectionUrl(connectionUrl)
+            .build();
     when(mockDatasourceService.get(ds1.getUrn())).thenThrow(MarquezServiceException.class);
     datasourceResource.get(ds1.getUrn());
   }
