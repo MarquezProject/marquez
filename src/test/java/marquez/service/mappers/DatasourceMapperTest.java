@@ -57,9 +57,9 @@ public class DatasourceMapperTest {
   @Test
   public void testMap_emptyRows() {
     final List<DatasourceRow> emptyRows = Collections.emptyList();
-    final List<Datasource> datasources = DatasourceMapper.map(emptyRows);
-    assertThat(datasources).isNotNull();
-    assertThat(datasources).isEmpty();
+    final List<Datasource> emptyDatasources = DatasourceMapper.map(emptyRows);
+    assertThat(emptyDatasources).isNotNull();
+    assertThat(emptyDatasources).isEmpty();
   }
 
   public void testMap_throwsException_onNullRows() {

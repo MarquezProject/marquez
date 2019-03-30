@@ -73,11 +73,11 @@ public class DatasourceRowMapperTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testMap_throwsException_onNullResultSet() throws SQLException {
-    final ResultSet nullResultSet = null;
+  public void testMap_throwsException_onNullResults() throws SQLException {
+    final ResultSet nullResults = null;
     final StatementContext context = mock(StatementContext.class);
     final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
-    rowMapper.map(nullResultSet, context);
+    rowMapper.map(nullResults, context);
   }
 
   @Test(expected = NullPointerException.class)
