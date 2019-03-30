@@ -90,7 +90,7 @@ public final class DbModelGenerator {
     return builder.build();
   }
 
-  public static Instant newTimestamp() {
+  private static Instant newTimestamp() {
     return Instant.now();
   }
 }
