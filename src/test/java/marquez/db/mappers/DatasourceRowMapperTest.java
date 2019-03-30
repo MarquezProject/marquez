@@ -47,12 +47,20 @@ public class DatasourceRowMapperTest {
 
   @Test
   public void testMap() throws SQLException {
+    final Object exists = mock(Object.class);
     final ResultSet results = mock(ResultSet.class);
+    when(results.getObject(Columns.ROW_UUID)).thenReturn(exists);
+    when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
+    when(results.getObject(Columns.NAME)).thenReturn(exists);
+    when(results.getObject(Columns.URN)).thenReturn(exists);
+    when(results.getObject(Columns.CONNECTION_URL)).thenReturn(exists);
+
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
     when(results.getString(Columns.NAME)).thenReturn(NAME.getValue());
     when(results.getString(Columns.URN)).thenReturn(URN.getValue());
     when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL.getRawValue());
+
     final StatementContext context = mock(StatementContext.class);
 
     final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
