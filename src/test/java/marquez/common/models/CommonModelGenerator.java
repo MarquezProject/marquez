@@ -87,6 +87,11 @@ public final class CommonModelGenerator {
     return DatasetName.fromString(value);
   }
 
+  public static DatasetUrn newDatasetUrnWith(
+      DatasourceName datasourceName, DatasetName datasetName) {
+    return DatasetUrn.from(datasourceName, datasetName);
+  }
+
   public static DatasetUrn newDatasetUrn() {
     return DatasetUrn.from(newDatasourceName(), newDatasetName());
   }
