@@ -14,96 +14,75 @@
 
 package marquez.api.mappers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static marquez.service.models.ServiceModelGenerator.newDatasource;
+import static marquez.service.models.ServiceModelGenerator.newDatasources;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
-import java.time.Instant;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import marquez.UnitTests;
 import marquez.api.models.DatasourceResponse;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceUrn;
+import marquez.api.models.DatasourcesResponse;
 import marquez.service.models.Datasource;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DatasourceResponseMapperTest {
-  private static final DatasourceName NAME = DatasourceName.fromString("datasource_name");
-  private static final Instant CREATED_AT = Instant.now();
-
-  private static final ConnectionUrl CONNECTION_URL =
-      ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
-
-  private static final DatasourceUrn DATASOURCE_URN = DatasourceUrn.from(CONNECTION_URL, NAME);
-  private static final Datasource DATASOURCE =
-      new Datasource(NAME, CREATED_AT, DATASOURCE_URN, CONNECTION_URL);
-
   @Test
-  public void testMapDatasource() {
-
-    final DatasourceResponse datasourceResponse = DatasourceResponseMapper.map(DATASOURCE);
-    assertNotNull(datasourceResponse);
-    assertEquals(NAME.getValue(), datasourceResponse.getName());
-    assertEquals(CREATED_AT.toString(), datasourceResponse.getCreatedAt());
-    assertEquals(DATASOURCE_URN.getValue(), datasourceResponse.getUrn());
-    assertEquals(CONNECTION_URL.getRawValue(), datasourceResponse.getConnectionUrl());
+  public void testMap_datasource() {
+    final Datasource datasource = newDatasource();
+    final DatasourceResponse response = DatasourceResponseMapper.map(datasource);
+    assertThat(response).isNotNull();
+    assertThat(datasource.getName().getValue()).isEqualTo(response.getName());
+    assertThat(datasource.getCreatedAt().toString()).isEqualTo(response.getCreatedAt());
+    assertThat(datasource.getUrn().getValue()).isEqualTo(response.getUrn());
+    assertThat(datasource.getConnectionUrl().getRawValue()).isEqualTo(response.getConnectionUrl());
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testMapNullDatasource() {
+  @Test
+  public void testMap_throwsException_onNullDatasource() {
     final Datasource nulldatasource = null;
-    DatasourceResponseMapper.map(nulldatasource);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testDatasourceResponseNameMissing() {
-    final DatasourceName nullDatasourceName = null;
-
-    final Datasource nullNameDatasource = mock(Datasource.class);
-    when(nullNameDatasource.getConnectionUrl()).thenReturn(CONNECTION_URL);
-    when(nullNameDatasource.getUrn()).thenReturn(DATASOURCE_URN);
-    when(nullNameDatasource.getCreatedAt()).thenReturn(CREATED_AT);
-
-    when(nullNameDatasource.getName()).thenReturn(nullDatasourceName);
-
-    DatasourceResponseMapper.map(nullNameDatasource);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testDatasourceResponseUrnMissing() {
-    final DatasourceUrn nullDatasourceUrn = null;
-
-    final Datasource nullNameDatasource = mock(Datasource.class);
-    when(nullNameDatasource.getName()).thenReturn(NAME);
-    when(nullNameDatasource.getConnectionUrl()).thenReturn(CONNECTION_URL);
-    when(nullNameDatasource.getCreatedAt()).thenReturn(CREATED_AT);
-
-    when(nullNameDatasource.getUrn()).thenReturn(nullDatasourceUrn);
-
-    DatasourceResponseMapper.map(nullNameDatasource);
+    assertThatNullPointerException().isThrownBy(() -> DatasourceResponseMapper.map(nulldatasource));
   }
 
   @Test
-  public void testMapDatasourceList() {
-    final List<Datasource> datasources = Arrays.asList(DATASOURCE);
-    final List<DatasourceResponse> datasourceResponses = DatasourceResponseMapper.map(datasources);
-    assertNotNull(datasourceResponses);
-    assertEquals(1, datasourceResponses.size());
+  public void testMap_datasources() {
+    final List<Datasource> datasources = newDatasources(4);
+    final List<DatasourceResponse> responses = DatasourceResponseMapper.map(datasources);
+    assertThat(responses).isNotNull();
+    assertThat(responses).hasSize(4);
   }
 
   @Test
-  public void testMapEmptyDatasourceList() {
-    final List<Datasource> datasources = Arrays.asList();
-    final List<DatasourceResponse> datasourceResponses = DatasourceResponseMapper.map(datasources);
-    assertNotNull(datasourceResponses);
-    assertEquals(0, datasourceResponses.size());
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testMapNullDatasourceList() {
+  public void testMap_throwsException_onNullDatasources() {
     final List<Datasource> datasources = null;
-    DatasourceResponseMapper.map(datasources);
+    assertThatNullPointerException().isThrownBy(() -> DatasourceResponseMapper.map(datasources));
+  }
+
+  @Test
+  public void testToDatasourcesResponse() {
+    final List<Datasource> datasources = newDatasources(4);
+    final DatasourcesResponse response =
+        DatasourceResponseMapper.toDatasourcesResponse(datasources);
+    assertThat(response).isNotNull();
+    assertThat(response.getDatasources()).hasSize(4);
+  }
+
+  @Test
+  public void testToDatasourcesResponse_emptyDatasources() {
+    final List<Datasource> emptyDatasources = Collections.emptyList();
+    final DatasourcesResponse response =
+        DatasourceResponseMapper.toDatasourcesResponse(emptyDatasources);
+    assertThat(response).isNotNull();
+    assertThat(response.getDatasources()).isEmpty();
+  }
+
+  @Test
+  public void testToDatasourcesResponse_throwsException_onNullDatasources() {
+    final List<Datasource> datasources = null;
+    assertThatNullPointerException()
+        .isThrownBy(() -> DatasourceResponseMapper.toDatasourcesResponse(datasources));
   }
 }
