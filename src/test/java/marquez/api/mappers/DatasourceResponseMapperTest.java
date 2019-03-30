@@ -58,7 +58,8 @@ public class DatasourceResponseMapperTest {
   @Test
   public void testMap_throwsException_onNullDatasources() {
     final List<Datasource> nullDatasources = null;
-    assertThatNullPointerException().isThrownBy(() -> DatasourceResponseMapper.map(nullDatasources));
+    assertThatNullPointerException()
+        .isThrownBy(() -> DatasourceResponseMapper.map(nullDatasources));
   }
 
   @Test
