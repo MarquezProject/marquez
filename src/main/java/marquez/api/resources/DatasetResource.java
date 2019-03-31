@@ -31,12 +31,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
+import marquez.api.exceptions.DatasetUrnNotFoundException;
 import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
+import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceUrn;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
@@ -79,6 +81,25 @@ public final class DatasetResource {
             request.getName(),
             request.getDatasourceUrn(),
             request.getDescription().orElse(null));
+    final DatasetResponse response = DatasetResponseMapper.map(dataset);
+    return Response.ok(response).build();
+  }
+
+  @GET
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  @Path("/namespaces/{namespace}/datasets/{urn}")
+  @Produces(APPLICATION_JSON)
+  public Response get(
+      @NonNull @PathParam("namespace") NamespaceName namespaceName,
+      @NonNull @PathParam("urn") DatasetUrn datasetUrn)
+      throws MarquezServiceException {
+    throwIfNotExists(namespaceName);
+    final Dataset dataset =
+        datasetService
+            .get(datasetUrn)
+            .orElseThrow(() -> new DatasetUrnNotFoundException(datasetUrn));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     return Response.ok(response).build();
   }

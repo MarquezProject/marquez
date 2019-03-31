@@ -163,6 +163,19 @@ public class DatasetResourceTest {
   }
 
   @Test
+  public void testGet() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.get(DATASET_URN)).thenReturn(Optional.of(DATASET));
+
+    final Response httpResponse = datasetResource.get(NAMESPACE_NAME, DATASET_URN);
+    assertThat(httpResponse.getStatusInfo()).isEqualTo(OK);
+
+    final DatasetResponse expected = DatasetResponseMapper.map(DATASET);
+    final DatasetResponse actual = (DatasetResponse) httpResponse.getEntity();
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
   public void testList() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
 
