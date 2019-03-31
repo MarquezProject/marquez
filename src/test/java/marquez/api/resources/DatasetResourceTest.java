@@ -14,7 +14,6 @@
 
 package marquez.api.resources;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.OK;
 import static marquez.api.models.ApiModelGenerator.newDatasetRequest;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
@@ -93,7 +92,7 @@ public class DatasetResourceTest {
   private final DatasourceService datasourceService = mock(DatasourceService.class);
   private final DatasetResource datasetResource =
       new DatasetResource(namespaceService, datasourceService, datasetService);
-  
+
   @Test
   public void testNewDatasetResource_throwsException_onNullNamespaceService() {
     final NamespaceService nullNamespaceService = null;
@@ -141,7 +140,7 @@ public class DatasetResourceTest {
     assertThatNullPointerException()
         .isThrownBy(() -> datasetResource.create(newNamespaceName(), newDatasetRequest()));
   }
- 
+
   @Test
   public void testCreate_throwsException_onDatasourceDoesNotExist() throws MarquezServiceException {
     when(datasourceService.exists(DATASOURCE_URN)).thenReturn(false);
