@@ -56,6 +56,14 @@ public class DatasourceResponseMapperTest {
   }
 
   @Test
+  public void testMap_emptyDatasources() {
+    final List<Datasource> emptyDatasources = Collections.emptyList();
+    final List<DatasourceResponse> emptyResponses = DatasourceResponseMapper.map(emptyDatasources);
+    assertThat(emptyResponses).isNotNull();
+    assertThat(emptyResponses).isEmpty();
+  }
+
+  @Test
   public void testMap_throwsException_onNullDatasources() {
     final List<Datasource> nullDatasources = null;
     assertThatNullPointerException()
