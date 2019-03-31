@@ -61,7 +61,7 @@ public final class ServiceModelGenerator {
     return builder.build();
   }
 
-  private static Instant newTimestamp() {
+  public static Instant newTimestamp() {
     return Instant.now();
   }
 }
