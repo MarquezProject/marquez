@@ -51,7 +51,7 @@ public class DatasetMapperTest {
           .datasourceUuid(UUID.randomUUID())
           .urn(URN.getValue())
           .description(DESCRIPTION.getValue())
-          .currentVersion(UUID.randomUUID())
+          .currentVersionUuid(UUID.randomUUID())
           .build();
 
   @Test
@@ -79,7 +79,7 @@ public class DatasetMapperTest {
             .namespaceUuid(UUID.randomUUID())
             .datasourceUuid(UUID.randomUUID())
             .urn(URN.getValue())
-            .currentVersion(UUID.randomUUID())
+            .currentVersionUuid(UUID.randomUUID())
             .build();
 
     final Dataset dataset = DatasetMapper.map(rowWithNoDescription);

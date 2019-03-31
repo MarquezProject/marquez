@@ -91,7 +91,7 @@ public final class DbModelGenerator {
 
     if (wasUpdated) {
       builder.updatedAt(newTimestamp());
-      builder.currentVersion(UUID.randomUUID());
+      builder.currentVersionUuid(UUID.randomUUID());
     }
 
     return builder.build();
