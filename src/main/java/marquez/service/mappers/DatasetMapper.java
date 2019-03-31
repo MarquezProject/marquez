@@ -16,7 +16,6 @@ package marquez.service.mappers;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-import static marquez.common.models.Description.NO_DESCRIPTION;
 
 import java.util.List;
 import lombok.NonNull;
@@ -34,7 +33,7 @@ public final class DatasetMapper {
         .name(DatasetName.fromString(row.getName()))
         .createdAt(row.getCreatedAt())
         .urn(DatasetUrn.fromString(row.getUrn()))
-        .description(row.getDescription().map(Description::fromString).orElse(NO_DESCRIPTION))
+        .description(Description.fromString(row.getDescription()))
         .build();
   }
 
