@@ -25,6 +25,12 @@ import static marquez.common.models.CommonModelGenerator.newDescription;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
+import marquez.common.models.ConnectionUrl;
+import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
+import marquez.common.models.Description;
 
 public final class ServiceModelGenerator {
   private ServiceModelGenerator() {}
@@ -34,11 +40,16 @@ public final class ServiceModelGenerator {
   }
 
   public static Datasource newDatasource() {
+    return newDatasourceWith(newDatasourceName(), newDatasourceUrn(), newConnectionUrl());
+  }
+
+  public static Datasource newDatasourceWith(
+      DatasourceName datasourceName, DatasourceUrn datasourceUrn, ConnectionUrl connectionUrl) {
     return Datasource.builder()
-        .name(newDatasourceName())
+        .name(datasourceName)
         .createdAt(newTimestamp())
-        .urn(newDatasourceUrn())
-        .connectionUrl(newConnectionUrl())
+        .urn(datasourceUrn)
+        .connectionUrl(connectionUrl)
         .build();
   }
 
@@ -51,17 +62,21 @@ public final class ServiceModelGenerator {
   }
 
   public static Dataset newDataset(boolean hasDescription) {
-    final Dataset.DatasetBuilder builder =
-        Dataset.builder().name(newDatasetName()).createdAt(newTimestamp()).urn(newDatasetUrn());
-
-    if (hasDescription) {
-      builder.description(newDescription());
-    }
-
-    return builder.build();
+    return newDatasetWith(
+        newDatasetName(), newDatasetUrn(), hasDescription ? newDescription() : null);
   }
 
-  public static Instant newTimestamp() {
+  public static Dataset newDatasetWith(
+      DatasetName datasetName, DatasetUrn datasetUrn, Description description) {
+    return Dataset.builder()
+        .name(datasetName)
+        .createdAt(newTimestamp())
+        .urn(datasetUrn)
+        .description(description)
+        .build();
+  }
+
+  private static Instant newTimestamp() {
     return Instant.now();
   }
 }
