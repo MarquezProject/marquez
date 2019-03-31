@@ -16,8 +16,11 @@ package marquez.service.models;
 
 import static java.util.stream.Collectors.toList;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
+import static marquez.common.models.CommonModelGenerator.newDescription;
 
 import java.time.Instant;
 import java.util.List;
@@ -37,6 +40,25 @@ public final class ServiceModelGenerator {
         .urn(newDatasourceUrn())
         .connectionUrl(newConnectionUrl())
         .build();
+  }
+
+  public static List<Dataset> newDatasets(int limit) {
+    return Stream.generate(() -> newDataset()).limit(limit).collect(toList());
+  }
+
+  public static Dataset newDataset() {
+    return newDataset(true);
+  }
+
+  public static Dataset newDataset(boolean hasDescription) {
+    final Dataset.DatasetBuilder builder =
+        Dataset.builder().name(newDatasetName()).createdAt(newTimestamp()).urn(newDatasetUrn());
+
+    if (hasDescription) {
+      builder.description(newDescription());
+    }
+
+    return builder.build();
   }
 
   private static Instant newTimestamp() {
