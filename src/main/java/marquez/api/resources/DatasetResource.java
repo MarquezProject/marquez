@@ -70,8 +70,7 @@ public final class DatasetResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(
-      @NonNull @PathParam("namespace") NamespaceName namespaceName,
-      @NonNull @Valid DatasetRequest request)
+      @PathParam("namespace") NamespaceName namespaceName, @Valid DatasetRequest request)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
     throwIfNotExists(request.getDatasourceUrn());
@@ -92,8 +91,7 @@ public final class DatasetResource {
   @Path("/namespaces/{namespace}/datasets/{urn}")
   @Produces(APPLICATION_JSON)
   public Response get(
-      @NonNull @PathParam("namespace") NamespaceName namespaceName,
-      @NonNull @PathParam("urn") DatasetUrn datasetUrn)
+      @PathParam("namespace") NamespaceName namespaceName, @PathParam("urn") DatasetUrn datasetUrn)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
     final Dataset dataset =
@@ -111,9 +109,9 @@ public final class DatasetResource {
   @Path("/namespaces/{namespace}/datasets")
   @Produces(APPLICATION_JSON)
   public Response list(
-      @NonNull @PathParam("namespace") NamespaceName namespaceName,
-      @NonNull @QueryParam("limit") @DefaultValue("100") Integer limit,
-      @NonNull @QueryParam("offset") @DefaultValue("0") Integer offset)
+      @PathParam("namespace") NamespaceName namespaceName,
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
     final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
