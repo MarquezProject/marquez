@@ -14,10 +14,14 @@
 
 package marquez.api.models;
 
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
+import static marquez.common.models.CommonModelGenerator.newDescription;
+
 public final class ApiModelGenerator {
   private ApiModelGenerator() {}
 
   public static DatasetRequest newDatasetRequest() {
-    return null;
+    return new DatasetRequest(newDatasetName(), newDatasourceUrn(), newDescription());
   }
 }
