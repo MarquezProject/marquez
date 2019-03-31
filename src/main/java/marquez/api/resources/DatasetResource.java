@@ -33,18 +33,17 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
-import marquez.api.mappers.DatasetMapper;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
 import marquez.service.DatasourceService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
-import marquez.service.models.Datasource;
 
 @Path("/api/v1")
 public final class DatasetResource {
@@ -73,13 +72,13 @@ public final class DatasetResource {
       @NonNull @Valid DatasetRequest request)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
-    final Datasource datasource =
-        datasourceService
-            .get(request.getDatasourceUrn())
-            .orElseThrow(() -> new DatasourceUrnNotFoundException(request.getDatasourceUrn()));
-    final Dataset newDataset = DatasetMapper.map(request);
+    throwIfNotExists(request.getDatasourceUrn());
     final Dataset dataset =
-        datasetService.create(namespaceName, datasource.getName(), datasource.getUrn(), newDataset);
+        datasetService.create(
+            namespaceName,
+            request.getName(),
+            request.getDatasourceUrn(),
+            request.getDescription().orElse(null));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     return Response.ok(response).build();
   }
@@ -105,6 +104,13 @@ public final class DatasetResource {
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       throw new NamespaceNotFoundException(namespaceName);
+    }
+  }
+
+  private void throwIfNotExists(@NonNull DatasourceUrn datasourceUrn)
+      throws MarquezServiceException {
+    if (!datasourceService.exists(datasourceUrn)) {
+      throw new DatasourceUrnNotFoundException(datasourceUrn);
     }
   }
 }
