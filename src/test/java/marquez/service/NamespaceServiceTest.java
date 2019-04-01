@@ -1,5 +1,6 @@
 package marquez.service;
 
+import static marquez.db.models.DbModelGenerator.newNamespaceRow;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,15 +10,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import marquez.common.models.NamespaceName;
 import marquez.db.NamespaceDao;
+import marquez.db.models.NamespaceRow;
 import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.mappers.NamespaceMapper;
 import marquez.service.models.Generator;
 import marquez.service.models.Namespace;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
@@ -37,18 +40,16 @@ public class NamespaceServiceTest {
 
   @Test
   public void testCreate() throws MarquezServiceException {
-    Namespace ns = Generator.genNamespace();
-    final NamespaceName namespaceName = NamespaceName.fromString(ns.getName());
-    when(namespaceDao.findBy(namespaceName))
-        .thenReturn(
-            Optional.of(
-                new Namespace(
-                    UUID.randomUUID(), ns.getName(), ns.getOwnerName(), ns.getDescription())));
-    Namespace nsReturned = namespaceService.create(ns);
+    final NamespaceRow row = newNamespaceRow();
+    final Namespace newNamespace = NamespaceMapper.map(row);
+    final NamespaceName name = NamespaceName.fromString(newNamespace.getName());
+    when(namespaceDao.findBy(name)).thenReturn(Optional.of(row));
+
+    final Namespace namespace = namespaceService.create(newNamespace);
     verify(namespaceDao).insert(any(Namespace.class));
-    assertEquals(ns.getName(), nsReturned.getName());
-    assertEquals(ns.getOwnerName(), nsReturned.getOwnerName());
-    assertEquals(ns.getDescription(), nsReturned.getDescription());
+    assertEquals(namespace.getName(), row.getName());
+    assertEquals(namespace.getOwnerName(), row.getCurrentOwnerName());
+    assertEquals(namespace.getDescription(), row.getDescription());
   }
 
   @Test(expected = MarquezServiceException.class)
@@ -88,7 +89,7 @@ public class NamespaceServiceTest {
   public void testGet_NsExists() throws MarquezServiceException {
     Namespace ns = Generator.genNamespace();
     final NamespaceName namespaceName = NamespaceName.fromString(ns.getName());
-    when(namespaceDao.findBy(namespaceName)).thenReturn(Optional.of(ns));
+    when(namespaceDao.findBy(namespaceName)).thenReturn(Optional.of(any()));
     Optional<Namespace> nsOptional = namespaceService.get(namespaceName);
     assertTrue(nsOptional.isPresent());
   }

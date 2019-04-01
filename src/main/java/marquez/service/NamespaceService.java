@@ -21,7 +21,9 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.NamespaceName;
 import marquez.db.NamespaceDao;
+import marquez.db.models.NamespaceRow;
 import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.mappers.NamespaceMapper;
 import marquez.service.models.Namespace;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
@@ -42,9 +44,10 @@ public class NamespaceService {
               namespace.getOwnerName(),
               namespace.getDescription());
       namespaceDao.insert(newNamespace);
-      return namespaceDao
-          .findBy(NamespaceName.fromString(newNamespace.getName()))
-          .orElseThrow(MarquezServiceException::new);
+      final NamespaceName namespaceName = NamespaceName.fromString(newNamespace.getName());
+      final NamespaceRow namespaceRow =
+          namespaceDao.findBy(namespaceName).orElseThrow(MarquezServiceException::new);
+      return NamespaceMapper.map(namespaceRow);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
       throw new MarquezServiceException();
@@ -63,7 +66,7 @@ public class NamespaceService {
   public Optional<Namespace> get(@NonNull NamespaceName namespaceName)
       throws MarquezServiceException {
     try {
-      return namespaceDao.findBy(namespaceName);
+      return namespaceDao.findBy(namespaceName).map(NamespaceMapper::map);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
       throw new MarquezServiceException();
