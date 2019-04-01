@@ -15,11 +15,7 @@
 package marquez.service.mappers;
 
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.NonNull;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
@@ -28,23 +24,16 @@ import marquez.service.models.DbTableVersion;
 public final class DatasetRowMapper {
   private DatasetRowMapper() {}
 
-  public static DatasetRow map(
-      @NonNull DatasetName datasetName,
-      @NonNull DatasetUrn datasetUrn,
-      @Nullable Description description) {
-    return DatasetRow.builder()
-        .uuid(UUID.randomUUID())
-        .name(datasetName.getValue())
-        .urn(datasetUrn.getValue())
-        .description(description == null ? null : description.getValue())
-        .build();
-  }
-
   @Deprecated
   public static DatasetRow map(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasourceRow dataSourceRow,
       @NonNull DbTableVersion dbTableVersion) {
-    throw new UnsupportedOperationException();
+    return DatasetRow.builder()
+        .uuid(UUID.randomUUID())
+        .datasourceUuid(dataSourceRow.getUuid())
+        .urn(dbTableVersion.toDatasetUrn(namespaceName).getValue())
+        .description(dbTableVersion.getDescription().map((desc) -> desc.getValue()).orElse(null))
+        .build();
   }
 }
