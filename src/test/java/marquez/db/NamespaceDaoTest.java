@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import marquez.common.models.NamespaceName;
 import marquez.db.fixtures.AppWithPostgresRule;
+import marquez.db.models.NamespaceRow;
 import marquez.service.models.Generator;
 import marquez.service.models.Namespace;
 import org.junit.After;
@@ -42,11 +43,11 @@ public class NamespaceDaoTest {
             });
   }
 
-  private void assertFieldsMatchExceptTS(Namespace ns1, Namespace ns2) {
-    assertEquals(ns1.getGuid(), ns2.getGuid());
-    assertEquals(ns1.getName(), ns2.getName());
-    assertEquals(ns1.getDescription(), ns2.getDescription());
-    assertEquals(ns1.getOwnerName(), ns2.getOwnerName());
+  private void assertFieldsMatchExceptTS(Namespace namespace, NamespaceRow row) {
+    assertEquals(namespace.getGuid(), row.getUuid());
+    assertEquals(namespace.getName(), row.getName());
+    assertEquals(namespace.getDescription(), row.getDescription());
+    assertEquals(namespace.getOwnerName(), row.getCurrentOwnerName());
   }
 
   @Test
