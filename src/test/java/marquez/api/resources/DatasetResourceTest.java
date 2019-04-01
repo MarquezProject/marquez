@@ -19,7 +19,6 @@ import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrnWith;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrnWith;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.service.models.ServiceModelGenerator.newDatasetWith;
@@ -67,7 +66,7 @@ public class DatasetResourceTest {
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
   private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
   private static final DatasourceUrn DATASOURCE_URN =
-      newDatasourceUrnWith(CONNECTION_URL.getDatasourceType(), DATASOURCE_NAME);
+      DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
   private static final Datasource DATASOURCE =
       newDatasourceWith(DATASOURCE_NAME, DATASOURCE_URN, CONNECTION_URL);
 
@@ -117,7 +116,8 @@ public class DatasetResourceTest {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasourceService.exists(DATASOURCE_URN)).thenReturn(true);
     when(datasourceService.get(DATASOURCE_URN)).thenReturn(Optional.of(DATASOURCE));
-    when(datasetService.create(NAMESPACE_NAME, DATASET_NAME, DATASOURCE_URN, DESCRIPTION))
+    when(datasetService.create(
+            NAMESPACE_NAME, DATASOURCE_NAME, DATASOURCE_URN, DATASET_NAME, DESCRIPTION))
         .thenReturn(DATASET);
 
     final Response response = datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST);
@@ -128,7 +128,7 @@ public class DatasetResourceTest {
     assertThat(actual).isEqualTo(expected);
 
     verify(datasetService, times(1))
-        .create(NAMESPACE_NAME, DATASET_NAME, DATASOURCE_URN, DESCRIPTION);
+        .create(NAMESPACE_NAME, DATASOURCE_NAME, DATASOURCE_URN, DATASET_NAME, DESCRIPTION);
   }
 
   @Test
@@ -138,7 +138,7 @@ public class DatasetResourceTest {
         .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST));
 
     verify(datasetService, never())
-        .create(NAMESPACE_NAME, DATASET_NAME, DATASOURCE_URN, DESCRIPTION);
+        .create(NAMESPACE_NAME, DATASOURCE_NAME, DATASOURCE_URN, DATASET_NAME, DESCRIPTION);
   }
 
   @Test
@@ -149,7 +149,7 @@ public class DatasetResourceTest {
         .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST));
 
     verify(datasetService, never())
-        .create(NAMESPACE_NAME, DATASET_NAME, DATASOURCE_URN, DESCRIPTION);
+        .create(NAMESPACE_NAME, DATASOURCE_NAME, DATASOURCE_URN, DATASET_NAME, DESCRIPTION);
   }
 
   @Test
