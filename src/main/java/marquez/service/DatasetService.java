@@ -14,7 +14,8 @@
 
 package marquez.service;
 
-import java.util.Collections;
+import static java.util.Collections.unmodifiableList;
+
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -22,10 +23,12 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
+import marquez.db.exceptions.RowNotFoundException;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
@@ -50,12 +53,24 @@ public class DatasetService {
 
   public Dataset create(
       @NonNull NamespaceName namespaceName,
-      @NonNull DatasetName datasetName,
+      @NonNull DatasourceName datasourceName,
       @NonNull DatasourceUrn datasourceUrn,
-      @Nullable Description description) {
-    throw new UnsupportedOperationException();
+      @NonNull DatasetName datasetName,
+      @Nullable Description description)
+      throws MarquezServiceException {
+    try {
+      final DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, datasetName);
+      final DatasetRow newDatasetRow = DatasetRowMapper.map(datasetName, datasetUrn, description);
+      final Optional<DatasetRow> datasetRow =
+          datasetDao.insertAndGet(namespaceName, datasourceUrn, newDatasetRow);
+      return datasetRow.map(DatasetMapper::map).orElseThrow(() -> new MarquezServiceException());
+    } catch (UnableToExecuteStatementException | RowNotFoundException e) {
+      log.error("", e);
+      throw new MarquezServiceException();
+    }
   }
 
+  @Deprecated
   public Dataset create(
       @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
       throws MarquezServiceException {
@@ -75,10 +90,19 @@ public class DatasetService {
     }
   }
 
-  public Optional<Dataset> get(@NonNull DatasetUrn urn) throws MarquezServiceException {
+  public boolean exists(@NonNull DatasetUrn datasetUrn) throws MarquezServiceException {
     try {
-      final Optional<DatasetRow> datasetRowIfFound = datasetDao.findBy(urn);
-      return datasetRowIfFound.map(DatasetMapper::map);
+      return datasetDao.exists(datasetUrn);
+    } catch (UnableToExecuteStatementException e) {
+      log.error("", e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public Optional<Dataset> get(@NonNull DatasetUrn datasetUrn) throws MarquezServiceException {
+    try {
+      final Optional<DatasetRow> datasetRow = datasetDao.findBy(datasetUrn);
+      return datasetRow.map(DatasetMapper::map);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
       throw new MarquezServiceException();
@@ -90,9 +114,9 @@ public class DatasetService {
       throws MarquezServiceException {
     try {
       final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, limit, offset);
-      return Collections.unmodifiableList(DatasetMapper.map(datasetRows));
+      return unmodifiableList(DatasetMapper.map(datasetRows));
     } catch (UnableToExecuteStatementException e) {
-      log.error(e.getMessage());
+      log.error("", e);
       throw new MarquezServiceException();
     }
   }
