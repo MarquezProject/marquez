@@ -305,8 +305,8 @@ paths:
             schema:
               $ref: '#/components/schemas/createDatasource'
       responses:
-        '201':
-          description: CREATED
+        '200':
+          description: OK
           content:
             application/json:
               schema:
