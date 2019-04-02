@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.postgresql.util.PSQLException;
 
 public final class Columns {
   private Columns() {}
@@ -86,9 +87,14 @@ public final class Columns {
   }
 
   public static Instant timestampOrNull(ResultSet results, String column) throws SQLException {
-    if (results.getObject(column) == null) {
+    try {
+      if (results.getObject(column) == null) {
+        return null;
+      }
+    } catch (PSQLException e) {
       return null;
     }
+
     return results.getTimestamp(column).toInstant();
   }
 

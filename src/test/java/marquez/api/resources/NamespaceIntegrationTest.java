@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.api;
+package marquez.api.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -25,7 +25,6 @@ import javax.ws.rs.core.Response;
 import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
-import marquez.api.resources.NamespaceBaseTest;
 import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.ClassRule;
 import org.junit.Test;

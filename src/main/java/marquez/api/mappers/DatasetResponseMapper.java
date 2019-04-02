@@ -21,17 +21,19 @@ import java.util.List;
 import lombok.NonNull;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
+import marquez.common.models.Description;
 import marquez.service.models.Dataset;
 
 public final class DatasetResponseMapper {
   private DatasetResponseMapper() {}
 
   public static DatasetResponse map(@NonNull Dataset dataset) {
+    final Description description = dataset.getDescription();
     return new DatasetResponse(
         dataset.getName().getValue(),
         dataset.getCreatedAt().toString(),
         dataset.getUrn().getValue(),
-        dataset.getDescription().getValue());
+        description == null ? null : description.getValue());
   }
 
   public static List<DatasetResponse> map(@NonNull List<Dataset> datasets) {

@@ -12,20 +12,6 @@
  * limitations under the License.
  */
 
-package marquez.db.models;
+package marquez;
 
-import java.time.Instant;
-import java.util.UUID;
-import lombok.Builder;
-import lombok.Data;
-
-@Data
-@Builder
-public final class NamespaceRow {
-  private UUID uuid;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private String name;
-  private String description;
-  private String currentOwnerName;
-}
+public interface IntegrationTests {}

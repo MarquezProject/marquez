@@ -17,16 +17,15 @@ package marquez.api.resources;
 import static javax.ws.rs.core.Response.Status.OK;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
-import static marquez.common.models.CommonModelGenerator.newDatasetUrnWith;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.service.models.ServiceModelGenerator.newDatasetWith;
 import static marquez.service.models.ServiceModelGenerator.newDatasets;
-import static marquez.service.models.ServiceModelGenerator.newDatasourceWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -37,8 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
 import marquez.UnitTests;
-import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
+import marquez.api.mappers.DatasetMapper;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
@@ -51,74 +50,60 @@ import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
-import marquez.service.DatasourceService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
-import marquez.service.models.Datasource;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetResourceTest {
-  private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
+  private static final int LIMIT = 100;
+  private static final int OFFSET = 0;
 
+  private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
   private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
   private static final DatasourceUrn DATASOURCE_URN =
       DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
-  private static final Datasource DATASOURCE =
-      newDatasourceWith(DATASOURCE_NAME, DATASOURCE_URN, CONNECTION_URL);
-
   private static final DatasetName DATASET_NAME = newDatasetName();
-  private static final DatasetUrn DATASET_URN = newDatasetUrnWith(DATASOURCE_NAME, DATASET_NAME);
+  private static final DatasetUrn DATASET_URN = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
   private static final Description DESCRIPTION = newDescription();
   private static final Dataset DATASET = newDatasetWith(DATASET_NAME, DATASET_URN, DESCRIPTION);
-
   private static final DatasetRequest DATASET_REQUEST =
       new DatasetRequest(DATASET_NAME, DATASOURCE_URN, DESCRIPTION);
+  private static final Dataset NEW_DATASET = DatasetMapper.map(DATASET_REQUEST);
 
-  private static final int LIMIT = 100;
-  private static final int OFFSET = 0;
+  private NamespaceService namespaceService;
+  private DatasetService datasetService;
+  private DatasetResource datasetResource;
 
-  private final NamespaceService namespaceService = mock(NamespaceService.class);
-  private final DatasetService datasetService = mock(DatasetService.class);
-  private final DatasourceService datasourceService = mock(DatasourceService.class);
-  private final DatasetResource datasetResource =
-      new DatasetResource(namespaceService, datasourceService, datasetService);
+  @Before
+  public void setUp() {
+    namespaceService = mock(NamespaceService.class);
+    datasetService = mock(DatasetService.class);
+    datasetResource = new DatasetResource(namespaceService, datasetService);
+  }
 
   @Test
   public void testNewDatasetResource_throwsException_onNullNamespaceService() {
     final NamespaceService nullNamespaceService = null;
     assertThatNullPointerException()
-        .isThrownBy(
-            () -> new DatasetResource(nullNamespaceService, datasourceService, datasetService));
-  }
-
-  @Test
-  public void testNewDatasetResource_throwsException_onNullDatasourceService() {
-    final DatasourceService nullDatasourceService = null;
-    assertThatNullPointerException()
-        .isThrownBy(
-            () -> new DatasetResource(namespaceService, nullDatasourceService, datasetService));
+        .isThrownBy(() -> new DatasetResource(nullNamespaceService, datasetService));
   }
 
   @Test
   public void testNewDatasetResource_throwsException_onNullDatasetService() {
     final DatasetService nullDatasetService = null;
     assertThatNullPointerException()
-        .isThrownBy(
-            () -> new DatasetResource(namespaceService, datasourceService, nullDatasetService));
+        .isThrownBy(() -> new DatasetResource(namespaceService, nullDatasetService));
   }
 
   @Test
   public void testCreate() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(datasourceService.exists(DATASOURCE_URN)).thenReturn(true);
-    when(datasourceService.get(DATASOURCE_URN)).thenReturn(Optional.of(DATASOURCE));
-    when(datasetService.create(
-            NAMESPACE_NAME, DATASOURCE_NAME, DATASOURCE_URN, DATASET_NAME, DESCRIPTION))
-        .thenReturn(DATASET);
+    when(datasetService.create(NAMESPACE_NAME, DATASOURCE_URN, NEW_DATASET)).thenReturn(DATASET);
 
     final Response response = datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST);
     assertThat(response.getStatusInfo()).isEqualTo(OK);
@@ -127,8 +112,7 @@ public class DatasetResourceTest {
     final DatasetResponse actual = (DatasetResponse) response.getEntity();
     assertThat(actual).isEqualTo(expected);
 
-    verify(datasetService, times(1))
-        .create(NAMESPACE_NAME, DATASOURCE_NAME, DATASOURCE_URN, DATASET_NAME, DESCRIPTION);
+    verify(datasetService, times(1)).create(NAMESPACE_NAME, DATASOURCE_URN, NEW_DATASET);
   }
 
   @Test
@@ -137,19 +121,18 @@ public class DatasetResourceTest {
     assertThatExceptionOfType(NamespaceNotFoundException.class)
         .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST));
 
-    verify(datasetService, never())
-        .create(NAMESPACE_NAME, DATASOURCE_NAME, DATASOURCE_URN, DATASET_NAME, DESCRIPTION);
+    verify(datasetService, never()).create(NAMESPACE_NAME, DATASOURCE_URN, NEW_DATASET);
   }
 
   @Test
   public void testCreate_throwsException_onDatasourceDoesNotExist() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(datasourceService.exists(DATASOURCE_URN)).thenReturn(false);
-    assertThatExceptionOfType(DatasourceUrnNotFoundException.class)
+    when(datasetService.create(NAMESPACE_NAME, DATASOURCE_URN, NEW_DATASET))
+        .thenThrow(MarquezServiceException.class);
+    assertThatExceptionOfType(MarquezServiceException.class)
         .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST));
 
-    verify(datasetService, never())
-        .create(NAMESPACE_NAME, DATASOURCE_NAME, DATASOURCE_URN, DATASET_NAME, DESCRIPTION);
+    verify(datasetService, times(1)).create(NAMESPACE_NAME, DATASOURCE_URN, NEW_DATASET);
   }
 
   @Test
@@ -173,7 +156,7 @@ public class DatasetResourceTest {
     assertThatExceptionOfType(NamespaceNotFoundException.class)
         .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN));
 
-    verify(datasetService, never()).get(DATASET_URN);
+    verify(datasetService, never()).get(any(DatasetUrn.class));
   }
 
   @Test

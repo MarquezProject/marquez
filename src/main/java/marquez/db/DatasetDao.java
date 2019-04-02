@@ -19,15 +19,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.common.models.DatasetUrn;
-import marquez.common.models.DatasourceUrn;
 import marquez.common.models.NamespaceName;
-import marquez.db.exceptions.RowNotFoundException;
 import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
-import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -38,43 +35,18 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 @RegisterRowMapper(DatasetRowMapper.class)
 public interface DatasetDao {
   @CreateSqlObject
-  NamespaceDao createNamespaceDao();
-
-  @CreateSqlObject
   DatasourceDao createDatasourceDao();
 
   @CreateSqlObject
   DbTableVersionDao createDbTableVersionDao();
 
   @SqlQuery(
-      "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, name, urn, description) "
-          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :name, :urn, :description) "
+      "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description) "
+          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description) "
           + "RETURNING *")
   Optional<DatasetRow> insertAndGet(@BindBean DatasetRow datasetRow);
 
-  @Transaction
-  default Optional<DatasetRow> insertAndGet(
-      NamespaceName namespaceName, DatasourceUrn datasourceUrn, DatasetRow datasetRow)
-      throws RowNotFoundException {
-    final NamespaceRow namespaceRow =
-        createNamespaceDao()
-            .findBy(namespaceName)
-            .orElseThrow(
-                () ->
-                    new RowNotFoundException(
-                        "Namespace row not found: " + namespaceName.getValue()));
-    final DatasourceRow datasourceRow =
-        createDatasourceDao()
-            .findBy(datasourceUrn)
-            .orElseThrow(
-                () ->
-                    new RowNotFoundException(
-                        "Datasource row not found: " + datasourceUrn.getValue()));
-    datasetRow.setNamespaceUuid(namespaceRow.getUuid());
-    datasetRow.setDatasourceUuid(datasourceRow.getUuid());
-    return insertAndGet(datasetRow);
-  }
-
+  @Deprecated
   @Transaction
   default void insertAll(
       DatasourceRow datasourceRow,
@@ -95,7 +67,7 @@ public interface DatasetDao {
           + "WHERE uuid = :uuid")
   void updateCurrentVersion(UUID uuid, Instant updatedAt, UUID currentVersion);
 
-  @SqlQuery("SELECT * FROM datasets WHERE uuid = :uuid")
+  @SqlQuery("SELECT * FROM datasets WHERE guid = :uuid")
   Optional<DatasetRow> findBy(UUID uuid);
 
   @SqlQuery("SELECT * FROM datasets WHERE urn = :value")
@@ -105,7 +77,7 @@ public interface DatasetDao {
       "SELECT * "
           + "FROM datasets d "
           + "INNER JOIN namespaces n "
-          + "    ON (n.guid = d.namespace_uuid AND n.name = :value)"
+          + "    ON (n.guid = d.namespace_guid AND n.name = :value)"
           + "ORDER BY name "
           + "LIMIT :limit OFFSET :offset")
   List<DatasetRow> findAll(@BindBean NamespaceName namespaceName, Integer limit, Integer offset);

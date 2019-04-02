@@ -41,7 +41,8 @@ public class DatasetResponseMapperTest {
     assertThat(dataset.getName().getValue()).isEqualTo(response.getName());
     assertThat(dataset.getCreatedAt().toString()).isEqualTo(response.getCreatedAt());
     assertThat(dataset.getUrn().getValue()).isEqualTo(response.getUrn());
-    assertThat(Optional.ofNullable(dataset.getDescription())).isEqualTo(response.getDescription());
+    assertThat(dataset.getDescription().getValue())
+        .isEqualTo(response.getDescription().orElse(null));
   }
 
   @Test

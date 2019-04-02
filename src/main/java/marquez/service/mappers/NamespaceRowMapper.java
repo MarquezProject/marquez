@@ -14,28 +14,20 @@
 
 package marquez.service.mappers;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
-
-import java.sql.Timestamp;
-import java.util.List;
+import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.models.NamespaceRow;
 import marquez.service.models.Namespace;
 
-public final class NamespaceMapper {
-  private NamespaceMapper() {}
+public final class NamespaceRowMapper {
+  private NamespaceRowMapper() {}
 
-  public static Namespace map(@NonNull NamespaceRow row) {
-    return new Namespace(
-        row.getUuid(),
-        Timestamp.from(row.getCreatedAt()),
-        row.getName(),
-        row.getCurrentOwnerName(),
-        row.getDescription());
-  }
-
-  public static List<Namespace> map(@NonNull List<NamespaceRow> rows) {
-    return unmodifiableList(rows.stream().map(row -> map(row)).collect(toList()));
+  public static NamespaceRow map(@NonNull Namespace namespace) {
+    return NamespaceRow.builder()
+        .uuid(UUID.randomUUID())
+        .name(namespace.getName())
+        .description(namespace.getDescription())
+        .currentOwnerName(namespace.getOwnerName())
+        .build();
   }
 }

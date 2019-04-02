@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
 import marquez.common.models.DatasetName;
@@ -56,20 +55,16 @@ public class DatasetMapperTest {
 
   @Test
   public void testMap_row() {
-    final Optional<Description> expectedDescription = Optional.of(DESCRIPTION);
-
     final Dataset dataset = DatasetMapper.map(ROW);
     assertNotNull(dataset);
     assertEquals(NAME, dataset.getName());
     assertEquals(CREATED_AT, dataset.getCreatedAt());
     assertEquals(URN, dataset.getUrn());
-    assertEquals(expectedDescription, dataset.getDescription());
+    assertEquals(DESCRIPTION, dataset.getDescription());
   }
 
   @Test
-  public void testMap_rowWithNoDescription() {
-    final Optional<Description> noDescription = Optional.of(NO_DESCRIPTION);
-
+  public void testMap_row_noDescription() {
     final DatasetRow rowWithNoDescription =
         DatasetRow.builder()
             .uuid(UUID.randomUUID())
@@ -87,7 +82,7 @@ public class DatasetMapperTest {
     assertEquals(NAME, dataset.getName());
     assertEquals(CREATED_AT, dataset.getCreatedAt());
     assertEquals(URN, dataset.getUrn());
-    assertEquals(noDescription, dataset.getDescription());
+    assertEquals(NO_DESCRIPTION, dataset.getDescription());
   }
 
   @Test(expected = NullPointerException.class)

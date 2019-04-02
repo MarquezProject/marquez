@@ -19,19 +19,18 @@ import java.util.Optional;
 import marquez.common.models.NamespaceName;
 import marquez.db.mappers.NamespaceRowMapper;
 import marquez.db.models.NamespaceRow;
-import marquez.service.models.Namespace;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(NamespaceRowMapper.class)
 public interface NamespaceDao {
-  @SqlUpdate(
-      "INSERT INTO namespaces(guid, name, description, current_ownership) "
-          + "VALUES(:guid, :name, :description, :ownerName) "
-          + "ON CONFLICT DO NOTHING")
-  void insert(@BindBean Namespace namespace);
+  @SqlQuery(
+      "INSERT INTO namespaces (guid, name, description, current_ownership) "
+          + "VALUES(:uuid, :name, :description, :currentOwnerName) "
+          + "ON CONFLICT (name) DO NOTHING "
+          + "RETURNING *")
+  Optional<NamespaceRow> insertAndGet(@BindBean NamespaceRow namespaceRow);
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM namespaces WHERE name = :value)")
   boolean exists(@BindBean NamespaceName namespaceName);
@@ -40,5 +39,5 @@ public interface NamespaceDao {
   Optional<NamespaceRow> findBy(@BindBean NamespaceName namespaceName);
 
   @SqlQuery("SELECT * FROM namespaces")
-  List<Namespace> findAll();
+  List<NamespaceRow> findAll();
 }

@@ -32,8 +32,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import marquez.api.exceptions.DatasetUrnNotFoundException;
-import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
+import marquez.api.mappers.DatasetMapper;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
@@ -41,24 +41,19 @@ import marquez.api.models.DatasetsResponse;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
-import marquez.service.DatasourceService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
-import marquez.service.models.Datasource;
 
 @Path("/api/v1")
 public final class DatasetResource {
   private final NamespaceService namespaceService;
-  private final DatasourceService datasourceService;
   private final DatasetService datasetService;
 
   public DatasetResource(
       @NonNull final NamespaceService namespaceService,
-      @NonNull final DatasourceService datasourceService,
       @NonNull final DatasetService datasetService) {
     this.namespaceService = namespaceService;
-    this.datasourceService = datasourceService;
     this.datasetService = datasetService;
   }
 
@@ -73,17 +68,9 @@ public final class DatasetResource {
       @PathParam("namespace") NamespaceName namespaceName, @Valid DatasetRequest request)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
-    final Datasource datasource =
-        datasourceService
-            .get(request.getDatasourceUrn())
-            .orElseThrow(() -> new DatasourceUrnNotFoundException(request.getDatasourceUrn()));
+    final Dataset newDataset = DatasetMapper.map(request);
     final Dataset dataset =
-        datasetService.create(
-            namespaceName,
-            datasource.getName(),
-            datasource.getUrn(),
-            request.getName(),
-            request.getDescription().orElse(null));
+        datasetService.create(namespaceName, request.getDatasourceUrn(), newDataset);
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     return Response.ok(response).build();
   }
