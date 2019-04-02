@@ -412,6 +412,8 @@ public class JobResourceTest {
         "2018-07-14T19:43:37+0000",
         "2018-07-14T19:43:37+0000",
         "{'key': 'value'}",
-        "NEW");
+        "NEW",
+        null,
+        null);
   }
 }

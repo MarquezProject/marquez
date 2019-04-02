@@ -14,9 +14,12 @@
 
 package marquez.db;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import marquez.db.mappers.JobRunRowMapper;
 import marquez.service.models.JobRun;
+import marquez.service.models.JobRunState;
 import marquez.service.models.RunArgs;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -55,9 +58,23 @@ public interface JobRunDao {
   @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE guid = :jobRunID")
   void updateCurrentState(UUID jobRunID, Integer state);
 
+  @SqlUpdate("UPDATE job_runs SET ended_at = NOW() WHERE guid = :jobRunID")
+  void updateJobRunEnded(UUID jobRunID);
+
+  @SqlUpdate("UPDATE job_runs SET started_at = NOW() WHERE guid = :jobRunID")
+  void updateJobRunStarted(UUID jobRunID);
+
   @Transaction
   default void updateState(UUID jobRunID, Integer state) {
     updateCurrentState(jobRunID, state);
+    final List<JobRunState.State> endedStates =
+        Arrays.asList(
+            JobRunState.State.ABORTED, JobRunState.State.COMPLETED, JobRunState.State.FAILED);
+    if (endedStates.contains(JobRunState.State.fromInt(state))) {
+      updateJobRunEnded(jobRunID);
+    } else if (JobRunState.State.fromInt(state) == JobRunState.State.RUNNING) {
+      updateJobRunStarted(jobRunID);
+    }
     createJobRunStateDao().insert(UUID.randomUUID(), jobRunID, state);
   }
 

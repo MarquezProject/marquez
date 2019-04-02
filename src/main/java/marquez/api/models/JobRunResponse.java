@@ -27,10 +27,9 @@ public final class JobRunResponse {
   @NotBlank private UUID runId;
 
   private String nominalStartTime;
-
   private String nominalEndTime;
-
   private String runArgs;
-
   private String runState;
+  private String startedAt;
+  private String finishedAt;
 }

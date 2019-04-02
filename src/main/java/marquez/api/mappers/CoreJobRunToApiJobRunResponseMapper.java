@@ -26,6 +26,8 @@ public class CoreJobRunToApiJobRunResponseMapper extends Mapper<JobRun, JobRunRe
         value.getNominalStartTime() == null ? null : value.getNominalStartTime().toString(),
         value.getNominalEndTime() == null ? null : value.getNominalEndTime().toString(),
         value.getRunArgs(),
-        JobRunState.State.fromInt(value.getCurrentState()).name());
+        JobRunState.State.fromInt(value.getCurrentState()).name(),
+        value.getStartedAt() == null ? null : value.getStartedAt().toString(),
+        value.getEndedAt() == null ? null : value.getEndedAt().toString());
   }
 }

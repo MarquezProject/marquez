@@ -35,6 +35,8 @@ public final class JobRunRowMapper implements RowMapper<JobRun> {
         results.getString(Columns.RUN_ARGS),
         results.getTimestamp(Columns.NOMINAL_START_TIME),
         results.getTimestamp(Columns.NOMINAL_END_TIME),
-        results.getTimestamp(Columns.CREATED_AT));
+        results.getTimestamp(Columns.CREATED_AT),
+        results.getTimestamp(Columns.STARTED_AT),
+        results.getTimestamp(Columns.ENDED_AT));
   }
 }

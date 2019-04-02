@@ -39,6 +39,8 @@ public final class JobRunRow {
   @Getter @NonNull private final List<UUID> outputDatasetVersionUuids;
   private final Instant nominalStartTime;
   private final Instant nominalEndTime;
+  private final Instant startedAt;
+  private final Instant endedAt;
 
   public Optional<Instant> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
@@ -46,5 +48,13 @@ public final class JobRunRow {
 
   public Optional<Instant> getNominalEndTime() {
     return Optional.ofNullable(nominalEndTime);
+  }
+
+  public Optional<Instant> getStartedAt() {
+    return Optional.ofNullable(startedAt);
+  }
+
+  public Optional<Instant> getEndedAt() {
+    return Optional.ofNullable(endedAt);
   }
 }

@@ -30,4 +30,6 @@ public final class JobRun {
   private final Timestamp nominalStartTime;
   private final Timestamp nominalEndTime;
   private final Timestamp createdAt;
+  private final Timestamp startedAt;
+  private final Timestamp endedAt;
 }

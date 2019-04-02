@@ -81,6 +81,8 @@ public class Generator {
         "{'foo': 1}",
         null,
         null,
+        null,
+        null,
         null);
   }
 
@@ -91,6 +93,8 @@ public class Generator {
         j.getJobVersionGuid(),
         j.getRunArgsHexDigest(),
         j.getRunArgs(),
+        null,
+        null,
         null,
         null,
         null);

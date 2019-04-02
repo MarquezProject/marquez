@@ -104,6 +104,45 @@ public class JobRunDaoTest extends JobRunBaseTest {
   }
 
   @Test
+  public void testJobRunSetRunningSetsStartedAt() {
+    final JobRun jr = jobRunDao.findJobRunById(CREATED_JOB_RUN_UUID);
+    assertThat(jr.getStartedAt()).isNull();
+
+    jobRunDao.updateState(CREATED_JOB_RUN_UUID, JobRunState.State.toInt(JobRunState.State.RUNNING));
+
+    final JobRun jr2 = jobRunDao.findJobRunById(CREATED_JOB_RUN_UUID);
+    assertThat(jr2.getStartedAt()).isNotNull();
+    assertThat(jr2.getStartedAt()).isAfter(jr.getCreatedAt());
+
+    assertThat(jr2.getEndedAt()).isNull();
+  }
+
+  @Test
+  public void testJobRunSetFailedSetsEndedAt() {
+    jobRunDao.updateState(CREATED_JOB_RUN_UUID, JobRunState.State.toInt(JobRunState.State.FAILED));
+    final JobRun jr = jobRunDao.findJobRunById(CREATED_JOB_RUN_UUID);
+    assertThat(jr.getEndedAt()).isNotNull();
+    assertThat(jr.getEndedAt()).isAfter(jr.getCreatedAt());
+  }
+
+  @Test
+  public void testJobRunSetAbortedSetsEndedAt() {
+    jobRunDao.updateState(CREATED_JOB_RUN_UUID, JobRunState.State.toInt(JobRunState.State.ABORTED));
+    final JobRun jr = jobRunDao.findJobRunById(CREATED_JOB_RUN_UUID);
+    assertThat(jr.getEndedAt()).isNotNull();
+    assertThat(jr.getEndedAt()).isAfter(jr.getCreatedAt());
+  }
+
+  @Test
+  public void testJobRunSetCompletedSetsEndedAt() {
+    jobRunDao.updateState(
+        CREATED_JOB_RUN_UUID, JobRunState.State.toInt(JobRunState.State.COMPLETED));
+    final JobRun jr = jobRunDao.findJobRunById(CREATED_JOB_RUN_UUID);
+    assertThat(jr.getEndedAt()).isNotNull();
+    assertThat(jr.getEndedAt()).isAfter(jr.getCreatedAt());
+  }
+
+  @Test
   public void testJobRunGetter() {
     JobRun returnedJobRun = jobRunDao.findJobRunById(CREATED_JOB_RUN_UUID);
     assertNull(returnedJobRun.getNominalStartTime());
