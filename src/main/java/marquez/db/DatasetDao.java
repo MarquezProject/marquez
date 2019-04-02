@@ -14,7 +14,6 @@
 
 package marquez.db;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,16 +55,16 @@ public interface DatasetDao {
     createDatasourceDao().insert(datasourceRow);
     insertAndGet(datasetRow);
     createDbTableVersionDao().insertAll(dbTableInfoRow, dbTableVersionRow);
-    updateCurrentVersion(datasetRow.getUuid(), Instant.now(), dbTableVersionRow.getUuid());
+    updateCurrentVersionUuid(datasetRow.getUuid(), dbTableVersionRow.getUuid());
   }
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM datasets WHERE urn = :value)")
   boolean exists(@BindBean DatasetUrn datasetUrn);
 
   @SqlUpdate(
-      "UPDATE datasets SET updated_at = :updatedAt, current_version_uuid = :currentVersionUuid "
-          + "WHERE uuid = :uuid")
-  void updateCurrentVersion(UUID uuid, Instant updatedAt, UUID currentVersion);
+      "UPDATE datasets SET updated_at = NOW(), current_version_uuid = :currentVersionUuid "
+          + "WHERE guid = :uuid")
+  void updateCurrentVersionUuid(UUID uuid, UUID currentVersionUuid);
 
   @SqlQuery("SELECT * FROM datasets WHERE guid = :uuid")
   Optional<DatasetRow> findBy(UUID uuid);

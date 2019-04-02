@@ -77,6 +77,25 @@ public class DatasetDaoTest {
   }
 
   @Test
+  public void testUpdateCurrentVersionUuid() {
+    final NamespaceRow namespaceRow = newNamespaceRow();
+    final DatasourceRow datasourceRow = newDatasourceRow();
+    namespaceDao.insertAndGet(namespaceRow);
+    datasourceDao.insert(datasourceRow);
+
+    final DatasetRow newDatasetRow =
+        newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
+    final DatasetRow datasetRow = datasetDao.insertAndGet(newDatasetRow).orElse(null);
+    assertThat(datasetRow.getCurrentVersionUuid()).isNull();
+
+    final UUID currentVersionUuid = UUID.randomUUID();
+    datasetDao.updateCurrentVersionUuid(datasetRow.getUuid(), currentVersionUuid);
+    final DatasetRow datasetRowWithVersion = datasetDao.findBy(datasetRow.getUuid()).orElse(null);
+    assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isNotNull();
+    assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isEqualTo(currentVersionUuid);
+  }
+
+  @Test
   public void testExists() {
     final DatasetUrn datasetUrn = newDatasetUrn();
     final NamespaceRow namespaceRow = newNamespaceRow();
