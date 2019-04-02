@@ -81,14 +81,18 @@ public class DatasetService {
       final DatasetRow newDatasetRow =
           DatasetRowMapper.map(
               namespaceRow.getUuid(), datasourceRow.getUuid(), datasourceName, dataset);
-      final DatasetRow datasetRow =
-          datasetDao
-              .insertAndGet(newDatasetRow)
-              .orElseThrow(
-                  () ->
-                      new MarquezServiceException(
-                          String.format("Failed to insert dataset row: %s", newDatasetRow)));
-      return DatasetMapper.map(datasetRow);
+      final DatasetUrn datasetUrn = DatasetUrn.fromString(newDatasetRow.getUrn());
+      final Optional<Dataset> datasetIfFound = get(datasetUrn);
+      if (datasetIfFound.isPresent()) {
+        return datasetIfFound.get();
+      }
+      return datasetDao
+          .insertAndGet(newDatasetRow)
+          .map(DatasetMapper::map)
+          .orElseThrow(
+              () ->
+                  new MarquezServiceException(
+                      String.format("Failed to insert dataset row: %s", newDatasetRow)));
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to create dataset: {}", dataset, e);
       throw new MarquezServiceException();
