@@ -13,12 +13,12 @@
 import logging
 import os
 import pendulum
-from airflow.models import DAG as AirflowDAG
+import airflow.models
 from marquez_client.marquez import MarquezClient
 from marquez.utils import JobIdMapping
 
 
-class DAG(AirflowDAG):
+class DAG(airflow.models.DAG):
     DEFAULT_NAMESPACE = 'default'
     _job_id_mapping = None
     _marquez_client = None
@@ -96,8 +96,9 @@ class DAG(AirflowDAG):
         return end_time
 
     def report_jobrun_change(self, dagrun, **kwargs):
+        session = kwargs.get('session')
         marquez_job_run_id = self._job_id_mapping.pop(
-            JobIdMapping.make_key(dagrun.dag_id, dagrun.run_id))
+            JobIdMapping.make_key(dagrun.dag_id, dagrun.run_id), session)
         if marquez_job_run_id:
             if kwargs.get('success'):
                 self.get_marquez_client().mark_job_run_completed(

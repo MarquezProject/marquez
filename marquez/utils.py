@@ -11,7 +11,6 @@
 # limitations under the License.
 
 import airflow
-from airflow.utils.db import provide_session
 
 
 class JobIdMapping:
@@ -23,19 +22,21 @@ class JobIdMapping:
                 JobIdMapping, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def set(self, key, val):
+    @staticmethod
+    def set(key, val):
         airflow.models.Variable.set(key, val)
 
-    @provide_session
-    def pop(self, key, session=None):
-        q = session.query(airflow.models.Variable).filter(
-            airflow.models.Variable.key == key)
-        if not q.first():
-            return
-        else:
-            val = q.first().val
-            q.delete(synchronize_session=False)
-            return val
+    @staticmethod
+    def pop(key, session):
+        if session:
+            q = session.query(airflow.models.Variable).filter(
+                airflow.models.Variable.key == key)
+            if not q.first():
+                return
+            else:
+                val = q.first().val
+                q.delete(synchronize_session=False)
+                return val
 
     @staticmethod
     def make_key(job_name, run_id):
