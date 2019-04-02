@@ -49,6 +49,8 @@ public class JobRunRowTest {
             .currentRunState(CURRENT_RUN_STATE)
             .inputDatasetVersionUuids(INPUT_DATASET_VERSION_UUIDS)
             .outputDatasetVersionUuids(OUTPUT_DATASET_VERSION_UUIDS)
+            .startedAt(null)
+            .endedAt(null)
             .build();
     assertEquals(ROW_UUID, jobRunRow.getUuid());
     assertEquals(CREATED_AT, jobRunRow.getCreatedAt());
@@ -56,6 +58,8 @@ public class JobRunRowTest {
     assertEquals(JOB_VERSION_UUID, jobRunRow.getJobVersionUuid());
     assertEquals(expectedNominalStartTime, jobRunRow.getNominalStartTime());
     assertEquals(expectedNominalEndTime, jobRunRow.getNominalEndTime());
+    assertEquals(Optional.empty(), jobRunRow.getStartedAt());
+    assertEquals(Optional.empty(), jobRunRow.getEndedAt());
     assertEquals(CURRENT_RUN_STATE, jobRunRow.getCurrentRunState());
     assertEquals(INPUT_DATASET_VERSION_UUIDS, jobRunRow.getInputDatasetVersionUuids());
     assertEquals(OUTPUT_DATASET_VERSION_UUIDS, jobRunRow.getOutputDatasetVersionUuids());
