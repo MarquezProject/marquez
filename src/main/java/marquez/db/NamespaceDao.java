@@ -28,7 +28,8 @@ public interface NamespaceDao {
   @SqlQuery(
       "INSERT INTO namespaces (guid, name, description, current_ownership) "
           + "VALUES(:uuid, :name, :description, :currentOwnerName) "
-          + "ON CONFLICT (name) DO NOTHING "
+          + "ON CONFLICT (name) DO UPDATE "
+          + "SET updated_at = NOW(), current_ownership = :currentOwnerName, description = :description "
           + "RETURNING *")
   Optional<NamespaceRow> insertAndGet(@BindBean NamespaceRow namespaceRow);
 

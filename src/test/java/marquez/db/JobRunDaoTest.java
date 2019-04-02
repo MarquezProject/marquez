@@ -71,7 +71,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
 
   @BeforeClass
   public static void setup() throws MarquezServiceException {
-    Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
+    Namespace generatedNamespace = namespaceService.createOrUpdate(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 

@@ -57,11 +57,11 @@ public final class NamespaceResource {
   @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces/{namespace}")
-  public Response create(
+  public Response createOrUpdate(
       @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceRequest request)
       throws MarquezServiceException {
     final Namespace namespace =
-        namespaceService.create(namespaceApiMapper.of(namespaceName.getValue(), request));
+        namespaceService.createOrUpdate(namespaceApiMapper.of(namespaceName.getValue(), request));
     final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
     return Response.ok(response).build();
   }

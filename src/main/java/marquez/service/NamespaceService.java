@@ -37,14 +37,16 @@ public class NamespaceService {
     this.namespaceDao = namespaceDao;
   }
 
-  public Namespace create(@NonNull Namespace namespace) throws MarquezServiceException {
+  public Namespace createOrUpdate(@NonNull Namespace namespace) throws MarquezServiceException {
     try {
       final NamespaceRow newNamespaceRow = NamespaceRowMapper.map(namespace);
-      namespaceDao.insertAndGet(newNamespaceRow);
-      final NamespaceName namespaceName = NamespaceName.fromString(newNamespaceRow.getName());
-      final NamespaceRow namespaceRow =
-          namespaceDao.findBy(namespaceName).orElseThrow(MarquezServiceException::new);
-      return NamespaceMapper.map(namespaceRow);
+      return namespaceDao
+          .insertAndGet(newNamespaceRow)
+          .map(NamespaceMapper::map)
+          .orElseThrow(
+              () ->
+                  new MarquezServiceException(
+                      String.format("Failed to insert namespace row: %s", newNamespaceRow)));
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to create namespace: {}", namespace, e);
       throw new MarquezServiceException();
