@@ -87,15 +87,9 @@ public final class Columns {
   }
 
   public static Instant timestampOrNull(ResultSet results, String column) throws SQLException {
-    // TODO: try/catch added to handle (possible) missing timestamp column, but should be removed.
-    try {
       if (results.getObject(column) == null) {
         return null;
       }
-    } catch (PSQLException e) {
-      return null;
-    }
-
     return results.getTimestamp(column).toInstant();
   }
 

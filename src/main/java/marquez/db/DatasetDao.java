@@ -40,8 +40,8 @@ public interface DatasetDao {
   DbTableVersionDao createDbTableVersionDao();
 
   @SqlQuery(
-      "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description) "
-          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description) "
+      "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
+          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name) "
           + "RETURNING *")
   Optional<DatasetRow> insertAndGet(@BindBean DatasetRow datasetRow);
 
@@ -77,7 +77,7 @@ public interface DatasetDao {
           + "FROM datasets d "
           + "INNER JOIN namespaces n "
           + "    ON (n.guid = d.namespace_guid AND n.name = :value)"
-          + "ORDER BY name "
+          + "ORDER BY n.name "
           + "LIMIT :limit OFFSET :offset")
   List<DatasetRow> findAll(@BindBean NamespaceName namespaceName, Integer limit, Integer offset);
 }
