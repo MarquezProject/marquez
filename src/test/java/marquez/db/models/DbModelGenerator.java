@@ -74,7 +74,8 @@ public final class DbModelGenerator {
     return newDatasourceRowWith(newDatasourceName(), newDatasourceUrn());
   }
 
-  public static DatasourceRow newDatasourceRowWith(DatasourceName datasourceName, DatasourceUrn datasourceUrn) {
+  public static DatasourceRow newDatasourceRowWith(
+      DatasourceName datasourceName, DatasourceUrn datasourceUrn) {
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .createdAt(newTimestamp())
