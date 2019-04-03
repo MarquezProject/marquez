@@ -39,6 +39,7 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
         .namespaceUuid(uuidOrNull(results, Columns.NAMESPACE_UUID))
         .datasourceUuid(uuidOrNull(results, Columns.DATASOURCE_UUID))
         .urn(stringOrThrow(results, Columns.URN))
+        .name(stringOrThrow(results, Columns.NAME))
         .description(stringOrNull(results, Columns.DESCRIPTION))
         .currentVersionUuid(uuidOrNull(results, Columns.CURRENT_VERSION_UUID))
         .build();
