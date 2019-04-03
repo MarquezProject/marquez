@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import marquez.common.models.NamespaceName;
 
@@ -70,14 +71,14 @@ public final class DbModelGenerator {
   }
 
   public static DatasourceRow newDatasourceRow() {
-    return newDatasourceRowWith(newDatasourceUrn());
+    return newDatasourceRowWith(newDatasourceName(), newDatasourceUrn());
   }
 
-  public static DatasourceRow newDatasourceRowWith(DatasourceUrn datasourceUrn) {
+  public static DatasourceRow newDatasourceRowWith(DatasourceName datasourceName, DatasourceUrn datasourceUrn) {
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .createdAt(newTimestamp())
-        .name(newDatasourceName().getValue())
+        .name(datasourceName.getValue())
         .urn(datasourceUrn.getValue())
         .connectionUrl(newConnectionUrl().getRawValue())
         .build();

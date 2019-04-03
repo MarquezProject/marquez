@@ -16,7 +16,6 @@ package marquez.db.mappers;
 
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrnWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,8 +41,7 @@ public class DatasourceRowMapperTest {
   private static final Instant CREATED_AT = Instant.now();
   private static final DatasourceName NAME = newDatasourceName();
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
-  private static final DatasourceUrn URN =
-      newDatasourceUrnWith(CONNECTION_URL.getDatasourceType(), NAME);
+  private static final DatasourceUrn URN = DatasourceUrn.from(CONNECTION_URL, NAME);
 
   @Test
   public void testMap() throws SQLException {

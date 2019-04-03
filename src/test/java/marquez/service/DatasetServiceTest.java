@@ -108,13 +108,11 @@ public class DatasetServiceTest {
   @Test
   public void testCreate() throws MarquezServiceException {
     final NamespaceRow namespaceRow = newNamespaceRowWith(NAMESPACE_NAME);
-    final DatasourceRow datasourceRow = newDatasourceRowWith(DATASOURCE_URN);
+    final DatasourceRow datasourceRow = newDatasourceRowWith(DATASOURCE_NAME, DATASOURCE_URN);
     when(namespaceDao.findBy(NAMESPACE_NAME)).thenReturn(Optional.of(namespaceRow));
     when(datasourceDao.findBy(DATASOURCE_URN)).thenReturn(Optional.of(datasourceRow));
 
-    final DatasetRow newDatasetRow =
-        DatasetRowMapper.map(
-            namespaceRow.getUuid(), datasourceRow.getUuid(), DATASOURCE_NAME, NEW_DATASET);
+    final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, NEW_DATASET);
     final DatasetRow datasetRow =
         DatasetRow.builder()
             .uuid(UUID.randomUUID())

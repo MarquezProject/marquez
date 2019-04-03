@@ -21,7 +21,6 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetUrn;
-import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
@@ -77,10 +76,7 @@ public class DatasetService {
                   () ->
                       new MarquezServiceException(
                           "Datasource row not found: " + datasourceUrn.getValue()));
-      final DatasourceName datasourceName = DatasourceName.fromString(datasourceRow.getName());
-      final DatasetRow newDatasetRow =
-          DatasetRowMapper.map(
-              namespaceRow.getUuid(), datasourceRow.getUuid(), datasourceName, dataset);
+      final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, dataset);
       final DatasetUrn datasetUrn = DatasetUrn.fromString(newDatasetRow.getUrn());
       final Optional<Dataset> datasetIfFound = get(datasetUrn);
       if (datasetIfFound.isPresent()) {
