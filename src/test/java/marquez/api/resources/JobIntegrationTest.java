@@ -152,6 +152,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
     assertEquals(JobRunState.State.NEW.name(), responseBody.getRunState());
     assertNull(responseBody.getNominalStartTime());
+    assertNull(responseBody.getStartedAt());
+    assertNull(responseBody.getEndedAt());
     assertNull(responseBody.getNominalEndTime());
   }
 
@@ -192,6 +194,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
     final JobRunResponse getJobRunResponse = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
     assertThat(getJobRunResponse.getRunState()).isEqualTo(JobRunState.State.COMPLETED.name());
+    assertThat(getJobRunResponse.getEndedAt()).isNotEmpty();
   }
 
   @Test
@@ -208,6 +211,9 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
     final JobRunResponse getJobRunResponse = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
     assertThat(getJobRunResponse.getRunState()).isEqualTo(JobRunState.State.RUNNING.name());
+
+    assertThat(getJobRunResponse.getStartedAt()).isNotEmpty();
+    assertThat(getJobRunResponse.getEndedAt()).isNullOrEmpty();
   }
 
   @Test
@@ -224,6 +230,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
     final JobRunResponse getJobRunResponse = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
     assertThat(getJobRunResponse.getRunState()).isEqualTo(JobRunState.State.FAILED.name());
+    assertThat(getJobRunResponse.getEndedAt()).isNotEmpty();
   }
 
   @Test
@@ -239,6 +246,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
 
     final JobRunResponse getJobRunResponse = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
     assertThat(getJobRunResponse.getRunState()).isEqualTo(JobRunState.State.ABORTED.name());
+    assertThat(getJobRunResponse.getEndedAt()).isNotEmpty();
   }
 
   private void evaluateResponse(Response res, JobResponse inputJob) {

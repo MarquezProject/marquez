@@ -31,5 +31,5 @@ public final class JobRunResponse {
   private String runArgs;
   private String runState;
   private String startedAt;
-  private String finishedAt;
+  private String endedAt;
 }
