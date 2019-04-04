@@ -22,9 +22,16 @@ import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(NamespaceRowMapper.class)
 public interface NamespaceDao {
+  @SqlUpdate(
+      "INSERT INTO namespaces (guid, name, description, current_ownership) "
+          + "VALUES(:uuid, :name, :description, :currentOwnerName) "
+          + "ON CONFLICT (name) DO NOTHING ")
+  void insert(@BindBean NamespaceRow namespaceRow);
+
   @SqlQuery(
       "INSERT INTO namespaces (guid, name, description, current_ownership) "
           + "VALUES(:uuid, :name, :description, :currentOwnerName) "

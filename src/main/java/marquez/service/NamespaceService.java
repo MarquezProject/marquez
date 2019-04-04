@@ -33,8 +33,25 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 public class NamespaceService {
   private final NamespaceDao namespaceDao;
 
-  public NamespaceService(@NonNull final NamespaceDao namespaceDao) {
+  public NamespaceService(@NonNull final NamespaceDao namespaceDao) throws MarquezServiceException {
     this.namespaceDao = namespaceDao;
+    init();
+  }
+
+  private void init() throws MarquezServiceException {
+    if (!exists(NamespaceName.DEFAULT)) {
+      create(Namespace.DEFAULT);
+    }
+  }
+
+  public void create(@NonNull Namespace namespace) throws MarquezServiceException {
+    try {
+      final NamespaceRow newNamespaceRow = NamespaceRowMapper.map(namespace);
+      namespaceDao.insert(newNamespaceRow);
+    } catch (UnableToExecuteStatementException e) {
+      log.error("Failed to create namespace: {}", namespace, e);
+      throw new MarquezServiceException();
+    }
   }
 
   public Namespace createOrUpdate(@NonNull Namespace namespace) throws MarquezServiceException {
@@ -48,7 +65,7 @@ public class NamespaceService {
                   new MarquezServiceException(
                       String.format("Failed to insert namespace row: %s", newNamespaceRow)));
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create namespace: {}", namespace, e);
+      log.error("Failed to create or update namespace: {}", namespace, e);
       throw new MarquezServiceException();
     }
   }
@@ -67,7 +84,7 @@ public class NamespaceService {
     try {
       return namespaceDao.findBy(namespaceName).map(NamespaceMapper::map);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get namespace: {}", namespaceName.getValue(), e.getMessage());
+      log.error("Failed to get namespace: {}", namespaceName.getValue(), e);
       throw new MarquezServiceException();
     }
   }
