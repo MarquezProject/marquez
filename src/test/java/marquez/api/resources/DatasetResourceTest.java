@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
 import marquez.UnitTests;
+import marquez.api.exceptions.DatasetUrnNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetRequest;
@@ -161,6 +162,17 @@ public class DatasetResourceTest {
         .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN));
 
     verify(datasetService, never()).get(any(DatasetUrn.class));
+  }
+
+  @Test
+  public void testGet_throwsException_onDatasetDoesNotExist() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.get(DATASET_URN)).thenReturn(Optional.empty());
+
+    assertThatExceptionOfType(DatasetUrnNotFoundException.class)
+        .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN));
+
+    verify(datasetService, times(1)).get(DATASET_URN);
   }
 
   @Test

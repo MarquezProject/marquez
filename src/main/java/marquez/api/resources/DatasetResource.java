@@ -112,8 +112,7 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  private void throwIfNotExists(@NonNull NamespaceName namespaceName)
-      throws MarquezServiceException {
+  private void throwIfNotExists(NamespaceName namespaceName) throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       throw new NamespaceNotFoundException(namespaceName);
     }
