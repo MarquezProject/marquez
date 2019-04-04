@@ -1,0 +1,18 @@
+interactions:
+- request:
+    body: '{"owner": "ns_owner", "description": "this is a namespace for testing."}'
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+      User-Agent: [OpenAPI-Generator/0.1.8/python]
+    method: PUT
+    uri: http://localhost:8080/api/v1/namespaces/ns_for_jobruns_test_1
+  response:
+    body: {string: '{"name":"ns_for_jobruns_test_1","createdAt":"2019-04-02 12:22:16.148431","owner":"ns_owner","description":"this
+        is a namespace for testing."}'}
+    headers:
+      Content-Length: ['141']
+      Content-Type: [application/json]
+      Date: ['Tue, 02 Apr 2019 19:42:08 GMT']
+    status: {code: 200, message: OK}
+version: 1

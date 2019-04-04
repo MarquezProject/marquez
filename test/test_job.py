@@ -37,13 +37,18 @@ def namespace(marquez_client):
 @vcr.use_cassette('test/fixtures/vcr/test_job/test_create_job.yaml')
 def test_create_job(marquez_client, namespace):
     marquez_client.set_namespace(namespace)
+
+    input_datset_urns = ['input1', 'input2']
+    output_datset_urns = ['output1', 'output2']
     created_job = marquez_client.create_job(
         'some_job', 'some_location',
-        ['input1', 'input2'],
-        ['output1', 'output2'])
+        input_datset_urns,
+        output_datset_urns)
 
     assert created_job.location == 'some_location'
     assert created_job.name == "some_job"
+    assert created_job.input_dataset_urns == input_datset_urns
+    assert created_job.output_dataset_urns == output_datset_urns
 
 
 def test_namespace_not_set(marquez_client):

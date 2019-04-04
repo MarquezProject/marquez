@@ -89,7 +89,8 @@ class MarquezClient(object):
             input_dataset_urns, output_dataset_urns, location, description)
         created_job = self.jobs_api_client.namespaces_namespace_jobs_job_put(
             self.get_namespace(),
-            job_name, create_job=create_job_request,
+            job_name,
+            create_job=create_job_request,
             _request_timeout=self.timeout
         )
         return created_job

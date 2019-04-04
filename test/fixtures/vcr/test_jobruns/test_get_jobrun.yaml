@@ -1,0 +1,33 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      User-Agent: [OpenAPI-Generator/0.1.8/python]
+    method: PUT
+    uri: http://localhost:8080/api/v1/jobs/runs/9b344c31-6824-45a3-b92d-a8bc6b5be49b/run
+  response:
+    body: {string: ''}
+    headers:
+      Content-Length: ['0']
+      Date: ['Tue, 02 Apr 2019 20:00:37 GMT']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+      User-Agent: [OpenAPI-Generator/0.1.8/python]
+    method: GET
+    uri: http://localhost:8080/api/v1/jobs/runs/9b344c31-6824-45a3-b92d-a8bc6b5be49b
+  response:
+    body: {string: '{"runId":"9b344c31-6824-45a3-b92d-a8bc6b5be49b","nominalStartTime":"2019-04-02
+        12:42:33.104391","nominalEndTime":"2019-04-03 12:42:33.104391","runArgs":"-a
+        1 -b 2 --some-flag","runState":"RUNNING"}'}
+    headers:
+      Content-Length: ['197']
+      Content-Type: [application/json]
+      Date: ['Tue, 02 Apr 2019 20:00:45 GMT']
+      Vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+version: 1
