@@ -35,6 +35,7 @@ public final class Columns {
   // Namespace ownership column names
 
   public static final String NAMESPACE_UUID = "namespace_guid";
+  public static final String OWNER_UUID = "owner_uuid";
   public static final String CURRENT_OWNER_NAME = "current_ownership";
 
   // Job column names
