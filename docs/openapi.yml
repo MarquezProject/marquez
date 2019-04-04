@@ -579,20 +579,10 @@ components:
         runArgs:
           description: The runtime arguments of the job. JSON encoded.
           type: string
-        startedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job started.
-          type: string
-          format: date-time
-        endedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job ended.
-          type: string
-          format: date-time
       example:
         runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         runState: COMPLETED
         runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
-        startedAt: 2018-10-04T15:01:23.045Z
-        endedAt: 2018-10-04T15:01:30.045Z
 
     jobRuns:
       type: object
