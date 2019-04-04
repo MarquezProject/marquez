@@ -72,6 +72,7 @@ public final class ServiceModelGenerator {
         .name(datasetName)
         .createdAt(newTimestamp())
         .urn(datasetUrn)
+        .datasourceUrn(newDatasourceUrn())
         .description(description)
         .build();
   }
