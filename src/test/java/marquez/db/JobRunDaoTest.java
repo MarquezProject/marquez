@@ -81,9 +81,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
   }
 
   @BeforeClass
-  public static void setup() throws MarquezServiceException {
-
-  }
+  public static void setup() throws MarquezServiceException {}
 
   @Before
   public void createJobRun() throws MarquezServiceException {
