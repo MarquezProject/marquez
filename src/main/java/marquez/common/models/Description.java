@@ -24,7 +24,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class Description {
-  public static final Description NO_DESCRIPTION = new Description(null);
-
   @Getter @Nullable private final String value;
+
+  public static final Description NO_DESCRIPTION = new Description(null);
 }

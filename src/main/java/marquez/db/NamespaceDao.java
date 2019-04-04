@@ -28,15 +28,17 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 public interface NamespaceDao {
   @SqlUpdate(
       "INSERT INTO namespaces (guid, name, description, current_ownership) "
-          + "VALUES(:uuid, :name, :description, :currentOwnerName) "
-          + "ON CONFLICT (name) DO NOTHING ")
+          + "VALUES (:uuid, :name, :description, :currentOwnerName) "
+          + "ON CONFLICT (name) DO NOTHING")
   void insert(@BindBean NamespaceRow namespaceRow);
 
   @SqlQuery(
       "INSERT INTO namespaces (guid, name, description, current_ownership) "
-          + "VALUES(:uuid, :name, :description, :currentOwnerName) "
+          + "VALUES (:uuid, :name, :description, :currentOwnerName) "
           + "ON CONFLICT (name) DO UPDATE "
-          + "SET updated_at = NOW(), current_ownership = :currentOwnerName, description = :description "
+          + "SET updated_at = NOW(), "
+          + "    current_ownership = :currentOwnerName, "
+          + "    description = :description "
           + "RETURNING *")
   Optional<NamespaceRow> insertAndGet(@BindBean NamespaceRow namespaceRow);
 

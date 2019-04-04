@@ -24,6 +24,7 @@ public final class DatasetMapper {
   public static Dataset map(@NonNull DatasetRequest request) {
     return Dataset.builder()
         .name(request.getName())
+        .datasourceUrn(request.getDatasourceUrn())
         .description(request.getDescription().orElse(null))
         .build();
   }

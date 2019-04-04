@@ -94,7 +94,7 @@ public class NamespaceService {
       final List<NamespaceRow> namespaceRows = namespaceDao.findAll();
       return unmodifiableList(NamespaceMapper.map(namespaceRows));
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to list namespaces.", e);
+      log.error("Failed to get namespaces.", e);
       throw new MarquezServiceException();
     }
   }

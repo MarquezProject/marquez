@@ -19,6 +19,7 @@ import lombok.Builder;
 import lombok.Data;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 
 @Data
@@ -27,5 +28,6 @@ public final class Dataset {
   private DatasetName name;
   private Instant createdAt;
   private DatasetUrn urn;
+  private DatasourceUrn datasourceUrn;
   private Description description;
 }

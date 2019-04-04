@@ -72,8 +72,7 @@ public final class DatasetResource {
     throwIfNotExists(namespaceName);
     log.debug("{}", request);
     final Dataset newDataset = DatasetMapper.map(request);
-    final Dataset dataset =
-        datasetService.create(namespaceName, request.getDatasourceUrn(), newDataset);
+    final Dataset dataset = datasetService.create(namespaceName, newDataset);
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     return Response.ok(response).build();
   }

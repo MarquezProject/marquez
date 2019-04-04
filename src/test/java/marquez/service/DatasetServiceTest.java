@@ -69,7 +69,12 @@ public class DatasetServiceTest {
   private static final DatasetName DATASET_NAME = newDatasetName();
   private static final DatasetUrn DATASET_URN = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
   private static final Description DESCRIPTION = newDescription();
-  final Dataset NEW_DATASET = Dataset.builder().name(DATASET_NAME).description(DESCRIPTION).build();
+  final Dataset NEW_DATASET =
+      Dataset.builder()
+          .name(DATASET_NAME)
+          .datasourceUrn(DATASOURCE_URN)
+          .description(DESCRIPTION)
+          .build();
 
   private NamespaceDao namespaceDao;
   private DatasourceDao datasourceDao;
@@ -125,7 +130,7 @@ public class DatasetServiceTest {
     when(datasetDao.insertAndGet(any(DatasetRow.class))).thenReturn(Optional.of(datasetRow));
 
     final Dataset expected = DatasetMapper.map(newDatasetRow);
-    final Dataset actual = datasetService.create(NAMESPACE_NAME, DATASOURCE_URN, NEW_DATASET);
+    final Dataset actual = datasetService.create(NAMESPACE_NAME, NEW_DATASET);
     assertThat(actual).isEqualTo(expected);
 
     verify(namespaceDao, times(1)).findBy(NAMESPACE_NAME);

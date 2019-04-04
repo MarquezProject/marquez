@@ -21,7 +21,6 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetUrn;
-import marquez.common.models.DatasourceUrn;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
 import marquez.db.DatasourceDao;
@@ -56,10 +55,7 @@ public class DatasetService {
     this.datasetDao = datasetDao;
   }
 
-  public Dataset create(
-      @NonNull NamespaceName namespaceName,
-      @NonNull DatasourceUrn datasourceUrn,
-      @NonNull Dataset dataset)
+  public Dataset create(@NonNull NamespaceName namespaceName, @NonNull Dataset dataset)
       throws MarquezServiceException {
     try {
       final NamespaceRow namespaceRow =
@@ -71,11 +67,11 @@ public class DatasetService {
                           "Namespace row not found: " + namespaceName.getValue()));
       final DatasourceRow datasourceRow =
           datasourceDao
-              .findBy(datasourceUrn)
+              .findBy(dataset.getDatasourceUrn())
               .orElseThrow(
                   () ->
                       new MarquezServiceException(
-                          "Datasource row not found: " + datasourceUrn.getValue()));
+                          "Datasource row not found: " + dataset.getDatasourceUrn().getValue()));
       final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, dataset);
       final DatasetUrn datasetUrn = DatasetUrn.fromString(newDatasetRow.getUrn());
       final Optional<Dataset> datasetIfFound = get(datasetUrn);
@@ -95,7 +91,6 @@ public class DatasetService {
     }
   }
 
-  @Deprecated
   public Dataset create(
       @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
       throws MarquezServiceException {
@@ -140,7 +135,7 @@ public class DatasetService {
       final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, limit, offset);
       return unmodifiableList(DatasetMapper.map(datasetRows));
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to list datasets for namespace: {}", namespaceName.getValue(), e);
+      log.error("Failed to get datasets for namespace: {}", namespaceName.getValue(), e);
       throw new MarquezServiceException();
     }
   }

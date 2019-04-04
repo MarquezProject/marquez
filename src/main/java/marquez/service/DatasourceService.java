@@ -61,7 +61,7 @@ public class DatasourceService {
     try {
       return datasourceDao.exists(datasourceUrn);
     } catch (UnableToExecuteStatementException e) {
-      log.error(e.getMessage());
+      log.error("Failed to check dataset: {}", datasourceUrn.getValue(), e);
       throw new MarquezServiceException();
     }
   }

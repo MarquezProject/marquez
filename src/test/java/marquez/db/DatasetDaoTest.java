@@ -54,7 +54,7 @@ public class DatasetDaoTest {
   private static DatasetDao datasetDao;
 
   @BeforeClass
-  public static void setUp() {
+  public static void setUpOnce() {
     final Jdbi jdbi = dbRule.getJdbi();
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
     datasourceDao = jdbi.onDemand(DatasourceDao.class);
