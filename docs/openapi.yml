@@ -574,8 +574,9 @@ components:
           format: uuid
         runState:
           description: The current state of the job.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+          schema:
+            type: string
+            enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
         runArgs:
           description: The runtime arguments of the job. JSON encoded.
           type: string
