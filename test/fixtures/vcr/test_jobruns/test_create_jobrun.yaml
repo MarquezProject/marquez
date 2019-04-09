@@ -1,20 +1,20 @@
 interactions:
 - request:
-    body: '{"nominalStartTime": "2019-04-02 12:42:11.514862", "nominalEndTime": "2019-04-03
-      12:42:11.514862", "runArgs": "-a 1 -b 2 --some-flag"}'
+    body: '{"nominalStartTime": "2019-04-08 17:20:58.953293", "nominalEndTime": "2019-04-09
+      17:20:58.953293", "runArgs": "-a 1 -b 2 --some-flag"}'
     headers:
       Accept: [application/json]
       Content-Type: [application/json]
-      User-Agent: [OpenAPI-Generator/0.1.8/python]
+      User-Agent: [OpenAPI-Generator/0.1.12/python]
     method: POST
     uri: http://localhost:8080/api/v1/namespaces/ns_for_jobruns_test_1/jobs/some_job/runs
   response:
-    body: {string: '{"runId":"e30801b1-e9b7-4003-97c7-67af7821e890","nominalStartTime":"2019-04-02
-        12:42:11.514862","nominalEndTime":"2019-04-03 12:42:11.514862","runArgs":"-a
+    body: {string: '{"runId":"e6ae09c8-3268-4d85-bf8c-49093cb11150","nominalStartTime":"2019-04-08
+        17:20:58.953293","nominalEndTime":"2019-04-09 17:20:58.953293","runArgs":"-a
         1 -b 2 --some-flag","runState":"NEW"}'}
     headers:
       Content-Length: ['193']
       Content-Type: [application/json]
-      Date: ['Tue, 02 Apr 2019 19:42:15 GMT']
+      Date: ['Mon, 08 Apr 2019 22:20:58 GMT']
     status: {code: 201, message: Created}
 version: 1

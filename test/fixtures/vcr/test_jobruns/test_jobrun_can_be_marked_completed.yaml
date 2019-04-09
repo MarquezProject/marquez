@@ -5,7 +5,7 @@ interactions:
       Content-Type: [application/json]
       User-Agent: [OpenAPI-Generator/0.1.12/python]
     method: PUT
-    uri: http://localhost:8080/api/v1/jobs/runs/658431f6-2411-43da-bf1b-543c7e233993/run
+    uri: http://localhost:8080/api/v1/jobs/runs/658431f6-2411-43da-bf1b-543c7e233993/complete
   response:
     body: {string: ''}
     headers:
@@ -23,9 +23,9 @@ interactions:
   response:
     body: {string: '{"runId":"658431f6-2411-43da-bf1b-543c7e233993","nominalStartTime":"2019-04-08
         17:20:59.023676","nominalEndTime":"2019-04-09 17:20:59.023676","runArgs":"-a
-        1 -b 2 --some-flag","runState":"RUNNING"}'}
+        1 -b 2 --some-flag","runState":"COMPLETED"}'}
     headers:
-      Content-Length: ['197']
+      Content-Length: ['199']
       Content-Type: [application/json]
       Date: ['Mon, 08 Apr 2019 22:20:59 GMT']
       Vary: [Accept-Encoding]

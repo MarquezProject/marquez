@@ -41,7 +41,7 @@ setup(
     url="",
     keywords=["OpenAPI", "OpenAPI-Generator", "Marquez"],
     install_requires=[
-        "marquez-python-codegen==0.1.8"
+        "marquez-python-codegen==0.1.12"
     ],
     packages=find_packages(),
     include_package_data=True,

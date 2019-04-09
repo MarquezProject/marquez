@@ -11,7 +11,6 @@
 # limitations under the License.
 import datetime
 
-import pytest
 import vcr
 
 from marquez_client.marquez import MarquezClient
@@ -92,11 +91,40 @@ def test_create_jobrun(marquez_client, existing_job, job_run_args,
     assert created_job_run.run_id is not None
 
 
-@pytest.mark.skip("Please re-enable after marquez-python-codegen"
-                  " is updated with fixes. 0.1.10+")
 @vcr.use_cassette(
     'test/fixtures/vcr/test_jobruns/test_get_jobrun.yaml')
-def test_get_jobrun(marquez_client, existing_jobrun):
+def test_get_jobrun(marquez_client, existing_jobrun, job_run_args):
     marquez_client.mark_job_run_running(existing_jobrun.run_id)
     get_jobrun_response = marquez_client.get_job_run(existing_jobrun.run_id)
-    assert get_jobrun_response.runId == existing_job.run_id
+    assert get_jobrun_response.run_id == existing_jobrun.run_id
+    assert get_jobrun_response.run_state == "RUNNING"
+    assert get_jobrun_response.run_args == job_run_args
+    assert get_jobrun_response.nominal_start_time is not None
+    assert get_jobrun_response.nominal_end_time is not None
+
+
+@vcr.use_cassette(
+    'test/fixtures/vcr/test_jobruns/test_jobrun_can_be_marked_aborted.yaml')
+def test_jobrun_can_be_marked_aborted(marquez_client, existing_jobrun):
+    marquez_client.mark_job_run_aborted(existing_jobrun.run_id)
+    get_jobrun_response = marquez_client.get_job_run(existing_jobrun.run_id)
+    assert get_jobrun_response.run_id == existing_jobrun.run_id
+    assert get_jobrun_response.run_state == "ABORTED"
+
+
+@vcr.use_cassette(
+    'test/fixtures/vcr/test_jobruns/test_jobrun_can_be_marked_failed.yaml')
+def test_jobrun_can_be_marked_failed(marquez_client, existing_jobrun):
+    marquez_client.mark_job_run_failed(existing_jobrun.run_id)
+    get_jobrun_response = marquez_client.get_job_run(existing_jobrun.run_id)
+    assert get_jobrun_response.run_id == existing_jobrun.run_id
+    assert get_jobrun_response.run_state == "FAILED"
+
+
+@vcr.use_cassette(
+    'test/fixtures/vcr/test_jobruns/test_jobrun_can_be_marked_completed.yaml')
+def test_jobrun_can_be_marked_completed(marquez_client, existing_jobrun):
+    marquez_client.mark_job_run_completed(existing_jobrun.run_id)
+    get_jobrun_response = marquez_client.get_job_run(existing_jobrun.run_id)
+    assert get_jobrun_response.run_id == existing_jobrun.run_id
+    assert get_jobrun_response.run_state == "COMPLETED"
