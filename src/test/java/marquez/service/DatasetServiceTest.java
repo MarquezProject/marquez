@@ -24,9 +24,11 @@ import static marquez.db.models.DbModelGenerator.newDatasetRows;
 import static marquez.db.models.DbModelGenerator.newDatasourceRowWith;
 import static marquez.db.models.DbModelGenerator.newNamespaceRowWith;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,6 +54,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.DatasetMapper;
 import marquez.service.mappers.DatasetRowMapper;
 import marquez.service.models.Dataset;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -111,7 +114,7 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void testCreate() throws MarquezServiceException {
+  public void testCreate_success() throws MarquezServiceException {
     final NamespaceRow namespaceRow = newNamespaceRowWith(NAMESPACE_NAME);
     final DatasourceRow datasourceRow = newDatasourceRowWith(DATASOURCE_NAME, DATASOURCE_URN);
     when(namespaceDao.findBy(NAMESPACE_NAME)).thenReturn(Optional.of(namespaceRow));
@@ -139,6 +142,64 @@ public class DatasetServiceTest {
   }
 
   @Test
+  public void testCreate_failed() throws MarquezServiceException {
+    final NamespaceRow namespaceRow = newNamespaceRowWith(NAMESPACE_NAME);
+    final DatasourceRow datasourceRow = newDatasourceRowWith(DATASOURCE_NAME, DATASOURCE_URN);
+    when(namespaceDao.findBy(NAMESPACE_NAME)).thenReturn(Optional.of(namespaceRow));
+    when(datasourceDao.findBy(DATASOURCE_URN)).thenReturn(Optional.of(datasourceRow));
+
+    assertThatExceptionOfType(MarquezServiceException.class)
+        .isThrownBy(() -> datasetService.create(NAMESPACE_NAME, NEW_DATASET));
+
+    verify(namespaceDao, times(1)).findBy(NAMESPACE_NAME);
+    verify(datasourceDao, times(1)).findBy(DATASOURCE_URN);
+    verify(datasetDao, times(1)).insertAndGet(any(DatasetRow.class));
+  }
+
+  @Test
+  public void testCreate_throwsException_onDbError() throws MarquezServiceException {
+    final NamespaceRow namespaceRow = newNamespaceRowWith(NAMESPACE_NAME);
+    final DatasourceRow datasourceRow = newDatasourceRowWith(DATASOURCE_NAME, DATASOURCE_URN);
+    when(namespaceDao.findBy(NAMESPACE_NAME)).thenReturn(Optional.of(namespaceRow));
+    when(datasourceDao.findBy(DATASOURCE_URN)).thenReturn(Optional.of(datasourceRow));
+    when(datasetDao.insertAndGet(any(DatasetRow.class)))
+        .thenThrow(UnableToExecuteStatementException.class);
+
+    assertThatExceptionOfType(MarquezServiceException.class)
+        .isThrownBy(() -> datasetService.create(NAMESPACE_NAME, NEW_DATASET));
+
+    verify(namespaceDao, times(1)).findBy(NAMESPACE_NAME);
+    verify(datasourceDao, times(1)).findBy(DATASOURCE_URN);
+    verify(datasetDao, times(1)).insertAndGet(any(DatasetRow.class));
+  }
+
+  @Test
+  public void testCreate_throwsException_onNamespaceNotFound() throws MarquezServiceException {
+    when(namespaceDao.findBy(NAMESPACE_NAME)).thenReturn(Optional.empty());
+
+    assertThatExceptionOfType(MarquezServiceException.class)
+        .isThrownBy(() -> datasetService.create(NAMESPACE_NAME, NEW_DATASET));
+
+    verify(namespaceDao, times(1)).findBy(NAMESPACE_NAME);
+    verify(datasourceDao, never()).findBy(DATASOURCE_URN);
+    verify(datasetDao, never()).insertAndGet(any(DatasetRow.class));
+  }
+
+  @Test
+  public void testCreate_throwsException_onDatasourceNotFound() throws MarquezServiceException {
+    final NamespaceRow namespaceRow = newNamespaceRowWith(NAMESPACE_NAME);
+    when(namespaceDao.findBy(NAMESPACE_NAME)).thenReturn(Optional.of(namespaceRow));
+    when(datasourceDao.findBy(DATASOURCE_URN)).thenReturn(Optional.empty());
+
+    assertThatExceptionOfType(MarquezServiceException.class)
+        .isThrownBy(() -> datasetService.create(NAMESPACE_NAME, NEW_DATASET));
+
+    verify(namespaceDao, times(1)).findBy(NAMESPACE_NAME);
+    verify(datasourceDao, times(1)).findBy(DATASOURCE_URN);
+    verify(datasetDao, never()).insertAndGet(any(DatasetRow.class));
+  }
+
+  @Test
   public void testExists() throws MarquezServiceException {
     when(datasetDao.exists(DATASET_URN)).thenReturn(true);
 
@@ -149,15 +210,35 @@ public class DatasetServiceTest {
   }
 
   @Test
+  public void testExists_throwsException_onDbError() throws MarquezServiceException {
+    when(datasetDao.exists(DATASET_URN)).thenThrow(UnableToExecuteStatementException.class);
+
+    assertThatExceptionOfType(MarquezServiceException.class)
+        .isThrownBy(() -> datasetService.exists(DATASET_URN));
+
+    verify(datasetDao, times(1)).exists(DATASET_URN);
+  }
+
+  @Test
   public void testGet() throws MarquezServiceException {
     final DatasetRow datasetRow = newDatasetRowWith(DATASET_URN);
-    when(datasetDao.findBy(any(DatasetUrn.class))).thenReturn(Optional.of(datasetRow));
+    when(datasetDao.findBy(DATASET_URN)).thenReturn(Optional.of(datasetRow));
 
     final Dataset dataset = datasetService.get(DATASET_URN).orElse(null);
     assertThat(dataset).isNotNull();
     assertThat(dataset.getUrn()).isEqualTo(DATASET_URN);
 
-    verify(datasetDao, times(1)).findBy(any(DatasetUrn.class));
+    verify(datasetDao, times(1)).findBy(DATASET_URN);
+  }
+
+  @Test
+  public void testGet_throwsException_onDbError() throws MarquezServiceException {
+    when(datasetDao.findBy(DATASET_URN)).thenThrow(UnableToExecuteStatementException.class);
+
+    assertThatExceptionOfType(MarquezServiceException.class)
+        .isThrownBy(() -> datasetService.get(DATASET_URN));
+
+    verify(datasetDao, times(1)).findBy(DATASET_URN);
   }
 
   @Test
@@ -168,6 +249,17 @@ public class DatasetServiceTest {
     final List<Dataset> datasets = datasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET);
     assertThat(datasets).isNotNull();
     assertThat(datasets).hasSize(4);
+
+    verify(datasetDao, times(1)).findAll(NAMESPACE_NAME, LIMIT, OFFSET);
+  }
+
+  @Test
+  public void testList_throwsException_onDbError() throws MarquezServiceException {
+    when(datasetDao.findAll(NAMESPACE_NAME, LIMIT, OFFSET))
+        .thenThrow(UnableToExecuteStatementException.class);
+
+    assertThatExceptionOfType(MarquezServiceException.class)
+        .isThrownBy(() -> datasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET));
 
     verify(datasetDao, times(1)).findAll(NAMESPACE_NAME, LIMIT, OFFSET);
   }

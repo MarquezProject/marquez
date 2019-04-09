@@ -123,6 +123,7 @@ public class DatasetResourceTest {
   @Test
   public void testCreate_throwsException_onNamespaceDoesNotExist() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
+
     assertThatExceptionOfType(NamespaceNotFoundException.class)
         .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST));
 
@@ -134,6 +135,7 @@ public class DatasetResourceTest {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.create(NAMESPACE_NAME, NEW_DATASET))
         .thenThrow(MarquezServiceException.class);
+
     assertThatExceptionOfType(MarquezServiceException.class)
         .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST));
 
@@ -158,6 +160,7 @@ public class DatasetResourceTest {
   @Test
   public void testGet_throwsException_onNamespaceDoesNotExist() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
+
     assertThatExceptionOfType(NamespaceNotFoundException.class)
         .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN));
 
