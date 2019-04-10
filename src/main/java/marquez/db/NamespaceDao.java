@@ -56,5 +56,5 @@ public interface NamespaceDao {
   List<NamespaceRow> findAll();
 
   @SqlQuery("SELECT COUNT(*) FROM namespaces")
-  int count();
+  Integer count();
 }

@@ -31,7 +31,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetUrnNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.mappers.DatasetMapper;
@@ -46,7 +45,6 @@ import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 
-@Slf4j
 @Path("/api/v1")
 public final class DatasetResource {
   private final NamespaceService namespaceService;
@@ -70,11 +68,9 @@ public final class DatasetResource {
       @PathParam("namespace") NamespaceName namespaceName, @Valid DatasetRequest request)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
-    log.debug("{}", request);
     final Dataset newDataset = DatasetMapper.map(request);
     final Dataset dataset = datasetService.create(namespaceName, newDataset);
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
-    log.debug("{}", response);
     return Response.ok(response).build();
   }
 
@@ -93,7 +89,6 @@ public final class DatasetResource {
             .get(datasetUrn)
             .orElseThrow(() -> new DatasetUrnNotFoundException(datasetUrn));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
-    log.debug("{}", response);
     return Response.ok(response).build();
   }
 
@@ -111,7 +106,6 @@ public final class DatasetResource {
     throwIfNotExists(namespaceName);
     final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
     final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(datasets);
-    log.debug("{}", response);
     return Response.ok(response).build();
   }
 

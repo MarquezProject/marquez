@@ -90,5 +90,5 @@ public interface DatasetDao {
   List<DatasetRow> findAll(@BindBean NamespaceName namespaceName, Integer limit, Integer offset);
 
   @SqlQuery("SELECT COUNT(*) FROM datasets")
-  int count();
+  Integer count();
 }
