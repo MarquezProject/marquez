@@ -33,6 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,7 +53,6 @@ import marquez.db.models.DatasourceRow;
 import marquez.db.models.NamespaceRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.DatasetMapper;
-import marquez.service.mappers.DatasetRowMapper;
 import marquez.service.models.Dataset;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.Before;
@@ -120,19 +120,19 @@ public class DatasetServiceTest {
     when(namespaceDao.findBy(NAMESPACE_NAME)).thenReturn(Optional.of(namespaceRow));
     when(datasourceDao.findBy(DATASOURCE_URN)).thenReturn(Optional.of(datasourceRow));
 
-    final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, NEW_DATASET);
     final DatasetRow datasetRow =
         DatasetRow.builder()
             .uuid(UUID.randomUUID())
+            .createdAt(Instant.now())
             .namespaceUuid(namespaceRow.getUuid())
             .datasourceUuid(datasourceRow.getUuid())
-            .name(DATASET_NAME.getValue())
+            .name(NAMESPACE_NAME.getValue())
             .urn(DATASET_URN.getValue())
             .description(DESCRIPTION.getValue())
             .build();
     when(datasetDao.insertAndGet(any(DatasetRow.class))).thenReturn(Optional.of(datasetRow));
 
-    final Dataset expected = DatasetMapper.map(newDatasetRow);
+    final Dataset expected = DatasetMapper.map(datasetRow);
     final Dataset actual = datasetService.create(NAMESPACE_NAME, NEW_DATASET);
     assertThat(actual).isEqualTo(expected);
 
