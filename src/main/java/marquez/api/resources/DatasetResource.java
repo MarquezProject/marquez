@@ -74,6 +74,7 @@ public final class DatasetResource {
     final Dataset newDataset = DatasetMapper.map(request);
     final Dataset dataset = datasetService.create(namespaceName, newDataset);
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
+    log.debug("{}", response);
     return Response.ok(response).build();
   }
 
@@ -92,6 +93,7 @@ public final class DatasetResource {
             .get(datasetUrn)
             .orElseThrow(() -> new DatasetUrnNotFoundException(datasetUrn));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
+    log.debug("{}", response);
     return Response.ok(response).build();
   }
 
@@ -109,6 +111,7 @@ public final class DatasetResource {
     throwIfNotExists(namespaceName);
     final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
     final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(datasets);
+    log.debug("{}", response);
     return Response.ok(response).build();
   }
 

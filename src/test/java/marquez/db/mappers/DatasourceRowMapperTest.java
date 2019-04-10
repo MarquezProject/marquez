@@ -17,6 +17,7 @@ package marquez.db.mappers;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,19 +71,19 @@ public class DatasourceRowMapperTest {
     assertThat(CONNECTION_URL.getRawValue()).isEqualTo(row.getConnectionUrl());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testMap_throwsException_onNullResults() throws SQLException {
     final ResultSet nullResults = null;
     final StatementContext context = mock(StatementContext.class);
     final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
-    rowMapper.map(nullResults, context);
+    assertThatNullPointerException().isThrownBy(() -> rowMapper.map(nullResults, context));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testMap_throwsException_onNullContext() throws SQLException {
     final ResultSet results = mock(ResultSet.class);
     final StatementContext nullContext = null;
     final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
-    rowMapper.map(results, nullContext);
+    assertThatNullPointerException().isThrownBy(() -> rowMapper.map(results, nullContext));
   }
 }

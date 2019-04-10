@@ -18,6 +18,7 @@ import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.db.models.DbModelGenerator.newDatasetRowWith;
 import static marquez.db.models.DbModelGenerator.newDatasetRows;
+import static marquez.db.models.DbModelGenerator.newDatasetRowsWith;
 import static marquez.db.models.DbModelGenerator.newDatasourceRow;
 import static marquez.db.models.DbModelGenerator.newNamespaceRow;
 import static marquez.db.models.DbModelGenerator.newNamespaceRowWith;
@@ -62,10 +63,27 @@ public class DatasetDaoTest {
   }
 
   @Test
+  public void testInsert() {
+    int rowsBefore = datasetDao.count();
+
+    final NamespaceRow namespaceRow = newNamespaceRow();
+    final DatasourceRow datasourceRow = newDatasourceRow();
+    namespaceDao.insert(namespaceRow);
+    datasourceDao.insert(datasourceRow);
+
+    final DatasetRow newDatasetRow =
+        newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
+    datasetDao.insert(newDatasetRow);
+
+    int rowsAfter = datasetDao.count();
+    assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
+  }
+
+  @Test
   public void testInsertAndGet() {
     final NamespaceRow namespaceRow = newNamespaceRow();
     final DatasourceRow datasourceRow = newDatasourceRow();
-    namespaceDao.insertAndGet(namespaceRow);
+    namespaceDao.insert(namespaceRow);
     datasourceDao.insert(datasourceRow);
 
     final DatasetRow newDatasetRow =
@@ -73,14 +91,13 @@ public class DatasetDaoTest {
     final DatasetRow datasetRow = datasetDao.insertAndGet(newDatasetRow).orElse(null);
     assertThat(datasetRow).isNotNull();
     assertThat(datasetRow.getUuid()).isEqualTo(newDatasetRow.getUuid());
-    assertThat(datasetRow.getUrn()).isEqualTo(newDatasetRow.getUrn());
   }
 
   @Test
   public void testUpdateCurrentVersionUuid() {
     final NamespaceRow namespaceRow = newNamespaceRow();
     final DatasourceRow datasourceRow = newDatasourceRow();
-    namespaceDao.insertAndGet(namespaceRow);
+    namespaceDao.insert(namespaceRow);
     datasourceDao.insert(datasourceRow);
 
     final DatasetRow newDatasetRow =
@@ -90,6 +107,7 @@ public class DatasetDaoTest {
 
     final UUID currentVersionUuid = UUID.randomUUID();
     datasetDao.updateCurrentVersionUuid(datasetRow.getUuid(), currentVersionUuid);
+
     final DatasetRow datasetRowWithVersion = datasetDao.findBy(datasetRow.getUuid()).orElse(null);
     assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isNotNull();
     assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isEqualTo(currentVersionUuid);
@@ -97,12 +115,12 @@ public class DatasetDaoTest {
 
   @Test
   public void testExists() {
-    final DatasetUrn datasetUrn = newDatasetUrn();
     final NamespaceRow namespaceRow = newNamespaceRow();
     final DatasourceRow datasourceRow = newDatasourceRow();
-    namespaceDao.insertAndGet(namespaceRow);
+    namespaceDao.insert(namespaceRow);
     datasourceDao.insert(datasourceRow);
 
+    final DatasetUrn datasetUrn = newDatasetUrn();
     final DatasetRow newDatasetRow =
         newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid(), datasetUrn);
     datasetDao.insertAndGet(newDatasetRow);
@@ -115,7 +133,7 @@ public class DatasetDaoTest {
   public void testFindBy_uuid() {
     final NamespaceRow namespaceRow = newNamespaceRow();
     final DatasourceRow datasourceRow = newDatasourceRow();
-    namespaceDao.insertAndGet(namespaceRow);
+    namespaceDao.insert(namespaceRow);
     datasourceDao.insert(datasourceRow);
 
     final UUID uuid = UUID.randomUUID();
@@ -130,12 +148,12 @@ public class DatasetDaoTest {
 
   @Test
   public void testFindBy_urn() {
-    final DatasetUrn datasetUrn = newDatasetUrn();
     final NamespaceRow namespaceRow = newNamespaceRow();
     final DatasourceRow datasourceRow = newDatasourceRow();
-    namespaceDao.insertAndGet(namespaceRow);
+    namespaceDao.insert(namespaceRow);
     datasourceDao.insert(datasourceRow);
 
+    final DatasetUrn datasetUrn = newDatasetUrn();
     final DatasetRow newDatasetRow =
         newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid(), datasetUrn);
     datasetDao.insertAndGet(newDatasetRow);
@@ -150,17 +168,53 @@ public class DatasetDaoTest {
     final NamespaceName namespaceName = newNamespaceName();
     final NamespaceRow namespaceRow = newNamespaceRowWith(namespaceName);
     final DatasourceRow datasourceRow = newDatasourceRow();
-    namespaceDao.insertAndGet(namespaceRow);
+    namespaceDao.insert(namespaceRow);
     datasourceDao.insert(datasourceRow);
 
     final List<DatasetRow> newDatasetRows =
-        newDatasetRows(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
-    for (DatasetRow newDatasetRow : newDatasetRows) {
-      datasetDao.insertAndGet(newDatasetRow);
-    }
+        newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
+    newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
 
     final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, LIMIT, OFFSET);
     assertThat(datasetRows).isNotNull();
     assertThat(datasetRows).hasSize(4);
+  }
+
+  @Test
+  public void testFindAll_withLimit() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final NamespaceRow namespaceRow = newNamespaceRowWith(namespaceName);
+    final DatasourceRow datasourceRow = newDatasourceRow();
+    namespaceDao.insert(namespaceRow);
+    datasourceDao.insert(datasourceRow);
+
+    final List<DatasetRow> newDatasetRows =
+        newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
+    newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
+
+    final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, 2, OFFSET);
+    assertThat(datasetRows).isNotNull();
+    assertThat(datasetRows).hasSize(2);
+    assertThat(datasetRows.get(0).getUuid()).isEqualTo(newDatasetRows.get(0).getUuid());
+    assertThat(datasetRows.get(1).getUuid()).isEqualTo(newDatasetRows.get(1).getUuid());
+  }
+
+  @Test
+  public void testFindAll_withOffset() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final NamespaceRow namespaceRow = newNamespaceRowWith(namespaceName);
+    final DatasourceRow datasourceRow = newDatasourceRow();
+    namespaceDao.insert(namespaceRow);
+    datasourceDao.insert(datasourceRow);
+
+    final List<DatasetRow> newDatasetRows =
+        newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
+    newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
+
+    final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, LIMIT, 2);
+    assertThat(datasetRows).isNotNull();
+    assertThat(datasetRows).hasSize(2);
+    assertThat(datasetRows.get(0).getUuid()).isEqualTo(newDatasetRows.get(2).getUuid());
+    assertThat(datasetRows.get(1).getUuid()).isEqualTo(newDatasetRows.get(3).getUuid());
   }
 }

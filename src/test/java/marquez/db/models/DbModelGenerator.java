@@ -89,7 +89,7 @@ public final class DbModelGenerator {
     return Stream.generate(() -> newDatasetRow()).limit(limit).collect(toList());
   }
 
-  public static List<DatasetRow> newDatasetRows(
+  public static List<DatasetRow> newDatasetRowsWith(
       UUID namespaceUuid, UUID datasourceUuid, int limit) {
     return Stream.generate(() -> newDatasetRowWith(namespaceUuid, datasourceUuid))
         .limit(limit)

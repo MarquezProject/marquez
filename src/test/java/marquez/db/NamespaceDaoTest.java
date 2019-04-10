@@ -42,9 +42,20 @@ public class NamespaceDaoTest {
   private static NamespaceDao namespaceDao;
 
   @BeforeClass
-  public static void setUp() {
+  public static void setUpOnce() {
     final Jdbi jdbi = dbRule.getJdbi();
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
+  }
+
+  @Test
+  public void testInsert() {
+    int rowsBefore = namespaceDao.count();
+
+    final NamespaceRow newNamespaceRow = newNamespaceRow();
+    namespaceDao.insert(newNamespaceRow);
+
+    int rowsAfter = namespaceDao.count();
+    assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
   }
 
   @Test
@@ -59,17 +70,28 @@ public class NamespaceDaoTest {
   public void testExists() {
     final NamespaceName namespaceName = newNamespaceName();
     final NamespaceRow newNamespaceRow = newNamespaceRowWith(namespaceName);
-    namespaceDao.insertAndGet(newNamespaceRow);
+    namespaceDao.insert(newNamespaceRow);
 
     boolean exists = namespaceDao.exists(namespaceName);
     assertThat(exists).isTrue();
   }
 
   @Test
-  public void testFindBy() {
+  public void testFindBy_uuid() {
     final NamespaceName namespaceName = newNamespaceName();
     final NamespaceRow newNamespaceRow = newNamespaceRowWith(namespaceName);
-    namespaceDao.insertAndGet(newNamespaceRow);
+    namespaceDao.insert(newNamespaceRow);
+
+    final NamespaceRow namespaceRow = namespaceDao.findBy(newNamespaceRow.getUuid()).orElse(null);
+    assertThat(namespaceRow).isNotNull();
+    assertThat(namespaceRow.getUuid()).isEqualTo(newNamespaceRow.getUuid());
+  }
+
+  @Test
+  public void testFindBy_name() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final NamespaceRow newNamespaceRow = newNamespaceRowWith(namespaceName);
+    namespaceDao.insert(newNamespaceRow);
 
     final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName).orElse(null);
     assertThat(namespaceRow).isNotNull();
@@ -79,9 +101,7 @@ public class NamespaceDaoTest {
   @Test
   public void testFindAll() {
     final List<NamespaceRow> newNamespaceRows = newNamespaceRows(4);
-    for (NamespaceRow newNamespaceRow : newNamespaceRows) {
-      namespaceDao.insertAndGet(newNamespaceRow);
-    }
+    newNamespaceRows.forEach(newNamespaceRow -> namespaceDao.insert(newNamespaceRow));
 
     final List<NamespaceRow> namespaceRows = namespaceDao.findAll();
     assertThat(namespaceRows).isNotNull();

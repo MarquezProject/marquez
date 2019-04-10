@@ -16,6 +16,7 @@ package marquez.db;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import marquez.common.models.NamespaceName;
 import marquez.db.mappers.NamespaceRowMapper;
 import marquez.db.models.NamespaceRow;
@@ -45,9 +46,15 @@ public interface NamespaceDao {
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM namespaces WHERE name = :value)")
   boolean exists(@BindBean NamespaceName namespaceName);
 
+  @SqlQuery("SELECT * FROM namespaces WHERE guid = :uuid")
+  Optional<NamespaceRow> findBy(UUID uuid);
+
   @SqlQuery("SELECT * FROM namespaces WHERE name = :value")
   Optional<NamespaceRow> findBy(@BindBean NamespaceName namespaceName);
 
   @SqlQuery("SELECT * FROM namespaces")
   List<NamespaceRow> findAll();
+
+  @SqlQuery("SELECT COUNT(*) FROM namespaces")
+  int count();
 }

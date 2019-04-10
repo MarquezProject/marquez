@@ -18,8 +18,6 @@ import static marquez.service.models.ServiceModelGenerator.newDataset;
 import static marquez.service.models.ServiceModelGenerator.newDatasets;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -96,8 +94,8 @@ public class DatasetResponseMapperTest {
   public void testToDatasetsResponse_emptyDatasets() {
     final List<Dataset> emptyDatasets = Collections.emptyList();
     final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(emptyDatasets);
-    assertNotNull(response);
-    assertTrue(response.getDatasets().isEmpty());
+    assertThat(response).isNotNull();
+    assertThat(response.getDatasets()).isEmpty();
   }
 
   @Test

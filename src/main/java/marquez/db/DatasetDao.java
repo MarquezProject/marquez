@@ -39,6 +39,12 @@ public interface DatasetDao {
   @CreateSqlObject
   DbTableVersionDao createDbTableVersionDao();
 
+  @SqlUpdate(
+      "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
+          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name) "
+          + "ON CONFLICT (urn) DO NOTHING")
+  void insert(@BindBean DatasetRow datasetRow);
+
   @SqlQuery(
       "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
           + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name) "
@@ -62,7 +68,9 @@ public interface DatasetDao {
   boolean exists(@BindBean DatasetUrn datasetUrn);
 
   @SqlUpdate(
-      "UPDATE datasets SET updated_at = NOW(), current_version_uuid = :currentVersionUuid "
+      "UPDATE datasets "
+          + "SET updated_at = NOW(), "
+          + "    current_version_uuid = :currentVersionUuid "
           + "WHERE guid = :uuid")
   void updateCurrentVersionUuid(UUID uuid, UUID currentVersionUuid);
 
@@ -80,4 +88,7 @@ public interface DatasetDao {
           + "ORDER BY n.name "
           + "LIMIT :limit OFFSET :offset")
   List<DatasetRow> findAll(@BindBean NamespaceName namespaceName, Integer limit, Integer offset);
+
+  @SqlQuery("SELECT COUNT(*) FROM datasets")
+  int count();
 }
