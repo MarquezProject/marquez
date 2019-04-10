@@ -17,7 +17,6 @@ package marquez.db;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.db.models.DbModelGenerator.newDatasetRowWith;
-import static marquez.db.models.DbModelGenerator.newDatasetRows;
 import static marquez.db.models.DbModelGenerator.newDatasetRowsWith;
 import static marquez.db.models.DbModelGenerator.newDatasourceRow;
 import static marquez.db.models.DbModelGenerator.newNamespaceRow;
@@ -181,7 +180,7 @@ public class DatasetDaoTest {
   }
 
   @Test
-  public void testFindAll_withLimit() {
+  public void testFindAll_limitOnly() {
     final NamespaceName namespaceName = newNamespaceName();
     final NamespaceRow namespaceRow = newNamespaceRowWith(namespaceName);
     final DatasourceRow datasourceRow = newDatasourceRow();
@@ -200,7 +199,7 @@ public class DatasetDaoTest {
   }
 
   @Test
-  public void testFindAll_withOffset() {
+  public void testFindAll_offsetOnly() {
     final NamespaceName namespaceName = newNamespaceName();
     final NamespaceRow namespaceRow = newNamespaceRowWith(namespaceName);
     final DatasourceRow datasourceRow = newDatasourceRow();

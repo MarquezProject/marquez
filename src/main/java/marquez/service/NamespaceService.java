@@ -57,7 +57,6 @@ public class NamespaceService {
   public Namespace createOrUpdate(@NonNull Namespace namespace) throws MarquezServiceException {
     try {
       final NamespaceRow newNamespaceRow = NamespaceRowMapper.map(namespace);
-      log.info("{}", newNamespaceRow);
       return namespaceDao
           .insertAndGet(newNamespaceRow)
           .map(NamespaceMapper::map)

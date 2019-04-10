@@ -28,7 +28,7 @@ public final class NamespaceMapper {
 
   public static Namespace map(@NonNull NamespaceRow row) {
     return new Namespace(
-        null,
+        row.getUuid(),
         Timestamp.from(row.getCreatedAt()),
         row.getName(),
         row.getCurrentOwnerName(),
