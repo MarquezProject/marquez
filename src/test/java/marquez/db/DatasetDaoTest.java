@@ -123,7 +123,7 @@ public class DatasetDaoTest {
         newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid(), datasetUrn);
     datasetDao.insertAndGet(newDatasetRow);
 
-    boolean exists = datasetDao.exists(datasetUrn);
+    final boolean exists = datasetDao.exists(datasetUrn);
     assertThat(exists).isTrue();
   }
 

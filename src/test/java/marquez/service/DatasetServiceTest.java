@@ -203,7 +203,7 @@ public class DatasetServiceTest {
   public void testExists() throws MarquezServiceException {
     when(datasetDao.exists(DATASET_URN)).thenReturn(true);
 
-    boolean exists = datasetService.exists(DATASET_URN);
+    final boolean exists = datasetService.exists(DATASET_URN);
     assertThat(exists).isTrue();
 
     verify(datasetDao, times(1)).exists(DATASET_URN);

@@ -72,7 +72,7 @@ public class NamespaceDaoTest {
     final NamespaceRow newNamespaceRow = newNamespaceRowWith(namespaceName);
     namespaceDao.insert(newNamespaceRow);
 
-    boolean exists = namespaceDao.exists(namespaceName);
+    final boolean exists = namespaceDao.exists(namespaceName);
     assertThat(exists).isTrue();
   }
 

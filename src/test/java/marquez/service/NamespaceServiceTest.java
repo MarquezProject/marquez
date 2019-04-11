@@ -123,7 +123,7 @@ public class NamespaceServiceTest {
   public void testExists() throws MarquezServiceException {
     when(namespaceDao.exists(NAMESPACE_NAME)).thenReturn(true);
 
-    boolean exists = namespaceService.exists(NAMESPACE_NAME);
+    final boolean exists = namespaceService.exists(NAMESPACE_NAME);
     assertThat(exists).isTrue();
 
     verify(namespaceDao, times(1)).exists(NAMESPACE_NAME);
