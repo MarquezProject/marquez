@@ -80,9 +80,6 @@ public class JobRunDaoTest extends JobRunBaseTest {
     CREATED_JOB_RUN_UUID = createdJob.getNamespaceGuid();
   }
 
-  @BeforeClass
-  public static void setup() throws MarquezServiceException {}
-
   @Before
   public void createJobRun() throws MarquezServiceException {
     JobRun createdJobRun =
