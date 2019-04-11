@@ -14,14 +14,10 @@
 
 package marquez.db;
 
-import static marquez.common.Preconditions.checkNotBlank;
-
-import java.sql.Array;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,8 +35,6 @@ public final class Columns {
   // Namespace ownership column names
 
   public static final String NAMESPACE_UUID = "namespace_guid";
-  public static final String STARTED_AT = "started_at";
-  public static final String ENDED_AT = "ended_at";
   public static final String OWNER_UUID = "owner_uuid";
   public static final String CURRENT_OWNER_NAME = "current_ownership";
 
@@ -59,7 +53,7 @@ public final class Columns {
   public static final String LATEST_JOB_RUN_UUID = "latest_run_guid";
   public static final String CURRENT_RUN_STATE = "current_state";
   public static final String CHECKSUM = "hex_digest";
-  public static final String RUN_ARGS_CHECKSUM = "job_run_args_hex_digest"; // TODO: revisit usage
+  public static final String RUN_ARGS_CHECKSUM = "job_run_args_hex_digest";
   public static final String RUN_ARGS = "args_json";
   public static final String RUN_STATE = "state";
   public static final String TRANSITIONED_AT = "transitioned_at";
@@ -75,15 +69,52 @@ public final class Columns {
   public static final String DB_SCHEMA_NAME = "db_schema";
   public static final String DB_TABLE_NAME = "db_table_name";
 
-  public static Instant toInstantOrNull(Timestamp timestamp) {
-    return timestamp == null ? null : timestamp.toInstant();
+  public static UUID uuidOrNull(ResultSet results, String column) throws SQLException {
+    if (results.getObject(column) == null) {
+      return null;
+    }
+    return results.getObject(column, UUID.class);
   }
 
-  public static UUID toUuidOrNull(String uuidString) {
-    return uuidString == null ? null : UUID.fromString(checkNotBlank(uuidString));
+  public static UUID uuidOrThrow(ResultSet results, String column) throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
+    }
+    return results.getObject(column, UUID.class);
   }
 
-  public static List<String> toList(Array array) throws SQLException {
-    return array == null ? Collections.emptyList() : Arrays.asList((String[]) array.getArray());
+  public static Instant timestampOrNull(ResultSet results, String column) throws SQLException {
+    if (results.getObject(column) == null) {
+      return null;
+    }
+    return results.getTimestamp(column).toInstant();
+  }
+
+  public static Instant timestampOrThrow(ResultSet results, String column) throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
+    }
+    return results.getTimestamp(column).toInstant();
+  }
+
+  public static String stringOrNull(ResultSet results, String column) throws SQLException {
+    if (results.getObject(column) == null) {
+      return null;
+    }
+    return results.getString(column);
+  }
+
+  public static String stringOrThrow(ResultSet results, String column) throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
+    }
+    return results.getString(column);
+  }
+
+  public static List<String> arrayOrThrow(ResultSet results, String column) throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
+    }
+    return Arrays.asList((String[]) results.getArray(column).getArray());
   }
 }

@@ -14,6 +14,7 @@
 
 package marquez.service.exceptions;
 
+import javax.annotation.Nullable;
 import lombok.NoArgsConstructor;
 import marquez.MarquezException;
 
@@ -21,15 +22,15 @@ import marquez.MarquezException;
 public final class MarquezServiceException extends MarquezException {
   private static final long serialVersionUID = 1L;
 
-  public MarquezServiceException(final Throwable cause) {
-    super(cause);
-  }
-
-  public MarquezServiceException(final String message) {
+  public MarquezServiceException(@Nullable final String message) {
     super(message);
   }
 
-  public MarquezServiceException(final String message, final Throwable cause) {
+  public MarquezServiceException(@Nullable final Throwable cause) {
+    super(cause);
+  }
+
+  public MarquezServiceException(@Nullable final String message, @Nullable final Throwable cause) {
     super(message, cause);
   }
 }

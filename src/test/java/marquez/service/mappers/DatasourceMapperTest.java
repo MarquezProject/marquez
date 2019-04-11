@@ -14,73 +14,56 @@
 
 package marquez.service.mappers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static marquez.db.models.DbModelGenerator.newDatasourceRow;
+import static marquez.db.models.DbModelGenerator.newDatasourceRows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
-import java.time.Instant;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceUrn;
+import marquez.UnitTests;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Datasource;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DatasourceMapperTest {
-  private static final Instant CREATED_AT = Instant.now();
-
-  private static final String CONNECTION_URL = "jdbc:postgresql://localhost:5431/novelists";
-  private static final String DATASOURCE_NAME = "my_database";
-  private static final String DATASOURCE_URN =
-      DatasourceUrn.from(
-              ConnectionUrl.fromString(CONNECTION_URL).getDatasourceType(),
-              DatasourceName.fromString(DATASOURCE_NAME))
-          .toString();
-
   @Test
-  public void testMapDatasourceRow() {
-    final DatasourceRow datasourceRow =
-        new DatasourceRow(
-            UUID.randomUUID(), DATASOURCE_URN, DATASOURCE_NAME, CONNECTION_URL, CREATED_AT);
-    final Datasource datasource = DatasourceMapper.map(datasourceRow);
-
-    assertNotNull(datasourceRow);
-    assertEquals(CONNECTION_URL, datasource.getConnectionUrl().getRawValue());
-    assertEquals(DATASOURCE_NAME, datasource.getName().getValue());
-    assertEquals(CREATED_AT, datasource.getCreatedAt());
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testMapNullDatasourceRow() {
-    final DatasourceRow nullDatasourceRow = null;
-    DatasourceMapper.map(nullDatasourceRow);
+  public void testMap_row() {
+    final DatasourceRow row = newDatasourceRow();
+    final Datasource datasource = DatasourceMapper.map(row);
+    assertThat(datasource).isNotNull();
+    assertThat(row.getName()).isEqualTo(datasource.getName().getValue());
+    assertThat(row.getCreatedAt()).isEqualTo(datasource.getCreatedAt().toString());
+    assertThat(row.getUrn()).isEqualTo(datasource.getUrn().getValue());
+    assertThat(row.getConnectionUrl()).isEqualTo(datasource.getConnectionUrl().getRawValue());
   }
 
   @Test
-  public void testMapDatasourceRowList() {
-    final List<DatasourceRow> datasourceRows =
-        Arrays.asList(
-            new DatasourceRow(
-                UUID.randomUUID(), DATASOURCE_URN, DATASOURCE_NAME, CONNECTION_URL, CREATED_AT));
-    final List<Datasource> datasources = DatasourceMapper.map(datasourceRows);
-
-    assertNotNull(datasources);
-    assertEquals(1, datasources.size());
+  public void testMap_throwsException_onNullRow() {
+    final DatasourceRow nullRow = null;
+    assertThatNullPointerException().isThrownBy(() -> DatasourceMapper.map(nullRow));
   }
 
   @Test
-  public void testMapEmptyDatasourceRowList() {
-    final List<DatasourceRow> emptyDatasourceRows = Arrays.asList();
-    final List<Datasource> datasources = DatasourceMapper.map(emptyDatasourceRows);
-    assertNotNull(datasources);
-    assertEquals(0, datasources.size());
+  public void testMap_rows() {
+    final List<DatasourceRow> rows = newDatasourceRows(4);
+    final List<Datasource> datasources = DatasourceMapper.map(rows);
+    assertThat(datasources).isNotNull();
+    assertThat(datasources).hasSize(4);
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testMapNullDatasourceRowList() {
-    final List<DatasourceRow> nullDatasourceRows = null;
-    DatasourceMapper.map(nullDatasourceRows);
+  @Test
+  public void testMap_emptyRows() {
+    final List<DatasourceRow> emptyRows = Collections.emptyList();
+    final List<Datasource> emptyDatasources = DatasourceMapper.map(emptyRows);
+    assertThat(emptyDatasources).isNotNull();
+    assertThat(emptyDatasources).isEmpty();
+  }
+
+  public void testMap_throwsException_onNullRows() {
+    final List<DatasourceRow> nullRows = null;
+    assertThatNullPointerException().isThrownBy(() -> DatasourceMapper.map(nullRows));
   }
 }

@@ -14,19 +14,29 @@
 
 package marquez.api.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.AllArgsConstructor;
+import static marquez.common.Preconditions.checkNotBlank;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
-@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
-public class DatasourceResponse {
-  @Getter @NonNull private final String name;
-  @Getter @NonNull private final String createdAt;
-  @Getter @NonNull private final String urn;
-  @Getter @NonNull private final String connectionUrl;
+public final class DatasourceResponse {
+  @Getter private final String name;
+  @Getter private final String createdAt;
+  @Getter private final String urn;
+  @Getter private final String connectionUrl;
+
+  public DatasourceResponse(
+      @NonNull final String name,
+      @NonNull final String createdAt,
+      @NonNull final String urn,
+      @NonNull final String connectionUrl) {
+    this.name = checkNotBlank(name);
+    this.createdAt = checkNotBlank(createdAt);
+    this.urn = checkNotBlank(urn);
+    this.connectionUrl = checkNotBlank(connectionUrl);
+  }
 }

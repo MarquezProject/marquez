@@ -14,9 +14,9 @@
 
 package marquez.service.mappers;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
-import java.util.Collections;
 import java.util.List;
 import lombok.NonNull;
 import marquez.common.models.ConnectionUrl;
@@ -25,22 +25,19 @@ import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Datasource;
 
-public class DatasourceMapper {
+public final class DatasourceMapper {
   private DatasourceMapper() {}
 
-  public static Datasource map(@NonNull DatasourceRow datasourceRow) {
-    final DatasourceName datasourceName = DatasourceName.fromString(datasourceRow.getName());
-    final ConnectionUrl connectionUrl = ConnectionUrl.fromString(datasourceRow.getConnectionUrl());
-    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
-    return new Datasource(
-        datasourceName,
-        datasourceRow.getCreatedAt().get(),
-        datasourceUrn,
-        ConnectionUrl.fromString(datasourceRow.getConnectionUrl()));
+  public static Datasource map(@NonNull DatasourceRow row) {
+    return Datasource.builder()
+        .name(DatasourceName.fromString(row.getName()))
+        .createdAt(row.getCreatedAt())
+        .urn(DatasourceUrn.fromString(row.getUrn()))
+        .connectionUrl(ConnectionUrl.fromString(row.getConnectionUrl()))
+        .build();
   }
 
-  public static List<Datasource> map(@NonNull List<DatasourceRow> datasourceRows) {
-    return Collections.unmodifiableList(
-        datasourceRows.stream().map(datasourceRow -> map(datasourceRow)).collect(toList()));
+  public static List<Datasource> map(@NonNull List<DatasourceRow> rows) {
+    return unmodifiableList(rows.stream().map(row -> map(row)).collect(toList()));
   }
 }
