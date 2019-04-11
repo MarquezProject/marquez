@@ -5,6 +5,11 @@ server:
   adminConnectors:
   - type: http
     port: ${MARQUEZ_ADMIN_PORT:-8081}
+  # requestLog:
+  #   appenders:
+  #     - type: console
+  #       layout:
+  #         type: access-json
 
 db:
   driverClass: org.postgresql.Driver
@@ -16,8 +21,8 @@ logging:
   level: ${LOG_LEVEL:-INFO}
   appenders:
     - type: console
-#      layout:
-#        type: json
+      # layout:
+      #   type: json
 
 metrics:
   frequency: ${METRICS_FREQUENCY:-1 minute}
