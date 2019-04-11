@@ -73,8 +73,8 @@ public class DatasetService {
                       new MarquezServiceException(
                           "Datasource row not found: " + dataset.getDatasourceUrn().getValue()));
       final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, dataset);
-      final DatasetUrn datasetUrn = DatasetUrn.fromString(newDatasetRow.getUrn());
-      final Optional<Dataset> datasetIfFound = get(datasetUrn);
+      final DatasetUrn urn = DatasetUrn.fromString(newDatasetRow.getUrn());
+      final Optional<Dataset> datasetIfFound = get(urn);
       if (datasetIfFound.isPresent()) {
         return datasetIfFound.get();
       }
@@ -110,20 +110,20 @@ public class DatasetService {
     }
   }
 
-  public boolean exists(@NonNull DatasetUrn datasetUrn) throws MarquezServiceException {
+  public boolean exists(@NonNull DatasetUrn urn) throws MarquezServiceException {
     try {
-      return datasetDao.exists(datasetUrn);
+      return datasetDao.exists(urn);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to check dataset: {}", datasetUrn.getValue(), e);
+      log.error("Failed to check dataset: {}", urn.getValue(), e);
       throw new MarquezServiceException();
     }
   }
 
-  public Optional<Dataset> get(@NonNull DatasetUrn datasetUrn) throws MarquezServiceException {
+  public Optional<Dataset> get(@NonNull DatasetUrn urn) throws MarquezServiceException {
     try {
-      return datasetDao.findBy(datasetUrn).map(DatasetMapper::map);
+      return datasetDao.findBy(urn).map(DatasetMapper::map);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get dataset: {}", datasetUrn.getValue(), e.getMessage());
+      log.error("Failed to get dataset: {}", urn.getValue(), e.getMessage());
       throw new MarquezServiceException();
     }
   }

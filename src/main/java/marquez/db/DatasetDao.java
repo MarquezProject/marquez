@@ -65,7 +65,7 @@ public interface DatasetDao {
   }
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM datasets WHERE urn = :value)")
-  boolean exists(@BindBean DatasetUrn datasetUrn);
+  boolean exists(@BindBean DatasetUrn urn);
 
   @SqlUpdate(
       "UPDATE datasets "
@@ -78,7 +78,7 @@ public interface DatasetDao {
   Optional<DatasetRow> findBy(UUID uuid);
 
   @SqlQuery("SELECT * FROM datasets WHERE urn = :value")
-  Optional<DatasetRow> findBy(@BindBean DatasetUrn datasetUrn);
+  Optional<DatasetRow> findBy(@BindBean DatasetUrn urn);
 
   @SqlQuery(
       "SELECT * "
