@@ -413,7 +413,7 @@ components:
         type: string
         format: URN
         maxLength: 1024
-        example: urn:datasource:postgresql:financials_db
+        example: urn:dataset:analytics_db:wedata.room_bookings
 
   schemas:
     createNamespace:
@@ -689,7 +689,7 @@ components:
       example:
         name: wedata.room_bookings
         createdAt: 2018-10-04T15:01:23.045Z
-        urn: urn:datasource:analytics_db:wedata.room_bookings
+        urn: urn:dataset:analytics_db:wedata.room_bookings
         description: "All room booking occupancy data."
 
     datasets:
