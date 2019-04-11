@@ -49,12 +49,12 @@ public class NamespaceDaoTest {
 
   @Test
   public void testInsert() {
-    int rowsBefore = namespaceDao.count();
+    final int rowsBefore = namespaceDao.count();
 
     final NamespaceRow newNamespaceRow = newNamespaceRow();
     namespaceDao.insert(newNamespaceRow);
 
-    int rowsAfter = namespaceDao.count();
+    final int rowsAfter = namespaceDao.count();
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
   }
 

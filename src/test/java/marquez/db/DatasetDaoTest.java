@@ -63,8 +63,7 @@ public class DatasetDaoTest {
 
   @Test
   public void testInsert() {
-    int rowsBefore = datasetDao.count();
-
+    final int rowsBefore = datasetDao.count();
     final NamespaceRow namespaceRow = newNamespaceRow();
     final DatasourceRow datasourceRow = newDatasourceRow();
     namespaceDao.insert(namespaceRow);
@@ -74,7 +73,7 @@ public class DatasetDaoTest {
         newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
     datasetDao.insert(newDatasetRow);
 
-    int rowsAfter = datasetDao.count();
+    final int rowsAfter = datasetDao.count();
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
   }
 
