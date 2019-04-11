@@ -13,7 +13,7 @@ db:
   password: ${POSTGRES_PASSWORD}
 
 metrics:
-  frequency: 1 minute
+  frequency: ${METRICS_FREQUENCY:-1 minute}
   reporters:
     - type: console
       timeZone: UTC
