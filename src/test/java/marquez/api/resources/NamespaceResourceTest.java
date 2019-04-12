@@ -64,7 +64,9 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Test
   public void testCreateNamespaceErrorHandling() throws MarquezServiceException {
-    doThrow(new MarquezServiceException()).when(NAMESPACE_SERVICE).create(any(Namespace.class));
+    doThrow(new MarquezServiceException())
+        .when(NAMESPACE_SERVICE)
+        .createOrUpdate(any(Namespace.class));
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),

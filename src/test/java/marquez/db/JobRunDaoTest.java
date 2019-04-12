@@ -52,12 +52,13 @@ public class JobRunDaoTest extends JobRunBaseTest {
   protected static final JobRunStateDao jobRunStateDao = APP.onDemand(JobRunStateDao.class);
   protected static final JobRunArgsDao jobRunArgsDao = APP.onDemand(JobRunArgsDao.class);
 
-  protected static final NamespaceService namespaceService = new NamespaceService(namespaceDao);
+  protected static NamespaceService namespaceService;
   protected static final JobService jobService =
       new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
   @BeforeClass
-  public static void setUpRowMapper() {
+  public static void setUpOnce() throws MarquezServiceException {
+    namespaceService = new NamespaceService(namespaceDao);
     APP.getJDBI()
         .registerRowMapper(
             JobRunState.class,
@@ -67,11 +68,8 @@ public class JobRunDaoTest extends JobRunBaseTest {
                     rs.getTimestamp("transitioned_at"),
                     UUID.fromString(rs.getString("job_run_guid")),
                     JobRunState.State.fromInt(rs.getInt("state"))));
-  }
 
-  @BeforeClass
-  public static void setup() throws MarquezServiceException {
-    Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
+    Namespace generatedNamespace = namespaceService.createOrUpdate(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 

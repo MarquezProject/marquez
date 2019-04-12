@@ -15,10 +15,10 @@
 package marquez.api.models;
 
 import java.util.List;
-import lombok.Data;
 import lombok.NonNull;
+import lombok.Value;
 
-@Data
+@Value
 public final class DatasetsResponse {
   @NonNull private final List<DatasetResponse> datasets;
 }

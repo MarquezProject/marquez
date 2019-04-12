@@ -1,0 +1,1 @@
+ALTER TABLE namespaces ADD COLUMN updated_at TIMESTAMPTZ;

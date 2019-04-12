@@ -14,28 +14,33 @@
 
 package marquez.api.mappers;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
-import java.util.Collections;
 import java.util.List;
 import lombok.NonNull;
 import marquez.api.models.DatasetResponse;
+import marquez.api.models.DatasetsResponse;
+import marquez.common.models.Description;
 import marquez.service.models.Dataset;
 
 public final class DatasetResponseMapper {
   private DatasetResponseMapper() {}
 
   public static DatasetResponse map(@NonNull Dataset dataset) {
+    final Description description = dataset.getDescription();
     return new DatasetResponse(
-        dataset.getUrn().getValue(),
+        dataset.getName().getValue(),
         dataset.getCreatedAt().toString(),
-        dataset.getDescription().map(desc -> desc.getValue()).orElse(null));
+        dataset.getUrn().getValue(),
+        (description == null) ? null : description.getValue());
   }
 
   public static List<DatasetResponse> map(@NonNull List<Dataset> datasets) {
-    return datasets.isEmpty()
-        ? Collections.emptyList()
-        : Collections.unmodifiableList(
-            datasets.stream().map(dataset -> map(dataset)).collect(toList()));
+    return unmodifiableList(datasets.stream().map(dataset -> map(dataset)).collect(toList()));
+  }
+
+  public static DatasetsResponse toDatasetsResponse(@NonNull List<Dataset> datasets) {
+    return new DatasetsResponse(map(datasets));
   }
 }
