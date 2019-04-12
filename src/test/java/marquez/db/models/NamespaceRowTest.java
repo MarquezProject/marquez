@@ -14,117 +14,62 @@
 
 package marquez.db.models;
 
-import static org.junit.Assert.assertEquals;
+import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.Description;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.OwnerName;
 import org.junit.Test;
 
 public class NamespaceRowTest {
   private static final UUID ROW_UUID = UUID.randomUUID();
   private static final Instant CREATED_AT = Instant.now();
-  private static final Instant UPDATED_AT = Instant.now();
-  private static final String NAME = "test_namespace";
-  private static final String CURRENT_OWNER_NAME = "test owner";
+  private static final NamespaceName NAME = newNamespaceName();
+  private static final Description DESCRIPTION = newDescription();
+  private static final OwnerName CURRENT_OWNER_NAME = newOwnerName();
 
   @Test
-  public void testNewNamespaceOwnershipRow() {
-    final String description = "test description";
-    final Optional<String> expectedDescription = Optional.of(description);
-    final NamespaceRow namespaceRow =
+  public void testNewRow() {
+    final NamespaceRow expected =
         NamespaceRow.builder()
             .uuid(ROW_UUID)
             .createdAt(CREATED_AT)
-            .updatedAt(UPDATED_AT)
-            .name(NAME)
-            .description(description)
-            .currentOwnerName(CURRENT_OWNER_NAME)
+            .name(NAME.getValue())
+            .description(DESCRIPTION.getValue())
+            .currentOwnerName(CURRENT_OWNER_NAME.getValue())
             .build();
-    assertEquals(ROW_UUID, namespaceRow.getUuid());
-    assertEquals(CREATED_AT, namespaceRow.getCreatedAt());
-    assertEquals(UPDATED_AT, namespaceRow.getUpdatedAt());
-    assertEquals(NAME, namespaceRow.getName());
-    assertEquals(expectedDescription, namespaceRow.getDescription());
-    assertEquals(CURRENT_OWNER_NAME, namespaceRow.getCurrentOwnerName());
-  }
-
-  @Test
-  public void testNewNamespaceOwnershipRow_noDescription() {
-    final Optional<String> noDescription = Optional.empty();
-    final NamespaceRow namespaceRow =
+    final NamespaceRow actual =
         NamespaceRow.builder()
             .uuid(ROW_UUID)
             .createdAt(CREATED_AT)
-            .updatedAt(UPDATED_AT)
-            .name(NAME)
-            .currentOwnerName(CURRENT_OWNER_NAME)
+            .name(NAME.getValue())
+            .description(DESCRIPTION.getValue())
+            .currentOwnerName(CURRENT_OWNER_NAME.getValue())
             .build();
-    assertEquals(ROW_UUID, namespaceRow.getUuid());
-    assertEquals(CREATED_AT, namespaceRow.getCreatedAt());
-    assertEquals(UPDATED_AT, namespaceRow.getUpdatedAt());
-    assertEquals(NAME, namespaceRow.getName());
-    assertEquals(noDescription, namespaceRow.getDescription());
-    assertEquals(CURRENT_OWNER_NAME, namespaceRow.getCurrentOwnerName());
+    assertThat(expected).isEqualTo(actual);
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testNewNamespaceOwnershipRow_nullUuid() {
-    final UUID nullUuid = null;
-    NamespaceRow.builder()
-        .uuid(nullUuid)
-        .createdAt(CREATED_AT)
-        .updatedAt(UPDATED_AT)
-        .name(NAME)
-        .currentOwnerName(CURRENT_OWNER_NAME)
-        .build();
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewNamespaceOwnershipRow_nullCreatedAt() {
-    final Instant nullCreatedAt = null;
-    NamespaceRow.builder()
-        .uuid(ROW_UUID)
-        .createdAt(nullCreatedAt)
-        .updatedAt(UPDATED_AT)
-        .name(NAME)
-        .currentOwnerName(CURRENT_OWNER_NAME)
-        .build();
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewNamespaceOwnershipRow_nullUpdatedAt() {
-    final Instant nullUpdatedAt = null;
-    NamespaceRow.builder()
-        .uuid(ROW_UUID)
-        .createdAt(CREATED_AT)
-        .updatedAt(nullUpdatedAt)
-        .name(NAME)
-        .currentOwnerName(CURRENT_OWNER_NAME)
-        .build();
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewNamespaceOwnershipRow_nullName() {
-    final String nullName = null;
-    NamespaceRow.builder()
-        .uuid(ROW_UUID)
-        .createdAt(CREATED_AT)
-        .updatedAt(UPDATED_AT)
-        .name(nullName)
-        .currentOwnerName(CURRENT_OWNER_NAME)
-        .build();
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewNamespaceOwnershipRow_nullCurrentOwnerName() {
-    final String nullCurrentOwnerName = null;
-    NamespaceRow.builder()
-        .uuid(ROW_UUID)
-        .createdAt(CREATED_AT)
-        .updatedAt(UPDATED_AT)
-        .name(NAME)
-        .currentOwnerName(nullCurrentOwnerName)
-        .build();
+  @Test
+  public void testNewRow_noDescription() {
+    final NamespaceRow expected =
+        NamespaceRow.builder()
+            .uuid(ROW_UUID)
+            .createdAt(CREATED_AT)
+            .name(NAME.getValue())
+            .currentOwnerName(CURRENT_OWNER_NAME.getValue())
+            .build();
+    final NamespaceRow actual =
+        NamespaceRow.builder()
+            .uuid(ROW_UUID)
+            .createdAt(CREATED_AT)
+            .name(NAME.getValue())
+            .currentOwnerName(CURRENT_OWNER_NAME.getValue())
+            .build();
+    assertThat(expected).isEqualTo(actual);
   }
 }

@@ -14,9 +14,12 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.stringOrThrow;
+import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidOrThrow;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
 import marquez.db.models.DatasourceRow;
@@ -28,11 +31,11 @@ public final class DatasourceRowMapper implements RowMapper<DatasourceRow> {
   public DatasourceRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
     return DatasourceRow.builder()
-        .uuid(results.getObject(Columns.ROW_UUID, UUID.class))
-        .urn(results.getString(Columns.URN))
-        .createdAt(results.getTimestamp(Columns.CREATED_AT).toInstant())
-        .name(results.getString(Columns.NAME))
-        .connectionUrl(results.getString(Columns.CONNECTION_URL))
+        .uuid(uuidOrThrow(results, Columns.ROW_UUID))
+        .createdAt(timestampOrThrow(results, Columns.CREATED_AT))
+        .name(stringOrThrow(results, Columns.NAME))
+        .urn(stringOrThrow(results, Columns.URN))
+        .connectionUrl(stringOrThrow(results, Columns.CONNECTION_URL))
         .build();
   }
 }

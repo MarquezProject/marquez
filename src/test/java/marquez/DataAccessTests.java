@@ -12,11 +12,6 @@
  * limitations under the License.
  */
 
-package marquez.api;
+package marquez;
 
-import marquez.db.fixtures.AppWithPostgresRule;
-import org.junit.ClassRule;
-
-public class JobRunBaseTest {
-  @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
-}
+public interface DataAccessTests {}

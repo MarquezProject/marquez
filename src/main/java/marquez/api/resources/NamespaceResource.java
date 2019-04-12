@@ -28,7 +28,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.api.mappers.NamespaceApiMapper;
 import marquez.api.mappers.NamespaceResponseMapper;
@@ -40,7 +39,6 @@ import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
 
-@Slf4j
 @Path("/api/v1")
 public final class NamespaceResource {
   private final NamespaceApiMapper namespaceApiMapper = new NamespaceApiMapper();
@@ -57,11 +55,11 @@ public final class NamespaceResource {
   @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces/{namespace}")
-  public Response create(
+  public Response createOrUpdate(
       @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceRequest request)
       throws MarquezServiceException {
     final Namespace namespace =
-        namespaceService.create(namespaceApiMapper.of(namespaceName.getValue(), request));
+        namespaceService.createOrUpdate(namespaceApiMapper.of(namespaceName.getValue(), request));
     final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
     return Response.ok(response).build();
   }
@@ -73,7 +71,7 @@ public final class NamespaceResource {
   public Response get(@PathParam("namespace") NamespaceName namespaceName)
       throws MarquezServiceException {
     final Optional<NamespaceResponse> namespaceResponse =
-        namespaceService.get(namespaceName.getValue()).map(NamespaceResponseMapper::map);
+        namespaceService.get(namespaceName).map(NamespaceResponseMapper::map);
     if (namespaceResponse.isPresent()) {
       return Response.ok(namespaceResponse.get()).build();
     } else {
@@ -85,8 +83,8 @@ public final class NamespaceResource {
   @Produces(APPLICATION_JSON)
   @Timed
   @Path("/namespaces")
-  public Response listNamespaces() throws MarquezServiceException {
-    final List<Namespace> namespaces = namespaceService.listNamespaces();
+  public Response list() throws MarquezServiceException {
+    final List<Namespace> namespaces = namespaceService.getAll();
     final List<NamespaceResponse> namespaceResponses =
         coreNamespaceToApiNamespaceMapper.map(namespaces);
     return Response.ok(new NamespacesResponse(namespaceResponses)).build();

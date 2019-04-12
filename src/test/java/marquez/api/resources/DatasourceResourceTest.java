@@ -15,7 +15,6 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -146,7 +145,12 @@ public class DatasourceResourceTest {
     final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
     final Datasource ds1 =
-        new Datasource(datasourceName, Instant.now(), datasourceUrn, connectionUrl);
+        Datasource.builder()
+            .name(datasourceName)
+            .createdAt(Instant.now())
+            .urn(datasourceUrn)
+            .connectionUrl(connectionUrl)
+            .build();
     when(mockDatasourceService.get(datasourceUrn)).thenReturn(Optional.of(ds1));
 
     final Response datasourceResourceResponse = datasourceResource.get(datasourceUrn);
@@ -182,7 +186,12 @@ public class DatasourceResourceTest {
     final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
     final Datasource ds1 =
-        new Datasource(datasourceName, Instant.now(), datasourceUrn, connectionUrl);
+        Datasource.builder()
+            .name(datasourceName)
+            .createdAt(Instant.now())
+            .urn(datasourceUrn)
+            .connectionUrl(connectionUrl)
+            .build();
     when(mockDatasourceService.get(ds1.getUrn())).thenThrow(MarquezServiceException.class);
     datasourceResource.get(ds1.getUrn());
   }
@@ -198,7 +207,7 @@ public class DatasourceResourceTest {
 
     // When we submit it
     final Response createDatasourceResponse = datasourceResource.create(validRequest);
-    assertThat(createDatasourceResponse.getStatus()).isEqualTo(CREATED.getStatusCode());
+    assertThat(createDatasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
     final DatasourceResponse returnedDatasource =
         (DatasourceResponse) createDatasourceResponse.getEntity();
 

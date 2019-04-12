@@ -14,12 +14,12 @@
 
 package marquez.service.mappers;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-import static marquez.common.models.Description.NO_DESCRIPTION;
 
-import java.util.Collections;
 import java.util.List;
 import lombok.NonNull;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.Description;
 import marquez.db.models.DatasetRow;
@@ -28,16 +28,16 @@ import marquez.service.models.Dataset;
 public final class DatasetMapper {
   private DatasetMapper() {}
 
-  public static Dataset map(@NonNull DatasetRow datasetRow) {
-    return new Dataset(
-        DatasetUrn.fromString(datasetRow.getUrn()),
-        datasetRow.getCreatedAt(),
-        datasetRow.getDescription().map(Description::fromString).orElse(NO_DESCRIPTION));
+  public static Dataset map(@NonNull DatasetRow row) {
+    return Dataset.builder()
+        .name(DatasetName.fromString(row.getName()))
+        .createdAt(row.getCreatedAt())
+        .urn(DatasetUrn.fromString(row.getUrn()))
+        .description(Description.fromString(row.getDescription()))
+        .build();
   }
 
-  public static List<Dataset> map(@NonNull List<DatasetRow> datasetRows) {
-    return datasetRows.isEmpty()
-        ? Collections.emptyList()
-        : Collections.unmodifiableList(datasetRows.stream().map(row -> map(row)).collect(toList()));
+  public static List<Dataset> map(@NonNull List<DatasetRow> rows) {
+    return unmodifiableList(rows.stream().map(row -> map(row)).collect(toList()));
   }
 }

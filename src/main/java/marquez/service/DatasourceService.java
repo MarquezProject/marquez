@@ -43,19 +43,32 @@ public class DatasourceService {
     final DatasourceRow row = DatasourceRowMapper.map(connectionUrl, name);
 
     try {
-      datasourceDao.insert(row);
-      final DatasourceUrn urn = DatasourceUrn.fromString(row.getUrn());
-      final Optional<DatasourceRow> rowIfFound = datasourceDao.findBy(urn.getValue());
-      return rowIfFound.map(DatasourceMapper::map).orElseThrow(MarquezServiceException::new);
+      // Check if its already there based on its name. If so, return
+      final Optional<DatasourceRow> existingRowIfFound = datasourceDao.findBy(name);
+      if (existingRowIfFound.isPresent()) {
+        return DatasourceMapper.map(existingRowIfFound.get());
+      }
+
+      Optional<DatasourceRow> insertedRow = datasourceDao.insert(row);
+      return insertedRow.map(DatasourceMapper::map).orElseThrow(MarquezServiceException::new);
     } catch (UnableToExecuteStatementException e) {
-      log.error(e.getMessage());
+      log.error("Database issue while trying to create datasource " + name, e.getMessage());
+      throw new MarquezServiceException();
+    }
+  }
+
+  public boolean exists(@NonNull DatasourceUrn datasourceUrn) throws MarquezServiceException {
+    try {
+      return datasourceDao.exists(datasourceUrn);
+    } catch (UnableToExecuteStatementException e) {
+      log.error("Failed to check dataset: {}", datasourceUrn.getValue(), e);
       throw new MarquezServiceException();
     }
   }
 
   public Optional<Datasource> get(@NonNull final DatasourceUrn urn) throws MarquezServiceException {
     try {
-      final Optional<DatasourceRow> rowIfFound = datasourceDao.findBy(urn.getValue());
+      final Optional<DatasourceRow> rowIfFound = datasourceDao.findBy(urn);
       return rowIfFound.map(DatasourceMapper::map);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());

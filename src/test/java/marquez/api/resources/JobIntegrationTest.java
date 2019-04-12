@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.api;
+package marquez.api.resources;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,7 +53,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JobIntegrationTest extends JobRunBaseTest {
-
   protected static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
   protected static String NAMESPACE_NAME;
@@ -70,13 +69,14 @@ public class JobIntegrationTest extends JobRunBaseTest {
   protected static final JobRunDao jobRunDao = APP.onDemand(JobRunDao.class);
   protected static final JobRunArgsDao jobRunArgsDao = APP.onDemand(JobRunArgsDao.class);
 
-  protected static final NamespaceService namespaceService = new NamespaceService(namespaceDao);
+  protected static NamespaceService namespaceService;
   protected static final JobService jobService =
       new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
   @BeforeClass
   public static void setup() throws MarquezServiceException {
-    Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
+    namespaceService = new NamespaceService(namespaceDao);
+    Namespace generatedNamespace = namespaceService.createOrUpdate(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 

@@ -14,10 +14,11 @@
 
 package marquez.db.models;
 
-import static org.junit.Assert.assertEquals;
+import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
+import static marquez.common.models.CommonModelGenerator.newDatasourceName;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
 import marquez.common.models.ConnectionUrl;
@@ -30,62 +31,28 @@ import org.junit.experimental.categories.Category;
 public class DatasourceRowTest {
   private static final UUID ROW_UUID = UUID.randomUUID();
   private static final Instant CREATED_AT = Instant.now();
-  private static final String TYPE = "postgresql";
-  private static final String NAME = "mydatabase123";
-  private static final String CONNECTION_URL =
-      String.format("jdbc:%s://localhost:5432/test_db", TYPE);
-  private static final String DATASOURCE_URN =
-      DatasourceUrn.from(ConnectionUrl.fromString(CONNECTION_URL), DatasourceName.fromString(NAME))
-          .toString();
+  private static final DatasourceName NAME = newDatasourceName();
+  private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
+  private static final DatasourceUrn URN = DatasourceUrn.from(CONNECTION_URL, NAME);
 
   @Test
-  public void testNewDatasourceRow() {
-    final Optional<Instant> expectedCreatedAt = Optional.of(CREATED_AT);
-    final DatasourceRow datasourceRow =
+  public void testNewRow() {
+    final DatasourceRow expected =
         DatasourceRow.builder()
             .uuid(ROW_UUID)
             .createdAt(CREATED_AT)
-            .urn(DATASOURCE_URN)
-            .name(NAME)
-            .connectionUrl(CONNECTION_URL)
+            .name(NAME.getValue())
+            .urn(URN.getValue())
+            .connectionUrl(CONNECTION_URL.getRawValue())
             .build();
-    assertEquals(ROW_UUID, datasourceRow.getUuid());
-    assertEquals(expectedCreatedAt, datasourceRow.getCreatedAt());
-    assertEquals(NAME, datasourceRow.getName());
-    assertEquals(CONNECTION_URL, datasourceRow.getConnectionUrl());
-  }
-
-  @Test
-  public void testNewDatasourceRow_noCreatedAt() {
-    final Optional<Instant> noCreatedAt = Optional.empty();
-    final DatasourceRow datasourceRow =
+    final DatasourceRow actual =
         DatasourceRow.builder()
             .uuid(ROW_UUID)
-            .urn(DATASOURCE_URN)
-            .name(NAME)
-            .connectionUrl(CONNECTION_URL)
+            .createdAt(CREATED_AT)
+            .name(NAME.getValue())
+            .urn(URN.getValue())
+            .connectionUrl(CONNECTION_URL.getRawValue())
             .build();
-    assertEquals(ROW_UUID, datasourceRow.getUuid());
-    assertEquals(noCreatedAt, datasourceRow.getCreatedAt());
-    assertEquals(NAME, datasourceRow.getName());
-    assertEquals(CONNECTION_URL, datasourceRow.getConnectionUrl());
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewDatasourceRow_throwsException_onNullUuid() {
-    final UUID nullUuid = null;
-    DatasourceRow.builder().uuid(nullUuid).name(NAME).connectionUrl(CONNECTION_URL).build();
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewDatasourceRow_throwsException_onNullName() {
-    final String nullName = null;
-    DatasourceRow.builder().uuid(ROW_UUID).name(nullName).connectionUrl(CONNECTION_URL).build();
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNewDatasourceRow_throwsException_onNullConnectionUrl() {
-    final String nullConnectionUrl = null;
-    DatasourceRow.builder().uuid(ROW_UUID).name(NAME).connectionUrl(nullConnectionUrl).build();
+    assertThat(expected).isEqualTo(actual);
   }
 }

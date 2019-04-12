@@ -14,6 +14,8 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.uuidOrNull;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -32,7 +34,7 @@ public final class JobVersionRowMapper implements RowMapper<JobVersion> {
         results.getObject(Columns.JOB_UUID, UUID.class),
         results.getString(Columns.LOCATION),
         results.getObject(Columns.VERSION, UUID.class),
-        Columns.toUuidOrNull(results.getString(Columns.LATEST_JOB_RUN_UUID)),
+        uuidOrNull(results, Columns.LATEST_JOB_RUN_UUID),
         results.getTimestamp(Columns.CREATED_AT),
         results.getTimestamp(Columns.UPDATED_AT));
   }
