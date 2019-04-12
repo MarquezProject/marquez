@@ -265,6 +265,23 @@ paths:
   /namespaces/{namespace}/datasets:
     parameters:
       - $ref: '#/components/parameters/namespace'
+    post:
+      summary: Create a dataset
+      description: Creates a new dataset object.
+      tags:
+        - Datasets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createDataset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dataset'
     get:
       summary: List all datasets
       description: Returns a list of datasets.
@@ -277,6 +294,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/datasets'
+
+  /namespaces/{namespace}/datasets/{urn}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/datasetUrn'
+    get:
+      summary: Get a dataset
+      description: Returns a dataset. An individual dataset object is identifiable by its Marquez-generated unique URN.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dataset'
 
   /datasources:
     get:
@@ -369,6 +403,17 @@ components:
         format: URN
         maxLength: 1024
         example: urn:datasource:postgresql:financials_db
+
+    datasetUrn:
+      name: urn
+      in: path
+      description: The URN of the dataset.
+      required: true
+      schema:
+        type: string
+        format: URN
+        maxLength: 1024
+        example: urn:dataset:analytics_db:wedata.room_bookings
 
   schemas:
     createNamespace:
@@ -603,20 +648,49 @@ components:
               - $ref: '#/components/schemas/DB'
               - $ref: '#/components/schemas/ICEBERG'
 
+    createDataset:
+      type: object
+      properties:
+        name:
+          description: The name of the dataset.
+          type: string
+        datasourceUrn:
+          description: The URN of the datasource associated with the dataset.
+          type: string
+          format: URN
+        description:
+          description:  The description of the dataset.
+          type: string
+      required:
+        - name
+        - datasourceUrn
+      example:
+        name: wedata.room_bookings
+        datasourceUrn: urn:datasource:postgresql:analytics_db
+        description: "All room booking occupancy data."
+
     dataset:
       type: object
       properties:
-        urn:
-          description: The URN of the dataset.
+        name:
+          description: The name of the dataset.
           type: string
-          format: URN
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
           type: string
           format: date-time
+        urn:
+          description: The URN of the dataset.
+          type: string
+          format: URN
+        description:
+          description:  The description of the dataset.
+          type: string
       example:
-        urn: urn:wework:wedata.room_bookings
+        name: wedata.room_bookings
         createdAt: 2018-10-04T15:01:23.045Z
+        urn: urn:dataset:analytics_db:wedata.room_bookings
+        description: "All room booking occupancy data."
 
     datasets:
       type: object
