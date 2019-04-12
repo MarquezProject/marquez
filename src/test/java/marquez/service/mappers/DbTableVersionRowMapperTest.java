@@ -33,6 +33,7 @@ import marquez.common.models.DbName;
 import marquez.common.models.DbSchemaName;
 import marquez.common.models.DbTableName;
 import marquez.db.Columns;
+import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.mappers.DbTableInfoRowMapper;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DbTableInfoRow;
@@ -60,6 +61,7 @@ public class DbTableVersionRowMapperTest {
   final UUID G_UUID = UUID.randomUUID();
   private final String URN = "test_urn";
   private final String DESCRIPTION = "test_description";
+  private final String NAME = "test_name";
 
   @Test
   public void testMap() throws SQLException {
@@ -72,22 +74,27 @@ public class DbTableVersionRowMapperTest {
     final DbTableInfoRowMapper dbTableInfoRowMapper = new DbTableInfoRowMapper();
     final DbTableInfoRow dbTableInfoRow = dbTableInfoRowMapper.map(results, context);
 
+    final ResultSet resultsDatasetRow = mock(ResultSet.class);
+    when(resultsDatasetRow.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(G_UUID);
+    when(resultsDatasetRow.getTimestamp(Columns.CREATED_AT))
+        .thenReturn(Timestamp.from(CREATED_UPDATED_AT));
+    when(resultsDatasetRow.getTimestamp(Columns.UPDATED_AT))
+        .thenReturn(Timestamp.from(CREATED_UPDATED_AT));
+    when(resultsDatasetRow.getObject(Columns.NAMESPACE_UUID, UUID.class)).thenReturn(G_UUID);
+    when(resultsDatasetRow.getString(Columns.URN)).thenReturn(URN);
+    when(resultsDatasetRow.getString(Columns.NAME)).thenReturn(NAME);
+    when(resultsDatasetRow.getString(Columns.DESCRIPTION)).thenReturn(DESCRIPTION);
+    when(resultsDatasetRow.getObject(Columns.CURRENT_VERSION_UUID, UUID.class)).thenReturn(G_UUID);
+    final DatasetRowMapper datasetRowMapper = new DatasetRowMapper();
+    final DatasetRow datasetRow = datasetRowMapper.map(resultsDatasetRow, context);
+
     final DbTableVersion dbTableVersion =
         DbTableVersion.builder()
             .connectionUrl(CONNECTION_URL)
             .dbSchemaName(DB_SCHEMA_NAME)
             .dbTableName(DB_TABLE_NAME)
             .build();
-    final DatasetRow datasetRow =
-        new DatasetRow(
-            G_UUID,
-            CREATED_UPDATED_AT,
-            CREATED_UPDATED_AT,
-            G_UUID,
-            G_UUID,
-            URN,
-            G_UUID,
-            DESCRIPTION);
+
     final DbTableVersionRow dbTableVersionRow =
         DbTableVersionRowMapper.map(datasetRow, dbTableInfoRow, dbTableVersion);
     assertNotNull(dbTableVersionRow);
