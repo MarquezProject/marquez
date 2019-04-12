@@ -31,6 +31,9 @@ public interface DatasourceDao {
           + "VALUES (:uuid, :urn, :name, :connectionUrl) RETURNING * ")
   Optional<DatasourceRow> insert(@BindBean DatasourceRow datasourceRow);
 
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM datasources WHERE urn = :value)")
+  boolean exists(@BindBean DatasourceUrn urn);
+
   @SqlQuery("SELECT * FROM datasources WHERE urn = :value")
   Optional<DatasourceRow> findBy(@BindBean DatasourceUrn urn);
 

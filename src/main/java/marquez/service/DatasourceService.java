@@ -57,6 +57,15 @@ public class DatasourceService {
     }
   }
 
+  public boolean exists(@NonNull DatasourceUrn datasourceUrn) throws MarquezServiceException {
+    try {
+      return datasourceDao.exists(datasourceUrn);
+    } catch (UnableToExecuteStatementException e) {
+      log.error("Failed to check dataset: {}", datasourceUrn.getValue(), e);
+      throw new MarquezServiceException();
+    }
+  }
+
   public Optional<Datasource> get(@NonNull final DatasourceUrn urn) throws MarquezServiceException {
     try {
       final Optional<DatasourceRow> rowIfFound = datasourceDao.findBy(urn);

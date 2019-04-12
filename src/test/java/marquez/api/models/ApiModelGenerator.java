@@ -12,19 +12,16 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.models;
 
-import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
+import static marquez.common.models.CommonModelGenerator.newDescription;
 
-@AllArgsConstructor(staticName = "fromString")
-@EqualsAndHashCode
-@ToString
-public final class Description {
-  @Getter @Nullable private final String value;
+public final class ApiModelGenerator {
+  private ApiModelGenerator() {}
 
-  public static final Description NO_DESCRIPTION = new Description(null);
+  public static DatasetRequest newDatasetRequest() {
+    return new DatasetRequest(newDatasetName(), newDatasourceUrn(), newDescription());
+  }
 }

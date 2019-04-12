@@ -16,6 +16,7 @@ package marquez.db.models;
 
 import static java.util.stream.Collectors.toList;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
@@ -27,21 +28,33 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
+import marquez.common.models.NamespaceName;
 
 public final class DbModelGenerator {
   private DbModelGenerator() {}
 
-  public static NamespaceRow newNamespaceRow() {
-    return newNamespaceRow(false);
+  public static List<NamespaceRow> newNamespaceRows(int limit) {
+    return Stream.generate(() -> newNamespaceRow()).limit(limit).collect(toList());
   }
 
-  public static NamespaceRow newNamespaceRow(boolean wasUpdated) {
+  public static NamespaceRow newNamespaceRow() {
+    return newNamespaceRowWith(newNamespaceName(), false);
+  }
+
+  public static NamespaceRow newNamespaceRowWith(NamespaceName namespaceName) {
+    return newNamespaceRowWith(namespaceName, false);
+  }
+
+  public static NamespaceRow newNamespaceRowWith(NamespaceName namespaceName, boolean wasUpdated) {
     final NamespaceRow.NamespaceRowBuilder builder =
         NamespaceRow.builder()
             .uuid(UUID.randomUUID())
             .createdAt(newTimestamp())
             .updatedAt(newTimestamp())
-            .name(newNamespaceName().getValue())
+            .name(namespaceName.getValue())
             .description(newDescription().getValue())
             .currentOwnerName(newOwnerName().getValue());
 
@@ -58,46 +71,93 @@ public final class DbModelGenerator {
   }
 
   public static DatasourceRow newDatasourceRow() {
+    return newDatasourceRowWith(newDatasourceName(), newDatasourceUrn());
+  }
+
+  public static DatasourceRow newDatasourceRowWith(
+      DatasourceName datasourceName, DatasourceUrn datasourceUrn) {
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .createdAt(newTimestamp())
-        .name(newDatasourceName().getValue())
-        .urn(newDatasourceUrn().getValue())
+        .name(datasourceName.getValue())
+        .urn(datasourceUrn.getValue())
         .connectionUrl(newConnectionUrl().getRawValue())
         .build();
+  }
+
+  public static List<DatasetRow> newDatasetRows(int limit) {
+    return Stream.generate(() -> newDatasetRow()).limit(limit).collect(toList());
+  }
+
+  public static List<DatasetRow> newDatasetRowsWith(
+      UUID namespaceUuid, UUID datasourceUuid, int limit) {
+    return Stream.generate(() -> newDatasetRowWith(namespaceUuid, datasourceUuid))
+        .limit(limit)
+        .collect(toList());
   }
 
   public static DatasetRow newDatasetRow() {
     return newDatasetRowWith(false);
   }
 
+  public static DatasetRow newDatasetRowWith(UUID uuid) {
+    return newDatasetRowWith(uuid, false);
+  }
+
+  public static DatasetRow newDatasetRowWith(DatasetUrn datasetUrn) {
+    return newDatasetRowWith(
+        UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), datasetUrn, false);
+  }
+
   public static DatasetRow newDatasetRowWith(boolean wasUpdated) {
-    return newDatasetRowWith(UUID.randomUUID(), UUID.randomUUID(), wasUpdated);
+    return newDatasetRowWith(
+        UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), newDatasetUrn(), wasUpdated);
+  }
+
+  public static DatasetRow newDatasetRowWith(UUID uuid, boolean wasUpdated) {
+    return newDatasetRowWith(
+        uuid, UUID.randomUUID(), UUID.randomUUID(), newDatasetUrn(), wasUpdated);
   }
 
   public static DatasetRow newDatasetRowWith(UUID namespaceUuid, UUID datasourceUuid) {
-    return newDatasetRowWith(namespaceUuid, datasourceUuid, false);
+    return newDatasetRowWith(
+        UUID.randomUUID(), namespaceUuid, datasourceUuid, newDatasetUrn(), false);
   }
 
   public static DatasetRow newDatasetRowWith(
-      UUID namespaceUuid, UUID datasourceUuid, boolean wasUpdated) {
+      UUID namespaceUuid, UUID datasourceUuid, DatasetUrn datasetUrn) {
+    return newDatasetRowWith(UUID.randomUUID(), namespaceUuid, datasourceUuid, datasetUrn, false);
+  }
+
+  public static DatasetRow newDatasetRowWith(UUID uuid, UUID namespaceUuid, UUID datasourceUuid) {
+    return newDatasetRowWith(uuid, namespaceUuid, datasourceUuid, newDatasetUrn(), false);
+  }
+
+  public static DatasetRow newDatasetRowWith(
+      UUID uuid,
+      UUID namespaceUuid,
+      UUID datasourceUuid,
+      DatasetUrn datasetUrn,
+      boolean wasUpdated) {
     final DatasetRow.DatasetRowBuilder builder =
         DatasetRow.builder()
-            .uuid(UUID.randomUUID())
+            .uuid(uuid)
             .createdAt(newTimestamp())
             .namespaceUuid(namespaceUuid)
             .datasourceUuid(datasourceUuid)
-            .urn(newDatasetUrn().getValue());
+            .name(newDatasetName().getValue())
+            .urn(datasetUrn.getValue())
+            .description(newDescription().getValue());
 
     if (wasUpdated) {
       builder.updatedAt(newTimestamp());
-      builder.currentVersion(UUID.randomUUID());
+      builder.currentVersionUuid(UUID.randomUUID());
     }
 
     return builder.build();
   }
 
-  public static Instant newTimestamp() {
+  private static Instant newTimestamp() {
     return Instant.now();
   }
 }

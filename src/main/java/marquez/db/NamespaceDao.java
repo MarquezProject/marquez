@@ -16,9 +16,10 @@ package marquez.db;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import marquez.common.models.NamespaceName;
 import marquez.db.mappers.NamespaceRowMapper;
-import marquez.service.models.Namespace;
+import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -27,17 +28,33 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(NamespaceRowMapper.class)
 public interface NamespaceDao {
   @SqlUpdate(
-      "INSERT INTO namespaces(guid, name, description, current_ownership) "
-          + "VALUES(:guid, :name, :description, :ownerName) "
-          + "ON CONFLICT DO NOTHING")
-  void insert(@BindBean Namespace namespace);
+      "INSERT INTO namespaces (guid, name, description, current_ownership) "
+          + "VALUES (:uuid, :name, :description, :currentOwnerName) "
+          + "ON CONFLICT (name) DO NOTHING")
+  void insert(@BindBean NamespaceRow namespaceRow);
+
+  @SqlQuery(
+      "INSERT INTO namespaces (guid, name, description, current_ownership) "
+          + "VALUES (:uuid, :name, :description, :currentOwnerName) "
+          + "ON CONFLICT (name) DO UPDATE "
+          + "SET updated_at = NOW(), "
+          + "    current_ownership = :currentOwnerName, "
+          + "    description = :description "
+          + "RETURNING *")
+  Optional<NamespaceRow> insertAndGet(@BindBean NamespaceRow namespaceRow);
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM namespaces WHERE name = :value)")
   boolean exists(@BindBean NamespaceName namespaceName);
 
+  @SqlQuery("SELECT * FROM namespaces WHERE guid = :uuid")
+  Optional<NamespaceRow> findBy(UUID uuid);
+
   @SqlQuery("SELECT * FROM namespaces WHERE name = :value")
-  Optional<Namespace> findBy(@BindBean NamespaceName namespaceName);
+  Optional<NamespaceRow> findBy(@BindBean NamespaceName namespaceName);
 
   @SqlQuery("SELECT * FROM namespaces")
-  List<Namespace> findAll();
+  List<NamespaceRow> findAll();
+
+  @SqlQuery("SELECT COUNT(*) FROM namespaces")
+  Integer count();
 }

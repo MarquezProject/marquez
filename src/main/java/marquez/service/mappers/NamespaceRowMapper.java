@@ -12,19 +12,22 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.service.mappers;
 
-import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import java.util.UUID;
+import lombok.NonNull;
+import marquez.db.models.NamespaceRow;
+import marquez.service.models.Namespace;
 
-@AllArgsConstructor(staticName = "fromString")
-@EqualsAndHashCode
-@ToString
-public final class Description {
-  @Getter @Nullable private final String value;
+public final class NamespaceRowMapper {
+  private NamespaceRowMapper() {}
 
-  public static final Description NO_DESCRIPTION = new Description(null);
+  public static NamespaceRow map(@NonNull Namespace namespace) {
+    return NamespaceRow.builder()
+        .uuid(UUID.randomUUID())
+        .name(namespace.getName())
+        .description(namespace.getDescription())
+        .currentOwnerName(namespace.getOwnerName())
+        .build();
+  }
 }

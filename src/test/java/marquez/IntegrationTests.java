@@ -12,19 +12,6 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez;
 
-import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-
-@AllArgsConstructor(staticName = "fromString")
-@EqualsAndHashCode
-@ToString
-public final class Description {
-  @Getter @Nullable private final String value;
-
-  public static final Description NO_DESCRIPTION = new Description(null);
-}
+public interface IntegrationTests {}

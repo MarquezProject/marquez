@@ -17,6 +17,9 @@ package marquez.service.models;
 import java.sql.Timestamp;
 import java.util.UUID;
 import lombok.Data;
+import marquez.common.models.Description;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.OwnerName;
 
 @Data
 public class Namespace {
@@ -43,4 +46,12 @@ public class Namespace {
     this.ownerName = ownerName;
     this.description = description;
   }
+
+  public static final Namespace DEFAULT =
+      new Namespace(
+          null,
+          null,
+          NamespaceName.DEFAULT.getValue(),
+          OwnerName.ANONYMOUS.getValue(),
+          Description.NO_DESCRIPTION.getValue());
 }

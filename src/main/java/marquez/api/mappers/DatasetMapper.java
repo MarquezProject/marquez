@@ -12,19 +12,20 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.mappers;
 
-import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.NonNull;
+import marquez.api.models.DatasetRequest;
+import marquez.service.models.Dataset;
 
-@AllArgsConstructor(staticName = "fromString")
-@EqualsAndHashCode
-@ToString
-public final class Description {
-  @Getter @Nullable private final String value;
+public final class DatasetMapper {
+  private DatasetMapper() {}
 
-  public static final Description NO_DESCRIPTION = new Description(null);
+  public static Dataset map(@NonNull DatasetRequest request) {
+    return Dataset.builder()
+        .name(request.getName())
+        .datasourceUrn(request.getDatasourceUrn())
+        .description(request.getDescription().orElse(null))
+        .build();
+  }
 }

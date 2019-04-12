@@ -62,7 +62,7 @@ public final class Columns {
 
   public static final String DATASET_UUID = "dataset_uuid";
   public static final String URN = "urn";
-  public static final String DATA_SOURCE_UUID = "datasource_uuid";
+  public static final String DATASOURCE_UUID = "datasource_uuid";
   public static final String CONNECTION_URL = "connection_url";
   public static final String DB_TABLE_INFO_UUID = "db_table_info_uuid";
   public static final String DB_NAME = "db";

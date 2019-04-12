@@ -58,10 +58,6 @@ public final class CommonModelGenerator {
     return DatasourceUrn.from(type, newDatasourceName());
   }
 
-  public static DatasourceUrn newDatasourceUrnWith(DatasourceType type, DatasourceName name) {
-    return DatasourceUrn.from(type, name);
-  }
-
   public static DatasourceUrn newDatasourceUrnWith(String value) {
     return DatasourceUrn.fromString(value);
   }
