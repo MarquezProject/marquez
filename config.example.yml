@@ -5,6 +5,7 @@ server:
   adminConnectors:
   - type: http
     port: ${MARQUEZ_ADMIN_PORT:-8081}
+  # Enables access logs formatted as JSON
   # requestLog:
   #   appenders:
   #     - type: console
@@ -21,6 +22,7 @@ logging:
   level: ${LOG_LEVEL:-INFO}
   appenders:
     - type: console
+      # Enables app logs formatted as JSON
       # layout:
       #   type: json
 
