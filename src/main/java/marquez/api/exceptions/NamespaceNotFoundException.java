@@ -12,19 +12,17 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.exceptions;
 
-import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import static marquez.common.Preconditions.checkNotNull;
 
-@AllArgsConstructor(staticName = "fromString")
-@EqualsAndHashCode
-@ToString
-public final class Description {
-  @Getter @Nullable private final String value;
+import javax.ws.rs.NotFoundException;
+import marquez.common.models.NamespaceName;
 
-  public static final Description NO_DESCRIPTION = new Description(null);
+public final class NamespaceNotFoundException extends NotFoundException {
+  private static final long serialVersionUID = 1L;
+
+  public NamespaceNotFoundException(final NamespaceName name) {
+    super(String.format("Namespace '%s' not found.", checkNotNull(name).getValue()));
+  }
 }

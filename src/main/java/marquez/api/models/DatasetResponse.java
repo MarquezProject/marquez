@@ -14,22 +14,33 @@
 
 package marquez.api.models;
 
+import static marquez.common.Preconditions.checkNotBlank;
+
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-@RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class DatasetResponse {
-  @Getter @NonNull private final String urn;
-
-  @Getter @NonNull private final String createdAt;
-
+public final class DatasetResponse {
+  @Getter private final String name;
+  @Getter private final String createdAt;
+  @Getter private final String urn;
   private final String description;
+
+  public DatasetResponse(
+      @NonNull final String name,
+      @NonNull final String createdAt,
+      @NonNull final String urn,
+      @Nullable final String description) {
+    this.name = checkNotBlank(name);
+    this.createdAt = checkNotBlank(createdAt);
+    this.urn = checkNotBlank(urn);
+    this.description = description;
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

@@ -17,27 +17,25 @@ package marquez.service.mappers;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
+import java.sql.Timestamp;
 import java.util.List;
 import lombok.NonNull;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.Description;
-import marquez.db.models.DatasetRow;
-import marquez.service.models.Dataset;
+import marquez.db.models.NamespaceRow;
+import marquez.service.models.Namespace;
 
-public final class DatasetMapper {
-  private DatasetMapper() {}
+public final class NamespaceMapper {
+  private NamespaceMapper() {}
 
-  public static Dataset map(@NonNull DatasetRow row) {
-    return Dataset.builder()
-        .name(DatasetName.fromString(row.getName()))
-        .createdAt(row.getCreatedAt())
-        .urn(DatasetUrn.fromString(row.getUrn()))
-        .description(Description.fromString(row.getDescription()))
-        .build();
+  public static Namespace map(@NonNull NamespaceRow row) {
+    return new Namespace(
+        row.getUuid(),
+        Timestamp.from(row.getCreatedAt()),
+        row.getName(),
+        row.getCurrentOwnerName(),
+        row.getDescription());
   }
 
-  public static List<Dataset> map(@NonNull List<DatasetRow> rows) {
+  public static List<Namespace> map(@NonNull List<NamespaceRow> rows) {
     return unmodifiableList(rows.stream().map(row -> map(row)).collect(toList()));
   }
 }

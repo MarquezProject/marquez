@@ -15,30 +15,20 @@
 package marquez.db.models;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.Data;
 
-@RequiredArgsConstructor
-@EqualsAndHashCode
-@ToString
+@Data
 @Builder
 public final class DatasetRow {
-  @Getter private final UUID uuid;
-  @Getter private final Instant createdAt;
-  @Getter private final Instant updatedAt;
-  @Getter @NonNull private final UUID namespaceUuid;
-  @Getter @NonNull private final UUID datasourceUuid;
-  @Getter @NonNull private final String urn;
-  @Getter private final UUID currentVersion;
-  private final String description;
-
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(description);
-  }
+  private UUID uuid;
+  private Instant createdAt;
+  private Instant updatedAt;
+  private UUID namespaceUuid;
+  private UUID datasourceUuid;
+  private String name;
+  private String urn;
+  private String description;
+  private UUID currentVersionUuid;
 }

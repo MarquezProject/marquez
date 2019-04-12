@@ -14,73 +14,94 @@
 
 package marquez.api.mappers;
 
-import static marquez.common.models.Description.NO_DESCRIPTION;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static marquez.service.models.ServiceModelGenerator.newDataset;
+import static marquez.service.models.ServiceModelGenerator.newDatasets;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
-import java.time.Instant;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import marquez.UnitTests;
 import marquez.api.models.DatasetResponse;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.Description;
+import marquez.api.models.DatasetsResponse;
 import marquez.service.models.Dataset;
-import marquez.service.models.Generator;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DatasetResponseMapperTest {
-  private static final Instant CREATED_AT = Instant.now();
-  private static final DatasetUrn DATASET_URN = Generator.genDatasetUrn();
-  private static final Description DESCRIPTION = Description.fromString("test description");
-  private static final Dataset DATASET = new Dataset(DATASET_URN, CREATED_AT, DESCRIPTION);
-
   @Test
-  public void testMapDataset() {
-    final Optional<String> nonEmptyDescriptionString = Optional.of(DESCRIPTION.getValue());
-    final DatasetResponse datasetResponse = DatasetResponseMapper.map(DATASET);
-    assertNotNull(datasetResponse);
-    assertEquals(CREATED_AT.toString(), datasetResponse.getCreatedAt());
-    assertEquals(DATASET_URN.getValue(), datasetResponse.getUrn());
-    assertEquals(nonEmptyDescriptionString, datasetResponse.getDescription());
+  public void testMap_dataset() {
+    final Dataset dataset = newDataset();
+    final DatasetResponse response = DatasetResponseMapper.map(dataset);
+    assertThat(response).isNotNull();
+    assertThat(dataset.getName().getValue()).isEqualTo(response.getName());
+    assertThat(dataset.getCreatedAt().toString()).isEqualTo(response.getCreatedAt());
+    assertThat(dataset.getUrn().getValue()).isEqualTo(response.getUrn());
+    assertThat(dataset.getDescription().getValue())
+        .isEqualTo(response.getDescription().orElse(null));
   }
 
   @Test
-  public void testMapDatasetNoDescription() {
-    final Optional<String> noDescriptionString = Optional.ofNullable(NO_DESCRIPTION.getValue());
-    final Dataset dataset = new Dataset(DATASET_URN, CREATED_AT, NO_DESCRIPTION);
-    final DatasetResponse datasetResponse = DatasetResponseMapper.map(dataset);
-    assertNotNull(datasetResponse);
-    assertEquals(DATASET_URN.getValue(), datasetResponse.getUrn());
-    assertEquals(CREATED_AT.toString(), datasetResponse.getCreatedAt());
-    assertEquals(noDescriptionString, datasetResponse.getDescription());
+  public void testMap_dataset_noDescription() {
+    final Dataset dataset = newDataset(false);
+    final DatasetResponse response = DatasetResponseMapper.map(dataset);
+    assertThat(response).isNotNull();
+    assertThat(dataset.getName().getValue()).isEqualTo(response.getName());
+    assertThat(dataset.getCreatedAt().toString()).isEqualTo(response.getCreatedAt());
+    assertThat(dataset.getUrn().getValue()).isEqualTo(response.getUrn());
+    assertThat(Optional.ofNullable(dataset.getDescription())).isEqualTo(response.getDescription());
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testMapNullDataset() {
+  @Test
+  public void testMap_throwsException_onNullDataset() {
     final Dataset nullDataset = null;
-    DatasetResponseMapper.map(nullDataset);
+    assertThatNullPointerException().isThrownBy(() -> DatasetResponseMapper.map(nullDataset));
   }
 
   @Test
-  public void testMapDatasetList() {
-    final List<Dataset> datasets = Arrays.asList(DATASET);
-    final List<DatasetResponse> datasetResponses = DatasetResponseMapper.map(datasets);
-    assertNotNull(datasetResponses);
-    assertEquals(1, datasetResponses.size());
+  public void testMap_datasets() {
+    final List<Dataset> datasets = newDatasets(4);
+    final List<DatasetResponse> responses = DatasetResponseMapper.map(datasets);
+    assertThat(responses).isNotNull();
+    assertThat(responses).hasSize(4);
   }
 
   @Test
-  public void testMapEmptyDatasetList() {
-    final List<Dataset> datasets = Arrays.asList();
-    final List<DatasetResponse> datasetResponses = DatasetResponseMapper.map(datasets);
-    assertNotNull(datasetResponses);
-    assertEquals(0, datasetResponses.size());
+  public void testMap_emptyDatasets() {
+    final List<Dataset> emptyDatasets = Collections.emptyList();
+    final List<DatasetResponse> emptyResponses = DatasetResponseMapper.map(emptyDatasets);
+    assertThat(emptyResponses).isNotNull();
+    assertThat(emptyResponses).isEmpty();
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testMapNullDatasetList() {
-    final List<Dataset> datasets = null;
-    DatasetResponseMapper.map(datasets);
+  @Test
+  public void testMap_throwsException_onNullDatasets() {
+    final List<Dataset> nullDatasets = null;
+    assertThatNullPointerException().isThrownBy(() -> DatasetResponseMapper.map(nullDatasets));
+  }
+
+  @Test
+  public void testToDatasetsResponse() {
+    final List<Dataset> datasets = newDatasets(4);
+    final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(datasets);
+    assertThat(response).isNotNull();
+    assertThat(response.getDatasets()).hasSize(4);
+  }
+
+  @Test
+  public void testToDatasetsResponse_emptyDatasets() {
+    final List<Dataset> emptyDatasets = Collections.emptyList();
+    final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(emptyDatasets);
+    assertThat(response).isNotNull();
+    assertThat(response.getDatasets()).isEmpty();
+  }
+
+  @Test
+  public void testToDatasetsResponse_throwsException_onNullDatasets() {
+    final List<Dataset> nullDatasets = null;
+    assertThatNullPointerException()
+        .isThrownBy(() -> DatasetResponseMapper.toDatasetsResponse(nullDatasets));
   }
 }
