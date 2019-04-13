@@ -65,28 +65,29 @@ public class DbTableVersionRowMapperTest {
 
   @Test
   public void testMap() throws SQLException {
-    final ResultSet results = mock(ResultSet.class);
-    when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(G_UUID);
-    when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_UPDATED_AT));
-    when(results.getString(Columns.DB_NAME)).thenReturn(DB_NAME.toString());
-    when(results.getString(Columns.DB_SCHEMA_NAME)).thenReturn(DB_SCHEMA_NAME.toString());
+    final Object exists = mock(Object.class);
+    final ResultSet resultss = mock(ResultSet.class);
+    when(resultss.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(G_UUID);
+    when(resultss.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_UPDATED_AT));
+    when(resultss.getString(Columns.DB_NAME)).thenReturn(DB_NAME.toString());
+    when(resultss.getString(Columns.DB_SCHEMA_NAME)).thenReturn(DB_SCHEMA_NAME.toString());
     final StatementContext context = mock(StatementContext.class);
     final DbTableInfoRowMapper dbTableInfoRowMapper = new DbTableInfoRowMapper();
-    final DbTableInfoRow dbTableInfoRow = dbTableInfoRowMapper.map(results, context);
+    final DbTableInfoRow dbTableInfoRow = dbTableInfoRowMapper.map(resultss, context);
 
-    final ResultSet resultsDatasetRow = mock(ResultSet.class);
-    when(resultsDatasetRow.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(G_UUID);
-    when(resultsDatasetRow.getTimestamp(Columns.CREATED_AT))
-        .thenReturn(Timestamp.from(CREATED_UPDATED_AT));
-    when(resultsDatasetRow.getTimestamp(Columns.UPDATED_AT))
-        .thenReturn(Timestamp.from(CREATED_UPDATED_AT));
-    when(resultsDatasetRow.getObject(Columns.NAMESPACE_UUID, UUID.class)).thenReturn(G_UUID);
-    when(resultsDatasetRow.getString(Columns.URN)).thenReturn(URN);
-    when(resultsDatasetRow.getString(Columns.NAME)).thenReturn(NAME);
-    when(resultsDatasetRow.getString(Columns.DESCRIPTION)).thenReturn(DESCRIPTION);
-    when(resultsDatasetRow.getObject(Columns.CURRENT_VERSION_UUID, UUID.class)).thenReturn(G_UUID);
+    final ResultSet results = mock(ResultSet.class);
+    when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
+    when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(G_UUID);
+    when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_UPDATED_AT));
+    when(results.getTimestamp(Columns.UPDATED_AT)).thenReturn(Timestamp.from(CREATED_UPDATED_AT));
+    when(results.getObject(Columns.NAMESPACE_UUID, UUID.class)).thenReturn(G_UUID);
+    when(results.getObject(Columns.DATASOURCE_UUID, UUID.class)).thenReturn(G_UUID);
+    when(results.getString(Columns.URN)).thenReturn(URN);
+    when(results.getString(Columns.NAME)).thenReturn(NAME);
+    when(results.getString(Columns.DESCRIPTION)).thenReturn(DESCRIPTION);
+    when(results.getObject(Columns.CURRENT_VERSION_UUID, UUID.class)).thenReturn(G_UUID);
     final DatasetRowMapper datasetRowMapper = new DatasetRowMapper();
-    final DatasetRow datasetRow = datasetRowMapper.map(resultsDatasetRow, context);
+    final DatasetRow datasetRow = datasetRowMapper.map(results, context);
 
     final DbTableVersion dbTableVersion =
         DbTableVersion.builder()
