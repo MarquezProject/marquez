@@ -16,12 +16,8 @@ package marquez.service.mappers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 import marquez.UnitTests;
@@ -32,14 +28,12 @@ import marquez.common.models.DatasourceUrn;
 import marquez.common.models.DbName;
 import marquez.common.models.DbSchemaName;
 import marquez.common.models.DbTableName;
-import marquez.db.Columns;
-import marquez.db.mappers.DatasetRowMapper;
-import marquez.db.mappers.DbTableInfoRowMapper;
+import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
 import marquez.service.models.DbTableVersion;
-import org.jdbi.v3.core.statement.StatementContext;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -62,33 +56,10 @@ public class DbTableVersionRowMapperTest {
   private final String URN = "test_urn";
   private final String DESCRIPTION = "test_description";
   private final String NAME = "test_name";
+  private final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test_namespace");
 
   @Test
   public void testMap() throws SQLException {
-    final Object exists = mock(Object.class);
-    final ResultSet resultss = mock(ResultSet.class);
-    when(resultss.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(G_UUID);
-    when(resultss.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_UPDATED_AT));
-    when(resultss.getString(Columns.DB_NAME)).thenReturn(DB_NAME.toString());
-    when(resultss.getString(Columns.DB_SCHEMA_NAME)).thenReturn(DB_SCHEMA_NAME.toString());
-    final StatementContext context = mock(StatementContext.class);
-    final DbTableInfoRowMapper dbTableInfoRowMapper = new DbTableInfoRowMapper();
-    final DbTableInfoRow dbTableInfoRow = dbTableInfoRowMapper.map(resultss, context);
-
-    final ResultSet results = mock(ResultSet.class);
-    when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
-    when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(G_UUID);
-    when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_UPDATED_AT));
-    when(results.getTimestamp(Columns.UPDATED_AT)).thenReturn(Timestamp.from(CREATED_UPDATED_AT));
-    when(results.getObject(Columns.NAMESPACE_UUID, UUID.class)).thenReturn(G_UUID);
-    when(results.getObject(Columns.DATASOURCE_UUID, UUID.class)).thenReturn(G_UUID);
-    when(results.getString(Columns.URN)).thenReturn(URN);
-    when(results.getString(Columns.NAME)).thenReturn(NAME);
-    when(results.getString(Columns.DESCRIPTION)).thenReturn(DESCRIPTION);
-    when(results.getObject(Columns.CURRENT_VERSION_UUID, UUID.class)).thenReturn(G_UUID);
-    final DatasetRowMapper datasetRowMapper = new DatasetRowMapper();
-    final DatasetRow datasetRow = datasetRowMapper.map(results, context);
-
     final DbTableVersion dbTableVersion =
         DbTableVersion.builder()
             .connectionUrl(CONNECTION_URL)
@@ -96,12 +67,17 @@ public class DbTableVersionRowMapperTest {
             .dbTableName(DB_TABLE_NAME)
             .build();
 
+    final DbTableInfoRow dbTableInfoRow = DbTableInfoRowMapper.map(dbTableVersion);
+
+    final DatasourceRow dataSourceRow = DatasourceRowMapper.map(dbTableVersion);
+
+    final DatasetRow datasetRow =
+        DatasetRowMapper.map(NAMESPACE_NAME, dataSourceRow, dbTableVersion);
+
     final DbTableVersionRow dbTableVersionRow =
         DbTableVersionRowMapper.map(datasetRow, dbTableInfoRow, dbTableVersion);
     assertNotNull(dbTableVersionRow);
     assertNotNull(dbTableVersionRow.getUuid());
-    assertEquals(G_UUID, dbTableVersionRow.getDatasetUuid());
-    assertEquals(G_UUID, dbTableVersionRow.getDbTableInfoUuid());
     assertEquals(DB_TABLE_NAME.getValue(), dbTableVersionRow.getDbTable());
   }
 
