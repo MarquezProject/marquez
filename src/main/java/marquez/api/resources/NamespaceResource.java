@@ -16,6 +16,8 @@ package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import com.codahale.metrics.annotation.ExceptionMetered;
+import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import java.util.Optional;
@@ -51,10 +53,12 @@ public final class NamespaceResource {
   }
 
   @PUT
-  @Consumes(APPLICATION_JSON)
-  @Produces(APPLICATION_JSON)
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/namespaces/{namespace}")
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
       @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceRequest request)
       throws MarquezServiceException {
@@ -65,9 +69,11 @@ public final class NamespaceResource {
   }
 
   @GET
-  @Produces(APPLICATION_JSON)
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/namespaces/{namespace}")
+  @Produces(APPLICATION_JSON)
   public Response get(@PathParam("namespace") NamespaceName namespaceName)
       throws MarquezServiceException {
     final Optional<NamespaceResponse> namespaceResponse =
@@ -80,9 +86,11 @@ public final class NamespaceResource {
   }
 
   @GET
-  @Produces(APPLICATION_JSON)
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/namespaces")
+  @Produces(APPLICATION_JSON)
   public Response list() throws MarquezServiceException {
     final List<Namespace> namespaces = namespaceService.getAll();
     final List<NamespaceResponse> namespaceResponses =

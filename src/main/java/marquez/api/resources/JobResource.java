@@ -16,6 +16,8 @@ package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import com.codahale.metrics.annotation.ExceptionMetered;
+import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.sql.Timestamp;
 import java.util.List;
@@ -64,10 +66,12 @@ public final class JobResource {
   }
 
   @PUT
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
-  @Timed
   public Response create(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,
@@ -93,9 +97,11 @@ public final class JobResource {
   }
 
   @GET
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Produces(APPLICATION_JSON)
-  @Timed
   public Response getJob(
       @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") final JobName jobName)
       throws MarquezServiceException {
@@ -111,9 +117,11 @@ public final class JobResource {
   }
 
   @GET
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
-  @Produces(APPLICATION_JSON)
   @Path("/namespaces/{namespace}/jobs")
+  @Produces(APPLICATION_JSON)
   public Response listJobs(@PathParam("namespace") NamespaceName namespaceName)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
@@ -125,9 +133,12 @@ public final class JobResource {
   }
 
   @POST
-  @Produces(APPLICATION_JSON)
-  @Consumes(APPLICATION_JSON)
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
   @Path("namespaces/{namespace}/jobs/{job}/runs")
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   public Response create(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,
@@ -153,9 +164,11 @@ public final class JobResource {
   }
 
   @GET
-  @Produces(APPLICATION_JSON)
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/jobs/runs/{id}")
+  @Produces(APPLICATION_JSON)
   public Response get(@PathParam("id") final UUID runId) throws MarquezServiceException {
     final Optional<JobRun> jobRun = jobService.getJobRun(runId);
     if (jobRun.isPresent()) {
@@ -165,6 +178,8 @@ public final class JobResource {
   }
 
   @PUT
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/jobs/runs/{id}/run")
   public Response runJobRun(@PathParam("id") final String runId) throws MarquezServiceException {
@@ -172,6 +187,8 @@ public final class JobResource {
   }
 
   @PUT
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/jobs/runs/{id}/complete")
   public Response completeJobRun(@PathParam("id") final String runId)
@@ -180,6 +197,8 @@ public final class JobResource {
   }
 
   @PUT
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/jobs/runs/{id}/fail")
   public Response failJobRun(@PathParam("id") final String runId) throws MarquezServiceException {
@@ -187,6 +206,8 @@ public final class JobResource {
   }
 
   @PUT
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/jobs/runs/{id}/abort")
   public Response abortJobRun(@PathParam("id") final String runId) throws MarquezServiceException {
