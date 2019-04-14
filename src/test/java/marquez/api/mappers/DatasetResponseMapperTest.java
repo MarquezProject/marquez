@@ -36,11 +36,11 @@ public class DatasetResponseMapperTest {
     final Dataset dataset = newDataset();
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     assertThat(response).isNotNull();
-    assertThat(dataset.getName().getValue()).isEqualTo(response.getName());
-    assertThat(dataset.getCreatedAt().toString()).isEqualTo(response.getCreatedAt());
-    assertThat(dataset.getUrn().getValue()).isEqualTo(response.getUrn());
-    assertThat(dataset.getDescription().getValue())
-        .isEqualTo(response.getDescription().orElse(null));
+    assertThat(response.getName()).isEqualTo(dataset.getName().getValue());
+    assertThat(response.getCreatedAt()).isEqualTo(dataset.getCreatedAt().toString());
+    assertThat(response.getUrn()).isEqualTo(dataset.getUrn().getValue());
+    assertThat(response.getDescription().orElse(null))
+        .isEqualTo(dataset.getDescription().getValue());
   }
 
   @Test
@@ -48,10 +48,10 @@ public class DatasetResponseMapperTest {
     final Dataset dataset = newDataset(false);
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     assertThat(response).isNotNull();
-    assertThat(dataset.getName().getValue()).isEqualTo(response.getName());
-    assertThat(dataset.getCreatedAt().toString()).isEqualTo(response.getCreatedAt());
-    assertThat(dataset.getUrn().getValue()).isEqualTo(response.getUrn());
-    assertThat(Optional.ofNullable(dataset.getDescription())).isEqualTo(response.getDescription());
+    assertThat(response.getName()).isEqualTo(dataset.getName().getValue());
+    assertThat(response.getCreatedAt()).isEqualTo(dataset.getCreatedAt().toString());
+    assertThat(response.getUrn()).isEqualTo(dataset.getUrn().getValue());
+    assertThat(response.getDescription()).isEqualTo(Optional.ofNullable(dataset.getDescription()));
   }
 
   @Test
