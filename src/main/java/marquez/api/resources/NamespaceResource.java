@@ -16,9 +16,10 @@ package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import com.codahale.metrics.annotation.ExceptionMetered;
+import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
-import java.util.Optional;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -28,6 +29,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
+import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.api.mappers.NamespaceApiMapper;
 import marquez.api.mappers.NamespaceResponseMapper;
@@ -51,10 +53,12 @@ public final class NamespaceResource {
   }
 
   @PUT
-  @Consumes(APPLICATION_JSON)
-  @Produces(APPLICATION_JSON)
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/namespaces/{namespace}")
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
       @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceRequest request)
       throws MarquezServiceException {
@@ -65,24 +69,27 @@ public final class NamespaceResource {
   }
 
   @GET
-  @Produces(APPLICATION_JSON)
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/namespaces/{namespace}")
+  @Produces(APPLICATION_JSON)
   public Response get(@PathParam("namespace") NamespaceName namespaceName)
       throws MarquezServiceException {
-    final Optional<NamespaceResponse> namespaceResponse =
-        namespaceService.get(namespaceName).map(NamespaceResponseMapper::map);
-    if (namespaceResponse.isPresent()) {
-      return Response.ok(namespaceResponse.get()).build();
-    } else {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    }
+    final Namespace namespace =
+        namespaceService
+            .get(namespaceName)
+            .orElseThrow(() -> new NamespaceNotFoundException(namespaceName));
+    final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
+    return Response.ok(response).build();
   }
 
   @GET
-  @Produces(APPLICATION_JSON)
+  @ResponseMetered
+  @ExceptionMetered
   @Timed
   @Path("/namespaces")
+  @Produces(APPLICATION_JSON)
   public Response list() throws MarquezServiceException {
     final List<Namespace> namespaces = namespaceService.getAll();
     final List<NamespaceResponse> namespaceResponses =
