@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import marquez.UnitTests;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
@@ -51,7 +50,7 @@ public class DatasetResponseMapperTest {
     assertThat(response.getName()).isEqualTo(dataset.getName().getValue());
     assertThat(response.getCreatedAt()).isEqualTo(dataset.getCreatedAt().toString());
     assertThat(response.getUrn()).isEqualTo(dataset.getUrn().getValue());
-    assertThat(response.getDescription()).isEqualTo(Optional.ofNullable(dataset.getDescription()));
+    assertThat(response.getDescription()).isNotPresent();
   }
 
   @Test
