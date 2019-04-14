@@ -22,6 +22,11 @@ public final class ApiModelGenerator {
   private ApiModelGenerator() {}
 
   public static DatasetRequest newDatasetRequest() {
-    return new DatasetRequest(newDatasetName(), newDatasourceUrn(), newDescription());
+    return newDatasetRequest(true);
+  }
+
+  public static DatasetRequest newDatasetRequest(boolean hasDescription) {
+    return new DatasetRequest(
+        newDatasetName(), newDatasourceUrn(), hasDescription ? newDescription() : null);
   }
 }
