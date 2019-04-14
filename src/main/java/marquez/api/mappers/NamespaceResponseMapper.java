@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 import java.util.List;
 import lombok.NonNull;
 import marquez.api.models.NamespaceResponse;
+import marquez.api.models.NamespacesResponse;
 import marquez.service.models.Namespace;
 
 public final class NamespaceResponseMapper {
@@ -36,5 +37,9 @@ public final class NamespaceResponseMapper {
   public static List<NamespaceResponse> map(@NonNull List<Namespace> namespaces) {
     return unmodifiableList(
         namespaces.stream().map(datasource -> map(datasource)).collect(toList()));
+  }
+
+  public static NamespacesResponse toNamespacesResponse(@NonNull List<Namespace> namespaces) {
+    return new NamespacesResponse(map(namespaces));
   }
 }
