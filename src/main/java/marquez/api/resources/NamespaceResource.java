@@ -30,7 +30,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import marquez.api.exceptions.NamespaceNotFoundException;
-import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
 import marquez.api.mappers.NamespaceApiMapper;
 import marquez.api.mappers.NamespaceResponseMapper;
 import marquez.api.models.NamespaceRequest;
@@ -44,8 +43,6 @@ import marquez.service.models.Namespace;
 @Path("/api/v1")
 public final class NamespaceResource {
   private final NamespaceApiMapper namespaceApiMapper = new NamespaceApiMapper();
-  private final CoreNamespaceToApiNamespaceMapper coreNamespaceToApiNamespaceMapper =
-      new CoreNamespaceToApiNamespaceMapper();
   private final NamespaceService namespaceService;
 
   public NamespaceResource(@NonNull final NamespaceService namespaceService) {
@@ -92,8 +89,7 @@ public final class NamespaceResource {
   @Produces(APPLICATION_JSON)
   public Response list() throws MarquezServiceException {
     final List<Namespace> namespaces = namespaceService.getAll();
-    final List<NamespaceResponse> namespaceResponses =
-        coreNamespaceToApiNamespaceMapper.map(namespaces);
-    return Response.ok(new NamespacesResponse(namespaceResponses)).build();
+    final NamespacesResponse response = NamespaceResponseMapper.toNamespacesResponse(namespaces);
+    return Response.ok(response).build();
   }
 }
