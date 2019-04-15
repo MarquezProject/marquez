@@ -1,0 +1,4 @@
+config.yml merge=ours
+build-and-push.sh merge=ours
+entrypoint.sh merge=ours
+login.sh merge=ours
