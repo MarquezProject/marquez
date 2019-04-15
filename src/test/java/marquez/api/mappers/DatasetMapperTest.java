@@ -14,45 +14,37 @@
 
 package marquez.api.mappers;
 
-import static marquez.common.models.CommonModelGenerator.newDatasetName;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
-import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.api.models.ApiModelGenerator.newDatasetRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
+import java.util.Optional;
 import marquez.UnitTests;
 import marquez.api.models.DatasetRequest;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasourceUrn;
-import marquez.common.models.Description;
 import marquez.service.models.Dataset;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetMapperTest {
-  private static final DatasourceUrn DATASOURCE_URN = newDatasourceUrn();
-  private static final DatasetName DATASET_NAME = newDatasetName();
-  private static final Description DESCRIPTION = newDescription();
-  private static final DatasetRequest REQUEST =
-      new DatasetRequest(DATASET_NAME, DATASOURCE_URN, DESCRIPTION);
-  private static final DatasetRequest REQUEST_NO_DESCRIPTION =
-      new DatasetRequest(DATASET_NAME, DATASOURCE_URN, null);
-
   @Test
   public void testMap_request() {
-    final Dataset dataset = DatasetMapper.map(REQUEST);
+    final DatasetRequest request = newDatasetRequest();
+    final Dataset dataset = DatasetMapper.map(request);
     assertThat(dataset).isNotNull();
-    assertThat(dataset.getName()).isEqualTo(DATASET_NAME);
-    assertThat(dataset.getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(dataset.getName()).isEqualTo(request.getName());
+    assertThat(dataset.getDatasourceUrn()).isEqualTo(request.getDatasourceUrn());
+    assertThat(Optional.ofNullable(dataset.getDescription())).isEqualTo(request.getDescription());
   }
 
   @Test
   public void testMap_request_noDescription() {
-    final Dataset dataset = DatasetMapper.map(REQUEST_NO_DESCRIPTION);
+    final DatasetRequest request = newDatasetRequest(false);
+    final Dataset dataset = DatasetMapper.map(request);
     assertThat(dataset).isNotNull();
-    assertThat(dataset.getName()).isEqualTo(DATASET_NAME);
-    assertThat(dataset.getDescription()).isEqualTo(null);
+    assertThat(dataset.getName()).isEqualTo(request.getName());
+    assertThat(dataset.getDatasourceUrn()).isEqualTo(request.getDatasourceUrn());
+    assertThat(dataset.getDescription()).isNull();
   }
 
   @Test
