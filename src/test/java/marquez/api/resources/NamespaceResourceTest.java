@@ -33,7 +33,7 @@ import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
-import marquez.api.mappers.CoreNamespaceToApiNamespaceMapper;
+import marquez.api.mappers.NamespaceResponseMapper;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
 import marquez.common.models.NamespaceName;
@@ -47,7 +47,6 @@ import org.junit.Test;
 public class NamespaceResourceTest extends NamespaceBaseTest {
 
   NamespaceName namespaceName = NamespaceName.fromString(NAMESPACE_NAME);
-  CoreNamespaceToApiNamespaceMapper namespaceMapper = new CoreNamespaceToApiNamespaceMapper();
   private static final NamespaceService NAMESPACE_SERVICE = mock(NamespaceService.class);
 
   @ClassRule
@@ -113,7 +112,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     Response res = namespaceResource.list();
     NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
 
-    NamespaceResponse expectedApiNamespace = namespaceMapper.map(TEST_NAMESPACE);
+    NamespaceResponse expectedApiNamespace = NamespaceResponseMapper.map(TEST_NAMESPACE);
     assertThat(responseBody.getNamespaces()).contains(expectedApiNamespace);
   }
 
@@ -154,8 +153,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
     Response res = namespaceResource.list();
     NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
-    NamespaceResponse nsResponse = namespaceMapper.map(TEST_NAMESPACE);
-    NamespaceResponse secondNsResponse = namespaceMapper.map(secondNamespace);
+    NamespaceResponse nsResponse = NamespaceResponseMapper.map(TEST_NAMESPACE);
+    NamespaceResponse secondNsResponse = NamespaceResponseMapper.map(secondNamespace);
 
     assertThat(responseBody.getNamespaces()).containsExactly(nsResponse, secondNsResponse);
   }
