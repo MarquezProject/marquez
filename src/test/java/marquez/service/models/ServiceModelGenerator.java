@@ -24,6 +24,7 @@ import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
@@ -37,12 +38,21 @@ import marquez.common.models.Description;
 public final class ServiceModelGenerator {
   private ServiceModelGenerator() {}
 
+  public static List<Namespace> newNamespaces(int limit) {
+    return Stream.generate(() -> newNamespace()).limit(limit).collect(toList());
+  }
+
   public static Namespace newNamespace() {
+    return newNamespace(true);
+  }
+
+  public static Namespace newNamespace(boolean hasDescription) {
     return new Namespace(
         null,
+        Timestamp.from(Instant.now()),
         newNamespaceName().getValue(),
         newOwnerName().getValue(),
-        newDescription().getValue());
+        hasDescription ? newDescription().getValue() : null);
   }
 
   public static List<Datasource> newDatasources(int limit) {

@@ -35,10 +35,10 @@ public class DatasourceResponseMapperTest {
     final Datasource datasource = newDatasource();
     final DatasourceResponse response = DatasourceResponseMapper.map(datasource);
     assertThat(response).isNotNull();
-    assertThat(datasource.getName().getValue()).isEqualTo(response.getName());
-    assertThat(datasource.getCreatedAt().toString()).isEqualTo(response.getCreatedAt());
-    assertThat(datasource.getUrn().getValue()).isEqualTo(response.getUrn());
-    assertThat(datasource.getConnectionUrl().getRawValue()).isEqualTo(response.getConnectionUrl());
+    assertThat(response.getName()).isEqualTo(datasource.getName().getValue());
+    assertThat(response.getCreatedAt()).isEqualTo(datasource.getCreatedAt().toString());
+    assertThat(response.getUrn()).isEqualTo(datasource.getUrn().getValue());
+    assertThat(response.getConnectionUrl()).isEqualTo(datasource.getConnectionUrl().getRawValue());
   }
 
   @Test
