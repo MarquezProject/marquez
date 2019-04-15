@@ -1,3 +1,17 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.db;
 
 import static org.junit.Assert.assertEquals;
@@ -8,10 +22,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import marquez.core.models.Generator;
-import marquez.core.models.Job;
-import marquez.core.models.JobVersion;
 import marquez.db.fixtures.AppWithPostgresRule;
+import marquez.service.models.Generator;
+import marquez.service.models.Job;
+import marquez.service.models.JobVersion;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Before;

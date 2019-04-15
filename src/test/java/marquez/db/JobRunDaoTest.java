@@ -1,3 +1,17 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.db;
 
 import static java.lang.String.format;
@@ -6,14 +20,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.util.UUID;
-import marquez.api.JobRunBaseTest;
-import marquez.core.exceptions.UnexpectedException;
-import marquez.core.models.Generator;
-import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
-import marquez.core.models.Namespace;
+import marquez.api.resources.JobRunBaseTest;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.models.Generator;
+import marquez.service.models.JobRun;
+import marquez.service.models.JobRunState;
+import marquez.service.models.Namespace;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.statement.Query;
 import org.junit.After;
@@ -38,12 +52,13 @@ public class JobRunDaoTest extends JobRunBaseTest {
   protected static final JobRunStateDao jobRunStateDao = APP.onDemand(JobRunStateDao.class);
   protected static final JobRunArgsDao jobRunArgsDao = APP.onDemand(JobRunArgsDao.class);
 
-  protected static final NamespaceService namespaceService = new NamespaceService(namespaceDao);
+  protected static NamespaceService namespaceService;
   protected static final JobService jobService =
       new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
   @BeforeClass
-  public static void setUpRowMapper() {
+  public static void setUpOnce() throws MarquezServiceException {
+    namespaceService = new NamespaceService(namespaceDao);
     APP.getJDBI()
         .registerRowMapper(
             JobRunState.class,
@@ -53,23 +68,20 @@ public class JobRunDaoTest extends JobRunBaseTest {
                     rs.getTimestamp("transitioned_at"),
                     UUID.fromString(rs.getString("job_run_guid")),
                     JobRunState.State.fromInt(rs.getInt("state"))));
-  }
 
-  @BeforeClass
-  public static void setup() throws UnexpectedException {
-    Namespace generatedNamespace = namespaceService.create(Generator.genNamespace());
+    Namespace generatedNamespace = namespaceService.createOrUpdate(Generator.genNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 
-    marquez.core.models.Job job = Generator.genJob(generatedNamespace.getGuid());
-    marquez.core.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
+    marquez.service.models.Job job = Generator.genJob(generatedNamespace.getGuid());
+    marquez.service.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
 
     CREATED_JOB_NAME = createdJob.getName();
     CREATED_JOB_RUN_UUID = createdJob.getNamespaceGuid();
   }
 
   @Before
-  public void createJobRun() throws UnexpectedException {
+  public void createJobRun() throws MarquezServiceException {
     JobRun createdJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     CREATED_JOB_RUN_UUID = createdJobRun.getGuid();

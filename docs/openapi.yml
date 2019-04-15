@@ -1,6 +1,6 @@
 openapi: 3.0.2
 info:
-  title: Marquez 
+  title: Marquez
   version: 0.1.0
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
@@ -22,24 +22,11 @@ paths:
         Note jobs and datasets will be unique within a namespace, but not across namespaces.
       tags:
         - Namespaces
-      required: true
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                owner:
-                  description: The owner of the namespace.
-                  type: string
-                description:
-                  description: The description of the namespace.
-                  type: string
-              required:
-                - owner
-              example:
-                owner: dataengineering
-                description: A namespace for core jobs and datasets at wework.
+              $ref: '#/components/schemas/createNamespace'
       responses:
         '200':
           description: OK
@@ -73,7 +60,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/namespaces'
- 
+
   /namespaces/{namespace}/jobs/{job}:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -86,43 +73,11 @@ paths:
         specific job version or possibly help debug a failed job run.
       tags:
         - Jobs
-      required: true
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                inputDatasetUrns:
-                  description: The URN list of input datasets.
-                  type: array
-                  items:
-                    type: string
-                    format: URN
-                  uniqueItems: true
-                outputDatasetUrns:
-                  description: The URN list of output datasets.
-                  type: array
-                  items:
-                    type: string
-                    format: URN
-                  uniqueItems: true
-                location:
-                  description: The URI of the job source or artifact.
-                  type: string
-                  format: URI
-                description:
-                  description: The description of the job.
-                  type: string
-              required:
-                - inputDatasetUrns
-                - outputDatasetUrns
-                - location
-              example:
-                inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
-                outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
-                location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-                description: Determine weekly room booking occupancy patterns.
+              $ref: '#/components/schemas/createJob'
       responses:
         '200':
           description: OK
@@ -185,26 +140,11 @@ paths:
       description: Creates a new job run object.
       tags:
         - Jobs
-      required: true
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                nominalStartTime:
-                  description: The nominal start time of the job.
-                  type: string
-                  format: date-time
-                nominalEndTime:
-                  description: The nominal end time of the job.
-                  type: string
-                  format: date-time
-                runArgs:
-                  description: The runtime arguments of the job. JSON encoded.
-                  type: string
-              example:
-                runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
+              $ref: '#/components/schemas/createJobRun'
       responses:
         '201':
           description: CREATED
@@ -297,7 +237,6 @@ paths:
       description: Creates a multiple output dataset objects.
       tags:
         - Jobs
-      required: true
       requestBody:
         content:
           application/json:
@@ -324,6 +263,25 @@ paths:
                 $ref: '#/components/schemas/datasets'
 
   /namespaces/{namespace}/datasets:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+    post:
+      summary: Create a dataset
+      description: Creates a new dataset object.
+      tags:
+        - Datasets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createDataset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dataset'
     get:
       summary: List all datasets
       description: Returns a list of datasets.
@@ -336,6 +294,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/datasets'
+
+  /namespaces/{namespace}/datasets/{urn}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/datasetUrn'
+    get:
+      summary: Get a dataset
+      description: Returns a dataset. An individual dataset object is identifiable by its Marquez-generated unique URN.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dataset'
+
+  /datasources:
+    get:
+      summary: List all datasources
+      description: Returns a list of datasources.
+      tags:
+        - Datasources
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datasources'
+    post:
+      summary: Create a datasource
+      description: Creates a new datasource object. A datasource is the physical location of a dataset such as
+        a table in PostgreSQL, or topic in Kafka. A datasource enables the grouping of physical datasets
+        to their physical source.
+
+      tags:
+        - Datasources
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createDatasource'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datasource'
+
+  /datasources/{urn}:
+    parameters:
+      - $ref: '#/components/parameters/datasourceUrn'
+    get:
+      summary: Get a datasource
+      description: Returns a datasource. An individual datasource object is identifiable by its Marquez-generated unique URN.
+      tags:
+        - Datasources
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datasource'
+
 components:
   parameters:
     namespace:
@@ -367,7 +393,44 @@ components:
         type: string
         format: uuid
 
+    datasourceUrn:
+      name: urn
+      in: path
+      description: The URN of the datasource.
+      required: true
+      schema:
+        type: string
+        format: URN
+        maxLength: 1024
+        example: urn:datasource:postgresql:financials_db
+
+    datasetUrn:
+      name: urn
+      in: path
+      description: The URN of the dataset.
+      required: true
+      schema:
+        type: string
+        format: URN
+        maxLength: 1024
+        example: urn:dataset:analytics_db:wedata.room_bookings
+
   schemas:
+    createNamespace:
+      type: object
+      properties:
+        owner:
+          description: The owner of the namespace.
+          type: string
+        description:
+          description: The description of the namespace.
+          type: string
+      required:
+        - owner
+      example:
+        owner: dataengineering
+        description: A namespace for core jobs and datasets at wework.
+
     namespace:
       type: object
       properties:
@@ -398,6 +461,40 @@ components:
           items:
             $ref: '#/components/schemas/namespace'
 
+    createJob:
+      type: object
+      properties:
+        inputDatasetUrns:
+          description: The URN list of input datasets.
+          type: array
+          items:
+            type: string
+            format: URN
+          uniqueItems: true
+        outputDatasetUrns:
+          description: The URN list of output datasets.
+          type: array
+          items:
+            type: string
+            format: URN
+          uniqueItems: true
+        location:
+          description: The URI of the job source or artifact.
+          type: string
+          format: URI
+        description:
+          description: The description of the job.
+          type: string
+      required:
+        - inputDatasetUrns
+        - outputDatasetUrns
+        - location
+      example:
+        inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
+        outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
+        location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+        description: Determine weekly room booking occupancy patterns.
+
     job:
       type: object
       properties:
@@ -407,11 +504,11 @@ components:
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
           type: string
-          format: date-time
+          format: long
         updatedAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.
           type: string
-          format: date-time
+          format: long
         inputDatasetUrns:
           description: The URN list of input datasets.
           type: array
@@ -435,8 +532,8 @@ components:
           type: string
       example:
         name: room_bookings_7_days
-        createdAt: 2018-10-04T15:01:23.045Z
-        updatedAt: 2018-10-04T16:15:30.000Z
+        createdAt: 1546584262373
+        updatedAt: 1546586497777
         inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
         outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
@@ -478,6 +575,23 @@ components:
           items:
             $ref: '#/components/schemas/jobVersion'
 
+    createJobRun:
+      type: object
+      properties:
+        nominalStartTime:
+          description: The nominal start time of the job.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: The nominal end time of the job.
+          type: string
+          format: date-time
+        runArgs:
+          description: The runtime arguments of the job. JSON encoded.
+          type: string
+      example:
+        runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
+
     jobRunId:
       type: object
       properties:
@@ -505,25 +619,16 @@ components:
           format: uuid
         runState:
           description: The current state of the job.
-          type: enum
-          enum: [STARTED, COMPLETED, FAILED]
+          schema:
+            type: string
+            enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
         runArgs:
           description: The runtime arguments of the job. JSON encoded.
           type: string
-        startedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job started.
-          type: string
-          format: date-time
-        endedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job ended.
-          type: string
-          format: date-time
       example:
         runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         runState: COMPLETED
         runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
-        startedAt: 2018-10-04T15:01:23.045Z
-        endedAt: 2018-10-04T15:01:30.045Z
 
     jobRuns:
       type: object
@@ -543,20 +648,49 @@ components:
               - $ref: '#/components/schemas/DB'
               - $ref: '#/components/schemas/ICEBERG'
 
+    createDataset:
+      type: object
+      properties:
+        name:
+          description: The name of the dataset.
+          type: string
+        datasourceUrn:
+          description: The URN of the datasource associated with the dataset.
+          type: string
+          format: URN
+        description:
+          description:  The description of the dataset.
+          type: string
+      required:
+        - name
+        - datasourceUrn
+      example:
+        name: wedata.room_bookings
+        datasourceUrn: urn:datasource:postgresql:analytics_db
+        description: "All room booking occupancy data."
+
     dataset:
       type: object
       properties:
-        urn:
-          description: The URN of the dataset.
+        name:
+          description: The name of the dataset.
           type: string
-          format: URN
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
           type: string
           format: date-time
+        urn:
+          description: The URN of the dataset.
+          type: string
+          format: URN
+        description:
+          description:  The description of the dataset.
+          type: string
       example:
-        urn: urn:wework:wedata.room_bookings
+        name: wedata.room_bookings
         createdAt: 2018-10-04T15:01:23.045Z
+        urn: urn:dataset:analytics_db:wedata.room_bookings
+        description: "All room booking occupancy data."
 
     datasets:
       type: object
@@ -564,6 +698,52 @@ components:
         datasets:
           items:
             $ref: '#/components/schemas/dataset'
+
+    createDatasource:
+      type: object
+      properties:
+        name:
+          description: The name of the datasource.
+          type: string
+        connectionUrl:
+          description: The url to be used to connect to the datasource.
+          type: string
+          format: URL
+      required:
+        - name
+        - connectionUrl
+      example:
+        name: financials_db
+        connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
+
+    datasource:
+      type: object
+      properties:
+        urn:
+          description: The URN of the datasource.
+          type: string
+          format: URN
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
+          type: string
+          format: date-time
+        name:
+          description: The name of the datasource.
+          type: string
+        connectionUrl:
+          description: The url to be used to connect to the datasource.
+      example:
+        name: financials_db
+        createdAt: 2018-09-02T11:01:12.022Z
+        urn: urn:datasource:postgresql:financials_db
+        connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
+
+    datasources:
+      type: object
+      properties:
+        datasources:
+          items:
+            $ref: '#/components/schemas/datasource'
 
     DB:
       type: object
@@ -595,7 +775,7 @@ components:
         connectionUrl: jdbc:postgresql://localhost:5432/wework
         schema: wedata
         table: room_bookings
-        
+
     ICEBERG:
       type: object
       properties:
@@ -615,8 +795,8 @@ components:
           description: The description of the output dataset.
           type: string
       required:
-         - type 
-         - snapshotId 
+         - type
+         - snapshotId
          - location
       example:
         type: ICEBERG

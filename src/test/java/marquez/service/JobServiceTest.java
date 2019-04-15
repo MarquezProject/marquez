@@ -17,16 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.core.exceptions.UnexpectedException;
-import marquez.core.models.Generator;
-import marquez.core.models.Job;
-import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
-import marquez.core.models.JobVersion;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
+import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.models.Generator;
+import marquez.service.models.Job;
+import marquez.service.models.JobRun;
+import marquez.service.models.JobRunState;
+import marquez.service.models.JobVersion;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Assert;
@@ -68,7 +68,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testGetAll_OK() throws UnexpectedException {
+  public void testGetAll_OK() throws MarquezServiceException {
     List<Job> jobs = new ArrayList<Job>();
     jobs.add(Generator.genJob(namespaceID));
     jobs.add(Generator.genJob(namespaceID));
@@ -77,14 +77,14 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testGetAll_NoJobs_OK() throws UnexpectedException {
+  public void testGetAll_NoJobs_OK() throws MarquezServiceException {
     List<Job> jobs = new ArrayList<Job>();
     when(jobDao.findAllInNamespace(TEST_NS)).thenReturn(jobs);
     Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS));
   }
 
   @Test
-  public void testGetAllVersions_OK() throws UnexpectedException {
+  public void testGetAllVersions_OK() throws MarquezServiceException {
     String jobName = "a job";
     UUID jobGuid = UUID.randomUUID();
     List<JobVersion> jobVersions = new ArrayList<JobVersion>();
@@ -95,22 +95,22 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testGetAllVersions_NoVersions_OK() throws UnexpectedException {
+  public void testGetAllVersions_NoVersions_OK() throws MarquezServiceException {
     String jobName = "a job";
     List<JobVersion> jobVersions = new ArrayList<JobVersion>();
     when(jobVersionDao.find(TEST_NS, jobName)).thenReturn(jobVersions);
     Assert.assertEquals(jobVersions, jobService.getAllVersionsOfJob(TEST_NS, jobName));
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testGetAllVersions_Exception() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testGetAllVersions_Exception() throws MarquezServiceException {
     String jobName = "job";
     when(jobVersionDao.find(TEST_NS, jobName)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getAllVersionsOfJob(TEST_NS, jobName);
   }
 
   @Test
-  public void testCreate_NewJob_OK() throws UnexpectedException {
+  public void testCreate_NewJob_OK() throws MarquezServiceException {
     ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
     Job job = Generator.genJob(namespaceID);
@@ -127,7 +127,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testCreate_JobFound_OK() throws UnexpectedException {
+  public void testCreate_JobFound_OK() throws MarquezServiceException {
     Job existingJob = Generator.genJob(namespaceID);
     JobVersion existingJobVersion = Generator.genJobVersion(existingJob);
     Job newJob = Generator.cloneJob(existingJob);
@@ -140,7 +140,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testCreate_NewVersion_OK() throws UnexpectedException {
+  public void testCreate_NewVersion_OK() throws MarquezServiceException {
     ArgumentCaptor<JobVersion> jobVersionCaptor = ArgumentCaptor.forClass(JobVersion.class);
     Job existingJob = Generator.genJob(namespaceID);
     Job newJob = Generator.genJob(namespaceID);
@@ -155,7 +155,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testCreate_JobAndVersionFound_NoInsert_OK() throws UnexpectedException {
+  public void testCreate_JobAndVersionFound_NoInsert_OK() throws MarquezServiceException {
     Job existingJob = Generator.genJob(namespaceID);
     Job newJob = Generator.cloneJob(existingJob);
     UUID existingJobVersionID = JobService.computeVersion(existingJob);
@@ -175,23 +175,23 @@ public class JobServiceTest {
     verify(jobVersionDao, never()).insert(any(JobVersion.class));
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testGet_JobDaoException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testGet_JobDaoException() throws MarquezServiceException {
     when(jobDao.findByName(eq(TEST_NS), any(String.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.getJob(TEST_NS, "a job");
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testCreate_JobDaoException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testCreate_JobDaoException() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     when(jobDao.findByName(eq(TEST_NS), any(String.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.createJob(TEST_NS, job);
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testCreateJobRun() throws UnexpectedException, NoSuchAlgorithmException {
+  @Test(expected = MarquezServiceException.class)
+  public void testCreateJobRun() throws MarquezServiceException, NoSuchAlgorithmException {
     String runArgsJson = "{'foo': 1}";
     String jobName = "a job";
     JobService jobService = spy(this.jobService);
@@ -199,8 +199,8 @@ public class JobServiceTest {
     jobService.createJobRun(TEST_NS, jobName, runArgsJson, null, null);
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testCreate_JobVersionDaoException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testCreate_JobVersionDaoException() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     UUID jobVersionID = JobService.computeVersion(job);
     when(jobDao.findByName(TEST_NS, job.getName())).thenReturn(job);
@@ -209,8 +209,8 @@ public class JobServiceTest {
     jobService.createJob(TEST_NS, job);
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testCreate_JobVersionInsertException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testCreate_JobVersionInsertException() throws MarquezServiceException {
     Job job = Generator.genJob(namespaceID);
     when(jobDao.findByName(TEST_NS, job.getName())).thenReturn(job);
     when(jobVersionDao.findByVersion(any(UUID.class))).thenReturn(null);
@@ -220,36 +220,36 @@ public class JobServiceTest {
     jobService.createJob(TEST_NS, job);
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testGetAll_Exception() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testGetAll_Exception() throws MarquezServiceException {
     when(jobDao.findAllInNamespace(TEST_NS)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getAllJobsInNamespace(TEST_NS);
   }
 
   @Test
-  public void testGetJobRun() throws UnexpectedException {
+  public void testGetJobRun() throws MarquezServiceException {
     JobRun jobRun = Generator.genJobRun();
     when(jobRunDao.findJobRunById(jobRun.getGuid())).thenReturn(jobRun);
     assertEquals(Optional.ofNullable(jobRun), jobService.getJobRun(jobRun.getGuid()));
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testGetJobRun_SQLException() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testGetJobRun_SQLException() throws MarquezServiceException {
     UUID jobRunID = UUID.randomUUID();
     when(jobRunDao.findJobRunById(jobRunID)).thenThrow(UnableToExecuteStatementException.class);
     jobService.getJobRun(jobRunID);
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testGetVersionLatest_Exception() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testGetVersionLatest_Exception() throws MarquezServiceException {
     String jobName = "a job";
     when(jobVersionDao.findLatest(TEST_NS, jobName))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.getLatestVersionOfJob(TEST_NS, jobName);
   }
 
-  @Test(expected = UnexpectedException.class)
-  public void testUpdateJobRunState_Exception() throws UnexpectedException {
+  @Test(expected = MarquezServiceException.class)
+  public void testUpdateJobRunState_Exception() throws MarquezServiceException {
     UUID jobRunID = UUID.randomUUID();
     JobRunState.State state = JobRunState.State.NEW;
     doThrow(UnableToExecuteStatementException.class)

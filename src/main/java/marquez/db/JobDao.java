@@ -1,13 +1,26 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.db;
 
 import java.util.List;
 import java.util.UUID;
-import marquez.core.models.Job;
-import marquez.core.models.JobVersion;
 import marquez.db.mappers.JobRowMapper;
+import marquez.service.models.Job;
+import marquez.service.models.JobVersion;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -23,9 +36,8 @@ public interface JobDao {
           + " VALUES (:guid, :name, :namespaceGuid, :description, :inputDatasetUrns, :outputDatasetUrns)")
   public void insert(@BindBean Job job);
 
-  @SqlUpdate("UPDATE jobs SET current_version_guid = :version_guid WHERE guid = :job_guid")
-  public void setCurrentVersionGuid(
-      @Bind("job_guid") UUID jobGuid, @Bind("version_guid") UUID currentVersionGuid);
+  @SqlUpdate("UPDATE jobs SET current_version_guid = :currentVersionGuid WHERE guid = :jobGuid")
+  public void setCurrentVersionGuid(UUID jobGuid, UUID currentVersionGuid);
 
   @Transaction
   default void insertJobAndVersion(final Job job, final JobVersion jobVersion) {
@@ -36,7 +48,7 @@ public interface JobDao {
 
   @SqlQuery(
       "SELECT j.*, jv.uri FROM jobs j INNER JOIN job_versions jv ON (j.guid = :guid AND j.current_version_guid = jv.guid)")
-  Job findByID(@Bind("guid") UUID guid);
+  Job findByID(UUID guid);
 
   @SqlQuery(
       "SELECT j.*, jv.uri "
@@ -44,8 +56,8 @@ public interface JobDao {
           + "INNER JOIN job_versions jv "
           + "    ON (j.current_version_guid = jv.guid) "
           + "INNER JOIN namespaces n "
-          + "    ON (j.namespace_guid = n.guid AND n.name = :ns_name AND j.name = :job_name)")
-  Job findByName(@Bind("ns_name") String namespace, @Bind("job_name") String name);
+          + "    ON (j.namespace_guid = n.guid AND n.name = :namespace AND j.name = :name)")
+  Job findByName(String namespace, String name);
 
   @SqlQuery(
       "SELECT j.*, jv.uri "
@@ -53,6 +65,6 @@ public interface JobDao {
           + "INNER JOIN job_versions jv "
           + " ON (j.current_version_guid = jv.guid) "
           + "INNER JOIN namespaces n "
-          + " ON (j.namespace_guid = n.guid AND n.name = :ns_name)")
-  List<Job> findAllInNamespace(@Bind("ns_name") String namespaceName);
+          + " ON (j.namespace_guid = n.guid AND n.name = :namespaceName)")
+  List<Job> findAllInNamespace(String namespaceName);
 }

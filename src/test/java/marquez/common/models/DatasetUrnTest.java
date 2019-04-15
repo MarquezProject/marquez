@@ -1,91 +1,74 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.common.models;
 
-import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertEquals;
 
-import java.util.StringJoiner;
-import java.util.stream.Stream;
+import marquez.UnitTests;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class DatasetUrnTest {
-  private static final String DATASET_URN_DELIM = ":";
-  private static final String DATASET_URN_PREFIX = "urn";
-  private static final Integer ALLOWED_DATASET_URN_SIZE = 64;
-  private static final Integer DATASET_URN_SIZE_GREATER_THAN_ALLOWED = ALLOWED_DATASET_URN_SIZE + 1;
+  private static final String NAMESPACE = "dataset";
+  private static final String VALUE = String.format("urn:%s:postgresql:public.foo", NAMESPACE);
+
+  private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("postgresql");
+  private static final DatasetName DATASET_NAME = DatasetName.fromString("public.foo");
 
   @Test
-  public void testNewDatasetUrn() {
-    final String datasetUrn = "urn:a:b.c";
-    assertEquals(datasetUrn, DatasetUrn.of(datasetUrn).getValue());
+  public void testNewDatasetUrn_from() {
+    final DatasetUrn urn = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
+    assertEquals(VALUE, urn.getValue());
+    assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test
-  public void testNewDatasetUrnFromNamespaceAndDataset() {
-    final DatasetUrn expected = DatasetUrn.of("urn:a:b.c");
-    final DatasetUrn actual = DatasetUrn.of(Namespace.of("a"), Dataset.of("b.c"));
-    assertEquals(expected, actual);
+  public void testNewDatasetUrn_fromString() {
+    final DatasetUrn urn = DatasetUrn.fromString(VALUE);
+    assertEquals(VALUE, urn.getValue());
+    assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test(expected = NullPointerException.class)
-  public void testDatasetUrnNull() {
-    final String nullDatasetUrn = null;
-    DatasetUrn.of(nullDatasetUrn);
+  public void testFrom_throwsException_onNullDatasourceName() {
+    final DatasourceName nullDatasourceName = null;
+    DatasetUrn.from(nullDatasourceName, DATASET_NAME);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testFrom_throwsException_onNullDatasetName() {
+    final DatasetName nullDatasetName = null;
+    DatasetUrn.from(DATASOURCE_NAME, nullDatasetName);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testFromString_throwsException_onNullValue() {
+    final String nullValue = null;
+    DatasetUrn.fromString(nullValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnEmpty() {
-    final String emptyDatasetUrn = "";
-    DatasetUrn.of(emptyDatasetUrn);
+  public void testFromString_throwsException_onEmptyValue() {
+    final String emptyValue = "";
+    DatasetUrn.fromString(emptyValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnBlank() {
-    final String blankDatasetUrn = " ";
-    DatasetUrn.of(blankDatasetUrn);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnNoPrefix() {
-    final String noPrefixDatasetUrn = "a:b";
-    DatasetUrn.of(noPrefixDatasetUrn);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnMissingPart() {
-    final String missingPartDatasetUrn = "urn:a";
-    DatasetUrn.of(missingPartDatasetUrn);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnExtraPart() {
-    final String extraPartDatasetUrn = "urn:a:b:c";
-    DatasetUrn.of(extraPartDatasetUrn);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnNonAlphanumericPart() {
-    final String nonAlphanumericPartDatasetUrn = "urn:a:b$c^";
-    DatasetUrn.of(nonAlphanumericPartDatasetUrn);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testDatasetUrnWithPartGreaterThan64() {
-    final String partGreaterThan64DatasetUrn = newDatasetUrnWithPartGreaterThan64();
-    DatasetUrn.of(partGreaterThan64DatasetUrn);
-  }
-
-  private String newDatasetUrnWithPartGreaterThan64() {
-    final String part0 = newDatasetUrnPart("a", ALLOWED_DATASET_URN_SIZE);
-    final String part1GreaterThan64 = newDatasetUrnPart("b", DATASET_URN_SIZE_GREATER_THAN_ALLOWED);
-
-    return new StringJoiner(DATASET_URN_DELIM)
-        .add(DATASET_URN_PREFIX)
-        .add(part0)
-        .add(part1GreaterThan64)
-        .toString();
-  }
-
-  private String newDatasetUrnPart(String s, Integer limit) {
-    return Stream.generate(() -> s).limit(limit).collect(joining());
+  public void testFromStringn_throwsException_onBlankValue() {
+    final String blankValue = " ";
+    DatasetUrn.fromString(blankValue);
   }
 }

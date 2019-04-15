@@ -1,3 +1,17 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.service;
 
 import java.nio.charset.StandardCharsets;
@@ -8,16 +22,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import marquez.core.exceptions.UnexpectedException;
-import marquez.core.models.Job;
-import marquez.core.models.JobRun;
-import marquez.core.models.JobRunState;
-import marquez.core.models.JobVersion;
-import marquez.core.models.RunArgs;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
+import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.models.Job;
+import marquez.service.models.JobRun;
+import marquez.service.models.JobRunState;
+import marquez.service.models.JobVersion;
+import marquez.service.models.RunArgs;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -38,17 +52,17 @@ public class JobService {
     this.jobRunArgsDao = jobRunArgsDao;
   }
 
-  public Optional<Job> getJob(String namespace, String jobName) throws UnexpectedException {
+  public Optional<Job> getJob(String namespace, String jobName) throws MarquezServiceException {
     try {
       return Optional.ofNullable(jobDao.findByName(namespace, jobName));
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to get a job";
       log.error(err, e);
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 
-  public Job createJob(String namespace, Job job) throws UnexpectedException {
+  public Job createJob(String namespace, Job job) throws MarquezServiceException {
     try {
       Job existingJob = this.jobDao.findByName(namespace, job.getName());
       if (existingJob == null) {
@@ -84,59 +98,59 @@ public class JobService {
     } catch (UnableToExecuteStatementException e) {
       String err = "failed to create new job";
       log.error(err, e);
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 
-  public List<Job> getAllJobsInNamespace(String namespace) throws UnexpectedException {
+  public List<Job> getAllJobsInNamespace(String namespace) throws MarquezServiceException {
     try {
       return jobDao.findAllInNamespace(namespace);
     } catch (UnableToExecuteStatementException e) {
       log.error("caught exception while fetching jobs in namespace ", e);
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 
   public List<JobVersion> getAllVersionsOfJob(String namespace, String jobName)
-      throws UnexpectedException {
+      throws MarquezServiceException {
     try {
       return jobVersionDao.find(namespace, jobName);
     } catch (UnableToExecuteStatementException e) {
       log.error("caught exception while fetching versions of job", e);
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 
   public Optional<JobVersion> getLatestVersionOfJob(String namespace, String jobName)
-      throws UnexpectedException {
+      throws MarquezServiceException {
     try {
       return Optional.ofNullable(jobVersionDao.findLatest(namespace, jobName));
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching latest version of job";
       log.error(err, e);
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 
   public JobRun updateJobRunState(UUID jobRunID, JobRunState.State state)
-      throws UnexpectedException {
+      throws MarquezServiceException {
     try {
       this.jobRunDao.updateState(jobRunID, JobRunState.State.toInt(state));
       return jobRunDao.findJobRunById(jobRunID);
     } catch (UnableToExecuteStatementException e) {
       String err = "error updating job run state";
       log.error(err, e);
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 
-  public Optional<JobRun> getJobRun(UUID jobRunID) throws UnexpectedException {
+  public Optional<JobRun> getJobRun(UUID jobRunID) throws MarquezServiceException {
     try {
       return Optional.ofNullable(jobRunDao.findJobRunById(jobRunID));
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching job run";
       log.error(err, e);
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 
@@ -146,7 +160,7 @@ public class JobService {
       String runArgsJson,
       Timestamp nominalStartTime,
       Timestamp nominalEndTime)
-      throws UnexpectedException {
+      throws MarquezServiceException {
     try {
       String runArgsDigest = null;
       RunArgs runArgs = null;
@@ -156,7 +170,7 @@ public class JobService {
                 "unable to find job <ns='%s', job name='%s'> to create job run",
                 namespaceName, jobName);
         log.error(err);
-        throw new UnexpectedException();
+        throw new MarquezServiceException();
       }
       Optional<JobVersion> latestJobVersion = getLatestVersionOfJob(namespaceName, jobName);
       if (!latestJobVersion.isPresent()) {
@@ -165,7 +179,7 @@ public class JobService {
                 "unable to find latest job version for <ns='%s', job name='%s'> to create job run",
                 namespaceName, jobName);
         log.error(err);
-        throw new UnexpectedException();
+        throw new MarquezServiceException();
       }
       if (runArgsJson != null) {
         runArgsDigest = computeRunArgsDigest(runArgsJson);
@@ -190,7 +204,7 @@ public class JobService {
     } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e) {
       String err = "error creating job run";
       log.error(err, e);
-      throw new UnexpectedException();
+      throw new MarquezServiceException();
     }
   }
 

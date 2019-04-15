@@ -1,12 +1,25 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.db;
 
 import java.util.UUID;
-import marquez.core.models.JobRun;
-import marquez.core.models.RunArgs;
 import marquez.db.mappers.JobRunRowMapper;
+import marquez.service.models.JobRun;
+import marquez.service.models.RunArgs;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -39,8 +52,8 @@ public interface JobRunDao {
     insert(jobRun);
   }
 
-  @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE guid = :job_run_id")
-  void updateCurrentState(@Bind("job_run_id") UUID jobRunID, @Bind("state") Integer state);
+  @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE guid = :jobRunID")
+  void updateCurrentState(UUID jobRunID, Integer state);
 
   @Transaction
   default void updateState(UUID jobRunID, Integer state) {
@@ -52,6 +65,7 @@ public interface JobRunDao {
       "SELECT jr.*, jra.args_json "
           + "FROM job_runs jr "
           + "LEFT JOIN job_run_args jra "
-          + " ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest)")
-  JobRun findJobRunById(@Bind("guid") UUID guid);
+          + " ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest) "
+          + "WHERE jr.guid = :guid")
+  JobRun findJobRunById(UUID guid);
 }

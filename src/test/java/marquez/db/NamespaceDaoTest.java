@@ -1,84 +1,110 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.db;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.db.models.DbModelGenerator.newNamespaceRow;
+import static marquez.db.models.DbModelGenerator.newNamespaceRowWith;
+import static marquez.db.models.DbModelGenerator.newNamespaceRows;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import marquez.core.models.Generator;
-import marquez.core.models.Namespace;
-import marquez.db.fixtures.AppWithPostgresRule;
-import org.junit.After;
+import marquez.DataAccessTests;
+import marquez.IntegrationTests;
+import marquez.common.models.NamespaceName;
+import marquez.db.models.NamespaceRow;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.jdbi.v3.testing.JdbiRule;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category({DataAccessTests.class, IntegrationTests.class})
 public class NamespaceDaoTest {
-  @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
-  NamespaceDao namespaceDao = APP.onDemand(NamespaceDao.class);
+  @ClassRule
+  public static final JdbiRule dbRule =
+      JdbiRule.embeddedPostgres().withPlugin(new SqlObjectPlugin()).migrateWithFlyway();
 
-  @After
-  public void tearDown() {
-    APP.getJDBI()
-        .useHandle(
-            handle -> {
-              handle.execute("DELETE FROM namespaces;");
-            });
-  }
+  private static NamespaceDao namespaceDao;
 
-  private void assertFieldsMatchExceptTS(Namespace ns1, Namespace ns2) {
-    assertEquals(ns1.getGuid(), ns2.getGuid());
-    assertEquals(ns1.getName(), ns2.getName());
-    assertEquals(ns1.getDescription(), ns2.getDescription());
-    assertEquals(ns1.getOwnerName(), ns2.getOwnerName());
-  }
-
-  @Test
-  public void testFind() {
-    Namespace namespace = Generator.genNamespace();
-    APP.getJDBI()
-        .useHandle(
-            handle -> {
-              handle.execute(
-                  "INSERT INTO namespaces(guid, name, description, current_ownership) VALUES (?, ?, ?, ?);",
-                  namespace.getGuid(),
-                  namespace.getName(),
-                  namespace.getDescription(),
-                  namespace.getOwnerName());
-            });
-    assertFieldsMatchExceptTS(namespace, namespaceDao.find(namespace.getName()));
-    assertEquals(null, namespaceDao.find("nonexistent_namespace"));
+  @BeforeClass
+  public static void setUpOnce() {
+    final Jdbi jdbi = dbRule.getJdbi();
+    namespaceDao = jdbi.onDemand(NamespaceDao.class);
   }
 
   @Test
   public void testInsert() {
-    Namespace newNs = Generator.genNamespace();
-    namespaceDao.insert(newNs);
-    assertFieldsMatchExceptTS(newNs, namespaceDao.find(newNs.getName()));
+    final int rowsBefore = namespaceDao.count();
+
+    final NamespaceRow newNamespaceRow = newNamespaceRow();
+    namespaceDao.insert(newNamespaceRow);
+
+    final int rowsAfter = namespaceDao.count();
+    assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
   }
 
   @Test
-  public void testFindAll() {
-    List<Namespace> existingNamespacesFound = namespaceDao.findAll();
-    List<Namespace> newNamespaces =
-        new ArrayList<Namespace>(Arrays.asList(Generator.genNamespace(), Generator.genNamespace()));
-    newNamespaces.forEach(n -> namespaceDao.insert(n));
-    List<Namespace> namespacesFound = namespaceDao.findAll();
-    assertEquals(newNamespaces.size(), namespacesFound.size() - existingNamespacesFound.size());
-  }
-
-  @Test
-  public void testFindAll_Empty() {
-    assertEquals(0, namespaceDao.findAll().size());
+  public void testInsertAndGet() {
+    final NamespaceRow newNamespaceRow = newNamespaceRow();
+    final NamespaceRow namespaceRow = namespaceDao.insertAndGet(newNamespaceRow).orElse(null);
+    assertThat(namespaceRow).isNotNull();
+    assertThat(namespaceRow.getUuid()).isEqualTo(newNamespaceRow.getUuid());
   }
 
   @Test
   public void testExists() {
-    Namespace nonexistentNs = Generator.genNamespace();
-    assertFalse(namespaceDao.exists(nonexistentNs.getName()));
-    Namespace existingNs = Generator.genNamespace();
-    namespaceDao.insert(existingNs);
-    assertTrue(namespaceDao.exists(existingNs.getName()));
+    final NamespaceName namespaceName = newNamespaceName();
+    final NamespaceRow newNamespaceRow = newNamespaceRowWith(namespaceName);
+    namespaceDao.insert(newNamespaceRow);
+
+    final boolean exists = namespaceDao.exists(namespaceName);
+    assertThat(exists).isTrue();
+  }
+
+  @Test
+  public void testFindBy_uuid() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final NamespaceRow newNamespaceRow = newNamespaceRowWith(namespaceName);
+    namespaceDao.insert(newNamespaceRow);
+
+    final NamespaceRow namespaceRow = namespaceDao.findBy(newNamespaceRow.getUuid()).orElse(null);
+    assertThat(namespaceRow).isNotNull();
+    assertThat(namespaceRow.getUuid()).isEqualTo(newNamespaceRow.getUuid());
+  }
+
+  @Test
+  public void testFindBy_name() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final NamespaceRow newNamespaceRow = newNamespaceRowWith(namespaceName);
+    namespaceDao.insert(newNamespaceRow);
+
+    final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName).orElse(null);
+    assertThat(namespaceRow).isNotNull();
+    assertThat(namespaceRow.getName()).isEqualTo(namespaceName.getValue());
+  }
+
+  @Test
+  public void testFindAll() {
+    final List<NamespaceRow> newNamespaceRows = newNamespaceRows(4);
+    newNamespaceRows.forEach(newNamespaceRow -> namespaceDao.insert(newNamespaceRow));
+
+    final List<NamespaceRow> namespaceRows = namespaceDao.findAll();
+    assertThat(namespaceRows).isNotNull();
+    assertThat(namespaceRows).hasSize(4);
   }
 }
