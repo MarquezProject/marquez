@@ -1,0 +1,50 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+html * {
+  font-size: 16px;
+}
+
+.page-header {
+  color: black;
+  background-color: #efefefff;
+  background-image: none;
+}
+
+.main-content h2 {
+  font-size: 28px;
+  font-weight: bold;
+  color: black;
+}
+
+.main-content h3 {
+  font-size: 19px;
+  font-weight: bold;
+  color: black;
+}
+
+.btn {
+  color: black;
+  border-color: black;
+  border-width: 2px
+}
+
+.btn:hover {
+  color: #71ddbfff;
+  border-color: #71ddbfff;
+}
+
+body {
+  color: black;
+  background-color: #f6f6f6;
+}
+
+a {
+  color:#337ab7;
+}
+
+.site-footer {
+  border-top: solid 1px #ccc;
+}
