@@ -69,9 +69,6 @@ public class DatasetDaoTest {
     datasourceDao.insert(datasourceRow);
   }
 
-  @Before
-  public void setupTestData() {}
-
   @Test
   public void testInsert() {
     final int rowsBefore = datasetDao.count();
@@ -110,11 +107,10 @@ public class DatasetDaoTest {
 
   @Test
   public void testExists() {
-
     final DatasetUrn datasetUrn = newDatasetUrn();
     final DatasetRow newDatasetRow =
         newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid(), datasetUrn);
-    datasetDao.insertAndGet(newDatasetRow);
+    datasetDao.insert(newDatasetRow);
 
     final boolean exists = datasetDao.exists(datasetUrn);
     assertThat(exists).isTrue();
@@ -125,7 +121,7 @@ public class DatasetDaoTest {
     final UUID uuid = UUID.randomUUID();
     final DatasetRow newDatasetRow =
         newDatasetRowWith(uuid, namespaceRow.getUuid(), datasourceRow.getUuid());
-    datasetDao.insertAndGet(newDatasetRow);
+    datasetDao.insert(newDatasetRow);
 
     final DatasetRow datasetRow = datasetDao.findBy(uuid).orElse(null);
     assertThat(datasetRow).isNotNull();
@@ -137,7 +133,7 @@ public class DatasetDaoTest {
     final DatasetUrn datasetUrn = newDatasetUrn();
     final DatasetRow newDatasetRow =
         newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid(), datasetUrn);
-    datasetDao.insertAndGet(newDatasetRow);
+    datasetDao.insert(newDatasetRow);
 
     final DatasetRow datasetRow = datasetDao.findBy(datasetUrn).orElse(null);
     assertThat(datasetRow).isNotNull();
