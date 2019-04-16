@@ -48,8 +48,13 @@ configMaps:
       config.yml: |-
         server:
           applicationConnectors:
-          - type: http
-            port: ${MARQUEZ_PORT:-5000}
+            - type: http
+              port: ${MARQUEZ_PORT:-5000}
+          requestLog:
+            appenders:
+              - type: console
+                layout:
+                  type: access-json
         db:
           driverClass: org.postgresql.Driver
           url: jdbc:postgresql://${POSTGRES_HOST:-localhost}/${POSTGRES_DB}
