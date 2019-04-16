@@ -22,6 +22,7 @@ import static marquez.db.models.DbModelGenerator.newNamespaceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
@@ -36,6 +37,7 @@ import org.jdbi.v3.testing.JdbiRule;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -52,8 +54,8 @@ public class DatasetDaoTest {
   private static DatasourceDao datasourceDao;
   private static DatasetDao datasetDao;
 
-  private static DatasourceRow datasourceRow;
-  private static NamespaceRow namespaceRow;
+  private DatasourceRow datasourceRow;
+  private NamespaceRow namespaceRow;
 
   @BeforeClass
   public static void setUpOnce() {
@@ -61,12 +63,28 @@ public class DatasetDaoTest {
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
     datasourceDao = jdbi.onDemand(DatasourceDao.class);
     datasetDao = jdbi.onDemand(DatasetDao.class);
+  }
 
+  @Before
+  public void setup() {
     datasourceRow = newDatasourceRow();
     namespaceRow = newNamespaceRow();
 
     namespaceDao.insert(namespaceRow);
     datasourceDao.insert(datasourceRow);
+  }
+
+  @Test
+  public void testGetEmptySetOfRowsByUUID() {
+    Optional<DatasetRow> returnedRow = datasetDao.findBy(UUID.randomUUID());
+    assertThat(returnedRow).isEmpty();
+  }
+
+  @Test
+  public void testFindAllWithEmptySetOfRows() {
+    List<DatasetRow> returnedRow =
+        datasetDao.findAll(NamespaceName.fromString(namespaceRow.getName()), LIMIT, 0);
+    assertThat(returnedRow).isEmpty();
   }
 
   @Test
@@ -79,6 +97,68 @@ public class DatasetDaoTest {
 
     final int rowsAfter = datasetDao.count();
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
+  }
+
+  @Test
+  public void testIdempotentInsert() {
+    final int rowsBefore = datasetDao.count();
+
+    final DatasetRow newDatasetRow =
+        newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
+    datasetDao.insert(newDatasetRow);
+
+    final int rowsAfter = datasetDao.count();
+    assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
+
+    datasetDao.insert(newDatasetRow);
+    final int rowsAfterIdempotentInsert = datasetDao.count();
+    assertThat(rowsAfter).isEqualTo(rowsAfterIdempotentInsert);
+  }
+
+  @Ignore("Ignore for now while we try to reach parity betwen insert and insertAndGet")
+  @Test
+  public void testIdempotentInsertAndGet() {
+    final int rowsBefore = datasetDao.count();
+
+    final DatasetRow newDatasetRow =
+        newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
+    datasetDao.insert(newDatasetRow);
+
+    final int rowsAfter = datasetDao.count();
+    assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
+
+    datasetDao.insertAndGet(newDatasetRow);
+    final int rowsAfterIdempotentInsertAndGet = datasetDao.count();
+    assertThat(rowsAfter).isEqualTo(rowsAfterIdempotentInsertAndGet);
+  }
+
+  @Test
+  public void testIdempotentInsertPreservesOldValues() {
+    final DatasetRow newDatasetRow =
+        newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
+    datasetDao.insert(newDatasetRow);
+    final String oldDescription = newDatasetRow.getDescription();
+    newDatasetRow.setUuid(UUID.randomUUID());
+    newDatasetRow.setDescription("new description");
+
+    datasetDao.insert(newDatasetRow);
+    Optional<DatasetRow> returnedDatasetRow =
+        datasetDao.findBy(DatasetUrn.fromString(newDatasetRow.getUrn()));
+    assertThat(returnedDatasetRow.get().getDescription()).isEqualTo(oldDescription);
+  }
+
+  @Ignore("Ignore for now while we try to reach parity betwen insert and insertAndGet")
+  @Test
+  public void testIdempotentInsertAndGetPreservesOldValues() {
+    final DatasetRow newDatasetRow =
+        newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
+    datasetDao.insert(newDatasetRow);
+    final String oldDescription = newDatasetRow.getDescription();
+    newDatasetRow.setUuid(UUID.randomUUID());
+    newDatasetRow.setDescription("new description");
+
+    Optional<DatasetRow> returnedDatasetRow = datasetDao.insertAndGet(newDatasetRow);
+    assertThat(returnedDatasetRow.get().getDescription()).isEqualTo(oldDescription);
   }
 
   @Test
@@ -142,7 +222,6 @@ public class DatasetDaoTest {
 
   @Test
   public void testFindAll() {
-    final int totalDatasetRows = datasetDao.count();
     final int rowsToInsert = 4;
     final List<DatasetRow> newDatasetRows =
         newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), rowsToInsert);
@@ -151,7 +230,7 @@ public class DatasetDaoTest {
     final List<DatasetRow> datasetRows =
         datasetDao.findAll(NamespaceName.fromString(namespaceRow.getName()), LIMIT, OFFSET);
     assertThat(datasetRows).isNotNull();
-    assertThat(datasetRows).hasSize(totalDatasetRows + rowsToInsert);
+    assertThat(datasetRows).hasSize(rowsToInsert);
   }
 
   @Test
@@ -170,27 +249,15 @@ public class DatasetDaoTest {
 
   @Test
   public void testFindAll_offsetOnly() {
-
     final List<DatasetRow> newDatasetRows =
         newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
 
-    final int totalDatasetRows = datasetDao.count();
-    final int offset = 2;
     final List<DatasetRow> datasetRows =
-        datasetDao.findAll(NamespaceName.fromString(namespaceRow.getName()), LIMIT, offset);
-
-    final List<DatasetRow> datasetRowsNoOffset =
-        datasetDao.findAll(NamespaceName.fromString(namespaceRow.getName()), LIMIT, 0);
-
+        datasetDao.findAll(NamespaceName.fromString(namespaceRow.getName()), LIMIT, 2);
     assertThat(datasetRows).isNotNull();
-    assertThat(datasetRows).hasSize(totalDatasetRows - offset);
-
-    int x = 0;
-    while (x < totalDatasetRows - offset) {
-      assertThat(datasetRowsNoOffset.get(x + offset).getUuid())
-          .isEqualTo(datasetRows.get(x).getUuid());
-      x++;
-    }
+    assertThat(datasetRows).hasSize(2);
+    assertThat(datasetRows.get(0).getUuid()).isEqualTo(newDatasetRows.get(2).getUuid());
+    assertThat(datasetRows.get(1).getUuid()).isEqualTo(newDatasetRows.get(3).getUuid());
   }
 }
