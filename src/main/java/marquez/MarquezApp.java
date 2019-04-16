@@ -26,19 +26,22 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.exceptions.ResourceExceptionMapper;
+import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.api.resources.DatasetResource;
+import marquez.api.resources.DatasourceResource;
 import marquez.api.resources.HealthResource;
 import marquez.api.resources.JobResource;
 import marquez.api.resources.NamespaceResource;
 import marquez.api.resources.PingResource;
 import marquez.db.DatasetDao;
+import marquez.db.DatasourceDao;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
 import marquez.service.DatasetService;
+import marquez.service.DatasourceService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import org.flywaydb.core.Flyway;
@@ -86,7 +89,7 @@ public class MarquezApp extends Application<MarquezConfig> {
   }
 
   @Override
-  public void run(@NonNull MarquezConfig config, @NonNull Environment env) {
+  public void run(@NonNull MarquezConfig config, @NonNull Environment env) throws MarquezException {
     migrateDbOrError(config);
     registerResources(config, env);
   }
@@ -111,7 +114,8 @@ public class MarquezApp extends Application<MarquezConfig> {
     }
   }
 
-  private void registerResources(@NonNull MarquezConfig config, @NonNull Environment env) {
+  private void registerResources(@NonNull MarquezConfig config, @NonNull Environment env)
+      throws MarquezException {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
@@ -126,6 +130,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JobRunDao jobRunDao = jdbi.onDemand(JobRunDao.class);
     final JobRunArgsDao jobRunArgsDao = jdbi.onDemand(JobRunArgsDao.class);
     final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
+    final DatasourceDao datasourceDao = jdbi.onDemand(DatasourceDao.class);
 
     final NamespaceService namespaceService = new NamespaceService(namespaceDao);
     final JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
@@ -134,8 +139,12 @@ public class MarquezApp extends Application<MarquezConfig> {
     env.jersey().register(new HealthResource());
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new JobResource(namespaceService, jobService));
-    env.jersey().register(new DatasetResource(namespaceService, new DatasetService(datasetDao)));
+    env.jersey().register(new DatasourceResource(new DatasourceService(datasourceDao)));
+    env.jersey()
+        .register(
+            new DatasetResource(
+                namespaceService, new DatasetService(namespaceDao, datasourceDao, datasetDao)));
 
-    env.jersey().register(new ResourceExceptionMapper());
+    env.jersey().register(new MarquezServiceExceptionMapper());
   }
 }

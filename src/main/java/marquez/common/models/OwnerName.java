@@ -25,4 +25,6 @@ import lombok.ToString;
 @ToString
 public final class OwnerName {
   @Getter @NonNull private final String value;
+
+  public static final OwnerName ANONYMOUS = OwnerName.fromString("anonymous");
 }

@@ -14,24 +14,31 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.stringOrNull;
+import static marquez.db.Columns.stringOrThrow;
+import static marquez.db.Columns.timestampOrNull;
+import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidOrNull;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
-import marquez.service.models.Namespace;
+import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public final class NamespaceRowMapper implements RowMapper<Namespace> {
+public final class NamespaceRowMapper implements RowMapper<NamespaceRow> {
   @Override
-  public Namespace map(@NonNull ResultSet results, @NonNull StatementContext context)
+  public NamespaceRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    return new Namespace(
-        results.getObject(Columns.ROW_UUID, UUID.class),
-        results.getTimestamp(Columns.CREATED_AT),
-        results.getString(Columns.NAME),
-        results.getString(Columns.CURRENT_OWNER_NAME),
-        results.getString(Columns.DESCRIPTION));
+    return NamespaceRow.builder()
+        .uuid(uuidOrNull(results, Columns.ROW_UUID))
+        .createdAt(timestampOrThrow(results, Columns.CREATED_AT))
+        .updatedAt(timestampOrNull(results, Columns.UPDATED_AT))
+        .name(stringOrThrow(results, Columns.NAME))
+        .description(stringOrNull(results, Columns.DESCRIPTION))
+        .currentOwnerName(stringOrNull(results, Columns.CURRENT_OWNER_NAME))
+        .build();
   }
 }

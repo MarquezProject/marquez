@@ -16,25 +16,30 @@ package marquez.db;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import marquez.db.mappers.DataSourceRowMapper;
-import marquez.db.models.DataSourceRow;
+import marquez.common.models.DatasourceName;
+import marquez.common.models.DatasourceUrn;
+import marquez.db.mappers.DatasourceRowMapper;
+import marquez.db.models.DatasourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-@RegisterRowMapper(DataSourceRowMapper.class)
-public interface DataSourceDao {
-  @SqlUpdate(
-      "INSERT INTO datasources (guid, name, connection_url) "
-          + "VALUES (:uuid, :name, :connectionUrl)")
-  void insert(@BindBean DataSourceRow dataSourceRow);
+@RegisterRowMapper(DatasourceRowMapper.class)
+public interface DatasourceDao {
+  @SqlQuery(
+      "INSERT INTO datasources (guid, urn, name, connection_url) "
+          + "VALUES (:uuid, :urn, :name, :connectionUrl) RETURNING * ")
+  Optional<DatasourceRow> insert(@BindBean DatasourceRow datasourceRow);
 
-  @SqlQuery("SELECT * FROM datasources WHERE guid = :uuid")
-  Optional<DataSourceRow> findBy(@Bind("uuid") UUID uuid);
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM datasources WHERE urn = :value)")
+  boolean exists(@BindBean DatasourceUrn urn);
+
+  @SqlQuery("SELECT * FROM datasources WHERE urn = :value")
+  Optional<DatasourceRow> findBy(@BindBean DatasourceUrn urn);
+
+  @SqlQuery("SELECT * FROM datasources WHERE name = :value")
+  Optional<DatasourceRow> findBy(@BindBean DatasourceName name);
 
   @SqlQuery("SELECT * FROM datasources LIMIT :limit OFFSET :offset")
-  List<DataSourceRow> findAll(@Bind("limit") Integer limit, @Bind("offset") Integer offset);
+  List<DatasourceRow> findAll(Integer limit, Integer offset);
 }

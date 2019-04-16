@@ -14,6 +14,8 @@
 
 package marquez.common.models;
 
+import static marquez.common.Preconditions.checkArgument;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
@@ -33,11 +35,10 @@ public final class NamespaceName {
   @Getter private final String value;
 
   private NamespaceName(@NonNull final String value) {
-    if (!NAMESPACE_PATTERN.matcher(value).matches()) {
-      throw new IllegalArgumentException(
-          "A namespaces must contain only letters (a-z, A-Z), numbers (0-9), or "
-              + "underscores (_) with a maximum length of 1024 characters.");
-    }
+    checkArgument(
+        NAMESPACE_PATTERN.matcher(value).matches(),
+        "A namespaces must contain only letters (a-z, A-Z), numbers (0-9), or "
+            + "underscores (_) with a maximum length of 1024 characters.");
 
     this.value = value;
   }
@@ -46,4 +47,6 @@ public final class NamespaceName {
   public static NamespaceName fromString(String value) {
     return new NamespaceName(value);
   }
+
+  public static final NamespaceName DEFAULT = NamespaceName.fromString("default");
 }

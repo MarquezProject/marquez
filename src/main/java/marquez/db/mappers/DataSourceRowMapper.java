@@ -14,24 +14,28 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.stringOrThrow;
+import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidOrThrow;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
-import marquez.db.models.DataSourceRow;
+import marquez.db.models.DatasourceRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public final class DataSourceRowMapper implements RowMapper<DataSourceRow> {
+public final class DatasourceRowMapper implements RowMapper<DatasourceRow> {
   @Override
-  public DataSourceRow map(@NonNull ResultSet results, @NonNull StatementContext context)
+  public DatasourceRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    return DataSourceRow.builder()
-        .uuid(results.getObject(Columns.ROW_UUID, UUID.class))
-        .createdAt(results.getTimestamp(Columns.CREATED_AT).toInstant())
-        .name(results.getString(Columns.NAME))
-        .connectionUrl(results.getString(Columns.CONNECTION_URL))
+    return DatasourceRow.builder()
+        .uuid(uuidOrThrow(results, Columns.ROW_UUID))
+        .createdAt(timestampOrThrow(results, Columns.CREATED_AT))
+        .name(stringOrThrow(results, Columns.NAME))
+        .urn(stringOrThrow(results, Columns.URN))
+        .connectionUrl(stringOrThrow(results, Columns.CONNECTION_URL))
         .build();
   }
 }
