@@ -17,6 +17,10 @@ repositories {
 }
 
 dependencies {
+  compile "io.prometheus:simpleclient:0.6.0"
+  compile "io.prometheus:simpleclient_dropwizard:0.6.0"
+  compile "io.prometheus:simpleclient_hotspot:0.6.0"
+  compile "io.prometheus:simpleclient_servlet:0.6.0"
   compile 'io.dropwizard.metrics:metrics-jdbi3:4.1.0-rc3'
   compile 'io.dropwizard.modules:dropwizard-flyway:1.3.0-4'
   compile 'io.dropwizard:dropwizard-core:1.3.9'

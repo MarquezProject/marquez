@@ -12,6 +12,10 @@ args:
 healthPath: /health
 healthPort: 5000
 
+monitoring:
+  enabled: true
+  team: marquez
+
 image:
   repository: quay.io/wework/marquez
 
