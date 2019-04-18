@@ -21,6 +21,7 @@ import static marquez.db.models.DbModelGenerator.newDatasourceRow;
 import static marquez.db.models.DbModelGenerator.newNamespaceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,12 +33,12 @@ import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -99,7 +100,7 @@ public class DatasetDaoTest {
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
   }
 
-  @Test
+  @Test(expected = UnableToExecuteStatementException.class)
   public void testIdempotentInsert() {
     final int rowsBefore = datasetDao.count();
 
@@ -111,12 +112,9 @@ public class DatasetDaoTest {
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
 
     datasetDao.insert(newDatasetRow);
-    final int rowsAfterIdempotentInsert = datasetDao.count();
-    assertThat(rowsAfter).isEqualTo(rowsAfterIdempotentInsert);
   }
 
-  @Ignore("Ignore for now while we try to reach parity betwen insert and insertAndGet")
-  @Test
+  @Test(expected = UnableToExecuteStatementException.class)
   public void testIdempotentInsertAndGet() {
     final int rowsBefore = datasetDao.count();
 
@@ -128,37 +126,6 @@ public class DatasetDaoTest {
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
 
     datasetDao.insertAndGet(newDatasetRow);
-    final int rowsAfterIdempotentInsertAndGet = datasetDao.count();
-    assertThat(rowsAfter).isEqualTo(rowsAfterIdempotentInsertAndGet);
-  }
-
-  @Test
-  public void testIdempotentInsertPreservesOldValues() {
-    final DatasetRow newDatasetRow =
-        newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
-    datasetDao.insert(newDatasetRow);
-    final String oldDescription = newDatasetRow.getDescription();
-    newDatasetRow.setUuid(UUID.randomUUID());
-    newDatasetRow.setDescription("new description");
-
-    datasetDao.insert(newDatasetRow);
-    Optional<DatasetRow> returnedDatasetRow =
-        datasetDao.findBy(DatasetUrn.fromString(newDatasetRow.getUrn()));
-    assertThat(returnedDatasetRow.get().getDescription()).isEqualTo(oldDescription);
-  }
-
-  @Ignore("Ignore for now while we try to reach parity betwen insert and insertAndGet")
-  @Test
-  public void testIdempotentInsertAndGetPreservesOldValues() {
-    final DatasetRow newDatasetRow =
-        newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
-    datasetDao.insert(newDatasetRow);
-    final String oldDescription = newDatasetRow.getDescription();
-    newDatasetRow.setUuid(UUID.randomUUID());
-    newDatasetRow.setDescription("new description");
-
-    Optional<DatasetRow> returnedDatasetRow = datasetDao.insertAndGet(newDatasetRow);
-    assertThat(returnedDatasetRow.get().getDescription()).isEqualTo(oldDescription);
   }
 
   @Test
@@ -176,6 +143,7 @@ public class DatasetDaoTest {
         newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
     final DatasetRow datasetRow = datasetDao.insertAndGet(newDatasetRow).orElse(null);
     assertThat(datasetRow.getCurrentVersionUuid()).isNull();
+    final Instant previousUpdatedAt = datasetRow.getUpdatedAt();
 
     final UUID currentVersionUuid = UUID.randomUUID();
     datasetDao.updateCurrentVersionUuid(datasetRow.getUuid(), currentVersionUuid);
@@ -183,6 +151,7 @@ public class DatasetDaoTest {
     final DatasetRow datasetRowWithVersion = datasetDao.findBy(datasetRow.getUuid()).orElse(null);
     assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isNotNull();
     assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isEqualTo(currentVersionUuid);
+    assertThat(datasetRowWithVersion.getUpdatedAt()).isAfter(previousUpdatedAt);
   }
 
   @Test
