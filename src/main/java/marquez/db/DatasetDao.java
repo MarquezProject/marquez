@@ -69,7 +69,7 @@ public interface DatasetDao {
   @SqlUpdate(
       "UPDATE datasets "
           + "SET updated_at = NOW(), "
-          + "current_version_uuid = :currentVersionUuid "
+          + "    current_version_uuid = :currentVersionUuid "
           + "WHERE guid = :uuid")
   void updateCurrentVersionUuid(UUID uuid, UUID currentVersionUuid);
 
