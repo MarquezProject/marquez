@@ -20,10 +20,9 @@ import static marquez.db.models.DbModelGenerator.newDatasetRowsWith;
 import static marquez.db.models.DbModelGenerator.newDatasourceRow;
 import static marquez.db.models.DbModelGenerator.newNamespaceRow;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
@@ -76,19 +75,6 @@ public class DatasetDaoTest {
   }
 
   @Test
-  public void testGetEmptySetOfRowsByUUID() {
-    Optional<DatasetRow> returnedRow = datasetDao.findBy(UUID.randomUUID());
-    assertThat(returnedRow).isEmpty();
-  }
-
-  @Test
-  public void testFindAllWithEmptySetOfRows() {
-    List<DatasetRow> returnedRow =
-        datasetDao.findAll(NamespaceName.fromString(namespaceRow.getName()), LIMIT, 0);
-    assertThat(returnedRow).isEmpty();
-  }
-
-  @Test
   public void testInsert() {
     final int rowsBefore = datasetDao.count();
 
@@ -100,8 +86,8 @@ public class DatasetDaoTest {
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
   }
 
-  @Test(expected = UnableToExecuteStatementException.class)
-  public void testIdempotentInsert() {
+  @Test
+  public void testInsert_throwsException_onDuplicateRow() {
     final int rowsBefore = datasetDao.count();
 
     final DatasetRow newDatasetRow =
@@ -111,11 +97,12 @@ public class DatasetDaoTest {
     final int rowsAfter = datasetDao.count();
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
 
-    datasetDao.insert(newDatasetRow);
+    assertThatExceptionOfType(UnableToExecuteStatementException.class)
+        .isThrownBy(() -> datasetDao.insert(newDatasetRow));
   }
 
-  @Test(expected = UnableToExecuteStatementException.class)
-  public void testIdempotentInsertAndGet() {
+  @Test
+  public void testInsertAndGet_throwsException_onDuplicateRow() {
     final int rowsBefore = datasetDao.count();
 
     final DatasetRow newDatasetRow =
@@ -125,7 +112,8 @@ public class DatasetDaoTest {
     final int rowsAfter = datasetDao.count();
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
 
-    datasetDao.insertAndGet(newDatasetRow);
+    assertThatExceptionOfType(UnableToExecuteStatementException.class)
+        .isThrownBy(() -> datasetDao.insertAndGet(newDatasetRow));
   }
 
   @Test
@@ -143,7 +131,6 @@ public class DatasetDaoTest {
         newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid());
     final DatasetRow datasetRow = datasetDao.insertAndGet(newDatasetRow).orElse(null);
     assertThat(datasetRow.getCurrentVersionUuid()).isNull();
-    final Instant previousUpdatedAt = datasetRow.getUpdatedAt();
 
     final UUID currentVersionUuid = UUID.randomUUID();
     datasetDao.updateCurrentVersionUuid(datasetRow.getUuid(), currentVersionUuid);
@@ -151,7 +138,7 @@ public class DatasetDaoTest {
     final DatasetRow datasetRowWithVersion = datasetDao.findBy(datasetRow.getUuid()).orElse(null);
     assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isNotNull();
     assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isEqualTo(currentVersionUuid);
-    assertThat(datasetRowWithVersion.getUpdatedAt()).isAfter(previousUpdatedAt);
+    assertThat(datasetRowWithVersion.getUpdatedAt()).isAfter(datasetRow.getUpdatedAt());
   }
 
   @Test
@@ -178,6 +165,11 @@ public class DatasetDaoTest {
   }
 
   @Test
+  public void testFindBy_uuid_noRowsFound() {
+    assertThat(datasetDao.findBy(UUID.randomUUID())).isEmpty();
+  }
+
+  @Test
   public void testFindBy_urn() {
     final DatasetUrn datasetUrn = newDatasetUrn();
     final DatasetRow newDatasetRow =
@@ -200,6 +192,12 @@ public class DatasetDaoTest {
         datasetDao.findAll(NamespaceName.fromString(namespaceRow.getName()), LIMIT, OFFSET);
     assertThat(datasetRows).isNotNull();
     assertThat(datasetRows).hasSize(rowsToInsert);
+  }
+
+  @Test
+  public void testFindAll_noRowsFound() {
+    assertThat(datasetDao.findAll(NamespaceName.fromString(namespaceRow.getName()), LIMIT, OFFSET))
+        .isEmpty();
   }
 
   @Test

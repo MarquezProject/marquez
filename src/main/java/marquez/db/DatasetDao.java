@@ -41,7 +41,7 @@ public interface DatasetDao {
 
   @SqlUpdate(
       "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
-          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name) ")
+          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name)")
   void insert(@BindBean DatasetRow datasetRow);
 
   @SqlQuery(
@@ -69,7 +69,7 @@ public interface DatasetDao {
   @SqlUpdate(
       "UPDATE datasets "
           + "SET updated_at = NOW(), "
-          + "    current_version_uuid = :currentVersionUuid "
+          + "current_version_uuid = :currentVersionUuid "
           + "WHERE guid = :uuid")
   void updateCurrentVersionUuid(UUID uuid, UUID currentVersionUuid);
 

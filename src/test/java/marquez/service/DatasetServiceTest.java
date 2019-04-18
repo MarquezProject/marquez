@@ -232,11 +232,10 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void testGetWithNoResults() throws MarquezServiceException {
+  public void testGet_notPresent() throws MarquezServiceException {
     when(datasetDao.findBy(DATASET_URN)).thenReturn(Optional.empty());
 
-    final Dataset dataset = datasetService.get(DATASET_URN).orElse(null);
-    assertThat(dataset).isNull();
+    assertThat(datasetService.get(DATASET_URN)).isNotPresent();
     verify(datasetDao, times(1)).findBy(DATASET_URN);
   }
 
