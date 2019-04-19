@@ -6,6 +6,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import MUIDataTable from "mui-datatables";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 import axios from 'axios'
 
 import JobDetailsDialog from './JobDetailsDialog';
@@ -93,17 +95,36 @@ class SimpleTabs extends React.Component {
   render() {
     const { classes } = this.props;
     const { value } = this.state;
+<<<<<<< HEAD
     const jobColumns = [
         "Name",
         "Description",
         "Created At"
     ];
     const datasetColumns = ["URN", "Created At"];
+=======
+    const jobColumns = ["Name", "Description", "Created At"];
+    const datasetColumns = ["Name", "urn", "Created At"];
+>>>>>>> 0f982bb52cc28ec5567c80ddf07d24a01bb6f0f0
 
     const options = {
         filter: true,
         filterType: 'dropdown',
+<<<<<<< HEAD
         onRowClick: this.handleJobRowClick
+=======
+        expandableRows: true,
+        renderExpandableRow: (rowData, rowMeta) => {
+          const colSpan = rowData.length + 1;
+          return (
+            <TableRow>
+              <TableCell colSpan={colSpan}>
+                Custom expandable row option. Data: {JSON.stringify(rowData)}
+              </TableCell>
+            </TableRow>
+          );
+        }   
+>>>>>>> 0f982bb52cc28ec5567c80ddf07d24a01bb6f0f0
     };
 
     return (
