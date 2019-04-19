@@ -6,7 +6,12 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import MUIDataTable from "mui-datatables";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 import axios from 'axios'
+
+import JobDetailsDialog from './JobDetailsDialog';
+
 
 function TabContainer(props) {
   return (
@@ -35,7 +40,8 @@ class SimpleTabs extends React.Component {
         value: 0,
         jobs: [],
         datasets: [],
-        namespace: null
+        namespace: null,
+        jobDetails: {runs: []}
       };
   }
 
@@ -47,7 +53,7 @@ class SimpleTabs extends React.Component {
     });
     axios.get('/api/v1/namespaces/' + namespace + '/datasets/').then((response) => {
       const datasetData = response.data
-      const datasetRows = datasetData.datasets.map(dataset => [dataset.name, dataset.createdAt])
+      const datasetRows = datasetData.datasets.map(dataset => [dataset.name, dataset.urn, dataset.createdAt])
       this.setState({datasets: datasetRows})
     }); 
   }
@@ -67,45 +73,82 @@ class SimpleTabs extends React.Component {
     this.setState({ value });
   };
 
+  handleJobRowClick = (rowData, rowState) => {
+    const jobName = rowData[0]
+    var jobRuns = []
+    axios.get('/api/v1/namespaces/' + this.state.namespace + '/jobs/' + jobName + '/runs' ).then((response) => {
+      jobRuns = response.data;
+      this.setState(
+        {
+          jobDetails: {
+            runs: jobRuns
+          }
+        })
+      this.setState({showJobDetails: true});
+    });
+  }
+
+  handleJobDetailsClose = () => {
+    this.setState({showJobDetails: false});
+  }
+
   render() {
     const { classes } = this.props;
     const { value } = this.state;
-    const jobColumns = ["Name", "Description", "Created At"];
+    const jobColumns = [
+        "Name",
+        "Description",
+        "Created At"
+    ];
     const datasetColumns = ["URN", "Created At"];
 
     const options = {
         filter: true,
-        filterType: 'dropdown'
+        filterType: 'dropdown',
+        onRowClick: this.handleJobRowClick
     };
 
     return (
-      <div className={classes.root}>
-        <AppBar position="static">
-          <Tabs value={value} onChange={this.handleChange}>
-            <Tab label="Jobs" />
-            <Tab label="Datasets" />
-          </Tabs>
-        </AppBar>
-        {value === 0 && 
-        <TabContainer>
-            <MUIDataTable 
-                title={"Jobs"}
-                data={this.state.jobs}
-                columns={jobColumns}
-                options={options}
-            />
-        </TabContainer>
-        }
-        {value === 1 && 
-        <TabContainer>
-            <MUIDataTable 
-                title={"Datasets"}
-                data={this.state.datasets}
-                columns={datasetColumns}
-                options={options}
-            />
-        </TabContainer>
-        }      </div>
+      <React.Fragment>
+        <div className={classes.root}>
+          <AppBar position="static">
+            <Tabs value={value} onChange={this.handleChange}>
+              <Tab label="Jobs" />
+              <Tab label="Datasets" />
+            </Tabs>
+          </AppBar>
+          {value === 0 && 
+          <TabContainer>
+              <MUIDataTable 
+                  title={"Jobs"}
+                  data={this.state.jobs}
+                  columns={jobColumns}
+                  options={options}
+              />
+          </TabContainer>
+          }
+          {value === 1 && 
+          <TabContainer>
+              <MUIDataTable 
+                  title={"Datasets"}
+                  data={this.state.datasets}
+                  columns={datasetColumns}
+                  options={options}
+              />
+          </TabContainer>
+          }      
+        </div>
+
+        {/* Job Details Dialog */}
+        <JobDetailsDialog
+          open={this.state.showJobDetails}
+          onClose={this.handleJobDetailsClose}
+          jobDetails={this.state.jobDetails}
+        />
+
+
+        {/* Dataset Details Dialog */}
+      </React.Fragment>
     );
   }
 }
