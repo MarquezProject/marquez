@@ -6,22 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import MUIDataTable from "mui-datatables";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
 import axios from 'axios'
-
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import Switch from '@material-ui/core/Switch';
-import Button from '@material-ui/core/Button';
 
 import JobDetailsDialog from './JobDetailsDialog';
 
@@ -53,7 +38,8 @@ class SimpleTabs extends React.Component {
         value: 0,
         jobs: [],
         datasets: [],
-        namespace: null
+        namespace: null,
+        jobDetails: {runs: []}
       };
   }
 
@@ -87,10 +73,8 @@ class SimpleTabs extends React.Component {
 
   handleJobRowClick = (rowData, rowState) => {
     const jobName = rowData[0]
-    var jobInfo = {}
     var jobRuns = []
     axios.get('/api/v1/namespaces/' + this.state.namespace + '/jobs/' + jobName + '/runs' ).then((response) => {
-      //console.log(response.data);
       jobRuns = response.data;
       this.setState(
         {
@@ -159,6 +143,7 @@ class SimpleTabs extends React.Component {
           onClose={this.handleJobDetailsClose}
           jobDetails={this.state.jobDetails}
         />
+
 
         {/* Dataset Details Dialog */}
       </React.Fragment>
