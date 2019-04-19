@@ -67,7 +67,7 @@ public class DatasetDaoTest {
   }
 
   @Before
-  public void setup() {
+  public void setUp() {
     datasourceRow = newDatasourceRow();
     namespaceRow = newNamespaceRow();
 
