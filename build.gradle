@@ -56,7 +56,7 @@ task testIntegration(type: Test) {
   }
 }
 
-task testDataAccessTest(type: Test) {
+task testDataAccess(type: Test) {
   useJUnit {
     includeCategories 'marquez.DataAccessTests'
   }
