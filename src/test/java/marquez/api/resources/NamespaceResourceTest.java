@@ -103,6 +103,19 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   }
 
   @Test
+  public void testListNamespaceWithNoResults() throws MarquezServiceException {
+    final List<Namespace> existingCoreModelNamespaces = Collections.emptyList();
+    NamespaceService namespaceService = mock(NamespaceService.class);
+    NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
+    when(namespaceService.getAll()).thenReturn(existingCoreModelNamespaces);
+
+    Response res = namespaceResource.list();
+    NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
+
+    assertThat(responseBody.getNamespaces()).isEmpty();
+  }
+
+  @Test
   public void testListNamespaceWithSingleResultSet() throws MarquezServiceException {
     final List<Namespace> existingCoreModelNamespaces = Collections.singletonList(TEST_NAMESPACE);
     NamespaceService namespaceService = mock(NamespaceService.class);

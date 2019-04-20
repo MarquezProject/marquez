@@ -210,7 +210,7 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void testExists_throwsException_onDbError() throws MarquezServiceException {
+  public void testExists_throwsException_onDbError() {
     when(datasetDao.exists(DATASET_URN)).thenThrow(UnableToExecuteStatementException.class);
 
     assertThatExceptionOfType(MarquezServiceException.class)
@@ -232,7 +232,15 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void testGet_throwsException_onDbError() throws MarquezServiceException {
+  public void testGet_notPresent() throws MarquezServiceException {
+    when(datasetDao.findBy(DATASET_URN)).thenReturn(Optional.empty());
+
+    assertThat(datasetService.get(DATASET_URN)).isNotPresent();
+    verify(datasetDao, times(1)).findBy(DATASET_URN);
+  }
+
+  @Test
+  public void testGet_throwsException_onDbError() {
     when(datasetDao.findBy(DATASET_URN)).thenThrow(UnableToExecuteStatementException.class);
 
     assertThatExceptionOfType(MarquezServiceException.class)
