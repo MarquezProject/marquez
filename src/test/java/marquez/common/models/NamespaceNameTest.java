@@ -33,6 +33,12 @@ public class NamespaceNameTest {
     assertEquals(value, NamespaceName.fromString(value).getValue());
   }
 
+  @Test
+  public void testNewNamespace_withDashesAndUnderscore() {
+    final String nameWithDashesAndUnderscore = "test_a-b_c";
+    NamespaceName.fromString(nameWithDashesAndUnderscore);
+  }
+
   @Test(expected = NullPointerException.class)
   public void testNewNamespace_throwsException_onNullValue() {
     final String nullValue = null;
