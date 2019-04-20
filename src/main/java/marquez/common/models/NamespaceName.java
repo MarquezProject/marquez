@@ -37,8 +37,8 @@ public final class NamespaceName {
   private NamespaceName(@NonNull final String value) {
     checkArgument(
         NAMESPACE_PATTERN.matcher(value).matches(),
-        "A namespaces must contain only letters (a-z, A-Z), numbers (0-9), or "
-            + "underscores (_) and dashes (-) with a maximum length of 1024 characters.");
+        "A namespaces must contain only letters (a-z, A-Z), numbers (0-9), "
+            + "underscores (_) or dashes (-) with a maximum length of 1024 characters.");
 
     this.value = value;
   }
