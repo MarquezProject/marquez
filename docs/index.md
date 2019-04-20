@@ -19,22 +19,22 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
   * Data discovery **+** exploration
 * Precise and highly dimensional [data model](#data-model)
   * Jobs
-  * Datasources
   * Datasets 
 * Easily collect metadata via an opinionated [Metadata API](./openapi.html)
+* **Datasets** as first-class values
 * **Enforcement** of _job_ and _dataset_ ownership
 * Simple to operate and deploy
 * RESTful API enabling sophisticated integrations with other systems:
   * [Airflow](https://airflow.apache.org)
   * [Amundsen](https://github.com/lyft/amundsenfrontendlibrary)
   * [Dagster](https://github.com/dagster-io/dagster)
-* Designed to promote a **healthy** data ecosystem where teams can seamlessly **share** datasets and **safely** depend on one another
+* Designed to promote a **healthy** data ecosystem where teams within an organization can seamlessly share datasets and safely depend on one another
 
 ## Why manage and utlize metadata?
 
-<p align="center">
+<figure align="center">
   <img src="./assets/images/healthy_data_ecosystem.png">
-</p>
+</figure>
 
 ## Design
 
@@ -46,9 +46,9 @@ Marquez is a modular system and has been designed as a highly scalable, highly e
 
 <br/>
 
-<p align="center">
+<figure align="center">
   <img src="./assets/images/design.png">
-</p>
+</figure>
 
 To ease adoption and enable a diverse set of data processing applications to build metadata collection as a core requirement into their design, Marquez provides language-specific clients that implement the [Metadata API](./openapi.html). As part of our initial release, we have provided support for [Python](https://github.com/MarquezProject/marquez-python).
 
@@ -57,6 +57,12 @@ The Metadata API is an abstraction for recording information around the producti
 Metadata needs to be collected, organized and stored in a way to allow for rich exploratory queries via the [Metadata UI](https://github.com/MarquezProject/marquez-web). The Metadata Repository serves as a catalog of dataset information encapsulated and cleanly abstracted away by the Metadata API.
 
 ## Data Model
+
+Marquez's data model emphasizes immutablility and timely processing of datasets. Datasets are first-class values produced by job runs. A job run is linked to _versioned_ code, and produces one or more immutable _versioned_ outputs (derived datasets). Different points in execution capture mutations as well as the success or failure of the run itself via API calls. The diagram below shows the metadata collected and cataloged for a given job run executed multiple times.
+
+<figure align="center">
+  <img src="./assets/images/model.png">
+</figure>
 
 `// TODO`
 
