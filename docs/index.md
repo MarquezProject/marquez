@@ -66,11 +66,11 @@ The diagram below shows the metadata collected and cataloged for a given job ove
   <img src="./assets/images/model.png">
 </figure>
 
-**Job**: A job has a unique _name_, an _owner_, and an optional _description_. A job will define one or more _versioned_ inputs as dependencies, and one or more _versioned_ outputs as artifacts. Note that it's possible for a job to have only inputs, or only outputs datasets defined.
+**Job**: A job has a unique _name_, _version_, _owner_, and an optional _description_. A job will define one or more _versioned_ inputs as dependencies, and one or more _versioned_ outputs as artifacts. Note that it's possible for a job to have only input, or only output datasets defined.
 
-**Job Version:** A read-only immutable _version_ of a job, with a unique referenceable link to code, preserving the reproducibility of builds from source. Marquez will create a _version_ of a job each time its definition has been modified.
+**Job Version:** A read-only immutable _version_ of a job, with a unique referenceable link to code preserving the reproducibility of builds from source. A job version associates one or more input and output datasets to a job definition. Such association catalog provenance links and provide powerful visualizations of the flow of data.
 
-`// TODO`
+**Dataset:** A dataset has a unique _name_, _version_, _schema_, _datasource_, and _owner_. A _version_ pointer is present for each dataset and maintained by Marquez. When a dataset is modified, its _version_ pointer is updated to the current version. A datasource enables the grouping of physical datasets to their physical source.
 
 ## Roadmap
 
