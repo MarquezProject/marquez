@@ -60,13 +60,15 @@ Metadata needs to be collected, organized and stored in a way to allow for rich 
 
 Marquez's data model emphasizes immutability and timely processing of datasets. Datasets are first-class values produced by job runs. A job run is linked to _versioned_ code, and produces one or more immutable _versioned_ outputs (derived datasets). Dataset changes are captured at different points in execution via lightweight API calls, including the success or failure of the run itself.
 
-The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the sequence of modifications applied to its input dataset.
+The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the captured time-ordered sequence of modifications applied to its input dataset.
 
 <figure align="center">
   <img src="./assets/images/model.png">
 </figure>
 
-**Job**: A job has a unique _name_, an _owner_, and an optional _description_. A job will define one or more _versioned_ inputs, and one or more _versioned_ outputs. It's possible for a job to have only input datasets. Marquez will create a _version_ of a job each time its definition has been modified.
+**Job**: A job has a unique _name_, an _owner_, and an optional _description_. A job will define one or more _versioned_ inputs as dependencies, and one or more _versioned_ outputs as artifacts. Note that it's possible for a job to have only inputs, or only outputs datasets defined.
+
+**Job Version:** A read-only immutable _version_ of a job, with a unique referenceable link to code, preserving the reproducibility of builds from source. Marquez will create a _version_ of a job each time its definition has been modified.
 
 `// TODO`
 
