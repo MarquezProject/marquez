@@ -41,8 +41,7 @@ public interface DatasetDao {
 
   @SqlUpdate(
       "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
-          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name) "
-          + "ON CONFLICT (urn) DO NOTHING")
+          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name)")
   void insert(@BindBean DatasetRow datasetRow);
 
   @SqlQuery(
