@@ -72,6 +72,8 @@ The diagram below shows the metadata collected and cataloged for a given job ove
 
 **Dataset:** A dataset has a unique _name_, _version_, _schema_, _datasource_, and _owner_. A _version_ pointer is present for each dataset and maintained by Marquez. When a dataset is modified, its _version_ pointer is updated to the current version. A datasource enables the grouping of physical datasets to their physical source.
 
+**Dataset Version:** A given version of a dataset. Each version can be read independently and has a unique version number for the corresponding dataset. A Version is immutable. Marquez uses dataset versions to ensure things like forward and backward compatibility and reproducibility of job runs.
+
 ## Roadmap
 
 `// TODO`
