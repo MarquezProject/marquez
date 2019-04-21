@@ -6,7 +6,6 @@ layout: default
 
 Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the [provenance](https://en.wikipedia.org/wiki/Provenance#Data_provenance) of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
 
-
 ## Why Marquez?
 
 Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Data_lineage) queries across _all datasets_, while reliably and efficiently associating (_upstream_, _downstream_) dependencies between jobs and the datasets they produce and consume.
@@ -23,12 +22,12 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
 * Easily collect metadata via an opinionated [Metadata API](./openapi.html)
 * **Datasets** as first-class values
 * **Enforcement** of _job_ and _dataset_ ownership
-* Simple to operate and deploy
+* Simple operation
 * RESTful API enabling sophisticated integrations with other systems:
   * [Airflow](https://airflow.apache.org)
   * [Amundsen](https://github.com/lyft/amundsenfrontendlibrary)
   * [Dagster](https://github.com/dagster-io/dagster)
-* Designed to promote a **healthy** data ecosystem where teams within an organization can seamlessly _share_ datasets and _safely_ depend on one another
+* Designed to promote a **healthy** data ecosystem where teams within an organization can seamlessly _share_ and _safely_ depend on individual datasets with confidence
 
 ## Why manage and utilize metadata?
 
@@ -52,27 +51,27 @@ Marquez is a modular system and has been designed as a highly scalable, highly e
 
 To ease adoption and enable a diverse set of data processing applications to build metadata collection as a core requirement into their design, Marquez provides language-specific clients that implement the [Metadata API](./openapi.html). As part of our initial release, we have provided support for [Python](https://github.com/MarquezProject/marquez-python).
 
-The Metadata API is an abstraction for recording information around the production and consumption of datasets. It's a low-latency, highly-available stateless layer responsible for encapsulating both metadata persistence and aggregation of lineage information. The API allows clients to collect and/or obtain dataset information to/from the **Metadata Repository**.
+The Metadata API is an abstraction for recording information around the production and consumption of datasets. It's a low-latency, highly-available stateless layer responsible for encapsulating both metadata persistence and aggregation of lineage information. The API allows clients to collect and/or obtain dataset information to/from the [Metadata Repository](https://www.lucidchart.com/documents/view/f918ce01-9eb4-4900-b266-49935da271b8/0).
 
 Metadata needs to be collected, organized and stored in a way to allow for rich exploratory queries via the [Metadata UI](https://github.com/MarquezProject/marquez-web). The Metadata Repository serves as a catalog of dataset information encapsulated and cleanly abstracted away by the Metadata API.
 
 ## Data Model
 
-Marquez's data model emphasizes immutability and timely processing of datasets. Datasets are first-class values produced by job runs. A job run is linked to _versioned_ code, and produces one or more immutable _versioned_ outputs (derived datasets). Dataset changes are captured at different points in execution via lightweight API calls, including the success or failure of the run itself.
+Marquez's data model emphasizes immutability and timely processing of datasets. Datasets are first-class values produced by job runs. A job run is linked to _versioned_ code, and produces one or more immutable _versioned_ outputs. Dataset changes are recorded at different points in job execution via lightweight API calls, including the success or failure of the run itself.
 
-The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the captured time-ordered sequence of modifications applied to its input dataset.
+The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the time-ordered sequence of modifications applied to its input dataset.
 
 <figure align="center">
   <img src="./assets/images/model.png">
 </figure>
 
-**Job**: A job has an _owner_, unique _name_, _version_, and optional _description_. A job will define one or more _versioned_ inputs as dependencies, and one or more _versioned_ outputs as artifacts. Note that it's possible for a job to have only input, or only output datasets defined.
+**Job**: A job has an `owner`, unique `name`, `version`, and optional `description`. A job will define one or more _versioned_ inputs as dependencies, and one or more _versioned_ outputs as artifacts. Note that it's possible for a job to have only input, or only output datasets defined.
 
-**Job Version:** A read-only immutable _version_ of a job, with a unique referenceable link to code preserving the reproducibility of builds from source. A job version associates one or more input and output datasets to a job definition. Such association catalog provenance links and provide powerful visualizations of the flow of data.
+**Job Version:** A read-only _immutable_ `version` of a job, with a unique referenceable `link` to code preserving the reproducibility of builds from source. A job version associates one or more input and output datasets to a job definition (important for lineage information as data moves through various jobs over time). Such associations catalog provenance links and provide powerful visualizations of the flow of data.
 
-**Dataset:** A dataset has an _owner_, _datasource_, unique _name_, _schema_, _version_, and optional _description_. A _version_ pointer is present for each dataset and maintained by Marquez. When a dataset is modified, its _version_ pointer is updated to the current version.
+**Dataset:** A dataset has an `owner`, unique `name`, `schema`, `version`, and optional `description`. A dataset is contained within a datasource. A `datasource` enables the grouping of physical datasets to their physical source. A version `pointer` into the historical set of changes is present for each dataset and maintained by Marquez. When a dataset change is committed back to Marquez, a distinct version ID is generated, stored, then set to `current` with the pointer updated internally.
 
-**Dataset Version:** A read-only immutable _version_ of a dataset. Each version can be read independently and has a unique version number for the corresponding dataset. The latest version number is considered to have changed when a modification to the dataset has been recorded. Versions are used to ensure things like forward and backward compatibility, and reproducibility of job runs.
+**Dataset Version:** A read-only _immutable_ `version` of a dataset. Each version can be read independently and has a unique version ID for the corresponding dataset. The _latest_ version ID is considered to have changed when a modification to the dataset has been recorded. To compute a distinct version ID, Marquez applies a versioning function to a set of c corresponding to the `datasource` assocaited with the dataset.
 
 ## Roadmap
 
