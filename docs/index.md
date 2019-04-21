@@ -9,7 +9,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Why Marquez?
 
-Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Data_lineage) queries accross _all datasets_, while reliably and efficiently associating (_upstream_, _downstream_) dependencies between jobs and the datasets they produce and consume.
+Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Data_lineage) queries across _all datasets_, while reliably and efficiently associating (_upstream_, _downstream_) dependencies between jobs and the datasets they produce and consume.
 
 ### Features
 
@@ -28,9 +28,9 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
   * [Airflow](https://airflow.apache.org)
   * [Amundsen](https://github.com/lyft/amundsenfrontendlibrary)
   * [Dagster](https://github.com/dagster-io/dagster)
-* Designed to promote a **healthy** data ecosystem where teams within an organization can seamlessly share datasets and safely depend on one another
+* Designed to promote a **healthy** data ecosystem where teams within an organization can seamlessly _share_ datasets and _safely_ depend on one another
 
-## Why manage and utlize metadata?
+## Why manage and utilize metadata?
 
 <figure align="center">
   <img src="./assets/images/healthy_data_ecosystem.png">
@@ -58,11 +58,15 @@ Metadata needs to be collected, organized and stored in a way to allow for rich 
 
 ## Data Model
 
-Marquez's data model emphasizes immutablility and timely processing of datasets. Datasets are first-class values produced by job runs. A job run is linked to _versioned_ code, and produces one or more immutable _versioned_ outputs (derived datasets). Different points in execution capture mutations as well as the success or failure of the run itself via API calls. The diagram below shows the metadata collected and cataloged for a given job run executed multiple times.
+Marquez's data model emphasizes immutability and timely processing of datasets. Datasets are first-class values produced by job runs. A job run is linked to _versioned_ code, and produces one or more immutable _versioned_ outputs (derived datasets). Dataset changes are captured at different points in execution via lightweight API calls, including the success or failure of the run itself.
+
+The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the sequence of modifications applied to its input dataset.
 
 <figure align="center">
   <img src="./assets/images/model.png">
 </figure>
+
+**Job**: A job has a unique _name_, an _owner_, and an optional _description_. A job will define one or more _versioned_ inputs, and one or more _versioned_ outputs. It's possible for a job to have only input datasets. Marquez will create a _version_ of a job each time its definition has been modified.
 
 `// TODO`
 
