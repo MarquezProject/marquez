@@ -15,6 +15,7 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
 * Centralized **metadata management** powering:
   * [Data lineage](https://en.wikipedia.org/wiki/Data_lineage)
   * [Data governance](https://en.wikipedia.org/wiki/Data_governance)
+  * Data health
   * Data discovery **+** exploration
 * Precise and highly dimensional [data model](#data-model)
   * Jobs
@@ -22,17 +23,17 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
 * Easily collect metadata via an opinionated [Metadata API](./openapi.html)
 * **Datasets** as first-class values
 * **Enforcement** of _job_ and _dataset_ ownership
-* Simple operation
+* Simple design and operation
 * RESTful API enabling sophisticated integrations with other systems:
   * [Airflow](https://airflow.apache.org)
   * [Amundsen](https://github.com/lyft/amundsenfrontendlibrary)
   * [Dagster](https://github.com/dagster-io/dagster)
-* Designed to promote a **healthy** data ecosystem where teams within an organization can seamlessly _share_ and _safely_ depend on individual datasets with confidence
+* Designed to promote a **healthy** data ecosystem where teams within an organization can seamlessly _share_ and _safely_ depend on one another's datasets with confidence
 
 ## Why manage and utilize metadata?
 
 <figure align="center">
-  <img src="./assets/images/healthy_data_ecosystem.png">
+  <img src="./assets/images/ecosystem.png">
 </figure>
 
 ## Design
@@ -53,13 +54,13 @@ To ease adoption and enable a diverse set of data processing applications to bui
 
 The Metadata API is an abstraction for recording information around the production and consumption of datasets. It's a low-latency, highly-available stateless layer responsible for encapsulating both metadata persistence and aggregation of lineage information. The API allows clients to collect and/or obtain dataset information to/from the [Metadata Repository](https://www.lucidchart.com/documents/view/f918ce01-9eb4-4900-b266-49935da271b8/0).
 
-Metadata needs to be collected, organized and stored in a way to allow for rich exploratory queries via the [Metadata UI](https://github.com/MarquezProject/marquez-web). The Metadata Repository serves as a catalog of dataset information encapsulated and cleanly abstracted away by the Metadata API.
+Metadata needs to be collected, organized, and stored in a way to allow for rich exploratory queries via the [Metadata UI](https://github.com/MarquezProject/marquez-web). The Metadata Repository serves as a catalog of dataset information encapsulated and cleanly abstracted away by the Metadata API.
 
 ## Data Model
 
 Marquez's data model emphasizes immutability and timely processing of datasets. Datasets are first-class values produced by job runs. A job run is linked to _versioned_ code, and produces one or more immutable _versioned_ outputs. Dataset changes are recorded at different points in job execution via lightweight API calls, including the success or failure of the run itself.
 
-The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the time-ordered sequence of modifications applied to its input dataset.
+The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the time-ordered sequence of changes applied to its input dataset over time.
 
 <figure align="center">
   <img src="./assets/images/model.png">
@@ -71,7 +72,7 @@ The diagram below shows the metadata collected and cataloged for a given job ove
 
 **Dataset:** A dataset has an `owner`, unique `name`, `schema`, `version`, and optional `description`. A dataset is contained within a datasource. A `datasource` enables the grouping of physical datasets to their physical source. A version `pointer` into the historical set of changes is present for each dataset and maintained by Marquez. When a dataset change is committed back to Marquez, a distinct version ID is generated, stored, then set to `current` with the pointer updated internally.
 
-**Dataset Version:** A read-only _immutable_ `version` of a dataset. Each version can be read independently and has a unique version ID for the corresponding dataset. The _latest_ version ID is considered to have changed when a modification to the dataset has been recorded. To compute a distinct version ID, Marquez applies a versioning function to a set of c corresponding to the `datasource` associated with the dataset.
+**Dataset Version:** A read-only _immutable_ `version` of a dataset. Each version can be read independently and has a unique ID mapped to a dataset change preserving its state at some given point in time. The _latest_ version ID is considered to have changed only when a modification to the dataset has been recorded. To compute a distinct ID for a given dataset version, Marquez applies a versioning function to a set of properties corresponding to its underlying datasource.
 
 ## Roadmap
 
