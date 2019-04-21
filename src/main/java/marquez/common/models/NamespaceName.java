@@ -30,15 +30,15 @@ public final class NamespaceName {
   private static final int NAMESPACE_MAX_SIZE = 1024;
   private static final Pattern NAMESPACE_PATTERN =
       Pattern.compile(
-          String.format("^[a-zA-Z0-9_]{%d,%d}$", NAMESPACE_MIN_SIZE, NAMESPACE_MAX_SIZE));
+          String.format("^[a-zA-Z0-9_-]{%d,%d}$", NAMESPACE_MIN_SIZE, NAMESPACE_MAX_SIZE));
 
   @Getter private final String value;
 
   private NamespaceName(@NonNull final String value) {
     checkArgument(
         NAMESPACE_PATTERN.matcher(value).matches(),
-        "A namespaces must contain only letters (a-z, A-Z), numbers (0-9), or "
-            + "underscores (_) with a maximum length of 1024 characters.");
+        "A namespaces must contain only letters (a-z, A-Z), numbers (0-9), "
+            + "underscores (_) or dashes (-) with a maximum length of 1024 characters.");
 
     this.value = value;
   }
