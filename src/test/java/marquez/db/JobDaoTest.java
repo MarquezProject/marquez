@@ -93,6 +93,7 @@ public class JobDaoTest {
     assertNull(null, jobDao.findByID(UUID.randomUUID()));
   }
 
+  @Test
   public void testFindByName() {
     jobDao.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDao.findByName(nsName, job.getName());

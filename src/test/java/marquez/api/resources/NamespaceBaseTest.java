@@ -28,7 +28,7 @@ public class NamespaceBaseTest {
   public static final String OWNER = "someOwner";
   public static final String DESCRIPTION = "someDescription";
   public static final Timestamp START_TIME = Timestamp.from(now());
-  public static final String NAMESPACE_NAME = "someNamespace";
+  public static final String NAMESPACE_NAME = "some_valid_Namespace-name";
   public static final Namespace TEST_NAMESPACE =
       new Namespace(NAMESPACE_UUID, START_TIME, NAMESPACE_NAME, OWNER, DESCRIPTION);
 

@@ -1,0 +1,1 @@
+ALTER TABLE datasets ALTER COLUMN updated_at SET DEFAULT current_timestamp;
