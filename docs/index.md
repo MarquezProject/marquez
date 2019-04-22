@@ -4,7 +4,7 @@ layout: default
 
 ## Overview
 
-Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the [provenance](https://en.wikipedia.org/wiki/Provenance#Data_provenance) of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
+Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the [provenance](https://en.wikipedia.org/wiki/Provenance#Data_provenance) of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more. Marquez was released and open sourced by the [We Company](https://www.we.co).
 
 ## Why Marquez?
 
@@ -23,7 +23,7 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
 * Easily collect metadata via an opinionated [Metadata API](./openapi.html)
 * **Datasets** as first-class values
 * **Enforcement** of _job_ and _dataset_ ownership
-* Simple design and operation
+* Simple operation and design with minimal dependencies
 * RESTful API enabling sophisticated integrations with other systems:
   * [Airflow](https://airflow.apache.org)
   * [Amundsen](https://github.com/lyft/amundsenfrontendlibrary)
@@ -87,6 +87,8 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 * Pick up a ["good first issue"](https://github.com/MarquezProject/marquez/labels/good%20first%20issue), then send a pull request our way
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](https://github.com/MarquezProject/marquez/blob/master/CODE_OF_CONDUCT.md) in all interactions with the community.
+
+If you’re interested in using or learning more about Marquez, reach out to us on [gitter](https://gitter.im/marquez-project/community) and follow [@MarquezProject](https://twitter.com/MarquezProject) for updates.
 
 ## Marquez Talks
 
