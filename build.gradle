@@ -44,9 +44,21 @@ compileTestJava {
   options.compilerArgs << '-parameters'
 }
 
-task testUnit(type: Test) {  
+task testUnit(type: Test) {
   useJUnit {
     includeCategories 'marquez.UnitTests'
+  }
+}
+
+task testIntegration(type: Test) {
+  useJUnit {
+    includeCategories 'marquez.IntegrationTests'
+  }
+}
+
+task testDataAccess(type: Test) {
+  useJUnit {
+    includeCategories 'marquez.DataAccessTests'
   }
 }
 
