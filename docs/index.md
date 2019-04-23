@@ -4,9 +4,7 @@ layout: index
 
 ## Overview
 
-Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the [provenance](https://en.wikipedia.org/wiki/Provenance#Data_provenance) of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
-
-Marquez was released and open sourced by the [We Company](https://www.we.co). It's named after the Colombian novelist Gabriel García Márquez. His 1976 novel, _One Hundred Years of Solitude_, tells the multi-generational story of the Buendía family. Both memory and past are major themes of the novel. Data lineage tells a story of data: its origin and evolution over time.
+Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the [provenance](https://en.wikipedia.org/wiki/Provenance#Data_provenance) of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more. Marquez<sup>[1](#1)</sup> was released and open sourced by the [We Company](https://www.we.co).
 
 ## Why Marquez?
 
@@ -62,7 +60,7 @@ Metadata needs to be collected, organized, and stored in a way to allow for rich
 
 Marquez's data model emphasizes immutability and timely processing of datasets. Datasets are first-class values produced by job runs. A job run is linked to _versioned_ code, and produces one or more immutable _versioned_ outputs. Dataset changes are recorded at different points in job execution via lightweight API calls, including the success or failure of the run itself.
 
-The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the time-ordered sequence of changes applied to its input dataset over time.
+The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the time-ordered sequence of changes applied to its input dataset.
 
 <figure align="center">
   <img src="./assets/images/model.png">
