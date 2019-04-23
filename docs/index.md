@@ -6,7 +6,7 @@ layout: index
 
 Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the [provenance](https://en.wikipedia.org/wiki/Provenance#Data_provenance) of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
 
-Marquez was released and open sourced by the [We Company](https://www.we.co). It's named after the Colombian novelist Gabriel García Márquez. His 1976 novel, _One Hundred Years of Solitude_, tells the multi-generational story of the Buendía family. Both memory and past are major themes of the novel. Data lineage tells a story of data: its origin and evolution over time
+Marquez was released and open sourced by the [We Company](https://www.we.co). It's named after the Colombian novelist Gabriel García Márquez. His 1976 novel, _One Hundred Years of Solitude_, tells the multi-generational story of the Buendía family. Both memory and past are major themes of the novel. Data lineage tells a story of data: its origin and evolution over time.
 
 ## Why Marquez?
 
