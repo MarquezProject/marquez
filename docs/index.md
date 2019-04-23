@@ -1,5 +1,5 @@
 ---
-layout: overview
+layout: index
 ---
 
 ## Overview
