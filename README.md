@@ -6,7 +6,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Status
 
-This project is under active development at the [We Company](https://www.we.co) and [Stitch Fix](https://www.stitchfix.com) (in collaboration with many others organizations).
+This project is under active development at [The We Company](https://www.we.co) and [Stitch Fix](https://www.stitchfix.com) (in collaboration with many others organizations).
 
 ## Documentation
 
