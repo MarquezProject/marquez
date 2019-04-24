@@ -8,7 +8,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Why Marquez?
 
-Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Data_lineage) queries across _all datasets_, while reliably and efficiently associating (_upstream_, _downstream_) dependencies between jobs and the datasets they produce and consume.
+Marquez enables highly flexible data lineage queries across _all datasets_, while reliably and efficiently associating (_upstream_, _downstream_) dependencies between jobs and the datasets they produce and consume.
 
 ### Features
 
