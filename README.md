@@ -6,11 +6,11 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Status
 
-This project is under active development at the [We Company](https://www.we.co) and [Stitch Fix](https://www.stitchfix.com) (in collaboration with many others organizations).
+This project is under active development at [The We Company](https://www.we.co) and [Stitch Fix](https://www.stitchfix.com) (in collaboration with many others organizations).
 
 ## Documentation
 
-The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL9cbEQrRJKLk3ez4PRA) is being actively updated and is open for comments.
+We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/master/docs).
 
 ## Requirements
 

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    {% seo %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+  </head>
+  <body>
+    <header class="page-header" role="banner">
+      <h1 class="project-name">{{ site.title | default: site.github.repository_name }}</h1>
+      <h2 class="project-tagline">{{ site.description | default: site.github.project_tagline }}</h2>
+      <a href="{{ site.github.repository_url }}" class="btn">View on GitHub</a>
+      <a href="documentation.html" class="btn">Documentation</a>
+      <a href="{{ site.github.repository_url }}/releases/tag/0.2.0" class="btn">Download 0.2.0</a>
+    </header>
+    <main id="content" class="main-content" role="main">
+      {{ content }}
+      <footer class="site-footer">
+      <a name="1"></a><sup><b>1</b></sup> We chose to name the project after the Colombian novelist Gabriel García Márquez.
+      His 1976 novel, <i>One Hundred Years of Solitude</i>, tells the multi-generational story of the Buendía family.
+      Both memory and past are major themes of the novel. Data lineage tells a story of data: its origin and evolution over time.
+      </footer>
+    </main>
+  </body>
+</html>
