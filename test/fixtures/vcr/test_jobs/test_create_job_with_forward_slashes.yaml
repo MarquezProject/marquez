@@ -1,0 +1,21 @@
+interactions:
+- request:
+    body: '{"inputDatasetUrns": ["input1", "input2"], "outputDatasetUrns": ["output1",
+      "output2"], "location": "some_location_1", "description": "someDescription"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['152']
+      Content-Type: [application/json]
+      User-Agent: [python-requests/2.20.1]
+    method: PUT
+    uri: http://localhost:8080/api/v1/namespaces/default/jobs/some%2Fjob%2Fwith%2Fmore%2Fthan%2Fone%2Fslash
+  response:
+    body: {string: '{"name":"some/job/with/more/than/one/slash","createdAt":1556152733355,"inputDatasetUrns":["input1","input2"],"outputDatasetUrns":["output1","output2"],"location":"some_location_1","description":"someDescription"}'}
+    headers:
+      Content-Length: ['212']
+      Content-Type: [application/json]
+      Date: ['Thu, 25 Apr 2019 00:49:24 GMT']
+    status: {code: 201, message: Created}
+version: 1

@@ -9,4 +9,4 @@ RUN cd marquez-python && \
     python setup.py sdist && pip install .
 
 COPY ./test/integration/integration_test.py .
-CMD python -m pytest ./integration_test.py
+CMD python -m pytest -s -v ./integration_test.py

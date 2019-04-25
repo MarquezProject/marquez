@@ -1,0 +1,21 @@
+interactions:
+- request:
+    body: '{"inputDatasetUrns": ["input1", "input2"], "outputDatasetUrns": ["output1",
+      "output2"], "location": "some_location_1", "description": "someDescription"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['152']
+      Content-Type: [application/json]
+      User-Agent: [python-requests/2.20.1]
+    method: PUT
+    uri: http://localhost:8080/api/v1/namespaces/default/jobs/%40ntago%20%20n%21st%5Cicj0bname2%60
+  response:
+    body: {string: '{"name":"@ntago  n!st\\icj0bname2`","createdAt":1556152779236,"inputDatasetUrns":["input1","input2"],"outputDatasetUrns":["output1","output2"],"location":"some_location_1","description":"someDescription"}'}
+    headers:
+      Content-Length: ['204']
+      Content-Type: [application/json]
+      Date: ['Thu, 25 Apr 2019 00:49:24 GMT']
+    status: {code: 201, message: Created}
+version: 1

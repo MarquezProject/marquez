@@ -1,0 +1,34 @@
+interactions:
+- request:
+    body: '{"name": "dataset_fixture_for_default_ns", "datasourceUrn": "urn:datasource:redshift:financials_db505",
+      "description": "a dataset for testing"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '143'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.21.0
+    method: POST
+    uri: http://localhost:8080/api/v1/namespaces/default/datasets
+  response:
+    body:
+      string: '{"name":"dataset_fixture_for_default_ns","createdAt":"2019-04-25T04:01:00.474822Z","urn":"urn:dataset:financials_db505:dataset_fixture_for_default_ns","description":"a
+        dataset for testing"}'
+    headers:
+      Content-Length:
+      - '189'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 25 Apr 2019 04:01:00 GMT
+    status:
+      code: 200
+      message: OK
+version: 1

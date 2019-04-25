@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"owner": "ns_owner", "description": "this is a namespace for testing."}'
+    body: '{"owner": "some_owner", "description": "this is a very nice namespace."}'
     headers:
       Accept:
       - '*/*'
@@ -15,18 +15,18 @@ interactions:
       User-Agent:
       - python-requests/2.21.0
     method: PUT
-    uri: http://localhost:8080/api/v1/namespaces/ns_name_for_testing
+    uri: http://localhost:8080/api/v1/namespaces/namespace_for_datasets_tests_3
   response:
     body:
-      string: '{"name":"ns_name_for_testing","createdAt":"2019-04-24 17:59:59.042689","owner":"ns_owner","description":"this
-        is a namespace for testing."}'
+      string: '{"name":"namespace_for_datasets_tests_3","createdAt":"2019-04-24 21:00:22.098563","owner":"some_owner","description":"this
+        is a very nice namespace."}'
     headers:
       Content-Length:
-      - '139'
+      - '150'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 00:59:58 GMT
+      - Thu, 25 Apr 2019 04:00:22 GMT
     status:
       code: 200
       message: OK

@@ -7,7 +7,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [python-requests/2.20.1]
     method: GET
-    uri: http://localhost:8080/api/v1/datasources
+    uri: http://localhost:8080/api/v1/datasources?limit=25
   response:
     body:
       string: !!binary |

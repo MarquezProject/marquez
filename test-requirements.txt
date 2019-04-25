@@ -8,4 +8,3 @@ urllib3
 vcrpy
 pytest-cov
 codecov
-marquez-python-codegen==0.1.12

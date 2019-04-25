@@ -1,0 +1,36 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.21.0
+    method: GET
+    uri: http://localhost:8080/api/v1/namespaces/default/datasets
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAK2PQQrCMBBFr1KytmWaJtpm5x1cKRLGJpFATSWZglB6dyPUtYJuZjG8/+fNzAwS
+        JkuJqdPMAt4sU++ddv5BU7TajVEb63AaSIfENqyPFsmaPWWYQ92VIEouD1CreqtAVl3dtI08ZnKK
+        ITN5qrVUOR8w9B6HpM1FAqiP14xNffR38uOrC4s1UGSwIJvIhytbNr/bC5UfAKjETrScf2Uv/2R/
+        Xp6U1YP7igEAAA==
+    headers:
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '181'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 25 Apr 2019 04:01:00 GMT
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+version: 1

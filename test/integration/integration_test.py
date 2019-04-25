@@ -10,24 +10,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from contextlib import contextmanager
-from marquez_client.marquez import MarquezClient
-from marquez_codegen_client.rest import ApiException
-from urllib3.exceptions import (MaxRetryError,
-                                NewConnectionError,
-                                ReadTimeoutError)
-from urllib3.util.retry import Retry
+import subprocess
+import sys
 
 import pytest
 import requests
-import subprocess
-import sys
+from marquez.client import Client
+from marquez.constants import NOT_FOUND
+from requests import ReadTimeout
+from urllib3.exceptions import MaxRetryError
+from urllib3.util.retry import Retry
 
 MARQUEZ_HOST = "marquez"
 MARQUEZ_PORT = "5000"
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture
+def broken_network():
+    iptables_drop_packets(True)
+    yield
+    iptables_drop_packets(False)
+
+
+@pytest.fixture(scope="module")
 def wait_for_marquez():
     url = 'http://{}:{}/ping'.format(MARQUEZ_HOST, MARQUEZ_PORT)
     session = requests.Session()
@@ -38,42 +43,32 @@ def wait_for_marquez():
 
 
 def test_bad_host(wait_for_marquez):
-    c = MarquezClient(host="bad-host", port=MARQUEZ_PORT)
-    with pytest.raises(MaxRetryError) as e:
-        c.get_namespace_info("no_connection")
-    assert isinstance(e.value.reason, NewConnectionError)
+    c = Client(host="bad-host", port=MARQUEZ_PORT)
+    with pytest.raises(requests.exceptions.ConnectionError) as e:
+        c.get_namespace("no_connection")
+    assert isinstance(e.value.args[0], MaxRetryError)
 
 
 def test_bad_port(wait_for_marquez):
-    c = MarquezClient(host=MARQUEZ_HOST, port="6000")
-    with pytest.raises(MaxRetryError) as e:
-        c.get_namespace_info("no_connection")
-    assert isinstance(e.value.reason, NewConnectionError)
+    c = Client(host=MARQUEZ_HOST, port="6000")
+    with pytest.raises(requests.exceptions.ConnectionError) as e:
+        c.get_namespace("no_connection")
+    assert isinstance(e.value.args[0], MaxRetryError)
 
 
-def test_timeout(wait_for_marquez):
-    c = MarquezClient(host=MARQUEZ_HOST, port=MARQUEZ_PORT, timeout=1)
+def test_timeout(wait_for_marquez, broken_network):
+    c = Client(host=MARQUEZ_HOST, port=MARQUEZ_PORT, timeout_ms=1)
 
-    with broken_network():
-        expected_namespace = "timeout_test"
-        with pytest.raises(MaxRetryError) as e:
-            c.get_namespace_info(expected_namespace)
-        assert isinstance(e.value.reason, ReadTimeoutError)
+    expected_namespace = "timeout_test"
+    with pytest.raises(ReadTimeout):
+        c.get_namespace(expected_namespace)
 
 
 def test_namespace_not_found(wait_for_marquez):
-    c = MarquezClient(host=MARQUEZ_HOST, port=MARQUEZ_PORT)
+    c = Client(host=MARQUEZ_HOST, port=MARQUEZ_PORT)
 
     expected_namespace = "not_found"
-    with pytest.raises(ApiException):
-        c.get_namespace_info(expected_namespace)
-
-
-@contextmanager
-def broken_network():
-    iptables_drop_packets(True)
-    yield
-    iptables_drop_packets(False)
+    assert c.get_namespace(expected_namespace) == NOT_FOUND
 
 
 def iptables_drop_packets(drop):
