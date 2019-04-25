@@ -20,7 +20,7 @@ pip install marquez-airflow
  Once the library is installed in your system, your current DAGs need to be modified slightly by changing the import of `airflow.models.DAG` to `marquez.airflow.DAG`, see example below:
  
 ```python
-from marquez.airflow import DAG
+from marquez_airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 
 

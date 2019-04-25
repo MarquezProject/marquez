@@ -15,7 +15,7 @@ import os
 import pendulum
 import airflow.models
 from marquez_client.marquez import MarquezClient
-from marquez.utils import JobIdMapping
+from marquez_airflow.utils import JobIdMapping
 
 
 class DAG(airflow.models.DAG):

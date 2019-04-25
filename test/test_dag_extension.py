@@ -13,12 +13,12 @@
 from airflow.utils.state import State
 from contextlib import contextmanager
 from datetime import datetime
-from marquez.airflow import DAG
+from marquez_airflow import DAG
 from marquez_client.marquez import MarquezClient
 from unittest.mock import Mock, create_autospec, patch
 
 import airflow.models
-import marquez.utils
+import marquez_airflow.utils
 import os
 import pytest
 
@@ -66,13 +66,13 @@ def execute_test(test_dag, mock_dag_run, mock_set):
 
     # Assert there is a job_id mapping being created
     mock_set.assert_called_once_with(
-        marquez.utils.JobIdMapping.make_key(test_dag.dag_id,
-                                            test_dag.airflow_run_id),
+        marquez_airflow.utils.JobIdMapping.make_key(test_dag.dag_id,
+                                                    test_dag.airflow_run_id),
         test_dag.marquez_run_id)
 
 
 @patch.object(airflow.models.DAG, 'create_dagrun')
-@patch.object(marquez.utils.JobIdMapping, 'set')
+@patch.object(marquez_airflow.utils.JobIdMapping, 'set')
 def test_create_dagrun(mock_set, mock_dag_run):
 
     test_dag = MockDag('test_dag_id')
@@ -83,7 +83,7 @@ def test_create_dagrun(mock_set, mock_dag_run):
 
 
 @patch.object(airflow.models.DAG, 'create_dagrun')
-@patch.object(marquez.utils.JobIdMapping, 'set')
+@patch.object(marquez_airflow.utils.JobIdMapping, 'set')
 def test_dag_once_schedule(mock_set, mock_dag_run):
     test_dag = MockDag('test_dag_id', schedule_interval="@once")
 
@@ -94,7 +94,7 @@ def test_dag_once_schedule(mock_set, mock_dag_run):
 
 
 @patch.object(airflow.models.DAG, 'create_dagrun')
-@patch.object(marquez.utils.JobIdMapping, 'set')
+@patch.object(marquez_airflow.utils.JobIdMapping, 'set')
 def test_no_marquez_connection(mock_set, mock_dag_run):
     test_dag = MockDag('test_dag_id', mock_marquez_client=False)
 

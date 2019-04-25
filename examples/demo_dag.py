@@ -1,5 +1,5 @@
 
-from marquez.airflow import DAG
+from marquez_airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime
 DAG_NAME = 'test_dag_v2'
