@@ -78,10 +78,6 @@ The diagram below shows the metadata collected and cataloged for a given job ove
 
 **Dataset Version:** A read-only _immutable_ `version` of a dataset. Each version can be read independently and has a unique ID mapped to a dataset change preserving its state at some given point in time. The _latest_ version ID is updated only when a change to the dataset has been recorded. To compute a distinct version ID, Marquez applies a versioning function to a set of properties corresponding to the datasets underlying datasource.
 
-## Roadmap
-
-`// TODO`
-
 ## Contributing
 
 We're excited you're interested in contributing to Marquez! We'd love your help, and there are plenty of ways to contribute:
