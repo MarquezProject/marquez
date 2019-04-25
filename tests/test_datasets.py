@@ -11,9 +11,9 @@
 # limitations under the License.
 import pytest
 import vcr
-from marquez.client import Client
-from marquez.constants import NOT_FOUND
-from marquez.utils import InvalidRequestError
+from marquez_client.client import Client
+from marquez_client.constants import NOT_FOUND
+from marquez_client.utils import InvalidRequestError
 from pytest import fixture
 
 

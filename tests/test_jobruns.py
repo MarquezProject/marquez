@@ -13,7 +13,7 @@
 import datetime
 
 import vcr
-from marquez.client import Client
+from marquez_client.client import Client
 from pytest import fixture
 
 

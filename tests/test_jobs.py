@@ -10,8 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import vcr
-from marquez.client import Client
-from marquez.constants import NOT_FOUND
+from marquez_client.client import Client
+from marquez_client.constants import NOT_FOUND
 from pytest import fixture
 
 

@@ -15,7 +15,7 @@ import logging
 import urllib
 from http import HTTPStatus
 
-from marquez.constants import NO_CONTENT_RESPONSE, NOT_FOUND
+from marquez_client.constants import NO_CONTENT_RESPONSE, NOT_FOUND
 
 
 def handle_response(response_function):

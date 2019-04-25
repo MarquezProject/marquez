@@ -12,8 +12,8 @@
 
 import pytest
 import vcr
-from marquez.client import Client
-from marquez.utils import InvalidRequestError
+from marquez_client.client import Client
+from marquez_client.utils import InvalidRequestError
 from pytest import fixture
 
 

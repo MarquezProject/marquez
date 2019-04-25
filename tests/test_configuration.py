@@ -13,8 +13,8 @@
 import os
 
 import pytest
-from marquez import client
-from marquez.client import Client
+from marquez_client import client
+from marquez_client.client import Client
 from pytest import fixture
 
 

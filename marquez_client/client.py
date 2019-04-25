@@ -14,7 +14,7 @@ import os
 import urllib
 
 import requests
-from marquez.utils import (_compose_path, handle_response)
+from marquez_client.utils import (_compose_path, handle_response)
 
 _API_PATH = "api/v1"
 _DEFAULT_TIMEOUT_MS = 5000

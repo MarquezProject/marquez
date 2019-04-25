@@ -15,9 +15,9 @@ from unittest.mock import MagicMock
 
 import pytest
 import vcr
-from marquez.client import Client
-from marquez.constants import NO_CONTENT_RESPONSE, NOT_FOUND
-from marquez.utils import APIError, InvalidRequestError
+from marquez_client.client import Client
+from marquez_client.constants import NO_CONTENT_RESPONSE, NOT_FOUND
+from marquez_client.utils import APIError, InvalidRequestError
 from pytest import fixture
 
 

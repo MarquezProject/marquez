@@ -15,8 +15,8 @@ import sys
 
 import pytest
 import requests
-from marquez.client import Client
-from marquez.constants import NOT_FOUND
+from marquez_client.client import Client
+from marquez_client.constants import NOT_FOUND
 from requests import ReadTimeout
 from urllib3.exceptions import MaxRetryError
 from urllib3.util.retry import Retry
