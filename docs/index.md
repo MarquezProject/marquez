@@ -6,10 +6,6 @@ layout: index
 
 Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the [provenance](https://en.wikipedia.org/wiki/Provenance#Data_provenance) of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more. Marquez<sup>[1](#1)</sup> was released and open sourced by [The We Company](https://www.we.co).
 
-## Why Marquez?
-
-Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Data_lineage) queries across _all datasets_, while reliably and efficiently associating (_upstream_, _downstream_) dependencies between jobs and the datasets they produce and consume.
-
 ### Features
 
 * Centralized [metadata management](https://en.wikipedia.org/wiki/Metadata_management) powering:
@@ -29,6 +25,14 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
   * [Amundsen](https://github.com/lyft/amundsenfrontendlibrary)
   * [Dagster](https://github.com/dagster-io/dagster)
 * Designed to promote a **healthy** data ecosystem where teams within an organization can seamlessly _share_ and _safely_ depend on one another's datasets with confidence
+
+## Why Marquez?
+
+Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Data_lineage) queries across _all datasets_, while reliably and efficiently associating (_upstream_, _downstream_) dependencies between jobs and the datasets they produce and consume.
+
+<figure align="center">
+  <img src="./assets/images/lineage.png">
+</figure>
 
 ## Why manage and utilize metadata?
 
