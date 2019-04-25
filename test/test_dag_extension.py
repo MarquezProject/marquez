@@ -13,8 +13,8 @@
 from airflow.utils.state import State
 from contextlib import contextmanager
 from datetime import datetime
+from marquez_client.client import Client
 from marquez_airflow import DAG
-from marquez_client.marquez import MarquezClient
 from unittest.mock import Mock, create_autospec, patch
 
 import airflow.models
@@ -125,23 +125,21 @@ def test_default_namespace():
 def assert_marquez_calls_for_dagrun(test_dag):
     marquez_client = test_dag.marquez_dag._marquez_client
 
-    marquez_client.set_namespace.assert_called_with(
-        test_dag.marquez_dag.marquez_namespace)
-
     marquez_client.create_job.assert_called_once_with(
         test_dag.dag_id, test_dag.location, test_dag.input_urns,
-        test_dag.output_urns, test_dag.description)
+        test_dag.output_urns, description=test_dag.description)
 
     marquez_client.create_job_run.assert_called_once_with(
-        test_dag.dag_id, "{}",
-        DAG.to_airflow_time(test_dag.start_date),
-        test_dag.marquez_dag.compute_endtime(test_dag.start_date))
+        test_dag.dag_id, job_run_args="{}",
+        nominal_start_time=DAG.to_airflow_time(test_dag.start_date),
+        nominal_end_time=test_dag.marquez_dag.compute_endtime(
+            test_dag.start_date))
 
 
 def make_mock_marquez_client(run_id):
     mock_marquez_jobrun = Mock()
     mock_marquez_jobrun.run_id = run_id
-    mock_marquez_client = create_autospec(MarquezClient)
+    mock_marquez_client = create_autospec(Client)
     mock_marquez_client.create_job_run.return_value = mock_marquez_jobrun
     return mock_marquez_client
 

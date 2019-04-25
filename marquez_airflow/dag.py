@@ -9,12 +9,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import logging
 import os
 import pendulum
 import airflow.models
-from marquez_client.marquez import MarquezClient
+
+from marquez_client.client import Client
 from marquez_airflow.utils import JobIdMapping
 
 
@@ -67,11 +67,11 @@ class DAG(airflow.models.DAG):
         start_time = DAG.to_airflow_time(execution_date)
         end_time = self.compute_endtime(execution_date)
         marquez_client = self.get_marquez_client()
-        marquez_client.set_namespace(self.marquez_namespace)
+
         marquez_client.create_job(
             job_name, self.marquez_location,
             self.marquez_input_urns, self.marquez_output_urns,
-            self.description)
+            description=self.description)
         marquez_jobrun = marquez_client.create_job_run(
             job_name, job_run_args=job_run_args,
             nominal_start_time=start_time,
@@ -79,7 +79,7 @@ class DAG(airflow.models.DAG):
 
         marquez_jobrun_id = str(marquez_jobrun.run_id)
 
-        marquez_client.mark_job_run_running(marquez_jobrun_id)
+        marquez_client.mark_job_run_as_running(marquez_jobrun_id)
         self.log_marquez_event(['job_running',
                                 marquez_jobrun_id,
                                 start_time])
@@ -101,10 +101,10 @@ class DAG(airflow.models.DAG):
             JobIdMapping.make_key(dagrun.dag_id, dagrun.run_id), session)
         if marquez_job_run_id:
             if kwargs.get('success'):
-                self.get_marquez_client().mark_job_run_completed(
+                self.get_marquez_client().mark_job_run_as_completed(
                     marquez_job_run_id)
             else:
-                self.get_marquez_client().mark_job_run_failed(
+                self.get_marquez_client().mark_job_run_as_failed(
                     marquez_job_run_id)
         state = 'COMPLETED' if kwargs.get('success') else 'FAILED'
         self.log_marquez_event(['job_state_change',
@@ -119,5 +119,6 @@ class DAG(airflow.models.DAG):
 
     def get_marquez_client(self):
         if not self._marquez_client:
-            self._marquez_client = MarquezClient()
+            self._marquez_client = Client(
+                namespace_name=self.marquez_namespace)
         return self._marquez_client

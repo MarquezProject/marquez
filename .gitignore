@@ -1,3 +1,4 @@
+.coverage
 *.iml
 *.jar
 *.swp
@@ -13,5 +14,6 @@
 ./**/*.class
 bin/
 build/
+coverage.xml
 dist/
 __pycache__

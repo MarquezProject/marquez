@@ -2,3 +2,4 @@ apache-airflow==1.10.2
 codecov
 pytest
 pytest-cov
+requests
