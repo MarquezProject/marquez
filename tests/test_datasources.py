@@ -31,7 +31,7 @@ def marquez_client_with_timeout():
 
 @fixture(scope='class')
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/datasource_for_datasource_tests.yaml')
+    'tests/fixtures/vcr/test_datasources/datasource_for_datasource_tests.yaml')
 def existing_datasource(marquez_client):
     datasource_name = "financials_db200"
     datasource_url = "jdbc:postgresql://localhost:5431/reporting_system"
@@ -39,7 +39,7 @@ def existing_datasource(marquez_client):
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/test_create_datasource.yaml')
+    'tests/fixtures/vcr/test_datasources/test_create_datasource.yaml')
 def test_create_datasource(marquez_client):
     datasource_name = "financials_db201"
     datasource_url = "jdbc:postgresql://localhost:5431/reporting_system"
@@ -53,7 +53,7 @@ def test_create_datasource(marquez_client):
 
 @pytest.mark.skip("Disabled until Marquez issue 458 is resolved")
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/'
+    'tests/fixtures/vcr/test_datasources/'
     'test_create_datasource_special_chars.yaml')
 def test_create_datasource_special_chars(marquez_client):
     datasource_name = "financi@ls db20!"
@@ -63,7 +63,7 @@ def test_create_datasource_special_chars(marquez_client):
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/'
+    'tests/fixtures/vcr/test_datasources/'
     'test_create_datasource.yaml')
 def test_create_datasource_with_timeout(marquez_client):
     datasource_name = "financials_db201"
@@ -77,7 +77,7 @@ def test_create_datasource_with_timeout(marquez_client):
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/test_get_datasource.yaml')
+    'tests/fixtures/vcr/test_datasources/test_get_datasource.yaml')
 def test_get_datasource(marquez_client, existing_datasource):
     response = marquez_client.get_datasource(
         existing_datasource['urn'])
@@ -89,14 +89,14 @@ def test_get_datasource(marquez_client, existing_datasource):
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/test_get_datasources.yaml')
+    'tests/fixtures/vcr/test_datasources/test_get_datasources.yaml')
 def test_get_datasources(marquez_client, existing_datasource):
     get_datasources_response = marquez_client.list_datasources()
     assert existing_datasource in get_datasources_response['datasources']
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/'
+    'tests/fixtures/vcr/test_datasources/'
     'test_get_datasources_with_timeout.yaml')
 def test_get_datasources_with_timeout(
         marquez_client_with_timeout, existing_datasource):
@@ -105,7 +105,7 @@ def test_get_datasources_with_timeout(
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/'
+    'tests/fixtures/vcr/test_datasources/'
     'test_get_datasources_with_limit.yaml')
 def test_get_datasources_with_limit(
         marquez_client, existing_datasource):
@@ -115,7 +115,7 @@ def test_get_datasources_with_limit(
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/'
+    'tests/fixtures/vcr/test_datasources/'
     'test_get_datasources_with_offset.yaml')
 def test_get_datasources_with_offset(
         marquez_client, existing_datasource):
@@ -131,7 +131,7 @@ def test_get_namespace_with_invalid_dictionary(marquez_client):
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/'
+    'tests/fixtures/vcr/test_datasources/'
     'test_get_datasources_with_limit_and_offset.yaml')
 def test_get_datasources_with_limit_and_offset(
         marquez_client, existing_datasource):

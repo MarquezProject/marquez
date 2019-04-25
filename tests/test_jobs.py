@@ -21,7 +21,7 @@ def namespace_name():
 
 
 @fixture(scope='class')
-@vcr.use_cassette('test/fixtures/vcr/test_jobs/namespace_for_job.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_jobs/namespace_for_job.yaml')
 def namespace(namespace_name):
     owner_name = "some_owner"
     description = "this is a very nice namespace."
@@ -48,7 +48,7 @@ def job_name():
 
 
 @fixture(scope='class')
-@vcr.use_cassette('test/fixtures/vcr/test_jobs/job_for_jobs_test.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_jobs/job_for_jobs_test.yaml')
 def job(marquez_client_with_ns, job_name):
     input_datset_urns = ['input1a', 'input2a']
     output_datset_urns = ['output1a', 'output2a']
@@ -60,7 +60,7 @@ def job(marquez_client_with_ns, job_name):
 
 @fixture(scope='class')
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_jobs/job_default_ns_for_jobs_test.yaml')
+    'tests/fixtures/vcr/test_jobs/job_default_ns_for_jobs_test.yaml')
 def job_default_ns(job_name):
     marquez_client = Client(host="localhost", port=8080)
 
@@ -72,12 +72,12 @@ def job_default_ns(job_name):
         output_datset_urns)
 
 
-@vcr.use_cassette('test/fixtures/vcr/test_jobs/test_create_job.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_jobs/test_create_job.yaml')
 def test_create_job(marquez_client_with_default_ns):
     _run_job_creation_test('some_job4', marquez_client_with_default_ns)
 
 
-@vcr.use_cassette('test/fixtures/vcr/test_jobs/test_get_job.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_jobs/test_get_job.yaml')
 def test_get_job(marquez_client_with_ns, job):
     retrieved_job = marquez_client_with_ns.get_job(job['name'])
 
@@ -88,19 +88,19 @@ def test_get_job(marquez_client_with_ns, job):
     assert 'createdAt' in retrieved_job
 
 
-@vcr.use_cassette('test/fixtures/vcr/test_jobs/test_list_jobs.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_jobs/test_list_jobs.yaml')
 def test_list_jobs(marquez_client_with_default_ns, job_default_ns):
     retrieved_jobs = marquez_client_with_default_ns.list_jobs()
     assert job_default_ns in retrieved_jobs['jobs']
 
 
-@vcr.use_cassette('test/fixtures/vcr/test_jobs/test_list_jobs_with_ns.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_jobs/test_list_jobs_with_ns.yaml')
 def test_list_jobs_with_namespace_client(marquez_client_with_ns, job):
     retrieved_jobs = marquez_client_with_ns.list_jobs()
     assert job in retrieved_jobs['jobs']
 
 
-@vcr.use_cassette('test/fixtures/vcr/test_jobs/test_list_jobs.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_jobs/test_list_jobs.yaml')
 def test_list_jobs_specify_namespace(
         marquez_client_with_default_ns, job_default_ns):
     retrieved_jobs = marquez_client_with_default_ns.list_jobs()
@@ -108,7 +108,7 @@ def test_list_jobs_specify_namespace(
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_jobs/test_list_jobs_no_such_namespace.yaml')
+    'tests/fixtures/vcr/test_jobs/test_list_jobs_no_such_namespace.yaml')
 def test_list_jobs_no_such_namespace(marquez_client_with_default_ns):
     no_such_namespace = "no_such_namespace_999"
     assert marquez_client_with_default_ns.list_jobs(
@@ -116,7 +116,7 @@ def test_list_jobs_no_such_namespace(marquez_client_with_default_ns):
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_jobs/'
+    'tests/fixtures/vcr/test_jobs/'
     'test_create_job_with_special_chars_no_spaces.yaml')
 def test_create_job_with_special_chars_no_spaces(
         marquez_client_with_default_ns):
@@ -125,7 +125,7 @@ def test_create_job_with_special_chars_no_spaces(
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_jobs/'
+    'tests/fixtures/vcr/test_jobs/'
     'test_create_job_with_forward_slash.yaml')
 def test_create_job_with_forward_slash(marquez_client_with_default_ns):
     job_name = 'some/job'
@@ -133,7 +133,7 @@ def test_create_job_with_forward_slash(marquez_client_with_default_ns):
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_jobs/'
+    'tests/fixtures/vcr/test_jobs/'
     'test_create_job_with_forward_slashes.yaml')
 def test_create_job_with_forward_slashes(marquez_client_with_default_ns):
     job_name = 'some/job/with/more/than/one/slash'
@@ -141,7 +141,7 @@ def test_create_job_with_forward_slashes(marquez_client_with_default_ns):
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_jobs/'
+    'tests/fixtures/vcr/test_jobs/'
     'test_create_job_with_forward_slashes_and_space.yaml')
 def test_create_job_with_forward_slashes_and_space(
         marquez_client_with_default_ns):
@@ -150,7 +150,7 @@ def test_create_job_with_forward_slashes_and_space(
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_jobs/'
+    'tests/fixtures/vcr/test_jobs/'
     'test_create_job_with_special_chars_with_spaces.yaml')
 def test_create_job_with_special_chars_with_spaces(
         marquez_client_with_default_ns):

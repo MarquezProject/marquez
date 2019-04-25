@@ -36,7 +36,7 @@ def marquez_client(namespace):
 
 @fixture(scope='class')
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasets/namespace_for_datasets.yaml')
+    'tests/fixtures/vcr/test_datasets/namespace_for_datasets.yaml')
 def namespace(marquez_client_default_ns, namespace_name):
     owner_name = "some_owner"
     description = "this is a very nice namespace."
@@ -48,7 +48,7 @@ def namespace(marquez_client_default_ns, namespace_name):
 
 @fixture(scope='class')
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasets/datasource_for_datasets_tests.yaml')
+    'tests/fixtures/vcr/test_datasets/datasource_for_datasets_tests.yaml')
 def existing_datasource(marquez_client):
     datasource_name = "financials_db505"
     datasource_url = "jdbc:redshift://localhost:5431/reporting_system"
@@ -57,7 +57,7 @@ def existing_datasource(marquez_client):
 
 @fixture(scope='class')
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasets/dataset_for_datasets_test.yaml')
+    'tests/fixtures/vcr/test_datasets/dataset_for_datasets_test.yaml')
 def existing_dataset(marquez_client, existing_datasource):
     dataset_name = 'dataset_fixture_3'
     dataset_description = 'a dataset for testing'
@@ -71,7 +71,7 @@ def existing_dataset(marquez_client, existing_datasource):
 
 @fixture(scope='class')
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasets/'
+    'tests/fixtures/vcr/test_datasets/'
     'dataset_default_ns_for_datasets_test.yaml')
 def existing_dataset_default_ns(
         marquez_client_default_ns, existing_datasource):
@@ -84,7 +84,7 @@ def existing_dataset_default_ns(
         description=dataset_description)
 
 
-@vcr.use_cassette('test/fixtures/vcr/test_datasets/test_create_dataset.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_datasets/test_create_dataset.yaml')
 def test_create_dataset(marquez_client, existing_datasource):
     dataset_name = 'some_dataset_999'
     description = "someDescription"
@@ -98,7 +98,7 @@ def test_create_dataset(marquez_client, existing_datasource):
 
 @pytest.mark.skip("Disabled until Marquez issue 458 is resolved")
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasources/'
+    'tests/fixtures/vcr/test_datasources/'
     'test_create_datasource_special_chars.yaml')
 def test_create_datasource_special_chars(marquez_client, existing_datasource):
     dataset_name = "financi@ls db20!"
@@ -107,7 +107,7 @@ def test_create_datasource_special_chars(marquez_client, existing_datasource):
             dataset_name, existing_datasource['urn'])
 
 
-@vcr.use_cassette('test/fixtures/vcr/test_datasets/test_get_dataset.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_datasets/test_get_dataset.yaml')
 def test_get_dataset(marquez_client, existing_dataset):
     retrieved_dataset = marquez_client.get_dataset(existing_dataset['urn'])
 
@@ -118,7 +118,7 @@ def test_get_dataset(marquez_client, existing_dataset):
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasets/test_get_dataset_specify_ns.yaml')
+    'tests/fixtures/vcr/test_datasets/test_get_dataset_specify_ns.yaml')
 def test_get_dataset_specify_ns(
         marquez_client_default_ns, namespace_name, existing_dataset):
     retrieved_dataset = marquez_client_default_ns.get_dataset(
@@ -131,7 +131,7 @@ def test_get_dataset_specify_ns(
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasets/test_get_dataset_default_ns.yaml')
+    'tests/fixtures/vcr/test_datasets/test_get_dataset_default_ns.yaml')
 def test_get_dataset_default_ns(
         marquez_client_default_ns, existing_dataset_default_ns):
     retrieved_dataset = marquez_client_default_ns.get_dataset(
@@ -145,20 +145,20 @@ def test_get_dataset_default_ns(
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasets/test_get_dataset_malformed_urn.yaml')
+    'tests/fixtures/vcr/test_datasets/test_get_dataset_malformed_urn.yaml')
 def test_get_dataset_malformed_urn(marquez_client):
     assert NOT_FOUND == marquez_client.get_dataset("not_a_valid_urn")
     assert NOT_FOUND == marquez_client.get_dataset("*55;34/098## *!! x;;$")
 
 
-@vcr.use_cassette('test/fixtures/vcr/test_datasets/test_list_datsets.yaml')
+@vcr.use_cassette('tests/fixtures/vcr/test_datasets/test_list_datsets.yaml')
 def test_list_datasets(marquez_client, existing_dataset):
     retrieved_datasets = marquez_client.list_datasets()
     assert existing_dataset in retrieved_datasets['datasets']
 
 
 @vcr.use_cassette(
-    'test/fixtures/vcr/test_datasets/test_list_datsets_default_ns.yaml')
+    'tests/fixtures/vcr/test_datasets/test_list_datsets_default_ns.yaml')
 def test_list_datasets_default_ns(
         marquez_client_default_ns, existing_dataset_default_ns):
     retrieved_datasets = marquez_client_default_ns.list_datasets()
