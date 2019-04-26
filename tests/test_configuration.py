@@ -39,14 +39,14 @@ def test_default_namespace(clear_env):
 
 
 def test_namespace_name_from_env(clear_env):
-    os.environ["MARQUEZ_NAMESPACE_NAME"] = "ns_from_env"
+    os.environ["MARQUEZ_NAMESPACE"] = "ns_from_env"
 
     m = Client(host="localhost", port=8080)
     assert m.namespace == "ns_from_env"
 
 
 def test_namespace_name_override(clear_env):
-    os.environ["MARQUEZ_NAMESPACE_NAME"] = "ns_from_env"
+    os.environ["MARQUEZ_NAMESPACE"] = "ns_from_env"
 
     m = Client(host="localhost", namespace_name="from_constructor", port=8080)
     assert m.namespace == "from_constructor"

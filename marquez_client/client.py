@@ -30,7 +30,7 @@ class Client(object):
                          else os.environ.get('MARQUEZ_TIMEOUT_MS'))
 
         self._namespace_name = (namespace_name
-                                or os.environ.get('MARQUEZ_NAMESPACE_NAME')
+                                or os.environ.get('MARQUEZ_NAMESPACE')
                                 or _DEFAULT_NAMESPACE_NAME)
         self._api_base = "http://{0}:{1}/{2}".format(
             host, port, _API_PATH)
