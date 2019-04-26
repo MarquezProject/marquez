@@ -121,4 +121,6 @@ class DAG(airflow.models.DAG):
         if not self._marquez_client:
             self._marquez_client = Client(
                 namespace_name=self.marquez_namespace)
+            self._marquez_client.create_namespace(self.marquez_namespace,
+                                                  "default_owner")
         return self._marquez_client

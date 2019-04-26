@@ -31,13 +31,17 @@ jobs:
       - run:
           name: Install marquez-airflow package
           command: pip install --user -e .
-      - run: python -m pytest --cov=marquez --cov-report xml ./test
+      - run: python -m pytest --ignore=tests/integration --cov=marquez --cov-report xml ./tests
 
-  integration-test:
-    <<: *defaults
+  integration:
+    machine: true
+    environment:
+      - COMPOSE_FILE: 'tests/integration/docker-compose.yml'
     steps:
       - checkout
-      - run: pip install --user pytest
+      - run:
+          name: Test
+          command: tests/integration/run.sh
 
   release:
     <<: *defaults
@@ -56,6 +60,9 @@ workflows:
       - test:
           requires:
             - build
+      - integration:
+          requires:
+            - test
       - release:
           filters:
             tags:
