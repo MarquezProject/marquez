@@ -37,6 +37,11 @@ $ cp config.example.yml config.yml
 
 You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`.
 
+By default, Marquez uses the following ports:
+
+* TCP port `8080` is available for the app server.
+* TCP port `8081` is available for the admin interface.
+
 **Note:** All environment variables in `config.yml` are accessed with [`${VAR_NAME}`](https://www.dropwizard.io/1.3.5/docs/manual/core.html#environment-variables).
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
@@ -52,6 +57,8 @@ Then browse to the admin interface: http://localhost:8081
 ```
 $ docker-compose up
 ```
+
+Marquez listens on port `5000` for all API calls and port `5001` for the admin interface.
 
 ## Getting involved
 
