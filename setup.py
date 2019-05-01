@@ -38,6 +38,9 @@ setup(
     url="",
     keywords=["Marquez"],
     packages=find_packages(),
+    install_requires=[
+        "requests"
+    ],
     include_package_data=True,
     long_description="""\
     Marquez-Python is an open source library for building clients that
