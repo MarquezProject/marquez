@@ -29,6 +29,6 @@ setuptools.setup(
     url="https://github.com/MarquezProject/marquez-airflow",
     packages=setuptools.find_packages(),
     install_requires=[
-        "marquez-python==0.3.0"
+        "marquez-python==0.3.2"
     ],
 )
