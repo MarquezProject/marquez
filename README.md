@@ -15,7 +15,7 @@ This project is under active development at WeWork. The latest published version
 
 ## Requirements.
 
-Python 2.7 and 3.4+
+Python 3.5.0+
 
 ## Installation & Usage
 ### pip install
@@ -29,7 +29,7 @@ pip install git+https://github.com/GIT_USER_ID/GIT_REPO_ID.git
 
 Then import the package:
 ```python
-import marquez_client 
+from marquez_client.client import Client
 ```
 
 ### Setuptools
@@ -43,7 +43,8 @@ python setup.py install --user
 
 Then import the package:
 ```python
-import marquez_client
+
+from marquez_client.client import Client
 ```
 
 ## Getting Started
@@ -54,14 +55,15 @@ Please be sure to set the environmental variables to connect with Marquez:
 ```
 export MARQUEZ_HOST='localhost'
 export MARQUEZ_PORT='8080'
+export MARQUEZ_NAMESPACE='accounting_team'
+export MARQUEZ_TIMEOUT_MS=5000
+
 ```
 
 ## Documentation For Authorization
 
  All endpoints do not require authorization.
 
-
-## Author
 
 
 

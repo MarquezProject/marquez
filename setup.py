@@ -32,6 +32,7 @@ VERSION = "0.3.1"
 
 setup(
     name=NAME,
+    python_requires='>3.5.0',
     version=VERSION,
     description="Marquez Python Client",
     author_email="",
