@@ -98,10 +98,11 @@ See [Create a Job](#Create-a-Job).
 
 #### Create a Namespace
 ``` 
-mc.create_namespace("accounting_team", 
-    "Gabriel G. Marquez",
-    "Jobs and data sets related to accounting.")
-   ```
+mc.create_namespace(name="accounting_team",
+    owner="Gabriel G. Marquez",
+    description="Jobs and data sets related to accounting.")
+
+```
 
 #### Create a Job
 ```
@@ -115,8 +116,9 @@ mc.create_job(job_name="quarterly_summary",
 
 #### Create a JobRun
 ```
-quarterly_job_run= mc.create_job_run(
-    "quarterly_summary", "{\"email\":\"accounting@wework.com\"}")
+quarterly_job_run = mc.create_job_run(
+    job_name="quarterly_summary",
+    job_run_args="{\"email\":\"accounting@wework.com\"}")
 ```
 
 ### Output Format
