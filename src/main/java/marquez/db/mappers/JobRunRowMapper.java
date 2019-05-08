@@ -14,6 +14,7 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 
 import java.sql.ResultSet;
@@ -35,8 +36,8 @@ public final class JobRunRowMapper implements RowMapper<JobRun> {
         results.getObject(Columns.JOB_VERSION_UUID, UUID.class),
         results.getString(Columns.RUN_ARGS_CHECKSUM),
         results.getString(Columns.RUN_ARGS),
-        timestampOrThrow(results, Columns.NOMINAL_START_TIME),
-        timestampOrThrow(results, Columns.NOMINAL_END_TIME),
+        timestampOrNull(results, Columns.NOMINAL_START_TIME),
+        timestampOrNull(results, Columns.NOMINAL_END_TIME),
         timestampOrThrow(results, Columns.CREATED_AT));
   }
 }

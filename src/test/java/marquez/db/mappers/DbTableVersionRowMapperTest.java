@@ -40,7 +40,10 @@ public class DbTableVersionRowMapperTest {
 
   @Test
   public void testMap() throws SQLException {
+    final Object exists = mock(Object.class);
     final ResultSet results = mock(ResultSet.class);
+    when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
+
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
     when(results.getObject(Columns.DATASET_UUID, UUID.class)).thenReturn(DATASET_UUID);

@@ -54,7 +54,8 @@ public class Generator {
         namespaceID,
         null,
         Arrays.asList(randUrn(), randUrn()),
-        Arrays.asList(randUrn(), randUrn()));
+        Arrays.asList(randUrn(), randUrn()),
+        Instant.now());
   }
 
   public static Job cloneJob(Job job) {
