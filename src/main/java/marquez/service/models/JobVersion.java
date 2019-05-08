@@ -14,7 +14,7 @@
 
 package marquez.service.models;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,6 @@ public final class JobVersion {
   private final String uri;
   private final UUID version;
   private final UUID latestJobRunGuid;
-  private final Timestamp createdAt;
-  private final Timestamp updatedAt;
+  private final Instant createdAt;
+  private final Instant updatedAt;
 }

@@ -14,6 +14,7 @@
 
 package marquez.api.mappers;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
@@ -29,7 +30,7 @@ public final class DatasourceResponseMapper {
   public static DatasourceResponse map(@NonNull Datasource datasource) {
     return new DatasourceResponse(
         datasource.getName().getValue(),
-        datasource.getCreatedAt().toString(),
+        ISO_INSTANT.format(datasource.getCreatedAt()),
         datasource.getUrn().getValue(),
         datasource.getConnectionUrl().getRawValue());
   }

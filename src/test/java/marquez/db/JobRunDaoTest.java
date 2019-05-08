@@ -65,7 +65,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
             (rs, ctx) ->
                 new JobRunState(
                     UUID.fromString(rs.getString("guid")),
-                    rs.getTimestamp("transitioned_at"),
+                    rs.getTimestamp("transitioned_at").toInstant(),
                     UUID.fromString(rs.getString("job_run_guid")),
                     JobRunState.State.fromInt(rs.getInt("state"))));
 

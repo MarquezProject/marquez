@@ -14,6 +14,7 @@
 
 package marquez.api.mappers;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
@@ -31,7 +32,7 @@ public final class DatasetResponseMapper {
     final Description description = dataset.getDescription();
     return new DatasetResponse(
         dataset.getName().getValue(),
-        dataset.getCreatedAt().toString(),
+        ISO_INSTANT.format(dataset.getCreatedAt()),
         dataset.getUrn().getValue(),
         (description == null) ? null : description.getValue());
   }

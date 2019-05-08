@@ -17,7 +17,7 @@ package marquez.service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -158,8 +158,8 @@ public class JobService {
       String namespaceName,
       String jobName,
       String runArgsJson,
-      Timestamp nominalStartTime,
-      Timestamp nominalEndTime)
+      Instant nominalStartTime,
+      Instant nominalEndTime)
       throws MarquezServiceException {
     try {
       String runArgsDigest = null;

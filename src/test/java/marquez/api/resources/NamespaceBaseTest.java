@@ -14,9 +14,7 @@
 
 package marquez.api.resources;
 
-import static java.time.Instant.now;
-
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.UUID;
 import marquez.api.models.NamespaceRequest;
 import marquez.service.models.Namespace;
@@ -27,7 +25,7 @@ public class NamespaceBaseTest {
   public static final UUID NAMESPACE_UUID = UUID.randomUUID();
   public static final String OWNER = "someOwner";
   public static final String DESCRIPTION = "someDescription";
-  public static final Timestamp START_TIME = Timestamp.from(now());
+  public static final Instant START_TIME = Instant.now();
   public static final String NAMESPACE_NAME = "some_valid_Namespace-name";
   public static final Namespace TEST_NAMESPACE =
       new Namespace(NAMESPACE_UUID, START_TIME, NAMESPACE_NAME, OWNER, DESCRIPTION);

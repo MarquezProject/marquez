@@ -19,7 +19,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -156,8 +156,8 @@ public final class JobResource {
             namespaceName.getValue(),
             jobName.getValue(),
             request.getRunArgs().orElse(null),
-            request.getNominalStartTime().map(Timestamp::valueOf).orElse(null),
-            request.getNominalEndTime().map(Timestamp::valueOf).orElse(null));
+            request.getNominalStartTime().map(Instant::parse).orElse(null),
+            request.getNominalEndTime().map(Instant::parse).orElse(null));
     return Response.status(Response.Status.CREATED)
         .entity(coreJobRunToApiJobRunMapper.map(createdJobRun))
         .build();

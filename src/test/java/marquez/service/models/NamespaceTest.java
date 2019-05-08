@@ -16,7 +16,6 @@ package marquez.service.models;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.Test;
@@ -26,7 +25,7 @@ public class NamespaceTest {
   private static final UUID NAMESPACE_UUID = UUID.randomUUID();
   private static final String NAMESPACE_NAME = "myNamespace";
   private static final String OWNER_NAME = "myOwner";
-  private static final Timestamp CREATED_AT = Timestamp.from(Instant.now());
+  private static final Instant CREATED_AT = Instant.now();
   private static final String DESCRIPTION = "the first namespace";
 
   private static final Namespace NAMESPACE =

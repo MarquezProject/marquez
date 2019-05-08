@@ -14,7 +14,7 @@
 
 package marquez.service.models;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ public final class Job {
   @Getter private final String description;
   @Getter private final List<String> inputDatasetUrns;
   @Getter private final List<String> outputDatasetUrns;
-  @Getter private final Timestamp createdAt;
+  @Getter private final Instant createdAt;
 
   public Job(
       final UUID guid,

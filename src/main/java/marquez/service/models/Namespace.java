@@ -14,7 +14,7 @@
 
 package marquez.service.models;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.Data;
 import marquez.common.models.Description;
@@ -28,7 +28,7 @@ public class Namespace {
   private final String name;
   private final String ownerName;
   private final String description;
-  private final Timestamp createdAt;
+  private final Instant createdAt;
 
   public Namespace(UUID guid, String name, String ownerName, String description) {
     this.guid = guid;
@@ -39,7 +39,7 @@ public class Namespace {
   }
 
   public Namespace(
-      UUID guid, Timestamp createdAt, String name, String ownerName, String description) {
+      UUID guid, Instant createdAt, String name, String ownerName, String description) {
     this.guid = guid;
     this.createdAt = createdAt;
     this.name = name;

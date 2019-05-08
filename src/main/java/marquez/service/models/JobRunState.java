@@ -14,7 +14,7 @@
 
 package marquez.service.models;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JobRunState {
   private final UUID guid;
-  private final Timestamp transitionedAt;
+  private final Instant transitionedAt;
   private final UUID jobRunGuid;
   private final State state;
 

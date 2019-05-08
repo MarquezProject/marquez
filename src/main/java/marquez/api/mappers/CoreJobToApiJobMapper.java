@@ -14,6 +14,8 @@
 
 package marquez.api.mappers;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+
 import marquez.api.models.JobResponse;
 
 public class CoreJobToApiJobMapper extends Mapper<marquez.service.models.Job, JobResponse> {
@@ -21,7 +23,7 @@ public class CoreJobToApiJobMapper extends Mapper<marquez.service.models.Job, Jo
   public JobResponse map(marquez.service.models.Job value) {
     return new JobResponse(
         value.getName(),
-        value.getCreatedAt(),
+        ISO_INSTANT.format(value.getCreatedAt()),
         value.getInputDatasetUrns(),
         value.getOutputDatasetUrns(),
         value.getLocation(),
