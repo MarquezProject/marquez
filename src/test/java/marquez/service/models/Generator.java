@@ -14,10 +14,8 @@
 
 package marquez.service.models;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 import marquez.common.models.ConnectionUrl;
@@ -99,10 +97,7 @@ public class Generator {
   // Job Run States
   public static JobRunState genJobRunState() {
     return new JobRunState(
-        UUID.randomUUID(),
-        new Timestamp(new Date(0).getTime()),
-        UUID.randomUUID(),
-        JobRunState.State.NEW);
+        UUID.randomUUID(), Instant.now(), UUID.randomUUID(), JobRunState.State.NEW);
   }
 
   public static JobRunState cloneJobRunState(JobRunState jrs) {
