@@ -17,7 +17,7 @@ package marquez.service.mappers;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import lombok.NonNull;
 import marquez.db.models.NamespaceRow;
@@ -29,7 +29,7 @@ public final class NamespaceMapper {
   public static Namespace map(@NonNull NamespaceRow row) {
     return new Namespace(
         row.getUuid(),
-        Timestamp.from(row.getCreatedAt()),
+        Instant.from(row.getCreatedAt()),
         row.getName(),
         row.getCurrentOwnerName(),
         row.getDescription());

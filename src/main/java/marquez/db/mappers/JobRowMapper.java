@@ -15,6 +15,7 @@
 package marquez.db.mappers;
 
 import static marquez.db.Columns.arrayOrThrow;
+import static marquez.db.Columns.timestampOrThrow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,6 +38,6 @@ public final class JobRowMapper implements RowMapper<Job> {
         results.getString(Columns.DESCRIPTION),
         arrayOrThrow(results, Columns.INPUT_DATASET_URNS),
         arrayOrThrow(results, Columns.OUTPUT_DATASET_URNS),
-        results.getTimestamp(Columns.CREATED_AT));
+        timestampOrThrow(results, Columns.CREATED_AT));
   }
 }

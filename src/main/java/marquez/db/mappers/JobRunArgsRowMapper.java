@@ -14,6 +14,8 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.timestampOrThrow;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import lombok.NonNull;
@@ -29,6 +31,6 @@ public final class JobRunArgsRowMapper implements RowMapper<RunArgs> {
     return new RunArgs(
         results.getString(Columns.CHECKSUM),
         results.getString(Columns.RUN_ARGS),
-        results.getTimestamp(Columns.CREATED_AT));
+        timestampOrThrow(results, Columns.CREATED_AT));
   }
 }

@@ -14,6 +14,8 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.timestampOrThrow;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -29,7 +31,7 @@ public final class DbTableInfoRowMapper implements RowMapper<DbTableInfoRow> {
       throws SQLException {
     return DbTableInfoRow.builder()
         .uuid(results.getObject(Columns.ROW_UUID, UUID.class))
-        .createdAt(results.getTimestamp(Columns.CREATED_AT).toInstant())
+        .createdAt(timestampOrThrow(results, Columns.CREATED_AT))
         .db(results.getString(Columns.DB_NAME))
         .dbSchema(results.getString(Columns.DB_SCHEMA_NAME))
         .build();

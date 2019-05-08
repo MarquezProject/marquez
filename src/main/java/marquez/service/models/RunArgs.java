@@ -14,7 +14,7 @@
 
 package marquez.service.models;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -24,5 +24,5 @@ public final class RunArgs {
 
   private final String hexDigest;
   private final String json;
-  private final Timestamp createdAt;
+  private final Instant createdAt;
 }
