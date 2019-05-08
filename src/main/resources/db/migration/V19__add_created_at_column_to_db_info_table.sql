@@ -1,2 +1,0 @@
-ALTER TABLE db_table_infos RENAME TO db_table_info;
-ALTER TABLE db_table_info ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
