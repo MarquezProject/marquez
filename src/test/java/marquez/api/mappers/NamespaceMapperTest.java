@@ -29,8 +29,8 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class NamespaceMapperTest {
-  private final NamespaceName NAMESPACE_NAME = newNamespaceName();
-  private final NamespaceRequest REQUEST = newNamespaceRequest();
+  private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
+  private static final NamespaceRequest REQUEST = newNamespaceRequest();
 
   @Test
   public void testMap_request() {
