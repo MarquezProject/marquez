@@ -14,22 +14,17 @@
 
 package marquez.api.mappers;
 
-import static java.util.Objects.requireNonNull;
-
+import lombok.NonNull;
 import marquez.api.models.NamespaceRequest;
-import marquez.api.models.NamespaceResponse;
+import marquez.common.models.NamespaceName;
 import marquez.service.models.Namespace;
 
-public class NamespaceApiMapper extends Mapper<NamespaceResponse, Namespace> {
-  public Namespace map(NamespaceResponse namespace) {
-    requireNonNull(namespace, "namespace must not be null");
-    return new Namespace(
-        null, namespace.getName().toLowerCase(), namespace.getOwner(), namespace.getDescription());
-  }
+public final class NamespaceMapper {
+  private NamespaceMapper() {}
 
-  public Namespace of(String namespaceName, NamespaceRequest request) {
-    return map(
-        new NamespaceResponse(
-            namespaceName, null, request.getOwner(), request.getDescription().orElse(null)));
+  public static Namespace map(
+      @NonNull NamespaceName namespaceName, @NonNull NamespaceRequest request) {
+    return new Namespace(
+        null, namespaceName.getValue(), request.getOwner(), request.getDescription().orElse(null));
   }
 }
