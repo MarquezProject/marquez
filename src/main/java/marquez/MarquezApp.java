@@ -96,8 +96,8 @@ public class MarquezApp extends Application<MarquezConfig> {
 
   private void migrateDbOrError(@NonNull MarquezConfig config) {
     final Flyway flyway = new Flyway();
-    final DataSourceFactory database = config.getDataSourceFactory();
-    flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
+    final DataSourceFactory db = config.getDataSourceFactory();
+    flyway.setDataSource(db.getUrl(), db.getUser(), db.getPassword());
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts
     // requiring we handle the throwable and apply a repair on the database to fix any
     // issues before terminating.
