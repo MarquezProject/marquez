@@ -37,7 +37,7 @@ public final class NamespaceResponseMapper {
 
   public static List<NamespaceResponse> map(@NonNull List<Namespace> namespaces) {
     return unmodifiableList(
-        namespaces.stream().map(namespaces -> map(namespaces)).collect(toList()));
+        namespaces.stream().map(namespace -> map(namespace)).collect(toList()));
   }
 
   public static NamespacesResponse toNamespacesResponse(@NonNull List<Namespace> namespaces) {
