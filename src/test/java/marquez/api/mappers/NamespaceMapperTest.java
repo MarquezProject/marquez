@@ -52,16 +52,16 @@ public class NamespaceMapperTest {
   }
 
   @Test
-  public void testMap_throwsException_onNullRequest() {
-    final NamespaceRequest nullRequest = null;
-    assertThatNullPointerException()
-        .isThrownBy(() -> NamespaceMapper.map(NAMESPACE_NAME, nullRequest));
-  }
-
-  @Test
   public void testMap_throwsException_onNullNamespaceName() {
     final NamespaceName nullNamespaceName = null;
     assertThatNullPointerException()
         .isThrownBy(() -> NamespaceMapper.map(nullNamespaceName, REQUEST));
+  }
+
+  @Test
+  public void testMap_throwsException_onNullRequest() {
+    final NamespaceRequest nullRequest = null;
+    assertThatNullPointerException()
+        .isThrownBy(() -> NamespaceMapper.map(NAMESPACE_NAME, nullRequest));
   }
 }
