@@ -449,7 +449,7 @@ components:
           type: string
       example:
         name: wework
-        createdAt: 2019-05-09T00:24:57.609125Z
+        createdAt: 2019-05-09T19:49:24.201361Z
         owner: dataengineering
         description: A namespace for core jobs and datasets at wework.
 
@@ -528,7 +528,7 @@ components:
           type: string
       example:
         name: room_bookings_7_days
-        createdAt: 2019-05-09T03:48:53.530747Z
+        createdAt: 2019-05-09T19:49:24.201361Z
         inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
         outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
@@ -559,7 +559,7 @@ components:
           format: URI
       example:
         version: b39b5cea-bc2e-42a5-a4ab-5329ae9fc54f
-        createdAt: 2018-10-04T15:01:23.045Z
+        createdAt: 2019-05-09T19:49:24.201361
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
 
     jobVersions:
@@ -683,7 +683,7 @@ components:
           type: string
       example:
         name: wedata.room_bookings
-        createdAt: 2019-05-09T03:46:22.262217Z
+        createdAt: 2019-05-09T19:49:24.201361Z
         urn: urn:dataset:analytics_db:wedata.room_bookings
         description: "All room booking occupancy data."
 
@@ -729,7 +729,7 @@ components:
           description: The url to be used to connect to the datasource.
       example:
         name: financials_db
-        createdAt: 2019-05-09T03:38:57.245970Z
+        createdAt: 2019-05-09T19:49:24.201361Z
         urn: urn:datasource:postgresql:financials_db
         connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
 
