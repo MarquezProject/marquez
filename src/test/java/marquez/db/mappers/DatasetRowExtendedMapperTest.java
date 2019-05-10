@@ -41,6 +41,7 @@ import marquez.common.models.Description;
 import marquez.db.Columns;
 import marquez.db.models.DatasetRowExtended;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -57,10 +58,19 @@ public class DatasetRowExtendedMapperTest {
   private static final Description DESCRIPTION = newDescription();
   private static final UUID CURRENT_VERSION_UUID = newRowUuid();
 
+  private Object exists;
+  private ResultSet results;
+  private StatementContext context;
+
+  @Before
+  public void setUp() {
+    exists = mock(Object.class);
+    results = mock(ResultSet.class);
+    context = mock(StatementContext.class);
+  }
+
   @Test
   public void testMap_row() throws SQLException {
-    final Object exists = mock(Object.class);
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.ROW_UUID)).thenReturn(exists);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
     when(results.getObject(Columns.UPDATED_AT)).thenReturn(exists);
@@ -83,8 +93,6 @@ public class DatasetRowExtendedMapperTest {
     when(results.getString(Columns.DESCRIPTION)).thenReturn(DESCRIPTION.getValue());
     when(results.getObject(Columns.CURRENT_VERSION_UUID, UUID.class))
         .thenReturn(CURRENT_VERSION_UUID);
-
-    final StatementContext context = mock(StatementContext.class);
 
     final DatasetRowExtendedMapper rowExtendedMapper = new DatasetRowExtendedMapper();
     final DatasetRowExtended rowExtended = rowExtendedMapper.map(results, context);
@@ -126,8 +134,6 @@ public class DatasetRowExtendedMapperTest {
     when(results.getObject(Columns.CURRENT_VERSION_UUID, UUID.class))
         .thenReturn(CURRENT_VERSION_UUID);
 
-    final StatementContext context = mock(StatementContext.class);
-
     final DatasetRowExtendedMapper rowExtendedMapper = new DatasetRowExtendedMapper();
     final DatasetRowExtended rowExtended = rowExtendedMapper.map(results, context);
     assertThat(rowExtended.getUuid()).isEqualTo(ROW_UUID);
@@ -138,7 +144,7 @@ public class DatasetRowExtendedMapperTest {
     assertThat(rowExtended.getName()).isEqualTo(NAME.getValue());
     assertThat(rowExtended.getUrn()).isEqualTo(URN.getValue());
     assertThat(rowExtended.getDatasourceUrn()).isEqualTo(DATASOURCE_URN.getValue());
-    assertThat(rowExtended.getDescription()).isNull();
+    assertThat(rowExtended.getDescription()).isEqualTo(NO_DESCRIPTION.getValue());
     assertThat(rowExtended.getCurrentVersionUuid()).isEqualTo(CURRENT_VERSION_UUID);
 
     verify(results, never()).getString(Columns.DESCRIPTION);
