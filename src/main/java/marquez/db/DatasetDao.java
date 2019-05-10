@@ -95,13 +95,13 @@ public interface DatasetDao {
   Optional<DatasetRowExtended> findBy(@BindBean DatasetUrn urn);
 
   @SqlQuery(
-      "SELECT d.*, ds.urn AS datasource_urn "
+      "SELECT d.*, s.urn AS datasource_urn "
           + "FROM datasets AS d "
           + "INNER JOIN namespaces AS n "
           + "    ON (n.guid = d.namespace_guid AND n.name = :value) "
-          + "INNER JOIN datasources AS ds "
-          + "    ON (ds.guid = d.datasource_uuid)"
-          + "ORDER BY n.name "
+          + "INNER JOIN datasources AS s "
+          + "    ON (s.guid = d.datasource_uuid)"
+          + "ORDER BY d.created_at "
           + "LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(DatasetRowExtendedMapper.class)
   List<DatasetRowExtended> findAll(
