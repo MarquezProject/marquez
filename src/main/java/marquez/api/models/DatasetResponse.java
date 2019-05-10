@@ -29,6 +29,7 @@ public final class DatasetResponse {
   @Getter private final String name;
   @Getter private final String createdAt;
   @Getter private final String urn;
+  @Getter private final String datasourceUrn;
   private final String description;
 
   public DatasetResponse(
@@ -40,6 +41,7 @@ public final class DatasetResponse {
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
     this.urn = checkNotBlank(urn);
+    this.datasourceUrn = checkNotBlank(datasourceUrn);
     this.description = description;
   }
 
