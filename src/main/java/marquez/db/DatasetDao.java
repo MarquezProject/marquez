@@ -97,11 +97,11 @@ public interface DatasetDao {
   @SqlQuery(
       "SELECT d.*, ds.urn AS datasource_urn "
           + "FROM datasets AS d "
-          + "INNER JOIN namespaces AS n "
-          + "    ON (n.guid = d.namespace_guid AND n.name = :value) "
+          + "INNER JOIN namespaces AS ns "
+          + "    ON (ns.guid = d.namespace_guid AND ns.name = :value) "
           + "INNER JOIN datasources AS ds "
           + "    ON (ds.guid = d.datasource_uuid)"
-          + "ORDER BY n.name "
+          + "ORDER BY ns.name "
           + "LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(DatasetRowExtendedMapper.class)
   List<DatasetRowExtended> findAll(
