@@ -40,17 +40,18 @@ public final class DatasetMapper {
         .build();
   }
 
-  public static Dataset map(@NonNull DatasetRowExtended row) {
+  public static Dataset map(@NonNull DatasetRowExtended rowExtended) {
     return Dataset.builder()
-        .name(DatasetName.fromString(row.getName()))
-        .createdAt(row.getCreatedAt())
-        .urn(DatasetUrn.fromString(row.getUrn()))
-        .datasourceUrn(DatasourceUrn.fromString(row.getDatasourceUrn()))
-        .description(Description.fromString(row.getDescription()))
+        .name(DatasetName.fromString(rowExtended.getName()))
+        .createdAt(rowExtended.getCreatedAt())
+        .urn(DatasetUrn.fromString(rowExtended.getUrn()))
+        .datasourceUrn(DatasourceUrn.fromString(rowExtended.getDatasourceUrn()))
+        .description(Description.fromString(rowExtended.getDescription()))
         .build();
   }
 
-  public static List<Dataset> map(@NonNull List<DatasetRowExtended> rows) {
-    return unmodifiableList(rows.stream().map(row -> map(row)).collect(toList()));
+  public static List<Dataset> map(@NonNull List<DatasetRowExtended> rowsExtended) {
+    return unmodifiableList(
+        rowsExtended.stream().map(rowExtended -> map(rowExtended)).collect(toList()));
   }
 }
