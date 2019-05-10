@@ -678,6 +678,10 @@ components:
           description: The URN of the dataset.
           type: string
           format: URN
+        datasourceUrn:
+          description: The URN of the datasource associated with the dataset.
+          type: string
+          format: URN
         description:
           description:  The description of the dataset.
           type: string
@@ -685,6 +689,7 @@ components:
         name: wedata.room_bookings
         createdAt: 2019-05-09T19:49:24.201361Z
         urn: urn:dataset:analytics_db:wedata.room_bookings
+        datasourceUrn: urn:datasource:postgresql:analytics_db
         description: "All room booking occupancy data."
 
     datasets:
