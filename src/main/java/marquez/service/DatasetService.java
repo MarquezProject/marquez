@@ -83,8 +83,11 @@ public class DatasetService {
       return datasetDao
           .insertAndGet(newDatasetRow)
           .map(
-              datasetRow ->
-                  DatasetMapper.map(DatasourceUrn.fromString(datasourceRow.getUrn()), datasetRow))
+              datasetRow -> {
+                final DatasourceUrn datasourceUrn =
+                    DatasourceUrn.fromString(datasourceRow.getUrn());
+                return DatasetMapper.map(datasourceUrn, datasetRow);
+              })
           .orElseThrow(
               () ->
                   new MarquezServiceException(
