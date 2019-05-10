@@ -19,8 +19,8 @@ import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
-import static marquez.db.models.DbModelGenerator.newDatasetRowWith;
-import static marquez.db.models.DbModelGenerator.newDatasetRows;
+import static marquez.db.models.DbModelGenerator.newDatasetRowExtendedWith;
+import static marquez.db.models.DbModelGenerator.newDatasetRowsExtended;
 import static marquez.db.models.DbModelGenerator.newDatasourceRowWith;
 import static marquez.db.models.DbModelGenerator.newNamespaceRowWith;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,6 +49,7 @@ import marquez.db.DatasetDao;
 import marquez.db.DatasourceDao;
 import marquez.db.NamespaceDao;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetRowExtended;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.NamespaceRow;
 import marquez.service.exceptions.MarquezServiceException;
@@ -132,7 +133,7 @@ public class DatasetServiceTest {
             .build();
     when(datasetDao.insertAndGet(any(DatasetRow.class))).thenReturn(Optional.of(datasetRow));
 
-    final Dataset expected = DatasetMapper.map(datasetRow);
+    final Dataset expected = DatasetMapper.map(DATASOURCE_URN, datasetRow);
     final Dataset actual = datasetService.create(NAMESPACE_NAME, NEW_DATASET);
     assertThat(actual).isEqualTo(expected);
 
@@ -221,8 +222,9 @@ public class DatasetServiceTest {
 
   @Test
   public void testGet() throws MarquezServiceException {
-    final DatasetRow datasetRow = newDatasetRowWith(DATASET_URN);
-    when(datasetDao.findBy(DATASET_URN)).thenReturn(Optional.of(datasetRow));
+    final DatasetRowExtended datasetRowExtended =
+        newDatasetRowExtendedWith(DATASET_URN, DATASOURCE_URN);
+    when(datasetDao.findBy(DATASET_URN)).thenReturn(Optional.of(datasetRowExtended));
 
     final Dataset dataset = datasetService.get(DATASET_URN).orElse(null);
     assertThat(dataset).isNotNull();
@@ -251,8 +253,8 @@ public class DatasetServiceTest {
 
   @Test
   public void testList() throws MarquezServiceException {
-    final List<DatasetRow> datasetRows = newDatasetRows(4);
-    when(datasetDao.findAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasetRows);
+    final List<DatasetRowExtended> datasetRowsExtended = newDatasetRowsExtended(4);
+    when(datasetDao.findAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasetRowsExtended);
 
     final List<Dataset> datasets = datasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET);
     assertThat(datasets).isNotNull();

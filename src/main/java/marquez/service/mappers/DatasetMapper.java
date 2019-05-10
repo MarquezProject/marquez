@@ -21,23 +21,36 @@ import java.util.List;
 import lombok.NonNull;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetRowExtended;
 import marquez.service.models.Dataset;
 
 public final class DatasetMapper {
   private DatasetMapper() {}
 
-  public static Dataset map(@NonNull DatasetRow row) {
+  public static Dataset map(@NonNull DatasourceUrn datasourceUrn, @NonNull DatasetRow row) {
     return Dataset.builder()
         .name(DatasetName.fromString(row.getName()))
         .createdAt(row.getCreatedAt())
         .urn(DatasetUrn.fromString(row.getUrn()))
+        .datasourceUrn(datasourceUrn)
         .description(Description.fromString(row.getDescription()))
         .build();
   }
 
-  public static List<Dataset> map(@NonNull List<DatasetRow> rows) {
+  public static Dataset map(@NonNull DatasetRowExtended row) {
+    return Dataset.builder()
+        .name(DatasetName.fromString(row.getName()))
+        .createdAt(row.getCreatedAt())
+        .urn(DatasetUrn.fromString(row.getUrn()))
+        .datasourceUrn(DatasourceUrn.fromString(row.getDatasourceUrn()))
+        .description(Description.fromString(row.getDescription()))
+        .build();
+  }
+
+  public static List<Dataset> map(@NonNull List<DatasetRowExtended> rows) {
     return unmodifiableList(rows.stream().map(row -> map(row)).collect(toList()));
   }
 }

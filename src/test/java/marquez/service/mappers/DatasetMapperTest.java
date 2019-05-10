@@ -14,102 +14,112 @@
 
 package marquez.service.mappers;
 
+import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.Description.NO_DESCRIPTION;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static marquez.db.models.DbModelGenerator.newDatasetRow;
+import static marquez.db.models.DbModelGenerator.newDatasetRowExtended;
+import static marquez.db.models.DbModelGenerator.newDatasetRowExtendedWith;
+import static marquez.db.models.DbModelGenerator.newDatasetRowWith;
+import static marquez.db.models.DbModelGenerator.newDatasetRowsExtended;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import marquez.UnitTests;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.Description;
+import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetRowExtended;
 import marquez.service.models.Dataset;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetMapperTest {
-  private static final DatasetName NAME = DatasetName.fromString("b.c");
-  private static final Instant CREATED_AT = Instant.now();
-  private static final Instant UPDATED_AT = Instant.now();
-  private static final DatasetUrn URN =
-      DatasetUrn.fromString(String.format("urn:dataset:a:%s", NAME.getValue()));
-  private static final Description DESCRIPTION = Description.fromString("test description");
-  private static final DatasetRow ROW =
-      DatasetRow.builder()
-          .uuid(UUID.randomUUID())
-          .name(NAME.getValue())
-          .createdAt(CREATED_AT)
-          .updatedAt(UPDATED_AT)
-          .namespaceUuid(UUID.randomUUID())
-          .datasourceUuid(UUID.randomUUID())
-          .urn(URN.getValue())
-          .description(DESCRIPTION.getValue())
-          .currentVersionUuid(UUID.randomUUID())
-          .build();
-
   @Test
   public void testMap_row() {
-    final Dataset dataset = DatasetMapper.map(ROW);
-    assertNotNull(dataset);
-    assertEquals(NAME, dataset.getName());
-    assertEquals(CREATED_AT, dataset.getCreatedAt());
-    assertEquals(URN, dataset.getUrn());
-    assertEquals(DESCRIPTION, dataset.getDescription());
+    final DatasourceUrn datasourceUrn = newDatasourceUrn();
+    final DatasetRow row = newDatasetRow();
+    final Dataset dataset = DatasetMapper.map(datasourceUrn, row);
+    assertThat(dataset).isNotNull();
+    assertThat(dataset.getName().getValue()).isEqualTo(row.getName());
+    assertThat(dataset.getCreatedAt()).isEqualTo(row.getCreatedAt());
+    assertThat(dataset.getUrn().getValue()).isEqualTo(row.getUrn());
+    assertThat(dataset.getDatasourceUrn()).isEqualTo(datasourceUrn);
+    assertThat(dataset.getDescription().getValue()).isEqualTo(row.getDescription());
   }
 
   @Test
   public void testMap_row_noDescription() {
-    final DatasetRow rowWithNoDescription =
-        DatasetRow.builder()
-            .uuid(UUID.randomUUID())
-            .name(NAME.getValue())
-            .createdAt(CREATED_AT)
-            .updatedAt(UPDATED_AT)
-            .namespaceUuid(UUID.randomUUID())
-            .datasourceUuid(UUID.randomUUID())
-            .urn(URN.getValue())
-            .currentVersionUuid(UUID.randomUUID())
-            .build();
-
-    final Dataset dataset = DatasetMapper.map(rowWithNoDescription);
-    assertNotNull(dataset);
-    assertEquals(NAME, dataset.getName());
-    assertEquals(CREATED_AT, dataset.getCreatedAt());
-    assertEquals(URN, dataset.getUrn());
-    assertEquals(NO_DESCRIPTION, dataset.getDescription());
+    final DatasourceUrn datasourceUrn = newDatasourceUrn();
+    final DatasetRow row = newDatasetRowWith(NO_DESCRIPTION);
+    final Dataset dataset = DatasetMapper.map(datasourceUrn, row);
+    assertThat(dataset).isNotNull();
+    assertThat(dataset.getName().getValue()).isEqualTo(row.getName());
+    assertThat(dataset.getCreatedAt()).isEqualTo(row.getCreatedAt());
+    assertThat(dataset.getUrn().getValue()).isEqualTo(row.getUrn());
+    assertThat(dataset.getDatasourceUrn()).isEqualTo(datasourceUrn);
+    assertThat(dataset.getDescription().getValue()).isNull();
   }
 
-  @Test(expected = NullPointerException.class)
+  public void testMap_throwsException_onNullDatasourceUrn() {
+    final DatasourceUrn nullDatasourceUrn = null;
+    assertThatNullPointerException()
+        .isThrownBy(() -> DatasetMapper.map(nullDatasourceUrn, newDatasetRow()));
+  }
+
   public void testMap_throwsException_onNullRow() {
     final DatasetRow nullRow = null;
-    DatasetMapper.map(nullRow);
+    assertThatNullPointerException()
+        .isThrownBy(() -> DatasetMapper.map(newDatasourceUrn(), nullRow));
   }
 
   @Test
-  public void testMap_rows() {
-    final List<DatasetRow> datasetRows = Arrays.asList(ROW);
-    final List<Dataset> datasets = DatasetMapper.map(datasetRows);
-    assertNotNull(datasets);
-    assertEquals(1, datasets.size());
+  public void testMap_rowExtended() {
+    final DatasetRowExtended rowExtended = newDatasetRowExtended();
+    final Dataset dataset = DatasetMapper.map(rowExtended);
+    assertThat(dataset).isNotNull();
+    assertThat(dataset.getName().getValue()).isEqualTo(rowExtended.getName());
+    assertThat(dataset.getCreatedAt()).isEqualTo(rowExtended.getCreatedAt());
+    assertThat(dataset.getUrn().getValue()).isEqualTo(rowExtended.getUrn());
+    assertThat(dataset.getDatasourceUrn().getValue()).isEqualTo(rowExtended.getDatasourceUrn());
+    assertThat(dataset.getDescription().getValue()).isEqualTo(rowExtended.getDescription());
   }
 
   @Test
-  public void testMap_emptyRows() {
-    final List<DatasetRow> emptyRows = Arrays.asList();
-    final List<Dataset> datasets = DatasetMapper.map(emptyRows);
-    assertNotNull(datasets);
-    assertTrue(datasets.isEmpty());
+  public void testMap_rowExtended_noDescription() {
+    final DatasetRowExtended rowExtended = newDatasetRowExtendedWith(NO_DESCRIPTION);
+    final Dataset dataset = DatasetMapper.map(rowExtended);
+    assertThat(dataset).isNotNull();
+    assertThat(dataset.getName().getValue()).isEqualTo(rowExtended.getName());
+    assertThat(dataset.getCreatedAt()).isEqualTo(rowExtended.getCreatedAt());
+    assertThat(dataset.getUrn().getValue()).isEqualTo(rowExtended.getUrn());
+    assertThat(dataset.getDatasourceUrn().getValue()).isEqualTo(rowExtended.getDatasourceUrn());
+    assertThat(dataset.getDescription().getValue()).isNull();
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testMap_throwsException_onNullRows() {
-    final List<DatasetRow> nullRows = null;
-    DatasetMapper.map(nullRows);
+  public void testMap_throwsException_onNullRowExtended() {
+    final DatasetRowExtended nullRowExtended = null;
+    assertThatNullPointerException().isThrownBy(() -> DatasetMapper.map(nullRowExtended));
+  }
+
+  @Test
+  public void testMap_rowsExtended() {
+    final List<DatasetRowExtended> datasetRowsExtended = newDatasetRowsExtended(4);
+    final List<Dataset> datasets = DatasetMapper.map(datasetRowsExtended);
+    assertThat(datasets).isNotNull();
+    assertThat(datasets).hasSize(4);
+  }
+
+  @Test
+  public void testMap_emptyRowsExtended() {
+    final List<DatasetRowExtended> datasetRowsExtended = newDatasetRowsExtended(0);
+    final List<Dataset> datasets = DatasetMapper.map(datasetRowsExtended);
+    assertThat(datasets).isNotNull();
+    assertThat(datasets).isEmpty();
+  }
+
+  public void testMap_throwsException_onNullRowsExtended() {
+    final List<DatasetRowExtended> nullRowsExtended = null;
+    assertThatNullPointerException().isThrownBy(() -> DatasetMapper.map(nullRowsExtended));
   }
 }

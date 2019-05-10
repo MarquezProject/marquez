@@ -35,6 +35,7 @@ public final class DatasetResponse {
       @NonNull final String name,
       @NonNull final String createdAt,
       @NonNull final String urn,
+      @NonNull final String datasourceUrn,
       @Nullable final String description) {
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
