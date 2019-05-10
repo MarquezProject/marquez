@@ -32,7 +32,7 @@ public final class DatasetRowExtendedMapper implements RowMapper<DatasetRowExten
   @Override
   public DatasetRowExtended map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    return DatasetRowExtended.builder()
+    return DatasetRowExtended.builderExtended()
         .uuid(uuidOrNull(results, Columns.ROW_UUID))
         .createdAt(timestampOrThrow(results, Columns.CREATED_AT))
         .updatedAt(timestampOrThrow(results, Columns.UPDATED_AT))

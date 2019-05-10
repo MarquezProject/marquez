@@ -21,7 +21,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public final class DatasetRow {
+public class DatasetRow {
   private UUID uuid;
   private Instant createdAt;
   private Instant updatedAt;

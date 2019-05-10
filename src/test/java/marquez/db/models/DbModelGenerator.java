@@ -209,7 +209,7 @@ public final class DbModelGenerator {
       Description description,
       boolean wasUpdated) {
     final DatasetRowExtended.DatasetRowExtendedBuilder builder =
-        DatasetRowExtended.builder()
+        DatasetRowExtended.builderExtended()
             .uuid(newRowUuid())
             .createdAt(newTimestamp())
             .namespaceUuid(newNamespaceRow().getUuid())

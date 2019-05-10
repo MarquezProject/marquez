@@ -17,19 +17,37 @@ package marquez.db.models;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-@Data
-@Builder
-public final class DatasetRowExtended {
-  private UUID uuid;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private UUID namespaceUuid;
-  private UUID datasourceUuid;
-  private String name;
-  private String urn;
-  private String datasourceUrn;
-  private String description;
-  private UUID currentVersionUuid;
+@EqualsAndHashCode(callSuper = true)
+@ToString
+public final class DatasetRowExtended extends DatasetRow {
+  @Getter private String datasourceUrn;
+
+  @Builder(builderMethodName = "builderExtended")
+  public DatasetRowExtended(
+      final UUID uuid,
+      final Instant createdAt,
+      final Instant updatedAt,
+      final UUID namespaceUuid,
+      final UUID datasourceUuid,
+      final String name,
+      final String urn,
+      final String datasourceUrn,
+      final String description,
+      final UUID currentVersionUuid) {
+    super(
+        uuid,
+        createdAt,
+        updatedAt,
+        namespaceUuid,
+        datasourceUuid,
+        name,
+        urn,
+        description,
+        currentVersionUuid);
+    this.datasourceUrn = datasourceUrn;
+  }
 }
