@@ -16,9 +16,9 @@ package marquez.db.mappers;
 
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
-import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidOrNull;
+import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,9 +35,9 @@ public final class DatasetRowExtendedMapper implements RowMapper<DatasetRowExten
     return DatasetRowExtended.builder()
         .uuid(uuidOrNull(results, Columns.ROW_UUID))
         .createdAt(timestampOrThrow(results, Columns.CREATED_AT))
-        .updatedAt(timestampOrNull(results, Columns.UPDATED_AT))
-        .namespaceUuid(uuidOrNull(results, Columns.NAMESPACE_UUID))
-        .datasourceUuid(uuidOrNull(results, Columns.DATASOURCE_UUID))
+        .updatedAt(timestampOrThrow(results, Columns.UPDATED_AT))
+        .namespaceUuid(uuidOrThrow(results, Columns.NAMESPACE_UUID))
+        .datasourceUuid(uuidOrThrow(results, Columns.DATASOURCE_UUID))
         .name(stringOrThrow(results, Columns.NAME))
         .urn(stringOrThrow(results, Columns.URN))
         .datasourceUrn(stringOrThrow(results, Columns.DATASOURCE_URN))
