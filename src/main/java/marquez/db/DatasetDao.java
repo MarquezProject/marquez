@@ -19,8 +19,10 @@ import java.util.Optional;
 import java.util.UUID;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
+import marquez.db.mappers.DatasetRowExtendedMapper;
 import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetRowExtended;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
@@ -31,7 +33,6 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
-@RegisterRowMapper(DatasetRowMapper.class)
 public interface DatasetDao {
   @CreateSqlObject
   DatasourceDao createDatasourceDao();
@@ -42,12 +43,14 @@ public interface DatasetDao {
   @SqlUpdate(
       "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
           + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name)")
+  @RegisterRowMapper(DatasetRowMapper.class)
   void insert(@BindBean DatasetRow datasetRow);
 
   @SqlQuery(
       "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
           + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name) "
           + "RETURNING *")
+  @RegisterRowMapper(DatasetRowMapper.class)
   Optional<DatasetRow> insertAndGet(@BindBean DatasetRow datasetRow);
 
   @Deprecated
@@ -73,20 +76,36 @@ public interface DatasetDao {
           + "WHERE guid = :uuid")
   void updateCurrentVersionUuid(UUID uuid, UUID currentVersionUuid);
 
-  @SqlQuery("SELECT * FROM datasets WHERE guid = :uuid")
-  Optional<DatasetRow> findBy(UUID uuid);
-
-  @SqlQuery("SELECT * FROM datasets WHERE urn = :value")
-  Optional<DatasetRow> findBy(@BindBean DatasetUrn urn);
+  @SqlQuery(
+      "SELECT d.*, ds.urn AS datasource_urn "
+          + "FROM datasets AS d "
+          + "INNER JOIN datasources AS ds "
+          + "    ON (ds.guid = d.datasource_uuid) "
+          + "WHERE d.guid = :uuid")
+  @RegisterRowMapper(DatasetRowExtendedMapper.class)
+  Optional<DatasetRowExtended> findBy(UUID uuid);
 
   @SqlQuery(
-      "SELECT * "
-          + "FROM datasets d "
-          + "INNER JOIN namespaces n "
-          + "    ON (n.guid = d.namespace_guid AND n.name = :value)"
-          + "ORDER BY n.name "
+      "SELECT d.*, ds.urn AS datasource_urn "
+          + "FROM datasets AS d "
+          + "INNER JOIN datasources AS ds "
+          + "    ON (ds.guid = d.datasource_uuid) "
+          + "WHERE d.urn = :value")
+  @RegisterRowMapper(DatasetRowExtendedMapper.class)
+  Optional<DatasetRowExtended> findBy(@BindBean DatasetUrn urn);
+
+  @SqlQuery(
+      "SELECT d.*, ds.urn AS datasource_urn "
+          + "FROM datasets AS d "
+          + "INNER JOIN namespaces AS ns "
+          + "    ON (ns.guid = d.namespace_guid AND ns.name = :value) "
+          + "INNER JOIN datasources AS ds "
+          + "    ON (ds.guid = d.datasource_uuid)"
+          + "ORDER BY ns.name "
           + "LIMIT :limit OFFSET :offset")
-  List<DatasetRow> findAll(@BindBean NamespaceName namespaceName, Integer limit, Integer offset);
+  @RegisterRowMapper(DatasetRowExtendedMapper.class)
+  List<DatasetRowExtended> findAll(
+      @BindBean NamespaceName namespaceName, Integer limit, Integer offset);
 
   @SqlQuery("SELECT COUNT(*) FROM datasets")
   Integer count();
