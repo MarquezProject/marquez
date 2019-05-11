@@ -17,6 +17,7 @@ package marquez.api.resources;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
+import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import javax.validation.Valid;
@@ -30,7 +31,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasourceUrnNotFoundException;
 import marquez.api.mappers.DatasourceResponseMapper;
 import marquez.api.models.DatasourceRequest;
@@ -41,7 +41,6 @@ import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
 
-@Slf4j
 @Path("/api/v1/datasources")
 public final class DatasourceResource {
   private final DatasourceService datasourceService;
@@ -51,6 +50,7 @@ public final class DatasourceResource {
   }
 
   @Timed
+  @ResponseMetered
   @ExceptionMetered
   @POST
   @Consumes(APPLICATION_JSON)
@@ -63,6 +63,7 @@ public final class DatasourceResource {
   }
 
   @Timed
+  @ResponseMetered
   @ExceptionMetered
   @GET
   @Produces(APPLICATION_JSON)
@@ -75,6 +76,7 @@ public final class DatasourceResource {
   }
 
   @Timed
+  @ResponseMetered
   @ExceptionMetered
   @GET
   @Produces(APPLICATION_JSON)
