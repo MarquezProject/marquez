@@ -23,7 +23,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
-import org.junit.Ignore;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +43,7 @@ import marquez.service.models.Datasource;
 import marquez.service.models.Generator;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DatasourceResourceTest {
@@ -226,7 +226,8 @@ public class DatasourceResourceTest {
         ConnectionUrl.fromString("jdbc:" + invalidDatasourceType + "://localhost:5431/novelists");
     final DatasourceRequest invalidDatasourceRequest = mock(DatasourceRequest.class);
     when(invalidDatasourceRequest.getConnectionUrl()).thenReturn(invalidConnectionUrl);
-    when(invalidDatasourceRequest.getName()).thenReturn(DatasourceName.fromString("mysql_cluster_2"));
+    when(invalidDatasourceRequest.getName())
+        .thenReturn(DatasourceName.fromString("mysql_cluster_2"));
 
     // When we submit it
     final Response createDatasourceResponse = datasourceResource.create(invalidDatasourceRequest);
