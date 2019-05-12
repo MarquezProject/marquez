@@ -35,7 +35,7 @@ import marquez.api.mappers.NamespaceResponseMapper;
 import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
 import marquez.api.models.NamespacesResponse;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.NamespaceName;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;

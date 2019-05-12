@@ -14,11 +14,11 @@
 
 package marquez.service;
 
-import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
-import static marquez.common.models.CommonModelGenerator.newDatasetName;
-import static marquez.common.models.CommonModelGenerator.newDatasourceName;
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.common.types.TypeGenerator.newConnectionUrl;
+import static marquez.common.types.TypeGenerator.newDatasetName;
+import static marquez.common.types.TypeGenerator.newDatasourceName;
+import static marquez.common.types.TypeGenerator.newDescription;
+import static marquez.common.types.TypeGenerator.newNamespaceName;
 import static marquez.db.models.DbModelGenerator.newDatasetRowExtendedWith;
 import static marquez.db.models.DbModelGenerator.newDatasetRowsExtended;
 import static marquez.db.models.DbModelGenerator.newDatasourceRowWith;
@@ -38,13 +38,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceUrn;
-import marquez.common.models.Description;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.ConnectionUrl;
+import marquez.common.types.DatasetName;
+import marquez.common.types.DatasetUrn;
+import marquez.common.types.DatasourceName;
+import marquez.common.types.DatasourceUrn;
+import marquez.common.types.Description;
+import marquez.common.types.NamespaceName;
 import marquez.db.DatasetDao;
 import marquez.db.DatasourceDao;
 import marquez.db.NamespaceDao;

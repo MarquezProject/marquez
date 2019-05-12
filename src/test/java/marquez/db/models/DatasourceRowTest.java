@@ -14,16 +14,16 @@
 
 package marquez.db.models;
 
-import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
-import static marquez.common.models.CommonModelGenerator.newDatasourceName;
+import static marquez.common.types.TypeGenerator.newConnectionUrl;
+import static marquez.common.types.TypeGenerator.newDatasourceName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 import java.util.UUID;
 import marquez.UnitTests;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceUrn;
+import marquez.common.types.ConnectionUrl;
+import marquez.common.types.DatasourceName;
+import marquez.common.types.DatasourceUrn;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 

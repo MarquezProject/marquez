@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.NamespaceName;
 import marquez.db.NamespaceDao;
 import marquez.db.models.NamespaceRow;
 import marquez.service.exceptions.MarquezServiceException;

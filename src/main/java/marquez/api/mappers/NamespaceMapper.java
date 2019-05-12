@@ -16,7 +16,7 @@ package marquez.api.mappers;
 
 import lombok.NonNull;
 import marquez.api.models.NamespaceRequest;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.NamespaceName;
 import marquez.service.models.Namespace;
 
 public final class NamespaceMapper {

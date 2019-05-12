@@ -14,7 +14,7 @@
 
 package marquez.db;
 
-import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.common.types.TypeGenerator.newNamespaceName;
 import static marquez.db.models.DbModelGenerator.newNamespaceRow;
 import static marquez.db.models.DbModelGenerator.newNamespaceRowWith;
 import static marquez.db.models.DbModelGenerator.newNamespaceRows;
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.NamespaceName;
 import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;

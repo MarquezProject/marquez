@@ -16,8 +16,8 @@ package marquez.db;
 
 import java.util.List;
 import java.util.Optional;
-import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceUrn;
+import marquez.common.types.DatasourceName;
+import marquez.common.types.DatasourceUrn;
 import marquez.db.mappers.DatasourceRowMapper;
 import marquez.db.models.DatasourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;

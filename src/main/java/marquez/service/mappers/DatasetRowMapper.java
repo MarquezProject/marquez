@@ -16,10 +16,10 @@ package marquez.service.mappers;
 
 import java.util.UUID;
 import lombok.NonNull;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.DatasourceName;
-import marquez.common.models.Description;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.DatasetUrn;
+import marquez.common.types.DatasourceName;
+import marquez.common.types.Description;
+import marquez.common.types.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.NamespaceRow;

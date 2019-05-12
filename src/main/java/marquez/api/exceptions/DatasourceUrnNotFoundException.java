@@ -17,7 +17,7 @@ package marquez.api.exceptions;
 import static marquez.common.Preconditions.checkNotNull;
 
 import javax.ws.rs.NotFoundException;
-import marquez.common.models.DatasourceUrn;
+import marquez.common.types.DatasourceUrn;
 
 public final class DatasourceUrnNotFoundException extends NotFoundException {
   private static final long serialVersionUID = 1L;

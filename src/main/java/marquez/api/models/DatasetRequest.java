@@ -8,9 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasourceUrn;
-import marquez.common.models.Description;
+import marquez.common.types.DatasetName;
+import marquez.common.types.DatasourceUrn;
+import marquez.common.types.Description;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode

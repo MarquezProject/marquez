@@ -14,17 +14,17 @@
 
 package marquez.api.mappers;
 
-import static marquez.common.models.Description.NO_DESCRIPTION;
+import static marquez.common.types.Description.NO_DESCRIPTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Optional;
 import marquez.api.models.DatasetType;
 import marquez.api.models.DbTableVersionRequest;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DbSchemaName;
-import marquez.common.models.DbTableName;
-import marquez.common.models.Description;
+import marquez.common.types.ConnectionUrl;
+import marquez.common.types.DbSchemaName;
+import marquez.common.types.DbTableName;
+import marquez.common.types.Description;
 import marquez.service.models.DbTableVersion;
 import org.junit.Test;
 

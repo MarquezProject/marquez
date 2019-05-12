@@ -14,7 +14,7 @@
 
 package marquez.db;
 
-import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
+import static marquez.common.types.TypeGenerator.newDatasetUrn;
 import static marquez.db.models.DbModelGenerator.newDatasetRowWith;
 import static marquez.db.models.DbModelGenerator.newDatasetRowsWith;
 import static marquez.db.models.DbModelGenerator.newDatasourceRow;
@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.UUID;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.DatasetUrn;
+import marquez.common.types.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetRowExtended;
 import marquez.db.models.DatasourceRow;

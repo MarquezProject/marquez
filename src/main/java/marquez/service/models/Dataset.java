@@ -17,10 +17,10 @@ package marquez.service.models;
 import java.time.Instant;
 import lombok.Builder;
 import lombok.Data;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.DatasourceUrn;
-import marquez.common.models.Description;
+import marquez.common.types.DatasetName;
+import marquez.common.types.DatasetUrn;
+import marquez.common.types.DatasourceUrn;
+import marquez.common.types.Description;
 
 @Data
 @Builder

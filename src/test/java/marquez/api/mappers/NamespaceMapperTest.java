@@ -15,14 +15,14 @@
 package marquez.api.mappers;
 
 import static marquez.api.models.ApiModelGenerator.newNamespaceRequest;
-import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.common.types.TypeGenerator.newNamespaceName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.util.Optional;
 import marquez.UnitTests;
 import marquez.api.models.NamespaceRequest;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.NamespaceName;
 import marquez.service.models.Namespace;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

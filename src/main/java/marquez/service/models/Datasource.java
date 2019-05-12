@@ -17,9 +17,9 @@ package marquez.service.models;
 import java.time.Instant;
 import lombok.Builder;
 import lombok.Data;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceUrn;
+import marquez.common.types.ConnectionUrl;
+import marquez.common.types.DatasourceName;
+import marquez.common.types.DatasourceUrn;
 
 @Data
 @Builder

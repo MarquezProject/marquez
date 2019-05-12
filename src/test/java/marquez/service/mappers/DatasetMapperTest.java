@@ -14,8 +14,8 @@
 
 package marquez.service.mappers;
 
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
-import static marquez.common.models.Description.NO_DESCRIPTION;
+import static marquez.common.types.TypeGenerator.newDatasourceUrn;
+import static marquez.common.types.Description.NO_DESCRIPTION;
 import static marquez.db.models.DbModelGenerator.newDatasetRow;
 import static marquez.db.models.DbModelGenerator.newDatasetRowExtended;
 import static marquez.db.models.DbModelGenerator.newDatasetRowExtendedWith;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.util.List;
 import marquez.UnitTests;
-import marquez.common.models.DatasourceUrn;
+import marquez.common.types.DatasourceUrn;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetRowExtended;
 import marquez.service.models.Dataset;

@@ -40,7 +40,7 @@ import marquez.api.models.JobResponse;
 import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobsResponse;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.NamespaceName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;

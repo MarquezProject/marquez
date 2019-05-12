@@ -17,9 +17,9 @@ package marquez.service.models;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Data;
-import marquez.common.models.Description;
-import marquez.common.models.NamespaceName;
-import marquez.common.models.OwnerName;
+import marquez.common.types.Description;
+import marquez.common.types.NamespaceName;
+import marquez.common.types.OwnerName;
 
 @Data
 public class Namespace {

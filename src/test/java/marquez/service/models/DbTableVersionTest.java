@@ -18,13 +18,13 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Optional;
 import marquez.UnitTests;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.DbSchemaName;
-import marquez.common.models.DbTableName;
-import marquez.common.models.Description;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.ConnectionUrl;
+import marquez.common.types.DatasetName;
+import marquez.common.types.DatasetUrn;
+import marquez.common.types.DbSchemaName;
+import marquez.common.types.DbTableName;
+import marquez.common.types.Description;
+import marquez.common.types.NamespaceName;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 

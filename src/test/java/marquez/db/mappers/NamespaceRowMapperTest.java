@@ -14,9 +14,9 @@
 
 package marquez.db.mappers;
 
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.CommonModelGenerator.newNamespaceName;
-import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static marquez.common.types.TypeGenerator.newDescription;
+import static marquez.common.types.TypeGenerator.newNamespaceName;
+import static marquez.common.types.TypeGenerator.newOwnerName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.mock;
@@ -28,9 +28,9 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 import marquez.UnitTests;
-import marquez.common.models.Description;
-import marquez.common.models.NamespaceName;
-import marquez.common.models.OwnerName;
+import marquez.common.types.Description;
+import marquez.common.types.NamespaceName;
+import marquez.common.types.OwnerName;
 import marquez.db.Columns;
 import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.core.statement.StatementContext;

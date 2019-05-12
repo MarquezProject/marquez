@@ -17,7 +17,7 @@ package marquez.db;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.NamespaceName;
 import marquez.db.mappers.NamespaceRowMapper;
 import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;

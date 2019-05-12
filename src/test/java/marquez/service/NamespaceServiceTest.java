@@ -1,8 +1,8 @@
 package marquez.service;
 
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.CommonModelGenerator.newNamespaceName;
-import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static marquez.common.types.TypeGenerator.newDescription;
+import static marquez.common.types.TypeGenerator.newNamespaceName;
+import static marquez.common.types.TypeGenerator.newOwnerName;
 import static marquez.db.models.DbModelGenerator.newNamespaceRows;
 import static marquez.service.models.ServiceModelGenerator.newNamespace;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
-import marquez.common.models.Description;
-import marquez.common.models.NamespaceName;
-import marquez.common.models.OwnerName;
+import marquez.common.types.Description;
+import marquez.common.types.NamespaceName;
+import marquez.common.types.OwnerName;
 import marquez.db.NamespaceDao;
 import marquez.db.models.NamespaceRow;
 import marquez.service.exceptions.MarquezServiceException;

@@ -19,10 +19,10 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import lombok.NonNull;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.DatasourceUrn;
-import marquez.common.models.Description;
+import marquez.common.types.DatasetName;
+import marquez.common.types.DatasetUrn;
+import marquez.common.types.DatasourceUrn;
+import marquez.common.types.Description;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetRowExtended;
 import marquez.service.models.Dataset;

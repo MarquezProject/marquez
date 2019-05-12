@@ -15,24 +15,24 @@
 package marquez.db.models;
 
 import static java.util.stream.Collectors.toList;
-import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
-import static marquez.common.models.CommonModelGenerator.newDatasetName;
-import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
-import static marquez.common.models.CommonModelGenerator.newDatasourceName;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.CommonModelGenerator.newNamespaceName;
-import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static marquez.common.types.TypeGenerator.newConnectionUrl;
+import static marquez.common.types.TypeGenerator.newDatasetName;
+import static marquez.common.types.TypeGenerator.newDatasetUrn;
+import static marquez.common.types.TypeGenerator.newDatasourceName;
+import static marquez.common.types.TypeGenerator.newDatasourceUrn;
+import static marquez.common.types.TypeGenerator.newDescription;
+import static marquez.common.types.TypeGenerator.newNamespaceName;
+import static marquez.common.types.TypeGenerator.newOwnerName;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceUrn;
-import marquez.common.models.Description;
-import marquez.common.models.NamespaceName;
+import marquez.common.types.DatasetUrn;
+import marquez.common.types.DatasourceName;
+import marquez.common.types.DatasourceUrn;
+import marquez.common.types.Description;
+import marquez.common.types.NamespaceName;
 
 public final class DbModelGenerator {
   private DbModelGenerator() {}

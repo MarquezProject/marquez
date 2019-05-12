@@ -19,9 +19,9 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import lombok.NonNull;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceUrn;
+import marquez.common.types.ConnectionUrl;
+import marquez.common.types.DatasourceName;
+import marquez.common.types.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
 import marquez.service.models.Datasource;
 
