@@ -17,15 +17,17 @@ package marquez.api.mappers;
 import marquez.api.models.JobRunResponse;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
+import lombok.NonNull;
 
-public class CoreJobRunToApiJobRunResponseMapper extends Mapper<JobRun, JobRunResponse> {
-  @Override
-  public JobRunResponse map(JobRun value) {
+public final class JobRunResponseMapper {
+  private JobRunResponseMapper() {}
+
+  public static JobRunResponse map(@NonNull JobRun jobRun) {
     return new JobRunResponse(
-        value.getGuid(),
-        value.getNominalStartTime() == null ? null : value.getNominalStartTime().toString(),
-        value.getNominalEndTime() == null ? null : value.getNominalEndTime().toString(),
-        value.getRunArgs(),
-        JobRunState.State.fromInt(value.getCurrentState()).name());
+        jobRun.getGuid(),
+        jobRun.getNominalStartTime() == null ? null : jobRun.getNominalStartTime().toString(),
+        jobRun.getNominalEndTime() == null ? null : jobRun.getNominalEndTime().toString(),
+        jobRun.getRunArgs(),
+        JobRunState.State.fromInt(jobRun.getCurrentState()).name());
   }
 }
