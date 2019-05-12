@@ -17,8 +17,8 @@ package marquez.api.mappers;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
-import lombok.NonNull;
 import java.util.List;
+import lombok.NonNull;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobRunsResponse;
 import marquez.service.models.JobRun;
