@@ -57,10 +57,10 @@ public final class DatasetResource {
     this.datasetService = datasetService;
   }
 
-  @POST
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @POST
   @Path("/namespaces/{namespace}/datasets")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
@@ -74,10 +74,10 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces/{namespace}/datasets/{urn}")
   @Produces(APPLICATION_JSON)
   public Response get(
@@ -90,10 +90,10 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces/{namespace}/datasets")
   @Produces(APPLICATION_JSON)
   public Response list(

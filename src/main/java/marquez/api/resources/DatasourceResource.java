@@ -53,10 +53,10 @@ public final class DatasourceResource {
     this.datasourceService = datasourceService;
   }
 
-  @POST
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @POST
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(@Valid @NonNull final DatasourceRequest request)
@@ -75,10 +75,10 @@ public final class DatasourceResource {
     return Response.status(OK).entity(DatasourceResponseMapper.map(createdDatasource)).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Produces(APPLICATION_JSON)
   @Path("/{urn}")
   public Response get(@PathParam("urn") @NonNull final DatasourceUrn urn)
@@ -89,10 +89,10 @@ public final class DatasourceResource {
     return Response.ok(DatasourceResponseMapper.map(datasource)).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Produces(APPLICATION_JSON)
   public Response list(
       @QueryParam("limit") @DefaultValue("100") Integer limit,
