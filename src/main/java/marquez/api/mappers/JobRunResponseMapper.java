@@ -14,20 +14,33 @@
 
 package marquez.api.mappers;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+
 import lombok.NonNull;
+import java.util.List;
 import marquez.api.models.JobRunResponse;
+import marquez.api.models.JobRunsResponse;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
 
 public final class JobRunResponseMapper {
   private JobRunResponseMapper() {}
 
-  public static JobRunResponse map(@NonNull JobRun jobRun) {
+  public static JobRunResponse map(@NonNull JobRun run) {
     return new JobRunResponse(
-        jobRun.getGuid(),
-        jobRun.getNominalStartTime() == null ? null : jobRun.getNominalStartTime().toString(),
-        jobRun.getNominalEndTime() == null ? null : jobRun.getNominalEndTime().toString(),
-        jobRun.getRunArgs(),
-        JobRunState.State.fromInt(jobRun.getCurrentState()).name());
+        run.getGuid(),
+        run.getNominalStartTime() == null ? null : run.getNominalStartTime().toString(),
+        run.getNominalEndTime() == null ? null : run.getNominalEndTime().toString(),
+        run.getRunArgs(),
+        JobRunState.State.fromInt(run.getCurrentState()).name());
+  }
+
+  public static List<JobRunResponse> map(@NonNull List<JobRun> runs) {
+    return unmodifiableList(runs.stream().map(run -> map(run)).collect(toList()));
+  }
+
+  public static JobRunsResponse toJobRunsResponse(@NonNull List<JobRun> runs) {
+    return new JobRunsResponse(map(runs));
   }
 }
