@@ -14,10 +14,10 @@
 
 package marquez.api.mappers;
 
+import lombok.NonNull;
 import marquez.api.models.JobRunResponse;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
-import lombok.NonNull;
 
 public final class JobRunResponseMapper {
   private JobRunResponseMapper() {}
