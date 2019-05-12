@@ -14,8 +14,8 @@
 
 package marquez.service.mappers;
 
-import static marquez.common.types.TypeGenerator.newDatasourceUrn;
 import static marquez.common.types.Description.NO_DESCRIPTION;
+import static marquez.common.types.TypeGenerator.newDatasourceUrn;
 import static marquez.db.models.DbModelGenerator.newDatasetRow;
 import static marquez.db.models.DbModelGenerator.newDatasetRowExtended;
 import static marquez.db.models.DbModelGenerator.newDatasetRowExtendedWith;

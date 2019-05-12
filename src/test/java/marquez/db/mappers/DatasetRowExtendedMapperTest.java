@@ -14,11 +14,11 @@
 
 package marquez.db.mappers;
 
+import static marquez.common.types.Description.NO_DESCRIPTION;
 import static marquez.common.types.TypeGenerator.newDatasetName;
 import static marquez.common.types.TypeGenerator.newDatasetUrn;
 import static marquez.common.types.TypeGenerator.newDatasourceUrn;
 import static marquez.common.types.TypeGenerator.newDescription;
-import static marquez.common.types.Description.NO_DESCRIPTION;
 import static marquez.db.models.DbModelGenerator.newRowUuid;
 import static marquez.db.models.DbModelGenerator.newTimestamp;
 import static org.assertj.core.api.Assertions.assertThat;
