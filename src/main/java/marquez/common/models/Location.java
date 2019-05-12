@@ -12,20 +12,17 @@
  * limitations under the License.
  */
 
-package marquez.api.mappers;
+package marquez.common.models;
 
-import marquez.api.models.JobResponse;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-public class ApiJobToCoreJobMapper extends Mapper<JobResponse, marquez.service.models.Job> {
-  @Override
-  public marquez.service.models.Job map(JobResponse value) {
-    return new marquez.service.models.Job(
-        null,
-        value.getName(),
-        value.getLocation(),
-        null,
-        value.getDescription(),
-        value.getInputDatasetUrns(),
-        value.getOutputDatasetUrns());
-  }
+@RequiredArgsConstructor(staticName = "fromString")
+@EqualsAndHashCode
+@ToString
+public final class Location {
+  @Getter @NonNull private final String value;
 }
