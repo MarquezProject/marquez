@@ -85,6 +85,7 @@ public final class JobResource {
             new JobResponse(
                 jobName.getValue(),
                 null,
+                null,
                 request.getInputDatasetUrns(),
                 request.getOutputDatasetUrns(),
                 request.getLocation(),
