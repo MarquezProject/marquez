@@ -16,6 +16,7 @@ package marquez.api.mappers;
 
 import static marquez.api.models.ApiModelGenerator.newJobRequest;
 import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
@@ -52,7 +53,7 @@ public class JobMapperTest {
     assertThat(job.getInputDatasetUrns()).containsAll(request.getInputDatasetUrns());
     assertThat(job.getOutputDatasetUrns()).containsAll(request.getOutputDatasetUrns());
     assertThat(job.getLocation()).isEqualTo(request.getLocation());
-    assertThat(job.getDescription()).isNull();
+    assertThat(job.getDescription()).isEqualTo(NO_DESCRIPTION.getValue());
   }
 
   @Test
