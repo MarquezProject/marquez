@@ -57,10 +57,10 @@ public final class DatasetResource {
     this.datasetService = datasetService;
   }
 
-  @POST
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @POST
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(
@@ -73,10 +73,10 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("{urn}")
   @Produces(APPLICATION_JSON)
   public Response get(
@@ -89,10 +89,10 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,

@@ -38,6 +38,7 @@ public final class JobRowMapper implements RowMapper<Job> {
         results.getString(Columns.DESCRIPTION),
         arrayOrThrow(results, Columns.INPUT_DATASET_URNS),
         arrayOrThrow(results, Columns.OUTPUT_DATASET_URNS),
-        timestampOrThrow(results, Columns.CREATED_AT));
+        timestampOrThrow(results, Columns.CREATED_AT),
+        timestampOrThrow(results, Columns.UPDATED_AT));
   }
 }
