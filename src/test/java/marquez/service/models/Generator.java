@@ -46,6 +46,8 @@ public class Generator {
   }
 
   public static Job genJob(UUID namespaceID) {
+    final Instant createdAt = Instant.now();
+    final Instant updatedAt = createdAt;
     int jobNum = randNum();
     return new Job(
         UUID.randomUUID(),
@@ -55,7 +57,8 @@ public class Generator {
         null,
         Arrays.asList(randUrn(), randUrn()),
         Arrays.asList(randUrn(), randUrn()),
-        Instant.now());
+        updatedAt,
+        updatedAt);
   }
 
   public static Job cloneJob(Job job) {
@@ -67,7 +70,8 @@ public class Generator {
         job.getDescription(),
         job.getInputDatasetUrns(),
         job.getOutputDatasetUrns(),
-        job.getCreatedAt());
+        job.getCreatedAt(),
+        job.getUpdatedAt());
   }
 
   // Job Runs
