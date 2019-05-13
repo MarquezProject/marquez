@@ -43,6 +43,7 @@ import marquez.service.models.Datasource;
 import marquez.service.models.Generator;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DatasourceResourceTest {
@@ -217,7 +218,7 @@ public class DatasourceResourceTest {
         .isEqualTo(ds1.getConnectionUrl().getRawValue());
   }
 
-  @Test
+  @Ignore("https://github.com/MarquezProject/marquez/issues/496")
   public void testCreateDatasource_invalidDatasource() throws MarquezServiceException {
     final String invalidDatasourceType = "xyz_postgres_999";
 

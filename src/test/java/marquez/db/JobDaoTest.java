@@ -177,6 +177,7 @@ public class JobDaoTest {
             "description",
             Collections.<String>emptyList(),
             Collections.<String>emptyList(),
+            null,
             null);
     JobVersion jobVersion = Generator.genJobVersion(jobWithEmptyInputsOutputs);
     jobDao.insertJobAndVersion(jobWithEmptyInputsOutputs, jobVersion);
