@@ -16,6 +16,7 @@ package marquez.common.models;
 
 import static java.util.stream.Collectors.toList;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -50,12 +51,12 @@ public final class CommonModelGenerator {
     return JobName.fromString(value);
   }
 
-  public static Location newLocation() {
+  public static URI newLocation() {
     return newLocationWith("https://github.com/repo/test/commit/" + newId());
   }
 
-  public static Location newLocationWith(String value) {
-    return Location.fromString(value);
+  public static URI newLocationWith(String value) {
+    return URI.create(value);
   }
 
   public static DatasourceType newDatasourceType() {

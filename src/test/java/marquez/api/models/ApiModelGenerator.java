@@ -57,7 +57,7 @@ public final class ApiModelGenerator {
     return new JobRequest(
         inputDatasetUrns,
         outputDatasetUrns,
-        newLocation().getValue(),
+        newLocation().toString(),
         hasDescription ? newDescription().getValue() : null);
   }
 }
