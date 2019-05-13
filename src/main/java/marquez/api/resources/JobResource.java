@@ -63,10 +63,10 @@ public final class JobResource {
     this.jobService = jobService;
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
@@ -84,10 +84,10 @@ public final class JobResource {
     return Response.status(Response.Status.CREATED).entity(coreJobToApiJobMapper.map(job)).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Produces(APPLICATION_JSON)
   public Response getJob(
@@ -104,10 +104,10 @@ public final class JobResource {
     return Response.status(Response.Status.NOT_FOUND).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces/{namespace}/jobs")
   @Produces(APPLICATION_JSON)
   public Response listJobs(@PathParam("namespace") NamespaceName namespaceName)
@@ -120,10 +120,10 @@ public final class JobResource {
     return Response.ok().entity(response).build();
   }
 
-  @POST
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @POST
   @Path("namespaces/{namespace}/jobs/{job}/runs")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
@@ -151,10 +151,10 @@ public final class JobResource {
         .build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/jobs/runs/{id}")
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("id") final UUID runId) throws MarquezServiceException {
@@ -165,38 +165,38 @@ public final class JobResource {
     return Response.status(Response.Status.NOT_FOUND).build();
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/jobs/runs/{id}/run")
   public Response runJobRun(@PathParam("id") final String runId) throws MarquezServiceException {
     return processJobRunStateUpdate(runId, JobRunState.State.RUNNING);
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/jobs/runs/{id}/complete")
   public Response completeJobRun(@PathParam("id") final String runId)
       throws MarquezServiceException {
     return processJobRunStateUpdate(runId, JobRunState.State.COMPLETED);
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/jobs/runs/{id}/fail")
   public Response failJobRun(@PathParam("id") final String runId) throws MarquezServiceException {
     return processJobRunStateUpdate(runId, JobRunState.State.FAILED);
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/jobs/runs/{id}/abort")
   public Response abortJobRun(@PathParam("id") final String runId) throws MarquezServiceException {
     return processJobRunStateUpdate(runId, JobRunState.State.ABORTED);

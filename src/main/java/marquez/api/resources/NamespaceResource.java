@@ -48,10 +48,10 @@ public final class NamespaceResource {
     this.namespaceService = namespaceService;
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/namespaces/{namespace}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
@@ -64,10 +64,10 @@ public final class NamespaceResource {
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces/{namespace}")
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("namespace") NamespaceName namespaceName)
@@ -80,10 +80,10 @@ public final class NamespaceResource {
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces")
   @Produces(APPLICATION_JSON)
   public Response list() throws MarquezServiceException {
