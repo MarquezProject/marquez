@@ -276,7 +276,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
     final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    return new JobResponse(jobName, null, inputList, outputList, location, description);
+    return new JobResponse(jobName, null, null, inputList, outputList, location, description);
   }
 
   private JobRunResponse getJobRunApiResponse(UUID jobRunGuid) {
