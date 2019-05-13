@@ -45,7 +45,7 @@ import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 
-@Path("/api/v1")
+@Path("/api/v1/namespaces/{namespace}/datasets")
 public final class DatasetResource {
   private final NamespaceService namespaceService;
   private final DatasetService datasetService;
@@ -57,11 +57,10 @@ public final class DatasetResource {
     this.datasetService = datasetService;
   }
 
-  @POST
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
-  @Path("/namespaces/{namespace}/datasets")
+  @POST
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(
@@ -74,11 +73,11 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
-  @Path("/namespaces/{namespace}/datasets/{urn}")
+  @GET
+  @Path("{urn}")
   @Produces(APPLICATION_JSON)
   public Response get(
       @PathParam("namespace") NamespaceName namespaceName, @PathParam("urn") DatasetUrn urn)
@@ -90,11 +89,10 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
-  @Path("/namespaces/{namespace}/datasets")
+  @GET
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
