@@ -57,7 +57,7 @@ public class Generator {
         null,
         Arrays.asList(randUrn(), randUrn()),
         Arrays.asList(randUrn(), randUrn()),
-        updatedAt,
+        createdAt,
         updatedAt);
   }
 
