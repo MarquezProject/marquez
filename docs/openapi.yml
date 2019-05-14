@@ -449,7 +449,7 @@ components:
           type: string
       example:
         name: wework
-        createdAt: 2018-10-04T15:01:23.045Z
+        createdAt: 2019-05-09T19:49:24.201361Z
         owner: dataengineering
         description: A namespace for core jobs and datasets at wework.
 
@@ -504,11 +504,11 @@ components:
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
           type: string
-          format: long
+          format: date-time
         updatedAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.
           type: string
-          format: long
+          format: date-time
         inputDatasetUrns:
           description: The URN list of input datasets.
           type: array
@@ -532,8 +532,8 @@ components:
           type: string
       example:
         name: room_bookings_7_days
-        createdAt: 1546584262373
-        updatedAt: 1546586497777
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
         inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
         outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
@@ -564,7 +564,7 @@ components:
           format: URI
       example:
         version: b39b5cea-bc2e-42a5-a4ab-5329ae9fc54f
-        createdAt: 2018-10-04T15:01:23.045Z
+        createdAt: 2019-05-09T19:49:24.201361
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
 
     jobVersions:
@@ -683,13 +683,18 @@ components:
           description: The URN of the dataset.
           type: string
           format: URN
+        datasourceUrn:
+          description: The URN of the datasource associated with the dataset.
+          type: string
+          format: URN
         description:
           description:  The description of the dataset.
           type: string
       example:
         name: wedata.room_bookings
-        createdAt: 2018-10-04T15:01:23.045Z
+        createdAt: 2019-05-09T19:49:24.201361Z
         urn: urn:dataset:analytics_db:wedata.room_bookings
+        datasourceUrn: urn:datasource:postgresql:analytics_db
         description: "All room booking occupancy data."
 
     datasets:
@@ -734,7 +739,7 @@ components:
           description: The url to be used to connect to the datasource.
       example:
         name: financials_db
-        createdAt: 2018-09-02T11:01:12.022Z
+        createdAt: 2019-05-09T19:49:24.201361Z
         urn: urn:datasource:postgresql:financials_db
         connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
 

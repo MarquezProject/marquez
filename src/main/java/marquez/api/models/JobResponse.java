@@ -14,7 +14,6 @@
 
 package marquez.api.models;
 
-import java.sql.Timestamp;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +25,9 @@ import lombok.NoArgsConstructor;
 public final class JobResponse {
   private String name;
 
-  private Timestamp createdAt;
+  private String createdAt;
+
+  private String updatedAt;
 
   private List<String> inputDatasetUrns;
 

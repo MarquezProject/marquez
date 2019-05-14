@@ -23,7 +23,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -156,7 +155,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     Namespace secondNamespace =
         new Namespace(
             UUID.randomUUID(),
-            Timestamp.from(Instant.now()),
+            Instant.now(),
             "someOtherName",
             "someOtherOwner",
             "a second ns for testing");

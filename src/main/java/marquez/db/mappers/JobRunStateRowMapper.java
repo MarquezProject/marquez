@@ -14,6 +14,8 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.timestampOrThrow;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -29,7 +31,7 @@ public class JobRunStateRowMapper implements RowMapper<JobRunState> {
       throws SQLException {
     return new JobRunState(
         results.getObject(Columns.ROW_UUID, UUID.class),
-        results.getTimestamp(Columns.TRANSITIONED_AT),
+        timestampOrThrow(results, Columns.TRANSITIONED_AT),
         results.getObject(Columns.JOB_RUN_UUID, UUID.class),
         JobRunState.State.fromInt(results.getInt(Columns.RUN_STATE)));
   }

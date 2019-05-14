@@ -6,11 +6,11 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Status
 
-This project is under active development at the [We Company](https://www.we.co) and [Stitch Fix](https://www.stitchfix.com) (in collaboration with many others organizations).
+This project is under active development at [The We Company](https://www.we.co) and [Stitch Fix](https://www.stitchfix.com) (in collaboration with many others organizations).
 
 ## Documentation
 
-The [Marquez design](https://drive.google.com/open?id=1zxvp-6jv4Gs7eAGFmK0fbKbYL9cbEQrRJKLk3ez4PRA) is being actively updated and is open for comments.
+We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/master/docs).
 
 ## Requirements
 
@@ -37,6 +37,11 @@ $ cp config.example.yml config.yml
 
 You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`.
 
+By default, Marquez uses the following ports:
+
+* TCP port `8080` is available for the app server.
+* TCP port `8081` is available for the admin interface.
+
 **Note:** All environment variables in `config.yml` are accessed with [`${VAR_NAME}`](https://www.dropwizard.io/1.3.5/docs/manual/core.html#environment-variables).
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
@@ -52,6 +57,8 @@ Then browse to the admin interface: http://localhost:8081
 ```
 $ docker-compose up
 ```
+
+Marquez listens on port `5000` for all API calls and port `5001` for the admin interface.
 
 ## Getting involved
 

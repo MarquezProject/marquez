@@ -19,7 +19,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -65,10 +65,10 @@ public final class JobResource {
     this.jobService = jobService;
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
@@ -85,6 +85,7 @@ public final class JobResource {
             new JobResponse(
                 jobName.getValue(),
                 null,
+                null,
                 request.getInputDatasetUrns(),
                 request.getOutputDatasetUrns(),
                 request.getLocation(),
@@ -96,10 +97,10 @@ public final class JobResource {
         .build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Produces(APPLICATION_JSON)
   public Response getJob(
@@ -116,10 +117,10 @@ public final class JobResource {
     return Response.status(Response.Status.NOT_FOUND).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces/{namespace}/jobs")
   @Produces(APPLICATION_JSON)
   public Response listJobs(@PathParam("namespace") NamespaceName namespaceName)
@@ -132,10 +133,10 @@ public final class JobResource {
     return Response.ok().entity(response).build();
   }
 
-  @POST
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @POST
   @Path("namespaces/{namespace}/jobs/{job}/runs")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
@@ -156,17 +157,17 @@ public final class JobResource {
             namespaceName.getValue(),
             jobName.getValue(),
             request.getRunArgs().orElse(null),
-            request.getNominalStartTime().map(Timestamp::valueOf).orElse(null),
-            request.getNominalEndTime().map(Timestamp::valueOf).orElse(null));
+            request.getNominalStartTime().map(Instant::parse).orElse(null),
+            request.getNominalEndTime().map(Instant::parse).orElse(null));
     return Response.status(Response.Status.CREATED)
         .entity(coreJobRunToApiJobRunMapper.map(createdJobRun))
         .build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/jobs/runs/{id}")
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("id") final UUID runId) throws MarquezServiceException {
@@ -177,38 +178,38 @@ public final class JobResource {
     return Response.status(Response.Status.NOT_FOUND).build();
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/jobs/runs/{id}/run")
   public Response runJobRun(@PathParam("id") final String runId) throws MarquezServiceException {
     return processJobRunStateUpdate(runId, JobRunState.State.RUNNING);
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/jobs/runs/{id}/complete")
   public Response completeJobRun(@PathParam("id") final String runId)
       throws MarquezServiceException {
     return processJobRunStateUpdate(runId, JobRunState.State.COMPLETED);
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/jobs/runs/{id}/fail")
   public Response failJobRun(@PathParam("id") final String runId) throws MarquezServiceException {
     return processJobRunStateUpdate(runId, JobRunState.State.FAILED);
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/jobs/runs/{id}/abort")
   public Response abortJobRun(@PathParam("id") final String runId) throws MarquezServiceException {
     return processJobRunStateUpdate(runId, JobRunState.State.ABORTED);

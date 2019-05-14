@@ -21,11 +21,13 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
 import marquez.db.DatasourceDao;
 import marquez.db.NamespaceDao;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetRowExtended;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
@@ -73,14 +75,19 @@ public class DatasetService {
                       new MarquezServiceException(
                           "Datasource row not found: " + dataset.getDatasourceUrn().getValue()));
       final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, dataset);
-      final DatasetUrn urn = DatasetUrn.fromString(newDatasetRow.getUrn());
-      final Optional<Dataset> datasetIfFound = get(urn);
+      final DatasetUrn datasetUrn = DatasetUrn.fromString(newDatasetRow.getUrn());
+      final Optional<Dataset> datasetIfFound = get(datasetUrn);
       if (datasetIfFound.isPresent()) {
         return datasetIfFound.get();
       }
       return datasetDao
           .insertAndGet(newDatasetRow)
-          .map(DatasetMapper::map)
+          .map(
+              datasetRow -> {
+                final DatasourceUrn datasourceUrn =
+                    DatasourceUrn.fromString(datasourceRow.getUrn());
+                return DatasetMapper.map(datasourceUrn, datasetRow);
+              })
           .orElseThrow(
               () ->
                   new MarquezServiceException(
@@ -102,8 +109,11 @@ public class DatasetService {
         DbTableVersionRowMapper.map(datasetRow, dbTableInfoRow, dbTableVersion);
     try {
       datasetDao.insertAll(datasourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
-      final Optional<DatasetRow> datasetRowIfFound = datasetDao.findBy(datasetRow.getUuid());
-      return datasetRowIfFound.map(DatasetMapper::map).orElseThrow(MarquezServiceException::new);
+      final Optional<DatasetRowExtended> datasetRowExtendedIfFound =
+          datasetDao.findBy(datasetRow.getUuid());
+      return datasetRowExtendedIfFound
+          .map(DatasetMapper::map)
+          .orElseThrow(MarquezServiceException::new);
     } catch (UnableToExecuteStatementException e) {
       log.error(e.getMessage());
       throw new MarquezServiceException();
@@ -132,8 +142,9 @@ public class DatasetService {
       @NonNull NamespaceName namespaceName, @NonNull Integer limit, @NonNull Integer offset)
       throws MarquezServiceException {
     try {
-      final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, limit, offset);
-      return unmodifiableList(DatasetMapper.map(datasetRows));
+      final List<DatasetRowExtended> datasetRowsExtended =
+          datasetDao.findAll(namespaceName, limit, offset);
+      return unmodifiableList(DatasetMapper.map(datasetRowsExtended));
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get datasets for namespace: {}", namespaceName.getValue(), e);
       throw new MarquezServiceException();

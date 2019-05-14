@@ -29,6 +29,7 @@ import marquez.IntegrationTests;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetRowExtended;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.core.Jdbi;
@@ -137,10 +138,11 @@ public class DatasetDaoTest {
     final UUID currentVersionUuid = UUID.randomUUID();
     datasetDao.updateCurrentVersionUuid(datasetRow.getUuid(), currentVersionUuid);
 
-    final DatasetRow datasetRowWithVersion = datasetDao.findBy(datasetRow.getUuid()).orElse(null);
-    assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isNotNull();
-    assertThat(datasetRowWithVersion.getCurrentVersionUuid()).isEqualTo(currentVersionUuid);
-    assertThat(datasetRowWithVersion.getUpdatedAt()).isAfter(datasetRow.getUpdatedAt());
+    final DatasetRowExtended datasetRowExtendedWithVersion =
+        datasetDao.findBy(datasetRow.getUuid()).orElse(null);
+    assertThat(datasetRowExtendedWithVersion.getCurrentVersionUuid()).isNotNull();
+    assertThat(datasetRowExtendedWithVersion.getCurrentVersionUuid()).isEqualTo(currentVersionUuid);
+    assertThat(datasetRowExtendedWithVersion.getUpdatedAt()).isAfter(datasetRow.getUpdatedAt());
   }
 
   @Test
@@ -161,9 +163,9 @@ public class DatasetDaoTest {
         newDatasetRowWith(uuid, namespaceRow.getUuid(), datasourceRow.getUuid());
     datasetDao.insert(newDatasetRow);
 
-    final DatasetRow datasetRow = datasetDao.findBy(uuid).orElse(null);
-    assertThat(datasetRow).isNotNull();
-    assertThat(datasetRow.getUuid()).isEqualTo(uuid);
+    final DatasetRowExtended datasetRowExtended = datasetDao.findBy(uuid).orElse(null);
+    assertThat(datasetRowExtended).isNotNull();
+    assertThat(datasetRowExtended.getUuid()).isEqualTo(uuid);
   }
 
   @Test
@@ -178,9 +180,9 @@ public class DatasetDaoTest {
         newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid(), datasetUrn);
     datasetDao.insert(newDatasetRow);
 
-    final DatasetRow datasetRow = datasetDao.findBy(datasetUrn).orElse(null);
-    assertThat(datasetRow).isNotNull();
-    assertThat(datasetRow.getUrn()).isEqualTo(datasetUrn.getValue());
+    final DatasetRowExtended datasetRowExtended = datasetDao.findBy(datasetUrn).orElse(null);
+    assertThat(datasetRowExtended).isNotNull();
+    assertThat(datasetRowExtended.getUrn()).isEqualTo(datasetUrn.getValue());
   }
 
   @Test
@@ -190,15 +192,17 @@ public class DatasetDaoTest {
         newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), rowsToInsert);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
 
-    final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, LIMIT, OFFSET);
-    assertThat(datasetRows).isNotNull();
-    assertThat(datasetRows).hasSize(rowsToInsert);
+    final List<DatasetRowExtended> datasetRowsExtended =
+        datasetDao.findAll(namespaceName, LIMIT, OFFSET);
+    assertThat(datasetRowsExtended).isNotNull();
+    assertThat(datasetRowsExtended).hasSize(rowsToInsert);
   }
 
   @Test
   public void testFindAll_noRowsFound() {
-    final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, LIMIT, OFFSET);
-    assertThat(datasetRows).isEmpty();
+    final List<DatasetRowExtended> datasetRowsExtended =
+        datasetDao.findAll(namespaceName, LIMIT, OFFSET);
+    assertThat(datasetRowsExtended).isEmpty();
   }
 
   @Test
@@ -207,11 +211,12 @@ public class DatasetDaoTest {
         newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
 
-    final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, 2, OFFSET);
-    assertThat(datasetRows).isNotNull();
-    assertThat(datasetRows).hasSize(2);
-    assertThat(datasetRows.get(0).getUuid()).isEqualTo(newDatasetRows.get(0).getUuid());
-    assertThat(datasetRows.get(1).getUuid()).isEqualTo(newDatasetRows.get(1).getUuid());
+    final List<DatasetRowExtended> datasetRowsExtended =
+        datasetDao.findAll(namespaceName, 2, OFFSET);
+    assertThat(datasetRowsExtended).isNotNull();
+    assertThat(datasetRowsExtended).hasSize(2);
+    assertThat(datasetRowsExtended.get(0).getUuid()).isEqualTo(newDatasetRows.get(0).getUuid());
+    assertThat(datasetRowsExtended.get(1).getUuid()).isEqualTo(newDatasetRows.get(1).getUuid());
   }
 
   @Test
@@ -220,10 +225,11 @@ public class DatasetDaoTest {
         newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
 
-    final List<DatasetRow> datasetRows = datasetDao.findAll(namespaceName, LIMIT, 2);
-    assertThat(datasetRows).isNotNull();
-    assertThat(datasetRows).hasSize(2);
-    assertThat(datasetRows.get(0).getUuid()).isEqualTo(newDatasetRows.get(2).getUuid());
-    assertThat(datasetRows.get(1).getUuid()).isEqualTo(newDatasetRows.get(3).getUuid());
+    final List<DatasetRowExtended> datasetRowsExtended =
+        datasetDao.findAll(namespaceName, LIMIT, 2);
+    assertThat(datasetRowsExtended).isNotNull();
+    assertThat(datasetRowsExtended).hasSize(2);
+    assertThat(datasetRowsExtended.get(0).getUuid()).isEqualTo(newDatasetRows.get(2).getUuid());
+    assertThat(datasetRowsExtended.get(1).getUuid()).isEqualTo(newDatasetRows.get(3).getUuid());
   }
 }

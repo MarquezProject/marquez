@@ -17,6 +17,7 @@ package marquez.api.models;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
 public final class ApiModelGenerator {
   private ApiModelGenerator() {}
@@ -28,5 +29,14 @@ public final class ApiModelGenerator {
   public static DatasetRequest newDatasetRequest(boolean hasDescription) {
     return new DatasetRequest(
         newDatasetName(), newDatasourceUrn(), hasDescription ? newDescription() : null);
+  }
+
+  public static NamespaceRequest newNamespaceRequest() {
+    return newNamespaceRequest(true);
+  }
+
+  public static NamespaceRequest newNamespaceRequest(boolean hasDescription) {
+    return new NamespaceRequest(
+        newOwnerName().getValue(), hasDescription ? newDescription().getValue() : null);
   }
 }

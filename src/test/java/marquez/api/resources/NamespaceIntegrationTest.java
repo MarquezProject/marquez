@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URI;
-import java.sql.Timestamp;
+import java.time.Instant;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -45,7 +45,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
 
     NamespaceResponse responseBody = res.readEntity(NamespaceResponse.class);
 
-    assertThat(Timestamp.valueOf(responseBody.getCreatedAt())).isAfter(START_TIME);
+    assertThat(Instant.parse(responseBody.getCreatedAt())).isAfter(START_TIME);
     assertThat(responseBody.getOwner()).isEqualTo(OWNER);
     assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
   }
@@ -65,7 +65,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
             .put(Entity.json(createNamespaceRequest));
     NamespaceResponse responseBody = res.readEntity(NamespaceResponse.class);
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    assertThat(Timestamp.valueOf(responseBody.getCreatedAt())).isAfter(START_TIME);
+    assertThat(Instant.parse(responseBody.getCreatedAt())).isAfter(START_TIME);
     assertThat(responseBody.getOwner()).isEqualTo(OWNER);
     assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
   }

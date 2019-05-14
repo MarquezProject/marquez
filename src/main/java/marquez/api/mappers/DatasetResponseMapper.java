@@ -14,6 +14,7 @@
 
 package marquez.api.mappers;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
@@ -21,19 +22,18 @@ import java.util.List;
 import lombok.NonNull;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
-import marquez.common.models.Description;
 import marquez.service.models.Dataset;
 
 public final class DatasetResponseMapper {
   private DatasetResponseMapper() {}
 
   public static DatasetResponse map(@NonNull Dataset dataset) {
-    final Description description = dataset.getDescription();
     return new DatasetResponse(
         dataset.getName().getValue(),
-        dataset.getCreatedAt().toString(),
+        ISO_INSTANT.format(dataset.getCreatedAt()),
         dataset.getUrn().getValue(),
-        (description == null) ? null : description.getValue());
+        dataset.getDatasourceUrn().getValue(),
+        (dataset.getDescription() == null) ? null : dataset.getDescription().getValue());
   }
 
   public static List<DatasetResponse> map(@NonNull List<Dataset> datasets) {

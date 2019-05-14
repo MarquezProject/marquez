@@ -14,6 +14,7 @@
 
 package marquez.api.mappers;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
@@ -29,14 +30,13 @@ public final class NamespaceResponseMapper {
   public static NamespaceResponse map(@NonNull Namespace namespace) {
     return new NamespaceResponse(
         namespace.getName(),
-        namespace.getCreatedAt().toString(),
+        ISO_INSTANT.format(namespace.getCreatedAt()),
         namespace.getOwnerName(),
         namespace.getDescription());
   }
 
   public static List<NamespaceResponse> map(@NonNull List<Namespace> namespaces) {
-    return unmodifiableList(
-        namespaces.stream().map(datasource -> map(datasource)).collect(toList()));
+    return unmodifiableList(namespaces.stream().map(namespace -> map(namespace)).collect(toList()));
   }
 
   public static NamespacesResponse toNamespacesResponse(@NonNull List<Namespace> namespaces) {

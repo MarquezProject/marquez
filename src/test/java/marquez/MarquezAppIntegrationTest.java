@@ -39,7 +39,6 @@ public class MarquezAppIntegrationTest {
               handle.execute("DELETE FROM job_versions;");
               handle.execute("DELETE FROM jobs;");
               handle.execute("DELETE FROM owners;");
-              handle.execute("DELETE FROM ownerships;");
             });
   }
 

@@ -30,7 +30,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import marquez.api.exceptions.NamespaceNotFoundException;
-import marquez.api.mappers.NamespaceApiMapper;
+import marquez.api.mappers.NamespaceMapper;
 import marquez.api.mappers.NamespaceResponseMapper;
 import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
@@ -42,33 +42,32 @@ import marquez.service.models.Namespace;
 
 @Path("/api/v1")
 public final class NamespaceResource {
-  private final NamespaceApiMapper namespaceApiMapper = new NamespaceApiMapper();
   private final NamespaceService namespaceService;
 
   public NamespaceResource(@NonNull final NamespaceService namespaceService) {
     this.namespaceService = namespaceService;
   }
 
-  @PUT
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @PUT
   @Path("/namespaces/{namespace}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
       @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceRequest request)
       throws MarquezServiceException {
-    final Namespace namespace =
-        namespaceService.createOrUpdate(namespaceApiMapper.of(namespaceName.getValue(), request));
+    final Namespace newNamespace = NamespaceMapper.map(namespaceName, request);
+    final Namespace namespace = namespaceService.createOrUpdate(newNamespace);
     final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces/{namespace}")
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("namespace") NamespaceName namespaceName)
@@ -81,10 +80,10 @@ public final class NamespaceResource {
     return Response.ok(response).build();
   }
 
-  @GET
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
   @Path("/namespaces")
   @Produces(APPLICATION_JSON)
   public Response list() throws MarquezServiceException {
