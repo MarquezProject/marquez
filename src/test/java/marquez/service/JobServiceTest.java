@@ -30,7 +30,6 @@ import marquez.service.models.JobVersion;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -42,12 +41,8 @@ public class JobServiceTest {
   private static final JobRunArgsDao jobRunArgsDao = mock(JobRunArgsDao.class);
   private static final UUID namespaceID = UUID.randomUUID();
 
-  JobService jobService;
-
-  @Before
-  public void setUp() {
-    jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
-  }
+  private static JobService jobService =
+      new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
 
   @After
   public void tearDown() {

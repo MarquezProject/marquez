@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -80,17 +81,17 @@ public class DatasetServiceTest {
           .description(DESCRIPTION)
           .build();
 
-  private NamespaceDao namespaceDao;
-  private DatasourceDao datasourceDao;
-  private DatasetDao datasetDao;
-  private DatasetService datasetService;
+  private static final NamespaceDao namespaceDao = mock(NamespaceDao.class);
+  private static final DatasourceDao datasourceDao = mock(DatasourceDao.class);
+  private static final DatasetDao datasetDao = mock(DatasetDao.class);
+  private static final DatasetService datasetService =
+      new DatasetService(namespaceDao, datasourceDao, datasetDao);
 
   @Before
-  public void setUp() {
-    namespaceDao = mock(NamespaceDao.class);
-    datasourceDao = mock(DatasourceDao.class);
-    datasetDao = mock(DatasetDao.class);
-    datasetService = new DatasetService(namespaceDao, datasourceDao, datasetDao);
+  public void teardOwn() {
+    reset(namespaceDao);
+    reset(datasourceDao);
+    reset(datasetDao);
   }
 
   @Test
