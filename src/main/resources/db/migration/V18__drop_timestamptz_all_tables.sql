@@ -22,6 +22,8 @@ ALTER COLUMN created_at SET NOT NULL,
 ALTER COLUMN nominal_start_time TYPE timestamp,
 ALTER COLUMN nominal_end_time TYPE timestamp;
 
+UPDATE job_versions SET updated_at = CURRENT_TIMESTAMP;
+
 ALTER TABLE job_versions
 ALTER COLUMN created_at TYPE timestamp,
 ALTER COLUMN created_at SET NOT NULL,
