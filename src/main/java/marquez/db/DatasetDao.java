@@ -101,7 +101,7 @@ public interface DatasetDao {
           + "    ON (ns.guid = d.namespace_guid AND ns.name = :value) "
           + "INNER JOIN datasources AS ds "
           + "    ON (ds.guid = d.datasource_uuid)"
-          + "ORDER BY ns.name "
+          + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(DatasetRowExtendedMapper.class)
   List<DatasetRowExtended> findAll(
