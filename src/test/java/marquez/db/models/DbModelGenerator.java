@@ -15,14 +15,7 @@
 package marquez.db.models;
 
 import static java.util.stream.Collectors.toList;
-import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
-import static marquez.common.models.CommonModelGenerator.newDatasetName;
-import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
-import static marquez.common.models.CommonModelGenerator.newDatasourceName;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.CommonModelGenerator.newNamespaceName;
-import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static marquez.common.models.CommonModelGenerator.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -175,6 +168,44 @@ public final class DbModelGenerator {
             .namespaceUuid(namespaceUuid)
             .datasourceUuid(datasourceUuid)
             .name(newDatasetName().getValue())
+            .urn(datasetUrn.getValue())
+            .description(description.getValue());
+
+    if (wasUpdated) {
+      builder.updatedAt(newTimestamp());
+      builder.currentVersionUuid(newRowUuid());
+    }
+
+    return builder.build();
+  }
+
+  public static DatasetRow newDatasetRowWith(
+      UUID namespaceUuid, UUID datasourceUuid, String datasetName) {
+    return newDatasetRowWith(
+        newRowUuid(),
+        namespaceUuid,
+        datasourceUuid,
+        datasetName,
+        newDatasetUrn(),
+        newDescription(),
+        false);
+  }
+
+  public static DatasetRow newDatasetRowWith(
+      UUID uuid,
+      UUID namespaceUuid,
+      UUID datasourceUuid,
+      String datasetName,
+      DatasetUrn datasetUrn,
+      Description description,
+      boolean wasUpdated) {
+    final DatasetRow.DatasetRowBuilder builder =
+        DatasetRow.builder()
+            .uuid(uuid)
+            .createdAt(newTimestamp())
+            .namespaceUuid(namespaceUuid)
+            .datasourceUuid(datasourceUuid)
+            .name(newDatasetNameWith(datasetName).getValue())
             .urn(datasetUrn.getValue())
             .description(description.getValue());
 
