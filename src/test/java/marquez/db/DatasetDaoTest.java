@@ -22,10 +22,10 @@ import static marquez.db.models.DbModelGenerator.newNamespaceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
 import marquez.common.models.DatasetUrn;
@@ -209,18 +209,10 @@ public class DatasetDaoTest {
 
   @Test
   public void testFindAll_limitOnly() {
-    List<DatasetRow> newDatasetRows = new ArrayList<>();
-
-    Stream.<String>builder()
-        .add("a_test_dataset")
-        .add("b_test_dataset")
-        .build()
-        .forEach(
-            name ->
-                newDatasetRows.add(
-                    newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid(), name)));
-
+    final List<DatasetRow> newDatasetRows =
+        newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
+    Collections.sort(newDatasetRows, Comparator.comparing(DatasetRow::getName));
 
     final List<DatasetRowExtended> datasetRowsExtended =
         datasetDao.findAll(namespaceName, 2, OFFSET);
@@ -232,19 +224,10 @@ public class DatasetDaoTest {
 
   @Test
   public void testFindAll_offsetOnly() {
-    List<DatasetRow> newDatasetRows = new ArrayList<>();
-
-    Stream.<String>builder()
-        .add("a_test_dataset")
-        .add("b_test_dataset")
-        .add("c_test_dataset")
-        .add("d_test_dataset")
-        .build()
-        .forEach(
-            name ->
-                newDatasetRows.add(
-                    newDatasetRowWith(namespaceRow.getUuid(), datasourceRow.getUuid(), name)));
+    final List<DatasetRow> newDatasetRows =
+        newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
+    Collections.sort(newDatasetRows, Comparator.comparing(DatasetRow::getName));
 
     final List<DatasetRowExtended> datasetRowsExtended =
         datasetDao.findAll(namespaceName, LIMIT, 2);
