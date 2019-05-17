@@ -14,7 +14,12 @@
 
 package marquez.common.models;
 
+import static java.util.stream.Collectors.toList;
+
+import java.net.URI;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public final class CommonModelGenerator {
   private CommonModelGenerator() {}
@@ -36,6 +41,22 @@ public final class CommonModelGenerator {
 
   public static NamespaceName newNamespaceNameWith(String value) {
     return NamespaceName.fromString(value);
+  }
+
+  public static JobName newJobName() {
+    return newJobNameWith("test_job" + newId());
+  }
+
+  public static JobName newJobNameWith(String value) {
+    return JobName.fromString(value);
+  }
+
+  public static URI newLocation() {
+    return newLocationWith("https://github.com/repo/test/commit/" + newId());
+  }
+
+  public static URI newLocationWith(String value) {
+    return URI.create(value);
   }
 
   public static DatasourceType newDatasourceType() {
@@ -85,6 +106,10 @@ public final class CommonModelGenerator {
 
   public static DatasetName newDatasetNameWith(String value) {
     return DatasetName.fromString(value);
+  }
+
+  public static List<DatasetUrn> newDatasetUrns(int limit) {
+    return Stream.generate(() -> newDatasetUrn()).limit(limit).collect(toList());
   }
 
   public static DatasetUrn newDatasetUrn() {
