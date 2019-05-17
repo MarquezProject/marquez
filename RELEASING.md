@@ -1,4 +1,4 @@
 # Releasing
 
-1. Update the [`CHANGELOG.md`](CHANGELOG.md)
-2. `./gradlew release -Prelease.useAutomaticVersion=true`
+1. Update [`CHANGELOG.md`](CHANGELOG.md)
+2. Run `./gradlew release -Prelease.useAutomaticVersion=true`
