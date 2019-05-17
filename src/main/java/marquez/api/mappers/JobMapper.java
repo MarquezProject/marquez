@@ -14,18 +14,22 @@
 
 package marquez.api.mappers;
 
-import marquez.api.models.JobResponse;
+import lombok.NonNull;
+import marquez.api.models.JobRequest;
+import marquez.common.models.JobName;
+import marquez.service.models.Job;
 
-public class ApiJobToCoreJobMapper extends Mapper<JobResponse, marquez.service.models.Job> {
-  @Override
-  public marquez.service.models.Job map(JobResponse value) {
-    return new marquez.service.models.Job(
+public final class JobMapper {
+  private JobMapper() {}
+
+  public static Job map(@NonNull JobName jobName, @NonNull JobRequest request) {
+    return new Job(
         null,
-        value.getName(),
-        value.getLocation(),
+        jobName.getValue(),
+        request.getLocation(),
         null,
-        value.getDescription(),
-        value.getInputDatasetUrns(),
-        value.getOutputDatasetUrns());
+        request.getDescription().orElse(null),
+        request.getInputDatasetUrns(),
+        request.getOutputDatasetUrns());
   }
 }

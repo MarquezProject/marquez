@@ -33,11 +33,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.mappers.ApiJobToCoreJobMapper;
 import marquez.api.mappers.CoreJobRunToApiJobRunResponseMapper;
 import marquez.api.mappers.CoreJobToApiJobMapper;
+import marquez.api.mappers.JobMapper;
 import marquez.api.models.JobRequest;
-import marquez.api.models.JobResponse;
 import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobsResponse;
 import marquez.common.models.JobName;
@@ -55,7 +54,6 @@ public final class JobResource {
   private final JobService jobService;
   private final NamespaceService namespaceService;
 
-  private final ApiJobToCoreJobMapper apiJobToCoreJobMapper = new ApiJobToCoreJobMapper();
   private final CoreJobToApiJobMapper coreJobToApiJobMapper = new CoreJobToApiJobMapper();
   private final CoreJobRunToApiJobRunResponseMapper coreJobRunToApiJobRunMapper =
       new CoreJobRunToApiJobRunResponseMapper();
@@ -80,21 +78,10 @@ public final class JobResource {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    final Job jobToCreate =
-        apiJobToCoreJobMapper.map(
-            new JobResponse(
-                jobName.getValue(),
-                null,
-                null,
-                request.getInputDatasetUrns(),
-                request.getOutputDatasetUrns(),
-                request.getLocation(),
-                request.getDescription().orElse(null)));
-    jobToCreate.setNamespaceGuid(namespaceService.get(namespaceName).get().getGuid());
-    final Job createdJob = jobService.createJob(namespaceName.getValue(), jobToCreate);
-    return Response.status(Response.Status.CREATED)
-        .entity(coreJobToApiJobMapper.map(createdJob))
-        .build();
+    final Job newJob = JobMapper.map(jobName, request);
+    newJob.setNamespaceGuid(namespaceService.get(namespaceName).get().getGuid());
+    final Job job = jobService.createJob(namespaceName.getValue(), newJob);
+    return Response.status(Response.Status.CREATED).entity(coreJobToApiJobMapper.map(job)).build();
   }
 
   @Timed
