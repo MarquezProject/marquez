@@ -34,9 +34,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.mappers.CoreJobRunToApiJobRunResponseMapper;
-import marquez.api.mappers.CoreJobToApiJobMapper;
 import marquez.api.mappers.JobMapper;
+import marquez.api.mappers.JobResponseMapper;
 import marquez.api.models.JobRequest;
+import marquez.api.models.JobResponse;
 import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobsResponse;
 import marquez.common.models.JobName;
@@ -54,7 +55,6 @@ public final class JobResource {
   private final JobService jobService;
   private final NamespaceService namespaceService;
 
-  private final CoreJobToApiJobMapper coreJobToApiJobMapper = new CoreJobToApiJobMapper();
   private final CoreJobRunToApiJobRunResponseMapper coreJobRunToApiJobRunMapper =
       new CoreJobRunToApiJobRunResponseMapper();
 
@@ -81,7 +81,8 @@ public final class JobResource {
     final Job newJob = JobMapper.map(jobName, request);
     newJob.setNamespaceGuid(namespaceService.get(namespaceName).get().getGuid());
     final Job job = jobService.createJob(namespaceName.getValue(), newJob);
-    return Response.status(Response.Status.CREATED).entity(coreJobToApiJobMapper.map(job)).build();
+    final JobResponse response = JobResponseMapper.map(job);
+    return Response.status(Response.Status.CREATED).entity(response).build();
   }
 
   @Timed
@@ -99,7 +100,7 @@ public final class JobResource {
     final Optional<Job> returnedJob =
         jobService.getJob(namespaceName.getValue(), jobName.getValue());
     if (returnedJob.isPresent()) {
-      return Response.ok().entity(coreJobToApiJobMapper.map(returnedJob.get())).build();
+      return Response.ok().entity(JobResponseMapper.map(returnedJob.get())).build();
     }
     return Response.status(Response.Status.NOT_FOUND).build();
   }
@@ -115,8 +116,8 @@ public final class JobResource {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    final List<Job> jobList = jobService.getAllJobsInNamespace(namespaceName.getValue());
-    final JobsResponse response = new JobsResponse(coreJobToApiJobMapper.map(jobList));
+    final List<Job> jobs = jobService.getAllJobsInNamespace(namespaceName.getValue());
+    final JobsResponse response = JobResponseMapper.toJobsResponse(jobs);
     return Response.ok().entity(response).build();
   }
 
