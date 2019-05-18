@@ -127,10 +127,6 @@ public final class ServiceModelGenerator {
   }
 
   public static JobRun newJobRun() {
-    return newJobRun(true);
-  }
-
-  public static JobRun newJobRun(boolean hasDescription) {
     return new JobRun(null, 0, null, null, null, null, null, newTimestamp());
   }
 
