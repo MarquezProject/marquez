@@ -115,7 +115,7 @@ public final class ServiceModelGenerator {
         newJobName().getValue(),
         newLocation().toString(),
         null,
-        newDescription().getValue(),
+        hasDescription ? newDescription().getValue() : null,
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
         createdAt,

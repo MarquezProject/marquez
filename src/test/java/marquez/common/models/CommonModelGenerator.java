@@ -121,7 +121,7 @@ public final class CommonModelGenerator {
   }
 
   public static Description newDescription() {
-    return newDescriptionWith("test_desciption" + newId());
+    return newDescriptionWith("test_description" + newId());
   }
 
   public static Description newDescriptionWith(String value) {

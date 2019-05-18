@@ -56,6 +56,7 @@ public class JobResponseMapperTest {
     assertThat(response.getInputDatasetUrns()).containsAll(job.getInputDatasetUrns());
     assertThat(response.getOutputDatasetUrns()).containsAll(job.getOutputDatasetUrns());
     assertThat(response.getLocation()).isEqualTo(job.getLocation());
+    assertThat(response.getDescription()).isNull();
   }
 
   @Test
