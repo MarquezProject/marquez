@@ -122,6 +122,18 @@ public final class ServiceModelGenerator {
         updatedAt);
   }
 
+  public static List<JobRun> newJobRuns(int limit) {
+    return Stream.generate(() -> newJobRun()).limit(limit).collect(toList());
+  }
+
+  public static JobRun newJobRun() {
+    return newJobRun(true);
+  }
+
+  public static JobRun newJobRun(boolean hasDescription) {
+    return new JobRun(null, 0, null, null, null, null, null, newTimestamp());
+  }
+
   public static Instant newTimestamp() {
     return Instant.now();
   }
