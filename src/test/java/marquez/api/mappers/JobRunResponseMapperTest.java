@@ -32,66 +32,66 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTests.class)
 public class JobRunResponseMapperTest {
   @Test
-  public void testMap_jobRun() {
-    final JobRun jobRun = newJobRun();
-    final JobRunResponse response = JobRunResponseMapper.map(jobRun);
+  public void testMap_run() {
+    final JobRun run = newJobRun();
+    final JobRunResponse response = JobRunResponseMapper.map(run);
     assertThat(response).isNotNull();
-    assertThat(response.getRunId()).isEqualTo(jobRun.getGuid());
+    assertThat(response.getRunId()).isEqualTo(run.getGuid());
     assertThat(response.getRunState())
-        .isEqualTo(JobRunState.State.fromInt(jobRun.getCurrentState()).name());
-    assertThat(response.getRunArgs()).isEqualTo(jobRun.getRunArgs());
-    assertThat(response.getNominalStartTime()).isEqualTo(jobRun.getNominalStartTime());
-    assertThat(response.getNominalEndTime()).isEqualTo(jobRun.getNominalEndTime());
+        .isEqualTo(JobRunState.State.fromInt(run.getCurrentState()).name());
+    assertThat(response.getRunArgs()).isEqualTo(run.getRunArgs());
+    assertThat(response.getNominalStartTime()).isEqualTo(run.getNominalStartTime());
+    assertThat(response.getNominalEndTime()).isEqualTo(run.getNominalEndTime());
   }
 
   @Test
-  public void testMap_throwsException_onNullJobRun() {
-    final JobRun nullJobRun = null;
-    assertThatNullPointerException().isThrownBy(() -> JobRunResponseMapper.map(nullJobRun));
+  public void testMap_throwsException_onNullRun() {
+    final JobRun nullRun = null;
+    assertThatNullPointerException().isThrownBy(() -> JobRunResponseMapper.map(nullRun));
   }
 
   @Test
-  public void testMap_jobRuns() {
-    final List<JobRun> jobRuns = newJobRuns(4);
-    final List<JobRunResponse> responses = JobRunResponseMapper.map(jobRuns);
+  public void testMap_runs() {
+    final List<JobRun> runs = newJobRuns(4);
+    final List<JobRunResponse> responses = JobRunResponseMapper.map(runs);
     assertThat(responses).isNotNull();
     assertThat(responses).hasSize(4);
   }
 
   @Test
-  public void testMap_emptyJobRuns() {
-    final List<JobRun> emptyJobRuns = Collections.emptyList();
-    final List<JobRunResponse> emptyResponses = JobRunResponseMapper.map(emptyJobRuns);
+  public void testMap_emptyRuns() {
+    final List<JobRun> emptyRuns = Collections.emptyList();
+    final List<JobRunResponse> emptyResponses = JobRunResponseMapper.map(emptyRuns);
     assertThat(emptyResponses).isNotNull();
     assertThat(emptyResponses).isEmpty();
   }
 
   @Test
-  public void testMap_throwsException_onNullJobRuns() {
-    final List<JobRun> nullJobRuns = null;
-    assertThatNullPointerException().isThrownBy(() -> JobRunResponseMapper.map(nullJobRuns));
+  public void testMap_throwsException_onNullRuns() {
+    final List<JobRun> nullRuns = null;
+    assertThatNullPointerException().isThrownBy(() -> JobRunResponseMapper.map(nullRuns));
   }
 
   @Test
   public void testToJobRunsResponse() {
-    final List<JobRun> jobRuns = newJobRuns(4);
-    final JobRunsResponse response = JobRunResponseMapper.toJobRunsResponse(jobRuns);
+    final List<JobRun> runs = newJobRuns(4);
+    final JobRunsResponse response = JobRunResponseMapper.toJobRunsResponse(runs);
     assertThat(response).isNotNull();
     assertThat(response.getRuns()).hasSize(4);
   }
 
   @Test
-  public void testToJobRunsResponse_emptyJobRuns() {
-    final List<JobRun> emptyJobRuns = Collections.emptyList();
-    final JobRunsResponse response = JobRunResponseMapper.toJobRunsResponse(emptyJobRuns);
+  public void testToJobRunsResponse_emptyRuns() {
+    final List<JobRun> emptyRuns = Collections.emptyList();
+    final JobRunsResponse response = JobRunResponseMapper.toJobRunsResponse(emptyRuns);
     assertThat(response).isNotNull();
     assertThat(response.getRuns()).isEmpty();
   }
 
   @Test
-  public void testToJobRunsResponse_throwsException_onNullJobs() {
-    final List<JobRun> nullJobRuns = null;
+  public void testToJobRunsResponse_throwsException_onNullRuns() {
+    final List<JobRun> nullRuns = null;
     assertThatNullPointerException()
-        .isThrownBy(() -> JobRunResponseMapper.toJobRunsResponse(nullJobRuns));
+        .isThrownBy(() -> JobRunResponseMapper.toJobRunsResponse(nullRuns));
   }
 }
