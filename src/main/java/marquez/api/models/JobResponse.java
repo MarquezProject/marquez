@@ -27,6 +27,8 @@ public final class JobResponse {
 
   private String createdAt;
 
+  private String updatedAt;
+
   private List<String> inputDatasetUrns;
 
   private List<String> outputDatasetUrns;

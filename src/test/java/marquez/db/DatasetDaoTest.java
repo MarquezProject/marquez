@@ -22,6 +22,8 @@ import static marquez.db.models.DbModelGenerator.newNamespaceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import marquez.DataAccessTests;
@@ -210,6 +212,7 @@ public class DatasetDaoTest {
     final List<DatasetRow> newDatasetRows =
         newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
+    Collections.sort(newDatasetRows, Comparator.comparing(DatasetRow::getName));
 
     final List<DatasetRowExtended> datasetRowsExtended =
         datasetDao.findAll(namespaceName, 2, OFFSET);
@@ -224,6 +227,7 @@ public class DatasetDaoTest {
     final List<DatasetRow> newDatasetRows =
         newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
+    Collections.sort(newDatasetRows, Comparator.comparing(DatasetRow::getName));
 
     final List<DatasetRowExtended> datasetRowsExtended =
         datasetDao.findAll(namespaceName, LIMIT, 2);

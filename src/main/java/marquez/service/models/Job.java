@@ -20,20 +20,20 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 @AllArgsConstructor
 @EqualsAndHashCode
 public final class Job {
-  @NonNull @Getter private final UUID guid;
-  @NonNull @Getter private final String name;
-  @NonNull @Getter private final String location;
-  @NonNull @Getter @Setter private UUID namespaceGuid;
+  @Getter private final UUID guid;
+  @Getter private final String name;
+  @Getter private final String location;
+  @Getter @Setter private UUID namespaceGuid;
   @Getter private final String description;
   @Getter private final List<String> inputDatasetUrns;
   @Getter private final List<String> outputDatasetUrns;
   @Getter private final Instant createdAt;
+  @Getter private final Instant updatedAt;
 
   public Job(
       final UUID guid,
@@ -51,5 +51,6 @@ public final class Job {
     this.inputDatasetUrns = inputDatasetUrns;
     this.outputDatasetUrns = outputDatasetUrns;
     this.createdAt = null;
+    this.updatedAt = null;
   }
 }

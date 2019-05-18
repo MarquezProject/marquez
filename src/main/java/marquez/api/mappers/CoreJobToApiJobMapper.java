@@ -24,6 +24,7 @@ public class CoreJobToApiJobMapper extends Mapper<marquez.service.models.Job, Jo
     return new JobResponse(
         value.getName(),
         ISO_INSTANT.format(value.getCreatedAt()),
+        ISO_INSTANT.format(value.getUpdatedAt()),
         value.getInputDatasetUrns(),
         value.getOutputDatasetUrns(),
         value.getLocation(),
