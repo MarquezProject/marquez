@@ -30,6 +30,7 @@ import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetRowExtended;
 import marquez.service.models.Dataset;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -61,12 +62,14 @@ public class DatasetMapperTest {
     assertThat(dataset.getDescription().getValue()).isNull();
   }
 
+  @Ignore
   public void testMap_throwsException_onNullDatasourceUrn() {
     final DatasourceUrn nullDatasourceUrn = null;
     assertThatNullPointerException()
         .isThrownBy(() -> DatasetMapper.map(nullDatasourceUrn, newDatasetRow()));
   }
 
+  @Ignore
   public void testMap_throwsException_onNullRow() {
     final DatasetRow nullRow = null;
     assertThatNullPointerException()
@@ -97,6 +100,7 @@ public class DatasetMapperTest {
     assertThat(dataset.getDescription().getValue()).isNull();
   }
 
+  @Ignore
   public void testMap_throwsException_onNullRowExtended() {
     final DatasetRowExtended nullRowExtended = null;
     assertThatNullPointerException().isThrownBy(() -> DatasetMapper.map(nullRowExtended));
