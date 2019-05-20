@@ -62,6 +62,7 @@ public class DatasourceMapperTest {
     assertThat(emptyDatasources).isEmpty();
   }
 
+  @Test
   public void testMap_throwsException_onNullRows() {
     final List<DatasourceRow> nullRows = null;
     assertThatNullPointerException().isThrownBy(() -> DatasourceMapper.map(nullRows));
