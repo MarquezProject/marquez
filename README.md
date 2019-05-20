@@ -42,7 +42,7 @@ With your database created, you can now copy [`config.example.yml`](https://gith
 $ cp config.example.yml config.yml
 ```
 
-You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): **`POSTGRES_DB`**, **`POSTGRES_USER`**, and **`POSTGRES_PASSWORD`**. The environment variable overrides the equivalent option in the configuration file. 
+You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`. The environment variables override the equivalent option in the configuration file. 
 
 By default, Marquez uses the following ports:
 
