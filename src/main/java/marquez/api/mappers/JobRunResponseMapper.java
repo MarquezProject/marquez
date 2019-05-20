@@ -14,6 +14,7 @@
 
 package marquez.api.mappers;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
@@ -30,8 +31,8 @@ public final class JobRunResponseMapper {
   public static JobRunResponse map(@NonNull JobRun run) {
     return new JobRunResponse(
         run.getGuid(),
-        run.getNominalStartTime() == null ? null : run.getNominalStartTime().toString(),
-        run.getNominalEndTime() == null ? null : run.getNominalEndTime().toString(),
+        run.getNominalStartTime() == null ? null : ISO_INSTANT.format(run.getNominalStartTime()),
+        run.getNominalEndTime() == null ? null : ISO_INSTANT.format(run.getNominalEndTime()),
         run.getRunArgs(),
         JobRunState.State.fromInt(run.getCurrentState()).name());
   }
