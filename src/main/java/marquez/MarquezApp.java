@@ -136,8 +136,8 @@ public class MarquezApp extends Application<MarquezConfig> {
     final JobVersionDao jobVersionDao = jdbi.onDemand(JobVersionDao.class);
     final JobRunDao jobRunDao = jdbi.onDemand(JobRunDao.class);
     final JobRunArgsDao jobRunArgsDao = jdbi.onDemand(JobRunArgsDao.class);
-    final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
     final DatasourceDao datasourceDao = jdbi.onDemand(DatasourceDao.class);
+    final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
 
     final NamespaceService namespaceService = new NamespaceService(namespaceDao);
     final JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
