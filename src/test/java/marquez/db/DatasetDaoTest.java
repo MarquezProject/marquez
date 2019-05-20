@@ -38,20 +38,21 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.jdbi.v3.testing.Migration;
+import org.junit.*;
 import org.junit.experimental.categories.Category;
 
 @Category({DataAccessTests.class, IntegrationTests.class})
 public class DatasetDaoTest {
   private static final int LIMIT = 100;
   private static final int OFFSET = 0;
+  private static final Migration migration = Migration.before();
 
   @ClassRule
   public static final JdbiRule dbRule =
-      JdbiRule.embeddedPostgres().withPlugin(new SqlObjectPlugin()).migrateWithFlyway();
+      JdbiRule.embeddedPostgres()
+          .withPlugin(new SqlObjectPlugin())
+          .withMigration(migration.withDefaultPath());
 
   private static NamespaceDao namespaceDao;
   private static DatasourceDao datasourceDao;
@@ -67,6 +68,11 @@ public class DatasetDaoTest {
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
     datasourceDao = jdbi.onDemand(DatasourceDao.class);
     datasetDao = jdbi.onDemand(DatasetDao.class);
+  }
+
+  @AfterClass
+  public static void cleanup() {
+    migration.cleanAfter();
   }
 
   @Before
