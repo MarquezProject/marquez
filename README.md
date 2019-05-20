@@ -23,7 +23,7 @@ We invite everyone to help us improve and keep documentation up to date. Documen
 
 To build the entire project run:
 
-```bash
+```
 $ ./gradlew shadowJar
 ```
 The executable can be found under `build/libs/`
@@ -32,13 +32,13 @@ The executable can be found under `build/libs/`
 
 To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. When creating your database using [`psql`](https://www.postgresql.org/docs/9.6/app-psql.html), we recommend calling it `marquez`:
 
-```bash
+```
 $ createdb marquez;
 ```
 
 With your database created, you can now copy [`config.example.yml`](https://github.com/MarquezProject/marquez/blob/master/config.example.yml):
 
-```bash
+```
 $ cp config.example.yml config.yml
 ```
 
