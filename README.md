@@ -33,13 +33,13 @@ The executable can be found under `build/libs/`
 1. Create a PostgreSQL database for Marquez. When creating your database, we recommend calling it `marquez`.
 2. To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. Please copy [`config.example.yml`](https://github.com/MarquezProject/marquez/blob/master/config.example.yml):
 
-  ```bash
-  $ cp config.example.yml config.yml
-  ```
+    ```bash
+    $ cp config.example.yml config.yml
+    ```
 
-  You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): **`POSTGRES_DB`**, **`POSTGRES_USER`**, and **`POSTGRES_PASSWORD`**.
+    You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): **`POSTGRES_DB`**, **`POSTGRES_USER`**, and **`POSTGRES_PASSWORD`**.
 
-  **Note:** All environment variables in `config.yml` are accessed with [`${VAR_NAME}`](https://www.dropwizard.io/1.3.5/docs/manual/core.html#environment-variables).
+    **Note:** All environment variables in `config.yml` are accessed with [`${VAR_NAME}`](https://www.dropwizard.io/1.3.5/docs/manual/core.html#environment-variables).
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
 
