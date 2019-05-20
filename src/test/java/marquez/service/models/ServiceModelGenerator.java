@@ -18,9 +18,12 @@ import static java.util.stream.Collectors.toList;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
+import static marquez.common.models.CommonModelGenerator.newDatasetUrns;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
@@ -48,7 +51,7 @@ public final class ServiceModelGenerator {
   public static Namespace newNamespace(boolean hasDescription) {
     return new Namespace(
         null,
-        Instant.now(),
+        newTimestamp(),
         newNamespaceName().getValue(),
         newOwnerName().getValue(),
         hasDescription ? newDescription().getValue() : null);
@@ -96,7 +99,30 @@ public final class ServiceModelGenerator {
         .build();
   }
 
-  private static Instant newTimestamp() {
+  public static List<Job> newJobs(int limit) {
+    return Stream.generate(() -> newJob()).limit(limit).collect(toList());
+  }
+
+  public static Job newJob() {
+    return newJob(true);
+  }
+
+  public static Job newJob(boolean hasDescription) {
+    final Instant createdAt = newTimestamp();
+    final Instant updatedAt = createdAt;
+    return new Job(
+        null,
+        newJobName().getValue(),
+        newLocation().toString(),
+        null,
+        hasDescription ? newDescription().getValue() : null,
+        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
+        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
+        createdAt,
+        updatedAt);
+  }
+
+  public static Instant newTimestamp() {
     return Instant.now();
   }
 }

@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = true)
-@ToString
+@ToString(callSuper = true)
 public final class DatasetRowExtended extends DatasetRow {
   @Getter private String datasourceUrn;
 

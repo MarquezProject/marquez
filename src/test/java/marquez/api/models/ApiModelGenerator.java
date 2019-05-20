@@ -22,7 +22,7 @@ import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
-import java.util.List;
+import marquez.common.models.DatasetUrn;
 
 public final class ApiModelGenerator {
   private ApiModelGenerator() {}
@@ -50,13 +50,9 @@ public final class ApiModelGenerator {
   }
 
   public static JobRequest newJobRequest(boolean hasDescription) {
-    final List<String> inputDatasetUrns =
-        newDatasetUrns(4).stream().map(datasetUrn -> datasetUrn.getValue()).collect(toList());
-    final List<String> outputDatasetUrns =
-        newDatasetUrns(2).stream().map(datasetUrn -> datasetUrn.getValue()).collect(toList());
     return new JobRequest(
-        inputDatasetUrns,
-        outputDatasetUrns,
+        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
+        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
         newLocation().toString(),
         hasDescription ? newDescription().getValue() : null);
   }
