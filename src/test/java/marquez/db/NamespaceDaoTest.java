@@ -28,6 +28,8 @@ import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
+import org.jdbi.v3.testing.Migration;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -35,9 +37,13 @@ import org.junit.experimental.categories.Category;
 
 @Category({DataAccessTests.class, IntegrationTests.class})
 public class NamespaceDaoTest {
+  private static final Migration migration = Migration.before();
+
   @ClassRule
   public static final JdbiRule dbRule =
-      JdbiRule.embeddedPostgres().withPlugin(new SqlObjectPlugin()).migrateWithFlyway();
+      JdbiRule.embeddedPostgres()
+          .withPlugin(new SqlObjectPlugin())
+          .withMigration(migration.withDefaultPath());
 
   private static NamespaceDao namespaceDao;
 
@@ -45,6 +51,11 @@ public class NamespaceDaoTest {
   public static void setUpOnce() {
     final Jdbi jdbi = dbRule.getJdbi();
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
+  }
+
+  @AfterClass
+  public static void cleanup() {
+    migration.cleanAfter();
   }
 
   @Test
