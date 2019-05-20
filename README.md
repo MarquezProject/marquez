@@ -30,16 +30,26 @@ The executable can be found under `build/libs/`
 
 ## Configuration
 
-1. Create a PostgreSQL database for Marquez. When creating your database, we recommend calling it `marquez`.
-2. To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. Please copy [`config.example.yml`](https://github.com/MarquezProject/marquez/blob/master/config.example.yml):
+To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. When creating your database using [`psql`](https://www.postgresql.org/docs/9.6/app-psql.html), we recommend calling it `marquez`:
 
-    ```bash
-    $ cp config.example.yml config.yml
-    ```
+```bash
+$ createdb marquez;
+```
 
-    You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): **`POSTGRES_DB`**, **`POSTGRES_USER`**, and **`POSTGRES_PASSWORD`**.
+With your database created, you can now copy [`config.example.yml`](https://github.com/MarquezProject/marquez/blob/master/config.example.yml):
 
-    **Note:** All environment variables in `config.yml` are accessed with [`${VAR_NAME}`](https://www.dropwizard.io/1.3.5/docs/manual/core.html#environment-variables).
+```bash
+$ cp config.example.yml config.yml
+```
+
+You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): **`POSTGRES_DB`**, **`POSTGRES_USER`**, and **`POSTGRES_PASSWORD`**. The environment variable overrides the equivalent option in the configuration file. 
+
+By default, Marquez uses the following ports:
+
+* TCP port **`8080`** is available for the HTTP API server.
+* TCP port **`8081`** is available for the admin interface.
+
+**Note:** All of the configuration settings in `config.yml` can be specified either in the configuration file or in an environment variable.
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
 
@@ -47,10 +57,7 @@ The executable can be found under `build/libs/`
 $ ./gradlew run --args 'server config.yml'
 ```
 
-By default, Marquez uses the following ports:
-
-* TCP port **`8080`** is available for the app server.
-* TCP port **`8081`** is available for the admin interface.
+Then browse to the admin interface: http://localhost:8081
 
 ## Running with [Docker](./Dockerfile) 
 
