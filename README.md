@@ -20,12 +20,12 @@ Python 3.5.0+
 ## Installation & Usage
 ### pip install
 
-If the python package is hosted on Github, you can install directly from Github
+Marquez-Python is hosted on PyPi and can be installed from that repository.
 
 ```sh
-pip install git+https://github.com/GIT_USER_ID/GIT_REPO_ID.git
+pip install marquez-python
 ```
-(you may need to run `pip` with root permission: `sudo pip install git+https://github.com/GIT_USER_ID/GIT_REPO_ID.git`)
+(you may need to run `pip` with root permission: `sudo pip install marquez-python`)
 
 Then import the package:
 ```python
