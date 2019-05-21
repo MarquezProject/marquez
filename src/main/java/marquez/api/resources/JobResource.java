@@ -160,11 +160,9 @@ public final class JobResource {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
     }
-    final Optional<List<JobRun>> jobRuns = jobService.getAllRunsOfJob(namespaceName, job);
-    if (jobRuns.isPresent()) {
-      return Response.ok().entity(coreJobRunToApiJobRunMapper.map(jobRuns.get())).build();
-    }
-    return Response.status(Response.Status.NOT_FOUND).build();
+    return Response.ok()
+        .entity(coreJobRunToApiJobRunMapper.map(jobService.getAllRunsOfJob(namespaceName, job)))
+        .build();
   }
 
   @GET

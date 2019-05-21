@@ -116,6 +116,11 @@ public class JobRunDaoTest extends JobRunBaseTest {
         .isEqualTo(getLatestJobRunStateForJobId(CREATED_JOB_RUN_UUID));
   }
 
+  @Test
+  public void testFindAllByJobUuid(UUID jobUuid) {
+    
+  }
+
   private JobRunState getLatestJobRunStateForJobId(UUID jobRunId) {
     Handle handle = APP.getJDBI().open();
     Query qr =
