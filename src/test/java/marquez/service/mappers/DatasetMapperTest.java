@@ -61,12 +61,14 @@ public class DatasetMapperTest {
     assertThat(dataset.getDescription().getValue()).isNull();
   }
 
+  @Test
   public void testMap_throwsException_onNullDatasourceUrn() {
     final DatasourceUrn nullDatasourceUrn = null;
     assertThatNullPointerException()
         .isThrownBy(() -> DatasetMapper.map(nullDatasourceUrn, newDatasetRow()));
   }
 
+  @Test
   public void testMap_throwsException_onNullRow() {
     final DatasetRow nullRow = null;
     assertThatNullPointerException()
@@ -97,6 +99,7 @@ public class DatasetMapperTest {
     assertThat(dataset.getDescription().getValue()).isNull();
   }
 
+  @Test
   public void testMap_throwsException_onNullRowExtended() {
     final DatasetRowExtended nullRowExtended = null;
     assertThatNullPointerException().isThrownBy(() -> DatasetMapper.map(nullRowExtended));
@@ -118,6 +121,7 @@ public class DatasetMapperTest {
     assertThat(datasets).isEmpty();
   }
 
+  @Test
   public void testMap_throwsException_onNullRowsExtended() {
     final List<DatasetRowExtended> nullRowsExtended = null;
     assertThatNullPointerException().isThrownBy(() -> DatasetMapper.map(nullRowsExtended));
