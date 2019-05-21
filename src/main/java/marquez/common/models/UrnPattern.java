@@ -38,7 +38,7 @@ final class UrnPattern {
     checkArgument(numOfParts > 0, "numOfParts must be > 0");
     final String value =
         String.format(
-            "^%s%s%s(%s[a-zA-Z0-9._]{%d,%d}){%d}$",
+            "^%s%s%s(%s[a-zA-Z0-9._-]{%d,%d}){%d}$",
             PREFIX, DELIM, namespace, DELIM, MIN_SIZE, MAX_SIZE, numOfParts);
     return new UrnPattern(value);
   }
@@ -48,7 +48,7 @@ final class UrnPattern {
       throw new IllegalArgumentException(
           String.format(
               "urn (%s) must contain only letters (a-z, A-Z), numbers (0-9), periods (.), "
-                  + "or underscores (_) and be sperated by colons (:) with each part "
+                  + "underscores (_) or dashes (-) and be sperated by colons (:) with each part "
                   + "having a maximum length of 64 characters",
               value));
     }
