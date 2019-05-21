@@ -30,20 +30,18 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
 import org.jdbi.v3.testing.Migration;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 public class DatasourceDaoTest {
   private static DatasourceDao datasourceDAO;
-  private static final Migration migration = Migration.before();
 
   @ClassRule
   public static final JdbiRule dbRule =
       JdbiRule.embeddedPostgres()
           .withPlugin(new SqlObjectPlugin())
-          .withMigration(migration.withDefaultPath());
+          .withMigration(Migration.before().withDefaultPath());
 
   @BeforeClass
   public static void setup() {
@@ -53,11 +51,6 @@ public class DatasourceDaoTest {
     datasourceDAO.insert(Generator.genDatasourceRow());
     datasourceDAO.insert(Generator.genDatasourceRow());
     datasourceDAO.insert(Generator.genDatasourceRow());
-  }
-
-  @AfterClass
-  public static void cleanup() {
-    migration.cleanAfter();
   }
 
   @Test
