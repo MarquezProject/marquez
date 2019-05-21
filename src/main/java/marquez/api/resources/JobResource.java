@@ -33,9 +33,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.mappers.CoreJobRunToApiJobRunResponseMapper;
 import marquez.api.mappers.JobMapper;
 import marquez.api.mappers.JobResponseMapper;
+import marquez.api.mappers.JobRunResponseMapper;
 import marquez.api.models.JobRequest;
 import marquez.api.models.JobResponse;
 import marquez.api.models.JobRunRequest;
@@ -54,9 +54,6 @@ import marquez.service.models.JobRunState;
 public final class JobResource {
   private final JobService jobService;
   private final NamespaceService namespaceService;
-
-  private final CoreJobRunToApiJobRunResponseMapper coreJobRunToApiJobRunMapper =
-      new CoreJobRunToApiJobRunResponseMapper();
 
   public JobResource(final NamespaceService namespaceService, final JobService jobService) {
     this.namespaceService = namespaceService;
@@ -148,7 +145,7 @@ public final class JobResource {
             request.getNominalStartTime().map(Instant::parse).orElse(null),
             request.getNominalEndTime().map(Instant::parse).orElse(null));
     return Response.status(Response.Status.CREATED)
-        .entity(coreJobRunToApiJobRunMapper.map(createdJobRun))
+        .entity(JobRunResponseMapper.map(createdJobRun))
         .build();
   }
 
@@ -161,7 +158,7 @@ public final class JobResource {
   public Response get(@PathParam("id") final UUID runId) throws MarquezServiceException {
     final Optional<JobRun> jobRun = jobService.getJobRun(runId);
     if (jobRun.isPresent()) {
-      return Response.ok().entity(coreJobRunToApiJobRunMapper.map(jobRun.get())).build();
+      return Response.ok().entity(JobRunResponseMapper.map(jobRun.get())).build();
     }
     return Response.status(Response.Status.NOT_FOUND).build();
   }
