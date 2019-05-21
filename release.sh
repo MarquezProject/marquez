@@ -37,8 +37,8 @@ version=$(python ./setup.py --version)
 echo "Upgrading version from the current version of ${version}"
 
 
-# The {new_version} is not a bash variable - it's a bumpversion notation for the new version.
-# Please see bumpversion --help for more information.
-bumpversion --current-version ${version} --commit --tag --tag-name {new_version} ${type} ./setup.py
+# The {new_version} is not a bash variable - it's a bump2version notation for the new version.
+# Please see bump2version --help for more information.
+bump2version --current-version ${version} --commit --tag --tag-name {new_version} ${type} ./setup.py
 git push --tags origin master
 echo "Done pushing to master"
