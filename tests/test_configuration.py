@@ -13,8 +13,9 @@
 import os
 
 import pytest
-from marquez_client import client
-from marquez_client.client import Client
+from marquez_client import MarquezClient
+from marquez_client.client import _DEFAULT_NAMESPACE_NAME
+from marquez_client.client import _DEFAULT_TIMEOUT_MS
 from pytest import fixture
 
 
@@ -25,87 +26,89 @@ def clear_env():
 
 def test_marquez_host_required(clear_env):
     with pytest.raises(ValueError):
-        Client(port=8080)
+        MarquezClient(port=8080)
 
 
 def test_marquez_port_required(clear_env):
     with pytest.raises(ValueError):
-        Client(host="localhost")
+        MarquezClient(host="localhost")
 
 
 def test_default_namespace(clear_env):
-    m = Client(host="localhost", port=8080)
-    assert m.namespace == client._DEFAULT_NAMESPACE_NAME
+    m = MarquezClient(host="localhost", port=8080)
+    assert m.namespace == _DEFAULT_NAMESPACE_NAME
 
 
 def test_namespace_name_from_env(clear_env):
     os.environ["MARQUEZ_NAMESPACE"] = "ns_from_env"
 
-    m = Client(host="localhost", port=8080)
+    m = MarquezClient(host="localhost", port=8080)
     assert m.namespace == "ns_from_env"
 
 
 def test_namespace_name_override(clear_env):
     os.environ["MARQUEZ_NAMESPACE"] = "ns_from_env"
 
-    m = Client(host="localhost", namespace_name="from_constructor", port=8080)
+    m = MarquezClient(
+        host="localhost", namespace_name="from_constructor", port=8080)
     assert m.namespace == "from_constructor"
 
 
 def test_set_client_namespace(clear_env):
     namespace_name = "someRandomNS"
-    m = Client(host="localhost", port=8080, namespace_name=namespace_name)
+    m = MarquezClient(
+        host="localhost", port=8080, namespace_name=namespace_name)
     assert m.namespace == namespace_name
 
 
 def test_host_override(clear_env):
     os.environ["MARQUEZ_HOST"] = "env_host"
-    m = Client(host="specified_host", port=8080)
+    m = MarquezClient(host="specified_host", port=8080)
     assert m._api_base == "http://specified_host:8080/api/v1"
 
 
 def test_host_from_env(clear_env):
     os.environ["MARQUEZ_HOST"] = "env_host"
-    m = Client(port=8080)
+    m = MarquezClient(port=8080)
     assert m._api_base == "http://env_host:8080/api/v1"
 
 
 def test_port_override(clear_env):
     os.environ["MARQUEZ_PORT"] = "9000"
-    m = Client(host="localhost", port=8080)
+    m = MarquezClient(host="localhost", port=8080)
     assert m._api_base == "http://localhost:8080/api/v1"
 
 
 def test_port_from_env(clear_env):
     os.environ["MARQUEZ_PORT"] = "9000"
-    m = Client(host="localhost")
+    m = MarquezClient(host="localhost")
     assert m._api_base == "http://localhost:9000/api/v1"
 
 
 def test_mixed_configuration(clear_env):
     os.environ["MARQUEZ_HOST"] = "localhost"
-    m = Client(port=9000)
+    m = MarquezClient(port=9000)
     assert m._api_base == "http://localhost:9000/api/v1"
 
 
 def test_timeout_from_env(clear_env):
     os.environ["MARQUEZ_TIMEOUT_MS"] = "3000"
-    m = Client(host="localhost", port=8080)
+    m = MarquezClient(host="localhost", port=8080)
     assert m._timeout == 3
 
 
 def test_default_timeout(clear_env):
-    m = Client(host="localhost", port=8080)
-    assert m._timeout == client._DEFAULT_TIMEOUT_MS / 1000.0
+    m = MarquezClient(host="localhost", port=8080)
+    assert m._timeout == _DEFAULT_TIMEOUT_MS / 1000.0
 
 
 def test_timeout_override(clear_env):
     os.environ["MARQUEZ_TIMEOUT_MS"] = "3000"
-    m = Client(host="localhost", port=8080, timeout_ms=7000)
+    m = MarquezClient(host="localhost", port=8080, timeout_ms=7000)
     assert m._timeout == 7.0
 
 
 def test_timeout_not_truncated(clear_env):
     os.environ["MARQUEZ_TIMEOUT_MS"] = "3500"
-    m = Client(host="localhost", port=8080)
+    m = MarquezClient(host="localhost", port=8080)
     assert m._timeout == 3.5

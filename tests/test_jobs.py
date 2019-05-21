@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import vcr
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 from marquez_client.constants import NOT_FOUND
 from pytest import fixture
 
@@ -25,7 +25,7 @@ def namespace_name():
 def namespace(namespace_name):
     owner_name = "some_owner"
     description = "this is a very nice namespace."
-    basic_marquez_client = Client(host="localhost", port=8080)
+    basic_marquez_client = MarquezClient(host="localhost", port=8080)
     created_ns = basic_marquez_client.create_namespace(
         namespace_name, owner_name, description)
     return created_ns
@@ -33,13 +33,13 @@ def namespace(namespace_name):
 
 @fixture(scope='class')
 def marquez_client_with_ns(namespace_name):
-    return Client(host="localhost", namespace_name=namespace_name,
-                  port=8080)
+    return MarquezClient(host="localhost", namespace_name=namespace_name,
+                         port=8080)
 
 
 @fixture(scope='class')
 def marquez_client_with_default_ns():
-    return Client(host="localhost", port=8080)
+    return MarquezClient(host="localhost", port=8080)
 
 
 @fixture(scope='class')
@@ -62,7 +62,7 @@ def job(marquez_client_with_ns, job_name):
 @vcr.use_cassette(
     'tests/fixtures/vcr/test_jobs/job_default_ns_for_jobs_test.yaml')
 def job_default_ns(job_name):
-    marquez_client = Client(host="localhost", port=8080)
+    marquez_client = MarquezClient(host="localhost", port=8080)
 
     input_datset_urns = ['input1a', 'input2a']
     output_datset_urns = ['output1a', 'output2a']

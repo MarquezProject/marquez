@@ -15,7 +15,7 @@ import sys
 
 import pytest
 import requests
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 from marquez_client.constants import NOT_FOUND
 from requests import ReadTimeout
 from urllib3.exceptions import MaxRetryError
@@ -43,21 +43,21 @@ def wait_for_marquez():
 
 
 def test_bad_host(wait_for_marquez):
-    c = Client(host="bad-host", port=MARQUEZ_PORT)
+    c = MarquezClient(host="bad-host", port=MARQUEZ_PORT)
     with pytest.raises(requests.exceptions.ConnectionError) as e:
         c.get_namespace("no_connection")
     assert isinstance(e.value.args[0], MaxRetryError)
 
 
 def test_bad_port(wait_for_marquez):
-    c = Client(host=MARQUEZ_HOST, port="6000")
+    c = MarquezClient(host=MARQUEZ_HOST, port="6000")
     with pytest.raises(requests.exceptions.ConnectionError) as e:
         c.get_namespace("no_connection")
     assert isinstance(e.value.args[0], MaxRetryError)
 
 
 def test_timeout(wait_for_marquez, broken_network):
-    c = Client(host=MARQUEZ_HOST, port=MARQUEZ_PORT, timeout_ms=1)
+    c = MarquezClient(host=MARQUEZ_HOST, port=MARQUEZ_PORT, timeout_ms=1)
 
     expected_namespace = "timeout_test"
     with pytest.raises(ReadTimeout):
@@ -65,7 +65,7 @@ def test_timeout(wait_for_marquez, broken_network):
 
 
 def test_namespace_not_found(wait_for_marquez):
-    c = Client(host=MARQUEZ_HOST, port=MARQUEZ_PORT)
+    c = MarquezClient(host=MARQUEZ_HOST, port=MARQUEZ_PORT)
 
     expected_namespace = "not_found"
     assert c.get_namespace(expected_namespace) == NOT_FOUND

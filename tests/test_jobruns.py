@@ -13,7 +13,7 @@
 import datetime
 
 import vcr
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 from pytest import fixture
 
 
@@ -24,8 +24,8 @@ def namespace_name():
 
 @fixture(scope='class')
 def marquez_client_default_ns():
-    return Client(host="localhost",
-                  port=8080)
+    return MarquezClient(host="localhost",
+                         port=8080)
 
 
 @fixture(scope='class')
@@ -41,8 +41,8 @@ def existing_namespace(marquez_client_default_ns, namespace_name):
 
 @fixture(scope='class')
 def marquez_client(namespace_name):
-    return Client(host="localhost", namespace_name=namespace_name,
-                  port=8080)
+    return MarquezClient(host="localhost", namespace_name=namespace_name,
+                         port=8080)
 
 
 @fixture(scope='class')

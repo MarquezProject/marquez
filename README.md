@@ -29,7 +29,7 @@ pip install marquez-python
 
 Then import the package:
 ```python
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 ```
 
 ### Setuptools
@@ -44,7 +44,7 @@ python setup.py install --user
 Then import the package:
 ```python
 
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 ```
 
 ## Getting Started
@@ -68,12 +68,12 @@ For more information about API calls, please see the Marquez API documentation.
 
 #### Instantiating the client
 ```
-mc = Client(host="localhost", port="8080")
+mc = MarquezClient(host="localhost", port="8080")
 ```
 
 #### Instantiating the client to use a default existing namespace
 ```
-mc = Client(
+mc = MarquezClient(
     host="localhost",
     port="8080",
     namespace_name="accounting_team")
@@ -87,7 +87,7 @@ The constructor-specified value will take precedence over
 the environmental variable. If neither is provided, the default
 namespace `default` is used. 
 ```
-mc = Client(
+mc = MarquezClient(
     host="localhost",
     port="8080")
 ```

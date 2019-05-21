@@ -21,7 +21,7 @@ _DEFAULT_TIMEOUT_MS = 5000
 _DEFAULT_NAMESPACE_NAME = "default"
 
 
-class Client(object):
+class MarquezClient(object):
     def __init__(self, host=None, port=None,
                  namespace_name=None, timeout_ms=None):
         host = host or os.environ.get('MARQUEZ_HOST')

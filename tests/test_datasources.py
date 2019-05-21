@@ -12,21 +12,21 @@
 
 import pytest
 import vcr
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 from marquez_client.utils import InvalidRequestError
 from pytest import fixture
 
 
 @fixture(scope='class')
 def marquez_client():
-    return Client(host="localhost",
-                  port=8080)
+    return MarquezClient(host="localhost",
+                         port=8080)
 
 
 @fixture(scope='class')
 def marquez_client_with_timeout():
-    return Client(host="localhost",
-                  port=8080, timeout_ms=4000)
+    return MarquezClient(host="localhost",
+                         port=8080, timeout_ms=4000)
 
 
 @fixture(scope='class')

@@ -11,7 +11,7 @@
 # limitations under the License.
 import pytest
 import vcr
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 from marquez_client.constants import NOT_FOUND
 from marquez_client.utils import InvalidRequestError
 from pytest import fixture
@@ -24,14 +24,14 @@ def namespace_name():
 
 @fixture(scope='class')
 def marquez_client_default_ns():
-    return Client(host="localhost",
-                  port=8080)
+    return MarquezClient(host="localhost",
+                         port=8080)
 
 
 @fixture(scope='class')
 def marquez_client(namespace):
-    return Client(host="localhost", namespace_name=namespace['name'],
-                  port=8080)
+    return MarquezClient(host="localhost", namespace_name=namespace['name'],
+                         port=8080)
 
 
 @fixture(scope='class')
