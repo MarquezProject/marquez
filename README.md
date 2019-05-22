@@ -46,8 +46,8 @@ You will then need to set the following environment variables (we recommend addi
 
 By default, Marquez uses the following ports:
 
-* TCP port **`8080`** is available for the HTTP API server.
-* TCP port **`8081`** is available for the admin interface.
+* TCP port `8080` is available for the HTTP API server.
+* TCP port `8081` is available for the admin interface.
 
 **Note:** All of the configuration settings in `config.yml` can be specified either in the configuration file or in an environment variable.
 
@@ -65,7 +65,7 @@ Then browse to the admin interface: http://localhost:8081
 $ docker-compose up
 ```
 
-Marquez listens on port **`5000`** for all API calls and port **`5001`** for the admin interface.
+Marquez listens on port `5000` for all API calls and port `5001` for the admin interface.
 
 ## Getting involved
 
