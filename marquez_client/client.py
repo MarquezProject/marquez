@@ -141,7 +141,7 @@ class MarquezClient(object):
         return result
 
     @handle_response
-    def create_job_run(self, job_name, job_run_args, namespace_name=None,
+    def create_job_run(self, job_name, job_run_args=None, namespace_name=None,
                        nominal_start_time=None,
                        nominal_end_time=None):
         if not namespace_name:
