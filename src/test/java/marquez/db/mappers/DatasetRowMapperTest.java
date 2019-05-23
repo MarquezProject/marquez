@@ -38,11 +38,13 @@ import marquez.common.models.Description;
 import marquez.db.Columns;
 import marquez.db.models.DatasetRow;
 import org.jdbi.v3.core.statement.StatementContext;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class DatasetRowMapperTest {
@@ -56,14 +58,11 @@ public class DatasetRowMapperTest {
   private static final Description DESCRIPTION = newDescription();
   private static final UUID CURRENT_VERSION_UUID = newRowUuid();
 
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
   @Mock private Object exists;
   @Mock private ResultSet results;
   @Mock private StatementContext context;
-
-  @Before
-  public void setup() {
-    MockitoAnnotations.initMocks(this);
-  }
 
   @Test
   public void testMap_row() throws SQLException {

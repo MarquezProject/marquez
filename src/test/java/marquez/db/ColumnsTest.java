@@ -15,7 +15,6 @@
 package marquez.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.Array;
@@ -27,16 +26,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import marquez.UnitTests;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class ColumnsTest {
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.WARN);
+
+  @Mock private ResultSet results;
+  @Mock private Array array;
+
   @Test
   public void testUuidOrNull_uuid() throws SQLException {
     final String column = "with_uuid";
     final UUID expected = UUID.randomUUID();
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(expected);
     when(results.getObject(column, UUID.class)).thenReturn(expected);
 
@@ -48,9 +56,7 @@ public class ColumnsTest {
   public void testUuidOrNull_null() throws SQLException {
     final String column = "with_null_uuid";
     final UUID expected = null;
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(expected);
-    when(results.getObject(column, UUID.class)).thenReturn(expected);
 
     final UUID actual = Columns.uuidOrNull(results, column);
     assertThat(actual).isEqualTo(expected);
@@ -60,7 +66,6 @@ public class ColumnsTest {
   public void testUuidOrThrow_uuid() throws SQLException {
     final String column = "with_uuid";
     final UUID expected = UUID.randomUUID();
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(expected);
     when(results.getObject(column, UUID.class)).thenReturn(expected);
 
@@ -72,7 +77,6 @@ public class ColumnsTest {
   public void testUuidOrThrow_throw() throws SQLException {
     final String column = "with_null_uuid";
     final UUID nullUuid = null;
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(nullUuid);
 
     Columns.uuidOrThrow(results, column);
@@ -82,7 +86,6 @@ public class ColumnsTest {
   public void testTimestampOrNull_timestamp() throws SQLException {
     final String column = "with_timestamp";
     final Instant expected = Instant.now();
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(Timestamp.from(expected));
     when(results.getTimestamp(column)).thenReturn(Timestamp.from(expected));
 
@@ -94,7 +97,6 @@ public class ColumnsTest {
   public void testTimestampOrNull_null() throws SQLException {
     final String column = "with_null_timestamp";
     final Instant expected = null;
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(expected);
 
     final Instant actual = Columns.timestampOrNull(results, column);
@@ -105,7 +107,6 @@ public class ColumnsTest {
   public void testTimestampOrThrow_timestamp() throws SQLException {
     final String column = "with_timestamp";
     final Instant expected = Instant.now();
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(expected);
 
     final Instant actual = Columns.timestampOrThrow(results, column);
@@ -116,7 +117,6 @@ public class ColumnsTest {
   public void testTimestampOrThrow_throw() throws SQLException {
     final String column = "with_null_timestamp";
     final Timestamp nullTimestamp = null;
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(nullTimestamp);
 
     Columns.timestampOrThrow(results, column);
@@ -126,7 +126,6 @@ public class ColumnsTest {
   public void testStringOrNull_string() throws SQLException {
     final String column = "with_string";
     final String expected = "string";
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(expected);
     when(results.getString(column)).thenReturn(expected);
 
@@ -138,9 +137,7 @@ public class ColumnsTest {
   public void testStringOrNull_null() throws SQLException {
     final String column = "with_null_string";
     final String expected = null;
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(expected);
-    when(results.getString(column)).thenReturn(expected);
 
     final String actual = Columns.stringOrNull(results, column);
     assertThat(actual).isEqualTo(expected);
@@ -149,7 +146,6 @@ public class ColumnsTest {
   public void testStringOrThrow_string() throws SQLException {
     final String column = "with_string";
     final String expected = "string";
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(expected);
     when(results.getString(column)).thenReturn(expected);
 
@@ -161,7 +157,6 @@ public class ColumnsTest {
   public void testStringOrThrow_throw() throws SQLException {
     final String column = "with_null_string";
     final String nullString = null;
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(nullString);
 
     Columns.stringOrThrow(results, column);
@@ -171,9 +166,7 @@ public class ColumnsTest {
   public void testArrayOrThrow_array() throws SQLException {
     final String column = "with_array";
     final String[] values = new String[] {"test_value0", "test_value1", "test_value2"};
-    final Array array = mock(Array.class);
     when(array.getArray()).thenReturn(values);
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(array);
     when(results.getArray(column)).thenReturn(array);
 
@@ -186,7 +179,6 @@ public class ColumnsTest {
   public void testArrayOrThrow_throw() throws SQLException {
     final String column = "with_null_array";
     final Array nullArray = null;
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(column)).thenReturn(nullArray);
 
     Columns.arrayOrThrow(results, column);

@@ -19,7 +19,6 @@ import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
@@ -34,8 +33,13 @@ import marquez.common.models.OwnerName;
 import marquez.db.Columns;
 import marquez.db.models.NamespaceRow;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class NamespaceRowMapperTest {
@@ -45,10 +49,14 @@ public class NamespaceRowMapperTest {
   private static final Description DESCRIPTION = newDescription();
   private static final OwnerName CURRENT_OWNER_NAME = newOwnerName();
 
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.WARN);
+
+  @Mock private Object exists;
+  @Mock private ResultSet results;
+  @Mock private StatementContext context;
+
   @Test
   public void testMap_row() throws SQLException {
-    final Object exists = mock(Object.class);
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.ROW_UUID)).thenReturn(exists);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
     when(results.getObject(Columns.NAME)).thenReturn(exists);
@@ -61,8 +69,6 @@ public class NamespaceRowMapperTest {
     when(results.getString(Columns.DESCRIPTION)).thenReturn(DESCRIPTION.getValue());
     when(results.getString(Columns.CURRENT_OWNER_NAME)).thenReturn(CURRENT_OWNER_NAME.getValue());
 
-    final StatementContext context = mock(StatementContext.class);
-
     final NamespaceRowMapper rowMapper = new NamespaceRowMapper();
     final NamespaceRow row = rowMapper.map(results, context);
     assertThat(row.getUuid()).isEqualTo(ROW_UUID);
@@ -74,8 +80,6 @@ public class NamespaceRowMapperTest {
 
   @Test
   public void testMap_row_noDescription() throws SQLException {
-    final Object exists = mock(Object.class);
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.ROW_UUID)).thenReturn(exists);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
     when(results.getObject(Columns.NAME)).thenReturn(exists);
@@ -86,8 +90,6 @@ public class NamespaceRowMapperTest {
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
     when(results.getString(Columns.NAME)).thenReturn(NAME.getValue());
     when(results.getString(Columns.CURRENT_OWNER_NAME)).thenReturn(CURRENT_OWNER_NAME.getValue());
-
-    final StatementContext context = mock(StatementContext.class);
 
     final NamespaceRowMapper rowMapper = new NamespaceRowMapper();
     final NamespaceRow row = rowMapper.map(results, context);
@@ -101,14 +103,12 @@ public class NamespaceRowMapperTest {
   @Test
   public void testMap_throwsException_onNullResults() throws SQLException {
     final ResultSet nullResults = null;
-    final StatementContext context = mock(StatementContext.class);
     final NamespaceRowMapper rowMapper = new NamespaceRowMapper();
     assertThatNullPointerException().isThrownBy(() -> rowMapper.map(nullResults, context));
   }
 
   @Test
   public void testMap_throwsException_onNullContext() throws SQLException {
-    final ResultSet results = mock(ResultSet.class);
     final StatementContext nullContext = null;
     final NamespaceRowMapper rowMapper = new NamespaceRowMapper();
     assertThatNullPointerException().isThrownBy(() -> rowMapper.map(results, nullContext));
