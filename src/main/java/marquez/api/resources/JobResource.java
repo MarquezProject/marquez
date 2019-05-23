@@ -151,6 +151,7 @@ public final class JobResource {
 
   @Timed
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
+<<<<<<< HEAD
   public Response getJobRuns(
       @PathParam("namespace") final NamespaceName namespaceName, @PathParam("job") final String job)
       throws MarquezServiceException {
@@ -167,6 +168,8 @@ public final class JobResource {
   @Timed
   @GET
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
+=======
+>>>>>>> fix merge issue
   @Produces(APPLICATION_JSON)
   public Response getJobRuns(
       @PathParam("namespace") final NamespaceName namespaceName, @PathParam("job") final String job)
@@ -174,9 +177,14 @@ public final class JobResource {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
     }
+<<<<<<< HEAD
     return Response.ok()
         .entity(JobRunResponseMapper.map(jobService.getAllRunsOfJob(namespaceName, job)))
         .build();
+=======
+    final List<JobRun> jobRuns = jobService.getAllRunsOfJob(namespaceName, job);
+    return Response.ok().entity(JobRunResponseMapper.map(jobRuns)).build();
+>>>>>>> fix merge issue
   }
 
   @GET
