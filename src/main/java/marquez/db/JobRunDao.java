@@ -77,7 +77,6 @@ public interface JobRunDao {
           + " ON (jr.job_version_guid = jv.guid AND jv.job_guid = :jobUuid)"
           + "LEFT JOIN job_run_args jra "
           + " ON (jr.job_run_args_hex_digest = jra.hex_digest) "
-          + "ORDER BY created_at DESC"
-          + "LIMIT :limit OFFSET :offset")
-  List<JobRun> findAllByJobUuid(UUID jobUuid, int limit, int offset);
+          + "ORDER BY created_at DESC")
+  List<JobRun> findAllByJobUuid(UUID jobUuid);
 }
