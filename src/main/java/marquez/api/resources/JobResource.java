@@ -161,7 +161,7 @@ public final class JobResource {
       return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
     }
     return Response.ok()
-        .entity(coreJobRunToApiJobRunMapper.map(jobService.getAllRunsOfJob(namespaceName, job)))
+        .entity(JobRunResponseMapper.map(jobService.getAllRunsOfJob(namespaceName, job)))
         .build();
   }
 
