@@ -19,8 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
 import java.util.UUID;
 import marquez.api.resources.JobRunBaseTest;
+import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
@@ -117,8 +119,39 @@ public class JobRunDaoTest extends JobRunBaseTest {
   }
 
   @Test
-  public void testFindAllByJobUuid(UUID jobUuid) {
-    
+  public void testFindAllByJobUuid() throws MarquezServiceException {
+    List<JobRun> jobRuns =
+        jobService.getAllRunsOfJob(NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME);
+    assertEquals(jobRuns.size(), 1);
+    jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
+    jobRuns =
+        jobService.getAllRunsOfJob(NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME);
+    assertEquals(jobRuns.size(), 2);
+  }
+
+  @Test
+  public void testFindAllByJobUuid_JobDoesntExist() throws MarquezServiceException {
+    String nonexistentJobName = "this_job_doesnt_exist";
+    List<JobRun> jobRuns =
+        jobService.getAllRunsOfJob(NamespaceName.fromString(NAMESPACE_NAME), nonexistentJobName);
+    assertEquals(jobRuns.size(), 0);
+  }
+
+  @Test
+  public void testFindAllByJobUuid_NoRuns() throws MarquezServiceException {
+    APP.getJDBI()
+        .useHandle(
+            handle -> {
+              handle.execute(
+                  format(
+                      "DELETE FROM job_run_states WHERE job_run_guid = '%s'",
+                      CREATED_JOB_RUN_UUID));
+              handle.execute(
+                  format("DELETE FROM job_runs WHERE guid = '%s'", CREATED_JOB_RUN_UUID));
+            });
+    List<JobRun> jobRuns =
+        jobService.getAllRunsOfJob(NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME);
+    assertEquals(jobRuns.size(), 0);
   }
 
   private JobRunState getLatestJobRunStateForJobId(UUID jobRunId) {
@@ -136,12 +169,8 @@ public class JobRunDaoTest extends JobRunBaseTest {
     APP.getJDBI()
         .useHandle(
             handle -> {
-              handle.execute(
-                  format(
-                      "delete from job_run_states where job_run_guid = '%s'",
-                      CREATED_JOB_RUN_UUID));
-              handle.execute(
-                  format("delete from job_runs where guid = '%s'", CREATED_JOB_RUN_UUID));
+              handle.execute(format("delete from job_run_states;", CREATED_JOB_RUN_UUID));
+              handle.execute(format("delete from job_runs;", CREATED_JOB_RUN_UUID));
             });
   }
 
@@ -150,14 +179,9 @@ public class JobRunDaoTest extends JobRunBaseTest {
     APP.getJDBI()
         .useHandle(
             handle -> {
-              handle.execute(
-                  format(
-                      "DELETE from job_versions where guid in (select job_versions.guid as guid from jobs inner join job_versions on job_versions.job_guid=jobs.guid and jobs.namespace_guid='%s')",
-                      CREATED_NAMESPACE_UUID));
-              handle.execute(
-                  format("delete from jobs where namespace_guid = '%s'", CREATED_NAMESPACE_UUID));
-              handle.execute(
-                  format("delete from namespaces where guid = '%s'", CREATED_NAMESPACE_UUID));
+              handle.execute("delete from job_versions");
+              handle.execute("delete from jobs");
+              handle.execute("delete from namespaces");
             });
   }
 }
