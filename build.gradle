@@ -19,7 +19,7 @@ repositories {
 ext {
   dropwizardVersion = '1.3.9'
   jdbi3Version = '3.7.1'
-  lombokVersion = '1.18.6'
+  lombokVersion = '1.18.8'
 }
 
 dependencies {
