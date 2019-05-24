@@ -22,7 +22,7 @@ See the [API docs](https://marquezproject.github.io/marquez/openapi.html).
 $ pip install --upgrade marquez-python
 ```
 
-Install from source with:
+To install from source run:
 
 ```bash
 $ python setup.py install
