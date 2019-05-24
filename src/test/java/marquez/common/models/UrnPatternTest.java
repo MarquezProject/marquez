@@ -98,6 +98,12 @@ public class UrnPatternTest {
     PATTERN.throwIfNoMatch(nonAlphanumericPartValue);
   }
 
+  @Test
+  public void testFrom_urnWithDash() {
+    final String stringWithDashes = "urn:test:a:b-with-dashes";
+    PATTERN.throwIfNoMatch(stringWithDashes);
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testThrowIfNoMatch_throwsException_onPartGreaterThan64Value() {
     final String partGreaterThan64Value = newUrnWithPartGreaterThan64();
