@@ -28,7 +28,7 @@ To install from source run:
 $ python setup.py install
 ```
 
-## Getting Started
+## Usage
 
 Please be sure to set the environmental variables to connect with Marquez:
 
