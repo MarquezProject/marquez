@@ -8,38 +8,24 @@ Python client for [Marquez](https://github.com/MarquezProject/marquez).
 
 This library is under active development at [The We Company](https://www.we.co). 
 
-## Requirements.
+## Documentation
 
-Python 3.5.0+
+See the [API docs](https://marquezproject.github.io/marquez/openapi.html).
 
-## Installation & Usage
-### pip install
+## Requirements
 
-Marquez-Python is hosted on PyPi and can be installed from that repository.
+[Python 3.5.0](https://www.python.org/downloads/)+
 
-```sh
-pip install marquez-python
-```
-(you may need to run `pip` with root permission: `sudo pip install marquez-python`)
+## Installation
 
-Then import the package:
-```python
-from marquez_client import MarquezClient
+```bash
+$ pip install --upgrade marquez-python
 ```
 
-### Setuptools
+Install from source with:
 
-Install via [Setuptools](http://pypi.python.org/pypi/setuptools).
-
-```sh
-python setup.py install --user
-```
-(or `sudo python setup.py install` to install the package for all users)
-
-Then import the package:
-```python
-
-from marquez_client import MarquezClient
+```bash
+$ python setup.py install
 ```
 
 ## Getting Started
