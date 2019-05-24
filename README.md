@@ -30,9 +30,8 @@ $ python setup.py install
 
 ## Getting Started
 
-Please follow the [installation procedure](#installation--usage) and then run the following:
-
 Please be sure to set the environmental variables to connect with Marquez:
+
 ```
 export MARQUEZ_HOST='localhost'
 export MARQUEZ_PORT='8080'
@@ -118,12 +117,3 @@ Value of `quarterly_job_info`:
     "runArgs": "{\"email\": \"accounting@wework.com\"}"
 }
 ```
-
-## Documentation For Authorization
-
- All endpoints do not require authorization.
-
-
-
-
-
