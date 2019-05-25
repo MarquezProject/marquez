@@ -27,6 +27,8 @@ import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
 import marquez.service.models.JobVersion;
+
+import org.assertj.core.util.Arrays;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Assert;
@@ -256,5 +258,15 @@ public class JobServiceTest {
         .when(jobRunDao)
         .updateState(jobRunID, JobRunState.State.toInt(state));
     jobService.updateJobRunState(jobRunID, state);
+  }
+
+  @Test
+  public void testGetAllRunsOfJob(){
+    UUID jobUuid = UUID.randomUUID();
+    List<JobRun> jobRuns = new ArrayList<JobRun>();
+    jobRuns.add(Generator.genJobRun());
+    jobRuns.add(Generator.genJobRun());
+    when(jobRunDao.findAllByJobUuid(jobUuid)).thenReturn(jobRuns);
+    List<JobRun> jobRunsFound = jobService.findAllByJobUuid(jobUuid);
   }
 }
