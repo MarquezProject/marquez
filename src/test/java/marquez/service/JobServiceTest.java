@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import marquez.common.models.NamespaceName;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
@@ -25,6 +27,8 @@ import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
 import marquez.service.models.JobVersion;
+
+import org.assertj.core.util.Arrays;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.*;
 import org.mockito.ArgumentCaptor;
@@ -249,5 +253,18 @@ public class JobServiceTest {
         .when(jobRunDao)
         .updateState(jobRunID, JobRunState.State.toInt(state));
     jobService.updateJobRunState(jobRunID, state);
+  }
+
+  @Test
+  public void testGetAllRunsOfJob() throws MarquezServiceException{
+    Job job = Generator.genJob();
+    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    List<JobRun> jobRuns = new ArrayList<JobRun>();
+    jobRuns.add(Generator.genJobRun());
+    jobRuns.add(Generator.genJobRun());
+    when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
+    when(jobRunDao.findAllByJobUuid(job.getGuid())).thenReturn(jobRuns);
+    List<JobRun> jobRunsFound = jobService.getAllRunsOfJob(jobNamespace, job.getName());
+    assertEquals(2, jobRunsFound.size());
   }
 }
