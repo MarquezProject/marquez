@@ -41,11 +41,21 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 public class NamespaceResourceTest extends NamespaceBaseTest {
 
-  NamespaceName namespaceName = NamespaceName.fromString(NAMESPACE_NAME);
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+  @Mock private NamespaceService namespaceService;
+
+  private NamespaceName namespaceName = NamespaceName.fromString(NAMESPACE_NAME);
+
   private static final NamespaceService NAMESPACE_SERVICE = mock(NamespaceService.class);
 
   @ClassRule
@@ -78,7 +88,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   @Test
   public void testValidNamespace() throws MarquezServiceException {
     Optional<Namespace> returnedOptionalNamespace = Optional.of(TEST_NAMESPACE);
-    NamespaceService namespaceService = mock(NamespaceService.class);
+
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
     when(namespaceService.get(namespaceName)).thenReturn(returnedOptionalNamespace);
@@ -104,7 +114,6 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   @Test
   public void testListNamespaceWithNoResults() throws MarquezServiceException {
     final List<Namespace> existingCoreModelNamespaces = Collections.emptyList();
-    NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
     when(namespaceService.getAll()).thenReturn(existingCoreModelNamespaces);
 
@@ -117,7 +126,6 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   @Test
   public void testListNamespaceWithSingleResultSet() throws MarquezServiceException {
     final List<Namespace> existingCoreModelNamespaces = Collections.singletonList(TEST_NAMESPACE);
-    NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
     when(namespaceService.getAll()).thenReturn(existingCoreModelNamespaces);
 
@@ -132,7 +140,6 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   public void testAllNamespaceFieldsPresentInListNamespacesResponse()
       throws MarquezServiceException {
     final List<Namespace> existingNamespaces = Collections.singletonList(TEST_NAMESPACE);
-    NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
     when(namespaceService.getAll()).thenReturn(existingNamespaces);
@@ -148,7 +155,6 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Test
   public void testListNamespaceWithMultipleResultSet() throws MarquezServiceException {
-    NamespaceService namespaceService = mock(NamespaceService.class);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
     final List<Namespace> existingCoreModelNamespaces = new ArrayList<>();
