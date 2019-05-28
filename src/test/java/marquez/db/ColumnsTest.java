@@ -32,11 +32,10 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class ColumnsTest {
-  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.WARN);
+  @Rule public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock private ResultSet results;
   @Mock private Array array;
