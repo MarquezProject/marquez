@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,8 +30,13 @@ import marquez.service.mappers.NamespaceMapper;
 import marquez.service.models.Namespace;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class NamespaceServiceTest {
@@ -43,12 +47,13 @@ public class NamespaceServiceTest {
       new Namespace(
           null, NAMESPACE_NAME.getValue(), CURRENT_OWNER_NAME.getValue(), DESCRIPTION.getValue());
 
-  private NamespaceDao namespaceDao;
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+  @Mock private NamespaceDao namespaceDao;
   private NamespaceService namespaceService;
 
   @Before
   public void setUp() throws MarquezServiceException {
-    namespaceDao = mock(NamespaceDao.class);
     namespaceService = new NamespaceService(namespaceDao);
   }
 

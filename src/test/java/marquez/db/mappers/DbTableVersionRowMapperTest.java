@@ -15,7 +15,6 @@
 package marquez.db.mappers;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
@@ -27,8 +26,13 @@ import marquez.UnitTests;
 import marquez.db.Columns;
 import marquez.db.models.DbTableVersionRow;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class DbTableVersionRowMapperTest {
@@ -38,10 +42,14 @@ public class DbTableVersionRowMapperTest {
   private static final UUID DB_TABLE_INFO_UUID = UUID.randomUUID();
   private static final String DB_TABLE_NAME = "Test_Table_Name";
 
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+  @Mock private Object exists;
+  @Mock private ResultSet results;
+  @Mock private StatementContext context;
+
   @Test
   public void testMap() throws SQLException {
-    final Object exists = mock(Object.class);
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
 
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
@@ -49,8 +57,6 @@ public class DbTableVersionRowMapperTest {
     when(results.getObject(Columns.DATASET_UUID, UUID.class)).thenReturn(DATASET_UUID);
     when(results.getObject(Columns.DB_TABLE_INFO_UUID, UUID.class)).thenReturn(DB_TABLE_INFO_UUID);
     when(results.getString(Columns.DB_TABLE_NAME)).thenReturn(DB_TABLE_NAME);
-
-    final StatementContext context = mock(StatementContext.class);
 
     final DbTableVersionRowMapper dbTableVersionRowMapper = new DbTableVersionRowMapper();
     final DbTableVersionRow dbTableVersionRow = dbTableVersionRowMapper.map(results, context);
@@ -64,14 +70,12 @@ public class DbTableVersionRowMapperTest {
   @Test(expected = NullPointerException.class)
   public void testMap_throwsException_onNullResults() throws SQLException {
     final ResultSet nullResults = null;
-    final StatementContext context = mock(StatementContext.class);
     final DbTableVersionRowMapper dbTableVersionRowMapper = new DbTableVersionRowMapper();
     dbTableVersionRowMapper.map(nullResults, context);
   }
 
   @Test(expected = NullPointerException.class)
   public void testMap_throwsException_onNullContext() throws SQLException {
-    final ResultSet results = mock(ResultSet.class);
     final StatementContext nullContext = null;
     final DbTableVersionRowMapper dbTableVersionRowMapper = new DbTableVersionRowMapper();
     dbTableVersionRowMapper.map(results, nullContext);
