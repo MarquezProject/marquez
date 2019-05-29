@@ -285,7 +285,7 @@ public class JobServiceTest {
   }
 
   @Test(expected = MarquezServiceException.class)
-  public void testGetAllRunsOfJob_xception() throws MarquezServiceException {
+  public void testGetAllRunsOfJob_exception() throws MarquezServiceException {
     Job job = Generator.genJob();
     NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
