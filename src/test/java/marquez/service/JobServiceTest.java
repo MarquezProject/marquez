@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import marquez.common.models.NamespaceName;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
@@ -29,8 +28,6 @@ import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
 import marquez.service.models.JobVersion;
-
-import org.assertj.core.util.Arrays;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.After;
 import org.junit.Assert;
@@ -263,7 +260,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testGetAllRunsOfJob_jobAndRunsFound() throws MarquezServiceException{
+  public void testGetAllRunsOfJob_jobAndRunsFound() throws MarquezServiceException {
     Job job = Generator.genJob();
     NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
     List<JobRun> jobRuns = new ArrayList<JobRun>();
@@ -273,5 +270,16 @@ public class JobServiceTest {
     when(jobRunDao.findAllByJobUuid(job.getGuid())).thenReturn(jobRuns);
     List<JobRun> jobRunsFound = jobService.getAllRunsOfJob(jobNamespace, job.getName());
     assertEquals(2, jobRunsFound.size());
+  }
+
+  @Test
+  public void testGetAllRunsOfJob_noRunsFound() throws MarquezServiceException {
+    Job job = Generator.genJob();
+    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    List<JobRun> jobRuns = new ArrayList<JobRun>();
+    when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
+    when(jobRunDao.findAllByJobUuid(job.getGuid())).thenReturn(jobRuns);
+    List<JobRun> jobRunsFound = jobService.getAllRunsOfJob(jobNamespace, job.getName());
+    assertEquals(0, jobRunsFound.size());
   }
 }
