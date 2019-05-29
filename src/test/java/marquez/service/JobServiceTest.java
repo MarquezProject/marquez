@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import marquez.common.models.NamespaceName;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
@@ -261,12 +263,15 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testGetAllRunsOfJob(){
-    UUID jobUuid = UUID.randomUUID();
+  public void testGetAllRunsOfJob() throws MarquezServiceException{
+    Job job = Generator.genJob();
+    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
     List<JobRun> jobRuns = new ArrayList<JobRun>();
     jobRuns.add(Generator.genJobRun());
     jobRuns.add(Generator.genJobRun());
-    when(jobRunDao.findAllByJobUuid(jobUuid)).thenReturn(jobRuns);
-    List<JobRun> jobRunsFound = jobService.findAllByJobUuid(jobUuid);
+    when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
+    when(jobRunDao.findAllByJobUuid(job.getGuid())).thenReturn(jobRuns);
+    List<JobRun> jobRunsFound = jobService.getAllRunsOfJob(jobNamespace, job.getName());
+    assertEquals(2, jobRunsFound.size());
   }
 }
