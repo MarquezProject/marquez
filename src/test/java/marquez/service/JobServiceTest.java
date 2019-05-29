@@ -266,6 +266,14 @@ public class JobServiceTest {
   }
 
   @Test
+  public void testGetAllRunsOfJob_jobNotFound() throws MarquezServiceException {
+    Job job = Generator.genJob();
+    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(null);
+    jobService.getAllRunsOfJob(jobNamespace, job.getName());
+  }
+
+  @Test
   public void testGetAllRunsOfJob_noRunsFound() throws MarquezServiceException {
     Job job = Generator.genJob();
     NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
