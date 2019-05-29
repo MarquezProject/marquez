@@ -38,7 +38,7 @@ client = MarquezClient()
 # list namespaces
 client.list_namespaces()
 
-# retrieve job
+# retrieve a job
 client.get_job('room_bookings_7_days')
 
 ```
