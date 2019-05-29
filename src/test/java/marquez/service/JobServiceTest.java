@@ -282,4 +282,14 @@ public class JobServiceTest {
     List<JobRun> jobRunsFound = jobService.getAllRunsOfJob(jobNamespace, job.getName());
     assertEquals(0, jobRunsFound.size());
   }
+
+  @Test(expected = MarquezServiceException.class)
+  public void testGetAllRunsOfJob_xception() throws MarquezServiceException {
+    Job job = Generator.genJob();
+    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
+    when(jobRunDao.findAllByJobUuid(job.getGuid()))
+        .thenThrow(UnableToExecuteStatementException.class);
+    jobService.getAllRunsOfJob(jobNamespace, job.getName());
+  }
 }
