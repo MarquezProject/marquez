@@ -277,7 +277,7 @@ public class JobServiceTest {
     Job job = Generator.genJob();
     NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(null);
-    jobService.getAllRunsOfJob(jobNamespace, job.getName());
+    assertEquals(0, jobService.getAllRunsOfJob(jobNamespace, job.getName()).size());
   }
 
   @Test
