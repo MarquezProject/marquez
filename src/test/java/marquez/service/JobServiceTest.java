@@ -276,13 +276,8 @@ public class JobServiceTest {
   public void testGetAllRunsOfJob_jobNotFound() throws MarquezServiceException {
     Job job = Generator.genJob();
     NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
-    List<JobRun> jobRuns = new ArrayList<JobRun>();
-    jobRuns.add(Generator.genJobRun());
-    jobRuns.add(Generator.genJobRun());
-    when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
-    when(jobRunDao.findAllByJobUuid(job.getGuid())).thenReturn(jobRuns);
-    List<JobRun> jobRunsFound = jobService.getAllRunsOfJob(jobNamespace, job.getName());
-    assertEquals(2, jobRunsFound.size());
+    when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(null);
+    jobService.getAllRunsOfJob(jobNamespace, job.getName());
   }
 
   @Test
