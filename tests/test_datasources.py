@@ -13,7 +13,7 @@
 import pytest
 import vcr
 from marquez_client import MarquezClient
-from marquez_client.utils import InvalidRequestError
+from marquez_client import errors
 from pytest import fixture
 
 
@@ -58,7 +58,7 @@ def test_create_datasource(marquez_client):
 def test_create_datasource_special_chars(marquez_client):
     datasource_name = "financi@ls db20!"
     datasource_url = "jdbc:postgresql://localhost:5431/reporting_system"
-    with pytest.raises(InvalidRequestError):
+    with pytest.raises(errors.InvalidRequestError):
         marquez_client.create_datasource(datasource_name, datasource_url)
 
 

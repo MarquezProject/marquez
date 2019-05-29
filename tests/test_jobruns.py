@@ -79,7 +79,7 @@ def nominal_end_time(nominal_start_time):
 def existing_jobrun(marquez_client, existing_job, job_run_args,
                     nominal_start_time, nominal_end_time):
     created_job_run = marquez_client.create_job_run(
-        existing_job['name'], job_run_args=job_run_args,
+        existing_job['name'], run_args=job_run_args,
         nominal_start_time=str(nominal_start_time),
         nominal_end_time=str(nominal_end_time))
     return created_job_run
@@ -93,7 +93,7 @@ def test_create_jobrun(marquez_client, existing_job, job_run_args,
     nominal_end_time = str(nominal_end_time)
 
     created_job_run = marquez_client.create_job_run(
-        existing_job['name'], job_run_args=job_run_args,
+        existing_job['name'], run_args=job_run_args,
         nominal_start_time=nominal_start_time,
         nominal_end_time=nominal_end_time)
 

@@ -12,8 +12,7 @@
 import pytest
 import vcr
 from marquez_client import MarquezClient
-from marquez_client.constants import NOT_FOUND
-from marquez_client.utils import InvalidRequestError
+from marquez_client import errors
 from pytest import fixture
 
 
@@ -63,7 +62,7 @@ def existing_dataset(marquez_client, existing_datasource):
     dataset_description = 'a dataset for testing'
 
     result = marquez_client.create_dataset(
-        name=dataset_name,
+        dataset_name=dataset_name,
         datasource_urn=existing_datasource['urn'],
         description=dataset_description)
     return result
@@ -79,7 +78,7 @@ def existing_dataset_default_ns(
     dataset_description = 'a dataset for testing'
 
     return marquez_client_default_ns.create_dataset(
-        name=dataset_name,
+        dataset_name=dataset_name,
         datasource_urn=existing_datasource['urn'],
         description=dataset_description)
 
@@ -102,7 +101,7 @@ def test_create_dataset(marquez_client, existing_datasource):
     'test_create_datasource_special_chars.yaml')
 def test_create_datasource_special_chars(marquez_client, existing_datasource):
     dataset_name = "financi@ls db20!"
-    with pytest.raises(InvalidRequestError):
+    with pytest.raises(errors.InvalidRequestError):
         marquez_client.create_dataset(
             dataset_name, existing_datasource['urn'])
 
@@ -135,7 +134,7 @@ def test_get_dataset_specify_ns(
 def test_get_dataset_default_ns(
         marquez_client_default_ns, existing_dataset_default_ns):
     retrieved_dataset = marquez_client_default_ns.get_dataset(
-        urn=existing_dataset_default_ns['urn'])
+        dataset_urn=existing_dataset_default_ns['urn'])
 
     assert (retrieved_dataset['description'] ==
             existing_dataset_default_ns['description'])
@@ -147,8 +146,10 @@ def test_get_dataset_default_ns(
 @vcr.use_cassette(
     'tests/fixtures/vcr/test_datasets/test_get_dataset_malformed_urn.yaml')
 def test_get_dataset_malformed_urn(marquez_client):
-    assert NOT_FOUND == marquez_client.get_dataset("not_a_valid_urn")
-    assert NOT_FOUND == marquez_client.get_dataset("*55;34/098## *!! x;;$")
+    with pytest.raises(errors.APIError):
+        marquez_client.get_dataset("not_a_valid_urn")
+    with pytest.raises(errors.APIError):
+        marquez_client.get_dataset("*55;34/098## *!! x;;$")
 
 
 @vcr.use_cassette('tests/fixtures/vcr/test_datasets/test_list_datsets.yaml')

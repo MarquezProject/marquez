@@ -11,7 +11,8 @@
 # limitations under the License.
 import vcr
 from marquez_client import MarquezClient
-from marquez_client.constants import NOT_FOUND
+from marquez_client import errors
+import pytest
 from pytest import fixture
 
 
@@ -111,8 +112,9 @@ def test_list_jobs_specify_namespace(
     'tests/fixtures/vcr/test_jobs/test_list_jobs_no_such_namespace.yaml')
 def test_list_jobs_no_such_namespace(marquez_client_with_default_ns):
     no_such_namespace = "no_such_namespace_999"
-    assert marquez_client_with_default_ns.list_jobs(
-        namespace_name=no_such_namespace) == NOT_FOUND
+    with pytest.raises(errors.APIError):
+        marquez_client_with_default_ns.list_jobs(
+            namespace_name=no_such_namespace)
 
 
 @vcr.use_cassette(

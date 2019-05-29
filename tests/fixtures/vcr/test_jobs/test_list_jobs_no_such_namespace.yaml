@@ -7,7 +7,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [python-requests/2.20.1]
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/no_such_namespace_999/jobs/
+    uri: http://localhost:8080/api/v1/namespaces/no_such_namespace_999/jobs
   response:
     body: {string: '<html>
 

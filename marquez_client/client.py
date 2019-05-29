@@ -9,243 +9,279 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import collections
+
+import json
 import os
-import urllib
-
 import requests
-from marquez_client.utils import (_compose_path, handle_response)
+import time
 
-_API_PATH = "api/v1"
-_DEFAULT_TIMEOUT_MS = 5000
-_DEFAULT_NAMESPACE_NAME = "default"
+
+from marquez_client import errors
+from marquez_client import log
+from marquez_client.constants import (
+    DEFAULT_HOST, DEFAULT_PORT, DEFAULT_TIMEOUT_MS, DEFAULT_NAMESPACE_NAME
+)
+from marquez_client.version import VERSION
+from requests import codes
+from six.moves.urllib.parse import quote
+
+_API_PATH = 'api/v1'
+
+_USER_AGENT = f'marquez-python/{VERSION}'
+
+_HEADERS = {'User-Agent': _USER_AGENT}
 
 
 class MarquezClient(object):
     def __init__(self, host=None, port=None,
-                 namespace_name=None, timeout_ms=None):
-        host = host or os.environ.get('MARQUEZ_HOST')
-        port = (str(port) if port else port) or os.environ.get('MARQUEZ_PORT')
-        timeout_input = (str(timeout_ms) if timeout_ms
-                         else os.environ.get('MARQUEZ_TIMEOUT_MS'))
-
-        self._namespace_name = (namespace_name
-                                or os.environ.get('MARQUEZ_NAMESPACE')
-                                or _DEFAULT_NAMESPACE_NAME)
-        self._api_base = "http://{0}:{1}/{2}".format(
-            host, port, _API_PATH)
-        self._timeout = self._set_timeout(timeout_input)
-
-        if not host or not port:
-            msg = ("Please provide host & port or set the proper env "
-                   "vars: MARQUEZ_HOST, MARQUEZ_PORT")
-            raise ValueError(msg)
+                 timeout_ms=None, namespace_name=None):
+        host = host or os.environ.get('MARQUEZ_HOST', DEFAULT_HOST)
+        port = port or os.environ.get('MARQUEZ_PORT', DEFAULT_PORT)
+        self._timeout = self._to_seconds(timeout_ms or os.environ.get(
+            'MARQUEZ_TIMEOUT_MS', DEFAULT_TIMEOUT_MS)
+        )
+        self._namespace_name = namespace_name or os.environ.get(
+            'MARQUEZ_NAMESPACE', DEFAULT_NAMESPACE_NAME
+        )
+        self._api_base = f'http://{host}:{port}/{_API_PATH}'
 
     @property
     def namespace(self):
         return self._namespace_name
 
-    #  Namespaces API
-    @handle_response
+    def create_namespace(self, namespace_name, owner_name, description=None):
+        if not namespace_name:
+            raise ValueError('namespace_name must not be None')
+        if not owner_name:
+            raise ValueError('owner_name must not be None')
+
+        return self._put(
+            self._url('/namespaces/{0}', namespace_name),
+            payload={
+                'owner': owner_name,
+                'description': description
+            })
+
     def get_namespace(self, namespace_name):
         if not namespace_name:
-            raise ValueError("Please provide a namespace")
-        path = "namespaces/{0}"
-        path_args = [namespace_name]
-        return self.get_request(path, path_args)
+            raise ValueError('namespace_name must not be None')
 
-    @handle_response
-    def list_namespaces(self):
-        path = "namespaces"
-        path_args = []
-        return self.get_request(path, path_args)
+        return self._get(self._url('/namespaces/{0}', namespace_name))
 
-    @handle_response
-    def create_namespace(self, name, owner,
-                         description=None):
-        path = "namespaces/{0}"
-        path_args = [name]
-        payload = {
-            "owner": owner,
-        }
-        if description:
-            payload['description'] = description
-        return self.put_request(path, path_args, payload)
+    def list_namespaces(self, limit=None, offset=None):
+        return self._get(
+            self._url('/namespaces'),
+            params={
+                'limit': limit,
+                'offset': offset
+            })
 
-    #  Datasources API
-    @handle_response
-    def list_datasources(self, limit=None, offset=None):
-        path = "datasources"
-        path_args = []
-        request_args = {}
-        if limit:
-            request_args['limit'] = limit
-        if offset:
-            request_args['offset'] = offset
-        return self.get_request(
-            path, path_args, request_args)
+    def create_job(self, job_name, location, input_dataset_urns=None,
+                   output_dataset_urns=None, description=None,
+                   namespace_name=None):
+        if not job_name:
+            raise ValueError('job_name must not be None')
+        if not location:
+            raise ValueError('location must not be None')
 
-    @handle_response
-    def get_datasource(self, urn):
-        path = "datasources/{0}"
-        path_args = [urn]
-        return self.get_request(path, path_args)
-
-    @handle_response
-    def create_datasource(self, name, connection_url):
-        path = "datasources"
-        path_args = []
-        payload = {
-            "name": name,
-            "connectionUrl": connection_url
-        }
-        return self.post_request(path, path_args, payload)
-
-    #  Jobs API
-    @handle_response
-    def create_job(self, job_name, location, input_dataset_urns,
-                   output_dataset_urns, namespace_name=None,
-                   description=None):
         if not namespace_name:
             namespace_name = self._namespace_name
 
-        path = "namespaces/{0}/jobs/{1}"
-        path_args = [namespace_name, job_name]
-        payload = {
-            "inputDatasetUrns": input_dataset_urns,
-            "outputDatasetUrns": output_dataset_urns,
-            "location": location
-        }
+        return self._put(
+            self._url('/namespaces/{0}/jobs/{1}', namespace_name, job_name),
+            payload={
+                'inputDatasetUrns': input_dataset_urns or [],
+                'outputDatasetUrns': output_dataset_urns or [],
+                'location': location,
+                'description': description
+            })
 
-        if description:
-            payload['description'] = description
-        return self.put_request(path, path_args, payload)
-
-    @handle_response
     def get_job(self, job_name, namespace_name=None):
+        if not job_name:
+            raise ValueError('job_name must not be None')
+
         if not namespace_name:
             namespace_name = self._namespace_name
 
-        path = "namespaces/{0}/jobs/{1}"
-        path_args = [namespace_name, job_name]
-        return self.get_request(path, path_args)
+        return self._get(
+            self._url('/namespaces/{0}/jobs/{1}', namespace_name, job_name))
 
-    @handle_response
-    def list_jobs(self, namespace_name=None):
+    def list_jobs(self, limit=None, offset=None, namespace_name=None):
         if not namespace_name:
             namespace_name = self._namespace_name
 
-        path = "namespaces/{0}/jobs/"
-        path_args = [namespace_name]
-        result = self.get_request(path, path_args)
-        return result
+        return self._get(
+            self._url('/namespaces/{0}/jobs', namespace_name),
+            params={
+                'limit': limit,
+                'offset': offset
+            })
 
-    @handle_response
-    def create_job_run(self, job_name, job_run_args=None, namespace_name=None,
-                       nominal_start_time=None,
-                       nominal_end_time=None):
+    def create_job_run(self, job_name, nominal_start_time=None,
+                       nominal_end_time=None, run_args=None,
+                       mark_as_running=False, namespace_name=None):
+        if not job_name:
+            raise ValueError('job_name must not be None')
+
         if not namespace_name:
             namespace_name = self._namespace_name
 
-        path = "namespaces/{0}/jobs/{1}/runs"
-        path_args = [namespace_name, job_name]
-        payload = {
-            "nominalStartTime": nominal_start_time,
-            "nominalEndTime": nominal_end_time,
-            "runArgs": job_run_args
-        }
-        return self.post_request(path, path_args, payload)
+        response = self._post(
+            self._url('/namespaces/{0}/jobs/{1}/runs',
+                      namespace_name, job_name),
+            payload={
+                'nominalStartTime': nominal_start_time,
+                'nominalEndTime': nominal_end_time,
+                'runArgs': run_args
+            })
 
-    @handle_response
-    def get_job_run(self, job_run_id):
-        path = "jobs/runs/{0}"
-        path_args = [job_run_id]
-        return self.get_request(path, path_args)
+        if mark_as_running:
+            run_id = response['runId']
+            response = self.mark_job_run_as_running(run_id)
 
-    def mark_job_run_as_running(self, job_run_id):
-        return self._mark_job_run_as(
-            job_run_id, "run")
+        return response
 
-    def mark_job_run_as_completed(self, job_run_id):
-        return self._mark_job_run_as(
-            job_run_id, "complete")
+    def get_job_run(self, run_id):
+        if not run_id:
+            raise ValueError('run_id must not be None')
 
-    def mark_job_run_as_failed(self, job_run_id):
-        return self._mark_job_run_as(
-            job_run_id, "fail")
+        return self._get(self._url('/jobs/runs/{0}', run_id))
 
-    def mark_job_run_as_aborted(self, job_run_id):
-        return self._mark_job_run_as(
-            job_run_id, "abort")
+    def mark_job_run_as_running(self, run_id):
+        return self._mark_job_run_as(run_id, 'run')
 
-    @handle_response
-    def _mark_job_run_as(self, job_run_id, action):
-        path = "jobs/runs/{0}/{1}".format(job_run_id, action)
-        path_args = [job_run_id, action]
-        payload = None
-        return self.put_request(path, path_args, payload)
+    def mark_job_run_as_completed(self, run_id):
+        return self._mark_job_run_as(run_id, 'complete')
 
-    #  Datasets API
-    @handle_response
-    def create_dataset(self, name, datasource_urn, namespace_name=None,
-                       description=None):
+    def mark_job_run_as_failed(self, run_id):
+        return self._mark_job_run_as(run_id, 'fail')
+
+    def mark_job_run_as_aborted(self, run_id):
+        return self._mark_job_run_as(run_id, 'abort')
+
+    def _mark_job_run_as(self, run_id, action):
+        if not run_id:
+            raise ValueError('run_id must not be None')
+
+        return self._put(
+            self._url('/jobs/runs/{0}/{1}', run_id, action), as_json=False)
+
+    def create_datasource(self, datasource_name, connection_url):
+        if not datasource_name:
+            raise ValueError('datasource_name must not be None')
+        if not connection_url:
+            raise ValueError('connection_url must not be None')
+
+        return self._post(
+            self._url('/datasources'),
+            payload={
+                'name': datasource_name,
+                'connectionUrl': connection_url
+            })
+
+    def get_datasource(self, datasource_urn):
+        if not datasource_urn:
+            raise ValueError('datasource_urn must not be None')
+
+        return self._get(self._url('/datasources/{0}', datasource_urn))
+
+    def list_datasources(self, limit=None, offset=None):
+        return self._get(
+            self._url('/datasources'),
+            params={
+                'limit': limit,
+                'offset': offset
+            })
+
+    def create_dataset(self, dataset_name, datasource_urn,
+                       description=None, namespace_name=None):
+        if not dataset_name:
+            raise ValueError('dataset_name must not be None')
+        if not datasource_urn:
+            raise ValueError('datasource_urn must not be None')
+
         if not namespace_name:
             namespace_name = self._namespace_name
 
-        path = "namespaces/{0}/datasets"
-        path_args = [namespace_name]
-        payload = {
-            'name': name,
-            'datasourceUrn': datasource_urn
-        }
+        return self._post(
+            self._url('/namespaces/{0}/datasets', namespace_name),
+            payload={
+                'name': dataset_name,
+                'datasourceUrn': datasource_urn,
+                'description': description
+            })
 
-        if description:
-            payload['description'] = description
+    def get_dataset(self, dataset_urn, namespace_name=None):
+        if not dataset_urn:
+            raise ValueError('dataset_urn must not be None')
 
-        return self.post_request(path, path_args, payload)
-
-    @handle_response
-    def get_dataset(self, urn, namespace_name=None):
-        path = "namespaces/{0}/datasets/{1}"
         if not namespace_name:
             namespace_name = self._namespace_name
 
-        path_args = [namespace_name, urn]
-        return self.get_request(path, path_args)
+        return self._get(
+            self._url('/namespaces/{0}/datasets/{1}',
+                      namespace_name, dataset_urn))
 
-    @handle_response
-    def list_datasets(self, namespace_name=None):
-        path = "namespaces/{0}/datasets"
+    def list_datasets(self, namespace_name=None, limit=None, offset=None):
         if not namespace_name:
             namespace_name = self._namespace_name
 
-        path_args = [namespace_name]
-        return self.get_request(path, path_args)
+        return self._get(
+            self._url('/namespaces/{0}/datasets', namespace_name),
+            params={
+                'limit': limit,
+                'offset': offset
+            })
 
-    def put_request(self, path, path_args=None, args=None):
-        path = _compose_path(path, path_args)
-        full_path = "{0}/{1}".format(self._api_base, path)
-        return requests.put(url=full_path, json=args, timeout=self._timeout)
+    def _url(self, path, *args):
+        encoded_args = [quote(arg.encode("utf-8"), safe='') for arg in args]
+        return f'{self._api_base}{path.format(*encoded_args)}'
 
-    def post_request(self, path, path_args=None, payload=None):
-        path = _compose_path(path, path_args)
-        full_path = "{0}/{1}".format(self._api_base, path)
+    def _post(self, url, payload, as_json=True):
+        now_ms = self._now_ms()
 
-        return requests.post(
-            url=full_path, json=payload, timeout=self._timeout)
+        response = requests.post(
+            url=url, headers=_HEADERS, json=payload, timeout=self._timeout)
+        log.info(f'{url}', method='POST', payload=json.dumps(
+            payload), duration_ms=(self._now_ms() - now_ms))
 
-    def get_request(self, path, path_args=None, request_args=None):
-        if request_args and not isinstance(request_args, collections.Mapping):
-            raise Exception("Request argument must be a dictionary")
-        path = _compose_path(path, path_args)
-        full_path = "{0}/{1}".format(self._api_base, path)
-        if request_args:
-            arg_str = urllib.parse.urlencode(request_args)
-            full_path = "{0}?{1}".format(full_path, arg_str)
-        return requests.get(full_path, timeout=self._timeout)
+        return self._response(response, as_json)
+
+    def _put(self, url, payload=None, as_json=True):
+        now_ms = self._now_ms()
+
+        response = requests.put(
+            url=url, headers=_HEADERS, json=payload, timeout=self._timeout)
+        log.info(f'{url}', method='PUT', payload=json.dumps(
+            payload), duration_ms=(self._now_ms() - now_ms))
+
+        return self._response(response, as_json)
+
+    def _get(self, url, params=None, as_json=True):
+        now_ms = self._now_ms()
+
+        response = requests.get(
+            url, params=params, headers=_HEADERS, timeout=self._timeout)
+        log.info(f'{url}', method='GET',
+                 duration_ms=(self._now_ms() - now_ms))
+
+        return self._response(response, as_json)
+
+    def _now_ms(self):
+        return int(round(time.time() * 1000))
+
+    def _response(self, response, as_json=True):
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            self._raise_api_error(e)
+
+        return response.json() if as_json else response.text
+
+    def _raise_api_error(self, e):
+        # TODO: https://github.com/MarquezProject/marquez-python/issues/55
+        raise errors.APIError() from e
 
     @staticmethod
-    def _set_timeout(t):
-        timeout_milliseconds = (float(t) if (t and t.isnumeric())
-                                else _DEFAULT_TIMEOUT_MS)
-        return timeout_milliseconds / 1000.0
+    def _to_seconds(timeout_ms):
+        return float(timeout_ms) / 1000.0

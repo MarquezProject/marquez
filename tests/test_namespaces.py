@@ -16,8 +16,7 @@ from unittest.mock import MagicMock
 import pytest
 import vcr
 from marquez_client import MarquezClient
-from marquez_client.constants import NO_CONTENT_RESPONSE, NOT_FOUND
-from marquez_client.utils import APIError, InvalidRequestError
+from marquez_client import errors
 from pytest import fixture
 
 
@@ -71,32 +70,17 @@ def test_get_namespace_invalid_input(marquez_client):
     'test_create_namespace_missing_owner.yaml')
 def test_create_namespace_missing_owner(marquez_client):
     missing_namespace_owner = None
-    with pytest.raises(InvalidRequestError):
+    with pytest.raises(ValueError):
         marquez_client.create_namespace(
             "some_ns_name", missing_namespace_owner)
-
-
-def test_namespace_internal_service_error(marquez_client, mock_500_response):
-    with pytest.raises(APIError):
-        marquez_client.get_namespace('any_old_namespace')
-
-
-def test_namespace_204_no_content_response(marquez_client, mock_204_response):
-    assert NO_CONTENT_RESPONSE == marquez_client.get_namespace(
-        'any_old_namespace')
-
-
-def test_namespace_general_error(
-        marquez_client, mock_default_exception_response):
-    with pytest.raises(Exception):
-        marquez_client.get_namespace('any_old_namespace')
 
 
 @vcr.use_cassette(
     'tests/fixtures/vcr/test_namespaces/test_get_no_such_namespace.yaml')
 def test_get_no_such_namespace(marquez_client):
     no_such_namespace = "no_such_namespace123"
-    assert marquez_client.get_namespace(no_such_namespace) == NOT_FOUND
+    with pytest.raises(errors.APIError):
+        marquez_client.get_namespace(no_such_namespace)
 
 
 @vcr.use_cassette(
@@ -113,36 +97,3 @@ def test_namespace_not_set(marquez_client):
                                        ['input1', 'input2'],
                                        ['output1', 'output2'])
     assert result['name'] == 'some_job'
-
-
-@pytest.fixture()
-def mock_204_response(marquez_client):
-    original_function = marquez_client.get_request
-    response_obj = MagicMock()
-    response_obj.text = ''
-    response_obj.status_code = HTTPStatus.NO_CONTENT
-    marquez_client.get_request = MagicMock(return_value=response_obj)
-    yield
-    marquez_client.get_request = original_function
-
-
-@pytest.fixture()
-def mock_500_response(marquez_client):
-    original_function = marquez_client.get_request
-    response_obj = MagicMock()
-    response_obj.text = ''
-    response_obj.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
-    marquez_client.get_request = MagicMock(return_value=response_obj)
-    yield
-    marquez_client.get_request = original_function
-
-
-@pytest.fixture()
-def mock_default_exception_response(marquez_client):
-    original_function = marquez_client.get_request
-    response_obj = MagicMock()
-    response_obj.text = 'a 508 response. loop detected?!'
-    response_obj.status_code = HTTPStatus.LOOP_DETECTED
-    marquez_client.get_request = MagicMock(return_value=response_obj)
-    yield
-    marquez_client.get_request = original_function

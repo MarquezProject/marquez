@@ -7,7 +7,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [python-requests/2.20.1]
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/job_namespace/jobs/
+    uri: http://localhost:8080/api/v1/namespaces/job_namespace/jobs
   response:
     body: {string: '{"jobs":[{"name":"job_fixture","createdAt":1556152622362,"inputDatasetUrns":["input1a","input2a"],"outputDatasetUrns":["output1a","output2a"],"location":"some_other_location","description":null}]}'}
     headers:

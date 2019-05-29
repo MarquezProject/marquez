@@ -16,7 +16,7 @@ import sys
 import pytest
 import requests
 from marquez_client import MarquezClient
-from marquez_client.constants import NOT_FOUND
+from marquez_client import errors
 from requests import ReadTimeout
 from urllib3.exceptions import MaxRetryError
 from urllib3.util.retry import Retry
@@ -68,7 +68,8 @@ def test_namespace_not_found(wait_for_marquez):
     c = MarquezClient(host=MARQUEZ_HOST, port=MARQUEZ_PORT)
 
     expected_namespace = "not_found"
-    assert c.get_namespace(expected_namespace) == NOT_FOUND
+    with pytest.raises(errors.APIError):
+        c.get_namespace(expected_namespace)
 
 
 def iptables_drop_packets(drop):
