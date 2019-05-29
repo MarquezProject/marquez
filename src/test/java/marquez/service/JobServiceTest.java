@@ -263,7 +263,7 @@ public class JobServiceTest {
   }
 
   @Test
-  public void testGetAllRunsOfJob() throws MarquezServiceException{
+  public void testGetAllRunsOfJob_jobAndRunsFound() throws MarquezServiceException{
     Job job = Generator.genJob();
     NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
     List<JobRun> jobRuns = new ArrayList<JobRun>();
