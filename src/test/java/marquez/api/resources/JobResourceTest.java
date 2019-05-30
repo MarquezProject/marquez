@@ -334,6 +334,16 @@ public class JobResourceTest {
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
 
+  @Test
+  public void testGetAllRunsOfJob_namespaceNotFound() throws MarquezServiceException {
+    JobResponse job = generateApiJob();
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
+
+    Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
+
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
   private Response getJobRun(String jobRunId) {
     String path = format("/api/v1/jobs/runs/%s", NAMESPACE_NAME.getValue(), jobRunId);
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
