@@ -54,6 +54,9 @@ public class JobRunDaoTest extends JobRunBaseTest {
   protected static final JobRunStateDao jobRunStateDao = APP.onDemand(JobRunStateDao.class);
   protected static final JobRunArgsDao jobRunArgsDao = APP.onDemand(JobRunArgsDao.class);
 
+  protected static final int DEFAULT_OFFSET = 0;
+  protected static final int DEFAULT_LIMIT = 10;
+
   protected static NamespaceService namespaceService;
   protected static final JobService jobService =
       new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
@@ -121,19 +124,44 @@ public class JobRunDaoTest extends JobRunBaseTest {
   @Test
   public void testFindAllByJobUuid() throws MarquezServiceException {
     List<JobRun> jobRuns =
-        jobService.getAllRunsOfJob(NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME);
+        jobService.getAllRunsOfJob(
+            NamespaceName.fromString(NAMESPACE_NAME),
+            CREATED_JOB_NAME,
+            DEFAULT_LIMIT,
+            DEFAULT_OFFSET);
     assertEquals(jobRuns.size(), 1);
     jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     jobRuns =
-        jobService.getAllRunsOfJob(NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME);
+        jobService.getAllRunsOfJob(
+            NamespaceName.fromString(NAMESPACE_NAME),
+            CREATED_JOB_NAME,
+            DEFAULT_LIMIT,
+            DEFAULT_OFFSET);
     assertEquals(jobRuns.size(), 2);
+  }
+
+  @Test
+  public void testFindAllByJobUuid_withLimit() throws MarquezServiceException {
+    int singleJobLimit = 1;
+    jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
+    List<JobRun> jobRuns =
+        jobService.getAllRunsOfJob(
+            NamespaceName.fromString(NAMESPACE_NAME),
+            CREATED_JOB_NAME,
+            singleJobLimit,
+            DEFAULT_OFFSET);
+    assertEquals(jobRuns.size(), 1);
   }
 
   @Test
   public void testFindAllByJobUuid_JobDoesntExist() throws MarquezServiceException {
     String nonexistentJobName = "this_job_doesnt_exist";
     List<JobRun> jobRuns =
-        jobService.getAllRunsOfJob(NamespaceName.fromString(NAMESPACE_NAME), nonexistentJobName);
+        jobService.getAllRunsOfJob(
+            NamespaceName.fromString(NAMESPACE_NAME),
+            nonexistentJobName,
+            DEFAULT_LIMIT,
+            DEFAULT_OFFSET);
     assertEquals(jobRuns.size(), 0);
   }
 
@@ -150,7 +178,11 @@ public class JobRunDaoTest extends JobRunBaseTest {
                   format("DELETE FROM job_runs WHERE guid = '%s'", CREATED_JOB_RUN_UUID));
             });
     List<JobRun> jobRuns =
-        jobService.getAllRunsOfJob(NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME);
+        jobService.getAllRunsOfJob(
+            NamespaceName.fromString(NAMESPACE_NAME),
+            CREATED_JOB_NAME,
+            DEFAULT_LIMIT,
+            DEFAULT_OFFSET);
     assertEquals(jobRuns.size(), 0);
   }
 

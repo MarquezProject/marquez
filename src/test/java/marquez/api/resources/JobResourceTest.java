@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -340,7 +339,7 @@ public class JobResourceTest {
         JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
 
     List<JobRunResponse> responseJobRuns = new ArrayList<JobRunResponse>();
-    for (Object resItem : (Collection<?>) response.getEntity()) {
+    for (Object resItem : (List<?>) response.getEntity()) {
       responseJobRuns.add((JobRunResponse) resItem);
     }
     assertEquals(jobRuns.size(), responseJobRuns.size());

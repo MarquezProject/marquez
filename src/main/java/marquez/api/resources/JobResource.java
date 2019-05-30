@@ -25,12 +25,14 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.mappers.JobMapper;
@@ -150,41 +152,20 @@ public final class JobResource {
   }
 
   @Timed
-  @Path("/namespaces/{namespace}/jobs/{job}/runs")
-<<<<<<< HEAD
-  public Response getJobRuns(
-      @PathParam("namespace") final NamespaceName namespaceName, @PathParam("job") final String job)
-      throws MarquezServiceException {
-    if (!namespaceService.exists(namespaceName)) {
-      return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
-    }
-    final Optional<List<JobRun>> jobRuns = jobService.getAllRunsOfJob(namespaceName, job);
-    if (jobRuns.isPresent()) {
-      return Response.ok().entity(coreJobRunToApiJobRunMapper.map(jobRuns.get())).build();
-    }
-    return Response.status(Response.Status.NOT_FOUND).build();
-  }
-
-  @Timed
   @GET
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
-=======
->>>>>>> fix merge issue
   @Produces(APPLICATION_JSON)
   public Response getRunsForJob(
-      @PathParam("namespace") final NamespaceName namespaceName, @PathParam("job") final String job)
+      @PathParam("namespace") final NamespaceName namespaceName,
+      @PathParam("job") final String job,
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
     }
-<<<<<<< HEAD
-    return Response.ok()
-        .entity(JobRunResponseMapper.map(jobService.getAllRunsOfJob(namespaceName, job)))
-        .build();
-=======
-    final List<JobRun> jobRuns = jobService.getAllRunsOfJob(namespaceName, job);
+    final List<JobRun> jobRuns = jobService.getAllRunsOfJob(namespaceName, job, limit, offset);
     return Response.ok().entity(JobRunResponseMapper.map(jobRuns)).build();
->>>>>>> fix merge issue
   }
 
   @GET
