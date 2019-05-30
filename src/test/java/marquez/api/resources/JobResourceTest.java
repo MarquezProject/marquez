@@ -322,6 +322,18 @@ public class JobResourceTest {
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), res.getStatus());
   }
 
+  @Test
+  public void testGetAllRunsOfJob() throws MarquezServiceException {
+    JobResponse job = generateApiJob();
+    List<JobRun> jobRuns = Arrays.asList(Generator.genJobRun(), Generator.genJobRun());
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName())).thenReturn(jobRuns);
+
+    Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
+
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
   private Response getJobRun(String jobRunId) {
     String path = format("/api/v1/jobs/runs/%s", NAMESPACE_NAME.getValue(), jobRunId);
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
