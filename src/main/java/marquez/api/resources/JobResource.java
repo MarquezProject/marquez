@@ -152,7 +152,7 @@ public final class JobResource {
   @GET
   @Produces(APPLICATION_JSON)
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
-  public Response getJobRuns(
+  public Response getRunsForJob(
       @PathParam("namespace") final NamespaceName namespaceName, @PathParam("job") final String job)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
