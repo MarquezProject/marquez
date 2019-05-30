@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 
 import logging
 import os
@@ -27,7 +27,7 @@ def test_data_in_marquez(wait_for_marquez, init_airflow_db):
     execution_date = "2019-02-01T00:00:00"
     namespace = "integration-test"
 
-    c = Client(namespace_name=namespace)
+    c = MarquezClient(namespace_name=namespace)
 
     assert(trigger_dag(dag_id, execution_date))
     assert(check_dag_state(dag_id, execution_date))

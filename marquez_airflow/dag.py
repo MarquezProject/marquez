@@ -14,7 +14,7 @@ import os
 import pendulum
 import airflow.models
 
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 from marquez_airflow.utils import JobIdMapping
 
 
@@ -63,7 +63,6 @@ class DAG(airflow.models.DAG):
 
     def report_jobrun(self, run_args, execution_date):
         job_name = self.dag_id
-        job_run_args = run_args
         start_time = DAG.to_airflow_time(execution_date)
         end_time = self.compute_endtime(execution_date)
         marquez_client = self.get_marquez_client()
@@ -73,7 +72,7 @@ class DAG(airflow.models.DAG):
             self.marquez_input_urns, self.marquez_output_urns,
             description=self.description)
         marquez_jobrun = marquez_client.create_job_run(
-            job_name, job_run_args=job_run_args,
+            job_name, run_args=run_args,
             nominal_start_time=start_time,
             nominal_end_time=end_time)
 
@@ -119,7 +118,7 @@ class DAG(airflow.models.DAG):
 
     def get_marquez_client(self):
         if not self._marquez_client:
-            self._marquez_client = Client(
+            self._marquez_client = MarquezClient(
                 namespace_name=self.marquez_namespace)
             self._marquez_client.create_namespace(self.marquez_namespace,
                                                   "default_owner")

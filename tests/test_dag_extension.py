@@ -13,7 +13,7 @@
 from airflow.utils.state import State
 from contextlib import contextmanager
 from datetime import datetime
-from marquez_client.client import Client
+from marquez_client import MarquezClient
 from marquez_airflow import DAG
 from unittest.mock import Mock, create_autospec, patch
 
@@ -130,7 +130,7 @@ def assert_marquez_calls_for_dagrun(test_dag):
         test_dag.output_urns, description=test_dag.description)
 
     marquez_client.create_job_run.assert_called_once_with(
-        test_dag.dag_id, job_run_args="{}",
+        test_dag.dag_id, run_args="{}",
         nominal_start_time=DAG.to_airflow_time(test_dag.start_date),
         nominal_end_time=test_dag.marquez_dag.compute_endtime(
             test_dag.start_date))
@@ -139,7 +139,7 @@ def assert_marquez_calls_for_dagrun(test_dag):
 def make_mock_marquez_client(run_id):
     mock_marquez_jobrun = Mock()
     mock_marquez_jobrun.run_id = run_id
-    mock_marquez_client = create_autospec(Client)
+    mock_marquez_client = create_autospec(MarquezClient)
     mock_marquez_client.create_job_run.return_value = mock_marquez_jobrun
     return mock_marquez_client
 
