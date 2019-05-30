@@ -48,3 +48,6 @@ To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG` o
 ```
 $ export MARQUEZ_LOG_LEVEL='INFO'
 ```
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez-python/blob/master/CONTRIBUTING.md) for more details about how to contribute.
