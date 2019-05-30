@@ -2,7 +2,7 @@
 
 We're excited you're interested in contributing to Marquez! We'd love your help, and there are plenty of ways to contribute:
 
-* Fix or [report](https://github.com/MarquezProject/marquez/issues/new) a bug
+* Fix or [report](https://github.com/MarquezProject/marquez-python/issues/new) a bug
 * Fix or improve documentation
 * Pick up a ["good first issue"](https://github.com/MarquezProject/marquez-python/labels/good%20first%20issue), then send a pull request our way
 
