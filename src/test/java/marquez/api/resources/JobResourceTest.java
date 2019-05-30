@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +60,9 @@ public class JobResourceTest {
       new JobResource(MOCK_NAMESPACE_SERVICE, MOCK_JOB_SERVICE);
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final Entity<?> EMPTY_PUT_BODY = Entity.json("");
+
+  private static final int DEFAULT_LIMIT = 0;
+  private static final int DEFAULT_OFFSET = 100;
 
   final int UNPROCESSABLE_ENTRY_STATUS_CODE = 422;
 
@@ -328,12 +332,17 @@ public class JobResourceTest {
     JobResponse job = generateApiJob();
     List<JobRun> jobRuns = Arrays.asList(Generator.genJobRun(), Generator.genJobRun());
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName())).thenReturn(jobRuns);
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(
+            NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET))
+        .thenReturn(jobRuns);
 
-    Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
+    Response response =
+        JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
 
-    List<JobRunResponse> responseJobRuns = (List<JobRunResponse>) response.getEntity();
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    List<JobRunResponse> responseJobRuns = new ArrayList<JobRunResponse>();
+    for (Object resItem : (Collection<?>) response.getEntity()) {
+      responseJobRuns.add((JobRunResponse) resItem);
+    }
     assertEquals(jobRuns.size(), responseJobRuns.size());
   }
 
@@ -341,7 +350,9 @@ public class JobResourceTest {
   public void testGetAllRunsOfJob_namespaceNotFound() throws MarquezServiceException {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
 
-    Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, "nonexistent_job");
+    Response response =
+        JOB_RESOURCE.getRunsForJob(
+            NAMESPACE_NAME, "nonexistent_job", DEFAULT_LIMIT, DEFAULT_OFFSET);
 
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
@@ -351,9 +362,12 @@ public class JobResourceTest {
     JobResponse job = generateApiJob();
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
     List<JobRun> noJobRuns = new ArrayList<JobRun>();
-    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName())).thenReturn(noJobRuns);
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(
+            NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET))
+        .thenReturn(noJobRuns);
 
-    Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
+    Response response =
+        JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
 
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
@@ -361,16 +375,19 @@ public class JobResourceTest {
   @Test(expected = MarquezServiceException.class)
   public void testGetAllRunsOfJob_NamespaceService_Exception() throws MarquezServiceException {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenThrow(MarquezServiceException.class);
-    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, "some job");
+
+    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, "some job", DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
   @Test(expected = MarquezServiceException.class)
   public void testGetAllRunsOfJob_JobService_Exception() throws MarquezServiceException {
     JobResponse job = generateApiJob();
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName()))
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(
+            NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET))
         .thenThrow(MarquezServiceException.class);
-    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
+
+    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
   private Response getJobRun(String jobRunId) {
