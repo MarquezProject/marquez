@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -331,17 +332,42 @@ public class JobResourceTest {
 
     Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
 
+    List<JobRunResponse> responseJobRuns = (List<JobRunResponse>) response.getEntity();
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertEquals(jobRuns.size(), responseJobRuns.size());
   }
 
   @Test
   public void testGetAllRunsOfJob_namespaceNotFound() throws MarquezServiceException {
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
+
+    Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, "nonexistent_job");
+
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testGetAllRunsOfJob_noJobRuns() throws MarquezServiceException {
     JobResponse job = generateApiJob();
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
+    List<JobRun> noJobRuns = new ArrayList<JobRun>();
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName())).thenReturn(noJobRuns);
 
     Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
 
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testGetAllRunsOfJob_NamespaceService_Exception() throws MarquezServiceException {
+    JobResponse job = generateApiJob();
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName()))
+        .thenThrow(MarquezServiceException.class);
+
+    Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
+
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 
   private Response getJobRun(String jobRunId) {
