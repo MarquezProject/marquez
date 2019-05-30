@@ -358,16 +358,10 @@ public class JobResourceTest {
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
 
-  @Test
+  @Test(expected = MarquezServiceException.class)
   public void testGetAllRunsOfJob_NamespaceService_Exception() throws MarquezServiceException {
-    JobResponse job = generateApiJob();
-    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
-    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName()))
-        .thenThrow(MarquezServiceException.class);
-
-    Response response = JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
-
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenThrow(MarquezServiceException.class);
+    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, "some job");
   }
 
   private Response getJobRun(String jobRunId) {
