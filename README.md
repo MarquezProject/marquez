@@ -11,6 +11,7 @@ This library is under active development at [The We Company](https://www.we.co).
 ## Requirements
 
  - [Python 3.5.0](https://www.python.org/downloads)+
+ - [Airflow 1.10.3](https://pypi.org/project/apache-airflow)+
 
 ## Installation
 
