@@ -171,7 +171,7 @@ public final class JobResource {
 =======
 >>>>>>> fix merge issue
   @Produces(APPLICATION_JSON)
-  public Response getJobRuns(
+  public Response getRunsForJob(
       @PathParam("namespace") final NamespaceName namespaceName, @PathParam("job") final String job)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
