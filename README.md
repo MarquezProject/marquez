@@ -8,7 +8,7 @@ A library that integrates Airflow DAGs with [Marquez](https://github.com/Marquez
 
 This library is under active development at [The We Company](https://www.we.co).
 
-# Requirements
+## Requirements
 
  - [Python 3.5.0](https://www.python.org/downloads)+
 
