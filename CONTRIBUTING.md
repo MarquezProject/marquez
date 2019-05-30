@@ -11,7 +11,7 @@ We feel that a welcoming community is important and we ask that you follow the [
 # Submitting a [pull request](https://help.github.com/articles/about-pull-requests)
 
 1. [Fork](https://github.com/MarquezProject/marquez-python/fork) and clone the repository
-2. Make sure all tests pass locally: `python -m pytest ./tests --ignore=tests/integration`
+2. Make sure all tests pass locally: `python -m pytest --ignore=tests/integration`
 3. Create a new branch: `git checkout -b my-cool-new-branch`
 4. Make change on your cool new branch
 5. Write a test for your change
