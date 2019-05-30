@@ -364,6 +364,15 @@ public class JobResourceTest {
     JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, "some job");
   }
 
+  @Test(expected = MarquezServiceException.class)
+  public void testGetAllRunsOfJob_JobService_Exception() throws MarquezServiceException {
+    JobResponse job = generateApiJob();
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName()))
+        .thenThrow(MarquezServiceException.class);
+    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
+  }
+
   private Response getJobRun(String jobRunId) {
     String path = format("/api/v1/jobs/runs/%s", NAMESPACE_NAME.getValue(), jobRunId);
     return resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
