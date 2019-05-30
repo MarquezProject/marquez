@@ -24,10 +24,6 @@ import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.dropwizard.DropwizardExports;
-import io.prometheus.client.exporter.MetricsServlet;
-import io.prometheus.client.hotspot.DefaultExports;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
@@ -60,10 +56,6 @@ public class MarquezApp extends Application<MarquezConfig> {
   private static final String POSTGRES_DB = "postgresql";
   private static final boolean ERROR_ON_UNDEFINED = false;
 
-  // Monitoring
-  private static final String PROMETHEUS = "prometheus";
-  private static final String PROMETHEUS_ENDPOINT = "/metrics";
-
   public static void main(String[] args) throws Exception {
     new MarquezApp().run(args);
   }
@@ -75,12 +67,6 @@ public class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void initialize(@NonNull Bootstrap<MarquezConfig> bootstrap) {
-    // Enable metric collection for prometheus.
-    CollectorRegistry.defaultRegistry.register(
-        new DropwizardExports(bootstrap.getMetricRegistry()));
-    // Add metrics about CPU, JVM memory etc.
-    DefaultExports.initialize();
-
     // Enable variable substitution with environment variables.
     bootstrap.setConfigurationSourceProvider(
         new SubstitutingSourceProvider(
@@ -106,9 +92,6 @@ public class MarquezApp extends Application<MarquezConfig> {
   public void run(@NonNull MarquezConfig config, @NonNull Environment env) throws MarquezException {
     migrateDbOrError(config);
     registerResources(config, env);
-
-    // Expose metrics for monitoring.
-    env.servlets().addServlet(PROMETHEUS, new MetricsServlet()).addMapping(PROMETHEUS_ENDPOINT);
   }
 
   private void migrateDbOrError(@NonNull MarquezConfig config) {

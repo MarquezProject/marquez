@@ -152,9 +152,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/jobRunId'
+    
     get:
-      summary: List all job runs
-      description: Returns a list of job runs.
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      summary: Retrieve job runs for a job
+      description: Returns a list of job runs, sorted reverse chronologically
       tags:
         - Jobs
       responses:
@@ -414,6 +418,22 @@ components:
         format: URN
         maxLength: 1024
         example: urn:dataset:analytics_db:wedata.room_bookings
+
+    limit:
+      name: limit
+      in: query
+      description: The number of results to return from offset
+      required: false
+      schema:
+        type: integer
+
+    offset:
+      name: offset
+      in: query
+      description: The initial position from which to return results
+      required: false
+      schema:
+        type: integer
 
   schemas:
     createNamespace:
