@@ -1,7 +1,7 @@
 version: '3'
 services:
   marquez:
-    image: marquezproject/marquez:0.2.1
+    image: marquezproject/marquez:0.3.4
     environment:
       - MARQUEZ_PORT=5000
       - MARQUEZ_ADMIN_PORT=5001
