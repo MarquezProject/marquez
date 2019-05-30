@@ -6,22 +6,19 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 * Fix or improve documentation
 * Pick up a ["good first issue"](https://github.com/MarquezProject/marquez-airflow/labels/good%20first%20issue), then send a pull request our way
 
-We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
+We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](https://github.com/MarquezProject/marquez-airflow/blob/master/CODE_OF_CONDUCT.md) in all interactions with the community.
 
 # Submitting a [pull request](https://help.github.com/articles/about-pull-requests)
 
 1. [Fork](https://github.com/MarquezProject/marquez-airflow/fork) and clone the repository
-2. Make sure all functional tests pass locally: `python -m pytest --ignore=tests/integration ./tests`
-3. Make sure all integration tests pass locally. This is a two-step process:
-   1. Rebuild the local docker image - `docker-compose -f tests/integration/docker-compose.yml build integration`
-   2. Run the integration tests: `docker-compose -f tests/integration/docker-compose.yml up --force-recreate  --exit-code-from integration`
-4. Create a new branch: `git checkout -b my-cool-new-branch`
-5. Make change on your cool new branch
-6. Write a test for your change
-7. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez-airflow/compare)
-8. Add the ["review"](https://github.com/MarquezProject/marquez-airflow/labels/review) label to your pull request
-9. Work with project maintainers to get your change reviewed and merged into the `master` branch
-10. Delete your branch
+2. Make sure all tests pass locally: `python -m pytest --ignore=tests/integration`
+3. Create a new branch: `git checkout -b my-cool-new-branch`
+4. Make change on your cool new branch
+5. Write a test for your change
+6. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez-airflow/compare)
+7. Add the ["review"](https://github.com/MarquezProject/marquez-airflow/labels/review) label to your pull request
+8. Work with project maintainers to get your change reviewed and merged into the `master` branch
+9. Delete your branch
 
 To ensure your pull request is accepted, follow these guidelines:
 
