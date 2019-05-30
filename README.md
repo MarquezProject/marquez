@@ -43,7 +43,7 @@ client.get_job('room_bookings_7_days')
 
 ```
 
-To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG` or `INFO`:
+To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG`, `INFO`, or `ERROR`:
 
 ```
 $ export MARQUEZ_LOG_LEVEL='INFO'
