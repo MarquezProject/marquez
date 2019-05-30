@@ -369,7 +369,7 @@ public class JobResourceTest {
     JobResponse job = generateApiJob();
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
     when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName()))
-      .thenThrow(MarquezServiceException.class);
+        .thenThrow(MarquezServiceException.class);
     JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName());
   }
 
