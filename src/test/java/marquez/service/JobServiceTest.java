@@ -2,9 +2,9 @@ package marquez.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -27,7 +27,10 @@ import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
 import marquez.service.models.JobVersion;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -38,10 +41,12 @@ public class JobServiceTest {
   private static final int DEFAULT_LIMIT = 20;
   private static final int DEFAULT_OFFSET = 0;
 
-  private static final JobDao jobDao = mock(JobDao.class);
-  private static final JobVersionDao jobVersionDao = mock(JobVersionDao.class);
-  private static final JobRunDao jobRunDao = mock(JobRunDao.class);
-  private static final JobRunArgsDao jobRunArgsDao = mock(JobRunArgsDao.class);
+  @Rule public MockitoRule rule = MockitoJUnit.rule();
+
+  @Mock private JobDao jobDao;
+  @Mock private JobVersionDao jobVersionDao;
+  @Mock private JobRunDao jobRunDao;
+  @Mock private JobRunArgsDao jobRunArgsDao;
   private static final UUID namespaceID = UUID.randomUUID();
 
   JobService jobService;
