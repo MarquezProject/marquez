@@ -54,8 +54,8 @@ public class JobRunDaoTest extends JobRunBaseTest {
   protected static final JobRunStateDao jobRunStateDao = APP.onDemand(JobRunStateDao.class);
   protected static final JobRunArgsDao jobRunArgsDao = APP.onDemand(JobRunArgsDao.class);
 
-  protected static final int DEFAULT_OFFSET = 0;
-  protected static final int DEFAULT_LIMIT = 10;
+  protected static final int TEST_OFFSET = 0;
+  protected static final int TEST_LIMIT = 10;
 
   protected static NamespaceService namespaceService;
   protected static final JobService jobService =
@@ -125,18 +125,12 @@ public class JobRunDaoTest extends JobRunBaseTest {
   public void testFindAllByJobUuid() throws MarquezServiceException {
     List<JobRun> jobRuns =
         jobService.getAllRunsOfJob(
-            NamespaceName.fromString(NAMESPACE_NAME),
-            CREATED_JOB_NAME,
-            DEFAULT_LIMIT,
-            DEFAULT_OFFSET);
+            NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME, TEST_LIMIT, TEST_OFFSET);
     assertEquals(jobRuns.size(), 1);
     jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     jobRuns =
         jobService.getAllRunsOfJob(
-            NamespaceName.fromString(NAMESPACE_NAME),
-            CREATED_JOB_NAME,
-            DEFAULT_LIMIT,
-            DEFAULT_OFFSET);
+            NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME, TEST_LIMIT, TEST_OFFSET);
     assertEquals(jobRuns.size(), 2);
   }
 
@@ -149,7 +143,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
             NamespaceName.fromString(NAMESPACE_NAME),
             CREATED_JOB_NAME,
             singleJobLimit,
-            DEFAULT_OFFSET);
+            TEST_OFFSET);
     assertEquals(jobRuns.size(), 1);
   }
 
@@ -158,10 +152,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
     String nonexistentJobName = "this_job_doesnt_exist";
     List<JobRun> jobRuns =
         jobService.getAllRunsOfJob(
-            NamespaceName.fromString(NAMESPACE_NAME),
-            nonexistentJobName,
-            DEFAULT_LIMIT,
-            DEFAULT_OFFSET);
+            NamespaceName.fromString(NAMESPACE_NAME), nonexistentJobName, TEST_LIMIT, TEST_OFFSET);
     assertEquals(jobRuns.size(), 0);
   }
 
@@ -179,10 +170,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
             });
     List<JobRun> jobRuns =
         jobService.getAllRunsOfJob(
-            NamespaceName.fromString(NAMESPACE_NAME),
-            CREATED_JOB_NAME,
-            DEFAULT_LIMIT,
-            DEFAULT_OFFSET);
+            NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME, TEST_LIMIT, TEST_OFFSET);
     assertEquals(jobRuns.size(), 0);
   }
 

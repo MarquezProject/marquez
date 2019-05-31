@@ -60,8 +60,8 @@ public class JobResourceTest {
   private static final NamespaceName NAMESPACE_NAME = NamespaceName.fromString("test");
   private static final Entity<?> EMPTY_PUT_BODY = Entity.json("");
 
-  private static final int DEFAULT_LIMIT = 0;
-  private static final int DEFAULT_OFFSET = 100;
+  private static final int TEST_LIMIT = 0;
+  private static final int TEST_OFFSET = 100;
 
   final int UNPROCESSABLE_ENTRY_STATUS_CODE = 422;
 
@@ -331,12 +331,11 @@ public class JobResourceTest {
     JobResponse job = generateApiJob();
     List<JobRun> jobRuns = Arrays.asList(Generator.genJobRun(), Generator.genJobRun());
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllRunsOfJob(
-            NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET))
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET))
         .thenReturn(jobRuns);
 
     Response response =
-        JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
+        JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET);
 
     List<JobRunResponse> responseJobRuns = new ArrayList<JobRunResponse>();
     for (Object resItem : (List<?>) response.getEntity()) {
@@ -350,8 +349,7 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
 
     Response response =
-        JOB_RESOURCE.getRunsForJob(
-            NAMESPACE_NAME, "nonexistent_job", DEFAULT_LIMIT, DEFAULT_OFFSET);
+        JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, "nonexistent_job", TEST_LIMIT, TEST_OFFSET);
 
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
@@ -361,12 +359,11 @@ public class JobResourceTest {
     JobResponse job = generateApiJob();
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
     List<JobRun> noJobRuns = new ArrayList<JobRun>();
-    when(MOCK_JOB_SERVICE.getAllRunsOfJob(
-            NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET))
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET))
         .thenReturn(noJobRuns);
 
     Response response =
-        JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
+        JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET);
 
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
@@ -375,18 +372,17 @@ public class JobResourceTest {
   public void testGetAllRunsOfJob_NamespaceService_Exception() throws MarquezServiceException {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenThrow(MarquezServiceException.class);
 
-    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, "some job", DEFAULT_LIMIT, DEFAULT_OFFSET);
+    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, "some job", TEST_LIMIT, TEST_OFFSET);
   }
 
   @Test(expected = MarquezServiceException.class)
   public void testGetAllRunsOfJob_JobService_Exception() throws MarquezServiceException {
     JobResponse job = generateApiJob();
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllRunsOfJob(
-            NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET))
+    when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET))
         .thenThrow(MarquezServiceException.class);
 
-    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
+    JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET);
   }
 
   private Response getJobRun(String jobRunId) {

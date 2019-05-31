@@ -38,8 +38,8 @@ import org.mockito.junit.MockitoRule;
 
 public class JobServiceTest {
   final String TEST_NS = "test_namespace";
-  private static final int DEFAULT_LIMIT = 20;
-  private static final int DEFAULT_OFFSET = 0;
+  private static final int TEST_LIMIT = 20;
+  private static final int TEST_OFFSET = 0;
 
   @Rule public MockitoRule rule = MockitoJUnit.rule();
 
@@ -265,10 +265,9 @@ public class JobServiceTest {
     jobRuns.add(Generator.genJobRun());
     jobRuns.add(Generator.genJobRun());
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
-    when(jobRunDao.findAllByJobUuid(job.getGuid(), DEFAULT_LIMIT, DEFAULT_OFFSET))
-        .thenReturn(jobRuns);
+    when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET)).thenReturn(jobRuns);
     List<JobRun> jobRunsFound =
-        jobService.getAllRunsOfJob(jobNamespace, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
+        jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET);
     assertEquals(2, jobRunsFound.size());
   }
 
@@ -278,10 +277,7 @@ public class JobServiceTest {
     NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(null);
     assertEquals(
-        0,
-        jobService
-            .getAllRunsOfJob(jobNamespace, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET)
-            .size());
+        0, jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET).size());
   }
 
   @Test
@@ -290,10 +286,9 @@ public class JobServiceTest {
     NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
     List<JobRun> jobRuns = new ArrayList<JobRun>();
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
-    when(jobRunDao.findAllByJobUuid(job.getGuid(), DEFAULT_LIMIT, DEFAULT_OFFSET))
-        .thenReturn(jobRuns);
+    when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET)).thenReturn(jobRuns);
     List<JobRun> jobRunsFound =
-        jobService.getAllRunsOfJob(jobNamespace, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
+        jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET);
     assertEquals(0, jobRunsFound.size());
   }
 
@@ -302,8 +297,8 @@ public class JobServiceTest {
     Job job = Generator.genJob();
     NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
-    when(jobRunDao.findAllByJobUuid(job.getGuid(), DEFAULT_LIMIT, DEFAULT_OFFSET))
+    when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET))
         .thenThrow(UnableToExecuteStatementException.class);
-    jobService.getAllRunsOfJob(jobNamespace, job.getName(), DEFAULT_LIMIT, DEFAULT_OFFSET);
+    jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET);
   }
 }
