@@ -12,7 +12,6 @@
 
 from airflow.utils.state import State
 from contextlib import contextmanager
-from datetime import datetime
 from marquez_client import MarquezClient
 from marquez_airflow import DAG
 from unittest.mock import Mock, create_autospec, patch
@@ -20,6 +19,7 @@ from unittest.mock import Mock, create_autospec, patch
 import airflow.models
 import marquez_airflow.utils
 import os
+import pendulum
 import pytest
 
 
@@ -34,7 +34,7 @@ class MockDag:
         self.location = location or 'test_location'
         self.input_urns = input_urns or []
         self.output_urns = output_urns or []
-        self.start_date = start_date or datetime(2019, 1, 31, 0, 0, 0)
+        self.start_date = start_date or pendulum.datetime(2019, 1, 31, 0, 0, 0)
         self.description = description or 'test description'
 
         self.marquez_run_id = marquez_run_id or '71d29487-0b54-4ae1-9295'
@@ -56,13 +56,17 @@ class MockDag:
 
 
 @contextmanager
-def execute_test(test_dag, mock_dag_run, mock_set):
+def execute_test(test_dag, mock_dag_run, mock_set,
+                 expected_starttime="2019-01-31T00:00:00Z",
+                 expected_endtime="2019-01-31T00:10:00Z"):
     mock_dag_run.return_value = make_mock_airflow_jobrun(
         test_dag.dag_id,
         test_dag.airflow_run_id)
     yield
     # Test the corresponding marquez calls
-    assert_marquez_calls_for_dagrun(test_dag)
+    assert_marquez_calls_for_dagrun(test_dag,
+                                    expected_starttime=expected_starttime,
+                                    expected_endtime=expected_endtime)
 
     # Assert there is a job_id mapping being created
     mock_set.assert_called_once_with(
@@ -86,8 +90,8 @@ def test_create_dagrun(mock_set, mock_dag_run):
 @patch.object(marquez_airflow.utils.JobIdMapping, 'set')
 def test_dag_once_schedule(mock_set, mock_dag_run):
     test_dag = MockDag('test_dag_id', schedule_interval="@once")
-
-    with execute_test(test_dag, mock_dag_run, mock_set):
+    with execute_test(test_dag, mock_dag_run, mock_set,
+                      expected_endtime=None):
         test_dag.marquez_dag.create_dagrun(state=State.RUNNING,
                                            run_id=test_dag.airflow_run_id,
                                            execution_date=test_dag.start_date)
@@ -122,7 +126,9 @@ def test_default_namespace():
         DAG.DEFAULT_NAMESPACE
 
 
-def assert_marquez_calls_for_dagrun(test_dag):
+def assert_marquez_calls_for_dagrun(test_dag,
+                                    expected_starttime,
+                                    expected_endtime):
     marquez_client = test_dag.marquez_dag._marquez_client
 
     marquez_client.create_job.assert_called_once_with(
@@ -131,9 +137,8 @@ def assert_marquez_calls_for_dagrun(test_dag):
 
     marquez_client.create_job_run.assert_called_once_with(
         test_dag.dag_id, run_args="{}",
-        nominal_start_time=DAG.to_airflow_time(test_dag.start_date),
-        nominal_end_time=test_dag.marquez_dag.compute_endtime(
-            test_dag.start_date))
+        nominal_start_time=expected_starttime,
+        nominal_end_time=expected_endtime)
 
 
 def make_mock_marquez_client(run_id):

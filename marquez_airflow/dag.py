@@ -11,7 +11,6 @@
 # limitations under the License.
 import logging
 import os
-import pendulum
 import airflow.models
 
 from marquez_client import MarquezClient
@@ -63,8 +62,10 @@ class DAG(airflow.models.DAG):
 
     def report_jobrun(self, run_args, execution_date):
         job_name = self.dag_id
-        start_time = DAG.to_airflow_time(execution_date)
+        start_time = execution_date.format("%Y-%m-%dT%H:%M:%SZ")
         end_time = self.compute_endtime(execution_date)
+        if end_time:
+            end_time = end_time.strftime("%Y-%m-%dT%H:%M:%SZ")
         marquez_client = self.get_marquez_client()
 
         marquez_client.create_job(
@@ -84,15 +85,8 @@ class DAG(airflow.models.DAG):
                                 start_time])
         return marquez_jobrun_id
 
-    @staticmethod
-    def to_airflow_time(execution_date):
-        return pendulum.instance(execution_date).to_datetime_string()
-
     def compute_endtime(self, execution_date):
-        end_time = self.following_schedule(execution_date)
-        if end_time:
-            end_time = DAG.to_airflow_time(end_time)
-        return end_time
+        return self.following_schedule(execution_date)
 
     def report_jobrun_change(self, dagrun, **kwargs):
         session = kwargs.get('session')
