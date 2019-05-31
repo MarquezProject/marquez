@@ -55,12 +55,16 @@ class MarquezClient(object):
         if not owner_name:
             raise ValueError('owner_name must not be None')
 
+        payload = {
+            'owner': owner_name
+        }
+
+        if description:
+            payload['description'] = description
+
         return self._put(
             self._url('/namespaces/{0}', namespace_name),
-            payload={
-                'owner': owner_name,
-                'description': description
-            })
+            payload=payload)
 
     def get_namespace(self, namespace_name):
         if not namespace_name:
@@ -87,14 +91,18 @@ class MarquezClient(object):
         if not namespace_name:
             namespace_name = self._namespace_name
 
+        payload = {
+            'inputDatasetUrns': input_dataset_urns or [],
+            'outputDatasetUrns': output_dataset_urns or [],
+            'location': location
+        }
+
+        if description:
+            payload['description'] = description
+
         return self._put(
             self._url('/namespaces/{0}/jobs/{1}', namespace_name, job_name),
-            payload={
-                'inputDatasetUrns': input_dataset_urns or [],
-                'outputDatasetUrns': output_dataset_urns or [],
-                'location': location,
-                'description': description
-            })
+            payload=payload)
 
     def get_job(self, job_name, namespace_name=None):
         if not job_name:
@@ -126,14 +134,21 @@ class MarquezClient(object):
         if not namespace_name:
             namespace_name = self._namespace_name
 
+        payload = {}
+
+        if nominal_start_time:
+            payload['nominalStartTime'] = nominal_start_time
+
+        if nominal_end_time:
+            payload['nominalEndTime'] = nominal_end_time
+
+        if run_args:
+            payload['runArgs'] = run_args
+
         response = self._post(
             self._url('/namespaces/{0}/jobs/{1}/runs',
                       namespace_name, job_name),
-            payload={
-                'nominalStartTime': nominal_start_time,
-                'nominalEndTime': nominal_end_time,
-                'runArgs': run_args
-            })
+            payload=payload)
 
         if mark_as_running:
             run_id = response['runId']
@@ -203,13 +218,17 @@ class MarquezClient(object):
         if not namespace_name:
             namespace_name = self._namespace_name
 
+        payload = {
+            'name': dataset_name,
+            'datasourceUrn': datasource_urn
+        }
+
+        if description:
+            payload['description'] = description
+
         return self._post(
             self._url('/namespaces/{0}/datasets', namespace_name),
-            payload={
-                'name': dataset_name,
-                'datasourceUrn': datasource_urn,
-                'description': description
-            })
+            payload=payload)
 
     def get_dataset(self, dataset_urn, namespace_name=None):
         if not dataset_urn:
