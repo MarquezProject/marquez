@@ -15,20 +15,17 @@ import os
 import requests
 import time
 
-
 from marquez_client import errors
 from marquez_client import log
 from marquez_client.constants import (
     DEFAULT_HOST, DEFAULT_PORT, DEFAULT_TIMEOUT_MS, DEFAULT_NAMESPACE_NAME
 )
 from marquez_client.version import VERSION
-from requests import codes
 from six.moves.urllib.parse import quote
 
 _API_PATH = 'api/v1'
 
 _USER_AGENT = f'marquez-python/{VERSION}'
-
 _HEADERS = {'User-Agent': _USER_AGENT}
 
 
@@ -64,7 +61,8 @@ class MarquezClient(object):
 
         return self._put(
             self._url('/namespaces/{0}', namespace_name),
-            payload=payload)
+            payload=payload
+        )
 
     def get_namespace(self, namespace_name):
         if not namespace_name:
@@ -78,7 +76,8 @@ class MarquezClient(object):
             params={
                 'limit': limit,
                 'offset': offset
-            })
+            }
+        )
 
     def create_job(self, job_name, location, input_dataset_urns=None,
                    output_dataset_urns=None, description=None,
@@ -102,7 +101,8 @@ class MarquezClient(object):
 
         return self._put(
             self._url('/namespaces/{0}/jobs/{1}', namespace_name, job_name),
-            payload=payload)
+            payload=payload
+        )
 
     def get_job(self, job_name, namespace_name=None):
         if not job_name:
@@ -112,7 +112,8 @@ class MarquezClient(object):
             namespace_name = self._namespace_name
 
         return self._get(
-            self._url('/namespaces/{0}/jobs/{1}', namespace_name, job_name))
+            self._url('/namespaces/{0}/jobs/{1}', namespace_name, job_name)
+        )
 
     def list_jobs(self, limit=None, offset=None, namespace_name=None):
         if not namespace_name:
@@ -123,7 +124,8 @@ class MarquezClient(object):
             params={
                 'limit': limit,
                 'offset': offset
-            })
+            }
+        )
 
     def create_job_run(self, job_name, nominal_start_time=None,
                        nominal_end_time=None, run_args=None,
@@ -179,7 +181,8 @@ class MarquezClient(object):
             raise ValueError('run_id must not be None')
 
         return self._put(
-            self._url('/jobs/runs/{0}/{1}', run_id, action), as_json=False)
+            self._url('/jobs/runs/{0}/{1}', run_id, action), as_json=False
+        )
 
     def create_datasource(self, datasource_name, connection_url):
         if not datasource_name:
@@ -192,7 +195,8 @@ class MarquezClient(object):
             payload={
                 'name': datasource_name,
                 'connectionUrl': connection_url
-            })
+            }
+        )
 
     def get_datasource(self, datasource_urn):
         if not datasource_urn:
@@ -206,7 +210,8 @@ class MarquezClient(object):
             params={
                 'limit': limit,
                 'offset': offset
-            })
+            }
+        )
 
     def create_dataset(self, dataset_name, datasource_urn,
                        description=None, namespace_name=None):
@@ -228,7 +233,8 @@ class MarquezClient(object):
 
         return self._post(
             self._url('/namespaces/{0}/datasets', namespace_name),
-            payload=payload)
+            payload=payload
+        )
 
     def get_dataset(self, dataset_urn, namespace_name=None):
         if not dataset_urn:
@@ -239,7 +245,8 @@ class MarquezClient(object):
 
         return self._get(
             self._url('/namespaces/{0}/datasets/{1}',
-                      namespace_name, dataset_urn))
+                      namespace_name, dataset_urn)
+        )
 
     def list_datasets(self, namespace_name=None, limit=None, offset=None):
         if not namespace_name:
@@ -250,10 +257,11 @@ class MarquezClient(object):
             params={
                 'limit': limit,
                 'offset': offset
-            })
+            }
+        )
 
     def _url(self, path, *args):
-        encoded_args = [quote(arg.encode("utf-8"), safe='') for arg in args]
+        encoded_args = [quote(arg.encode('utf-8'), safe='') for arg in args]
         return f'{self._api_base}{path.format(*encoded_args)}'
 
     def _post(self, url, payload, as_json=True):
@@ -286,10 +294,11 @@ class MarquezClient(object):
 
         return self._response(response, as_json)
 
-    def _now_ms(self):
+    @staticmethod
+    def _now_ms():
         return int(round(time.time() * 1000))
 
-    def _response(self, response, as_json=True):
+    def _response(self, response, as_json):
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
