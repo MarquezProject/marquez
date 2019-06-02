@@ -14,15 +14,23 @@ $ git clone git@github.com:MarquezProject/marquez.git && cd marquez
 
 #### RUNNING WITH [DOCKER](https://github.com/MarquezProject/marquez/blob/master/Dockerfile)
 
-The easiest way to get up and running is with [Docker](https://docs.docker.com/install). From the base of the Marquez repository run:
+The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
 $ docker-compose up
 ```
 
-Marquez listens on port `5000` for all API calls and port `5001` for the admin interface.
+Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To make sure everything is up and running browse to [http://localhost:8081](http://localhost:8081).
+
+> **Note:** By default, the Marquez HTTP API does not require any form of authentication or authorization.
 
 ## Example
+
+Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` enables the contextual grouping of metadata for related jobs and datasets. Note that jobs and datasets are unique within a namespace, but not across namespaces (please see [data model](https://marquezproject.github.io/marquez/#data-model) for an introduction to the data model of Marquez).
+
+Marquez provides a `default` namespace to record metadata, but we encourage you to create your own.
+
+> **Note:** The example shows how to collect metadata via direct HTTP API calls using `curl`. But, you can also get started using with our client library for [Python](https://github.com/MarquezProject/marquez-python).
 
 #### CREATE A NAMESPACE
 
@@ -66,7 +74,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_
   -d '{
         "inputDatasetUrns": ["urn:dataset:analytics_db:public.room_bookings"],
         "outputDatasetUrns": ["urn:dataset:analytics_db:public.room_bookings_7_days"],
-        "location": "https://github.com/wework/airflow/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
+        "location": "https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
         "description": "Determine weekly room booking occupancy patterns."
       }'
 ```
