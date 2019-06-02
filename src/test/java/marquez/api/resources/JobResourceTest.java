@@ -357,7 +357,7 @@ public class JobResourceTest {
   @Test
   public void testGetAllRunsOfJob_noJobRuns() throws MarquezServiceException {
     JobResponse job = generateApiJob();
-    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(false);
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
     List<JobRun> noJobRuns = new ArrayList<JobRun>();
     when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET))
         .thenReturn(noJobRuns);
@@ -365,7 +365,12 @@ public class JobResourceTest {
     Response response =
         JOB_RESOURCE.getRunsForJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET);
 
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    List<JobRunResponse> responseJobRuns = new ArrayList<JobRunResponse>();
+    for (Object resItem : (List<?>) response.getEntity()) {
+      responseJobRuns.add((JobRunResponse) resItem);
+    }
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertEquals(0, responseJobRuns.size());
   }
 
   @Test(expected = MarquezServiceException.class)
