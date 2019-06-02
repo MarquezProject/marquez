@@ -31,11 +31,32 @@ html * {
   color: black;
 }
 
-
 .main-content h4 a {
   font-size: 17px;
   font-weight: bold;
   color:#337ab7;
+}
+
+.highlight .nv {
+  font-size: 14.4px;
+  font-weight: bold;
+  color: #333333;
+}
+
+.highlight .nt {
+  font-size: 14.4px;
+  font-weight: bold;
+  color: #333333;
+}
+
+.highlight .se {
+  font-size: 14.4px;
+  color: #333333;
+}
+
+.highlight .s1 {
+  font-size: 14.4px;
+  color: #567482;
 }
 
 .highlight pre {
