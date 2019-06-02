@@ -30,7 +30,7 @@ Before we can begin collecting metadata, we must first create a _namespace_. A `
 
 Marquez provides a `default` namespace to record metadata, but we encourage you to create your own.
 
-> **Note:** The example shows how to collect metadata via direct HTTP API calls using `curl`. But, you can also get started using with our client library for [Python](https://github.com/MarquezProject/marquez-python).
+> **Note:** The example shows how to collect metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Python](https://github.com/MarquezProject/marquez-python).
 
 #### CREATE A NAMESPACE
 
