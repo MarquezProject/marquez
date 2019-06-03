@@ -18,6 +18,12 @@ set -e -x
 # Usage: $ ./prepare_for_release.py <type>
 # type - [major | minor | patch]. Default is patch.
 
+# Verify bump2version is installed
+if [[ ! $(type -P bump2version) ]]; then
+ echo "bump2version not installed! Please see https://github.com/c4urself/bump2version#installation"
+ exit 1
+fi
+
 branch=$(git rev-parse --abbrev-ref HEAD)
 if [[ "${branch}" != "master" ]]; then
   echo "You may only tag a commit on the 'master' branch"
