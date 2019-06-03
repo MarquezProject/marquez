@@ -151,9 +151,12 @@ public final class JobResource {
         .build();
   }
 
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
+  @Produces(APPLICATION_JSON)
   public Response getRunsForJob(
       @PathParam("namespace") final NamespaceName namespaceName,
       @PathParam("job") final String job,
