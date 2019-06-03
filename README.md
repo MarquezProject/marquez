@@ -30,7 +30,7 @@ The executable can be found under `build/libs/`
 
 ## Configuration
 
-To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. When creating your database using [`psql`](https://www.postgresql.org/docs/9.6/app-psql.html), we recommend calling it `marquez`:
+To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. When creating your database using [`createdb`](https://www.postgresql.org/docs/9.6/app-createdb.html), we recommend calling it `marquez`:
 
 ```
 $ createdb marquez;
