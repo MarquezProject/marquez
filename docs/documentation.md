@@ -20,7 +20,7 @@ The easiest way to get up and running is with Docker. From the base of the Marqu
 $ docker-compose up
 ```
 
-Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To make sure everything is up and running browse to [http://localhost:8081](http://localhost:8081).
+Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To verify the HTTP server is running and listening on `localhost` browse to [http://localhost:8081](http://localhost:8081).
 
 > **Note:** By default, the Marquez HTTP API does not require any form of authentication or authorization.
 
