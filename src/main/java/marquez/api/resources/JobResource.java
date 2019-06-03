@@ -167,9 +167,12 @@ public final class JobResource {
     return Response.ok().entity(JobRunResponseMapper.map(jobRuns)).build();
   }
 
-  @GET
   @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
   @Path("/jobs/runs/{id}")
+  @Produces(APPLICATION_JSON)
   public Response get(@PathParam("id") final UUID runId) throws MarquezServiceException {
     final Optional<JobRun> jobRun = jobService.getJobRun(runId);
     if (jobRun.isPresent()) {
