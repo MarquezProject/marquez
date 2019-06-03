@@ -22,11 +22,11 @@ $ docker-compose up
 
 Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:8081](http://localhost:8081).
 
-> **Note:** By default, the Marquez HTTP API does not require any form of authentication or authorization.
+> **Note:** By default, the Metadata API does not require any form of authentication or authorization.
 
 ## Example
 
-Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` enables the contextual grouping of metadata for related jobs and datasets. Note that jobs and datasets are unique within a namespace, but not across namespaces (please see [data model](https://marquezproject.github.io/marquez/#data-model) for an introduction to the data model of Marquez).
+Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` enables the contextual grouping of metadata for related jobs and datasets. Note that jobs and datasets are unique within a namespace, but not across namespaces (please see [data model](https://marquezproject.github.io/marquez/#data-model) for an introduction to the basic concepts of Marquez).
 
 Marquez provides a `default` namespace to record metadata, but we encourage you to create your own.
 
