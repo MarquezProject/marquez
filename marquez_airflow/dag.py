@@ -77,12 +77,15 @@ class DAG(airflow.models.DAG):
             nominal_start_time=start_time,
             nominal_end_time=end_time)
 
-        marquez_jobrun_id = str(marquez_jobrun.run_id)
-
-        marquez_client.mark_job_run_as_running(marquez_jobrun_id)
-        self.log_marquez_event(['job_running',
-                                marquez_jobrun_id,
-                                start_time])
+        marquez_jobrun_id = marquez_jobrun.get('runId')
+        if marquez_jobrun_id:
+            marquez_client.mark_job_run_as_running(marquez_jobrun_id)
+            self.log_marquez_event(['job_running',
+                                    marquez_jobrun_id,
+                                    start_time])
+        else:
+            logging.warning("[Marquez]\tNo 'runId' in payload: {}".format(
+                    marquez_jobrun))
         return marquez_jobrun_id
 
     def compute_endtime(self, execution_date):

@@ -21,6 +21,7 @@ import marquez_airflow.utils
 import os
 import pendulum
 import pytest
+import sys
 
 
 class MockDag:
@@ -142,10 +143,8 @@ def assert_marquez_calls_for_dagrun(test_dag,
 
 
 def make_mock_marquez_client(run_id):
-    mock_marquez_jobrun = Mock()
-    mock_marquez_jobrun.run_id = run_id
     mock_marquez_client = create_autospec(MarquezClient)
-    mock_marquez_client.create_job_run.return_value = mock_marquez_jobrun
+    mock_marquez_client.create_job_run.return_value = {'runId': run_id}
     return mock_marquez_client
 
 
@@ -157,4 +156,4 @@ def make_mock_airflow_jobrun(dag_id, airflow_run_id):
 
 
 if __name__ == "__main__":
-    pytest.main()
+    pytest.main([sys.argv[0]])
