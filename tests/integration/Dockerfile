@@ -9,4 +9,4 @@ RUN cd /marquez-airflow && \
     pip install .
 
 COPY ./tests/integration/integration_test.py .
-CMD python -m pytest ./integration_test.py
+CMD python -m pytest --log-cli-level=INFO ./integration_test.py

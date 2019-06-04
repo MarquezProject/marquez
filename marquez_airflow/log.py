@@ -31,8 +31,13 @@ def _log_level():
         return _LOG_LEVELS['ERROR']
 
 
-logging.basicConfig(level=_log_level(), format=_LOG_FORMAT)
+_CONSOLE = logging.StreamHandler()
+_CONSOLE.setLevel(_log_level())
+_CONSOLE.setFormatter(logging.Formatter(_LOG_FORMAT))
+
 _LOG = logging.getLogger('marquez_airflow')
+_LOG.setLevel(_log_level())
+_LOG.addHandler(_CONSOLE)
 
 
 def debug(msg, **extra):

@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Install marquez-airflow package
           command: pip install --user -e .
-      - run: python -m pytest --ignore=tests/integration --cov=marquez --cov-report xml ./tests
+      - run: python -m pytest --log-cli-level=INFO --ignore=tests/integration --cov=marquez --cov-report xml ./tests
 
   integration:
     machine: true

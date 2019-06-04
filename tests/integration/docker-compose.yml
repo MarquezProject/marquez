@@ -35,6 +35,7 @@ services:
       - AIRFLOW_HOME=/usr/local/airflow
       - MARQUEZ_HOST=marquez
       - MARQUEZ_PORT=5000
+      - MARQUEZ_LOG_LEVEL=INFO
       - MARQUEZ_NAMESPACE=integration-test
     volumes:
      - ./airflow/dags:/usr/local/airflow/dags
