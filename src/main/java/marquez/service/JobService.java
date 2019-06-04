@@ -18,10 +18,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.models.NamespaceName;
 import marquez.db.JobDao;
 import marquez.db.JobRunArgsDao;
 import marquez.db.JobRunDao;
@@ -150,6 +153,22 @@ public class JobService {
     } catch (UnableToExecuteStatementException e) {
       String err = "error fetching job run";
       log.error(err, e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public List<JobRun> getAllRunsOfJob(
+      NamespaceName namespace, String jobName, @NonNull Integer limit, @NonNull Integer offset)
+      throws MarquezServiceException {
+    try {
+      final Optional<Job> job =
+          Optional.ofNullable(jobDao.findByName(namespace.getValue(), jobName));
+      if (job.isPresent()) {
+        return jobRunDao.findAllByJobUuid(job.get().getGuid(), limit, offset);
+      }
+      return Collections.emptyList();
+    } catch (UnableToExecuteStatementException e) {
+      log.error(e.getMessage(), e);
       throw new MarquezServiceException();
     }
   }

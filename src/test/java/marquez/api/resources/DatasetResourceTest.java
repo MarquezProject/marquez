@@ -26,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -54,8 +53,13 @@ import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class DatasetResourceTest {
@@ -80,14 +84,13 @@ public class DatasetResourceTest {
           .description(DESCRIPTION)
           .build();
 
-  private NamespaceService namespaceService;
-  private DatasetService datasetService;
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+  @Mock private NamespaceService namespaceService;
+  @Mock private DatasetService datasetService;
   private DatasetResource datasetResource;
 
   @Before
   public void setUp() {
-    namespaceService = mock(NamespaceService.class);
-    datasetService = mock(DatasetService.class);
     datasetResource = new DatasetResource(namespaceService, datasetService);
   }
 

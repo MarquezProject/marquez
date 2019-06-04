@@ -16,7 +16,6 @@ package marquez.db.mappers;
 
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 import static marquez.db.models.DbModelGenerator.newRowUuid;
@@ -35,10 +34,9 @@ import java.util.UUID;
 import marquez.UnitTests;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
-import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 import marquez.db.Columns;
-import marquez.db.models.DatasetRowExtended;
+import marquez.db.models.DatasetRow;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,7 +47,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
-public class DatasetRowExtendedMapperTest {
+public class DatasetRowMapperTest {
   private static final UUID ROW_UUID = newRowUuid();
   private static final Instant CREATED_AT = newTimestamp();
   private static final Instant UPDATED_AT = CREATED_AT;
@@ -57,7 +55,6 @@ public class DatasetRowExtendedMapperTest {
   private static final UUID DATASOURCE_ROW_UUID = newRowUuid();
   private static final DatasetName NAME = newDatasetName();
   private static final DatasetUrn URN = newDatasetUrn();
-  private static final DatasourceUrn DATASOURCE_URN = newDatasourceUrn();
   private static final Description DESCRIPTION = newDescription();
   private static final UUID CURRENT_VERSION_UUID = newRowUuid();
 
@@ -76,7 +73,6 @@ public class DatasetRowExtendedMapperTest {
     when(results.getObject(Columns.DATASOURCE_UUID)).thenReturn(exists);
     when(results.getObject(Columns.NAME)).thenReturn(exists);
     when(results.getObject(Columns.URN)).thenReturn(exists);
-    when(results.getObject(Columns.DATASOURCE_URN)).thenReturn(exists);
     when(results.getObject(Columns.DESCRIPTION)).thenReturn(exists);
     when(results.getObject(Columns.CURRENT_VERSION_UUID)).thenReturn(exists);
 
@@ -87,23 +83,21 @@ public class DatasetRowExtendedMapperTest {
     when(results.getObject(Columns.DATASOURCE_UUID, UUID.class)).thenReturn(DATASOURCE_ROW_UUID);
     when(results.getString(Columns.NAME)).thenReturn(NAME.getValue());
     when(results.getString(Columns.URN)).thenReturn(URN.getValue());
-    when(results.getString(Columns.DATASOURCE_URN)).thenReturn(DATASOURCE_URN.getValue());
     when(results.getString(Columns.DESCRIPTION)).thenReturn(DESCRIPTION.getValue());
     when(results.getObject(Columns.CURRENT_VERSION_UUID, UUID.class))
         .thenReturn(CURRENT_VERSION_UUID);
 
-    final DatasetRowExtendedMapper rowExtendedMapper = new DatasetRowExtendedMapper();
-    final DatasetRowExtended rowExtended = rowExtendedMapper.map(results, context);
-    assertThat(rowExtended.getUuid()).isEqualTo(ROW_UUID);
-    assertThat(rowExtended.getCreatedAt()).isEqualTo(CREATED_AT);
-    assertThat(rowExtended.getUpdatedAt()).isEqualTo(UPDATED_AT);
-    assertThat(rowExtended.getNamespaceUuid()).isEqualTo(NAMESPACE_ROW_UUID);
-    assertThat(rowExtended.getDatasourceUuid()).isEqualTo(DATASOURCE_ROW_UUID);
-    assertThat(rowExtended.getName()).isEqualTo(NAME.getValue());
-    assertThat(rowExtended.getUrn()).isEqualTo(URN.getValue());
-    assertThat(rowExtended.getDatasourceUrn()).isEqualTo(DATASOURCE_URN.getValue());
-    assertThat(rowExtended.getDescription()).isEqualTo(DESCRIPTION.getValue());
-    assertThat(rowExtended.getCurrentVersionUuid()).isEqualTo(CURRENT_VERSION_UUID);
+    final DatasetRowMapper rowMapper = new DatasetRowMapper();
+    DatasetRow datasetRow = rowMapper.map(results, context);
+    assertThat(datasetRow.getUuid()).isEqualTo(ROW_UUID);
+    assertThat(datasetRow.getCreatedAt()).isEqualTo(CREATED_AT);
+    assertThat(datasetRow.getUpdatedAt()).isEqualTo(UPDATED_AT);
+    assertThat(datasetRow.getNamespaceUuid()).isEqualTo(NAMESPACE_ROW_UUID);
+    assertThat(datasetRow.getDatasourceUuid()).isEqualTo(DATASOURCE_ROW_UUID);
+    assertThat(datasetRow.getName()).isEqualTo(NAME.getValue());
+    assertThat(datasetRow.getUrn()).isEqualTo(URN.getValue());
+    assertThat(datasetRow.getDescription()).isEqualTo(DESCRIPTION.getValue());
+    assertThat(datasetRow.getCurrentVersionUuid()).isEqualTo(CURRENT_VERSION_UUID);
   }
 
   @Test
@@ -115,7 +109,6 @@ public class DatasetRowExtendedMapperTest {
     when(results.getObject(Columns.DATASOURCE_UUID)).thenReturn(exists);
     when(results.getObject(Columns.NAME)).thenReturn(exists);
     when(results.getObject(Columns.URN)).thenReturn(exists);
-    when(results.getObject(Columns.DATASOURCE_URN)).thenReturn(exists);
     when(results.getObject(Columns.DESCRIPTION)).thenReturn(NO_DESCRIPTION.getValue());
     when(results.getObject(Columns.CURRENT_VERSION_UUID)).thenReturn(exists);
 
@@ -126,37 +119,35 @@ public class DatasetRowExtendedMapperTest {
     when(results.getObject(Columns.DATASOURCE_UUID, UUID.class)).thenReturn(DATASOURCE_ROW_UUID);
     when(results.getString(Columns.NAME)).thenReturn(NAME.getValue());
     when(results.getString(Columns.URN)).thenReturn(URN.getValue());
-    when(results.getString(Columns.DATASOURCE_URN)).thenReturn(DATASOURCE_URN.getValue());
     when(results.getObject(Columns.CURRENT_VERSION_UUID, UUID.class))
         .thenReturn(CURRENT_VERSION_UUID);
 
-    final DatasetRowExtendedMapper rowExtendedMapper = new DatasetRowExtendedMapper();
-    final DatasetRowExtended rowExtended = rowExtendedMapper.map(results, context);
-    assertThat(rowExtended.getUuid()).isEqualTo(ROW_UUID);
-    assertThat(rowExtended.getCreatedAt()).isEqualTo(CREATED_AT);
-    assertThat(rowExtended.getUpdatedAt()).isEqualTo(UPDATED_AT);
-    assertThat(rowExtended.getNamespaceUuid()).isEqualTo(NAMESPACE_ROW_UUID);
-    assertThat(rowExtended.getDatasourceUuid()).isEqualTo(DATASOURCE_ROW_UUID);
-    assertThat(rowExtended.getName()).isEqualTo(NAME.getValue());
-    assertThat(rowExtended.getUrn()).isEqualTo(URN.getValue());
-    assertThat(rowExtended.getDatasourceUrn()).isEqualTo(DATASOURCE_URN.getValue());
-    assertThat(rowExtended.getDescription()).isEqualTo(NO_DESCRIPTION.getValue());
-    assertThat(rowExtended.getCurrentVersionUuid()).isEqualTo(CURRENT_VERSION_UUID);
+    final DatasetRowMapper rowMapper = new DatasetRowMapper();
+    DatasetRow datasetRow = rowMapper.map(results, context);
+    assertThat(datasetRow.getUuid()).isEqualTo(ROW_UUID);
+    assertThat(datasetRow.getCreatedAt()).isEqualTo(CREATED_AT);
+    assertThat(datasetRow.getUpdatedAt()).isEqualTo(UPDATED_AT);
+    assertThat(datasetRow.getNamespaceUuid()).isEqualTo(NAMESPACE_ROW_UUID);
+    assertThat(datasetRow.getDatasourceUuid()).isEqualTo(DATASOURCE_ROW_UUID);
+    assertThat(datasetRow.getName()).isEqualTo(NAME.getValue());
+    assertThat(datasetRow.getUrn()).isEqualTo(URN.getValue());
+    assertThat(datasetRow.getDescription()).isEqualTo(NO_DESCRIPTION.getValue());
+    assertThat(datasetRow.getCurrentVersionUuid()).isEqualTo(CURRENT_VERSION_UUID);
 
     verify(results, never()).getString(Columns.DESCRIPTION);
   }
 
   @Test
-  public void testMap_throwsException_onNullResults() throws SQLException {
+  public void testMap_throwsException_onNullResults() {
     final ResultSet nullResults = null;
-    final DatasetRowExtendedMapper rowExtendedMapper = new DatasetRowExtendedMapper();
-    assertThatNullPointerException().isThrownBy(() -> rowExtendedMapper.map(nullResults, context));
+    final DatasetRowMapper rowMapper = new DatasetRowMapper();
+    assertThatNullPointerException().isThrownBy(() -> rowMapper.map(nullResults, context));
   }
 
   @Test
-  public void testMap_throwsException_onNullContext() throws SQLException {
+  public void testMap_throwsException_onNullContext() {
     final StatementContext nullContext = null;
-    final DatasetRowExtendedMapper rowExtendedMapper = new DatasetRowExtendedMapper();
-    assertThatNullPointerException().isThrownBy(() -> rowExtendedMapper.map(results, nullContext));
+    final DatasetRowMapper rowMapper = new DatasetRowMapper();
+    assertThatNullPointerException().isThrownBy(() -> rowMapper.map(results, nullContext));
   }
 }

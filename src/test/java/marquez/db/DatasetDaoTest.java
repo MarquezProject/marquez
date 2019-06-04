@@ -22,6 +22,8 @@ import static marquez.db.models.DbModelGenerator.newNamespaceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import marquez.DataAccessTests;
@@ -36,6 +38,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
+import org.jdbi.v3.testing.Migration;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -49,7 +52,9 @@ public class DatasetDaoTest {
 
   @ClassRule
   public static final JdbiRule dbRule =
-      JdbiRule.embeddedPostgres().withPlugin(new SqlObjectPlugin()).migrateWithFlyway();
+      JdbiRule.embeddedPostgres()
+          .withPlugin(new SqlObjectPlugin())
+          .withMigration(Migration.before().withDefaultPath());
 
   private static NamespaceDao namespaceDao;
   private static DatasourceDao datasourceDao;
@@ -210,6 +215,7 @@ public class DatasetDaoTest {
     final List<DatasetRow> newDatasetRows =
         newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
+    Collections.sort(newDatasetRows, Comparator.comparing(DatasetRow::getName));
 
     final List<DatasetRowExtended> datasetRowsExtended =
         datasetDao.findAll(namespaceName, 2, OFFSET);
@@ -224,6 +230,7 @@ public class DatasetDaoTest {
     final List<DatasetRow> newDatasetRows =
         newDatasetRowsWith(namespaceRow.getUuid(), datasourceRow.getUuid(), 4);
     newDatasetRows.forEach(newDatasetRow -> datasetDao.insert(newDatasetRow));
+    Collections.sort(newDatasetRows, Comparator.comparing(DatasetRow::getName));
 
     final List<DatasetRowExtended> datasetRowsExtended =
         datasetDao.findAll(namespaceName, LIMIT, 2);

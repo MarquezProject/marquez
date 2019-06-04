@@ -29,6 +29,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
+import org.jdbi.v3.testing.Migration;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -38,7 +39,9 @@ public class DatasourceDaoTest {
 
   @ClassRule
   public static final JdbiRule dbRule =
-      JdbiRule.embeddedPostgres().withPlugin(new SqlObjectPlugin()).migrateWithFlyway();
+      JdbiRule.embeddedPostgres()
+          .withPlugin(new SqlObjectPlugin())
+          .withMigration(Migration.before().withDefaultPath());
 
   @BeforeClass
   public static void setup() {

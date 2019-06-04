@@ -14,10 +14,15 @@
 
 package marquez.api.models;
 
+import static java.util.stream.Collectors.toList;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDatasetUrns;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
+
+import marquez.common.models.DatasetUrn;
 
 public final class ApiModelGenerator {
   private ApiModelGenerator() {}
@@ -38,5 +43,17 @@ public final class ApiModelGenerator {
   public static NamespaceRequest newNamespaceRequest(boolean hasDescription) {
     return new NamespaceRequest(
         newOwnerName().getValue(), hasDescription ? newDescription().getValue() : null);
+  }
+
+  public static JobRequest newJobRequest() {
+    return newJobRequest(true);
+  }
+
+  public static JobRequest newJobRequest(boolean hasDescription) {
+    return new JobRequest(
+        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
+        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
+        newLocation().toString(),
+        hasDescription ? newDescription().getValue() : null);
   }
 }

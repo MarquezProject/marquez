@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,8 +56,13 @@ import marquez.service.mappers.DatasetMapper;
 import marquez.service.models.Dataset;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class DatasetServiceTest {
@@ -80,16 +84,15 @@ public class DatasetServiceTest {
           .description(DESCRIPTION)
           .build();
 
-  private NamespaceDao namespaceDao;
-  private DatasourceDao datasourceDao;
-  private DatasetDao datasetDao;
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+  @Mock private NamespaceDao namespaceDao;
+  @Mock private DatasourceDao datasourceDao;
+  @Mock private DatasetDao datasetDao;
   private DatasetService datasetService;
 
   @Before
   public void setUp() {
-    namespaceDao = mock(NamespaceDao.class);
-    datasourceDao = mock(DatasourceDao.class);
-    datasetDao = mock(DatasetDao.class);
     datasetService = new DatasetService(namespaceDao, datasourceDao, datasetDao);
   }
 
