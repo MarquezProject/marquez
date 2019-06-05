@@ -19,6 +19,7 @@ _LOG_FORMAT = '%(asctime)s | %(name)s | %(levelname)s | %(message)s'
 _LOG_LEVELS = {
     'DEBUG': logging.DEBUG,
     'INFO': logging.INFO,
+    'WARN': logging.WARN,
     'ERROR': logging.ERROR
 }
 
@@ -30,8 +31,13 @@ def _log_level():
         return _LOG_LEVELS['ERROR']
 
 
-logging.basicConfig(level=_log_level(), format=_LOG_FORMAT)
+_CONSOLE = logging.StreamHandler()
+_CONSOLE.setLevel(_log_level())
+_CONSOLE.setFormatter(logging.Formatter(_LOG_FORMAT))
+
 _LOG = logging.getLogger('marquez_client')
+_LOG.setLevel(_log_level())
+_LOG.addHandler(_CONSOLE)
 
 
 def debug(msg, **extra):
@@ -40,6 +46,10 @@ def debug(msg, **extra):
 
 def info(msg, **extra):
     _LOG.info(_fmt(msg, **extra))
+
+
+def warn(msg, **extra):
+    _LOG.warn(_fmt(msg, **extra))
 
 
 def error(msg, **extra):
