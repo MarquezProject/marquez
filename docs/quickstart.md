@@ -91,7 +91,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_
 {"name":"room_bookings_7_days","createdAt":"2019-06-05T05:08:04.991289Z","updatedAt":"2019-06-05T05:08:04.991289Z","inputDatasetUrns":["urn:dataset:analytics_db:public.room_bookings"],"outputDatasetUrns":["urn:dataset:analytics_db:public.room_bookings_7_days"],"location":"https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c","description":"Determine weekly room booking occupancy patterns."}
 ```
 
-#### STEP 5: RECORD A JOB RUN
+#### STEP 5: CREATE A JOB RUN
 
 ```bash
 $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_7_days/runs \
