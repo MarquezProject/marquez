@@ -27,28 +27,19 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-
 import marquez.UnitTests;
-import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceType;
 import marquez.common.models.DatasourceUrn;
-import marquez.common.models.DbName;
-import marquez.common.models.DbSchemaName;
-import marquez.common.models.DbTableName;
 import marquez.common.models.Description;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetRowExtended;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.NamespaceRow;
 import marquez.service.models.Dataset;
-import marquez.service.models.DbTableVersion;
 import marquez.service.models.Namespace;
-
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -145,84 +136,70 @@ public class DatasetMapperTest {
     final List<DatasetRowExtended> nullRowsExtended = null;
     assertThatNullPointerException().isThrownBy(() -> DatasetMapper.map(nullRowsExtended));
   }
-  
-  //things I wrote
-  @Test (expected = NullPointerException.class)
+
+  @Test(expected = NullPointerException.class)
   public void testDataSetRowMapper_nullNameSpaceRow() {
-	  final NamespaceRow namespaceRow = null;
-	  final DatasourceRow dataSourceRow = newDatasourceRow();
-	  final DatasetRowExtended rowExtended = newDatasetRowExtendedWith(NO_DESCRIPTION);
-	  final Dataset dataset = DatasetMapper.map(rowExtended);
-	  DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+    final NamespaceRow namespaceRow = null;
+    final DatasourceRow dataSourceRow = newDatasourceRow();
+    final DatasetRowExtended rowExtended = newDatasetRowExtendedWith(NO_DESCRIPTION);
+    final Dataset dataset = DatasetMapper.map(rowExtended);
+    DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
   }
-  
-  @Test (expected = NullPointerException.class)
+
+  @Test(expected = NullPointerException.class)
   public void testDataSetRowMapper_nullDataSourceRow() {
-	  final NamespaceRow namespaceRow = NamespaceRowMapper.map(new Namespace(UUID.randomUUID(),"a","b","c"));
-	  final DatasourceRow dataSourceRow = null;
-	  final DatasetRowExtended rowExtended = newDatasetRowExtendedWith(NO_DESCRIPTION);
-	  final Dataset dataset = DatasetMapper.map(rowExtended);
-	  DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+    final NamespaceRow namespaceRow =
+        NamespaceRowMapper.map(new Namespace(UUID.randomUUID(), "a", "b", "c"));
+    final DatasourceRow dataSourceRow = null;
+    final DatasetRowExtended rowExtended = newDatasetRowExtendedWith(NO_DESCRIPTION);
+    final Dataset dataset = DatasetMapper.map(rowExtended);
+    DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
   }
-  
-  @Test (expected = NullPointerException.class)
+
+  @Test(expected = NullPointerException.class)
   public void testDataSetRowMapper_nullDataset() {
-	  final NamespaceRow namespaceRow = NamespaceRowMapper.map(new Namespace(UUID.randomUUID(),"a","b","c"));
-	  final DatasourceRow dataSourceRow = newDatasourceRow();
-	  final Dataset dataset = null;
-	  DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+    final NamespaceRow namespaceRow =
+        NamespaceRowMapper.map(new Namespace(UUID.randomUUID(), "a", "b", "c"));
+    final DatasourceRow dataSourceRow = newDatasourceRow();
+    final Dataset dataset = null;
+    DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
   }
-  
+
   @Test
   public void testDataSetRowMapper_normalTest_NoDescription() {
-	  final NamespaceRow namespaceRow = NamespaceRowMapper.map(new Namespace(UUID.randomUUID(),"a","b","c"));
-	  final DatasourceRow dataSourceRow = newDatasourceRow();
-	  final DatasetRowExtended rowExtended = newDatasetRowExtendedWith(NO_DESCRIPTION);
-	  final Dataset dataset = DatasetMapper.map(rowExtended);
-	  dataset.setDescription(null);
-	  DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
-	  DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
-	  DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
-	  assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
-	  assertEquals(dataset.getName().getValue(),dr.getName());
-	  assertEquals(namespaceRow.getUuid(),dr.getNamespaceUuid());
-	  assertEquals(datasetUrn.getValue(),dr.getUrn());
-	  assertNull(dr.getDescription());
-	  assertThat(dr.getUuid()).isNotNull();
+    final NamespaceRow namespaceRow =
+        NamespaceRowMapper.map(new Namespace(UUID.randomUUID(), "a", "b", "c"));
+    final DatasourceRow dataSourceRow = newDatasourceRow();
+    final DatasetRowExtended rowExtended = newDatasetRowExtendedWith(NO_DESCRIPTION);
+    final Dataset dataset = DatasetMapper.map(rowExtended);
+    dataset.setDescription(null);
+    DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+    DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
+    DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
+    assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
+    assertEquals(dataset.getName().getValue(), dr.getName());
+    assertEquals(namespaceRow.getUuid(), dr.getNamespaceUuid());
+    assertEquals(datasetUrn.getValue(), dr.getUrn());
+    assertNull(dr.getDescription());
+    assertThat(dr.getUuid()).isNotNull();
   }
-  
+
   @Test
   public void testDataSetRowMapper_normalTest_WithDescription() {
-	  final NamespaceRow namespaceRow = NamespaceRowMapper.map(new Namespace(UUID.randomUUID(),"a","b","c"));
-	  final DatasourceRow dataSourceRow = newDatasourceRow();
-	  final DatasetRowExtended rowExtended = newDatasetRowExtendedWith(NO_DESCRIPTION);
-	  final Dataset dataset = DatasetMapper.map(rowExtended);
-	  dataset.setDescription(Description.fromString("TestDescription"));
-	  DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
-	  DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
-	  DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
-	  assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
-	  assertEquals(dataset.getName().getValue(),dr.getName());
-	  assertEquals(namespaceRow.getUuid(),dr.getNamespaceUuid());
-	  assertEquals(datasetUrn.getValue(),dr.getUrn());
-	  assertEquals("TestDescription",dr.getDescription().toString());
-	  assertThat(dr.getUuid()).isNotNull();
+    final NamespaceRow namespaceRow =
+        NamespaceRowMapper.map(new Namespace(UUID.randomUUID(), "a", "b", "c"));
+    final DatasourceRow dataSourceRow = newDatasourceRow();
+    final DatasetRowExtended rowExtended = newDatasetRowExtendedWith(NO_DESCRIPTION);
+    final Dataset dataset = DatasetMapper.map(rowExtended);
+    dataset.setDescription(Description.fromString("TestDescription"));
+    DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+    DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
+    DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
+    assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
+    assertEquals(dataset.getName().getValue(), dr.getName());
+    assertEquals(namespaceRow.getUuid(), dr.getNamespaceUuid());
+    assertEquals(datasetUrn.getValue(), dr.getUrn());
+    assertEquals("TestDescription", dr.getDescription().toString());
+    assertThat(dr.getUuid()).isNotNull();
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
 }
