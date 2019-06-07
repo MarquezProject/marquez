@@ -12,6 +12,12 @@ To checkout the Marquez source code run:
 $ git clone git@github.com:MarquezProject/marquez.git && cd marquez
 ```
 
+#### INSTALL [DOCKER](https://github.com/MarquezProject/marquez/blob/master/Dockerfile)
+To install Docker run:
+```
+$ brew cask install docker
+```
+
 #### RUNNING WITH [DOCKER](https://github.com/MarquezProject/marquez/blob/master/Dockerfile)
 
 The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
