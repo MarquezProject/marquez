@@ -8,6 +8,21 @@
     <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
   </head>
   <body>
+    <script>
+      var gitHubPath = 'MarquezProject/marquez';  // example repo
+      var url = 'https://api.github.com/repos/' + gitHubPath + '/tags';
+
+      $.get(url).done(function (data) {
+        var versions = data.sort(function (v1, v2) {
+          return semver.compare(v2.name, v1.name)
+        });
+        $('#result').html(versions[0].name);
+      });
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://rawgit.com/hippich/bower-semver/master/semver.min.js"></script>
+    <p>Latest tag: <span id="result"></span></p>
+    
     <header class="page-header" role="banner">
       <h1 class="project-name">{{ site.title | default: site.github.repository_name }}</h1>
       <h2 class="project-tagline">{{ site.description | default: site.github.project_tagline }}</h2>
