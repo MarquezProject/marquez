@@ -28,7 +28,7 @@ Marquez listens on port `5000` for all API calls and port `5001` for the admin i
 
 > **Note:** The example shows how to collect metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Python](https://github.com/MarquezProject/marquez-python).
 
-#### 1. CREATE A NAMESPACE
+#### STEP 1: CREATE A NAMESPACE
 
 Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` enables the contextual grouping of metadata for related jobs and datasets. Note that jobs and datasets are unique within a namespace, but not across namespaces (please see [data model](https://marquezproject.github.io/marquez/#data-model) for an introduction to the basic concepts of Marquez).
 
@@ -47,7 +47,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
 
 > **Note:** Marquez provides a `default` namespace to record metadata, but we encourage you to create your own.
 
-#### 2. CREATE A DATASOURCE
+#### STEP 2: CREATE A DATASOURCE
 
 Each dataset must be associated with a _datasource_. A `datasource` is the physical location of a dataset, such as a table in PostgreSQL, or a file in S3. A datasource enables the grouping of physical datasets to their physical source.
 
@@ -62,7 +62,7 @@ $ curl -X POST http://localhost:5000/api/v1/datasources \
 {"name":"analytics_db","createdAt":"2019-06-05T05:03:13.312327Z","urn":"urn:datasource:postgresql:analytics_db","connectionUrl":"jdbc:postgresql://localhost:5431/analytics"}
 ```
 
-#### 3. CREATE A DATASET
+#### STEP 3: ADD DATASET TO NAMESPACE
 
 ```bash
 $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/datasets \
@@ -76,7 +76,7 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/datasets \
 {"name":"public.room_bookings","createdAt":"2019-06-05T05:06:13.965385Z","urn":"urn:dataset:analytics_db:public.room_bookings","datasourceUrn":"urn:datasource:postgresql:analytics_db","description":"All global room bookings for each office."}
 ```
 
-#### 4. ADD JOB TO NAMESPACE
+#### STEP 4: ADD JOB TO NAMESPACE
 
 ```bash
 $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_7_days \
@@ -91,7 +91,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_
 {"name":"room_bookings_7_days","createdAt":"2019-06-05T05:08:04.991289Z","updatedAt":"2019-06-05T05:08:04.991289Z","inputDatasetUrns":["urn:dataset:analytics_db:public.room_bookings"],"outputDatasetUrns":["urn:dataset:analytics_db:public.room_bookings_7_days"],"location":"https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c","description":"Determine weekly room booking occupancy patterns."}
 ```
 
-#### 5. RECORD A JOB RUN
+#### STEP 5: RECORD A JOB RUN
 
 ```bash
 $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_7_days/runs \
@@ -103,13 +103,13 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings
 {"runId":"b2ce1db1-12f8-401f-b0af-f8521296b731","nominalStartTime":null,"nominalEndTime":null,"runArgs":"--output=s3://output/","runState":"NEW"}
 ```
 
-#### 6. RECORD A RUN
+#### STEP 6: RECORD A RUN
 
 ```bash
 $ curl -X PUT http://localhost:5000/api/v1/jobs/runs/b2ce1db1-12f8-401f-b0af-f8521296b731/run
 ```
 
-#### 7. RECORD A COMPLETE RUN
+#### STEP 7: RECORD A COMPLETE RUN
 
 ```bash
 $ curl -X PUT http://localhost:5000/api/v1/jobs/runs/b2ce1db1-12f8-401f-b0af-f8521296b731/complete
