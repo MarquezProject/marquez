@@ -4,18 +4,19 @@ layout: quickstart
 
 ## Quickstart
 
+#### PREREQUISITES
+
+Before you begin, make sure you have installed:
+
+* [Docker 17.05](https://docs.docker.com/install)+
+* [Docker Compose](https://docs.docker.com/compose/install)
+
 #### SETUP
 
 To checkout the Marquez source code run:
 
 ```
 $ git clone git@github.com:MarquezProject/marquez.git && cd marquez
-```
-
-#### INSTALL [DOCKER](https://github.com/MarquezProject/marquez/blob/master/Dockerfile)
-To install Docker run:
-```
-$ brew cask install docker
 ```
 
 #### RUNNING WITH [DOCKER](https://github.com/MarquezProject/marquez/blob/master/Dockerfile)
