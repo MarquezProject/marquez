@@ -62,7 +62,7 @@ $ curl -X POST http://localhost:5000/api/v1/datasources \
 {"name":"analytics_db","createdAt":"2019-06-05T05:03:13.312327Z","urn":"urn:datasource:postgresql:analytics_db","connectionUrl":"jdbc:postgresql://localhost:5431/analytics"}
 ```
 
-#### STEP 3: ADD DATASET TO DATASOURCE
+#### STEP 3: ADD DATASET TO NAMESPACE
 
 ```bash
 $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/datasets \
