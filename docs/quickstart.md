@@ -4,6 +4,13 @@ layout: quickstart
 
 ## Quickstart
 
+#### PREREQUISITES
+
+Before you begin, make sure you have installed:
+
+* [Docker 17.05](https://docs.docker.com/install)+
+* [Docker Compose](https://docs.docker.com/compose/install)
+
 #### SETUP
 
 To checkout the Marquez source code run:
