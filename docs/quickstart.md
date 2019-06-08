@@ -6,7 +6,7 @@ layout: quickstart
 
 #### PREREQUISITES
 
-Before you begin, make sure you have already installed:
+Before you begin, make sure you have installed:
 
 * [Docker 17.05](https://docs.docker.com/install)+
 * [Docker Compose](https://docs.docker.com/compose/install)
@@ -29,15 +29,17 @@ $ docker-compose up --build
 
 Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
 
-> **Note:** By default, the Metadata API does not require any form of authentication or authorization.
+> **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
 ## Example
 
-> **Note:** The example shows how to collect metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Python](https://github.com/MarquezProject/marquez-python).
+In this example, we show how you can record job and dataset metadata using Marquez. We encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](./openapi.html) of Marquez first.
+
+> **Note:** The example shows how to record metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Python](https://github.com/MarquezProject/marquez-python).
 
 #### STEP 1: CREATE A NAMESPACE
 
-Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` enables the contextual grouping of metadata for related jobs and datasets. Note that jobs and datasets are unique within a namespace, but not across namespaces (please see [data model](https://marquezproject.github.io/marquez/#data-model) for an introduction to the basic concepts of Marquez). In this quickstart, we will use the namespace `wedata`:
+Before we can begin recording metadata, we must first create a _namespace_. A `namespace` enables the contextual grouping of metadata for related jobs and datasets. Note that jobs and datasets are unique within a namespace, but not across namespaces. In this example, we will use the namespace `wedata`:
 
 ##### REQUEST
 
@@ -63,9 +65,11 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
 
 > **Note:** Marquez provides a `default` namespace to record metadata, but we encourage you to create your own.
 
+With our `wedata` namespace created, we can start recording job and dataset metadata.
+
 #### STEP 2: CREATE A DATASOURCE
 
-Each dataset must be associated with a _datasource_. A `datasource` is the physical location of a dataset, such as a table in PostgreSQL, or a file in S3. A datasource enables the grouping of physical datasets to their physical source.
+Each dataset must be associated with a _datasource_. A `datasource` is the physical location of a dataset, such as a table in PostgreSQL, or a file in S3. A datasource enables the mapping of physical datasets to their physical source.
 
 ##### REQUEST
 
