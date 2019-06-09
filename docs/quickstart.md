@@ -45,11 +45,11 @@ In this quickstart, we will use the namespace `wedata`:
 $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
   -H 'Content-Type: application/json' \
   -d '{
-        "owner": "analytics",
+        "ownerName": "analytics",
         "description": "Contains datasets such as room bookings for each office."
       }'
 
-{"name":"wedata","createdAt":"2019-06-05T05:02:45.073284Z","owner":"analytics","description":"Contains datasets such as room bookings for each office."}
+{"name":"wedata","createdAt":"2019-06-05T05:02:45.073284Z","ownerName":"analytics","description":"Contains datasets such as room bookings for each office."}
 ```
 
 > **Note:** Marquez provides a `default` namespace to record metadata, but we encourage you to create your own.
