@@ -33,7 +33,7 @@ Marquez listens on port `5000` for all API calls and port `5001` for the admin i
 
 ## Example
 
-In this example, we show how you can record job and dataset metadata using Marquez. We encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](./openapi.html) of Marquez first.
+In this example, we show how you can record job and dataset metadata using Marquez. We encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](./openapi.html) of Marquez.
 
 > **Note:** The example shows how to record metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Python](https://github.com/MarquezProject/marquez-python).
 
@@ -65,11 +65,9 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
 
 > **Note:** Marquez provides a `default` namespace to record metadata, but we encourage you to create your own.
 
-With our `wedata` namespace created, we can start recording job and dataset metadata.
-
 #### STEP 2: CREATE A DATASOURCE
 
-Each dataset must be associated with a _datasource_. A `datasource` is the physical location of a dataset, such as a table in PostgreSQL, or a file in S3. A datasource enables the mapping of physical datasets to their physical source.
+Each dataset must be associated with a _datasource_. A `datasource` is the physical location of a dataset, such as a table in a database, or a file on cloud storage. A datasource enables the logical grouping and mapping of physical datasets to their physical source.
 
 ##### REQUEST
 
@@ -93,7 +91,11 @@ $ curl -X POST http://localhost:5000/api/v1/datasources \
 }
 ```
 
+When creating a datasource, the response includes a URN, which we can use to associate datasets to the datasource.
+
 #### STEP 3: ADD DATASET TO NAMESPACE
+
+Next, we need to create a dataset and associate it with an existing datasource:
 
 ##### REQUEST
 
