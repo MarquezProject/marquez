@@ -15,8 +15,8 @@
 package marquez.db.mappers;
 
 import static marquez.db.Columns.arrayOrThrow;
-import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.stringOrNull;
+import static marquez.db.Columns.timestampOrThrow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

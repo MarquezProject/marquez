@@ -14,6 +14,29 @@
 
 package marquez.db.mappers;
 
+import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
+import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newLocation;
+import static marquez.common.models.Description.NO_DESCRIPTION;
+import static marquez.db.models.DbModelGenerator.newNamespaceRow;
+import static marquez.db.models.DbModelGenerator.newRowUuid;
+import static marquez.db.models.DbModelGenerator.newTimestamp;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.net.URI;
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.UUID;
 import marquez.UnitTests;
 import marquez.common.models.Description;
 import marquez.common.models.JobName;
@@ -27,31 +50,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.net.URI;
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.UUID;
-
-import static marquez.common.models.CommonModelGenerator.newJobName;
-import static marquez.common.models.CommonModelGenerator.newLocation;
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
-import static marquez.common.models.Description.NO_DESCRIPTION;
-import static marquez.db.models.DbModelGenerator.newNamespaceRow;
-import static marquez.db.models.DbModelGenerator.newRowUuid;
-import static marquez.db.models.DbModelGenerator.newTimestamp;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.never;
-
-
 @Category(UnitTests.class)
 public class JobRowMapperTest {
   private static final UUID ROW_UUID = newRowUuid();
@@ -59,8 +57,8 @@ public class JobRowMapperTest {
   private static final URI LOCATION = newLocation();
   private static final UUID NAMESPACE_UUID = newNamespaceRow().getUuid();
   private static final Description DESCRIPTION = newDescription();
-  private static final String[] INPUT_DATASET_URNS = new String[]{newDatasetUrn().toString()};
-  private static final String[] OUTPUT_DATASET_URNS = new String[]{newDatasetUrn().toString()};
+  private static final String[] INPUT_DATASET_URNS = new String[] {newDatasetUrn().toString()};
+  private static final String[] OUTPUT_DATASET_URNS = new String[] {newDatasetUrn().toString()};
   private static final Instant CREATED_AT = newTimestamp();
   private static final Instant UPDATED_AT = CREATED_AT;
 
