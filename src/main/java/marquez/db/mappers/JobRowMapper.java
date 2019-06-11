@@ -16,6 +16,7 @@ package marquez.db.mappers;
 
 import static marquez.db.Columns.arrayOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.stringOrNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,7 +36,7 @@ public final class JobRowMapper implements RowMapper<Job> {
         results.getString(Columns.NAME),
         results.getString(Columns.LOCATION),
         results.getObject(Columns.NAMESPACE_UUID, UUID.class),
-        results.getString(Columns.DESCRIPTION),
+        stringOrNull(results, Columns.DESCRIPTION),
         arrayOrThrow(results, Columns.INPUT_DATASET_URNS),
         arrayOrThrow(results, Columns.OUTPUT_DATASET_URNS),
         timestampOrThrow(results, Columns.CREATED_AT),
