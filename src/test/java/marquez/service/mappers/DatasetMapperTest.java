@@ -21,17 +21,13 @@ import static marquez.db.models.DbModelGenerator.newDatasetRowExtended;
 import static marquez.db.models.DbModelGenerator.newDatasetRowExtendedWith;
 import static marquez.db.models.DbModelGenerator.newDatasetRowWith;
 import static marquez.db.models.DbModelGenerator.newDatasetRowsExtended;
-import static marquez.db.models.DbModelGenerator.newDatasourceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.time.Instant;
 import java.util.List;
 import marquez.UnitTests;
-import marquez.common.models.CommonModelGenerator;
-import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
@@ -43,7 +39,7 @@ import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbModelGenerator;
 import marquez.db.models.NamespaceRow;
 import marquez.service.models.Dataset;
-
+import marquez.service.models.ServiceModelGenerator;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -144,14 +140,8 @@ public class DatasetMapperTest {
   @Test(expected = NullPointerException.class)
   public void testDataSetRowMapper_nullNameSpaceRow() {
     final NamespaceRow namespaceRow = null;
-    final DatasourceRow dataSourceRow = newDatasourceRow();
-    final Dataset dataset = Dataset.builder()
-    		.name(DatasetName.fromString("testName"))
-    		.createdAt(Instant.now())
-    		.urn(CommonModelGenerator.newDatasetUrn())
-    		.datasourceUrn(CommonModelGenerator.newDatasourceUrn())
-    		.description(Description.fromString("TestDescription"))
-    		.build();
+    final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
+    final Dataset dataset = ServiceModelGenerator.newDataset();
     DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
   }
 
@@ -160,37 +150,25 @@ public class DatasetMapperTest {
     final NamespaceRow namespaceRow =
         DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
     final DatasourceRow dataSourceRow = null;
-    final Dataset dataset = Dataset.builder()
-    		.name(DatasetName.fromString("testName"))
-    		.createdAt(Instant.now())
-    		.urn(CommonModelGenerator.newDatasetUrn())
-    		.datasourceUrn(CommonModelGenerator.newDatasourceUrn())
-    		.description(Description.fromString("TestDescription"))
-    		.build();
+    final Dataset dataset = ServiceModelGenerator.newDataset();
     DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
   }
 
   @Test(expected = NullPointerException.class)
   public void testDataSetRowMapper_nullDataset() {
-	final NamespaceRow namespaceRow =
-		        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
-	final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
+    final NamespaceRow namespaceRow =
+        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
     final Dataset dataset = null;
     DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
   }
 
   @Test
   public void testDataSetRowMapper_normalTest_NoDescription() {
-	  final NamespaceRow namespaceRow =
-		        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow =
+        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
     final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
-    final Dataset dataset = Dataset.builder()
-    		.name(DatasetName.fromString("testName"))
-    		.createdAt(Instant.now())
-    		.urn(CommonModelGenerator.newDatasetUrn())
-    		.datasourceUrn(CommonModelGenerator.newDatasourceUrn())
-    		.description(Description.fromString("TestDescription"))
-    		.build();
+    final Dataset dataset = ServiceModelGenerator.newDataset();
     dataset.setDescription(null);
     DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
     DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
@@ -205,16 +183,10 @@ public class DatasetMapperTest {
 
   @Test
   public void testDataSetRowMapper_normalTest_WithDescription() {
-	final NamespaceRow namespaceRow =
-		        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow =
+        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
     final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
-    final Dataset dataset = Dataset.builder()
-    		.name(DatasetName.fromString("testName"))
-    		.createdAt(Instant.now())
-    		.urn(CommonModelGenerator.newDatasetUrn())
-    		.datasourceUrn(CommonModelGenerator.newDatasourceUrn())
-    		.description(Description.fromString("TestDescription"))
-    		.build();
+    final Dataset dataset = ServiceModelGenerator.newDataset();
     dataset.setDescription(Description.fromString("TestDescription"));
     DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
     DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
