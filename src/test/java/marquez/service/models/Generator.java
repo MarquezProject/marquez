@@ -29,6 +29,7 @@ import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
 import marquez.db.models.DbTableVersionRow;
 
+@Deprecated
 public class Generator {
   private static Random rand = new Random();
 
