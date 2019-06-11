@@ -19,13 +19,13 @@ See the [API docs](https://marquezproject.github.io/marquez/openapi.html).
 ## Installation
 
 ```bash
-$ pip install marquez-python
+$ pip3 install marquez-python
 ```
 
 To install from source run:
 
 ```bash
-$ python setup.py install
+$ python3 setup.py install
 ```
 
 ## Usage
