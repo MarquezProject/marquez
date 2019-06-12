@@ -40,7 +40,8 @@ setup(
     keywords=["Marquez"],
     packages=find_packages(),
     install_requires=[
-        "requests"
+        "requests",
+        "six"
     ],
     include_package_data=True,
     long_description="""\
