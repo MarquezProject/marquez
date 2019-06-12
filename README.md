@@ -14,4 +14,4 @@ See the [API docs](https://marquezproject.github.io/marquez/openapi.html).
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez-python/blob/master/CONTRIBUTING.md) for more details about how to contribute.
+See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez-java/blob/master/CONTRIBUTING.md) for more details about how to contribute.
