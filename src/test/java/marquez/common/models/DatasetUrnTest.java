@@ -22,11 +22,13 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetUrnTest {
-  private static final String NAMESPACE = "dataset";
-  private static final String VALUE = String.format("urn:%s:postgresql:public.foo", NAMESPACE);
 
-  private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("postgresql");
-  private static final DatasetName DATASET_NAME = DatasetName.fromString("public.foo");
+  private static final DatasourceName DATASOURCE_NAME = CommonModelGenerator.newDatasourceName();
+  private static final DatasetName DATASET_NAME = CommonModelGenerator.newDatasetName();
+
+  private static final String NAMESPACE = "dataset";
+  private static final String VALUE =
+      String.format("urn:%s:%s:%s", NAMESPACE, DATASOURCE_NAME.getValue(), DATASET_NAME.getValue());
 
   @Test
   public void testNewDatasetUrn_from() {

@@ -23,14 +23,16 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTests.class)
 public class DatasourceUrnTest {
 
+  private static final DatasourceName DATASOURCE_NAME = CommonModelGenerator.newDatasourceName();
+  private static final DatasourceType DATASOURCE_TYPE = CommonModelGenerator.newDatasourceType();
+
   private static final ConnectionUrl CONNECTION_URL =
-      ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+      CommonModelGenerator.newConnectionUrlWithDatasourceType(DATASOURCE_TYPE);
 
   private static final String NAMESPACE = "datasource";
-  private static final String VALUE = String.format("urn:%s:postgresql:test", NAMESPACE);
-
-  private static final DatasourceType DATASOURCE_TYPE = DatasourceType.POSTGRESQL;
-  private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("test");
+  private static final String VALUE =
+      String.format(
+          "urn:%s:%s:%s", NAMESPACE, DATASOURCE_TYPE.toString(), DATASOURCE_NAME.getValue());
 
   @Test
   public void testNewDatasourceUrn_from() {
