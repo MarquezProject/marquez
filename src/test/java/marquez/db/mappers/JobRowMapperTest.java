@@ -57,8 +57,8 @@ public class JobRowMapperTest {
   private static final URI LOCATION = newLocation();
   private static final UUID NAMESPACE_UUID = newNamespaceRow().getUuid();
   private static final Description DESCRIPTION = newDescription();
-  private static final String[] INPUT_DATASET_URNS = new String[] {newDatasetUrn().toString()};
-  private static final String[] OUTPUT_DATASET_URNS = new String[] {newDatasetUrn().toString()};
+  private static final String[] INPUT_DATASET_URNS = new String[] {newDatasetUrn().getValue()};
+  private static final String[] OUTPUT_DATASET_URNS = new String[] {newDatasetUrn().getValue()};
   private static final Instant CREATED_AT = newTimestamp();
   private static final Instant UPDATED_AT = CREATED_AT;
 
