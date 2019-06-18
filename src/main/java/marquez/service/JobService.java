@@ -14,7 +14,6 @@
 
 package marquez.service;
 
-import lombok.NonNull;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -23,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.NamespaceName;
 import marquez.db.JobDao;
@@ -105,9 +105,11 @@ public class JobService {
     }
   }
 
-  public List<Job> getAllJobsInNamespace(String namespace,@NonNull Integer limit,@NonNull Integer offset) throws MarquezServiceException {
+  public List<Job> getAllJobsInNamespace(
+      String namespace, @NonNull Integer limit, @NonNull Integer offset)
+      throws MarquezServiceException {
     try {
-      return jobDao.findAllInNamespace(namespace,limit,offset);
+      return jobDao.findAllInNamespace(namespace, limit, offset);
     } catch (UnableToExecuteStatementException e) {
       log.error("caught exception while fetching jobs in namespace ", e);
       throw new MarquezServiceException();

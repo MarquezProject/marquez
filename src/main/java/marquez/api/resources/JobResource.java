@@ -111,14 +111,15 @@ public final class JobResource {
   @Path("/namespaces/{namespace}/jobs")
   @Produces(APPLICATION_JSON)
   public Response listJobs(
-		  @PathParam("namespace") NamespaceName namespaceName,
-		  @QueryParam("limit") @DefaultValue("100") Integer limit,
-	      @QueryParam("offset") @DefaultValue("0") Integer offset)
+      @PathParam("namespace") NamespaceName namespaceName,
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    final List<Job> jobs = jobService.getAllJobsInNamespace(namespaceName.getValue(),limit,offset);
+    final List<Job> jobs =
+        jobService.getAllJobsInNamespace(namespaceName.getValue(), limit, offset);
     final JobsResponse response = JobResponseMapper.toJobsResponse(jobs);
     return Response.ok().entity(response).build();
   }

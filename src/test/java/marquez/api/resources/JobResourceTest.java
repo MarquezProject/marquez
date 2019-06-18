@@ -178,8 +178,8 @@ public class JobResourceTest {
   @Test
   public void testGetAllJobsInNamespaceErrorHandling() throws MarquezServiceException {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    
-    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(eq(NAMESPACE_NAME.getValue()),any(),any()))
+
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(eq(NAMESPACE_NAME.getValue()), any(), any()))
         .thenThrow(new MarquezServiceException());
 
     String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
@@ -192,9 +192,10 @@ public class JobResourceTest {
     marquez.service.models.Job job1 = Generator.genJob();
     marquez.service.models.Job job2 = Generator.genJob();
     List<marquez.service.models.Job> jobsList = Arrays.asList(job1, job2);
-    
+
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(eq(NAMESPACE_NAME.getValue()),any(),any())).thenReturn(jobsList);
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(eq(NAMESPACE_NAME.getValue()), any(), any()))
+        .thenReturn(jobsList);
 
     String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
@@ -202,20 +203,22 @@ public class JobResourceTest {
     List<JobResponse> returnedJobs = res.readEntity(JobsResponse.class).getJobs();
     assertThat(returnedJobs).hasSize(jobsList.size());
   }
-  
+
   @Test
   public void testGetAllJobsInNamespaceVerifyInputs() throws MarquezServiceException {
-	marquez.service.models.Job job1 = Generator.genJob();
+    marquez.service.models.Job job1 = Generator.genJob();
     marquez.service.models.Job job2 = Generator.genJob();
     List<marquez.service.models.Job> jobsList = Arrays.asList(job1, job2);
-    
+
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(eq(NAMESPACE_NAME.getValue()),any(),any())).thenReturn(jobsList);
-    
-    JOB_RESOURCE.listJobs(NAMESPACE_NAME,TEST_LIMIT,TEST_OFFSET);
-    verify(MOCK_JOB_SERVICE,times(1)).getAllJobsInNamespace(NAMESPACE_NAME.getValue(),TEST_LIMIT,TEST_OFFSET);
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(eq(NAMESPACE_NAME.getValue()), any(), any()))
+        .thenReturn(jobsList);
+
+    JOB_RESOURCE.listJobs(NAMESPACE_NAME, TEST_LIMIT, TEST_OFFSET);
+    verify(MOCK_JOB_SERVICE, times(1))
+        .getAllJobsInNamespace(NAMESPACE_NAME.getValue(), TEST_LIMIT, TEST_OFFSET);
   }
-  
+
   @Test
   public void testCreateJobRunInternalErrorHandling() throws MarquezServiceException {
     when(MOCK_JOB_SERVICE.createJobRun(any(), any(), any(), any(), any()))

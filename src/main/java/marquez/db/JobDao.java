@@ -67,6 +67,6 @@ public interface JobDao {
           + "INNER JOIN namespaces n "
           + " ON (j.namespace_guid = n.guid AND n.name = :namespaceName) "
           + " ORDER BY j.name "
-  		  + "LIMIT :limit OFFSET :offset")
-  List<Job> findAllInNamespace(String namespaceName,Integer limit, Integer offset);
+          + "LIMIT :limit OFFSET :offset")
+  List<Job> findAllInNamespace(String namespaceName, Integer limit, Integer offset);
 }

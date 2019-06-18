@@ -72,26 +72,26 @@ public class JobServiceTest {
     List<Job> jobs = new ArrayList<Job>();
     jobs.add(Generator.genJob(namespaceID));
     jobs.add(Generator.genJob(namespaceID));
-    when(jobDao.findAllInNamespace(TEST_NS,TEST_LIMIT,TEST_OFFSET)).thenReturn(jobs);
-    Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS,TEST_LIMIT,TEST_OFFSET));
-    verify(jobDao,times(1)).findAllInNamespace(TEST_NS,TEST_LIMIT,TEST_OFFSET);
+    when(jobDao.findAllInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET)).thenReturn(jobs);
+    Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET));
+    verify(jobDao, times(1)).findAllInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET);
   }
-  
-  @Test(expected=NullPointerException.class)
-  public void testGetAllNullLimit() throws MarquezServiceException{
-	  jobService.getAllJobsInNamespace(TEST_NS,null,TEST_OFFSET);
+
+  @Test(expected = NullPointerException.class)
+  public void testGetAllNullLimit() throws MarquezServiceException {
+    jobService.getAllJobsInNamespace(TEST_NS, null, TEST_OFFSET);
   }
-  
-  @Test(expected=NullPointerException.class)
+
+  @Test(expected = NullPointerException.class)
   public void testGetAllNullOffset() throws MarquezServiceException {
-	  jobService.getAllJobsInNamespace(TEST_NS,TEST_LIMIT,null);
+    jobService.getAllJobsInNamespace(TEST_NS, TEST_LIMIT, null);
   }
 
   @Test
   public void testGetAll_NoJobs_OK() throws MarquezServiceException {
     List<Job> jobs = new ArrayList<Job>();
-    when(jobDao.findAllInNamespace(TEST_NS,TEST_LIMIT,TEST_OFFSET)).thenReturn(jobs);
-    Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS,TEST_LIMIT,TEST_OFFSET));
+    when(jobDao.findAllInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET)).thenReturn(jobs);
+    Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET));
   }
 
   @Test
@@ -233,10 +233,11 @@ public class JobServiceTest {
 
   @Test(expected = MarquezServiceException.class)
   public void testGetAll_Exception() throws MarquezServiceException {
-	Integer limit = new Integer(10);
-	Integer offset = new Integer(0);
-    when(jobDao.findAllInNamespace(TEST_NS,limit,offset)).thenThrow(UnableToExecuteStatementException.class);
-    jobService.getAllJobsInNamespace(TEST_NS,limit,offset);
+    Integer limit = new Integer(10);
+    Integer offset = new Integer(0);
+    when(jobDao.findAllInNamespace(TEST_NS, limit, offset))
+        .thenThrow(UnableToExecuteStatementException.class);
+    jobService.getAllJobsInNamespace(TEST_NS, limit, offset);
   }
 
   @Test
