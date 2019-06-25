@@ -92,10 +92,10 @@ public final class CommonModelGenerator {
   }
 
   public static ConnectionUrl newConnectionUrl() {
-    return newConnectionUrlWithDatasourceType(newDatasourceType());
+    return newConnectionUrlWith(newDatasourceType());
   }
 
-  public static ConnectionUrl newConnectionUrlWithDatasourceType(DatasourceType datasourceType) {
+  public static ConnectionUrl newConnectionUrlWith(DatasourceType datasourceType) {
     return newConnectionUrlWith(
         String.format("jdbc:%s://localhost:5432/%s", datasourceType, newDbName().getValue()));
   }

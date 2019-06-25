@@ -14,6 +14,8 @@
 
 package marquez.common.models;
 
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static org.junit.Assert.assertEquals;
 
 import marquez.UnitTests;
@@ -23,8 +25,8 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTests.class)
 public class DatasetUrnTest {
 
-  private static final DatasourceName DATASOURCE_NAME = CommonModelGenerator.newDatasourceName();
-  private static final DatasetName DATASET_NAME = CommonModelGenerator.newDatasetName();
+  private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
+  private static final DatasetName DATASET_NAME = newDatasetName();
 
   private static final String NAMESPACE = "dataset";
   private static final String VALUE =

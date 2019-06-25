@@ -14,6 +14,7 @@
 
 package marquez.common.models;
 
+import static marquez.common.models.CommonModelGenerator.newDatasourceType;
 import static org.junit.Assert.assertEquals;
 
 import marquez.UnitTests;
@@ -22,7 +23,7 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class ConnectionUrlTest {
-  private static final DatasourceType DATASOURCE_TYPE = CommonModelGenerator.newDatasourceType();
+  private static final DatasourceType DATASOURCE_TYPE = newDatasourceType();
   private static final int DB_PORT = 5432;
   private static final DbName DB_NAME = DbName.fromString("test");
 
