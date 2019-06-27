@@ -34,6 +34,7 @@ public final class Job {
   @Getter private final List<String> outputDatasetUrns;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
+  @Getter private final JobType type;
 
   public Job(
       final UUID guid,
@@ -42,7 +43,8 @@ public final class Job {
       final UUID namespaceGuid,
       final String description,
       final List<String> inputDatasetUrns,
-      final List<String> outputDatasetUrns) {
+      final List<String> outputDatasetUrns,
+      final JobType type) {
     this.guid = guid;
     this.name = name;
     this.location = location;
@@ -52,5 +54,6 @@ public final class Job {
     this.outputDatasetUrns = outputDatasetUrns;
     this.createdAt = null;
     this.updatedAt = null;
+    this.type = type;
   }
 }

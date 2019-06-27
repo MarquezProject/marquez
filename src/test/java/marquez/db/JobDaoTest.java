@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import static marquez.common.models.CommonModelGenerator.newJobType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -82,6 +83,7 @@ public class JobDaoTest {
     assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
     assertEquals(job1.getInputDatasetUrns(), job2.getInputDatasetUrns());
     assertEquals(job1.getOutputDatasetUrns(), job2.getOutputDatasetUrns());
+    assertEquals(job1.getType(), job2.getType());
   }
 
   @Test
@@ -124,7 +126,8 @@ public class JobDaoTest {
             newNamespaceId,
             "desc",
             Collections.<String>emptyList(),
-            Collections.<String>emptyList());
+            Collections.<String>emptyList(),
+            newJobType());
     jobDao.insert(jobWithDiffNsSameName);
   }
 
@@ -139,7 +142,8 @@ public class JobDaoTest {
             job.getNamespaceGuid(),
             "desc",
             Collections.<String>emptyList(),
-            Collections.<String>emptyList());
+            Collections.<String>emptyList(),
+            newJobType());
     jobDao.insert(jobWithSameNsSameName);
   }
 
@@ -178,7 +182,8 @@ public class JobDaoTest {
             Collections.<String>emptyList(),
             Collections.<String>emptyList(),
             null,
-            null);
+            null,
+            newJobType());
     JobVersion jobVersion = Generator.genJobVersion(jobWithEmptyInputsOutputs);
     jobDao.insertJobAndVersion(jobWithEmptyInputsOutputs, jobVersion);
     Job jobFound = jobDao.findByID(jobId);

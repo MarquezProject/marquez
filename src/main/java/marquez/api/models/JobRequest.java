@@ -18,8 +18,13 @@ public final class JobRequest {
   @Getter @NotNull private final List<String> outputDatasetUrns;
   @Getter @NotNull private final String location;
   @Nullable private final String description;
+  @Nullable private final String type;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<String> getType() {
+    return Optional.ofNullable(type);
   }
 }

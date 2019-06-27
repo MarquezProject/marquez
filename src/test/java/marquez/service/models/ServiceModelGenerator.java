@@ -23,6 +23,7 @@ import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newJobType;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
@@ -119,7 +120,8 @@ public final class ServiceModelGenerator {
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
         createdAt,
-        updatedAt);
+        updatedAt,
+        newJobType());
   }
 
   public static List<JobRun> newJobRuns(int limit) {

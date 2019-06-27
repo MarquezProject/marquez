@@ -36,4 +36,6 @@ public final class JobResponse {
   private String location;
 
   private String description;
+
+  private String type;
 }

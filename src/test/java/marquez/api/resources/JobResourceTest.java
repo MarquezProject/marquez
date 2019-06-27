@@ -47,6 +47,7 @@ import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
 import marquez.service.models.JobRun;
+import marquez.service.models.JobType;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -139,6 +140,19 @@ public class JobResourceTest {
 
     JobResponse jobForJobCreationRequest = generateApiJob();
     jobForJobCreationRequest.setDescription(null);
+
+    insertJob(jobForJobCreationRequest);
+    verify(MOCK_JOB_SERVICE, times(1)).createJob(any(), any());
+  }
+
+
+  @Test
+  public void testTypeOptionalForCreateJobInputs() throws MarquezServiceException {
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+
+    JobResponse jobForJobCreationRequest = generateApiJob();
+    jobForJobCreationRequest.setType(null);
 
     insertJob(jobForJobCreationRequest);
     verify(MOCK_JOB_SERVICE, times(1)).createJob(any(), any());
@@ -406,7 +420,8 @@ public class JobResourceTest {
             job.getInputDatasetUrns(),
             job.getOutputDatasetUrns(),
             job.getLocation(),
-            job.getDescription());
+            job.getDescription(),
+            job.getType());
     String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME.getValue(), job.getName());
     return resources
         .client()
@@ -471,7 +486,8 @@ public class JobResourceTest {
     final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    return new JobResponse(jobName, null, null, inputList, outputList, location, description);
+    final String type = JobType.SERVICE.name();
+    return new JobResponse(jobName, null, null, inputList, outputList, location, description, type);
   }
 
   JobRunResponse generateApiJobRun() {

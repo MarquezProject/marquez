@@ -19,6 +19,7 @@ import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrns;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newJobType;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
@@ -54,6 +55,16 @@ public final class ApiModelGenerator {
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
         newLocation().toString(),
-        hasDescription ? newDescription().getValue() : null);
+        hasDescription ? newDescription().getValue() : null,
+        newJobType().name());
+  }
+
+  public static JobRequest newJobRequest(boolean hasDescription, boolean hasType) {
+    return new JobRequest(
+        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
+        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
+        newLocation().toString(),
+        hasDescription ? newDescription().getValue() : null,
+        hasType ? newJobType().name() : null);
   }
 }

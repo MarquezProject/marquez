@@ -35,7 +35,8 @@ public final class JobResponseMapper {
         job.getInputDatasetUrns(),
         job.getOutputDatasetUrns(),
         job.getLocation(),
-        job.getDescription());
+        job.getDescription(),
+        job.getType().name());
   }
 
   public static List<JobResponse> map(@NonNull List<Job> jobs) {

@@ -57,6 +57,7 @@ public final class Columns {
   public static final String RUN_ARGS = "args_json";
   public static final String RUN_STATE = "state";
   public static final String TRANSITIONED_AT = "transitioned_at";
+  public static final String JOB_TYPE = "type";
 
   // Dataset column names
 
