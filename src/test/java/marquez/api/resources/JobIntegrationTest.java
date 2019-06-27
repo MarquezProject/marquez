@@ -45,6 +45,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
+import marquez.service.models.JobType;
 import marquez.service.models.Namespace;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -260,7 +261,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
             job.getInputDatasetUrns(),
             job.getOutputDatasetUrns(),
             job.getLocation(),
-            job.getDescription());
+            job.getDescription(),
+            job.getType());
 
     String path = format("/api/v1/namespaces/%s/jobs/%s", namespace, job.getName());
     return APP.client()
@@ -276,7 +278,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
     final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    return new JobResponse(jobName, null, null, inputList, outputList, location, description);
+    final String type = JobType.STREAM.name();
+    return new JobResponse(jobName, null, null, inputList, outputList, location, description, type);
   }
 
   private JobRunResponse getJobRunApiResponse(UUID jobRunGuid) {

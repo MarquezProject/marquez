@@ -24,6 +24,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
 import marquez.service.models.Job;
+import marquez.service.models.JobType;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
@@ -40,6 +41,7 @@ public final class JobRowMapper implements RowMapper<Job> {
         arrayOrThrow(results, Columns.INPUT_DATASET_URNS),
         arrayOrThrow(results, Columns.OUTPUT_DATASET_URNS),
         timestampOrThrow(results, Columns.CREATED_AT),
-        timestampOrThrow(results, Columns.UPDATED_AT));
+        timestampOrThrow(results, Columns.UPDATED_AT),
+        JobType.valueOf(results.getString(Columns.JOB_TYPE)));
   }
 }

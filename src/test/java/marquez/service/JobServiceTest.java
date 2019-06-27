@@ -64,6 +64,7 @@ public class JobServiceTest {
     assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
     assertEquals(job1.getInputDatasetUrns(), job2.getInputDatasetUrns());
     assertEquals(job1.getOutputDatasetUrns(), job2.getOutputDatasetUrns());
+    assertEquals(job1.getType(), job2.getType());
   }
 
   @Test

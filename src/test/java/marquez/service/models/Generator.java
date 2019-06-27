@@ -59,7 +59,25 @@ public class Generator {
         Arrays.asList(randUrn(), randUrn()),
         Arrays.asList(randUrn(), randUrn()),
         createdAt,
-        updatedAt);
+        updatedAt,
+        JobType.BATCH);
+  }
+
+  public static Job genJobWithType(UUID namespaceID, JobType type) {
+    final Instant createdAt = Instant.now();
+    final Instant updatedAt = createdAt;
+    int jobNum = randNum();
+    return new Job(
+        UUID.randomUUID(),
+        "job" + jobNum,
+        "http://foo.bar/" + jobNum,
+        namespaceID,
+        null,
+        Arrays.asList(randUrn(), randUrn()),
+        Arrays.asList(randUrn(), randUrn()),
+        createdAt,
+        updatedAt,
+        type);
   }
 
   public static Job cloneJob(Job job) {
@@ -72,7 +90,8 @@ public class Generator {
         job.getInputDatasetUrns(),
         job.getOutputDatasetUrns(),
         job.getCreatedAt(),
-        job.getUpdatedAt());
+        job.getUpdatedAt(),
+        job.getType());
   }
 
   // Job Runs

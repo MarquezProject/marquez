@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
+import marquez.service.models.JobType;
 
 public final class CommonModelGenerator {
   private CommonModelGenerator() {}
@@ -126,6 +127,10 @@ public final class CommonModelGenerator {
 
   public static Description newDescription() {
     return newDescriptionWith("test_description" + newId());
+  }
+
+  public static JobType newJobType() {
+    return JobType.BATCH;
   }
 
   public static Description newDescriptionWith(String value) {

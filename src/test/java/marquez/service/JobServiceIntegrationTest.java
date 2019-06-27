@@ -89,7 +89,8 @@ public class JobServiceIntegrationTest {
             job.getNamespaceGuid(),
             job.getDescription(),
             job.getInputDatasetUrns(),
-            job.getOutputDatasetUrns());
+            job.getOutputDatasetUrns(),
+            job.getType());
     Job jobCreateRet =
         jobService.createJob(namespaceName, jobWithNewLoc); // should create new version implicitly
     Optional<Job> jobGetRet = jobService.getJob(namespaceName, job.getName());

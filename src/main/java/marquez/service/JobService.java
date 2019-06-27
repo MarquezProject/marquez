@@ -14,6 +14,7 @@
 
 package marquez.service;
 
+import com.google.common.base.Enums;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,6 +34,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
+import marquez.service.models.JobType;
 import marquez.service.models.JobVersion;
 import marquez.service.models.RunArgs;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
@@ -43,6 +45,8 @@ public class JobService {
   private final JobVersionDao jobVersionDao;
   private final JobRunDao jobRunDao;
   private final JobRunArgsDao jobRunArgsDao;
+
+  private static final JobType DEFAULT_JOB_TYPE = JobType.BATCH;
 
   public JobService(
       JobDao jobDao,
@@ -69,6 +73,7 @@ public class JobService {
     try {
       Job existingJob = this.jobDao.findByName(namespace, job.getName());
       if (existingJob == null) {
+        final JobType newJobType = job.getType() == null ? DEFAULT_JOB_TYPE : job.getType();
         Job newJob =
             new Job(
                 UUID.randomUUID(),
@@ -77,10 +82,13 @@ public class JobService {
                 job.getNamespaceGuid(),
                 job.getDescription(),
                 job.getInputDatasetUrns(),
-                job.getOutputDatasetUrns());
+                job.getOutputDatasetUrns(),
+                newJobType);
         jobDao.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
         return jobDao.findByID(newJob.getGuid());
       } else {
+        final JobType existingJobType =
+            existingJob.getType() == null ? DEFAULT_JOB_TYPE : existingJob.getType();
         Job existingJobWithNewUri =
             new Job(
                 existingJob.getGuid(),
@@ -89,7 +97,8 @@ public class JobService {
                 existingJob.getNamespaceGuid(),
                 existingJob.getDescription(),
                 existingJob.getInputDatasetUrns(),
-                existingJob.getOutputDatasetUrns());
+                existingJob.getOutputDatasetUrns(),
+                existingJobType);
         UUID versionID = JobService.computeVersion(existingJobWithNewUri);
         JobVersion existingJobVersion = jobVersionDao.findByVersion(versionID);
         if (existingJobVersion == null) {
@@ -236,6 +245,13 @@ public class JobService {
         null,
         null,
         null);
+  }
+
+  public static boolean isValidType(String type) {
+    if (Enums.getIfPresent(JobType.class, type).orNull() != null) {
+      return true;
+    }
+    return false;
   }
 
   protected static UUID computeVersion(Job job) {

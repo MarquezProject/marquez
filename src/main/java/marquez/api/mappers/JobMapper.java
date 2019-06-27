@@ -18,6 +18,7 @@ import lombok.NonNull;
 import marquez.api.models.JobRequest;
 import marquez.common.models.JobName;
 import marquez.service.models.Job;
+import marquez.service.models.JobType;
 
 public final class JobMapper {
   private JobMapper() {}
@@ -30,6 +31,7 @@ public final class JobMapper {
         null,
         request.getDescription().orElse(null),
         request.getInputDatasetUrns(),
-        request.getOutputDatasetUrns());
+        request.getOutputDatasetUrns(),
+        request.getType().isPresent() ? JobType.valueOf(request.getType().get()) : null);
   }
 }

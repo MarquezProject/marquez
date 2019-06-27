@@ -50,6 +50,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
+import org.eclipse.jetty.http.HttpStatus;
 
 @Slf4j
 @Path("/api/v1")
@@ -76,6 +77,11 @@ public final class JobResource {
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).build();
+    }
+    if (request.getType().isPresent() && !jobService.isValidType(request.getType().get())) {
+      return Response.status(HttpStatus.BAD_REQUEST_400)
+          .entity("Bad value for Job type " + request.getType().get())
+          .build();
     }
     final Job newJob = JobMapper.map(jobName, request);
     newJob.setNamespaceGuid(namespaceService.get(namespaceName).get().getGuid());
