@@ -235,7 +235,7 @@ public class JobService {
     return false;
   }
 
-  Job generateNewJob(Job job) {
+  protected static Job generateNewJob(Job job) {
     final Job.Type newJobType = job.getType() == null ? DEFAULT_JOB_TYPE : job.getType();
     return new Job(
         UUID.randomUUID(),
@@ -248,7 +248,7 @@ public class JobService {
         newJobType);
   }
 
-  Job generateExistingJobWithNewUri(Job inputJob, Job existingJob) {
+  protected static Job generateExistingJobWithNewUri(Job inputJob, Job existingJob) {
     final Job.Type typeToSet;
     if (inputJob.getType() == null) {
       typeToSet = existingJob.getType() == null ? DEFAULT_JOB_TYPE : existingJob.getType();
