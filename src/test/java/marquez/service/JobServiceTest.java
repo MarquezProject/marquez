@@ -1,5 +1,6 @@
 package marquez.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -301,5 +302,22 @@ public class JobServiceTest {
     when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET);
+  }
+
+  @Test
+  public void testValidJobType() {
+    assertThat(jobService.isValidType("SERVICE")).isTrue();
+    assertThat(jobService.isValidType("STREAM")).isTrue();
+    assertThat(jobService.isValidType("BATCH")).isTrue();
+  }
+
+  @Test
+  public void testInvalidJobType() {
+    assertThat(jobService.isValidType("NOSUCHSERVICE")).isFalse();
+  }
+
+  @Test
+  public void testNullJobType() {
+    assertThat(jobService.isValidType(null)).isFalse();
   }
 }
