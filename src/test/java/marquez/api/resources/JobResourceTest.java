@@ -153,24 +153,24 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
     when(MOCK_JOB_SERVICE.isValidType(any())).thenReturn(true);
-
     JobResponse jobForJobCreationRequest = generateApiJob();
     jobForJobCreationRequest.setDescription(null);
 
     insertJob(jobForJobCreationRequest);
-    verify(MOCK_JOB_SERVICE, times(1)).createJob(any(), any());
+
+    verify(MOCK_JOB_SERVICE).createJob(any(), any());
   }
 
   @Test
   public void testTypeOptionalForCreateJobInputs() throws MarquezServiceException {
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    final JobRequest jobForJobCreationRequest = generateApiJobRequestWithType(null);
 
-    JobResponse jobForJobCreationRequest = generateApiJob();
-    jobForJobCreationRequest.setType(null);
+    insertJob(newJobName(), jobForJobCreationRequest);
 
-    insertJob(jobForJobCreationRequest);
-    verify(MOCK_JOB_SERVICE, times(1)).createJob(any(), any());
+    verify(MOCK_JOB_SERVICE, times(0)).isValidType(any());
+    verify(MOCK_JOB_SERVICE).createJob(any(), any());
   }
 
   @Test
@@ -515,11 +515,14 @@ public class JobResourceTest {
   }
 
   JobRequest generateApiJobRequest() {
+    return generateApiJobRequestWithType(Job.Type.SERVICE.name());
+  }
+
+  JobRequest generateApiJobRequestWithType(String type) {
     final String location = "someLocation";
     final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    final String type = Job.Type.SERVICE.name();
     return new JobRequest(inputList, outputList, location, description, type);
   }
 
