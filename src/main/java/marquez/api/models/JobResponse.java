@@ -24,18 +24,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class JobResponse {
   private String name;
-
   private String createdAt;
-
   private String updatedAt;
-
   private List<String> inputDatasetUrns;
-
   private List<String> outputDatasetUrns;
-
   private String location;
-
   private String description;
-
   private String type;
 }
