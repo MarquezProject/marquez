@@ -249,7 +249,7 @@ public class JobService {
   }
 
   Job generateExistingJobWithNewUri(Job inputJob, Job existingJob) {
-    Job.Type typeToSet;
+    final Job.Type typeToSet;
     if (inputJob.getType() == null) {
       typeToSet = existingJob.getType() == null ? DEFAULT_JOB_TYPE : existingJob.getType();
     } else {
