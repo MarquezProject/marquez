@@ -16,6 +16,7 @@ package marquez.api.resources;
 
 import static java.lang.String.format;
 import static javax.ws.rs.client.Entity.entity;
+import static marquez.common.models.CommonModelGenerator.newJobName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,13 +42,14 @@ import marquez.api.models.JobResponse;
 import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobsResponse;
+import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
+import marquez.service.models.Job;
 import marquez.service.models.JobRun;
-import marquez.service.models.JobType;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -130,6 +132,18 @@ public class JobResourceTest {
     jobForJobCreationRequest.setLocation(null);
 
     Response res = insertJob(jobForJobCreationRequest);
+    assertEquals(UNPROCESSABLE_ENTRY_STATUS_CODE, res.getStatus());
+  }
+
+  @Test
+  public void testCreateJob_invalidType_returnsBadRequestResponse() throws MarquezServiceException {
+    when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
+
+    final JobRequest jobForJobCreationRequest = new JobRequest(Collections.singletonList("input1"), Collections.singletonList("outputList"),
+            "someLocation", "someDescription", "NO_SUCH_TYPE");
+
+    when(MOCK_JOB_SERVICE.isValidType(any())).thenReturn(false);
+    final Response res = insertJob(newJobName(), jobForJobCreationRequest);
     assertEquals(UNPROCESSABLE_ENTRY_STATUS_CODE, res.getStatus());
   }
 
@@ -429,6 +443,15 @@ public class JobResourceTest {
         .put(entity(jobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
   }
 
+  private Response insertJob(JobName jobName, JobRequest jobRequest) {
+    String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME.getValue(), jobName);
+    return resources
+            .client()
+            .target(path)
+            .request(MediaType.APPLICATION_JSON)
+            .put(entity(jobRequest, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+  }
+
   private Response insertJobRun(JobRunResponse jobRun) {
     JobRunRequest jobRequest =
         new JobRunRequest(
@@ -485,8 +508,17 @@ public class JobResourceTest {
     final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    final String type = JobType.SERVICE.name();
+    final String type = Job.Type.SERVICE.name();
     return new JobResponse(jobName, null, null, inputList, outputList, location, description, type);
+  }
+
+  JobRequest generateApiJobRequest() {
+    final String location = "someLocation";
+    final String description = "someDescription";
+    final List<String> inputList = Collections.singletonList("input1");
+    final List<String> outputList = Collections.singletonList("output1");
+    final String type = Job.Type.SERVICE.name();
+    return new JobRequest(inputList, outputList, location, description, type);
   }
 
   JobRunResponse generateApiJobRun() {

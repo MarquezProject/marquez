@@ -61,6 +61,7 @@ public class JobRowMapperTest {
   private static final String[] OUTPUT_DATASET_URNS = new String[] {newDatasetUrn().getValue()};
   private static final Instant CREATED_AT = newTimestamp();
   private static final Instant UPDATED_AT = CREATED_AT;
+  private static final Job.Type JOB_TYPE = Job.Type.STREAM;
 
   @Rule public MockitoRule rule = MockitoJUnit.rule();
 
@@ -82,6 +83,7 @@ public class JobRowMapperTest {
     when(results.getObject(Columns.OUTPUT_DATASET_URNS)).thenReturn(exists);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
     when(results.getObject(Columns.UPDATED_AT)).thenReturn(exists);
+    when(results.getObject(Columns.JOB_TYPE)).thenReturn(exists);
 
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
     when(results.getString(Columns.NAME)).thenReturn(NAME.getValue());
@@ -94,6 +96,7 @@ public class JobRowMapperTest {
     when(results.getArray(Columns.OUTPUT_DATASET_URNS)).thenReturn(outputArray);
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
     when(results.getTimestamp(Columns.UPDATED_AT)).thenReturn(Timestamp.from(UPDATED_AT));
+    when(results.getString(Columns.JOB_TYPE)).thenReturn(JOB_TYPE.name());
 
     final JobRowMapper jobRowMapper = new JobRowMapper();
     final Job job = jobRowMapper.map(results, context);
@@ -106,6 +109,7 @@ public class JobRowMapperTest {
     assertThat(job.getOutputDatasetUrns()).isEqualTo(Arrays.asList(OUTPUT_DATASET_URNS));
     assertThat(job.getCreatedAt()).isEqualTo(CREATED_AT);
     assertThat(job.getUpdatedAt()).isEqualTo(UPDATED_AT);
+    assertThat(job.getType()).isEqualTo(JOB_TYPE);
   }
 
   @Test
@@ -122,6 +126,7 @@ public class JobRowMapperTest {
     when(results.getObject(Columns.OUTPUT_DATASET_URNS)).thenReturn(exists);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
     when(results.getObject(Columns.UPDATED_AT)).thenReturn(exists);
+    when(results.getObject(Columns.JOB_TYPE)).thenReturn(exists);
 
     when(results.getObject(Columns.ROW_UUID, UUID.class)).thenReturn(ROW_UUID);
     when(results.getString(Columns.NAME)).thenReturn(NAME.getValue());
@@ -133,6 +138,7 @@ public class JobRowMapperTest {
     when(results.getArray(Columns.OUTPUT_DATASET_URNS)).thenReturn(outputArray);
     when(results.getTimestamp(Columns.CREATED_AT)).thenReturn(Timestamp.from(CREATED_AT));
     when(results.getTimestamp(Columns.UPDATED_AT)).thenReturn(Timestamp.from(UPDATED_AT));
+    when(results.getString(Columns.JOB_TYPE)).thenReturn(JOB_TYPE.name());
 
     final JobRowMapper jobRowMapper = new JobRowMapper();
     final Job job = jobRowMapper.map(results, context);
@@ -145,6 +151,7 @@ public class JobRowMapperTest {
     assertThat(job.getOutputDatasetUrns()).isEqualTo(Arrays.asList(OUTPUT_DATASET_URNS));
     assertThat(job.getCreatedAt()).isEqualTo(CREATED_AT);
     assertThat(job.getUpdatedAt()).isEqualTo(UPDATED_AT);
+    assertThat(job.getType()).isEqualTo(JOB_TYPE);
 
     verify(results, never()).getString(Columns.DESCRIPTION);
   }

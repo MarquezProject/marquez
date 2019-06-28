@@ -43,9 +43,9 @@ import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Generator;
+import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
-import marquez.service.models.JobType;
 import marquez.service.models.Namespace;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -278,7 +278,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
     final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    final String type = JobType.STREAM.name();
+    final String type = Job.Type.STREAM.name();
     return new JobResponse(jobName, null, null, inputList, outputList, location, description, type);
   }
 

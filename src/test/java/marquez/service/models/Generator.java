@@ -60,10 +60,10 @@ public class Generator {
         Arrays.asList(randUrn(), randUrn()),
         createdAt,
         updatedAt,
-        JobType.BATCH);
+        Job.Type.BATCH);
   }
 
-  public static Job genJobWithType(UUID namespaceID, JobType type) {
+  public static Job genJobWithType(UUID namespaceID, Job.Type type) {
     final Instant createdAt = Instant.now();
     final Instant updatedAt = createdAt;
     int jobNum = randNum();

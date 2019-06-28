@@ -14,13 +14,14 @@
 
 package marquez.common.models;
 
+import marquez.service.models.Job;
+
 import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
-import marquez.service.models.JobType;
 
 public final class CommonModelGenerator {
   private CommonModelGenerator() {}
@@ -129,8 +130,8 @@ public final class CommonModelGenerator {
     return newDescriptionWith("test_description" + newId());
   }
 
-  public static JobType newJobType() {
-    return JobType.BATCH;
+  public static Job.Type newJobType() {
+    return Job.Type.BATCH;
   }
 
   public static Description newDescriptionWith(String value) {

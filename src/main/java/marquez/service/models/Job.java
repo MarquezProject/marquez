@@ -34,7 +34,7 @@ public final class Job {
   @Getter private final List<String> outputDatasetUrns;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
-  @Getter private final JobType type;
+  @Getter private final Type type;
 
   public Job(
       final UUID guid,
@@ -44,7 +44,7 @@ public final class Job {
       final String description,
       final List<String> inputDatasetUrns,
       final List<String> outputDatasetUrns,
-      final JobType type) {
+      final Type type) {
     this.guid = guid;
     this.name = name;
     this.location = location;
@@ -55,5 +55,11 @@ public final class Job {
     this.createdAt = null;
     this.updatedAt = null;
     this.type = type;
+  }
+
+  public enum Type {
+    BATCH,
+    STREAM,
+    SERVICE
   }
 }

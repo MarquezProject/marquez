@@ -34,7 +34,6 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
-import marquez.service.models.JobType;
 import marquez.service.models.JobVersion;
 import marquez.service.models.RunArgs;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
@@ -46,7 +45,7 @@ public class JobService {
   private final JobRunDao jobRunDao;
   private final JobRunArgsDao jobRunArgsDao;
 
-  private static final JobType DEFAULT_JOB_TYPE = JobType.BATCH;
+  private static final Job.Type DEFAULT_JOB_TYPE = Job.Type.BATCH;
 
   public JobService(
       JobDao jobDao,
@@ -73,7 +72,7 @@ public class JobService {
     try {
       Job existingJob = this.jobDao.findByName(namespace, job.getName());
       if (existingJob == null) {
-        final JobType newJobType = job.getType() == null ? DEFAULT_JOB_TYPE : job.getType();
+        final Job.Type newJobType = job.getType() == null ? DEFAULT_JOB_TYPE : job.getType();
         Job newJob =
             new Job(
                 UUID.randomUUID(),
@@ -87,7 +86,7 @@ public class JobService {
         jobDao.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
         return jobDao.findByID(newJob.getGuid());
       } else {
-        final JobType existingJobType =
+        final Job.Type existingJobType =
             existingJob.getType() == null ? DEFAULT_JOB_TYPE : existingJob.getType();
         Job existingJobWithNewUri =
             new Job(
@@ -247,8 +246,11 @@ public class JobService {
         null);
   }
 
-  public static boolean isValidType(String type) {
-    if (Enums.getIfPresent(JobType.class, type).orNull() != null) {
+  public boolean isValidType(String type) {
+    if (type == null) {
+      return false;
+    }
+    if (Enums.getIfPresent(Job.Type.class, type).orNull() != null) {
       return true;
     }
     return false;
