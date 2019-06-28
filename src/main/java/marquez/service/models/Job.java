@@ -59,7 +59,7 @@ public final class Job {
 
   public enum Type {
     BATCH,
-    STREAM,
-    SERVICE
+    SERVICE,
+    STREAM
   }
 }
