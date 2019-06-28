@@ -45,7 +45,7 @@ public class JobService {
   private final JobRunDao jobRunDao;
   private final JobRunArgsDao jobRunArgsDao;
 
-  private static final Job.Type DEFAULT_JOB_TYPE = Job.Type.BATCH;
+  static final Job.Type DEFAULT_JOB_TYPE = Job.Type.BATCH;
 
   public JobService(
       JobDao jobDao,
@@ -70,36 +70,15 @@ public class JobService {
 
   public Job createJob(String namespace, Job job) throws MarquezServiceException {
     try {
-      Job existingJob = this.jobDao.findByName(namespace, job.getName());
+      final Job existingJob = this.jobDao.findByName(namespace, job.getName());
       if (existingJob == null) {
-        final Job.Type newJobType = job.getType() == null ? DEFAULT_JOB_TYPE : job.getType();
-        Job newJob =
-            new Job(
-                UUID.randomUUID(),
-                job.getName(),
-                job.getLocation(),
-                job.getNamespaceGuid(),
-                job.getDescription(),
-                job.getInputDatasetUrns(),
-                job.getOutputDatasetUrns(),
-                newJobType);
+        final Job newJob = generateNewJob(job);
         jobDao.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
         return jobDao.findByID(newJob.getGuid());
       } else {
-        final Job.Type existingJobType =
-            existingJob.getType() == null ? DEFAULT_JOB_TYPE : existingJob.getType();
-        Job existingJobWithNewUri =
-            new Job(
-                existingJob.getGuid(),
-                existingJob.getName(),
-                job.getLocation(),
-                existingJob.getNamespaceGuid(),
-                existingJob.getDescription(),
-                existingJob.getInputDatasetUrns(),
-                existingJob.getOutputDatasetUrns(),
-                existingJobType);
-        UUID versionID = JobService.computeVersion(existingJobWithNewUri);
-        JobVersion existingJobVersion = jobVersionDao.findByVersion(versionID);
+        final Job existingJobWithNewUri = generateExistingJobWithNewUri(job, existingJob);
+        final UUID versionID = JobService.computeVersion(existingJobWithNewUri);
+        final JobVersion existingJobVersion = jobVersionDao.findByVersion(versionID);
         if (existingJobVersion == null) {
           jobVersionDao.insert(JobService.createJobVersion(existingJobWithNewUri));
           return jobDao.findByID(existingJob.getGuid());
@@ -254,6 +233,38 @@ public class JobService {
       return true;
     }
     return false;
+  }
+
+  Job generateNewJob(Job job) {
+    final Job.Type newJobType = job.getType() == null ? DEFAULT_JOB_TYPE : job.getType();
+    return new Job(
+        UUID.randomUUID(),
+        job.getName(),
+        job.getLocation(),
+        job.getNamespaceGuid(),
+        job.getDescription(),
+        job.getInputDatasetUrns(),
+        job.getOutputDatasetUrns(),
+        newJobType);
+  }
+
+  Job generateExistingJobWithNewUri(Job inputJob, Job existingJob) {
+    Job.Type typeToSet;
+    if (inputJob.getType() == null) {
+      typeToSet = existingJob.getType() == null ? DEFAULT_JOB_TYPE : existingJob.getType();
+    } else {
+      typeToSet = inputJob.getType();
+    }
+
+    return new Job(
+        existingJob.getGuid(),
+        existingJob.getName(),
+        inputJob.getLocation(),
+        existingJob.getNamespaceGuid(),
+        existingJob.getDescription(),
+        existingJob.getInputDatasetUrns(),
+        existingJob.getOutputDatasetUrns(),
+        typeToSet);
   }
 
   protected static UUID computeVersion(Job job) {

@@ -209,8 +209,8 @@ public class JobResourceTest {
     when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME.getValue()))
         .thenThrow(new MarquezServiceException());
 
-    String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
-    Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
+    final String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
+    final Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
 

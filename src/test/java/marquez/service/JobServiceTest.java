@@ -1,5 +1,7 @@
 package marquez.service;
 
+import static marquez.service.models.ServiceModelGenerator.newJob;
+import static marquez.service.models.ServiceModelGenerator.newJobWithType;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -319,5 +321,37 @@ public class JobServiceTest {
   @Test
   public void testNullJobType() {
     assertThat(jobService.isValidType(null)).isFalse();
+  }
+
+  @Test
+  public void testTypeNotSpecifiedInNewJob() {
+    when(jobDao.findByName(any(), any())).thenReturn(null);
+    final Job newWithoutType = newJobWithType(true, null);
+    assertThat(jobService.generateNewJob(newWithoutType).getType())
+        .isEqualTo(jobService.DEFAULT_JOB_TYPE);
+  }
+
+  @Test
+  public void testTypeNotSpecifiedForExistingJobWithNoType() {
+    final Job foundJobWithoutType = newJobWithType(true, null);
+    when(jobDao.findByName(any(), any())).thenReturn(foundJobWithoutType);
+    final Job updatedJobWithoutType = newJobWithType(true, null);
+    assertThat(
+            jobService
+                .generateExistingJobWithNewUri(updatedJobWithoutType, foundJobWithoutType)
+                .getType())
+        .isEqualTo(jobService.DEFAULT_JOB_TYPE);
+  }
+
+  @Test
+  public void testTypeNotSpecifiedForExistingJobWithType() {
+    final Job foundJobWithType = newJobWithType(true, Job.Type.SERVICE);
+    when(jobDao.findByName(any(), any())).thenReturn(foundJobWithType);
+    final Job updatedJobWithoutType = newJobWithType(true, null);
+    assertThat(
+            jobService
+                .generateExistingJobWithNewUri(updatedJobWithoutType, foundJobWithType)
+                .getType())
+        .isEqualTo(Job.Type.SERVICE);
   }
 }

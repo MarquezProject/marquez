@@ -109,6 +109,10 @@ public final class ServiceModelGenerator {
   }
 
   public static Job newJob(boolean hasDescription) {
+    return newJobWithType(hasDescription, newJobType());
+  }
+
+  public static Job newJobWithType(boolean hasDescription, Job.Type type) {
     final Instant createdAt = newTimestamp();
     final Instant updatedAt = createdAt;
     return new Job(
@@ -121,7 +125,7 @@ public final class ServiceModelGenerator {
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
         createdAt,
         updatedAt,
-        newJobType());
+        type);
   }
 
   public static List<JobRun> newJobRuns(int limit) {
