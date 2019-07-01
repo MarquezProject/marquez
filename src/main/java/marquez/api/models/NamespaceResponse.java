@@ -14,16 +14,30 @@
 
 package marquez.api.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class NamespaceResponse {
-  String name;
-  String createdAt;
-  String owner;
+  @Getter String name;
+  @Getter String createdAt;
+  @Getter String owner;
   String description;
+
+  public NamespaceResponse(
+      @NonNull String name,
+      @NonNull String createdAt,
+      @NonNull String owner,
+      @Nullable String description) {
+    this.name = name;
+    this.createdAt = createdAt;
+    this.owner = owner;
+    this.description = description;
+  }
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(this.description);
+  }
 }

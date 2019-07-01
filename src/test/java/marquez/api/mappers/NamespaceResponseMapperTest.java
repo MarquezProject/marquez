@@ -38,7 +38,7 @@ public class NamespaceResponseMapperTest {
     assertThat(response.getName()).isEqualTo(namespace.getName());
     assertThat(response.getCreatedAt()).isEqualTo(namespace.getCreatedAt().toString());
     assertThat(response.getOwner()).isEqualTo(namespace.getOwnerName());
-    assertThat(response.getDescription()).isEqualTo(namespace.getDescription());
+    assertThat(response.getDescription().orElse("")).isEqualTo(namespace.getDescription());
   }
 
   @Test
@@ -49,7 +49,7 @@ public class NamespaceResponseMapperTest {
     assertThat(response.getName()).isEqualTo(namespace.getName());
     assertThat(response.getCreatedAt()).isEqualTo(namespace.getCreatedAt().toString());
     assertThat(response.getOwner()).isEqualTo(namespace.getOwnerName());
-    assertThat(response.getDescription()).isNull();
+    assertThat(response.getDescription().orElse(null)).isNull();
   }
 
   @Test

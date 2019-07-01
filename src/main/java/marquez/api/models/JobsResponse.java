@@ -14,15 +14,20 @@
 
 package marquez.api.models;
 
+import java.util.Collections;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class JobsResponse {
   @Getter private List<JobResponse> jobs;
+
+  public JobsResponse() {
+    this.jobs = Collections.EMPTY_LIST;
+  }
+
+  public JobsResponse(@NonNull List<JobResponse> jobs) {
+    this.jobs = jobs;
+  }
 }
