@@ -29,6 +29,7 @@ import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasetName;
@@ -127,7 +128,7 @@ public final class ServiceModelGenerator {
   }
 
   public static JobRun newJobRun() {
-    return new JobRun(null, 0, null, null, null, null, null, newTimestamp());
+    return new JobRun(UUID.randomUUID(), 0, null, null, null, null, null, newTimestamp());
   }
 
   public static Instant newTimestamp() {

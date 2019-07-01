@@ -15,6 +15,7 @@
 package marquez.api.resources;
 
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import java.net.URI;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -260,7 +262,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
             job.getInputDatasetUrns(),
             job.getOutputDatasetUrns(),
             job.getLocation(),
-            job.getDescription());
+            job.getDescription().orElse(null));
 
     String path = format("/api/v1/namespaces/%s/jobs/%s", namespace, job.getName());
     return APP.client()
@@ -276,7 +278,9 @@ public class JobIntegrationTest extends JobRunBaseTest {
     final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    return new JobResponse(jobName, null, null, inputList, outputList, location, description);
+    String createdAt = ISO_INSTANT.format(Instant.now());
+    return new JobResponse(
+        jobName, createdAt, createdAt, inputList, outputList, location, description);
   }
 
   private JobRunResponse getJobRunApiResponse(UUID jobRunGuid) {

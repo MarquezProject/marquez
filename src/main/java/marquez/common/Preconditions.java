@@ -14,6 +14,7 @@
 
 package marquez.common;
 
+import java.util.Collection;
 import javax.annotation.Nullable;
 
 public final class Preconditions {
@@ -59,5 +60,13 @@ public final class Preconditions {
     if (!expression) {
       throw new IllegalArgumentException(errorMessage);
     }
+  }
+
+  public static Collection<?> checkNotEmpty(final Collection<?> collection) {
+    checkNotNull(collection);
+    if (collection.isEmpty()) {
+      throw new IllegalArgumentException();
+    }
+    return collection;
   }
 }

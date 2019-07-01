@@ -15,22 +15,27 @@
 package marquez.api.models;
 
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotBlank;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 public final class JobRunResponse {
-  @NotBlank private UUID runId;
+  @Getter private UUID runId;
+  @Getter private String nominalStartTime;
+  @Getter private String nominalEndTime;
+  @Getter private String runArgs;
+  @Getter private String runState;
 
-  private String nominalStartTime;
-
-  private String nominalEndTime;
-
-  private String runArgs;
-
-  private String runState;
+  public JobRunResponse(
+      @NonNull final UUID runId,
+      final String nominalStartTime,
+      final String nominalEndTime,
+      final String runArgs,
+      final String runState) {
+    this.runId = runId;
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
+    this.runArgs = runArgs;
+    this.runState = runState;
+  }
 }

@@ -15,6 +15,7 @@
 package marquez.api.resources;
 
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static javax.ws.rs.client.Entity.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -119,14 +121,13 @@ public class JobResourceTest {
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
   }
 
-  @Test
+  @Test(expected = NullPointerException.class)
   public void testCreateJobBadInputs() throws MarquezServiceException {
     when(MOCK_JOB_SERVICE.createJob(any(), any())).thenThrow(new MarquezServiceException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
 
-    JobResponse jobForJobCreationRequest = generateApiJob();
-    jobForJobCreationRequest.setLocation(null);
+    JobResponse jobForJobCreationRequest = generateApiJobWithNullLocation();
 
     Response res = insertJob(jobForJobCreationRequest);
     assertEquals(UNPROCESSABLE_ENTRY_STATUS_CODE, res.getStatus());
@@ -137,8 +138,7 @@ public class JobResourceTest {
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
 
-    JobResponse jobForJobCreationRequest = generateApiJob();
-    jobForJobCreationRequest.setDescription(null);
+    JobResponse jobForJobCreationRequest = generateApiJobWithNullDescription();
 
     insertJob(jobForJobCreationRequest);
     verify(MOCK_JOB_SERVICE, times(1)).createJob(any(), any());
@@ -406,7 +406,7 @@ public class JobResourceTest {
             job.getInputDatasetUrns(),
             job.getOutputDatasetUrns(),
             job.getLocation(),
-            job.getDescription());
+            job.getDescription().orElse(null));
     String path = format("/api/v1/namespaces/%s/jobs/%s", NAMESPACE_NAME.getValue(), job.getName());
     return resources
         .client()
@@ -466,12 +466,24 @@ public class JobResourceTest {
   }
 
   JobResponse generateApiJob() {
+    return generateApiJob("someLocation", "someDescription");
+  }
+
+  JobResponse generateApiJobWithNullLocation() {
+    return generateApiJob(null, "someDescription");
+  }
+
+  JobResponse generateApiJobWithNullDescription() {
+    return generateApiJob("someLocation", null);
+  }
+
+  JobResponse generateApiJob(String location, String description) {
     String jobName = "myJob" + System.currentTimeMillis();
-    final String location = "someLocation";
-    final String description = "someDescription";
     final List<String> inputList = Collections.singletonList("input1");
     final List<String> outputList = Collections.singletonList("output1");
-    return new JobResponse(jobName, null, null, inputList, outputList, location, description);
+    String createdAt = ISO_INSTANT.format(Instant.now());
+    return new JobResponse(
+        jobName, createdAt, createdAt, inputList, outputList, location, description);
   }
 
   JobRunResponse generateApiJobRun() {

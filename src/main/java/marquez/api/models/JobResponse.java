@@ -14,26 +14,43 @@
 
 package marquez.api.models;
 
+import static marquez.common.Preconditions.checkNotBlank;
+import static marquez.common.Preconditions.checkNotEmpty;
+
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 public final class JobResponse {
-  private String name;
-
-  private String createdAt;
-
-  private String updatedAt;
-
-  private List<String> inputDatasetUrns;
-
-  private List<String> outputDatasetUrns;
-
-  private String location;
-
+  @Getter private String name;
+  @Getter private String createdAt;
+  @Getter private String updatedAt;
+  @Getter private List<String> inputDatasetUrns;
+  @Getter private List<String> outputDatasetUrns;
+  @Getter private String location;
   private String description;
+
+  public JobResponse(
+      @NonNull final String name,
+      @NonNull final String createdAt,
+      @NonNull final String updatedAt,
+      @NonNull final List<String> inputDatasetUrns,
+      @NonNull final List<String> outputDatasetUrns,
+      @NonNull String location,
+      @Nullable String description) {
+    this.name = checkNotBlank(name);
+    this.createdAt = checkNotBlank(createdAt);
+    this.updatedAt = checkNotBlank(updatedAt);
+    this.inputDatasetUrns = (List<String>) checkNotEmpty(inputDatasetUrns);
+    this.outputDatasetUrns = (List<String>) checkNotEmpty(outputDatasetUrns);
+    this.location = checkNotBlank(location);
+    this.description = description;
+  }
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(this.description);
+  }
 }
