@@ -19,6 +19,7 @@ import static javax.ws.rs.client.Entity.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -177,7 +178,8 @@ public class JobResourceTest {
   @Test
   public void testGetAllJobsInNamespaceErrorHandling() throws MarquezServiceException {
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME.getValue()))
+
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(eq(NAMESPACE_NAME.getValue()), any(), any()))
         .thenThrow(new MarquezServiceException());
 
     String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
@@ -192,13 +194,29 @@ public class JobResourceTest {
     List<marquez.service.models.Job> jobsList = Arrays.asList(job1, job2);
 
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(NAMESPACE_NAME.getValue())).thenReturn(jobsList);
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(eq(NAMESPACE_NAME.getValue()), any(), any()))
+        .thenReturn(jobsList);
 
     String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
     List<JobResponse> returnedJobs = res.readEntity(JobsResponse.class).getJobs();
     assertThat(returnedJobs).hasSize(jobsList.size());
+  }
+
+  @Test
+  public void testGetAllJobsInNamespaceVerifyInputs() throws MarquezServiceException {
+    marquez.service.models.Job job1 = Generator.genJob();
+    marquez.service.models.Job job2 = Generator.genJob();
+    List<marquez.service.models.Job> jobsList = Arrays.asList(job1, job2);
+
+    when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(MOCK_JOB_SERVICE.getAllJobsInNamespace(eq(NAMESPACE_NAME.getValue()), any(), any()))
+        .thenReturn(jobsList);
+
+    JOB_RESOURCE.listJobs(NAMESPACE_NAME, TEST_LIMIT, TEST_OFFSET);
+    verify(MOCK_JOB_SERVICE, times(1))
+        .getAllJobsInNamespace(NAMESPACE_NAME.getValue(), TEST_LIMIT, TEST_OFFSET);
   }
 
   @Test
