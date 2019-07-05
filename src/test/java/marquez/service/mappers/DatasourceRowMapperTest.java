@@ -44,12 +44,14 @@ public class DatasourceRowMapperTest {
     assertThat(row.getConnectionUrl()).isEqualTo(CONNECTION_URL.getRawValue());
   }
 
+  @Test
   public void testMap_throwsException_onNullConnectionUrl() {
     assertThatNullPointerException()
         .isThrownBy(() -> DatasourceRowMapper.map(null, DATASOURCE_NAME));
   }
 
-  public void testMap_throwsException_onNullDbTableVersion() {
+  @Test
+  public void testMap_throwsException_onNullDatasourceName() {
     assertThatNullPointerException()
         .isThrownBy(() -> DatasourceRowMapper.map(CONNECTION_URL, null));
   }
