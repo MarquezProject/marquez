@@ -23,22 +23,15 @@ import marquez.db.mappers.DatasetRowExtendedMapper;
 import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetRowExtended;
-import marquez.db.models.DatasourceRow;
-import marquez.db.models.DbTableInfoRow;
-import marquez.db.models.DbTableVersionRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 public interface DatasetDao {
   @CreateSqlObject
   DatasourceDao createDatasourceDao();
-
-  @CreateSqlObject
-  DbTableVersionDao createDbTableVersionDao();
 
   @SqlUpdate(
       "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
@@ -52,19 +45,6 @@ public interface DatasetDao {
           + "RETURNING *")
   @RegisterRowMapper(DatasetRowMapper.class)
   Optional<DatasetRow> insertAndGet(@BindBean DatasetRow datasetRow);
-
-  @Deprecated
-  @Transaction
-  default void insertAll(
-      DatasourceRow datasourceRow,
-      DatasetRow datasetRow,
-      DbTableInfoRow dbTableInfoRow,
-      DbTableVersionRow dbTableVersionRow) {
-    createDatasourceDao().insert(datasourceRow);
-    insertAndGet(datasetRow);
-    createDbTableVersionDao().insertAll(dbTableInfoRow, dbTableVersionRow);
-    updateCurrentVersionUuid(datasetRow.getUuid(), dbTableVersionRow.getUuid());
-  }
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM datasets WHERE urn = :value)")
   boolean exists(@BindBean DatasetUrn urn);
