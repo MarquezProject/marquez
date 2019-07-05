@@ -233,39 +233,6 @@ paths:
         '200':
           description: OK
 
-  /jobs/runs/{id}/outputs:
-    parameters:
-      - $ref: '#/components/parameters/jobRunId'
-    put:
-      summary: Create multiple output datasets
-      description: Creates a multiple output dataset objects.
-      tags:
-        - Jobs
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/jobRunOutputs'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/datasets'
-    get:
-      summary: List all job run outputs
-      description: Returns a list job run outputs.
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/datasets'
-
   /namespaces/{namespace}/datasets:
     parameters:
       - $ref: '#/components/parameters/namespace'

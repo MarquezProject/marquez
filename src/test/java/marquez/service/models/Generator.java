@@ -27,7 +27,6 @@ import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
-import marquez.db.models.DbTableVersionRow;
 
 @Deprecated
 public class Generator {
@@ -218,16 +217,6 @@ public class Generator {
         .uuid(UUID.randomUUID())
         .db("db" + randNum())
         .dbSchema("schema" + randNum())
-        .build();
-  }
-
-  // DbTableVersion Rows
-  public static DbTableVersionRow genDbTableVersionRow(UUID datasetUuid, UUID dbTableInfoUuid) {
-    return DbTableVersionRow.builder()
-        .uuid(UUID.randomUUID())
-        .datasetUuid(datasetUuid)
-        .dbTableInfoUuid(dbTableInfoUuid)
-        .dbTable("table " + randNum())
         .build();
   }
 }
