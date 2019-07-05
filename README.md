@@ -18,6 +18,7 @@ We invite everyone to help us improve and keep documentation up to date. Documen
 * [PostgreSQL 9.6](https://www.postgresql.org/download)
 * [Gradle 4.10](https://gradle.org/releases)+ (_optional_)
 * [Docker 17.05](https://docs.docker.com/install)+ (_optional_)
+* [Docker Compose](https://docs.docker.com/compose/install) (_optional_)
 
 ## Building
 
