@@ -14,7 +14,7 @@
 
 package marquez.common.models;
 
-import static marquez.common.Preconditions.checkNotBlank;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.NonNull;

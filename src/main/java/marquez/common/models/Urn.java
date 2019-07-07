@@ -14,7 +14,7 @@
 
 package marquez.common.models;
 
-import static marquez.common.Preconditions.checkNotBlank;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 import static marquez.common.models.UrnPattern.DELIM;
 import static marquez.common.models.UrnPattern.PREFIX;
 

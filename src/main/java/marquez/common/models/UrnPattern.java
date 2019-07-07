@@ -14,8 +14,8 @@
 
 package marquez.common.models;
 
-import static marquez.common.Preconditions.checkArgument;
-import static marquez.common.Preconditions.checkNotBlank;
+import static com.google.common.base.Preconditions.checkArgument;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import java.util.regex.Pattern;
 import lombok.NonNull;
