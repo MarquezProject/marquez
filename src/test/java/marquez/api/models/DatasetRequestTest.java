@@ -17,37 +17,30 @@ package marquez.api.models;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import marquez.UnitTests;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasourceUrn;
-import marquez.common.models.Description;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetRequestTest {
-  private static final DatasetName NAME = newDatasetName();
-  private static final DatasourceUrn URN = newDatasourceUrn();
-  private static final Description DESCRIPTION = newDescription();
+  private static final String NAME_VALUE = newDatasetName().getValue();
+  private static final String URN_VALUE = newDatasourceUrn().getValue();
+  private static final String DESCRIPTION_VALUE = newDescription().getValue();
+  private static final String NO_DESCRIPTION_VALUE = newDescription().getValue();
 
   @Test
   public void testNewRequest() {
-    final DatasetRequest expected =
-        new DatasetRequest(NAME.getValue(), URN.getValue(), DESCRIPTION.getValue());
-    final DatasetRequest actual =
-        new DatasetRequest(NAME.getValue(), URN.getValue(), DESCRIPTION.getValue());
+    final DatasetRequest expected = new DatasetRequest(NAME_VALUE, URN_VALUE, DESCRIPTION_VALUE);
+    final DatasetRequest actual = new DatasetRequest(NAME_VALUE, URN_VALUE, DESCRIPTION_VALUE);
     assertThat(expected).isEqualTo(actual);
   }
 
   @Test
   public void testNewRequest_noDescription() {
-    final DatasetRequest expected =
-        new DatasetRequest(NAME.getValue(), URN.getValue(), NO_DESCRIPTION.getValue());
-    final DatasetRequest actual =
-        new DatasetRequest(NAME.getValue(), URN.getValue(), NO_DESCRIPTION.getValue());
+    final DatasetRequest expected = new DatasetRequest(NAME_VALUE, URN_VALUE, NO_DESCRIPTION_VALUE);
+    final DatasetRequest actual = new DatasetRequest(NAME_VALUE, URN_VALUE, NO_DESCRIPTION_VALUE);
     assertThat(expected).isEqualTo(actual);
   }
 }
