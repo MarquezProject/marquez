@@ -76,11 +76,11 @@ public final class CommonModelGenerator {
   }
 
   public static DatasourceUrn newDatasourceUrnWith(DatasourceType type) {
-    return DatasourceUrn.from(type, newDatasourceName());
+    return DatasourceUrn.of(type, newDatasourceName());
   }
 
   public static DatasourceUrn newDatasourceUrnWith(String value) {
-    return DatasourceUrn.fromString(value);
+    return DatasourceUrn.of(value);
   }
 
   public static DbName newDbName() {
@@ -117,11 +117,11 @@ public final class CommonModelGenerator {
   }
 
   public static DatasetUrn newDatasetUrn() {
-    return DatasetUrn.from(newDatasourceName(), newDatasetName());
+    return DatasetUrn.of(newDatasourceName(), newDatasetName());
   }
 
   public static DatasetUrn newDatasetUrnWith(String value) {
-    return DatasetUrn.fromString(value);
+    return DatasetUrn.of(value);
   }
 
   public static Description newDescription() {

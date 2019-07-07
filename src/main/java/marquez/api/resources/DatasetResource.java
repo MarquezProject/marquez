@@ -80,9 +80,10 @@ public final class DatasetResource {
   @Path("{urn}")
   @Produces(APPLICATION_JSON)
   public Response get(
-      @PathParam("namespace") NamespaceName namespaceName, @PathParam("urn") DatasetUrn urn)
+      @PathParam("namespace") NamespaceName namespaceName, @PathParam("urn") String urnAsString)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
+    final DatasetUrn urn = DatasetUrn.of(urnAsString);
     final Dataset dataset =
         datasetService.get(urn).orElseThrow(() -> new DatasetUrnNotFoundException(urn));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);

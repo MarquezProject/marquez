@@ -113,7 +113,7 @@ public class DatasourceServiceTest {
 
     final Optional<Datasource> response =
         datasourceService.get(
-            DatasourceUrn.from(
+            DatasourceUrn.of(
                 ConnectionUrl.of(row.getConnectionUrl()),
                 DatasourceName.fromString(row.getName())));
     assertThat(response.isPresent()).isTrue();
@@ -136,7 +136,7 @@ public class DatasourceServiceTest {
     when(datasourceDao.findBy(any(DatasourceUrn.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     datasourceService.get(
-        DatasourceUrn.from(
+        DatasourceUrn.of(
             ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.fromString(row.getName())));
   }
 

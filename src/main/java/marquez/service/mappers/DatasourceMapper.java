@@ -32,7 +32,7 @@ public final class DatasourceMapper {
     return Datasource.builder()
         .name(DatasourceName.fromString(row.getName()))
         .createdAt(row.getCreatedAt())
-        .urn(DatasourceUrn.fromString(row.getUrn()))
+        .urn(DatasourceUrn.of(row.getUrn()))
         .connectionUrl(ConnectionUrl.of(row.getConnectionUrl()))
         .build();
   }

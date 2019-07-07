@@ -32,7 +32,7 @@ public final class DatasetRowMapper {
       @NonNull DatasourceRow datasourceRow,
       @NonNull Dataset dataset) {
     final DatasourceName datasourceName = DatasourceName.fromString(datasourceRow.getName());
-    final DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
+    final DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
     final Description description = dataset.getDescription();
     return DatasetRow.builder()
         .uuid(UUID.randomUUID())

@@ -70,9 +70,9 @@ public class DatasetResourceTest {
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
   private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
   private static final DatasourceUrn DATASOURCE_URN =
-      DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
+      DatasourceUrn.of(CONNECTION_URL, DATASOURCE_NAME);
   private static final DatasetName DATASET_NAME = newDatasetName();
-  private static final DatasetUrn DATASET_URN = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
+  private static final DatasetUrn DATASET_URN = DatasetUrn.of(DATASOURCE_NAME, DATASET_NAME);
   private static final Description DESCRIPTION = newDescription();
   private static final Dataset DATASET = newDatasetWith(DATASET_NAME, DATASET_URN, DESCRIPTION);
   private static final DatasetRequest DATASET_REQUEST =
@@ -150,7 +150,7 @@ public class DatasetResourceTest {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.get(DATASET_URN)).thenReturn(Optional.of(DATASET));
 
-    final Response response = datasetResource.get(NAMESPACE_NAME, DATASET_URN);
+    final Response response = datasetResource.get(NAMESPACE_NAME, DATASET_URN.getValue());
     assertThat(response.getStatusInfo()).isEqualTo(OK);
 
     final DatasetResponse expected = DatasetResponseMapper.map(DATASET);
@@ -165,7 +165,7 @@ public class DatasetResourceTest {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
 
     assertThatExceptionOfType(NamespaceNotFoundException.class)
-        .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN));
+        .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN.getValue()));
 
     verify(datasetService, never()).get(any(DatasetUrn.class));
   }
@@ -176,7 +176,7 @@ public class DatasetResourceTest {
     when(datasetService.get(DATASET_URN)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(DatasetUrnNotFoundException.class)
-        .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN));
+        .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN.getValue()));
 
     verify(datasetService, times(1)).get(DATASET_URN);
   }

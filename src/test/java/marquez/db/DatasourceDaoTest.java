@@ -59,7 +59,7 @@ public class DatasourceDaoTest {
     datasourceDAO.insert(datasourceRow);
 
     final Optional<DatasourceRow> returnedRow =
-        datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn()));
+        datasourceDAO.findBy(DatasourceUrn.of(datasourceRow.getUrn()));
     assertThat(returnedRow).isPresent();
 
     final DatasourceRow row = returnedRow.get();
@@ -84,11 +84,11 @@ public class DatasourceDaoTest {
     datasourceDAO.insert(datasourceRow);
 
     final Optional<DatasourceRow> returnedRow =
-        datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn()));
+        datasourceDAO.findBy(DatasourceUrn.of(datasourceRow.getUrn()));
     assertThat(returnedRow).isPresent();
 
     datasourceDAO.insert(datasourceRow);
-    assertThat(datasourceDAO.findBy(DatasourceUrn.fromString(datasourceRow.getUrn())))
+    assertThat(datasourceDAO.findBy(DatasourceUrn.of(datasourceRow.getUrn())))
         .isEqualTo(returnedRow);
   }
 
@@ -100,7 +100,7 @@ public class DatasourceDaoTest {
         ConnectionUrl.of("jdbc:postgresql://localhost:9999/novelists_");
 
     final DatasourceName datasourceName = DatasourceName.fromString("Datasource");
-    final String datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName).getValue();
+    final String datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName).getValue();
 
     final DatasourceRow datasourceRow =
         DatasourceRow.builder()
@@ -114,7 +114,7 @@ public class DatasourceDaoTest {
     final DatasourceRow sameNameRow =
         DatasourceRow.builder()
             .uuid(UUID.randomUUID())
-            .urn(DatasourceUrn.from(connectionUrl2, datasourceName).getValue())
+            .urn(DatasourceUrn.of(connectionUrl2, datasourceName).getValue())
             .name(datasourceName.getValue())
             .connectionUrl(connectionUrl.getRawValue())
             .createdAt(Instant.now())
@@ -129,7 +129,7 @@ public class DatasourceDaoTest {
 
   @Test
   public void testDatasourceNotPresent() {
-    DatasourceUrn datasourceUrn = DatasourceUrn.fromString(Generator.genDatasourceRow().getUrn());
+    DatasourceUrn datasourceUrn = DatasourceUrn.of(Generator.genDatasourceRow().getUrn());
     final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceUrn);
     assertThat(returnedRow).isNotPresent();
   }

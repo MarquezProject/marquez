@@ -172,7 +172,7 @@ public class DatasetMapperTest {
     dataset.setDescription(null);
     DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
     DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
-    DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
+    DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
     assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
     assertEquals(dataset.getName().getValue(), dr.getName());
     assertEquals(namespaceRow.getUuid(), dr.getNamespaceUuid());
@@ -190,7 +190,7 @@ public class DatasetMapperTest {
     dataset.setDescription(Description.fromString("TestDescription"));
     DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
     DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
-    DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
+    DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
     assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
     assertEquals(dataset.getName().getValue(), dr.getName());
     assertEquals(namespaceRow.getUuid(), dr.getNamespaceUuid());

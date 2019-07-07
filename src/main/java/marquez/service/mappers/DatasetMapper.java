@@ -34,7 +34,7 @@ public final class DatasetMapper {
     return Dataset.builder()
         .name(DatasetName.fromString(row.getName()))
         .createdAt(row.getCreatedAt())
-        .urn(DatasetUrn.fromString(row.getUrn()))
+        .urn(DatasetUrn.of(row.getUrn()))
         .datasourceUrn(datasourceUrn)
         .description(Description.fromString(row.getDescription()))
         .build();
@@ -44,8 +44,8 @@ public final class DatasetMapper {
     return Dataset.builder()
         .name(DatasetName.fromString(rowExtended.getName()))
         .createdAt(rowExtended.getCreatedAt())
-        .urn(DatasetUrn.fromString(rowExtended.getUrn()))
-        .datasourceUrn(DatasourceUrn.fromString(rowExtended.getDatasourceUrn()))
+        .urn(DatasetUrn.of(rowExtended.getUrn()))
+        .datasourceUrn(DatasourceUrn.of(rowExtended.getDatasourceUrn()))
         .description(Description.fromString(rowExtended.getDescription()))
         .build();
   }

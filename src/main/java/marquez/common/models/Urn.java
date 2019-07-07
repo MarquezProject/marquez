@@ -15,35 +15,30 @@
 package marquez.common.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
-import static marquez.common.models.UrnPattern.DELIM;
-import static marquez.common.models.UrnPattern.PREFIX;
 
-import java.util.StringJoiner;
+import com.google.common.base.Joiner;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
 public abstract class Urn {
+  private static final Joiner ON_URN_DELIM = Joiner.on(UrnPattern.DELIM);
+
   @Getter private final String value;
 
-  protected Urn(@NonNull final String value) {
+  protected Urn(final String value) {
     pattern().throwIfNoMatch(checkNotBlank(value));
     this.value = value;
   }
 
-  protected static String valueFrom(@NonNull String namespace, @NonNull String... parts) {
+  protected static String valueFrom(final String namespace, final String... parts) {
     checkNotBlank(namespace);
     for (String part : parts) {
       checkNotBlank(part);
     }
-    return new StringJoiner(DELIM)
-        .add(PREFIX)
-        .add(namespace)
-        .add(String.join(DELIM, parts))
-        .toString();
+    return ON_URN_DELIM.join(UrnPattern.PREFIX, namespace, ON_URN_DELIM.join(parts));
   }
 
   public abstract String namespace();

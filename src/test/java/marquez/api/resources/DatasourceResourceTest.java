@@ -143,7 +143,7 @@ public class DatasourceResourceTest {
     final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
     final ConnectionUrl connectionUrl =
         ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_");
-    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+    final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);
 
     final Datasource ds1 =
         Datasource.builder()
@@ -154,7 +154,7 @@ public class DatasourceResourceTest {
             .build();
     when(mockDatasourceService.get(datasourceUrn)).thenReturn(Optional.of(ds1));
 
-    final Response datasourceResourceResponse = datasourceResource.get(datasourceUrn);
+    final Response datasourceResourceResponse = datasourceResource.get(datasourceUrn.getValue());
     assertThat(datasourceResourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
     final DatasourceResponse datasourceResponse =
@@ -170,12 +170,12 @@ public class DatasourceResourceTest {
   @Test(expected = DatasourceUrnNotFoundException.class)
   public void testGetNoSuchDatasource() throws MarquezServiceException {
     when(mockDatasourceService.get(any(DatasourceUrn.class))).thenReturn(Optional.empty());
-    datasourceResource.get(DatasourceUrn.from(CONNECTION_URL, TEST_DATASOURCE_NAME));
+    datasourceResource.get(DatasourceUrn.of(CONNECTION_URL, TEST_DATASOURCE_NAME).getValue());
   }
 
   @Test(expected = NullPointerException.class)
   public void testGet_throwsException_onNullDatasourceUrn() throws MarquezServiceException {
-    final DatasourceUrn nullUrn = null;
+    final String nullUrn = null;
     datasourceResource.get(nullUrn);
   }
 
@@ -184,7 +184,7 @@ public class DatasourceResourceTest {
     final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
     final ConnectionUrl connectionUrl =
         ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_");
-    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+    final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);
 
     final Datasource ds1 =
         Datasource.builder()
@@ -194,7 +194,7 @@ public class DatasourceResourceTest {
             .connectionUrl(connectionUrl)
             .build();
     when(mockDatasourceService.get(ds1.getUrn())).thenThrow(MarquezServiceException.class);
-    datasourceResource.get(ds1.getUrn());
+    datasourceResource.get(ds1.getUrn().getValue());
   }
 
   @Test

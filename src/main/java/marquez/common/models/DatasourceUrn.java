@@ -16,30 +16,29 @@ package marquez.common.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.NonNull;
 
 public final class DatasourceUrn extends Urn {
   private static final String NAMESPACE = "datasource";
   private static final int NUM_OF_PARTS = 2;
-  private static final UrnPattern PATTERN = UrnPattern.from(NAMESPACE, NUM_OF_PARTS);
+  private static final UrnPattern PATTERN = UrnPattern.of(NAMESPACE, NUM_OF_PARTS);
 
-  private DatasourceUrn(@NonNull final String value) {
+  private DatasourceUrn(final String value) {
     super(checkNotBlank(value));
   }
 
-  public static DatasourceUrn from(@NonNull DatasourceType type, @NonNull DatasourceName name) {
-    final String value = valueFrom(NAMESPACE, type.toString(), name.getValue());
-    return fromString(value);
+  public static DatasourceUrn of(
+      @NonNull final ConnectionUrl connectionUrl, @NonNull final DatasourceName datasourceName) {
+    return of(connectionUrl.getDatasourceType(), datasourceName);
   }
 
-  public static DatasourceUrn from(
-      @NonNull ConnectionUrl connectionUrl, @NonNull DatasourceName name) {
-    return from(connectionUrl.getDatasourceType(), name);
+  public static DatasourceUrn of(
+      @NonNull final DatasourceType datasourceType, @NonNull final DatasourceName datasourceName) {
+    final String value = valueFrom(NAMESPACE, datasourceType.toString(), datasourceName.getValue());
+    return of(value);
   }
 
-  @JsonCreator
-  public static DatasourceUrn fromString(@NonNull final String value) {
+  public static DatasourceUrn of(final String value) {
     return new DatasourceUrn(value);
   }
 

@@ -71,7 +71,8 @@ public final class DatasourceResource {
   @GET
   @Produces(APPLICATION_JSON)
   @Path("/{urn}")
-  public Response get(@PathParam("urn") DatasourceUrn urn) throws MarquezServiceException {
+  public Response get(@PathParam("urn") String urnAsString) throws MarquezServiceException {
+    final DatasourceUrn urn = DatasourceUrn.of(urnAsString);
     final Datasource datasource =
         datasourceService.get(urn).orElseThrow(() -> new DatasourceUrnNotFoundException(urn));
     final DatasourceResponse response = DatasourceResponseMapper.map(datasource);
