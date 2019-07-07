@@ -30,7 +30,7 @@ public final class DatasourceMapper {
 
   public static Datasource map(@NonNull DatasourceRow row) {
     return Datasource.builder()
-        .name(DatasourceName.fromString(row.getName()))
+        .name(DatasourceName.of(row.getName()))
         .createdAt(row.getCreatedAt())
         .urn(DatasourceUrn.of(row.getUrn()))
         .connectionUrl(ConnectionUrl.of(row.getConnectionUrl()))

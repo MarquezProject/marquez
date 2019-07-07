@@ -31,7 +31,7 @@ public final class DatasetRowMapper {
       @NonNull NamespaceRow namespaceRow,
       @NonNull DatasourceRow datasourceRow,
       @NonNull Dataset dataset) {
-    final DatasourceName datasourceName = DatasourceName.fromString(datasourceRow.getName());
+    final DatasourceName datasourceName = DatasourceName.of(datasourceRow.getName());
     final DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
     final Description description = dataset.getDescription();
     return DatasetRow.builder()

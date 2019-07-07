@@ -168,7 +168,7 @@ public class DatasetMapperTest {
     final Dataset dataset = ServiceModelGenerator.newDataset();
     dataset.setDescription(null);
     DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
-    DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
+    DatasourceName datasourceName = DatasourceName.of(dataSourceRow.getName());
     DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
     assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
     assertEquals(dataset.getName().getValue(), dr.getName());
@@ -185,7 +185,7 @@ public class DatasetMapperTest {
     final Dataset dataset = ServiceModelGenerator.newDataset();
     dataset.setDescription(Description.of("TestDescription"));
     DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
-    DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
+    DatasourceName datasourceName = DatasourceName.of(dataSourceRow.getName());
     DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
     assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
     assertEquals(dataset.getName().getValue(), dr.getName());

@@ -72,7 +72,7 @@ public class DatasourceDaoTest {
   public void testFindByDatasourceName() {
     DatasourceRow row = Generator.genDatasourceRow();
     datasourceDAO.insert(row);
-    DatasourceName name = DatasourceName.fromString(row.getName());
+    DatasourceName name = DatasourceName.of(row.getName());
     final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(name);
     assertThat(returnedRow).isPresent();
     assertThat(returnedRow.get().getName()).isEqualTo(row.getName());
@@ -99,7 +99,7 @@ public class DatasourceDaoTest {
     final ConnectionUrl connectionUrl2 =
         ConnectionUrl.of("jdbc:postgresql://localhost:9999/novelists_");
 
-    final DatasourceName datasourceName = DatasourceName.fromString("Datasource");
+    final DatasourceName datasourceName = DatasourceName.of("Datasource");
     final String datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName).getValue();
 
     final DatasourceRow datasourceRow =

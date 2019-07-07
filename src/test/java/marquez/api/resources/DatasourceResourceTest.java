@@ -60,7 +60,7 @@ public class DatasourceResourceTest {
 
   private static final String TEST_DATASOURCE_NAME_STR = "finance_team_mysql_server_1";
   private static final DatasourceName TEST_DATASOURCE_NAME =
-      DatasourceName.fromString(TEST_DATASOURCE_NAME_STR);
+      DatasourceName.of(TEST_DATASOURCE_NAME_STR);
 
   @ClassRule
   public static final ResourceTestRule resources =
@@ -140,7 +140,7 @@ public class DatasourceResourceTest {
 
   @Test
   public void testGetDatasource() throws MarquezServiceException {
-    final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
+    final DatasourceName datasourceName = DatasourceName.of("mysqlcluster");
     final ConnectionUrl connectionUrl =
         ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_");
     final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);
@@ -181,7 +181,7 @@ public class DatasourceResourceTest {
 
   @Test(expected = MarquezServiceException.class)
   public void testGetInternalError() throws MarquezServiceException {
-    final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
+    final DatasourceName datasourceName = DatasourceName.of("mysqlcluster");
     final ConnectionUrl connectionUrl =
         ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_");
     final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);

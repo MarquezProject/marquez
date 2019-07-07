@@ -68,7 +68,7 @@ public final class CommonModelGenerator {
   }
 
   public static DatasourceName newDatasourceNameWith(String value) {
-    return DatasourceName.fromString(value);
+    return DatasourceName.of(value);
   }
 
   public static DatasourceUrn newDatasourceUrn() {

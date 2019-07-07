@@ -167,7 +167,7 @@ public class Generator {
     final ConnectionUrl connectionUrl =
         ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_" + randNum());
     final DatasourceName datasourceName =
-        DatasourceName.fromString("postgresqllocalhost" + randNum());
+        DatasourceName.of("postgresqllocalhost" + randNum());
     final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);
 
     return new Datasource(datasourceName, Instant.now(), datasourceUrn, connectionUrl);
@@ -179,7 +179,7 @@ public class Generator {
     final String connectionUrl = "jdbc:postgresql://localhost:5431/novelists_" + randNum();
     final String datasourceName = "Datasource" + datasourceNum;
     final String datasourceUrn =
-        DatasourceUrn.of(ConnectionUrl.of(connectionUrl), DatasourceName.fromString(datasourceName))
+        DatasourceUrn.of(ConnectionUrl.of(connectionUrl), DatasourceName.of(datasourceName))
             .getValue();
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())

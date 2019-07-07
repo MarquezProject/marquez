@@ -59,7 +59,7 @@ public final class DatasourceResource {
   @Produces(APPLICATION_JSON)
   public Response create(@Valid DatasourceRequest request) throws MarquezServiceException {
     final ConnectionUrl connectionUrl = ConnectionUrl.of(request.getConnectionUrl());
-    final DatasourceName name = DatasourceName.fromString(request.getName());
+    final DatasourceName name = DatasourceName.of(request.getName());
     final Datasource datasource = datasourceService.create(connectionUrl, name);
     final DatasourceResponse response = DatasourceResponseMapper.map(datasource);
     return Response.ok(response).build();
