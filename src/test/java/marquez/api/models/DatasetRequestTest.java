@@ -26,21 +26,25 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTests.class)
 public class DatasetRequestTest {
   private static final String NAME_VALUE = newDatasetName().getValue();
-  private static final String URN_VALUE = newDatasourceUrn().getValue();
+  private static final String DATASOURCE_URN_VALUE = newDatasourceUrn().getValue();
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = newDescription().getValue();
 
   @Test
   public void testNewRequest() {
-    final DatasetRequest expected = new DatasetRequest(NAME_VALUE, URN_VALUE, DESCRIPTION_VALUE);
-    final DatasetRequest actual = new DatasetRequest(NAME_VALUE, URN_VALUE, DESCRIPTION_VALUE);
+    final DatasetRequest expected =
+        new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, DESCRIPTION_VALUE);
+    final DatasetRequest actual =
+        new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, DESCRIPTION_VALUE);
     assertThat(expected).isEqualTo(actual);
   }
 
   @Test
   public void testNewRequest_noDescription() {
-    final DatasetRequest expected = new DatasetRequest(NAME_VALUE, URN_VALUE, NO_DESCRIPTION_VALUE);
-    final DatasetRequest actual = new DatasetRequest(NAME_VALUE, URN_VALUE, NO_DESCRIPTION_VALUE);
+    final DatasetRequest expected =
+        new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
+    final DatasetRequest actual =
+        new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
     assertThat(expected).isEqualTo(actual);
   }
 }
