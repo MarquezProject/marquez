@@ -32,7 +32,7 @@ public class DatasourceRowMapperTest {
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
   private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
   private static final DatasourceUrn DATASOURCE_URN =
-      DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
+      DatasourceUrn.of(CONNECTION_URL, DATASOURCE_NAME);
 
   @Test
   public void testMap_row() {

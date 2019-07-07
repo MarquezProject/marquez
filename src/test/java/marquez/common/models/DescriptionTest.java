@@ -26,14 +26,14 @@ public class DescriptionTest {
 
   @Test
   public void testNewDescription() {
-    final Description description = Description.fromString(VALUE);
+    final Description description = Description.of(VALUE);
     assertEquals(VALUE, description.getValue());
   }
 
   @Test
   public void testNewDescription_nullValue() {
     final String nullValue = null;
-    final Description description = Description.fromString(nullValue);
+    final Description description = Description.of(nullValue);
     assertEquals(nullValue, description.getValue());
   }
 }

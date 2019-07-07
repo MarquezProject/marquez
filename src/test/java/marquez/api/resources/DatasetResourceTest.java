@@ -70,13 +70,14 @@ public class DatasetResourceTest {
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
   private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
   private static final DatasourceUrn DATASOURCE_URN =
-      DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
+      DatasourceUrn.of(CONNECTION_URL, DATASOURCE_NAME);
   private static final DatasetName DATASET_NAME = newDatasetName();
-  private static final DatasetUrn DATASET_URN = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
+  private static final DatasetUrn DATASET_URN = DatasetUrn.of(DATASOURCE_NAME, DATASET_NAME);
   private static final Description DESCRIPTION = newDescription();
   private static final Dataset DATASET = newDatasetWith(DATASET_NAME, DATASET_URN, DESCRIPTION);
   private static final DatasetRequest DATASET_REQUEST =
-      new DatasetRequest(DATASET_NAME, DATASOURCE_URN, DESCRIPTION);
+      new DatasetRequest(
+          DATASET_NAME.getValue(), DATASOURCE_URN.getValue(), DESCRIPTION.getValue());
   private static final Dataset NEW_DATASET =
       Dataset.builder()
           .name(DATASET_NAME)
@@ -113,7 +114,7 @@ public class DatasetResourceTest {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.create(NAMESPACE_NAME, NEW_DATASET)).thenReturn(DATASET);
 
-    final Response response = datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST);
+    final Response response = datasetResource.create(NAMESPACE_NAME.getValue(), DATASET_REQUEST);
     assertThat(response.getStatusInfo()).isEqualTo(OK);
 
     final DatasetResponse expected = DatasetResponseMapper.map(DATASET);
@@ -128,7 +129,7 @@ public class DatasetResourceTest {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
 
     assertThatExceptionOfType(NamespaceNotFoundException.class)
-        .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST));
+        .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME.getValue(), DATASET_REQUEST));
 
     verify(datasetService, never()).create(NAMESPACE_NAME, NEW_DATASET);
   }
@@ -140,7 +141,7 @@ public class DatasetResourceTest {
         .thenThrow(MarquezServiceException.class);
 
     assertThatExceptionOfType(MarquezServiceException.class)
-        .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME, DATASET_REQUEST));
+        .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME.getValue(), DATASET_REQUEST));
 
     verify(datasetService, times(1)).create(NAMESPACE_NAME, NEW_DATASET);
   }
@@ -150,7 +151,8 @@ public class DatasetResourceTest {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.get(DATASET_URN)).thenReturn(Optional.of(DATASET));
 
-    final Response response = datasetResource.get(NAMESPACE_NAME, DATASET_URN);
+    final Response response =
+        datasetResource.get(NAMESPACE_NAME.getValue(), DATASET_URN.getValue());
     assertThat(response.getStatusInfo()).isEqualTo(OK);
 
     final DatasetResponse expected = DatasetResponseMapper.map(DATASET);
@@ -165,7 +167,7 @@ public class DatasetResourceTest {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
 
     assertThatExceptionOfType(NamespaceNotFoundException.class)
-        .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN));
+        .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME.getValue(), DATASET_URN.getValue()));
 
     verify(datasetService, never()).get(any(DatasetUrn.class));
   }
@@ -176,7 +178,7 @@ public class DatasetResourceTest {
     when(datasetService.get(DATASET_URN)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(DatasetUrnNotFoundException.class)
-        .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DATASET_URN));
+        .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME.getValue(), DATASET_URN.getValue()));
 
     verify(datasetService, times(1)).get(DATASET_URN);
   }
@@ -188,7 +190,7 @@ public class DatasetResourceTest {
     final List<Dataset> datasets = newDatasets(4);
     when(datasetService.getAll(NAMESPACE_NAME, LIMIT, OFFSET)).thenReturn(datasets);
 
-    final Response response = datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET);
+    final Response response = datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET);
     assertThat(response.getStatusInfo()).isEqualTo(OK);
 
     final DatasetsResponse expected = DatasetResponseMapper.toDatasetsResponse(datasets);
@@ -202,7 +204,7 @@ public class DatasetResourceTest {
   public void testList_throwsException_onNamespaceDoesNotExist() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
     assertThatExceptionOfType(NamespaceNotFoundException.class)
-        .isThrownBy(() -> datasetResource.list(NAMESPACE_NAME, LIMIT, OFFSET));
+        .isThrownBy(() -> datasetResource.list(NAMESPACE_NAME.getValue(), LIMIT, OFFSET));
 
     verify(datasetService, never()).getAll(NAMESPACE_NAME, LIMIT, OFFSET);
   }

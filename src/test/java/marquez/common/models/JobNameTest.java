@@ -25,12 +25,12 @@ public class JobNameTest {
   @Test
   public void testNewJobName() {
     final String value = "test";
-    assertEquals(value, JobName.fromString(value).getValue());
+    assertEquals(value, JobName.of(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
   public void testNewJobName_throwsException_onNullValue() {
     final String nullValue = null;
-    JobName.fromString(nullValue);
+    JobName.of(nullValue);
   }
 }

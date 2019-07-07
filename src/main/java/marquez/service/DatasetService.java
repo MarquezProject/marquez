@@ -69,7 +69,7 @@ public class DatasetService {
                       new MarquezServiceException(
                           "Datasource row not found: " + dataset.getDatasourceUrn().getValue()));
       final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, dataset);
-      final DatasetUrn datasetUrn = DatasetUrn.fromString(newDatasetRow.getUrn());
+      final DatasetUrn datasetUrn = DatasetUrn.of(newDatasetRow.getUrn());
       final Optional<Dataset> datasetIfFound = get(datasetUrn);
       if (datasetIfFound.isPresent()) {
         return datasetIfFound.get();
@@ -78,8 +78,7 @@ public class DatasetService {
           .insertAndGet(newDatasetRow)
           .map(
               datasetRow -> {
-                final DatasourceUrn datasourceUrn =
-                    DatasourceUrn.fromString(datasourceRow.getUrn());
+                final DatasourceUrn datasourceUrn = DatasourceUrn.of(datasourceRow.getUrn());
                 return DatasetMapper.map(datasourceUrn, datasetRow);
               })
           .orElseThrow(

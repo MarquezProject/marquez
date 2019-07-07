@@ -33,7 +33,9 @@ public final class ApiModelGenerator {
 
   public static DatasetRequest newDatasetRequest(boolean hasDescription) {
     return new DatasetRequest(
-        newDatasetName(), newDatasourceUrn(), hasDescription ? newDescription() : null);
+        newDatasetName().getValue(),
+        newDatasourceUrn().getValue(),
+        hasDescription ? newDescription().getValue() : null);
   }
 
   public static NamespaceRequest newNamespaceRequest() {

@@ -15,10 +15,10 @@
 package marquez.api.mappers;
 
 import static marquez.api.models.ApiModelGenerator.newDatasetRequest;
+import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
-import java.util.Optional;
 import marquez.UnitTests;
 import marquez.api.models.DatasetRequest;
 import marquez.service.models.Dataset;
@@ -32,9 +32,9 @@ public class DatasetMapperTest {
     final DatasetRequest request = newDatasetRequest();
     final Dataset dataset = DatasetMapper.map(request);
     assertThat(dataset).isNotNull();
-    assertThat(dataset.getName()).isEqualTo(request.getName());
-    assertThat(dataset.getDatasourceUrn()).isEqualTo(request.getDatasourceUrn());
-    assertThat(Optional.ofNullable(dataset.getDescription())).isEqualTo(request.getDescription());
+    assertThat(dataset.getName().getValue()).isEqualTo(request.getName());
+    assertThat(dataset.getDatasourceUrn().getValue()).isEqualTo(request.getDatasourceUrn());
+    assertThat(dataset.getDescription().getValue()).isEqualTo(request.getDescription().get());
   }
 
   @Test
@@ -42,9 +42,9 @@ public class DatasetMapperTest {
     final DatasetRequest request = newDatasetRequest(false);
     final Dataset dataset = DatasetMapper.map(request);
     assertThat(dataset).isNotNull();
-    assertThat(dataset.getName()).isEqualTo(request.getName());
-    assertThat(dataset.getDatasourceUrn()).isEqualTo(request.getDatasourceUrn());
-    assertThat(dataset.getDescription()).isNull();
+    assertThat(dataset.getName().getValue()).isEqualTo(request.getName());
+    assertThat(dataset.getDatasourceUrn().getValue()).isEqualTo(request.getDatasourceUrn());
+    assertThat(dataset.getDescription().getValue()).isEqualTo(NO_DESCRIPTION.getValue());
   }
 
   @Test

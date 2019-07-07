@@ -25,12 +25,12 @@ public class OwnerNameTest {
   @Test
   public void testNewOwnerName() {
     final String value = "test";
-    assertEquals(value, OwnerName.fromString(value).getValue());
+    assertEquals(value, OwnerName.of(value).getValue());
   }
 
   @Test(expected = NullPointerException.class)
   public void testNewOwnerName_throwsException_onNullValue() {
     final String nullValue = null;
-    OwnerName.fromString(nullValue);
+    OwnerName.of(nullValue);
   }
 }

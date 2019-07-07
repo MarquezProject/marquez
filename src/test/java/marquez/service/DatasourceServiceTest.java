@@ -57,12 +57,10 @@ public class DatasourceServiceTest {
 
     final Datasource response =
         datasourceService.create(
-            ConnectionUrl.fromString(row.getConnectionUrl()),
-            DatasourceName.fromString(row.getName()));
-    assertThat(response.getConnectionUrl())
-        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
+            ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.of(row.getName()));
+    assertThat(response.getConnectionUrl()).isEqualTo(ConnectionUrl.of(row.getConnectionUrl()));
 
-    assertThat(response.getName()).isEqualTo(DatasourceName.fromString(row.getName()));
+    assertThat(response.getName()).isEqualTo(DatasourceName.of(row.getName()));
   }
 
   @Test(expected = NullPointerException.class)
@@ -70,7 +68,7 @@ public class DatasourceServiceTest {
       throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
 
-    datasourceService.create(null, DatasourceName.fromString(row.getName()));
+    datasourceService.create(null, DatasourceName.of(row.getName()));
   }
 
   @Test(expected = NullPointerException.class)
@@ -78,7 +76,7 @@ public class DatasourceServiceTest {
       throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
 
-    datasourceService.create(ConnectionUrl.fromString(row.getConnectionUrl()), null);
+    datasourceService.create(ConnectionUrl.of(row.getConnectionUrl()), null);
   }
 
   @Test()
@@ -86,12 +84,11 @@ public class DatasourceServiceTest {
     final DatasourceRow existingRow = Generator.genDatasourceRow();
     final String newConnectionUrl = "jdbc:postgresql://localhost:9999/different_novelists_";
 
-    when(datasourceDao.findBy(DatasourceName.fromString(existingRow.getName())))
+    when(datasourceDao.findBy(DatasourceName.of(existingRow.getName())))
         .thenReturn(Optional.of(existingRow));
     Datasource createdDatasource =
         datasourceService.create(
-            ConnectionUrl.fromString(newConnectionUrl),
-            DatasourceName.fromString(existingRow.getName()));
+            ConnectionUrl.of(newConnectionUrl), DatasourceName.of(existingRow.getName()));
     assertThat(createdDatasource.getConnectionUrl().getRawValue())
         .isEqualTo(existingRow.getConnectionUrl());
   }
@@ -101,7 +98,7 @@ public class DatasourceServiceTest {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.insert(any(DatasourceRow.class))).thenReturn(Optional.empty());
     datasourceService.create(
-        ConnectionUrl.fromString(row.getConnectionUrl()), DatasourceName.fromString(row.getName()));
+        ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.of(row.getName()));
   }
 
   @Test(expected = NullPointerException.class)
@@ -116,14 +113,13 @@ public class DatasourceServiceTest {
 
     final Optional<Datasource> response =
         datasourceService.get(
-            DatasourceUrn.from(
-                ConnectionUrl.fromString(row.getConnectionUrl()),
-                DatasourceName.fromString(row.getName())));
+            DatasourceUrn.of(
+                ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.of(row.getName())));
     assertThat(response.isPresent()).isTrue();
 
     assertThat(response.get().getConnectionUrl())
-        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
-    assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
+        .isEqualTo(ConnectionUrl.of(row.getConnectionUrl()));
+    assertThat(response.get().getName()).isEqualTo(DatasourceName.of(row.getName()));
   }
 
   @Test(expected = NullPointerException.class)
@@ -139,9 +135,8 @@ public class DatasourceServiceTest {
     when(datasourceDao.findBy(any(DatasourceUrn.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     datasourceService.get(
-        DatasourceUrn.from(
-            ConnectionUrl.fromString(row.getConnectionUrl()),
-            DatasourceName.fromString(row.getName())));
+        DatasourceUrn.of(
+            ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.of(row.getName())));
   }
 
   @Test

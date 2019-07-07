@@ -73,9 +73,9 @@ public class DatasetServiceTest {
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
   private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
   private static final DatasourceUrn DATASOURCE_URN =
-      DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
+      DatasourceUrn.of(CONNECTION_URL, DATASOURCE_NAME);
   private static final DatasetName DATASET_NAME = newDatasetName();
-  private static final DatasetUrn DATASET_URN = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
+  private static final DatasetUrn DATASET_URN = DatasetUrn.of(DATASOURCE_NAME, DATASET_NAME);
   private static final Description DESCRIPTION = newDescription();
   final Dataset NEW_DATASET =
       Dataset.builder()

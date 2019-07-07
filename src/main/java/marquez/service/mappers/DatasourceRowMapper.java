@@ -26,7 +26,7 @@ public final class DatasourceRowMapper {
 
   public static DatasourceRow map(
       @NonNull final ConnectionUrl connectionUrl, @NonNull final DatasourceName datasourceName) {
-    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+    final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
         .urn(datasourceUrn.getValue())

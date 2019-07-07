@@ -147,8 +147,7 @@ public class DatasetMapperTest {
 
   @Test(expected = NullPointerException.class)
   public void testDataSetRowMapper_nullDataSourceRow() {
-    final NamespaceRow namespaceRow =
-        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
     final DatasourceRow dataSourceRow = null;
     final Dataset dataset = ServiceModelGenerator.newDataset();
     DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
@@ -156,8 +155,7 @@ public class DatasetMapperTest {
 
   @Test(expected = NullPointerException.class)
   public void testDataSetRowMapper_nullDataset() {
-    final NamespaceRow namespaceRow =
-        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
     final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
     final Dataset dataset = null;
     DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
@@ -165,14 +163,13 @@ public class DatasetMapperTest {
 
   @Test
   public void testDataSetRowMapper_normalTest_NoDescription() {
-    final NamespaceRow namespaceRow =
-        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
     final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
     final Dataset dataset = ServiceModelGenerator.newDataset();
     dataset.setDescription(null);
     DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
-    DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
-    DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
+    DatasourceName datasourceName = DatasourceName.of(dataSourceRow.getName());
+    DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
     assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
     assertEquals(dataset.getName().getValue(), dr.getName());
     assertEquals(namespaceRow.getUuid(), dr.getNamespaceUuid());
@@ -183,14 +180,13 @@ public class DatasetMapperTest {
 
   @Test
   public void testDataSetRowMapper_normalTest_WithDescription() {
-    final NamespaceRow namespaceRow =
-        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
     final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
     final Dataset dataset = ServiceModelGenerator.newDataset();
-    dataset.setDescription(Description.fromString("TestDescription"));
+    dataset.setDescription(Description.of("TestDescription"));
     DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
-    DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
-    DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
+    DatasourceName datasourceName = DatasourceName.of(dataSourceRow.getName());
+    DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
     assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
     assertEquals(dataset.getName().getValue(), dr.getName());
     assertEquals(namespaceRow.getUuid(), dr.getNamespaceUuid());

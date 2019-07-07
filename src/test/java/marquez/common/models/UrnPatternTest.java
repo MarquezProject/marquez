@@ -30,36 +30,36 @@ public class UrnPatternTest {
   private static final int PART_SIZE_GREATER_THAN_ALLOWED = ALLOWED_PART_SIZE + 1;
   private static final String NAMESPACE = "test";
   private static final int NUM_OF_PARTS = 2;
-  private static final UrnPattern PATTERN = UrnPattern.from(NAMESPACE, NUM_OF_PARTS);
+  private static final UrnPattern PATTERN = UrnPattern.of(NAMESPACE, NUM_OF_PARTS);
 
   @Test(expected = NullPointerException.class)
   public void testFrom_throwsException_onNullNamespace() {
     final String nullNamespace = null;
-    UrnPattern.from(nullNamespace, NUM_OF_PARTS);
+    UrnPattern.of(nullNamespace, NUM_OF_PARTS);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFrom_throwsException_onEmptyNamespace() {
     final String emptyNamespace = "";
-    UrnPattern.from(emptyNamespace, NUM_OF_PARTS);
+    UrnPattern.of(emptyNamespace, NUM_OF_PARTS);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFrom_throwsException_onBlankNamespace() {
     final String blankNamespace = " ";
-    UrnPattern.from(blankNamespace, NUM_OF_PARTS);
+    UrnPattern.of(blankNamespace, NUM_OF_PARTS);
   }
 
   @Test(expected = NullPointerException.class)
   public void testFrom_throwsException_onNullNumOfParts() {
     final Integer nullNumOfParts = null;
-    UrnPattern.from(NAMESPACE, nullNumOfParts);
+    UrnPattern.of(NAMESPACE, nullNumOfParts);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFrom_throwsException_onNegativeNumOfParts() {
     final Integer negativeNumOfParts = -1;
-    UrnPattern.from(NAMESPACE, negativeNumOfParts);
+    UrnPattern.of(NAMESPACE, negativeNumOfParts);
   }
 
   @Test

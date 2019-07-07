@@ -23,7 +23,6 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
-import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.DbTableInfoRow;
@@ -166,10 +165,9 @@ public class Generator {
   // Datasource
   public static Datasource genDatasource() {
     final ConnectionUrl connectionUrl =
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_" + randNum());
-    final DatasourceName datasourceName =
-        DatasourceName.fromString("postgresqllocalhost" + randNum());
-    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+        ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_" + randNum());
+    final DatasourceName datasourceName = DatasourceName.of("postgresqllocalhost" + randNum());
+    final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);
 
     return new Datasource(datasourceName, Instant.now(), datasourceUrn, connectionUrl);
   }
@@ -180,8 +178,7 @@ public class Generator {
     final String connectionUrl = "jdbc:postgresql://localhost:5431/novelists_" + randNum();
     final String datasourceName = "Datasource" + datasourceNum;
     final String datasourceUrn =
-        DatasourceUrn.from(
-                ConnectionUrl.fromString(connectionUrl), DatasourceName.fromString(datasourceName))
+        DatasourceUrn.of(ConnectionUrl.of(connectionUrl), DatasourceName.of(datasourceName))
             .getValue();
     return DatasourceRow.builder()
         .uuid(UUID.randomUUID())
@@ -194,8 +191,7 @@ public class Generator {
 
   // DatasetUrn
   public static DatasetUrn genDatasetUrn() {
-    return DatasetUrn.from(
-        NamespaceName.fromString("ns" + randNum()), DatasetName.fromString("dataset" + randNum()));
+    return DatasetUrn.of(genDatasource().getName(), DatasetName.of("dataset" + randNum()));
   }
 
   // Dataset Rows

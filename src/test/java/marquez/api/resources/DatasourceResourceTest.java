@@ -56,11 +56,11 @@ public class DatasourceResourceTest {
   private static final String TEST_DATASOURCE_CONNECTION_STR =
       "jdbc:redshift://localhost:5431/finance";
   private static final ConnectionUrl CONNECTION_URL =
-      ConnectionUrl.fromString(TEST_DATASOURCE_CONNECTION_STR);
+      ConnectionUrl.of(TEST_DATASOURCE_CONNECTION_STR);
 
   private static final String TEST_DATASOURCE_NAME_STR = "finance_team_mysql_server_1";
   private static final DatasourceName TEST_DATASOURCE_NAME =
-      DatasourceName.fromString(TEST_DATASOURCE_NAME_STR);
+      DatasourceName.of(TEST_DATASOURCE_NAME_STR);
 
   @ClassRule
   public static final ResourceTestRule resources =
@@ -140,10 +140,10 @@ public class DatasourceResourceTest {
 
   @Test
   public void testGetDatasource() throws MarquezServiceException {
-    final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
+    final DatasourceName datasourceName = DatasourceName.of("mysqlcluster");
     final ConnectionUrl connectionUrl =
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
-    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+        ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_");
+    final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);
 
     final Datasource ds1 =
         Datasource.builder()
@@ -154,7 +154,7 @@ public class DatasourceResourceTest {
             .build();
     when(mockDatasourceService.get(datasourceUrn)).thenReturn(Optional.of(ds1));
 
-    final Response datasourceResourceResponse = datasourceResource.get(datasourceUrn);
+    final Response datasourceResourceResponse = datasourceResource.get(datasourceUrn.getValue());
     assertThat(datasourceResourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
     final DatasourceResponse datasourceResponse =
@@ -170,21 +170,21 @@ public class DatasourceResourceTest {
   @Test(expected = DatasourceUrnNotFoundException.class)
   public void testGetNoSuchDatasource() throws MarquezServiceException {
     when(mockDatasourceService.get(any(DatasourceUrn.class))).thenReturn(Optional.empty());
-    datasourceResource.get(DatasourceUrn.from(CONNECTION_URL, TEST_DATASOURCE_NAME));
+    datasourceResource.get(DatasourceUrn.of(CONNECTION_URL, TEST_DATASOURCE_NAME).getValue());
   }
 
   @Test(expected = NullPointerException.class)
   public void testGet_throwsException_onNullDatasourceUrn() throws MarquezServiceException {
-    final DatasourceUrn nullUrn = null;
+    final String nullUrn = null;
     datasourceResource.get(nullUrn);
   }
 
   @Test(expected = MarquezServiceException.class)
   public void testGetInternalError() throws MarquezServiceException {
-    final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
+    final DatasourceName datasourceName = DatasourceName.of("mysqlcluster");
     final ConnectionUrl connectionUrl =
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
-    final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
+        ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_");
+    final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);
 
     final Datasource ds1 =
         Datasource.builder()
@@ -194,7 +194,7 @@ public class DatasourceResourceTest {
             .connectionUrl(connectionUrl)
             .build();
     when(mockDatasourceService.get(ds1.getUrn())).thenThrow(MarquezServiceException.class);
-    datasourceResource.get(ds1.getUrn());
+    datasourceResource.get(ds1.getUrn().getValue());
   }
 
   @Test

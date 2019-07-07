@@ -17,11 +17,8 @@ package marquez.common.models;
 import static com.google.common.base.Preconditions.checkArgument;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode
@@ -29,16 +26,15 @@ import lombok.ToString;
 public final class RunId {
   private static final int ID_LENGTH = 36;
 
-  @Getter private final UUID value;
+  @Getter private final String value;
 
-  public RunId(@NonNull final String value) {
-    checkNotBlank(value, "value must not be blank or empty");
-    checkArgument(value.length() == ID_LENGTH, String.format("value length must = %d", ID_LENGTH));
-    this.value = UUID.fromString(value);
+  private RunId(final String value) {
+    checkNotBlank(value, "value must not be blank");
+    checkArgument(value.length() == ID_LENGTH, "value length must = %d", ID_LENGTH);
+    this.value = value;
   }
 
-  @JsonCreator
-  public static RunId fromString(String value) {
+  public static RunId of(final String value) {
     return new RunId(value);
   }
 }

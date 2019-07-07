@@ -16,33 +16,24 @@ package marquez.common.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.NonNull;
 
 public final class DatasetUrn extends Urn {
   private static final String NAMESPACE = "dataset";
   private static final int NUM_OF_PARTS = 2;
-  private static final UrnPattern PATTERN = UrnPattern.from(NAMESPACE, NUM_OF_PARTS);
+  private static final UrnPattern PATTERN = UrnPattern.of(NAMESPACE, NUM_OF_PARTS);
 
-  private DatasetUrn(@NonNull final String value) {
+  private DatasetUrn(final String value) {
     super(checkNotBlank(value));
   }
 
-  @Deprecated
-  public static DatasetUrn from(
-      @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
-    final String value = valueFrom(NAMESPACE, namespaceName.getValue(), datasetName.getValue());
-    return fromString(value);
-  }
-
-  public static DatasetUrn from(
-      @NonNull DatasourceName datasourceName, @NonNull DatasetName datasetName) {
+  public static DatasetUrn of(
+      @NonNull final DatasourceName datasourceName, @NonNull final DatasetName datasetName) {
     final String value = valueFrom(NAMESPACE, datasourceName.getValue(), datasetName.getValue());
-    return fromString(value);
+    return of(value);
   }
 
-  @JsonCreator
-  public static DatasetUrn fromString(String value) {
+  public static DatasetUrn of(final String value) {
     return new DatasetUrn(value);
   }
 

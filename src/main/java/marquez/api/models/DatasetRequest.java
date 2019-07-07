@@ -8,19 +8,16 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasourceUrn;
-import marquez.common.models.Description;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
 public final class DatasetRequest {
-  @Getter @NotNull private final DatasetName name;
-  @Getter @NotNull private final DatasourceUrn datasourceUrn;
-  @Nullable private final Description description;
+  @Getter @NotNull private final String name;
+  @Getter @NotNull private final String datasourceUrn;
+  @Nullable private final String description;
 
-  public Optional<Description> getDescription() {
+  public Optional<String> getDescription() {
     return Optional.ofNullable(description);
   }
 }
