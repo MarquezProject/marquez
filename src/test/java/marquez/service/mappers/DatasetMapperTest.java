@@ -187,7 +187,7 @@ public class DatasetMapperTest {
         DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
     final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
     final Dataset dataset = ServiceModelGenerator.newDataset();
-    dataset.setDescription(Description.fromString("TestDescription"));
+    dataset.setDescription(Description.of("TestDescription"));
     DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
     DatasourceName datasourceName = DatasourceName.fromString(dataSourceRow.getName());
     DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());

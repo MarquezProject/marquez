@@ -129,7 +129,7 @@ public final class CommonModelGenerator {
   }
 
   public static Description newDescriptionWith(String value) {
-    return Description.fromString(value);
+    return Description.of(value);
   }
 
   private static int newId() {

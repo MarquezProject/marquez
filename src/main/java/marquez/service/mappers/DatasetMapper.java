@@ -36,7 +36,7 @@ public final class DatasetMapper {
         .createdAt(row.getCreatedAt())
         .urn(DatasetUrn.of(row.getUrn()))
         .datasourceUrn(datasourceUrn)
-        .description(Description.fromString(row.getDescription()))
+        .description(Description.of(row.getDescription()))
         .build();
   }
 
@@ -46,7 +46,7 @@ public final class DatasetMapper {
         .createdAt(rowExtended.getCreatedAt())
         .urn(DatasetUrn.of(rowExtended.getUrn()))
         .datasourceUrn(DatasourceUrn.of(rowExtended.getDatasourceUrn()))
-        .description(Description.fromString(rowExtended.getDescription()))
+        .description(Description.of(rowExtended.getDescription()))
         .build();
   }
 
