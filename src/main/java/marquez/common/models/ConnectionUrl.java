@@ -32,10 +32,10 @@ public final class ConnectionUrl {
   private ConnectionUrl(
       @NonNull final DatasourceType datasourceType,
       @NonNull final DbName dbName,
-      @NonNull final String rawValue) {
+      final String rawValue) {
     this.datasourceType = datasourceType;
     this.dbName = dbName;
-    this.rawValue = rawValue;
+    this.rawValue = checkNotBlank(rawValue);
   }
 
   public static ConnectionUrl of(final String rawValue) {
