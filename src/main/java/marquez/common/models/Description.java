@@ -28,7 +28,7 @@ public final class Description {
     this.value = value;
   }
 
-  public static Description of(final String value) {
+  public static Description of(@Nullable final String value) {
     return new Description(value);
   }
 

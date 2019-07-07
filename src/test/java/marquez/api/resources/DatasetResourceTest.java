@@ -52,6 +52,7 @@ import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
+import marquez.service.models.DatasetMeta;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,8 +79,8 @@ public class DatasetResourceTest {
   private static final DatasetRequest DATASET_REQUEST =
       new DatasetRequest(
           DATASET_NAME.getValue(), DATASOURCE_URN.getValue(), DESCRIPTION.getValue());
-  private static final Dataset NEW_DATASET =
-      Dataset.builder()
+  private static final DatasetMeta DATASET_META =
+      DatasetMeta.builder()
           .name(DATASET_NAME)
           .datasourceUrn(DATASOURCE_URN)
           .description(DESCRIPTION)
@@ -112,7 +113,7 @@ public class DatasetResourceTest {
   @Test
   public void testCreate() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(datasetService.create(NAMESPACE_NAME, NEW_DATASET)).thenReturn(DATASET);
+    when(datasetService.create(NAMESPACE_NAME, DATASET_META)).thenReturn(DATASET);
 
     final Response response = datasetResource.create(NAMESPACE_NAME.getValue(), DATASET_REQUEST);
     assertThat(response.getStatusInfo()).isEqualTo(OK);
@@ -121,7 +122,7 @@ public class DatasetResourceTest {
     final DatasetResponse actual = (DatasetResponse) response.getEntity();
     assertThat(actual).isEqualTo(expected);
 
-    verify(datasetService, times(1)).create(NAMESPACE_NAME, NEW_DATASET);
+    verify(datasetService, times(1)).create(NAMESPACE_NAME, DATASET_META);
   }
 
   @Test
@@ -131,19 +132,19 @@ public class DatasetResourceTest {
     assertThatExceptionOfType(NamespaceNotFoundException.class)
         .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME.getValue(), DATASET_REQUEST));
 
-    verify(datasetService, never()).create(NAMESPACE_NAME, NEW_DATASET);
+    verify(datasetService, never()).create(NAMESPACE_NAME, DATASET_META);
   }
 
   @Test
   public void testCreate_throwsException_onDatasourceDoesNotExist() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(datasetService.create(NAMESPACE_NAME, NEW_DATASET))
+    when(datasetService.create(NAMESPACE_NAME, DATASET_META))
         .thenThrow(MarquezServiceException.class);
 
     assertThatExceptionOfType(MarquezServiceException.class)
         .isThrownBy(() -> datasetResource.create(NAMESPACE_NAME.getValue(), DATASET_REQUEST));
 
-    verify(datasetService, times(1)).create(NAMESPACE_NAME, NEW_DATASET);
+    verify(datasetService, times(1)).create(NAMESPACE_NAME, DATASET_META);
   }
 
   @Test

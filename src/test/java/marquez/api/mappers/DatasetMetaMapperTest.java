@@ -19,37 +19,38 @@ import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
+import java.util.Optional;
 import marquez.UnitTests;
 import marquez.api.models.DatasetRequest;
-import marquez.service.models.Dataset;
+import marquez.service.models.DatasetMeta;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DatasetMapperTest {
+public class DatasetMetaMapperTest {
   @Test
   public void testMap_request() {
     final DatasetRequest request = newDatasetRequest();
-    final Dataset dataset = DatasetMapper.map(request);
-    assertThat(dataset).isNotNull();
-    assertThat(dataset.getName().getValue()).isEqualTo(request.getName());
-    assertThat(dataset.getDatasourceUrn().getValue()).isEqualTo(request.getDatasourceUrn());
-    assertThat(dataset.getDescription().getValue()).isEqualTo(request.getDescription().get());
+    final DatasetMeta meta = DatasetMetaMapper.map(request);
+    assertThat(meta).isNotNull();
+    assertThat(meta.getName().getValue()).isEqualTo(request.getName());
+    assertThat(meta.getDatasourceUrn().getValue()).isEqualTo(request.getDatasourceUrn());
+    assertThat(meta.getDescription()).isNotEmpty();
   }
 
   @Test
   public void testMap_request_noDescription() {
     final DatasetRequest request = newDatasetRequest(false);
-    final Dataset dataset = DatasetMapper.map(request);
-    assertThat(dataset).isNotNull();
-    assertThat(dataset.getName().getValue()).isEqualTo(request.getName());
-    assertThat(dataset.getDatasourceUrn().getValue()).isEqualTo(request.getDatasourceUrn());
-    assertThat(dataset.getDescription().getValue()).isEqualTo(NO_DESCRIPTION.getValue());
+    final DatasetMeta meta = DatasetMetaMapper.map(request);
+    assertThat(meta).isNotNull();
+    assertThat(meta.getName().getValue()).isEqualTo(request.getName());
+    assertThat(meta.getDatasourceUrn().getValue()).isEqualTo(request.getDatasourceUrn());
+    assertThat(meta.getDescription()).isEqualTo(Optional.ofNullable(NO_DESCRIPTION));
   }
 
   @Test
   public void testMap_throwsException_onNullRequest() {
     final DatasetRequest nullRequest = null;
-    assertThatNullPointerException().isThrownBy(() -> DatasetMapper.map(nullRequest));
+    assertThatNullPointerException().isThrownBy(() -> DatasetMetaMapper.map(nullRequest));
   }
 }
