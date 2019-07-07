@@ -48,7 +48,7 @@ public final class CommonModelGenerator {
   }
 
   public static JobName newJobNameWith(String value) {
-    return JobName.fromString(value);
+    return JobName.of(value);
   }
 
   public static URI newLocation() {

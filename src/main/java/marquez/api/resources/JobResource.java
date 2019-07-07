@@ -71,13 +71,13 @@ public final class JobResource {
   @Produces(APPLICATION_JSON)
   public Response create(
       @PathParam("namespace") NamespaceName namespaceName,
-      @PathParam("job") JobName jobName,
+      @PathParam("job") String jobAsString,
       @Valid final JobRequest request)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    final Job newJob = JobMapper.map(jobName, request);
+    final Job newJob = JobMapper.map(JobName.of(jobAsString), request);
     newJob.setNamespaceGuid(namespaceService.get(namespaceName).get().getGuid());
     final Job job = jobService.createJob(namespaceName.getValue(), newJob);
     final JobResponse response = JobResponseMapper.map(job);
@@ -91,13 +91,12 @@ public final class JobResource {
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Produces(APPLICATION_JSON)
   public Response getJob(
-      @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") final JobName jobName)
+      @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") String jobAsString)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).entity("Namespace not found").build();
     }
-    final Optional<Job> returnedJob =
-        jobService.getJob(namespaceName.getValue(), jobName.getValue());
+    final Optional<Job> returnedJob = jobService.getJob(namespaceName.getValue(), jobAsString);
     if (returnedJob.isPresent()) {
       return Response.ok().entity(JobResponseMapper.map(returnedJob.get())).build();
     }
@@ -133,20 +132,20 @@ public final class JobResource {
   @Produces(APPLICATION_JSON)
   public Response create(
       @PathParam("namespace") NamespaceName namespaceName,
-      @PathParam("job") JobName jobName,
+      @PathParam("job") String jobAsString,
       @Valid final JobRunRequest request)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    if (!jobService.getJob(namespaceName.getValue(), jobName.getValue()).isPresent()) {
-      log.error("Could not find job: " + jobName.getValue());
+    if (!jobService.getJob(namespaceName.getValue(), jobAsString).isPresent()) {
+      log.error("Could not find job: " + jobAsString);
       return Response.status(Response.Status.NOT_FOUND).build();
     }
     JobRun createdJobRun =
         jobService.createJobRun(
             namespaceName.getValue(),
-            jobName.getValue(),
+            jobAsString,
             request.getRunArgs().orElse(null),
             request.getNominalStartTime().map(Instant::parse).orElse(null),
             request.getNominalEndTime().map(Instant::parse).orElse(null));
