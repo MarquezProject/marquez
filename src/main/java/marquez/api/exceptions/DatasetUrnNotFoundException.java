@@ -14,7 +14,7 @@
 
 package marquez.api.exceptions;
 
-import static marquez.common.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.ws.rs.NotFoundException;
 import marquez.common.models.DatasetUrn;
