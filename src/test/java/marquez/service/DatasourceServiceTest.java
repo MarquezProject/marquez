@@ -114,8 +114,7 @@ public class DatasourceServiceTest {
     final Optional<Datasource> response =
         datasourceService.get(
             DatasourceUrn.of(
-                ConnectionUrl.of(row.getConnectionUrl()),
-                DatasourceName.of(row.getName())));
+                ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.of(row.getName())));
     assertThat(response.isPresent()).isTrue();
 
     assertThat(response.get().getConnectionUrl())

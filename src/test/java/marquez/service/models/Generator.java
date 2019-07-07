@@ -166,8 +166,7 @@ public class Generator {
   public static Datasource genDatasource() {
     final ConnectionUrl connectionUrl =
         ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_" + randNum());
-    final DatasourceName datasourceName =
-        DatasourceName.of("postgresqllocalhost" + randNum());
+    final DatasourceName datasourceName = DatasourceName.of("postgresqllocalhost" + randNum());
     final DatasourceUrn datasourceUrn = DatasourceUrn.of(connectionUrl, datasourceName);
 
     return new Datasource(datasourceName, Instant.now(), datasourceUrn, connectionUrl);
