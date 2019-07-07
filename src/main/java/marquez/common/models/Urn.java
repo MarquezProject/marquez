@@ -35,7 +35,7 @@ public abstract class Urn {
 
   protected static String valueFrom(final String namespace, final String... parts) {
     checkNotBlank(namespace);
-    for (String part : parts) {
+    for (final String part : parts) {
       checkNotBlank(part);
     }
     return ON_URN_DELIM.join(UrnPattern.PREFIX, namespace, ON_URN_DELIM.join(parts));

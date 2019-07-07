@@ -19,6 +19,7 @@ import org.junit.Test;
 public class MorePreconditionsTest {
   private static final String NULL_ERROR_MESSAGE = null;
   private static final String NON_NULL_ERROR_MESSAGE = "test error message";
+  private static final String NON_NULL_ERROR_MESSAGE_WITH_ARGS = "test error message with %s";
   private static final String BLANK_STRING = " ";
   private static final String NON_BLANK_STRING = "test string";
   private static final String NULL_STRING = null;
@@ -65,7 +66,12 @@ public class MorePreconditionsTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void checkNotBlank_throwsException_withErrorMessage() {
+  public void checkNotBlank_throwsException_errorMessageNoArgs() {
     MorePreconditions.checkNotBlank(BLANK_STRING, NON_NULL_ERROR_MESSAGE);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void checkNotBlank_throwsException_errorMessageWithArgs() {
+    MorePreconditions.checkNotBlank(BLANK_STRING, NON_NULL_ERROR_MESSAGE_WITH_ARGS, "foo");
   }
 }
