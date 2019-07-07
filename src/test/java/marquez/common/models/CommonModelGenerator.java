@@ -109,7 +109,7 @@ public final class CommonModelGenerator {
   }
 
   public static DatasetName newDatasetNameWith(String value) {
-    return DatasetName.fromString(value);
+    return DatasetName.of(value);
   }
 
   public static List<DatasetUrn> newDatasetUrns(int limit) {

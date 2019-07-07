@@ -192,7 +192,7 @@ public class Generator {
 
   // DatasetUrn
   public static DatasetUrn genDatasetUrn() {
-    return DatasetUrn.of(genDatasource().getName(), DatasetName.fromString("dataset" + randNum()));
+    return DatasetUrn.of(genDatasource().getName(), DatasetName.of("dataset" + randNum()));
   }
 
   // Dataset Rows
