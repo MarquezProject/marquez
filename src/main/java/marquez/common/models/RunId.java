@@ -28,7 +28,7 @@ public final class RunId {
 
   @Getter private final String value;
 
-  public RunId(final String value) {
+  private RunId(final String value) {
     checkNotBlank(value, "value must not be blank");
     checkArgument(value.length() == ID_LENGTH, "value length must = %d", ID_LENGTH);
     this.value = value;
