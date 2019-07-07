@@ -14,14 +14,19 @@
 
 package marquez.api.models;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.util.stream.Collectors.toList;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrns;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Stream;
 import marquez.common.models.DatasetUrn;
 
 public final class ApiModelGenerator {
@@ -31,9 +36,34 @@ public final class ApiModelGenerator {
     return newDatasetRequest(true);
   }
 
-  public static DatasetRequest newDatasetRequest(boolean hasDescription) {
+  public static DatasetRequest newDatasetRequest(final Boolean hasDescription) {
     return new DatasetRequest(
         newDatasetName().getValue(),
+        newDatasourceUrn().getValue(),
+        hasDescription ? newDescription().getValue() : null);
+  }
+
+  public static DatasetsResponse newDatasetsResponse() {
+    return newDatasetsResponseWith(newDatasetResponses(4));
+  }
+
+  public static DatasetsResponse newDatasetsResponseWith(final List<DatasetResponse> responses) {
+    return new DatasetsResponse(responses);
+  }
+
+  public static List<DatasetResponse> newDatasetResponses(final Integer limit) {
+    return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toList());
+  }
+
+  public static DatasetResponse newDatasetResponse() {
+    return newDatasetResponse(true);
+  }
+
+  public static DatasetResponse newDatasetResponse(final Boolean hasDescription) {
+    return new DatasetResponse(
+        newDatasetName().getValue(),
+        newDatasetUrn().getValue(),
+        newIsoTimestamp(),
         newDatasourceUrn().getValue(),
         hasDescription ? newDescription().getValue() : null);
   }
@@ -42,7 +72,7 @@ public final class ApiModelGenerator {
     return newNamespaceRequest(true);
   }
 
-  public static NamespaceRequest newNamespaceRequest(boolean hasDescription) {
+  public static NamespaceRequest newNamespaceRequest(final Boolean hasDescription) {
     return new NamespaceRequest(
         newOwnerName().getValue(), hasDescription ? newDescription().getValue() : null);
   }
@@ -51,11 +81,15 @@ public final class ApiModelGenerator {
     return newJobRequest(true);
   }
 
-  public static JobRequest newJobRequest(boolean hasDescription) {
+  public static JobRequest newJobRequest(final Boolean hasDescription) {
     return new JobRequest(
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
         newLocation().toString(),
         hasDescription ? newDescription().getValue() : null);
+  }
+
+  public static String newIsoTimestamp() {
+    return ISO_INSTANT.format(Instant.now());
   }
 }
