@@ -17,6 +17,7 @@ package marquez.api.models;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import marquez.UnitTests;
@@ -28,7 +29,7 @@ public class DatasetRequestTest {
   private static final String NAME_VALUE = newDatasetName().getValue();
   private static final String DATASOURCE_URN_VALUE = newDatasourceUrn().getValue();
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
-  private static final String NO_DESCRIPTION_VALUE = newDescription().getValue();
+  private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
 
   @Test
   public void testNewRequest() {
@@ -36,7 +37,7 @@ public class DatasetRequestTest {
         new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, DESCRIPTION_VALUE);
     final DatasetRequest actual =
         new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, DESCRIPTION_VALUE);
-    assertThat(expected).isEqualTo(actual);
+    assertThat(actual).isEqualTo(expected);
   }
 
   @Test
@@ -45,6 +46,6 @@ public class DatasetRequestTest {
         new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
     final DatasetRequest actual =
         new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
-    assertThat(expected).isEqualTo(actual);
+    assertThat(actual).isEqualTo(expected);
   }
 }
