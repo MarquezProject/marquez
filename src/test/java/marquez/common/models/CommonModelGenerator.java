@@ -88,7 +88,7 @@ public final class CommonModelGenerator {
   }
 
   public static DbName newDbNameWith(String value) {
-    return DbName.fromString(value);
+    return DbName.of(value);
   }
 
   public static ConnectionUrl newConnectionUrl() {
@@ -101,7 +101,7 @@ public final class CommonModelGenerator {
   }
 
   public static ConnectionUrl newConnectionUrlWith(String value) {
-    return ConnectionUrl.fromString(value);
+    return ConnectionUrl.of(value);
   }
 
   public static DatasetName newDatasetName() {

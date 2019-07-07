@@ -56,7 +56,7 @@ public class DatasourceResourceTest {
   private static final String TEST_DATASOURCE_CONNECTION_STR =
       "jdbc:redshift://localhost:5431/finance";
   private static final ConnectionUrl CONNECTION_URL =
-      ConnectionUrl.fromString(TEST_DATASOURCE_CONNECTION_STR);
+      ConnectionUrl.of(TEST_DATASOURCE_CONNECTION_STR);
 
   private static final String TEST_DATASOURCE_NAME_STR = "finance_team_mysql_server_1";
   private static final DatasourceName TEST_DATASOURCE_NAME =
@@ -142,7 +142,7 @@ public class DatasourceResourceTest {
   public void testGetDatasource() throws MarquezServiceException {
     final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
     final ConnectionUrl connectionUrl =
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+        ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_");
     final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
     final Datasource ds1 =
@@ -183,7 +183,7 @@ public class DatasourceResourceTest {
   public void testGetInternalError() throws MarquezServiceException {
     final DatasourceName datasourceName = DatasourceName.fromString("mysqlcluster");
     final ConnectionUrl connectionUrl =
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+        ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_");
     final DatasourceUrn datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName);
 
     final Datasource ds1 =

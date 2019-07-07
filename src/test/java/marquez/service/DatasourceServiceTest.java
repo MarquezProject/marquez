@@ -57,10 +57,8 @@ public class DatasourceServiceTest {
 
     final Datasource response =
         datasourceService.create(
-            ConnectionUrl.fromString(row.getConnectionUrl()),
-            DatasourceName.fromString(row.getName()));
-    assertThat(response.getConnectionUrl())
-        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
+            ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.fromString(row.getName()));
+    assertThat(response.getConnectionUrl()).isEqualTo(ConnectionUrl.of(row.getConnectionUrl()));
 
     assertThat(response.getName()).isEqualTo(DatasourceName.fromString(row.getName()));
   }
@@ -78,7 +76,7 @@ public class DatasourceServiceTest {
       throws MarquezServiceException {
     final DatasourceRow row = Generator.genDatasourceRow();
 
-    datasourceService.create(ConnectionUrl.fromString(row.getConnectionUrl()), null);
+    datasourceService.create(ConnectionUrl.of(row.getConnectionUrl()), null);
   }
 
   @Test()
@@ -90,8 +88,7 @@ public class DatasourceServiceTest {
         .thenReturn(Optional.of(existingRow));
     Datasource createdDatasource =
         datasourceService.create(
-            ConnectionUrl.fromString(newConnectionUrl),
-            DatasourceName.fromString(existingRow.getName()));
+            ConnectionUrl.of(newConnectionUrl), DatasourceName.fromString(existingRow.getName()));
     assertThat(createdDatasource.getConnectionUrl().getRawValue())
         .isEqualTo(existingRow.getConnectionUrl());
   }
@@ -101,7 +98,7 @@ public class DatasourceServiceTest {
     final DatasourceRow row = Generator.genDatasourceRow();
     when(datasourceDao.insert(any(DatasourceRow.class))).thenReturn(Optional.empty());
     datasourceService.create(
-        ConnectionUrl.fromString(row.getConnectionUrl()), DatasourceName.fromString(row.getName()));
+        ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.fromString(row.getName()));
   }
 
   @Test(expected = NullPointerException.class)
@@ -117,12 +114,12 @@ public class DatasourceServiceTest {
     final Optional<Datasource> response =
         datasourceService.get(
             DatasourceUrn.from(
-                ConnectionUrl.fromString(row.getConnectionUrl()),
+                ConnectionUrl.of(row.getConnectionUrl()),
                 DatasourceName.fromString(row.getName())));
     assertThat(response.isPresent()).isTrue();
 
     assertThat(response.get().getConnectionUrl())
-        .isEqualTo(ConnectionUrl.fromString(row.getConnectionUrl()));
+        .isEqualTo(ConnectionUrl.of(row.getConnectionUrl()));
     assertThat(response.get().getName()).isEqualTo(DatasourceName.fromString(row.getName()));
   }
 
@@ -140,8 +137,7 @@ public class DatasourceServiceTest {
         .thenThrow(UnableToExecuteStatementException.class);
     datasourceService.get(
         DatasourceUrn.from(
-            ConnectionUrl.fromString(row.getConnectionUrl()),
-            DatasourceName.fromString(row.getName())));
+            ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.fromString(row.getName())));
   }
 
   @Test

@@ -95,9 +95,9 @@ public class DatasourceDaoTest {
   @Test(expected = UnableToExecuteStatementException.class)
   public void testUniquenessConstraintOnName() {
     final ConnectionUrl connectionUrl =
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:5431/novelists_");
+        ConnectionUrl.of("jdbc:postgresql://localhost:5431/novelists_");
     final ConnectionUrl connectionUrl2 =
-        ConnectionUrl.fromString("jdbc:postgresql://localhost:9999/novelists_");
+        ConnectionUrl.of("jdbc:postgresql://localhost:9999/novelists_");
 
     final DatasourceName datasourceName = DatasourceName.fromString("Datasource");
     final String datasourceUrn = DatasourceUrn.from(connectionUrl, datasourceName).getValue();
