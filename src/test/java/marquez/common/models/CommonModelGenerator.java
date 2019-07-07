@@ -40,7 +40,7 @@ public final class CommonModelGenerator {
   }
 
   public static NamespaceName newNamespaceNameWith(String value) {
-    return NamespaceName.fromString(value);
+    return NamespaceName.of(value);
   }
 
   public static JobName newJobName() {

@@ -275,7 +275,7 @@ public class JobServiceTest {
   @Test
   public void testGetAllRunsOfJob_jobAndRunsFound() throws MarquezServiceException {
     Job job = Generator.genJob();
-    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     List<JobRun> jobRuns = new ArrayList<JobRun>();
     jobRuns.add(Generator.genJobRun());
     jobRuns.add(Generator.genJobRun());
@@ -289,7 +289,7 @@ public class JobServiceTest {
   @Test
   public void testGetAllRunsOfJob_jobNotFound() throws MarquezServiceException {
     Job job = Generator.genJob();
-    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(null);
     assertEquals(
         0, jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET).size());
@@ -298,7 +298,7 @@ public class JobServiceTest {
   @Test
   public void testGetAllRunsOfJob_noRunsFound() throws MarquezServiceException {
     Job job = Generator.genJob();
-    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     List<JobRun> jobRuns = new ArrayList<JobRun>();
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
     when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET)).thenReturn(jobRuns);
@@ -310,7 +310,7 @@ public class JobServiceTest {
   @Test(expected = MarquezServiceException.class)
   public void testGetAllRunsOfJob_exception() throws MarquezServiceException {
     Job job = Generator.genJob();
-    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
     when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET))
         .thenThrow(UnableToExecuteStatementException.class);

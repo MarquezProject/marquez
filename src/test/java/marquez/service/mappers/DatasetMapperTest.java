@@ -147,8 +147,7 @@ public class DatasetMapperTest {
 
   @Test(expected = NullPointerException.class)
   public void testDataSetRowMapper_nullDataSourceRow() {
-    final NamespaceRow namespaceRow =
-        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
     final DatasourceRow dataSourceRow = null;
     final Dataset dataset = ServiceModelGenerator.newDataset();
     DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
@@ -156,8 +155,7 @@ public class DatasetMapperTest {
 
   @Test(expected = NullPointerException.class)
   public void testDataSetRowMapper_nullDataset() {
-    final NamespaceRow namespaceRow =
-        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
     final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
     final Dataset dataset = null;
     DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
@@ -165,8 +163,7 @@ public class DatasetMapperTest {
 
   @Test
   public void testDataSetRowMapper_normalTest_NoDescription() {
-    final NamespaceRow namespaceRow =
-        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
     final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
     final Dataset dataset = ServiceModelGenerator.newDataset();
     dataset.setDescription(null);
@@ -183,8 +180,7 @@ public class DatasetMapperTest {
 
   @Test
   public void testDataSetRowMapper_normalTest_WithDescription() {
-    final NamespaceRow namespaceRow =
-        DbModelGenerator.newNamespaceRowWith(NamespaceName.fromString("a"));
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
     final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
     final Dataset dataset = ServiceModelGenerator.newDataset();
     dataset.setDescription(Description.of("TestDescription"));
