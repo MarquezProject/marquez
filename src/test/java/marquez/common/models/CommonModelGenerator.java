@@ -32,7 +32,7 @@ public final class CommonModelGenerator {
   }
 
   public static OwnerName newOwnerNameWith(String value) {
-    return OwnerName.fromString(value);
+    return OwnerName.of(value);
   }
 
   public static NamespaceName newNamespaceName() {
