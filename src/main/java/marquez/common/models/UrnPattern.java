@@ -15,6 +15,7 @@
 package marquez.common.models;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.lenientFormat;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import java.util.regex.Pattern;
@@ -46,7 +47,7 @@ final class UrnPattern {
   void throwIfNoMatch(String value) {
     if (!pattern.matcher(checkNotBlank(value)).matches()) {
       throw new IllegalArgumentException(
-          String.format(
+          lenientFormat(
               "urn (%s) must contain only letters (a-z, A-Z), numbers (0-9), periods (.), "
                   + "underscores (_) or dashes (-) and be sperated by colons (:) with each part "
                   + "having a maximum length of 64 characters",
