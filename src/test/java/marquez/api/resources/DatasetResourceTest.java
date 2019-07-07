@@ -76,7 +76,8 @@ public class DatasetResourceTest {
   private static final Description DESCRIPTION = newDescription();
   private static final Dataset DATASET = newDatasetWith(DATASET_NAME, DATASET_URN, DESCRIPTION);
   private static final DatasetRequest DATASET_REQUEST =
-      new DatasetRequest(DATASET_NAME, DATASOURCE_URN, DESCRIPTION);
+      new DatasetRequest(
+          DATASET_NAME.getValue(), DATASOURCE_URN.getValue(), DESCRIPTION.getValue());
   private static final Dataset NEW_DATASET =
       Dataset.builder()
           .name(DATASET_NAME)
