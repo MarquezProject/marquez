@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,8 +56,13 @@ import marquez.service.mappers.DatasetMapper;
 import marquez.service.models.Dataset;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class DatasetServiceTest {
@@ -69,9 +73,9 @@ public class DatasetServiceTest {
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
   private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
   private static final DatasourceUrn DATASOURCE_URN =
-      DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
+      DatasourceUrn.of(CONNECTION_URL, DATASOURCE_NAME);
   private static final DatasetName DATASET_NAME = newDatasetName();
-  private static final DatasetUrn DATASET_URN = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
+  private static final DatasetUrn DATASET_URN = DatasetUrn.of(DATASOURCE_NAME, DATASET_NAME);
   private static final Description DESCRIPTION = newDescription();
   final Dataset NEW_DATASET =
       Dataset.builder()
@@ -80,16 +84,15 @@ public class DatasetServiceTest {
           .description(DESCRIPTION)
           .build();
 
-  private NamespaceDao namespaceDao;
-  private DatasourceDao datasourceDao;
-  private DatasetDao datasetDao;
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+  @Mock private NamespaceDao namespaceDao;
+  @Mock private DatasourceDao datasourceDao;
+  @Mock private DatasetDao datasetDao;
   private DatasetService datasetService;
 
   @Before
   public void setUp() {
-    namespaceDao = mock(NamespaceDao.class);
-    datasourceDao = mock(DatasourceDao.class);
-    datasetDao = mock(DatasetDao.class);
     datasetService = new DatasetService(namespaceDao, datasourceDao, datasetDao);
   }
 

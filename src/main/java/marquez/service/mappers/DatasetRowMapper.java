@@ -19,12 +19,10 @@ import lombok.NonNull;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.Description;
-import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.NamespaceRow;
 import marquez.service.models.Dataset;
-import marquez.service.models.DbTableVersion;
 
 public final class DatasetRowMapper {
   private DatasetRowMapper() {}
@@ -33,8 +31,8 @@ public final class DatasetRowMapper {
       @NonNull NamespaceRow namespaceRow,
       @NonNull DatasourceRow datasourceRow,
       @NonNull Dataset dataset) {
-    final DatasourceName datasourceName = DatasourceName.fromString(datasourceRow.getName());
-    final DatasetUrn datasetUrn = DatasetUrn.from(datasourceName, dataset.getName());
+    final DatasourceName datasourceName = DatasourceName.of(datasourceRow.getName());
+    final DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
     final Description description = dataset.getDescription();
     return DatasetRow.builder()
         .uuid(UUID.randomUUID())
@@ -43,19 +41,6 @@ public final class DatasetRowMapper {
         .name(dataset.getName().getValue())
         .urn(datasetUrn.getValue())
         .description(description == null ? null : description.getValue())
-        .build();
-  }
-
-  @Deprecated
-  public static DatasetRow map(
-      @NonNull NamespaceName namespaceName,
-      @NonNull DatasourceRow dataSourceRow,
-      @NonNull DbTableVersion dbTableVersion) {
-    return DatasetRow.builder()
-        .uuid(UUID.randomUUID())
-        .datasourceUuid(dataSourceRow.getUuid())
-        .urn(dbTableVersion.toDatasetUrn(namespaceName).getValue())
-        .description(dbTableVersion.getDescription().map((desc) -> desc.getValue()).orElse(null))
         .build();
   }
 }

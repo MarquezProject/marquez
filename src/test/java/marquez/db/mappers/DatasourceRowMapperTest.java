@@ -18,7 +18,6 @@ import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
@@ -33,8 +32,13 @@ import marquez.common.models.DatasourceUrn;
 import marquez.db.Columns;
 import marquez.db.models.DatasourceRow;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class DatasourceRowMapperTest {
@@ -42,12 +46,16 @@ public class DatasourceRowMapperTest {
   private static final Instant CREATED_AT = Instant.now();
   private static final DatasourceName NAME = newDatasourceName();
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
-  private static final DatasourceUrn URN = DatasourceUrn.from(CONNECTION_URL, NAME);
+  private static final DatasourceUrn URN = DatasourceUrn.of(CONNECTION_URL, NAME);
+
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+  @Mock private Object exists;
+  @Mock private ResultSet results;
+  @Mock private StatementContext context;
 
   @Test
   public void testMap() throws SQLException {
-    final Object exists = mock(Object.class);
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.ROW_UUID)).thenReturn(exists);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
     when(results.getObject(Columns.NAME)).thenReturn(exists);
@@ -59,8 +67,6 @@ public class DatasourceRowMapperTest {
     when(results.getString(Columns.NAME)).thenReturn(NAME.getValue());
     when(results.getString(Columns.URN)).thenReturn(URN.getValue());
     when(results.getString(Columns.CONNECTION_URL)).thenReturn(CONNECTION_URL.getRawValue());
-
-    final StatementContext context = mock(StatementContext.class);
 
     final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
     final DatasourceRow row = rowMapper.map(results, context);
@@ -74,14 +80,12 @@ public class DatasourceRowMapperTest {
   @Test
   public void testMap_throwsException_onNullResults() throws SQLException {
     final ResultSet nullResults = null;
-    final StatementContext context = mock(StatementContext.class);
     final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
     assertThatNullPointerException().isThrownBy(() -> rowMapper.map(nullResults, context));
   }
 
   @Test
   public void testMap_throwsException_onNullContext() throws SQLException {
-    final ResultSet results = mock(ResultSet.class);
     final StatementContext nullContext = null;
     final DatasourceRowMapper rowMapper = new DatasourceRowMapper();
     assertThatNullPointerException().isThrownBy(() -> rowMapper.map(results, nullContext));

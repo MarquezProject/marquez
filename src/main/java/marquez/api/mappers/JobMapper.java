@@ -12,11 +12,24 @@
  * limitations under the License.
  */
 
-package marquez.service.models;
+package marquez.api.mappers;
 
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.NamespaceName;
+import lombok.NonNull;
+import marquez.api.models.JobRequest;
+import marquez.common.models.JobName;
+import marquez.service.models.Job;
 
-public interface DatasetVersion {
-  DatasetUrn toDatasetUrn(NamespaceName namespace);
+public final class JobMapper {
+  private JobMapper() {}
+
+  public static Job map(@NonNull JobName jobName, @NonNull JobRequest request) {
+    return new Job(
+        null,
+        jobName.getValue(),
+        request.getLocation(),
+        null,
+        request.getDescription().orElse(null),
+        request.getInputDatasetUrns(),
+        request.getOutputDatasetUrns());
+  }
 }

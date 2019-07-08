@@ -23,7 +23,6 @@ import static marquez.db.models.DbModelGenerator.newRowUuid;
 import static marquez.db.models.DbModelGenerator.newTimestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,9 +40,13 @@ import marquez.common.models.Description;
 import marquez.db.Columns;
 import marquez.db.models.DatasetRowExtended;
 import org.jdbi.v3.core.statement.StatementContext;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class DatasetRowExtendedMapperTest {
@@ -58,16 +61,11 @@ public class DatasetRowExtendedMapperTest {
   private static final Description DESCRIPTION = newDescription();
   private static final UUID CURRENT_VERSION_UUID = newRowUuid();
 
-  private Object exists;
-  private ResultSet results;
-  private StatementContext context;
+  @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
-  @Before
-  public void setUp() {
-    exists = mock(Object.class);
-    results = mock(ResultSet.class);
-    context = mock(StatementContext.class);
-  }
+  @Mock private Object exists;
+  @Mock private ResultSet results;
+  @Mock private StatementContext context;
 
   @Test
   public void testMap_row() throws SQLException {
@@ -110,8 +108,6 @@ public class DatasetRowExtendedMapperTest {
 
   @Test
   public void testMap_row_noDescription() throws SQLException {
-    final Object exists = mock(Object.class);
-    final ResultSet results = mock(ResultSet.class);
     when(results.getObject(Columns.ROW_UUID)).thenReturn(exists);
     when(results.getObject(Columns.CREATED_AT)).thenReturn(exists);
     when(results.getObject(Columns.UPDATED_AT)).thenReturn(exists);
@@ -153,14 +149,12 @@ public class DatasetRowExtendedMapperTest {
   @Test
   public void testMap_throwsException_onNullResults() throws SQLException {
     final ResultSet nullResults = null;
-    final StatementContext context = mock(StatementContext.class);
     final DatasetRowExtendedMapper rowExtendedMapper = new DatasetRowExtendedMapper();
     assertThatNullPointerException().isThrownBy(() -> rowExtendedMapper.map(nullResults, context));
   }
 
   @Test
   public void testMap_throwsException_onNullContext() throws SQLException {
-    final ResultSet results = mock(ResultSet.class);
     final StatementContext nullContext = null;
     final DatasetRowExtendedMapper rowExtendedMapper = new DatasetRowExtendedMapper();
     assertThatNullPointerException().isThrownBy(() -> rowExtendedMapper.map(results, nullContext));

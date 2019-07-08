@@ -14,7 +14,12 @@
 
 package marquez.common.models;
 
+import static java.util.stream.Collectors.toList;
+
+import java.net.URI;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public final class CommonModelGenerator {
   private CommonModelGenerator() {}
@@ -27,7 +32,7 @@ public final class CommonModelGenerator {
   }
 
   public static OwnerName newOwnerNameWith(String value) {
-    return OwnerName.fromString(value);
+    return OwnerName.of(value);
   }
 
   public static NamespaceName newNamespaceName() {
@@ -35,7 +40,23 @@ public final class CommonModelGenerator {
   }
 
   public static NamespaceName newNamespaceNameWith(String value) {
-    return NamespaceName.fromString(value);
+    return NamespaceName.of(value);
+  }
+
+  public static JobName newJobName() {
+    return newJobNameWith("test_job" + newId());
+  }
+
+  public static JobName newJobNameWith(String value) {
+    return JobName.of(value);
+  }
+
+  public static URI newLocation() {
+    return newLocationWith("https://github.com/repo/test/commit/" + newId());
+  }
+
+  public static URI newLocationWith(String value) {
+    return URI.create(value);
   }
 
   public static DatasourceType newDatasourceType() {
@@ -47,7 +68,7 @@ public final class CommonModelGenerator {
   }
 
   public static DatasourceName newDatasourceNameWith(String value) {
-    return DatasourceName.fromString(value);
+    return DatasourceName.of(value);
   }
 
   public static DatasourceUrn newDatasourceUrn() {
@@ -55,11 +76,11 @@ public final class CommonModelGenerator {
   }
 
   public static DatasourceUrn newDatasourceUrnWith(DatasourceType type) {
-    return DatasourceUrn.from(type, newDatasourceName());
+    return DatasourceUrn.of(type, newDatasourceName());
   }
 
   public static DatasourceUrn newDatasourceUrnWith(String value) {
-    return DatasourceUrn.fromString(value);
+    return DatasourceUrn.of(value);
   }
 
   public static DbName newDbName() {
@@ -67,16 +88,20 @@ public final class CommonModelGenerator {
   }
 
   public static DbName newDbNameWith(String value) {
-    return DbName.fromString(value);
+    return DbName.of(value);
   }
 
   public static ConnectionUrl newConnectionUrl() {
+    return newConnectionUrlWith(newDatasourceType());
+  }
+
+  public static ConnectionUrl newConnectionUrlWith(DatasourceType datasourceType) {
     return newConnectionUrlWith(
-        String.format("jdbc:%s://localhost:5432/%s", newDatasourceType(), newDbName().getValue()));
+        String.format("jdbc:%s://localhost:5432/%s", datasourceType, newDbName().getValue()));
   }
 
   public static ConnectionUrl newConnectionUrlWith(String value) {
-    return ConnectionUrl.fromString(value);
+    return ConnectionUrl.of(value);
   }
 
   public static DatasetName newDatasetName() {
@@ -84,23 +109,27 @@ public final class CommonModelGenerator {
   }
 
   public static DatasetName newDatasetNameWith(String value) {
-    return DatasetName.fromString(value);
+    return DatasetName.of(value);
+  }
+
+  public static List<DatasetUrn> newDatasetUrns(int limit) {
+    return Stream.generate(() -> newDatasetUrn()).limit(limit).collect(toList());
   }
 
   public static DatasetUrn newDatasetUrn() {
-    return DatasetUrn.from(newDatasourceName(), newDatasetName());
+    return DatasetUrn.of(newDatasourceName(), newDatasetName());
   }
 
   public static DatasetUrn newDatasetUrnWith(String value) {
-    return DatasetUrn.fromString(value);
+    return DatasetUrn.of(value);
   }
 
   public static Description newDescription() {
-    return newDescriptionWith("test_desciption" + newId());
+    return newDescriptionWith("test_description" + newId());
   }
 
   public static Description newDescriptionWith(String value) {
-    return Description.fromString(value);
+    return Description.of(value);
   }
 
   private static int newId() {

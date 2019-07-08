@@ -32,21 +32,21 @@ public final class DatasetMapper {
 
   public static Dataset map(@NonNull DatasourceUrn datasourceUrn, @NonNull DatasetRow row) {
     return Dataset.builder()
-        .name(DatasetName.fromString(row.getName()))
+        .name(DatasetName.of(row.getName()))
         .createdAt(row.getCreatedAt())
-        .urn(DatasetUrn.fromString(row.getUrn()))
+        .urn(DatasetUrn.of(row.getUrn()))
         .datasourceUrn(datasourceUrn)
-        .description(Description.fromString(row.getDescription()))
+        .description(Description.of(row.getDescription()))
         .build();
   }
 
   public static Dataset map(@NonNull DatasetRowExtended rowExtended) {
     return Dataset.builder()
-        .name(DatasetName.fromString(rowExtended.getName()))
+        .name(DatasetName.of(rowExtended.getName()))
         .createdAt(rowExtended.getCreatedAt())
-        .urn(DatasetUrn.fromString(rowExtended.getUrn()))
-        .datasourceUrn(DatasourceUrn.fromString(rowExtended.getDatasourceUrn()))
-        .description(Description.fromString(rowExtended.getDescription()))
+        .urn(DatasetUrn.of(rowExtended.getUrn()))
+        .datasourceUrn(DatasourceUrn.of(rowExtended.getDatasourceUrn()))
+        .description(Description.of(rowExtended.getDescription()))
         .build();
   }
 

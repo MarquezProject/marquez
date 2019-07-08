@@ -14,8 +14,9 @@
 
 package marquez.common.models;
 
-import static marquez.common.Preconditions.checkArgument;
-import static marquez.common.Preconditions.checkNotBlank;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.lenientFormat;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import java.util.regex.Pattern;
 import lombok.NonNull;
@@ -29,26 +30,26 @@ final class UrnPattern {
 
   private final Pattern pattern;
 
-  private UrnPattern(@NonNull final String value) {
+  private UrnPattern(final String value) {
     this.pattern = Pattern.compile(checkNotBlank(value));
   }
 
-  static UrnPattern from(@NonNull String namespace, @NonNull Integer numOfParts) {
-    checkNotBlank(namespace);
+  static UrnPattern of(final String namespace, @NonNull final Integer numOfParts) {
+    checkNotBlank(namespace, "namespace must not be blank");
     checkArgument(numOfParts > 0, "numOfParts must be > 0");
     final String value =
         String.format(
-            "^%s%s%s(%s[a-zA-Z0-9._]{%d,%d}){%d}$",
+            "^%s%s%s(%s[a-zA-Z0-9._-]{%d,%d}){%d}$",
             PREFIX, DELIM, namespace, DELIM, MIN_SIZE, MAX_SIZE, numOfParts);
     return new UrnPattern(value);
   }
 
-  void throwIfNoMatch(@NonNull String value) {
+  void throwIfNoMatch(String value) {
     if (!pattern.matcher(checkNotBlank(value)).matches()) {
       throw new IllegalArgumentException(
-          String.format(
+          lenientFormat(
               "urn (%s) must contain only letters (a-z, A-Z), numbers (0-9), periods (.), "
-                  + "or underscores (_) and be sperated by colons (:) with each part "
+                  + "underscores (_) or dashes (-) and be sperated by colons (:) with each part "
                   + "having a maximum length of 64 characters",
               value));
     }

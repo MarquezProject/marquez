@@ -12,20 +12,13 @@
  * limitations under the License.
  */
 
-package marquez.db.models;
+package marquez.api.models;
 
-import java.time.Instant;
-import java.util.UUID;
-import lombok.Builder;
-import lombok.Data;
+import java.util.List;
 import lombok.NonNull;
+import lombok.Value;
 
-@Data
-@Builder
-public final class DbTableVersionRow {
-  @NonNull private final UUID uuid;
-  private final Instant createdAt;
-  @NonNull private final UUID datasetUuid;
-  @NonNull private final UUID dbTableInfoUuid;
-  @NonNull private final String dbTable;
+@Value
+public final class JobRunsResponse {
+  @NonNull private final List<JobRunResponse> runs;
 }

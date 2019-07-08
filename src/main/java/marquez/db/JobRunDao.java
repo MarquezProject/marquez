@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import java.util.List;
 import java.util.UUID;
 import marquez.db.mappers.JobRunRowMapper;
 import marquez.service.models.JobRun;
@@ -68,4 +69,15 @@ public interface JobRunDao {
           + " ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest) "
           + "WHERE jr.guid = :guid")
   JobRun findJobRunById(UUID guid);
+
+  @SqlQuery(
+      "SELECT jr.*, jra.args_json "
+          + "FROM job_runs jr "
+          + "INNER JOIN job_versions jv "
+          + " ON (jr.job_version_guid = jv.guid AND jv.job_guid = :jobUuid)"
+          + "LEFT JOIN job_run_args jra "
+          + " ON (jr.job_run_args_hex_digest = jra.hex_digest) "
+          + "ORDER BY created_at DESC "
+          + "LIMIT :limit OFFSET :offset")
+  List<JobRun> findAllByJobUuid(UUID jobUuid, int limit, int offset);
 }

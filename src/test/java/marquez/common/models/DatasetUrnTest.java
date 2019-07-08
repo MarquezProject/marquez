@@ -14,6 +14,8 @@
 
 package marquez.common.models;
 
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static org.junit.Assert.assertEquals;
 
 import marquez.UnitTests;
@@ -22,22 +24,24 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetUrnTest {
-  private static final String NAMESPACE = "dataset";
-  private static final String VALUE = String.format("urn:%s:postgresql:public.foo", NAMESPACE);
 
-  private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("postgresql");
-  private static final DatasetName DATASET_NAME = DatasetName.fromString("public.foo");
+  private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
+  private static final DatasetName DATASET_NAME = newDatasetName();
+
+  private static final String NAMESPACE = "dataset";
+  private static final String VALUE =
+      String.format("urn:%s:%s:%s", NAMESPACE, DATASOURCE_NAME.getValue(), DATASET_NAME.getValue());
 
   @Test
   public void testNewDatasetUrn_from() {
-    final DatasetUrn urn = DatasetUrn.from(DATASOURCE_NAME, DATASET_NAME);
+    final DatasetUrn urn = DatasetUrn.of(DATASOURCE_NAME, DATASET_NAME);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test
   public void testNewDatasetUrn_fromString() {
-    final DatasetUrn urn = DatasetUrn.fromString(VALUE);
+    final DatasetUrn urn = DatasetUrn.of(VALUE);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
@@ -45,30 +49,30 @@ public class DatasetUrnTest {
   @Test(expected = NullPointerException.class)
   public void testFrom_throwsException_onNullDatasourceName() {
     final DatasourceName nullDatasourceName = null;
-    DatasetUrn.from(nullDatasourceName, DATASET_NAME);
+    DatasetUrn.of(nullDatasourceName, DATASET_NAME);
   }
 
   @Test(expected = NullPointerException.class)
   public void testFrom_throwsException_onNullDatasetName() {
     final DatasetName nullDatasetName = null;
-    DatasetUrn.from(DATASOURCE_NAME, nullDatasetName);
+    DatasetUrn.of(DATASOURCE_NAME, nullDatasetName);
   }
 
   @Test(expected = NullPointerException.class)
   public void testFromString_throwsException_onNullValue() {
     final String nullValue = null;
-    DatasetUrn.fromString(nullValue);
+    DatasetUrn.of(nullValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFromString_throwsException_onEmptyValue() {
     final String emptyValue = "";
-    DatasetUrn.fromString(emptyValue);
+    DatasetUrn.of(emptyValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFromStringn_throwsException_onBlankValue() {
     final String blankValue = " ";
-    DatasetUrn.fromString(blankValue);
+    DatasetUrn.of(blankValue);
   }
 }

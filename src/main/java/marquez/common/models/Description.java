@@ -15,16 +15,22 @@
 package marquez.common.models;
 
 import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-@AllArgsConstructor(staticName = "fromString")
 @EqualsAndHashCode
 @ToString
 public final class Description {
-  @Getter @Nullable private final String value;
+  @Getter private final String value;
+
+  private Description(@Nullable final String value) {
+    this.value = value;
+  }
+
+  public static Description of(final String value) {
+    return new Description(value);
+  }
 
   public static final Description NO_DESCRIPTION = new Description(null);
 }

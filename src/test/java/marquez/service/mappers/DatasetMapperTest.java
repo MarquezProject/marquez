@@ -23,13 +23,23 @@ import static marquez.db.models.DbModelGenerator.newDatasetRowWith;
 import static marquez.db.models.DbModelGenerator.newDatasetRowsExtended;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 import marquez.UnitTests;
+import marquez.common.models.DatasetUrn;
+import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
+import marquez.common.models.Description;
+import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetRowExtended;
+import marquez.db.models.DatasourceRow;
+import marquez.db.models.DbModelGenerator;
+import marquez.db.models.NamespaceRow;
 import marquez.service.models.Dataset;
+import marquez.service.models.ServiceModelGenerator;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -61,12 +71,14 @@ public class DatasetMapperTest {
     assertThat(dataset.getDescription().getValue()).isNull();
   }
 
+  @Test
   public void testMap_throwsException_onNullDatasourceUrn() {
     final DatasourceUrn nullDatasourceUrn = null;
     assertThatNullPointerException()
         .isThrownBy(() -> DatasetMapper.map(nullDatasourceUrn, newDatasetRow()));
   }
 
+  @Test
   public void testMap_throwsException_onNullRow() {
     final DatasetRow nullRow = null;
     assertThatNullPointerException()
@@ -97,6 +109,7 @@ public class DatasetMapperTest {
     assertThat(dataset.getDescription().getValue()).isNull();
   }
 
+  @Test
   public void testMap_throwsException_onNullRowExtended() {
     final DatasetRowExtended nullRowExtended = null;
     assertThatNullPointerException().isThrownBy(() -> DatasetMapper.map(nullRowExtended));
@@ -118,8 +131,67 @@ public class DatasetMapperTest {
     assertThat(datasets).isEmpty();
   }
 
+  @Test
   public void testMap_throwsException_onNullRowsExtended() {
     final List<DatasetRowExtended> nullRowsExtended = null;
     assertThatNullPointerException().isThrownBy(() -> DatasetMapper.map(nullRowsExtended));
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testDataSetRowMapper_nullNameSpaceRow() {
+    final NamespaceRow namespaceRow = null;
+    final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
+    final Dataset dataset = ServiceModelGenerator.newDataset();
+    DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testDataSetRowMapper_nullDataSourceRow() {
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
+    final DatasourceRow dataSourceRow = null;
+    final Dataset dataset = ServiceModelGenerator.newDataset();
+    DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testDataSetRowMapper_nullDataset() {
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
+    final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
+    final Dataset dataset = null;
+    DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+  }
+
+  @Test
+  public void testDataSetRowMapper_normalTest_NoDescription() {
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
+    final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
+    final Dataset dataset = ServiceModelGenerator.newDataset();
+    dataset.setDescription(null);
+    DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+    DatasourceName datasourceName = DatasourceName.of(dataSourceRow.getName());
+    DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
+    assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
+    assertEquals(dataset.getName().getValue(), dr.getName());
+    assertEquals(namespaceRow.getUuid(), dr.getNamespaceUuid());
+    assertEquals(datasetUrn.getValue(), dr.getUrn());
+    assertNull(dr.getDescription());
+    assertThat(dr.getUuid()).isNotNull();
+  }
+
+  @Test
+  public void testDataSetRowMapper_normalTest_WithDescription() {
+    final NamespaceRow namespaceRow = DbModelGenerator.newNamespaceRowWith(NamespaceName.of("a"));
+    final DatasourceRow dataSourceRow = DbModelGenerator.newDatasourceRow();
+    final Dataset dataset = ServiceModelGenerator.newDataset();
+    dataset.setDescription(Description.of("TestDescription"));
+    DatasetRow dr = DatasetRowMapper.map(namespaceRow, dataSourceRow, dataset);
+    DatasourceName datasourceName = DatasourceName.of(dataSourceRow.getName());
+    DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, dataset.getName());
+    assertEquals(dataSourceRow.getUuid(), dr.getDatasourceUuid());
+    assertEquals(dataset.getName().getValue(), dr.getName());
+    assertEquals(namespaceRow.getUuid(), dr.getNamespaceUuid());
+    assertEquals(datasetUrn.getValue(), dr.getUrn());
+    assertEquals("TestDescription", dr.getDescription().toString());
+    assertThat(dr.getUuid()).isNotNull();
   }
 }

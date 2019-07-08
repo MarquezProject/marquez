@@ -14,17 +14,24 @@
 
 package marquez.common.models;
 
+import static marquez.common.base.MorePreconditions.checkNotBlank;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-@RequiredArgsConstructor(staticName = "fromString")
 @EqualsAndHashCode
 @ToString
 public final class OwnerName {
-  @Getter @NonNull private final String value;
+  @Getter private final String value;
 
-  public static final OwnerName ANONYMOUS = OwnerName.fromString("anonymous");
+  private OwnerName(final String value) {
+    this.value = checkNotBlank(value, "value must not be blank");
+  }
+
+  public static OwnerName of(final String value) {
+    return new OwnerName(value);
+  }
+
+  public static final OwnerName ANONYMOUS = OwnerName.of("anonymous");
 }
