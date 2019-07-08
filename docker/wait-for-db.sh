@@ -12,21 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./wait-for-db.sh <host> <port>
+# Usage: $ ./wait-for-db.sh <host> <port> [timeout]
 
 set -eu
 
 host="${1}"
 port="${2}"
+time="${3}" || 60s
 
-until PGPASSWORD="${POSTGRES_PASSWORD}" psql \
+timeout time bash -c 'until PGPASSWORD="${POSTGRES_PASSWORD}" psql \
         --host="${host}" \
         --port="${port}" \
         --username "${POSTGRES_USER}" \
         --dbname "${POSTGRES_DB}" \
-        --command '\q' > /dev/null 2>&1; do
-  echo "Waiting for postgres to become available..."
-  sleep 1
-done
+        --command '"'"'\q'"'"' > /dev/null 2>&1; do 
+  echo "Waiting for postgres to become available...";
+  sleep 1;
+done;
+echo "Great news! Postgres is up."';
 
-echo "Great news! Postgres is up."
+echo "Timeout, the postgres server is taking too long to respond."
