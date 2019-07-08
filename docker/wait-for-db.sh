@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./wait-for-db.sh <host> <port>
+# Usage: $ ./wait-for-db.sh <host> <port> [timeout]
 
 set -eu
 
