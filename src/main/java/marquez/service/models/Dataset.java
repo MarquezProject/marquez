@@ -28,11 +28,11 @@ import marquez.common.models.Description;
 @Value
 @Builder
 public class Dataset {
-  @NonNull private DatasetName name;
-  @NonNull private Instant createdAt;
-  @NonNull private DatasetUrn urn;
-  @NonNull private DatasourceUrn datasourceUrn;
-  @Nullable private Description description;
+  @NonNull DatasetName name;
+  @NonNull Instant createdAt;
+  @NonNull DatasetUrn urn;
+  @NonNull DatasourceUrn datasourceUrn;
+  @Nullable Description description;
 
   public Optional<Description> getDescription() {
     return Optional.ofNullable(description);

@@ -18,7 +18,6 @@ import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceName;
-import marquez.common.models.Description;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasourceRow;
 import marquez.db.models.NamespaceRow;
@@ -33,14 +32,13 @@ public final class DatasetRowMapper {
       @NonNull final DatasetMeta meta) {
     final DatasourceName datasourceName = DatasourceName.of(datasourceRow.getName());
     final DatasetUrn datasetUrn = DatasetUrn.of(datasourceName, meta.getName());
-    final Description description = meta.getDescription().orElse(null);
     return DatasetRow.builder()
         .uuid(UUID.randomUUID())
         .namespaceUuid(namespaceRow.getUuid())
         .datasourceUuid(datasourceRow.getUuid())
         .name(meta.getName().getValue())
         .urn(datasetUrn.getValue())
-        .description(description == null ? null : description.getValue())
+        .description(meta.getDescription().map(description -> description.getValue()).orElse(null))
         .build();
   }
 }

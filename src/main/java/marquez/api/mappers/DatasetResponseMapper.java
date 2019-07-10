@@ -14,9 +14,8 @@
 
 package marquez.api.mappers;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import lombok.NonNull;
@@ -37,7 +36,7 @@ public final class DatasetResponseMapper {
   }
 
   public static List<DatasetResponse> map(@NonNull final List<Dataset> datasets) {
-    return unmodifiableList(datasets.stream().map(dataset -> map(dataset)).collect(toList()));
+    return datasets.stream().map(dataset -> map(dataset)).collect(toImmutableList());
   }
 
   public static DatasetsResponse toDatasetsResponse(@NonNull final List<Dataset> datasets) {
