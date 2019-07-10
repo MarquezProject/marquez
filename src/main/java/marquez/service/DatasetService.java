@@ -34,6 +34,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.DatasetMapper;
 import marquez.service.mappers.DatasetRowMapper;
 import marquez.service.models.Dataset;
+import marquez.service.models.DatasetMeta;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -51,7 +52,7 @@ public class DatasetService {
     this.datasetDao = datasetDao;
   }
 
-  public Dataset create(@NonNull NamespaceName namespaceName, @NonNull Dataset dataset)
+  public Dataset create(@NonNull NamespaceName namespaceName, @NonNull DatasetMeta meta)
       throws MarquezServiceException {
     try {
       final NamespaceRow namespaceRow =
@@ -63,12 +64,12 @@ public class DatasetService {
                           "Namespace row not found: " + namespaceName.getValue()));
       final DatasourceRow datasourceRow =
           datasourceDao
-              .findBy(dataset.getDatasourceUrn())
+              .findBy(meta.getDatasourceUrn())
               .orElseThrow(
                   () ->
                       new MarquezServiceException(
-                          "Datasource row not found: " + dataset.getDatasourceUrn().getValue()));
-      final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, dataset);
+                          "Datasource row not found: " + meta.getDatasourceUrn().getValue()));
+      final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, meta);
       final DatasetUrn datasetUrn = DatasetUrn.of(newDatasetRow.getUrn());
       final Optional<Dataset> datasetIfFound = get(datasetUrn);
       if (datasetIfFound.isPresent()) {
@@ -86,7 +87,7 @@ public class DatasetService {
                   new MarquezServiceException(
                       String.format("Failed to insert dataset row: %s", newDatasetRow)));
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create dataset: {}", dataset, e);
+      log.error("Failed to create dataset: {}", meta, e);
       throw new MarquezServiceException();
     }
   }

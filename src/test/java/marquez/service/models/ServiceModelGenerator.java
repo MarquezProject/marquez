@@ -75,6 +75,26 @@ public final class ServiceModelGenerator {
         .build();
   }
 
+  public static DatasetMeta newDatasetMeta() {
+    return newDatasetMeta(true);
+  }
+
+  public static DatasetMeta newDatasetMeta(final Boolean hasDescription) {
+    return newDatasetMetaWith(
+        newDatasetName(), newDatasourceUrn(), hasDescription ? newDescription() : null);
+  }
+
+  public static DatasetMeta newDatasetMetaWith(
+      final DatasetName datasetName,
+      final DatasourceUrn datasourceUrn,
+      final Description description) {
+    return DatasetMeta.builder()
+        .name(datasetName)
+        .datasourceUrn(datasourceUrn)
+        .description(description)
+        .build();
+  }
+
   public static List<Dataset> newDatasets(int limit) {
     return Stream.generate(() -> newDataset()).limit(limit).collect(toList());
   }

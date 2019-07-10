@@ -14,9 +14,8 @@
 
 package marquez.api.mappers;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import lombok.NonNull;
@@ -27,20 +26,20 @@ import marquez.service.models.Dataset;
 public final class DatasetResponseMapper {
   private DatasetResponseMapper() {}
 
-  public static DatasetResponse map(@NonNull Dataset dataset) {
+  public static DatasetResponse map(@NonNull final Dataset dataset) {
     return new DatasetResponse(
         dataset.getName().getValue(),
         ISO_INSTANT.format(dataset.getCreatedAt()),
         dataset.getUrn().getValue(),
         dataset.getDatasourceUrn().getValue(),
-        (dataset.getDescription() == null) ? null : dataset.getDescription().getValue());
+        dataset.getDescription().map(description -> description.getValue()).orElse(null));
   }
 
-  public static List<DatasetResponse> map(@NonNull List<Dataset> datasets) {
-    return unmodifiableList(datasets.stream().map(dataset -> map(dataset)).collect(toList()));
+  public static List<DatasetResponse> map(@NonNull final List<Dataset> datasets) {
+    return datasets.stream().map(dataset -> map(dataset)).collect(toImmutableList());
   }
 
-  public static DatasetsResponse toDatasetsResponse(@NonNull List<Dataset> datasets) {
+  public static DatasetsResponse toDatasetsResponse(@NonNull final List<Dataset> datasets) {
     return new DatasetsResponse(map(datasets));
   }
 }

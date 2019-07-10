@@ -12,25 +12,25 @@
  * limitations under the License.
  */
 
-package marquez.api.mappers;
+package marquez.service.models;
 
-import static marquez.common.models.Description.NO_DESCRIPTION;
-
+import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.Builder;
 import lombok.NonNull;
-import marquez.api.models.DatasetRequest;
+import lombok.Value;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
-import marquez.service.models.Dataset;
 
-public final class DatasetMapper {
-  private DatasetMapper() {}
+@Value
+@Builder
+public class DatasetMeta {
+  @NonNull DatasetName name;
+  @NonNull DatasourceUrn datasourceUrn;
+  @Nullable Description description;
 
-  public static Dataset map(@NonNull DatasetRequest request) {
-    return Dataset.builder()
-        .name(DatasetName.of(request.getName()))
-        .datasourceUrn(DatasourceUrn.of(request.getDatasourceUrn()))
-        .description(request.getDescription().map(Description::of).orElse(NO_DESCRIPTION))
-        .build();
+  public Optional<Description> getDescription() {
+    return Optional.ofNullable(description);
   }
 }
