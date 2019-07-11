@@ -14,18 +14,14 @@
 
 package marquez.api.models;
 
-import java.util.Collections;
 import java.util.List;
 import lombok.*;
 
 @EqualsAndHashCode
 @ToString
+@NoArgsConstructor
 public final class JobRunsResponse {
-  @Getter private final List<JobRunResponse> runs;
-
-  public JobRunsResponse() {
-    runs = Collections.EMPTY_LIST;
-  }
+  @Getter private List<JobRunResponse> runs;
 
   public JobRunsResponse(@NonNull List<JobRunResponse> runs) {
     this.runs = runs;
