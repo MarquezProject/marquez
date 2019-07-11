@@ -69,4 +69,13 @@ public final class Preconditions {
     }
     return collection;
   }
+
+  public static Collection<?> checkNotEmpty(
+      final Collection<?> collection, @Nullable String errorMessage) {
+    checkNotNull(collection);
+    if (collection.isEmpty()) {
+      throw new IllegalArgumentException(errorMessage);
+    }
+    return collection;
+  }
 }

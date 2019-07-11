@@ -14,6 +14,9 @@
 
 package marquez.common;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 
 public class PreconditionsTest {
@@ -21,12 +24,21 @@ public class PreconditionsTest {
   private static final Object NON_NULL_REFERENCE = new Object();
   private static final String NULL_ERROR_MESSAGE = null;
   private static final String NON_NULL_ERROR_MESSAGE = "test error message";
+  private static final String BLANK_ERROR_MESSAGE = "object is blank";
   private static final String BLANK_STRING = " ";
   private static final String NON_BLANK_STRING = "test string";
   private static final String NULL_STRING = null;
   private static final String NON_NULL_STRING = NON_BLANK_STRING;
   private static final boolean TRUE = 0 < 1;
   private static final boolean FALSE = 0 > 1;
+  private static final List<String> NON_EMPTY_LIST =
+      new ArrayList(1) {
+        {
+          add("one");
+        }
+      };
+  private static final List<String> EMPTY_LIST = Collections.emptyList();
+  private static final List<String> NULL_LIST = null;
 
   @Test
   public void testCheckNotNull_noErrorMessage() {
@@ -131,5 +143,35 @@ public class PreconditionsTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCheckArgument_throwsException_onFalseExpression_withErrorMessage() {
     Preconditions.checkArgument(FALSE, NON_NULL_ERROR_MESSAGE);
+  }
+
+  @Test
+  public void testCheckNotEmpty_noErrorMessage() {
+    Preconditions.checkNotEmpty(NON_EMPTY_LIST);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCheckNotEmpty_emptyList_noErrorMessage() {
+    Preconditions.checkNotEmpty(EMPTY_LIST);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testCheckNotEmpty_nullCollection_noErrorMessage() {
+    Preconditions.checkNotEmpty(NULL_LIST);
+  }
+
+  @Test
+  public void testCheckNotEmpty_withErrorMessage() {
+    Preconditions.checkNotEmpty(NON_EMPTY_LIST, NON_NULL_ERROR_MESSAGE);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCheckNotEmpty_emptyList_withErrorMessage() {
+    Preconditions.checkNotEmpty(EMPTY_LIST, BLANK_ERROR_MESSAGE);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testCheckNotEmpty_nullCollection_withErrorMessage() {
+    Preconditions.checkNotEmpty(NULL_LIST, NULL_ERROR_MESSAGE);
   }
 }
