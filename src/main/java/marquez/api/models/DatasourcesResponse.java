@@ -15,14 +15,10 @@
 package marquez.api.models;
 
 import java.util.List;
-import lombok.*;
+import lombok.NonNull;
+import lombok.Value;
 
-@EqualsAndHashCode
-@ToString
+@Value
 public final class DatasourcesResponse {
-  @Getter private final List<DatasourceResponse> datasources;
-
-  public DatasourcesResponse(@NonNull List<DatasourceResponse> datasources) {
-    this.datasources = datasources;
-  }
+  @NonNull List<DatasourceResponse> datasources;
 }

@@ -15,7 +15,6 @@
 package marquez.api.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
-import static marquez.common.base.MorePreconditions.checkNotEmpty;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,8 +43,8 @@ public final class JobResponse {
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);
-    this.inputDatasetUrns = (List<String>) checkNotEmpty(inputDatasetUrns);
-    this.outputDatasetUrns = (List<String>) checkNotEmpty(outputDatasetUrns);
+    this.inputDatasetUrns = inputDatasetUrns;
+    this.outputDatasetUrns = outputDatasetUrns;
     this.location = checkNotBlank(location);
     this.description = description;
   }

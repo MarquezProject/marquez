@@ -14,20 +14,11 @@
 
 package marquez.api.models;
 
-import java.util.Collections;
 import java.util.List;
-import lombok.*;
+import lombok.NonNull;
+import lombok.Value;
 
-@EqualsAndHashCode
-@ToString
+@Value
 public final class NamespacesResponse {
-  @Getter private List<NamespaceResponse> namespaces;
-
-  public NamespacesResponse() {
-    this.namespaces = Collections.EMPTY_LIST;
-  }
-
-  public NamespacesResponse(@NonNull List<NamespaceResponse> namespaces) {
-    this.namespaces = namespaces;
-  }
+  @NonNull List<NamespaceResponse> namespaces;
 }
