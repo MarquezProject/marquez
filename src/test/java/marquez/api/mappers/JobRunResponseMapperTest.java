@@ -39,9 +39,9 @@ public class JobRunResponseMapperTest {
     assertThat(response.getRunId()).isEqualTo(run.getGuid());
     assertThat(response.getRunState())
         .isEqualTo(JobRunState.State.fromInt(run.getCurrentState()).name());
-    assertThat(response.getRunArgs()).isEqualTo(run.getRunArgs());
-    assertThat(response.getNominalStartTime()).isEqualTo(run.getNominalStartTime());
-    assertThat(response.getNominalEndTime()).isEqualTo(run.getNominalEndTime());
+    assertThat(response.getRunArgs().orElse(null)).isEqualTo(run.getRunArgs());
+    assertThat(response.getNominalStartTime().orElse(null)).isEqualTo(run.getNominalStartTime());
+    assertThat(response.getNominalEndTime().orElse(null)).isEqualTo(run.getNominalEndTime());
   }
 
   @Test

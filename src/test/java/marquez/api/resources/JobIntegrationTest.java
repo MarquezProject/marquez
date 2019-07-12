@@ -154,8 +154,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
     JobRunResponse responseBody = getJobRunApiResponse(CREATED_JOB_RUN_UUID);
 
     assertEquals(JobRunState.State.NEW.name(), responseBody.getRunState());
-    assertNull(responseBody.getNominalStartTime());
-    assertNull(responseBody.getNominalEndTime());
+    assertNull(responseBody.getNominalStartTime().orElse(null));
+    assertNull(responseBody.getNominalEndTime().orElse(null));
   }
 
   @Test

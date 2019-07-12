@@ -441,7 +441,9 @@ public class JobResourceTest {
   private Response insertJobRun(JobRunResponse jobRun) {
     JobRunRequest jobRequest =
         new JobRunRequest(
-            jobRun.getNominalStartTime(), jobRun.getNominalEndTime(), jobRun.getRunArgs());
+            jobRun.getNominalStartTime().orElse(""),
+            jobRun.getNominalEndTime().orElse(""),
+            jobRun.getRunArgs().orElse(""));
     String path =
         format("/api/v1/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME.getValue(), "somejob");
     return resources
