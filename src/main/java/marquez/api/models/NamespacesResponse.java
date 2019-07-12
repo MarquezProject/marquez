@@ -20,5 +20,5 @@ import lombok.Value;
 
 @Value
 public class NamespacesResponse {
-  @NonNull List<NamespaceResponse> namespaces;
+  @NonNull private List<NamespaceResponse> namespaces;
 }

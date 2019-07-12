@@ -25,11 +25,11 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
-public class NamespaceResponse {
-  @Getter String name;
-  @Getter String createdAt;
-  @Getter String owner;
-  String description;
+public final class NamespaceResponse {
+  @Getter private String name;
+  @Getter private String createdAt;
+  @Getter private String owner;
+  private String description;
 
   public NamespaceResponse(
       @NonNull final String name,
