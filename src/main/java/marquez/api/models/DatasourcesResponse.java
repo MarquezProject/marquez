@@ -19,6 +19,6 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public final class DatasourcesResponse {
+public class DatasourcesResponse {
   @NonNull List<DatasourceResponse> datasources;
 }

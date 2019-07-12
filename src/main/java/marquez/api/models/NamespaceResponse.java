@@ -14,6 +14,8 @@
 
 package marquez.api.models;
 
+import static marquez.common.base.MorePreconditions.checkNotBlank;
+
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.*;
@@ -31,13 +33,13 @@ public class NamespaceResponse {
       @NonNull String createdAt,
       @NonNull String owner,
       @Nullable String description) {
-    this.name = name;
-    this.createdAt = createdAt;
-    this.owner = owner;
+    this.name = checkNotBlank(name);
+    this.createdAt = checkNotBlank(createdAt);
+    this.owner = checkNotBlank(owner);
     this.description = description;
   }
 
   public Optional<String> getDescription() {
-    return Optional.ofNullable(this.description);
+    return Optional.ofNullable(description);
   }
 }
