@@ -27,7 +27,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @EqualsAndHashCode
 @ToString
 public final class NamespaceRequest {
-  @Getter @NotBlank private final String owner;
+  @Getter @NotBlank private final String ownerName;
   @Nullable private final String description;
 
   public Optional<String> getDescription() {

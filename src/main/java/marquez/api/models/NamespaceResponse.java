@@ -24,6 +24,6 @@ import lombok.NoArgsConstructor;
 public class NamespaceResponse {
   String name;
   String createdAt;
-  String owner;
+  String ownerName;
   String description;
 }

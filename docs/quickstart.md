@@ -47,7 +47,7 @@ Before we can begin recording metadata, we must first create a _namespace_. A `n
 $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
   -H 'Content-Type: application/json' \
   -d '{
-        "owner": "analytics",
+        "ownerName": "analytics",
         "description": "Contains datasets such as room bookings for each office."
       }'
 ```
@@ -58,7 +58,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
 {
   "name": "wedata",
   "createdAt": "2019-06-08T19:11:59.430162Z",
-  "owner": "analytics",
+  "ownerName": "analytics",
   "description": "Contains datasets such as room bookings for each office."
 }
 ```
