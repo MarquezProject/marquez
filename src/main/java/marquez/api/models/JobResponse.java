@@ -14,8 +14,8 @@
 
 package marquez.api.models;
 
-import static marquez.common.Preconditions.checkNotBlank;
-import static marquez.common.Preconditions.checkNotEmpty;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
+import static marquez.common.base.MorePreconditions.checkNotEmpty;
 
 import java.util.List;
 import java.util.Optional;

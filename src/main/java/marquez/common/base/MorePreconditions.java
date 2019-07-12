@@ -16,6 +16,7 @@ package marquez.common.base;
 
 import static com.google.common.base.Strings.lenientFormat;
 
+import java.util.Collection;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 
@@ -41,5 +42,20 @@ public final class MorePreconditions {
 
   private static Boolean emptyOrBlank(final String arg) {
     return arg.trim().isEmpty();
+  }
+
+  public static Collection<?> checkNotEmpty(@NonNull final Collection<?> collection) {
+    if (collection.isEmpty()) {
+      throw new IllegalArgumentException();
+    }
+    return collection;
+  }
+
+  public static Collection<?> checkNotEmpty(
+      @NonNull final Collection<?> collection, @Nullable String errorMessage) {
+    if (collection.isEmpty()) {
+      throw new IllegalArgumentException(errorMessage);
+    }
+    return collection;
   }
 }
