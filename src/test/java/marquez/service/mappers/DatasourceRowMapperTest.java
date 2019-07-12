@@ -14,55 +14,45 @@
 
 package marquez.service.mappers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
+import static marquez.common.models.CommonModelGenerator.newDatasourceName;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import marquez.UnitTests;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
-import marquez.common.models.DatasourceType;
 import marquez.common.models.DatasourceUrn;
-import marquez.common.models.DbName;
-import marquez.common.models.DbSchemaName;
-import marquez.common.models.DbTableName;
 import marquez.db.models.DatasourceRow;
-import marquez.service.models.DbTableVersion;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasourceRowMapperTest {
-  private static final DatasourceType DATASOURCE_TYPE = DatasourceType.POSTGRESQL;
-  private static final DatasourceName DATASOURCE_NAME = DatasourceName.fromString("mydatabase123");
-  private static final DbName DB_NAME = DbName.fromString("test_db");
-  private static final ConnectionUrl CONNECTION_URL =
-      ConnectionUrl.fromString(
-          String.format(
-              "jdbc:%s://localhost:5432/%s",
-              DATASOURCE_TYPE.toString().toLowerCase(), DB_NAME.getValue()));
+  private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
+  private static final DatasourceName DATASOURCE_NAME = newDatasourceName();
   private static final DatasourceUrn DATASOURCE_URN =
-      DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
-  private static final DbSchemaName DB_SCHEMA_NAME = DbSchemaName.fromString("test_schema");
-  private static final DbTableName DB_TABLE_NAME = DbTableName.fromString("test_table");
+      DatasourceUrn.of(CONNECTION_URL, DATASOURCE_NAME);
 
   @Test
-  public void testMap() {
-    final DbTableVersion dbTableVersion =
-        DbTableVersion.builder()
-            .connectionUrl(CONNECTION_URL)
-            .dbSchemaName(DB_SCHEMA_NAME)
-            .dbTableName(DB_TABLE_NAME)
-            .build();
-    final DatasourceRow datasourceRow = DatasourceRowMapper.map(dbTableVersion);
-    assertNotNull(datasourceRow);
-    assertNotNull(datasourceRow.getUuid());
-    assertEquals(DB_NAME.getValue(), datasourceRow.getName());
-    assertEquals(CONNECTION_URL.getRawValue(), datasourceRow.getConnectionUrl());
+  public void testMap_row() {
+    final DatasourceRow row = DatasourceRowMapper.map(CONNECTION_URL, DATASOURCE_NAME);
+    assertThat(row).isNotNull();
+    assertThat(row.getUuid()).isNotNull();
+    assertThat(row.getName()).isEqualTo(DATASOURCE_NAME.getValue());
+    assertThat(row.getUrn()).isEqualTo(DATASOURCE_URN.getValue());
+    assertThat(row.getConnectionUrl()).isEqualTo(CONNECTION_URL.getRawValue());
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testMap_throwsException_onNullDbTableVersion() {
-    final DbTableVersion nullDbTableVersion = null;
-    DatasourceRowMapper.map(nullDbTableVersion);
+  @Test
+  public void testMap_throwsException_onNullConnectionUrl() {
+    assertThatNullPointerException()
+        .isThrownBy(() -> DatasourceRowMapper.map(null, DATASOURCE_NAME));
+  }
+
+  @Test
+  public void testMap_throwsException_onNullDatasourceName() {
+    assertThatNullPointerException()
+        .isThrownBy(() -> DatasourceRowMapper.map(CONNECTION_URL, null));
   }
 }

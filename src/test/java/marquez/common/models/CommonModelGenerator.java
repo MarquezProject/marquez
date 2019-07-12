@@ -32,7 +32,7 @@ public final class CommonModelGenerator {
   }
 
   public static OwnerName newOwnerNameWith(String value) {
-    return OwnerName.fromString(value);
+    return OwnerName.of(value);
   }
 
   public static NamespaceName newNamespaceName() {
@@ -40,7 +40,7 @@ public final class CommonModelGenerator {
   }
 
   public static NamespaceName newNamespaceNameWith(String value) {
-    return NamespaceName.fromString(value);
+    return NamespaceName.of(value);
   }
 
   public static JobName newJobName() {
@@ -48,7 +48,7 @@ public final class CommonModelGenerator {
   }
 
   public static JobName newJobNameWith(String value) {
-    return JobName.fromString(value);
+    return JobName.of(value);
   }
 
   public static URI newLocation() {
@@ -68,7 +68,7 @@ public final class CommonModelGenerator {
   }
 
   public static DatasourceName newDatasourceNameWith(String value) {
-    return DatasourceName.fromString(value);
+    return DatasourceName.of(value);
   }
 
   public static DatasourceUrn newDatasourceUrn() {
@@ -76,11 +76,11 @@ public final class CommonModelGenerator {
   }
 
   public static DatasourceUrn newDatasourceUrnWith(DatasourceType type) {
-    return DatasourceUrn.from(type, newDatasourceName());
+    return DatasourceUrn.of(type, newDatasourceName());
   }
 
   public static DatasourceUrn newDatasourceUrnWith(String value) {
-    return DatasourceUrn.fromString(value);
+    return DatasourceUrn.of(value);
   }
 
   public static DbName newDbName() {
@@ -88,7 +88,7 @@ public final class CommonModelGenerator {
   }
 
   public static DbName newDbNameWith(String value) {
-    return DbName.fromString(value);
+    return DbName.of(value);
   }
 
   public static ConnectionUrl newConnectionUrl() {
@@ -101,7 +101,7 @@ public final class CommonModelGenerator {
   }
 
   public static ConnectionUrl newConnectionUrlWith(String value) {
-    return ConnectionUrl.fromString(value);
+    return ConnectionUrl.of(value);
   }
 
   public static DatasetName newDatasetName() {
@@ -109,7 +109,7 @@ public final class CommonModelGenerator {
   }
 
   public static DatasetName newDatasetNameWith(String value) {
-    return DatasetName.fromString(value);
+    return DatasetName.of(value);
   }
 
   public static List<DatasetUrn> newDatasetUrns(int limit) {
@@ -117,11 +117,11 @@ public final class CommonModelGenerator {
   }
 
   public static DatasetUrn newDatasetUrn() {
-    return DatasetUrn.from(newDatasourceName(), newDatasetName());
+    return DatasetUrn.of(newDatasourceName(), newDatasetName());
   }
 
   public static DatasetUrn newDatasetUrnWith(String value) {
-    return DatasetUrn.fromString(value);
+    return DatasetUrn.of(value);
   }
 
   public static Description newDescription() {
@@ -129,7 +129,7 @@ public final class CommonModelGenerator {
   }
 
   public static Description newDescriptionWith(String value) {
-    return Description.fromString(value);
+    return Description.of(value);
   }
 
   private static int newId() {

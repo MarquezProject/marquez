@@ -79,7 +79,7 @@ public class DatasetDaoTest {
 
     namespaceDao.insert(namespaceRow);
     datasourceDao.insert(datasourceRow);
-    namespaceName = NamespaceName.fromString(namespaceRow.getName());
+    namespaceName = NamespaceName.of(namespaceRow.getName());
   }
 
   @Test

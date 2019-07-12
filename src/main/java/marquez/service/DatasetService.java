@@ -29,17 +29,12 @@ import marquez.db.NamespaceDao;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetRowExtended;
 import marquez.db.models.DatasourceRow;
-import marquez.db.models.DbTableInfoRow;
-import marquez.db.models.DbTableVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.DatasetMapper;
 import marquez.service.mappers.DatasetRowMapper;
-import marquez.service.mappers.DatasourceRowMapper;
-import marquez.service.mappers.DbTableInfoRowMapper;
-import marquez.service.mappers.DbTableVersionRowMapper;
 import marquez.service.models.Dataset;
-import marquez.service.models.DbTableVersion;
+import marquez.service.models.DatasetMeta;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -57,7 +52,7 @@ public class DatasetService {
     this.datasetDao = datasetDao;
   }
 
-  public Dataset create(@NonNull NamespaceName namespaceName, @NonNull Dataset dataset)
+  public Dataset create(@NonNull NamespaceName namespaceName, @NonNull DatasetMeta meta)
       throws MarquezServiceException {
     try {
       final NamespaceRow namespaceRow =
@@ -69,13 +64,13 @@ public class DatasetService {
                           "Namespace row not found: " + namespaceName.getValue()));
       final DatasourceRow datasourceRow =
           datasourceDao
-              .findBy(dataset.getDatasourceUrn())
+              .findBy(meta.getDatasourceUrn())
               .orElseThrow(
                   () ->
                       new MarquezServiceException(
-                          "Datasource row not found: " + dataset.getDatasourceUrn().getValue()));
-      final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, dataset);
-      final DatasetUrn datasetUrn = DatasetUrn.fromString(newDatasetRow.getUrn());
+                          "Datasource row not found: " + meta.getDatasourceUrn().getValue()));
+      final DatasetRow newDatasetRow = DatasetRowMapper.map(namespaceRow, datasourceRow, meta);
+      final DatasetUrn datasetUrn = DatasetUrn.of(newDatasetRow.getUrn());
       final Optional<Dataset> datasetIfFound = get(datasetUrn);
       if (datasetIfFound.isPresent()) {
         return datasetIfFound.get();
@@ -84,8 +79,7 @@ public class DatasetService {
           .insertAndGet(newDatasetRow)
           .map(
               datasetRow -> {
-                final DatasourceUrn datasourceUrn =
-                    DatasourceUrn.fromString(datasourceRow.getUrn());
+                final DatasourceUrn datasourceUrn = DatasourceUrn.of(datasourceRow.getUrn());
                 return DatasetMapper.map(datasourceUrn, datasetRow);
               })
           .orElseThrow(
@@ -93,29 +87,7 @@ public class DatasetService {
                   new MarquezServiceException(
                       String.format("Failed to insert dataset row: %s", newDatasetRow)));
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create dataset: {}", dataset, e);
-      throw new MarquezServiceException();
-    }
-  }
-
-  public Dataset create(
-      @NonNull NamespaceName namespaceName, @NonNull DbTableVersion dbTableVersion)
-      throws MarquezServiceException {
-    final DatasourceRow datasourceRow = DatasourceRowMapper.map(dbTableVersion);
-    final DatasetRow datasetRow =
-        DatasetRowMapper.map(namespaceName, datasourceRow, dbTableVersion);
-    final DbTableInfoRow dbTableInfoRow = DbTableInfoRowMapper.map(dbTableVersion);
-    final DbTableVersionRow dbTableVersionRow =
-        DbTableVersionRowMapper.map(datasetRow, dbTableInfoRow, dbTableVersion);
-    try {
-      datasetDao.insertAll(datasourceRow, datasetRow, dbTableInfoRow, dbTableVersionRow);
-      final Optional<DatasetRowExtended> datasetRowExtendedIfFound =
-          datasetDao.findBy(datasetRow.getUuid());
-      return datasetRowExtendedIfFound
-          .map(DatasetMapper::map)
-          .orElseThrow(MarquezServiceException::new);
-    } catch (UnableToExecuteStatementException e) {
-      log.error(e.getMessage());
+      log.error("Failed to create dataset: {}", meta, e);
       throw new MarquezServiceException();
     }
   }

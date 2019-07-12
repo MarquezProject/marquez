@@ -15,6 +15,7 @@
 package marquez.api.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -33,7 +34,7 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import marquez.api.exceptions.DatasetUrnNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
-import marquez.api.mappers.DatasetMapper;
+import marquez.api.mappers.DatasetMetaMapper;
 import marquez.api.mappers.DatasetResponseMapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
@@ -44,6 +45,7 @@ import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
+import marquez.service.models.DatasetMeta;
 
 @Path("/api/v1/namespaces/{namespace}/datasets")
 public final class DatasetResource {
@@ -64,11 +66,14 @@ public final class DatasetResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(
-      @PathParam("namespace") NamespaceName namespaceName, @Valid DatasetRequest request)
+      @PathParam("namespace") String namespaceAsString, @Valid DatasetRequest request)
       throws MarquezServiceException {
+    checkNotBlank(namespaceAsString, "namespace must not be blank");
+    final NamespaceName namespaceName = NamespaceName.of(namespaceAsString);
     throwIfNotExists(namespaceName);
-    final Dataset newDataset = DatasetMapper.map(request);
-    final Dataset dataset = datasetService.create(namespaceName, newDataset);
+
+    final DatasetMeta meta = DatasetMetaMapper.map(request);
+    final Dataset dataset = datasetService.create(namespaceName, meta);
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
     return Response.ok(response).build();
   }
@@ -80,9 +85,14 @@ public final class DatasetResource {
   @Path("{urn}")
   @Produces(APPLICATION_JSON)
   public Response get(
-      @PathParam("namespace") NamespaceName namespaceName, @PathParam("urn") DatasetUrn urn)
+      @PathParam("namespace") String namespaceAsString, @PathParam("urn") String urnAsString)
       throws MarquezServiceException {
+    checkNotBlank(namespaceAsString, "namespace must not be blank");
+    checkNotBlank(urnAsString, "urn must not be blank");
+    final NamespaceName namespaceName = NamespaceName.of(namespaceAsString);
     throwIfNotExists(namespaceName);
+
+    final DatasetUrn urn = DatasetUrn.of(urnAsString);
     final Dataset dataset =
         datasetService.get(urn).orElseThrow(() -> new DatasetUrnNotFoundException(urn));
     final DatasetResponse response = DatasetResponseMapper.map(dataset);
@@ -95,11 +105,14 @@ public final class DatasetResource {
   @GET
   @Produces(APPLICATION_JSON)
   public Response list(
-      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("namespace") String namespaceAsString,
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset)
       throws MarquezServiceException {
+    checkNotBlank(namespaceAsString, "namespace must not be blank");
+    final NamespaceName namespaceName = NamespaceName.of(namespaceAsString);
     throwIfNotExists(namespaceName);
+
     final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
     final DatasetsResponse response = DatasetResponseMapper.toDatasetsResponse(datasets);
     return Response.ok(response).build();

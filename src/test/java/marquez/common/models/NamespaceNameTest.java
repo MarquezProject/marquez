@@ -30,43 +30,43 @@ public class NamespaceNameTest {
   @Test
   public void testNewNamespace() {
     final String value = "test";
-    assertEquals(value, NamespaceName.fromString(value).getValue());
+    assertEquals(value, NamespaceName.of(value).getValue());
   }
 
   @Test
   public void testNewNamespace_withDashesAndUnderscore() {
     final String nameWithDashesAndUnderscore = "test_a-b_c";
-    NamespaceName.fromString(nameWithDashesAndUnderscore);
+    NamespaceName.of(nameWithDashesAndUnderscore);
   }
 
   @Test(expected = NullPointerException.class)
   public void testNewNamespace_throwsException_onNullValue() {
     final String nullValue = null;
-    NamespaceName.fromString(nullValue);
+    NamespaceName.of(nullValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNewNamespace_throwsException_onEmptyValue() {
     final String emptyValue = "";
-    NamespaceName.fromString(emptyValue);
+    NamespaceName.of(emptyValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNewNamespace_throwsException_onBlankValue() {
     final String blankValue = " ";
-    NamespaceName.fromString(blankValue);
+    NamespaceName.of(blankValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNewNamespace_throwsException_onNonAlphanumericValue() {
     final String nonAlphanumericValue = "t@?t>";
-    NamespaceName.fromString(nonAlphanumericValue);
+    NamespaceName.of(nonAlphanumericValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testNewNamespace_throwsException_onGreaterThan1024Value() {
     final String greaterThan1024Value = newGreaterThan1024Value();
-    NamespaceName.fromString(greaterThan1024Value);
+    NamespaceName.of(greaterThan1024Value);
   }
 
   private String newGreaterThan1024Value() {

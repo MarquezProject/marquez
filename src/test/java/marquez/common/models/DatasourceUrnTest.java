@@ -38,21 +38,21 @@ public class DatasourceUrnTest {
 
   @Test
   public void testNewDatasourceUrn_from() {
-    final DatasourceUrn urn = DatasourceUrn.from(DATASOURCE_TYPE, DATASOURCE_NAME);
+    final DatasourceUrn urn = DatasourceUrn.of(DATASOURCE_TYPE, DATASOURCE_NAME);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test
   public void testNewDatasourceUrn_fromConnectionUrlAndName() {
-    final DatasourceUrn urn = DatasourceUrn.from(CONNECTION_URL, DATASOURCE_NAME);
+    final DatasourceUrn urn = DatasourceUrn.of(CONNECTION_URL, DATASOURCE_NAME);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
 
   @Test
   public void testNewDatasourceUrn_fromString() {
-    final DatasourceUrn urn = DatasourceUrn.fromString(VALUE);
+    final DatasourceUrn urn = DatasourceUrn.of(VALUE);
     assertEquals(VALUE, urn.getValue());
     assertEquals(NAMESPACE, urn.namespace());
   }
@@ -60,30 +60,30 @@ public class DatasourceUrnTest {
   @Test(expected = NullPointerException.class)
   public void testFrom_throwsException_onNullDatasourceType() {
     final DatasourceType nullDatasourceType = null;
-    DatasourceUrn.from(nullDatasourceType, DATASOURCE_NAME);
+    DatasourceUrn.of(nullDatasourceType, DATASOURCE_NAME);
   }
 
   @Test(expected = NullPointerException.class)
   public void tesFrom_throwsException_onNullDatasourceName() {
     final DatasourceName nullDatasourceName = null;
-    DatasourceUrn.from(DATASOURCE_TYPE, nullDatasourceName);
+    DatasourceUrn.of(DATASOURCE_TYPE, nullDatasourceName);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFromString_throwsException_onEmptyValue() {
     final String emptyValue = "";
-    DatasourceUrn.fromString(emptyValue);
+    DatasourceUrn.of(emptyValue);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFromString_throwsException_onBlankValue() {
     final String blankValue = " ";
-    DatasourceUrn.fromString(blankValue);
+    DatasourceUrn.of(blankValue);
   }
 
   @Test(expected = NullPointerException.class)
   public void testDatasourceUrn_throwsException_onNullInput() {
     final String nullUrn = null;
-    DatasourceUrn.fromString(nullUrn);
+    DatasourceUrn.of(nullUrn);
   }
 }
