@@ -16,7 +16,6 @@ package marquez.common.base;
 
 import static com.google.common.base.Strings.lenientFormat;
 
-import java.util.Collection;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 
