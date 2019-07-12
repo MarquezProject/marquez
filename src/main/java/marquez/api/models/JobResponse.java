@@ -19,7 +19,10 @@ import static marquez.common.base.MorePreconditions.checkNotBlank;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
@@ -38,8 +41,8 @@ public final class JobResponse {
       @NonNull final String updatedAt,
       @NonNull final List<String> inputDatasetUrns,
       @NonNull final List<String> outputDatasetUrns,
-      @NonNull String location,
-      @Nullable String description) {
+      @NonNull final String location,
+      @Nullable final String description) {
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);
@@ -50,6 +53,6 @@ public final class JobResponse {
   }
 
   public Optional<String> getDescription() {
-    return Optional.ofNullable(this.description);
+    return Optional.ofNullable(description);
   }
 }

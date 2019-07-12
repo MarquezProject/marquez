@@ -14,28 +14,47 @@
 
 package marquez.api.models;
 
+import static marquez.common.base.MorePreconditions.checkNotBlank;
+
+import java.util.Optional;
 import java.util.UUID;
-import lombok.*;
+import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
 public final class JobRunResponse {
   @Getter private UUID runId;
-  @Getter private String nominalStartTime;
-  @Getter private String nominalEndTime;
-  @Getter private String runArgs;
+  private String nominalStartTime;
+  private String nominalEndTime;
+  private String runArgs;
   @Getter private String runState;
 
   public JobRunResponse(
       @NonNull final UUID runId,
-      final String nominalStartTime,
-      final String nominalEndTime,
-      final String runArgs,
-      final String runState) {
+      @Nullable final String nominalStartTime,
+      @Nullable final String nominalEndTime,
+      @Nullable final String runArgs,
+      @NonNull final String runState) {
     this.runId = runId;
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;
     this.runArgs = runArgs;
-    this.runState = runState;
+    this.runState = checkNotBlank(runState);
+  }
+
+  public Optional<String> getNominalStartTime() {
+    return Optional.ofNullable(nominalStartTime);
+  }
+
+  public Optional<String> getNominalEndTime() {
+    return Optional.ofNullable(nominalEndTime);
+  }
+
+  public Optional<String> getRunArgs() {
+    return Optional.ofNullable(runArgs);
   }
 }
