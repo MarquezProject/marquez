@@ -56,9 +56,10 @@ public final class NamespaceResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
-      @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceRequest request)
+      @PathParam("namespace") String nameAsString, @Valid NamespaceRequest request)
       throws MarquezServiceException {
-    final Namespace newNamespace = NamespaceMapper.map(namespaceName, request);
+    final NamespaceName name = NamespaceName.of(nameAsString);
+    final Namespace newNamespace = NamespaceMapper.map(name, request);
     final Namespace namespace = namespaceService.createOrUpdate(newNamespace);
     final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
     return Response.ok(response).build();
@@ -70,12 +71,10 @@ public final class NamespaceResource {
   @GET
   @Path("/namespaces/{namespace}")
   @Produces(APPLICATION_JSON)
-  public Response get(@PathParam("namespace") NamespaceName namespaceName)
-      throws MarquezServiceException {
+  public Response get(@PathParam("namespace") String nameAsString) throws MarquezServiceException {
+    final NamespaceName name = NamespaceName.of(nameAsString);
     final Namespace namespace =
-        namespaceService
-            .get(namespaceName)
-            .orElseThrow(() -> new NamespaceNotFoundException(namespaceName));
+        namespaceService.get(name).orElseThrow(() -> new NamespaceNotFoundException(name));
     final NamespaceResponse response = NamespaceResponseMapper.map(namespace);
     return Response.ok(response).build();
   }

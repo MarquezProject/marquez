@@ -46,7 +46,7 @@ public class DatasourceRowMapperTest {
   private static final Instant CREATED_AT = Instant.now();
   private static final DatasourceName NAME = newDatasourceName();
   private static final ConnectionUrl CONNECTION_URL = newConnectionUrl();
-  private static final DatasourceUrn URN = DatasourceUrn.from(CONNECTION_URL, NAME);
+  private static final DatasourceUrn URN = DatasourceUrn.of(CONNECTION_URL, NAME);
 
   @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 

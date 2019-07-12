@@ -105,9 +105,11 @@ public class JobService {
     }
   }
 
-  public List<Job> getAllJobsInNamespace(String namespace) throws MarquezServiceException {
+  public List<Job> getAllJobsInNamespace(
+      String namespace, @NonNull Integer limit, @NonNull Integer offset)
+      throws MarquezServiceException {
     try {
-      return jobDao.findAllInNamespace(namespace);
+      return jobDao.findAllInNamespace(namespace, limit, offset);
     } catch (UnableToExecuteStatementException e) {
       log.error("caught exception while fetching jobs in namespace ", e);
       throw new MarquezServiceException();

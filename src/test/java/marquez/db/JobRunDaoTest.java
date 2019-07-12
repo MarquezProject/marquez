@@ -125,12 +125,12 @@ public class JobRunDaoTest extends JobRunBaseTest {
   public void testFindAllByJobUuid() throws MarquezServiceException {
     List<JobRun> jobRuns =
         jobService.getAllRunsOfJob(
-            NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME, TEST_LIMIT, TEST_OFFSET);
+            NamespaceName.of(NAMESPACE_NAME), CREATED_JOB_NAME, TEST_LIMIT, TEST_OFFSET);
     assertEquals(jobRuns.size(), 1);
     jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     jobRuns =
         jobService.getAllRunsOfJob(
-            NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME, TEST_LIMIT, TEST_OFFSET);
+            NamespaceName.of(NAMESPACE_NAME), CREATED_JOB_NAME, TEST_LIMIT, TEST_OFFSET);
     assertEquals(jobRuns.size(), 2);
   }
 
@@ -140,10 +140,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
     jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
     List<JobRun> jobRuns =
         jobService.getAllRunsOfJob(
-            NamespaceName.fromString(NAMESPACE_NAME),
-            CREATED_JOB_NAME,
-            singleJobLimit,
-            TEST_OFFSET);
+            NamespaceName.of(NAMESPACE_NAME), CREATED_JOB_NAME, singleJobLimit, TEST_OFFSET);
     assertEquals(jobRuns.size(), 1);
   }
 
@@ -152,7 +149,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
     String nonexistentJobName = "this_job_doesnt_exist";
     List<JobRun> jobRuns =
         jobService.getAllRunsOfJob(
-            NamespaceName.fromString(NAMESPACE_NAME), nonexistentJobName, TEST_LIMIT, TEST_OFFSET);
+            NamespaceName.of(NAMESPACE_NAME), nonexistentJobName, TEST_LIMIT, TEST_OFFSET);
     assertEquals(jobRuns.size(), 0);
   }
 
@@ -170,7 +167,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
             });
     List<JobRun> jobRuns =
         jobService.getAllRunsOfJob(
-            NamespaceName.fromString(NAMESPACE_NAME), CREATED_JOB_NAME, TEST_LIMIT, TEST_OFFSET);
+            NamespaceName.of(NAMESPACE_NAME), CREATED_JOB_NAME, TEST_LIMIT, TEST_OFFSET);
     assertEquals(jobRuns.size(), 0);
   }
 

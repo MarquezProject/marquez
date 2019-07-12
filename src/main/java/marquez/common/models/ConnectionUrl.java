@@ -14,6 +14,9 @@
 
 package marquez.common.models;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -29,32 +32,22 @@ public final class ConnectionUrl {
   private ConnectionUrl(
       @NonNull final DatasourceType datasourceType,
       @NonNull final DbName dbName,
-      @NonNull final String rawValue) {
+      final String rawValue) {
     this.datasourceType = datasourceType;
     this.dbName = dbName;
-    this.rawValue = rawValue;
+    this.rawValue = checkNotBlank(rawValue);
   }
 
-  public static ConnectionUrl fromString(@NonNull String rawValue) {
-    if (rawValue.trim().isEmpty()) {
-      throw new IllegalArgumentException("The connection url value must not be blank or empty.");
-    }
-
-    final RawValueParser rawValueParser = RawValueParser.get(rawValue);
-    if (rawValueParser == RawValueParser.UNKNOWN) {
-      throw new IllegalArgumentException(
-          String.format(
-              "Failed to parse connection url value '%s', unknown data source.", rawValue));
-    }
-
-    return rawValueParser.parse(rawValue);
+  public static ConnectionUrl of(final String rawValue) {
+    final UrlParser parser = UrlParser.get(checkNotBlank(rawValue));
+    return parser.parse(rawValue);
   }
 
-  private enum RawValueParser {
+  private enum UrlParser {
     JDBC("jdbc") {
       private static final String URL_DELIM = ":";
       private static final int URL_PART_COUNT = 4;
-      private static final int DATA_SOURCE_PART = 1;
+      private static final int DATASOURCE_PART = 1;
       private static final int PORT_AND_DB_PART = 3;
       private static final String PORT_AND_DB_PART_DELIM = "/";
       private static final int DB_PART = 1;
@@ -62,31 +55,17 @@ public final class ConnectionUrl {
       private static final int DB_PART_NO_PARAMS = 0;
 
       @Override
-      public ConnectionUrl parse(@NonNull String rawValue) {
-        final String[] urlParts = rawValue.split(URL_DELIM);
-        if (urlParts.length != URL_PART_COUNT) {
-          throw new IllegalArgumentException(
-              String.format(
-                  "The connection url value has missing parts: %d != %d.",
-                  urlParts.length, URL_PART_COUNT));
-        }
-        final String datasourceString = urlParts[DATA_SOURCE_PART];
-        final DatasourceType datasourceType =
-            DatasourceType.valueOf(datasourceString.toUpperCase());
-        final String dbNameString =
-            urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
-        final DbName dbName =
-            DbName.fromString(
-                dbNameString.contains(DB_PART_DELIM)
-                    ? dbNameString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
-                    : dbNameString);
-        return new ConnectionUrl(datasourceType, dbName, rawValue);
-      }
-    },
-    UNKNOWN("") {
-      @Override
-      public ConnectionUrl parse(@NonNull String rawValue) {
-        throw new UnsupportedOperationException();
+      ConnectionUrl parse(String rawValue) {
+        final String[] urlParts = checkNotBlank(rawValue).split(URL_DELIM);
+        checkArgument(urlParts.length == URL_PART_COUNT);
+        final String dbAsString = urlParts[PORT_AND_DB_PART].split(PORT_AND_DB_PART_DELIM)[DB_PART];
+        return new ConnectionUrl(
+            DatasourceType.valueOf(urlParts[DATASOURCE_PART].toUpperCase()),
+            DbName.of(
+                dbAsString.contains(DB_PART_DELIM)
+                    ? dbAsString.split(DB_PART_DELIM)[DB_PART_NO_PARAMS]
+                    : dbAsString),
+            rawValue);
       }
     };
 
@@ -94,19 +73,19 @@ public final class ConnectionUrl {
 
     private final String value;
 
-    private RawValueParser(@NonNull final String value) {
-      this.value = value;
+    private UrlParser(final String value) {
+      this.value = checkNotBlank(value);
     }
 
     String getValue() {
       return value;
     }
 
-    static RawValueParser get(@NonNull String rawValue) {
-      if (rawValue.startsWith(JDBC.getValue())) {
+    static UrlParser get(final String rawValue) {
+      if (checkNotBlank(rawValue).startsWith(JDBC.getValue())) {
         return JDBC;
       }
-      return UNKNOWN;
+      throw new IllegalArgumentException();
     }
   }
 }

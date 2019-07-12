@@ -12,25 +12,24 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.models;
 
-import static org.junit.Assert.assertEquals;
+import static marquez.api.models.ApiModelGenerator.newDatasetResponses;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import marquez.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class OwnerNameTest {
-  @Test
-  public void testNewOwnerName() {
-    final String value = "test";
-    assertEquals(value, OwnerName.of(value).getValue());
-  }
+public class DatasetsResponseTest {
+  final List<DatasetResponse> RESPONSES = newDatasetResponses(4);
 
-  @Test(expected = NullPointerException.class)
-  public void testNewOwnerName_throwsException_onNullValue() {
-    final String nullValue = null;
-    OwnerName.of(nullValue);
+  @Test
+  public void testNewResponse() {
+    final DatasetsResponse expected = new DatasetsResponse(RESPONSES);
+    final DatasetsResponse actual = new DatasetsResponse(RESPONSES);
+    assertThat(actual).isEqualTo(expected);
   }
 }

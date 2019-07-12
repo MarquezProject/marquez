@@ -26,13 +26,13 @@ public class DatasourceNameTest {
 
   @Test
   public void testNewDatasetName_fromString() {
-    final DatasetName name = DatasetName.fromString(VALUE);
+    final DatasetName name = DatasetName.of(VALUE);
     assertEquals(VALUE, name.getValue());
   }
 
   @Test(expected = NullPointerException.class)
   public void testFromString_throwsException_onNullValue() {
     final String nullValue = null;
-    DatasetName.fromString(nullValue);
+    DatasetName.of(nullValue);
   }
 }

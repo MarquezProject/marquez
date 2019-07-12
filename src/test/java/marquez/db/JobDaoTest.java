@@ -160,9 +160,15 @@ public class JobDaoTest {
         job -> {
           jobDao.insertJobAndVersion(job, Generator.genJobVersion(job));
         });
-    List<Job> jobsFound = jobDao.findAllInNamespace(nsName);
+    List<Job> jobsFound = jobDao.findAllInNamespace(nsName, 10, 0);
     assertEquals(jobs.size(), jobsFound.size());
-    assertEquals(0, jobDao.findAllInNamespace("nonexistent").size());
+    assertEquals(0, jobDao.findAllInNamespace("nonexistent", 10, 0).size());
+    assertEquals(2, jobDao.findAllInNamespace(nsName, 2, 0).size());
+    assertEquals(1, jobDao.findAllInNamespace(nsName, 1, 0).size());
+    assertEquals(0, jobDao.findAllInNamespace(nsName, 0, 0).size());
+    assertEquals(2, jobDao.findAllInNamespace(nsName, 10, 1).size());
+    assertEquals(1, jobDao.findAllInNamespace(nsName, 10, 2).size());
+    assertEquals(0, jobDao.findAllInNamespace(nsName, 10, 10).size());
   }
 
   @Test

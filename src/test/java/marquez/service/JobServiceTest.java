@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,15 +72,26 @@ public class JobServiceTest {
     List<Job> jobs = new ArrayList<Job>();
     jobs.add(Generator.genJob(namespaceID));
     jobs.add(Generator.genJob(namespaceID));
-    when(jobDao.findAllInNamespace(TEST_NS)).thenReturn(jobs);
-    Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS));
+    when(jobDao.findAllInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET)).thenReturn(jobs);
+    Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET));
+    verify(jobDao, times(1)).findAllInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testGetAllNullLimit() throws MarquezServiceException {
+    jobService.getAllJobsInNamespace(TEST_NS, null, TEST_OFFSET);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testGetAllNullOffset() throws MarquezServiceException {
+    jobService.getAllJobsInNamespace(TEST_NS, TEST_LIMIT, null);
   }
 
   @Test
   public void testGetAll_NoJobs_OK() throws MarquezServiceException {
     List<Job> jobs = new ArrayList<Job>();
-    when(jobDao.findAllInNamespace(TEST_NS)).thenReturn(jobs);
-    Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS));
+    when(jobDao.findAllInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET)).thenReturn(jobs);
+    Assert.assertEquals(jobs, jobService.getAllJobsInNamespace(TEST_NS, TEST_LIMIT, TEST_OFFSET));
   }
 
   @Test
@@ -221,8 +233,11 @@ public class JobServiceTest {
 
   @Test(expected = MarquezServiceException.class)
   public void testGetAll_Exception() throws MarquezServiceException {
-    when(jobDao.findAllInNamespace(TEST_NS)).thenThrow(UnableToExecuteStatementException.class);
-    jobService.getAllJobsInNamespace(TEST_NS);
+    Integer limit = new Integer(10);
+    Integer offset = new Integer(0);
+    when(jobDao.findAllInNamespace(TEST_NS, limit, offset))
+        .thenThrow(UnableToExecuteStatementException.class);
+    jobService.getAllJobsInNamespace(TEST_NS, limit, offset);
   }
 
   @Test
@@ -260,7 +275,7 @@ public class JobServiceTest {
   @Test
   public void testGetAllRunsOfJob_jobAndRunsFound() throws MarquezServiceException {
     Job job = Generator.genJob();
-    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     List<JobRun> jobRuns = new ArrayList<JobRun>();
     jobRuns.add(Generator.genJobRun());
     jobRuns.add(Generator.genJobRun());
@@ -274,7 +289,7 @@ public class JobServiceTest {
   @Test
   public void testGetAllRunsOfJob_jobNotFound() throws MarquezServiceException {
     Job job = Generator.genJob();
-    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(null);
     assertEquals(
         0, jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET).size());
@@ -283,7 +298,7 @@ public class JobServiceTest {
   @Test
   public void testGetAllRunsOfJob_noRunsFound() throws MarquezServiceException {
     Job job = Generator.genJob();
-    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     List<JobRun> jobRuns = new ArrayList<JobRun>();
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
     when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET)).thenReturn(jobRuns);
@@ -295,7 +310,7 @@ public class JobServiceTest {
   @Test(expected = MarquezServiceException.class)
   public void testGetAllRunsOfJob_exception() throws MarquezServiceException {
     Job job = Generator.genJob();
-    NamespaceName jobNamespace = NamespaceName.fromString(TEST_NS);
+    NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
     when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET))
         .thenThrow(UnableToExecuteStatementException.class);

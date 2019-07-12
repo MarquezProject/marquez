@@ -65,6 +65,8 @@ public interface JobDao {
           + "INNER JOIN job_versions jv "
           + " ON (j.current_version_guid = jv.guid) "
           + "INNER JOIN namespaces n "
-          + " ON (j.namespace_guid = n.guid AND n.name = :namespaceName)")
-  List<Job> findAllInNamespace(String namespaceName);
+          + " ON (j.namespace_guid = n.guid AND n.name = :namespaceName) "
+          + " ORDER BY j.name "
+          + "LIMIT :limit OFFSET :offset")
+  List<Job> findAllInNamespace(String namespaceName, Integer limit, Integer offset);
 }

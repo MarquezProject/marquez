@@ -54,7 +54,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Mock private NamespaceService namespaceService;
 
-  private NamespaceName namespaceName = NamespaceName.fromString(NAMESPACE_NAME);
+  private NamespaceName namespaceName = NamespaceName.of(NAMESPACE_NAME);
 
   private static final NamespaceService NAMESPACE_SERVICE = mock(NamespaceService.class);
 
@@ -92,7 +92,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
     when(namespaceService.get(namespaceName)).thenReturn(returnedOptionalNamespace);
-    Response res = namespaceResource.get(namespaceName);
+    Response res = namespaceResource.get(namespaceName.getValue());
     NamespaceResponse responseBody = (NamespaceResponse) res.getEntity();
 
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());

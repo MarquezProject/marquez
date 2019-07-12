@@ -19,6 +19,6 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public final class DatasetsResponse {
-  @NonNull private final List<DatasetResponse> datasets;
+public class DatasetsResponse {
+  @NonNull List<DatasetResponse> datasets;
 }

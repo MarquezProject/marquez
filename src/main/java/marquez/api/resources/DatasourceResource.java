@@ -58,8 +58,8 @@ public final class DatasourceResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(@Valid DatasourceRequest request) throws MarquezServiceException {
-    final ConnectionUrl connectionUrl = ConnectionUrl.fromString(request.getConnectionUrl());
-    final DatasourceName name = DatasourceName.fromString(request.getName());
+    final ConnectionUrl connectionUrl = ConnectionUrl.of(request.getConnectionUrl());
+    final DatasourceName name = DatasourceName.of(request.getName());
     final Datasource datasource = datasourceService.create(connectionUrl, name);
     final DatasourceResponse response = DatasourceResponseMapper.map(datasource);
     return Response.ok(response).build();
@@ -71,7 +71,8 @@ public final class DatasourceResource {
   @GET
   @Produces(APPLICATION_JSON)
   @Path("/{urn}")
-  public Response get(@PathParam("urn") DatasourceUrn urn) throws MarquezServiceException {
+  public Response get(@PathParam("urn") String urnAsString) throws MarquezServiceException {
+    final DatasourceUrn urn = DatasourceUrn.of(urnAsString);
     final Datasource datasource =
         datasourceService.get(urn).orElseThrow(() -> new DatasourceUrnNotFoundException(urn));
     final DatasourceResponse response = DatasourceResponseMapper.map(datasource);

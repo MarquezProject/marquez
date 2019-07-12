@@ -17,21 +17,20 @@ package marquez.api.mappers;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 
 import lombok.NonNull;
-import marquez.api.models.DbTableVersionRequest;
-import marquez.common.models.ConnectionUrl;
-import marquez.common.models.DbSchemaName;
-import marquez.common.models.DbTableName;
+import marquez.api.models.DatasetRequest;
+import marquez.common.models.DatasetName;
+import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
-import marquez.service.models.DbTableVersion;
+import marquez.service.models.DatasetMeta;
 
-public final class DbTableVersionMapper {
-  private DbTableVersionMapper() {}
+public final class DatasetMetaMapper {
+  private DatasetMetaMapper() {}
 
-  public static DbTableVersion map(@NonNull DbTableVersionRequest request) {
-    return new DbTableVersion(
-        ConnectionUrl.fromString(request.getConnectionUrl()),
-        DbSchemaName.fromString(request.getSchema()),
-        DbTableName.fromString(request.getTable()),
-        request.getDescription().map(Description::fromString).orElse(NO_DESCRIPTION));
+  public static DatasetMeta map(@NonNull final DatasetRequest request) {
+    return DatasetMeta.builder()
+        .name(DatasetName.of(request.getName()))
+        .datasourceUrn(DatasourceUrn.of(request.getDatasourceUrn()))
+        .description(request.getDescription().map(Description::of).orElse(NO_DESCRIPTION))
+        .build();
   }
 }

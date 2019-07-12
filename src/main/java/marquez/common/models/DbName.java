@@ -14,15 +14,22 @@
 
 package marquez.common.models;
 
+import static marquez.common.base.MorePreconditions.checkNotBlank;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-@RequiredArgsConstructor(staticName = "fromString")
 @EqualsAndHashCode
 @ToString
 public final class DbName {
-  @Getter @NonNull private final String value;
+  @Getter private final String value;
+
+  private DbName(final String value) {
+    this.value = checkNotBlank(value, "value must not be blank");
+  }
+
+  public static DbName of(final String value) {
+    return new DbName(value);
+  }
 }
