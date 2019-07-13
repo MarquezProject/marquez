@@ -20,6 +20,7 @@ import static javax.ws.rs.client.Entity.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -45,7 +46,6 @@ import marquez.api.models.JobRequest;
 import marquez.api.models.JobResponse;
 import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
-import marquez.api.models.JobsResponse;
 import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -202,8 +202,11 @@ public class JobResourceTest {
     String path = format("/api/v1/namespaces/%s/jobs", NAMESPACE_NAME.getValue());
     Response res = resources.client().target(path).request(MediaType.APPLICATION_JSON).get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
-    List<JobResponse> returnedJobs = res.readEntity(JobsResponse.class).getJobs();
-    assertThat(returnedJobs).hasSize(jobsList.size());
+
+    String jsonResponse = res.readEntity(String.class);
+    assertNotNull(jsonResponse);
+    assertThat(jsonResponse).contains(job1.getName());
+    assertThat(jsonResponse).contains(job2.getName());
   }
 
   @Test

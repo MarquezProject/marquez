@@ -15,14 +15,10 @@
 package marquez.api.models;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 public class JobsResponse {
   @NonNull private List<JobResponse> jobs;
 }

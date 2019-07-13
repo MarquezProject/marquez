@@ -15,11 +15,10 @@
 package marquez.api.models;
 
 import java.util.List;
-import lombok.*;
+import lombok.NonNull;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 public class NamespacesResponse {
-  @NonNull private List<NamespaceResponse> namespaces;
+  @NonNull List<NamespaceResponse> namespaces;
 }
