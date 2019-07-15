@@ -406,16 +406,16 @@ components:
     createNamespace:
       type: object
       properties:
-        owner:
+        ownerName:
           description: The owner of the namespace.
           type: string
         description:
           description: The description of the namespace.
           type: string
       required:
-        - owner
+        - ownerName
       example:
-        owner: dataengineering
+        ownerName: dataengineering
         description: A namespace for core jobs and datasets at wework.
 
     namespace:
@@ -428,7 +428,7 @@ components:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the namespace was created.
           type: string
           format: date-time
-        owner:
+        ownerName:
           description: The owner of the namespace.
           type: string
         description:
@@ -437,7 +437,7 @@ components:
       example:
         name: wework
         createdAt: 2019-05-09T19:49:24.201361Z
-        owner: dataengineering
+        ownerName: dataengineering
         description: A namespace for core jobs and datasets at wework.
 
     namespaces:
