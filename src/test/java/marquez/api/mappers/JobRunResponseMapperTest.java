@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import marquez.UnitTests;
 import marquez.api.models.JobRunResponse;
 import marquez.api.models.JobRunsResponse;
@@ -36,12 +37,12 @@ public class JobRunResponseMapperTest {
     final JobRun run = newJobRun();
     final JobRunResponse response = JobRunResponseMapper.map(run);
     assertThat(response).isNotNull();
-    assertThat(response.getRunId()).isEqualTo(run.getGuid());
+    assertThat(UUID.fromString(response.getRunId())).isEqualTo(run.getGuid());
     assertThat(response.getRunState())
         .isEqualTo(JobRunState.State.fromInt(run.getCurrentState()).name());
-    assertThat(response.getRunArgs()).isEqualTo(run.getRunArgs());
-    assertThat(response.getNominalStartTime()).isEqualTo(run.getNominalStartTime());
-    assertThat(response.getNominalEndTime()).isEqualTo(run.getNominalEndTime());
+    assertThat(response.getRunArgs().orElse(null)).isEqualTo(run.getRunArgs());
+    assertThat(response.getNominalStartTime().orElse(null)).isEqualTo(run.getNominalStartTime());
+    assertThat(response.getNominalEndTime().orElse(null)).isEqualTo(run.getNominalEndTime());
   }
 
   @Test

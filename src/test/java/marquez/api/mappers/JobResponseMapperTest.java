@@ -42,7 +42,7 @@ public class JobResponseMapperTest {
     assertThat(response.getInputDatasetUrns()).containsAll(job.getInputDatasetUrns());
     assertThat(response.getOutputDatasetUrns()).containsAll(job.getOutputDatasetUrns());
     assertThat(response.getLocation()).isEqualTo(job.getLocation());
-    assertThat(response.getDescription()).isEqualTo(job.getDescription());
+    assertThat(response.getDescription().get()).isEqualTo(job.getDescription());
   }
 
   @Test
@@ -56,7 +56,7 @@ public class JobResponseMapperTest {
     assertThat(response.getInputDatasetUrns()).containsAll(job.getInputDatasetUrns());
     assertThat(response.getOutputDatasetUrns()).containsAll(job.getOutputDatasetUrns());
     assertThat(response.getLocation()).isEqualTo(job.getLocation());
-    assertThat(response.getDescription()).isNull();
+    assertThat(response.getDescription().orElse(null)).isNull();
   }
 
   @Test

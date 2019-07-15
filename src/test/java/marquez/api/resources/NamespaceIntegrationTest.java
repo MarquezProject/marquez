@@ -16,6 +16,7 @@ package marquez.api.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.net.URI;
 import java.time.Instant;
@@ -24,7 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import marquez.api.models.NamespaceRequest;
 import marquez.api.models.NamespaceResponse;
-import marquez.api.models.NamespacesResponse;
 import marquez.db.fixtures.AppWithPostgresRule;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
 
     assertThat(Instant.parse(responseBody.getCreatedAt())).isAfter(START_TIME);
     assertThat(responseBody.getOwnerName()).isEqualTo(OWNER);
-    assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(responseBody.getDescription().orElse("")).isEqualTo(DESCRIPTION);
   }
 
   @Test
@@ -67,7 +67,7 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
     assertThat(Instant.parse(responseBody.getCreatedAt())).isAfter(START_TIME);
     assertThat(responseBody.getOwnerName()).isEqualTo(OWNER);
-    assertThat(responseBody.getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(responseBody.getDescription().orElse("")).isEqualTo(DESCRIPTION);
   }
 
   @Test
@@ -82,17 +82,26 @@ public class NamespaceIntegrationTest extends NamespaceBaseTest {
   }
 
   @Test
-  public void testListNamespaceWithEmptyResultSet() {
+  public void testListNamespaceWithResultSet() {
+    final Response createResponse =
+        APP.client()
+            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .path("/api/v1/namespaces/" + NAMESPACE_NAME)
+            .request(MediaType.APPLICATION_JSON)
+            .put(Entity.json(createNamespaceRequest));
+    assertEquals(Response.Status.OK.getStatusCode(), createResponse.getStatus());
+
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path("/api/v1/namespaces/")
+            .path("/api/v1/namespaces")
             .request(MediaType.APPLICATION_JSON)
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
 
-    NamespacesResponse responseBody = res.readEntity(NamespacesResponse.class);
-    assertThat(responseBody.getNamespaces().isEmpty());
+    String jsonResponse = res.readEntity(String.class);
+    assertNotNull(jsonResponse);
+    assertThat(jsonResponse).contains(NAMESPACE_NAME);
   }
 
   @Test

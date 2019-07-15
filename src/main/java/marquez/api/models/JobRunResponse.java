@@ -14,23 +14,46 @@
 
 package marquez.api.models;
 
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotBlank;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
+
+@EqualsAndHashCode
+@ToString
 public final class JobRunResponse {
-  @NotBlank private UUID runId;
+  @Getter private final String runId;
+  private final String nominalStartTime;
+  private final String nominalEndTime;
+  private final String runArgs;
+  @Getter private final String runState;
 
-  private String nominalStartTime;
+  public JobRunResponse(
+      @NonNull final String runId,
+      @Nullable final String nominalStartTime,
+      @Nullable final String nominalEndTime,
+      @Nullable final String runArgs,
+      @NonNull final String runState) {
+    this.runId = runId;
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
+    this.runArgs = runArgs;
+    this.runState = checkNotBlank(runState);
+  }
 
-  private String nominalEndTime;
+  public Optional<String> getNominalStartTime() {
+    return Optional.ofNullable(nominalStartTime);
+  }
 
-  private String runArgs;
+  public Optional<String> getNominalEndTime() {
+    return Optional.ofNullable(nominalEndTime);
+  }
 
-  private String runState;
+  public Optional<String> getRunArgs() {
+    return Optional.ofNullable(runArgs);
+  }
 }

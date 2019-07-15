@@ -14,16 +14,35 @@
 
 package marquez.api.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class NamespaceResponse {
-  String name;
-  String createdAt;
-  String ownerName;
-  String description;
+import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
+
+@EqualsAndHashCode
+@ToString
+public final class NamespaceResponse {
+  @Getter private final String name;
+  @Getter private final String createdAt;
+  @Getter private final String ownerName;
+  private final String description;
+
+  public NamespaceResponse(
+      @NonNull final String name,
+      @NonNull final String createdAt,
+      @NonNull final String ownerName,
+      @Nullable final String description) {
+    this.name = checkNotBlank(name);
+    this.createdAt = checkNotBlank(createdAt);
+    this.ownerName = checkNotBlank(ownerName);
+    this.description = description;
+  }
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
+  }
 }

@@ -19,6 +19,6 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public final class JobRunsResponse {
-  @NonNull private final List<JobRunResponse> runs;
+public class JobRunsResponse {
+  @NonNull List<JobRunResponse> runs;
 }
