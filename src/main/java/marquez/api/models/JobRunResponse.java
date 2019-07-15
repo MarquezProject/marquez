@@ -17,7 +17,6 @@ package marquez.api.models;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import java.util.Optional;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,14 +26,14 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class JobRunResponse {
-  @Getter private UUID runId;
-  private String nominalStartTime;
-  private String nominalEndTime;
-  private String runArgs;
-  @Getter private String runState;
+  @Getter private final String runId;
+  private final String nominalStartTime;
+  private final String nominalEndTime;
+  private final String runArgs;
+  @Getter private final String runState;
 
   public JobRunResponse(
-      @NonNull final UUID runId,
+      @NonNull final String runId,
       @Nullable final String nominalStartTime,
       @Nullable final String nominalEndTime,
       @Nullable final String runArgs,

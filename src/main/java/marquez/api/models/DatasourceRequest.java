@@ -25,6 +25,6 @@ import org.hibernate.validator.constraints.NotBlank;
 @EqualsAndHashCode
 @ToString
 public class DatasourceRequest {
-  @Getter @NotBlank private String name;
-  @Getter @NotBlank private String connectionUrl;
+  @Getter @NotBlank private final String name;
+  @Getter @NotBlank private final String connectionUrl;
 }

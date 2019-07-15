@@ -135,7 +135,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
             .post(createJobRunRequestEntity);
     assertEquals(Response.Status.CREATED.getStatusCode(), res.getStatus());
     JobRunResponse responseBody = res.readEntity(JobRunResponse.class);
-    UUID returnedId = responseBody.getRunId();
+    UUID returnedId =
+        responseBody.getRunId() != null ? UUID.fromString(responseBody.getRunId()) : null;
     try {
       assertNotNull(returnedId);
     } finally {

@@ -27,13 +27,13 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class JobResponse {
-  @Getter private String name;
-  @Getter private String createdAt;
-  @Getter private String updatedAt;
-  @Getter private List<String> inputDatasetUrns;
-  @Getter private List<String> outputDatasetUrns;
-  @Getter private String location;
-  private String description;
+  @Getter private final String name;
+  @Getter private final String createdAt;
+  @Getter private final String updatedAt;
+  @Getter private final List<String> inputDatasetUrns;
+  @Getter private final List<String> outputDatasetUrns;
+  @Getter private final String location;
+  private final String description;
 
   public JobResponse(
       @NonNull final String name,

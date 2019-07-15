@@ -20,5 +20,5 @@ import lombok.Value;
 
 @Value
 public class JobsResponse {
-  @NonNull private List<JobResponse> jobs;
+  @NonNull List<JobResponse> jobs;
 }
