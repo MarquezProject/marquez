@@ -157,7 +157,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jobRunId'
+                $ref: '#/components/schemas/jobRun'
     
     get:
       parameters:
