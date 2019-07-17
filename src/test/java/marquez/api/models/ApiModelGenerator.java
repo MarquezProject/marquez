@@ -23,6 +23,7 @@ import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static marquez.common.models.Description.NO_DESCRIPTION;
 
 import java.time.Instant;
 import java.util.List;
@@ -75,6 +76,18 @@ public final class ApiModelGenerator {
   public static NamespaceRequest newNamespaceRequest(final Boolean hasDescription) {
     return new NamespaceRequest(
         newOwnerName().getValue(), hasDescription ? newDescription().getValue() : null);
+  }
+
+  public static List<NamespaceResponse> newNamespaceResponses(final Integer limit) {
+    return Stream.generate(() -> newNamespaceResponse(true)).limit(limit).collect(toList());
+  }
+
+  public static NamespaceResponse newNamespaceResponse(final Boolean hasDescription) {
+    return new NamespaceResponse(
+        newDatasetName().getValue(),
+        newIsoTimestamp(),
+        newOwnerName().getValue(),
+        hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
   public static JobRequest newJobRequest() {
