@@ -167,7 +167,7 @@ public final class JobResource {
     throwIfNotExists(namespaceName);
     final List<JobRun> jobRuns =
         jobService.getAllRunsOfJob(namespaceName, jobAsString, limit, offset);
-    return Response.ok().entity(JobRunResponseMapper.map(jobRuns)).build();
+    return Response.ok().entity(JobRunResponseMapper.toJobRunsResponse(jobRuns)).build();
   }
 
   @Timed

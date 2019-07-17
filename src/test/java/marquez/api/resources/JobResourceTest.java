@@ -46,6 +46,7 @@ import marquez.api.models.JobRequest;
 import marquez.api.models.JobResponse;
 import marquez.api.models.JobRunRequest;
 import marquez.api.models.JobRunResponse;
+import marquez.api.models.JobRunsResponse;
 import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -360,12 +361,9 @@ public class JobResourceTest {
     Response response =
         JOB_RESOURCE.getRunsForJob(
             NAMESPACE_NAME.getValue(), job.getName(), TEST_LIMIT, TEST_OFFSET);
+    JobRunsResponse jobRunsResponse = (JobRunsResponse) response.getEntity();
 
-    List<JobRunResponse> responseJobRuns = new ArrayList<JobRunResponse>();
-    for (Object resItem : (List<?>) response.getEntity()) {
-      responseJobRuns.add((JobRunResponse) resItem);
-    }
-    assertEquals(jobRuns.size(), responseJobRuns.size());
+    assertEquals(jobRuns.size(), jobRunsResponse.getRuns().size());
   }
 
   @Test
@@ -390,13 +388,10 @@ public class JobResourceTest {
     Response response =
         JOB_RESOURCE.getRunsForJob(
             NAMESPACE_NAME.getValue(), job.getName(), TEST_LIMIT, TEST_OFFSET);
+    JobRunsResponse jobRunsResponse = (JobRunsResponse) response.getEntity();
 
-    List<JobRunResponse> responseJobRuns = new ArrayList<JobRunResponse>();
-    for (Object resItem : (List<?>) response.getEntity()) {
-      responseJobRuns.add((JobRunResponse) resItem);
-    }
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    assertEquals(0, responseJobRuns.size());
+    assertEquals(0, jobRunsResponse.getRuns().size());
   }
 
   @Test(expected = MarquezServiceException.class)
