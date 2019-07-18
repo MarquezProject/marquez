@@ -358,10 +358,10 @@ public class JobResourceTest {
     when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET))
         .thenReturn(jobRuns);
 
-    Response response =
+    final Response response =
         JOB_RESOURCE.getRunsForJob(
             NAMESPACE_NAME.getValue(), job.getName(), TEST_LIMIT, TEST_OFFSET);
-    JobRunsResponse jobRunsResponse = (JobRunsResponse) response.getEntity();
+    final JobRunsResponse jobRunsResponse = (JobRunsResponse) response.getEntity();
 
     assertEquals(jobRuns.size(), jobRunsResponse.getRuns().size());
   }
@@ -385,10 +385,10 @@ public class JobResourceTest {
     when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET))
         .thenReturn(noJobRuns);
 
-    Response response =
+    final Response response =
         JOB_RESOURCE.getRunsForJob(
             NAMESPACE_NAME.getValue(), job.getName(), TEST_LIMIT, TEST_OFFSET);
-    JobRunsResponse jobRunsResponse = (JobRunsResponse) response.getEntity();
+    final JobRunsResponse jobRunsResponse = (JobRunsResponse) response.getEntity();
 
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     assertEquals(0, jobRunsResponse.getRuns().size());
