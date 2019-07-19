@@ -34,7 +34,7 @@ The executable can be found under `build/libs/`
 
 To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. The configuration file creation steps are outlined below.
 
-#### Step 1: Create Database
+### Step 1: Create Database
 
 When creating your database using [`createdb`](https://www.postgresql.org/docs/9.6/app-createdb.html), we recommend calling it `marquez`:
 
@@ -42,7 +42,7 @@ When creating your database using [`createdb`](https://www.postgresql.org/docs/9
 $ createdb marquez;
 ```
 
-#### Step 2: Create `config.yml`
+### Step 2: Create `config.yml`
 
 With your database created, you can now copy [`config.example.yml`](https://github.com/MarquezProject/marquez/blob/master/config.example.yml):
 
