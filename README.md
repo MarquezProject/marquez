@@ -32,7 +32,7 @@ The executable can be found under `build/libs/`
 
 ## Configuration
 
-To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. 
+To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. The configuration file creation steps are outlined below.
 
 #### Step 1: Create Database
 
