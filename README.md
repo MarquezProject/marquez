@@ -42,7 +42,7 @@ When creating your database using [`createdb`](https://www.postgresql.org/docs/9
 $ createdb marquez;
 ```
 
-#### Step 2: Define `config.yml`
+#### Step 2: Create `config.yml`
 
 With your database created, you can now copy [`config.example.yml`](https://github.com/MarquezProject/marquez/blob/master/config.example.yml):
 
