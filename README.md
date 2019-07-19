@@ -12,13 +12,12 @@ This project is under active development at [The We Company](https://www.we.co) 
 
 We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/master/docs).
 
+> **Note:** To begin collecting metadata with Marquez, follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide. Below you will find the steps to getting up and running from source.
+
 ## Requirements
 
 * [Java 8](https://openjdk.java.net/install)+
 * [PostgreSQL 9.6](https://www.postgresql.org/download)
-* [Gradle 4.10](https://gradle.org/releases)+ (_optional_)
-* [Docker 17.05](https://docs.docker.com/install)+ (_optional_)
-* [Docker Compose](https://docs.docker.com/compose/install) (_optional_)
 
 ## Building
 
@@ -59,14 +58,6 @@ $ ./gradlew run --args 'server config.yml'
 ```
 
 Then browse to the admin interface: http://localhost:8081
-
-## Running with [Docker](./Dockerfile) 
-
-```
-$ docker-compose up
-```
-
-Marquez listens on port `5000` for all API calls and port `5001` for the admin interface.
 
 ## Getting involved
 
