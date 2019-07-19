@@ -39,7 +39,7 @@ dependencies {
   testCompile 'com.opentable.components:otj-pg-embedded:0.13.1'
   testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
   testCompile 'junit:junit:4.12'
-  testCompile 'org.mockito:mockito-core:2.27.0'
+  testCompile 'org.mockito:mockito-core:3.0.0'
 }
 
 compileJava {
