@@ -67,7 +67,7 @@ $ ./gradlew run --args 'server config.yml'
 
 Then browse to the admin interface: http://localhost:8081
 
-## Getting involved
+## Getting Involved
 
 * Website: https://marquezproject.github.io/marquez
 * Mailing Lists:
