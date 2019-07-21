@@ -14,22 +14,35 @@
 
 package marquez.api.models;
 
+import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import marquez.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetRequestTest {
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
   private static final String NAME_VALUE = newDatasetName().getValue();
   private static final String DATASOURCE_URN_VALUE = newDatasourceUrn().getValue();
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
+
+  private static final DatasetRequest REQUEST =
+      new DatasetRequest(
+          "public.room_bookings",
+          "urn:datasource:postgresql:analytics_db",
+          "All global room bookings for each office.");
+  private static final DatasetRequest REQUEST_NO_DESCRIPTION =
+      new DatasetRequest("public.room_bookings", "urn:datasource:postgresql:analytics_db", null);
 
   @Test
   public void testNewRequest() {
@@ -46,6 +59,39 @@ public class DatasetRequestTest {
         new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
     final DatasetRequest actual =
         new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testNewRequest_fromJson() throws Exception {
+    final DatasetRequest actual =
+        MAPPER.readValue(fixture("fixtures/dataset.json"), DatasetRequest.class);
+    assertThat(actual).isEqualTo(REQUEST);
+  }
+
+  @Test
+  public void testNewRequest_fromJson_noDescription() throws Exception {
+    final DatasetRequest actual =
+        MAPPER.readValue(fixture("fixtures/dataset_no_description.json"), DatasetRequest.class);
+    assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
+  }
+
+  @Test
+  public void testNewRequest_toJson() throws Exception {
+    final String expected =
+        MAPPER.writeValueAsString(
+            MAPPER.readValue(fixture("fixtures/dataset.json"), DatasetRequest.class));
+    final String actual = MAPPER.writeValueAsString(REQUEST);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testNewRequest_toJson_noDescription() throws Exception {
+    final String expected =
+        MAPPER.writeValueAsString(
+            MAPPER.readValue(
+                fixture("fixtures/dataset_no_description.json"), DatasetRequest.class));
+    final String actual = MAPPER.writeValueAsString(REQUEST_NO_DESCRIPTION);
     assertThat(actual).isEqualTo(expected);
   }
 }
