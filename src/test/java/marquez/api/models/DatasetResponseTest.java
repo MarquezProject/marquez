@@ -14,6 +14,7 @@
 
 package marquez.api.models;
 
+import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
@@ -22,18 +23,37 @@ import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import marquez.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetResponseTest {
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
   private static final String NAME_VALUE = newDatasetName().getValue();
   private static final String CREATED_AT = newIsoTimestamp();
   private static final String URN_VALUE = newDatasetUrn().getValue();
   private static final String DATASOURCE_URN_VALUE = newDatasourceUrn().getValue();
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
+
+  private static final DatasetResponse RESPONSE =
+      new DatasetResponse(
+          "public.room_bookings",
+          "2019-06-08T19:13:34.507414Z",
+          "urn:dataset:analytics_db:public.room_bookings",
+          "urn:datasource:postgresql:analytics_db",
+          "All global room bookings for each office.");
+  private static final DatasetResponse RESPONSE_NO_DESCRIPTION =
+      new DatasetResponse(
+          "public.room_bookings",
+          "2019-06-08T19:13:34.507414Z",
+          "urn:dataset:analytics_db:public.room_bookings",
+          "urn:datasource:postgresql:analytics_db",
+          null);
 
   @Test
   public void testNewResponse() {
@@ -55,5 +75,20 @@ public class DatasetResponseTest {
         new DatasetResponse(
             NAME_VALUE, CREATED_AT, URN_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
     assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testNewResponse_toJson() throws Exception {
+    final DatasetResponse actual =
+        MAPPER.readValue(fixture("fixtures/dataset/response.json"), DatasetResponse.class);
+    assertThat(actual).isEqualTo(RESPONSE);
+  }
+
+  @Test
+  public void testNewResponse_toJson_noDescription() throws Exception {
+    final DatasetResponse actual =
+        MAPPER.readValue(
+            fixture("fixtures/dataset/response_no_description.json"), DatasetResponse.class);
+    assertThat(actual).isEqualTo(RESPONSE_NO_DESCRIPTION);
   }
 }

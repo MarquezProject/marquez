@@ -65,7 +65,7 @@ public class DatasetRequestTest {
   @Test
   public void testNewRequest_fromJson() throws Exception {
     final DatasetRequest actual =
-        MAPPER.readValue(fixture("fixtures/datasets/request.json"), DatasetRequest.class);
+        MAPPER.readValue(fixture("fixtures/dataset/request.json"), DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
@@ -73,7 +73,7 @@ public class DatasetRequestTest {
   public void testNewRequest_fromJson_noDescription() throws Exception {
     final DatasetRequest actual =
         MAPPER.readValue(
-            fixture("fixtures/datasets/request_no_description.json"), DatasetRequest.class);
+            fixture("fixtures/dataset/request_no_description.json"), DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }
