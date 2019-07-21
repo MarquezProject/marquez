@@ -75,23 +75,4 @@ public class DatasetRequestTest {
         MAPPER.readValue(fixture("fixtures/dataset_no_description.json"), DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
-
-  @Test
-  public void testNewRequest_toJson() throws Exception {
-    final String expected =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(fixture("fixtures/dataset.json"), DatasetRequest.class));
-    final String actual = MAPPER.writeValueAsString(REQUEST);
-    assertThat(actual).isEqualTo(expected);
-  }
-
-  @Test
-  public void testNewRequest_toJson_noDescription() throws Exception {
-    final String expected =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(
-                fixture("fixtures/dataset_no_description.json"), DatasetRequest.class));
-    final String actual = MAPPER.writeValueAsString(REQUEST_NO_DESCRIPTION);
-    assertThat(actual).isEqualTo(expected);
-  }
 }

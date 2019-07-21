@@ -66,23 +66,4 @@ public class NamespaceRequestTest {
         MAPPER.readValue(fixture("fixtures/namespace_no_description.json"), NamespaceRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
-
-  @Test
-  public void testNewRequest_toJson() throws Exception {
-    final String expected =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(fixture("fixtures/namespace.json"), NamespaceRequest.class));
-    final String actual = MAPPER.writeValueAsString(REQUEST);
-    assertThat(actual).isEqualTo(expected);
-  }
-
-  @Test
-  public void testNewRequest_toJson_noDescription() throws Exception {
-    final String expected =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(
-                fixture("fixtures/namespace_no_description.json"), NamespaceRequest.class));
-    final String actual = MAPPER.writeValueAsString(REQUEST_NO_DESCRIPTION);
-    assertThat(actual).isEqualTo(expected);
-  }
 }
