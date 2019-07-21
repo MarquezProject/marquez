@@ -79,16 +79,20 @@ public class DatasetResponseTest {
 
   @Test
   public void testNewResponse_toJson() throws Exception {
-    final DatasetResponse actual =
-        MAPPER.readValue(fixture("fixtures/dataset/response.json"), DatasetResponse.class);
-    assertThat(actual).isEqualTo(RESPONSE);
+    final String expected = MAPPER.writeValueAsString(RESPONSE);
+    final String actual =
+        MAPPER.writeValueAsString(
+            MAPPER.readValue(fixture("fixtures/dataset/response.json"), DatasetResponse.class));
+    assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testNewResponse_toJson_noDescription() throws Exception {
-    final DatasetResponse actual =
-        MAPPER.readValue(
-            fixture("fixtures/dataset/response_no_description.json"), DatasetResponse.class);
-    assertThat(actual).isEqualTo(RESPONSE_NO_DESCRIPTION);
+    final String expected = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
+    final String actual =
+        MAPPER.writeValueAsString(
+            MAPPER.readValue(
+                fixture("fixtures/dataset/response_no_description.json"), DatasetResponse.class));
+    assertThat(actual).isEqualTo(expected);
   }
 }
