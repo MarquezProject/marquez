@@ -66,14 +66,14 @@ public class NamespaceResponseTest {
   }
 
   @Test
-  public void testNewResponse_toJson() throws Exception {
+  public void testResponse_toJson() throws Exception {
     final NamespaceResponse actual =
         MAPPER.readValue(fixture("fixtures/namespace/response.json"), NamespaceResponse.class);
     assertThat(actual).isEqualTo(RESPONSE);
   }
 
   @Test
-  public void testNewResponse_toJson_noDescription() throws Exception {
+  public void testResponse_toJson_noDescription() throws Exception {
     final NamespaceResponse actual =
         MAPPER.readValue(
             fixture("fixtures/namespace/response_no_description.json"), NamespaceResponse.class);

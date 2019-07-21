@@ -78,7 +78,7 @@ public class DatasetResponseTest {
   }
 
   @Test
-  public void testNewResponse_toJson() throws Exception {
+  public void testResponse_toJson() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE);
     final String actual =
         MAPPER.writeValueAsString(
@@ -87,7 +87,7 @@ public class DatasetResponseTest {
   }
 
   @Test
-  public void testNewResponse_toJson_noDescription() throws Exception {
+  public void testResponse_toJson_noDescription() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
     final String actual =
         MAPPER.writeValueAsString(
