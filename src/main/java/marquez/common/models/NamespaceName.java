@@ -43,6 +43,4 @@ public final class NamespaceName {
   public static NamespaceName of(final String value) {
     return new NamespaceName(value);
   }
-
-  public static final NamespaceName DEFAULT = NamespaceName.of("default");
 }

@@ -34,6 +34,12 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class NamespaceService {
+  private static final NamespaceName DEFAULT_NAMESPACE_NAME = NamespaceName.of("default");
+  private static final Description DEFAULT_NAMESPACE_DESCRIPTION =
+      Description.of(
+          "The default global namespace for job and dataset metadata not belonging "
+              + "to a user-specified namespace.");
+
   private final NamespaceDao dao;
 
   public NamespaceService(@NonNull final NamespaceDao dao) throws MarquezServiceException {
@@ -42,16 +48,13 @@ public class NamespaceService {
   }
 
   private void init() throws MarquezServiceException {
-    if (!exists(NamespaceName.DEFAULT)) {
+    if (!exists(DEFAULT_NAMESPACE_NAME)) {
       log.info("No default namespace found, creating...");
       final NamespaceMeta meta =
           NamespaceMeta.builder()
-              .name(NamespaceName.DEFAULT)
+              .name(DEFAULT_NAMESPACE_NAME)
               .ownerName(OwnerName.ANONYMOUS)
-              .description(
-                  Description.of(
-                      "The default global namespace for job and dataset metadata not belonging "
-                          + "to a user-specified namespace."))
+              .description(DEFAULT_NAMESPACE_DESCRIPTION)
               .build();
       final Namespace namespace = createOrUpdate(meta);
       log.info("Successfully created default namespace: {}", namespace);
