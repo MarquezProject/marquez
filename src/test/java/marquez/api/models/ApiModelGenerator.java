@@ -44,14 +44,6 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static DatasetsResponse newDatasetsResponse() {
-    return newDatasetsResponseWith(newDatasetResponses(4));
-  }
-
-  public static DatasetsResponse newDatasetsResponseWith(final List<DatasetResponse> responses) {
-    return new DatasetsResponse(responses);
-  }
-
   public static List<DatasetResponse> newDatasetResponses(final Integer limit) {
     return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toList());
   }
