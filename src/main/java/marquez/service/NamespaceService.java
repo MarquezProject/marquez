@@ -14,19 +14,22 @@
 
 package marquez.service;
 
-import static java.util.Collections.unmodifiableList;
+import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.OwnerName;
 import marquez.db.NamespaceDao;
 import marquez.db.models.NamespaceRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.NamespaceMapper;
 import marquez.service.mappers.NamespaceRowMapper;
 import marquez.service.models.Namespace;
+import marquez.service.models.NamespaceMeta;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -40,23 +43,21 @@ public class NamespaceService {
 
   private void init() throws MarquezServiceException {
     if (!exists(NamespaceName.DEFAULT)) {
-      create(Namespace.DEFAULT);
+      log.info("No default namespace found, creating...");
+      final Namespace namespace =
+          createOrUpdate(
+              NamespaceMeta.builder()
+                  .name(NamespaceName.DEFAULT)
+                  .ownerName(OwnerName.ANONYMOUS)
+                  .description(Description.of(""))
+                  .build());
+      log.info("Successfully created default namespace: {}", namespace);
     }
   }
 
-  public void create(@NonNull Namespace namespace) throws MarquezServiceException {
+  public Namespace createOrUpdate(@NonNull NamespaceMeta meta) throws MarquezServiceException {
     try {
-      final NamespaceRow newNamespaceRow = NamespaceRowMapper.map(namespace);
-      namespaceDao.insert(newNamespaceRow);
-    } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create namespace: {}", namespace, e);
-      throw new MarquezServiceException();
-    }
-  }
-
-  public Namespace createOrUpdate(@NonNull Namespace namespace) throws MarquezServiceException {
-    try {
-      final NamespaceRow newNamespaceRow = NamespaceRowMapper.map(namespace);
+      final NamespaceRow newNamespaceRow = NamespaceRowMapper.map(meta);
       return namespaceDao
           .insertAndGet(newNamespaceRow)
           .map(NamespaceMapper::map)
@@ -65,34 +66,36 @@ public class NamespaceService {
                   new MarquezServiceException(
                       String.format("Failed to insert namespace row: %s", newNamespaceRow)));
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create or update namespace: {}", namespace, e);
+      log.error("Failed to create or update namespace: {}", meta, e);
       throw new MarquezServiceException();
     }
   }
 
-  public boolean exists(@NonNull NamespaceName namespaceName) throws MarquezServiceException {
+  public Boolean exists(@NonNull NamespaceName name) throws MarquezServiceException {
     try {
-      return namespaceDao.exists(namespaceName);
+      return namespaceDao.exists(name);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to check namespace: {}", namespaceName.getValue(), e);
+      log.error("Failed to check namespace: {}", name, e);
       throw new MarquezServiceException();
     }
   }
 
-  public Optional<Namespace> get(@NonNull NamespaceName namespaceName)
+  public Optional<Namespace> get(@NonNull NamespaceName name) throws MarquezServiceException {
+    try {
+      return namespaceDao.findBy(name).map(NamespaceMapper::map);
+    } catch (UnableToExecuteStatementException e) {
+      log.error("Failed to get namespace: {}", name, e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public List<Namespace> getAll(@NonNull Integer limit, @NonNull Integer offset)
       throws MarquezServiceException {
+    checkArgument(limit >= 0, "limit must be >= 0");
+    checkArgument(offset >= 0, "offset must be >= 0");
     try {
-      return namespaceDao.findBy(namespaceName).map(NamespaceMapper::map);
-    } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get namespace: {}", namespaceName.getValue(), e);
-      throw new MarquezServiceException();
-    }
-  }
-
-  public List<Namespace> getAll() throws MarquezServiceException {
-    try {
-      final List<NamespaceRow> namespaceRows = namespaceDao.findAll();
-      return unmodifiableList(NamespaceMapper.map(namespaceRows));
+      final List<NamespaceRow> rows = namespaceDao.findAll(limit, offset);
+      return NamespaceMapper.map(rows);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get namespaces.", e);
       throw new MarquezServiceException();

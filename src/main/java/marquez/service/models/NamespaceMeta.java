@@ -12,22 +12,25 @@
  * limitations under the License.
  */
 
-package marquez.service.mappers;
+package marquez.service.models;
 
-import java.util.UUID;
+import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.Builder;
 import lombok.NonNull;
-import marquez.db.models.NamespaceRow;
-import marquez.service.models.NamespaceMeta;
+import lombok.Value;
+import marquez.common.models.Description;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.OwnerName;
 
-public final class NamespaceRowMapper {
-  private NamespaceRowMapper() {}
+@Value
+@Builder
+public class NamespaceMeta {
+  @NonNull NamespaceName name;
+  @NonNull OwnerName ownerName;
+  @Nullable Description description;
 
-  public static NamespaceRow map(@NonNull final NamespaceMeta meta) {
-    return NamespaceRow.builder()
-        .uuid(UUID.randomUUID())
-        .name(meta.getName().getValue())
-        .description(meta.getDescription().map(description -> description.getValue()).orElse(null))
-        .currentOwnerName(meta.getOwnerName().getValue())
-        .build();
+  public Optional<Description> getDescription() {
+    return Optional.ofNullable(description);
   }
 }
