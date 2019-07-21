@@ -8,7 +8,7 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
 
-# Submitting a [pull request](https://help.github.com/articles/about-pull-requests)
+# Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
 
 1. [Fork](https://github.com/MarquezProject/marquez/fork) and clone the repository
 2. Make sure all tests pass locally: `./gradlew test`
