@@ -38,8 +38,8 @@ To run Marquez, you will have to define `config.yml`. The configuration file is 
 
 When creating your database using [`psql`](https://www.postgresql.org/docs/9.6/app-psql.html), we recommend calling it `marquez`:
 
-```
-$ psql -c "CREATE DATABASE marquez";
+```bash
+$ psql -c 'CREATE DATABASE marquez;'
 ```
 
 ### Step 2: Create `config.yml`
