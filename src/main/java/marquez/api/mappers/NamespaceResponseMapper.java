@@ -30,6 +30,7 @@ public final class NamespaceResponseMapper {
     return new NamespaceResponse(
         namespace.getName().getValue(),
         ISO_INSTANT.format(namespace.getCreatedAt()),
+        ISO_INSTANT.format(namespace.getUpdatedAt()),
         namespace.getOwnerName().getValue(),
         namespace.getDescription().map(description -> description.getValue()).orElse(null));
   }
