@@ -14,28 +14,30 @@
 
 package marquez.service.mappers;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
-import java.time.Instant;
 import java.util.List;
 import lombok.NonNull;
+import marquez.common.models.Description;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.OwnerName;
 import marquez.db.models.NamespaceRow;
 import marquez.service.models.Namespace;
 
 public final class NamespaceMapper {
   private NamespaceMapper() {}
 
-  public static Namespace map(@NonNull NamespaceRow row) {
-    return new Namespace(
-        row.getUuid(),
-        Instant.from(row.getCreatedAt()),
-        row.getName(),
-        row.getCurrentOwnerName(),
-        row.getDescription());
+  public static Namespace map(@NonNull final NamespaceRow row) {
+    return Namespace.builder()
+        .name(NamespaceName.of(row.getName()))
+        .createdAt(row.getCreatedAt())
+        .updatedAt(row.getUpdatedAt())
+        .ownerName(OwnerName.of(row.getCurrentOwnerName()))
+        .description(Description.of(row.getDescription()))
+        .build();
   }
 
-  public static List<Namespace> map(@NonNull List<NamespaceRow> rows) {
-    return unmodifiableList(rows.stream().map(row -> map(row)).collect(toList()));
+  public static List<Namespace> map(@NonNull final List<NamespaceRow> rows) {
+    return rows.stream().map(row -> map(row)).collect(toImmutableList());
   }
 }
