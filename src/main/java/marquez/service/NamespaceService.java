@@ -50,8 +50,8 @@ public class NamespaceService {
               .ownerName(OwnerName.ANONYMOUS)
               .description(
                   Description.of(
-                      "The default global namespace for job and dataset metadata "
-                          + "not belonging to a user-specified namespace."))
+                      "The default global namespace for job and dataset metadata not belonging "
+                          + "to a user-specified namespace."))
               .build();
       final Namespace namespace = createOrUpdate(meta);
       log.info("Successfully created default namespace: {}", namespace);
