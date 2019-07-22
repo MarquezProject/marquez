@@ -67,16 +67,21 @@ public class NamespaceResponseTest {
 
   @Test
   public void testResponse_toJson() throws Exception {
-    final NamespaceResponse actual =
-        MAPPER.readValue(fixture("fixtures/namespace/response.json"), NamespaceResponse.class);
-    assertThat(actual).isEqualTo(RESPONSE);
+    final String expected = MAPPER.writeValueAsString(RESPONSE);
+    final String actual =
+        MAPPER.writeValueAsString(
+            MAPPER.readValue(fixture("fixtures/namespace/response.json"), NamespaceResponse.class));
+    assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
-    final NamespaceResponse actual =
-        MAPPER.readValue(
-            fixture("fixtures/namespace/response_no_description.json"), NamespaceResponse.class);
-    assertThat(actual).isEqualTo(RESPONSE_NO_DESCRIPTION);
+    final String expected = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
+    final String actual =
+        MAPPER.writeValueAsString(
+            MAPPER.readValue(
+                fixture("fixtures/namespace/response_no_description.json"),
+                NamespaceResponse.class));
+    assertThat(actual).isEqualTo(expected);
   }
 }
