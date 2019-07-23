@@ -15,6 +15,8 @@
 package marquez.api.models;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
+import static marquez.api.models.ApiModelGenerator.asJson;
+import static marquez.api.models.ApiModelGenerator.newDatasetResponse;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
@@ -40,20 +42,8 @@ public class DatasetResponseTest {
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
 
-  private static final DatasetResponse RESPONSE =
-      new DatasetResponse(
-          "public.room_bookings",
-          "2019-06-08T19:13:34.507414Z",
-          "urn:dataset:analytics_db:public.room_bookings",
-          "urn:datasource:postgresql:analytics_db",
-          "All global room bookings for each office.");
-  private static final DatasetResponse RESPONSE_NO_DESCRIPTION =
-      new DatasetResponse(
-          "public.room_bookings",
-          "2019-06-08T19:13:34.507414Z",
-          "urn:dataset:analytics_db:public.room_bookings",
-          "urn:datasource:postgresql:analytics_db",
-          null);
+  private static final DatasetResponse RESPONSE = newDatasetResponse();
+  private static final DatasetResponse RESPONSE_NO_DESCRIPTION = newDatasetResponse(false);
 
   @Test
   public void testNewResponse() {
@@ -80,19 +70,14 @@ public class DatasetResponseTest {
   @Test
   public void testResponse_toJson() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE);
-    final String actual =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(fixture("fixtures/dataset/response.json"), DatasetResponse.class));
+    final String actual = MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE), DatasetResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
-    final String actual =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(
-                fixture("fixtures/dataset/response_no_description.json"), DatasetResponse.class));
+    final String actual = MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE_NO_DESCRIPTION), DatasetResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 }

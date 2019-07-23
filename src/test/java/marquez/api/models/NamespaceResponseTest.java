@@ -15,7 +15,9 @@
 package marquez.api.models;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
+import static marquez.api.models.ApiModelGenerator.asJson;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
+import static marquez.api.models.ApiModelGenerator.newNamespaceResponse;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
@@ -38,15 +40,8 @@ public class NamespaceResponseTest {
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
 
-  private static final NamespaceResponse RESPONSE =
-      new NamespaceResponse(
-          "wedata",
-          "2019-06-08T19:11:59.430162Z",
-          "analytics",
-          "Contains datasets such as room bookings for each office.");
-  private static final NamespaceResponse RESPONSE_NO_DESCRIPTION =
-      new NamespaceResponse("wedata", "2019-06-08T19:11:59.430162Z", "analytics", null);
-
+  private static final NamespaceResponse RESPONSE = newNamespaceResponse();
+  private static final NamespaceResponse RESPONSE_NO_DESCRIPTION = newNamespaceResponse(false);
   @Test
   public void testNewResponse() {
     NamespaceResponse expected =
@@ -68,20 +63,14 @@ public class NamespaceResponseTest {
   @Test
   public void testResponse_toJson() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE);
-    final String actual =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(fixture("fixtures/namespace/response.json"), NamespaceResponse.class));
+    final String actual = MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE), NamespaceResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
-    final String actual =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(
-                fixture("fixtures/namespace/response_no_description.json"),
-                NamespaceResponse.class));
+    final String actual = MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE_NO_DESCRIPTION), NamespaceResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 }

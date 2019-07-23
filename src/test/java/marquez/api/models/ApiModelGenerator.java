@@ -26,12 +26,37 @@ import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import marquez.common.models.DatasetUrn;
 
 public final class ApiModelGenerator {
+  private static final ObjectMapper MAPPER =
+      new ObjectMapper()
+          .registerModule(new Jdk8Module())
+          .registerModule(new JavaTimeModule())
+          .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+  private static final Supplier<String> nullString = () -> null;
+
   private ApiModelGenerator() {}
+
+  public static String asJson(final DatasetRequest datasetRequest) throws JsonProcessingException {
+    final Map<String, Object> datasetRequestMap = new LinkedHashMap<>();
+    datasetRequestMap.put("name", datasetRequest.getName());
+    datasetRequestMap.put("datasourceUrn", datasetRequest.getDatasourceUrn());
+    datasetRequestMap.put("description", datasetRequest.getDescription().orElseGet(nullString));
+
+    return MAPPER.writeValueAsString(datasetRequestMap);
+  }
 
   public static DatasetRequest newDatasetRequest() {
     return newDatasetRequest(true);
@@ -48,6 +73,17 @@ public final class ApiModelGenerator {
     return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toList());
   }
 
+  public static String asJson(final DatasetResponse datasetResponse) throws JsonProcessingException {
+    final Map<String, Object> datasetResponseMap = new LinkedHashMap<>();
+    datasetResponseMap.put("name", datasetResponse.getName());
+    datasetResponseMap.put("createdAt", datasetResponse.getCreatedAt());
+    datasetResponseMap.put("urn", datasetResponse.getUrn());
+    datasetResponseMap.put("datasourceUrn", datasetResponse.getDatasourceUrn());
+    datasetResponseMap.put("description", datasetResponse.getDescription().orElseGet(nullString));
+
+    return MAPPER.writeValueAsString(datasetResponseMap);
+  }
+
   public static DatasetResponse newDatasetResponse() {
     return newDatasetResponse(true);
   }
@@ -59,6 +95,14 @@ public final class ApiModelGenerator {
         newIsoTimestamp(),
         newDatasourceUrn().getValue(),
         hasDescription ? newDescription().getValue() : null);
+  }
+
+  public static String asJson(final NamespaceRequest namespaceRequest) throws JsonProcessingException {
+    final Map<String, Object> namespaceRequestMap = new LinkedHashMap<>();
+    namespaceRequestMap.put("ownerName", namespaceRequest.getOwnerName());
+    namespaceRequestMap.put("description", namespaceRequest.getDescription().orElseGet(nullString));
+
+    return MAPPER.writeValueAsString(namespaceRequestMap);
   }
 
   public static NamespaceRequest newNamespaceRequest() {
@@ -74,12 +118,36 @@ public final class ApiModelGenerator {
     return Stream.generate(() -> newNamespaceResponse(true)).limit(limit).collect(toList());
   }
 
+  public static String asJson(final NamespaceResponse namespaceResponse) throws JsonProcessingException {
+    final Map<String, Object> namespaceResponseMap = new LinkedHashMap<>();
+    namespaceResponseMap.put("name", namespaceResponse.getName());
+    namespaceResponseMap.put("createdAt", namespaceResponse.getCreatedAt());
+    namespaceResponseMap.put("ownerName", namespaceResponse.getOwnerName());
+    namespaceResponseMap.put("description", namespaceResponse.getDescription().orElseGet(nullString));
+
+    return MAPPER.writeValueAsString(namespaceResponseMap);
+  }
+
+  public static NamespaceResponse newNamespaceResponse() {
+    return newNamespaceResponse(true);
+  }
+
   public static NamespaceResponse newNamespaceResponse(final Boolean hasDescription) {
     return new NamespaceResponse(
         newDatasetName().getValue(),
         newIsoTimestamp(),
         newOwnerName().getValue(),
         hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
+  }
+
+  public static String asJson(final JobRequest jobRequest) throws JsonProcessingException {
+    final Map<String, Object> jobRequestMap = new LinkedHashMap<>();
+    jobRequestMap.put("inputDatasetUrns", jobRequest.getInputDatasetUrns());
+    jobRequestMap.put("outputDatasetUrns", jobRequest.getOutputDatasetUrns());
+    jobRequestMap.put("location", jobRequest.getLocation());
+    jobRequestMap.put("description", jobRequest.getDescription().orElseGet(nullString));
+
+    return MAPPER.writeValueAsString(jobRequestMap);
   }
 
   public static JobRequest newJobRequest() {

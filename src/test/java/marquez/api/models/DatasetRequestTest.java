@@ -15,6 +15,8 @@
 package marquez.api.models;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
+import static marquez.api.models.ApiModelGenerator.asJson;
+import static marquez.api.models.ApiModelGenerator.newDatasetRequest;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
@@ -36,13 +38,8 @@ public class DatasetRequestTest {
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
 
-  private static final DatasetRequest REQUEST =
-      new DatasetRequest(
-          "public.room_bookings",
-          "urn:datasource:postgresql:analytics_db",
-          "All global room bookings for each office.");
-  private static final DatasetRequest REQUEST_NO_DESCRIPTION =
-      new DatasetRequest("public.room_bookings", "urn:datasource:postgresql:analytics_db", null);
+  private static final DatasetRequest REQUEST = newDatasetRequest();
+  private static final DatasetRequest REQUEST_NO_DESCRIPTION = newDatasetRequest(false);
 
   @Test
   public void testNewRequest() {
@@ -65,15 +62,14 @@ public class DatasetRequestTest {
   @Test
   public void testNewRequest_fromJson() throws Exception {
     final DatasetRequest actual =
-        MAPPER.readValue(fixture("fixtures/dataset/request.json"), DatasetRequest.class);
+        MAPPER.readValue(asJson(REQUEST), DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
   public void testNewRequest_fromJson_noDescription() throws Exception {
     final DatasetRequest actual =
-        MAPPER.readValue(
-            fixture("fixtures/dataset/request_no_description.json"), DatasetRequest.class);
+        MAPPER.readValue(asJson(REQUEST_NO_DESCRIPTION), DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }

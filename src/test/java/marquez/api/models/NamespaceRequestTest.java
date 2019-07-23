@@ -15,6 +15,8 @@
 package marquez.api.models;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
+import static marquez.api.models.ApiModelGenerator.asJson;
+import static marquez.api.models.ApiModelGenerator.newNamespaceRequest;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.Description.NO_DESCRIPTION;
@@ -34,10 +36,8 @@ public class NamespaceRequestTest {
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
 
-  private static final NamespaceRequest REQUEST =
-      new NamespaceRequest("analytics", "Contains datasets such as room bookings for each office.");
-  private static final NamespaceRequest REQUEST_NO_DESCRIPTION =
-      new NamespaceRequest("analytics", null);
+  private static final NamespaceRequest REQUEST = newNamespaceRequest();
+  private static final NamespaceRequest REQUEST_NO_DESCRIPTION = newNamespaceRequest(false);
 
   @Test
   public void testNewRequest() {
@@ -55,16 +55,13 @@ public class NamespaceRequestTest {
 
   @Test
   public void testNewRequest_fromJson() throws Exception {
-    final NamespaceRequest actual =
-        MAPPER.readValue(fixture("fixtures/namespace/request.json"), NamespaceRequest.class);
+    final NamespaceRequest actual = MAPPER.readValue(asJson(REQUEST), NamespaceRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
   public void testNewRequest_fromJson_noDescription() throws Exception {
-    final NamespaceRequest actual =
-        MAPPER.readValue(
-            fixture("fixtures/namespace/request_no_description.json"), NamespaceRequest.class);
+    final NamespaceRequest actual = MAPPER.readValue(asJson(REQUEST_NO_DESCRIPTION), NamespaceRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }
