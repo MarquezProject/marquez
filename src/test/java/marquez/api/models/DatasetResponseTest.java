@@ -14,7 +14,6 @@
 
 package marquez.api.models;
 
-import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static marquez.api.models.ApiModelGenerator.asJson;
 import static marquez.api.models.ApiModelGenerator.newDatasetResponse;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
@@ -70,14 +69,17 @@ public class DatasetResponseTest {
   @Test
   public void testResponse_toJson() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE);
-    final String actual = MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE), DatasetResponse.class));
+    final String actual =
+        MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE), DatasetResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
-    final String actual = MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE_NO_DESCRIPTION), DatasetResponse.class));
+    final String actual =
+        MAPPER.writeValueAsString(
+            MAPPER.readValue(asJson(RESPONSE_NO_DESCRIPTION), DatasetResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 }

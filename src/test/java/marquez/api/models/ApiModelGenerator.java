@@ -25,18 +25,17 @@ import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import marquez.common.models.DatasetUrn;
 
 public final class ApiModelGenerator {
@@ -73,7 +72,8 @@ public final class ApiModelGenerator {
     return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toList());
   }
 
-  public static String asJson(final DatasetResponse datasetResponse) throws JsonProcessingException {
+  public static String asJson(final DatasetResponse datasetResponse)
+      throws JsonProcessingException {
     final Map<String, Object> datasetResponseMap = new LinkedHashMap<>();
     datasetResponseMap.put("name", datasetResponse.getName());
     datasetResponseMap.put("createdAt", datasetResponse.getCreatedAt());
@@ -97,7 +97,8 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static String asJson(final NamespaceRequest namespaceRequest) throws JsonProcessingException {
+  public static String asJson(final NamespaceRequest namespaceRequest)
+      throws JsonProcessingException {
     final Map<String, Object> namespaceRequestMap = new LinkedHashMap<>();
     namespaceRequestMap.put("ownerName", namespaceRequest.getOwnerName());
     namespaceRequestMap.put("description", namespaceRequest.getDescription().orElseGet(nullString));
@@ -118,12 +119,14 @@ public final class ApiModelGenerator {
     return Stream.generate(() -> newNamespaceResponse(true)).limit(limit).collect(toList());
   }
 
-  public static String asJson(final NamespaceResponse namespaceResponse) throws JsonProcessingException {
+  public static String asJson(final NamespaceResponse namespaceResponse)
+      throws JsonProcessingException {
     final Map<String, Object> namespaceResponseMap = new LinkedHashMap<>();
     namespaceResponseMap.put("name", namespaceResponse.getName());
     namespaceResponseMap.put("createdAt", namespaceResponse.getCreatedAt());
     namespaceResponseMap.put("ownerName", namespaceResponse.getOwnerName());
-    namespaceResponseMap.put("description", namespaceResponse.getDescription().orElseGet(nullString));
+    namespaceResponseMap.put(
+        "description", namespaceResponse.getDescription().orElseGet(nullString));
 
     return MAPPER.writeValueAsString(namespaceResponseMap);
   }

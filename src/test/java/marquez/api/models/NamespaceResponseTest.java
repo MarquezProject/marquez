@@ -14,7 +14,6 @@
 
 package marquez.api.models;
 
-import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static marquez.api.models.ApiModelGenerator.asJson;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
 import static marquez.api.models.ApiModelGenerator.newNamespaceResponse;
@@ -42,6 +41,7 @@ public class NamespaceResponseTest {
 
   private static final NamespaceResponse RESPONSE = newNamespaceResponse();
   private static final NamespaceResponse RESPONSE_NO_DESCRIPTION = newNamespaceResponse(false);
+
   @Test
   public void testNewResponse() {
     NamespaceResponse expected =
@@ -63,14 +63,17 @@ public class NamespaceResponseTest {
   @Test
   public void testResponse_toJson() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE);
-    final String actual = MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE), NamespaceResponse.class));
+    final String actual =
+        MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE), NamespaceResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
     final String expected = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
-    final String actual = MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE_NO_DESCRIPTION), NamespaceResponse.class));
+    final String actual =
+        MAPPER.writeValueAsString(
+            MAPPER.readValue(asJson(RESPONSE_NO_DESCRIPTION), NamespaceResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 }

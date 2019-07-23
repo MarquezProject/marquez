@@ -14,7 +14,6 @@
 
 package marquez.api.models;
 
-import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static marquez.api.models.ApiModelGenerator.asJson;
 import static marquez.api.models.ApiModelGenerator.newDatasetRequest;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
@@ -61,8 +60,7 @@ public class DatasetRequestTest {
 
   @Test
   public void testNewRequest_fromJson() throws Exception {
-    final DatasetRequest actual =
-        MAPPER.readValue(asJson(REQUEST), DatasetRequest.class);
+    final DatasetRequest actual = MAPPER.readValue(asJson(REQUEST), DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
