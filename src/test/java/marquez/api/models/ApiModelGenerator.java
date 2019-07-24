@@ -94,6 +94,21 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
+  public static List<JobResponse> newJobResponses(final Integer limit) {
+    return Stream.generate(() -> newJobResponse(true)).limit(limit).collect(toList());
+  }
+
+  public static JobResponse newJobResponse(final Boolean hasDescription) {
+    return new JobResponse(
+        newDatasetName().getValue(),
+        newIsoTimestamp(),
+        newIsoTimestamp(),
+        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
+        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
+        newLocation().toString(),
+        hasDescription ? newDescription().getValue() : null);
+  }
+
   public static String newIsoTimestamp() {
     return ISO_INSTANT.format(Instant.now());
   }
