@@ -14,7 +14,7 @@
 
 package marquez.api.models;
 
-import static java.util.stream.Collectors.toList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
@@ -35,9 +35,13 @@ public class JobResponseTest {
   private static final String CREATED_AT = newIsoTimestamp();
   private static final String UPDATED_AT = newIsoTimestamp();
   private static final List<String> INPUT_DATASET_URNS =
-      CommonModelGenerator.newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList());
+      CommonModelGenerator.newDatasetUrns(4).stream()
+          .map(DatasetUrn::getValue)
+          .collect(toImmutableList());
   private static final List<String> OUTPUT_DATASET_URNS =
-      CommonModelGenerator.newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList());
+      CommonModelGenerator.newDatasetUrns(2).stream()
+          .map(DatasetUrn::getValue)
+          .collect(toImmutableList());
   private static final String LOCATION_VALUE = newLocation().toString();
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();

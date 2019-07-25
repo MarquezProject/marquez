@@ -14,7 +14,8 @@
 
 package marquez.api.models;
 
-import static java.util.stream.Collectors.toList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static marquez.common.models.CommonModelGenerator.newDatasetUrns;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.Description.NO_DESCRIPTION;
@@ -22,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import marquez.UnitTests;
-import marquez.common.models.CommonModelGenerator;
 import marquez.common.models.DatasetUrn;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -30,9 +30,9 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTests.class)
 public class JobRequestTest {
   private static final List<String> INPUT_DATASET_URNS =
-      CommonModelGenerator.newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList());
+      newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList());
   private static final List<String> OUTPUT_DATASET_URNS =
-      CommonModelGenerator.newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList());
+      newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList());
   private static final String LOCATION_VALUE = newLocation().toString();
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();

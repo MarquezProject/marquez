@@ -120,10 +120,6 @@ public final class CommonModelGenerator {
     return DatasetUrn.of(newDatasourceName(), newDatasetName());
   }
 
-  public static DatasetUrn newDatasetUrnWith(String value) {
-    return DatasetUrn.of(value);
-  }
-
   public static Description newDescription() {
     return newDescriptionWith("test_description" + newId());
   }
