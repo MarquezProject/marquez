@@ -1,5 +1,0 @@
-{
-  "name": "public.room_bookings",
-  "datasourceUrn": "urn:datasource:postgresql:analytics_db",
-  "description": null
-}
