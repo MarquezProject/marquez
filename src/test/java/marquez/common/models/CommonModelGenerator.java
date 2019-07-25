@@ -24,95 +24,58 @@ import java.util.stream.Stream;
 public final class CommonModelGenerator {
   private CommonModelGenerator() {}
 
-  private static final int BOUND = DatasourceType.values().length;
   private static final Random RANDOM = new Random();
 
   public static OwnerName newOwnerName() {
-    return newOwnerNameWith("test_owner" + newId());
-  }
-
-  public static OwnerName newOwnerNameWith(String value) {
-    return OwnerName.of(value);
+    return OwnerName.of("test_owner" + newId());
   }
 
   public static NamespaceName newNamespaceName() {
-    return newNamespaceNameWith("test_namespace" + newId());
-  }
-
-  public static NamespaceName newNamespaceNameWith(String value) {
-    return NamespaceName.of(value);
+    return NamespaceName.of("test_namespace" + newId());
   }
 
   public static JobName newJobName() {
-    return newJobNameWith("test_job" + newId());
-  }
-
-  public static JobName newJobNameWith(String value) {
-    return JobName.of(value);
+    return JobName.of("test_job" + newId());
   }
 
   public static URI newLocation() {
-    return newLocationWith("https://github.com/repo/test/commit/" + newId());
-  }
-
-  public static URI newLocationWith(String value) {
-    return URI.create(value);
+    return URI.create("https://github.com/repo/test/commit/" + newId());
   }
 
   public static DatasourceType newDatasourceType() {
-    return DatasourceType.values()[newIdWithBound(BOUND)];
+    return DatasourceType.values()[newIdWithBound(DatasourceType.values().length - 1)];
   }
 
   public static DatasourceName newDatasourceName() {
-    return newDatasourceNameWith("test_datasource" + newId());
-  }
-
-  public static DatasourceName newDatasourceNameWith(String value) {
-    return DatasourceName.of(value);
+    return DatasourceName.of("test_datasource" + newId());
   }
 
   public static DatasourceUrn newDatasourceUrn() {
     return newDatasourceUrnWith(newDatasourceType());
   }
 
-  public static DatasourceUrn newDatasourceUrnWith(DatasourceType type) {
+  public static DatasourceUrn newDatasourceUrnWith(final DatasourceType type) {
     return DatasourceUrn.of(type, newDatasourceName());
   }
 
-  public static DatasourceUrn newDatasourceUrnWith(String value) {
-    return DatasourceUrn.of(value);
-  }
-
   public static DbName newDbName() {
-    return newDbNameWith("test_db" + newId());
-  }
-
-  public static DbName newDbNameWith(String value) {
-    return DbName.of(value);
+    return DbName.of("test_db" + newId());
   }
 
   public static ConnectionUrl newConnectionUrl() {
     return newConnectionUrlWith(newDatasourceType());
   }
 
-  public static ConnectionUrl newConnectionUrlWith(DatasourceType datasourceType) {
-    return newConnectionUrlWith(
-        String.format("jdbc:%s://localhost:5432/%s", datasourceType, newDbName().getValue()));
-  }
-
-  public static ConnectionUrl newConnectionUrlWith(String value) {
-    return ConnectionUrl.of(value);
+  public static ConnectionUrl newConnectionUrlWith(final DatasourceType type) {
+    return ConnectionUrl.of(
+        String.format("jdbc:%s://localhost:5432/%s", type.toString(), newDbName().getValue()));
   }
 
   public static DatasetName newDatasetName() {
-    return newDatasetNameWith("test_dataset" + newId());
+    return DatasetName.of("test_dataset" + newId());
   }
 
-  public static DatasetName newDatasetNameWith(String value) {
-    return DatasetName.of(value);
-  }
-
-  public static List<DatasetUrn> newDatasetUrns(int limit) {
+  public static List<DatasetUrn> newDatasetUrns(final Integer limit) {
     return Stream.generate(() -> newDatasetUrn()).limit(limit).collect(toList());
   }
 
@@ -121,18 +84,14 @@ public final class CommonModelGenerator {
   }
 
   public static Description newDescription() {
-    return newDescriptionWith("test_description" + newId());
+    return Description.of("test_description" + newId());
   }
 
-  public static Description newDescriptionWith(String value) {
-    return Description.of(value);
-  }
-
-  private static int newId() {
+  private static Integer newId() {
     return RANDOM.nextInt(Integer.MAX_VALUE - 1);
   }
 
-  private static int newIdWithBound(int bound) {
-    return RANDOM.nextInt(BOUND);
+  private static Integer newIdWithBound(final Integer bound) {
+    return RANDOM.nextInt(bound);
   }
 }
