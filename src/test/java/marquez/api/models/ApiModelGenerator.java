@@ -14,6 +14,7 @@
 
 package marquez.api.models;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.util.stream.Collectors.toList;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
@@ -88,8 +89,23 @@ public final class ApiModelGenerator {
 
   public static JobRequest newJobRequest(final Boolean hasDescription) {
     return new JobRequest(
-        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
-        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
+        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
+        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
+        newLocation().toString(),
+        hasDescription ? newDescription().getValue() : null);
+  }
+
+  public static List<JobResponse> newJobResponses(final Integer limit) {
+    return Stream.generate(() -> newJobResponse(true)).limit(limit).collect(toImmutableList());
+  }
+
+  public static JobResponse newJobResponse(final Boolean hasDescription) {
+    return new JobResponse(
+        newDatasetName().getValue(),
+        newIsoTimestamp(),
+        newIsoTimestamp(),
+        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
+        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
         hasDescription ? newDescription().getValue() : null);
   }
