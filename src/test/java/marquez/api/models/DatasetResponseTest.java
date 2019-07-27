@@ -14,9 +14,9 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.asJson;
 import static marquez.api.models.ApiModelGenerator.newDatasetResponse;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
+import static marquez.api.models.ApiModelGenerator.newJsonFrom;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
@@ -68,18 +68,18 @@ public class DatasetResponseTest {
 
   @Test
   public void testResponse_toJson() throws Exception {
-    final String expected = MAPPER.writeValueAsString(RESPONSE);
+    final String expected = newJsonFrom(RESPONSE);
     final String actual =
-        MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE), DatasetResponse.class));
+        MAPPER.writeValueAsString(MAPPER.readValue(newJsonFrom(RESPONSE), DatasetResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
-    final String expected = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
+    final String expected = newJsonFrom(RESPONSE_NO_DESCRIPTION);
     final String actual =
         MAPPER.writeValueAsString(
-            MAPPER.readValue(asJson(RESPONSE_NO_DESCRIPTION), DatasetResponse.class));
+            MAPPER.readValue(newJsonFrom(RESPONSE_NO_DESCRIPTION), DatasetResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 }

@@ -52,7 +52,7 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static String asJson(final DatasetRequest request) {
+  public static String newJsonFrom(final DatasetRequest request) {
     return MAPPER
         .createObjectNode()
         .put("name", request.getName())
@@ -78,7 +78,7 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static String asJson(final DatasetResponse response) {
+  public static String newJsonFrom(final DatasetResponse response) {
     return MAPPER
         .createObjectNode()
         .put("name", response.getName())
@@ -98,7 +98,7 @@ public final class ApiModelGenerator {
         newOwnerName().getValue(), hasDescription ? newDescription().getValue() : null);
   }
 
-  public static String asJson(final NamespaceRequest request) {
+  public static String newJsonFrom(final NamespaceRequest request) {
     return MAPPER
         .createObjectNode()
         .put("ownerName", request.getOwnerName())
@@ -122,7 +122,7 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
-  public static String asJson(final NamespaceResponse response) {
+  public static String newJsonFrom(final NamespaceResponse response) {
     return MAPPER
         .createObjectNode()
         .put("name", response.getName())
@@ -144,7 +144,7 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static String asJson(final JobRequest request) throws JsonProcessingException {
+  public static String newJsonFrom(final JobRequest request) throws JsonProcessingException {
     final ArrayNode inputDatasetUrns = MAPPER.valueToTree(request.getInputDatasetUrns());
     final ArrayNode outputDatasetUrns = MAPPER.valueToTree(request.getInputDatasetUrns());
     final ObjectNode obj =

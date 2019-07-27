@@ -14,8 +14,8 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.asJson;
 import static marquez.api.models.ApiModelGenerator.newDatasetRequest;
+import static marquez.api.models.ApiModelGenerator.newJsonFrom;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
@@ -60,14 +60,14 @@ public class DatasetRequestTest {
 
   @Test
   public void testNewRequest_fromJson() throws Exception {
-    final DatasetRequest actual = MAPPER.readValue(asJson(REQUEST), DatasetRequest.class);
+    final DatasetRequest actual = MAPPER.readValue(newJsonFrom(REQUEST), DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
   public void testNewRequest_fromJson_noDescription() throws Exception {
     final DatasetRequest actual =
-        MAPPER.readValue(asJson(REQUEST_NO_DESCRIPTION), DatasetRequest.class);
+        MAPPER.readValue(newJsonFrom(REQUEST_NO_DESCRIPTION), DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }

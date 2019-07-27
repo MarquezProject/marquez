@@ -14,7 +14,7 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.asJson;
+import static marquez.api.models.ApiModelGenerator.newJsonFrom;
 import static marquez.api.models.ApiModelGenerator.newNamespaceRequest;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
@@ -54,14 +54,14 @@ public class NamespaceRequestTest {
 
   @Test
   public void testNewRequest_fromJson() throws Exception {
-    final NamespaceRequest actual = MAPPER.readValue(asJson(REQUEST), NamespaceRequest.class);
+    final NamespaceRequest actual = MAPPER.readValue(newJsonFrom(REQUEST), NamespaceRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
   public void testNewRequest_fromJson_noDescription() throws Exception {
     final NamespaceRequest actual =
-        MAPPER.readValue(asJson(REQUEST_NO_DESCRIPTION), NamespaceRequest.class);
+        MAPPER.readValue(newJsonFrom(REQUEST_NO_DESCRIPTION), NamespaceRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }

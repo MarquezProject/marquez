@@ -14,8 +14,8 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.asJson;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
+import static marquez.api.models.ApiModelGenerator.newJsonFrom;
 import static marquez.api.models.ApiModelGenerator.newNamespaceResponse;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
@@ -62,18 +62,18 @@ public class NamespaceResponseTest {
 
   @Test
   public void testResponse_toJson() throws Exception {
-    final String expected = MAPPER.writeValueAsString(RESPONSE);
+    final String expected = newJsonFrom(RESPONSE);
     final String actual =
-        MAPPER.writeValueAsString(MAPPER.readValue(asJson(RESPONSE), NamespaceResponse.class));
+        MAPPER.writeValueAsString(MAPPER.readValue(newJsonFrom(RESPONSE), NamespaceResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
-    final String expected = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
+    final String expected = newJsonFrom(RESPONSE_NO_DESCRIPTION);
     final String actual =
         MAPPER.writeValueAsString(
-            MAPPER.readValue(asJson(RESPONSE_NO_DESCRIPTION), NamespaceResponse.class));
+            MAPPER.readValue(newJsonFrom(RESPONSE_NO_DESCRIPTION), NamespaceResponse.class));
     assertThat(actual).isEqualTo(expected);
   }
 }
