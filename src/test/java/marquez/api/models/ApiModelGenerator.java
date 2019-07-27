@@ -28,35 +28,18 @@ import static marquez.common.models.Description.NO_DESCRIPTION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.dropwizard.jackson.Jackson;
 import java.time.Instant;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import marquez.common.models.DatasetUrn;
 
 public final class ApiModelGenerator {
-  private static final ObjectMapper MAPPER =
-      new ObjectMapper()
-          .registerModule(new Jdk8Module())
-          .registerModule(new JavaTimeModule())
-          .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-  private static final Supplier<String> nullString = () -> null;
-
   private ApiModelGenerator() {}
 
-  public static String asJson(final DatasetRequest datasetRequest) throws JsonProcessingException {
-    final Map<String, Object> datasetRequestMap = new LinkedHashMap<>();
-    datasetRequestMap.put("name", datasetRequest.getName());
-    datasetRequestMap.put("datasourceUrn", datasetRequest.getDatasourceUrn());
-    datasetRequestMap.put("description", datasetRequest.getDescription().orElseGet(nullString));
-
-    return MAPPER.writeValueAsString(datasetRequestMap);
-  }
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
   public static DatasetRequest newDatasetRequest() {
     return newDatasetRequest(true);
@@ -69,20 +52,17 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static List<DatasetResponse> newDatasetResponses(final Integer limit) {
-    return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toList());
+  public static String asJson(final DatasetRequest request) {
+    return MAPPER
+        .createObjectNode()
+        .put("name", request.getName())
+        .put("datasourceUrn", request.getDatasourceUrn())
+        .put("description", request.getDescription().orElse(null))
+        .toString();
   }
 
-  public static String asJson(final DatasetResponse datasetResponse)
-      throws JsonProcessingException {
-    final Map<String, Object> datasetResponseMap = new LinkedHashMap<>();
-    datasetResponseMap.put("name", datasetResponse.getName());
-    datasetResponseMap.put("createdAt", datasetResponse.getCreatedAt());
-    datasetResponseMap.put("urn", datasetResponse.getUrn());
-    datasetResponseMap.put("datasourceUrn", datasetResponse.getDatasourceUrn());
-    datasetResponseMap.put("description", datasetResponse.getDescription().orElseGet(nullString));
-
-    return MAPPER.writeValueAsString(datasetResponseMap);
+  public static List<DatasetResponse> newDatasetResponses(final Integer limit) {
+    return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toList());
   }
 
   public static DatasetResponse newDatasetResponse() {
@@ -98,13 +78,15 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static String asJson(final NamespaceRequest namespaceRequest)
-      throws JsonProcessingException {
-    final Map<String, Object> namespaceRequestMap = new LinkedHashMap<>();
-    namespaceRequestMap.put("ownerName", namespaceRequest.getOwnerName());
-    namespaceRequestMap.put("description", namespaceRequest.getDescription().orElseGet(nullString));
-
-    return MAPPER.writeValueAsString(namespaceRequestMap);
+  public static String asJson(final DatasetResponse response) {
+    return MAPPER
+        .createObjectNode()
+        .put("name", response.getName())
+        .put("createdAt", response.getCreatedAt())
+        .put("urn", response.getUrn())
+        .put("datasourceUrn", response.getDatasourceUrn())
+        .put("description", response.getDescription().orElse(null))
+        .toString();
   }
 
   public static NamespaceRequest newNamespaceRequest() {
@@ -116,20 +98,16 @@ public final class ApiModelGenerator {
         newOwnerName().getValue(), hasDescription ? newDescription().getValue() : null);
   }
 
-  public static List<NamespaceResponse> newNamespaceResponses(final Integer limit) {
-    return Stream.generate(() -> newNamespaceResponse(true)).limit(limit).collect(toList());
+  public static String asJson(final NamespaceRequest request) {
+    return MAPPER
+        .createObjectNode()
+        .put("ownerName", request.getOwnerName())
+        .put("description", request.getDescription().orElse(null))
+        .toString();
   }
 
-  public static String asJson(final NamespaceResponse namespaceResponse)
-      throws JsonProcessingException {
-    final Map<String, Object> namespaceResponseMap = new LinkedHashMap<>();
-    namespaceResponseMap.put("name", namespaceResponse.getName());
-    namespaceResponseMap.put("createdAt", namespaceResponse.getCreatedAt());
-    namespaceResponseMap.put("ownerName", namespaceResponse.getOwnerName());
-    namespaceResponseMap.put(
-        "description", namespaceResponse.getDescription().orElseGet(nullString));
-
-    return MAPPER.writeValueAsString(namespaceResponseMap);
+  public static List<NamespaceResponse> newNamespaceResponses(final Integer limit) {
+    return Stream.generate(() -> newNamespaceResponse(true)).limit(limit).collect(toList());
   }
 
   public static NamespaceResponse newNamespaceResponse() {
@@ -144,14 +122,14 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
-  public static String asJson(final JobRequest jobRequest) throws JsonProcessingException {
-    final Map<String, Object> jobRequestMap = new LinkedHashMap<>();
-    jobRequestMap.put("inputDatasetUrns", jobRequest.getInputDatasetUrns());
-    jobRequestMap.put("outputDatasetUrns", jobRequest.getOutputDatasetUrns());
-    jobRequestMap.put("location", jobRequest.getLocation());
-    jobRequestMap.put("description", jobRequest.getDescription().orElseGet(nullString));
-
-    return MAPPER.writeValueAsString(jobRequestMap);
+  public static String asJson(final NamespaceResponse response) {
+    return MAPPER
+        .createObjectNode()
+        .put("name", response.getName())
+        .put("createdAt", response.getCreatedAt())
+        .put("ownerName", response.getOwnerName())
+        .put("description", response.getDescription().orElse(null))
+        .toString();
   }
 
   public static JobRequest newJobRequest() {
@@ -164,6 +142,19 @@ public final class ApiModelGenerator {
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
         hasDescription ? newDescription().getValue() : null);
+  }
+
+  public static String asJson(final JobRequest request) throws JsonProcessingException {
+    final ArrayNode inputDatasetUrns = MAPPER.valueToTree(request.getInputDatasetUrns());
+    final ArrayNode outputDatasetUrns = MAPPER.valueToTree(request.getInputDatasetUrns());
+    final ObjectNode obj =
+        MAPPER
+            .createObjectNode()
+            .put("location", request.getLocation())
+            .put("description", request.getDescription().orElse(null));
+    obj.putArray("inputDatasetUrns").addAll(inputDatasetUrns);
+    obj.putArray("outputDatasetUrns").addAll(outputDatasetUrns);
+    return obj.toString();
   }
 
   public static List<JobResponse> newJobResponses(final Integer limit) {
