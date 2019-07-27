@@ -15,8 +15,7 @@
 package marquez.api.models;
 
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
-import static marquez.api.models.ApiModelGenerator.newJsonFrom;
-import static marquez.api.models.ApiModelGenerator.newNamespaceResponse;
+import static marquez.api.models.ApiModelGenerator.newNamespaceResponseAsJson;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
@@ -39,9 +38,6 @@ public class NamespaceResponseTest {
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
 
-  private static final NamespaceResponse RESPONSE = newNamespaceResponse();
-  private static final NamespaceResponse RESPONSE_NO_DESCRIPTION = newNamespaceResponse(false);
-
   @Test
   public void testNewResponse() {
     NamespaceResponse expected =
@@ -62,18 +58,17 @@ public class NamespaceResponseTest {
 
   @Test
   public void testResponse_toJson() throws Exception {
-    final String expected = newJsonFrom(RESPONSE);
+    final String responseAsJson = newNamespaceResponseAsJson();
     final String actual =
-        MAPPER.writeValueAsString(MAPPER.readValue(newJsonFrom(RESPONSE), NamespaceResponse.class));
-    assertThat(actual).isEqualTo(expected);
+        MAPPER.writeValueAsString(MAPPER.readValue(responseAsJson, NamespaceResponse.class));
+    assertThat(actual).isEqualTo(responseAsJson);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
-    final String expected = newJsonFrom(RESPONSE_NO_DESCRIPTION);
+    final String responseAsJson = newNamespaceResponseAsJson(false);
     final String actual =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(newJsonFrom(RESPONSE_NO_DESCRIPTION), NamespaceResponse.class));
-    assertThat(actual).isEqualTo(expected);
+        MAPPER.writeValueAsString(MAPPER.readValue(responseAsJson, NamespaceResponse.class));
+    assertThat(actual).isEqualTo(responseAsJson);
   }
 }

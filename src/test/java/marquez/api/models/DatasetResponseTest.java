@@ -14,9 +14,8 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.newDatasetResponse;
+import static marquez.api.models.ApiModelGenerator.newDatasetResponseAsJson;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
-import static marquez.api.models.ApiModelGenerator.newJsonFrom;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
@@ -40,9 +39,6 @@ public class DatasetResponseTest {
   private static final String DATASOURCE_URN_VALUE = newDatasourceUrn().getValue();
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
-
-  private static final DatasetResponse RESPONSE = newDatasetResponse();
-  private static final DatasetResponse RESPONSE_NO_DESCRIPTION = newDatasetResponse(false);
 
   @Test
   public void testNewResponse() {
@@ -68,18 +64,17 @@ public class DatasetResponseTest {
 
   @Test
   public void testResponse_toJson() throws Exception {
-    final String expected = newJsonFrom(RESPONSE);
+    final String responseAsJson = newDatasetResponseAsJson();
     final String actual =
-        MAPPER.writeValueAsString(MAPPER.readValue(newJsonFrom(RESPONSE), DatasetResponse.class));
-    assertThat(actual).isEqualTo(expected);
+        MAPPER.writeValueAsString(MAPPER.readValue(responseAsJson, DatasetResponse.class));
+    assertThat(actual).isEqualTo(responseAsJson);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
-    final String expected = newJsonFrom(RESPONSE_NO_DESCRIPTION);
+    final String responseAsJson = newDatasetResponseAsJson(false);
     final String actual =
-        MAPPER.writeValueAsString(
-            MAPPER.readValue(newJsonFrom(RESPONSE_NO_DESCRIPTION), DatasetResponse.class));
-    assertThat(actual).isEqualTo(expected);
+        MAPPER.writeValueAsString(MAPPER.readValue(responseAsJson, DatasetResponse.class));
+    assertThat(actual).isEqualTo(responseAsJson);
   }
 }

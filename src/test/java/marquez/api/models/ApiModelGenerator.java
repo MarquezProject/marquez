@@ -78,7 +78,12 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static String newJsonFrom(final DatasetResponse response) {
+  public static String newDatasetResponseAsJson() {
+    return newDatasetResponseAsJson(true);
+  }
+
+  public static String newDatasetResponseAsJson(final Boolean hasDescription) {
+    final DatasetResponse response = newDatasetResponse(hasDescription);
     return MAPPER
         .createObjectNode()
         .put("name", response.getName())
@@ -122,7 +127,12 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
-  public static String newJsonFrom(final NamespaceResponse response) {
+  public static String newNamespaceResponseAsJson() {
+    return newNamespaceResponseAsJson(true);
+  }
+
+  public static String newNamespaceResponseAsJson(final Boolean hasDescription) {
+    final NamespaceResponse response = newNamespaceResponse(hasDescription);
     return MAPPER
         .createObjectNode()
         .put("name", response.getName())
