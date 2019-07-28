@@ -43,7 +43,7 @@ public final class ApiModelGenerator {
     return new DatasetRequest(
         newDatasetName().getValue(),
         newDatasourceUrn().getValue(),
-        hasDescription ? newDescription().getValue() : null);
+        hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
   public static List<DatasetResponse> newDatasetResponses(final Integer limit) {
@@ -60,7 +60,7 @@ public final class ApiModelGenerator {
         newDatasetUrn().getValue(),
         newIsoTimestamp(),
         newDatasourceUrn().getValue(),
-        hasDescription ? newDescription().getValue() : null);
+        hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
   public static NamespaceRequest newNamespaceRequest() {
@@ -69,7 +69,8 @@ public final class ApiModelGenerator {
 
   public static NamespaceRequest newNamespaceRequest(final Boolean hasDescription) {
     return new NamespaceRequest(
-        newOwnerName().getValue(), hasDescription ? newDescription().getValue() : null);
+        newOwnerName().getValue(),
+        hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
   public static List<NamespaceResponse> newNamespaceResponses(final Integer limit) {
@@ -99,7 +100,7 @@ public final class ApiModelGenerator {
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
-        hasDescription ? newDescription().getValue() : null);
+        hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
   public static List<JobResponse> newJobResponses(final Integer limit) {
@@ -119,7 +120,7 @@ public final class ApiModelGenerator {
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
-        hasDescription ? newDescription().getValue() : null);
+        hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
   public static String newIsoTimestamp() {
