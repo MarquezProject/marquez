@@ -14,7 +14,6 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.newJsonFrom;
 import static marquez.api.models.ApiModelGenerator.newNamespaceRequest;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
@@ -54,14 +53,25 @@ public class NamespaceRequestTest {
 
   @Test
   public void testNewRequest_fromJson() throws Exception {
-    final NamespaceRequest actual = MAPPER.readValue(newJsonFrom(REQUEST), NamespaceRequest.class);
+    final String requestAsJson =
+        MAPPER
+            .createObjectNode()
+            .put("ownerName", REQUEST.getOwnerName())
+            .put("description", REQUEST.getDescription().orElseThrow(Exception::new))
+            .toString();
+    final NamespaceRequest actual = MAPPER.readValue(requestAsJson, NamespaceRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
   public void testNewRequest_fromJson_noDescription() throws Exception {
-    final NamespaceRequest actual =
-        MAPPER.readValue(newJsonFrom(REQUEST_NO_DESCRIPTION), NamespaceRequest.class);
+    final String requestAsJson =
+        MAPPER
+            .createObjectNode()
+            .put("ownerName", REQUEST_NO_DESCRIPTION.getOwnerName())
+            .put("description", REQUEST_NO_DESCRIPTION.getDescription().orElse(null))
+            .toString();
+    final NamespaceRequest actual = MAPPER.readValue(requestAsJson, NamespaceRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }

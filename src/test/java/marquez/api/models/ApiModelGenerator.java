@@ -16,7 +16,6 @@ package marquez.api.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static java.util.stream.Collectors.toList;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrns;
@@ -24,11 +23,10 @@ import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newLocation;
+import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dropwizard.jackson.Jackson;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
@@ -36,8 +34,6 @@ import marquez.common.models.DatasetUrn;
 
 public final class ApiModelGenerator {
   private ApiModelGenerator() {}
-
-  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
   public static DatasetRequest newDatasetRequest() {
     return newDatasetRequest(true);
@@ -51,7 +47,7 @@ public final class ApiModelGenerator {
   }
 
   public static List<DatasetResponse> newDatasetResponses(final Integer limit) {
-    return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toList());
+    return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toImmutableList());
   }
 
   public static DatasetResponse newDatasetResponse() {
@@ -76,16 +72,10 @@ public final class ApiModelGenerator {
         newOwnerName().getValue(), hasDescription ? newDescription().getValue() : null);
   }
 
-  public static String newJsonFrom(final NamespaceRequest request) {
-    return MAPPER
-        .createObjectNode()
-        .put("ownerName", request.getOwnerName())
-        .put("description", request.getDescription().orElse(null))
-        .toString();
-  }
-
   public static List<NamespaceResponse> newNamespaceResponses(final Integer limit) {
-    return Stream.generate(() -> newNamespaceResponse(true)).limit(limit).collect(toList());
+    return Stream.generate(() -> newNamespaceResponse(true))
+        .limit(limit)
+        .collect(toImmutableList());
   }
 
   public static NamespaceResponse newNamespaceResponse() {
@@ -94,25 +84,10 @@ public final class ApiModelGenerator {
 
   public static NamespaceResponse newNamespaceResponse(final Boolean hasDescription) {
     return new NamespaceResponse(
-        newDatasetName().getValue(),
+        newNamespaceName().getValue(),
         newIsoTimestamp(),
         newOwnerName().getValue(),
         hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
-  }
-
-  public static String newNamespaceResponseAsJson() {
-    return newNamespaceResponseAsJson(true);
-  }
-
-  public static String newNamespaceResponseAsJson(final Boolean hasDescription) {
-    final NamespaceResponse response = newNamespaceResponse(hasDescription);
-    return MAPPER
-        .createObjectNode()
-        .put("name", response.getName())
-        .put("createdAt", response.getCreatedAt())
-        .put("ownerName", response.getOwnerName())
-        .put("description", response.getDescription().orElse(null))
-        .toString();
   }
 
   public static JobRequest newJobRequest() {
@@ -125,6 +100,10 @@ public final class ApiModelGenerator {
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
         hasDescription ? newDescription().getValue() : null);
+  }
+
+  public static List<JobResponse> newJobResponses(final Integer limit) {
+    return Stream.generate(() -> newJobResponse(true)).limit(limit).collect(toImmutableList());
   }
 
   public static JobResponse newJobResponse() {
@@ -141,10 +120,6 @@ public final class ApiModelGenerator {
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
         hasDescription ? newDescription().getValue() : null);
-  }
-
-  public static List<JobResponse> newJobResponses(final Integer limit) {
-    return Stream.generate(() -> newJobResponse(true)).limit(limit).collect(toImmutableList());
   }
 
   public static String newIsoTimestamp() {
