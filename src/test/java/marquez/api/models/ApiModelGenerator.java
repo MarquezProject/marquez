@@ -52,15 +52,6 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static String newJsonFrom(final DatasetRequest request) {
-    return MAPPER
-        .createObjectNode()
-        .put("name", request.getName())
-        .put("datasourceUrn", request.getDatasourceUrn())
-        .put("description", request.getDescription().orElse(null))
-        .toString();
-  }
-
   public static List<DatasetResponse> newDatasetResponses(final Integer limit) {
     return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toList());
   }
@@ -76,22 +67,6 @@ public final class ApiModelGenerator {
         newIsoTimestamp(),
         newDatasourceUrn().getValue(),
         hasDescription ? newDescription().getValue() : null);
-  }
-
-  public static String newDatasetResponseAsJson() {
-    return newDatasetResponseAsJson(true);
-  }
-
-  public static String newDatasetResponseAsJson(final Boolean hasDescription) {
-    final DatasetResponse response = newDatasetResponse(hasDescription);
-    return MAPPER
-        .createObjectNode()
-        .put("name", response.getName())
-        .put("createdAt", response.getCreatedAt())
-        .put("urn", response.getUrn())
-        .put("datasourceUrn", response.getDatasourceUrn())
-        .put("description", response.getDescription().orElse(null))
-        .toString();
   }
 
   public static NamespaceRequest newNamespaceRequest() {

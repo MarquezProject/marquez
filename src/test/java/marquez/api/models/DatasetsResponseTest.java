@@ -17,6 +17,10 @@ package marquez.api.models;
 import static marquez.api.models.ApiModelGenerator.newDatasetResponses;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.dropwizard.jackson.Jackson;
 import java.util.List;
 import marquez.UnitTests;
 import org.junit.Test;
@@ -24,12 +28,32 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetsResponseTest {
-  final List<DatasetResponse> RESPONSES = newDatasetResponses(4);
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
+  private static final List<DatasetResponse> DATASETS = newDatasetResponses(1);
+  private static final DatasetsResponse RESPONSE = new DatasetsResponse(DATASETS);
 
   @Test
   public void testNewResponse() {
-    final DatasetsResponse expected = new DatasetsResponse(RESPONSES);
-    final DatasetsResponse actual = new DatasetsResponse(RESPONSES);
+    final DatasetsResponse expected = new DatasetsResponse(DATASETS);
+    final DatasetsResponse actual = new DatasetsResponse(DATASETS);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testResponse_toJson() throws Exception {
+    final ObjectNode obj =
+        MAPPER
+            .createObjectNode()
+            .put("name", DATASETS.get(0).getName())
+            .put("createdAt", DATASETS.get(0).getCreatedAt())
+            .put("urn", DATASETS.get(0).getUrn())
+            .put("datasourceUrn", DATASETS.get(0).getDatasourceUrn())
+            .put("description", DATASETS.get(0).getDescription().orElseThrow(Exception::new));
+    final ArrayNode array = MAPPER.createArrayNode().addPOJO(obj);
+    final String expected = MAPPER.createObjectNode().set("datasets", array).toString();
+    final String actual = MAPPER.writeValueAsString(RESPONSE);
+    System.out.println(actual);
     assertThat(actual).isEqualTo(expected);
   }
 }

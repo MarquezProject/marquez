@@ -14,7 +14,7 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.newDatasetResponseAsJson;
+import static marquez.api.models.ApiModelGenerator.newDatasetResponse;
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
@@ -40,6 +40,9 @@ public class DatasetResponseTest {
   private static final String DESCRIPTION_VALUE = newDescription().getValue();
   private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
 
+  private static final DatasetResponse RESPONSE = newDatasetResponse();
+  private static final DatasetResponse RESPONSE_NO_DESCRIPTION = newDatasetResponse(false);
+
   @Test
   public void testNewResponse() {
     final DatasetResponse expected =
@@ -64,17 +67,31 @@ public class DatasetResponseTest {
 
   @Test
   public void testResponse_toJson() throws Exception {
-    final String responseAsJson = newDatasetResponseAsJson();
-    final String actual =
-        MAPPER.writeValueAsString(MAPPER.readValue(responseAsJson, DatasetResponse.class));
-    assertThat(actual).isEqualTo(responseAsJson);
+    final String expected =
+        MAPPER
+            .createObjectNode()
+            .put("name", RESPONSE.getName())
+            .put("createdAt", RESPONSE.getCreatedAt())
+            .put("urn", RESPONSE.getUrn())
+            .put("datasourceUrn", RESPONSE.getDatasourceUrn())
+            .put("description", RESPONSE.getDescription().orElseThrow(Exception::new))
+            .toString();
+    final String actual = MAPPER.writeValueAsString(RESPONSE);
+    assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
-    final String responseAsJson = newDatasetResponseAsJson(false);
-    final String actual =
-        MAPPER.writeValueAsString(MAPPER.readValue(responseAsJson, DatasetResponse.class));
-    assertThat(actual).isEqualTo(responseAsJson);
+    final String expected =
+        MAPPER
+            .createObjectNode()
+            .put("name", RESPONSE_NO_DESCRIPTION.getName())
+            .put("createdAt", RESPONSE_NO_DESCRIPTION.getCreatedAt())
+            .put("urn", RESPONSE_NO_DESCRIPTION.getUrn())
+            .put("datasourceUrn", RESPONSE_NO_DESCRIPTION.getDatasourceUrn())
+            .put("description", RESPONSE_NO_DESCRIPTION.getDescription().orElse(null))
+            .toString();
+    final String actual = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
+    assertThat(actual).isEqualTo(expected);
   }
 }

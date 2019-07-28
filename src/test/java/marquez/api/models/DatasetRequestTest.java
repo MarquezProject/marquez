@@ -15,7 +15,6 @@
 package marquez.api.models;
 
 import static marquez.api.models.ApiModelGenerator.newDatasetRequest;
-import static marquez.api.models.ApiModelGenerator.newJsonFrom;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
@@ -60,14 +59,27 @@ public class DatasetRequestTest {
 
   @Test
   public void testNewRequest_fromJson() throws Exception {
-    final DatasetRequest actual = MAPPER.readValue(newJsonFrom(REQUEST), DatasetRequest.class);
+    final String requestAsJson =
+        MAPPER
+            .createObjectNode()
+            .put("name", REQUEST.getName())
+            .put("datasourceUrn", REQUEST.getDatasourceUrn())
+            .put("description", REQUEST.getDescription().orElseThrow(Exception::new))
+            .toString();
+    final DatasetRequest actual = MAPPER.readValue(requestAsJson, DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
   public void testNewRequest_fromJson_noDescription() throws Exception {
-    final DatasetRequest actual =
-        MAPPER.readValue(newJsonFrom(REQUEST_NO_DESCRIPTION), DatasetRequest.class);
+    final String requestAsJson =
+        MAPPER
+            .createObjectNode()
+            .put("name", REQUEST_NO_DESCRIPTION.getName())
+            .put("datasourceUrn", REQUEST_NO_DESCRIPTION.getDatasourceUrn())
+            .put("description", REQUEST_NO_DESCRIPTION.getDescription().orElse(null))
+            .toString();
+    final DatasetRequest actual = MAPPER.readValue(requestAsJson, DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }
