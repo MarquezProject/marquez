@@ -22,6 +22,7 @@ import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrns;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.Description.NO_DESCRIPTION;
@@ -126,19 +127,24 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : null);
   }
 
-  public static List<JobResponse> newJobResponses(final Integer limit) {
-    return Stream.generate(() -> newJobResponse(true)).limit(limit).collect(toImmutableList());
+  public static JobResponse newJobResponse() {
+    return newJobResponse(true);
   }
 
   public static JobResponse newJobResponse(final Boolean hasDescription) {
+    final String isoTimestamp = newIsoTimestamp();
     return new JobResponse(
-        newDatasetName().getValue(),
-        newIsoTimestamp(),
-        newIsoTimestamp(),
+        newJobName().getValue(),
+        isoTimestamp,
+        isoTimestamp,
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
         hasDescription ? newDescription().getValue() : null);
+  }
+
+  public static List<JobResponse> newJobResponses(final Integer limit) {
+    return Stream.generate(() -> newJobResponse(true)).limit(limit).collect(toImmutableList());
   }
 
   public static String newIsoTimestamp() {
