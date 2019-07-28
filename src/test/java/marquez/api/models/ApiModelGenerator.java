@@ -26,10 +26,7 @@ import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.dropwizard.jackson.Jackson;
 import java.time.Instant;
 import java.util.List;
@@ -127,19 +124,6 @@ public final class ApiModelGenerator {
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
         hasDescription ? newDescription().getValue() : null);
-  }
-
-  public static String newJsonFrom(final JobRequest request) throws JsonProcessingException {
-    final ArrayNode inputDatasetUrns = MAPPER.valueToTree(request.getInputDatasetUrns());
-    final ArrayNode outputDatasetUrns = MAPPER.valueToTree(request.getInputDatasetUrns());
-    final ObjectNode obj =
-        MAPPER
-            .createObjectNode()
-            .put("location", request.getLocation())
-            .put("description", request.getDescription().orElse(null));
-    obj.putArray("inputDatasetUrns").addAll(inputDatasetUrns);
-    obj.putArray("outputDatasetUrns").addAll(outputDatasetUrns);
-    return obj.toString();
   }
 
   public static List<JobResponse> newJobResponses(final Integer limit) {

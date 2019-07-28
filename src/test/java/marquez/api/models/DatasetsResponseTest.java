@@ -53,7 +53,6 @@ public class DatasetsResponseTest {
     final ArrayNode array = MAPPER.createArrayNode().addPOJO(obj);
     final String expected = MAPPER.createObjectNode().set("datasets", array).toString();
     final String actual = MAPPER.writeValueAsString(RESPONSE);
-    System.out.println(actual);
     assertThat(actual).isEqualTo(expected);
   }
 }
