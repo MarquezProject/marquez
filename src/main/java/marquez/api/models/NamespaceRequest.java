@@ -21,12 +21,13 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
 public final class NamespaceRequest {
-  @Getter private final String ownerName;
+  @Getter @NotBlank private final String ownerName;
   @Nullable private final String description;
 
   public Optional<String> getDescription() {
