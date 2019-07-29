@@ -69,35 +69,28 @@ public class JobRequestTest {
 
   @Test
   public void testNewRequest_fromJson() throws Exception {
-    final ArrayNode array0 = MAPPER.valueToTree(REQUEST.getInputDatasetUrns());
-    final ArrayNode array1 = MAPPER.valueToTree(REQUEST.getOutputDatasetUrns());
-    final ObjectNode obj =
-        MAPPER
-            .createObjectNode()
-            .put("location", REQUEST.getLocation())
-            .put("description", REQUEST.getDescription().get());
-    obj.putArray("inputDatasetUrns").addAll(array0);
-    obj.putArray("outputDatasetUrns").addAll(array1);
-
-    final String requestAsJson = obj.toString();
+    final String requestAsJson = buildJsonFor(REQUEST);
     final JobRequest actual = MAPPER.readValue(requestAsJson, JobRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
   public void testNewRequest_fromJson_noDescription() throws Exception {
-    final ArrayNode array0 = MAPPER.valueToTree(REQUEST_NO_DESCRIPTION.getInputDatasetUrns());
-    final ArrayNode array1 = MAPPER.valueToTree(REQUEST_NO_DESCRIPTION.getOutputDatasetUrns());
+    final String requestAsJson = buildJsonFor(REQUEST_NO_DESCRIPTION);
+    final JobRequest actual = MAPPER.readValue(requestAsJson, JobRequest.class);
+    assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
+  }
+
+  private String buildJsonFor(JobRequest request) {
+    final ArrayNode array0 = MAPPER.valueToTree(request.getInputDatasetUrns());
+    final ArrayNode array1 = MAPPER.valueToTree(request.getOutputDatasetUrns());
     final ObjectNode obj =
         MAPPER
             .createObjectNode()
-            .put("location", REQUEST_NO_DESCRIPTION.getLocation())
-            .put("description", REQUEST_NO_DESCRIPTION.getDescription().orElse(null));
+            .put("location", request.getLocation())
+            .put("description", request.getDescription().orElse(null));
     obj.putArray("inputDatasetUrns").addAll(array0);
     obj.putArray("outputDatasetUrns").addAll(array1);
-
-    final String requestAsJson = obj.toString();
-    final JobRequest actual = MAPPER.readValue(requestAsJson, JobRequest.class);
-    assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
+    return obj.toString();
   }
 }

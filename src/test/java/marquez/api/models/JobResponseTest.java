@@ -100,41 +100,31 @@ public class JobResponseTest {
 
   @Test
   public void testResponse_toJson() throws Exception {
-    final ArrayNode array0 = MAPPER.valueToTree(RESPONSE.getInputDatasetUrns());
-    final ArrayNode array1 = MAPPER.valueToTree(RESPONSE.getOutputDatasetUrns());
-    final ObjectNode obj =
-        MAPPER
-            .createObjectNode()
-            .put("name", RESPONSE.getName())
-            .put("createdAt", RESPONSE.getCreatedAt())
-            .put("updatedAt", RESPONSE.getUpdatedAt());
-    obj.putArray("inputDatasetUrns").addAll(array0);
-    obj.putArray("outputDatasetUrns").addAll(array1);
-    obj.put("location", RESPONSE.getLocation());
-    obj.put("description", RESPONSE.getDescription().get());
-
-    final String expected = obj.toString();
+    final String expected = buildJsonFor(RESPONSE);
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
-    final ArrayNode array0 = MAPPER.valueToTree(RESPONSE_NO_DESCRIPTION.getInputDatasetUrns());
-    final ArrayNode array1 = MAPPER.valueToTree(RESPONSE_NO_DESCRIPTION.getOutputDatasetUrns());
+    final String expected = buildJsonFor(RESPONSE_NO_DESCRIPTION);
+    final String actual = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  private String buildJsonFor(JobResponse response) {
+    final ArrayNode array0 = MAPPER.valueToTree(response.getInputDatasetUrns());
+    final ArrayNode array1 = MAPPER.valueToTree(response.getOutputDatasetUrns());
     final ObjectNode obj =
         MAPPER
             .createObjectNode()
-            .put("name", RESPONSE_NO_DESCRIPTION.getName())
-            .put("createdAt", RESPONSE_NO_DESCRIPTION.getCreatedAt())
-            .put("updatedAt", RESPONSE_NO_DESCRIPTION.getUpdatedAt());
+            .put("name", response.getName())
+            .put("createdAt", response.getCreatedAt())
+            .put("updatedAt", response.getUpdatedAt());
     obj.putArray("inputDatasetUrns").addAll(array0);
     obj.putArray("outputDatasetUrns").addAll(array1);
-    obj.put("location", RESPONSE_NO_DESCRIPTION.getLocation());
-    obj.put("description", RESPONSE_NO_DESCRIPTION.getDescription().orElse(null));
-
-    final String expected = obj.toString();
-    final String actual = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
-    assertThat(actual).isEqualTo(expected);
+    obj.put("location", response.getLocation());
+    obj.put("description", response.getDescription().orElse(null));
+    return obj.toString();
   }
 }
