@@ -59,27 +59,24 @@ public class DatasetRequestTest {
 
   @Test
   public void testNewRequest_fromJson() throws Exception {
-    final String requestAsJson =
-        MAPPER
-            .createObjectNode()
-            .put("name", REQUEST.getName())
-            .put("datasourceUrn", REQUEST.getDatasourceUrn())
-            .put("description", REQUEST.getDescription().get())
-            .toString();
+    final String requestAsJson = buildJsonFor(REQUEST);
     final DatasetRequest actual = MAPPER.readValue(requestAsJson, DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
   public void testNewRequest_fromJson_noDescription() throws Exception {
-    final String requestAsJson =
-        MAPPER
-            .createObjectNode()
-            .put("name", REQUEST_NO_DESCRIPTION.getName())
-            .put("datasourceUrn", REQUEST_NO_DESCRIPTION.getDatasourceUrn())
-            .put("description", REQUEST_NO_DESCRIPTION.getDescription().orElse(null))
-            .toString();
+    final String requestAsJson = buildJsonFor(REQUEST_NO_DESCRIPTION);
     final DatasetRequest actual = MAPPER.readValue(requestAsJson, DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
+  }
+
+  private String buildJsonFor(DatasetRequest request) {
+    return MAPPER
+        .createObjectNode()
+        .put("name", request.getName())
+        .put("datasourceUrn", request.getDatasourceUrn())
+        .put("description", request.getDescription().orElse(NO_DESCRIPTION.getValue()))
+        .toString();
   }
 }

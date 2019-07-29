@@ -31,7 +31,7 @@ import org.junit.experimental.categories.Category;
 public class DatasetsResponseTest {
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
-  private static final List<DatasetResponse> DATASETS = newDatasetResponses(1);
+  private static final List<DatasetResponse> DATASETS = newDatasetResponses(4);
   private static final DatasetsResponse RESPONSE = new DatasetsResponse(DATASETS);
 
   @Test
@@ -43,19 +43,28 @@ public class DatasetsResponseTest {
 
   @Test
   public void testResponse_toJson() throws Exception {
-    final ObjectNode obj =
-        MAPPER
-            .createObjectNode()
-            .put("name", DATASETS.get(0).getName())
-            .put("createdAt", DATASETS.get(0).getCreatedAt())
-            .put("urn", DATASETS.get(0).getUrn())
-            .put("datasourceUrn", DATASETS.get(0).getDatasourceUrn())
-            .put("description", DATASETS.get(0).getDescription().get());
-    final ArrayNode array = MAPPER.createArrayNode().addPOJO(obj);
-    final JsonNode json = MAPPER.createObjectNode().set("datasets", array);
-
-    final String expected = json.toString();
+    final String expected = buildJsonFor(RESPONSE);
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
+  }
+
+  private String buildJsonFor(DatasetsResponse response) {
+    final ArrayNode array = MAPPER.createArrayNode();
+    response
+        .getDatasets()
+        .forEach(
+            (dataset) -> {
+              final ObjectNode obj =
+                  MAPPER
+                      .createObjectNode()
+                      .put("name", dataset.getName())
+                      .put("createdAt", dataset.getCreatedAt())
+                      .put("urn", dataset.getUrn())
+                      .put("datasourceUrn", dataset.getDatasourceUrn())
+                      .put("description", dataset.getDescription().orElse(null));
+              array.addPOJO(obj);
+            });
+    final JsonNode responseAsJson = MAPPER.createObjectNode().set("datasets", array);
+    return responseAsJson.toString();
   }
 }

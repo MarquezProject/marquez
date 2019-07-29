@@ -67,31 +67,26 @@ public class DatasetResponseTest {
 
   @Test
   public void testResponse_toJson() throws Exception {
-    final String expected =
-        MAPPER
-            .createObjectNode()
-            .put("name", RESPONSE.getName())
-            .put("createdAt", RESPONSE.getCreatedAt())
-            .put("urn", RESPONSE.getUrn())
-            .put("datasourceUrn", RESPONSE.getDatasourceUrn())
-            .put("description", RESPONSE.getDescription().get())
-            .toString();
+    final String expected = buildJsonFor(RESPONSE);
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
-    final String expected =
-        MAPPER
-            .createObjectNode()
-            .put("name", RESPONSE_NO_DESCRIPTION.getName())
-            .put("createdAt", RESPONSE_NO_DESCRIPTION.getCreatedAt())
-            .put("urn", RESPONSE_NO_DESCRIPTION.getUrn())
-            .put("datasourceUrn", RESPONSE_NO_DESCRIPTION.getDatasourceUrn())
-            .put("description", RESPONSE_NO_DESCRIPTION.getDescription().orElse(null))
-            .toString();
+    final String expected = buildJsonFor(RESPONSE_NO_DESCRIPTION);
     final String actual = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
     assertThat(actual).isEqualTo(expected);
+  }
+
+  private String buildJsonFor(DatasetResponse response) {
+    return MAPPER
+        .createObjectNode()
+        .put("name", response.getName())
+        .put("createdAt", response.getCreatedAt())
+        .put("urn", response.getUrn())
+        .put("datasourceUrn", response.getDatasourceUrn())
+        .put("description", response.getDescription().orElse(null))
+        .toString();
   }
 }
