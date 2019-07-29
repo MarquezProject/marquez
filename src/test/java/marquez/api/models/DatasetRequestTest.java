@@ -64,7 +64,7 @@ public class DatasetRequestTest {
             .createObjectNode()
             .put("name", REQUEST.getName())
             .put("datasourceUrn", REQUEST.getDatasourceUrn())
-            .put("description", REQUEST.getDescription().orElseThrow(Exception::new))
+            .put("description", REQUEST.getDescription().get())
             .toString();
     final DatasetRequest actual = MAPPER.readValue(requestAsJson, DatasetRequest.class);
     assertThat(actual).isEqualTo(REQUEST);

@@ -17,6 +17,7 @@ package marquez.api.models;
 import static marquez.api.models.ApiModelGenerator.newNamespaceResponses;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -50,7 +51,9 @@ public class NamespacesResponseTest {
             .put("ownerName", NAMESPACES.get(0).getOwnerName())
             .put("description", NAMESPACES.get(0).getDescription().orElseThrow(Exception::new));
     final ArrayNode array = MAPPER.createArrayNode().addPOJO(obj);
-    final String expected = MAPPER.createObjectNode().set("namespaces", array).toString();
+    final JsonNode json = MAPPER.createObjectNode().set("namespaces", array);
+
+    final String expected = json.toString();
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
   }

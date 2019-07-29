@@ -57,7 +57,7 @@ public class NamespaceRequestTest {
         MAPPER
             .createObjectNode()
             .put("ownerName", REQUEST.getOwnerName())
-            .put("description", REQUEST.getDescription().orElseThrow(Exception::new))
+            .put("description", REQUEST.getDescription().get())
             .toString();
     final NamespaceRequest actual = MAPPER.readValue(requestAsJson, NamespaceRequest.class);
     assertThat(actual).isEqualTo(REQUEST);

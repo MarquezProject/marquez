@@ -67,7 +67,7 @@ public class NamespaceResponseTest {
             .put("name", RESPONSE.getName())
             .put("createdAt", RESPONSE.getCreatedAt())
             .put("ownerName", RESPONSE.getOwnerName())
-            .put("description", RESPONSE.getDescription().orElseThrow(Exception::new))
+            .put("description", RESPONSE.getDescription().get())
             .toString();
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);

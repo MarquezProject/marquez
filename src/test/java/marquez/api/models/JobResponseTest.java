@@ -111,7 +111,8 @@ public class JobResponseTest {
     obj.putArray("inputDatasetUrns").addAll(array0);
     obj.putArray("outputDatasetUrns").addAll(array1);
     obj.put("location", RESPONSE.getLocation());
-    obj.put("description", RESPONSE.getDescription().orElseThrow(Exception::new));
+    obj.put("description", RESPONSE.getDescription().get());
+
     final String expected = obj.toString();
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
@@ -131,6 +132,7 @@ public class JobResponseTest {
     obj.putArray("outputDatasetUrns").addAll(array1);
     obj.put("location", RESPONSE_NO_DESCRIPTION.getLocation());
     obj.put("description", RESPONSE_NO_DESCRIPTION.getDescription().orElse(null));
+
     final String expected = obj.toString();
     final String actual = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
     assertThat(actual).isEqualTo(expected);

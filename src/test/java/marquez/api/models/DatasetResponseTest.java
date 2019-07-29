@@ -74,7 +74,7 @@ public class DatasetResponseTest {
             .put("createdAt", RESPONSE.getCreatedAt())
             .put("urn", RESPONSE.getUrn())
             .put("datasourceUrn", RESPONSE.getDatasourceUrn())
-            .put("description", RESPONSE.getDescription().orElseThrow(Exception::new))
+            .put("description", RESPONSE.getDescription().get())
             .toString();
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);

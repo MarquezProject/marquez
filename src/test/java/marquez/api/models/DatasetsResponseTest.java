@@ -17,6 +17,7 @@ package marquez.api.models;
 import static marquez.api.models.ApiModelGenerator.newDatasetResponses;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -49,9 +50,11 @@ public class DatasetsResponseTest {
             .put("createdAt", DATASETS.get(0).getCreatedAt())
             .put("urn", DATASETS.get(0).getUrn())
             .put("datasourceUrn", DATASETS.get(0).getDatasourceUrn())
-            .put("description", DATASETS.get(0).getDescription().orElseThrow(Exception::new));
+            .put("description", DATASETS.get(0).getDescription().get());
     final ArrayNode array = MAPPER.createArrayNode().addPOJO(obj);
-    final String expected = MAPPER.createObjectNode().set("datasets", array).toString();
+    final JsonNode json = MAPPER.createObjectNode().set("datasets", array);
+
+    final String expected = json.toString();
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
   }

@@ -75,9 +75,10 @@ public class JobRequestTest {
         MAPPER
             .createObjectNode()
             .put("location", REQUEST.getLocation())
-            .put("description", REQUEST.getDescription().orElseThrow(Exception::new));
+            .put("description", REQUEST.getDescription().get());
     obj.putArray("inputDatasetUrns").addAll(array0);
     obj.putArray("outputDatasetUrns").addAll(array1);
+
     final String requestAsJson = obj.toString();
     final JobRequest actual = MAPPER.readValue(requestAsJson, JobRequest.class);
     assertThat(actual).isEqualTo(REQUEST);
@@ -94,6 +95,7 @@ public class JobRequestTest {
             .put("description", REQUEST_NO_DESCRIPTION.getDescription().orElse(null));
     obj.putArray("inputDatasetUrns").addAll(array0);
     obj.putArray("outputDatasetUrns").addAll(array1);
+
     final String requestAsJson = obj.toString();
     final JobRequest actual = MAPPER.readValue(requestAsJson, JobRequest.class);
     assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
