@@ -17,10 +17,7 @@ package marquez.api.models;
 import static marquez.api.models.ApiModelGenerator.newDatasetResponses;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.dropwizard.jackson.Jackson;
 import java.util.List;
 import marquez.UnitTests;
@@ -35,36 +32,9 @@ public class DatasetsResponseTest {
   private static final DatasetsResponse RESPONSE = new DatasetsResponse(DATASETS);
 
   @Test
-  public void testNewResponse() {
-    final DatasetsResponse expected = new DatasetsResponse(DATASETS);
-    final DatasetsResponse actual = new DatasetsResponse(DATASETS);
-    assertThat(actual).isEqualTo(expected);
-  }
-
-  @Test
   public void testResponse_toJson() throws Exception {
-    final String expected = buildJsonFor(RESPONSE);
+    final String expected = JsonGenerator.newJsonFor(RESPONSE);
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
-  }
-
-  private String buildJsonFor(DatasetsResponse response) {
-    final ArrayNode array = MAPPER.createArrayNode();
-    response
-        .getDatasets()
-        .forEach(
-            (dataset) -> {
-              final ObjectNode obj =
-                  MAPPER
-                      .createObjectNode()
-                      .put("name", dataset.getName())
-                      .put("createdAt", dataset.getCreatedAt())
-                      .put("urn", dataset.getUrn())
-                      .put("datasourceUrn", dataset.getDatasourceUrn())
-                      .put("description", dataset.getDescription().orElse(null));
-              array.addPOJO(obj);
-            });
-    final JsonNode responseAsJson = MAPPER.createObjectNode().set("datasets", array);
-    return responseAsJson.toString();
   }
 }

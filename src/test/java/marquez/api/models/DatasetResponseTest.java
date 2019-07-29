@@ -15,12 +15,6 @@
 package marquez.api.models;
 
 import static marquez.api.models.ApiModelGenerator.newDatasetResponse;
-import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
-import static marquez.common.models.CommonModelGenerator.newDatasetName;
-import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,60 +27,20 @@ import org.junit.experimental.categories.Category;
 public class DatasetResponseTest {
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
-  private static final String NAME_VALUE = newDatasetName().getValue();
-  private static final String CREATED_AT = newIsoTimestamp();
-  private static final String URN_VALUE = newDatasetUrn().getValue();
-  private static final String DATASOURCE_URN_VALUE = newDatasourceUrn().getValue();
-  private static final String DESCRIPTION_VALUE = newDescription().getValue();
-  private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
-
   private static final DatasetResponse RESPONSE = newDatasetResponse();
   private static final DatasetResponse RESPONSE_NO_DESCRIPTION = newDatasetResponse(false);
 
   @Test
-  public void testNewResponse() {
-    final DatasetResponse expected =
-        new DatasetResponse(
-            NAME_VALUE, CREATED_AT, URN_VALUE, DATASOURCE_URN_VALUE, DESCRIPTION_VALUE);
-    final DatasetResponse actual =
-        new DatasetResponse(
-            NAME_VALUE, CREATED_AT, URN_VALUE, DATASOURCE_URN_VALUE, DESCRIPTION_VALUE);
-    assertThat(actual).isEqualTo(expected);
-  }
-
-  @Test
-  public void testNewResponse_noDescription() {
-    final DatasetResponse expected =
-        new DatasetResponse(
-            NAME_VALUE, CREATED_AT, URN_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
-    final DatasetResponse actual =
-        new DatasetResponse(
-            NAME_VALUE, CREATED_AT, URN_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
-    assertThat(actual).isEqualTo(expected);
-  }
-
-  @Test
   public void testResponse_toJson() throws Exception {
-    final String expected = buildJsonFor(RESPONSE);
+    final String expected = JsonGenerator.newJsonFor(RESPONSE);
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
   public void testResponse_toJson_noDescription() throws Exception {
-    final String expected = buildJsonFor(RESPONSE_NO_DESCRIPTION);
+    final String expected = JsonGenerator.newJsonFor(RESPONSE_NO_DESCRIPTION);
     final String actual = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
     assertThat(actual).isEqualTo(expected);
-  }
-
-  private String buildJsonFor(DatasetResponse response) {
-    return MAPPER
-        .createObjectNode()
-        .put("name", response.getName())
-        .put("createdAt", response.getCreatedAt())
-        .put("urn", response.getUrn())
-        .put("datasourceUrn", response.getDatasourceUrn())
-        .put("description", response.getDescription().orElse(null))
-        .toString();
   }
 }

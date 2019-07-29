@@ -15,13 +15,9 @@
 package marquez.api.models;
 
 import static marquez.api.models.ApiModelGenerator.newJobResponses;
-import static marquez.common.models.Description.NO_DESCRIPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.dropwizard.jackson.Jackson;
 import java.util.List;
 import marquez.UnitTests;
@@ -36,40 +32,9 @@ public class JobsResponseTest {
   private static final JobsResponse RESPONSE = new JobsResponse(JOBS);
 
   @Test
-  public void testNewResponse() {
-    final JobsResponse actual = new JobsResponse(JOBS);
-    final JobsResponse expected = new JobsResponse(JOBS);
-    assertThat(actual).isEqualTo(expected);
-  }
-
-  @Test
   public void testResponse_toJson() throws Exception {
-    final String expected = buildJsonFor(RESPONSE);
+    final String expected = JsonGenerator.newJsonFor(RESPONSE);
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
-  }
-
-  private String buildJsonFor(JobsResponse response) {
-    final ArrayNode array = MAPPER.createArrayNode();
-    response
-        .getJobs()
-        .forEach(
-            (job) -> {
-              final ArrayNode array0 = MAPPER.valueToTree(job.getInputDatasetUrns());
-              final ArrayNode array1 = MAPPER.valueToTree(job.getOutputDatasetUrns());
-              final ObjectNode obj =
-                  MAPPER
-                      .createObjectNode()
-                      .put("name", job.getName())
-                      .put("createdAt", job.getCreatedAt())
-                      .put("updatedAt", job.getUpdatedAt());
-              obj.putArray("inputDatasetUrns").addAll(array0);
-              obj.putArray("outputDatasetUrns").addAll(array1);
-              obj.put("location", job.getLocation());
-              obj.put("description", job.getDescription().orElse(NO_DESCRIPTION.getValue()));
-              array.addPOJO(obj);
-            });
-    final JsonNode responseAsJson = MAPPER.createObjectNode().set("jobs", array);
-    return responseAsJson.toString();
   }
 }

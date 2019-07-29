@@ -17,10 +17,7 @@ package marquez.api.models;
 import static marquez.api.models.ApiModelGenerator.newNamespaceResponses;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.dropwizard.jackson.Jackson;
 import java.util.List;
 import marquez.UnitTests;
@@ -31,29 +28,12 @@ import org.junit.experimental.categories.Category;
 public class NamespacesResponseTest {
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
-  private static final List<NamespaceResponse> NAMESPACES = newNamespaceResponses(1);
+  private static final List<NamespaceResponse> NAMESPACES = newNamespaceResponses(4);
   private static final NamespacesResponse RESPONSE = new NamespacesResponse(NAMESPACES);
 
   @Test
-  public void testNewResponse() {
-    final NamespacesResponse expected = new NamespacesResponse(NAMESPACES);
-    final NamespacesResponse actual = new NamespacesResponse(NAMESPACES);
-    assertThat(actual).isEqualTo(expected);
-  }
-
-  @Test
   public void testResponse_toJson() throws Exception {
-    final ObjectNode obj =
-        MAPPER
-            .createObjectNode()
-            .put("name", NAMESPACES.get(0).getName())
-            .put("createdAt", NAMESPACES.get(0).getCreatedAt())
-            .put("ownerName", NAMESPACES.get(0).getOwnerName())
-            .put("description", NAMESPACES.get(0).getDescription().orElseThrow(Exception::new));
-    final ArrayNode array = MAPPER.createArrayNode().addPOJO(obj);
-    final JsonNode json = MAPPER.createObjectNode().set("namespaces", array);
-
-    final String expected = json.toString();
+    final String expected = JsonGenerator.newJsonFor(RESPONSE);
     final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
   }
