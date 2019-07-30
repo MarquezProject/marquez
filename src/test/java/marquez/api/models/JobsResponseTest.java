@@ -17,6 +17,8 @@ package marquez.api.models;
 import static marquez.api.models.ApiModelGenerator.newJobResponses;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import java.util.List;
 import marquez.UnitTests;
 import org.junit.Test;
@@ -24,12 +26,15 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class JobsResponseTest {
-  private static final List<JobResponse> RESPONSES = newJobResponses(4);
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
+  private static final List<JobResponse> JOBS = newJobResponses(4);
+  private static final JobsResponse RESPONSE = new JobsResponse(JOBS);
 
   @Test
-  public void testNewResponse() {
-    final JobsResponse actual = new JobsResponse(RESPONSES);
-    final JobsResponse expected = new JobsResponse(RESPONSES);
+  public void testResponse_toJson() throws Exception {
+    final String expected = JsonGenerator.newJsonFor(RESPONSE);
+    final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
   }
 }

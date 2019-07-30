@@ -1,9 +1,0 @@
-{
-  "name": "sample_dataset",
-  "createdAt": "2018-07-14T19:43:37+0000",
-  "updatedAt": "2018-08-15T11:20:05+0000",
-  "type": "DB_TABLE",
-  "origin": "EXTERNAL",
-  "currentVersion": "10892965-454c-4bb1-b187-d67f2141423c",
-  "description": "sample dataset for testing"
-}

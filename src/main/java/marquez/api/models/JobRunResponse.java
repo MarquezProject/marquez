@@ -38,7 +38,7 @@ public final class JobRunResponse {
       @Nullable final String nominalEndTime,
       @Nullable final String runArgs,
       @NonNull final String runState) {
-    this.runId = runId;
+    this.runId = checkNotBlank(runId);
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;
     this.runArgs = runArgs;

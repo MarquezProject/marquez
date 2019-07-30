@@ -14,81 +14,33 @@
 
 package marquez.api.models;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
-import static marquez.common.models.CommonModelGenerator.newDatasetName;
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.CommonModelGenerator.newLocation;
-import static marquez.common.models.Description.NO_DESCRIPTION;
+import static marquez.api.models.ApiModelGenerator.newJobResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import marquez.UnitTests;
-import marquez.common.models.CommonModelGenerator;
-import marquez.common.models.DatasetUrn;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class JobResponseTest {
-  private static final String NAME_VALUE = newDatasetName().getValue();
-  private static final String CREATED_AT = newIsoTimestamp();
-  private static final String UPDATED_AT = newIsoTimestamp();
-  private static final List<String> INPUT_DATASET_URNS =
-      CommonModelGenerator.newDatasetUrns(4).stream()
-          .map(DatasetUrn::getValue)
-          .collect(toImmutableList());
-  private static final List<String> OUTPUT_DATASET_URNS =
-      CommonModelGenerator.newDatasetUrns(2).stream()
-          .map(DatasetUrn::getValue)
-          .collect(toImmutableList());
-  private static final String LOCATION_VALUE = newLocation().toString();
-  private static final String DESCRIPTION_VALUE = newDescription().getValue();
-  private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
+  private static final JobResponse RESPONSE = newJobResponse();
+  private static final JobResponse RESPONSE_NO_DESCRIPTION = newJobResponse(false);
 
   @Test
-  public void testNewResponse() {
-    final JobResponse actual =
-        new JobResponse(
-            NAME_VALUE,
-            CREATED_AT,
-            UPDATED_AT,
-            INPUT_DATASET_URNS,
-            OUTPUT_DATASET_URNS,
-            LOCATION_VALUE,
-            DESCRIPTION_VALUE);
-    final JobResponse expected =
-        new JobResponse(
-            NAME_VALUE,
-            CREATED_AT,
-            UPDATED_AT,
-            INPUT_DATASET_URNS,
-            OUTPUT_DATASET_URNS,
-            LOCATION_VALUE,
-            DESCRIPTION_VALUE);
+  public void testResponse_toJson() throws Exception {
+    final String expected = JsonGenerator.newJsonFor(RESPONSE);
+    final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
   }
 
   @Test
-  public void testNewResponse_noDescription() {
-    final JobResponse actual =
-        new JobResponse(
-            NAME_VALUE,
-            CREATED_AT,
-            UPDATED_AT,
-            INPUT_DATASET_URNS,
-            OUTPUT_DATASET_URNS,
-            LOCATION_VALUE,
-            NO_DESCRIPTION_VALUE);
-    final JobResponse expected =
-        new JobResponse(
-            NAME_VALUE,
-            CREATED_AT,
-            UPDATED_AT,
-            INPUT_DATASET_URNS,
-            OUTPUT_DATASET_URNS,
-            LOCATION_VALUE,
-            NO_DESCRIPTION_VALUE);
+  public void testResponse_toJson_noDescription() throws Exception {
+    final String expected = JsonGenerator.newJsonFor(RESPONSE_NO_DESCRIPTION);
+    final String actual = MAPPER.writeValueAsString(RESPONSE_NO_DESCRIPTION);
     assertThat(actual).isEqualTo(expected);
   }
 }

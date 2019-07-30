@@ -19,12 +19,11 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.NotBlank;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
-public class DatasourceRequest {
-  @Getter @NotBlank private final String name;
-  @Getter @NotBlank private final String connectionUrl;
+public final class DatasourceRequest {
+  @Getter private final String name;
+  @Getter private final String connectionUrl;
 }

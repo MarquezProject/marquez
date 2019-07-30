@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,9 +13,9 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class JobRequest {
-  @Getter @NotNull private final List<String> inputDatasetUrns;
-  @Getter @NotNull private final List<String> outputDatasetUrns;
-  @Getter @NotNull private final String location;
+  @Getter private final List<String> inputDatasetUrns;
+  @Getter private final List<String> outputDatasetUrns;
+  @Getter private final String location;
   @Nullable private final String description;
 
   public Optional<String> getDescription() {

@@ -14,46 +14,33 @@
 
 package marquez.api.models;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static marquez.common.models.CommonModelGenerator.newDatasetUrns;
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.CommonModelGenerator.newLocation;
-import static marquez.common.models.Description.NO_DESCRIPTION;
+import static marquez.api.models.ApiModelGenerator.newJobRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import marquez.UnitTests;
-import marquez.common.models.DatasetUrn;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class JobRequestTest {
-  private static final List<String> INPUT_DATASET_URNS =
-      newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList());
-  private static final List<String> OUTPUT_DATASET_URNS =
-      newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList());
-  private static final String LOCATION_VALUE = newLocation().toString();
-  private static final String DESCRIPTION_VALUE = newDescription().getValue();
-  private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
+  private static final JobRequest REQUEST = newJobRequest();
+  private static final JobRequest REQUEST_NO_DESCRIPTION = newJobRequest(false);
 
   @Test
-  public void testNewRequest() {
-    final JobRequest actual =
-        new JobRequest(INPUT_DATASET_URNS, OUTPUT_DATASET_URNS, LOCATION_VALUE, DESCRIPTION_VALUE);
-    final JobRequest expected =
-        new JobRequest(INPUT_DATASET_URNS, OUTPUT_DATASET_URNS, LOCATION_VALUE, DESCRIPTION_VALUE);
-    assertThat(actual).isEqualTo(expected);
+  public void testNewRequest_fromJson() throws Exception {
+    final String requestAsJson = JsonGenerator.newJsonFor(REQUEST);
+    final JobRequest actual = MAPPER.readValue(requestAsJson, JobRequest.class);
+    assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
-  public void testNewRequest_noDescription() {
-    final JobRequest actual =
-        new JobRequest(
-            INPUT_DATASET_URNS, OUTPUT_DATASET_URNS, LOCATION_VALUE, NO_DESCRIPTION_VALUE);
-    final JobRequest expected =
-        new JobRequest(
-            INPUT_DATASET_URNS, OUTPUT_DATASET_URNS, LOCATION_VALUE, NO_DESCRIPTION_VALUE);
-    assertThat(actual).isEqualTo(expected);
+  public void testNewRequest_fromJson_noDescription() throws Exception {
+    final String requestAsJson = JsonGenerator.newJsonFor(REQUEST_NO_DESCRIPTION);
+    final JobRequest actual = MAPPER.readValue(requestAsJson, JobRequest.class);
+    assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }
