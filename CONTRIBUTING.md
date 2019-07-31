@@ -24,6 +24,14 @@ $ ./gradlew test --tests marquez.service.DatasetServiceTest
 $ ./gradlew test --tests marquez.db.DatasetDaoTest
 ```
 
+Or run tests by category:  
+
+```bash
+$ ./gradlew testUnit         # runs unit tests
+$ ./gradlew testIntegration  # runs integration tests
+$ ./gradlew testDataAccess   # runs data access tests
+```
+
 We use [spotless](https://github.com/diffplug/spotless) to format our code. This ensures `.java` files are formatted to comply with [Google Java Style](https://google.github.io/styleguide/javaguide.html). Make sure your code is formatted before pushing any changes, otherwise CI will fail:
 
 ```
