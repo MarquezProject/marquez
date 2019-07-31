@@ -14,7 +14,7 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.*;
+import static marquez.api.models.ApiModelGenerator.newDatasourceResponses;
 
 import java.util.List;
 import marquez.UnitTests;

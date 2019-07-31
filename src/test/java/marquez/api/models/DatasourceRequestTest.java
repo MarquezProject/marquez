@@ -14,7 +14,8 @@
 
 package marquez.api.models;
 
-import static marquez.common.models.CommonModelGenerator.*;
+import static marquez.common.models.CommonModelGenerator.newDatasourceName;
+import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import marquez.UnitTests;
