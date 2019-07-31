@@ -16,9 +16,11 @@ package marquez.api.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrns;
+import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newJobName;
@@ -125,5 +127,17 @@ public final class ApiModelGenerator {
 
   public static String newIsoTimestamp() {
     return ISO_INSTANT.format(Instant.now());
+  }
+
+  public static List<DatasourceResponse> newDatasourceResponses(final Integer limit) {
+    return Stream.generate(() -> newDatasourceResponse()).limit(limit).collect(toImmutableList());
+  }
+  public static DatasourceResponse newDatasourceResponse() {
+    return new DatasourceResponse(
+        newDatasourceName().getValue(),
+        newIsoTimestamp(),
+        newDatasourceUrn().getValue(),
+        newConnectionUrl().getRawValue()
+    );
   }
 }
