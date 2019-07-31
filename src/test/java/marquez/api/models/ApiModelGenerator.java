@@ -132,12 +132,12 @@ public final class ApiModelGenerator {
   public static List<DatasourceResponse> newDatasourceResponses(final Integer limit) {
     return Stream.generate(() -> newDatasourceResponse()).limit(limit).collect(toImmutableList());
   }
+
   public static DatasourceResponse newDatasourceResponse() {
     return new DatasourceResponse(
         newDatasourceName().getValue(),
         newIsoTimestamp(),
         newDatasourceUrn().getValue(),
-        newConnectionUrl().getRawValue()
-    );
+        newConnectionUrl().getRawValue());
   }
 }

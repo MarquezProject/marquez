@@ -16,8 +16,8 @@ package marquez.api.models;
 
 import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDatasourceName;
+import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import marquez.UnitTests;
@@ -33,8 +33,10 @@ public class DatasourceResponseTest {
 
   @Test
   public void testNewResponse() {
-    final DatasourceResponse actual = new DatasourceResponse(NAME_VALUE, CREATED_AT, URN_VALUE, URL_VALUE);
-    final DatasourceResponse expected = new DatasourceResponse(NAME_VALUE, CREATED_AT, URN_VALUE, URL_VALUE);
+    final DatasourceResponse actual =
+        new DatasourceResponse(NAME_VALUE, CREATED_AT, URN_VALUE, URL_VALUE);
+    final DatasourceResponse expected =
+        new DatasourceResponse(NAME_VALUE, CREATED_AT, URN_VALUE, URL_VALUE);
     assertThat(actual).isEqualTo(expected);
   }
 }

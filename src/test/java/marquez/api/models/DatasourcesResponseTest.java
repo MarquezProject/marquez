@@ -32,5 +32,4 @@ public class DatasourcesResponseTest {
     final DatasourcesResponse expected = new DatasourcesResponse(RESPONSES);
     Assertions.assertThat(actual).isEqualTo(expected);
   }
-
 }
