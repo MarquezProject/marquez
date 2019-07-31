@@ -8,6 +8,30 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
 
+# Development
+
+To run the entire test suite:
+
+```bash
+$ ./gradlew test
+```
+
+You can also run individual tests using the flag `--tests`:
+
+```bash
+$ ./gradlew test --tests marquez.api.resources.DatasetResourceTest
+$ ./gradlew test --tests marquez.service.DatasetServiceTest
+$ ./gradlew test --tests marquez.db.DatasetDaoTest
+```
+
+We use [spotless](https://github.com/diffplug/spotless) to format our code. This ensures `.java` files are formatted to comply with [Google Java Style](https://google.github.io/styleguide/javaguide.html). Make sure your code is formatted before pushing any changes, otherwise CI will fail:
+
+```
+$ ./gradlew spotlessApply
+```
+
+> **Note:** To make formatting code simple, we recommned installing a [plugin](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides) for your favorite IDE. We also us [Lombok](https://projectlombok.org). Though note required, you might want to install the [plugin](https://projectlombok.org/setup/overview) as well. 
+
 # Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
 
 1. [Fork](https://github.com/MarquezProject/marquez/fork) and clone the repository
