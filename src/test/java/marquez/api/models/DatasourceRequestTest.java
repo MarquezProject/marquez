@@ -14,23 +14,25 @@
 
 package marquez.api.models;
 
-import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
-import static marquez.common.models.CommonModelGenerator.newDatasourceName;
+import static marquez.api.models.ApiModelGenerator.newDatasourceRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import marquez.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasourceRequestTest {
-  private static final String NAME_VALUE = newDatasourceName().getValue();
-  private static final String URL_VALUE = newConnectionUrl().getRawValue();
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
+  private static final DatasourceRequest REQUEST = newDatasourceRequest();
 
   @Test
-  public void testNewRequest() {
-    final DatasourceRequest actual = new DatasourceRequest(NAME_VALUE, URL_VALUE);
-    final DatasourceRequest expected = new DatasourceRequest(NAME_VALUE, URL_VALUE);
-    assertThat(actual).isEqualTo(expected);
+  public void testNewRequest_fromJson() throws Exception {
+    final String requestAsJson = JsonGenerator.newJsonFor(REQUEST);
+    final DatasourceRequest actual = MAPPER.readValue(requestAsJson, DatasourceRequest.class);
+    assertThat(actual).isEqualTo(REQUEST);
   }
 }

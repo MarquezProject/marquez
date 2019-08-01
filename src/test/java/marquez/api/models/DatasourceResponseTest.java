@@ -14,29 +14,25 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.newIsoTimestamp;
-import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
-import static marquez.common.models.CommonModelGenerator.newDatasourceName;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
+import static marquez.api.models.ApiModelGenerator.newDatasourceResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import marquez.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasourceResponseTest {
-  private static final String NAME_VALUE = newDatasourceName().getValue();
-  private static final String CREATED_AT = newIsoTimestamp();
-  private static final String URN_VALUE = newDatasourceUrn().getValue();
-  private static final String URL_VALUE = newConnectionUrl().getRawValue();
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
+  private static final DatasourceResponse RESPONSE = newDatasourceResponse();
 
   @Test
-  public void testNewResponse() {
-    final DatasourceResponse actual =
-        new DatasourceResponse(NAME_VALUE, CREATED_AT, URN_VALUE, URL_VALUE);
-    final DatasourceResponse expected =
-        new DatasourceResponse(NAME_VALUE, CREATED_AT, URN_VALUE, URL_VALUE);
+  public void testNewResponse_toJson() throws Exception {
+    final String expected = JsonGenerator.newJsonFor(RESPONSE);
+    final String actual = MAPPER.writeValueAsString(RESPONSE);
     assertThat(actual).isEqualTo(expected);
   }
 }

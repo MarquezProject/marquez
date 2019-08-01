@@ -129,6 +129,10 @@ public final class ApiModelGenerator {
     return ISO_INSTANT.format(Instant.now());
   }
 
+  public static DatasourceRequest newDatasourceRequest() {
+    return new DatasourceRequest(newDatasourceName().getValue(), newConnectionUrl().getRawValue());
+  }
+
   public static List<DatasourceResponse> newDatasourceResponses(final Integer limit) {
     return Stream.generate(() -> newDatasourceResponse()).limit(limit).collect(toImmutableList());
   }
