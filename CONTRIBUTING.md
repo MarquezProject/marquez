@@ -38,7 +38,7 @@ We use [spotless](https://github.com/diffplug/spotless) to format our code. This
 $ ./gradlew spotlessApply
 ```
 
-> **Note:** To make formatting code simple, we recommend installing a [plugin](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides) for your favorite IDE. We also us [Lombok](https://projectlombok.org). Though note required, you might want to install the [plugin](https://projectlombok.org/setup/overview) as well. 
+> **Note:** To make formatting code simple, we recommend installing a [plugin](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides) for your favorite IDE. We also us [Lombok](https://projectlombok.org). Though not required, you might want to install the [plugin](https://projectlombok.org/setup/overview) as well. 
 
 # Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
 
