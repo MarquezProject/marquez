@@ -114,4 +114,28 @@ public final class JsonGenerator {
     final JsonNode responseAsJson = MAPPER.createObjectNode().set("datasets", array);
     return responseAsJson.toString();
   }
+
+  public static String newJsonFor(final DatasourceRequest request) {
+    return MAPPER
+        .createObjectNode()
+        .put("name", request.getName())
+        .put("connectionUrl", request.getConnectionUrl())
+        .toString();
+  }
+
+  public static String newJsonFor(final DatasourceResponse response) {
+    return MAPPER
+        .createObjectNode()
+        .put("name", response.getName())
+        .put("createdAt", response.getCreatedAt())
+        .put("urn", response.getUrn())
+        .put("connectionUrl", response.getConnectionUrl())
+        .toString();
+  }
+
+  public static String newJsonFor(final DatasourcesResponse response) {
+    final ArrayNode array = MAPPER.createArrayNode();
+    response.getDatasources().forEach((datasource) -> array.addPOJO(newJsonFor(datasource)));
+    return MAPPER.createObjectNode().set("datasources", array).toString();
+  }
 }
