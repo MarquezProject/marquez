@@ -20,7 +20,7 @@ You can also run individual tests using the flag `--tests`:
 
 ```bash
 $ ./gradlew test --tests marquez.client.MarquezClientTest
-$ ./gradlew test --tests marquez.client.MarquezHttp
+$ ./gradlew test --tests marquez.client.MarquezHttpTest
 $ ./gradlew test --tests marquez.client.models.DatasetMetaTest
 ```
 
