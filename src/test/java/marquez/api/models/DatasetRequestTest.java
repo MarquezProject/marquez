@@ -14,38 +14,33 @@
 
 package marquez.api.models;
 
-import static marquez.common.models.CommonModelGenerator.newDatasetName;
-import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
-import static marquez.common.models.CommonModelGenerator.newDescription;
-import static marquez.common.models.Description.NO_DESCRIPTION;
+import static marquez.api.models.ApiModelGenerator.newDatasetRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
 import marquez.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class DatasetRequestTest {
-  private static final String NAME_VALUE = newDatasetName().getValue();
-  private static final String DATASOURCE_URN_VALUE = newDatasourceUrn().getValue();
-  private static final String DESCRIPTION_VALUE = newDescription().getValue();
-  private static final String NO_DESCRIPTION_VALUE = NO_DESCRIPTION.getValue();
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
+  private static final DatasetRequest REQUEST = newDatasetRequest();
+  private static final DatasetRequest REQUEST_NO_DESCRIPTION = newDatasetRequest(false);
 
   @Test
-  public void testNewRequest() {
-    final DatasetRequest expected =
-        new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, DESCRIPTION_VALUE);
-    final DatasetRequest actual =
-        new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, DESCRIPTION_VALUE);
-    assertThat(actual).isEqualTo(expected);
+  public void testNewRequest_fromJson() throws Exception {
+    final String requestAsJson = JsonGenerator.newJsonFor(REQUEST);
+    final DatasetRequest actual = MAPPER.readValue(requestAsJson, DatasetRequest.class);
+    assertThat(actual).isEqualTo(REQUEST);
   }
 
   @Test
-  public void testNewRequest_noDescription() {
-    final DatasetRequest expected =
-        new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
-    final DatasetRequest actual =
-        new DatasetRequest(NAME_VALUE, DATASOURCE_URN_VALUE, NO_DESCRIPTION_VALUE);
-    assertThat(actual).isEqualTo(expected);
+  public void testNewRequest_fromJson_noDescription() throws Exception {
+    final String requestAsJson = JsonGenerator.newJsonFor(REQUEST_NO_DESCRIPTION);
+    final DatasetRequest actual = MAPPER.readValue(requestAsJson, DatasetRequest.class);
+    assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }

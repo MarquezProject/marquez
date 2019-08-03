@@ -14,27 +14,33 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.newDatasetResponses;
+import static marquez.api.models.ApiModelGenerator.newJobRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
-import java.util.List;
 import marquez.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DatasetsResponseTest {
+public class JobRequestTest {
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
-  private static final List<DatasetResponse> DATASETS = newDatasetResponses(4);
-  private static final DatasetsResponse RESPONSE = new DatasetsResponse(DATASETS);
+  private static final JobRequest REQUEST = newJobRequest();
+  private static final JobRequest REQUEST_NO_DESCRIPTION = newJobRequest(false);
 
   @Test
-  public void testResponse_toJson() throws Exception {
-    final String expected = JsonGenerator.newJsonFor(RESPONSE);
-    final String actual = MAPPER.writeValueAsString(RESPONSE);
-    assertThat(actual).isEqualTo(expected);
+  public void testNewRequest_fromJson() throws Exception {
+    final String requestAsJson = JsonGenerator.newJsonFor(REQUEST);
+    final JobRequest actual = MAPPER.readValue(requestAsJson, JobRequest.class);
+    assertThat(actual).isEqualTo(REQUEST);
+  }
+
+  @Test
+  public void testNewRequest_fromJson_noDescription() throws Exception {
+    final String requestAsJson = JsonGenerator.newJsonFor(REQUEST_NO_DESCRIPTION);
+    final JobRequest actual = MAPPER.readValue(requestAsJson, JobRequest.class);
+    assertThat(actual).isEqualTo(REQUEST_NO_DESCRIPTION);
   }
 }

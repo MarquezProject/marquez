@@ -14,7 +14,7 @@
 
 package marquez.api.models;
 
-import static marquez.api.models.ApiModelGenerator.newDatasetResponses;
+import static marquez.api.models.ApiModelGenerator.newJobResponses;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,11 +25,11 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class DatasetsResponseTest {
+public class JobsResponseTest {
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
-  private static final List<DatasetResponse> DATASETS = newDatasetResponses(4);
-  private static final DatasetsResponse RESPONSE = new DatasetsResponse(DATASETS);
+  private static final List<JobResponse> JOBS = newJobResponses(4);
+  private static final JobsResponse RESPONSE = new JobsResponse(JOBS);
 
   @Test
   public void testResponse_toJson() throws Exception {
