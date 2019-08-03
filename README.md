@@ -12,6 +12,37 @@ This library is under active development at [The We Company](https://www.we.co).
 
 See the [API docs](https://marquezproject.github.io/marquez/openapi.html).
 
+## Installation
+
+Maven:
+
+```xml
+<dependency>
+    <groupId>io.github.marquezproject</groupId>
+    <artifactId>marquez-java</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+or Gradle:
+
+```groovy
+compile 'io.github.marquezproject:marquez-java:0.1.0'
+```
+## Usage
+
+```java
+MarquezClient client = MarquezClient().builder()
+    .baseUrl("http://localhost:5000/api/v1")
+    .build()
+     
+// List namespaces
+client.listNamespaces()
+
+// Retrieve a job
+client.getJob("room_bookings_7_days")
+```
+
 ## Contributing
 
 See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez-java/blob/master/CONTRIBUTING.md) for more details about how to contribute.
