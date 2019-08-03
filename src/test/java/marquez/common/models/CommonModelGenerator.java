@@ -18,13 +18,11 @@ import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Stream;
+import marquez.ModelGenerator;
 
-public final class CommonModelGenerator {
+public final class CommonModelGenerator extends ModelGenerator {
   private CommonModelGenerator() {}
-
-  private static final Random RANDOM = new Random();
 
   public static OwnerName newOwnerName() {
     return OwnerName.of("test_owner" + newId());
@@ -75,7 +73,7 @@ public final class CommonModelGenerator {
     return DatasetName.of("test_dataset" + newId());
   }
 
-  public static List<DatasetUrn> newDatasetUrns(final Integer limit) {
+  public static List<DatasetUrn> newDatasetUrns(final int limit) {
     return Stream.generate(() -> newDatasetUrn()).limit(limit).collect(toList());
   }
 
@@ -85,13 +83,5 @@ public final class CommonModelGenerator {
 
   public static Description newDescription() {
     return Description.of("test_description" + newId());
-  }
-
-  private static Integer newId() {
-    return RANDOM.nextInt(Integer.MAX_VALUE - 1);
-  }
-
-  private static Integer newIdWithBound(final Integer bound) {
-    return RANDOM.nextInt(bound);
   }
 }

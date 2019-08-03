@@ -29,26 +29,26 @@ import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
+import marquez.ModelGenerator;
 import marquez.common.models.DatasetUrn;
 
-public final class ApiModelGenerator {
+public final class ApiModelGenerator extends ModelGenerator {
   private ApiModelGenerator() {}
 
   public static DatasetRequest newDatasetRequest() {
     return newDatasetRequest(true);
   }
 
-  public static DatasetRequest newDatasetRequest(final Boolean hasDescription) {
+  public static DatasetRequest newDatasetRequest(final boolean hasDescription) {
     return new DatasetRequest(
         newDatasetName().getValue(),
         newDatasourceUrn().getValue(),
         hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
-  public static List<DatasetResponse> newDatasetResponses(final Integer limit) {
+  public static List<DatasetResponse> newDatasetResponses(final int limit) {
     return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toImmutableList());
   }
 
@@ -56,7 +56,7 @@ public final class ApiModelGenerator {
     return newDatasetResponse(true);
   }
 
-  public static DatasetResponse newDatasetResponse(final Boolean hasDescription) {
+  public static DatasetResponse newDatasetResponse(final boolean hasDescription) {
     return new DatasetResponse(
         newDatasetName().getValue(),
         newDatasetUrn().getValue(),
@@ -69,13 +69,13 @@ public final class ApiModelGenerator {
     return newNamespaceRequest(true);
   }
 
-  public static NamespaceRequest newNamespaceRequest(final Boolean hasDescription) {
+  public static NamespaceRequest newNamespaceRequest(final boolean hasDescription) {
     return new NamespaceRequest(
         newOwnerName().getValue(),
         hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
-  public static List<NamespaceResponse> newNamespaceResponses(final Integer limit) {
+  public static List<NamespaceResponse> newNamespaceResponses(final int limit) {
     return Stream.generate(() -> newNamespaceResponse(true))
         .limit(limit)
         .collect(toImmutableList());
@@ -85,7 +85,7 @@ public final class ApiModelGenerator {
     return newNamespaceResponse(true);
   }
 
-  public static NamespaceResponse newNamespaceResponse(final Boolean hasDescription) {
+  public static NamespaceResponse newNamespaceResponse(final boolean hasDescription) {
     return new NamespaceResponse(
         newNamespaceName().getValue(),
         newIsoTimestamp(),
@@ -97,7 +97,7 @@ public final class ApiModelGenerator {
     return newJobRequest(true);
   }
 
-  public static JobRequest newJobRequest(final Boolean hasDescription) {
+  public static JobRequest newJobRequest(final boolean hasDescription) {
     return new JobRequest(
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
@@ -105,7 +105,7 @@ public final class ApiModelGenerator {
         hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
-  public static List<JobResponse> newJobResponses(final Integer limit) {
+  public static List<JobResponse> newJobResponses(final int limit) {
     return Stream.generate(() -> newJobResponse(true)).limit(limit).collect(toImmutableList());
   }
 
@@ -113,7 +113,7 @@ public final class ApiModelGenerator {
     return newJobResponse(true);
   }
 
-  public static JobResponse newJobResponse(final Boolean hasDescription) {
+  public static JobResponse newJobResponse(final boolean hasDescription) {
     final String isoTimestamp = newIsoTimestamp();
     return new JobResponse(
         newJobName().getValue(),
@@ -126,14 +126,14 @@ public final class ApiModelGenerator {
   }
 
   public static String newIsoTimestamp() {
-    return ISO_INSTANT.format(Instant.now());
+    return ISO_INSTANT.format(newTimestamp());
   }
 
   public static DatasourceRequest newDatasourceRequest() {
     return new DatasourceRequest(newDatasourceName().getValue(), newConnectionUrl().getRawValue());
   }
 
-  public static List<DatasourceResponse> newDatasourceResponses(final Integer limit) {
+  public static List<DatasourceResponse> newDatasourceResponses(final int limit) {
     return Stream.generate(() -> newDatasourceResponse()).limit(limit).collect(toImmutableList());
   }
 

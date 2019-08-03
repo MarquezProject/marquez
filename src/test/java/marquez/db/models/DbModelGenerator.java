@@ -24,20 +24,20 @@ import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import marquez.ModelGenerator;
 import marquez.common.models.DatasetUrn;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 import marquez.common.models.NamespaceName;
 
-public final class DbModelGenerator {
+public final class DbModelGenerator extends ModelGenerator {
   private DbModelGenerator() {}
 
-  public static List<NamespaceRow> newNamespaceRows(int limit) {
+  public static List<NamespaceRow> newNamespaceRows(final int limit) {
     return Stream.generate(() -> newNamespaceRow()).limit(limit).collect(toList());
   }
 
@@ -45,11 +45,12 @@ public final class DbModelGenerator {
     return newNamespaceRowWith(newNamespaceName(), false);
   }
 
-  public static NamespaceRow newNamespaceRowWith(NamespaceName namespaceName) {
+  public static NamespaceRow newNamespaceRowWith(final NamespaceName namespaceName) {
     return newNamespaceRowWith(namespaceName, false);
   }
 
-  public static NamespaceRow newNamespaceRowWith(NamespaceName namespaceName, boolean wasUpdated) {
+  public static NamespaceRow newNamespaceRowWith(
+      final NamespaceName namespaceName, final boolean wasUpdated) {
     final NamespaceRow.NamespaceRowBuilder builder =
         NamespaceRow.builder()
             .uuid(newRowUuid())
@@ -67,7 +68,7 @@ public final class DbModelGenerator {
     return builder.build();
   }
 
-  public static List<DatasourceRow> newDatasourceRows(int limit) {
+  public static List<DatasourceRow> newDatasourceRows(final int limit) {
     return Stream.generate(() -> newDatasourceRow()).limit(limit).collect(toList());
   }
 
@@ -76,7 +77,7 @@ public final class DbModelGenerator {
   }
 
   public static DatasourceRow newDatasourceRowWith(
-      DatasourceName datasourceName, DatasourceUrn datasourceUrn) {
+      final DatasourceName datasourceName, final DatasourceUrn datasourceUrn) {
     return DatasourceRow.builder()
         .uuid(newRowUuid())
         .createdAt(newTimestamp())
@@ -86,12 +87,12 @@ public final class DbModelGenerator {
         .build();
   }
 
-  public static List<DatasetRow> newDatasetRows(int limit) {
+  public static List<DatasetRow> newDatasetRows(final int limit) {
     return Stream.generate(() -> newDatasetRow()).limit(limit).collect(toList());
   }
 
   public static List<DatasetRow> newDatasetRowsWith(
-      UUID namespaceUuid, UUID datasourceUuid, int limit) {
+      final UUID namespaceUuid, final UUID datasourceUuid, final int limit) {
     return Stream.generate(() -> newDatasetRowWith(namespaceUuid, datasourceUuid))
         .limit(limit)
         .collect(toList());
@@ -101,11 +102,11 @@ public final class DbModelGenerator {
     return newDatasetRowWith(false);
   }
 
-  public static DatasetRow newDatasetRowWith(UUID uuid) {
+  public static DatasetRow newDatasetRowWith(final UUID uuid) {
     return newDatasetRowWith(uuid, false);
   }
 
-  public static DatasetRow newDatasetRowWith(DatasetUrn datasetUrn) {
+  public static DatasetRow newDatasetRowWith(final DatasetUrn datasetUrn) {
     return newDatasetRowWith(
         newRowUuid(),
         newNamespaceRow().getUuid(),
@@ -115,7 +116,7 @@ public final class DbModelGenerator {
         false);
   }
 
-  public static DatasetRow newDatasetRowWith(Description description) {
+  public static DatasetRow newDatasetRowWith(final Description description) {
     return newDatasetRowWith(
         newRowUuid(),
         newNamespaceRow().getUuid(),
@@ -125,7 +126,7 @@ public final class DbModelGenerator {
         false);
   }
 
-  public static DatasetRow newDatasetRowWith(boolean wasUpdated) {
+  public static DatasetRow newDatasetRowWith(final boolean wasUpdated) {
     return newDatasetRowWith(
         newRowUuid(),
         newNamespaceRow().getUuid(),
@@ -135,7 +136,7 @@ public final class DbModelGenerator {
         wasUpdated);
   }
 
-  public static DatasetRow newDatasetRowWith(UUID uuid, boolean wasUpdated) {
+  public static DatasetRow newDatasetRowWith(final UUID uuid, final boolean wasUpdated) {
     return newDatasetRowWith(
         uuid,
         newNamespaceRow().getUuid(),
@@ -145,29 +146,30 @@ public final class DbModelGenerator {
         wasUpdated);
   }
 
-  public static DatasetRow newDatasetRowWith(UUID namespaceUuid, UUID datasourceUuid) {
+  public static DatasetRow newDatasetRowWith(final UUID namespaceUuid, final UUID datasourceUuid) {
     return newDatasetRowWith(
         newRowUuid(), namespaceUuid, datasourceUuid, newDatasetUrn(), newDescription(), false);
   }
 
   public static DatasetRow newDatasetRowWith(
-      UUID namespaceUuid, UUID datasourceUuid, DatasetUrn datasetUrn) {
+      final UUID namespaceUuid, final UUID datasourceUuid, final DatasetUrn datasetUrn) {
     return newDatasetRowWith(
         newRowUuid(), namespaceUuid, datasourceUuid, datasetUrn, newDescription(), false);
   }
 
-  public static DatasetRow newDatasetRowWith(UUID uuid, UUID namespaceUuid, UUID datasourceUuid) {
+  public static DatasetRow newDatasetRowWith(
+      final UUID uuid, final UUID namespaceUuid, final UUID datasourceUuid) {
     return newDatasetRowWith(
         uuid, namespaceUuid, datasourceUuid, newDatasetUrn(), newDescription(), false);
   }
 
   public static DatasetRow newDatasetRowWith(
-      UUID uuid,
-      UUID namespaceUuid,
-      UUID datasourceUuid,
-      DatasetUrn datasetUrn,
-      Description description,
-      boolean wasUpdated) {
+      final UUID uuid,
+      final UUID namespaceUuid,
+      final UUID datasourceUuid,
+      final DatasetUrn datasetUrn,
+      final Description description,
+      final boolean wasUpdated) {
     final DatasetRow.DatasetRowBuilder builder =
         DatasetRow.builder()
             .uuid(uuid)
@@ -186,7 +188,7 @@ public final class DbModelGenerator {
     return builder.build();
   }
 
-  public static List<DatasetRowExtended> newDatasetRowsExtended(int limit) {
+  public static List<DatasetRowExtended> newDatasetRowsExtended(final int limit) {
     return Stream.generate(() -> newDatasetRowExtended()).limit(limit).collect(toList());
   }
 
@@ -195,19 +197,19 @@ public final class DbModelGenerator {
   }
 
   public static DatasetRowExtended newDatasetRowExtendedWith(
-      DatasetUrn datasetUrn, DatasourceUrn datasourceUrn) {
+      final DatasetUrn datasetUrn, final DatasourceUrn datasourceUrn) {
     return newDatasetRowExtendedWith(datasetUrn, datasourceUrn, newDescription(), false);
   }
 
-  public static DatasetRowExtended newDatasetRowExtendedWith(Description description) {
+  public static DatasetRowExtended newDatasetRowExtendedWith(final Description description) {
     return newDatasetRowExtendedWith(newDatasetUrn(), newDatasourceUrn(), description, false);
   }
 
   public static DatasetRowExtended newDatasetRowExtendedWith(
-      DatasetUrn datasetUrn,
-      DatasourceUrn datasourceUrn,
-      Description description,
-      boolean wasUpdated) {
+      final DatasetUrn datasetUrn,
+      final DatasourceUrn datasourceUrn,
+      final Description description,
+      final boolean wasUpdated) {
     final DatasetRowExtended.DatasetRowExtendedBuilder builder =
         DatasetRowExtended.builderExtended()
             .uuid(newRowUuid())
@@ -229,9 +231,5 @@ public final class DbModelGenerator {
 
   public static UUID newRowUuid() {
     return UUID.randomUUID();
-  }
-
-  public static Instant newTimestamp() {
-    return Instant.now();
   }
 }
