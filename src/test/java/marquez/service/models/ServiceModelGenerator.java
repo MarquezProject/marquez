@@ -28,11 +28,11 @@ import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.Description.NO_DESCRIPTION;
 
-import marquez.ModelGenerator;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import marquez.ModelGenerator;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
