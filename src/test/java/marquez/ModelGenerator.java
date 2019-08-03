@@ -20,15 +20,15 @@ import java.util.Random;
 public abstract class ModelGenerator {
   private static final Random RANDOM = new Random();
 
-  public static Instant newTimestamp() {
-    return Instant.now();
-  }
-
   protected static Integer newId() {
     return RANDOM.nextInt(Integer.MAX_VALUE - 1);
   }
 
   protected static Integer newIdWithBound(final int bound) {
     return RANDOM.nextInt(bound);
+  }
+
+  public static Instant newTimestamp() {
+    return Instant.now();
   }
 }

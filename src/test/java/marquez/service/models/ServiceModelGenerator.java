@@ -84,7 +84,7 @@ public final class ServiceModelGenerator extends ModelGenerator {
     return newDatasetMeta(true);
   }
 
-  public static DatasetMeta newDatasetMeta(final Boolean hasDescription) {
+  public static DatasetMeta newDatasetMeta(final boolean hasDescription) {
     return newDatasetMetaWith(
         newDatasetName(), newDatasourceUrn(), hasDescription ? newDescription() : NO_DESCRIPTION);
   }
