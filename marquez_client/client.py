@@ -164,6 +164,22 @@ class MarquezClient(object):
 
         return self._get(self._url('/jobs/runs/{0}', run_id))
 
+    def list_job_runs(self, job_name, limit=None,
+                      offset=None, namespace_name=None):
+        if not namespace_name:
+            namespace_name = self._namespace_name
+
+        return self._get(
+            self._url(
+                '/namespaces/{0}/jobs/{1}/runs',
+                namespace_name,
+                job_name),
+            params={
+                'limit': limit,
+                'offset': offset
+            }
+        )
+
     def mark_job_run_as_running(self, run_id):
         return self._mark_job_run_as(run_id, 'run')
 
