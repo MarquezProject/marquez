@@ -57,7 +57,7 @@ public final class DbModelGenerator extends ModelGenerator {
     return NamespaceRow.builder()
         .uuid(newRowUuid())
         .createdAt(createdAt)
-        .updatedAt(wasUpdated ? newTimestamp() : updatedAt)
+        .updatedAt(updatedAt)
         .name(namespaceName.getValue())
         .description(newDescription().getValue())
         .currentOwnerName(newOwnerName().getValue())
