@@ -24,6 +24,7 @@ import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -51,21 +52,16 @@ public final class DbModelGenerator extends ModelGenerator {
 
   public static NamespaceRow newNamespaceRowWith(
       final NamespaceName namespaceName, final boolean wasUpdated) {
-    final NamespaceRow.NamespaceRowBuilder builder =
-        NamespaceRow.builder()
-            .uuid(newRowUuid())
-            .createdAt(newTimestamp())
-            .updatedAt(newTimestamp())
-            .name(namespaceName.getValue())
-            .description(newDescription().getValue())
-            .currentOwnerName(newOwnerName().getValue());
-
-    if (wasUpdated) {
-      builder.updatedAt(newTimestamp());
-      builder.currentOwnerName(newOwnerName().getValue());
-    }
-
-    return builder.build();
+    final Instant createdAt = newTimestamp();
+    final Instant updatedAt = Instant.from(createdAt);
+    return NamespaceRow.builder()
+        .uuid(newRowUuid())
+        .createdAt(createdAt)
+        .updatedAt((wasUpdated) ? newTimestamp() : updatedAt)
+        .name(namespaceName.getValue())
+        .description(newDescription().getValue())
+        .currentOwnerName(newOwnerName().getValue())
+        .build();
   }
 
   public static List<DatasourceRow> newDatasourceRows(final int limit) {
