@@ -217,11 +217,6 @@ public final class DbModelGenerator extends ModelGenerator {
         .build();
   }
 
-  private static Instant newTimestampOrDefault(
-      final boolean wasUpdated, final Instant defaultValue) {
-    return wasUpdated ? newTimestamp() : Instant.from(defaultValue);
-  }
-
   public static UUID newRowUuid() {
     return UUID.randomUUID();
   }
