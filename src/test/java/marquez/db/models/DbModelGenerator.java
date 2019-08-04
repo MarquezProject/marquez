@@ -53,11 +53,11 @@ public final class DbModelGenerator extends ModelGenerator {
   public static NamespaceRow newNamespaceRowWith(
       final NamespaceName namespaceName, final boolean wasUpdated) {
     final Instant createdAt = newTimestamp();
-    final Instant updatedAt = Instant.from(createdAt);
+    final Instant updatedAt = newTimestampOrDefault(wasUpdated, createdAt);
     return NamespaceRow.builder()
         .uuid(newRowUuid())
         .createdAt(createdAt)
-        .updatedAt((wasUpdated) ? newTimestamp() : updatedAt)
+        .updatedAt(wasUpdated ? newTimestamp() : updatedAt)
         .name(namespaceName.getValue())
         .description(newDescription().getValue())
         .currentOwnerName(newOwnerName().getValue())
@@ -166,22 +166,18 @@ public final class DbModelGenerator extends ModelGenerator {
       final DatasetUrn datasetUrn,
       final Description description,
       final boolean wasUpdated) {
-    final DatasetRow.DatasetRowBuilder builder =
-        DatasetRow.builder()
-            .uuid(uuid)
-            .createdAt(newTimestamp())
-            .namespaceUuid(namespaceUuid)
-            .datasourceUuid(datasourceUuid)
-            .name(newDatasetName().getValue())
-            .urn(datasetUrn.getValue())
-            .description(description.getValue());
-
-    if (wasUpdated) {
-      builder.updatedAt(newTimestamp());
-      builder.currentVersionUuid(newRowUuid());
-    }
-
-    return builder.build();
+    final Instant createdAt = newTimestamp();
+    final Instant updatedAt = newTimestampOrDefault(wasUpdated, createdAt);
+    return DatasetRow.builder()
+        .uuid(uuid)
+        .createdAt(createdAt)
+        .updatedAt(updatedAt)
+        .namespaceUuid(namespaceUuid)
+        .datasourceUuid(datasourceUuid)
+        .name(newDatasetName().getValue())
+        .urn(datasetUrn.getValue())
+        .description(description.getValue())
+        .build();
   }
 
   public static List<DatasetRowExtended> newDatasetRowsExtended(final int limit) {
@@ -206,23 +202,24 @@ public final class DbModelGenerator extends ModelGenerator {
       final DatasourceUrn datasourceUrn,
       final Description description,
       final boolean wasUpdated) {
-    final DatasetRowExtended.DatasetRowExtendedBuilder builder =
-        DatasetRowExtended.builderExtended()
-            .uuid(newRowUuid())
-            .createdAt(newTimestamp())
-            .namespaceUuid(newNamespaceRow().getUuid())
-            .datasourceUuid(newDatasourceRow().getUuid())
-            .name(newDatasetName().getValue())
-            .urn(datasetUrn.getValue())
-            .datasourceUrn(datasourceUrn.getValue())
-            .description(description.getValue());
+    final Instant createdAt = newTimestamp();
+    final Instant updatedAt = newTimestampOrDefault(wasUpdated, createdAt);
+    return DatasetRowExtended.builderExtended()
+        .uuid(newRowUuid())
+        .createdAt(createdAt)
+        .updatedAt(updatedAt)
+        .namespaceUuid(newNamespaceRow().getUuid())
+        .datasourceUuid(newDatasourceRow().getUuid())
+        .name(newDatasetName().getValue())
+        .urn(datasetUrn.getValue())
+        .datasourceUrn(datasourceUrn.getValue())
+        .description(description.getValue())
+        .build();
+  }
 
-    if (wasUpdated) {
-      builder.updatedAt(newTimestamp());
-      builder.currentVersionUuid(newRowUuid());
-    }
-
-    return builder.build();
+  private static Instant newTimestampOrDefault(
+      final boolean wasUpdated, final Instant defaultValue) {
+    return wasUpdated ? newTimestamp() : Instant.from(defaultValue);
   }
 
   public static UUID newRowUuid() {
