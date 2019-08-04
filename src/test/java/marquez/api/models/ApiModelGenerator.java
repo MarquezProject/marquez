@@ -114,11 +114,12 @@ public final class ApiModelGenerator extends ModelGenerator {
   }
 
   public static JobResponse newJobResponse(final boolean hasDescription) {
-    final String isoTimestamp = newIsoTimestamp();
+    final String createdAt = newIsoTimestamp();
+    final String updatedAt = createdAt;
     return new JobResponse(
         newJobName().getValue(),
-        isoTimestamp,
-        isoTimestamp,
+        createdAt,
+        updatedAt,
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
