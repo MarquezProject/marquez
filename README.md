@@ -39,7 +39,7 @@ MarquezClient client = MarquezClient().builder()
 // With description
 NamespaceMeta meta = NamespaceMeta().builder()
     .name("example-namespace")
-    .ownerName("example-owner")
+    .ownerName("owner@example.com")
     .description("example description")
     .build()
 
