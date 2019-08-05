@@ -40,6 +40,9 @@ import org.mockito.quality.Strictness;
 
 @Category(UnitTests.class)
 public class NamespaceServiceTest {
+  private static final int LIMIT = 100;
+  private static final int OFFSET = 0;
+
   private final NamespaceName NAMESPACE_NAME = newNamespaceName();
   private final Description DESCRIPTION = newDescription();
   private final OwnerName CURRENT_OWNER_NAME = newOwnerName();
@@ -147,22 +150,22 @@ public class NamespaceServiceTest {
   @Test
   public void testList() throws MarquezServiceException {
     final List<NamespaceRow> namespaceRows = newNamespaceRows(4);
-    when(namespaceDao.findAll()).thenReturn(namespaceRows);
+    when(namespaceDao.findAll(LIMIT, OFFSET)).thenReturn(namespaceRows);
 
-    final List<Namespace> datasets = namespaceService.getAll();
+    final List<Namespace> datasets = namespaceService.getAll(LIMIT, OFFSET);
     assertThat(datasets).isNotNull();
     assertThat(datasets).hasSize(4);
 
-    verify(namespaceDao, times(1)).findAll();
+    verify(namespaceDao, times(1)).findAll(LIMIT, OFFSET);
   }
 
   @Test
   public void testList_throwsException_onDbError() throws MarquezServiceException {
-    when(namespaceDao.findAll()).thenThrow(UnableToExecuteStatementException.class);
+    when(namespaceDao.findAll(LIMIT, OFFSET)).thenThrow(UnableToExecuteStatementException.class);
 
     assertThatExceptionOfType(MarquezServiceException.class)
-        .isThrownBy(() -> namespaceService.getAll());
+        .isThrownBy(() -> namespaceService.getAll(LIMIT, OFFSET));
 
-    verify(namespaceDao, times(1)).findAll();
+    verify(namespaceDao, times(1)).findAll(LIMIT, OFFSET);
   }
 }

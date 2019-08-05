@@ -30,6 +30,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
 import org.jdbi.v3.testing.Migration;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -49,6 +50,11 @@ public class NamespaceDaoTest {
   public static void setUpOnce() {
     final Jdbi jdbi = dbRule.getJdbi();
     dao = jdbi.onDemand(NamespaceDao.class);
+  }
+
+  @Before
+  public void setUp() {
+    dbRule.getHandle().execute("DELETE FROM namespaces;");
   }
 
   @Test
@@ -73,7 +79,7 @@ public class NamespaceDaoTest {
     assertThatCode(() -> dao.insert(newRow)).doesNotThrowAnyException();
 
     final int rowsAfter = dao.count();
-    assertThat(rowsAfter).isEqualTo(rowsBefore);
+    assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
   }
 
   @Test
