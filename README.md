@@ -36,7 +36,7 @@ MarquezClient client = MarquezClient().builder()
     .baseUrl("http://localhost:5000/api/v1")
     .build()
      
-// With description
+// Metadata
 NamespaceMeta meta = NamespaceMeta().builder()
     .name("example-namespace")
     .ownerName("owner@example.com")
