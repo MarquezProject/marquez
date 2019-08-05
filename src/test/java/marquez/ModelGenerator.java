@@ -32,8 +32,7 @@ public abstract class ModelGenerator {
     return Instant.now();
   }
 
-  public static Instant newTimestampOrDefault(
-      final boolean expression, final Instant defaultValue) {
-    return expression ? newTimestamp() : Instant.from(defaultValue);
+  public static Instant newTimestampOrDefault(final boolean expression, final Instant timestamp) {
+    return expression ? newTimestamp() : Instant.from(timestamp);
   }
 }
