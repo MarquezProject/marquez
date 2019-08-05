@@ -22,11 +22,13 @@ import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import marquez.api.exceptions.NamespaceNotFoundException;
@@ -85,8 +87,11 @@ public final class NamespaceResource {
   @GET
   @Path("/namespaces")
   @Produces(APPLICATION_JSON)
-  public Response list() throws MarquezServiceException {
-    final List<Namespace> namespaces = namespaceService.getAll();
+  public Response list(
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset)
+      throws MarquezServiceException {
+    final List<Namespace> namespaces = namespaceService.getAll(limit, offset);
     final NamespacesResponse response = NamespaceResponseMapper.toNamespacesResponse(namespaces);
     return Response.ok(response).build();
   }

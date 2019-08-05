@@ -14,7 +14,7 @@
 
 package marquez.service;
 
-import static java.util.Collections.unmodifiableList;
+import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.List;
 import java.util.Optional;
@@ -89,12 +89,15 @@ public class NamespaceService {
     }
   }
 
-  public List<Namespace> getAll() throws MarquezServiceException {
+  public List<Namespace> getAll(@NonNull Integer limit, @NonNull Integer offset)
+      throws MarquezServiceException {
+    checkArgument(limit >= 0, "limit must be >= 0");
+    checkArgument(offset >= 0, "offset must be >= 0");
     try {
-      final List<NamespaceRow> namespaceRows = namespaceDao.findAll();
-      return unmodifiableList(NamespaceMapper.map(namespaceRows));
+      final List<NamespaceRow> rows = namespaceDao.findAll(limit, offset);
+      return NamespaceMapper.map(rows);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get namespaces.", e);
+      log.error("Failed to get namespaces {}...{}", offset, (offset + limit), e);
       throw new MarquezServiceException();
     }
   }

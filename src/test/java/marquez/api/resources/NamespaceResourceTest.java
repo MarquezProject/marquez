@@ -49,6 +49,8 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 public class NamespaceResourceTest extends NamespaceBaseTest {
+  private static final int LIMIT = 100;
+  private static final int OFFSET = 0;
 
   @Rule public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
@@ -115,9 +117,9 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   public void testListNamespaceWithNoResults() throws MarquezServiceException {
     final List<Namespace> existingCoreModelNamespaces = Collections.emptyList();
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
-    when(namespaceService.getAll()).thenReturn(existingCoreModelNamespaces);
+    when(namespaceService.getAll(LIMIT, OFFSET)).thenReturn(existingCoreModelNamespaces);
 
-    Response res = namespaceResource.list();
+    Response res = namespaceResource.list(LIMIT, OFFSET);
     NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
 
     assertThat(responseBody.getNamespaces()).isEmpty();
@@ -127,9 +129,9 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
   public void testListNamespaceWithSingleResultSet() throws MarquezServiceException {
     final List<Namespace> existingCoreModelNamespaces = Collections.singletonList(TEST_NAMESPACE);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
-    when(namespaceService.getAll()).thenReturn(existingCoreModelNamespaces);
+    when(namespaceService.getAll(LIMIT, OFFSET)).thenReturn(existingCoreModelNamespaces);
 
-    Response res = namespaceResource.list();
+    Response res = namespaceResource.list(LIMIT, OFFSET);
     NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
 
     NamespaceResponse expectedApiNamespace = NamespaceResponseMapper.map(TEST_NAMESPACE);
@@ -142,8 +144,8 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
     final List<Namespace> existingNamespaces = Collections.singletonList(TEST_NAMESPACE);
     NamespaceResource namespaceResource = new NamespaceResource(namespaceService);
 
-    when(namespaceService.getAll()).thenReturn(existingNamespaces);
-    Response res = namespaceResource.list();
+    when(namespaceService.getAll(LIMIT, OFFSET)).thenReturn(existingNamespaces);
+    Response res = namespaceResource.list(LIMIT, OFFSET);
 
     NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
     NamespaceResponse nsResponseFromList = responseBody.getNamespaces().get(0);
@@ -168,9 +170,9 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
             "a second ns for testing");
     existingCoreModelNamespaces.add(TEST_NAMESPACE);
     existingCoreModelNamespaces.add(secondNamespace);
-    when(namespaceService.getAll()).thenReturn(existingCoreModelNamespaces);
+    when(namespaceService.getAll(LIMIT, OFFSET)).thenReturn(existingCoreModelNamespaces);
 
-    Response res = namespaceResource.list();
+    Response res = namespaceResource.list(LIMIT, OFFSET);
     NamespacesResponse responseBody = (NamespacesResponse) res.getEntity();
     NamespaceResponse nsResponse = NamespaceResponseMapper.map(TEST_NAMESPACE);
     NamespaceResponse secondNsResponse = NamespaceResponseMapper.map(secondNamespace);
@@ -180,7 +182,7 @@ public class NamespaceResourceTest extends NamespaceBaseTest {
 
   @Test
   public void testListNamespacesErrorHandling() throws MarquezServiceException {
-    doThrow(new MarquezServiceException()).when(NAMESPACE_SERVICE).getAll();
+    doThrow(new MarquezServiceException()).when(NAMESPACE_SERVICE).getAll(LIMIT, OFFSET);
 
     assertEquals(
         Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
