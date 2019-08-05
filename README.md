@@ -36,11 +36,15 @@ MarquezClient client = MarquezClient().builder()
     .baseUrl("http://localhost:5000/api/v1")
     .build()
      
-// List namespaces
-client.listNamespaces()
+// With description
+NamespaceMeta meta = NamespaceMeta().builder()
+    .name("example-namespace")
+    .ownerName("example-owner")
+    .description("example description")
+    .build()
 
-// Retrieve a job
-client.getJob("room_bookings_7_days")
+// Create namespace 
+Namespace namespace = client.createNamespace(meta);
 ```
 
 ## Contributing
