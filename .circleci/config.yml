@@ -1,0 +1,43 @@
+version: 2
+
+defaults: &defaults
+  docker:
+    - image: circleci/openjdk:8-jdk
+  working_directory: ~/marquez-java
+
+cache: &cache
+  keys:
+    - v1-deps-{{ .Branch }}-{{ .Revision }}
+    - v1-deps-{{ .Branch }}
+
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *cache
+      - run: ./gradlew --no-daemon --stacktrace build -x test
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-deps-{{ .Branch }}-{{ .Revision }}
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *cache
+      - run: ./gradlew --no-daemon --stacktrace test
+      - run: ./gradlew --no-daemon jacocoTestReport
+      - run: bash <(curl -s https://codecov.io/bash)
+
+workflows:
+  version: 2
+  marquez:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
