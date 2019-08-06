@@ -1,0 +1,88 @@
+plugins {
+  id 'checkstyle'
+  id 'jacoco'
+  id 'java-library'
+  id 'com.adarshr.test-logger' version '1.7.0'
+  id 'com.diffplug.gradle.spotless' version '3.23.1'
+  id 'com.github.jk1.dependency-license-report' version '1.9'
+  id 'net.researchgate.release' version '2.8.0'
+}
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  jacksonCoreVersion = '2.6.3'
+  jacksonDatatypeVersion = '2.9.9'
+  lombokVersion = '1.18.8'
+}
+
+dependencies {
+  implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonCoreVersion}"
+  implementation "com.fasterxml.jackson.core:jackson-core:${jacksonCoreVersion}"
+  implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonCoreVersion}"
+  implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonDatatypeVersion}"
+  implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDatatypeVersion}"
+  implementation 'org.apache.httpcomponents:httpclient:4.5.9'
+  implementation 'org.slf4j:slf4j-api:1.7.25'
+  implementation 'org.slf4j:slf4j-simple:1.7.26'
+  compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+  compileOnly "org.projectlombok:lombok:${lombokVersion}"
+  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+  
+  testImplementation 'junit:junit:4.12'
+  testImplementation 'org.mockito:mockito-core:2.27.0'
+  testImplementation 'org.assertj:assertj-core:3.12.2'
+}
+
+task testUnit(type: Test) {
+  useJUnit {
+    includeCategories 'marquez.client.UnitTests'
+  }
+}
+
+spotless {
+  java {
+    googleJavaFormat()
+    removeUnusedImports()
+  }
+}
+
+def reportsDir = "${buildDir}/reports";
+
+checkstyle {
+  toolVersion = '8.12'
+  configFile = rootProject.file('checkstyle.xml')
+}
+
+task checkstyle(type: Checkstyle) {
+  reports {
+    xml.enabled = true
+    html.enabled = true
+    html.destination = file("${reportsDir}/checkstyle")
+  }
+}
+
+checkstyleMain {
+  source = 'src/main/java'
+}
+
+checkstyleTest {
+  source = 'src/test/java'
+}
+
+def coverageDir = "${reportsDir}/coverage";
+
+jacoco {
+  toolVersion = '0.8.2'
+  reportsDir = file(coverageDir)
+}
+
+jacocoTestReport {
+  reports {
+    xml.enabled = true
+    html.enabled = true
+    html.destination = file(coverageDir)
+  }
+}
