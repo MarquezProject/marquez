@@ -1,2 +1,2 @@
 # marquez-chart
-Helm Chart for Marquez
+Helm Chart for [Marquez](https://github.com/MarquezProject/marquez).
