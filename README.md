@@ -1,6 +1,9 @@
 # Marquez Java Client
 
-[![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status) [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez-python/master/LICENSE)
+[![CircleCI](https://circleci.com/gh/MarquezProject/marquez-java/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez-java/tree/master) 
+[![codecov](https://codecov.io/gh/MarquezProject/marquez-java/branch/master/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez-java/branch/master)
+[![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
+[![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez-java/master/LICENSE)
 
 Java client for [Marquez](https://github.com/MarquezProject/marquez).
 
