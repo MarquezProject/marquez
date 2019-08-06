@@ -52,8 +52,8 @@ public interface NamespaceDao {
   @SqlQuery("SELECT * FROM namespaces WHERE name = :value")
   Optional<NamespaceRow> findBy(@BindBean NamespaceName namespaceName);
 
-  @SqlQuery("SELECT * FROM namespaces")
-  List<NamespaceRow> findAll();
+  @SqlQuery("SELECT * FROM namespaces ORDER BY name LIMIT :limit OFFSET :offset")
+  List<NamespaceRow> findAll(Integer limit, Integer offset);
 
   @SqlQuery("SELECT COUNT(*) FROM namespaces")
   Integer count();
