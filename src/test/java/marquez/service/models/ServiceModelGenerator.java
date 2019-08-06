@@ -26,11 +26,13 @@ import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static marquez.common.models.Description.NO_DESCRIPTION;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import marquez.ModelGenerator;
 import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetUrn;
@@ -38,10 +40,10 @@ import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import marquez.common.models.Description;
 
-public final class ServiceModelGenerator {
+public final class ServiceModelGenerator extends ModelGenerator {
   private ServiceModelGenerator() {}
 
-  public static List<Namespace> newNamespaces(int limit) {
+  public static List<Namespace> newNamespaces(final int limit) {
     return Stream.generate(() -> newNamespace()).limit(limit).collect(toList());
   }
 
@@ -49,16 +51,16 @@ public final class ServiceModelGenerator {
     return newNamespace(true);
   }
 
-  public static Namespace newNamespace(boolean hasDescription) {
+  public static Namespace newNamespace(final boolean hasDescription) {
     return new Namespace(
         null,
         newTimestamp(),
         newNamespaceName().getValue(),
         newOwnerName().getValue(),
-        hasDescription ? newDescription().getValue() : null);
+        hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
   }
 
-  public static List<Datasource> newDatasources(int limit) {
+  public static List<Datasource> newDatasources(final int limit) {
     return Stream.generate(() -> newDatasource()).limit(limit).collect(toList());
   }
 
@@ -67,7 +69,9 @@ public final class ServiceModelGenerator {
   }
 
   public static Datasource newDatasourceWith(
-      DatasourceName datasourceName, DatasourceUrn datasourceUrn, ConnectionUrl connectionUrl) {
+      final DatasourceName datasourceName,
+      final DatasourceUrn datasourceUrn,
+      final ConnectionUrl connectionUrl) {
     return Datasource.builder()
         .name(datasourceName)
         .createdAt(newTimestamp())
@@ -80,9 +84,9 @@ public final class ServiceModelGenerator {
     return newDatasetMeta(true);
   }
 
-  public static DatasetMeta newDatasetMeta(final Boolean hasDescription) {
+  public static DatasetMeta newDatasetMeta(final boolean hasDescription) {
     return newDatasetMetaWith(
-        newDatasetName(), newDatasourceUrn(), hasDescription ? newDescription() : null);
+        newDatasetName(), newDatasourceUrn(), hasDescription ? newDescription() : NO_DESCRIPTION);
   }
 
   public static DatasetMeta newDatasetMetaWith(
@@ -96,7 +100,7 @@ public final class ServiceModelGenerator {
         .build();
   }
 
-  public static List<Dataset> newDatasets(int limit) {
+  public static List<Dataset> newDatasets(final int limit) {
     return Stream.generate(() -> newDataset()).limit(limit).collect(toList());
   }
 
@@ -104,13 +108,13 @@ public final class ServiceModelGenerator {
     return newDataset(true);
   }
 
-  public static Dataset newDataset(boolean hasDescription) {
+  public static Dataset newDataset(final boolean hasDescription) {
     return newDatasetWith(
-        newDatasetName(), newDatasetUrn(), hasDescription ? newDescription() : null);
+        newDatasetName(), newDatasetUrn(), hasDescription ? newDescription() : NO_DESCRIPTION);
   }
 
   public static Dataset newDatasetWith(
-      DatasetName datasetName, DatasetUrn datasetUrn, Description description) {
+      final DatasetName datasetName, final DatasetUrn datasetUrn, final Description description) {
     return Dataset.builder()
         .name(datasetName)
         .createdAt(newTimestamp())
@@ -120,7 +124,7 @@ public final class ServiceModelGenerator {
         .build();
   }
 
-  public static List<Job> newJobs(int limit) {
+  public static List<Job> newJobs(final int limit) {
     return Stream.generate(() -> newJob()).limit(limit).collect(toList());
   }
 
@@ -128,7 +132,7 @@ public final class ServiceModelGenerator {
     return newJob(true);
   }
 
-  public static Job newJob(boolean hasDescription) {
+  public static Job newJob(final boolean hasDescription) {
     final Instant createdAt = newTimestamp();
     final Instant updatedAt = createdAt;
     return new Job(
@@ -136,22 +140,18 @@ public final class ServiceModelGenerator {
         newJobName().getValue(),
         newLocation().toString(),
         null,
-        hasDescription ? newDescription().getValue() : null,
+        hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue(),
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
         createdAt,
         updatedAt);
   }
 
-  public static List<JobRun> newJobRuns(int limit) {
+  public static List<JobRun> newJobRuns(final int limit) {
     return Stream.generate(() -> newJobRun()).limit(limit).collect(toList());
   }
 
   public static JobRun newJobRun() {
     return new JobRun(UUID.randomUUID(), 0, null, null, null, null, null, newTimestamp());
-  }
-
-  public static Instant newTimestamp() {
-    return Instant.now();
   }
 }

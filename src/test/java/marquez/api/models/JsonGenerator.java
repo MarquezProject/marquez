@@ -45,7 +45,7 @@ public final class JsonGenerator {
         .toString();
   }
 
-  public static String newJsonFor(NamespacesResponse response) {
+  public static String newJsonFor(final NamespacesResponse response) {
     final ArrayNode array = MAPPER.createArrayNode();
     response.getNamespaces().forEach((namespace) -> array.addPOJO(newJsonFor(namespace)));
     final JsonNode responseAsJson = MAPPER.createObjectNode().set("namespaces", array);
@@ -65,7 +65,7 @@ public final class JsonGenerator {
     return obj.toString();
   }
 
-  public static String newJsonFor(JobResponse response) {
+  public static String newJsonFor(final JobResponse response) {
     final ArrayNode array0 = MAPPER.valueToTree(response.getInputDatasetUrns());
     final ArrayNode array1 = MAPPER.valueToTree(response.getOutputDatasetUrns());
     final ObjectNode obj =
@@ -81,7 +81,7 @@ public final class JsonGenerator {
     return obj.toString();
   }
 
-  public static String newJsonFor(JobsResponse response) {
+  public static String newJsonFor(final JobsResponse response) {
     final ArrayNode array = MAPPER.createArrayNode();
     response.getJobs().forEach((job) -> array.addPOJO(newJsonFor(job)));
     final JsonNode responseAsJson = MAPPER.createObjectNode().set("jobs", array);
