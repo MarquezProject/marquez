@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-  jacksonCoreVersion = '2.6.3'
+  jacksonCoreVersion = '2.9.9'
   jacksonDatatypeVersion = '2.9.9'
   lombokVersion = '1.18.8'
 }
