@@ -25,10 +25,8 @@ timeout time bash -c 'until PGPASSWORD="${POSTGRES_PASSWORD}" psql \
         --port="${port}" \
         --username "${POSTGRES_USER}" \
         --dbname "${POSTGRES_DB}" \
-        --command '"'"'\q'"'"' > /dev/null 2>&1; do 
+        --command '"'"'\q'"'"' > /dev/null 2>&1; do
   echo "Waiting for postgres to become available...";
   sleep 1;
 done;
-echo "Great news! Postgres is up."';
-
-echo "Timeout, the postgres server is taking too long to respond."
+echo "Great news! Postgres is up."' || echo "Timeout, the postgres server is taking too long to respond." ;
