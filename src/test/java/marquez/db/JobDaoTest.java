@@ -14,7 +14,8 @@
 
 package marquez.db;
 
-import static marquez.service.models.ServiceModelGenerator.*;
+import static marquez.service.models.ServiceModelGenerator.newJobVersion;
+import static marquez.service.models.ServiceModelGenerator.newJobWithNameSpaceId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

@@ -15,7 +15,8 @@
 package marquez.db;
 
 import static java.lang.String.format;
-import static marquez.service.models.ServiceModelGenerator.*;
+import static marquez.service.models.ServiceModelGenerator.newJobWithNameSpaceId;
+import static marquez.service.models.ServiceModelGenerator.newNamespace;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
