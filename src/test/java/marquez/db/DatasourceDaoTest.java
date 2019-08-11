@@ -14,7 +14,7 @@
 
 package marquez.db;
 
-import static marquez.db.models.DbModelGenerator.*;
+import static marquez.db.models.DbModelGenerator.newDatasourceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;

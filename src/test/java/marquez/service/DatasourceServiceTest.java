@@ -14,7 +14,7 @@
 
 package marquez.service;
 
-import static marquez.db.models.DbModelGenerator.*;
+import static marquez.db.models.DbModelGenerator.newDatasourceRow;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -31,7 +31,9 @@ import marquez.db.models.DatasourceRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
