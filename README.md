@@ -32,7 +32,7 @@ Maven:
 or Gradle:
 
 ```groovy
-compile 'io.github.marquezproject:marquez-java:0.1.0'
+implementation 'io.github.marquezproject:marquez-java:0.1.0'
 ```
 ## Usage
 
