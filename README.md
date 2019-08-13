@@ -43,13 +43,12 @@ MarquezClient client = MarquezClient().builder()
      
 // Metadata
 NamespaceMeta meta = NamespaceMeta().builder()
-    .name("example-namespace")
     .ownerName("owner@example.com")
     .description("example description")
     .build()
 
 // Create namespace 
-Namespace namespace = client.createNamespace(meta);
+Namespace namespace = client.createNamespace("example-namespace", meta);
 ```
 
 ## Contributing
