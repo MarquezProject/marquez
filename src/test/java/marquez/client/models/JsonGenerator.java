@@ -12,30 +12,14 @@
  * limitations under the License.
  */
 
-package marquez.client;
+package marquez.client.models;
 
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import marquez.client.models.Dataset;
-import marquez.client.models.DatasetMeta;
-import marquez.client.models.Datasets;
-import marquez.client.models.Datasource;
-import marquez.client.models.DatasourceMeta;
-import marquez.client.models.Datasources;
-import marquez.client.models.Job;
-import marquez.client.models.JobMeta;
-import marquez.client.models.JobRun;
-import marquez.client.models.JobRunMeta;
-import marquez.client.models.JobRuns;
-import marquez.client.models.Jobs;
-import marquez.client.models.Namespace;
-import marquez.client.models.NamespaceMeta;
-import marquez.client.models.Namespaces;
 
 public final class JsonGenerator {
   private JsonGenerator() {}
@@ -58,13 +42,6 @@ public final class JsonGenerator {
         .put("ownerName", namespace.getOwnerName())
         .put("description", namespace.getDescription().orElse(null))
         .toString();
-  }
-
-  public static String newJsonFor(final Namespaces namespaces) {
-    final ArrayNode array = MAPPER.createArrayNode();
-    namespaces.getNamespaces().forEach((namespace) -> array.addPOJO(newJsonFor(namespace)));
-    final JsonNode responseAsJson = MAPPER.createObjectNode().set("namespaces", array);
-    return responseAsJson.toString();
   }
 
   public static String newJsonFor(final JobMeta meta) {
@@ -93,13 +70,6 @@ public final class JsonGenerator {
     return obj.toString();
   }
 
-  public static String newJsonFor(final Jobs jobs) {
-    final ArrayNode array = MAPPER.createArrayNode();
-    jobs.getJobs().forEach((job) -> array.addPOJO(newJsonFor(job)));
-    final JsonNode responseAsJson = MAPPER.createObjectNode().set("jobs", array);
-    return responseAsJson.toString();
-  }
-
   public static String newJsonFor(final JobRunMeta meta) {
     return MAPPER
         .createObjectNode()
@@ -109,21 +79,15 @@ public final class JsonGenerator {
         .toString();
   }
 
-  public static String newJsonFor(final JobRun jobRun) {
+  public static String newJsonFor(final JobRun run) {
     return MAPPER
         .createObjectNode()
-        .put("runId", jobRun.getRunId())
-        .put("nominalStartTime", ISO_INSTANT.format(jobRun.getNominalStartTime().orElse(null)))
-        .put("nominalEndTime", ISO_INSTANT.format(jobRun.getNominalEndTime().orElse(null)))
-        .put("runArgs", jobRun.getRunArgs().orElse(null))
-        .put("runState", jobRun.getRunState().toString())
+        .put("runId", run.getRunId())
+        .put("nominalStartTime", ISO_INSTANT.format(run.getNominalStartTime().orElse(null)))
+        .put("nominalEndTime", ISO_INSTANT.format(run.getNominalEndTime().orElse(null)))
+        .put("runArgs", run.getRunArgs().orElse(null))
+        .put("runState", run.getRunState().toString())
         .toString();
-  }
-
-  public static String newJsonFor(final JobRuns jobRuns) {
-    final ArrayNode array = MAPPER.createArrayNode();
-    jobRuns.getRuns().forEach((jobRun) -> array.addPOJO(newJsonFor(jobRun)));
-    return array.toString();
   }
 
   public static String newJsonFor(final DatasourceMeta meta) {
@@ -144,12 +108,6 @@ public final class JsonGenerator {
         .toString();
   }
 
-  public static String newJsonFor(final Datasources datasources) {
-    final ArrayNode array = MAPPER.createArrayNode();
-    datasources.getDatasources().forEach((datasource) -> array.addPOJO(newJsonFor(datasource)));
-    return MAPPER.createObjectNode().set("datasources", array).toString();
-  }
-
   public static String newJsonFor(final DatasetMeta meta) {
     return MAPPER
         .createObjectNode()
@@ -168,12 +126,5 @@ public final class JsonGenerator {
         .put("datasourceUrn", dataset.getDatasourceUrn())
         .put("description", dataset.getDescription().orElse(null))
         .toString();
-  }
-
-  public static String newJsonFor(final Datasets datasets) {
-    final ArrayNode array = MAPPER.createArrayNode();
-    datasets.getDatasets().forEach((dataset) -> array.addPOJO(newJsonFor(dataset)));
-    final JsonNode responseAsJson = MAPPER.createObjectNode().set("datasets", array);
-    return responseAsJson.toString();
   }
 }

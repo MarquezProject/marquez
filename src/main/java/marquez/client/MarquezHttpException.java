@@ -12,30 +12,25 @@
  * limitations under the License.
  */
 
-package marquez.client.models;
+package marquez.client;
 
-import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.Value;
-import marquez.client.utils.JsonUtils;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-@Value
-@Builder
-public class JobMeta {
-  @Getter @NonNull List<String> inputDatasetUrns;
-  @Getter @NonNull List<String> outputDatasetUrns;
-  @Getter @NonNull String location;
-  @Nullable String description;
+/** An exception thrown to indicate an HTTP error. */
+@NoArgsConstructor
+@ToString
+public final class MarquezHttpException extends MarquezClientException {
+  private static final long serialVersionUID = 1L;
 
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(description);
-  }
+  @Getter @Nullable private Integer status;
+  @Getter @Nullable private String message;
 
-  public String toJson() {
-    return JsonUtils.toJson(this);
+  /** Constructs a {@code MarquezHttpException} with the HTTP error {@code error}. */
+  MarquezHttpException(final MarquezHttp.HttpError error) {
+    this.status = error.getStatus();
+    this.message = error.getMessage();
   }
 }

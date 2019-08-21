@@ -1,170 +1,191 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.client;
 
-import static marquez.client.Preconditions.checkNotBlank;
+import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.net.MediaType.JSON_UTF_8;
+import static org.apache.http.HttpHeaders.ACCEPT;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
-import java.io.BufferedReader;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import marquez.client.exceptions.InternalServerException;
-import marquez.client.exceptions.InvalidRequestException;
-import marquez.client.exceptions.MarquezException;
-import marquez.client.exceptions.RequestNotFoundException;
-import org.apache.http.NameValuePair;
+import javax.annotation.Nullable;
+import lombok.Getter;
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
+import marquez.client.utils.JsonUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
-@AllArgsConstructor
-public class MarquezHttp {
-  private static final String API_PATH = "/api/v1";
+@Slf4j
+class MarquezHttp {
+  @VisibleForTesting final URL baseUrl;
+  private final HttpClient http;
 
-  private final String baseUrl;
-
-  /**
-   * HTTP GET request wrapper for Marquez Core API calls.
-   *
-   * @param url A valid URL (with query parameters if required), use {@code url} method to generate
-   * @return {@code String} JSON response for GET request
-   * @throws IOException
-   * @throws MarquezException
-   */
-  public String get(@NonNull final URL url) throws IOException, MarquezException {
-    final HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    con.setRequestMethod("GET");
-    con.setRequestProperty("Accept", "application/json");
-    con.setDoOutput(true);
-    return getResponse(con);
+  private MarquezHttp(final URL baseUrl, final HttpClient http) {
+    this.baseUrl = baseUrl;
+    this.http = http;
   }
 
-  /**
-   * HTTP POST request wrapper for Marquez Core API calls.
-   *
-   * @param url A valid URL, use {@code url} method to generate
-   * @param payload A valid JSON payload
-   * @return {@code String} JSON response for POST request
-   * @throws IOException
-   * @throws MarquezException
-   */
-  public String post(@NonNull final URL url, @NonNull final String payload)
-      throws IOException, MarquezException {
-    checkNotBlank(payload);
-
-    final HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    con.setRequestMethod("POST");
-    setupPayload(con, payload);
-    return getResponse(con);
+  static final MarquezHttp create(final URL baseUrl, final MarquezClient.Version version) {
+    final UserAgent userAgent = UserAgent.of(version);
+    final HttpClient http = HttpClientBuilder.create().setUserAgent(userAgent.getValue()).build();
+    return new MarquezHttp(baseUrl, http);
   }
 
-  /**
-   * HTTP PUT request wrapper for Marquez Core API calls.
-   *
-   * @param url A valid URL, use {@code url} method to generate
-   * @param payload A valid JSON payload
-   * @return {@code String} JSON response for PUT request
-   * @throws IOException
-   * @throws MarquezException
-   */
-  public String put(@NonNull final URL url, @NonNull final String payload)
-      throws IOException, MarquezException {
-    checkNotBlank(payload);
+  String get(final URL url) {
+    log.debug("GET {}", url);
+    try {
+      final HttpGet request = new HttpGet();
+      request.setURI(url.toURI());
+      request.addHeader(ACCEPT, JSON_UTF_8.toString());
 
-    final HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    con.setRequestMethod("PUT");
-    setupPayload(con, payload);
-    return getResponse(con);
+      final HttpResponse response = http.execute(request);
+      throwOnHttpError(response);
+
+      final String bodyAsJson = EntityUtils.toString(response.getEntity(), UTF_8);
+      log.debug("Response: {}", bodyAsJson);
+      return bodyAsJson;
+    } catch (URISyntaxException | IOException e) {
+      throw new MarquezHttpException();
+    }
   }
 
-  /**
-   * HTTP PUT request wrapper for Marquez Core API calls.
-   *
-   * @param url A valid URL, use {@code url} method to generate
-   * @return {@code String} JSON response for PUT request
-   * @throws IOException
-   * @throws MarquezException
-   */
-  public String put(@NonNull final URL url) throws IOException, MarquezException {
-    final HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    con.setRequestMethod("PUT");
-    con.setRequestProperty("Accept", "application/json");
-    con.setDoOutput(true);
-    return getResponse(con);
+  String post(final URL url, final String json) {
+    log.debug("POST {}: {}", url, json);
+    try {
+      final HttpPost request = new HttpPost();
+      request.setURI(url.toURI());
+      request.addHeader(ACCEPT, JSON_UTF_8.toString());
+      request.addHeader(CONTENT_TYPE, JSON_UTF_8.toString());
+      request.setEntity(new StringEntity(json, JSON_UTF_8.toString()));
+
+      final HttpResponse response = http.execute(request);
+      throwOnHttpError(response);
+
+      final String bodyAsJson = EntityUtils.toString(response.getEntity(), UTF_8);
+      log.debug("Response: {}", bodyAsJson);
+      return bodyAsJson;
+    } catch (URISyntaxException | IOException e) {
+      throw new MarquezHttpException();
+    }
   }
 
-  private void setupPayload(final HttpURLConnection con, final String payload) throws IOException {
-    con.setRequestProperty("Content-Type", "application/json");
-    con.setRequestProperty("Accept", "application/json");
-    con.setDoOutput(true);
-    OutputStream os = con.getOutputStream();
-    byte[] input = payload.getBytes("utf-8");
-    os.write(input, 0, input.length);
+  String put(final URL url) {
+    return put(url, null);
   }
 
-  private String getResponse(final HttpURLConnection con) throws IOException, MarquezException {
-    final BufferedReader bufferedReader =
-        new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+  String put(final URL url, @Nullable final String json) {
+    log.debug("PUT {}: {}", url, json);
+    try {
+      final HttpPut request = new HttpPut();
+      request.setURI(url.toURI());
+      request.addHeader(ACCEPT, JSON_UTF_8.toString());
+      if (json != null) {
+        request.addHeader(CONTENT_TYPE, JSON_UTF_8.toString());
+        request.setEntity(new StringEntity(json, JSON_UTF_8.toString()));
+      }
 
-    final Integer responseCode = con.getResponseCode();
-    if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {
-      throw new InvalidRequestException();
-    } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
-      throw new RequestNotFoundException();
-    } else if (responseCode == HttpURLConnection.HTTP_BAD_METHOD) {
-      throw new RequestNotFoundException();
-    } else if (responseCode >= 500) {
-      throw new InternalServerException();
-    } else if (!(responseCode >= 200 && responseCode < 400)) {
-      throw new MarquezException();
+      final HttpResponse response = http.execute(request);
+      throwOnHttpError(response);
+
+      final String bodyAsJson = EntityUtils.toString(response.getEntity(), UTF_8);
+      log.debug("Response: {}", bodyAsJson);
+      return bodyAsJson;
+    } catch (URISyntaxException | IOException e) {
+      throw new MarquezHttpException();
+    }
+  }
+
+  private void throwOnHttpError(HttpResponse response) throws IOException {
+    final int code = response.getStatusLine().getStatusCode();
+    if (code >= 400 && code < 600) { // non-2xx
+      throw new MarquezHttpException(HttpError.of(response));
+    }
+  }
+
+  URL url(final String pathTemplate, @Nullable final String... pathArgs) {
+    return url(String.format(pathTemplate, (Object[]) pathArgs), ImmutableMap.of());
+  }
+
+  URL url(
+      final String pathTemplate,
+      final Map<String, Object> queryParams,
+      @Nullable final String... pathArgs) {
+    return url(String.format(pathTemplate, (Object[]) pathArgs), queryParams);
+  }
+
+  URL url(final String path, final Map<String, Object> queryParams) {
+    try {
+      final URIBuilder builder = new URIBuilder(baseUrl.toString()).setPath(path);
+      queryParams.forEach((name, value) -> builder.addParameter(name, String.valueOf(value)));
+      return builder.build().toURL();
+    } catch (URISyntaxException | MalformedURLException e) {
+      throw new MarquezHttpException();
+    }
+  }
+
+  @Value
+  static class UserAgent {
+    @Getter String value;
+
+    private UserAgent(final String value) {
+      this.value = value;
     }
 
-    final StringBuilder response = new StringBuilder();
-    String responseLine = null;
-    while ((responseLine = bufferedReader.readLine()) != null) {
-      response.append(responseLine.trim());
-    }
-    return response.toString();
-  }
-
-  /**
-   * Generates a {@link URL} for Marquez Core API calls based on the given path.
-   *
-   * @param path path for the API call
-   * @return a {@link URL} object
-   * @throws URISyntaxException
-   * @throws MalformedURLException
-   */
-  public URL url(final String path) throws URISyntaxException, MalformedURLException {
-    return url(path, Collections.emptyMap());
-  }
-
-  /**
-   * Generates a URL for Marquez Core API calls based on the given path and query parameters.
-   *
-   * @param path path for the API call
-   * @return a {@link URL} object
-   * @throws URISyntaxException
-   * @throws MalformedURLException
-   */
-  public URL url(@NonNull final String path, @NonNull final Map<String, Object> params)
-      throws URISyntaxException, MalformedURLException {
-    checkNotBlank(path);
-
-    final List<NameValuePair> nvps = new ArrayList<>();
-    for (Map.Entry<String, Object> entry : params.entrySet()) {
-      final BasicNameValuePair nameValuePair =
-          new BasicNameValuePair(entry.getKey(), String.valueOf(entry.getValue()));
-      nvps.add(nameValuePair);
+    static UserAgent of(final MarquezClient.Version version) {
+      return of("marquez-java" + "/" + version.getValue());
     }
 
-    return new URIBuilder(baseUrl).setPath(API_PATH + path).setParameters(nvps).build().toURL();
+    static UserAgent of(final String value) {
+      return new UserAgent(value);
+    }
+  }
+
+  @Value
+  static class HttpError {
+    @Getter Integer status;
+    @Getter String message;
+
+    @JsonCreator
+    HttpError(final Integer status, final String message) {
+      this.status = status;
+      this.message = message;
+    }
+
+    static HttpError of(final HttpResponse response) throws IOException {
+      final String json = EntityUtils.toString(response.getEntity(), UTF_8);
+      return fromJson(json);
+    }
+
+    static HttpError fromJson(final String json) {
+      return JsonUtils.fromJson(json, new TypeReference<HttpError>() {});
+    }
   }
 }

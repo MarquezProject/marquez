@@ -1,68 +1,59 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package marquez.client;
 
-import static marquez.client.Preconditions.checkNotBlank;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.HashMap;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import marquez.client.exceptions.MarquezException;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetMeta;
-import marquez.client.models.Datasets;
 import marquez.client.models.Datasource;
 import marquez.client.models.DatasourceMeta;
-import marquez.client.models.Datasources;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobRun;
 import marquez.client.models.JobRunMeta;
-import marquez.client.models.JobRuns;
-import marquez.client.models.Jobs;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
-import marquez.client.models.Namespaces;
+import marquez.client.utils.JsonUtils;
 
 @Slf4j
 public class MarquezClient {
-  private final MarquezHttp http;
-  private final Long timeoutMs;
-  /** Namespace name used when a namespace is not specified by client methods. */
+  @VisibleForTesting static final int DEFAULT_LIMIT = 100;
+  @VisibleForTesting static final int DEFAULT_OFFSET = 0;
+
+  @VisibleForTesting final MarquezHttp http;
+
   @Getter private final String namespaceName;
 
-  private static final ObjectMapper MAPPER =
-      new ObjectMapper()
-          .registerModule(new Jdk8Module())
-          .registerModule(new JavaTimeModule())
-          .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-  MarquezClient(@NonNull final MarquezHttp http, final Long timeoutMs, final String namespaceName) {
+  MarquezClient(@NonNull final MarquezHttp http, @NonNull final String namespaceName) {
     this.http = http;
-    this.timeoutMs = timeoutMs;
-    this.namespaceName = checkNotBlank(namespaceName);
-  }
-
-  /**
-   * Creates and returns a new {@link Namespace} object with the default {@code namespaceName}.
-   *
-   * @param namespaceMeta metadata for the new {@link Namespace}
-   * @return the new {@link Namespace} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Namespace createNamespace(@NonNull NamespaceMeta namespaceMeta)
-      throws IOException, MarquezException, URISyntaxException {
-    return createNamespace(namespaceName, namespaceMeta);
+    this.namespaceName = namespaceName;
   }
 
   /**
@@ -71,30 +62,20 @@ public class MarquezClient {
    * @param namespaceName name for the new {@link Namespace} object
    * @param namespaceMeta metadata for the new {@link Namespace}
    * @return the new {@link Namespace} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Namespace createNamespace(String namespaceName, @NonNull NamespaceMeta namespaceMeta)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-
-    final String path = String.format("/namespaces/%s", namespaceName);
-    final String payload = MAPPER.writeValueAsString(namespaceMeta);
-    final String json = http.put(http.url(path), payload);
-
-    return MAPPER.readValue(json, Namespace.class);
+  public Namespace createNamespace(
+      @NonNull String namespaceName, @NonNull NamespaceMeta namespaceMeta) {
+    final String bodyAsJson =
+        http.put(http.url("/namespaces/%s", namespaceName), namespaceMeta.toJson());
+    return Namespace.fromJson(bodyAsJson);
   }
 
   /**
    * Retrieves the {@link Namespace} object with the default {@code namespaceName}.
    *
    * @return the retrieved {@link Namespace} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Namespace getNamespace() throws IOException, MarquezException, URISyntaxException {
+  public Namespace getNamespace() {
     return getNamespace(namespaceName);
   }
 
@@ -103,33 +84,19 @@ public class MarquezClient {
    *
    * @param namespaceName name of the {@link Namespace} object to retrieve
    * @return the retrieved {@link Namespace} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Namespace getNamespace(String namespaceName)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-
-    final String path = String.format("/namespaces/%s", namespaceName);
-    final String json = http.get(http.url(path));
-
-    return MAPPER.readValue(json, Namespace.class);
+  public Namespace getNamespace(@NonNull String namespaceName) {
+    final String bodyAsJson = http.get(http.url("/namespaces/%s", namespaceName));
+    return Namespace.fromJson(bodyAsJson);
   }
 
   /**
    * Retrieves a list of all {@link Namespace} objects.
    *
    * @return a {@link Namespaces} object containing {@link Namespace} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Namespaces listNamespaces() throws IOException, MarquezException, URISyntaxException {
-    final String path = "/namespaces";
-    final String json = http.get(http.url(path));
-
-    return MAPPER.readValue(json, Namespaces.class);
+  public List<Namespace> listNamespaces() {
+    return listNamespaces(DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
   /**
@@ -138,21 +105,172 @@ public class MarquezClient {
    * @param limit max number of {@link Namespace} objects in the returned list
    * @param offset number of {@link Namespace} objects to skip before adding {@link Namespace}
    *     objects to the returned list
-   * @return a {@link Namespaces} object containing {@link Namespace} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Namespaces listNamespaces(@NonNull Integer limit, @NonNull Integer offset)
-      throws IOException, MarquezException, URISyntaxException {
-    final Map<String, Object> params = new HashMap<String, Object>();
-    params.put("limit", limit);
-    params.put("offset", offset);
+  public List<Namespace> listNamespaces(@NonNull Integer limit, @NonNull Integer offset) {
+    final String bodyAsJson = http.get(http.url("/namespaces", newQueryParamsWith(limit, offset)));
+    return Namespaces.fromJson(bodyAsJson).getValue();
+  }
 
-    final String path = "/namespaces";
-    final String json = http.get(http.url(path, params));
+  /**
+   * Creates and returns a new {@link Datasource} object with the given metadata.
+   *
+   * @param datasourceMeta metadata for the new {@link Datasource} object
+   * @return the new {@link Datasource} object
+   */
+  public Datasource createDatasource(@NonNull DatasourceMeta datasourceMeta) {
+    final String bodyAsJson = http.post(http.url("/datasources"), datasourceMeta.toJson());
+    return Datasource.fromJson(bodyAsJson);
+  }
 
-    return MAPPER.readValue(json, Namespaces.class);
+  /**
+   * Retrieves the {@link Datasource} object with the given {@code datasourceUrn}.
+   *
+   * @param datasourceUrn urn for the {@link Datasource} object to retrieve
+   * @return the retrieved {@link Datasource} object
+   */
+  public Datasource getDatasource(@NonNull String datasourceUrn) {
+    final String bodyAsJson = http.get(http.url("/datasources/%s", datasourceUrn));
+    return Datasource.fromJson(bodyAsJson);
+  }
+
+  /**
+   * Retrieves a list of all {@link Datasource} objects.
+   *
+   * @return {@link Datasources} object containing {@link Datasource} objects
+   */
+  public List<Datasource> listDatasources() {
+    return listDatasources(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
+  }
+
+  /**
+   * Retrieves a list of all {@link Datasource} objects.
+   *
+   * @return {@link Datasources} object containing {@link Datasource} objects
+   */
+  public List<Datasource> listDatasources(Integer limit, Integer offset) {
+    return listDatasources(namespaceName, limit, offset);
+  }
+
+  /**
+   * Retrieves a list of all {@link Datasource} objects.
+   *
+   * @return {@link Datasources} object containing {@link Datasource} objects
+   */
+  public List<Datasource> listDatasources(String namespaceName) {
+    return listDatasources(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
+  }
+
+  /**
+   * Retrieves a list of all {@link Datasource} objects with {@code limit} and {@code offset}.
+   *
+   * @param limit max number of {@link Datasource} objects in the returned list
+   * @param offset number of {@link Datasource} objects to skip before adding {@link Datasource}
+   *     objects to the returned list
+   * @return {@link Datasources} object containing {@link Datasource} objects
+   */
+  public List<Datasource> listDatasources(
+      @NonNull String namespaceName, @NonNull Integer limit, @NonNull Integer offset) {
+    final String bodyAsJson = http.get(http.url("/datasources", newQueryParamsWith(limit, offset)));
+    return Datasources.fromJson(bodyAsJson).getValue();
+  }
+
+  /**
+   * Creates and returns a new {@link Datasource} object with the given metadata in the default
+   * namespace.
+   *
+   * @param datasetMeta metadata for the new {@link Dataset} object
+   * @return the new {@link Dataset} object
+   */
+  public Dataset createDataset(DatasetMeta datasetMeta) {
+    return createDataset(namespaceName, datasetMeta);
+  }
+
+  /**
+   * Creates and returns a new {@link Datasource} object with the given metadata in the given
+   * namespace.
+   *
+   * @param namespaceName namespace in which to create the new {@link Dataset} object
+   * @param datasetMeta metadata for the new {@link Dataset} object
+   * @return the new {@link Dataset} object
+   */
+  public Dataset createDataset(@NonNull String namespaceName, @NonNull DatasetMeta datasetMeta) {
+    final String bodyAsJson =
+        http.post(http.url("/namespaces/%s/datasets", namespaceName), datasetMeta.toJson());
+    return Dataset.fromJson(bodyAsJson);
+  }
+
+  /**
+   * Retrieves the {@link Datasource} object with the given {@code datasetUrn} in the default
+   * namespace.
+   *
+   * @param datasetUrn urn for the {@link Dataset} object to retrieve
+   * @return the retrieved {@link Dataset} object
+   */
+  public Dataset getDataset(String datasetUrn) {
+    return getDataset(namespaceName, datasetUrn);
+  }
+
+  /**
+   * Retrieves the {@link Datasource} object with the given {@code datasetUrn} in the given
+   * namespace.
+   *
+   * @param namespaceName namespace from which to retrieve the {@link Dataset} object
+   * @param datasetUrn urn for the {@link Dataset} object to retrieve
+   * @return the retrieved {@link Dataset} object
+   */
+  public Dataset getDataset(@NonNull String namespaceName, @NonNull String datasetUrn) {
+    final String bodyAsJson =
+        http.get(http.url("/namespaces/%s/datasets/%s", namespaceName, datasetUrn));
+    return Dataset.fromJson(bodyAsJson);
+  }
+
+  /**
+   * Retrieves a list of all {@link Dataset} objects in the default namespace.
+   *
+   * @return {@link Datasets} object containing {@link Job} objects
+   */
+  public List<Dataset> listDatasets() {
+    return listDatasets(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
+  }
+
+  /**
+   * Retrieves a list of all {@link Dataset} objects in the default namespace with {@code limit} and
+   * {@code offset}.
+   *
+   * @param limit max number of {@link Dataset} objects in the returned list
+   * @param offset number of {@link Dataset} objects to skip before adding {@link Dataset} objects
+   *     to the returned list
+   * @return {@link Datasets} object containing {@link Job} objects
+   */
+  public List<Dataset> listDatasets(Integer limit, Integer offset) {
+    return listDatasets(namespaceName, limit, offset);
+  }
+
+  /**
+   * Retrieves a list of all {@link Dataset} objects in the default namespace.
+   *
+   * @return {@link Datasets} object containing {@link Job} objects
+   */
+  public List<Dataset> listDatasets(String namespaceName) {
+    return listDatasets(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
+  }
+
+  /**
+   * Retrieves a list of all {@link Dataset} objects in the given namespace with {@code limit} and
+   * {@code offset}.
+   *
+   * @param namespaceName namespace from which to retrieve {@link Dataset} objects
+   * @param limit max number of {@link Dataset} objects in the returned list
+   * @param offset number of {@link Dataset} objects to skip before adding {@link Dataset} objects
+   *     to the returned list
+   * @return {@link Datasets} object containing {@link Job} objects
+   */
+  public List<Dataset> listDatasets(
+      @NonNull String namespaceName, @NonNull Integer limit, @NonNull Integer offset) {
+    final String bodyAsJson =
+        http.get(
+            http.url("/namespaces/%s/datasets", newQueryParamsWith(limit, offset), namespaceName));
+    return Datasets.fromJson(bodyAsJson).getValue();
   }
 
   /**
@@ -161,12 +279,8 @@ public class MarquezClient {
    * @param jobName name for the new {@link Job} object
    * @param jobMeta metadata for the new {@link Job} object
    * @return the new {@link Job} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Job createJob(String jobName, @NonNull JobMeta jobMeta)
-      throws IOException, MarquezException, URISyntaxException {
+  public Job createJob(String jobName, JobMeta jobMeta) {
     return createJob(namespaceName, jobName, jobMeta);
   }
 
@@ -177,20 +291,12 @@ public class MarquezClient {
    * @param jobName name for the new {@link Job} object
    * @param jobMeta metadata for the new {@link Job} object
    * @return the new {@link Job} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Job createJob(String namespaceName, String jobName, @NonNull JobMeta jobMeta)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-    checkNotBlank(jobName);
-
-    final String path = String.format("/namespaces/%s/jobs/%s", namespaceName, jobName);
-    final String payload = MAPPER.writeValueAsString(jobMeta);
-    final String json = http.put(http.url(path), payload);
-
-    return MAPPER.readValue(json, Job.class);
+  public Job createJob(
+      @NonNull String namespaceName, @NonNull String jobName, @NonNull JobMeta jobMeta) {
+    final String bodyAsJson =
+        http.put(http.url("/namespaces/%s/jobs/%s", namespaceName, jobName), jobMeta.toJson());
+    return Job.fromJson(bodyAsJson);
   }
 
   /**
@@ -198,11 +304,8 @@ public class MarquezClient {
    *
    * @param jobName name of the {@link Job} object to retrieve
    * @return the retrieved {@link Job} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Job getJob(String jobName) throws IOException, MarquezException, URISyntaxException {
+  public Job getJob(String jobName) {
     return getJob(namespaceName, jobName);
   }
 
@@ -212,31 +315,19 @@ public class MarquezClient {
    * @param namespaceName namespace for the new {@link Job} object
    * @param jobName name of the {@link Job} object to retrieve
    * @return the retrieved {@link Job} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Job getJob(String namespaceName, String jobName)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-    checkNotBlank(jobName);
-
-    final String path = String.format("/namespaces/%s/jobs/%s", namespaceName, jobName);
-    final String json = http.get(http.url(path));
-
-    return MAPPER.readValue(json, Job.class);
+  public Job getJob(@NonNull String namespaceName, @NonNull String jobName) {
+    final String bodyAsJson = http.get(http.url("/namespaces/%s/jobs/%s", namespaceName, jobName));
+    return Job.fromJson(bodyAsJson);
   }
 
   /**
    * Retrieves a list of all {@link Job} objects in the default namespace.
    *
    * @return a {@link Jobs} object containing {@link Job} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Jobs listJobs() throws IOException, MarquezException, URISyntaxException {
-    return listJobs(namespaceName);
+  public List<Job> listJobs() {
+    return listJobs(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
   /**
@@ -247,12 +338,8 @@ public class MarquezClient {
    * @param offset number of {@link Job} objects to skip before adding {@link Job} objects to the
    *     returned list
    * @return a {@link Jobs} object containing {@link Job} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Jobs listJobs(@NonNull Integer limit, @NonNull Integer offset)
-      throws IOException, MarquezException, URISyntaxException {
+  public List<Job> listJobs(Integer limit, Integer offset) {
     return listJobs(namespaceName, limit, offset);
   }
 
@@ -261,18 +348,9 @@ public class MarquezClient {
    *
    * @param namespaceName namespace from which to retrieve {@link Job} objects
    * @return a {@link Jobs} object containing {@link Job} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Jobs listJobs(String namespaceName)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-
-    final String path = String.format("/namespaces/%s/jobs", namespaceName);
-    final String json = http.get(http.url(path));
-
-    return MAPPER.readValue(json, Jobs.class);
+  public List<Job> listJobs(String namespaceName) {
+    return listJobs(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
   /**
@@ -284,22 +362,12 @@ public class MarquezClient {
    * @param offset number of {@link Job} objects to skip before adding {@link Job} objects to the
    *     returned list
    * @return a {@link Jobs} object containing {@link Job} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public Jobs listJobs(String namespaceName, @NonNull Integer limit, @NonNull Integer offset)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-
-    final Map<String, Object> params = new HashMap<String, Object>();
-    params.put("limit", limit);
-    params.put("offset", offset);
-
-    final String path = String.format("/namespaces/%s/jobs", namespaceName);
-    final String json = http.get(http.url(path, params));
-
-    return MAPPER.readValue(json, Jobs.class);
+  public List<Job> listJobs(
+      @NonNull String namespaceName, @NonNull Integer limit, @NonNull Integer offset) {
+    final String bodyAsJson =
+        http.get(http.url("/namespaces/%s/jobs", newQueryParamsWith(limit, offset), namespaceName));
+    return Jobs.fromJson(bodyAsJson).getValue();
   }
 
   /**
@@ -309,12 +377,8 @@ public class MarquezClient {
    * @param jobName job associated with the new {@link JobRun} object
    * @param jobRunMeta metadata for the new {@link JobRun} object
    * @return the new {@link JobRun} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public JobRun createJobRun(String jobName, @NonNull JobRunMeta jobRunMeta)
-      throws IOException, MarquezException, URISyntaxException {
+  public JobRun createJobRun(String jobName, JobRunMeta jobRunMeta) {
     return createJobRun(namespaceName, jobName, jobRunMeta);
   }
 
@@ -326,20 +390,13 @@ public class MarquezClient {
    * @param jobName job associated with the new {@link JobRun} object
    * @param jobRunMeta metadata for the new {@link JobRun} object
    * @return the new {@link JobRun} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public JobRun createJobRun(String namespaceName, String jobName, @NonNull JobRunMeta jobRunMeta)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-    checkNotBlank(jobName);
-
-    final String path = String.format("/namespaces/%s/jobs/%s/runs", namespaceName, jobName);
-    final String payload = MAPPER.writeValueAsString(jobRunMeta);
-    final String json = http.post(http.url(path), payload);
-
-    return MAPPER.readValue(json, JobRun.class);
+  public JobRun createJobRun(
+      @NonNull String namespaceName, @NonNull String jobName, @NonNull JobRunMeta jobRunMeta) {
+    final String bodyAsJson =
+        http.post(
+            http.url("/namespaces/%s/jobs/%s/runs", namespaceName, jobName), jobRunMeta.toJson());
+    return JobRun.fromJson(bodyAsJson);
   }
 
   /**
@@ -347,17 +404,10 @@ public class MarquezClient {
    *
    * @param runId id for the {@link JobRun} object to retrieve
    * @return the retrieved {@link JobRun} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public JobRun getJobRun(String runId) throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(runId);
-
-    final String path = String.format("/jobs/runs/%s", runId);
-    final String json = http.get(http.url(path));
-
-    return MAPPER.readValue(json, JobRun.class);
+  public JobRun getJobRun(@NonNull String runId) {
+    final String bodyAsJson = http.get(http.url("/jobs/runs/%s", runId));
+    return JobRun.fromJson(bodyAsJson);
   }
 
   /**
@@ -366,13 +416,9 @@ public class MarquezClient {
    *
    * @param jobName job for which to retrieve {@link JobRun} objects
    * @return a {@link JobRuns} object containing {@link JobRun} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public JobRuns listJobRuns(@NonNull String jobName)
-      throws IOException, MarquezException, URISyntaxException {
-    return listJobRuns(namespaceName, jobName);
+  public List<JobRun> listJobRuns(String jobName) {
+    return listJobRuns(namespaceName, jobName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
   /**
@@ -384,36 +430,20 @@ public class MarquezClient {
    * @param offset number of {@link JobRun} objects to skip before adding {@link JobRun} objects to
    *     the returned list
    * @return a {@link JobRuns} object containing {@link JobRun} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public JobRuns listJobRuns(
-      @NonNull String jobName, @NonNull Integer limit, @NonNull Integer offset)
-      throws IOException, MarquezException, URISyntaxException {
+  public List<JobRun> listJobRuns(String jobName, Integer limit, Integer offset) {
     return listJobRuns(namespaceName, jobName, limit, offset);
   }
 
   /**
-   * Retrieves a list of all {@link JobRun} objects for the given {@link Job} in the given
+   * Retrieves a list of all {@link JobRun} objects for the given {@link Job} in the default
    * namespace.
    *
-   * @param namespaceName namespace from which to retrieve {@link JobRun} objects
    * @param jobName job for which to retrieve {@link JobRun} objects
    * @return a {@link JobRuns} object containing {@link JobRun} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public JobRuns listJobRuns(String namespaceName, String jobName)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-    checkNotBlank(jobName);
-
-    final String path = String.format("/namespaces/%s/jobs/%s/runs", namespaceName, jobName);
-    final String json = http.get(http.url(path));
-
-    return new JobRuns(MAPPER.readValue(json, new TypeReference<List<JobRun>>() {}));
+  public List<JobRun> listJobRuns(String namespaceName, String jobName) {
+    return listJobRuns(namespaceName, jobName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
   /**
@@ -426,332 +456,84 @@ public class MarquezClient {
    * @param offset number of {@link JobRun} objects to skip before adding {@link JobRun} objects to
    *     the returned list
    * @return a {@link JobRuns} object containing {@link JobRun} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public JobRuns listJobRuns(
-      String namespaceName, String jobName, @NonNull Integer limit, @NonNull Integer offset)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-    checkNotBlank(jobName);
-
-    final Map<String, Object> params = new HashMap<String, Object>();
-    params.put("limit", limit);
-    params.put("offset", offset);
-
-    final String path = String.format("/namespaces/%s/jobs/%s/runs", namespaceName, jobName);
-    final String json = http.get(http.url(path, params));
-
-    return new JobRuns(MAPPER.readValue(json, new TypeReference<List<JobRun>>() {}));
+  public List<JobRun> listJobRuns(
+      @NonNull String namespaceName,
+      @NonNull String jobName,
+      @NonNull Integer limit,
+      @NonNull Integer offset) {
+    final String bodyAsJson =
+        http.get(
+            http.url(
+                "/namespaces/%s/jobs/%s/runs",
+                newQueryParamsWith(limit, offset), namespaceName, jobName));
+    return JobRuns.fromJson(bodyAsJson).getValue();
   }
 
   /**
    * Sets the {@code runState} of this {@link JobRun} as running.
    *
    * @param runId id for the {@link JobRun} to mark
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public void markJobRunAsRunning(String runId)
-      throws IOException, MarquezException, URISyntaxException {
-    markJobRunAs(runId, "run");
+  public void markJobRunAsRunning(@NonNull String runId) {
+    http.put(http.url("/jobs/runs/%s/run", runId));
   }
 
   /**
    * Sets the {@code runState} of this {@link JobRun} as completed.
    *
    * @param runId id for the {@link JobRun} to mark
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public void markJobRunAsCompleted(String runId)
-      throws IOException, MarquezException, URISyntaxException {
-    markJobRunAs(runId, "complete");
-  }
-
-  /**
-   * Sets the {@code runState} of this {@link JobRun} as failed.
-   *
-   * @param runId id for the {@link JobRun} to mark
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public void markJobRunAsFailed(String runId)
-      throws IOException, MarquezException, URISyntaxException {
-    markJobRunAs(runId, "fail");
+  public void markJobRunAsCompleted(@NonNull String runId) {
+    http.put(http.url("/jobs/runs/%s/complete", runId));
   }
 
   /**
    * Sets the {@code runState} of this {@link JobRun} as aborted.
    *
    * @param runId id for the {@link JobRun} to mark
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
    */
-  public void markJobRunAsAborted(String runId)
-      throws IOException, MarquezException, URISyntaxException {
-    markJobRunAs(runId, "abort");
-  }
-
-  private void markJobRunAs(String runId, String runState)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(runId);
-    checkNotBlank(runState);
-
-    final String path = String.format("/jobs/runs/%s/%s", runId, runState);
-    http.put(http.url(path));
+  public void markJobRunAsAborted(@NonNull String runId) {
+    http.put(http.url("/jobs/runs/%s/abort", runId));
   }
 
   /**
-   * Creates and returns a new {@link Datasource} object with the given metadata.
+   * Sets the {@code runState} of this {@link JobRun} as failed.
    *
-   * @param datasourceMeta metadata for the new {@link Datasource} object
-   * @return the new {@link Datasource} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
+   * @param runId id for the {@link JobRun} to mark
    */
-  public Datasource createDatasource(@NonNull DatasourceMeta datasourceMeta)
-      throws IOException, MarquezException, URISyntaxException {
-    final String path = "/datasources";
-    final String payload = MAPPER.writeValueAsString(datasourceMeta);
-    final String json = http.post(http.url(path), payload);
-
-    return MAPPER.readValue(json, Datasource.class);
+  public void markJobRunAsFailed(@NonNull String runId) {
+    http.put(http.url("/jobs/runs/%s/fail", runId));
   }
 
-  /**
-   * Retrieves the {@link Datasource} object with the given {@code datasourceUrn}.
-   *
-   * @param datasourceUrn urn for the {@link Datasource} object to retrieve
-   * @return the retrieved {@link Datasource} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Datasource getDatasource(String datasourceUrn)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(datasourceUrn);
-
-    final String path = String.format("/datasources/%s", datasourceUrn);
-    final String json = http.get(http.url(path));
-
-    return MAPPER.readValue(json, Datasource.class);
-  }
-
-  /**
-   * Retrieves a list of all {@link Datasource} objects.
-   *
-   * @return {@link Datasources} object containing {@link Datasource} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Datasources listDatasources() throws IOException, MarquezException, URISyntaxException {
-    final String path = "/datasources";
-    final String json = http.get(http.url(path));
-
-    return MAPPER.readValue(json, Datasources.class);
-  }
-
-  /**
-   * Retrieves a list of all {@link Datasource} objects with {@code limit} and {@code offset}.
-   *
-   * @param limit max number of {@link Datasource} objects in the returned list
-   * @param offset number of {@link Datasource} objects to skip before adding {@link Datasource}
-   *     objects to the returned list
-   * @return {@link Datasources} object containing {@link Datasource} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Datasources listDatasources(@NonNull Integer limit, @NonNull Integer offset)
-      throws IOException, MarquezException, URISyntaxException {
-    final Map<String, Object> params = new HashMap<String, Object>();
-    params.put("limit", limit);
-    params.put("offset", offset);
-
-    final String path = "/datasources";
-    final String json = http.get(http.url(path, params));
-
-    return MAPPER.readValue(json, Datasources.class);
-  }
-
-  /**
-   * Creates and returns a new {@link Datasource} object with the given metadata in the default
-   * namespace.
-   *
-   * @param datasetMeta metadata for the new {@link Dataset} object
-   * @return the new {@link Dataset} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Dataset createDataset(@NonNull DatasetMeta datasetMeta)
-      throws IOException, MarquezException, URISyntaxException {
-    return createDataset(namespaceName, datasetMeta);
-  }
-
-  /**
-   * Creates and returns a new {@link Datasource} object with the given metadata in the given
-   * namespace.
-   *
-   * @param namespaceName namespace in which to create the new {@link Dataset} object
-   * @param datasetMeta metadata for the new {@link Dataset} object
-   * @return the new {@link Dataset} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Dataset createDataset(String namespaceName, @NonNull DatasetMeta datasetMeta)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-
-    final String path = String.format("/namespaces/%s/datasets", namespaceName);
-    final String payload = MAPPER.writeValueAsString(datasetMeta);
-    final String json = http.post(http.url(path), payload);
-
-    return MAPPER.readValue(json, Dataset.class);
-  }
-
-  /**
-   * Retrieves the {@link Datasource} object with the given {@code datasetUrn} in the default
-   * namespace.
-   *
-   * @param datasetUrn urn for the {@link Dataset} object to retrieve
-   * @return the retrieved {@link Dataset} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Dataset getDataset(String datasetUrn)
-      throws IOException, MarquezException, URISyntaxException {
-    return getDataset(namespaceName, datasetUrn);
-  }
-
-  /**
-   * Retrieves the {@link Datasource} object with the given {@code datasetUrn} in the given
-   * namespace.
-   *
-   * @param namespaceName namespace from which to retrieve the {@link Dataset} object
-   * @param datasetUrn urn for the {@link Dataset} object to retrieve
-   * @return the retrieved {@link Dataset} object
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Dataset getDataset(String namespaceName, String datasetUrn)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-    checkNotBlank(datasetUrn);
-
-    final String path = String.format("/namespaces/%s/datasets/%s", namespaceName, datasetUrn);
-    final String json = http.get(http.url(path));
-
-    return MAPPER.readValue(json, Dataset.class);
-  }
-
-  /**
-   * Retrieves a list of all {@link Dataset} objects in the default namespace.
-   *
-   * @return {@link Datasets} object containing {@link Job} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Datasets listDatasets() throws IOException, MarquezException, URISyntaxException {
-    return listDatasets(namespaceName);
-  }
-
-  /**
-   * Retrieves a list of all {@link Dataset} objects in the default namespace with {@code limit} and
-   * {@code offset}.
-   *
-   * @param limit max number of {@link Dataset} objects in the returned list
-   * @param offset number of {@link Dataset} objects to skip before adding {@link Dataset} objects
-   *     to the returned list
-   * @return {@link Datasets} object containing {@link Job} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Datasets listDatasets(@NonNull Integer limit, @NonNull Integer offset)
-      throws IOException, MarquezException, URISyntaxException {
-    return listDatasets(namespaceName, limit, offset);
-  }
-
-  /**
-   * Retrieves a list of all {@link Dataset} objects in the given namespace.
-   *
-   * @param namespaceName namespace from which to retrieve {@link Dataset} objects
-   * @return {@link Datasets} object containing {@link Job} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Datasets listDatasets(String namespaceName)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-
-    final String path = String.format("/namespaces/%s/datasets", namespaceName);
-    final String json = http.get(http.url(path));
-
-    return MAPPER.readValue(json, Datasets.class);
-  }
-
-  /**
-   * Retrieves a list of all {@link Dataset} objects in the given namespace with {@code limit} and
-   * {@code offset}.
-   *
-   * @param namespaceName namespace from which to retrieve {@link Dataset} objects
-   * @param limit max number of {@link Dataset} objects in the returned list
-   * @param offset number of {@link Dataset} objects to skip before adding {@link Dataset} objects
-   *     to the returned list
-   * @return {@link Datasets} object containing {@link Job} objects
-   * @throws IOException
-   * @throws MarquezException
-   * @throws URISyntaxException
-   */
-  public Datasets listDatasets(
-      String namespaceName, @NonNull Integer limit, @NonNull Integer offset)
-      throws IOException, MarquezException, URISyntaxException {
-    checkNotBlank(namespaceName);
-
-    final Map<String, Object> params = new HashMap<String, Object>();
-    params.put("limit", limit);
-    params.put("offset", offset);
-
-    final String path = String.format("/namespaces/%s/datasets", namespaceName);
-    final String json = http.get(http.url(path, params));
-
-    return MAPPER.readValue(json, Datasets.class);
+  private Map<String, Object> newQueryParamsWith(Integer limit, Integer offset) {
+    return ImmutableMap.of("limit", limit, "offset", offset);
   }
 
   public static final class Builder {
-    private static final String DEFAULT_BASE_URL = "http://localhost:8080";
-    private static final long DEFAULT_TIMEOUT_MS = 10000L;
-    private static final String DEFAULT_NAMESPACE_NAME = "default";
+    @VisibleForTesting static final URL DEFAULT_BASE_URL = toUrl("http://localhost:8080/api/v1");
+    @VisibleForTesting static final String DEFAULT_NAMESPACE_NAME = "default";
+    @VisibleForTesting static final String NAMESPACE_NAME_ENV_VAR = "MARQUEZ_NAMESPACE";
 
-    private String baseUrl;
-    private Long timeoutMs;
+    @VisibleForTesting URL baseUrl;
+
     private String namespaceName;
 
-    public Builder baseUrl(String baseUrl) {
+    private Builder() {
+      this.baseUrl = DEFAULT_BASE_URL;
+      this.namespaceName = System.getProperty(NAMESPACE_NAME_ENV_VAR, DEFAULT_NAMESPACE_NAME);
+    }
+
+    public Builder baseUrl(@NonNull String baseUrl) {
+      return baseUrl(toUrl(baseUrl));
+    }
+
+    public Builder baseUrl(@NonNull URL baseUrl) {
       this.baseUrl = baseUrl;
       return this;
     }
 
-    public Builder timeoutMs(Long timeoutMs) {
-      this.timeoutMs = timeoutMs;
-      return this;
-    }
-
-    public Builder namespaceName(String namespaceName) {
+    public Builder namespaceName(@NonNull String namespaceName) {
       this.namespaceName = namespaceName;
       return this;
     }
@@ -767,20 +549,16 @@ public class MarquezClient {
      * @return an instance of {@link MarquezClient} with the specified parameters
      */
     public MarquezClient build() {
-      if (baseUrl == null) {
-        baseUrl = DEFAULT_BASE_URL;
-      }
+      return new MarquezClient(
+          MarquezHttp.create(baseUrl, MarquezClient.Version.get()), namespaceName);
+    }
 
-      if (timeoutMs == null) {
-        timeoutMs = DEFAULT_TIMEOUT_MS;
+    private static URL toUrl(final String url) {
+      try {
+        return new URL(url);
+      } catch (MalformedURLException e) {
+        throw new IllegalArgumentException("Malformed URL: " + url);
       }
-
-      if (namespaceName == null) {
-        namespaceName = System.getProperty("MARQUEZ_NAMESPACE", DEFAULT_NAMESPACE_NAME);
-      }
-
-      final MarquezHttp http = new MarquezHttp(baseUrl);
-      return new MarquezClient(http, timeoutMs, namespaceName);
     }
   }
 
@@ -792,5 +570,104 @@ public class MarquezClient {
    */
   public static Builder builder() {
     return new Builder();
+  }
+
+  @Value
+  static class Version {
+    private static final String POM_PROPERTIES =
+        "/META-INF/maven/io.github.marquezproject/marquez-java/pom.properties";
+
+    private static final String VERSION_PROPERTY_NAME = "version";
+    private static final String VERSION_UNKNOWN = "unknown";
+
+    @Getter String value;
+
+    private Version(@NonNull final String value) {
+      this.value = value;
+    }
+
+    static Version get() {
+      final Properties properties = new Properties();
+      try (final InputStream stream =
+          MarquezClient.class.getClassLoader().getResourceAsStream(POM_PROPERTIES)) {
+        properties.load(stream);
+        return new Version(properties.getProperty(VERSION_PROPERTY_NAME, VERSION_UNKNOWN));
+      } catch (Exception e) {
+        log.warn("Failed to load properties file: {}", POM_PROPERTIES, e);
+      }
+      return NO_VERSION;
+    }
+
+    public static Version NO_VERSION = new Version(VERSION_UNKNOWN);
+  }
+
+  @Value
+  static final class Namespaces {
+    @Getter List<Namespace> value;
+
+    @JsonCreator
+    Namespaces(@JsonProperty("namespaces") final List<Namespace> value) {
+      this.value = ImmutableList.copyOf(value);
+    }
+
+    static Namespaces fromJson(final String json) {
+      return JsonUtils.fromJson(json, new TypeReference<Namespaces>() {});
+    }
+  }
+
+  @Value
+  static final class Datasources {
+    @Getter List<Datasource> value;
+
+    @JsonCreator
+    Datasources(@JsonProperty("datasources") final List<Datasource> value) {
+      this.value = ImmutableList.copyOf(value);
+    }
+
+    static Datasources fromJson(final String json) {
+      return JsonUtils.fromJson(json, new TypeReference<Datasources>() {});
+    }
+  }
+
+  @Value
+  static final class Datasets {
+    @Getter List<Dataset> value;
+
+    @JsonCreator
+    Datasets(@JsonProperty("datasets") final List<Dataset> value) {
+      this.value = ImmutableList.copyOf(value);
+    }
+
+    static Datasets fromJson(final String json) {
+      return JsonUtils.fromJson(json, new TypeReference<Datasets>() {});
+    }
+  }
+
+  @Value
+  static final class Jobs {
+    @Getter List<Job> value;
+
+    @JsonCreator
+    Jobs(@JsonProperty("jobs") final List<Job> value) {
+      this.value = ImmutableList.copyOf(value);
+    }
+
+    static Jobs fromJson(final String json) {
+      return JsonUtils.fromJson(json, new TypeReference<Jobs>() {});
+    }
+  }
+
+  @Value
+  static final class JobRuns {
+    @Getter List<JobRun> value;
+
+    @JsonCreator
+    JobRuns(@JsonProperty("jobs") final List<JobRun> value) {
+      this.value = ImmutableList.copyOf(value);
+    }
+
+    static JobRuns fromJson(final String json) {
+      return JsonUtils.fromJson(json, new TypeReference<JobRuns>() {});
+    }
   }
 }

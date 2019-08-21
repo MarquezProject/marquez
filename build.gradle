@@ -29,21 +29,22 @@ repositories {
 }
 
 ext {
-  jacksonCoreVersion = '2.9.9'
-  jacksonDatatypeVersion = '2.9.9'
+  jacksonVersion = '2.9.9'
   lombokVersion = '1.18.8'
   slf4jVersion = '1.7.26'
 }
 
 dependencies {
-  implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonCoreVersion}"
-  implementation "com.fasterxml.jackson.core:jackson-core:${jacksonCoreVersion}"
-  implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonCoreVersion}"
-  implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonDatatypeVersion}"
-  implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDatatypeVersion}"
-  implementation 'org.apache.httpcomponents:httpclient:4.5.9'
+  implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+  implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+  implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+  implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
+  implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+  implementation "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
   implementation "org.slf4j:slf4j-api:${slf4jVersion}"
   implementation "org.slf4j:slf4j-simple:${slf4jVersion}"
+  implementation 'com.google.guava:guava:28.0-jre'
+  implementation 'org.apache.httpcomponents:httpclient:4.5.9'
   compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
@@ -51,6 +52,16 @@ dependencies {
   testImplementation 'junit:junit:4.12'
   testImplementation 'org.mockito:mockito-core:2.27.0'
   testImplementation 'org.assertj:assertj-core:3.12.2'
+}
+
+compileJava {
+  options.incremental = true
+  options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+  options.incremental = true
+  options.compilerArgs << '-parameters'
 }
 
 task testUnit(type: Test) {

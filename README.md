@@ -43,7 +43,7 @@ MarquezClient client = MarquezClient().builder()
      
 // Metadata
 NamespaceMeta meta = NamespaceMeta().builder()
-    .ownerName("owner@example.com")
+    .ownerName("example-owner")
     .description("example description")
     .build()
 

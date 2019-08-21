@@ -29,6 +29,42 @@ public final class ModelGenerator {
 
   private static final Random RANDOM = new Random();
 
+  public static NamespaceMeta newNamespaceMeta() {
+    return NamespaceMeta.builder().ownerName(newOwnerName()).description(newDescription()).build();
+  }
+
+  public static DatasourceMeta newDatasourceMeta() {
+    return DatasourceMeta.builder()
+        .name(newDatasetName())
+        .connectionUrl(newConnectionUrl())
+        .build();
+  }
+
+  public static DatasetMeta newDatasetMeta() {
+    return DatasetMeta.builder()
+        .name(newDatasetName())
+        .datasourceUrn(newDatasourceUrn())
+        .description(newDescription())
+        .build();
+  }
+
+  public static JobMeta newJobMeta() {
+    return JobMeta.builder()
+        .inputDatasetUrns(newDatasetUrns(2))
+        .outputDatasetUrns(newDatasetUrns(4))
+        .location(newLocation())
+        .description(newDescription())
+        .build();
+  }
+
+  public static JobRunMeta newJobRunMeta() {
+    return JobRunMeta.builder()
+        .nominalStartTime(newTimestamp())
+        .nominalEndTime(newTimestamp())
+        .runArgs(newRunArgs())
+        .build();
+  }
+
   public static String newOwnerName() {
     return "test_owner" + newId();
   }
@@ -144,5 +180,9 @@ public final class ModelGenerator {
 
   public static List<Dataset> newDatasets(int limit) {
     return Stream.generate(() -> newDataset()).limit(limit).collect(toList());
+  }
+
+  public static Instant newTimestamp() {
+    return Instant.now();
   }
 }

@@ -20,16 +20,13 @@ You can also run individual tests using the flag `--tests`:
 
 ```bash
 $ ./gradlew test --tests marquez.client.MarquezClientTest
-$ ./gradlew test --tests marquez.client.MarquezHttpTest
 $ ./gradlew test --tests marquez.client.models.DatasetMetaTest
 ```
 
 Or run tests by category:  
 
 ```bash
-$ ./gradlew testUnit         # run only unit tests
-$ ./gradlew testIntegration  # run only integration tests
-$ ./gradlew testDataAccess   # run only data access tests
+$ ./gradlew testUnit  # run only unit tests
 ```
 
 We use [spotless](https://github.com/diffplug/spotless) to format our code. This ensures `.java` files are formatted to comply with [Google Java Style](https://google.github.io/styleguide/javaguide.html). Make sure your code is formatted before pushing any changes, otherwise CI will fail:
