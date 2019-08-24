@@ -14,6 +14,7 @@
 
 package marquez.client.utils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,7 @@ public final class JsonUtils {
           .registerModule(new ParameterNamesModule());
 
   static {
+    MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
   }
 
