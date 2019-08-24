@@ -27,9 +27,10 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class JsonUtilsTest {
-  final String VALUE = "test";
-  final Object OBJECT = new Object(VALUE);
-  final String JSON = "{\"value\":\"" + VALUE + "\"}";
+  private static final String VALUE = "test";
+  private static final Object OBJECT = new Object(VALUE);
+  private static final TypeReference<Object> TYPE = new TypeReference<Object>() {};
+  private static final String JSON = "{\"value\":\"" + VALUE + "\"}";
 
   @Test
   public void testToJson() {
@@ -44,21 +45,19 @@ public class JsonUtilsTest {
 
   @Test
   public void testFromJson() {
-    final Object actual = JsonUtils.fromJson(JSON, new TypeReference<Object>() {});
+    final Object actual = JsonUtils.fromJson(JSON, TYPE);
     assertThat(actual).isEqualToComparingFieldByField(OBJECT);
   }
 
   @Test
   public void testFromJson_throwsOnNull() {
     assertThatNullPointerException().isThrownBy(() -> JsonUtils.fromJson(JSON, null));
-
-    assertThatNullPointerException()
-        .isThrownBy(() -> JsonUtils.fromJson(null, new TypeReference<Object>() {}));
+    assertThatNullPointerException().isThrownBy(() -> JsonUtils.fromJson(null, TYPE));
   }
 
   @JsonAutoDetect(fieldVisibility = Visibility.ANY)
   static final class Object {
-    String value;
+    final String value;
 
     @JsonCreator
     Object(final String value) {
