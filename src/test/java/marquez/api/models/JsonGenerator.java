@@ -30,7 +30,7 @@ public final class JsonGenerator {
   public static String newJsonFor(final NamespaceRequest request) {
     return MAPPER
         .createObjectNode()
-        .put("ownerName", request.getOwnerName())
+        .put("owner", request.getOwner())
         .put("description", request.getDescription().orElse(NO_DESCRIPTION.getValue()))
         .toString();
   }
@@ -40,7 +40,7 @@ public final class JsonGenerator {
         .createObjectNode()
         .put("name", response.getName())
         .put("createdAt", response.getCreatedAt())
-        .put("ownerName", response.getOwnerName())
+        .put("owner", response.getOwner())
         .put("description", response.getDescription().orElse(NO_DESCRIPTION.getValue()))
         .toString();
   }

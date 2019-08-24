@@ -62,7 +62,7 @@ public class JobDaoTest {
             });
   }
 
-  private void insertNamespace(UUID namespaceId, String name, String ownerName) {
+  private void insertNamespace(UUID namespaceId, String name, String owner) {
     APP.getJDBI()
         .useHandle(
             handle -> {
@@ -70,7 +70,7 @@ public class JobDaoTest {
                   "INSERT INTO namespaces(guid, name, current_ownership)" + "VALUES (?, ?, ?);",
                   namespaceId,
                   name,
-                  ownerName);
+                  owner);
             });
   }
 

@@ -37,7 +37,7 @@ public class NamespaceMapperTest {
     final Namespace namespace = NamespaceMapper.map(NAMESPACE_NAME, REQUEST);
     assertThat(namespace).isNotNull();
     assertThat(namespace.getName()).isEqualTo(NAMESPACE_NAME.getValue());
-    assertThat(namespace.getOwnerName()).isEqualTo(REQUEST.getOwnerName());
+    assertThat(namespace.getOwner()).isEqualTo(REQUEST.getOwner());
     assertThat(Optional.ofNullable(namespace.getDescription())).isEqualTo(REQUEST.getDescription());
   }
 
@@ -47,7 +47,7 @@ public class NamespaceMapperTest {
     final Namespace namespace = NamespaceMapper.map(NAMESPACE_NAME, request);
     assertThat(namespace).isNotNull();
     assertThat(namespace.getName()).isEqualTo(NAMESPACE_NAME.getValue());
-    assertThat(namespace.getOwnerName()).isEqualTo(request.getOwnerName());
+    assertThat(namespace.getOwner()).isEqualTo(request.getOwner());
     assertThat(namespace.getDescription()).isNull();
   }
 
