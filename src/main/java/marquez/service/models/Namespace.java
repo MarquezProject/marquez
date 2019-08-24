@@ -38,8 +38,7 @@ public class Namespace {
     this.createdAt = null;
   }
 
-  public Namespace(
-      UUID guid, Instant createdAt, String name, String owner, String description) {
+  public Namespace(UUID guid, Instant createdAt, String name, String owner, String description) {
     this.guid = guid;
     this.createdAt = createdAt;
     this.name = name;
