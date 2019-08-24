@@ -26,24 +26,23 @@ public class Namespace {
 
   private final UUID guid;
   private final String name;
-  private final String ownerName;
+  private final String owner;
   private final String description;
   private final Instant createdAt;
 
-  public Namespace(UUID guid, String name, String ownerName, String description) {
+  public Namespace(UUID guid, String name, String owner, String description) {
     this.guid = guid;
     this.name = name;
-    this.ownerName = ownerName;
+    this.owner = owner;
     this.description = description;
     this.createdAt = null;
   }
 
-  public Namespace(
-      UUID guid, Instant createdAt, String name, String ownerName, String description) {
+  public Namespace(UUID guid, Instant createdAt, String name, String owner, String description) {
     this.guid = guid;
     this.createdAt = createdAt;
     this.name = name;
-    this.ownerName = ownerName;
+    this.owner = owner;
     this.description = description;
   }
 

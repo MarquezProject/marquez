@@ -150,7 +150,7 @@ public class Generator {
   }
 
   public static Namespace cloneNamespace(Namespace n) {
-    return new Namespace(n.getGuid(), n.getName(), n.getOwnerName(), n.getDescription());
+    return new Namespace(n.getGuid(), n.getName(), n.getOwner(), n.getDescription());
   }
 
   // Run Args

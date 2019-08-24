@@ -27,7 +27,7 @@ public final class NamespaceRowMapper {
         .uuid(UUID.randomUUID())
         .name(namespace.getName())
         .description(namespace.getDescription())
-        .currentOwnerName(namespace.getOwnerName())
+        .currentOwnerName(namespace.getOwner())
         .build();
   }
 }
