@@ -29,4 +29,3 @@ until PGPASSWORD="${POSTGRES_PASSWORD}" psql \
   sleep 1
 done
 
-echo "Great news! Postgres is up."

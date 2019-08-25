@@ -20,4 +20,8 @@ host="${1}"
 port="${2}"
 timeInSecs="${3:-60s}"
 
-timeout ${timeInSecs} bash -c "./connect-to-db.sh ${host} ${port}" || echo "Timeout, the postgres server is taking too long to respond." ;
+if timeout ${timeInSecs} bash -c "./connect-to-db.sh ${host} ${port}"; then
+    echo "Great news! Postgres is up."
+else
+    echo "Timeout, the postgres server is taking too long to respond."
+fi
