@@ -18,6 +18,6 @@ set -eu
 
 host="${1}"
 port="${2}"
-timeInSecs="${3:-60}"
+timeInSecs="${3:-60s}"
 
 timeout ${timeInSecs} bash -c "./connect-to-db.sh ${host} ${port}" || echo "Timeout, the postgres server is taking too long to respond." ;

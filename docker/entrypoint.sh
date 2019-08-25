@@ -16,6 +16,6 @@
 
 set -eu
 
-./wait-for-db.sh "${POSTGRES_HOST:-localhost}" "${POSTGRES_PORT:-5432}" 20
+./wait-for-db.sh "${POSTGRES_HOST:-localhost}" "${POSTGRES_PORT:-5432}" 59s
 
 java -Duser.timezone=UTC -jar marquez-*.jar server "${MARQUEZ_CONFIG}"
