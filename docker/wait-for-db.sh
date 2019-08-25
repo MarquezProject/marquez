@@ -21,7 +21,7 @@ port="${2}"
 timeInSecs="${3:-60s}"
 
 if timeout ${timeInSecs} bash -c "./connect-to-db.sh ${host} ${port}"; then
-    echo "Connection to db Successful"
+    echo "Connection to db successful."
 else
     echo "Timeout, the postgres server is taking too long to respond."
 fi
