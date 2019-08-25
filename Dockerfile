@@ -18,5 +18,7 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build/libs/marquez-*.jar marquez-*.jar
 COPY docker/wait-for-db.sh wait-for-db.sh
 COPY docker/entrypoint.sh entrypoint.sh
+COPY docker/entrypoint.sh entrypoint.sh
+COPY docker/connect-to-db.sh connect-to-db.sh
 EXPOSE 5000 5001
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
