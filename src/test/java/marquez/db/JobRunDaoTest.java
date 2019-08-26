@@ -15,6 +15,8 @@
 package marquez.db;
 
 import static java.lang.String.format;
+import static marquez.service.models.ServiceModelGenerator.newJobWithNameSpaceId;
+import static marquez.service.models.ServiceModelGenerator.newNamespace;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -26,7 +28,6 @@ import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
-import marquez.service.models.Generator;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
 import marquez.service.models.Namespace;
@@ -74,11 +75,11 @@ public class JobRunDaoTest extends JobRunBaseTest {
                     UUID.fromString(rs.getString("job_run_guid")),
                     JobRunState.State.fromInt(rs.getInt("state"))));
 
-    Namespace generatedNamespace = namespaceService.createOrUpdate(Generator.genNamespace());
+    Namespace generatedNamespace = namespaceService.createOrUpdate(newNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
     CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
 
-    marquez.service.models.Job job = Generator.genJob(generatedNamespace.getGuid());
+    marquez.service.models.Job job = newJobWithNameSpaceId(generatedNamespace.getGuid());
     marquez.service.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
 
     CREATED_JOB_NAME = createdJob.getName();

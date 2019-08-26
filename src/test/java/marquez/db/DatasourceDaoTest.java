@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import static marquez.db.models.DbModelGenerator.newDatasourceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
@@ -24,7 +25,6 @@ import marquez.common.models.ConnectionUrl;
 import marquez.common.models.DatasourceName;
 import marquez.common.models.DatasourceUrn;
 import marquez.db.models.DatasourceRow;
-import marquez.service.models.Generator;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
@@ -48,14 +48,14 @@ public class DatasourceDaoTest {
     final Jdbi jdbi = dbRule.getJdbi();
     datasourceDAO = jdbi.onDemand(DatasourceDao.class);
 
-    datasourceDAO.insert(Generator.genDatasourceRow());
-    datasourceDAO.insert(Generator.genDatasourceRow());
-    datasourceDAO.insert(Generator.genDatasourceRow());
+    datasourceDAO.insert(newDatasourceRow());
+    datasourceDAO.insert(newDatasourceRow());
+    datasourceDAO.insert(newDatasourceRow());
   }
 
   @Test
   public void testCreate() {
-    final DatasourceRow datasourceRow = Generator.genDatasourceRow();
+    final DatasourceRow datasourceRow = newDatasourceRow();
     datasourceDAO.insert(datasourceRow);
 
     final Optional<DatasourceRow> returnedRow =
@@ -70,7 +70,7 @@ public class DatasourceDaoTest {
 
   @Test
   public void testFindByDatasourceName() {
-    DatasourceRow row = Generator.genDatasourceRow();
+    DatasourceRow row = newDatasourceRow();
     datasourceDAO.insert(row);
     DatasourceName name = DatasourceName.of(row.getName());
     final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(name);
@@ -80,7 +80,7 @@ public class DatasourceDaoTest {
 
   @Test(expected = UnableToExecuteStatementException.class)
   public void testInsertDuplicateRow_ThrowsDaoException() {
-    final DatasourceRow datasourceRow = Generator.genDatasourceRow();
+    final DatasourceRow datasourceRow = newDatasourceRow();
     datasourceDAO.insert(datasourceRow);
 
     final Optional<DatasourceRow> returnedRow =
@@ -129,7 +129,7 @@ public class DatasourceDaoTest {
 
   @Test
   public void testDatasourceNotPresent() {
-    DatasourceUrn datasourceUrn = DatasourceUrn.of(Generator.genDatasourceRow().getUrn());
+    DatasourceUrn datasourceUrn = DatasourceUrn.of(newDatasourceRow().getUrn());
     final Optional<DatasourceRow> returnedRow = datasourceDAO.findBy(datasourceUrn);
     assertThat(returnedRow).isNotPresent();
   }

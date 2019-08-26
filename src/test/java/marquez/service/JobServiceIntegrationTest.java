@@ -1,5 +1,6 @@
 package marquez.service;
 
+import static marquez.service.models.ServiceModelGenerator.newJobWithNameSpaceId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -15,7 +16,6 @@ import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
 import marquez.db.fixtures.AppWithPostgresRule;
 import marquez.service.exceptions.MarquezServiceException;
-import marquez.service.models.Generator;
 import marquez.service.models.Job;
 import marquez.service.models.JobRun;
 import marquez.service.models.JobRunState;
@@ -65,7 +65,7 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void testCreate() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
+    Job job = newJobWithNameSpaceId(namespaceID);
     Job jobCreateRet = jobService.createJob(namespaceName, job);
     assertNotNull(jobCreateRet.getCreatedAt());
     Optional<Job> jobGetRet = jobService.getJob(namespaceName, job.getName());
@@ -79,7 +79,7 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void testCreateNewVersion() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
+    Job job = newJobWithNameSpaceId(namespaceID);
     jobService.createJob(namespaceName, job);
     Job jobWithNewLoc =
         new Job(
@@ -104,7 +104,7 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void testGetJob_JobFound() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
+    Job job = newJobWithNameSpaceId(namespaceID);
     Job jobCreateRet = jobService.createJob(namespaceName, job);
     Optional<Job> jobGetRet = jobService.getJob(namespaceName, job.getName());
     assertTrue(jobGetRet.isPresent());
@@ -114,8 +114,8 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void testGetJob_JobNotFound() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
-    Job job2 = Generator.genJob(namespaceID);
+    Job job = newJobWithNameSpaceId(namespaceID);
+    Job job2 = newJobWithNameSpaceId(namespaceID);
     jobService.createJob(namespaceName, job);
     Optional<Job> jobFound = jobService.getJob(namespaceName, job2.getName());
     assertFalse(jobFound.isPresent());
@@ -123,7 +123,7 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void createAndUpdateJobRun() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
+    Job job = newJobWithNameSpaceId(namespaceID);
     String runArgsJson = "{'foo': 1}";
     jobService.createJob(namespaceName, job);
     JobRun jobRun = jobService.createJobRun(namespaceName, job.getName(), runArgsJson, null, null);
@@ -140,7 +140,7 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void testCreateJobRun_NullArgs() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
+    Job job = newJobWithNameSpaceId(namespaceID);
     String nullRunArgsJson = null;
     jobService.createJob(namespaceName, job);
     JobRun jobRun =
@@ -153,7 +153,7 @@ public class JobServiceIntegrationTest {
 
   @Test
   public void testCreateJobRun_NonNullArgs() throws MarquezServiceException {
-    Job job = Generator.genJob(namespaceID);
+    Job job = newJobWithNameSpaceId(namespaceID);
     String argsJson = "{'foo': 1}";
     jobService.createJob(namespaceName, job);
     JobRun jobRun = jobService.createJobRun(namespaceName, job.getName(), argsJson, null, null);

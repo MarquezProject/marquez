@@ -14,6 +14,8 @@
 
 package marquez.db;
 
+import static marquez.service.models.ServiceModelGenerator.newJobVersion;
+import static marquez.service.models.ServiceModelGenerator.newJobWithNameSpaceId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -23,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import marquez.db.fixtures.AppWithPostgresRule;
-import marquez.service.models.Generator;
 import marquez.service.models.Job;
 import marquez.service.models.JobVersion;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
@@ -39,14 +40,14 @@ public class JobDaoTest {
   final JobDao jobDao = APP.onDemand(JobDao.class);
   final UUID nsID = UUID.randomUUID();
   final String nsName = "my_ns";
-  Job job = Generator.genJob(nsID);
-  JobVersion jobVersion = Generator.genJobVersion(job);
+  Job job = newJobWithNameSpaceId(nsID);
+  JobVersion jobVersion = newJobVersion(job);
 
   @Before
   public void setUp() {
     insertNamespace(nsID, nsName, "Amaranta");
-    job = Generator.genJob(nsID);
-    jobVersion = Generator.genJobVersion(job);
+    job = newJobWithNameSpaceId(nsID);
+    jobVersion = newJobVersion(job);
   }
 
   @After
@@ -104,7 +105,7 @@ public class JobDaoTest {
 
   @Test
   public void testInsert() {
-    JobVersion jobVersion = Generator.genJobVersion(job);
+    JobVersion jobVersion = newJobVersion(job);
     jobDao.insertJobAndVersion(job, jobVersion);
     Job jobFound = jobDao.findByID(job.getGuid());
     assertNotNull(jobFound);
@@ -155,10 +156,11 @@ public class JobDaoTest {
   @Test
   public void testFindAllInNamespace() {
     List<Job> jobs =
-        Arrays.asList(Generator.genJob(nsID), Generator.genJob(nsID), Generator.genJob(nsID));
+        Arrays.asList(
+            newJobWithNameSpaceId(nsID), newJobWithNameSpaceId(nsID), newJobWithNameSpaceId(nsID));
     jobs.forEach(
         job -> {
-          jobDao.insertJobAndVersion(job, Generator.genJobVersion(job));
+          jobDao.insertJobAndVersion(job, newJobVersion(job));
         });
     List<Job> jobsFound = jobDao.findAllInNamespace(nsName, 10, 0);
     assertEquals(jobs.size(), jobsFound.size());
@@ -185,7 +187,7 @@ public class JobDaoTest {
             Collections.<String>emptyList(),
             null,
             null);
-    JobVersion jobVersion = Generator.genJobVersion(jobWithEmptyInputsOutputs);
+    JobVersion jobVersion = newJobVersion(jobWithEmptyInputsOutputs);
     jobDao.insertJobAndVersion(jobWithEmptyInputsOutputs, jobVersion);
     Job jobFound = jobDao.findByID(jobId);
     assertEquals(0, jobFound.getInputDatasetUrns().size());

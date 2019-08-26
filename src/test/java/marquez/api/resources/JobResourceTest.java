@@ -17,6 +17,9 @@ package marquez.api.resources;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static javax.ws.rs.client.Entity.entity;
+import static marquez.service.models.ServiceModelGenerator.newJob;
+import static marquez.service.models.ServiceModelGenerator.newJobRun;
+import static marquez.service.models.ServiceModelGenerator.newNamespace;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
@@ -51,7 +54,6 @@ import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
-import marquez.service.models.Generator;
 import marquez.service.models.JobRun;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -98,7 +100,7 @@ public class JobResourceTest {
   public void testCreateJobInternalErrorHandling() throws MarquezServiceException {
     when(MOCK_JOB_SERVICE.createJob(any(), any())).thenThrow(new MarquezServiceException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(newNamespace()));
 
     JobResponse jobForJobCreationRequest = generateApiJob();
     Response res = insertJob(jobForJobCreationRequest);
@@ -119,7 +121,7 @@ public class JobResourceTest {
   public void testGetJobInternalErrorHandling() throws MarquezServiceException {
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenThrow(new MarquezServiceException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(newNamespace()));
 
     Response res = getJob("someName");
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), res.getStatus());
@@ -129,7 +131,7 @@ public class JobResourceTest {
   public void testCreateJobBadInputs() throws MarquezServiceException {
     when(MOCK_JOB_SERVICE.createJob(any(), any())).thenThrow(new MarquezServiceException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(newNamespace()));
 
     JobResponse jobForJobCreationRequest = generateApiJobWithNullLocation();
 
@@ -140,7 +142,7 @@ public class JobResourceTest {
   @Test
   public void testDescriptionOptionalForCreateJobInputs() throws MarquezServiceException {
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(newNamespace()));
 
     JobResponse jobForJobCreationRequest = generateApiJobWithNullDescription();
 
@@ -151,7 +153,7 @@ public class JobResourceTest {
   @Test
   public void testGetJobNoSuchJob() throws MarquezServiceException {
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(newNamespace()));
 
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
 
@@ -192,8 +194,8 @@ public class JobResourceTest {
 
   @Test
   public void testGetAllJobsInNamespace() throws MarquezServiceException {
-    marquez.service.models.Job job1 = Generator.genJob();
-    marquez.service.models.Job job2 = Generator.genJob();
+    marquez.service.models.Job job1 = newJob();
+    marquez.service.models.Job job2 = newJob();
     List<marquez.service.models.Job> jobsList = Arrays.asList(job1, job2);
 
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
@@ -212,8 +214,8 @@ public class JobResourceTest {
 
   @Test
   public void testGetAllJobsInNamespaceVerifyInputs() throws MarquezServiceException {
-    marquez.service.models.Job job1 = Generator.genJob();
-    marquez.service.models.Job job2 = Generator.genJob();
+    marquez.service.models.Job job1 = newJob();
+    marquez.service.models.Job job2 = newJob();
     List<marquez.service.models.Job> jobsList = Arrays.asList(job1, job2);
 
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
@@ -230,8 +232,8 @@ public class JobResourceTest {
     when(MOCK_JOB_SERVICE.createJobRun(any(), any(), any(), any(), any()))
         .thenThrow(new MarquezServiceException());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
-    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.of(Generator.genJob()));
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(newNamespace()));
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.of(newJob()));
 
     JobRunResponse jobForJobCreationRequest = generateApiJobRun();
     Response res = insertJobRun(jobForJobCreationRequest);
@@ -241,7 +243,7 @@ public class JobResourceTest {
   @Test
   public void testStartJobRunInternalErrorHandling() throws MarquezServiceException, Exception {
     UUID externalRunId = UUID.randomUUID();
-    JobRun generatedJobRun = Generator.genJobRun();
+    JobRun generatedJobRun = newJobRun();
 
     when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
     when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new MarquezServiceException());
@@ -252,7 +254,7 @@ public class JobResourceTest {
   @Test
   public void testCompleteJobRunInternalErrorHandling() throws MarquezServiceException, Exception {
     UUID externalRunId = UUID.randomUUID();
-    JobRun generatedJobRun = Generator.genJobRun();
+    JobRun generatedJobRun = newJobRun();
 
     when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
     when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new MarquezServiceException());
@@ -263,7 +265,7 @@ public class JobResourceTest {
   @Test
   public void testAbortJobRunInternalErrorHandling() throws MarquezServiceException, Exception {
     UUID externalRunId = UUID.randomUUID();
-    JobRun generatedJobRun = Generator.genJobRun();
+    JobRun generatedJobRun = newJobRun();
 
     when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
     when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new MarquezServiceException());
@@ -274,7 +276,7 @@ public class JobResourceTest {
   @Test
   public void testFailJobRunInternalErrorHandling() throws MarquezServiceException, Exception {
     UUID externalRunId = UUID.randomUUID();
-    JobRun generatedJobRun = Generator.genJobRun();
+    JobRun generatedJobRun = newJobRun();
 
     when(MOCK_JOB_SERVICE.getJobRun(any())).thenReturn(Optional.of(generatedJobRun));
     when(MOCK_JOB_SERVICE.updateJobRunState(any(), any())).thenThrow(new MarquezServiceException());
@@ -288,7 +290,7 @@ public class JobResourceTest {
 
     when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.empty());
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(false);
-    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.of(Generator.genJob()));
+    when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.of(newJob()));
 
     Response res = insertJobRun(jobRunForJobRunCreationRequest);
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), res.getStatus());
@@ -298,7 +300,7 @@ public class JobResourceTest {
   public void testJobRunCreationWithInvalidJob() throws MarquezServiceException {
     JobRunResponse jobRunForJobRunCreationRequest = generateApiJobRun();
 
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(newNamespace()));
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
 
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
@@ -311,7 +313,7 @@ public class JobResourceTest {
   public void testJobRunStartWithInvalidJob() throws MarquezServiceException, Exception {
     JobRunResponse jobRunForJobRunCreationRequest = generateApiJobRun();
 
-    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(Generator.genNamespace()));
+    when(MOCK_NAMESPACE_SERVICE.get(any())).thenReturn(Optional.of(newNamespace()));
     when(MOCK_NAMESPACE_SERVICE.exists(any())).thenReturn(true);
 
     when(MOCK_JOB_SERVICE.getJob(any(), any())).thenReturn(Optional.empty());
@@ -353,7 +355,7 @@ public class JobResourceTest {
   @Test
   public void testGetAllRunsOfJob() throws MarquezServiceException {
     JobResponse job = generateApiJob();
-    List<JobRun> jobRuns = Arrays.asList(Generator.genJobRun(), Generator.genJobRun());
+    List<JobRun> jobRuns = Arrays.asList(newJobRun(), newJobRun());
     when(MOCK_NAMESPACE_SERVICE.exists(NAMESPACE_NAME)).thenReturn(true);
     when(MOCK_JOB_SERVICE.getAllRunsOfJob(NAMESPACE_NAME, job.getName(), TEST_LIMIT, TEST_OFFSET))
         .thenReturn(jobRuns);

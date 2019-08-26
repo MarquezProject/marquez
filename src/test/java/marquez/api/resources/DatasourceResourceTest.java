@@ -16,6 +16,7 @@ package marquez.api.resources;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
+import static marquez.service.models.ServiceModelGenerator.newDatasource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -40,7 +41,6 @@ import marquez.common.models.DatasourceUrn;
 import marquez.service.DatasourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
-import marquez.service.models.Generator;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -94,7 +94,7 @@ public class DatasourceResourceTest {
   @Test
   public void testListDatasources200_singleset() {
     when(mockDatasourceService.getAll(any(), any()))
-        .thenReturn(Collections.singletonList(Generator.genDatasource()));
+        .thenReturn(Collections.singletonList(newDatasource()));
     final Response datasourceResponse = datasourceResource.list(100, 0);
     assertThat(datasourceResponse.getStatus()).isEqualTo(OK.getStatusCode());
 
@@ -106,8 +106,8 @@ public class DatasourceResourceTest {
   @Test
   public void testListDatasources200_multipleItems() {
     final List<Datasource> resultSet = new ArrayList<>();
-    resultSet.add(Generator.genDatasource());
-    resultSet.add(Generator.genDatasource());
+    resultSet.add(newDatasource());
+    resultSet.add(newDatasource());
 
     when(mockDatasourceService.getAll(any(), any())).thenReturn(resultSet);
     final Response datasourceResponse = datasourceResource.list(100, 0);
@@ -120,7 +120,7 @@ public class DatasourceResourceTest {
 
   @Test
   public void testListDatasourceResponseCorrect() {
-    final Datasource ds1 = Generator.genDatasource();
+    final Datasource ds1 = newDatasource();
     final List<Datasource> resultSet = Collections.singletonList(ds1);
 
     when(mockDatasourceService.getAll(any(), any())).thenReturn(resultSet);
@@ -199,7 +199,7 @@ public class DatasourceResourceTest {
 
   @Test
   public void testCreateDatasource() throws MarquezServiceException {
-    final Datasource ds1 = Generator.genDatasource();
+    final Datasource ds1 = newDatasource();
 
     final DatasourceRequest validRequest =
         new DatasourceRequest(ds1.getName().getValue(), ds1.getConnectionUrl().getRawValue());
@@ -235,7 +235,7 @@ public class DatasourceResourceTest {
 
   @Test(expected = MarquezServiceException.class)
   public void testInternalErrorHandling() throws MarquezServiceException {
-    final Datasource ds1 = Generator.genDatasource();
+    final Datasource ds1 = newDatasource();
 
     final DatasourceRequest validRequest =
         new DatasourceRequest(ds1.getName().getValue(), ds1.getConnectionUrl().getRawValue());
