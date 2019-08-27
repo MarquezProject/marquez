@@ -120,23 +120,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/jobs'
 
-  /namespaces/{namespace}/jobs/{job}/versions:
-    parameters:
-      - $ref: '#/components/parameters/namespace'
-      - $ref: '#/components/parameters/job'
-    get:
-      summary: List all job versions
-      description: Returns a list of job versions.
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/jobVersions'
-
   /namespaces/{namespace}/jobs/{job}/runs:
     parameters:
       - $ref: '#/components/parameters/namespace'
