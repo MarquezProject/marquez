@@ -14,6 +14,7 @@
 
 package marquez.service;
 
+import static marquez.db.models.DbModelGenerator.newDatasourceRow;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -29,9 +30,10 @@ import marquez.db.DatasourceDao;
 import marquez.db.models.DatasourceRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Datasource;
-import marquez.service.models.Generator;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -52,7 +54,7 @@ public class DatasourceServiceTest {
 
   @Test
   public void testCreateDatasource() throws MarquezServiceException {
-    final DatasourceRow row = Generator.genDatasourceRow();
+    final DatasourceRow row = newDatasourceRow();
     when(datasourceDao.insert(any(DatasourceRow.class))).thenReturn(Optional.of(row));
 
     final Datasource response =
@@ -66,7 +68,7 @@ public class DatasourceServiceTest {
   @Test(expected = NullPointerException.class)
   public void testCreateDatasource_throwsException_onNullConnectionUrl()
       throws MarquezServiceException {
-    final DatasourceRow row = Generator.genDatasourceRow();
+    final DatasourceRow row = newDatasourceRow();
 
     datasourceService.create(null, DatasourceName.of(row.getName()));
   }
@@ -74,14 +76,14 @@ public class DatasourceServiceTest {
   @Test(expected = NullPointerException.class)
   public void testCreateDatasource_throwsException_onNullDatasourceName()
       throws MarquezServiceException {
-    final DatasourceRow row = Generator.genDatasourceRow();
+    final DatasourceRow row = newDatasourceRow();
 
     datasourceService.create(ConnectionUrl.of(row.getConnectionUrl()), null);
   }
 
   @Test()
   public void testCreateDatasourceDuplicateName() throws MarquezServiceException {
-    final DatasourceRow existingRow = Generator.genDatasourceRow();
+    final DatasourceRow existingRow = newDatasourceRow();
     final String newConnectionUrl = "jdbc:postgresql://localhost:9999/different_novelists_";
 
     when(datasourceDao.findBy(DatasourceName.of(existingRow.getName())))
@@ -95,7 +97,7 @@ public class DatasourceServiceTest {
 
   @Test(expected = MarquezServiceException.class)
   public void testCreateDatasource_throwsException_onDaoException() throws MarquezServiceException {
-    final DatasourceRow row = Generator.genDatasourceRow();
+    final DatasourceRow row = newDatasourceRow();
     when(datasourceDao.insert(any(DatasourceRow.class))).thenReturn(Optional.empty());
     datasourceService.create(
         ConnectionUrl.of(row.getConnectionUrl()), DatasourceName.of(row.getName()));
@@ -108,7 +110,7 @@ public class DatasourceServiceTest {
 
   @Test
   public void testGetDatasourceByUrn() throws MarquezServiceException {
-    final DatasourceRow row = Generator.genDatasourceRow();
+    final DatasourceRow row = newDatasourceRow();
     when(datasourceDao.findBy(any(DatasourceUrn.class))).thenReturn(Optional.of(row));
 
     final Optional<Datasource> response =
@@ -131,7 +133,7 @@ public class DatasourceServiceTest {
   @Test(expected = MarquezServiceException.class)
   public void testGetDatasourceByUrn_throwMarquezServiceException_onDaoException()
       throws MarquezServiceException {
-    final DatasourceRow row = Generator.genDatasourceRow();
+    final DatasourceRow row = newDatasourceRow();
     when(datasourceDao.findBy(any(DatasourceUrn.class)))
         .thenThrow(UnableToExecuteStatementException.class);
     datasourceService.get(
@@ -142,8 +144,8 @@ public class DatasourceServiceTest {
   @Test
   public void testGetAll_multipleResults() {
     final List<DatasourceRow> datasourceRowList = new ArrayList();
-    datasourceRowList.add(Generator.genDatasourceRow());
-    datasourceRowList.add(Generator.genDatasourceRow());
+    datasourceRowList.add(newDatasourceRow());
+    datasourceRowList.add(newDatasourceRow());
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);
 
@@ -155,7 +157,7 @@ public class DatasourceServiceTest {
 
   @Test
   public void testGetAll_singleResult() {
-    final DatasourceRow generatedDatasourceRow = Generator.genDatasourceRow();
+    final DatasourceRow generatedDatasourceRow = newDatasourceRow();
     final List<DatasourceRow> datasourceRowList = Collections.singletonList(generatedDatasourceRow);
 
     when(datasourceDao.findAll(any(), any())).thenReturn(datasourceRowList);

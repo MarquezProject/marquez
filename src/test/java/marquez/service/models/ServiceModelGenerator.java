@@ -14,7 +14,7 @@
 
 package marquez.service.models;
 
-import static java.util.stream.Collectors.toList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDatasetUrn;
@@ -44,7 +44,7 @@ public final class ServiceModelGenerator extends ModelGenerator {
   private ServiceModelGenerator() {}
 
   public static List<Namespace> newNamespaces(final int limit) {
-    return Stream.generate(() -> newNamespace()).limit(limit).collect(toList());
+    return Stream.generate(() -> newNamespace()).limit(limit).collect(toImmutableList());
   }
 
   public static Namespace newNamespace() {
@@ -61,7 +61,7 @@ public final class ServiceModelGenerator extends ModelGenerator {
   }
 
   public static List<Datasource> newDatasources(final int limit) {
-    return Stream.generate(() -> newDatasource()).limit(limit).collect(toList());
+    return Stream.generate(() -> newDatasource()).limit(limit).collect(toImmutableList());
   }
 
   public static Datasource newDatasource() {
@@ -101,7 +101,7 @@ public final class ServiceModelGenerator extends ModelGenerator {
   }
 
   public static List<Dataset> newDatasets(final int limit) {
-    return Stream.generate(() -> newDataset()).limit(limit).collect(toList());
+    return Stream.generate(() -> newDataset()).limit(limit).collect(toImmutableList());
   }
 
   public static Dataset newDataset() {
@@ -125,33 +125,78 @@ public final class ServiceModelGenerator extends ModelGenerator {
   }
 
   public static List<Job> newJobs(final int limit) {
-    return Stream.generate(() -> newJob()).limit(limit).collect(toList());
+    return Stream.generate(() -> newJob()).limit(limit).collect(toImmutableList());
   }
 
   public static Job newJob() {
-    return newJob(true);
+    return newJob(true, UUID.randomUUID());
+  }
+
+  public static Job newJobWithNameSpaceId(UUID nameSpaceId) {
+    return newJob(true, nameSpaceId);
   }
 
   public static Job newJob(final boolean hasDescription) {
+    return newJob(hasDescription, UUID.randomUUID());
+  }
+
+  public static Job newJob(final boolean hasDescription, UUID nameSpaceId) {
     final Instant createdAt = newTimestamp();
     final Instant updatedAt = createdAt;
     return new Job(
-        null,
+        UUID.randomUUID(),
         newJobName().getValue(),
         newLocation().toString(),
-        null,
+        nameSpaceId,
         hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue(),
-        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toList()),
-        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toList()),
+        newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
+        newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         createdAt,
         updatedAt);
   }
 
   public static List<JobRun> newJobRuns(final int limit) {
-    return Stream.generate(() -> newJobRun()).limit(limit).collect(toList());
+    return Stream.generate(() -> newJobRun()).limit(limit).collect(toImmutableList());
   }
 
   public static JobRun newJobRun() {
-    return new JobRun(UUID.randomUUID(), 0, null, null, null, null, null, newTimestamp());
+    return new JobRun(
+        UUID.randomUUID(),
+        JobRunState.State.toInt(JobRunState.State.NEW),
+        UUID.randomUUID(),
+        "abc123",
+        "{'foo': 1}",
+        null,
+        null,
+        null);
+  }
+
+  public static Job cloneJob(Job job) {
+    return new Job(
+        job.getGuid(),
+        job.getName(),
+        job.getLocation(),
+        job.getNamespaceGuid(),
+        job.getDescription(),
+        job.getInputDatasetUrns(),
+        job.getOutputDatasetUrns(),
+        job.getCreatedAt(),
+        job.getUpdatedAt());
+  }
+
+  public static JobVersion newJobVersion() {
+    return new JobVersion(
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        newLocation().toString(),
+        UUID.randomUUID(),
+        null,
+        null,
+        null);
+  }
+
+  public static JobVersion newJobVersion(Job job) {
+    return new JobVersion(
+        UUID.randomUUID(), job.getGuid(), job.getLocation(), UUID.randomUUID(), null, null, null);
   }
 }
