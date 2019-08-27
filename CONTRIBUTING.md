@@ -38,7 +38,7 @@ We use [spotless](https://github.com/diffplug/spotless) to format our code. This
 $ ./gradlew spotlessApply
 ```
 
-> **Note:** To make formatting code simple, we recommend installing a [plugin](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides) for your favorite IDE. We also us [Lombok](https://projectlombok.org). Though not required, you might want to install the [plugin](https://projectlombok.org/setup/overview) as well. 
+> **Note:** To make formatting code simple, we recommend installing a [plugin](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides) for your favorite IDE. We also us [Lombok](https://projectlombok.org). Though not required, you might want to install the [plugin](https://projectlombok.org/setup/overview) as well.
 
 # Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
 
@@ -59,6 +59,25 @@ To ensure your pull request is accepted, follow these guidelines:
 * Do your best to have a [well-formed commit message](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for your change
 * [Keep diffs small](https://graysonkoonce.com/stacked-pull-requests-keeping-github-diffs-small) and self-contained
 * If your change fixes a bug, please [link the issue](https://help.github.com/articles/closing-issues-using-keywords) in your pull request description
+* Any changes to the API reference requires [regenerating](#docs) the static `openapi.html` file.
+
+# [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
+
+> **Note:** To bundle or serve the API reference, please install [`redoc-cli`](https://www.npmjs.com/package/redoc-cli).
+
+To bundle:
+
+```bash
+$ redoc-cli bundle docs/openapi.yml -o docs/openapi.html  --title "Marquez API Reference"
+```
+
+To serve:  
+
+```bash
+$ redoc-cli serve docs/openapi.yml
+```
+
+Then browse to: http://localhost:8080
 
 # Resources
 
