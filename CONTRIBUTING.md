@@ -63,8 +63,6 @@ To ensure your pull request is accepted, follow these guidelines:
 
 # [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
 
-> **Note:** To bundle or serve the API reference, please install [`redoc-cli`](https://www.npmjs.com/package/redoc-cli).
-
 To bundle:
 
 ```bash
@@ -78,6 +76,8 @@ $ redoc-cli serve docs/openapi.yml
 ```
 
 Then browse to: http://localhost:8080
+
+> **Note:** To bundle or serve the API reference, please install [`redoc-cli`](https://www.npmjs.com/package/redoc-cli).
 
 # Resources
 
