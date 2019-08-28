@@ -24,14 +24,13 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(JobRunStateRowMapper.class)
 public interface JobRunStateDao {
   @SqlUpdate(
-      "INSERT INTO job_run_states (guid, job_run_guid, state)"
-          + "VALUES (:guid, :job_run_guid, :state)")
-  void insert(final UUID guid, UUID job_run_guid, final Integer state);
+      "INSERT INTO job_run_states (uuid, job_run_uuid, state)"
+          + "VALUES (:uuid, :runUuid, :runState)")
+  void insert(UUID uuid, UUID runUuid, final Integer runState);
 
-  @SqlQuery("SELECT * FROM job_run_states WHERE guid = :guid")
-  JobRunState findById(UUID guid);
+  @SqlQuery("SELECT * FROM job_run_states WHERE uuid = :uuid")
+  JobRunState findById(UUID uuid);
 
-  @SqlQuery(
-      "SELECT * FROM job_run_states WHERE job_run_guid = :jobRunGuid ORDER by transitioned_at DESC")
-  JobRunState findByLatestJobRun(UUID jobRunGuid);
+  @SqlQuery("SELECT * FROM job_run_states WHERE job_run_uuid = :uuid ORDER by transitioned_at DESC")
+  JobRunState findByLatestJobRun(UUID uuid);
 }

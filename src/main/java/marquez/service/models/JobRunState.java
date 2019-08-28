@@ -25,9 +25,9 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class JobRunState {
-  private final UUID guid;
+  private final UUID uuid;
   private final Instant transitionedAt;
-  private final UUID jobRunGuid;
+  private final UUID jobRunUuid;
   private final State state;
 
   public enum State {

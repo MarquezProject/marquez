@@ -68,7 +68,7 @@ public class JobDaoTest {
         .useHandle(
             handle -> {
               handle.execute(
-                  "INSERT INTO namespaces(guid, name, current_ownership)" + "VALUES (?, ?, ?);",
+                  "INSERT INTO namespaces(uuid, name, current_ownership)" + "VALUES (?, ?, ?);",
                   namespaceId,
                   name,
                   owner);
@@ -76,11 +76,11 @@ public class JobDaoTest {
   }
 
   private void assertJobFieldsMatch(Job job1, Job job2) {
-    assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
-    assertEquals(job1.getGuid(), job2.getGuid());
+    assertEquals(job1.getNamespaceUuid(), job2.getNamespaceUuid());
+    assertEquals(job1.getUuid(), job2.getUuid());
     assertEquals(job1.getName(), job2.getName());
     assertEquals(job1.getLocation(), job2.getLocation());
-    assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
+    assertEquals(job1.getNamespaceUuid(), job2.getNamespaceUuid());
     assertEquals(job1.getInputDatasetUrns(), job2.getInputDatasetUrns());
     assertEquals(job1.getOutputDatasetUrns(), job2.getOutputDatasetUrns());
   }
@@ -88,7 +88,7 @@ public class JobDaoTest {
   @Test
   public void testFindByID() {
     jobDao.insertJobAndVersion(job, jobVersion);
-    Job jobFound = jobDao.findByID(job.getGuid());
+    Job jobFound = jobDao.findByID(job.getUuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
     assertNull(null, jobDao.findByID(UUID.randomUUID()));
@@ -107,7 +107,7 @@ public class JobDaoTest {
   public void testInsert() {
     JobVersion jobVersion = newJobVersion(job);
     jobDao.insertJobAndVersion(job, jobVersion);
-    Job jobFound = jobDao.findByID(job.getGuid());
+    Job jobFound = jobDao.findByID(job.getUuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
   }
@@ -137,7 +137,7 @@ public class JobDaoTest {
             UUID.randomUUID(),
             job.getName(),
             "location",
-            job.getNamespaceGuid(),
+            job.getNamespaceUuid(),
             "desc",
             Collections.<String>emptyList(),
             Collections.<String>emptyList());
@@ -147,7 +147,7 @@ public class JobDaoTest {
   @Test
   public void testInsertJobAndVersion() {
     jobDao.insertJobAndVersion(job, jobVersion);
-    Job jobFound = jobDao.findByID(job.getGuid());
+    Job jobFound = jobDao.findByID(job.getUuid());
     assertNotNull(jobFound);
     assertJobFieldsMatch(job, jobFound);
     assertEquals(job.getLocation(), jobFound.getLocation());

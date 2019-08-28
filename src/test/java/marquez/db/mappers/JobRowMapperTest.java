@@ -97,10 +97,10 @@ public class JobRowMapperTest {
 
     final JobRowMapper jobRowMapper = new JobRowMapper();
     final Job job = jobRowMapper.map(results, context);
-    assertThat(job.getGuid()).isEqualTo(ROW_UUID);
+    assertThat(job.getUuid()).isEqualTo(ROW_UUID);
     assertThat(job.getName()).isEqualTo(NAME.getValue());
     assertThat(job.getLocation()).isEqualTo(LOCATION.toASCIIString());
-    assertThat(job.getNamespaceGuid()).isEqualTo(NAMESPACE_UUID);
+    assertThat(job.getNamespaceUuid()).isEqualTo(NAMESPACE_UUID);
     assertThat(job.getDescription()).isEqualTo(DESCRIPTION.getValue());
     assertThat(job.getInputDatasetUrns()).isEqualTo(Arrays.asList(INPUT_DATASET_URNS));
     assertThat(job.getOutputDatasetUrns()).isEqualTo(Arrays.asList(OUTPUT_DATASET_URNS));
@@ -136,10 +136,10 @@ public class JobRowMapperTest {
 
     final JobRowMapper jobRowMapper = new JobRowMapper();
     final Job job = jobRowMapper.map(results, context);
-    assertThat(job.getGuid()).isEqualTo(ROW_UUID);
+    assertThat(job.getUuid()).isEqualTo(ROW_UUID);
     assertThat(job.getName()).isEqualTo(NAME.getValue());
     assertThat(job.getLocation()).isEqualTo(LOCATION.toASCIIString());
-    assertThat(job.getNamespaceGuid()).isEqualTo(NAMESPACE_UUID);
+    assertThat(job.getNamespaceUuid()).isEqualTo(NAMESPACE_UUID);
     assertThat(job.getDescription()).isEqualTo(NO_DESCRIPTION.getValue());
     assertThat(job.getInputDatasetUrns()).isEqualTo(Arrays.asList(INPUT_DATASET_URNS));
     assertThat(job.getOutputDatasetUrns()).isEqualTo(Arrays.asList(OUTPUT_DATASET_URNS));

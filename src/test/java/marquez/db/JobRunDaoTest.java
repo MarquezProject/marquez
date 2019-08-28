@@ -70,27 +70,27 @@ public class JobRunDaoTest extends JobRunBaseTest {
             JobRunState.class,
             (rs, ctx) ->
                 new JobRunState(
-                    UUID.fromString(rs.getString("guid")),
+                    UUID.fromString(rs.getString("uuid")),
                     rs.getTimestamp("transitioned_at").toInstant(),
-                    UUID.fromString(rs.getString("job_run_guid")),
+                    UUID.fromString(rs.getString("job_run_uuid")),
                     JobRunState.State.fromInt(rs.getInt("state"))));
 
     Namespace generatedNamespace = namespaceService.createOrUpdate(newNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
-    CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
+    CREATED_NAMESPACE_UUID = generatedNamespace.getUuid();
 
-    marquez.service.models.Job job = newJobWithNameSpaceId(generatedNamespace.getGuid());
+    marquez.service.models.Job job = newJobWithNameSpaceId(generatedNamespace.getUuid());
     marquez.service.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
 
     CREATED_JOB_NAME = createdJob.getName();
-    CREATED_JOB_RUN_UUID = createdJob.getNamespaceGuid();
+    CREATED_JOB_RUN_UUID = createdJob.getNamespaceUuid();
   }
 
   @Before
   public void createJobRun() throws MarquezServiceException {
     JobRun createdJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
-    CREATED_JOB_RUN_UUID = createdJobRun.getGuid();
+    CREATED_JOB_RUN_UUID = createdJobRun.getUuid();
   }
 
   @Test
@@ -161,10 +161,10 @@ public class JobRunDaoTest extends JobRunBaseTest {
             handle -> {
               handle.execute(
                   format(
-                      "DELETE FROM job_run_states WHERE job_run_guid = '%s'",
+                      "DELETE FROM job_run_states WHERE job_run_uuid = '%s'",
                       CREATED_JOB_RUN_UUID));
               handle.execute(
-                  format("DELETE FROM job_runs WHERE guid = '%s'", CREATED_JOB_RUN_UUID));
+                  format("DELETE FROM job_runs WHERE uuid = '%s'", CREATED_JOB_RUN_UUID));
             });
     List<JobRun> jobRuns =
         jobService.getAllRunsOfJob(
@@ -177,7 +177,7 @@ public class JobRunDaoTest extends JobRunBaseTest {
     Query qr =
         handle.select(
             format(
-                "SELECT * FROM job_run_states WHERE job_run_guid = '%s' ORDER by transitioned_at DESC",
+                "SELECT * FROM job_run_states WHERE job_run_uuid = '%s' ORDER by transitioned_at DESC",
                 jobRunId.toString()));
     return qr.mapTo(JobRunState.class).stream().findFirst().get();
   }

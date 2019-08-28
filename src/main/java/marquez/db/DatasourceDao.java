@@ -27,7 +27,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 @RegisterRowMapper(DatasourceRowMapper.class)
 public interface DatasourceDao {
   @SqlQuery(
-      "INSERT INTO datasources (guid, urn, name, connection_url) "
+      "INSERT INTO datasources (uuid, urn, name, connection_url) "
           + "VALUES (:uuid, :urn, :name, :connectionUrl) RETURNING * ")
   Optional<DatasourceRow> insert(@BindBean DatasourceRow datasourceRow);
 

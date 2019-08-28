@@ -30,7 +30,7 @@ public final class JobRunResponseMapper {
 
   public static JobRunResponse map(@NonNull JobRun run) {
     return new JobRunResponse(
-        run.getGuid() == null ? null : run.getGuid().toString(),
+        run.getUuid() == null ? null : run.getUuid().toString(),
         run.getNominalStartTime() == null ? null : ISO_INSTANT.format(run.getNominalStartTime()),
         run.getNominalEndTime() == null ? null : ISO_INSTANT.format(run.getNominalEndTime()),
         run.getRunArgs(),

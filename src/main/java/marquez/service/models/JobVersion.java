@@ -22,11 +22,11 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public final class JobVersion {
-  private final UUID guid;
-  private final UUID jobGuid;
+  private final UUID uuid;
+  private final UUID jobUuid;
   private final String uri;
   private final UUID version;
-  private final UUID latestJobRunGuid;
+  private final UUID latestJobRunUuid;
   private final Instant createdAt;
   private final Instant updatedAt;
 }

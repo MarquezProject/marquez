@@ -22,9 +22,9 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public final class JobRun {
-  private final UUID guid;
+  private final UUID uuid;
   private final Integer currentState;
-  private final UUID jobVersionGuid;
+  private final UUID jobVersionUuid;
   private final String runArgsHexDigest;
   private final String runArgs;
   private final Instant nominalStartTime;

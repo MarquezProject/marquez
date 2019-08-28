@@ -42,7 +42,7 @@ public class JobServiceIntegrationTest {
         .useHandle(
             handle -> {
               handle.execute(
-                  "INSERT INTO namespaces(guid, name, current_ownership) VALUES(?, ?, ?);",
+                  "INSERT INTO namespaces(uuid, name, current_ownership) VALUES(?, ?, ?);",
                   namespaceID,
                   namespaceName,
                   jobOwner);
@@ -74,7 +74,7 @@ public class JobServiceIntegrationTest {
     assertEquals(job.getName(), jobGetRet.get().getName());
     List<JobVersion> versions = jobService.getAllVersionsOfJob(namespaceName, job.getName());
     assertEquals(1, versions.size());
-    assertEquals(jobGetRet.get().getGuid(), versions.get(0).getJobGuid());
+    assertEquals(jobGetRet.get().getUuid(), versions.get(0).getJobUuid());
   }
 
   @Test
@@ -86,7 +86,7 @@ public class JobServiceIntegrationTest {
             null,
             job.getName(),
             job.getLocation() + "/new",
-            job.getNamespaceGuid(),
+            job.getNamespaceUuid(),
             job.getDescription(),
             job.getInputDatasetUrns(),
             job.getOutputDatasetUrns());
@@ -98,8 +98,8 @@ public class JobServiceIntegrationTest {
     assertEquals(job.getName(), jobGetRet.get().getName());
     assertEquals(jobCreateRet, jobGetRet.get());
     List<JobVersion> versions = jobService.getAllVersionsOfJob(namespaceName, job.getName());
-    assertEquals(jobGetRet.get().getGuid(), versions.get(0).getJobGuid());
-    assertEquals(jobGetRet.get().getGuid(), versions.get(1).getJobGuid());
+    assertEquals(jobGetRet.get().getUuid(), versions.get(0).getJobUuid());
+    assertEquals(jobGetRet.get().getUuid(), versions.get(1).getJobUuid());
   }
 
   @Test
@@ -127,15 +127,15 @@ public class JobServiceIntegrationTest {
     String runArgsJson = "{'foo': 1}";
     jobService.createJob(namespaceName, job);
     JobRun jobRun = jobService.createJobRun(namespaceName, job.getName(), runArgsJson, null, null);
-    Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getGuid());
+    Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getUuid());
     assertTrue(jobRunFound.isPresent());
-    assertEquals(jobRun.getGuid(), jobRunFound.get().getGuid());
+    assertEquals(jobRun.getUuid(), jobRunFound.get().getUuid());
     assertEquals(
         JobRunState.State.toInt(JobRunState.State.NEW),
         jobRunFound.get().getCurrentState().intValue());
     String argsHexDigest = jobRun.getRunArgsHexDigest();
     assertEquals(runArgsJson, jobRunArgsDao.findByDigest(argsHexDigest).getJson());
-    jobService.updateJobRunState(jobRun.getGuid(), JobRunState.State.RUNNING);
+    jobService.updateJobRunState(jobRun.getUuid(), JobRunState.State.RUNNING);
   }
 
   @Test
@@ -145,7 +145,7 @@ public class JobServiceIntegrationTest {
     jobService.createJob(namespaceName, job);
     JobRun jobRun =
         jobService.createJobRun(namespaceName, job.getName(), nullRunArgsJson, null, null);
-    Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getGuid());
+    Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getUuid());
     assertTrue(jobRunFound.isPresent());
     assertNull(jobRun.getRunArgsHexDigest());
     assertNull(jobRun.getRunArgs());
@@ -157,7 +157,7 @@ public class JobServiceIntegrationTest {
     String argsJson = "{'foo': 1}";
     jobService.createJob(namespaceName, job);
     JobRun jobRun = jobService.createJobRun(namespaceName, job.getName(), argsJson, null, null);
-    Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getGuid());
+    Optional<JobRun> jobRunFound = jobService.getJobRun(jobRun.getUuid());
     assertTrue(jobRunFound.isPresent());
     assertNotNull(jobRun.getRunArgsHexDigest());
     assertEquals(argsJson, jobRun.getRunArgs());

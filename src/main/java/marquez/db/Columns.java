@@ -26,7 +26,7 @@ public final class Columns {
 
   // Common column names
 
-  public static final String ROW_UUID = "guid";
+  public static final String ROW_UUID = "uuid";
   public static final String CREATED_AT = "created_at";
   public static final String UPDATED_AT = "updated_at";
   public static final String NAME = "name";
@@ -34,23 +34,23 @@ public final class Columns {
 
   // Namespace ownership column names
 
-  public static final String NAMESPACE_UUID = "namespace_guid";
+  public static final String NAMESPACE_UUID = "namespace_uuid";
   public static final String OWNER_UUID = "owner_uuid";
   public static final String CURRENT_OWNER_NAME = "current_ownership";
 
   // Job column names
 
-  public static final String JOB_UUID = "job_guid";
-  public static final String JOB_VERSION_UUID = "job_version_guid";
+  public static final String JOB_UUID = "job_uuid";
+  public static final String JOB_VERSION_UUID = "job_version_uuid";
   public static final String INPUT_DATASET_URNS = "input_dataset_urns";
   public static final String OUTPUT_DATASET_URNS = "output_dataset_urns";
   public static final String LOCATION = "uri";
   public static final String VERSION = "version";
   public static final String CURRENT_VERSION_UUID = "current_version_uuid";
-  public static final String JOB_RUN_UUID = "job_run_guid";
+  public static final String JOB_RUN_UUID = "job_run_uuid";
   public static final String NOMINAL_START_TIME = "nominal_start_time";
   public static final String NOMINAL_END_TIME = "nominal_end_time";
-  public static final String LATEST_JOB_RUN_UUID = "latest_run_guid";
+  public static final String LATEST_JOB_RUN_UUID = "latest_run_uuid";
   public static final String CURRENT_RUN_STATE = "current_state";
   public static final String CHECKSUM = "hex_digest";
   public static final String RUN_ARGS_CHECKSUM = "job_run_args_hex_digest";
@@ -70,49 +70,54 @@ public final class Columns {
   public static final String DB_SCHEMA_NAME = "db_schema";
   public static final String DB_TABLE_NAME = "db_table_name";
 
-  public static UUID uuidOrNull(ResultSet results, String column) throws SQLException {
+  public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {
       return null;
     }
     return results.getObject(column, UUID.class);
   }
 
-  public static UUID uuidOrThrow(ResultSet results, String column) throws SQLException {
+  public static UUID uuidOrThrow(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {
       throw new IllegalArgumentException();
     }
     return results.getObject(column, UUID.class);
   }
 
-  public static Instant timestampOrNull(ResultSet results, String column) throws SQLException {
+  public static Instant timestampOrNull(final ResultSet results, final String column)
+      throws SQLException {
     if (results.getObject(column) == null) {
       return null;
     }
     return results.getTimestamp(column).toInstant();
   }
 
-  public static Instant timestampOrThrow(ResultSet results, String column) throws SQLException {
+  public static Instant timestampOrThrow(final ResultSet results, final String column)
+      throws SQLException {
     if (results.getObject(column) == null) {
       throw new IllegalArgumentException();
     }
     return results.getTimestamp(column).toInstant();
   }
 
-  public static String stringOrNull(ResultSet results, String column) throws SQLException {
+  public static String stringOrNull(final ResultSet results, final String column)
+      throws SQLException {
     if (results.getObject(column) == null) {
       return null;
     }
     return results.getString(column);
   }
 
-  public static String stringOrThrow(ResultSet results, String column) throws SQLException {
+  public static String stringOrThrow(final ResultSet results, final String column)
+      throws SQLException {
     if (results.getObject(column) == null) {
       throw new IllegalArgumentException();
     }
     return results.getString(column);
   }
 
-  public static List<String> arrayOrThrow(ResultSet results, String column) throws SQLException {
+  public static List<String> arrayOrThrow(final ResultSet results, final String column)
+      throws SQLException {
     if (results.getObject(column) == null) {
       throw new IllegalArgumentException();
     }

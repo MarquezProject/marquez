@@ -34,13 +34,13 @@ public interface DatasetDao {
   DatasourceDao createDatasourceDao();
 
   @SqlUpdate(
-      "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
+      "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, urn, description, name) "
           + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name)")
   @RegisterRowMapper(DatasetRowMapper.class)
   void insert(@BindBean DatasetRow datasetRow);
 
   @SqlQuery(
-      "INSERT INTO datasets (guid, namespace_guid, datasource_uuid, urn, description, name) "
+      "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, urn, description, name) "
           + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name) "
           + "RETURNING *")
   @RegisterRowMapper(DatasetRowMapper.class)
@@ -53,15 +53,15 @@ public interface DatasetDao {
       "UPDATE datasets "
           + "SET updated_at = NOW(), "
           + "    current_version_uuid = :currentVersionUuid "
-          + "WHERE guid = :uuid")
+          + "WHERE uuid = :uuid")
   void updateCurrentVersionUuid(UUID uuid, UUID currentVersionUuid);
 
   @SqlQuery(
       "SELECT d.*, ds.urn AS datasource_urn "
           + "FROM datasets AS d "
           + "INNER JOIN datasources AS ds "
-          + "    ON (ds.guid = d.datasource_uuid) "
-          + "WHERE d.guid = :uuid")
+          + "    ON (ds.uuid = d.datasource_uuid) "
+          + "WHERE d.uuid = :uuid")
   @RegisterRowMapper(DatasetRowExtendedMapper.class)
   Optional<DatasetRowExtended> findBy(UUID uuid);
 
@@ -69,7 +69,7 @@ public interface DatasetDao {
       "SELECT d.*, ds.urn AS datasource_urn "
           + "FROM datasets AS d "
           + "INNER JOIN datasources AS ds "
-          + "    ON (ds.guid = d.datasource_uuid) "
+          + "    ON (ds.uuid = d.datasource_uuid) "
           + "WHERE d.urn = :value")
   @RegisterRowMapper(DatasetRowExtendedMapper.class)
   Optional<DatasetRowExtended> findBy(@BindBean DatasetUrn urn);
@@ -78,9 +78,9 @@ public interface DatasetDao {
       "SELECT d.*, ds.urn AS datasource_urn "
           + "FROM datasets AS d "
           + "INNER JOIN namespaces AS ns "
-          + "    ON (ns.guid = d.namespace_guid AND ns.name = :value) "
+          + "    ON (ns.uuid = d.namespace_uuid AND ns.name = :value) "
           + "INNER JOIN datasources AS ds "
-          + "    ON (ds.guid = d.datasource_uuid)"
+          + "    ON (ds.uuid = d.datasource_uuid)"
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(DatasetRowExtendedMapper.class)

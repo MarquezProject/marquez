@@ -78,7 +78,7 @@ public final class JobResource {
     final NamespaceName namespaceName = NamespaceName.of(namespaceAsString);
     throwIfNotExists(namespaceName);
     final Job newJob = JobMapper.map(JobName.of(jobAsString), request);
-    newJob.setNamespaceGuid(namespaceService.get(namespaceName).get().getGuid());
+    newJob.setNamespaceUuid(namespaceService.get(namespaceName).get().getUuid());
     final Job job = jobService.createJob(namespaceName.getValue(), newJob);
     final JobResponse response = JobResponseMapper.map(job);
     return Response.status(Response.Status.CREATED).entity(response).build();

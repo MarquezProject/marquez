@@ -25,10 +25,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @EqualsAndHashCode
 public final class Job {
-  @Getter private final UUID guid;
+  @Getter private final UUID uuid;
   @Getter private final String name;
   @Getter private final String location;
-  @Getter @Setter private UUID namespaceGuid;
+  @Getter @Setter private UUID namespaceUuid;
   @Getter private final String description;
   @Getter private final List<String> inputDatasetUrns;
   @Getter private final List<String> outputDatasetUrns;
@@ -36,17 +36,17 @@ public final class Job {
   @Getter private final Instant updatedAt;
 
   public Job(
-      final UUID guid,
+      final UUID uuid,
       final String name,
       final String location,
-      final UUID namespaceGuid,
+      final UUID namespaceUuid,
       final String description,
       final List<String> inputDatasetUrns,
       final List<String> outputDatasetUrns) {
-    this.guid = guid;
+    this.uuid = uuid;
     this.name = name;
     this.location = location;
-    this.namespaceGuid = namespaceGuid;
+    this.namespaceUuid = namespaceUuid;
     this.description = description;
     this.inputDatasetUrns = inputDatasetUrns;
     this.outputDatasetUrns = outputDatasetUrns;

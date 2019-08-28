@@ -46,7 +46,7 @@ public class JobVersionDaoTest {
         .useHandle(
             handle -> {
               handle.execute(
-                  "INSERT INTO namespaces(guid, name, current_ownership)" + "VALUES (?, ?, ?);",
+                  "INSERT INTO namespaces(uuid, name, current_ownership)" + "VALUES (?, ?, ?);",
                   nsID,
                   nsName,
                   "Amaranta");
@@ -72,7 +72,7 @@ public class JobVersionDaoTest {
     JobVersion jobVersion = newJobVersion(job);
     jobVersionDao.insert(jobVersion);
     JobVersion jobVersionFound = jobVersionDao.findByVersion(jobVersion.getVersion());
-    assertEquals(jobVersion.getGuid(), jobVersionFound.getGuid());
+    assertEquals(jobVersion.getUuid(), jobVersionFound.getUuid());
     assertNull(jobVersionDao.findByVersion(UUID.randomUUID()));
   }
 
@@ -83,9 +83,9 @@ public class JobVersionDaoTest {
     jobVersionDao.insert(jobVersion1);
     jobVersionDao.insert(jobVersion2);
     assertEquals(
-        jobVersion1.getGuid(), jobVersionDao.findByVersion(jobVersion1.getVersion()).getGuid());
+        jobVersion1.getUuid(), jobVersionDao.findByVersion(jobVersion1.getVersion()).getUuid());
     assertEquals(
-        jobVersion2.getGuid(), jobVersionDao.findByVersion(jobVersion2.getVersion()).getGuid());
+        jobVersion2.getUuid(), jobVersionDao.findByVersion(jobVersion2.getVersion()).getUuid());
   }
 
   @Test
@@ -115,6 +115,6 @@ public class JobVersionDaoTest {
     JobVersion jobVersion2 = newJobVersion(job);
     jobVersionDao.insert(jobVersion1);
     jobVersionDao.insert(jobVersion2);
-    assertEquals(jobVersion2.getGuid(), jobVersionDao.findLatest(nsName, job.getName()).getGuid());
+    assertEquals(jobVersion2.getUuid(), jobVersionDao.findLatest(nsName, job.getName()).getUuid());
   }
 }
