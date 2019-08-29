@@ -37,9 +37,9 @@ public interface JobVersionDao {
       "SELECT jv.* \n"
           + "FROM job_versions jv\n"
           + "INNER JOIN jobs j "
-          + " ON (j.guid = jv.job_guid AND j.name=:jobName)"
+          + " ON (j.uuid = jv.job_uuid AND j.name=:jobName)"
           + "INNER JOIN namespaces n "
-          + " ON (n.guid = j.namespace_guid AND n.name=:namespace)\n"
+          + " ON (n.uuid = j.namespace_uuid AND n.name=:namespace)\n"
           + "ORDER BY created_at")
   List<JobVersion> find(String namespace, String jobName);
 
@@ -47,20 +47,20 @@ public interface JobVersionDao {
       "SELECT jv.* \n"
           + "FROM job_versions jv\n"
           + "INNER JOIN jobs j "
-          + " ON (j.guid = jv.job_guid AND j.name=:jobName)"
+          + " ON (j.uuid = jv.job_uuid AND j.name=:jobName)"
           + "INNER JOIN namespaces n "
-          + " ON (n.guid = j.namespace_guid AND n.name=:namespace)\n"
+          + " ON (n.uuid = j.namespace_uuid AND n.name=:namespace)\n"
           + "ORDER BY created_at DESC \n"
           + "LIMIT 1")
   JobVersion findLatest(String namespace, String jobName);
 
   @SqlUpdate(
-      "INSERT INTO job_versions(guid, version, job_guid, uri) VALUES (:guid, :version, :jobGuid, :uri)")
+      "INSERT INTO job_versions(uuid, version, job_uuid, uri) VALUES (:uuid, :version, :jobUuid, :uri)")
   void insertVersionOnly(@BindBean JobVersion jobVersion);
 
   @Transaction
   default void insert(JobVersion jobVersion) {
     insertVersionOnly(jobVersion);
-    createJobDao().setCurrentVersionGuid(jobVersion.getJobGuid(), jobVersion.getGuid());
+    createJobDao().setCurrentVersionUuid(jobVersion.getJobUuid(), jobVersion.getUuid());
   }
 }

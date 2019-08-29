@@ -37,7 +37,7 @@ public class JobRunResponseMapperTest {
     final JobRun run = newJobRun();
     final JobRunResponse response = JobRunResponseMapper.map(run);
     assertThat(response).isNotNull();
-    assertThat(UUID.fromString(response.getRunId())).isEqualTo(run.getGuid());
+    assertThat(UUID.fromString(response.getRunId())).isEqualTo(run.getUuid());
     assertThat(response.getRunState())
         .isEqualTo(JobRunState.State.fromInt(run.getCurrentState()).name());
     assertThat(response.getRunArgs().orElse(null)).isEqualTo(run.getRunArgs());

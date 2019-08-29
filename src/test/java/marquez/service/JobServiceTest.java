@@ -62,11 +62,11 @@ public class JobServiceTest {
   }
 
   private void assertJobFieldsMatch(Job job1, Job job2) {
-    assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
-    assertEquals(job1.getGuid(), job2.getGuid());
+    assertEquals(job1.getNamespaceUuid(), job2.getNamespaceUuid());
+    assertEquals(job1.getUuid(), job2.getUuid());
     assertEquals(job1.getName(), job2.getName());
     assertEquals(job1.getLocation(), job2.getLocation());
-    assertEquals(job1.getNamespaceGuid(), job2.getNamespaceGuid());
+    assertEquals(job1.getNamespaceUuid(), job2.getNamespaceUuid());
     assertEquals(job1.getInputDatasetUrns(), job2.getInputDatasetUrns());
     assertEquals(job1.getOutputDatasetUrns(), job2.getOutputDatasetUrns());
   }
@@ -132,10 +132,10 @@ public class JobServiceTest {
     when(jobDao.findByID(any(UUID.class))).thenReturn(job);
     Job jobReturned = jobService.createJob(TEST_NS, job);
     verify(jobDao).insertJobAndVersion(jobCaptor.capture(), jobVersionCaptor.capture());
-    assertEquals(job.getNamespaceGuid(), jobReturned.getNamespaceGuid());
+    assertEquals(job.getNamespaceUuid(), jobReturned.getNamespaceUuid());
     assertEquals(job.getName(), jobReturned.getName());
     assertEquals(job.getLocation(), jobReturned.getLocation());
-    assertEquals(job.getNamespaceGuid(), jobReturned.getNamespaceGuid());
+    assertEquals(job.getNamespaceUuid(), jobReturned.getNamespaceUuid());
     assertEquals(job.getInputDatasetUrns(), jobReturned.getInputDatasetUrns());
     assertEquals(job.getOutputDatasetUrns(), jobReturned.getOutputDatasetUrns());
   }
@@ -160,11 +160,11 @@ public class JobServiceTest {
     Job newJob = newJobWithNameSpaceId(namespaceID);
     when(jobDao.findByName(eq(TEST_NS), any(String.class))).thenReturn(existingJob);
     when(jobVersionDao.findByVersion(any(UUID.class))).thenReturn(null);
-    when(jobDao.findByID(existingJob.getGuid())).thenReturn(existingJob);
+    when(jobDao.findByID(existingJob.getUuid())).thenReturn(existingJob);
     Job jobCreated = jobService.createJob(TEST_NS, newJob);
     verify(jobDao, never()).insert(newJob);
     verify(jobVersionDao).insert(jobVersionCaptor.capture());
-    assertEquals(jobCreated.getGuid(), jobVersionCaptor.getValue().getJobGuid());
+    assertEquals(jobCreated.getUuid(), jobVersionCaptor.getValue().getJobUuid());
     assertEquals(newJob.getLocation(), jobVersionCaptor.getValue().getUri());
   }
 
@@ -176,7 +176,7 @@ public class JobServiceTest {
     JobVersion existingJobVersion =
         new JobVersion(
             UUID.randomUUID(),
-            existingJob.getGuid(),
+            existingJob.getUuid(),
             existingJob.getLocation(),
             existingJobVersionID,
             null,
@@ -246,8 +246,8 @@ public class JobServiceTest {
   @Test
   public void testGetJobRun() throws MarquezServiceException {
     JobRun jobRun = newJobRun();
-    when(jobRunDao.findJobRunById(jobRun.getGuid())).thenReturn(jobRun);
-    assertEquals(Optional.ofNullable(jobRun), jobService.getJobRun(jobRun.getGuid()));
+    when(jobRunDao.findJobRunById(jobRun.getUuid())).thenReturn(jobRun);
+    assertEquals(Optional.ofNullable(jobRun), jobService.getJobRun(jobRun.getUuid()));
   }
 
   @Test(expected = MarquezServiceException.class)
@@ -283,7 +283,7 @@ public class JobServiceTest {
     jobRuns.add(newJobRun());
     jobRuns.add(newJobRun());
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
-    when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET)).thenReturn(jobRuns);
+    when(jobRunDao.findAllByJobUuid(job.getUuid(), TEST_LIMIT, TEST_OFFSET)).thenReturn(jobRuns);
     List<JobRun> jobRunsFound =
         jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET);
     assertEquals(2, jobRunsFound.size());
@@ -304,7 +304,7 @@ public class JobServiceTest {
     NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     List<JobRun> jobRuns = new ArrayList<JobRun>();
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
-    when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET)).thenReturn(jobRuns);
+    when(jobRunDao.findAllByJobUuid(job.getUuid(), TEST_LIMIT, TEST_OFFSET)).thenReturn(jobRuns);
     List<JobRun> jobRunsFound =
         jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET);
     assertEquals(0, jobRunsFound.size());
@@ -315,7 +315,7 @@ public class JobServiceTest {
     Job job = newJob();
     NamespaceName jobNamespace = NamespaceName.of(TEST_NS);
     when(jobDao.findByName(jobNamespace.getValue(), job.getName())).thenReturn(job);
-    when(jobRunDao.findAllByJobUuid(job.getGuid(), TEST_LIMIT, TEST_OFFSET))
+    when(jobRunDao.findAllByJobUuid(job.getUuid(), TEST_LIMIT, TEST_OFFSET))
         .thenThrow(UnableToExecuteStatementException.class);
     jobService.getAllRunsOfJob(jobNamespace, job.getName(), TEST_LIMIT, TEST_OFFSET);
   }

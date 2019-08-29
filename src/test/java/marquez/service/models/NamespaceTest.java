@@ -32,8 +32,8 @@ public class NamespaceTest {
       new Namespace(NAMESPACE_UUID, CREATED_AT, NAMESPACE_NAME, OWNER_NAME, DESCRIPTION);
 
   @Test
-  public void testGuidSet() {
-    assertThat(NAMESPACE.getGuid()).isEqualTo(NAMESPACE_UUID);
+  public void testUuidSet() {
+    assertThat(NAMESPACE.getUuid()).isEqualTo(NAMESPACE_UUID);
   }
 
   @Test

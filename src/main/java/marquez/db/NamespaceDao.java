@@ -28,13 +28,13 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(NamespaceRowMapper.class)
 public interface NamespaceDao {
   @SqlUpdate(
-      "INSERT INTO namespaces (guid, name, description, current_ownership) "
+      "INSERT INTO namespaces (uuid, name, description, current_ownership) "
           + "VALUES (:uuid, :name, :description, :currentOwnerName) "
           + "ON CONFLICT (name) DO NOTHING")
   void insert(@BindBean NamespaceRow namespaceRow);
 
   @SqlQuery(
-      "INSERT INTO namespaces (guid, name, description, current_ownership) "
+      "INSERT INTO namespaces (uuid, name, description, current_ownership) "
           + "VALUES (:uuid, :name, :description, :currentOwnerName) "
           + "ON CONFLICT (name) DO UPDATE "
           + "SET updated_at = NOW(), "
@@ -46,7 +46,7 @@ public interface NamespaceDao {
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM namespaces WHERE name = :value)")
   boolean exists(@BindBean NamespaceName namespaceName);
 
-  @SqlQuery("SELECT * FROM namespaces WHERE guid = :uuid")
+  @SqlQuery("SELECT * FROM namespaces WHERE uuid = :uuid")
   Optional<NamespaceRow> findBy(UUID uuid);
 
   @SqlQuery("SELECT * FROM namespaces WHERE name = :value")

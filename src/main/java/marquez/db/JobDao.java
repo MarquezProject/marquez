@@ -32,40 +32,40 @@ public interface JobDao {
   JobVersionDao createJobVersionDao();
 
   @SqlUpdate(
-      "INSERT INTO jobs (guid, name, namespace_guid, description, input_dataset_urns, output_dataset_urns) "
-          + " VALUES (:guid, :name, :namespaceGuid, :description, :inputDatasetUrns, :outputDatasetUrns)")
+      "INSERT INTO jobs (uuid, name, namespace_uuid, description, input_dataset_urns, output_dataset_urns) "
+          + " VALUES (:uuid, :name, :namespaceUuid, :description, :inputDatasetUrns, :outputDatasetUrns)")
   public void insert(@BindBean Job job);
 
-  @SqlUpdate("UPDATE jobs SET current_version_guid = :currentVersionGuid WHERE guid = :jobGuid")
-  public void setCurrentVersionGuid(UUID jobGuid, UUID currentVersionGuid);
+  @SqlUpdate("UPDATE jobs SET current_version_uuid = :currentVersionUuid WHERE uuid = :jobUuid")
+  public void setCurrentVersionUuid(UUID jobUuid, UUID currentVersionUuid);
 
   @Transaction
   default void insertJobAndVersion(final Job job, final JobVersion jobVersion) {
     insert(job);
     createJobVersionDao().insert(jobVersion);
-    setCurrentVersionGuid(job.getGuid(), jobVersion.getGuid());
+    setCurrentVersionUuid(job.getUuid(), jobVersion.getUuid());
   }
 
   @SqlQuery(
-      "SELECT j.*, jv.uri FROM jobs j INNER JOIN job_versions jv ON (j.guid = :guid AND j.current_version_guid = jv.guid)")
-  Job findByID(UUID guid);
+      "SELECT j.*, jv.uri FROM jobs j INNER JOIN job_versions jv ON (j.uuid = :uuid AND j.current_version_uuid = jv.uuid)")
+  Job findByID(UUID uuid);
 
   @SqlQuery(
       "SELECT j.*, jv.uri "
           + "FROM jobs j "
           + "INNER JOIN job_versions jv "
-          + "    ON (j.current_version_guid = jv.guid) "
+          + "    ON (j.current_version_uuid = jv.uuid) "
           + "INNER JOIN namespaces n "
-          + "    ON (j.namespace_guid = n.guid AND n.name = :namespace AND j.name = :name)")
+          + "    ON (j.namespace_uuid = n.uuid AND n.name = :namespace AND j.name = :name)")
   Job findByName(String namespace, String name);
 
   @SqlQuery(
       "SELECT j.*, jv.uri "
           + "FROM jobs j "
           + "INNER JOIN job_versions jv "
-          + " ON (j.current_version_guid = jv.guid) "
+          + " ON (j.current_version_uuid = jv.uuid) "
           + "INNER JOIN namespaces n "
-          + " ON (j.namespace_guid = n.guid AND n.name = :namespaceName) "
+          + " ON (j.namespace_uuid = n.uuid AND n.name = :namespaceName) "
           + " ORDER BY j.name "
           + "LIMIT :limit OFFSET :offset")
   List<Job> findAllInNamespace(String namespaceName, Integer limit, Integer offset);

@@ -81,9 +81,9 @@ public class JobIntegrationTest extends JobRunBaseTest {
     namespaceService = new NamespaceService(namespaceDao);
     Namespace generatedNamespace = namespaceService.createOrUpdate(newNamespace());
     NAMESPACE_NAME = generatedNamespace.getName();
-    CREATED_NAMESPACE_UUID = generatedNamespace.getGuid();
+    CREATED_NAMESPACE_UUID = generatedNamespace.getUuid();
 
-    marquez.service.models.Job job = newJobWithNameSpaceId(generatedNamespace.getGuid());
+    marquez.service.models.Job job = newJobWithNameSpaceId(generatedNamespace.getUuid());
     marquez.service.models.Job createdJob = jobService.createJob(NAMESPACE_NAME, job);
 
     CREATED_JOB_NAME = createdJob.getName();
@@ -121,7 +121,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   public void createJobRun() throws MarquezServiceException {
     JobRun createdJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
-    CREATED_JOB_RUN_UUID = createdJobRun.getGuid();
+    CREATED_JOB_RUN_UUID = createdJobRun.getUuid();
   }
 
   @Test
@@ -145,8 +145,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
           .useHandle(
               handle -> {
                 handle.execute(
-                    format("delete from job_run_states where job_run_guid = '%s'", returnedId));
-                handle.execute(format("delete from job_runs where guid = '%s'", returnedId));
+                    format("delete from job_run_states where job_run_uuid = '%s'", returnedId));
+                handle.execute(format("delete from job_runs where uuid = '%s'", returnedId));
               });
     }
   }
@@ -164,12 +164,12 @@ public class JobIntegrationTest extends JobRunBaseTest {
   public void testJobRunRetrievalWithMultipleJobRuns() throws MarquezServiceException {
     JobRun secondCreatedJobRun =
         jobService.createJobRun(NAMESPACE_NAME, CREATED_JOB_NAME, JOB_RUN_ARGS, null, null);
-    final UUID secondJobRunUUID = secondCreatedJobRun.getGuid();
+    final UUID secondJobRunUUID = secondCreatedJobRun.getUuid();
 
     try {
-      assertThat(jobService.getJobRun(CREATED_JOB_RUN_UUID).get().getGuid())
+      assertThat(jobService.getJobRun(CREATED_JOB_RUN_UUID).get().getUuid())
           .isEqualByComparingTo(CREATED_JOB_RUN_UUID);
-      assertThat(jobService.getJobRun(secondJobRunUUID).get().getGuid())
+      assertThat(jobService.getJobRun(secondJobRunUUID).get().getUuid())
           .isEqualByComparingTo(secondJobRunUUID);
     } finally {
       APP.getJDBI()
@@ -177,8 +177,8 @@ public class JobIntegrationTest extends JobRunBaseTest {
               handle -> {
                 handle.execute(
                     format(
-                        "delete from job_run_states where job_run_guid = '%s'", secondJobRunUUID));
-                handle.execute(format("delete from job_runs where guid = '%s'", secondJobRunUUID));
+                        "delete from job_run_states where job_run_uuid = '%s'", secondJobRunUUID));
+                handle.execute(format("delete from job_runs where uuid = '%s'", secondJobRunUUID));
               });
     }
   }
@@ -285,11 +285,11 @@ public class JobIntegrationTest extends JobRunBaseTest {
         jobName, createdAt, createdAt, inputList, outputList, location, description);
   }
 
-  private JobRunResponse getJobRunApiResponse(UUID jobRunGuid) {
+  private JobRunResponse getJobRunApiResponse(UUID jobRunUuid) {
     final Response res =
         APP.client()
             .target(URI.create("http://localhost:" + APP.getLocalPort()))
-            .path(format("/api/v1/jobs/runs/%s", jobRunGuid))
+            .path(format("/api/v1/jobs/runs/%s", jobRunUuid))
             .request(MediaType.APPLICATION_JSON)
             .get();
     assertEquals(Response.Status.OK.getStatusCode(), res.getStatus());
@@ -303,10 +303,10 @@ public class JobIntegrationTest extends JobRunBaseTest {
             handle -> {
               handle.execute(
                   format(
-                      "delete from job_run_states where job_run_guid = '%s'",
+                      "delete from job_run_states where job_run_uuid = '%s'",
                       CREATED_JOB_RUN_UUID));
               handle.execute(
-                  format("delete from job_runs where guid = '%s'", CREATED_JOB_RUN_UUID));
+                  format("delete from job_runs where uuid = '%s'", CREATED_JOB_RUN_UUID));
             });
   }
 
@@ -317,12 +317,12 @@ public class JobIntegrationTest extends JobRunBaseTest {
             handle -> {
               handle.execute(
                   format(
-                      "DELETE from job_versions where guid in (select job_versions.guid as guid from jobs inner join job_versions on job_versions.job_guid=jobs.guid and jobs.namespace_guid='%s')",
+                      "DELETE from job_versions where uuid in (select job_versions.uuid as uuid from jobs inner join job_versions on job_versions.job_uuid=jobs.uuid and jobs.namespace_uuid='%s')",
                       CREATED_NAMESPACE_UUID));
               handle.execute(
-                  format("delete from jobs where namespace_guid = '%s'", CREATED_NAMESPACE_UUID));
+                  format("delete from jobs where namespace_uuid = '%s'", CREATED_NAMESPACE_UUID));
               handle.execute(
-                  format("delete from namespaces where guid = '%s'", CREATED_NAMESPACE_UUID));
+                  format("delete from namespaces where uuid = '%s'", CREATED_NAMESPACE_UUID));
             });
   }
 }

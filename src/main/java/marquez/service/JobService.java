@@ -74,19 +74,19 @@ public class JobService {
                 UUID.randomUUID(),
                 job.getName(),
                 job.getLocation(),
-                job.getNamespaceGuid(),
+                job.getNamespaceUuid(),
                 job.getDescription(),
                 job.getInputDatasetUrns(),
                 job.getOutputDatasetUrns());
         jobDao.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
-        return jobDao.findByID(newJob.getGuid());
+        return jobDao.findByID(newJob.getUuid());
       } else {
         Job existingJobWithNewUri =
             new Job(
-                existingJob.getGuid(),
+                existingJob.getUuid(),
                 existingJob.getName(),
                 job.getLocation(),
-                existingJob.getNamespaceGuid(),
+                existingJob.getNamespaceUuid(),
                 existingJob.getDescription(),
                 existingJob.getInputDatasetUrns(),
                 existingJob.getOutputDatasetUrns());
@@ -94,7 +94,7 @@ public class JobService {
         JobVersion existingJobVersion = jobVersionDao.findByVersion(versionID);
         if (existingJobVersion == null) {
           jobVersionDao.insert(JobService.createJobVersion(existingJobWithNewUri));
-          return jobDao.findByID(existingJob.getGuid());
+          return jobDao.findByID(existingJob.getUuid());
         }
         return existingJob;
       }
@@ -166,7 +166,7 @@ public class JobService {
       final Optional<Job> job =
           Optional.ofNullable(jobDao.findByName(namespace.getValue(), jobName));
       if (job.isPresent()) {
-        return jobRunDao.findAllByJobUuid(job.get().getGuid(), limit, offset);
+        return jobRunDao.findAllByJobUuid(job.get().getUuid(), limit, offset);
       }
       return Collections.emptyList();
     } catch (UnableToExecuteStatementException e) {
@@ -210,7 +210,7 @@ public class JobService {
           new JobRun(
               UUID.randomUUID(),
               JobRunState.State.toInt(JobRunState.State.NEW),
-              latestJobVersion.get().getGuid(),
+              latestJobVersion.get().getUuid(),
               runArgsDigest,
               runArgsJson,
               nominalStartTime,
@@ -232,7 +232,7 @@ public class JobService {
   private static JobVersion createJobVersion(Job job) {
     return new JobVersion(
         UUID.randomUUID(),
-        job.getGuid(),
+        job.getUuid(),
         job.getLocation(),
         JobService.computeVersion(job),
         null,
@@ -242,7 +242,7 @@ public class JobService {
 
   protected static UUID computeVersion(Job job) {
     return UUID.nameUUIDFromBytes(
-        String.format("%s:%s", job.getGuid(), job.getLocation()).getBytes());
+        String.format("%s:%s", job.getUuid(), job.getLocation()).getBytes());
   }
 
   protected String computeRunArgsDigest(String runArgsJson) throws NoSuchAlgorithmException {

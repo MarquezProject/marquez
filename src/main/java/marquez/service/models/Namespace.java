@@ -24,22 +24,22 @@ import marquez.common.models.OwnerName;
 @Data
 public class Namespace {
 
-  private final UUID guid;
+  private final UUID uuid;
   private final String name;
   private final String owner;
   private final String description;
   private final Instant createdAt;
 
-  public Namespace(UUID guid, String name, String owner, String description) {
-    this.guid = guid;
+  public Namespace(UUID uuid, String name, String owner, String description) {
+    this.uuid = uuid;
     this.name = name;
     this.owner = owner;
     this.description = description;
     this.createdAt = null;
   }
 
-  public Namespace(UUID guid, Instant createdAt, String name, String owner, String description) {
-    this.guid = guid;
+  public Namespace(UUID uuid, Instant createdAt, String name, String owner, String description) {
+    this.uuid = uuid;
     this.createdAt = createdAt;
     this.name = name;
     this.owner = owner;

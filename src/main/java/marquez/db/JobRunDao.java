@@ -35,16 +35,16 @@ public interface JobRunDao {
   JobRunArgsDao createJobRunArgsDao();
 
   @SqlUpdate(
-      "INSERT INTO job_runs (guid, job_version_guid, current_state, "
+      "INSERT INTO job_runs (uuid, job_version_uuid, current_state, "
           + " job_run_args_hex_digest, nominal_start_time, nominal_end_time) "
-          + "VALUES (:guid, :jobVersionGuid, :currentState, :runArgsHexDigest, "
+          + "VALUES (:uuid, :jobVersionUuid, :currentState, :runArgsHexDigest, "
           + " :nominalStartTime, :nominalEndTime)")
   void insertJobRun(@BindBean JobRun jobRun);
 
   @Transaction
   default void insert(JobRun jobRun) {
     insertJobRun(jobRun);
-    createJobRunStateDao().insert(UUID.randomUUID(), jobRun.getGuid(), jobRun.getCurrentState());
+    createJobRunStateDao().insert(UUID.randomUUID(), jobRun.getUuid(), jobRun.getCurrentState());
   }
 
   @Transaction
@@ -53,28 +53,28 @@ public interface JobRunDao {
     insert(jobRun);
   }
 
-  @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE guid = :jobRunID")
-  void updateCurrentState(UUID jobRunID, Integer state);
+  @SqlUpdate("UPDATE job_runs SET current_state = :state WHERE uuid = :jobRunUuid")
+  void updateCurrentState(UUID jobRunUuid, Integer state);
 
   @Transaction
-  default void updateState(UUID jobRunID, Integer state) {
-    updateCurrentState(jobRunID, state);
-    createJobRunStateDao().insert(UUID.randomUUID(), jobRunID, state);
+  default void updateState(UUID jobRunUuid, Integer state) {
+    updateCurrentState(jobRunUuid, state);
+    createJobRunStateDao().insert(UUID.randomUUID(), jobRunUuid, state);
   }
 
   @SqlQuery(
       "SELECT jr.*, jra.args_json "
           + "FROM job_runs jr "
           + "LEFT JOIN job_run_args jra "
-          + " ON (jr.guid = :guid AND jr.job_run_args_hex_digest = jra.hex_digest) "
-          + "WHERE jr.guid = :guid")
-  JobRun findJobRunById(UUID guid);
+          + " ON (jr.uuid = :uuid AND jr.job_run_args_hex_digest = jra.hex_digest) "
+          + "WHERE jr.uuid = :uuid")
+  JobRun findJobRunById(UUID uuid);
 
   @SqlQuery(
       "SELECT jr.*, jra.args_json "
           + "FROM job_runs jr "
           + "INNER JOIN job_versions jv "
-          + " ON (jr.job_version_guid = jv.guid AND jv.job_guid = :jobUuid)"
+          + " ON (jr.job_version_uuid = jv.uuid AND jv.job_uuid = :jobUuid)"
           + "LEFT JOIN job_run_args jra "
           + " ON (jr.job_run_args_hex_digest = jra.hex_digest) "
           + "ORDER BY created_at DESC "

@@ -173,10 +173,10 @@ public final class ServiceModelGenerator extends ModelGenerator {
 
   public static Job cloneJob(Job job) {
     return new Job(
-        job.getGuid(),
+        job.getUuid(),
         job.getName(),
         job.getLocation(),
-        job.getNamespaceGuid(),
+        job.getNamespaceUuid(),
         job.getDescription(),
         job.getInputDatasetUrns(),
         job.getOutputDatasetUrns(),
@@ -197,6 +197,6 @@ public final class ServiceModelGenerator extends ModelGenerator {
 
   public static JobVersion newJobVersion(Job job) {
     return new JobVersion(
-        UUID.randomUUID(), job.getGuid(), job.getLocation(), UUID.randomUUID(), null, null, null);
+        UUID.randomUUID(), job.getUuid(), job.getLocation(), UUID.randomUUID(), null, null, null);
   }
 }
