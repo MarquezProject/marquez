@@ -24,6 +24,7 @@ import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newJobType;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
@@ -99,6 +100,7 @@ public final class ApiModelGenerator extends ModelGenerator {
 
   public static JobRequest newJobRequest(final boolean hasDescription) {
     return new JobRequest(
+        newJobType().toString(),
         newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
         newLocation().toString(),
@@ -117,6 +119,7 @@ public final class ApiModelGenerator extends ModelGenerator {
     final String createdAt = newIsoTimestamp();
     final String updatedAt = createdAt;
     return new JobResponse(
+        newJobType().toString(),
         newJobName().getValue(),
         createdAt,
         updatedAt,

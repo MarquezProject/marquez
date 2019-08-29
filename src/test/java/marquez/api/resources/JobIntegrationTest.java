@@ -16,6 +16,7 @@ package marquez.api.resources;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static marquez.common.models.CommonModelGenerator.newJobType;
 import static marquez.service.models.ServiceModelGenerator.newJobWithNameSpaceId;
 import static marquez.service.models.ServiceModelGenerator.newNamespace;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -261,6 +262,7 @@ public class JobIntegrationTest extends JobRunBaseTest {
   private Response createJobOnNamespace(String namespace, JobResponse job) {
     JobRequest jobRequest =
         new JobRequest(
+            job.getType(),
             job.getInputDatasetUrns(),
             job.getOutputDatasetUrns(),
             job.getLocation(),
@@ -282,7 +284,14 @@ public class JobIntegrationTest extends JobRunBaseTest {
     final List<String> outputList = Collections.singletonList("output1");
     String createdAt = ISO_INSTANT.format(Instant.now());
     return new JobResponse(
-        jobName, createdAt, createdAt, inputList, outputList, location, description);
+        newJobType().toString(),
+        jobName,
+        createdAt,
+        createdAt,
+        inputList,
+        outputList,
+        location,
+        description);
   }
 
   private JobRunResponse getJobRunApiResponse(UUID jobRunUuid) {

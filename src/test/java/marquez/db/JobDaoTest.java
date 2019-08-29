@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import static marquez.common.models.CommonModelGenerator.newJobType;
 import static marquez.service.models.ServiceModelGenerator.newJobVersion;
 import static marquez.service.models.ServiceModelGenerator.newJobWithNameSpaceId;
 import static org.junit.Assert.assertEquals;
@@ -120,6 +121,7 @@ public class JobDaoTest {
     Job jobWithDiffNsSameName =
         new Job(
             UUID.randomUUID(),
+            newJobType(),
             job.getName(),
             "location",
             newNamespaceId,
@@ -135,6 +137,7 @@ public class JobDaoTest {
     Job jobWithSameNsSameName =
         new Job(
             UUID.randomUUID(),
+            newJobType(),
             job.getName(),
             "location",
             job.getNamespaceUuid(),
@@ -179,6 +182,7 @@ public class JobDaoTest {
     Job jobWithEmptyInputsOutputs =
         new Job(
             jobId,
+            newJobType(),
             "job",
             "location",
             nsID,

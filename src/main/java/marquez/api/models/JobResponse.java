@@ -27,6 +27,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class JobResponse {
+  @Getter private final String type;
   @Getter private final String name;
   @Getter private final String createdAt;
   @Getter private final String updatedAt;
@@ -36,6 +37,7 @@ public final class JobResponse {
   private final String description;
 
   public JobResponse(
+      @NonNull final String type,
       @NonNull final String name,
       @NonNull final String createdAt,
       @NonNull final String updatedAt,
@@ -43,6 +45,7 @@ public final class JobResponse {
       @NonNull final List<String> outputDatasetUrns,
       @NonNull final String location,
       @Nullable final String description) {
+    this.type = checkNotBlank(type);
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);

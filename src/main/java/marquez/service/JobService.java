@@ -72,6 +72,7 @@ public class JobService {
         Job newJob =
             new Job(
                 UUID.randomUUID(),
+                job.getType(),
                 job.getName(),
                 job.getLocation(),
                 job.getNamespaceUuid(),
@@ -84,6 +85,7 @@ public class JobService {
         Job existingJobWithNewUri =
             new Job(
                 existingJob.getUuid(),
+                existingJob.getType(),
                 existingJob.getName(),
                 job.getLocation(),
                 existingJob.getNamespaceUuid(),

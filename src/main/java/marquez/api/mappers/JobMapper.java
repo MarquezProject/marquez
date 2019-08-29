@@ -17,6 +17,7 @@ package marquez.api.mappers;
 import lombok.NonNull;
 import marquez.api.models.JobRequest;
 import marquez.common.models.JobName;
+import marquez.common.models.JobType;
 import marquez.service.models.Job;
 
 public final class JobMapper {
@@ -25,6 +26,7 @@ public final class JobMapper {
   public static Job map(@NonNull JobName jobName, @NonNull JobRequest request) {
     return new Job(
         null,
+        JobType.valueOf(request.getType()),
         jobName.getValue(),
         request.getLocation(),
         null,

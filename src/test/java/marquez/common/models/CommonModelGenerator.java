@@ -36,6 +36,10 @@ public final class CommonModelGenerator extends ModelGenerator {
     return JobName.of("test_job" + newId());
   }
 
+  public static JobType newJobType() {
+    return JobType.values()[newIdWithBound(JobType.values().length - 1)];
+  }
+
   public static URI newLocation() {
     return URI.create("https://github.com/repo/test/commit/" + newId());
   }

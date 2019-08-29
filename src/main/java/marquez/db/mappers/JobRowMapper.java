@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 import lombok.NonNull;
+import marquez.common.models.JobType;
 import marquez.db.Columns;
 import marquez.service.models.Job;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -33,6 +34,7 @@ public final class JobRowMapper implements RowMapper<Job> {
       throws SQLException {
     return new Job(
         results.getObject(Columns.ROW_UUID, UUID.class),
+        JobType.valueOf(results.getString(Columns.TYPE)),
         results.getString(Columns.NAME),
         results.getString(Columns.LOCATION),
         results.getObject(Columns.NAMESPACE_UUID, UUID.class),

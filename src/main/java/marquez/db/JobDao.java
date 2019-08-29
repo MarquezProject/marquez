@@ -32,8 +32,8 @@ public interface JobDao {
   JobVersionDao createJobVersionDao();
 
   @SqlUpdate(
-      "INSERT INTO jobs (uuid, name, namespace_uuid, description, input_dataset_urns, output_dataset_urns) "
-          + " VALUES (:uuid, :name, :namespaceUuid, :description, :inputDatasetUrns, :outputDatasetUrns)")
+      "INSERT INTO jobs (uuid, name, namespace_uuid, description, input_dataset_urns, output_dataset_urns, type) "
+          + " VALUES (:uuid, :name, :namespaceUuid, :description, :inputDatasetUrns, :outputDatasetUrns, :type)")
   public void insert(@BindBean Job job);
 
   @SqlUpdate("UPDATE jobs SET current_version_uuid = :currentVersionUuid WHERE uuid = :jobUuid")
