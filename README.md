@@ -35,12 +35,8 @@ from marquez_client import MarquezClient
 
 client = MarquezClient()
 
-# list namespaces
-client.list_namespaces()
-
-# retrieve a job
-client.get_job('room_bookings_7_days')
-
+# create namespace
+client.create_namespace('example-namespace', 'example-owner', 'example description')
 ```
 
 To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG`, `INFO`, or `ERROR`:
