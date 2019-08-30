@@ -17,6 +17,7 @@ package marquez.api.resources;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static javax.ws.rs.client.Entity.entity;
+import static marquez.common.models.CommonModelGenerator.newJobType;
 import static marquez.service.models.ServiceModelGenerator.newJob;
 import static marquez.service.models.ServiceModelGenerator.newJobRun;
 import static marquez.service.models.ServiceModelGenerator.newNamespace;
@@ -426,6 +427,7 @@ public class JobResourceTest {
   private Response insertJob(JobResponse job) {
     JobRequest jobRequest =
         new JobRequest(
+            job.getType(),
             job.getInputDatasetUrns(),
             job.getOutputDatasetUrns(),
             job.getLocation(),
@@ -508,7 +510,14 @@ public class JobResourceTest {
     final List<String> outputList = Collections.singletonList("output1");
     String createdAt = ISO_INSTANT.format(Instant.now());
     return new JobResponse(
-        jobName, createdAt, createdAt, inputList, outputList, location, description);
+        newJobType().toString(),
+        jobName,
+        createdAt,
+        createdAt,
+        inputList,
+        outputList,
+        location,
+        description);
   }
 
   JobRunResponse generateApiJobRun() {

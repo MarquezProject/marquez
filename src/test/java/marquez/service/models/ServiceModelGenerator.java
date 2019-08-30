@@ -23,6 +23,7 @@ import static marquez.common.models.CommonModelGenerator.newDatasourceName;
 import static marquez.common.models.CommonModelGenerator.newDatasourceUrn;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newJobType;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
@@ -145,6 +146,7 @@ public final class ServiceModelGenerator extends ModelGenerator {
     final Instant updatedAt = createdAt;
     return new Job(
         UUID.randomUUID(),
+        newJobType(),
         newJobName().getValue(),
         newLocation().toString(),
         nameSpaceId,
@@ -174,6 +176,7 @@ public final class ServiceModelGenerator extends ModelGenerator {
   public static Job cloneJob(Job job) {
     return new Job(
         job.getUuid(),
+        job.getType(),
         job.getName(),
         job.getLocation(),
         job.getNamespaceUuid(),

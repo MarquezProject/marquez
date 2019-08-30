@@ -13,6 +13,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class JobRequest {
+  @Getter private final String type;
   @Getter private final List<String> inputDatasetUrns;
   @Getter private final List<String> outputDatasetUrns;
   @Getter private final String location;

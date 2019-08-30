@@ -84,6 +84,7 @@ public class JobServiceIntegrationTest {
     Job jobWithNewLoc =
         new Job(
             null,
+            job.getType(),
             job.getName(),
             job.getLocation() + "/new",
             job.getNamespaceUuid(),

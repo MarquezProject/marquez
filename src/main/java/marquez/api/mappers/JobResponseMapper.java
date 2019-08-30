@@ -14,9 +14,8 @@
 
 package marquez.api.mappers;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import lombok.NonNull;
@@ -27,8 +26,9 @@ import marquez.service.models.Job;
 public final class JobResponseMapper {
   private JobResponseMapper() {}
 
-  public static JobResponse map(@NonNull Job job) {
+  public static JobResponse map(@NonNull final Job job) {
     return new JobResponse(
+        job.getType().toString(),
         job.getName(),
         ISO_INSTANT.format(job.getCreatedAt()),
         ISO_INSTANT.format(job.getUpdatedAt()),
@@ -38,11 +38,11 @@ public final class JobResponseMapper {
         job.getDescription());
   }
 
-  public static List<JobResponse> map(@NonNull List<Job> jobs) {
-    return unmodifiableList(jobs.stream().map(job -> map(job)).collect(toList()));
+  public static List<JobResponse> map(@NonNull final List<Job> jobs) {
+    return jobs.stream().map(job -> map(job)).collect(toImmutableList());
   }
 
-  public static JobsResponse toJobsResponse(@NonNull List<Job> jobs) {
+  public static JobsResponse toJobsResponse(@NonNull final List<Job> jobs) {
     return new JobsResponse(map(jobs));
   }
 }

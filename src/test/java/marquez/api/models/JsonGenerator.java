@@ -58,6 +58,7 @@ public final class JsonGenerator {
     final ObjectNode obj =
         MAPPER
             .createObjectNode()
+            .put("type", request.getType())
             .put("location", request.getLocation())
             .put("description", request.getDescription().orElse(NO_DESCRIPTION.getValue()));
     obj.putArray("inputDatasetUrns").addAll(array0);
@@ -71,6 +72,7 @@ public final class JsonGenerator {
     final ObjectNode obj =
         MAPPER
             .createObjectNode()
+            .put("type", response.getType())
             .put("name", response.getName())
             .put("createdAt", response.getCreatedAt())
             .put("updatedAt", response.getUpdatedAt());

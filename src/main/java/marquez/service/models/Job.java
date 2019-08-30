@@ -21,11 +21,13 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import marquez.common.models.JobType;
 
 @AllArgsConstructor
 @EqualsAndHashCode
 public final class Job {
   @Getter private final UUID uuid;
+  @Getter private final JobType type;
   @Getter private final String name;
   @Getter private final String location;
   @Getter @Setter private UUID namespaceUuid;
@@ -37,6 +39,7 @@ public final class Job {
 
   public Job(
       final UUID uuid,
+      final JobType type,
       final String name,
       final String location,
       final UUID namespaceUuid,
@@ -44,6 +47,7 @@ public final class Job {
       final List<String> inputDatasetUrns,
       final List<String> outputDatasetUrns) {
     this.uuid = uuid;
+    this.type = type;
     this.name = name;
     this.location = location;
     this.namespaceUuid = namespaceUuid;

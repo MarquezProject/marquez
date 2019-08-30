@@ -1,0 +1,2 @@
+CREATE TYPE job_types AS ENUM ('BATCH', 'STREAM', 'SERVICE');
+ALTER TABLE jobs ADD COLUMN type job_types NOT NULL;
