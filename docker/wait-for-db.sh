@@ -18,9 +18,9 @@ set -eu
 
 host="${1}"
 port="${2}"
-timeInSecs="${3:-60s}"
+timeout_in_secs="${3:-60s}"
 
-if timeout ${timeInSecs} bash -c "./connect-to-db.sh ${host} ${port}"; then
+if timeout ${timeout_in_secs} bash -c "./connect-to-db.sh ${host} ${port}"; then
     echo "Connection to db successful."
 else
     echo "Timeout, the postgres server is taking too long to respond."
