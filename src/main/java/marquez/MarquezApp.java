@@ -29,10 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.api.resources.DatasetResource;
 import marquez.api.resources.DatasourceResource;
-import marquez.api.resources.HealthResource;
 import marquez.api.resources.JobResource;
 import marquez.api.resources.NamespaceResource;
-import marquez.api.resources.PingResource;
 import marquez.db.DatasetDao;
 import marquez.db.DatasourceDao;
 import marquez.db.JobDao;
@@ -145,8 +143,6 @@ public class MarquezApp extends Application<MarquezConfig> {
     final DatasetService datasetService =
         new DatasetService(namespaceDao, datasourceDao, datasetDao);
 
-    env.jersey().register(new PingResource());
-    env.jersey().register(new HealthResource());
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new JobResource(namespaceService, jobService));
     env.jersey().register(new DatasourceResource(datasourceService));

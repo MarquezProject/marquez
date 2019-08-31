@@ -15,42 +15,26 @@
 package marquez;
 
 import static javax.ws.rs.core.Response.Status.OK;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dropwizard.jackson.Jackson;
 import java.net.URI;
 import javax.ws.rs.core.Response;
 import marquez.db.fixtures.AppWithPostgresRule;
-import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 public class MarquezAppIntegrationTest {
-  protected static final ObjectMapper mapper = Jackson.newObjectMapper();
-
   @ClassRule public static final AppWithPostgresRule APP = new AppWithPostgresRule();
 
-  @After
-  public void teardown() {
-    APP.getJDBI()
-        .useHandle(
-            handle -> {
-              handle.execute("DELETE FROM job_versions;");
-              handle.execute("DELETE FROM jobs;");
-              handle.execute("DELETE FROM owners;");
-            });
-  }
-
   @Test
-  public void runAppTest() {
+  public void testApp_run() {
     final Response response =
         APP.client()
-            .target(URI.create("http://localhost:" + APP.getLocalPort()))
+            .target(URI.create("http://localhost:" + APP.getAdminPort()))
             .path("/ping")
             .request()
             .get();
-    assertEquals(OK.getStatusCode(), response.getStatus());
-    assertEquals("pong", response.readEntity(String.class));
+    assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
+    assertThat(response.readEntity(String.class)).isEqualTo("pong\n");
   }
 }
