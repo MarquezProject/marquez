@@ -27,13 +27,12 @@ import lombok.NonNull;
 public final class JsonUtils {
   private JsonUtils() {}
 
-  private static final ObjectMapper MAPPER = JsonUtils.newObjectMapper();
+  private static final ObjectMapper MAPPER = newObjectMapper();
 
   public static ObjectMapper newObjectMapper() {
-    ObjectMapper mapper = Jackson.newObjectMapper();
+    final ObjectMapper mapper = Jackson.newObjectMapper();
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
     return mapper;
   }
 
