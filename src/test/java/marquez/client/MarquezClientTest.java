@@ -28,7 +28,18 @@ import static org.mockito.Mockito.when;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
-import marquez.client.models.*;
+import marquez.client.models.Dataset;
+import marquez.client.models.DatasetMeta;
+import marquez.client.models.Datasource;
+import marquez.client.models.DatasourceMeta;
+import marquez.client.models.Job;
+import marquez.client.models.JobMeta;
+import marquez.client.models.JobRun;
+import marquez.client.models.JobRunMeta;
+import marquez.client.models.JobType;
+import marquez.client.models.JsonGenerator;
+import marquez.client.models.Namespace;
+import marquez.client.models.NamespaceMeta;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -84,7 +95,7 @@ public class MarquezClientTest {
   private static final Instant NOMINAL_START_TIME = newTimestamp();
   private static final Instant NOMINAL_END_TIME = newTimestamp();
   private static final String RUN_ARGS = newRunArgs();
-  private static final RunState RUN_STATE = RunState.NEW;
+  private static final JobRun.State RUN_STATE = JobRun.State.NEW;
   private static final JobRun RUN =
       new JobRun(RUN_ID, NOMINAL_START_TIME, NOMINAL_END_TIME, RUN_ARGS, RUN_STATE);
 

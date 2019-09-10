@@ -15,7 +15,6 @@
 package marquez.client.models;
 
 import static java.util.stream.Collectors.toList;
-import static marquez.client.models.RunState.NEW;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -158,7 +157,7 @@ public final class ModelGenerator {
 
   public static JobRun newJobRun() {
     final Instant now = Instant.now();
-    return new JobRun(newRunId(), now, now, newRunArgs(), NEW);
+    return new JobRun(newRunId(), now, now, newRunArgs(), JobRun.State.NEW);
   }
 
   public static Datasource newDatasource() {

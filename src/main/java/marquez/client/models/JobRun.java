@@ -34,7 +34,7 @@ public final class JobRun {
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
   @Nullable private final String runArgs;
-  @Getter @NonNull private final RunState runState;
+  @Getter @NonNull private final State runState;
 
   public Optional<Instant> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
@@ -50,5 +50,13 @@ public final class JobRun {
 
   public static JobRun fromJson(@NonNull final String json) {
     return JsonUtils.fromJson(json, new TypeReference<JobRun>() {});
+  }
+
+  public enum State {
+    NEW,
+    RUNNING,
+    COMPLETED,
+    ABORTED,
+    FAILED;
   }
 }
