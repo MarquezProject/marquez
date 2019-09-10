@@ -28,18 +28,7 @@ import static org.mockito.Mockito.when;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
-import marquez.client.models.Dataset;
-import marquez.client.models.DatasetMeta;
-import marquez.client.models.Datasource;
-import marquez.client.models.DatasourceMeta;
-import marquez.client.models.Job;
-import marquez.client.models.JobMeta;
-import marquez.client.models.JobRun;
-import marquez.client.models.JobRunMeta;
-import marquez.client.models.JobType;
-import marquez.client.models.JsonGenerator;
-import marquez.client.models.Namespace;
-import marquez.client.models.NamespaceMeta;
+import marquez.client.models.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,11 +50,12 @@ public class MarquezClientTest {
       new Namespace(NAMESPACE_NAME, CREATED_AT, OWNER_NAME, DESCRIPTION);
 
   // DATASOURCE
+  private static final DatasourceType DATASOURCE_TYPE = newDatasourceType();
   private static final String DATASOURCE_NAME = newDatasourceName();
   private static final String DATASOURCE_URN = newDatasourceUrn();
   private static final String CONNECTION_URL = newConnectionUrl();
   private static final Datasource DATASOURCE =
-      new Datasource(DATASOURCE_NAME, CREATED_AT, DATASOURCE_URN, CONNECTION_URL);
+      new Datasource(DATASOURCE_TYPE, DATASOURCE_NAME, CREATED_AT, DATASOURCE_URN, CONNECTION_URL);
 
   // DATASET
   private static final String DATASET_NAME = newDatasetName();

@@ -103,6 +103,7 @@ public final class JsonGenerator {
   public static String newJsonFor(final Datasource datasource) {
     return MAPPER
         .createObjectNode()
+        .put("type", datasource.getType().toString())
         .put("name", datasource.getName())
         .put("createdAt", ISO_INSTANT.format(datasource.getCreatedAt()))
         .put("urn", datasource.getUrn())

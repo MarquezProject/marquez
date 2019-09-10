@@ -28,6 +28,7 @@ import marquez.client.utils.JsonUtils;
 @EqualsAndHashCode
 @ToString
 public final class Datasource {
+  @Getter @NonNull private final DatasourceType type;
   @Getter @NonNull private final String name;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final String urn;

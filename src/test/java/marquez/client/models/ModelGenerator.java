@@ -17,7 +17,6 @@ package marquez.client.models;
 import static java.util.stream.Collectors.toList;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -89,6 +88,10 @@ public final class ModelGenerator {
     return "test_datasource" + newId();
   }
 
+  public static DatasourceType newDatasourceType() {
+    return DatasourceType.values()[newIdWithBound(DatasourceType.values().length)];
+  }
+
   public static String newDatasourceUrn() {
     return String.format("urn:datasource:%s:%s" + newId(), newDatasourceType(), newDbName());
   }
@@ -129,11 +132,6 @@ public final class ModelGenerator {
     return RANDOM.nextInt(bound);
   }
 
-  private static String newDatasourceType() {
-    List<String> datasourceTypes = Arrays.asList("redshift", "mysql", "postgresql");
-    return datasourceTypes.get(RANDOM.nextInt(datasourceTypes.size()));
-  }
-
   private static String newDbName() {
     return "test_db" + newId();
   }
@@ -162,7 +160,8 @@ public final class ModelGenerator {
 
   public static Datasource newDatasource() {
     final Instant now = Instant.now();
-    return new Datasource(newDatasourceName(), now, newDatasetUrn(), newConnectionUrl());
+    return new Datasource(
+        newDatasourceType(), newDatasourceName(), now, newDatasetUrn(), newConnectionUrl());
   }
 
   public static Dataset newDataset() {
