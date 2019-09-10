@@ -31,6 +31,7 @@ import marquez.client.utils.JsonUtils;
 @EqualsAndHashCode
 @ToString
 public final class Job {
+  @Getter @NonNull private final JobType type;
   @Getter @NonNull private final String name;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;

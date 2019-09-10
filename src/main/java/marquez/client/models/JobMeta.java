@@ -26,6 +26,7 @@ import marquez.client.utils.JsonUtils;
 @Value
 @Builder
 public class JobMeta {
+  @Getter @NonNull JobType type;
   @Getter @NonNull List<String> inputDatasetUrns;
   @Getter @NonNull List<String> outputDatasetUrns;
   @Getter @NonNull String location;

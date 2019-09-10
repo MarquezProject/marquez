@@ -17,20 +17,7 @@ package marquez.client;
 import static marquez.client.MarquezClient.Builder.DEFAULT_BASE_URL;
 import static marquez.client.MarquezClient.Builder.DEFAULT_NAMESPACE_NAME;
 import static marquez.client.MarquezClient.Builder.NAMESPACE_NAME_ENV_VAR;
-import static marquez.client.models.ModelGenerator.newConnectionUrl;
-import static marquez.client.models.ModelGenerator.newDatasetName;
-import static marquez.client.models.ModelGenerator.newDatasetUrn;
-import static marquez.client.models.ModelGenerator.newDatasetUrns;
-import static marquez.client.models.ModelGenerator.newDatasourceName;
-import static marquez.client.models.ModelGenerator.newDatasourceUrn;
-import static marquez.client.models.ModelGenerator.newDescription;
-import static marquez.client.models.ModelGenerator.newJobName;
-import static marquez.client.models.ModelGenerator.newLocation;
-import static marquez.client.models.ModelGenerator.newNamespaceName;
-import static marquez.client.models.ModelGenerator.newOwnerName;
-import static marquez.client.models.ModelGenerator.newRunArgs;
-import static marquez.client.models.ModelGenerator.newRunId;
-import static marquez.client.models.ModelGenerator.newTimestamp;
+import static marquez.client.models.ModelGenerator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
@@ -41,18 +28,7 @@ import static org.mockito.Mockito.when;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
-import marquez.client.models.Dataset;
-import marquez.client.models.DatasetMeta;
-import marquez.client.models.Datasource;
-import marquez.client.models.DatasourceMeta;
-import marquez.client.models.Job;
-import marquez.client.models.JobMeta;
-import marquez.client.models.JobRun;
-import marquez.client.models.JobRunMeta;
-import marquez.client.models.JsonGenerator;
-import marquez.client.models.Namespace;
-import marquez.client.models.NamespaceMeta;
-import marquez.client.models.RunState;
+import marquez.client.models.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,8 +67,10 @@ public class MarquezClientTest {
   private static final List<String> INPUT_DATASET_URNS = newDatasetUrns(3);
   private static final List<String> OUTPUT_DATASET_URNS = newDatasetUrns(4);
   private static final String LOCATION = newLocation();
+  private static final JobType JOB_TYPE = newJobType();
   private static final Job JOB =
       new Job(
+          JOB_TYPE,
           JOB_NAME,
           CREATED_AT,
           UPDATED_AT,
@@ -271,6 +249,7 @@ public class MarquezClientTest {
 
     final JobMeta meta =
         JobMeta.builder()
+            .type(JOB_TYPE)
             .inputDatasetUrns(INPUT_DATASET_URNS)
             .outputDatasetUrns(OUTPUT_DATASET_URNS)
             .location(LOCATION)

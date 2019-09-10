@@ -19,12 +19,12 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import marquez.client.utils.JsonUtils;
 
 public final class JsonGenerator {
   private JsonGenerator() {}
 
-  private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
+  private static final ObjectMapper MAPPER = JsonUtils.newObjectMapper();
 
   public static String newJsonFor(final NamespaceMeta meta) {
     return MAPPER
@@ -48,6 +48,7 @@ public final class JsonGenerator {
     final ArrayNode array0 = MAPPER.valueToTree(meta.getInputDatasetUrns());
     final ArrayNode array1 = MAPPER.valueToTree(meta.getOutputDatasetUrns());
     final ObjectNode obj = MAPPER.createObjectNode();
+    obj.put("type", meta.getType().toString());
     obj.putArray("inputDatasetUrns").addAll(array0);
     obj.putArray("outputDatasetUrns").addAll(array1);
     obj.put("location", meta.getLocation()).put("description", meta.getDescription().orElse(null));
@@ -60,6 +61,7 @@ public final class JsonGenerator {
     final ObjectNode obj =
         MAPPER
             .createObjectNode()
+            .put("type", job.getType().toString())
             .put("name", job.getName())
             .put("createdAt", ISO_INSTANT.format(job.getCreatedAt()))
             .put("updatedAt", ISO_INSTANT.format(job.getUpdatedAt()));

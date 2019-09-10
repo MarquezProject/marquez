@@ -19,9 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import io.dropwizard.jackson.Jackson;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import lombok.NonNull;
@@ -29,15 +27,14 @@ import lombok.NonNull;
 public final class JsonUtils {
   private JsonUtils() {}
 
-  private static final ObjectMapper MAPPER =
-      new ObjectMapper()
-          .registerModule(new Jdk8Module())
-          .registerModule(new JavaTimeModule())
-          .registerModule(new ParameterNamesModule());
+  private static final ObjectMapper MAPPER = JsonUtils.newObjectMapper();
 
-  static {
-    MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+  public static ObjectMapper newObjectMapper() {
+    ObjectMapper mapper = Jackson.newObjectMapper();
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    return mapper;
   }
 
   public static String toJson(@NonNull final Object value) {

@@ -29,6 +29,10 @@ public final class ModelGenerator {
 
   private static final Random RANDOM = new Random();
 
+  public static JobType newJobType() {
+    return JobType.values()[newIdWithBound(JobType.values().length)];
+  }
+
   public static NamespaceMeta newNamespaceMeta() {
     return NamespaceMeta.builder().ownerName(newOwnerName()).description(newDescription()).build();
   }
@@ -50,6 +54,7 @@ public final class ModelGenerator {
 
   public static JobMeta newJobMeta() {
     return JobMeta.builder()
+        .type(newJobType())
         .inputDatasetUrns(newDatasetUrns(2))
         .outputDatasetUrns(newDatasetUrns(4))
         .location(newLocation())
@@ -121,6 +126,10 @@ public final class ModelGenerator {
     return RANDOM.nextInt(Integer.MAX_VALUE - 1);
   }
 
+  private static int newIdWithBound(final int bound) {
+    return RANDOM.nextInt(bound);
+  }
+
   private static String newDatasourceType() {
     List<String> datasourceTypes = Arrays.asList("redshift", "mysql", "postgresql");
     return datasourceTypes.get(RANDOM.nextInt(datasourceTypes.size()));
@@ -137,6 +146,7 @@ public final class ModelGenerator {
   public static Job newJob() {
     final Instant now = Instant.now();
     return new Job(
+        newJobType(),
         newJobName(),
         now,
         now,
