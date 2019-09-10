@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -590,9 +591,11 @@ public class MarquezClient {
       final Properties properties = new Properties();
       try (final InputStream stream =
           MarquezClient.class.getClassLoader().getResourceAsStream(POM_PROPERTIES)) {
-        properties.load(stream);
-        return new Version(properties.getProperty(VERSION_PROPERTY_NAME, VERSION_UNKNOWN));
-      } catch (Exception e) {
+        if (stream != null) {
+          properties.load(stream);
+          return new Version(properties.getProperty(VERSION_PROPERTY_NAME, VERSION_UNKNOWN));
+        }
+      } catch (IOException e) {
         log.warn("Failed to load properties file: {}", POM_PROPERTIES, e);
       }
       return NO_VERSION;
