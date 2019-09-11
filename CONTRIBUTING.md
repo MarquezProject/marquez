@@ -45,10 +45,11 @@ $ ./gradlew spotlessApply
 4. Make change on your cool new branch
 5. Write a test for your change
 6. Make sure `.java` files are formatted: `./gradlew spotlessJavaCheck`
-7. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez-java/compare)
-8. Add the ["review"](https://github.com/MarquezProject/marquez-java/labels/review) label to your pull request
-9. Work with project maintainers to get your change reviewed and merged into the `master` branch
-10. Delete your branch
+7. Run code lint checks: `./gradlew check`
+8. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez-java/compare)
+9. Add the ["review"](https://github.com/MarquezProject/marquez-java/labels/review) label to your pull request
+10. Work with project maintainers to get your change reviewed and merged into the `master` branch
+11. Delete your branch
 
 To ensure your pull request is accepted, follow these guidelines:
 
