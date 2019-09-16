@@ -137,8 +137,6 @@ jar {
   }
 }
 
-afterReleaseBuild.dependsOn publish
-
 spotless {
   java {
     googleJavaFormat()
