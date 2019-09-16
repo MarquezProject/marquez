@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 public final class ModelGenerator {
   private ModelGenerator() {}
@@ -42,14 +41,6 @@ public final class ModelGenerator {
         .build();
   }
 
-  public static DatasetMeta newDatasetMeta() {
-    return DatasetMeta.builder()
-        .name(newDatasetName())
-        .datasourceUrn(newDatasourceUrn())
-        .description(newDescription())
-        .build();
-  }
-
   public static JobMeta newJobMeta() {
     return JobMeta.builder()
         .type(newJobType())
@@ -66,6 +57,41 @@ public final class ModelGenerator {
         .nominalEndTime(newTimestamp())
         .runArgs(newRunArgs())
         .build();
+  }
+
+  public static DbTableMeta newDbTableMeta() {
+
+    return DbTableMeta.builder()
+        .name(newDatasetName())
+        .physicalName(newDatasetPhysicalName())
+        .datasourceName(newDatasourceName())
+        .description(newDescription())
+        .build();
+  }
+
+  public static StreamMeta newStreamMeta() {
+
+    return StreamMeta.builder()
+        .name(newDatasetName())
+        .physicalName(newDatasetPhysicalName())
+        .datasourceName(newDatasourceName())
+        .description(newDescription())
+        .schemaLocation(newSchemaLocation())
+        .build();
+  }
+
+  public static DatasetMeta newDatasetMeta() {
+    return newDatasetMeta(newDatasetType());
+  }
+
+  public static DatasetMeta newDatasetMeta(DatasetType type) {
+
+    switch (type) {
+      case STREAM:
+        return newStreamMeta();
+      default:
+        return newDbTableMeta();
+    }
   }
 
   public static String newOwnerName() {
@@ -100,20 +126,32 @@ public final class ModelGenerator {
     return String.format("jdbc:%s://localhost:5431/%s" + newId(), newDatasourceType(), newDbName());
   }
 
+  public static DatasetType newDatasetType() {
+    return DatasetType.values()[newIdWithBound(DatasetType.values().length)];
+  }
+
   public static String newDatasetName() {
     return "test_dataset" + newId();
   }
 
-  public static List<String> newDatasetUrns(int limit) {
-    return Stream.generate(() -> newDatasetUrn()).limit(limit).collect(toList());
+  public static String newDatasetPhysicalName() {
+    return "test_schema.test_table" + newId();
   }
 
-  public static String newDatasetUrn() {
-    return String.format("urn:dataset:%s:public.room_bookings" + newId(), newDbName());
+  public static String newSchemaLocation() {
+    return "http://localhost:8081/schemas/ids/" + newId();
   }
 
   public static String newDescription() {
     return "test_description" + newId();
+  }
+
+  public static List<String> newDatasetUrns(int limit) {
+    return java.util.stream.Stream.generate(() -> newDatasetUrn()).limit(limit).collect(toList());
+  }
+
+  public static String newDatasetUrn() {
+    return String.format("urn:dataset:%s:public.room_bookings" + newId(), newDbName());
   }
 
   public static String newRunArgs() {
@@ -164,30 +202,65 @@ public final class ModelGenerator {
         newDatasourceType(), newDatasourceName(), now, newDatasetUrn(), newConnectionUrl());
   }
 
-  public static Dataset newDataset() {
+  public static DbTable newDbTable() {
+
     final Instant now = Instant.now();
-    return new Dataset(
-        newDatasetName(), now, newDatasetUrn(), newDatasourceUrn(), newDescription());
+
+    return new DbTable(
+        newDatasetName(),
+        newDatasetPhysicalName(),
+        now,
+        now,
+        newDatasourceName(),
+        newDescription());
+  }
+
+  public static Stream newStream() {
+
+    final Instant now = Instant.now();
+
+    return new Stream(
+        newDatasetName(),
+        newDatasetPhysicalName(),
+        now,
+        now,
+        newDatasourceName(),
+        newSchemaLocation(),
+        newDescription());
+  }
+
+  public static Dataset newDataset() {
+    return newDataset(newDatasetType());
+  }
+
+  public static Dataset newDataset(DatasetType type) {
+
+    switch (type) {
+      case STREAM:
+        return newStream();
+      default:
+        return newDbTable();
+    }
   }
 
   public static List<Namespace> newNamespaces(int limit) {
-    return Stream.generate(() -> newNamespace()).limit(limit).collect(toList());
+    return java.util.stream.Stream.generate(() -> newNamespace()).limit(limit).collect(toList());
   }
 
   public static List<Job> newJobs(int limit) {
-    return Stream.generate(() -> newJob()).limit(limit).collect(toList());
+    return java.util.stream.Stream.generate(() -> newJob()).limit(limit).collect(toList());
   }
 
   public static List<JobRun> newJobRuns(int limit) {
-    return Stream.generate(() -> newJobRun()).limit(limit).collect(toList());
+    return java.util.stream.Stream.generate(() -> newJobRun()).limit(limit).collect(toList());
   }
 
   public static List<Datasource> newDatasources(int limit) {
-    return Stream.generate(() -> newDatasource()).limit(limit).collect(toList());
+    return java.util.stream.Stream.generate(() -> newDatasource()).limit(limit).collect(toList());
   }
 
   public static List<Dataset> newDatasets(int limit) {
-    return Stream.generate(() -> newDataset()).limit(limit).collect(toList());
+    return java.util.stream.Stream.generate(() -> newDataset()).limit(limit).collect(toList());
   }
 
   public static Instant newTimestamp() {

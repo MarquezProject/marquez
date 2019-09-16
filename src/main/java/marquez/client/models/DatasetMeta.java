@@ -14,26 +14,38 @@
 
 package marquez.client.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
-import marquez.client.utils.JsonUtils;
+import lombok.ToString;
 
-@Value
-@Builder
-public class DatasetMeta {
-  @Getter @NonNull String name;
-  @Getter @NonNull String datasourceUrn;
-  @Nullable String description;
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@EqualsAndHashCode
+@ToString
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type")
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = DbTableMeta.class, name = "DB_TABLE"),
+  @JsonSubTypes.Type(value = StreamMeta.class, name = "STREAM")
+})
+public abstract class DatasetMeta {
+  @Getter @NonNull private final DatasetType type;
+  @Getter @NonNull private final String name;
+  @Getter @NonNull private final String physicalName;
+  @Getter @NonNull private final String datasourceName;
+  @Nullable private final String description;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
   }
 
-  public String toJson() {
-    return JsonUtils.toJson(this);
-  }
+  public abstract String toJson();
 }

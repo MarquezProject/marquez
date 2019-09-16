@@ -15,6 +15,8 @@
 package marquez.client.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
 import java.util.Optional;
@@ -29,11 +31,18 @@ import marquez.client.utils.JsonUtils;
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
-public final class Dataset {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = DbTable.class, name = "DB_TABLE"),
+  @JsonSubTypes.Type(value = Stream.class, name = "STREAM")
+})
+public abstract class Dataset {
+  @Getter @NonNull private final DatasetType type;
   @Getter @NonNull private final String name;
+  @Getter @NonNull private final String physicalName;
   @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final String urn;
-  @Getter @NonNull private final String datasourceUrn;
+  @Getter @NonNull private final Instant updatedAt;
+  @Getter @NonNull private final String datasourceName;
   @Nullable private final String description;
 
   public Optional<String> getDescription() {

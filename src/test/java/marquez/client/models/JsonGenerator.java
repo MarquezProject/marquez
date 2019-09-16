@@ -112,21 +112,69 @@ public final class JsonGenerator {
   }
 
   public static String newJsonFor(final DatasetMeta meta) {
+    switch (meta.getType()) {
+      case STREAM:
+        return newJsonFor((StreamMeta) meta);
+      default:
+        return newJsonFor((DbTableMeta) meta);
+    }
+  }
+
+  public static String newJsonFor(final DbTableMeta meta) {
     return MAPPER
         .createObjectNode()
+        .put("type", meta.getType().toString())
         .put("name", meta.getName())
-        .put("datasourceUrn", meta.getDatasourceUrn())
+        .put("physicalName", meta.getPhysicalName())
+        .put("datasourceName", meta.getDatasourceName())
+        .put("description", meta.getDescription().orElse(null))
+        .toString();
+  }
+
+  public static String newJsonFor(final StreamMeta meta) {
+    return MAPPER
+        .createObjectNode()
+        .put("type", meta.getType().toString())
+        .put("name", meta.getName())
+        .put("physicalName", meta.getPhysicalName())
+        .put("datasourceName", meta.getDatasourceName())
+        .put("schemaLocation", meta.getSchemaLocation())
         .put("description", meta.getDescription().orElse(null))
         .toString();
   }
 
   public static String newJsonFor(final Dataset dataset) {
+    switch (dataset.getType()) {
+      case STREAM:
+        return newJsonFor((Stream) dataset);
+      default:
+        return newJsonFor((DbTable) dataset);
+    }
+  }
+
+  public static String newJsonFor(final DbTable dataset) {
     return MAPPER
         .createObjectNode()
+        .put("type", dataset.getType().toString())
         .put("name", dataset.getName())
+        .put("physicalName", dataset.getPhysicalName())
         .put("createdAt", ISO_INSTANT.format(dataset.getCreatedAt()))
-        .put("urn", dataset.getUrn())
-        .put("datasourceUrn", dataset.getDatasourceUrn())
+        .put("updatedAt", ISO_INSTANT.format(dataset.getUpdatedAt()))
+        .put("datasourceName", dataset.getDatasourceName())
+        .put("description", dataset.getDescription().orElse(null))
+        .toString();
+  }
+
+  public static String newJsonFor(final Stream dataset) {
+    return MAPPER
+        .createObjectNode()
+        .put("type", dataset.getType().toString())
+        .put("name", dataset.getName())
+        .put("physicalName", dataset.getPhysicalName())
+        .put("createdAt", ISO_INSTANT.format(dataset.getCreatedAt()))
+        .put("updatedAt", ISO_INSTANT.format(dataset.getUpdatedAt()))
+        .put("datasourceName", dataset.getDatasourceName())
+        .put("schemaLocation", dataset.schemaLocation)
         .put("description", dataset.getDescription().orElse(null))
         .toString();
   }

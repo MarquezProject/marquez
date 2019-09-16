@@ -19,11 +19,13 @@ import static marquez.client.MarquezClient.Builder.DEFAULT_NAMESPACE_NAME;
 import static marquez.client.MarquezClient.Builder.NAMESPACE_NAME_ENV_VAR;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newDatasetName;
+import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDatasetUrn;
 import static marquez.client.models.ModelGenerator.newDatasetUrns;
 import static marquez.client.models.ModelGenerator.newDatasourceName;
 import static marquez.client.models.ModelGenerator.newDatasourceType;
 import static marquez.client.models.ModelGenerator.newDatasourceUrn;
+import static marquez.client.models.ModelGenerator.newDbTable;
 import static marquez.client.models.ModelGenerator.newDescription;
 import static marquez.client.models.ModelGenerator.newJobName;
 import static marquez.client.models.ModelGenerator.newJobType;
@@ -32,6 +34,8 @@ import static marquez.client.models.ModelGenerator.newNamespaceName;
 import static marquez.client.models.ModelGenerator.newOwnerName;
 import static marquez.client.models.ModelGenerator.newRunArgs;
 import static marquez.client.models.ModelGenerator.newRunId;
+import static marquez.client.models.ModelGenerator.newSchemaLocation;
+import static marquez.client.models.ModelGenerator.newStream;
 import static marquez.client.models.ModelGenerator.newTimestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -44,10 +48,11 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 import marquez.client.models.Dataset;
-import marquez.client.models.DatasetMeta;
 import marquez.client.models.Datasource;
 import marquez.client.models.DatasourceMeta;
 import marquez.client.models.DatasourceType;
+import marquez.client.models.DbTable;
+import marquez.client.models.DbTableMeta;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobRun;
@@ -56,6 +61,8 @@ import marquez.client.models.JobType;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
+import marquez.client.models.Stream;
+import marquez.client.models.StreamMeta;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -84,11 +91,19 @@ public class MarquezClientTest {
   private static final Datasource DATASOURCE =
       new Datasource(DATASOURCE_TYPE, DATASOURCE_NAME, CREATED_AT, DATASOURCE_URN, CONNECTION_URL);
 
-  // DATASET
-  private static final String DATASET_NAME = newDatasetName();
-  private static final String DATASET_URN = newDatasetUrn();
-  private static final Dataset DATASET =
-      new Dataset(DATASET_NAME, CREATED_AT, DATASET_URN, DATASOURCE_URN, DESCRIPTION);
+  // DATASETS
+  // DBTABLE
+  private static final String DBTABLE_NAME = newDatasetName();
+  private static final String DBTABLE_PHYSICAL_NAME = newDatasetPhysicalName();
+  private static final String DBTABLE_URN = newDatasetUrn();
+  private static final DbTable DBTABLE = newDbTable();
+
+  // STREAM
+  private static final String STREAM_NAME = newDatasetName();
+  private static final String STREAM_PHYSICAL_NAME = newDatasetPhysicalName();
+  private static final String STREAM_URN = newDatasetUrn();
+  private static final String STREAM_SCHEMA_LOCATION = newSchemaLocation();
+  private static final Stream STREAM = newStream();
 
   // JOB
   private static final String JOB_NAME = newJobName();
@@ -234,38 +249,76 @@ public class MarquezClientTest {
   }
 
   @Test
-  public void testCreateDataset() throws Exception {
+  public void testCreateDbTable() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME);
     final URL url = buildUrlFor(path);
     when(http.url(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
 
-    final DatasetMeta meta =
-        DatasetMeta.builder()
-            .name(DATASET_NAME)
-            .datasourceUrn(DATASOURCE_URN)
+    final DbTableMeta meta =
+        DbTableMeta.builder()
+            .name(DBTABLE_NAME)
+            .physicalName(DBTABLE_PHYSICAL_NAME)
+            .datasourceName(DATASOURCE_NAME)
             .description(DESCRIPTION)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String datasetAsJson = JsonGenerator.newJsonFor(DATASET);
+    final String datasetAsJson = JsonGenerator.newJsonFor(DBTABLE);
     when(http.post(url, metaAsJson)).thenReturn(datasetAsJson);
 
     final Dataset dataset = client.createDataset(NAMESPACE_NAME, meta);
-    assertThat(dataset).isEqualTo(DATASET);
+    assertThat(dataset).isEqualTo(DBTABLE);
   }
 
   @Test
-  public void testGetDataset() throws Exception {
+  public void testGetDbTable() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DATASET_URN);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DBTABLE_URN);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, DATASET_URN)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, DBTABLE_URN)).thenReturn(url);
 
-    final String datasetAsJson = JsonGenerator.newJsonFor(DATASET);
+    final String datasetAsJson = JsonGenerator.newJsonFor(DBTABLE);
     when(http.get(url)).thenReturn(datasetAsJson);
 
-    final Dataset dataset = client.getDataset(NAMESPACE_NAME, DATASET_URN);
-    assertThat(dataset).isEqualTo(DATASET);
+    final Dataset dataset = client.getDataset(NAMESPACE_NAME, DBTABLE_URN);
+    assertThat(dataset).isEqualTo(DBTABLE);
+  }
+
+  @Test
+  public void testCreateStream() throws Exception {
+    final String pathTemplate = "/namespaces/%s/datasets";
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME);
+    final URL url = buildUrlFor(path);
+    when(http.url(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
+
+    final StreamMeta meta =
+        StreamMeta.builder()
+            .name(STREAM_NAME)
+            .physicalName(STREAM_PHYSICAL_NAME)
+            .datasourceName(DATASOURCE_NAME)
+            .description(DESCRIPTION)
+            .schemaLocation(STREAM_SCHEMA_LOCATION)
+            .build();
+    final String metaAsJson = JsonGenerator.newJsonFor(meta);
+    final String datasetAsJson = JsonGenerator.newJsonFor(STREAM);
+    when(http.post(url, metaAsJson)).thenReturn(datasetAsJson);
+
+    final Dataset dataset = client.createDataset(NAMESPACE_NAME, meta);
+    assertThat(dataset).isEqualTo(STREAM);
+  }
+
+  @Test
+  public void testGetStream() throws Exception {
+    final String pathTemplate = "/namespaces/%s/datasets/%s";
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_URN);
+    final URL url = buildUrlFor(path);
+    when(http.url(pathTemplate, NAMESPACE_NAME, STREAM_URN)).thenReturn(url);
+
+    final String datasetAsJson = JsonGenerator.newJsonFor(STREAM);
+    when(http.get(url)).thenReturn(datasetAsJson);
+
+    final Dataset dataset = client.getDataset(NAMESPACE_NAME, STREAM_URN);
+    assertThat(dataset).isEqualTo(STREAM);
   }
 
   @Test
