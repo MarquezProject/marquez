@@ -49,7 +49,6 @@ public class MarquezClient {
   @VisibleForTesting static final int DEFAULT_OFFSET = 0;
 
   @VisibleForTesting final MarquezHttp http;
-
   @Getter private final String namespaceName;
 
   MarquezClient(@NonNull final MarquezHttp http, @NonNull final String namespaceName) {
@@ -147,14 +146,14 @@ public class MarquezClient {
     return Datasets.fromJson(bodyAsJson).getValue();
   }
 
-  public Job createJob(String jobName, JobMeta jobMeta) {
-    return createJob(namespaceName, jobName, jobMeta);
+  public Job createJob(String jobName, JobMeta meta) {
+    return createJob(namespaceName, jobName, meta);
   }
 
   public Job createJob(
-      @NonNull String namespaceName, @NonNull String jobName, @NonNull JobMeta jobMeta) {
+      @NonNull String namespaceName, @NonNull String jobName, @NonNull JobMeta meta) {
     final String bodyAsJson =
-        http.put(http.url("/namespaces/%s/jobs/%s", namespaceName, jobName), jobMeta.toJson());
+        http.put(http.url("/namespaces/%s/jobs/%s", namespaceName, jobName), meta.toJson());
     return Job.fromJson(bodyAsJson);
   }
 
@@ -185,8 +184,8 @@ public class MarquezClient {
     return Jobs.fromJson(bodyAsJson).getValue();
   }
 
-  public Run createRun(String jobName, RunMeta runMeta) {
-    return createRun(namespaceName, jobName, runMeta);
+  public Run createRun(String jobName, RunMeta meta) {
+    return createRun(namespaceName, jobName, meta);
   }
 
   public Run createRun(
@@ -214,10 +213,7 @@ public class MarquezClient {
   }
 
   public List<Run> listRuns(
-      @NonNull String namespaceName,
-      @NonNull String jobName,
-      @NonNull Integer limit,
-      @NonNull Integer offset) {
+      @NonNull String namespaceName, @NonNull String jobName, Integer limit, Integer offset) {
     final String bodyAsJson =
         http.get(
             http.url(
@@ -261,7 +257,6 @@ public class MarquezClient {
     @VisibleForTesting static final String NAMESPACE_NAME_ENV_VAR = "MARQUEZ_NAMESPACE";
 
     @VisibleForTesting URL baseUrl;
-
     private String namespaceName;
 
     private Builder() {
