@@ -475,7 +475,7 @@ public class MarquezClient {
    * @param runId id for the {@link JobRun} to mark
    */
   public void markJobRunAsRunning(@NonNull String runId) {
-    http.put(http.url("/jobs/runs/%s/run", runId));
+    http.post(http.url("/jobs/runs/%s/run", runId));
   }
 
   /**
@@ -484,7 +484,7 @@ public class MarquezClient {
    * @param runId id for the {@link JobRun} to mark
    */
   public void markJobRunAsCompleted(@NonNull String runId) {
-    http.put(http.url("/jobs/runs/%s/complete", runId));
+    http.post(http.url("/jobs/runs/%s/complete", runId));
   }
 
   /**
@@ -493,7 +493,7 @@ public class MarquezClient {
    * @param runId id for the {@link JobRun} to mark
    */
   public void markJobRunAsAborted(@NonNull String runId) {
-    http.put(http.url("/jobs/runs/%s/abort", runId));
+    http.post(http.url("/jobs/runs/%s/abort", runId));
   }
 
   /**
@@ -502,7 +502,7 @@ public class MarquezClient {
    * @param runId id for the {@link JobRun} to mark
    */
   public void markJobRunAsFailed(@NonNull String runId) {
-    http.put(http.url("/jobs/runs/%s/fail", runId));
+    http.post(http.url("/jobs/runs/%s/fail", runId));
   }
 
   private Map<String, Object> newQueryParamsWith(Integer limit, Integer offset) {

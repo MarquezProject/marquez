@@ -402,7 +402,7 @@ public class MarquezClientTest {
 
     client.markJobRunAsRunning(RUN_ID);
 
-    verify(http, times(1)).put(url);
+    verify(http, times(1)).post(url);
   }
 
   @Test
@@ -414,7 +414,7 @@ public class MarquezClientTest {
 
     client.markJobRunAsCompleted(RUN_ID);
 
-    verify(http, times(1)).put(url);
+    verify(http, times(1)).post(url);
   }
 
   @Test
@@ -426,7 +426,7 @@ public class MarquezClientTest {
 
     client.markJobRunAsAborted(RUN_ID);
 
-    verify(http, times(1)).put(url);
+    verify(http, times(1)).post(url);
   }
 
   @Test
@@ -438,7 +438,7 @@ public class MarquezClientTest {
 
     client.markJobRunAsFailed(RUN_ID);
 
-    verify(http, times(1)).put(url);
+    verify(http, times(1)).post(url);
   }
 
   private String buildPathFor(String pathTemplate, String... pathArgs) {

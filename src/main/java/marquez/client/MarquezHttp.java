@@ -76,14 +76,20 @@ class MarquezHttp {
     }
   }
 
-  String post(final URL url, final String json) {
+  String post(final URL url) {
+    return post(url, null);
+  }
+
+  String post(final URL url, @Nullable final String json) {
     log.debug("POST {}: {}", url, json);
     try {
       final HttpPost request = new HttpPost();
       request.setURI(url.toURI());
       request.addHeader(ACCEPT, JSON_UTF_8.toString());
-      request.addHeader(CONTENT_TYPE, JSON_UTF_8.toString());
-      request.setEntity(new StringEntity(json, JSON_UTF_8.toString()));
+      if (json != null) {
+        request.addHeader(CONTENT_TYPE, JSON_UTF_8.toString());
+        request.setEntity(new StringEntity(json, JSON_UTF_8.toString()));
+      }
 
       final HttpResponse response = http.execute(request);
       throwOnHttpError(response);
@@ -96,20 +102,14 @@ class MarquezHttp {
     }
   }
 
-  String put(final URL url) {
-    return put(url, null);
-  }
-
-  String put(final URL url, @Nullable final String json) {
+  String put(final URL url, final String json) {
     log.debug("PUT {}: {}", url, json);
     try {
       final HttpPut request = new HttpPut();
       request.setURI(url.toURI());
       request.addHeader(ACCEPT, JSON_UTF_8.toString());
-      if (json != null) {
-        request.addHeader(CONTENT_TYPE, JSON_UTF_8.toString());
-        request.setEntity(new StringEntity(json, JSON_UTF_8.toString()));
-      }
+      request.addHeader(CONTENT_TYPE, JSON_UTF_8.toString());
+      request.setEntity(new StringEntity(json, JSON_UTF_8.toString()));
 
       final HttpResponse response = http.execute(request);
       throwOnHttpError(response);
