@@ -1,7 +1,5 @@
 package marquez.client.models;
 
-import static marquez.client.models.DatasetType.STREAM;
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import javax.annotation.Nullable;
 import lombok.Builder;
@@ -24,7 +22,7 @@ public final class StreamMeta extends DatasetMeta {
       @NonNull final String schemaLocation,
       @Nullable final String description,
       @Nullable final String runId) {
-    super(STREAM, physicalName, sourceName, description, runId);
+    super(physicalName, sourceName, description, runId);
     this.schemaLocation = schemaLocation;
   }
 

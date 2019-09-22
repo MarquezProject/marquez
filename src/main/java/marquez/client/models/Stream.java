@@ -14,8 +14,6 @@
 
 package marquez.client.models;
 
-import static marquez.client.models.DatasetType.STREAM;
-
 import java.time.Instant;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -36,7 +34,7 @@ public final class Stream extends Dataset {
       String sourceName,
       @NonNull String schemaLocation,
       @Nullable String description) {
-    super(STREAM, name, physicalName, createdAt, updatedAt, sourceName, description);
+    super(name, physicalName, createdAt, updatedAt, sourceName, description);
     this.schemaLocation = schemaLocation;
   }
 }

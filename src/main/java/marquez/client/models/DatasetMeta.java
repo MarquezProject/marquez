@@ -28,16 +28,12 @@ import lombok.ToString;
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = DbTableMeta.class, name = "DB_TABLE"),
   @JsonSubTypes.Type(value = StreamMeta.class, name = "STREAM")
 })
 public abstract class DatasetMeta {
-  @Getter @NonNull private final DatasetType type;
   @Getter @NonNull private final String physicalName;
   @Getter @NonNull private final String sourceName;
   @Nullable private final String description;

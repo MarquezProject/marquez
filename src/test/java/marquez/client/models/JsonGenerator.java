@@ -26,6 +26,9 @@ public final class JsonGenerator {
 
   private static final ObjectMapper MAPPER = Utils.newObjectMapper();
 
+  private static final String DB_TABLE = "DB_TABLE";
+  private static final String STREAM = "STREAM";
+
   public static String newJsonFor(final NamespaceMeta meta) {
     return MAPPER
         .createObjectNode()
@@ -67,18 +70,19 @@ public final class JsonGenerator {
   }
 
   public static String newJsonFor(final DatasetMeta meta) {
-    switch (meta.getType()) {
-      case STREAM:
-        return newJsonFor((StreamMeta) meta);
-      default:
-        return newJsonFor((DbTableMeta) meta);
+    if (meta instanceof DbTableMeta) {
+      return newJsonFor((DbTableMeta) meta);
+    } else if (meta instanceof StreamMeta) {
+      return newJsonFor((StreamMeta) meta);
     }
+
+    throw new IllegalArgumentException();
   }
 
-  public static String newJsonFor(final DbTableMeta meta) {
+  private static String newJsonFor(final DbTableMeta meta) {
     return MAPPER
         .createObjectNode()
-        .put("type", meta.getType().toString())
+        .put("type", DB_TABLE)
         .put("physicalName", meta.getPhysicalName())
         .put("sourceName", meta.getSourceName())
         .put("description", meta.getDescription().orElse(null))
@@ -86,10 +90,10 @@ public final class JsonGenerator {
         .toString();
   }
 
-  public static String newJsonFor(final StreamMeta meta) {
+  private static String newJsonFor(final StreamMeta meta) {
     return MAPPER
         .createObjectNode()
-        .put("type", meta.getType().toString())
+        .put("type", STREAM)
         .put("physicalName", meta.getPhysicalName())
         .put("sourceName", meta.getSourceName())
         .put("schemaLocation", meta.getSchemaLocation())
@@ -99,38 +103,39 @@ public final class JsonGenerator {
   }
 
   public static String newJsonFor(final Dataset dataset) {
-    switch (dataset.getType()) {
-      case STREAM:
-        return newJsonFor((Stream) dataset);
-      default:
-        return newJsonFor((DbTable) dataset);
+    if (dataset instanceof DbTable) {
+      return newJsonFor((DbTable) dataset);
+    } else if (dataset instanceof Stream) {
+      return newJsonFor((Stream) dataset);
     }
+
+    throw new IllegalArgumentException();
   }
 
-  public static String newJsonFor(final DbTable dataset) {
+  private static String newJsonFor(final DbTable dbTable) {
     return MAPPER
         .createObjectNode()
-        .put("type", dataset.getType().toString())
-        .put("name", dataset.getName())
-        .put("physicalName", dataset.getPhysicalName())
-        .put("createdAt", ISO_INSTANT.format(dataset.getCreatedAt()))
-        .put("updatedAt", ISO_INSTANT.format(dataset.getUpdatedAt()))
-        .put("sourceName", dataset.getSourceName())
-        .put("description", dataset.getDescription().orElse(null))
+        .put("type", DB_TABLE)
+        .put("name", dbTable.getName())
+        .put("physicalName", dbTable.getPhysicalName())
+        .put("createdAt", ISO_INSTANT.format(dbTable.getCreatedAt()))
+        .put("updatedAt", ISO_INSTANT.format(dbTable.getUpdatedAt()))
+        .put("sourceName", dbTable.getSourceName())
+        .put("description", dbTable.getDescription().orElse(null))
         .toString();
   }
 
-  public static String newJsonFor(final Stream dataset) {
+  private static String newJsonFor(final Stream stream) {
     return MAPPER
         .createObjectNode()
-        .put("type", dataset.getType().toString())
-        .put("name", dataset.getName())
-        .put("physicalName", dataset.getPhysicalName())
-        .put("createdAt", ISO_INSTANT.format(dataset.getCreatedAt()))
-        .put("updatedAt", ISO_INSTANT.format(dataset.getUpdatedAt()))
-        .put("sourceName", dataset.getSourceName())
-        .put("schemaLocation", dataset.getSchemaLocation())
-        .put("description", dataset.getDescription().orElse(null))
+        .put("type", STREAM)
+        .put("name", stream.getName())
+        .put("physicalName", stream.getPhysicalName())
+        .put("createdAt", ISO_INSTANT.format(stream.getCreatedAt()))
+        .put("updatedAt", ISO_INSTANT.format(stream.getUpdatedAt()))
+        .put("sourceName", stream.getSourceName())
+        .put("schemaLocation", stream.getSchemaLocation())
+        .put("description", stream.getDescription().orElse(null))
         .toString();
   }
 

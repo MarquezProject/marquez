@@ -1,7 +1,5 @@
 package marquez.client.models;
 
-import static marquez.client.models.DatasetType.DB_TABLE;
-
 import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -17,7 +15,7 @@ public final class DbTableMeta extends DatasetMeta {
       final String sourceName,
       @Nullable final String description,
       @Nullable final String runId) {
-    super(DB_TABLE, physicalName, sourceName, description, runId);
+    super(physicalName, sourceName, description, runId);
   }
 
   public String toJson() {
