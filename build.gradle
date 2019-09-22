@@ -78,7 +78,7 @@ publishing {
     mavenJava(MavenPublication) {
       groupId = 'io.github.marquezproject'
       artifactId = 'marquez-java'
-      version = '0.2.0-rc.2'
+      version = '0.2.0-rc.3'
 
       from components.java
 
