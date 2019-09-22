@@ -32,6 +32,7 @@ import marquez.client.Utils;
 public final class Namespace {
   @Getter @NonNull private final String name;
   @Getter @NonNull private final Instant createdAt;
+  @Getter @NonNull private final Instant updatedAt;
   @Getter @NonNull private final String ownerName;
   @Nullable private final String description;
 

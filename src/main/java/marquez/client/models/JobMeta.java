@@ -14,6 +14,7 @@
 
 package marquez.client.models;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -24,11 +25,10 @@ import lombok.Value;
 import marquez.client.Utils;
 
 @Value
-@Builder
 public class JobMeta {
   @Getter @NonNull JobType type;
-  @Getter @NonNull List<String> inputDatasetUrns;
-  @Getter @NonNull List<String> outputDatasetUrns;
+  @Getter @NonNull List<String> inputs;
+  @Getter @NonNull List<String> outputs;
   @Getter @NonNull String location;
   @Nullable String description;
 
@@ -38,5 +38,55 @@ public class JobMeta {
 
   public String toJson() {
     return Utils.toJson(this);
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static final class Builder {
+    private JobType type;
+    private List<String> inputs;
+    private List<String> outputs;
+    private String location;
+    @Nullable private String description;
+
+    private Builder() {
+      this.inputs = ImmutableList.of();
+      this.outputs = ImmutableList.of();
+    }
+
+    public Builder type(@NonNull String typeString) {
+      return type(JobType.valueOf(typeString));
+    }
+
+    public Builder type(@NonNull JobType type) {
+      this.type = type;
+      return this;
+    }
+
+    public Builder inputs(@NonNull List<String> inputs) {
+      this.inputs = ImmutableList.copyOf(inputs);
+      return this;
+    }
+
+    public Builder outputs(@NonNull List<String> outputs) {
+      this.outputs = ImmutableList.copyOf(outputs);
+      return this;
+    }
+
+    public Builder location(@NonNull String location) {
+      this.location = location;
+      return this;
+    }
+
+    public Builder description(@Nullable String description) {
+      this.description = description;
+      return this;
+    }
+
+    public JobMeta build() {
+      return new JobMeta(type, inputs, outputs, location, description);
+    }
   }
 }

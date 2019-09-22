@@ -38,13 +38,17 @@ import lombok.ToString;
 })
 public abstract class DatasetMeta {
   @Getter @NonNull private final DatasetType type;
-  @Getter @NonNull private final String name;
   @Getter @NonNull private final String physicalName;
-  @Getter @NonNull private final String datasourceName;
+  @Getter @NonNull private final String sourceName;
   @Nullable private final String description;
+  @Nullable private final String runId;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<String> getRunId() {
+    return Optional.ofNullable(runId);
   }
 
   public abstract String toJson();

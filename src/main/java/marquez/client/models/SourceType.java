@@ -14,19 +14,11 @@
 
 package marquez.client.models;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Value;
-import marquez.client.Utils;
-
-@Value
-@Builder
-public class DatasourceMeta {
-  @Getter @NonNull String name;
-  @Getter @NonNull String connectionUrl;
-
-  public String toJson() {
-    return Utils.toJson(this);
-  }
+public enum SourceType {
+  MYSQL,
+  POSTGRESQL,
+  REDSHIFT,
+  SNOWFLAKE,
+  KAFKA,
+  REST;
 }

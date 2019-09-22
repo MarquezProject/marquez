@@ -1,6 +1,6 @@
 package marquez.client.models;
 
-import static marquez.client.models.ModelGenerator.newJobRunMeta;
+import static marquez.client.models.ModelGenerator.newRunMeta;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import marquez.client.UnitTests;
@@ -8,8 +8,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class JobRunMetaTest {
-  private static final JobRunMeta META = newJobRunMeta();
+public class RunMetaTest {
+  private static final RunMeta META = newRunMeta();
   private static final String JSON = JsonGenerator.newJsonFor(META);
 
   @Test

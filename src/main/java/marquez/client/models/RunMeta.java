@@ -14,19 +14,24 @@
 
 package marquez.client.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.Builder;
+import lombok.NonNull;
 import lombok.Value;
 import marquez.client.Utils;
 
 @Value
-@Builder
-public class JobRunMeta {
+public class RunMeta {
   @Nullable Instant nominalStartTime;
   @Nullable Instant nominalEndTime;
-  @Nullable String runArgs;
+
+  @NonNull
+  @JsonProperty("runArgs")
+  Map<String, String> args;
 
   public Optional<Instant> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
@@ -36,11 +41,39 @@ public class JobRunMeta {
     return Optional.ofNullable(nominalEndTime);
   }
 
-  public Optional<String> getRunArgs() {
-    return Optional.ofNullable(runArgs);
-  }
-
   public String toJson() {
     return Utils.toJson(this);
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static final class Builder {
+    @Nullable private Instant nominalStartTime;
+    @Nullable private Instant nominalEndTime;
+    private Map<String, String> args;
+
+    private Builder() {
+      this.args = ImmutableMap.of();
+    }
+
+    public Builder nominalStartTime(@NonNull Instant nominalStartTime) {
+      this.nominalStartTime = nominalStartTime;
+      return this;
+    }
+
+    public Builder nominalEndTime(@NonNull Instant nominalEndTime) {
+      return this;
+    }
+
+    public Builder args(@NonNull Map<String, String> args) {
+      this.args = ImmutableMap.copyOf(args);
+      return this;
+    }
+
+    public RunMeta build() {
+      return new RunMeta(nominalStartTime, nominalEndTime, args);
+    }
   }
 }

@@ -29,34 +29,19 @@ import marquez.client.Utils;
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
-public final class JobRun {
-  @Getter @NonNull private final String runId;
-  @Nullable private final Instant nominalStartTime;
-  @Nullable private final Instant nominalEndTime;
-  @Nullable private final String runArgs;
-  @Getter @NonNull private final State runState;
+public final class Source {
+  @Getter private final SourceType type;
+  @Getter private final String name;
+  @Getter private final Instant createdAt;
+  @Getter private final Instant updatedAt;
+  @Getter private final String connectionUrl;
+  @Nullable private final String description;
 
-  public Optional<Instant> getNominalStartTime() {
-    return Optional.ofNullable(nominalStartTime);
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
   }
 
-  public Optional<Instant> getNominalEndTime() {
-    return Optional.ofNullable(nominalEndTime);
-  }
-
-  public Optional<String> getRunArgs() {
-    return Optional.ofNullable(runArgs);
-  }
-
-  public static JobRun fromJson(@NonNull final String json) {
-    return Utils.fromJson(json, new TypeReference<JobRun>() {});
-  }
-
-  public enum State {
-    NEW,
-    RUNNING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
+  public static Source fromJson(@NonNull final String json) {
+    return Utils.fromJson(json, new TypeReference<Source>() {});
   }
 }

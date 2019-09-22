@@ -35,8 +35,8 @@ public final class Job {
   @Getter @NonNull private final String name;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
-  @Getter @NonNull private final List<String> inputDatasetUrns;
-  @Getter @NonNull private final List<String> outputDatasetUrns;
+  @Getter @NonNull private final List<String> inputs;
+  @Getter @NonNull private final List<String> outputs;
   @Getter @NonNull private final String location;
   @Nullable private final String description;
 

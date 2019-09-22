@@ -39,75 +39,30 @@ public final class JsonGenerator {
         .createObjectNode()
         .put("name", namespace.getName())
         .put("createdAt", ISO_INSTANT.format(namespace.getCreatedAt()))
+        .put("updatedAt", ISO_INSTANT.format(namespace.getUpdatedAt()))
         .put("ownerName", namespace.getOwnerName())
         .put("description", namespace.getDescription().orElse(null))
         .toString();
   }
 
-  public static String newJsonFor(final JobMeta meta) {
-    final ArrayNode array0 = MAPPER.valueToTree(meta.getInputDatasetUrns());
-    final ArrayNode array1 = MAPPER.valueToTree(meta.getOutputDatasetUrns());
-    final ObjectNode obj = MAPPER.createObjectNode();
-    obj.put("type", meta.getType().toString());
-    obj.putArray("inputDatasetUrns").addAll(array0);
-    obj.putArray("outputDatasetUrns").addAll(array1);
-    obj.put("location", meta.getLocation()).put("description", meta.getDescription().orElse(null));
-    return obj.toString();
-  }
-
-  public static String newJsonFor(final Job job) {
-    final ArrayNode array0 = MAPPER.valueToTree(job.getInputDatasetUrns());
-    final ArrayNode array1 = MAPPER.valueToTree(job.getOutputDatasetUrns());
-    final ObjectNode obj =
-        MAPPER
-            .createObjectNode()
-            .put("type", job.getType().toString())
-            .put("name", job.getName())
-            .put("createdAt", ISO_INSTANT.format(job.getCreatedAt()))
-            .put("updatedAt", ISO_INSTANT.format(job.getUpdatedAt()));
-    obj.putArray("inputDatasetUrns").addAll(array0);
-    obj.putArray("outputDatasetUrns").addAll(array1);
-    obj.put("location", job.getLocation());
-    obj.put("description", job.getDescription().orElse(null));
-    return obj.toString();
-  }
-
-  public static String newJsonFor(final JobRunMeta meta) {
+  public static String newJsonFor(final SourceMeta meta) {
     return MAPPER
         .createObjectNode()
-        .put("nominalStartTime", ISO_INSTANT.format(meta.getNominalStartTime().orElse(null)))
-        .put("nominalEndTime", ISO_INSTANT.format(meta.getNominalEndTime().orElse(null)))
-        .put("runArgs", meta.getRunArgs().orElse(null))
-        .toString();
-  }
-
-  public static String newJsonFor(final JobRun run) {
-    return MAPPER
-        .createObjectNode()
-        .put("runId", run.getRunId())
-        .put("nominalStartTime", ISO_INSTANT.format(run.getNominalStartTime().orElse(null)))
-        .put("nominalEndTime", ISO_INSTANT.format(run.getNominalEndTime().orElse(null)))
-        .put("runArgs", run.getRunArgs().orElse(null))
-        .put("runState", run.getRunState().toString())
-        .toString();
-  }
-
-  public static String newJsonFor(final DatasourceMeta meta) {
-    return MAPPER
-        .createObjectNode()
-        .put("name", meta.getName())
+        .put("type", meta.getType().toString())
         .put("connectionUrl", meta.getConnectionUrl())
+        .put("description", meta.getDescription().orElse(null))
         .toString();
   }
 
-  public static String newJsonFor(final Datasource datasource) {
+  public static String newJsonFor(final Source source) {
     return MAPPER
         .createObjectNode()
-        .put("type", datasource.getType().toString())
-        .put("name", datasource.getName())
-        .put("createdAt", ISO_INSTANT.format(datasource.getCreatedAt()))
-        .put("urn", datasource.getUrn())
-        .put("connectionUrl", datasource.getConnectionUrl())
+        .put("type", source.getType().toString())
+        .put("name", source.getName())
+        .put("createdAt", ISO_INSTANT.format(source.getCreatedAt()))
+        .put("updatedAt", ISO_INSTANT.format(source.getUpdatedAt()))
+        .put("connectionUrl", source.getConnectionUrl())
+        .put("description", source.getDescription().orElse(null))
         .toString();
   }
 
@@ -124,10 +79,10 @@ public final class JsonGenerator {
     return MAPPER
         .createObjectNode()
         .put("type", meta.getType().toString())
-        .put("name", meta.getName())
         .put("physicalName", meta.getPhysicalName())
-        .put("datasourceName", meta.getDatasourceName())
+        .put("sourceName", meta.getSourceName())
         .put("description", meta.getDescription().orElse(null))
+        .put("runId", meta.getRunId().orElse(null))
         .toString();
   }
 
@@ -135,11 +90,11 @@ public final class JsonGenerator {
     return MAPPER
         .createObjectNode()
         .put("type", meta.getType().toString())
-        .put("name", meta.getName())
         .put("physicalName", meta.getPhysicalName())
-        .put("datasourceName", meta.getDatasourceName())
+        .put("sourceName", meta.getSourceName())
         .put("schemaLocation", meta.getSchemaLocation())
         .put("description", meta.getDescription().orElse(null))
+        .put("runId", meta.getRunId().orElse(null))
         .toString();
   }
 
@@ -160,7 +115,7 @@ public final class JsonGenerator {
         .put("physicalName", dataset.getPhysicalName())
         .put("createdAt", ISO_INSTANT.format(dataset.getCreatedAt()))
         .put("updatedAt", ISO_INSTANT.format(dataset.getUpdatedAt()))
-        .put("datasourceName", dataset.getDatasourceName())
+        .put("sourceName", dataset.getSourceName())
         .put("description", dataset.getDescription().orElse(null))
         .toString();
   }
@@ -173,9 +128,66 @@ public final class JsonGenerator {
         .put("physicalName", dataset.getPhysicalName())
         .put("createdAt", ISO_INSTANT.format(dataset.getCreatedAt()))
         .put("updatedAt", ISO_INSTANT.format(dataset.getUpdatedAt()))
-        .put("datasourceName", dataset.getDatasourceName())
-        .put("schemaLocation", dataset.schemaLocation)
+        .put("sourceName", dataset.getSourceName())
+        .put("schemaLocation", dataset.getSchemaLocation())
         .put("description", dataset.getDescription().orElse(null))
         .toString();
+  }
+
+  public static String newJsonFor(final JobMeta meta) {
+    final ArrayNode inputs = MAPPER.valueToTree(meta.getInputs());
+    final ArrayNode outputs = MAPPER.valueToTree(meta.getOutputs());
+    final ObjectNode obj = MAPPER.createObjectNode();
+    obj.put("type", meta.getType().toString());
+    obj.putArray("inputs").addAll(inputs);
+    obj.putArray("outputs").addAll(outputs);
+    obj.put("location", meta.getLocation());
+    obj.put("description", meta.getDescription().orElse(null));
+    return obj.toString();
+  }
+
+  public static String newJsonFor(final Job job) {
+    final ArrayNode inputs = MAPPER.valueToTree(job.getInputs());
+    final ArrayNode outputs = MAPPER.valueToTree(job.getOutputs());
+    final ObjectNode obj =
+        MAPPER
+            .createObjectNode()
+            .put("type", job.getType().toString())
+            .put("name", job.getName())
+            .put("createdAt", ISO_INSTANT.format(job.getCreatedAt()))
+            .put("updatedAt", ISO_INSTANT.format(job.getUpdatedAt()));
+    obj.putArray("inputs").addAll(inputs);
+    obj.putArray("outputs").addAll(outputs);
+    obj.put("location", job.getLocation());
+    obj.put("description", job.getDescription().orElse(null));
+    return obj.toString();
+  }
+
+  public static String newJsonFor(final RunMeta meta) {
+    final ObjectNode obj = MAPPER.createObjectNode();
+    obj.put("nominalStartTime", meta.getNominalStartTime().map(ISO_INSTANT::format).orElse(null));
+    obj.put("nominalEndTime", meta.getNominalEndTime().map(ISO_INSTANT::format).orElse(null));
+
+    final ObjectNode runArgs = MAPPER.createObjectNode();
+    meta.getArgs().forEach((k, v) -> runArgs.put(k, v));
+    obj.set("runArgs", runArgs);
+    return obj.toString();
+  }
+
+  public static String newJsonFor(final Run run) {
+    final ObjectNode obj =
+        MAPPER
+            .createObjectNode()
+            .put("runId", run.getId())
+            .put("createdAt", ISO_INSTANT.format(run.getCreatedAt()))
+            .put("updatedAt", ISO_INSTANT.format(run.getUpdatedAt()));
+    obj.put("nominalStartTime", run.getNominalStartTime().map(ISO_INSTANT::format).orElse(null));
+    obj.put("nominalEndTime", run.getNominalEndTime().map(ISO_INSTANT::format).orElse(null));
+
+    final ObjectNode runArgs = MAPPER.createObjectNode();
+    run.getArgs().forEach((k, v) -> runArgs.put(k, v));
+    obj.set("runArgs", runArgs);
+    obj.put("runState", run.getState().toString());
+    return obj.toString();
   }
 }

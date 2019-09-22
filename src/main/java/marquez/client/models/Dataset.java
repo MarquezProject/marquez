@@ -42,7 +42,7 @@ public abstract class Dataset {
   @Getter @NonNull private final String physicalName;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
-  @Getter @NonNull private final String datasourceName;
+  @Getter @NonNull private final String sourceName;
   @Nullable private final String description;
 
   public Optional<String> getDescription() {

@@ -15,8 +15,12 @@
 package marquez.client.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
+import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,14 +31,45 @@ import marquez.client.Utils;
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
-public final class Datasource {
-  @Getter @NonNull private final DatasourceType type;
-  @Getter @NonNull private final String name;
-  @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final String urn;
-  @Getter @NonNull private final String connectionUrl;
+public final class Run {
+  @Getter
+  @NonNull
+  @JsonProperty("runId")
+  private final String id;
 
-  public static Datasource fromJson(@NonNull final String json) {
-    return Utils.fromJson(json, new TypeReference<Datasource>() {});
+  @Getter @NonNull private final Instant createdAt;
+  @Getter @NonNull private final Instant updatedAt;
+
+  @Nullable private final Instant nominalStartTime;
+  @Nullable private final Instant nominalEndTime;
+
+  @Getter
+  @NonNull
+  @JsonProperty("runArgs")
+  private final Map<String, String> args;
+
+  @Getter
+  @NonNull
+  @JsonProperty("runState")
+  private final State state;
+
+  public enum State {
+    NEW,
+    RUNNING,
+    COMPLETED,
+    ABORTED,
+    FAILED;
+  }
+
+  public Optional<Instant> getNominalStartTime() {
+    return Optional.ofNullable(nominalStartTime);
+  }
+
+  public Optional<Instant> getNominalEndTime() {
+    return Optional.ofNullable(nominalEndTime);
+  }
+
+  public static Run fromJson(@NonNull final String json) {
+    return Utils.fromJson(json, new TypeReference<Run>() {});
   }
 }

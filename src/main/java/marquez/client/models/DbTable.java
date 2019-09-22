@@ -14,24 +14,23 @@
 
 package marquez.client.models;
 
+import static marquez.client.models.DatasetType.DB_TABLE;
+
 import java.time.Instant;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public final class DbTable extends Dataset {
   public DbTable(
-      String name,
-      String physicalName,
-      Instant createdAt,
-      Instant updatedAt,
-      String datasourceName,
-      @Nullable String description) {
-    super(
-        DatasetType.DB_TABLE,
-        name,
-        physicalName,
-        createdAt,
-        updatedAt,
-        datasourceName,
-        description);
+      final String name,
+      final String physicalName,
+      final Instant createdAt,
+      final Instant updatedAt,
+      final String sourceName,
+      @Nullable final String description) {
+    super(DB_TABLE, name, physicalName, createdAt, updatedAt, sourceName, description);
   }
 }

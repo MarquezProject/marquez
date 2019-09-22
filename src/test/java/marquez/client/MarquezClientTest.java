@@ -20,22 +20,18 @@ import static marquez.client.MarquezClient.Builder.NAMESPACE_NAME_ENV_VAR;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newDatasetName;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
-import static marquez.client.models.ModelGenerator.newDatasetUrn;
-import static marquez.client.models.ModelGenerator.newDatasetUrns;
-import static marquez.client.models.ModelGenerator.newDatasourceName;
-import static marquez.client.models.ModelGenerator.newDatasourceType;
-import static marquez.client.models.ModelGenerator.newDatasourceUrn;
-import static marquez.client.models.ModelGenerator.newDbTable;
 import static marquez.client.models.ModelGenerator.newDescription;
+import static marquez.client.models.ModelGenerator.newInputs;
 import static marquez.client.models.ModelGenerator.newJobName;
 import static marquez.client.models.ModelGenerator.newJobType;
 import static marquez.client.models.ModelGenerator.newLocation;
 import static marquez.client.models.ModelGenerator.newNamespaceName;
+import static marquez.client.models.ModelGenerator.newOutputs;
 import static marquez.client.models.ModelGenerator.newOwnerName;
 import static marquez.client.models.ModelGenerator.newRunArgs;
 import static marquez.client.models.ModelGenerator.newRunId;
 import static marquez.client.models.ModelGenerator.newSchemaLocation;
-import static marquez.client.models.ModelGenerator.newStream;
+import static marquez.client.models.ModelGenerator.newSourceName;
 import static marquez.client.models.ModelGenerator.newTimestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -47,20 +43,21 @@ import static org.mockito.Mockito.when;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import marquez.client.models.Dataset;
-import marquez.client.models.Datasource;
-import marquez.client.models.DatasourceMeta;
-import marquez.client.models.DatasourceType;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
-import marquez.client.models.JobRun;
-import marquez.client.models.JobRunMeta;
 import marquez.client.models.JobType;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
+import marquez.client.models.Run;
+import marquez.client.models.RunMeta;
+import marquez.client.models.Source;
+import marquez.client.models.SourceMeta;
+import marquez.client.models.SourceType;
 import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import org.junit.Before;
@@ -73,63 +70,82 @@ import org.mockito.junit.MockitoRule;
 
 @Category(UnitTests.class)
 public class MarquezClientTest {
+  // COMMON
   private static final Instant CREATED_AT = newTimestamp();
-  private static final Instant UPDATED_AT = Instant.from(CREATED_AT);
+  private static final Instant UPDATED_AT = CREATED_AT;
 
   // NAMESPACE
   private static final String NAMESPACE_NAME = newNamespaceName();
   private static final String OWNER_NAME = newOwnerName();
-  private static final String DESCRIPTION = newDescription();
+  private static final String NAMESPACE_DESCRIPTION = newDescription();
   private static final Namespace NAMESPACE =
-      new Namespace(NAMESPACE_NAME, CREATED_AT, OWNER_NAME, DESCRIPTION);
+      new Namespace(NAMESPACE_NAME, CREATED_AT, UPDATED_AT, OWNER_NAME, NAMESPACE_DESCRIPTION);
 
-  // DATASOURCE
-  private static final DatasourceType DATASOURCE_TYPE = newDatasourceType();
-  private static final String DATASOURCE_NAME = newDatasourceName();
-  private static final String DATASOURCE_URN = newDatasourceUrn();
+  // SOURCE
+  private static final SourceType SOURCE_TYPE = SourceType.POSTGRESQL;
+  private static final String SOURCE_NAME = newSourceName();
   private static final String CONNECTION_URL = newConnectionUrl();
-  private static final Datasource DATASOURCE =
-      new Datasource(DATASOURCE_TYPE, DATASOURCE_NAME, CREATED_AT, DATASOURCE_URN, CONNECTION_URL);
+  private static final String SOURCE_DESCRIPTION = newDescription();
+  private static final Source SOURCE =
+      new Source(
+          SOURCE_TYPE, SOURCE_NAME, CREATED_AT, UPDATED_AT, CONNECTION_URL, SOURCE_DESCRIPTION);
 
-  // DATASETS
-  // DBTABLE
-  private static final String DBTABLE_NAME = newDatasetName();
-  private static final String DBTABLE_PHYSICAL_NAME = newDatasetPhysicalName();
-  private static final String DBTABLE_URN = newDatasetUrn();
-  private static final DbTable DBTABLE = newDbTable();
+  // DB TABLE DATASET
+  private static final String DB_TABLE_NAME = newDatasetName();
+  private static final String DB_TABLE_PHYSICAL_NAME = newDatasetPhysicalName();
+  private static final String DB_TABLE_SOURCE_NAME = newSourceName();
+  private static final String DB_TABLE_DESCRIPTION = newDescription();
+  private static final DbTable DB_TABLE =
+      new DbTable(
+          DB_TABLE_NAME,
+          DB_TABLE_PHYSICAL_NAME,
+          CREATED_AT,
+          UPDATED_AT,
+          DB_TABLE_SOURCE_NAME,
+          DB_TABLE_DESCRIPTION);
 
-  // STREAM
+  // STREAM DATASET
   private static final String STREAM_NAME = newDatasetName();
   private static final String STREAM_PHYSICAL_NAME = newDatasetPhysicalName();
-  private static final String STREAM_URN = newDatasetUrn();
+  private static final String STREAM_SOURCE_NAME = newSourceName();
   private static final String STREAM_SCHEMA_LOCATION = newSchemaLocation();
-  private static final Stream STREAM = newStream();
+  private static final String STREAM_DESCRIPTION = newDescription();
+  private static final Stream STREAM =
+      new Stream(
+          STREAM_NAME,
+          STREAM_PHYSICAL_NAME,
+          CREATED_AT,
+          UPDATED_AT,
+          STREAM_SOURCE_NAME,
+          STREAM_SCHEMA_LOCATION,
+          STREAM_DESCRIPTION);
 
   // JOB
   private static final String JOB_NAME = newJobName();
-  private static final List<String> INPUT_DATASET_URNS = newDatasetUrns(3);
-  private static final List<String> OUTPUT_DATASET_URNS = newDatasetUrns(4);
+  private static final List<String> INPUTS = newInputs(2);
+  private static final List<String> OUTPUTS = newOutputs(4);
   private static final String LOCATION = newLocation();
   private static final JobType JOB_TYPE = newJobType();
+  private static final String JOB_DESCRIPTION = newDescription();
   private static final Job JOB =
       new Job(
-          JOB_TYPE,
-          JOB_NAME,
-          CREATED_AT,
-          UPDATED_AT,
-          INPUT_DATASET_URNS,
-          OUTPUT_DATASET_URNS,
-          LOCATION,
-          DESCRIPTION);
+          JOB_TYPE, JOB_NAME, CREATED_AT, UPDATED_AT, INPUTS, OUTPUTS, LOCATION, JOB_DESCRIPTION);
 
-  // JOB RUN
+  // RUN
   private static final String RUN_ID = newRunId();
   private static final Instant NOMINAL_START_TIME = newTimestamp();
   private static final Instant NOMINAL_END_TIME = newTimestamp();
-  private static final String RUN_ARGS = newRunArgs();
-  private static final JobRun.State RUN_STATE = JobRun.State.NEW;
-  private static final JobRun RUN =
-      new JobRun(RUN_ID, NOMINAL_START_TIME, NOMINAL_END_TIME, RUN_ARGS, RUN_STATE);
+  private static final Map<String, String> RUN_ARGS = newRunArgs();
+  private static final Run.State RUN_STATE = Run.State.NEW;
+  private static final Run RUN =
+      new Run(
+          RUN_ID,
+          CREATED_AT,
+          UPDATED_AT,
+          NOMINAL_START_TIME,
+          NOMINAL_END_TIME,
+          RUN_ARGS,
+          RUN_STATE);
 
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
 
@@ -161,9 +177,9 @@ public class MarquezClientTest {
 
   @Test
   public void testClientBuilder_throwsOnNull() {
-    final String nullUrlAsString = null;
+    final String nullUrlString = null;
     assertThatNullPointerException()
-        .isThrownBy(() -> MarquezClient.builder().baseUrl(nullUrlAsString).build());
+        .isThrownBy(() -> MarquezClient.builder().baseUrl(nullUrlString).build());
 
     final URL nullUrl = null;
     assertThatNullPointerException()
@@ -195,7 +211,7 @@ public class MarquezClientTest {
     when(http.url(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
 
     final NamespaceMeta meta =
-        NamespaceMeta.builder().ownerName(OWNER_NAME).description(DESCRIPTION).build();
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
     final String namespaceAsJson = JsonGenerator.newJsonFor(NAMESPACE);
     when(http.put(url, metaAsJson)).thenReturn(namespaceAsJson);
@@ -219,168 +235,174 @@ public class MarquezClientTest {
   }
 
   @Test
-  public void testCreateDatasource() throws Exception {
-    final String path = "/datasources";
+  public void testCreateSource() throws Exception {
+    final String pathTemplate = "/sources/%s";
+    final String path = buildPathFor(pathTemplate, SOURCE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(path)).thenReturn(url);
+    when(http.url(pathTemplate, SOURCE_NAME)).thenReturn(url);
 
-    final DatasourceMeta meta =
-        DatasourceMeta.builder().name(DATASOURCE_NAME).connectionUrl(CONNECTION_URL).build();
+    final SourceMeta meta =
+        SourceMeta.builder()
+            .type(SOURCE_TYPE)
+            .connectionUrl(CONNECTION_URL)
+            .description(SOURCE_DESCRIPTION)
+            .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String datasourceAsJson = JsonGenerator.newJsonFor(DATASOURCE);
-    when(http.post(url, metaAsJson)).thenReturn(datasourceAsJson);
+    final String sourceAsJson = JsonGenerator.newJsonFor(SOURCE);
+    when(http.put(url, metaAsJson)).thenReturn(sourceAsJson);
 
-    final Datasource datasource = client.createDatasource(meta);
-    assertThat(datasource).isEqualTo(DATASOURCE);
+    final Source source = client.createSource(SOURCE_NAME, meta);
+    assertThat(source).isEqualTo(SOURCE);
   }
 
   @Test
-  public void testGetDatasource() throws Exception {
-    final String pathTemplate = "/datasources/%s";
-    final String path = buildPathFor(pathTemplate, DATASOURCE_URN);
+  public void testGetSource() throws Exception {
+    final String pathTemplate = "/sources/%s";
+    final String path = buildPathFor(pathTemplate, SOURCE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DATASOURCE_URN)).thenReturn(url);
+    when(http.url(pathTemplate, SOURCE_NAME)).thenReturn(url);
 
-    final String datasourceAsJson = JsonGenerator.newJsonFor(DATASOURCE);
-    when(http.get(url)).thenReturn(datasourceAsJson);
+    final String sourceAsJson = JsonGenerator.newJsonFor(SOURCE);
+    when(http.get(url)).thenReturn(sourceAsJson);
 
-    final Datasource datasource = client.getDatasource(DATASOURCE_URN);
-    assertThat(datasource).isEqualTo(DATASOURCE);
+    final Source source = client.getSource(SOURCE_NAME);
+    assertThat(source).isEqualTo(SOURCE);
   }
 
   @Test
   public void testCreateDbTable() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME);
+    final String pathTemplate = "/namespaces/%s/datasets/%s";
+    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
 
     final DbTableMeta meta =
         DbTableMeta.builder()
-            .name(DBTABLE_NAME)
-            .physicalName(DBTABLE_PHYSICAL_NAME)
-            .datasourceName(DATASOURCE_NAME)
-            .description(DESCRIPTION)
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .description(DB_TABLE_DESCRIPTION)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String datasetAsJson = JsonGenerator.newJsonFor(DBTABLE);
-    when(http.post(url, metaAsJson)).thenReturn(datasetAsJson);
+    final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
+    when(http.put(url, metaAsJson)).thenReturn(dbTableAsJson);
 
-    final Dataset dataset = client.createDataset(NAMESPACE_NAME, meta);
-    assertThat(dataset).isEqualTo(DBTABLE);
+    final Dataset dataset = client.createDataset(DB_TABLE_NAME, meta);
+    assertThat(dataset).isInstanceOf(DbTable.class);
+    assertThat((DbTable) dataset).isEqualTo(DB_TABLE);
   }
 
   @Test
   public void testGetDbTable() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DBTABLE_URN);
+    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, DBTABLE_URN)).thenReturn(url);
+    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
 
-    final String datasetAsJson = JsonGenerator.newJsonFor(DBTABLE);
-    when(http.get(url)).thenReturn(datasetAsJson);
+    final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
+    when(http.get(url)).thenReturn(dbTableAsJson);
 
-    final Dataset dataset = client.getDataset(NAMESPACE_NAME, DBTABLE_URN);
-    assertThat(dataset).isEqualTo(DBTABLE);
+    final Dataset dataset = client.getDataset(DB_TABLE_NAME);
+    assertThat(dataset).isInstanceOf(DbTable.class);
+    assertThat((DbTable) dataset).isEqualTo(DB_TABLE);
   }
 
   @Test
   public void testCreateStream() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME);
+    final String pathTemplate = "/namespaces/%s/datasets/%s";
+    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
 
     final StreamMeta meta =
         StreamMeta.builder()
-            .name(STREAM_NAME)
             .physicalName(STREAM_PHYSICAL_NAME)
-            .datasourceName(DATASOURCE_NAME)
-            .description(DESCRIPTION)
+            .sourceName(STREAM_SOURCE_NAME)
+            .description(STREAM_DESCRIPTION)
             .schemaLocation(STREAM_SCHEMA_LOCATION)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String datasetAsJson = JsonGenerator.newJsonFor(STREAM);
-    when(http.post(url, metaAsJson)).thenReturn(datasetAsJson);
+    final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
+    when(http.put(url, metaAsJson)).thenReturn(streamAsJson);
 
-    final Dataset dataset = client.createDataset(NAMESPACE_NAME, meta);
+    final Dataset dataset = client.createDataset(STREAM_NAME, meta);
+    assertThat(dataset).isInstanceOf(Stream.class);
     assertThat(dataset).isEqualTo(STREAM);
   }
 
   @Test
   public void testGetStream() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_URN);
+    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, STREAM_URN)).thenReturn(url);
+    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
 
     final String datasetAsJson = JsonGenerator.newJsonFor(STREAM);
     when(http.get(url)).thenReturn(datasetAsJson);
 
-    final Dataset dataset = client.getDataset(NAMESPACE_NAME, STREAM_URN);
+    final Dataset dataset = client.getDataset(STREAM_NAME);
     assertThat(dataset).isEqualTo(STREAM);
   }
 
   @Test
   public void testCreateJob() throws Exception {
     final String pathTemplate = "/namespaces/%s/jobs/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
+    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
 
     final JobMeta meta =
         JobMeta.builder()
             .type(JOB_TYPE)
-            .inputDatasetUrns(INPUT_DATASET_URNS)
-            .outputDatasetUrns(OUTPUT_DATASET_URNS)
+            .inputs(INPUTS)
+            .outputs(OUTPUTS)
             .location(LOCATION)
-            .description(DESCRIPTION)
+            .description(JOB_DESCRIPTION)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
     when(http.put(url, metaAsJson)).thenReturn(jobAsJson);
 
-    final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, meta);
+    final Job job = client.createJob(JOB_NAME, meta);
     assertThat(job).isEqualTo(JOB);
   }
 
   @Test
   public void testGetJob() throws Exception {
     final String pathTemplate = "/namespaces/%s/jobs/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
+    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
 
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
     when(http.get(url)).thenReturn(jobAsJson);
 
-    final Job job = client.getJob(NAMESPACE_NAME, JOB_NAME);
+    final Job job = client.getJob(JOB_NAME);
     assertThat(job).isEqualTo(JOB);
   }
 
   @Test
-  public void testCreateJobRun() throws Exception {
+  public void testCreateRun() throws Exception {
     final String pathTemplate = "/namespaces/%s/jobs/%s/runs";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
+    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
 
-    final JobRunMeta meta =
-        JobRunMeta.builder()
+    final RunMeta meta =
+        RunMeta.builder()
             .nominalStartTime(NOMINAL_START_TIME)
             .nominalEndTime(NOMINAL_END_TIME)
-            .runArgs(RUN_ARGS)
+            .args(RUN_ARGS)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
     final String runAsJson = JsonGenerator.newJsonFor(RUN);
     when(http.post(url, metaAsJson)).thenReturn(runAsJson);
 
-    final JobRun run = client.createJobRun(NAMESPACE_NAME, JOB_NAME, meta);
+    final Run run = client.createRun(JOB_NAME, meta);
     assertThat(run).isEqualTo(RUN);
   }
 
   @Test
-  public void testGetJobRun() throws Exception {
+  public void testGetRun() throws Exception {
     final String pathTemplate = "/jobs/runs/%s";
     final String path = buildPathFor(pathTemplate, RUN_ID);
     final URL url = buildUrlFor(path);
@@ -389,54 +411,70 @@ public class MarquezClientTest {
     final String runAsJson = JsonGenerator.newJsonFor(RUN);
     when(http.get(url)).thenReturn(runAsJson);
 
-    final JobRun run = client.getJobRun(RUN_ID);
+    final Run run = client.getRun(RUN_ID);
     assertThat(run).isEqualTo(RUN);
   }
 
   @Test
-  public void testMarkJobRunAsRunning() throws Exception {
-    final String pathTemplate = "/jobs/runs/%s/run";
+  public void testMarkRunAsRunning() throws Exception {
+    final String pathTemplate = "/jobs/runs/%s/start";
     final String path = buildPathFor(pathTemplate, RUN_ID);
     final URL url = buildUrlFor(path);
     when(http.url(pathTemplate, RUN_ID)).thenReturn(url);
 
-    client.markJobRunAsRunning(RUN_ID);
+    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    when(http.post(url)).thenReturn(runAsJson);
+
+    final Run run = client.markRunAsRunning(RUN_ID);
+    assertThat(run).isEqualTo(RUN);
 
     verify(http, times(1)).post(url);
   }
 
   @Test
-  public void testMarkJobRunAsCompleted() throws Exception {
+  public void testMarkRunAsCompleted() throws Exception {
     final String pathTemplate = "/jobs/runs/%s/complete";
     final String path = buildPathFor(pathTemplate, RUN_ID);
     final URL url = buildUrlFor(path);
     when(http.url(pathTemplate, RUN_ID)).thenReturn(url);
 
-    client.markJobRunAsCompleted(RUN_ID);
+    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    when(http.post(url)).thenReturn(runAsJson);
+
+    final Run run = client.markRunAsCompleted(RUN_ID);
+    assertThat(run).isEqualTo(RUN);
 
     verify(http, times(1)).post(url);
   }
 
   @Test
-  public void testMarkJobRunAsAborted() throws Exception {
+  public void testMarkRunAsAborted() throws Exception {
     final String pathTemplate = "/jobs/runs/%s/abort";
     final String path = buildPathFor(pathTemplate, RUN_ID);
     final URL url = buildUrlFor(path);
     when(http.url(pathTemplate, RUN_ID)).thenReturn(url);
 
-    client.markJobRunAsAborted(RUN_ID);
+    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    when(http.post(url)).thenReturn(runAsJson);
+
+    final Run run = client.markRunAsAborted(RUN_ID);
+    assertThat(run).isEqualTo(RUN);
 
     verify(http, times(1)).post(url);
   }
 
   @Test
-  public void testMarkJobRunAsFailed() throws Exception {
+  public void testMarkRunAsFailed() throws Exception {
     final String pathTemplate = "/jobs/runs/%s/fail";
     final String path = buildPathFor(pathTemplate, RUN_ID);
     final URL url = buildUrlFor(path);
     when(http.url(pathTemplate, RUN_ID)).thenReturn(url);
 
-    client.markJobRunAsFailed(RUN_ID);
+    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    when(http.post(url)).thenReturn(runAsJson);
+
+    final Run run = client.markRunAsFailed(RUN_ID);
+    assertThat(run).isEqualTo(RUN);
 
     verify(http, times(1)).post(url);
   }

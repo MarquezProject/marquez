@@ -14,10 +14,26 @@
 
 package marquez.client.models;
 
-public enum DatasourceType {
-  REDSHIFT,
-  MYSQL,
-  POSTGRESQL,
-  KAFKA,
-  REST;
+import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Value;
+import marquez.client.Utils;
+
+@Value
+@Builder
+public class SourceMeta {
+  @Getter @NonNull SourceType type;
+  @Getter @NonNull String connectionUrl;
+  @Nullable String description;
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
+  }
+
+  public String toJson() {
+    return Utils.toJson(this);
+  }
 }
