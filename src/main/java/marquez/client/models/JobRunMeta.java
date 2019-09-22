@@ -19,7 +19,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Value;
-import marquez.client.utils.JsonUtils;
+import marquez.client.Utils;
 
 @Value
 @Builder
@@ -41,6 +41,6 @@ public class JobRunMeta {
   }
 
   public String toJson() {
-    return JsonUtils.toJson(this);
+    return Utils.toJson(this);
   }
 }

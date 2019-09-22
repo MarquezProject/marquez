@@ -38,7 +38,7 @@ import static marquez.client.models.ModelGenerator.newSchemaLocation;
 import static marquez.client.models.ModelGenerator.newStream;
 import static marquez.client.models.ModelGenerator.newTimestamp;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -182,9 +182,9 @@ public class MarquezClientTest {
 
   @Test
   public void testClientBuilder_throwsOnBadUrl() throws Exception {
-    final String badUrlAsString = "test.com/api/v1";
-    assertThatIllegalArgumentException()
-        .isThrownBy(() -> MarquezClient.builder().baseUrl(badUrlAsString).build());
+    final String badUrlString = "test.com/api/v1";
+    assertThatExceptionOfType(AssertionError.class)
+        .isThrownBy(() -> MarquezClient.builder().baseUrl(badUrlString).build());
   }
 
   @Test

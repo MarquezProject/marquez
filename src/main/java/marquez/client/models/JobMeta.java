@@ -21,7 +21,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
-import marquez.client.utils.JsonUtils;
+import marquez.client.Utils;
 
 @Value
 @Builder
@@ -37,6 +37,6 @@ public class JobMeta {
   }
 
   public String toJson() {
-    return JsonUtils.toJson(this);
+    return Utils.toJson(this);
   }
 }

@@ -19,12 +19,12 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import marquez.client.utils.JsonUtils;
+import marquez.client.Utils;
 
 public final class JsonGenerator {
   private JsonGenerator() {}
 
-  private static final ObjectMapper MAPPER = JsonUtils.newObjectMapper();
+  private static final ObjectMapper MAPPER = Utils.newObjectMapper();
 
   public static String newJsonFor(final NamespaceMeta meta) {
     return MAPPER

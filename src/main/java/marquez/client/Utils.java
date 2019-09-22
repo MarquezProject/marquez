@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.client.utils;
+package marquez.client;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,10 +22,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import io.dropwizard.jackson.Jackson;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import lombok.NonNull;
 
-public final class JsonUtils {
-  private JsonUtils() {}
+public final class Utils {
+  private Utils() {}
 
   private static final ObjectMapper MAPPER = newObjectMapper();
 
@@ -49,6 +51,16 @@ public final class JsonUtils {
       return MAPPER.readValue(json, type);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
+    }
+  }
+
+  public static URL toUrl(@NonNull final String urlString) {
+    try {
+      return new URL(urlString);
+    } catch (MalformedURLException e) {
+      final AssertionError error = new AssertionError("Malformed URL: " + urlString);
+      error.initCause(e);
+      throw error;
     }
   }
 }

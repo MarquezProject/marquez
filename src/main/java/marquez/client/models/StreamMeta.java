@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import marquez.client.utils.JsonUtils;
+import marquez.client.Utils;
 
 @JsonPropertyOrder({
   "type",
@@ -30,6 +30,6 @@ public final class StreamMeta extends DatasetMeta {
   }
 
   public String toJson() {
-    return JsonUtils.toJson(this);
+    return Utils.toJson(this);
   }
 }

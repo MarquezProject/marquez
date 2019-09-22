@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import marquez.client.utils.JsonUtils;
+import marquez.client.Utils;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
@@ -50,6 +50,6 @@ public abstract class Dataset {
   }
 
   public static Dataset fromJson(@NonNull final String json) {
-    return JsonUtils.fromJson(json, new TypeReference<Dataset>() {});
+    return Utils.fromJson(json, new TypeReference<Dataset>() {});
   }
 }

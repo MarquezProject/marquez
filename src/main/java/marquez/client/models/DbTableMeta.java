@@ -2,7 +2,7 @@ package marquez.client.models;
 
 import javax.annotation.Nullable;
 import lombok.Builder;
-import marquez.client.utils.JsonUtils;
+import marquez.client.Utils;
 
 public final class DbTableMeta extends DatasetMeta {
   @Builder
@@ -12,6 +12,6 @@ public final class DbTableMeta extends DatasetMeta {
   }
 
   public String toJson() {
-    return JsonUtils.toJson(this);
+    return Utils.toJson(this);
   }
 }

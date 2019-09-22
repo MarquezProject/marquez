@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.client.utils;
+package marquez.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
@@ -21,12 +21,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
-import marquez.client.UnitTests;
+import java.net.URL;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class JsonUtilsTest {
+public class UtilsTest {
   private static final String VALUE = "test";
   private static final Object OBJECT = new Object(VALUE);
   private static final TypeReference<Object> TYPE = new TypeReference<Object>() {};
@@ -34,25 +34,38 @@ public class JsonUtilsTest {
 
   @Test
   public void testToJson() {
-    final String actual = JsonUtils.toJson(OBJECT);
+    final String actual = Utils.toJson(OBJECT);
     assertThat(actual).isEqualTo(JSON);
   }
 
   @Test
   public void testToJson_throwsOnNull() {
-    assertThatNullPointerException().isThrownBy(() -> JsonUtils.toJson(null));
+    assertThatNullPointerException().isThrownBy(() -> Utils.toJson(null));
   }
 
   @Test
   public void testFromJson() {
-    final Object actual = JsonUtils.fromJson(JSON, TYPE);
+    final Object actual = Utils.fromJson(JSON, TYPE);
     assertThat(actual).isEqualToComparingFieldByField(OBJECT);
   }
 
   @Test
   public void testFromJson_throwsOnNull() {
-    assertThatNullPointerException().isThrownBy(() -> JsonUtils.fromJson(JSON, null));
-    assertThatNullPointerException().isThrownBy(() -> JsonUtils.fromJson(null, TYPE));
+    assertThatNullPointerException().isThrownBy(() -> Utils.fromJson(JSON, null));
+    assertThatNullPointerException().isThrownBy(() -> Utils.fromJson(null, TYPE));
+  }
+
+  @Test
+  public void testToUrl() throws Exception {
+    final String urlString = "http://test.com:8080";
+    final URL expected = new URL(urlString);
+    final URL actual = Utils.toUrl(urlString);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testToUrl_throwsOnNull() {
+    assertThatNullPointerException().isThrownBy(() -> Utils.toUrl(null));
   }
 
   @JsonAutoDetect(fieldVisibility = Visibility.ANY)

@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,6 @@ import marquez.client.models.JobRun;
 import marquez.client.models.JobRunMeta;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
-import marquez.client.utils.JsonUtils;
 
 @Slf4j
 public class MarquezClient {
@@ -512,7 +510,9 @@ public class MarquezClient {
   }
 
   public static final class Builder {
-    @VisibleForTesting static final URL DEFAULT_BASE_URL = toUrl("http://localhost:8080/api/v1");
+    @VisibleForTesting
+    static final URL DEFAULT_BASE_URL = Utils.toUrl("http://localhost:8080/api/v1");
+
     @VisibleForTesting static final String DEFAULT_NAMESPACE_NAME = "default";
     @VisibleForTesting static final String NAMESPACE_NAME_ENV_VAR = "MARQUEZ_NAMESPACE";
 
@@ -526,7 +526,7 @@ public class MarquezClient {
     }
 
     public Builder baseUrl(@NonNull String baseUrl) {
-      return baseUrl(toUrl(baseUrl));
+      return baseUrl(Utils.toUrl(baseUrl));
     }
 
     public Builder baseUrl(@NonNull URL baseUrl) {
@@ -552,14 +552,6 @@ public class MarquezClient {
     public MarquezClient build() {
       return new MarquezClient(
           MarquezHttp.create(baseUrl, MarquezClient.Version.get()), namespaceName);
-    }
-
-    private static URL toUrl(final String url) {
-      try {
-        return new URL(url);
-      } catch (MalformedURLException e) {
-        throw new IllegalArgumentException("Malformed URL: " + url);
-      }
     }
   }
 
@@ -614,7 +606,7 @@ public class MarquezClient {
     }
 
     static Namespaces fromJson(final String json) {
-      return JsonUtils.fromJson(json, new TypeReference<Namespaces>() {});
+      return Utils.fromJson(json, new TypeReference<Namespaces>() {});
     }
   }
 
@@ -628,7 +620,7 @@ public class MarquezClient {
     }
 
     static Datasources fromJson(final String json) {
-      return JsonUtils.fromJson(json, new TypeReference<Datasources>() {});
+      return Utils.fromJson(json, new TypeReference<Datasources>() {});
     }
   }
 
@@ -642,7 +634,7 @@ public class MarquezClient {
     }
 
     static Datasets fromJson(final String json) {
-      return JsonUtils.fromJson(json, new TypeReference<Datasets>() {});
+      return Utils.fromJson(json, new TypeReference<Datasets>() {});
     }
   }
 
@@ -656,7 +648,7 @@ public class MarquezClient {
     }
 
     static Jobs fromJson(final String json) {
-      return JsonUtils.fromJson(json, new TypeReference<Jobs>() {});
+      return Utils.fromJson(json, new TypeReference<Jobs>() {});
     }
   }
 
@@ -670,7 +662,7 @@ public class MarquezClient {
     }
 
     static JobRuns fromJson(final String json) {
-      return JsonUtils.fromJson(json, new TypeReference<JobRuns>() {});
+      return Utils.fromJson(json, new TypeReference<JobRuns>() {});
     }
   }
 }

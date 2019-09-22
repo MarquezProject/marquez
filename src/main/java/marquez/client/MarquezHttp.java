@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import marquez.client.utils.JsonUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -185,7 +184,7 @@ class MarquezHttp {
     }
 
     static HttpError fromJson(final String json) {
-      return JsonUtils.fromJson(json, new TypeReference<HttpError>() {});
+      return Utils.fromJson(json, new TypeReference<HttpError>() {});
     }
   }
 }
