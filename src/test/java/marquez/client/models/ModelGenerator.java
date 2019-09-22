@@ -29,6 +29,8 @@ public final class ModelGenerator {
 
   private static final Random RANDOM = new Random();
 
+  public static final String HTTP_GET = "GET";
+
   public static NamespaceMeta newNamespaceMeta() {
     return NamespaceMeta.builder().ownerName(newOwnerName()).description(newDescription()).build();
   }
@@ -85,10 +87,10 @@ public final class ModelGenerator {
 
   public static StreamMeta newStreamMeta() {
     return StreamMeta.builder()
-        .physicalName(newDatasetPhysicalName())
+        .physicalName(newStreamName())
         .sourceName(newSourceName())
-        .description(newDescription())
         .schemaLocation(newSchemaLocation())
+        .description(newDescription())
         .build();
   }
 
@@ -96,12 +98,27 @@ public final class ModelGenerator {
     final Instant now = newTimestamp();
     return new Stream(
         newDatasetName(),
-        newDatasetPhysicalName(),
+        newStreamName(),
         now,
         now,
         newSourceName(),
-        newSchemaLocation().toString(),
+        newSchemaLocation(),
         newDescription());
+  }
+
+  public static HttpEndpointMeta newHttpEndpointMeta() {
+    return HttpEndpointMeta.builder()
+        .physicalName(newHttpPath())
+        .sourceName(newSourceName())
+        .httpMethod(HTTP_GET)
+        .description(newDescription())
+        .build();
+  }
+
+  public static HttpEndpoint newHttpEndpoint() {
+    final Instant now = newTimestamp();
+    return new HttpEndpoint(
+        newDatasetName(), newHttpPath(), now, now, newSourceName(), HTTP_GET, newDescription());
   }
 
   public static JobMeta newJobMeta() {
@@ -180,6 +197,14 @@ public final class ModelGenerator {
 
   public static String newDatasetPhysicalName() {
     return "test_schema.test_table" + newId();
+  }
+
+  public static String newStreamName() {
+    return "test." + newId();
+  }
+
+  public static String newHttpPath() {
+    return "/test/" + newId();
   }
 
   public static JobType newJobType() {

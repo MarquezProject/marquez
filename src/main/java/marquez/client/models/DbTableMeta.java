@@ -18,6 +18,7 @@ public final class DbTableMeta extends DatasetMeta {
     super(physicalName, sourceName, description, runId);
   }
 
+  @Override
   public String toJson() {
     return Utils.toJson(this);
   }

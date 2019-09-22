@@ -28,6 +28,7 @@ public final class JsonGenerator {
 
   private static final String DB_TABLE = "DB_TABLE";
   private static final String STREAM = "STREAM";
+  private static final String HTTP_ENDPOINT = "HTTP_ENDPOINT";
 
   public static String newJsonFor(final NamespaceMeta meta) {
     return MAPPER
@@ -74,6 +75,8 @@ public final class JsonGenerator {
       return newJsonFor((DbTableMeta) meta);
     } else if (meta instanceof StreamMeta) {
       return newJsonFor((StreamMeta) meta);
+    } else if (meta instanceof HttpEndpointMeta) {
+      return newJsonFor((HttpEndpointMeta) meta);
     }
 
     throw new IllegalArgumentException();
@@ -102,11 +105,25 @@ public final class JsonGenerator {
         .toString();
   }
 
+  private static String newJsonFor(final HttpEndpointMeta meta) {
+    return MAPPER
+        .createObjectNode()
+        .put("type", HTTP_ENDPOINT)
+        .put("physicalName", meta.getPhysicalName())
+        .put("sourceName", meta.getSourceName())
+        .put("httpMethod", meta.getHttpMethod())
+        .put("description", meta.getDescription().orElse(null))
+        .put("runId", meta.getRunId().orElse(null))
+        .toString();
+  }
+
   public static String newJsonFor(final Dataset dataset) {
     if (dataset instanceof DbTable) {
       return newJsonFor((DbTable) dataset);
     } else if (dataset instanceof Stream) {
       return newJsonFor((Stream) dataset);
+    } else if (dataset instanceof HttpEndpoint) {
+      return newJsonFor((HttpEndpoint) dataset);
     }
 
     throw new IllegalArgumentException();
@@ -136,6 +153,20 @@ public final class JsonGenerator {
         .put("sourceName", stream.getSourceName())
         .put("schemaLocation", stream.getSchemaLocation())
         .put("description", stream.getDescription().orElse(null))
+        .toString();
+  }
+
+  private static String newJsonFor(final HttpEndpoint httpEndpoint) {
+    return MAPPER
+        .createObjectNode()
+        .put("type", HTTP_ENDPOINT)
+        .put("name", httpEndpoint.getName())
+        .put("physicalName", httpEndpoint.getPhysicalName())
+        .put("createdAt", ISO_INSTANT.format(httpEndpoint.getCreatedAt()))
+        .put("updatedAt", ISO_INSTANT.format(httpEndpoint.getUpdatedAt()))
+        .put("sourceName", httpEndpoint.getSourceName())
+        .put("httpMethod", httpEndpoint.getHttpMethod())
+        .put("description", httpEndpoint.getDescription().orElse(null))
         .toString();
   }
 

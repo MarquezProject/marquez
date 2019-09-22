@@ -11,19 +11,19 @@ import marquez.client.Utils;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@JsonPropertyOrder({"type", "physicalName", "sourceName", "schemaLocation", "description", "runId"})
-public final class StreamMeta extends DatasetMeta {
-  @Getter private final String schemaLocation;
+@JsonPropertyOrder({"type", "physicalName", "sourceName", "httpMethod", "description", "runId"})
+public final class HttpEndpointMeta extends DatasetMeta {
+  @Getter private final String httpMethod;
 
   @Builder
-  private StreamMeta(
+  private HttpEndpointMeta(
       final String physicalName,
       final String sourceName,
-      @NonNull final String schemaLocation,
+      @NonNull final String httpMethod,
       @Nullable final String description,
       @Nullable final String runId) {
     super(physicalName, sourceName, description, runId);
-    this.schemaLocation = schemaLocation;
+    this.httpMethod = httpMethod;
   }
 
   @Override
