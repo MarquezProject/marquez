@@ -14,10 +14,10 @@
 
 package marquez.client;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.net.MediaType.JSON_UTF_8;
+import static org.apache.http.Consts.UTF_8;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -63,7 +63,7 @@ class MarquezHttp {
     try {
       final HttpGet request = new HttpGet();
       request.setURI(url.toURI());
-      request.addHeader(ACCEPT, JSON_UTF_8.toString());
+      request.addHeader(ACCEPT, APPLICATION_JSON.toString());
 
       final HttpResponse response = http.execute(request);
       throwOnHttpError(response);
@@ -85,10 +85,10 @@ class MarquezHttp {
     try {
       final HttpPost request = new HttpPost();
       request.setURI(url.toURI());
-      request.addHeader(ACCEPT, JSON_UTF_8.toString());
+      request.addHeader(ACCEPT, APPLICATION_JSON.toString());
       if (json != null) {
-        request.addHeader(CONTENT_TYPE, JSON_UTF_8.toString());
-        request.setEntity(new StringEntity(json, JSON_UTF_8.toString()));
+        request.addHeader(CONTENT_TYPE, APPLICATION_JSON.toString());
+        request.setEntity(new StringEntity(json, APPLICATION_JSON));
       }
 
       final HttpResponse response = http.execute(request);
@@ -107,9 +107,9 @@ class MarquezHttp {
     try {
       final HttpPut request = new HttpPut();
       request.setURI(url.toURI());
-      request.addHeader(ACCEPT, JSON_UTF_8.toString());
-      request.addHeader(CONTENT_TYPE, JSON_UTF_8.toString());
-      request.setEntity(new StringEntity(json, JSON_UTF_8.toString()));
+      request.addHeader(ACCEPT, APPLICATION_JSON.toString());
+      request.addHeader(CONTENT_TYPE, APPLICATION_JSON.toString());
+      request.setEntity(new StringEntity(json, APPLICATION_JSON));
 
       final HttpResponse response = http.execute(request);
       throwOnHttpError(response);
