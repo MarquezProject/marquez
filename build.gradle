@@ -26,12 +26,14 @@ plugins {
 }
 
 repositories {
+  mavenLocal()
   mavenCentral()
 }
 
 ext {
   lombokVersion = '1.18.8'
   slf4jVersion = '1.7.26'
+  isReleaseVersion = !version.endsWith("SNAPSHOT")
 }
 
 dependencies {
@@ -78,7 +80,6 @@ publishing {
     mavenJava(MavenPublication) {
       groupId = 'io.github.marquezproject'
       artifactId = 'marquez-java'
-      version = '0.2.0-rc.4'
 
       from components.java
 
@@ -122,6 +123,7 @@ publishing {
 }
 
 signing {
+  required { isReleaseVersion }
   sign publishing.publications.mavenJava
 }
 

@@ -37,6 +37,13 @@ $ ./gradlew spotlessApply
 
 > **Note:** To make formatting code simple, we recommend installing a [plugin](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides) for your favorite IDE. We also us [Lombok](https://projectlombok.org). Though not required, you might want to install the [plugin](https://projectlombok.org/setup/overview) as well. 
 
+# Local Publishing
+
+You can publish SNAPSHOT releases to your local maven repository with the following:
+```
+$ /gradlew -Pversion=0.2.0-rc.4-SNAPSHOT publishToMavenLocal
+```
+
 # Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
 
 1. [Fork](https://github.com/MarquezProject/marquez-java/fork) and clone the repository
