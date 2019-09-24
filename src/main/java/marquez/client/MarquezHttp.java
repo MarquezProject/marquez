@@ -47,7 +47,7 @@ class MarquezHttp {
   @VisibleForTesting final URL baseUrl;
   private final HttpClient http;
 
-  private MarquezHttp(final URL baseUrl, final HttpClient http) {
+  MarquezHttp(final URL baseUrl, final HttpClient http) {
     this.baseUrl = baseUrl;
     this.http = http;
   }
@@ -56,24 +56,6 @@ class MarquezHttp {
     final UserAgent userAgent = UserAgent.of(version);
     final HttpClient http = HttpClientBuilder.create().setUserAgent(userAgent.getValue()).build();
     return new MarquezHttp(baseUrl, http);
-  }
-
-  String get(final URL url) {
-    log.debug("GET {}", url);
-    try {
-      final HttpGet request = new HttpGet();
-      request.setURI(url.toURI());
-      request.addHeader(ACCEPT, APPLICATION_JSON.toString());
-
-      final HttpResponse response = http.execute(request);
-      throwOnHttpError(response);
-
-      final String bodyAsJson = EntityUtils.toString(response.getEntity(), UTF_8);
-      log.debug("Response: {}", bodyAsJson);
-      return bodyAsJson;
-    } catch (URISyntaxException | IOException e) {
-      throw new MarquezHttpException();
-    }
   }
 
   String post(final URL url) {
@@ -110,6 +92,24 @@ class MarquezHttp {
       request.addHeader(ACCEPT, APPLICATION_JSON.toString());
       request.addHeader(CONTENT_TYPE, APPLICATION_JSON.toString());
       request.setEntity(new StringEntity(json, APPLICATION_JSON));
+
+      final HttpResponse response = http.execute(request);
+      throwOnHttpError(response);
+
+      final String bodyAsJson = EntityUtils.toString(response.getEntity(), UTF_8);
+      log.debug("Response: {}", bodyAsJson);
+      return bodyAsJson;
+    } catch (URISyntaxException | IOException e) {
+      throw new MarquezHttpException();
+    }
+  }
+
+  String get(final URL url) {
+    log.debug("GET {}", url);
+    try {
+      final HttpGet request = new HttpGet();
+      request.setURI(url.toURI());
+      request.addHeader(ACCEPT, APPLICATION_JSON.toString());
 
       final HttpResponse response = http.execute(request);
       throwOnHttpError(response);
@@ -169,11 +169,11 @@ class MarquezHttp {
 
   @Value
   static class HttpError {
-    @Getter Integer status;
+    @Getter int status;
     @Getter String message;
 
     @JsonCreator
-    HttpError(final Integer status, final String message) {
+    HttpError(final int status, final String message) {
       this.status = status;
       this.message = message;
     }
