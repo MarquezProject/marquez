@@ -58,11 +58,11 @@ class MarquezHttp {
     return new MarquezHttp(baseUrl, http);
   }
 
-  String post(final URL url) {
+  String post(URL url) {
     return post(url, null);
   }
 
-  String post(final URL url, @Nullable final String json) {
+  String post(URL url, @Nullable String json) {
     log.debug("POST {}: {}", url, json);
     try {
       final HttpPost request = new HttpPost();
@@ -84,7 +84,7 @@ class MarquezHttp {
     }
   }
 
-  String put(final URL url, final String json) {
+  String put(URL url, String json) {
     log.debug("PUT {}: {}", url, json);
     try {
       final HttpPut request = new HttpPut();
@@ -104,7 +104,7 @@ class MarquezHttp {
     }
   }
 
-  String get(final URL url) {
+  String get(URL url) {
     log.debug("GET {}", url);
     try {
       final HttpGet request = new HttpGet();
@@ -129,18 +129,15 @@ class MarquezHttp {
     }
   }
 
-  URL url(final String pathTemplate, @Nullable final String... pathArgs) {
+  URL url(String pathTemplate, @Nullable String... pathArgs) {
     return url(String.format(pathTemplate, (Object[]) pathArgs), ImmutableMap.of());
   }
 
-  URL url(
-      final String pathTemplate,
-      final Map<String, Object> queryParams,
-      @Nullable final String... pathArgs) {
+  URL url(String pathTemplate, Map<String, Object> queryParams, @Nullable String... pathArgs) {
     return url(String.format(pathTemplate, (Object[]) pathArgs), queryParams);
   }
 
-  URL url(final String path, final Map<String, Object> queryParams) {
+  URL url(String path, Map<String, Object> queryParams) {
     try {
       final URIBuilder builder = new URIBuilder(baseUrl.toString()).setPath(path);
       queryParams.forEach((name, value) -> builder.addParameter(name, String.valueOf(value)));
