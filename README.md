@@ -25,14 +25,14 @@ Maven:
 <dependency>
     <groupId>io.github.marquezproject</groupId>
     <artifactId>marquez-java</artifactId>
-    <version>0.2.0-rc.4</version>
+    <version>0.2.0-rc.5</version>
 </dependency>
 ```
 
 or Gradle:
 
 ```groovy
-implementation 'io.github.marquezproject:marquez-java:0.2.0-rc.4'
+implementation 'io.github.marquezproject:marquez-java:0.2.0-rc.5'
 ```
 ## Usage
 
