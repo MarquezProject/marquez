@@ -24,7 +24,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class HttpEndpoint extends Dataset {
-  @Getter private final String httpMethod;
+  @Getter private final HttpMethod httpMethod;
 
   public HttpEndpoint(
       final String name,
@@ -32,7 +32,7 @@ public final class HttpEndpoint extends Dataset {
       final Instant createdAt,
       final Instant updatedAt,
       final String sourceName,
-      @NonNull final String httpMethod,
+      @NonNull final HttpMethod httpMethod,
       @Nullable final String description) {
     super(name, physicalName, createdAt, updatedAt, sourceName, description);
     this.httpMethod = httpMethod;

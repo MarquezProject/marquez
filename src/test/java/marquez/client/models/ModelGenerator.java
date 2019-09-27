@@ -29,8 +29,6 @@ public final class ModelGenerator {
 
   private static final Random RANDOM = new Random();
 
-  public static final String HTTP_GET = "GET";
-
   public static NamespaceMeta newNamespaceMeta() {
     return NamespaceMeta.builder().ownerName(newOwnerName()).description(newDescription()).build();
   }
@@ -110,7 +108,7 @@ public final class ModelGenerator {
     return HttpEndpointMeta.builder()
         .physicalName(newHttpPath())
         .sourceName(newSourceName())
-        .httpMethod(HTTP_GET)
+        .httpMethod(newHttpMethod())
         .description(newDescription())
         .build();
   }
@@ -118,7 +116,13 @@ public final class ModelGenerator {
   public static HttpEndpoint newHttpEndpoint() {
     final Instant now = newTimestamp();
     return new HttpEndpoint(
-        newDatasetName(), newHttpPath(), now, now, newSourceName(), HTTP_GET, newDescription());
+        newDatasetName(),
+        newHttpPath(),
+        now,
+        now,
+        newSourceName(),
+        newHttpMethod(),
+        newDescription());
   }
 
   public static JobMeta newJobMeta() {
@@ -205,6 +209,10 @@ public final class ModelGenerator {
 
   public static String newHttpPath() {
     return "/test/" + newId();
+  }
+
+  public static HttpMethod newHttpMethod() {
+    return HttpMethod.values()[newIdWithBound(HttpMethod.values().length)];
   }
 
   public static JobType newJobType() {

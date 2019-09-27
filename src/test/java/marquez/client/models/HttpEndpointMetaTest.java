@@ -14,27 +14,21 @@
 
 package marquez.client.models;
 
-import static marquez.client.models.ModelGenerator.newStream;
+import static marquez.client.models.ModelGenerator.newHttpEndpointMeta;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import marquez.client.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class StreamTest {
-  private static final Dataset DATASET = newStream();
-  private static final String JSON = JsonGenerator.newJsonFor(DATASET);
+public class HttpEndpointMetaTest {
+  private static final DatasetMeta META = newHttpEndpointMeta();
+  private static final String JSON = JsonGenerator.newJsonFor(META);
 
   @Test
-  public void testFromJson() {
-    final Dataset actual = Stream.fromJson(JSON);
-    assertThat(actual).isEqualTo(DATASET);
-  }
-
-  @Test
-  public void testFromJson_throwsOnNull() {
-    assertThatNullPointerException().isThrownBy(() -> Stream.fromJson(null));
+  public void testToJson() {
+    final String actual = META.toJson();
+    assertThat(actual).isEqualTo(JSON);
   }
 }

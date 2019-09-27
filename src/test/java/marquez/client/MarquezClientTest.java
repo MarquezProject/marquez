@@ -17,11 +17,11 @@ package marquez.client;
 import static marquez.client.MarquezClient.Builder.DEFAULT_BASE_URL;
 import static marquez.client.MarquezClient.Builder.DEFAULT_NAMESPACE_NAME;
 import static marquez.client.MarquezClient.Builder.NAMESPACE_NAME_ENV_VAR;
-import static marquez.client.models.ModelGenerator.HTTP_GET;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newDatasetName;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
+import static marquez.client.models.ModelGenerator.newHttpMethod;
 import static marquez.client.models.ModelGenerator.newHttpPath;
 import static marquez.client.models.ModelGenerator.newInputs;
 import static marquez.client.models.ModelGenerator.newJobName;
@@ -52,6 +52,7 @@ import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.HttpEndpoint;
 import marquez.client.models.HttpEndpointMeta;
+import marquez.client.models.HttpMethod;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobType;
@@ -129,6 +130,7 @@ public class MarquezClientTest {
   private static final String HTTP_ENDPOINT_NAME = newDatasetName();
   private static final String HTTP_ENDPOINT_PHYSICAL_NAME = newHttpPath();
   private static final String HTTP_ENDPOINT_SOURCE_NAME = newSourceName();
+  private static final HttpMethod HTTP_ENDPOINT_METHOD = newHttpMethod();
   private static final String HTTP_ENDPOINT_DESCRIPTION = newDescription();
   private static final HttpEndpoint HTTP_ENDPOINT =
       new HttpEndpoint(
@@ -137,7 +139,7 @@ public class MarquezClientTest {
           CREATED_AT,
           UPDATED_AT,
           HTTP_ENDPOINT_SOURCE_NAME,
-          HTTP_GET,
+          HTTP_ENDPOINT_METHOD,
           HTTP_ENDPOINT_DESCRIPTION);
 
   // JOB
@@ -374,7 +376,7 @@ public class MarquezClientTest {
         HttpEndpointMeta.builder()
             .physicalName(HTTP_ENDPOINT_PHYSICAL_NAME)
             .sourceName(HTTP_ENDPOINT_SOURCE_NAME)
-            .httpMethod(HTTP_GET)
+            .httpMethod(HTTP_ENDPOINT_METHOD)
             .description(HTTP_ENDPOINT_DESCRIPTION)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
