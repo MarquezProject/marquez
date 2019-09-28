@@ -45,13 +45,13 @@ public final class Run {
 
   @Getter
   @NonNull
-  @JsonProperty("runArgs")
-  private final Map<String, String> args;
+  @JsonProperty("runState")
+  private final State state;
 
   @Getter
   @NonNull
-  @JsonProperty("runState")
-  private final State state;
+  @JsonProperty("runArgs")
+  private final Map<String, String> args;
 
   public enum State {
     NEW,

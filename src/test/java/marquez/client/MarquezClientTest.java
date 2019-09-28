@@ -32,6 +32,7 @@ import static marquez.client.models.ModelGenerator.newOutputs;
 import static marquez.client.models.ModelGenerator.newOwnerName;
 import static marquez.client.models.ModelGenerator.newRunArgs;
 import static marquez.client.models.ModelGenerator.newRunId;
+import static marquez.client.models.ModelGenerator.newRunState;
 import static marquez.client.models.ModelGenerator.newSchemaLocation;
 import static marquez.client.models.ModelGenerator.newSourceName;
 import static marquez.client.models.ModelGenerator.newStreamName;
@@ -157,8 +158,8 @@ public class MarquezClientTest {
   private static final String RUN_ID = newRunId();
   private static final Instant NOMINAL_START_TIME = newTimestamp();
   private static final Instant NOMINAL_END_TIME = newTimestamp();
+  private static final Run.State RUN_STATE = newRunState();
   private static final Map<String, String> RUN_ARGS = newRunArgs();
-  private static final Run.State RUN_STATE = Run.State.NEW;
   private static final Run RUN =
       new Run(
           RUN_ID,
@@ -166,8 +167,8 @@ public class MarquezClientTest {
           UPDATED_AT,
           NOMINAL_START_TIME,
           NOMINAL_END_TIME,
-          RUN_ARGS,
-          RUN_STATE);
+          RUN_STATE,
+          RUN_ARGS);
 
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
 
