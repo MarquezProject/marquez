@@ -18,11 +18,13 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static marquez.client.models.SourceType.POSTGRESQL;
 
 import com.google.common.collect.ImmutableMap;
+import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import marquez.client.Utils;
 
 public final class ModelGenerator {
   private ModelGenerator() {}
@@ -235,8 +237,8 @@ public final class ModelGenerator {
     return "https://github.com/repo/test/commit/" + newId();
   }
 
-  public static String newSchemaLocation() {
-    return "http://localhost:8081/schemas/ids/" + newId();
+  public static URL newSchemaLocation() {
+    return Utils.toUrl("http://localhost:8081/schemas/ids/" + newId());
   }
 
   public static String newDescription() {

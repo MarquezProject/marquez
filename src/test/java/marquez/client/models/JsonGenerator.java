@@ -99,7 +99,7 @@ public final class JsonGenerator {
         .put("type", STREAM)
         .put("physicalName", meta.getPhysicalName())
         .put("sourceName", meta.getSourceName())
-        .put("schemaLocation", meta.getSchemaLocation())
+        .put("schemaLocation", meta.getSchemaLocation().toString())
         .put("description", meta.getDescription().orElse(null))
         .put("runId", meta.getRunId().orElse(null))
         .toString();
@@ -151,7 +151,7 @@ public final class JsonGenerator {
         .put("createdAt", ISO_INSTANT.format(stream.getCreatedAt()))
         .put("updatedAt", ISO_INSTANT.format(stream.getUpdatedAt()))
         .put("sourceName", stream.getSourceName())
-        .put("schemaLocation", stream.getSchemaLocation())
+        .put("schemaLocation", stream.getSchemaLocation().toString())
         .put("description", stream.getDescription().orElse(null))
         .toString();
   }

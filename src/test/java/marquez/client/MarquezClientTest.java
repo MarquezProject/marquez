@@ -115,7 +115,7 @@ public class MarquezClientTest {
   private static final String STREAM_NAME = newDatasetName();
   private static final String STREAM_PHYSICAL_NAME = newStreamName();
   private static final String STREAM_SOURCE_NAME = newSourceName();
-  private static final String STREAM_SCHEMA_LOCATION = newSchemaLocation();
+  private static final URL STREAM_SCHEMA_LOCATION = newSchemaLocation();
   private static final String STREAM_DESCRIPTION = newDescription();
   private static final Stream STREAM =
       new Stream(

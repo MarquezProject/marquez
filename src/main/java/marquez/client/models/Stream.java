@@ -14,6 +14,7 @@
 
 package marquez.client.models;
 
+import java.net.URL;
 import java.time.Instant;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -24,7 +25,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class Stream extends Dataset {
-  @Getter String schemaLocation;
+  @Getter URL schemaLocation;
 
   public Stream(
       String name,
@@ -32,7 +33,7 @@ public final class Stream extends Dataset {
       Instant createdAt,
       Instant updatedAt,
       String sourceName,
-      @NonNull String schemaLocation,
+      @NonNull URL schemaLocation,
       @Nullable String description) {
     super(name, physicalName, createdAt, updatedAt, sourceName, description);
     this.schemaLocation = schemaLocation;
