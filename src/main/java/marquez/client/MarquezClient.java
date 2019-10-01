@@ -45,11 +45,32 @@ import marquez.client.models.SourceMeta;
 
 @Slf4j
 public class MarquezClient {
+  @VisibleForTesting
+  static final URL DEFAULT_BASE_URL = Utils.toUrl("http://localhost:8080/api/v1");
+
+  @VisibleForTesting static final String DEFAULT_NAMESPACE_NAME = "default";
+
   @VisibleForTesting static final int DEFAULT_LIMIT = 100;
   @VisibleForTesting static final int DEFAULT_OFFSET = 0;
 
   @VisibleForTesting final MarquezHttp http;
   @Getter private final String namespaceName;
+
+  public MarquezClient() {
+    this(DEFAULT_BASE_URL, DEFAULT_NAMESPACE_NAME);
+  }
+
+  public MarquezClient(final String namespaceName) {
+    this(DEFAULT_BASE_URL, namespaceName);
+  }
+
+  public MarquezClient(final String baseUrlString, final String namespaceName) {
+    this(Utils.toUrl(baseUrlString), namespaceName);
+  }
+
+  public MarquezClient(@NonNull final URL baseUrl, final String namespaceName) {
+    this(MarquezHttp.create(baseUrl, MarquezClient.Version.get()), namespaceName);
+  }
 
   MarquezClient(@NonNull final MarquezHttp http, @NonNull final String namespaceName) {
     this.http = http;
@@ -250,10 +271,6 @@ public class MarquezClient {
   }
 
   public static final class Builder {
-    @VisibleForTesting
-    static final URL DEFAULT_BASE_URL = Utils.toUrl("http://localhost:8080/api/v1");
-
-    @VisibleForTesting static final String DEFAULT_NAMESPACE_NAME = "default";
     @VisibleForTesting static final String NAMESPACE_NAME_ENV_VAR = "MARQUEZ_NAMESPACE";
 
     @VisibleForTesting URL baseUrl;

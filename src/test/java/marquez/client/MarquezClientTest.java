@@ -14,9 +14,9 @@
 
 package marquez.client;
 
-import static marquez.client.MarquezClient.Builder.DEFAULT_BASE_URL;
-import static marquez.client.MarquezClient.Builder.DEFAULT_NAMESPACE_NAME;
 import static marquez.client.MarquezClient.Builder.NAMESPACE_NAME_ENV_VAR;
+import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
+import static marquez.client.MarquezClient.DEFAULT_NAMESPACE_NAME;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newDatasetName;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
