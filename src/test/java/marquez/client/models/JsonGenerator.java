@@ -111,7 +111,6 @@ public final class JsonGenerator {
         .put("type", HTTP_ENDPOINT)
         .put("physicalName", meta.getPhysicalName())
         .put("sourceName", meta.getSourceName())
-        .put("httpMethod", meta.getHttpMethod().toString())
         .put("description", meta.getDescription().orElse(null))
         .put("runId", meta.getRunId().orElse(null))
         .toString();
@@ -165,7 +164,6 @@ public final class JsonGenerator {
         .put("createdAt", ISO_INSTANT.format(httpEndpoint.getCreatedAt()))
         .put("updatedAt", ISO_INSTANT.format(httpEndpoint.getUpdatedAt()))
         .put("sourceName", httpEndpoint.getSourceName())
-        .put("httpMethod", httpEndpoint.getHttpMethod().toString())
         .put("description", httpEndpoint.getDescription().orElse(null))
         .toString();
   }

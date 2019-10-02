@@ -17,24 +17,18 @@ package marquez.client.models;
 import java.time.Instant;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class HttpEndpoint extends Dataset {
-  @Getter private final HttpMethod httpMethod;
-
   public HttpEndpoint(
       final String name,
       final String physicalName,
       final Instant createdAt,
       final Instant updatedAt,
       final String sourceName,
-      @NonNull final HttpMethod httpMethod,
       @Nullable final String description) {
     super(name, physicalName, createdAt, updatedAt, sourceName, description);
-    this.httpMethod = httpMethod;
   }
 }

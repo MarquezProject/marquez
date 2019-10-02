@@ -110,7 +110,6 @@ public final class ModelGenerator {
     return HttpEndpointMeta.builder()
         .physicalName(newHttpPath())
         .sourceName(newSourceName())
-        .httpMethod(newHttpMethod())
         .description(newDescription())
         .build();
   }
@@ -118,13 +117,7 @@ public final class ModelGenerator {
   public static HttpEndpoint newHttpEndpoint() {
     final Instant now = newTimestamp();
     return new HttpEndpoint(
-        newDatasetName(),
-        newHttpPath(),
-        now,
-        now,
-        newSourceName(),
-        newHttpMethod(),
-        newDescription());
+        newDatasetName(), newHttpPath(), now, now, newSourceName(), newDescription());
   }
 
   public static JobMeta newJobMeta() {
@@ -211,10 +204,6 @@ public final class ModelGenerator {
 
   public static String newHttpPath() {
     return "/test/" + newId();
-  }
-
-  public static HttpMethod newHttpMethod() {
-    return HttpMethod.values()[newIdWithBound(HttpMethod.values().length)];
   }
 
   public static JobType newJobType() {
