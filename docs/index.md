@@ -92,4 +92,5 @@ If you’re interested in using or learning more about Marquez, reach out to us 
 
 ## Marquez Talks
 
+* [Marquez: An Open Source Metadata Service for ML Platforms](https://www.slideshare.net/WillyLulciuc/marquez-an-open-source-metadata-service-for-ml-platforms) by Willy Lulciuc, Shawn Shah at AI NEXTCon SF '19
 * [Marquez: A Metadata Service for Data Abstraction, Data Lineage, and Event-based Triggers](https://www.datacouncil.ai/speaker/marquez-a-metadata-service-for-data-abstraction-data-lineage-and-event-based-triggers) by Willy Lulciuc at DataEngConf NYC '18
