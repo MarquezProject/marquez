@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.1.0
+  version: 0.5.0
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -26,7 +26,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/createNamespace'
+              $ref: '#/components/schemas/newNamespace'
       responses:
         '200':
           description: OK
@@ -64,6 +64,113 @@ paths:
               schema:
                 $ref: '#/components/schemas/namespaces'
 
+  /sources/{source}:
+    parameters:
+      - $ref: '#/components/parameters/source'
+    put:
+      summary: Create a source
+      description: Creates a new source object. A source is the physical location of a dataset such as
+        a table in PostgreSQL, or topic in Kafka. A source enables the grouping of physical datasets
+        to their physical source.
+      tags:
+        - Sources
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newSource'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/source'
+    get:
+      summary: Get a source
+      description: Returns a source.
+      tags:
+        - Sources
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/source'
+
+  /sources:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      summary: List all sources
+      description: Returns a list of sources.
+      tags:
+        - Sources
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sources'
+
+
+  /namespaces/{namespace}/datasets/{dataset}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/dataset'
+    put:
+      summary: Create a dataset
+      description: Creates a new dataset object.
+      tags:
+        - Datasets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newDataset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dataset'
+    get:
+      summary: Get a dataset
+      description: Returns a dataset.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dataset'
+
+  /namespaces/{namespace}/datasets:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/dataset'
+    get:
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      summary: List all datasets
+      description: Returns a list of datasets.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datasets'
+
   /namespaces/{namespace}/jobs/{job}:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -80,7 +187,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/createJob'
+              $ref: '#/components/schemas/newJob'
       responses:
         '200':
           description: OK
@@ -125,29 +232,28 @@ paths:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/job'
     post:
-      summary: Create a job run
-      description: Creates a new job run object.
+      summary: Create a run
+      description: Creates a new run object for a job.
       tags:
         - Jobs
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/createJobRun'
+              $ref: '#/components/schemas/newRun'
       responses:
         '201':
           description: CREATED
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jobRun'
-    
+                $ref: '#/components/schemas/runAsNew'
     get:
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
-      summary: Retrieve job runs for a job
-      description: Returns a list of job runs, sorted reverse chronologically
+      summary: List all runs
+      description: Returns a list of runs for a job.
       tags:
         - Jobs
       responses:
@@ -156,14 +262,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jobRuns'
+                $ref: '#/components/schemas/runs'
 
   /jobs/runs/{id}:
     parameters:
-      - $ref: '#/components/parameters/jobRunId'
+      - $ref: '#/components/parameters/runId'
     get:
-      summary: Retrieve a job run
-      description: Retrieve a job run.
+      summary: Retrieve a run
+      description: Retrieve a run.
       tags:
         - Jobs
       responses:
@@ -172,161 +278,71 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jobRun'
+                $ref: '#/components/schemas/runAsNew'
 
-  /jobs/runs/{id}/run:
+  /jobs/runs/{id}/start:
     parameters:
-      - $ref: '#/components/parameters/jobRunId'
-    put:
-      summary: Start a job run
-      description: Marks the job run as running.
+      - $ref: '#/components/parameters/runId'
+    post:
+      summary: Start a run
+      description: Marks the run as `RUNNING`.
       tags:
         - Jobs
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runAsRunning'
 
   /jobs/runs/{id}/complete:
     parameters:
-      - $ref: '#/components/parameters/jobRunId'
-    put:
-      summary: Complete a job run
-      description: Marks the job run as completed.
+      - $ref: '#/components/parameters/runId'
+    post:
+      summary: Complete a run
+      description: Marks the run as `COMPLETED`.
       tags:
         - Jobs
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runAsCompleted'
 
   /jobs/runs/{id}/fail:
     parameters:
-      - $ref: '#/components/parameters/jobRunId'
-    put:
-      summary: Fail a job run
-      description: Marks the job run as failed.
+      - $ref: '#/components/parameters/runId'
+    post:
+      summary: Fail a run
+      description: Marks the run as `FAILED`.
       tags:
         - Jobs
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runAsFailed'
 
   /jobs/runs/{id}/abort:
     parameters:
-      - $ref: '#/components/parameters/jobRunId'
-    put:
-      summary: Abort a job run
-      description: Marks the job run as aborted.
+      - $ref: '#/components/parameters/runId'
+    post:
+      summary: Abort a run
+      description: Marks the run as `ABORTED`.
       tags:
         - Jobs
       responses:
         '200':
           description: OK
-
-  /namespaces/{namespace}/datasets:
-    parameters:
-      - $ref: '#/components/parameters/namespace'
-    post:
-      summary: Create a dataset
-      description: Creates a new dataset object.
-      tags:
-        - Datasets
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/createDataset'
-      responses:
-        '200':
-          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/dataset'
-    get:
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
-      summary: List all datasets
-      description: Returns a list of datasets.
-      tags:
-        - Datasets
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/datasets'
-
-  /namespaces/{namespace}/datasets/{urn}:
-    parameters:
-      - $ref: '#/components/parameters/namespace'
-      - $ref: '#/components/parameters/datasetUrn'
-    get:
-      summary: Get a dataset
-      description: Returns a dataset. An individual dataset object is identifiable by its Marquez-generated unique URN.
-      tags:
-        - Datasets
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/dataset'
-
-  /datasources:
-    get:
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
-      summary: List all datasources
-      description: Returns a list of datasources.
-      tags:
-        - Datasources
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/datasources'
-    post:
-      summary: Create a datasource
-      description: Creates a new datasource object. A datasource is the physical location of a dataset such as
-        a table in PostgreSQL, or topic in Kafka. A datasource enables the grouping of physical datasets
-        to their physical source.
-
-      tags:
-        - Datasources
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/createDatasource'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/datasource'
-
-  /datasources/{urn}:
-    parameters:
-      - $ref: '#/components/parameters/datasourceUrn'
-    get:
-      summary: Get a datasource
-      description: Returns a datasource. An individual datasource object is identifiable by its Marquez-generated unique URN.
-      tags:
-        - Datasources
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/datasource'
+                $ref: '#/components/schemas/runAsAborted'
 
 components:
   parameters:
@@ -350,36 +366,34 @@ components:
         maxLength: 1024
         example: room_bookings_7_days
 
-    jobRunId:
+    runId:
       name: id
       in: path
-      description: The unique ID of the job run.
+      description: The ID of the run.
       required: true
       schema:
         type: string
         format: uuid
 
-    datasourceUrn:
-      name: urn
+    source:
+      name: source
       in: path
-      description: The URN of the datasource.
+      description: The name of the source.
       required: true
       schema:
         type: string
-        format: URN
         maxLength: 1024
-        example: urn:datasource:postgresql:financials_db
+        example: analytics_db
 
-    datasetUrn:
-      name: urn
+    dataset:
+      name: dataset
       in: path
-      description: The URN of the dataset.
+      description: The name of the dataset.
       required: true
       schema:
         type: string
-        format: URN
         maxLength: 1024
-        example: urn:dataset:analytics_db:wedata.room_bookings
+        example: wedata.room_bookings
 
     limit:
       name: limit
@@ -398,19 +412,19 @@ components:
         type: integer
 
   schemas:
-    createNamespace:
+    newNamespace:
       type: object
       properties:
-        owner:
+        ownerName:
           description: The owner of the namespace.
           type: string
         description:
           description: The description of the namespace.
           type: string
       required:
-        - owner
+        - ownerName
       example:
-        owner: dataengineering
+        ownerName: dataengineering
         description: A namespace for core jobs and datasets at wework.
 
     namespace:
@@ -423,7 +437,11 @@ components:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the namespace was created.
           type: string
           format: date-time
-        owner:
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the namespace was updated.
+          type: string
+          format: date-time
+        ownerName:
           description: The owner of the namespace.
           type: string
         description:
@@ -432,7 +450,8 @@ components:
       example:
         name: wework
         createdAt: 2019-05-09T19:49:24.201361Z
-        owner: dataengineering
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        ownerName: dataengineering
         description: A namespace for core jobs and datasets at wework.
 
     namespaces:
@@ -443,43 +462,50 @@ components:
           items:
             $ref: '#/components/schemas/namespace'
 
-    createJob:
+    newJob:
       type: object
       properties:
-        inputDatasetUrns:
-          description: The URN list of input datasets.
+        type:
+          description: The type of the job.
+          type: string
+          enum: [BATCH, STREAM, SERVICE]
+        inputs:
+          description: The list of input datasets.
           type: array
           items:
             type: string
-            format: URN
           uniqueItems: true
-        outputDatasetUrns:
-          description: The URN list of output datasets.
+        outputs:
+          description: The list of output datasets.
           type: array
           items:
             type: string
-            format: URN
           uniqueItems: true
         location:
-          description: The URI of the job source or artifact.
+          description: The URL of the job source code or artifact.
           type: string
-          format: URI
+          format: URL
         description:
           description: The description of the job.
           type: string
       required:
-        - inputDatasetUrns
-        - outputDatasetUrns
+        - type
+        - inputs
+        - outputs
         - location
       example:
-        inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
-        outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
+        type: BATCH
+        inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
+        outputs: ["wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         description: Determine weekly room booking occupancy patterns.
 
     job:
       type: object
       properties:
+        type:
+          description: The type of the job.
+          type: string
         name:
           description: The name of the job.
           type: string
@@ -491,33 +517,32 @@ components:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.
           type: string
           format: date-time
-        inputDatasetUrns:
-          description: The URN list of input datasets.
+        inputs:
+          description: The list of input datasets.
           type: array
           items:
             type: string
-            format: URN
           uniqueItems: true
-        outputDatasetUrns:
-          description: The URN list of output datasets.
+        outputs:
+          description: The list of output datasets.
           type: array
           items:
             type: string
-            format: URN
           uniqueItems: true
         location:
-          description: The URI of the job source or artifact.
+          description: The URL of the job source code or artifact.
           type: string
-          format: URI
+          format: URL
         description:
           description: The description of the job.
           type: string
       example:
+        type: BATCH
         name: room_bookings_7_days
         createdAt: 2019-05-09T19:49:24.201361Z
         updatedAt: 2019-05-09T19:49:24.201361Z
-        inputDatasetUrns: ["urn:wework:wedata.room_bookings", "urn:meetup:analytics.scheduled_events"]
-        outputDatasetUrns: ["urn:wework:wedata.room_bookings_7_days"]
+        inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
+        outputs: ["wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         description: Determine weekly room booking occupancy patterns.
 
@@ -529,154 +554,371 @@ components:
           items:
             $ref: '#/components/schemas/job'
 
-    jobVersion:
+    newRun:
       type: object
       properties:
-        version:
-          description: The version of the job.
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        runArgs:
+          description: The arguments of the run.
+          type: object
+      example:
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+
+    runId:
+      type: object
+      properties:
+        runId:
+          description: The ID of the run.
+          type: string
+          format: uuid
+      example:
+        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+
+    runAsNew:
+      type: object
+      properties:
+        runId:
+          description: The ID of the run.
           type: string
           format: uuid
         createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job version was created.
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
           type: string
           format: date-time
-        location:
-          description: The URI of the job source or artifact.
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
           type: string
-          format: URI
-      example:
-        version: b39b5cea-bc2e-42a5-a4ab-5329ae9fc54f
-        createdAt: 2019-05-09T19:49:24.201361
-        location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-
-    jobVersions:
-      type: object
-      properties:
-        versions:
-          type: array
-          items:
-            $ref: '#/components/schemas/jobVersion'
-
-    createJobRun:
-      type: object
-      properties:
+          format: date-time
         nominalStartTime:
-          description: The nominal start time of the job.
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
           type: string
           format: date-time
         nominalEndTime:
-          description: The nominal end time of the job.
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
           type: string
           format: date-time
-        runArgs:
-          description: The runtime arguments of the job. JSON encoded.
-          type: string
-      example:
-        runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
-
-    jobRunId:
-      type: object
-      properties:
-        runId:
-          description: The unique ID assigned to the run.
-          type: string
-          format: uuid
-      example:
-        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-
-    jobRun:
-      type: object
-      properties:
-        nominalStartTime:
-          description: The nominal start time of the job.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: The nominal end time of the job.
-          type: string
-          format: date-time
-        runId:
-          description: The unique ID assigned to the run.
-          type: string
-          format: uuid
         runState:
-          description: The current state of the job.
-          schema:
-            type: string
-            enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        runArgs:
-          description: The runtime arguments of the job. JSON encoded.
+          description: The current state of the run.
           type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        runArgs:
+          description: The arguments of the run.
+          type: object
       example:
         runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-        runState: COMPLETED
-        runArgs: "{\\\"email\\\": \\\"data@wework.com\\\", \\\"emailOnFailure\\\": false, \\\"emailOnRetry\\\": true, \\\"retries\\\": 1}"
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        runState: NEW
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
 
-    jobRuns:
+    runAsRunning:
+      type: object
+      properties:
+        runId:
+          description: The ID of the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+          type: string
+          format: date-time
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        runState:
+          description: The current state of the run.
+          type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        runArgs:
+          description: The arguments of the run.
+          type: object
+      example:
+        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        runState: RUNNING
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+
+    runAsCompleted:
+      type: object
+      properties:
+        runId:
+          description: The ID of the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+          type: string
+          format: date-time
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        runState:
+          description: The current state of the run.
+          type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        runArgs:
+          description: The arguments of the run.
+          type: object
+      example:
+        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        runState: COMPLETED
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+
+    runAsFailed:
+      type: object
+      properties:
+        runId:
+          description: The ID of the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+          type: string
+          format: date-time
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        runState:
+          description: The current state of the run.
+          type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        runArgs:
+          description: The arguments of the run.
+          type: object
+      example:
+        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        runState: FAILED
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+
+    runAsAborted:
+      type: object
+      properties:
+        runId:
+          description: The ID of the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+          type: string
+          format: date-time
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        runState:
+          description: The current state of the run.
+          type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        runArgs:
+          description: The arguments of the run.
+          type: object
+      example:
+        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        runState: ABORTED
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+
+    runs:
       type: object
       properties:
         runs:
           type: array
           items:
-            $ref: '#/components/schemas/jobRun'
+            $ref: '#/components/schemas/runAsNew'
 
-    jobRunOutputs:
+    newDataset:
       type: object
       properties:
         datasets:
           type: array
           items:
             oneOf:
-              - $ref: '#/components/schemas/DB'
-              - $ref: '#/components/schemas/ICEBERG'
+              - $ref: '#/components/schemas/DB_TABLE'
+              - $ref: '#/components/schemas/STREAM'
+              - $ref: '#/components/schemas/HTTP_ENDPOINT'
 
-    createDataset:
+    DB_TABLE:
       type: object
       properties:
-        name:
-          description: The name of the dataset.
+        type:
+          description: The type of the dataset.
+          type: enum
+          enum: [DB_TABLE]
+        physicalName:
+          description: The physical name of the table.
           type: string
-        datasourceUrn:
-          description: The URN of the datasource associated with the dataset.
+        sourceName:
+          description: The name of the source associated with the table.
           type: string
-          format: URN
         description:
-          description:  The description of the dataset.
+          description:  The description of the table.
+          type: string
+        runId:
+          description: The ID associated with the run modifying the table.
           type: string
       required:
-        - name
-        - datasourceUrn
+        - type
+        - physicalName
+        - sourceName
       example:
+        type: DB_TABLE
         name: wedata.room_bookings
-        datasourceUrn: urn:datasource:postgresql:analytics_db
+        physicalName: wedata.room_bookings
+        sourceName: analytics_db
         description: "All room booking occupancy data."
+
+    STREAM:
+      type: object
+      properties:
+        type:
+          description: The type of the dataset.
+          type: enum
+          enum: [STREAM]
+        physicalName:
+          description: The physical name of the stream.
+          type: string
+        sourceName:
+          description: The name of the source associated with the stream.
+          type: string
+        schemaLocation:
+          description: The URL of the schema for the stream.
+          type: string
+        description:
+          description: The description of the stream.
+          type: string
+        runId:
+          description: The ID associated with the run modifying the stream.
+          type: string
+      required:
+        - type
+        - physicalName
+        - sourceName
+        - schemaLocation
+      example:
+        type: STREAM
+        name: room_bookings
+        sourceName: kafka_prod
+        description: "A stream of room booking occupancy data."
+
+    HTTP_ENDPOINT:
+      type: object
+      properties:
+        type:
+          description: The type of the dataset.
+          type: enum
+          enum: [HTTP_ENDPOINT]
+        physicalName:
+          description: The HTTP path of the endpoint.
+          type: string
+        sourceName:
+          description: The base HTTP URL of the service associated with the endpoint.
+          type: string
+        description:
+          description: The description of the endpoint.
+          type: string
+        runId:
+          description: The ID associated with the run modifying the stream.
+          type: string
+      required:
+        - type
+        - physicalName
+        - sourceName
+      example:
+        type: HTTP_ENDPOINT
+        name: /apps/{app}/events
+        sourceName: https://localhost:5000/api/v1
 
     dataset:
       type: object
       properties:
+        type:
+          description: The type of the dataset.
+          type: string
         name:
           description: The name of the dataset.
+          type: string
+        physicalName:
+          description: The physical name of the dataset.
           type: string
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
           type: string
           format: date-time
-        urn:
-          description: The URN of the dataset.
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was updated.
           type: string
-          format: URN
-        datasourceUrn:
-          description: The URN of the datasource associated with the dataset.
+          format: date-time
+        sourceName:
+          description: The name of the source associated with the dataset.
           type: string
-          format: URN
         description:
           description:  The description of the dataset.
           type: string
       example:
+        type: DB_TABLE
         name: wedata.room_bookings
+        physicalName: wedata.room_bookings
         createdAt: 2019-05-09T19:49:24.201361Z
-        urn: urn:dataset:analytics_db:wedata.room_bookings
-        datasourceUrn: urn:datasource:postgresql:analytics_db
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        sourceName: analytics_db
         description: "All room booking occupancy data."
 
     datasets:
@@ -686,107 +928,61 @@ components:
           items:
             $ref: '#/components/schemas/dataset'
 
-    createDatasource:
-      type: object
-      properties:
-        name:
-          description: The name of the datasource.
-          type: string
-        connectionUrl:
-          description: The url to be used to connect to the datasource.
-          type: string
-          format: URL
-      required:
-        - name
-        - connectionUrl
-      example:
-        name: financials_db
-        connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
-
-    datasource:
-      type: object
-      properties:
-        urn:
-          description: The URN of the datasource.
-          type: string
-          format: URN
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
-          type: string
-          format: date-time
-        name:
-          description: The name of the datasource.
-          type: string
-        connectionUrl:
-          description: The url to be used to connect to the datasource.
-      example:
-        name: financials_db
-        createdAt: 2019-05-09T19:49:24.201361Z
-        urn: urn:datasource:postgresql:financials_db
-        connectionUrl: jdbc:postgresql://localhost:5431/reporting_system
-
-    datasources:
-      type: object
-      properties:
-        datasources:
-          items:
-            $ref: '#/components/schemas/datasource'
-
-    DB:
+    newSource:
       type: object
       properties:
         type:
-          description: The output dataset type.
-          type: enum
-          enum: [DB]
+          description: The type of the source.
+          type: string
+          enum: [MYSQL, POSTGRESQL, REDSHIFT, SNOWFLAKE, KAFKA, REST]
         connectionUrl:
-          description: The URL to connect to the database.
+          description: The URL to be used to connect to the source.
           type: string
           format: URL
-        schema:
-          description: The name of the database schema.
-          type: string
-        table:
-          description: The name of the table.
-          type: string
         description:
-          description: The description of the output dataset.
+          description:  The description of the source.
           type: string
       required:
         - type
         - connectionUrl
-        - schema
-        - table
       example:
-        type: DB
-        connectionUrl: jdbc:postgresql://localhost:5432/wework
-        schema: wedata
-        table: room_bookings
+        type: POSTGRESQL
+        connectionUrl: jdbc:postgresql://localhost:5431/reports
 
-    ICEBERG:
+    source:
       type: object
       properties:
         type:
-          description: The output dataset type.
-          type: enum
-          enum: [ICEBERG]
-        snapshotId:
-          description: The unique ID of the snapshot representing a list of files on the file system.
-          type: integer
-          format: int64
-        location:
-          description: The location on the file system where data files, manifest files, and table
-            metadata files are stored.
+          description: The type of the source.
           type: string
+        name:
+          description: The name of the source.
+          type: string
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the source was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the source was updated.
+          type: string
+          format: date-time
+        connectionUrl:
+          description: The URL to be used to connect to the source.
+          type: string
+          format: URL
         description:
-          description: The description of the output dataset.
+          description:  The description of the dataset.
           type: string
-      required:
-         - type
-         - snapshotId
-         - location
       example:
-        type: ICEBERG
-        snapshotId: 3051729675574597004
-        location: s3://wedata/room_bookings
-        description: Archived room bookings data.
+        type: POSTGRESQL
+        name: analytics_db
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        connectionUrl: jdbc:postgresql://localhost:5431/reports
+
+    sources:
+      type: object
+      properties:
+        sources:
+          items:
+            $ref: '#/components/schemas/source'
