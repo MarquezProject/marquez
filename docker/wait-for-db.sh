@@ -18,7 +18,7 @@ set -eu
 
 host="${1}"
 port="${2}"
-timeout="${3}"
+timeout="${3:-20}"
 NEXT_WAIT_TIME=0
 
 until [ PGPASSWORD="${POSTGRES_PASSWORD}" psql \
