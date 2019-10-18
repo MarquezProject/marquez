@@ -22,7 +22,7 @@
 from setuptools import find_packages, setup
 
 NAME = "marquez-python"
-VERSION = "0.5.4-rc"
+VERSION = "0.6.0-rc"
 # To install the library, run the following
 #
 # python setup.py install
