@@ -2,32 +2,36 @@ interactions:
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.20.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/datasources?limit=25
+    uri: http://localhost:5000/api/v1/sources?limit=25
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAALWX3W7aQBCF38XXYZmf/b9rxCPQm1YVcsBJqBw7tZ1KVZR37+LQNBKswxL2hguz
-        Pv40OnN25rnYlEPZt0/duuoL//25aMqHqvDF7bYpm/W2rPvFtSyuinVXlUO1+TKE/wjQzYBnREt0
-        XhmvUBABW/UtnHzqmnAm/Pr/0v6x7Ye7rup/1f5AuW2aaj1s2+ZrV4c3f25u1u/Pz+d1uy7r+/DE
-        K8k476rHthu2zd2q/9MP1UPxcnUUW8WxCTxoL0EwMlAytroE9oqPg682NzFwtSQO1J6sQAVgXBr4
-        XjlPvYM4TXOjV1oYMqDSuSkrOMfA9RKtJ+1JCU1SMyaDc1bwaGe+gjsPJHRoTKuTwTO2ZlCP9uY/
-        cMXCKQTHyeAXac4oOMIkOWuvQDjngs+TyV+186HjNLrz6ASydVqmo2Ne9Gi0jOghEjFEomMp0zsU
-        82YLTodLQGcWRluGMwyTN11wOl5CoIMR1hFSepdi3nzBqYBxPtz/qISzWp9xF2HehNHT5BTkBGuL
-        BMnkOm/NTyFXaCSe4fTM6DAV64FdemIBGkGlV30vnm/sgqlgd+P8ogU5gzI92PfiGeE/qPwIL9Fq
-        me4aunzlF29fNYpNDN3u8hFG06BmAHsK+qF0KnjT/q7qbT/0K+mMjmLbj7ClFaTD0HjSZXoonQnb
-        TWOHYTdcpMSSTxp2D6Uvh/1+V4yGot3ZG9xobwtWJdp7r5xrC11cT5l7BA8jOjgwJnl9PsvbB+Au
-        vlxEMkXOUI+r/3gTkSWF8cGlqzb9/fZ28Mekj8G/vfCJrQiOjy1yt0IDB7WwGgkyiiYSJQYenVpS
-        wH+8/AXONQLmMhIAAA==
+        H4sIAAAAAAAAALWQy07DMBBF/8XrNrGTOMXeZQEsisSjYQNCkeu4ralrG9tZVFX/HRckXqIkArGd
+        OTNzz+yAN53jwgN6vwNhawWg4OpyVp/fnM6uL8AIaLY51BZSM80lU75p5xji2OFOsCDaKsR2BhEZ
+        IziGpEaEQkQxTrLy5C5inW2HYNxoLXiQRt86FdHHds6pNT4snfBPiqapMpypVaxQXOQodcIaF3wc
+        bYXnTtrDLKC6U2o/enOZVmfT6l1jzRZr1rxs+tlgQguckBz3GHzEvhqsQrCfYhNIsp64va+P948E
+        R7BGE5rHREVCsvJY8G+wX75e6mXjtz6Izd+l4BCpEg2SesX+R+ph/wxSzPlqMgMAAA==
     headers:
-      Content-Encoding: [gzip]
-      Content-Length: ['640']
-      Content-Type: [application/json]
-      Date: ['Thu, 25 Apr 2019 17:03:52 GMT']
-      Vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '277'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 10 Oct 2019 17:43:48 GMT
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 version: 1

@@ -1,21 +1,34 @@
 interactions:
 - request:
-    body: '{"inputDatasetUrns": ["input1", "input2"], "outputDatasetUrns": ["output1",
-      "output2"], "location": "some_location_1", "description": "someDescription"}'
+    body: '{"inputs": ["input1", "input2"], "outputs": ["output1", "output2"], "location":
+      "https://github.com/wework/jobs/commit/124f", "type": "BATCH", "description":
+      "someDescription"}'
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      Content-Length: ['152']
-      Content-Type: [application/json]
-      User-Agent: [python-requests/2.20.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '176'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - marquez-python/0.5.3
     method: PUT
-    uri: http://localhost:8080/api/v1/namespaces/default/jobs/%40ntago%20%20n%21st%5Cicj0bname2%60
+    uri: http://localhost:5000/api/v1/namespaces/default/jobs/%40ntago%20%20n%21st%5Cicj0bname2%60
   response:
-    body: {string: '{"name":"@ntago  n!st\\icj0bname2`","createdAt":1556152779236,"inputDatasetUrns":["input1","input2"],"outputDatasetUrns":["output1","output2"],"location":"some_location_1","description":"someDescription"}'}
+    body:
+      string: '{"type":"BATCH","name":"@ntago  n!st\\icj0bname2`","createdAt":"2019-10-14T20:42:58.745Z","updatedAt":"2019-10-14T20:42:58.751Z","inputs":[],"outputs":[],"location":"https://github.com/wework/jobs/commit/124f","description":"someDescription"}'
     headers:
-      Content-Length: ['204']
-      Content-Type: [application/json]
-      Date: ['Thu, 25 Apr 2019 00:49:24 GMT']
-    status: {code: 201, message: Created}
+      Content-Length:
+      - '242'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 14 Oct 2019 20:42:58 GMT
+    status:
+      code: 200
+      message: OK
 version: 1

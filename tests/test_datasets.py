@@ -14,30 +14,31 @@ import vcr
 from marquez_client import MarquezClient
 from marquez_client import errors
 from pytest import fixture
+from marquez_client.models import SourceType, DatasetType
 
 
 @fixture(scope='class')
 def namespace_name():
-    return "namespace_for_datasets_tests_3"
+    return "namespace_for_tests_3"
 
 
 @fixture(scope='class')
 def marquez_client_default_ns():
     return MarquezClient(host="localhost",
-                         port=8080)
+                         port=5000)
 
 
 @fixture(scope='class')
 def marquez_client(namespace):
     return MarquezClient(host="localhost", namespace_name=namespace['name'],
-                         port=8080)
+                         port=5000)
 
 
 @fixture(scope='class')
 @vcr.use_cassette(
     'tests/fixtures/vcr/test_datasets/namespace_for_datasets.yaml')
 def namespace(marquez_client_default_ns, namespace_name):
-    owner_name = "some_owner"
+    owner_name = "someone dataset"
     description = "this is a very nice namespace."
 
     client_ns = marquez_client_default_ns.create_namespace(
@@ -50,8 +51,11 @@ def namespace(marquez_client_default_ns, namespace_name):
     'tests/fixtures/vcr/test_datasets/datasource_for_datasets_tests.yaml')
 def existing_datasource(marquez_client):
     datasource_name = "financials_db505"
-    datasource_url = "jdbc:redshift://localhost:5431/reporting_system"
-    return marquez_client.create_datasource(datasource_name, datasource_url)
+    datasource_type = SourceType.POSTGRESQL
+    datasource_url = \
+        "jdbc:redshift://localhost:5431/reporting_system"
+    return marquez_client.\
+        create_source(datasource_name, datasource_type, datasource_url)
 
 
 @fixture(scope='class')
@@ -62,8 +66,10 @@ def existing_dataset(marquez_client, existing_datasource):
     dataset_description = 'a dataset for testing'
 
     result = marquez_client.create_dataset(
+        dataset_type=DatasetType.DB_TABLE,
         dataset_name=dataset_name,
-        datasource_urn=existing_datasource['urn'],
+        source_name=existing_datasource['name'],
+        physical_name=dataset_name,
         description=dataset_description)
     return result
 
@@ -77,10 +83,13 @@ def existing_dataset_default_ns(
     dataset_name = 'dataset_fixture_for_default_ns'
     dataset_description = 'a dataset for testing'
 
-    return marquez_client_default_ns.create_dataset(
+    result = marquez_client_default_ns.create_dataset(
+        dataset_type=DatasetType.DB_TABLE,
         dataset_name=dataset_name,
-        datasource_urn=existing_datasource['urn'],
+        source_name=existing_datasource['name'],
+        physical_name=dataset_name,
         description=dataset_description)
+    return result
 
 
 @vcr.use_cassette('tests/fixtures/vcr/test_datasets/test_create_dataset.yaml')
@@ -88,9 +97,13 @@ def test_create_dataset(marquez_client, existing_datasource):
     dataset_name = 'some_dataset_999'
     description = "someDescription"
     created_dataset = marquez_client.create_dataset(
-        dataset_name, existing_datasource['urn'], description=description)
+        dataset_type=DatasetType.DB_TABLE,
+        dataset_name=dataset_name,
+        source_name=existing_datasource['name'],
+        physical_name=dataset_name,
+        description=description)
 
-    assert existing_datasource['name'] in str(created_dataset['urn'])
+    assert existing_datasource['name'] == str(created_dataset['sourceName'])
     assert created_dataset['name'] == dataset_name
     assert created_dataset['description'] == description
 
@@ -108,7 +121,7 @@ def test_create_datasource_special_chars(marquez_client, existing_datasource):
 
 @vcr.use_cassette('tests/fixtures/vcr/test_datasets/test_get_dataset.yaml')
 def test_get_dataset(marquez_client, existing_dataset):
-    retrieved_dataset = marquez_client.get_dataset(existing_dataset['urn'])
+    retrieved_dataset = marquez_client.get_dataset(existing_dataset['name'])
 
     assert retrieved_dataset['description'] == existing_dataset['description']
     assert retrieved_dataset['name'] == existing_dataset['name']
@@ -121,7 +134,7 @@ def test_get_dataset(marquez_client, existing_dataset):
 def test_get_dataset_specify_ns(
         marquez_client_default_ns, namespace_name, existing_dataset):
     retrieved_dataset = marquez_client_default_ns.get_dataset(
-        existing_dataset['urn'], namespace_name=namespace_name)
+        existing_dataset['name'], namespace_name=namespace_name)
 
     assert retrieved_dataset['description'] == existing_dataset['description']
     assert retrieved_dataset['name'] == existing_dataset['name']
@@ -134,7 +147,7 @@ def test_get_dataset_specify_ns(
 def test_get_dataset_default_ns(
         marquez_client_default_ns, existing_dataset_default_ns):
     retrieved_dataset = marquez_client_default_ns.get_dataset(
-        dataset_urn=existing_dataset_default_ns['urn'])
+        dataset_name=existing_dataset_default_ns['name'])
 
     assert (retrieved_dataset['description'] ==
             existing_dataset_default_ns['description'])

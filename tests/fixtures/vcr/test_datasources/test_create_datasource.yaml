@@ -1,20 +1,32 @@
 interactions:
 - request:
-    body: '{"name": "financials_db201", "connectionUrl": "jdbc:postgresql://localhost:5431/reporting_system"}'
+    body: '{"type": "POSTGRESQL", "connectionUrl": "jdbc:postgresql://localhost:5431/reporting_system"}'
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      Content-Length: ['98']
-      Content-Type: [application/json]
-      User-Agent: [python-requests/2.20.1]
-    method: POST
-    uri: http://localhost:8080/api/v1/datasources
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '92'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - marquez-python/0.5.3
+    method: PUT
+    uri: http://localhost:5000/api/v1/sources/financials_db201
   response:
-    body: {string: '{"name":"financials_db201","createdAt":"2019-03-26T19:26:26.297144Z","urn":"urn:datasource:postgresql:financials_db201","connectionUrl":"jdbc:postgresql://localhost:5431/reporting_system"}'}
+    body:
+      string: '{"type":"POSTGRESQL","name":"financials_db201","createdAt":"2019-10-10T17:37:44.926Z","updatedAt":"2019-10-10T17:37:44.926Z","connectionUrl":"jdbc:postgresql://localhost:5431/reporting_system","description":null}'
     headers:
-      Content-Length: ['188']
-      Content-Type: [application/json]
-      Date: ['Thu, 25 Apr 2019 04:02:20 GMT']
-    status: {code: 200, message: OK}
+      Content-Length:
+      - '212'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 10 Oct 2019 17:43:48 GMT
+    status:
+      code: 200
+      message: OK
 version: 1

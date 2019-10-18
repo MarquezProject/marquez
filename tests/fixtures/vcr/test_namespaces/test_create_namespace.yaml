@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"owner": "some_owner", "description": "this is a very nice namespace."}'
+    body: '{"ownerName": "some_owner", "description": "this is a very nice namespace."}'
     headers:
       Accept:
       - '*/*'
@@ -9,24 +9,24 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '72'
+      - '76'
       Content-Type:
       - application/json
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: PUT
-    uri: http://localhost:8080/api/v1/namespaces/ns_name_997
+    uri: http://localhost:5000/api/v1/namespaces/ns_name_997
   response:
     body:
-      string: '{"name":"ns_name_997","createdAt":"2019-04-11 17:48:46.928362","owner":"some_owner","description":"this
+      string: '{"name":"ns_name_997","createdAt":"2019-10-17T21:39:36.656Z","updatedAt":"2019-10-17T21:39:36.656Z","ownerName":"some_owner","description":"this
         is a very nice namespace."}'
     headers:
       Content-Length:
-      - '131'
+      - '172'
       Content-Type:
       - application/json
       Date:
-      - Fri, 12 Apr 2019 23:41:14 GMT
+      - Thu, 17 Oct 2019 22:20:14 GMT
     status:
       code: 200
       message: OK

@@ -9,16 +9,16 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/default/datasets
+    uri: http://localhost:5000/api/v1/namespaces/default/datasets
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAAK2PQQrCMBBFr1KytmWaJtpm5x1cKRLGJpFATSWZglB6dyPUtYJuZjG8/+fNzAwS
-        JkuJqdPMAt4sU++ddv5BU7TajVEb63AaSIfENqyPFsmaPWWYQ92VIEouD1CreqtAVl3dtI08ZnKK
-        ITN5qrVUOR8w9B6HpM1FAqiP14xNffR38uOrC4s1UGSwIJvIhytbNr/bC5UfAKjETrScf2Uv/2R/
-        Xp6U1YP7igEAAA==
+        H4sIAAAAAAAAAI3OQQrCMBAF0KuUrFXSYkWzs+hOXHWlSBiTiQZqGpIJWErvboQeoPBX8x/MH5kG
+        gogUmbiPjAaPTLBTI9tjczmzFXPw+V9mJY39UgooTR+kRgOpI+lidv49RKuguy70KiAQ6iNlXPHy
+        sC55Tsu5qPei2m22vLxllrxewmKfgsL5t7EOnLLQRamfNa9zrzGqYD3Z3mUAxTyvyLMKwkjWvdj0
+        mH49i0doDgEAAA==
     headers:
       Content-Encoding:
       - gzip
@@ -27,7 +27,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 04:01:00 GMT
+      - Thu, 10 Oct 2019 00:58:26 GMT
       Vary:
       - Accept-Encoding
     status:

@@ -25,7 +25,7 @@ def namespace_name():
 @fixture(scope='class')
 def marquez_client_default_ns():
     return MarquezClient(host="localhost",
-                         port=8080)
+                         port=5000)
 
 
 @fixture(scope='class')
@@ -42,7 +42,7 @@ def existing_namespace(marquez_client_default_ns, namespace_name):
 @fixture(scope='class')
 def marquez_client(namespace_name):
     return MarquezClient(host="localhost", namespace_name=namespace_name,
-                         port=8080)
+                         port=5000)
 
 
 @fixture(scope='class')
@@ -52,7 +52,7 @@ def existing_job(marquez_client, existing_namespace):
     input_datset_urns = ['input1', 'input2']
     output_datset_urns = ['output1', 'output2']
     created_job = marquez_client.create_job(
-        'some_job', 'some_location',
+        'some_job', 'BATCH', 'https://github.com/wework/jobs/commit/124f',
         input_datset_urns,
         output_datset_urns)
     return created_job
@@ -60,17 +60,17 @@ def existing_job(marquez_client, existing_namespace):
 
 @fixture(scope='function')
 def job_run_args():
-    return "-a 1 -b 2 --some-flag"
+    return None
 
 
 @fixture(scope='function')
 def nominal_start_time():
-    return datetime.datetime.now()
+    return "2019-10-14T21:20:04.586Z"
 
 
 @fixture(scope='function')
 def nominal_end_time(nominal_start_time):
-    return nominal_start_time + datetime.timedelta(days=1)
+    return "2019-10-14T22:20:04.586Z"
 
 
 @fixture(scope='function')
@@ -103,11 +103,10 @@ def test_create_jobrun(marquez_client, existing_job, job_run_args,
 @vcr.use_cassette(
     'tests/fixtures/vcr/test_jobruns/test_get_jobrun.yaml')
 def test_get_jobrun(marquez_client, existing_jobrun, job_run_args):
-    marquez_client.mark_job_run_as_running(existing_jobrun['runId'])
+    marquez_client.mark_job_run_as_started(existing_jobrun['runId'])
     get_jobrun_response = marquez_client.get_job_run(existing_jobrun['runId'])
     assert get_jobrun_response['runId'] == existing_jobrun['runId']
     assert get_jobrun_response['runState'] == "RUNNING"
-    assert get_jobrun_response['runArgs'] == job_run_args
     assert get_jobrun_response['nominalStartTime'] is not None
     assert get_jobrun_response['nominalEndTime'] is not None
 

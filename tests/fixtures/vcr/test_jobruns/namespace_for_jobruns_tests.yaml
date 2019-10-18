@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"owner": "ns_owner", "description": "this is a namespace for testing."}'
+    body: '{"ownerName": "ns_owner", "description": "this is a namespace for testing."}'
     headers:
       Accept:
       - '*/*'
@@ -9,24 +9,24 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '72'
+      - '76'
       Content-Type:
       - application/json
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: PUT
-    uri: http://localhost:8080/api/v1/namespaces/ns_name_for_testing
+    uri: http://localhost:5000/api/v1/namespaces/ns_name_for_testing
   response:
     body:
-      string: '{"name":"ns_name_for_testing","createdAt":"2019-04-24 17:59:59.042689","owner":"ns_owner","description":"this
+      string: '{"name":"ns_name_for_testing","createdAt":"2019-10-14T22:17:43.156Z","updatedAt":"2019-10-14T22:17:43.156Z","ownerName":"ns_owner","description":"this
         is a namespace for testing."}'
     headers:
       Content-Length:
-      - '139'
+      - '180'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 00:59:58 GMT
+      - Mon, 14 Oct 2019 22:34:27 GMT
     status:
       code: 200
       message: OK

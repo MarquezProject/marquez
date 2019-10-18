@@ -1,7 +1,7 @@
 interactions:
 - request:
-    body: '{"name": "some_dataset_999", "datasourceUrn": "urn:datasource:redshift:financials_db505",
-      "description": "someDescription"}'
+    body: '{"type": "DB_TABLE", "physicalName": "some_dataset_999", "sourceName":
+      "financials_db505", "description": "someDescription"}'
     headers:
       Accept:
       - '*/*'
@@ -10,23 +10,23 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '123'
+      - '124'
       Content-Type:
       - application/json
       User-Agent:
-      - python-requests/2.21.0
-    method: POST
-    uri: http://localhost:8080/api/v1/namespaces/namespace_for_datasets_tests_3/datasets
+      - marquez-python/0.5.3
+    method: PUT
+    uri: http://localhost:5000/api/v1/namespaces/namespace_for_tests_3/datasets/some_dataset_999
   response:
     body:
-      string: '{"name":"some_dataset_999","createdAt":"2019-04-25T04:01:00.235197Z","urn":"urn:dataset:financials_db505:some_dataset_999","description":"someDescription"}'
+      string: '{"type":"DB_TABLE","name":"some_dataset_999","physicalName":"some_dataset_999","createdAt":"2019-10-10T00:47:24.473Z","updatedAt":"2019-10-10T00:47:24.473Z","sourceName":"financials_db505","description":"someDescription"}'
     headers:
       Content-Length:
-      - '155'
+      - '221'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 04:01:00 GMT
+      - Thu, 10 Oct 2019 00:47:24 GMT
     status:
       code: 200
       message: OK

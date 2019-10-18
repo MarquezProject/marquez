@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"owner": "some_owner", "description": "this is a very nice namespace."}'
+    body: '{"ownerName": "someone dataset", "description": "this is a very nice namespace."}'
     headers:
       Accept:
       - '*/*'
@@ -9,24 +9,24 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '72'
+      - '81'
       Content-Type:
       - application/json
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: PUT
-    uri: http://localhost:8080/api/v1/namespaces/namespace_for_datasets_tests_3
+    uri: http://localhost:5000/api/v1/namespaces/namespace_for_tests_3
   response:
     body:
-      string: '{"name":"namespace_for_datasets_tests_3","createdAt":"2019-04-24 21:00:22.098563","owner":"some_owner","description":"this
-        is a very nice namespace."}'
+      string: '{"name":"namespace_for_tests_3","createdAt":"2019-10-09T19:00:58.697Z","updatedAt":"2019-10-10T00:47:24.412Z","ownerName":"someone
+        dataset","description":"Contains datasets such as room bookings for each office."}'
     headers:
       Content-Length:
-      - '150'
+      - '213'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 04:00:22 GMT
+      - Thu, 10 Oct 2019 00:47:24 GMT
     status:
       code: 200
       message: OK

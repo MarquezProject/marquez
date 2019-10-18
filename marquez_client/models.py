@@ -13,6 +13,21 @@
 from enum import Enum
 
 
+class SourceType(Enum):
+    MYSQL = "MYSQL"
+    POSTGRESQL = "POSTGRESQL"
+    REDSHIFT = "REDSHIFT"
+    SNOWFLAKE = "SNOWFLAKE"
+    KAFKA = "KAFKA"
+    REST = "REST"
+
+
+class DatasetType(Enum):
+    DB_TABLE = "DB_TABLE"
+    STREAM = "STREAM"
+    HTTP_ENDPOINT = "HTTP_ENDPOINT"
+
+
 class RunState(Enum):
     NEW = 'NEW'
     RUNNING = 'RUNNING'

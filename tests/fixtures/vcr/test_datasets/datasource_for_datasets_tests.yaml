@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"name": "financials_db505", "connectionUrl": "jdbc:redshift://localhost:5431/reporting_system"}'
+    body: '{"type": "POSTGRESQL", "connectionUrl": "jdbc:redshift://localhost:5431/reporting_system"}'
     headers:
       Accept:
       - '*/*'
@@ -9,23 +9,23 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '96'
+      - '90'
       Content-Type:
       - application/json
       User-Agent:
-      - python-requests/2.21.0
-    method: POST
-    uri: http://localhost:8080/api/v1/datasources
+      - marquez-python/0.5.3
+    method: PUT
+    uri: http://localhost:5000/api/v1/sources/financials_db505
   response:
     body:
-      string: '{"name":"financials_db505","createdAt":"2019-04-25T03:54:29.275208Z","urn":"urn:datasource:redshift:financials_db505","connectionUrl":"jdbc:redshift://localhost:5431/reporting_system"}'
+      string: '{"type":"POSTGRESQL","name":"financials_db505","createdAt":"2019-10-09T19:01:55.268Z","updatedAt":"2019-10-09T19:01:55.268Z","connectionUrl":"jdbc:postgresql://localhost:5431/reports","description":null}'
     headers:
       Content-Length:
-      - '184'
+      - '203'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 04:00:22 GMT
+      - Thu, 10 Oct 2019 00:47:24 GMT
     status:
       code: 200
       message: OK

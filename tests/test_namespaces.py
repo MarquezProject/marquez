@@ -23,7 +23,7 @@ from pytest import fixture
 @fixture(scope='class')
 def marquez_client():
     return MarquezClient(host="localhost",
-                         port=8080)
+                         port=5000)
 
 
 @fixture(scope='function')
@@ -47,7 +47,7 @@ def test_create_namespace(marquez_client):
     created_ns = marquez_client.create_namespace(
         ns_name, owner_name, description)
     assert created_ns['name'] == ns_name
-    assert created_ns['owner'] == owner_name
+    assert created_ns['ownerName'] == owner_name
     assert created_ns['description'] == description
 
 
@@ -56,7 +56,7 @@ def test_get_namespace(marquez_client, namespace):
     returned_ns = marquez_client.get_namespace(namespace['name'])
     assert returned_ns['name'] == namespace['name']
     assert returned_ns['description'] == namespace['description']
-    assert returned_ns['owner'] == namespace['owner']
+    assert returned_ns['ownerName'] == namespace['ownerName']
 
 
 def test_get_namespace_invalid_input(marquez_client):
@@ -89,11 +89,11 @@ def test_list_namespaces(marquez_client, namespace):
     all_namespaces = marquez_client.list_namespaces()
     assert namespace in all_namespaces['namespaces']
 
-
 @vcr.use_cassette(
     'tests/fixtures/vcr/test_namespaces/test_namespaces_not_set.yaml')
 def test_namespace_not_set(marquez_client):
-    result = marquez_client.create_job('some_job', 'some_location',
+    result = marquez_client.create_job('some_job', 'BATCH',
+                                       'https://github.com/124f',
                                        ['input1', 'input2'],
                                        ['output1', 'output2'])
     assert result['name'] == 'some_job'

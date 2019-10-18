@@ -15,6 +15,7 @@ import os
 import requests
 import time
 
+from .models import DatasetType, SourceType
 from marquez_client import errors
 from marquez_client import log
 from marquez_client.constants import (
@@ -53,7 +54,7 @@ class MarquezClient(object):
             raise ValueError('owner_name must not be None')
 
         payload = {
-            'owner': owner_name
+            'ownerName': owner_name
         }
 
         if description:
@@ -79,11 +80,13 @@ class MarquezClient(object):
             }
         )
 
-    def create_job(self, job_name, location, input_dataset_urns=None,
-                   output_dataset_urns=None, description=None,
+    def create_job(self, job_name, job_type, location, input_dataset=None,
+                   output_dataset=None, description=None,
                    namespace_name=None):
         if not job_name:
             raise ValueError('job_name must not be None')
+        if not job_type:
+            raise ValueError('job_type must not be None')
         if not location:
             raise ValueError('location must not be None')
 
@@ -91,9 +94,10 @@ class MarquezClient(object):
             namespace_name = self._namespace_name
 
         payload = {
-            'inputDatasetUrns': input_dataset_urns or [],
-            'outputDatasetUrns': output_dataset_urns or [],
-            'location': location
+            'inputs': input_dataset or [],
+            'outputs': output_dataset or [],
+            'location': location,
+            'type': job_type
         }
 
         if description:
@@ -154,7 +158,7 @@ class MarquezClient(object):
 
         if mark_as_running:
             run_id = response['runId']
-            response = self.mark_job_run_as_running(run_id)
+            response = self.mark_job_run_as_started(run_id)
 
         return response
 
@@ -180,8 +184,8 @@ class MarquezClient(object):
             }
         )
 
-    def mark_job_run_as_running(self, run_id):
-        return self._mark_job_run_as(run_id, 'run')
+    def mark_job_run_as_started(self, run_id):
+        return self._mark_job_run_as(run_id, 'start')
 
     def mark_job_run_as_completed(self, run_id):
         return self._mark_job_run_as(run_id, 'complete')
@@ -196,72 +200,97 @@ class MarquezClient(object):
         if not run_id:
             raise ValueError('run_id must not be None')
 
-        return self._put(
-            self._url('/jobs/runs/{0}/{1}', run_id, action), as_json=False
+        return self._post(
+            self._url('/jobs/runs/{0}/{1}', run_id, action), payload={}
         )
 
-    def create_datasource(self, datasource_name, connection_url):
-        if not datasource_name:
-            raise ValueError('datasource_name must not be None')
+    # Sources API
+    def create_source(self, source_name, source_type, connection_url,
+                      description=None):
+        if not source_name:
+            raise ValueError('source_name must not be None')
         if not connection_url:
             raise ValueError('connection_url must not be None')
+        if not isinstance(source_type, SourceType):
+            raise ValueError(f'source_type must be instance of SourceType')
 
-        return self._post(
-            self._url('/datasources'),
-            payload={
-                'name': datasource_name,
-                'connectionUrl': connection_url
-            }
-        )
+        payload = {'type': source_type.value,
+                   'connectionUrl': connection_url}
 
-    def get_datasource(self, datasource_urn):
-        if not datasource_urn:
-            raise ValueError('datasource_urn must not be None')
+        if description:
+            payload['description'] = description
 
-        return self._get(self._url('/datasources/{0}', datasource_urn))
+        return self._put(self._url('/sources/{0}', source_name),
+                         payload=payload)
 
-    def list_datasources(self, limit=None, offset=None):
+    def get_source(self, source_name):
+        if not source_name:
+            raise ValueError('source_name must not be None')
+
+        return self._get(self._url('/sources/{0}', source_name))
+
+    def list_sources(self, limit=None, offset=None):
         return self._get(
-            self._url('/datasources'),
+            self._url('/sources'),
             params={
                 'limit': limit,
                 'offset': offset
             }
         )
 
-    def create_dataset(self, dataset_name, datasource_urn,
-                       description=None, namespace_name=None):
+    # Datasets API
+
+    def create_dataset(self, dataset_name, dataset_type,
+                       physical_name, source_name,
+                       description=None, run_id=None,
+                       schema_location=None,
+                       namespace_name=None):
         if not dataset_name:
             raise ValueError('dataset_name must not be None')
-        if not datasource_urn:
-            raise ValueError('datasource_urn must not be None')
+        if not isinstance(dataset_type, DatasetType):
+            raise ValueError('dataset_type must be instance of DatasetType')
+        if not physical_name:
+            raise ValueError('physical_name must not be None')
+        if not source_name:
+            raise ValueError('source_name must not be None')
+
+        if dataset_type == DatasetType.STREAM and not schema_location:
+            raise ValueError('STREAM type datasets must have schema_location')
 
         if not namespace_name:
             namespace_name = self._namespace_name
 
         payload = {
-            'name': dataset_name,
-            'datasourceUrn': datasource_urn
+            'type': dataset_type.value,
+            'physicalName': physical_name,
+            'sourceName': source_name,
         }
 
         if description:
             payload['description'] = description
 
-        return self._post(
-            self._url('/namespaces/{0}/datasets', namespace_name),
+        if run_id:
+            payload['runId'] = run_id
+
+        if schema_location:
+            payload['schemaLocation'] = schema_location
+
+        return self._put(
+            self._url('/namespaces/{0}/datasets/{1}', namespace_name,
+                      dataset_name),
             payload=payload
         )
 
-    def get_dataset(self, dataset_urn, namespace_name=None):
-        if not dataset_urn:
-            raise ValueError('dataset_urn must not be None')
+    def get_dataset(self, dataset_name, namespace_name=None):
+        if not dataset_name:
+            raise ValueError('dataset_name must not be None')
 
         if not namespace_name:
             namespace_name = self._namespace_name
 
         return self._get(
             self._url('/namespaces/{0}/datasets/{1}',
-                      namespace_name, dataset_urn)
+                      namespace_name, dataset_name)
         )
 
     def list_datasets(self, namespace_name=None, limit=None, offset=None):
@@ -275,6 +304,8 @@ class MarquezClient(object):
                 'offset': offset
             }
         )
+
+    # Common
 
     def _url(self, path, *args):
         encoded_args = [quote(arg.encode('utf-8'), safe='') for arg in args]

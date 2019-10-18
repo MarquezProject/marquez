@@ -1,7 +1,6 @@
 interactions:
 - request:
-    body: '{"nominalStartTime": "2019-04-24 17:59:59.153027", "nominalEndTime": "2019-04-25
-      17:59:59.153027", "runArgs": "-a 1 -b 2 --some-flag"}'
+    body: '{"nominalStartTime": "2019-10-14T21:20:04.586Z", "nominalEndTime": "2019-10-14T22:20:04.586Z"}'
     headers:
       Accept:
       - '*/*'
@@ -10,26 +9,24 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '134'
+      - '94'
       Content-Type:
       - application/json
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: POST
-    uri: http://localhost:8080/api/v1/namespaces/ns_name_for_testing/jobs/some_job/runs
+    uri: http://localhost:5000/api/v1/namespaces/ns_name_for_testing/jobs/some_job/runs
   response:
     body:
-      string: '{"runId":"6699d56a-ae49-4ebb-a575-cb69b22ab231","nominalStartTime":"2019-04-24
-        17:59:59.153027","nominalEndTime":"2019-04-25 17:59:59.153027","runArgs":"-a
-        1 -b 2 --some-flag","runState":"NEW"}'
+      string: '{"createdAt":"2019-10-14T22:34:27.706Z","updatedAt":"2019-10-14T22:34:27.711Z","nominalStartTime":"2019-10-14T21:20:04.586Z","nominalEndTime":"2019-10-14T22:20:04.586Z","runId":"1e17c1bd-f7ff-4800-ab13-69b7d772fc27","runState":"NEW","runArgs":{}}'
     headers:
       Content-Length:
-      - '193'
+      - '246'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 00:59:59 GMT
+      - Mon, 14 Oct 2019 22:34:27 GMT
     status:
-      code: 201
-      message: Created
+      code: 200
+      message: OK
 version: 1

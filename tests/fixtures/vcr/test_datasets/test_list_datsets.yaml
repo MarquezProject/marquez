@@ -9,20 +9,27 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/namespace_for_datasets_tests_3/datasets
+    uri: http://localhost:5000/api/v1/namespaces/namespace_for_tests_3/datasets
   response:
     body:
-      string: '{"datasets":[{"name":"dataset_fixture_3","createdAt":"2019-04-25T04:00:26.291549Z","urn":"urn:dataset:financials_db505:dataset_fixture_3","description":"a
-        dataset for testing"}]}'
+      string: !!binary |
+        H4sIAAAAAAAAAJWRzW7CMBCEXwX5DImdHyC+geBGe2hzalVZJtk0LokTZR1UhHj3GpS2tAHUHr0z
+        K883uyepNBLBIOHPe2J2NRBOFnMRz+arJRkSLcvjpHOJTL2btgHhW6nOd6gSWdxftyQNSAPpzFjd
+        oywaMTqiUcwiTj3uT52xFzxZW1unf7Fh1TYJdN9lSkudKFmgSNchDa2eAiaNqo2qtDXIQZdokFXN
+        wAAapV/JYfhF+Rg/LGd334wbmW2kKCqL1Kc7jR2UZV2AgC1ocxOPUc6YE3rRbTwWcuY7Phv38H6G
+        wSSHUq7sq4PLjam56570vELDp3TKXGzXb5AYdM9zulto0G6hO/7dkW6L4qyQ/tmxKkF8HjaKon4v
+        FxyXWmE0ppQHE+4FTjDxr7Vywfa/ox/jLM4mh5fDB2fJxmDjAgAA
     headers:
+      Content-Encoding:
+      - gzip
       Content-Length:
-      - '178'
+      - '324'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 04:00:39 GMT
+      - Thu, 10 Oct 2019 00:47:24 GMT
       Vary:
       - Accept-Encoding
     status:

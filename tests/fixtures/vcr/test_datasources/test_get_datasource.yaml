@@ -2,18 +2,29 @@ interactions:
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.20.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/datasources/urn%3Adatasource%3Apostgresql%3Afinancials_db200
+    uri: http://localhost:5000/api/v1/sources/financials_db200
   response:
-    body: {string: '{"name":"financials_db200","createdAt":"2019-03-26T19:26:26.418647Z","urn":"urn:datasource:postgresql:financials_db200","connectionUrl":"jdbc:postgresql://localhost:5431/reporting_system"}'}
+    body:
+      string: '{"type":"POSTGRESQL","name":"financials_db200","createdAt":"2019-10-10T17:37:44.961Z","updatedAt":"2019-10-10T17:37:44.961Z","connectionUrl":"jdbc:postgresql://localhost:5431/reporting_system","description":null}'
     headers:
-      Content-Length: ['188']
-      Content-Type: [application/json]
-      Date: ['Thu, 25 Apr 2019 04:02:20 GMT']
-      Vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+      Content-Length:
+      - '212'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 10 Oct 2019 17:43:48 GMT
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 version: 1

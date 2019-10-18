@@ -9,20 +9,20 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/namespace_for_datasets_tests_3/datasets/urn%3Adataset%3Afinancials_db505%3Adataset_fixture_3
+    uri: http://localhost:5000/api/v1/namespaces/namespace_for_tests_3/datasets/dataset_fixture_3
   response:
     body:
-      string: '{"name":"dataset_fixture_3","createdAt":"2019-04-25T04:00:26.291549Z","urn":"urn:dataset:financials_db505:dataset_fixture_3","description":"a
+      string: '{"type":"DB_TABLE","name":"dataset_fixture_3","physicalName":"dataset_fixture_3","createdAt":"2019-10-09T19:02:38.624Z","updatedAt":"2019-10-09T19:02:38.624Z","sourceName":"financials_db505","description":"a
         dataset for testing"}'
     headers:
       Content-Length:
-      - '163'
+      - '229'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 04:01:00 GMT
+      - Thu, 10 Oct 2019 00:47:24 GMT
       Vary:
       - Accept-Encoding
     status:

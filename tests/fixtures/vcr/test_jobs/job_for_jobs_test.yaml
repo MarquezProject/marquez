@@ -1,21 +1,33 @@
 interactions:
 - request:
-    body: '{"inputDatasetUrns": ["input1a", "input2a"], "outputDatasetUrns": ["output1a",
-      "output2a"], "location": "some_other_location"}'
+    body: '{"inputs": ["input1a", "input2a"], "outputs": ["output1a", "output2a"],
+      "location": "https://github.com/wework/jobs/commit/124f", "type": "BATCH"}'
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      Content-Length: ['126']
-      Content-Type: [application/json]
-      User-Agent: [python-requests/2.20.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '146'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - marquez-python/0.5.3
     method: PUT
-    uri: http://localhost:8080/api/v1/namespaces/job_namespace/jobs/job_fixture
+    uri: http://localhost:5000/api/v1/namespaces/default/jobs/job_fixture
   response:
-    body: {string: '{"name":"job_fixture","createdAt":1556152622362,"inputDatasetUrns":["input1a","input2a"],"outputDatasetUrns":["output1a","output2a"],"location":"some_other_location","description":null}'}
+    body:
+      string: '{"type":"BATCH","name":"job_fixture","createdAt":"2019-10-14T20:42:58.288Z","updatedAt":"2019-10-14T20:42:58.306Z","inputs":[],"outputs":[],"location":"https://github.com/wework/jobs/commit/124f","description":null}'
     headers:
-      Content-Length: ['185']
-      Content-Type: [application/json]
-      Date: ['Thu, 25 Apr 2019 00:49:24 GMT']
-    status: {code: 201, message: Created}
+      Content-Length:
+      - '215'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 14 Oct 2019 20:42:58 GMT
+    status:
+      code: 200
+      message: OK
 version: 1

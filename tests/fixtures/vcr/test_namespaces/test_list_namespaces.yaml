@@ -2,24 +2,36 @@ interactions:
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.20.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces
+    uri: http://localhost:5000/api/v1/namespaces
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAALXR3QrCIBQH8FcRr7cx5z7Uu54jYth2KoPpUCti7N1zDUZE0C4KvDhyDp4ffwes
-        ZQeulw04LLbD84oF1q4+GFufzd5eQu3B+ZrgCDcWpId248NMlhIep3lMCCKVyJnIi4QwljEaBs1N
-        g50fmssIt+Aaq3qvjA4Nf1IOhSPRIkBhJZpWKX1M8Bh90KyVlElBC17yF4kzHXy1XMHekVbBsqje
-        JVNVc16tMPCQRZn9wTClsTTXZ8I5pRX7ze/sxgcXhfHoPAIAAA==
+        H4sIAAAAAAAAAI2Ry26DMBBFf2XkdUCQBwR2/YGusmpUoQEPxBXYyB5SRVH+vSatKEqlEsmLeVz5
+        nmtfhcaOXI8VOZEfr/dW5EJSjUPLYiUqS8gkX9hP11GcBXEUxOlhHeebfb7dhvsoefOyoZfPyMyn
+        Jvv67YHa6EtnBufnklxlVc/KaL85nAh+CKBpTYktTJhQGwsfpgTUErwnOmLoiHGsQRuGklqjG6Ub
+        YAMIgyMbuJ4qVSuSvxeF4raa8mpX+HuLaVkwOS7i//Nn+SYJ0120kH8um+f3nvf2T3w+KQf+4EPq
+        kcnHegQfqyLL0idgk93SZ81lc1hnvMkS7pnsBbTyuPNXfr99ASj8GHtmAgAA
     headers:
-      Content-Encoding: [gzip]
-      Content-Length: ['208']
-      Content-Type: [application/json]
-      Date: ['Mon, 15 Apr 2019 23:38:03 GMT']
-      Vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '273'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 17 Oct 2019 22:20:15 GMT
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 version: 1

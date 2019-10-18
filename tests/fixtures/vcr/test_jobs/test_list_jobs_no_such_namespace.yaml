@@ -2,38 +2,27 @@ interactions:
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.20.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/no_such_namespace_999/jobs
+    uri: http://localhost:5000/api/v1/namespaces/no_such_namespace_999/jobs
   response:
-    body: {string: '<html>
-
-        <head>
-
-        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-
-        <title>Error 404 Not Found</title>
-
-        </head>
-
-        <body><h2>HTTP ERROR 404</h2>
-
-        <p>Problem accessing /api/v1/namespaces/no_such_namespace_999/jobs/. Reason:
-
-        <pre>    Not Found</pre></p>
-
-        </body>
-
-        </html>
-
-'}
+    body:
+      string: '{"code":404,"message":"Namespace ''no_such_namespace_999'' not found."}'
     headers:
-      Cache-Control: ['must-revalidate,no-cache,no-store']
-      Content-Length: ['277']
-      Content-Type: [text/html;charset=iso-8859-1]
-      Date: ['Thu, 25 Apr 2019 00:49:24 GMT']
-    status: {code: 404, message: Not Found}
+      Content-Length:
+      - '69'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 14 Oct 2019 20:42:58 GMT
+    status:
+      code: 404
+      message: Not Found
 version: 1

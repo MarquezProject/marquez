@@ -9,19 +9,19 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/namespace_for_datasets_tests_3/datasets/not_a_valid_urn
+    uri: http://localhost:5000/api/v1/namespaces/namespace_for_tests_3/datasets/not_a_valid_urn
   response:
     body:
-      string: '{"code":404,"message":"HTTP 404 Not Found"}'
+      string: '{"code":404,"message":"Dataset ''not_a_valid_urn'' not found."}'
     headers:
       Content-Length:
-      - '43'
+      - '61'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 04:01:00 GMT
+      - Thu, 10 Oct 2019 00:47:24 GMT
     status:
       code: 404
       message: Not Found
@@ -35,19 +35,19 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/namespace_for_datasets_tests_3/datasets/%2A55%3B34%2F098%23%23%20%2A%21%21%20x%3B%3B%24
+    uri: http://localhost:5000/api/v1/namespaces/namespace_for_tests_3/datasets/%2A55%3B34%2F098%23%23%20%2A%21%21%20x%3B%3B%24
   response:
     body:
-      string: '{"code":404,"message":"HTTP 404 Not Found"}'
+      string: '{"code":404,"message":"Dataset ''*55;34/098## *!! x;;$'' not found."}'
     headers:
       Content-Length:
-      - '43'
+      - '67'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 04:01:00 GMT
+      - Thu, 10 Oct 2019 00:47:24 GMT
     status:
       code: 404
       message: Not Found

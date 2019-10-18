@@ -9,20 +9,20 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.21.0
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/default/datasets/urn%3Adataset%3Afinancials_db505%3Adataset_fixture_for_default_ns
+    uri: http://localhost:5000/api/v1/namespaces/default/datasets/dataset_fixture_for_default_ns
   response:
     body:
-      string: '{"name":"dataset_fixture_for_default_ns","createdAt":"2019-04-25T04:01:00.474822Z","urn":"urn:dataset:financials_db505:dataset_fixture_for_default_ns","description":"a
+      string: '{"type":"DB_TABLE","name":"dataset_fixture_for_default_ns","physicalName":"dataset_fixture_for_default_ns","createdAt":"2019-10-10T00:58:26.401Z","updatedAt":"2019-10-10T00:58:26.401Z","sourceName":"financials_db505","description":"a
         dataset for testing"}'
     headers:
       Content-Length:
-      - '189'
+      - '255'
       Content-Type:
       - application/json
       Date:
-      - Thu, 25 Apr 2019 04:01:00 GMT
+      - Thu, 10 Oct 2019 00:59:24 GMT
       Vary:
       - Accept-Encoding
     status:

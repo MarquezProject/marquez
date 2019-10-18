@@ -2,38 +2,27 @@ interactions:
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.20.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:8080/api/v1/namespaces/no_such_namespace123
+    uri: http://localhost:5000/api/v1/namespaces/no_such_namespace123
   response:
-    body: {string: '<html>
-
-        <head>
-
-        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-
-        <title>Error 404 Not Found</title>
-
-        </head>
-
-        <body><h2>HTTP ERROR 404</h2>
-
-        <p>Problem accessing /api/v1/namespaces/no_such_namespace123. Reason:
-
-        <pre>    Not Found</pre></p>
-
-        </body>
-
-        </html>
-
-'}
+    body:
+      string: '{"code":404,"message":"Namespace ''no_such_namespace123'' not found."}'
     headers:
-      Cache-Control: ['must-revalidate,no-cache,no-store']
-      Content-Length: ['270']
-      Content-Type: [text/html;charset=iso-8859-1]
-      Date: ['Tue, 16 Apr 2019 07:45:29 GMT']
-    status: {code: 404, message: Not Found}
+      Content-Length:
+      - '68'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 17 Oct 2019 22:20:15 GMT
+    status:
+      code: 404
+      message: Not Found
 version: 1
