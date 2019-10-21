@@ -54,7 +54,7 @@ import org.mockito.junit.MockitoRule;
 
 @Category(UnitTests.class)
 public class MarquezHttpTest {
-  private static final URL BASE_URL = Utils.toUrl("http://localhost:8080");
+  private static final URL BASE_URL = Utils.toUrl("http://localhost:8080/api/v1");
 
   private static final int HTTP_200 = 200;
   private static final int HTTP_500 = 500;
@@ -73,6 +73,18 @@ public class MarquezHttpTest {
   @Before
   public void setUp() {
     marquezHttp = new MarquezHttp(BASE_URL, httpClient);
+  }
+
+  @Test
+  public void testClient_preservesBaseURL() throws Exception {
+    MarquezHttp marquezHttp = new MarquezHttp(BASE_URL, httpClient);
+    String namespacesPath = "/namespaces/%s";
+    String namespaceName = "default";
+
+    URL expectedURL = new URL(marquezHttp.baseUrl + String.format(namespacesPath, namespaceName));
+    URL url = marquezHttp.url(namespacesPath, namespaceName);
+
+    assertThat(expectedURL).isEqualTo(url);
   }
 
   @Test
