@@ -172,13 +172,15 @@ class MarquezHttp {
 
   @Value
   static class HttpError {
-    @Getter int status;
+    @Getter int code;
     @Getter String message;
+    @Nullable String details;
 
     @JsonCreator
-    HttpError(final int status, final String message) {
-      this.status = status;
+    HttpError(final int status, final String message, final String details) {
+      this.code = status;
       this.message = message;
+      this.details = details;
     }
 
     static HttpError of(final HttpResponse response) throws IOException {

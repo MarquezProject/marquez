@@ -30,7 +30,7 @@ public final class MarquezHttpException extends MarquezClientException {
 
   /** Constructs a {@code MarquezHttpException} with the HTTP error {@code error}. */
   MarquezHttpException(final MarquezHttp.HttpError error) {
-    this.status = error.getStatus();
+    this.status = error.getCode();
     this.message = error.getMessage();
   }
 }
