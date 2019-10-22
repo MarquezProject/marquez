@@ -307,8 +307,7 @@ public class MarquezClient {
 
   @Value
   static class Version {
-    private static final String POM_PROPERTIES =
-        "/META-INF/maven/io.github.marquezproject/marquez-java/pom.properties";
+    private static final String CONFIG_PROPERTIES = "config.properties";
 
     private static final String VERSION_PROPERTY_NAME = "version";
     private static final String VERSION_UNKNOWN = "unknown";
@@ -322,13 +321,13 @@ public class MarquezClient {
     static Version get() {
       final Properties properties = new Properties();
       try (final InputStream stream =
-          MarquezClient.class.getClassLoader().getResourceAsStream(POM_PROPERTIES)) {
+          MarquezClient.class.getClassLoader().getResourceAsStream(CONFIG_PROPERTIES)) {
         if (stream != null) {
           properties.load(stream);
           return new Version(properties.getProperty(VERSION_PROPERTY_NAME, VERSION_UNKNOWN));
         }
       } catch (IOException e) {
-        log.warn("Failed to load properties file: {}", POM_PROPERTIES, e);
+        log.warn("Failed to load properties file: {}", CONFIG_PROPERTIES, e);
       }
       return NO_VERSION;
     }
