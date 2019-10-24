@@ -65,9 +65,6 @@ To ensure your pull request is accepted, follow these guidelines:
 
 # Branching
 
-* Choose _short_ and _descriptive_ branch names
-* Use dashes (`-`) to separate _words_ in branch names
-* Use _lowercase_ in branch names
 * Use a _group_ at the beginning of your branch names
 
   ```
@@ -85,6 +82,10 @@ To ensure your pull request is accepted, follow these guidelines:
   bug/my-bug-fix
   bug/my-other-bug-fix
   ```
+  
+* Choose _short_ and _descriptive_ branch names
+* Use dashes (`-`) to separate _words_ in branch names
+* Use _lowercase_ in branch names
 
 # [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
 
