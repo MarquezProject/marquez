@@ -64,7 +64,10 @@ To ensure your pull request is accepted, follow these guidelines:
 > **Note:** A pull request should generally contain only one commit (use `git commit --amend` and `git --force push` or [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) existing commits into one).
 
 # Branching
-  
+
+* Choose _short_ and _descriptive_ branch names
+* Use dashes (`-`) to separate _words_ in branch names
+* Use _lowercase_ in branch names
 * Use a _group_ at the beginning of your branch names
 
   ```
@@ -82,10 +85,6 @@ To ensure your pull request is accepted, follow these guidelines:
   bug/my-bug-fix
   bug/my-other-bug-fix
   ```
-
-* Choose _short_ and _descriptive_ branch names
-* Use dashes (`-`) to separate _words_ in branch names
-* Use _lowercase_ in branch names
 
 # [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
 
