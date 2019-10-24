@@ -185,9 +185,9 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings
   "runState": "NEW",
   "runArgs": {
     "email": "data@wework.com",
-    "emailOnFailure": false,
-    "emailOnRetry": true,
-    "retries": 1
+    "emailOnFailure": "false",
+    "emailOnRetry": "true",
+    "retries": "1"
   }
 }
 ```
@@ -212,9 +212,9 @@ $ curl -X POST http://localhost:5000/api/v1/jobs/runs/099a7574-e518-4e05-877a-6f
   "runState": "RUNNING",
   "runArgs": {
     "email": "data@wework.com",
-    "emailOnFailure": false,
-    "emailOnRetry": true,
-    "retries": 1
+    "emailOnFailure": "false",
+    "emailOnRetry": "true",
+    "retries": "1"
   }
 }
 ```
@@ -239,9 +239,9 @@ $ curl -X POST http://localhost:5000/api/v1/jobs/runs/099a7574-e518-4e05-877a-6f
   "runState": "COMPLETED",
   "runArgs": {
     "email": "data@wework.com",
-    "emailOnFailure": false,
-    "emailOnRetry": true,
-    "retries": 1
+    "emailOnFailure": "false",
+    "emailOnRetry": "true",
+    "retries": "1"
   }
 }
 ```
