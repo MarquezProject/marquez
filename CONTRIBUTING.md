@@ -44,7 +44,7 @@ $ ./gradlew spotlessApply
 
 1. [Fork](https://github.com/MarquezProject/marquez/fork) and clone the repository
 2. Make sure all tests pass locally: `./gradlew test`
-3. Create a new branch: `git checkout -b my-cool-new-branch`
+3. Create a new [branch](#branching): `git checkout -b feature/my-cool-new-feature`
 4. Make change on your cool new branch
 5. Write a test for your change
 6. Make sure `.java` files are formatted: `./gradlew spotlessJavaCheck`
@@ -60,6 +60,32 @@ To ensure your pull request is accepted, follow these guidelines:
 * [Keep diffs small](https://graysonkoonce.com/stacked-pull-requests-keeping-github-diffs-small) and self-contained
 * If your change fixes a bug, please [link the issue](https://help.github.com/articles/closing-issues-using-keywords) in your pull request description
 * Any changes to the API reference requires [regenerating](#docs) the static `openapi.html` file.
+
+> **Note:** A pull request should generally contain only one commit (use `git commit --amend` and `git --force push` or [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) existing commits into one).
+
+# Branching
+
+* Use a _group_ at the beginning of your branch names
+
+  ```
+  wip      Work on a feature is still in progress
+  feature  Add or expand a feature
+  bug      Fix a bug
+  ```
+  
+  _For example_:
+  
+  ```
+  wip/my-cool-new-wip-feature
+  feature/my-cool-new-feature
+  feature/my-other-cool-new-feature
+  bug/my-bug-fix
+  bug/my-other-bug-fix
+  ```
+  
+* Choose _short_ and _descriptive_ branch names
+* Use dashes (`-`) to separate _words_ in branch names
+* Use _lowercase_ in branch names
 
 # [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
 
