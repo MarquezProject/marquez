@@ -16,7 +16,6 @@ package marquez.db.mappers;
 
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
-import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidOrNull;
 
@@ -32,13 +31,12 @@ public final class NamespaceRowMapper implements RowMapper<NamespaceRow> {
   @Override
   public NamespaceRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    return NamespaceRow.builder()
-        .uuid(uuidOrNull(results, Columns.ROW_UUID))
-        .createdAt(timestampOrThrow(results, Columns.CREATED_AT))
-        .updatedAt(timestampOrNull(results, Columns.UPDATED_AT))
-        .name(stringOrThrow(results, Columns.NAME))
-        .description(stringOrNull(results, Columns.DESCRIPTION))
-        .currentOwnerName(stringOrNull(results, Columns.CURRENT_OWNER_NAME))
-        .build();
+    return new NamespaceRow(
+        uuidOrNull(results, Columns.ROW_UUID),
+        timestampOrThrow(results, Columns.CREATED_AT),
+        timestampOrThrow(results, Columns.UPDATED_AT),
+        stringOrThrow(results, Columns.NAME),
+        stringOrNull(results, Columns.DESCRIPTION),
+        stringOrThrow(results, Columns.CURRENT_OWNER_NAME));
   }
 }

@@ -17,25 +17,23 @@ package marquez.db.models;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import javax.annotation.Nullable;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.Value;
 
-@RequiredArgsConstructor
-@EqualsAndHashCode
-@ToString
-@Builder
-public final class NamespaceOwnershipRow {
-  @Getter @NonNull private final UUID uuid;
-  @Getter @NonNull private final Instant startedAt;
-  @Getter @NonNull private final UUID namespaceUuid;
-  @Getter @NonNull private final UUID ownerUuid;
-  private final Instant endedAt;
+@Value
+public class NamespaceOwnershipRow {
+  @NonNull UUID uuid;
+  @NonNull Instant startedAt;
+  @Nullable Instant endedAt;
+  @NonNull UUID namespaceUuid;
+  @NonNull UUID ownerUuid;
 
   public Optional<Instant> getEndedAt() {
     return Optional.ofNullable(endedAt);
+  }
+
+  public boolean hasOwnershipEnded() {
+    return (endedAt == null) ? false : endedAt.isAfter(startedAt);
   }
 }

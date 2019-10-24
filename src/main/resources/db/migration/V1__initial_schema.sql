@@ -1,93 +1,123 @@
+CREATE TABLE namespaces (
+  uuid               UUID PRIMARY KEY,
+  created_at         TIMESTAMP NOT NULL,
+  updated_at         TIMESTAMP NOT NULL,
+  name               VARCHAR(64) UNIQUE NOT NULL,
+  description        TEXT,
+  current_owner_name VARCHAR(64)
+);
+
 CREATE TABLE owners (
-  guid       UUID PRIMARY KEY,
-  name       VARCHAR(64) UNIQUE NOT NULL,
-  created_at TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP
+  uuid       UUID PRIMARY KEY,
+  created_at TIMESTAMP NOT NULL,
+  name       VARCHAR(64) UNIQUE NOT NULL
 );
 
-CREATE TABLE jobs (
-  guid              UUID PRIMARY KEY,
-  name              VARCHAR(64) UNIQUE NOT NULL,
-  created_at        TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
-  updated_at        TIMESTAMP with time zone,
-  current_version   INTEGER,
-  current_ownership INTEGER,
-  nominal_time      TIMESTAMP with time zone,
-  category          VARCHAR(64),
-  description       TEXT NOT NULL
+CREATE TABLE namespace_ownerships (
+  uuid           UUID PRIMARY KEY,
+  started_at     TIMESTAMP NOT NULL,
+  ended_at       TIMESTAMP,
+  namespace_uuid UUID REFERENCES namespaces(uuid),
+  owner_uuid     UUID REFERENCES owners(uuid),
+  UNIQUE (namespace_uuid, owner_uuid)
 );
 
-CREATE TABLE ownerships (
-  guid       UUID PRIMARY KEY,
-  started_at TIMESTAMP with time zone,
-  ended_at   TIMESTAMP with time zone,
-  job_guid   UUID REFERENCES jobs(guid),
-  owner_guid UUID REFERENCES owners(guid)
-);
-
-CREATE TABLE job_versions (
-  guid            UUID PRIMARY KEY,
-  created_at      TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
-  updated_at      TIMESTAMP with time zone,
-  input_dataset   VARCHAR(64) NOT NULL,
-  output_dataset  VARCHAR(64) NOT NULL,
-  job_guid        UUID REFERENCES jobs(guid),
-  git_repo_uri    VARCHAR(255),
-  git_sha         VARCHAR(255),
-  latest_run_guid UUID
-);
-
-CREATE TABLE job_runs (
-  guid                        UUID PRIMARY KEY,
-  created_at                  TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
-  job_version_guid            UUID REFERENCES job_versions(guid),
-  run_guid                    VARCHAR(255) UNIQUE NOT NULL,
-  started_at                  TIMESTAMP with time zone,
-  ended_at                    TIMESTAMP with time zone,
-  input_dataset_version_guid  UUID,
-  output_dataset_version_guid UUID,
-  latest_heartbeat            TIMESTAMP with time zone
-);
-
-CREATE TABLE job_run_states (
-  guid            UUID PRIMARY KEY,
-  transitioned_at TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
-  job_run_guid    UUID REFERENCES job_runs(guid),
-  state           INTEGER
+CREATE TABLE sources (
+  uuid            UUID PRIMARY KEY,
+  type            VARCHAR(64) NOT NULL,
+  created_at      TIMESTAMP NOT NULL,
+  updated_at      TIMESTAMP NOT NULL,
+  name            VARCHAR(64) UNIQUE NOT NULL,
+  connection_url  VARCHAR(255) NOT NULL,
+  description     TEXT,
+  UNIQUE (name, connection_url)
 );
 
 CREATE TABLE datasets (
-  guid            UUID PRIMARY KEY,
-  name            VARCHAR(64) UNIQUE NOT NULL,
-  created_at      TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
-  updated_at      TIMESTAMP with time zone,
-  type            INTEGER,
-  origin          INTEGER,
-  current_version INTEGER,
-  description     TEXT NOT NULL
+  uuid                 UUID PRIMARY KEY,
+  type                 VARCHAR(64) NOT NULL,
+  created_at           TIMESTAMP NOT NULL,
+  updated_at           TIMESTAMP NOT NULL,
+  namespace_uuid       UUID REFERENCES namespaces(uuid),
+  source_uuid          UUID REFERENCES sources(uuid),
+  name                 VARCHAR(255) NOT NULL,
+  physical_name        VARCHAR(255) NOT NULL,
+  description          TEXT,
+  current_version_uuid UUID,
+  UNIQUE (namespace_uuid, source_uuid, name, physical_name)
 );
 
-CREATE TABLE dbs (
-  guid           UUID PRIMARY KEY,
-  name           VARCHAR(64) UNIQUE NOT NULL,
-  created_at     TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
-  type           INTEGER,
-  connection_url VARCHAR(255),
-  description    TEXT NOT NULL
+CREATE TABLE jobs (
+  uuid                 UUID PRIMARY KEY,
+  type                 VARCHAR(64) NOT NULL,
+  created_at           TIMESTAMP NOT NULL,
+  updated_at           TIMESTAMP NOT NULL,
+  namespace_uuid       UUID REFERENCES namespaces(uuid),
+  name                 VARCHAR(255) UNIQUE NOT NULL,
+  description          TEXT,
+  current_version_uuid UUID,
+  UNIQUE (namespace_uuid, name)
 );
 
-CREATE TABLE db_table_versions (
-  guid          UUID PRIMARY KEY,
-  created_at    TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
-  dataset_guid  UUID REFERENCES datasets(guid),
-  db_guid       UUID REFERENCES dbs(guid),
-  description TEXT NOT NULL
+CREATE TABLE job_versions (
+  uuid            UUID PRIMARY KEY,
+  created_at      TIMESTAMP NOT NULL,
+  updated_at      TIMESTAMP NOT NULL,
+  job_uuid        UUID REFERENCES jobs(uuid),
+  version         UUID NOT NULL,
+  location        VARCHAR(255) NOT NULL,
+  latest_run_uuid UUID,
+  UNIQUE (job_uuid, version)
 );
 
-CREATE TABLE iceberg_table_versions (
-  guid                 UUID PRIMARY KEY,
-  created_at           TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
-  dataset_guid         UUID REFERENCES datasets(guid),
-  previous_snapshot_id BIGINT,
-  current_snapshot_id  BIGINT,
-  metadata_location    VARCHAR(255)
+CREATE TABLE job_versions_io_mapping (
+  job_version_uuid UUID REFERENCES job_versions(uuid),
+  dataset_uuid     UUID REFERENCES datasets(uuid),
+  io_type          VARCHAR(64) NOT NULL,
+  PRIMARY KEY (job_version_uuid, dataset_uuid, io_type) 
+);
+
+CREATE TABLE run_args (
+  uuid       UUID PRIMARY KEY,
+  created_at TIMESTAMP NOT NULL,
+  args       VARCHAR(255) NOT NULL,
+  checksum   VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE runs (
+  uuid                UUID PRIMARY KEY,
+  created_at          TIMESTAMP NOT NULL,
+  updated_at          TIMESTAMP NOT NULL,
+  job_version_uuid    UUID REFERENCES job_versions(uuid),
+  run_args_uuid       UUID REFERENCES run_args(uuid),
+  nominal_start_time  TIMESTAMP,
+  nominal_end_time    TIMESTAMP,
+  current_run_state   VARCHAR(64)
+);
+
+CREATE TABLE run_states (
+  uuid            UUID PRIMARY KEY,
+  transitioned_at TIMESTAMP NOT NULL,
+  run_uuid        UUID REFERENCES runs(uuid),
+  state           VARCHAR(64) NOT NULL
+);
+
+CREATE TABLE dataset_versions (
+  uuid         UUID PRIMARY KEY,
+  created_at   TIMESTAMP NOT NULL,
+  dataset_uuid UUID REFERENCES datasets(uuid),
+  version      UUID NOT NULL,
+  run_uuid     UUID,
+  UNIQUE (dataset_uuid, version)
+);
+
+CREATE TABLE stream_versions (
+  dataset_version_uuid UUID REFERENCES dataset_versions(uuid),
+  schema_location      VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE runs_input_mapping (
+  run_uuid             UUID REFERENCES runs(uuid),
+  dataset_version_uuid UUID REFERENCES dataset_versions(uuid),
+  PRIMARY KEY (run_uuid, dataset_version_uuid) 
 );

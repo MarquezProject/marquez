@@ -28,17 +28,20 @@ import lombok.ToString;
 public final class NamespaceResponse {
   @Getter private final String name;
   @Getter private final String createdAt;
-  @Getter private final String owner;
-  private final String description;
+  @Getter private final String updatedAt;
+  @Getter private final String ownerName;
+  @Nullable private final String description;
 
   public NamespaceResponse(
       @NonNull final String name,
       @NonNull final String createdAt,
-      @NonNull final String owner,
+      @NonNull final String updatedAt,
+      @NonNull final String ownerName,
       @Nullable final String description) {
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
-    this.owner = checkNotBlank(owner);
+    this.updatedAt = checkNotBlank(updatedAt);
+    this.ownerName = checkNotBlank(ownerName);
     this.description = description;
   }
 

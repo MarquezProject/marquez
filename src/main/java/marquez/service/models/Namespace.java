@@ -15,42 +15,22 @@
 package marquez.service.models;
 
 import java.time.Instant;
-import java.util.UUID;
-import lombok.Data;
-import marquez.common.models.Description;
+import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.NonNull;
+import lombok.Value;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
 
-@Data
+@Value
 public class Namespace {
+  @NonNull NamespaceName name;
+  @NonNull Instant createdAt;
+  @NonNull Instant updatedAt;
+  @NonNull OwnerName ownerName;
+  @Nullable String description;
 
-  private final UUID uuid;
-  private final String name;
-  private final String owner;
-  private final String description;
-  private final Instant createdAt;
-
-  public Namespace(UUID uuid, String name, String owner, String description) {
-    this.uuid = uuid;
-    this.name = name;
-    this.owner = owner;
-    this.description = description;
-    this.createdAt = null;
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
   }
-
-  public Namespace(UUID uuid, Instant createdAt, String name, String owner, String description) {
-    this.uuid = uuid;
-    this.createdAt = createdAt;
-    this.name = name;
-    this.owner = owner;
-    this.description = description;
-  }
-
-  public static final Namespace DEFAULT =
-      new Namespace(
-          null,
-          null,
-          NamespaceName.DEFAULT.getValue(),
-          OwnerName.ANONYMOUS.getValue(),
-          Description.NO_DESCRIPTION.getValue());
 }

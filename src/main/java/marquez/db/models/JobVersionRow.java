@@ -18,33 +18,23 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import javax.annotation.Nullable;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.Value;
 
-@RequiredArgsConstructor
-@EqualsAndHashCode
-@ToString
-@Builder
-public final class JobVersionRow {
-  @Getter @NonNull private final UUID uuid;
-  @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final UUID jobUuid;
-  @Getter @NonNull private final List<String> inputDatasetUrns;
-  @Getter @NonNull private final List<String> outputDatasetUrns;
-  @Getter @NonNull private final UUID version;
-  @Getter @NonNull private final String location;
-  private final Instant updatedAt;
-  private final UUID latestJobRunUuid;
+@Value
+public class JobVersionRow {
+  @NonNull UUID uuid;
+  @NonNull Instant createdAt;
+  @NonNull Instant updateAt;
+  @NonNull UUID jobUuid;
+  @NonNull List<UUID> inputs;
+  @NonNull List<UUID> outputs;
+  @NonNull String location;
+  @NonNull UUID version;
+  @Nullable UUID latestRunUuid;
 
-  public Optional<Instant> getUpdatedAt() {
-    return Optional.ofNullable(updatedAt);
-  }
-
-  public Optional<UUID> getLatestJobRunUuid() {
-    return Optional.ofNullable(latestJobRunUuid);
+  public Optional<UUID> getLatestRunUuid() {
+    return Optional.ofNullable(latestRunUuid);
   }
 }

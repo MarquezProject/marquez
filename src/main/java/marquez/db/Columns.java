@@ -24,52 +24,61 @@ import java.util.UUID;
 public final class Columns {
   private Columns() {}
 
-  // Common column names
-
+  /* COMMON ROW COLUMNS */
   public static final String ROW_UUID = "uuid";
   public static final String TYPE = "type";
   public static final String CREATED_AT = "created_at";
   public static final String UPDATED_AT = "updated_at";
   public static final String NAME = "name";
-  public static final String DESCRIPTION = "description";
-
-  // Namespace ownership column names
-
-  public static final String NAMESPACE_UUID = "namespace_uuid";
-  public static final String OWNER_UUID = "owner_uuid";
-  public static final String CURRENT_OWNER_NAME = "current_ownership";
-
-  // Job column names
-
-  public static final String JOB_UUID = "job_uuid";
-  public static final String JOB_VERSION_UUID = "job_version_uuid";
-  public static final String INPUT_DATASET_URNS = "input_dataset_urns";
-  public static final String OUTPUT_DATASET_URNS = "output_dataset_urns";
-  public static final String LOCATION = "uri";
   public static final String VERSION = "version";
+  public static final String DESCRIPTION = "description";
+  public static final String NAMESPACE_UUID = "namespace_uuid";
+  public static final String DATASET_UUID = "dataset_uuid";
+  public static final String DATASET_VERSION_UUID = "dataset_version_uuid";
+  public static final String JOB_VERSION_UUID = "job_version_uuid";
   public static final String CURRENT_VERSION_UUID = "current_version_uuid";
-  public static final String JOB_RUN_UUID = "job_run_uuid";
+
+  /* NAMESPACE ROW COLUMNS */
+  public static final String CURRENT_OWNER_NAME = "current_owner_name";
+
+  /* NAMESPACE OWNERSHIP ROW COLUMNS */
+  public static final String STARTED_AT = "started_at";
+  public static final String ENDED_AT = "ended_at";
+  public static final String OWNER_UUID = "owner_uuid";
+
+  /* SOURCE ROW COLUMNS */
+  public static final String CONNECTION_URL = "connection_url";
+
+  /* DATASET ROW COLUMNS */
+  public static final String SOURCE_UUID = "source_uuid";
+  public static final String SOURCE_NAME = "source_name";
+  public static final String PHYSICAL_NAME = "physical_name";
+
+  /* STREAM VERSION ROW COLUMNS */
+  public static final String INPUTS = "inputs";
+  public static final String OUTPUTS = "outputs";
+  public static final String SCHEMA_LOCATION = "schema_location";
+  public static final String IO_TYPE = "io_type";
+
+  /* JOB VERSION ROW COLUMNS */
+  public static final String JOB_UUID = "job_uuid";
+  public static final String LOCATION = "location";
+  public static final String LATEST_RUN_UUID = "latest_run_uuid";
+
+  /* RUN ROW COLUMNS */
+  public static final String RUN_ARGS_UUID = "run_args_uuid";
   public static final String NOMINAL_START_TIME = "nominal_start_time";
   public static final String NOMINAL_END_TIME = "nominal_end_time";
-  public static final String LATEST_JOB_RUN_UUID = "latest_run_uuid";
-  public static final String CURRENT_RUN_STATE = "current_state";
-  public static final String CHECKSUM = "hex_digest";
-  public static final String RUN_ARGS_CHECKSUM = "job_run_args_hex_digest";
-  public static final String RUN_ARGS = "args_json";
-  public static final String RUN_STATE = "state";
+  public static final String CURRENT_RUN_STATE = "current_run_state";
+
+  /* RUN ARGS ROW COLUMNS */
+  public static final String ARGS = "args";
+  public static final String CHECKSUM = "checksum";
+
+  /* RUN STATE ROW COLUMNS */
   public static final String TRANSITIONED_AT = "transitioned_at";
-
-  // Dataset column names
-
-  public static final String DATASET_UUID = "dataset_uuid";
-  public static final String URN = "urn";
-  public static final String DATASOURCE_UUID = "datasource_uuid";
-  public static final String DATASOURCE_URN = "datasource_urn";
-  public static final String CONNECTION_URL = "connection_url";
-  public static final String DB_TABLE_INFO_UUID = "db_table_info_uuid";
-  public static final String DB_NAME = "db";
-  public static final String DB_SCHEMA_NAME = "db_schema";
-  public static final String DB_TABLE_NAME = "db_table_name";
+  public static final String RUN_UUID = "run_uuid";
+  public static final String STATE = "state";
 
   public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {
@@ -117,7 +126,15 @@ public final class Columns {
     return results.getString(column);
   }
 
-  public static List<String> arrayOrThrow(final ResultSet results, final String column)
+  public static List<UUID> uuidArrayOrThrow(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
+    }
+    return Arrays.asList((UUID[]) results.getArray(column).getArray());
+  }
+
+  public static List<String> stringArrayOrThrow(final ResultSet results, final String column)
       throws SQLException {
     if (results.getObject(column) == null) {
       throw new IllegalArgumentException();

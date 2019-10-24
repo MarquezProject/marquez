@@ -14,23 +14,46 @@
 
 package marquez.service.models;
 
+import com.google.common.base.Joiner;
 import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 import marquez.common.models.DatasetName;
-import marquez.common.models.DatasourceUrn;
-import marquez.common.models.Description;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.SourceName;
 
-@Value
-@Builder
-public class DatasetMeta {
-  @NonNull DatasetName name;
-  @NonNull DatasourceUrn datasourceUrn;
-  @Nullable Description description;
+@EqualsAndHashCode
+@ToString
+public abstract class DatasetMeta {
+  static final Joiner VERSION_JOINER = Joiner.on(":");
 
-  public Optional<Description> getDescription() {
+  @Getter private final DatasetName physicalName;
+  @Getter private final SourceName sourceName;
+  @Nullable private final String description;
+  @Nullable private final UUID runId;
+
+  public DatasetMeta(
+      @NonNull final DatasetName physicalName,
+      @NonNull final SourceName sourceName,
+      @Nullable final String description,
+      @Nullable final UUID runId) {
+    this.physicalName = physicalName;
+    this.sourceName = sourceName;
+    this.description = description;
+    this.runId = runId;
+  }
+
+  public Optional<String> getDescription() {
     return Optional.ofNullable(description);
   }
+
+  public Optional<UUID> getRunId() {
+    return Optional.ofNullable(runId);
+  }
+
+  public abstract Optional<UUID> version(NamespaceName namespaceName, DatasetName name);
 }
