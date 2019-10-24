@@ -54,12 +54,13 @@ import org.mockito.junit.MockitoRule;
 
 @Category(UnitTests.class)
 public class MarquezHttpTest {
-  private static final URL BASE_URL = Utils.toUrl("http://localhost:8080/api/v1");
+  private static final String BASE_URL_STRING = "http://localhost:8080/api/v1";
+  private static final URL BASE_URL = Utils.toUrl(BASE_URL_STRING);
 
   private static final int HTTP_200 = 200;
   private static final int HTTP_500 = 500;
   private static final String HTTP_ERROR_AS_JSON =
-      "{\"status\":500, \"message\": \"internal server error\"}";
+      "{\"code\":500, \"message\": \"internal server error\"}";
   private static final byte[] HTTP_ERROR_AS_BYTES = HTTP_ERROR_AS_JSON.getBytes(UTF_8);
 
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
@@ -77,14 +78,13 @@ public class MarquezHttpTest {
 
   @Test
   public void testClient_preservesBaseURL() throws Exception {
-    MarquezHttp marquezHttp = new MarquezHttp(BASE_URL, httpClient);
-    String namespacesPath = "/namespaces/%s";
-    String namespaceName = "default";
+    final String pathTemplate = "/namespaces/%s";
+    final String pathArg = "default";
+    final String path = String.format(pathTemplate, pathArg);
 
-    URL expectedURL = new URL(marquezHttp.baseUrl + String.format(namespacesPath, namespaceName));
-    URL url = marquezHttp.url(namespacesPath, namespaceName);
-
-    assertThat(expectedURL).isEqualTo(url);
+    URL expected = new URL(BASE_URL_STRING + path);
+    URL actual = marquezHttp.url(path, pathArg);
+    assertThat(actual).isEqualTo(expected);
   }
 
   @Test

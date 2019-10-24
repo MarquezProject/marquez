@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -39,7 +38,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -140,12 +138,8 @@ class MarquezHttp {
   }
 
   URL url(String path, Map<String, Object> queryParams) {
-    final String basePath = this.baseUrl.getPath();
-
-    final List<String> pathSegments = URLEncodedUtils.parsePathSegments(basePath + path);
-
     try {
-      final URIBuilder builder = new URIBuilder(baseUrl.toString()).setPathSegments(pathSegments);
+      final URIBuilder builder = new URIBuilder(baseUrl.toURI()).setPath(baseUrl.getPath() + path);
       queryParams.forEach((name, value) -> builder.addParameter(name, String.valueOf(value)));
       return builder.build().toURL();
     } catch (URISyntaxException | MalformedURLException e) {
@@ -172,13 +166,16 @@ class MarquezHttp {
 
   @Value
   static class HttpError {
-    @Getter int code;
-    @Getter String message;
-    @Nullable String details;
+    @Getter @Nullable Integer code;
+    @Getter @Nullable String message;
+    @Getter @Nullable String details;
 
     @JsonCreator
-    HttpError(final int status, final String message, final String details) {
-      this.code = status;
+    HttpError(
+        @Nullable final Integer code,
+        @Nullable final String message,
+        @Nullable final String details) {
+      this.code = code;
       this.message = message;
       this.details = details;
     }
