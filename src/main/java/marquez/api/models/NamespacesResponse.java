@@ -14,11 +14,14 @@
 
 package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
 public class NamespacesResponse {
-  @NonNull List<NamespaceResponse> namespaces;
+  @NonNull
+  @JsonProperty("namespaces")
+  List<NamespaceResponse> responses;
 }

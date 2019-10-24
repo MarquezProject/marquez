@@ -16,9 +16,9 @@ package marquez.db.mappers;
 
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
-import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidOrNull;
+import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,16 +32,16 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
   @Override
   public DatasetRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    return DatasetRow.builder()
-        .uuid(uuidOrNull(results, Columns.ROW_UUID))
-        .createdAt(timestampOrThrow(results, Columns.CREATED_AT))
-        .updatedAt(timestampOrNull(results, Columns.UPDATED_AT))
-        .namespaceUuid(uuidOrNull(results, Columns.NAMESPACE_UUID))
-        .datasourceUuid(uuidOrNull(results, Columns.DATASOURCE_UUID))
-        .name(stringOrThrow(results, Columns.NAME))
-        .urn(stringOrThrow(results, Columns.URN))
-        .description(stringOrNull(results, Columns.DESCRIPTION))
-        .currentVersionUuid(uuidOrNull(results, Columns.CURRENT_VERSION_UUID))
-        .build();
+    return new DatasetRow(
+        uuidOrThrow(results, Columns.ROW_UUID),
+        stringOrThrow(results, Columns.TYPE),
+        timestampOrThrow(results, Columns.CREATED_AT),
+        timestampOrThrow(results, Columns.UPDATED_AT),
+        uuidOrThrow(results, Columns.NAMESPACE_UUID),
+        uuidOrThrow(results, Columns.SOURCE_UUID),
+        stringOrThrow(results, Columns.NAME),
+        stringOrThrow(results, Columns.PHYSICAL_NAME),
+        stringOrNull(results, Columns.DESCRIPTION),
+        uuidOrNull(results, Columns.CURRENT_VERSION_UUID));
   }
 }

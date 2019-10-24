@@ -14,59 +14,55 @@
 
 package marquez.db;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import marquez.db.mappers.JobRowMapper;
-import marquez.service.models.Job;
-import marquez.service.models.JobVersion;
-import org.jdbi.v3.sqlobject.CreateSqlObject;
+import marquez.db.models.JobRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(JobRowMapper.class)
 public interface JobDao {
-  @CreateSqlObject
-  JobVersionDao createJobVersionDao();
+  @SqlUpdate(
+      "INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, description, current_version_uuid) "
+          + "VALUES (:uuid, :type, :createdAt, :updatedAt, :namespaceUuid, :name, :description, :currentVersionUuid)")
+  void insert(@BindBean JobRow row);
+
+  @SqlQuery(
+      "SELECT EXISTS (SELECT 1 FROM jobs AS j "
+          + "INNER JOIN namespaces AS n "
+          + "  ON (n.name = :namespaceName AND "
+          + "      j.namespace_uuid = n.uuid AND "
+          + "      j.name = :jobName))")
+  boolean exists(String namespaceName, String jobName);
 
   @SqlUpdate(
-      "INSERT INTO jobs (uuid, name, namespace_uuid, description, input_dataset_urns, output_dataset_urns, type) "
-          + " VALUES (:uuid, :name, :namespaceUuid, :description, :inputDatasetUrns, :outputDatasetUrns, :type)")
-  public void insert(@BindBean Job job);
-
-  @SqlUpdate("UPDATE jobs SET current_version_uuid = :currentVersionUuid WHERE uuid = :jobUuid")
-  public void setCurrentVersionUuid(UUID jobUuid, UUID currentVersionUuid);
-
-  @Transaction
-  default void insertJobAndVersion(final Job job, final JobVersion jobVersion) {
-    insert(job);
-    createJobVersionDao().insert(jobVersion);
-    setCurrentVersionUuid(job.getUuid(), jobVersion.getUuid());
-  }
+      "UPDATE jobs "
+          + "SET updated_at = :updatedAt, "
+          + "    current_version_uuid = :currentVersionUuid "
+          + "WHERE uuid = :rowUuid")
+  void update(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
   @SqlQuery(
-      "SELECT j.*, jv.uri FROM jobs j INNER JOIN job_versions jv ON (j.uuid = :uuid AND j.current_version_uuid = jv.uuid)")
-  Job findByID(UUID uuid);
+      "SELECT j.* FROM jobs AS j "
+          + "INNER JOIN namespaces AS n "
+          + "  ON (n.name = :namespaceName AND "
+          + "      j.namespace_uuid = n.uuid AND "
+          + "      j.name = :jobName)")
+  Optional<JobRow> findBy(String namespaceName, String jobName);
 
   @SqlQuery(
-      "SELECT j.*, jv.uri "
-          + "FROM jobs j "
-          + "INNER JOIN job_versions jv "
-          + "    ON (j.current_version_uuid = jv.uuid) "
-          + "INNER JOIN namespaces n "
-          + "    ON (j.namespace_uuid = n.uuid AND n.name = :namespace AND j.name = :name)")
-  Job findByName(String namespace, String name);
-
-  @SqlQuery(
-      "SELECT j.*, jv.uri "
-          + "FROM jobs j "
-          + "INNER JOIN job_versions jv "
-          + " ON (j.current_version_uuid = jv.uuid) "
-          + "INNER JOIN namespaces n "
-          + " ON (j.namespace_uuid = n.uuid AND n.name = :namespaceName) "
-          + " ORDER BY j.name "
+      "SELECT j.* FROM jobs AS j "
+          + "INNER JOIN namespaces AS n "
+          + "  ON (n.name = :namespaceName AND j.namespace_uuid = n.uuid) "
+          + "ORDER BY j.name "
           + "LIMIT :limit OFFSET :offset")
-  List<Job> findAllInNamespace(String namespaceName, Integer limit, Integer offset);
+  List<JobRow> findAll(String namespaceName, int limit, int offset);
+
+  @SqlQuery("SELECT COUNT(*) FROM jobs")
+  int count();
 }

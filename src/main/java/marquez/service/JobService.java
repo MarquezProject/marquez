@@ -14,252 +14,276 @@
 
 package marquez.service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
-import java.util.Collections;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.models.DatasetName;
+import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.db.DatasetDao;
 import marquez.db.JobDao;
-import marquez.db.JobRunArgsDao;
-import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
+import marquez.db.NamespaceDao;
+import marquez.db.RunArgsDao;
+import marquez.db.RunDao;
+import marquez.db.RunStateDao;
+import marquez.db.models.ExtendedRunRow;
+import marquez.db.models.JobRow;
+import marquez.db.models.JobVersionRow;
+import marquez.db.models.NamespaceRow;
+import marquez.db.models.RunArgsRow;
+import marquez.db.models.RunRow;
+import marquez.db.models.RunStateRow;
 import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.mappers.Mapper;
 import marquez.service.models.Job;
-import marquez.service.models.JobRun;
-import marquez.service.models.JobRunState;
-import marquez.service.models.JobVersion;
-import marquez.service.models.RunArgs;
+import marquez.service.models.JobMeta;
+import marquez.service.models.Run;
+import marquez.service.models.RunMeta;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class JobService {
+  private final NamespaceDao namespaceDao;
+  private final DatasetDao datasetDao;
   private final JobDao jobDao;
-  private final JobVersionDao jobVersionDao;
-  private final JobRunDao jobRunDao;
-  private final JobRunArgsDao jobRunArgsDao;
+  private final JobVersionDao versionDao;
+  private final RunDao runDao;
+  private final RunArgsDao runArgsDao;
+  private final RunStateDao runStateDao;
 
   public JobService(
-      JobDao jobDao,
-      JobVersionDao jobVersionDao,
-      JobRunDao jobRunDao,
-      JobRunArgsDao jobRunArgsDao) {
+      @NonNull final NamespaceDao namespaceDao,
+      @NonNull final DatasetDao datasetDao,
+      @NonNull final JobDao jobDao,
+      @NonNull final JobVersionDao versionDao,
+      @NonNull final RunDao runDao,
+      @NonNull final RunArgsDao runArgsDao,
+      @NonNull final RunStateDao runStateDao) {
+    this.namespaceDao = namespaceDao;
+    this.datasetDao = datasetDao;
     this.jobDao = jobDao;
-    this.jobVersionDao = jobVersionDao;
-    this.jobRunDao = jobRunDao;
-    this.jobRunArgsDao = jobRunArgsDao;
+    this.versionDao = versionDao;
+    this.runDao = runDao;
+    this.runArgsDao = runArgsDao;
+    this.runStateDao = runStateDao;
   }
 
-  public Optional<Job> getJob(String namespace, String jobName) throws MarquezServiceException {
+  public Job createOrUpdate(
+      @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull JobMeta meta)
+      throws MarquezServiceException {
     try {
-      return Optional.ofNullable(jobDao.findByName(namespace, jobName));
-    } catch (UnableToExecuteStatementException e) {
-      String err = "failed to get a job";
-      log.error(err, e);
-      throw new MarquezServiceException();
-    }
-  }
+      if (!exists(namespaceName, jobName)) {
+        final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
+        final JobRow newJobRow = Mapper.toJobRow(namespaceRow.getUuid(), jobName, meta);
 
-  public Job createJob(String namespace, Job job) throws MarquezServiceException {
-    try {
-      Job existingJob = this.jobDao.findByName(namespace, job.getName());
-      if (existingJob == null) {
-        Job newJob =
-            new Job(
-                UUID.randomUUID(),
-                job.getType(),
-                job.getName(),
-                job.getLocation(),
-                job.getNamespaceUuid(),
-                job.getDescription(),
-                job.getInputDatasetUrns(),
-                job.getOutputDatasetUrns());
-        jobDao.insertJobAndVersion(newJob, JobService.createJobVersion(newJob));
-        return jobDao.findByID(newJob.getUuid());
-      } else {
-        Job existingJobWithNewUri =
-            new Job(
-                existingJob.getUuid(),
-                existingJob.getType(),
-                existingJob.getName(),
-                job.getLocation(),
-                existingJob.getNamespaceUuid(),
-                existingJob.getDescription(),
-                existingJob.getInputDatasetUrns(),
-                existingJob.getOutputDatasetUrns());
-        UUID versionID = JobService.computeVersion(existingJobWithNewUri);
-        JobVersion existingJobVersion = jobVersionDao.findByVersion(versionID);
-        if (existingJobVersion == null) {
-          jobVersionDao.insert(JobService.createJobVersion(existingJobWithNewUri));
-          return jobDao.findByID(existingJob.getUuid());
-        }
-        return existingJob;
+        jobDao.insert(newJobRow);
       }
-    } catch (UnableToExecuteStatementException e) {
-      String err = "failed to create new job";
-      log.error(err, e);
-      throw new MarquezServiceException();
-    }
-  }
 
-  public List<Job> getAllJobsInNamespace(
-      String namespace, @NonNull Integer limit, @NonNull Integer offset)
-      throws MarquezServiceException {
-    try {
-      return jobDao.findAllInNamespace(namespace, limit, offset);
-    } catch (UnableToExecuteStatementException e) {
-      log.error("caught exception while fetching jobs in namespace ", e);
-      throw new MarquezServiceException();
-    }
-  }
+      final UUID version = meta.version(namespaceName, jobName);
+      if (!versionDao.exists(version)) {
+        final JobRow jobRow = jobDao.findBy(namespaceName.getValue(), jobName.getValue()).get();
+        final List<UUID> inputs =
+            datasetDao
+                .findAllInNameList(
+                    meta.getInputs().stream()
+                        .map(input -> input.getValue())
+                        .collect(toImmutableList()))
+                .stream()
+                .map(row -> row.getUuid())
+                .collect(toImmutableList());
+        final List<UUID> outputs =
+            datasetDao
+                .findAllInNameList(
+                    meta.getOutputs().stream()
+                        .map(input -> input.getValue())
+                        .collect(toImmutableList()))
+                .stream()
+                .map(row -> row.getUuid())
+                .collect(toImmutableList());
+        final JobVersionRow newVersionRow =
+            Mapper.toJobVersionRow(jobRow.getUuid(), inputs, outputs, meta.getLocation(), version);
 
-  public List<JobVersion> getAllVersionsOfJob(String namespace, String jobName)
-      throws MarquezServiceException {
-    try {
-      return jobVersionDao.find(namespace, jobName);
-    } catch (UnableToExecuteStatementException e) {
-      log.error("caught exception while fetching versions of job", e);
-      throw new MarquezServiceException();
-    }
-  }
-
-  public Optional<JobVersion> getLatestVersionOfJob(String namespace, String jobName)
-      throws MarquezServiceException {
-    try {
-      return Optional.ofNullable(jobVersionDao.findLatest(namespace, jobName));
-    } catch (UnableToExecuteStatementException e) {
-      String err = "error fetching latest version of job";
-      log.error(err, e);
-      throw new MarquezServiceException();
-    }
-  }
-
-  public JobRun updateJobRunState(UUID jobRunID, JobRunState.State state)
-      throws MarquezServiceException {
-    try {
-      this.jobRunDao.updateState(jobRunID, JobRunState.State.toInt(state));
-      return jobRunDao.findJobRunById(jobRunID);
-    } catch (UnableToExecuteStatementException e) {
-      String err = "error updating job run state";
-      log.error(err, e);
-      throw new MarquezServiceException();
-    }
-  }
-
-  public Optional<JobRun> getJobRun(UUID jobRunID) throws MarquezServiceException {
-    try {
-      return Optional.ofNullable(jobRunDao.findJobRunById(jobRunID));
-    } catch (UnableToExecuteStatementException e) {
-      String err = "error fetching job run";
-      log.error(err, e);
-      throw new MarquezServiceException();
-    }
-  }
-
-  public List<JobRun> getAllRunsOfJob(
-      NamespaceName namespace, String jobName, @NonNull Integer limit, @NonNull Integer offset)
-      throws MarquezServiceException {
-    try {
-      final Optional<Job> job =
-          Optional.ofNullable(jobDao.findByName(namespace.getValue(), jobName));
-      if (job.isPresent()) {
-        return jobRunDao.findAllByJobUuid(job.get().getUuid(), limit, offset);
+        versionDao.insertAndUpdate(newVersionRow);
       }
-      return Collections.emptyList();
+
+      return get(namespaceName, jobName).get();
     } catch (UnableToExecuteStatementException e) {
+      log.error(
+          "Failed to create or update job {} for namespace {} with meta: {}",
+          jobName.getValue(),
+          namespaceName.getValue(),
+          meta,
+          e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public boolean exists(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)
+      throws MarquezServiceException {
+    try {
+      return jobDao.exists(namespaceName.getValue(), jobName.getValue());
+    } catch (UnableToExecuteStatementException e) {
+      log.error(
+          "Failed to check job {} for namespace {}.",
+          jobName.getValue(),
+          namespaceName.getValue(),
+          e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public Optional<Job> get(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)
+      throws MarquezServiceException {
+    try {
+      Optional<JobRow> jobRow = jobDao.findBy(namespaceName.getValue(), jobName.getValue());
+      if (jobRow.isPresent()) {
+        return Optional.of(toJob(jobRow.get()));
+      }
+      return Optional.empty();
+    } catch (UnableToExecuteStatementException e) {
+      log.error(
+          "Failed to get job {} for namespace {}.",
+          jobName.getValue(),
+          namespaceName.getValue(),
+          e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public List<Job> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
+      throws MarquezServiceException {
+    checkArgument(limit >= 0, "limit must be >= 0");
+    checkArgument(offset >= 0, "offset must be >= 0");
+    try {
+      final List<JobRow> jobRows = jobDao.findAll(namespaceName.getValue(), limit, offset);
+
+      final ImmutableList.Builder<Job> builder = ImmutableList.builder();
+      jobRows.forEach(
+          jobRow -> {
+            builder.add(toJob(jobRow));
+          });
+
+      return builder.build();
+    } catch (UnableToExecuteStatementException e) {
+      log.error(
+          "Failed to get jobs for namespace {}:  limit={} and offset={}",
+          namespaceName.getValue(),
+          limit,
+          offset,
+          e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  private Job toJob(JobRow jobRow) {
+    final UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
+    final JobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
+
+    final List<DatasetName> inputs =
+        datasetDao.findAllInUuidList(versionRow.getInputs()).stream()
+            .map(row -> DatasetName.of(row.getName()))
+            .collect(toImmutableList());
+
+    final List<DatasetName> outputs =
+        datasetDao.findAllInUuidList(versionRow.getOutputs()).stream()
+            .map(row -> DatasetName.of(row.getName()))
+            .collect(toImmutableList());
+
+    return Mapper.toJob(jobRow, inputs, outputs, versionRow.getLocation());
+  }
+
+  public Run createRun(
+      @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta)
+      throws MarquezServiceException {
+    try {
+      final String checksum = Run.checksumFor(runMeta.getArgs());
+      if (!runArgsDao.exists(checksum)) {
+        final RunArgsRow newRunArgsRow = Mapper.toRunArgsRow(runMeta.getArgs(), checksum);
+
+        runArgsDao.insert(newRunArgsRow);
+      }
+
+      final JobVersionRow versionRow =
+          versionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
+      final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
+      final RunRow newRunRow = Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), runMeta);
+
+      runDao.insertAndUpdate(newRunRow);
+      markRunAs(newRunRow.getUuid(), Run.State.NEW);
+
+      return getRun(newRunRow.getUuid()).get();
+    } catch (UnableToExecuteStatementException e) {
+      log.error(
+          "Failed to create run for job {} for namespace {} with meta: ",
+          jobName.getValue(),
+          namespaceName.getValue(),
+          runMeta,
+          e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public boolean runExists(@NonNull UUID runId) throws MarquezServiceException {
+    try {
+      return runDao.exists(runId);
+    } catch (UnableToExecuteStatementException e) {
+      log.error("Failed to check job run {}.", runId, e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public Optional<Run> getRun(UUID runId) throws MarquezServiceException {
+    try {
+      return runDao.findBy(runId).map(Mapper::toRun);
+    } catch (UnableToExecuteStatementException e) {
+      log.error("Failed to get job run {}.", runId, e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public List<Run> getAllRunsFor(
+      @NonNull NamespaceName namespaceName, @NonNull JobName jobName, int limit, int offset)
+      throws MarquezServiceException {
+    checkArgument(limit >= 0, "limit must be >= 0");
+    checkArgument(offset >= 0, "offset must be >= 0");
+    try {
+      final Optional<JobVersionRow> versionRow =
+          versionDao.findLatest(namespaceName.getValue(), jobName.getValue());
+      if (versionRow.isPresent()) {
+        final List<ExtendedRunRow> runRows =
+            runDao.findAll(versionRow.get().getUuid(), limit, offset);
+        final List<Run> runs = Mapper.toRun(runRows);
+        return ImmutableList.copyOf(runs);
+      }
+      return ImmutableList.of();
+    } catch (UnableToExecuteStatementException e) {
+      log.error(
+          "Failed to get runs for job {} for namespace {}: limit={} and offset={}",
+          jobName.getValue(),
+          namespaceName.getValue(),
+          limit,
+          offset,
+          e);
       log.error(e.getMessage(), e);
       throw new MarquezServiceException();
     }
   }
 
-  public JobRun createJobRun(
-      String namespaceName,
-      String jobName,
-      String runArgsJson,
-      Instant nominalStartTime,
-      Instant nominalEndTime)
+  public void markRunAs(@NonNull UUID runId, @NonNull Run.State runState)
       throws MarquezServiceException {
     try {
-      String runArgsDigest = null;
-      RunArgs runArgs = null;
-      if (null == jobDao.findByName(namespaceName, jobName)) {
-        String err =
-            String.format(
-                "unable to find job <ns='%s', job name='%s'> to create job run",
-                namespaceName, jobName);
-        log.error(err);
-        throw new MarquezServiceException();
-      }
-      Optional<JobVersion> latestJobVersion = getLatestVersionOfJob(namespaceName, jobName);
-      if (!latestJobVersion.isPresent()) {
-        String err =
-            String.format(
-                "unable to find latest job version for <ns='%s', job name='%s'> to create job run",
-                namespaceName, jobName);
-        log.error(err);
-        throw new MarquezServiceException();
-      }
-      if (runArgsJson != null) {
-        runArgsDigest = computeRunArgsDigest(runArgsJson);
-        runArgs = new RunArgs(runArgsDigest, runArgsJson, null);
-      }
-      JobRun jobRun =
-          new JobRun(
-              UUID.randomUUID(),
-              JobRunState.State.toInt(JobRunState.State.NEW),
-              latestJobVersion.get().getUuid(),
-              runArgsDigest,
-              runArgsJson,
-              nominalStartTime,
-              nominalEndTime,
-              null);
-      if (runArgsJson == null || jobRunArgsDao.digestExists(runArgsDigest)) {
-        jobRunDao.insert(jobRun);
-      } else {
-        jobRunDao.insertJobRunAndArgs(jobRun, runArgs);
-      }
-      return jobRun;
-    } catch (UnableToExecuteStatementException | NoSuchAlgorithmException e) {
-      String err = "error creating job run";
-      log.error(err, e);
+      final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
+      runStateDao.insertAndUpdate(newRunStateRow);
+    } catch (UnableToExecuteStatementException e) {
+      log.error("Failed to mark job run {} as {}.", runId, runState, e);
       throw new MarquezServiceException();
     }
-  }
-
-  private static JobVersion createJobVersion(Job job) {
-    return new JobVersion(
-        UUID.randomUUID(),
-        job.getUuid(),
-        job.getLocation(),
-        JobService.computeVersion(job),
-        null,
-        null,
-        null);
-  }
-
-  protected static UUID computeVersion(Job job) {
-    return UUID.nameUUIDFromBytes(
-        String.format("%s:%s", job.getUuid(), job.getLocation()).getBytes());
-  }
-
-  protected String computeRunArgsDigest(String runArgsJson) throws NoSuchAlgorithmException {
-    MessageDigest digest = MessageDigest.getInstance("SHA-256");
-    byte[] hash = digest.digest(runArgsJson.getBytes(StandardCharsets.UTF_8));
-    return bytesToHex(hash);
-  }
-
-  protected String bytesToHex(byte[] hash) {
-    StringBuffer hexString = new StringBuffer();
-    for (int i = 0; i < hash.length; i++) {
-      String hex = Integer.toHexString(0xff & hash[i]);
-      if (hex.length() == 1) hexString.append('0');
-      hexString.append(hex);
-    }
-    return hexString.toString();
   }
 }

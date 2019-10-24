@@ -17,27 +17,26 @@ package marquez.db.models;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import javax.annotation.Nullable;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.Value;
 
-@RequiredArgsConstructor
-@EqualsAndHashCode
-@ToString
-@Builder
-public final class JobRow {
-  @Getter @NonNull private final UUID uuid;
-  @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final Instant updatedAt;
-  @Getter @NonNull private final UUID namespaceUuid;
-  @Getter @NonNull private final String name;
-  @Getter @NonNull private final UUID currentVersionUuid;
-  private final String description;
+@Value
+public class JobRow {
+  @NonNull UUID uuid;
+  @NonNull String type;
+  @NonNull Instant createdAt;
+  @NonNull Instant updatedAt;
+  @NonNull UUID namespaceUuid;
+  @NonNull String name;
+  @Nullable String description;
+  @Nullable UUID currentVersionUuid;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<UUID> getCurrentVersionUuid() {
+    return Optional.ofNullable(currentVersionUuid);
   }
 }
