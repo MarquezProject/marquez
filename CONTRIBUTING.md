@@ -110,3 +110,4 @@ Then browse to: http://localhost:8080
 * [How to Contribute to Open Source](https://opensource.guide/how-to-contribute)
 * [Using the Fork-and-Branch Git Workflow](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow)
 * [Keep a Changelog](https://keepachangelog.com)
+* [Code Review Developer Guide](https://google.github.io/eng-practices/review)
