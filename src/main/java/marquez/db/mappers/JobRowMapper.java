@@ -14,34 +14,32 @@
 
 package marquez.db.mappers;
 
-import static marquez.db.Columns.arrayOrThrow;
 import static marquez.db.Columns.stringOrNull;
+import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidOrNull;
+import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
 import lombok.NonNull;
-import marquez.common.models.JobType;
 import marquez.db.Columns;
-import marquez.service.models.Job;
+import marquez.db.models.JobRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public final class JobRowMapper implements RowMapper<Job> {
+public final class JobRowMapper implements RowMapper<JobRow> {
   @Override
-  public Job map(@NonNull ResultSet results, @NonNull StatementContext context)
+  public JobRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    return new Job(
-        results.getObject(Columns.ROW_UUID, UUID.class),
-        JobType.valueOf(results.getString(Columns.TYPE)),
-        results.getString(Columns.NAME),
-        results.getString(Columns.LOCATION),
-        results.getObject(Columns.NAMESPACE_UUID, UUID.class),
-        stringOrNull(results, Columns.DESCRIPTION),
-        arrayOrThrow(results, Columns.INPUT_DATASET_URNS),
-        arrayOrThrow(results, Columns.OUTPUT_DATASET_URNS),
+    return new JobRow(
+        uuidOrThrow(results, Columns.ROW_UUID),
+        stringOrThrow(results, Columns.TYPE),
         timestampOrThrow(results, Columns.CREATED_AT),
-        timestampOrThrow(results, Columns.UPDATED_AT));
+        timestampOrThrow(results, Columns.UPDATED_AT),
+        uuidOrThrow(results, Columns.NAMESPACE_UUID),
+        stringOrThrow(results, Columns.NAME),
+        stringOrNull(results, Columns.DESCRIPTION),
+        uuidOrNull(results, Columns.CURRENT_VERSION_UUID));
   }
 }

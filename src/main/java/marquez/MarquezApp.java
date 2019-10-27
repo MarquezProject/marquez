@@ -26,22 +26,26 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.DatasetResource;
+import marquez.api.JobResource;
+import marquez.api.NamespaceResource;
+import marquez.api.SourceResource;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
-import marquez.api.resources.DatasetResource;
-import marquez.api.resources.DatasourceResource;
-import marquez.api.resources.JobResource;
-import marquez.api.resources.NamespaceResource;
 import marquez.db.DatasetDao;
-import marquez.db.DatasourceDao;
+import marquez.db.DatasetVersionDao;
 import marquez.db.JobDao;
-import marquez.db.JobRunArgsDao;
-import marquez.db.JobRunDao;
 import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
+import marquez.db.NamespaceOwnershipDao;
+import marquez.db.OwnerDao;
+import marquez.db.RunArgsDao;
+import marquez.db.RunDao;
+import marquez.db.RunStateDao;
+import marquez.db.SourceDao;
 import marquez.service.DatasetService;
-import marquez.service.DatasourceService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.SourceService;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
@@ -49,7 +53,7 @@ import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
 @Slf4j
-public class MarquezApp extends Application<MarquezConfig> {
+public final class MarquezApp extends Application<MarquezConfig> {
   private static final String APP_NAME = "MarquezApp";
   private static final String POSTGRES_DB = "postgresql";
   private static final boolean ERROR_ON_UNDEFINED = false;
@@ -98,7 +102,7 @@ public class MarquezApp extends Application<MarquezConfig> {
     flyway.setDataSource(db.getUrl(), db.getUser(), db.getPassword());
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts
     // requiring we handle the throwable and apply a repair on the database to fix any
-    // issues before terminating.
+    // issues before app termination.
     try {
       log.info("Migrating database...");
       flyway.migrate();
@@ -130,23 +134,30 @@ public class MarquezApp extends Application<MarquezConfig> {
     jdbi.setSqlLogger(new InstrumentedSqlLogger(env.metrics()));
 
     final NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
+    final OwnerDao ownerDao = jdbi.onDemand(OwnerDao.class);
+    final NamespaceOwnershipDao namespaceOwnershipDao = jdbi.onDemand(NamespaceOwnershipDao.class);
+    final SourceDao sourceDao = jdbi.onDemand(SourceDao.class);
+    final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
+    final DatasetVersionDao datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
     final JobDao jobDao = jdbi.onDemand(JobDao.class);
     final JobVersionDao jobVersionDao = jdbi.onDemand(JobVersionDao.class);
-    final JobRunDao jobRunDao = jdbi.onDemand(JobRunDao.class);
-    final JobRunArgsDao jobRunArgsDao = jdbi.onDemand(JobRunArgsDao.class);
-    final DatasourceDao datasourceDao = jdbi.onDemand(DatasourceDao.class);
-    final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
+    final RunDao runDao = jdbi.onDemand(RunDao.class);
+    final RunArgsDao runArgsDao = jdbi.onDemand(RunArgsDao.class);
+    final RunStateDao runStateDao = jdbi.onDemand(RunStateDao.class);
 
-    final NamespaceService namespaceService = new NamespaceService(namespaceDao);
-    final JobService jobService = new JobService(jobDao, jobVersionDao, jobRunDao, jobRunArgsDao);
-    final DatasourceService datasourceService = new DatasourceService(datasourceDao);
+    final NamespaceService namespaceService =
+        new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
+    final SourceService sourceService = new SourceService(sourceDao);
     final DatasetService datasetService =
-        new DatasetService(namespaceDao, datasourceDao, datasetDao);
+        new DatasetService(namespaceDao, sourceDao, datasetDao, datasetVersionDao);
+    final JobService jobService =
+        new JobService(
+            namespaceDao, datasetDao, jobDao, jobVersionDao, runDao, runArgsDao, runStateDao);
 
     env.jersey().register(new NamespaceResource(namespaceService));
+    env.jersey().register(new SourceResource(sourceService));
+    env.jersey().register(new DatasetResource(namespaceService, datasetService, jobService));
     env.jersey().register(new JobResource(namespaceService, jobService));
-    env.jersey().register(new DatasourceResource(datasourceService));
-    env.jersey().register(new DatasetResource(namespaceService, datasetService));
 
     env.jersey().register(new MarquezServiceExceptionMapper());
   }

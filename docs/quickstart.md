@@ -47,7 +47,7 @@ Before we can begin recording metadata, we must first create a _namespace_. A `n
 $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
   -H 'Content-Type: application/json' \
   -d '{
-        "owner": "analytics",
+        "ownerName": "analytics",
         "description": "Contains datasets such as room bookings for each office."
       }'
 ```
@@ -57,25 +57,26 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
 ```bash
 {
   "name": "wedata",
-  "createdAt": "2019-06-08T19:11:59.430162Z",
-  "owner": "analytics",
+  "createdAt": "2019-06-08T19:11:59.430Z",
+  "updatedAt": "2019-06-08T19:11:59.430Z",
+  "ownerName": "analytics",
   "description": "Contains datasets such as room bookings for each office."
 }
 ```
 
 > **Note:** Marquez provides a `default` namespace to record metadata, but we encourage you to create your own.
 
-#### STEP 2: CREATE A DATASOURCE
+#### STEP 2: CREATE A SOURCE
 
-Each dataset must be associated with a _datasource_. A `datasource` is the physical location of a dataset, such as a table in a database, or a file on cloud storage. A datasource enables the logical grouping and mapping of physical datasets to their physical source.
+Each dataset must be associated with a _source_. A `source` is the physical location of a dataset, such as a table in a database, or a file on cloud storage. A source enables the logical grouping and mapping of physical datasets to their physical source.
 
 ##### REQUEST
 
 ```bash
-$ curl -X POST http://localhost:5000/api/v1/datasources \
+$ curl -X PUT http://localhost:5000/api/v1/sources/analytics_db \
   -H 'Content-Type: application/json' \
   -d '{
-        "name": "analytics_db",
+        "type": "POSTGRESQL",
         "connectionUrl": "jdbc:postgresql://localhost:5431/analytics"
       }'  
 ```
@@ -84,27 +85,28 @@ $ curl -X POST http://localhost:5000/api/v1/datasources \
 
 ```bash
 {
+  "type": "POSTGRESQL",
   "name": "analytics_db",
-  "createdAt": "2019-06-08T19:13:00.749356Z",
-  "urn": "urn:datasource:postgresql:analytics_db",
-  "connectionUrl": "jdbc:postgresql://localhost:5431/analytics"
+  "createdAt": "2019-06-08T19:13:00.749Z",
+  "updatedAt": "2019-06-08T19:13:00.749Z",
+  "connectionUrl": "jdbc:postgresql://localhost:5431/analytics",
+  "description": null
 }
 ```
 
-When creating a datasource, the response includes a URN, which we can use to associate datasets to the datasource.
-
 #### STEP 3: ADD DATASET TO NAMESPACE
 
-Next, we need to create a dataset and associate it with an existing datasource:
+Next, we need to create a dataset and associate it with an existing source:
 
 ##### REQUEST
 
 ```bash
-$ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/datasets \
+$ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/public.room_bookings \
   -H 'Content-Type: application/json' \
   -d '{ 
-        "name": "public.room_bookings",
-        "datasourceUrn": "urn:datasource:postgresql:analytics_db",
+        "type": "DB_TABLE",
+        "physicalName": "wedata.room_bookings",
+        "sourceName": "analytics_db",
         "description": "All global room bookings for each office."
       }'
 ```
@@ -113,10 +115,12 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/datasets \
 
 ```bash
 {
-  "name": "public.room_bookings",
-  "createdAt": "2019-06-08T19:13:34.507414Z",
-  "urn": "urn:dataset:analytics_db:public.room_bookings",
-  "datasourceUrn": "urn:datasource:postgresql:analytics_db",
+  "type": "DB_TABLE",
+  "name": "wedata.room_bookings",
+  "physicalName": "wedata.room_bookings",
+  "createdAt": "2019-06-08T19:13:34.507Z",
+  "updatedAt": "2019-06-08T19:13:34.507Z",
+  "sourceName": "analytics_db",
   "description": "All global room bookings for each office."
 }
 ```
@@ -129,10 +133,11 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/datasets \
 $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_7_days \
   -H 'Content-Type: application/json' \
   -d '{
-        "inputDatasetUrns": ["urn:dataset:analytics_db:public.room_bookings"],
-        "outputDatasetUrns": [],
+        "type": "BATCH",
+        "inputs": ["wedata.room_bookings"],
+        "outputs": [],
         "location": "https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
-        "description": "Determine weekly room booking occupancy patterns."
+        "description": "Weekly email of room bookings occupancy patterns."
       }'
 ```
 
@@ -140,19 +145,18 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_
 
 ```bash
 {
+  "type": "BATCH",
   "name": "room_bookings_7_days",
-  "createdAt": "2019-06-08T19:13:58.434995Z",
-  "updatedAt": "2019-06-08T19:13:58.434995Z",
-  "inputDatasetUrns": [
-    "urn:dataset:analytics_db:public.room_bookings"
-  ],
-  "outputDatasetUrns": [],
+  "createdAt": "2019-06-08T19:13:58.434Z",
+  "updatedAt": "2019-06-08T19:13:58.434Z",
+  "inputs": ["wedata.room_bookings"],
+  "outputs": [],
   "location": "https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
-  "description": "Determine weekly room booking occupancy patterns."
+  "description": "Weekly email of room bookings occupancy patterns."
 }
 ```
 
-#### STEP 5: CREATE A JOB RUN
+#### STEP 5: CREATE A RUN
 
 ##### REQUEST
 
@@ -160,7 +164,12 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_
 $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_7_days/runs \
   -H 'Content-Type: application/json' \
   -d '{
-        "runArgs": "--email=wedata@wework.com"
+        "runArgs": {
+          "email": "data@wework.com",
+          "emailOnFailure": false,
+          "emailOnRetry": true,
+          "retries": 1
+        }
       }'
 ```
 
@@ -168,22 +177,71 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings
 
 ```bash
 {
-  "runId": "0fddd72a-a04f-463e-a0c6-fb5e5ff82fcb",
+  "runId": "099a7574-e518-4e05-877a-6f2749e92791",
+  "createdAt": "2019-06-08T19:14:30.679Z",
+  "updatedAt": "2019-06-08T19:14:30.694Z",
   "nominalStartTime": null,
   "nominalEndTime": null,
-  "runArgs": "--email=wedata@wework.com",
-  "runState": "NEW"
+  "runState": "NEW",
+  "runArgs": {
+    "email": "data@wework.com",
+    "emailOnFailure": "false",
+    "emailOnRetry": "true",
+    "retries": "1"
+  }
 }
 ```
 
 #### STEP 6: RECORD A RUN
 
+##### REQUEST
+
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/jobs/runs/0fddd72a-a04f-463e-a0c6-fb5e5ff82fcb/run
+$ curl -X POST http://localhost:5000/api/v1/jobs/runs/099a7574-e518-4e05-877a-6f2749e92791/start
+```
+
+##### RESPONSE
+
+```bash
+{
+  "runId": "099a7574-e518-4e05-877a-6f2749e92791",
+  "createdAt": "2019-06-08T19:14:30.679Z",
+  "updatedAt": "2019-06-08T19:24:23.443Z",
+  "nominalStartTime": null,
+  "nominalEndTime": null,
+  "runState": "RUNNING",
+  "runArgs": {
+    "email": "data@wework.com",
+    "emailOnFailure": "false",
+    "emailOnRetry": "true",
+    "retries": "1"
+  }
+}
 ```
 
 #### STEP 7: RECORD A COMPLETE RUN
 
+##### REQUEST
+
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/jobs/runs/0fddd72a-a04f-463e-a0c6-fb5e5ff82fcb/complete
+$ curl -X POST http://localhost:5000/api/v1/jobs/runs/099a7574-e518-4e05-877a-6f2749e92791/complete
+```
+
+##### RESPONSE
+
+```bash
+{
+  "runId": "099a7574-e518-4e05-877a-6f2749e92791",
+  "createdAt": "2019-06-08T19:14:30.679Z",
+  "updatedAt": "2019-06-08T19:26:31.492Z",
+  "nominalStartTime": null,
+  "nominalEndTime": null,
+  "runState": "COMPLETED",
+  "runArgs": {
+    "email": "data@wework.com",
+    "emailOnFailure": "false",
+    "emailOnRetry": "true",
+    "retries": "1"
+  }
+}
 ```

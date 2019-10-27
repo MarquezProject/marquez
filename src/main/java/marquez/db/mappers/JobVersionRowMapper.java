@@ -14,29 +14,33 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidArrayOrThrow;
 import static marquez.db.Columns.uuidOrNull;
+import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
-import marquez.service.models.JobVersion;
+import marquez.db.models.JobVersionRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public final class JobVersionRowMapper implements RowMapper<JobVersion> {
+public final class JobVersionRowMapper implements RowMapper<JobVersionRow> {
   @Override
-  public JobVersion map(@NonNull ResultSet results, @NonNull StatementContext context)
+  public JobVersionRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    return new JobVersion(
-        results.getObject(Columns.ROW_UUID, UUID.class),
-        results.getObject(Columns.JOB_UUID, UUID.class),
-        results.getString(Columns.LOCATION),
-        results.getObject(Columns.VERSION, UUID.class),
-        uuidOrNull(results, Columns.LATEST_JOB_RUN_UUID),
+    return new JobVersionRow(
+        uuidOrThrow(results, Columns.ROW_UUID),
         timestampOrThrow(results, Columns.CREATED_AT),
-        timestampOrThrow(results, Columns.UPDATED_AT));
+        timestampOrThrow(results, Columns.UPDATED_AT),
+        uuidOrThrow(results, Columns.JOB_UUID),
+        uuidArrayOrThrow(results, Columns.INPUTS),
+        uuidArrayOrThrow(results, Columns.OUTPUTS),
+        stringOrThrow(results, Columns.LOCATION),
+        uuidOrThrow(results, Columns.VERSION),
+        uuidOrNull(results, Columns.LATEST_RUN_UUID));
   }
 }

@@ -14,11 +14,14 @@
 
 package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
 public class DatasetsResponse {
-  @NonNull List<DatasetResponse> datasets;
+  @NonNull
+  @JsonProperty("datasets")
+  List<DatasetResponse> responses;
 }

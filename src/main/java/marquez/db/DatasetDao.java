@@ -14,79 +14,76 @@
 
 package marquez.db;
 
+import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
+
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.models.DatasetUrn;
-import marquez.common.models.NamespaceName;
-import marquez.db.mappers.DatasetRowExtendedMapper;
 import marquez.db.mappers.DatasetRowMapper;
+import marquez.db.mappers.ExtendedDatasetRowMapper;
 import marquez.db.models.DatasetRow;
-import marquez.db.models.DatasetRowExtended;
-import org.jdbi.v3.sqlobject.CreateSqlObject;
+import marquez.db.models.ExtendedDatasetRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 public interface DatasetDao {
-  @CreateSqlObject
-  DatasourceDao createDatasourceDao();
-
   @SqlUpdate(
-      "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, urn, description, name) "
-          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name)")
-  @RegisterRowMapper(DatasetRowMapper.class)
-  void insert(@BindBean DatasetRow datasetRow);
+      "INSERT INTO datasets (uuid, type, created_at, updated_at, namespace_uuid, source_uuid, name, physical_name, description, current_version_uuid) "
+          + "VALUES (:uuid, :type, :createdAt, :updatedAt, :namespaceUuid, :sourceUuid, :name, :physicalName, :description, :currentVersionUuid)")
+  void insert(@BindBean DatasetRow row);
 
-  @SqlQuery(
-      "INSERT INTO datasets (uuid, namespace_uuid, datasource_uuid, urn, description, name) "
-          + "VALUES (:uuid, :namespaceUuid, :datasourceUuid, :urn, :description, :name) "
-          + "RETURNING *")
-  @RegisterRowMapper(DatasetRowMapper.class)
-  Optional<DatasetRow> insertAndGet(@BindBean DatasetRow datasetRow);
-
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM datasets WHERE urn = :value)")
-  boolean exists(@BindBean DatasetUrn urn);
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM datasets WHERE name = :name)")
+  boolean exists(String name);
 
   @SqlUpdate(
       "UPDATE datasets "
-          + "SET updated_at = NOW(), "
+          + "SET updated_at = :updatedAt, "
           + "    current_version_uuid = :currentVersionUuid "
-          + "WHERE uuid = :uuid")
-  void updateCurrentVersionUuid(UUID uuid, UUID currentVersionUuid);
+          + "WHERE uuid = :rowUuid")
+  void update(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
   @SqlQuery(
-      "SELECT d.*, ds.urn AS datasource_urn "
+      "SELECT d.*, s.name AS source_name "
           + "FROM datasets AS d "
-          + "INNER JOIN datasources AS ds "
-          + "    ON (ds.uuid = d.datasource_uuid) "
-          + "WHERE d.uuid = :uuid")
-  @RegisterRowMapper(DatasetRowExtendedMapper.class)
-  Optional<DatasetRowExtended> findBy(UUID uuid);
+          + "INNER JOIN sources AS s "
+          + "  ON (s.uuid = d.source_uuid) "
+          + "WHERE d.uuid = :rowUuid")
+  @RegisterRowMapper(ExtendedDatasetRowMapper.class)
+  Optional<ExtendedDatasetRow> findBy(UUID rowUuid);
 
   @SqlQuery(
-      "SELECT d.*, ds.urn AS datasource_urn "
+      "SELECT d.*, s.name AS source_name "
           + "FROM datasets AS d "
-          + "INNER JOIN datasources AS ds "
-          + "    ON (ds.uuid = d.datasource_uuid) "
-          + "WHERE d.urn = :value")
-  @RegisterRowMapper(DatasetRowExtendedMapper.class)
-  Optional<DatasetRowExtended> findBy(@BindBean DatasetUrn urn);
+          + "INNER JOIN sources AS s "
+          + "  ON (s.uuid = d.source_uuid) "
+          + "WHERE d.name = :name")
+  @RegisterRowMapper(ExtendedDatasetRowMapper.class)
+  Optional<ExtendedDatasetRow> findBy(String name);
+
+  @SqlQuery("SELECT * FROM datasets WHERE uuid IN (<rowUuids>)")
+  @RegisterRowMapper(DatasetRowMapper.class)
+  List<DatasetRow> findAllInUuidList(@BindList(onEmpty = NULL_STRING) List<UUID> rowUuids);
+
+  @SqlQuery("SELECT * FROM datasets WHERE name IN (<names>)")
+  @RegisterRowMapper(DatasetRowMapper.class)
+  List<DatasetRow> findAllInNameList(@BindList(onEmpty = NULL_STRING) List<String> names);
 
   @SqlQuery(
-      "SELECT d.*, ds.urn AS datasource_urn "
+      "SELECT d.*, s.name AS source_name "
           + "FROM datasets AS d "
-          + "INNER JOIN namespaces AS ns "
-          + "    ON (ns.uuid = d.namespace_uuid AND ns.name = :value) "
-          + "INNER JOIN datasources AS ds "
-          + "    ON (ds.uuid = d.datasource_uuid)"
+          + "INNER JOIN namespaces AS n "
+          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
+          + "INNER JOIN sources AS s "
+          + "  ON (s.uuid = d.source_uuid)"
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
-  @RegisterRowMapper(DatasetRowExtendedMapper.class)
-  List<DatasetRowExtended> findAll(
-      @BindBean NamespaceName namespaceName, Integer limit, Integer offset);
+  @RegisterRowMapper(ExtendedDatasetRowMapper.class)
+  List<ExtendedDatasetRow> findAll(String namespaceName, int limit, int offset);
 
   @SqlQuery("SELECT COUNT(*) FROM datasets")
-  Integer count();
+  int count();
 }

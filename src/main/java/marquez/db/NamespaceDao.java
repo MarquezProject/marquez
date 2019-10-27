@@ -14,47 +14,69 @@
 
 package marquez.db;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.models.NamespaceName;
+import javax.annotation.Nullable;
 import marquez.db.mappers.NamespaceRowMapper;
+import marquez.db.models.NamespaceOwnershipRow;
 import marquez.db.models.NamespaceRow;
+import marquez.db.models.OwnerRow;
+import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(NamespaceRowMapper.class)
 public interface NamespaceDao {
+  @CreateSqlObject
+  OwnerDao createOwnerDao();
+
+  @CreateSqlObject
+  NamespaceOwnershipDao createNamespaceOwnershipDao();
+
+  @Transaction
+  default void insertWith(NamespaceRow namespaceRow, NamespaceOwnershipRow ownershipRow) {
+    insertWith(namespaceRow, null, ownershipRow);
+  }
+
+  @Transaction
+  default void insertWith(
+      NamespaceRow namespaceRow, @Nullable OwnerRow ownerRow, NamespaceOwnershipRow ownershipRow) {
+    insert(namespaceRow);
+    if (ownerRow != null) {
+      createOwnerDao().insertAndUpdateWith(ownerRow, namespaceRow.getUuid());
+    }
+    createNamespaceOwnershipDao().insert(ownershipRow);
+  }
+
   @SqlUpdate(
-      "INSERT INTO namespaces (uuid, name, description, current_ownership) "
-          + "VALUES (:uuid, :name, :description, :currentOwnerName) "
-          + "ON CONFLICT (name) DO NOTHING")
-  void insert(@BindBean NamespaceRow namespaceRow);
+      "INSERT INTO namespaces (uuid, created_at, updated_at, name, description, current_owner_name) "
+          + "VALUES (:uuid, :createdAt, :updatedAt, :name, :description, :currentOwnerName)")
+  void insert(@BindBean NamespaceRow row);
 
-  @SqlQuery(
-      "INSERT INTO namespaces (uuid, name, description, current_ownership) "
-          + "VALUES (:uuid, :name, :description, :currentOwnerName) "
-          + "ON CONFLICT (name) DO UPDATE "
-          + "SET updated_at = NOW(), "
-          + "    current_ownership = :currentOwnerName, "
-          + "    description = :description "
-          + "RETURNING *")
-  Optional<NamespaceRow> insertAndGet(@BindBean NamespaceRow namespaceRow);
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM namespaces WHERE name = :name)")
+  boolean exists(String name);
 
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM namespaces WHERE name = :value)")
-  boolean exists(@BindBean NamespaceName namespaceName);
+  @SqlUpdate(
+      "UPDATE namespaces "
+          + "SET updated_at = :updatedAt, "
+          + "    current_owner_name = :currentOwnerName "
+          + "WHERE uuid = :rowUuid")
+  void update(UUID rowUuid, Instant updatedAt, String currentOwnerName);
 
-  @SqlQuery("SELECT * FROM namespaces WHERE uuid = :uuid")
-  Optional<NamespaceRow> findBy(UUID uuid);
+  @SqlQuery("SELECT * FROM namespaces WHERE uuid = :rowUuid")
+  Optional<NamespaceRow> findBy(UUID rowUuid);
 
-  @SqlQuery("SELECT * FROM namespaces WHERE name = :value")
-  Optional<NamespaceRow> findBy(@BindBean NamespaceName namespaceName);
+  @SqlQuery("SELECT * FROM namespaces WHERE name = :name")
+  Optional<NamespaceRow> findBy(String name);
 
   @SqlQuery("SELECT * FROM namespaces ORDER BY name LIMIT :limit OFFSET :offset")
-  List<NamespaceRow> findAll(Integer limit, Integer offset);
+  List<NamespaceRow> findAll(int limit, int offset);
 
   @SqlQuery("SELECT COUNT(*) FROM namespaces")
-  Integer count();
+  int count();
 }

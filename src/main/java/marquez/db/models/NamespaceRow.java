@@ -15,17 +15,22 @@
 package marquez.db.models;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
-import lombok.Builder;
-import lombok.Data;
+import javax.annotation.Nullable;
+import lombok.NonNull;
+import lombok.Value;
 
-@Data
-@Builder
-public final class NamespaceRow {
-  private UUID uuid;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private String name;
-  private String description;
-  private String currentOwnerName;
+@Value
+public class NamespaceRow {
+  @NonNull UUID uuid;
+  @NonNull Instant createdAt;
+  @NonNull Instant updatedAt;
+  @NonNull String name;
+  @Nullable String description;
+  @NonNull String currentOwnerName;
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
+  }
 }
