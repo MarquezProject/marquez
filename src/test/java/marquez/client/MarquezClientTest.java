@@ -21,7 +21,6 @@ import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newDatasetName;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
-import static marquez.client.models.ModelGenerator.newHttpPath;
 import static marquez.client.models.ModelGenerator.newInputs;
 import static marquez.client.models.ModelGenerator.newJobName;
 import static marquez.client.models.ModelGenerator.newJobType;
@@ -50,8 +49,6 @@ import java.util.Map;
 import marquez.client.models.Dataset;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
-import marquez.client.models.HttpEndpoint;
-import marquez.client.models.HttpEndpointMeta;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobType;
@@ -124,20 +121,6 @@ public class MarquezClientTest {
           STREAM_SOURCE_NAME,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION);
-
-  // HTTP ENDPOINT DATASET
-  private static final String HTTP_ENDPOINT_NAME = newDatasetName();
-  private static final String HTTP_ENDPOINT_PHYSICAL_NAME = newHttpPath();
-  private static final String HTTP_ENDPOINT_SOURCE_NAME = newSourceName();
-  private static final String HTTP_ENDPOINT_DESCRIPTION = newDescription();
-  private static final HttpEndpoint HTTP_ENDPOINT =
-      new HttpEndpoint(
-          HTTP_ENDPOINT_NAME,
-          HTTP_ENDPOINT_PHYSICAL_NAME,
-          CREATED_AT,
-          UPDATED_AT,
-          HTTP_ENDPOINT_SOURCE_NAME,
-          HTTP_ENDPOINT_DESCRIPTION);
 
   // JOB
   private static final String JOB_NAME = newJobName();
@@ -360,42 +343,6 @@ public class MarquezClientTest {
 
     final Dataset dataset = client.getDataset(STREAM_NAME);
     assertThat(dataset).isEqualTo(STREAM);
-  }
-
-  @Test
-  public void testCreateHttpEndpoint() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, HTTP_ENDPOINT_NAME);
-    final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, HTTP_ENDPOINT_NAME)).thenReturn(url);
-
-    final HttpEndpointMeta meta =
-        HttpEndpointMeta.builder()
-            .physicalName(HTTP_ENDPOINT_PHYSICAL_NAME)
-            .sourceName(HTTP_ENDPOINT_SOURCE_NAME)
-            .description(HTTP_ENDPOINT_DESCRIPTION)
-            .build();
-    final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String httpEndpointAsJson = JsonGenerator.newJsonFor(HTTP_ENDPOINT);
-    when(http.put(url, metaAsJson)).thenReturn(httpEndpointAsJson);
-
-    final Dataset dataset = client.createDataset(HTTP_ENDPOINT_NAME, meta);
-    assertThat(dataset).isInstanceOf(HttpEndpoint.class);
-    assertThat(dataset).isEqualTo(HTTP_ENDPOINT);
-  }
-
-  @Test
-  public void testGetHttpEndpoint() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, HTTP_ENDPOINT_NAME);
-    final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, HTTP_ENDPOINT_NAME)).thenReturn(url);
-
-    final String httpEndpointAsJson = JsonGenerator.newJsonFor(HTTP_ENDPOINT);
-    when(http.get(url)).thenReturn(httpEndpointAsJson);
-
-    final Dataset dataset = client.getDataset(HTTP_ENDPOINT_NAME);
-    assertThat(dataset).isEqualTo(HTTP_ENDPOINT);
   }
 
   @Test

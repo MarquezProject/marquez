@@ -34,8 +34,7 @@ import marquez.client.Utils;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = DbTable.class, name = "DB_TABLE"),
-  @JsonSubTypes.Type(value = Stream.class, name = "STREAM"),
-  @JsonSubTypes.Type(value = HttpEndpoint.class, name = "HTTP_ENDPOINT")
+  @JsonSubTypes.Type(value = Stream.class, name = "STREAM")
 })
 public abstract class Dataset {
   @Getter @NonNull private final String name;

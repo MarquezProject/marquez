@@ -106,20 +106,6 @@ public final class ModelGenerator {
         newDescription());
   }
 
-  public static HttpEndpointMeta newHttpEndpointMeta() {
-    return HttpEndpointMeta.builder()
-        .physicalName(newHttpPath())
-        .sourceName(newSourceName())
-        .description(newDescription())
-        .build();
-  }
-
-  public static HttpEndpoint newHttpEndpoint() {
-    final Instant now = newTimestamp();
-    return new HttpEndpoint(
-        newDatasetName(), newHttpPath(), now, now, newSourceName(), newDescription());
-  }
-
   public static JobMeta newJobMeta() {
     return JobMeta.builder()
         .type(newJobType())

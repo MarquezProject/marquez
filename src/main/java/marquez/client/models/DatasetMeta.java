@@ -31,8 +31,7 @@ import lombok.ToString;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = DbTableMeta.class, name = "DB_TABLE"),
-  @JsonSubTypes.Type(value = StreamMeta.class, name = "STREAM"),
-  @JsonSubTypes.Type(value = HttpEndpointMeta.class, name = "HTTP_ENDPOINT")
+  @JsonSubTypes.Type(value = StreamMeta.class, name = "STREAM")
 })
 public abstract class DatasetMeta {
   @Getter @NonNull private final String physicalName;
