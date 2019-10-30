@@ -14,11 +14,17 @@
 
 package marquez;
 
+import java.net.URI;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public class MarquezDb extends PostgreSQLContainer<MarquezDb> {
   private static final String POSTGRES_9_6 = "postgres:9.6";
+  private static final int JDBC = 5;
+
   private static MarquezDb db;
+
+  private String host;
+  private int port;
 
   private MarquezDb() {
     super(POSTGRES_9_6);
@@ -31,13 +37,21 @@ public class MarquezDb extends PostgreSQLContainer<MarquezDb> {
     return db;
   }
 
+  public String getHost() {
+    return host;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
   @Override
   public void start() {
     super.start();
 
-    System.setProperty("DB_URL", db.getJdbcUrl());
-    System.setProperty("DB_USERNAME", db.getUsername());
-    System.setProperty("DB_PASSWORD", db.getPassword());
+    final URI jdbcUri = URI.create(db.getJdbcUrl().substring(JDBC));
+    host = jdbcUri.getHost();
+    port = jdbcUri.getPort();
   }
 
   @Override
