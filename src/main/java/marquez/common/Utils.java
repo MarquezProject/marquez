@@ -63,7 +63,7 @@ public final class Utils {
     }
   }
 
-  public static String checksumFor(@NonNull final Map<String, String> value) {
-    return Hashing.sha256().hashString(KV_JOINER.join(value), UTF_8).toString();
+  public static String checksumFor(@NonNull final Map<String, String> kvMap) {
+    return Hashing.sha256().hashString(KV_JOINER.join(kvMap), UTF_8).toString();
   }
 }
