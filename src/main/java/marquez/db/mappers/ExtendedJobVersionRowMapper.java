@@ -24,23 +24,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import lombok.NonNull;
 import marquez.db.Columns;
-import marquez.db.models.JobVersionRow;
+import marquez.db.models.ExtendedJobVersionRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public final class JobVersionRowMapper implements RowMapper<JobVersionRow> {
+public final class ExtendedJobVersionRowMapper implements RowMapper<ExtendedJobVersionRow> {
   @Override
-  public JobVersionRow map(@NonNull ResultSet results, @NonNull StatementContext context)
+  public ExtendedJobVersionRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    return new JobVersionRow(
+    return new ExtendedJobVersionRow(
         uuidOrThrow(results, Columns.ROW_UUID),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         uuidOrThrow(results, Columns.JOB_UUID),
+        uuidOrThrow(results, Columns.JOB_CONTEXT_UUID),
         uuidArrayOrThrow(results, Columns.INPUTS),
         uuidArrayOrThrow(results, Columns.OUTPUTS),
         stringOrThrow(results, Columns.LOCATION),
         uuidOrThrow(results, Columns.VERSION),
-        uuidOrNull(results, Columns.LATEST_RUN_UUID));
+        uuidOrNull(results, Columns.LATEST_RUN_UUID),
+        stringOrThrow(results, Columns.CONTEXT));
   }
 }

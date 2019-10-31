@@ -37,6 +37,7 @@ public final class Columns {
   public static final String DATASET_VERSION_UUID = "dataset_version_uuid";
   public static final String JOB_VERSION_UUID = "job_version_uuid";
   public static final String CURRENT_VERSION_UUID = "current_version_uuid";
+  public static final String CHECKSUM = "checksum";
 
   /* NAMESPACE ROW COLUMNS */
   public static final String CURRENT_OWNER_NAME = "current_owner_name";
@@ -62,8 +63,12 @@ public final class Columns {
 
   /* JOB VERSION ROW COLUMNS */
   public static final String JOB_UUID = "job_uuid";
+  public static final String JOB_CONTEXT_UUID = "job_context_uuid";
   public static final String LOCATION = "location";
   public static final String LATEST_RUN_UUID = "latest_run_uuid";
+
+  /* JOB CONTEXT ROW COLUMNS */
+  public static final String CONTEXT = "context";
 
   /* RUN ROW COLUMNS */
   public static final String RUN_ARGS_UUID = "run_args_uuid";
@@ -73,7 +78,6 @@ public final class Columns {
 
   /* RUN ARGS ROW COLUMNS */
   public static final String ARGS = "args";
-  public static final String CHECKSUM = "checksum";
 
   /* RUN STATE ROW COLUMNS */
   public static final String TRANSITIONED_AT = "transitioned_at";

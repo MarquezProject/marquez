@@ -16,31 +16,40 @@ package marquez.db.models;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
-public class JobVersionRow {
-  @Getter @NonNull private final UUID uuid;
-  @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final Instant updateAt;
-  @Getter @NonNull private final UUID jobUuid;
-  @Getter @NonNull private final UUID jobContextUuid;
-  @Getter @NonNull private final List<UUID> inputs;
-  @Getter @NonNull private final List<UUID> outputs;
-  @Getter @NonNull private final String location;
-  @Getter @NonNull private final UUID version;
-  @Nullable private final UUID latestRunUuid;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class ExtendedJobVersionRow extends JobVersionRow {
+  @Getter private final String context;
 
-  public Optional<UUID> getLatestRunUuid() {
-    return Optional.ofNullable(latestRunUuid);
+  public ExtendedJobVersionRow(
+      final UUID uuid,
+      final Instant createdAt,
+      final Instant updatedAt,
+      final UUID jobUuid,
+      final UUID jobContextUuid,
+      final List<UUID> inputs,
+      final List<UUID> outputs,
+      final String location,
+      final UUID version,
+      final UUID latestRunUuid,
+      @NonNull final String context) {
+    super(
+        uuid,
+        createdAt,
+        updatedAt,
+        jobUuid,
+        jobContextUuid,
+        inputs,
+        outputs,
+        location,
+        version,
+        latestRunUuid);
+    this.context = context;
   }
 }

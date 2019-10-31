@@ -33,6 +33,7 @@ import marquez.api.SourceResource;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
+import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
@@ -141,6 +142,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final DatasetVersionDao datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
     final JobDao jobDao = jdbi.onDemand(JobDao.class);
     final JobVersionDao jobVersionDao = jdbi.onDemand(JobVersionDao.class);
+    final JobContextDao jobContextDao = jdbi.onDemand(JobContextDao.class);
     final RunDao runDao = jdbi.onDemand(RunDao.class);
     final RunArgsDao runArgsDao = jdbi.onDemand(RunArgsDao.class);
     final RunStateDao runStateDao = jdbi.onDemand(RunStateDao.class);
@@ -152,7 +154,14 @@ public final class MarquezApp extends Application<MarquezConfig> {
         new DatasetService(namespaceDao, sourceDao, datasetDao, datasetVersionDao);
     final JobService jobService =
         new JobService(
-            namespaceDao, datasetDao, jobDao, jobVersionDao, runDao, runArgsDao, runStateDao);
+            namespaceDao,
+            datasetDao,
+            jobDao,
+            jobVersionDao,
+            jobContextDao,
+            runDao,
+            runArgsDao,
+            runStateDao);
 
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new SourceResource(sourceService));

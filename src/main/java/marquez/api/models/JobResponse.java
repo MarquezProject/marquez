@@ -17,8 +17,10 @@ package marquez.api.models;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -36,6 +38,7 @@ public final class JobResponse {
   private final List<String> inputs;
   private final List<String> outputs;
   @Getter private final String location;
+  @Nullable private final Map<String, String> context;
   @Nullable private final String description;
 
   public JobResponse(
@@ -46,6 +49,7 @@ public final class JobResponse {
       @NonNull final List<String> inputs,
       @NonNull final List<String> outputs,
       @NonNull final String location,
+      @Nullable final Map<String, String> context,
       @Nullable final String description) {
     this.type = checkNotBlank(type);
     this.name = checkNotBlank(name);
@@ -54,6 +58,7 @@ public final class JobResponse {
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = checkNotBlank(location);
+    this.context = context;
     this.description = description;
   }
 
@@ -63,6 +68,10 @@ public final class JobResponse {
 
   public List<String> getOutputs() {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
+  }
+
+  public Map<String, String> getContext() {
+    return (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
   }
 
   public Optional<String> getDescription() {

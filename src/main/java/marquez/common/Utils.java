@@ -12,22 +12,30 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.common;
+
+import static com.google.common.base.Charsets.UTF_8;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
+import com.google.common.hash.Hashing;
 import io.dropwizard.jackson.Jackson;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import lombok.NonNull;
 
 public final class Utils {
   private Utils() {}
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+
+  public static final String KV_DELIM = "#";
+  public static final Joiner.MapJoiner KV_JOINER = Joiner.on(KV_DELIM).withKeyValueSeparator("=");
 
   public static URL toUrl(final String urlString) {
     try {
@@ -53,5 +61,9 @@ public final class Utils {
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+  }
+
+  public static String checksumFor(@NonNull final Map<String, String> value) {
+    return Hashing.sha256().hashString(KV_JOINER.join(value), UTF_8).toString();
   }
 }

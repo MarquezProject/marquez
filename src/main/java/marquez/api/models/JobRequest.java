@@ -2,8 +2,10 @@ package marquez.api.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
@@ -19,6 +21,7 @@ public final class JobRequest {
   private final List<String> inputs;
   private final List<String> outputs;
   @Getter private final String location;
+  @Nullable private final Map<String, String> context;
   @Nullable private final String description;
 
   public List<String> getInputs() {
@@ -27,6 +30,10 @@ public final class JobRequest {
 
   public List<String> getOutputs() {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
+  }
+
+  public Map<String, String> getContext() {
+    return (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
   }
 
   public Optional<String> getDescription() {

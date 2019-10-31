@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
+import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.JobName;
@@ -33,11 +34,11 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
-import marquez.common.models.Utils;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
 import marquez.db.models.ExtendedRunRow;
+import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceOwnershipRow;
@@ -200,7 +201,8 @@ public final class Mapper {
       @NonNull final JobRow row,
       @NonNull final List<DatasetName> inputs,
       @NonNull final List<DatasetName> outputs,
-      @NonNull final String locationString) {
+      @NonNull final String locationString,
+      @NonNull final String contextString) {
     return new Job(
         JobType.valueOf(row.getType()),
         JobName.of(row.getName()),
@@ -209,6 +211,7 @@ public final class Mapper {
         inputs,
         outputs,
         Utils.toUrl(locationString),
+        Utils.fromJson(contextString, new TypeReference<Map<String, String>>() {}),
         row.getDescription().orElse(null));
   }
 
@@ -226,8 +229,14 @@ public final class Mapper {
         null);
   }
 
+  public static JobContextRow toJobContextRow(
+      @NonNull final Map<String, String> context, String checksum) {
+    return new JobContextRow(UUID.randomUUID(), Instant.now(), Utils.toJson(context), checksum);
+  }
+
   public static JobVersionRow toJobVersionRow(
       @NonNull final UUID jobRowUuid,
+      @NonNull final UUID jobContextRowUuid,
       @NonNull final List<UUID> inputs,
       @NonNull final List<UUID> outputs,
       @NonNull final URL location,
@@ -238,6 +247,7 @@ public final class Mapper {
         now,
         now,
         jobRowUuid,
+        jobContextRowUuid,
         inputs,
         outputs,
         location.toString(),
