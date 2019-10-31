@@ -87,7 +87,8 @@ public final class ModelGenerator extends Generator {
   }
 
   public static Map<String, String> newContext() {
-    return ImmutableMap.of("sql", "SELECT * FROM room_bookings WHERE room = '2H';");
+    return ImmutableMap.of(
+        "sql", String.format("SELECT * FROM room_bookings WHERE room = '%dH';", newId()));
   }
 
   public static UUID newRunId() {

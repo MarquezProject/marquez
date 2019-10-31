@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.db.mappers.JobContextRowMapper;
@@ -38,6 +39,9 @@ public interface JobContextDao {
 
   @SqlQuery("SELECT * FROM job_contexts WHERE checksum = :checksum")
   Optional<JobContextRow> findBy(String checksum);
+
+  @SqlQuery("SELECT * FROM job_contexts ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+  List<JobContextRow> findAll(int limit, int offset);
 
   @SqlQuery("SELECT COUNT(*) FROM job_contexts")
   int count();
