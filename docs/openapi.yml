@@ -942,7 +942,7 @@ components:
         type:
           description: The type of the source.
           type: string
-          enum: [MYSQL, POSTGRESQL, REDSHIFT, SNOWFLAKE, KAFKA, REST]
+          enum: [MYSQL, POSTGRESQL, REDSHIFT, SNOWFLAKE, KAFKA]
         connectionUrl:
           description: The URL to be used to connect to the source.
           type: string
