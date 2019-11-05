@@ -501,7 +501,7 @@ components:
         inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
         outputs: ["wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-        context: {'email': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
+        context: {'sql': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
         description: Determine weekly room booking occupancy patterns.
 
     job:
@@ -551,7 +551,7 @@ components:
         inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
         outputs: ["wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-        context: {'email': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
+        context: {'sql': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
         description: Determine weekly room booking occupancy patterns.
 
     jobs:
@@ -577,7 +577,6 @@ components:
           description: The arguments of the run.
           type: object
       example:
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
 
     runId:
       type: object
@@ -626,7 +625,7 @@ components:
         nominalStartTime: null
         nominalEndTime: null
         runState: NEW
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
 
     runAsRunning:
       type: object
@@ -665,7 +664,7 @@ components:
         nominalStartTime: null
         nominalEndTime: null
         runState: RUNNING
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
 
     runAsCompleted:
       type: object
@@ -704,7 +703,7 @@ components:
         nominalStartTime: null
         nominalEndTime: null
         runState: COMPLETED
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
 
     runAsFailed:
       type: object
@@ -743,7 +742,7 @@ components:
         nominalStartTime: null
         nominalEndTime: null
         runState: FAILED
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
 
     runAsAborted:
       type: object
@@ -782,7 +781,7 @@ components:
         nominalStartTime: null
         nominalEndTime: null
         runState: ABORTED
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
 
     runs:
       type: object
@@ -942,7 +941,7 @@ components:
         type:
           description: The type of the source.
           type: string
-          enum: [MYSQL, POSTGRESQL, REDSHIFT, SNOWFLAKE, KAFKA, REST]
+          enum: [MYSQL, POSTGRESQL, REDSHIFT, SNOWFLAKE, KAFKA]
         connectionUrl:
           description: The URL to be used to connect to the source.
           type: string
