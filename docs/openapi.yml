@@ -501,7 +501,7 @@ components:
         inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
         outputs: ["wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-        context: {'email': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
+        context: {'sql': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
         description: Determine weekly room booking occupancy patterns.
 
     job:
@@ -551,7 +551,7 @@ components:
         inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
         outputs: ["wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-        context: {'email': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
+        context: {'sql': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
         description: Determine weekly room booking occupancy patterns.
 
     jobs:
