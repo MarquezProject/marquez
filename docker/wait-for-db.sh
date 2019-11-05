@@ -18,18 +18,21 @@ set -eu
 
 host="${1}"
 port="${2}"
-timeout="${3:-20}"
-NEXT_WAIT_TIME=0
+timeout="${3:-10}"
 
 until [ PGPASSWORD="${POSTGRES_PASSWORD}" psql \
         --host="${host}" \
         --port="${port}" \
         --username "${POSTGRES_USER}" \
         --dbname "${POSTGRES_DB}" \
-        --command '\q' > /dev/null 2>&1 || $NEXT_WAIT_TIME -eq "${timeout}" ]; do
+        --command '\q' > /dev/null 2>&1 ]; do
   echo "Waiting for postgres to become available..."
   sleep 1
-  let NEXT_WAIT_TIME=NEXT_WAIT_TIME+1
+  timeout=$(( timeout-1 ))
+  if [ "${timeout}" -eq 0 ]; then
+    echo "Bad news! Postgres isn't up :(" >&2
+    exit 1
+  fi
 done
 
-echo "Great news! Postgres is up."
+echo "Great news! Postgres is up :)"
