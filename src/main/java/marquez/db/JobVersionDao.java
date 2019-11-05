@@ -18,7 +18,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.db.mappers.JobVersionRowMapper;
+import marquez.db.mappers.ExtendedJobVersionRowMapper;
+import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.JobVersionRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -27,7 +28,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
-@RegisterRowMapper(JobVersionRowMapper.class)
+@RegisterRowMapper(ExtendedJobVersionRowMapper.class)
 public interface JobVersionDao {
   enum IoType {
     INPUT,
@@ -54,8 +55,8 @@ public interface JobVersionDao {
   }
 
   @SqlUpdate(
-      "INSERT INTO job_versions (uuid, created_at, updated_at, job_uuid, version, location, latest_run_uuid) "
-          + "VALUES (:uuid, :createdAt, :updateAt, :jobUuid, :version, :location, :latestRunUuid)")
+      "INSERT INTO job_versions (uuid, created_at, updated_at, job_uuid, version, location, latest_run_uuid, job_context_uuid) "
+          + "VALUES (:uuid, :createdAt, :updateAt, :jobUuid, :version, :location, :latestRunUuid, :jobContextUuid)")
   void insert(@BindBean JobVersionRow row);
 
   @SqlUpdate(
@@ -74,7 +75,7 @@ public interface JobVersionDao {
   void update(UUID rowUuid, Instant updatedAt, UUID latestRunUuid);
 
   @SqlQuery(
-      "SELECT j.uuid AS job_uuid, j.namespace_uuid, jv.*, "
+      "SELECT j.uuid AS job_uuid, j.namespace_uuid, jv.*, jc.uuid AS job_context_uuid, jc.context, "
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
           + "      WHERE job_version_uuid = jv.uuid AND "
@@ -88,11 +89,13 @@ public interface JobVersionDao {
           + "  ON (job_uuid = jv.job_uuid AND j.current_version_uuid = :currentVersionUuid)"
           + "INNER JOIN namespaces AS n "
           + "  ON (j.namespace_uuid = n.uuid) "
+          + "INNER JOIN job_contexts AS jc "
+          + "  ON (job_context_uuid = jc.uuid) "
           + "WHERE jv.version = :currentVersionUuid ")
-  Optional<JobVersionRow> findBy(UUID currentVersionUuid);
+  Optional<ExtendedJobVersionRow> findBy(UUID currentVersionUuid);
 
   @SqlQuery(
-      "SELECT j.uuid AS job_uuid, j.namespace_uuid, jv.*, "
+      "SELECT j.uuid AS job_uuid, j.namespace_uuid, jv.*, jc.uuid AS job_context_uuid, jc.context, "
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
           + "      WHERE job_version_uuid = jv.uuid AND "
@@ -106,17 +109,32 @@ public interface JobVersionDao {
           + "  ON (job_uuid = jv.job_uuid AND j.name = :jobName)"
           + "INNER JOIN namespaces AS n "
           + "  ON (j.namespace_uuid = n.uuid AND n.name = :namespaceName) "
+          + "INNER JOIN job_contexts AS jc "
+          + "  ON (job_context_uuid = jc.uuid) "
           + "ORDER BY created_at DESC "
           + "LIMIT 1")
-  Optional<JobVersionRow> findLatest(String namespaceName, String jobName);
+  Optional<ExtendedJobVersionRow> findLatest(String namespaceName, String jobName);
 
   @SqlQuery(
-      "SELECT j.* FROM jobs AS j "
+      "SELECT j.uuid AS job_uuid, j.namespace_uuid, jv.*, jc.uuid AS job_context_uuid, jc.context "
+          + "ARRAY(SELECT dataset_uuid "
+          + "      FROM job_versions_io_mapping "
+          + "      WHERE job_version_uuid = jv.uuid AND "
+          + "            io_type = 'INPUT') AS inputs, "
+          + "ARRAY(SELECT dataset_uuid "
+          + "      FROM job_versions_io_mapping "
+          + "      WHERE job_version_uuid = jv.uuid AND "
+          + "            io_type = 'OUTPUT') AS outputs "
+          + "FROM job_versions AS jv "
+          + "INNER JOIN jobs AS j "
+          + "  ON (job_uuid = jv.job_uuid AND j.name = :jobName)"
           + "INNER JOIN namespaces AS n "
-          + "  ON (n.name = :namespaceName AND j.namespace_uuid = n.uuid) "
-          + "ORDER BY j.name "
+          + "  ON (j.namespace_uuid = n.uuid AND n.name = :namespaceName) "
+          + "INNER JOIN job_contexts AS jc "
+          + "  ON (job_context_uuid = jc.uuid) "
+          + "ORDER BY created_at DESC "
           + "LIMIT :limit OFFSET :offset")
-  List<JobVersionRow> findAll(String namespaceName, String jobName, int limit, int offset);
+  List<ExtendedJobVersionRow> findAll(String namespaceName, String jobName, int limit, int offset);
 
   @SqlQuery("SELECT COUNT(*) FROM job_versions")
   int count();

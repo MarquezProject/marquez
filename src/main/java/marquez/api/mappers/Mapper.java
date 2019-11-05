@@ -42,12 +42,12 @@ import marquez.api.models.SourceResponse;
 import marquez.api.models.SourcesResponse;
 import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
+import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobType;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
-import marquez.common.models.Utils;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTable;
@@ -172,6 +172,7 @@ public final class Mapper {
         request.getInputs().stream().map(DatasetName::of).collect(toImmutableList()),
         request.getOutputs().stream().map(DatasetName::of).collect(toImmutableList()),
         Utils.toUrl(request.getLocation()),
+        request.getContext(),
         request.getDescription().orElse(null));
   }
 
@@ -184,6 +185,7 @@ public final class Mapper {
         job.getInputs().stream().map(input -> input.getValue()).collect(toImmutableList()),
         job.getOutputs().stream().map(output -> output.getValue()).collect(toImmutableList()),
         job.getLocation().toString(),
+        job.getContext(),
         job.getDescription().orElse(null));
   }
 

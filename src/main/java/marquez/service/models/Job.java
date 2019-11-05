@@ -15,10 +15,12 @@
 package marquez.service.models;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.NonNull;
@@ -36,6 +38,7 @@ public class Job {
   @NonNull List<DatasetName> inputs;
   @NonNull List<DatasetName> outputs;
   @NonNull URL location;
+  @Nullable Map<String, String> context;
   @Nullable String description;
 
   public List<DatasetName> getInputs() {
@@ -44,6 +47,10 @@ public class Job {
 
   public List<DatasetName> getOutputs() {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
+  }
+
+  public Map<String, String> getContext() {
+    return (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
   }
 
   public Optional<String> getDescription() {

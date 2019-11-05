@@ -16,12 +16,15 @@ package marquez.service.models;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static java.util.stream.Collectors.joining;
+import static marquez.common.Utils.KV_JOINER;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -41,6 +44,7 @@ public class JobMeta {
   @NonNull List<DatasetName> inputs;
   @NonNull List<DatasetName> outputs;
   @NonNull URL location;
+  @Nullable Map<String, String> context;
   @Nullable String description;
 
   public List<DatasetName> getInputs() {
@@ -51,18 +55,25 @@ public class JobMeta {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
   }
 
+  public Map<String, String> getContext() {
+    return (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
+  }
+
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
   }
 
-  public UUID version(NamespaceName namespaceName, JobName jobName) {
+  public UUID version(@NonNull NamespaceName namespaceName, @NonNull JobName jobName) {
     final byte[] bytes =
         VERSION_JOINER
             .join(
                 namespaceName.getValue(),
                 jobName.getValue(),
-                inputs.stream().map(input -> input.getValue()).collect(joining(VERSION_DELIM)),
-                outputs.stream().map(output -> output.getValue()).collect(joining(VERSION_DELIM)),
+                getInputs().stream().map(input -> input.getValue()).collect(joining(VERSION_DELIM)),
+                getOutputs().stream()
+                    .map(output -> output.getValue())
+                    .collect(joining(VERSION_DELIM)),
+                KV_JOINER.join(getContext()),
                 location.toString())
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);

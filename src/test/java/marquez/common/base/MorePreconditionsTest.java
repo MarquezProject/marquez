@@ -17,8 +17,11 @@ package marquez.common.base;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
+import marquez.UnitTests;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTests.class)
 public class MorePreconditionsTest {
   private static final String NULL_ERROR_MESSAGE = null;
   private static final String NON_NULL_ERROR_MESSAGE = "test error message";

@@ -14,11 +14,7 @@
 
 package marquez.service.models;
 
-import static com.google.common.base.Charsets.UTF_8;
-
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.hash.Hashing;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -29,8 +25,6 @@ import lombok.Value;
 
 @Value
 public class Run {
-  private static final Joiner.MapJoiner ARGS_JOINER = Joiner.on(":").withKeyValueSeparator("=");
-
   @NonNull UUID id;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
@@ -57,10 +51,5 @@ public class Run {
 
   public Map<String, String> getArgs() {
     return (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
-  }
-
-  public static String checksumFor(final Map<String, String> args) {
-    final String argsAsString = ARGS_JOINER.join(args);
-    return Hashing.sha256().hashString(argsAsString, UTF_8).toString();
   }
 }

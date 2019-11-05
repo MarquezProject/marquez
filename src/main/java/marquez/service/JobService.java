@@ -23,17 +23,21 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
+import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
+import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.ExtendedRunRow;
+import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
@@ -54,6 +58,7 @@ public class JobService {
   private final DatasetDao datasetDao;
   private final JobDao jobDao;
   private final JobVersionDao versionDao;
+  private final JobContextDao contextDao;
   private final RunDao runDao;
   private final RunArgsDao runArgsDao;
   private final RunStateDao runStateDao;
@@ -63,6 +68,7 @@ public class JobService {
       @NonNull final DatasetDao datasetDao,
       @NonNull final JobDao jobDao,
       @NonNull final JobVersionDao versionDao,
+      @NonNull final JobContextDao contextDao,
       @NonNull final RunDao runDao,
       @NonNull final RunArgsDao runArgsDao,
       @NonNull final RunStateDao runStateDao) {
@@ -70,6 +76,7 @@ public class JobService {
     this.datasetDao = datasetDao;
     this.jobDao = jobDao;
     this.versionDao = versionDao;
+    this.contextDao = contextDao;
     this.runDao = runDao;
     this.runArgsDao = runArgsDao;
     this.runStateDao = runStateDao;
@@ -82,12 +89,17 @@ public class JobService {
       if (!exists(namespaceName, jobName)) {
         final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
         final JobRow newJobRow = Mapper.toJobRow(namespaceRow.getUuid(), jobName, meta);
-
         jobDao.insert(newJobRow);
       }
 
       final UUID version = meta.version(namespaceName, jobName);
       if (!versionDao.exists(version)) {
+        final String checksum = Utils.checksumFor(meta.getContext());
+        if (!contextDao.exists(checksum)) {
+          final JobContextRow newContextRow = Mapper.toJobContextRow(meta.getContext(), checksum);
+          contextDao.insert(newContextRow);
+        }
+
         final JobRow jobRow = jobDao.findBy(namespaceName.getValue(), jobName.getValue()).get();
         final List<UUID> inputs =
             datasetDao
@@ -107,8 +119,16 @@ public class JobService {
                 .stream()
                 .map(row -> row.getUuid())
                 .collect(toImmutableList());
+
+        final JobContextRow contextRow = contextDao.findBy(checksum).get();
         final JobVersionRow newVersionRow =
-            Mapper.toJobVersionRow(jobRow.getUuid(), inputs, outputs, meta.getLocation(), version);
+            Mapper.toJobVersionRow(
+                jobRow.getUuid(),
+                contextRow.getUuid(),
+                inputs,
+                outputs,
+                meta.getLocation(),
+                version);
 
         versionDao.insertAndUpdate(newVersionRow);
       }
@@ -163,13 +183,11 @@ public class JobService {
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
       final List<JobRow> jobRows = jobDao.findAll(namespaceName.getValue(), limit, offset);
-
       final ImmutableList.Builder<Job> builder = ImmutableList.builder();
       jobRows.forEach(
           jobRow -> {
             builder.add(toJob(jobRow));
           });
-
       return builder.build();
     } catch (UnableToExecuteStatementException e) {
       log.error(
@@ -182,9 +200,9 @@ public class JobService {
     }
   }
 
-  private Job toJob(JobRow jobRow) {
+  private Job toJob(@NonNull JobRow jobRow) {
     final UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
-    final JobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
+    final ExtendedJobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
 
     final List<DatasetName> inputs =
         datasetDao.findAllInUuidList(versionRow.getInputs()).stream()
@@ -196,17 +214,17 @@ public class JobService {
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
 
-    return Mapper.toJob(jobRow, inputs, outputs, versionRow.getLocation());
+    final JobContextRow contextRow = contextDao.findBy(versionRow.getJobContextUuid()).get();
+    return Mapper.toJob(jobRow, inputs, outputs, versionRow.getLocation(), versionRow.getContext());
   }
 
   public Run createRun(
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta)
       throws MarquezServiceException {
     try {
-      final String checksum = Run.checksumFor(runMeta.getArgs());
+      final String checksum = Utils.checksumFor(runMeta.getArgs());
       if (!runArgsDao.exists(checksum)) {
         final RunArgsRow newRunArgsRow = Mapper.toRunArgsRow(runMeta.getArgs(), checksum);
-
         runArgsDao.insert(newRunArgsRow);
       }
 
@@ -254,7 +272,7 @@ public class JobService {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
-      final Optional<JobVersionRow> versionRow =
+      final Optional<ExtendedJobVersionRow> versionRow =
           versionDao.findLatest(namespaceName.getValue(), jobName.getValue());
       if (versionRow.isPresent()) {
         final List<ExtendedRunRow> runRows =

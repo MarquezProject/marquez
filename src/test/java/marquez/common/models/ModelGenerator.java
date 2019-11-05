@@ -16,12 +16,15 @@ package marquez.common.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import marquez.Generator;
+import marquez.common.Utils;
 
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}
@@ -81,6 +84,11 @@ public final class ModelGenerator extends Generator {
 
   public static URL newLocation() {
     return Utils.toUrl("https://github.com/repo/test/commit/" + newId());
+  }
+
+  public static Map<String, String> newContext() {
+    return ImmutableMap.of(
+        "sql", String.format("SELECT * FROM room_bookings WHERE room = '%dH';", newId()));
   }
 
   public static UUID newRunId() {

@@ -18,6 +18,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static marquez.common.models.ModelGenerator.newConnectionUrl;
 import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
+import static marquez.common.models.ModelGenerator.newContext;
 import static marquez.common.models.ModelGenerator.newDescription;
 import static marquez.common.models.ModelGenerator.newJobType;
 import static marquez.common.models.ModelGenerator.newLocation;
@@ -154,89 +155,11 @@ public final class ModelGenerator extends Generator {
         inputs.stream().map(DatasetName::getValue).collect(toImmutableList()),
         outputs.stream().map(DatasetName::getValue).collect(toImmutableList()),
         newLocation().toString(),
+        newContext(),
         hasDescription ? newDescription() : null);
   }
 
   public static String newIsoTimestamp() {
     return ISO_INSTANT.format(newTimestamp());
   }
-
-  ////////////////
-
-  // public static DatasetRequest newDatasetRequest() {
-  //   return newDatasetRequest(true);
-  // }
-  //
-  // public static DatasetRequest newDatasetRequest(final boolean hasDescription) {
-  //   return new DatasetRequest(
-  //       newDatasetName().getValue(),
-  //       newDatasourceUrn().getValue(),
-  //       hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
-  // }
-  //
-  // public static List<DatasetResponse> newDatasetResponses(final int limit) {
-  //   return Stream.generate(() -> newDatasetResponse()).limit(limit).collect(toImmutableList());
-  // }
-  //
-  // public static DatasetResponse newDatasetResponse() {
-  //   return newDatasetResponse(true);
-  // }
-  //
-  // public static DatasetResponse newDatasetResponse(final boolean hasDescription) {
-  //   return new DatasetResponse(
-  //       newDatasetName().getValue(),
-  //       newDatasetUrn().getValue(),
-  //       newIsoTimestamp(),
-  //       newDatasourceUrn().getValue(),
-  //       hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
-  // }
-  //
-  //
-  //
-
-  // }
-  //
-  // public static List<JobResponse> newJobResponses(final int limit) {
-  //   return Stream.generate(() -> newJobResponse(true)).limit(limit).collect(toImmutableList());
-  // }
-  //
-  // public static JobResponse newJobResponse() {
-  //   return newJobResponse(true);
-  // }
-  //
-  // public static JobResponse newJobResponse(final boolean hasDescription) {
-  //   final String createdAt = newIsoTimestamp();
-  //   final String updatedAt = createdAt;
-  //   return new JobResponse(
-  //       newJobType().toString(),
-  //       newJobName().getValue(),
-  //       createdAt,
-  //       updatedAt,
-  //       newDatasetUrns(4).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
-  //       newDatasetUrns(2).stream().map(DatasetUrn::getValue).collect(toImmutableList()),
-  //       newLocation().toString(),
-  //       hasDescription ? newDescription().getValue() : NO_DESCRIPTION.getValue());
-  // }
-  //
-
-  //
-  // public static DatasourceRequest newDatasourceRequest() {
-  //   return new DatasourceRequest(newDatasourceName().getValue(),
-  // newConnectionUrl().getRawValue());
-  // }
-  //
-  // public static List<DatasourceResponse> newDatasourceResponses(final int limit) {
-  //   return Stream.generate(() ->
-  // newDatasourceResponse()).limit(limit).collect(toImmutableList());
-  // }
-  //
-  // public static DatasourceResponse newDatasourceResponse() {
-  //   return new DatasourceResponse(
-  //       newDatasourceName().getValue(),
-  //       newIsoTimestamp(),
-  //       newDatasourceUrn().getValue(),
-  //       newConnectionUrl().getRawValue());
-  // }
-  //
-  //
 }

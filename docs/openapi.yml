@@ -485,6 +485,9 @@ components:
           description: The URL of the job source code or artifact.
           type: string
           format: URL
+        context:
+          description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
+          type: object
         description:
           description: The description of the job.
           type: string
@@ -498,6 +501,7 @@ components:
         inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
         outputs: ["wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+        context: {'email': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
         description: Determine weekly room booking occupancy patterns.
 
     job:
@@ -533,6 +537,9 @@ components:
           description: The URL of the job source code or artifact.
           type: string
           format: URL
+        context:
+          description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
+          type: object
         description:
           description: The description of the job.
           type: string
@@ -544,6 +551,7 @@ components:
         inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
         outputs: ["wedata.room_bookings_7_days"]
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+        context: {'email': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
         description: Determine weekly room booking occupancy patterns.
 
     jobs:
