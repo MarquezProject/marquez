@@ -11,10 +11,10 @@ interactions:
       User-Agent:
       - marquez-python/0.5.3
     method: GET
-    uri: http://localhost:5000/api/v1/namespaces/namespace_for_tests_3/datasets/not_a_valid_urn
+    uri: http://localhost:5000/api/v1/namespaces/namespace_for_tests_3/datasets/not_a_valid_name
   response:
     body:
-      string: '{"code":404,"message":"Dataset ''not_a_valid_urn'' not found."}'
+      string: '{"code":404,"message":"Dataset ''not_a_valid_name'' not found."}'
     headers:
       Content-Length:
       - '61'

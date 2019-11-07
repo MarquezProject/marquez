@@ -51,12 +51,14 @@ def job_name():
 @fixture(scope='class')
 @vcr.use_cassette('tests/fixtures/vcr/test_jobs/job_for_jobs_test.yaml')
 def job(marquez_client_with_ns, job_name):
-    input_datset_urns = ['input1a', 'input2a']
-    output_datset_urns = ['output1a', 'output2a']
+    input_datsets = ['input1a', 'input2a']
+    output_datsets = ['output1a', 'output2a']
+    context = {'sql': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
     return marquez_client_with_ns.create_job(
         job_name, 'BATCH', 'https://github.com/wework/jobs/commit/124f',
-        input_datset_urns,
-        output_datset_urns)
+        input_datsets,
+        output_datsets,
+        context=context)
 
 
 @fixture(scope='class')
@@ -65,12 +67,12 @@ def job(marquez_client_with_ns, job_name):
 def job_default_ns(job_name):
     marquez_client = MarquezClient(host="localhost", port=5000)
 
-    input_datset_urns = ['input1a', 'input2a']
-    output_datset_urns = ['output1a', 'output2a']
+    input_datsets = ['input1a', 'input2a']
+    output_datsets = ['output1a', 'output2a']
     return marquez_client.create_job(
         job_name, 'BATCH', 'https://github.com/wework/jobs/commit/124f',
-        input_datset_urns,
-        output_datset_urns)
+        input_datsets,
+        output_datsets)
 
 
 @vcr.use_cassette('tests/fixtures/vcr/test_jobs/test_create_job.yaml')
@@ -164,17 +166,17 @@ def _run_job_creation_test(job_name, marquez_client):
     job_name = job_name
     location = "https://github.com/wework/jobs/commit/124f"
     description = "someDescription"
-    input_datset_urns = ['input1', 'input2']
-    output_datset_urns = ['output1', 'output2']
+    input_datsets = ['input1', 'input2']
+    output_datsets = ['output1', 'output2']
     created_job = marquez_client.create_job(
         job_name, 'BATCH', location,
-        input_datset_urns, output_datset_urns,
+        input_datsets, output_datsets,
         description=description)
 
     assert created_job['location'] == location
     assert created_job['name'] == job_name
-    # assert created_job['inputs'] == input_datset_urns
+    # assert created_job['inputs'] == input_datsets
     # todo: provide valid  inputs
-    # assert created_job['outputs'] == output_datset_urns
+    # assert created_job['outputs'] == output_datsets
     # todo: provide valid outputs
     assert created_job['description'] == description

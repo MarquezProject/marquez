@@ -116,7 +116,7 @@ def test_create_datasource_special_chars(marquez_client, existing_datasource):
     dataset_name = "financi@ls db20!"
     with pytest.raises(errors.InvalidRequestError):
         marquez_client.create_dataset(
-            dataset_name, existing_datasource['urn'])
+            dataset_name, existing_datasource['name'])
 
 
 @vcr.use_cassette('tests/fixtures/vcr/test_datasets/test_get_dataset.yaml')
@@ -157,10 +157,10 @@ def test_get_dataset_default_ns(
 
 
 @vcr.use_cassette(
-    'tests/fixtures/vcr/test_datasets/test_get_dataset_malformed_urn.yaml')
-def test_get_dataset_malformed_urn(marquez_client):
+    'tests/fixtures/vcr/test_datasets/test_get_dataset_malformed_name.yaml')
+def test_get_dataset_malformed_name(marquez_client):
     with pytest.raises(errors.APIError):
-        marquez_client.get_dataset("not_a_valid_urn")
+        marquez_client.get_dataset("not_a_valid_name")
     with pytest.raises(errors.APIError):
         marquez_client.get_dataset("*55;34/098## *!! x;;$")
 

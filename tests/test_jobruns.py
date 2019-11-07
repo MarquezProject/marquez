@@ -49,12 +49,12 @@ def marquez_client(namespace_name):
 @vcr.use_cassette(
     'tests/fixtures/vcr/test_jobruns/job_for_jobruns_tests.yaml')
 def existing_job(marquez_client, existing_namespace):
-    input_datset_urns = ['input1', 'input2']
-    output_datset_urns = ['output1', 'output2']
+    input_datsets = ['input1', 'input2']
+    output_datsets = ['output1', 'output2']
     created_job = marquez_client.create_job(
         'some_job', 'BATCH', 'https://github.com/wework/jobs/commit/124f',
-        input_datset_urns,
-        output_datset_urns)
+        input_datsets,
+        output_datsets)
     return created_job
 
 

@@ -81,7 +81,7 @@ class MarquezClient(object):
         )
 
     def create_job(self, job_name, job_type, location, input_dataset=None,
-                   output_dataset=None, description=None,
+                   output_dataset=None, description=None, context=None,
                    namespace_name=None):
         if not job_name:
             raise ValueError('job_name must not be None')
@@ -99,6 +99,9 @@ class MarquezClient(object):
             'location': location,
             'type': job_type
         }
+
+        if context:
+            payload['context'] = context
 
         if description:
             payload['description'] = description
