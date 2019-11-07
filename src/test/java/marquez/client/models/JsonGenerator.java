@@ -143,11 +143,15 @@ public final class JsonGenerator {
     final ArrayNode inputs = MAPPER.valueToTree(meta.getInputs());
     final ArrayNode outputs = MAPPER.valueToTree(meta.getOutputs());
     final ObjectNode obj = MAPPER.createObjectNode();
+    final ObjectNode context = MAPPER.createObjectNode();
+    meta.getContext().forEach((k, v) -> context.put(k, v));
+
     obj.put("type", meta.getType().toString());
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", meta.getLocation());
     obj.put("description", meta.getDescription().orElse(null));
+    obj.set("context", context);
 
     return obj.toString();
   }
@@ -155,6 +159,9 @@ public final class JsonGenerator {
   public static String newJsonFor(final Job job) {
     final ArrayNode inputs = MAPPER.valueToTree(job.getInputs());
     final ArrayNode outputs = MAPPER.valueToTree(job.getOutputs());
+    final ObjectNode context = MAPPER.createObjectNode();
+    job.getContext().forEach((k, v) -> context.put(k, v));
+
     final ObjectNode obj =
         MAPPER
             .createObjectNode()
@@ -166,6 +173,7 @@ public final class JsonGenerator {
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", job.getLocation());
     obj.put("description", job.getDescription().orElse(null));
+    obj.set("context", context);
 
     return obj.toString();
   }

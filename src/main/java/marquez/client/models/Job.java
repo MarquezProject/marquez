@@ -16,8 +16,10 @@ package marquez.client.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
@@ -39,9 +41,14 @@ public final class Job {
   @Getter @NonNull private final List<String> outputs;
   @Getter @NonNull private final String location;
   @Nullable private final String description;
+  @Nullable private Map<String, String> context;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Map<String, String> getContext() {
+    return (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
   }
 
   public static Job fromJson(@NonNull final String json) {

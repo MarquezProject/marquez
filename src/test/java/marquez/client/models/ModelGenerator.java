@@ -113,6 +113,7 @@ public final class ModelGenerator {
         .outputs(newOutputs(4))
         .location(newLocation())
         .description(newDescription())
+        .context(newContext())
         .build();
   }
 
@@ -130,7 +131,8 @@ public final class ModelGenerator {
         newInputs(2),
         newOutputs(4),
         newLocation().toString(),
-        newDescription());
+        newDescription(),
+        newContext());
   }
 
   public static RunMeta newRunMeta() {
@@ -210,6 +212,11 @@ public final class ModelGenerator {
 
   public static String newLocation() {
     return "https://github.com/repo/test/commit/" + newId();
+  }
+
+  public static Map<String, String> newContext() {
+    return ImmutableMap.of(
+        "sql", String.format("SELECT * FROM room_bookings WHERE room = '%dH';", newId()));
   }
 
   public static URL newSchemaLocation() {

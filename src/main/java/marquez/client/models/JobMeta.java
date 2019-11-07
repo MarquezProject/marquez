@@ -16,6 +16,7 @@ package marquez.client.models;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.Builder;
@@ -31,6 +32,7 @@ public class JobMeta {
   @Getter @NonNull List<String> outputs;
   @Getter @NonNull String location;
   @Nullable String description;
+  @Nullable Map<String, String> context;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
@@ -50,6 +52,7 @@ public class JobMeta {
     private List<String> outputs;
     private String location;
     @Nullable private String description;
+    @Nullable Map<String, String> context;
 
     private Builder() {
       this.inputs = ImmutableList.of();
@@ -85,8 +88,13 @@ public class JobMeta {
       return this;
     }
 
+    public Builder context(@Nullable Map<String, String> context) {
+      this.context = context;
+      return this;
+    }
+
     public JobMeta build() {
-      return new JobMeta(type, inputs, outputs, location, description);
+      return new JobMeta(type, inputs, outputs, location, description, context);
     }
   }
 }

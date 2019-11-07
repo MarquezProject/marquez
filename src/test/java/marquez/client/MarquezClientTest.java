@@ -18,6 +18,7 @@ import static marquez.client.MarquezClient.Builder.NAMESPACE_NAME_ENV_VAR;
 import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
 import static marquez.client.MarquezClient.DEFAULT_NAMESPACE_NAME;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
+import static marquez.client.models.ModelGenerator.newContext;
 import static marquez.client.models.ModelGenerator.newDatasetName;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
@@ -129,9 +130,18 @@ public class MarquezClientTest {
   private static final String LOCATION = newLocation();
   private static final JobType JOB_TYPE = newJobType();
   private static final String JOB_DESCRIPTION = newDescription();
+  private static final Map<String, String> JOB_CONTEXT = newContext();
   private static final Job JOB =
       new Job(
-          JOB_TYPE, JOB_NAME, CREATED_AT, UPDATED_AT, INPUTS, OUTPUTS, LOCATION, JOB_DESCRIPTION);
+          JOB_TYPE,
+          JOB_NAME,
+          CREATED_AT,
+          UPDATED_AT,
+          INPUTS,
+          OUTPUTS,
+          LOCATION,
+          JOB_DESCRIPTION,
+          JOB_CONTEXT);
 
   // RUN
   private static final String RUN_ID = newRunId();
@@ -359,6 +369,7 @@ public class MarquezClientTest {
             .outputs(OUTPUTS)
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
+            .context(JOB_CONTEXT)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
