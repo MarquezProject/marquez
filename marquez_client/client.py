@@ -80,15 +80,13 @@ class MarquezClient(object):
             }
         )
 
-    def create_job(self, job_name, job_type, location, input_dataset=None,
+    def create_job(self, job_name, job_type, location=None, input_dataset=None,
                    output_dataset=None, description=None, context=None,
                    namespace_name=None):
         if not job_name:
             raise ValueError('job_name must not be None')
         if not job_type:
             raise ValueError('job_type must not be None')
-        if not location:
-            raise ValueError('location must not be None')
 
         if not namespace_name:
             namespace_name = self._namespace_name
@@ -96,13 +94,13 @@ class MarquezClient(object):
         payload = {
             'inputs': input_dataset or [],
             'outputs': output_dataset or [],
-            'location': location,
             'type': job_type
         }
 
         if context:
             payload['context'] = context
-
+        if location:
+            payload['location'] = location
         if description:
             payload['description'] = description
 
