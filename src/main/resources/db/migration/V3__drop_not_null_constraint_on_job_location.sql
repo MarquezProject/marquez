@@ -1,0 +1,1 @@
+ALTER TABLE job_versions ALTER COLUMN location DROP NOT NULL;

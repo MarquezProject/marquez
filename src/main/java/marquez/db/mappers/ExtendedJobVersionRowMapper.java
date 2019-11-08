@@ -14,6 +14,7 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidArrayOrThrow;
@@ -40,7 +41,7 @@ public final class ExtendedJobVersionRowMapper implements RowMapper<ExtendedJobV
         uuidOrThrow(results, Columns.JOB_CONTEXT_UUID),
         uuidArrayOrThrow(results, Columns.INPUTS),
         uuidArrayOrThrow(results, Columns.OUTPUTS),
-        stringOrThrow(results, Columns.LOCATION),
+        stringOrNull(results, Columns.LOCATION),
         uuidOrThrow(results, Columns.VERSION),
         uuidOrNull(results, Columns.LATEST_RUN_UUID),
         stringOrThrow(results, Columns.CONTEXT));

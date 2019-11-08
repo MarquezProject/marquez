@@ -38,12 +38,12 @@ import marquez.common.models.NamespaceName;
 @Value
 public class JobMeta {
   private static final String VERSION_DELIM = ":";
-  private static final Joiner VERSION_JOINER = Joiner.on(VERSION_DELIM);
+  private static final Joiner VERSION_JOINER = Joiner.on(VERSION_DELIM).skipNulls();
 
   @NonNull JobType type;
   @NonNull List<DatasetName> inputs;
   @NonNull List<DatasetName> outputs;
-  @NonNull URL location;
+  @Nullable URL location;
   @Nullable Map<String, String> context;
   @Nullable String description;
 
@@ -53,6 +53,10 @@ public class JobMeta {
 
   public List<DatasetName> getOutputs() {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
+  }
+
+  public Optional<URL> getLocation() {
+    return Optional.ofNullable(location);
   }
 
   public Map<String, String> getContext() {
@@ -74,7 +78,7 @@ public class JobMeta {
                     .map(output -> output.getValue())
                     .collect(joining(VERSION_DELIM)),
                 KV_JOINER.join(getContext()),
-                location.toString())
+                getLocation().map(URL::toString).orElse(null))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }

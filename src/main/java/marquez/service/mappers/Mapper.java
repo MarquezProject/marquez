@@ -201,7 +201,7 @@ public final class Mapper {
       @NonNull final JobRow row,
       @NonNull final List<DatasetName> inputs,
       @NonNull final List<DatasetName> outputs,
-      @NonNull final String locationString,
+      @Nullable final String locationString,
       @NonNull final String contextString) {
     return new Job(
         JobType.valueOf(row.getType()),
@@ -210,7 +210,7 @@ public final class Mapper {
         row.getUpdatedAt(),
         inputs,
         outputs,
-        Utils.toUrl(locationString),
+        (locationString == null) ? null : Utils.toUrl(locationString),
         Utils.fromJson(contextString, new TypeReference<Map<String, String>>() {}),
         row.getDescription().orElse(null));
   }
@@ -239,7 +239,7 @@ public final class Mapper {
       @NonNull final UUID jobContextRowUuid,
       @NonNull final List<UUID> inputs,
       @NonNull final List<UUID> outputs,
-      @NonNull final URL location,
+      @Nullable final URL location,
       @NonNull final UUID version) {
     final Instant now = Instant.now();
     return new JobVersionRow(
@@ -250,7 +250,7 @@ public final class Mapper {
         jobContextRowUuid,
         inputs,
         outputs,
-        location.toString(),
+        (location == null) ? null : location.toString(),
         version,
         null);
   }

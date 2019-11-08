@@ -20,7 +20,7 @@ public final class JobRequest {
   @Getter private final String type;
   private final List<String> inputs;
   private final List<String> outputs;
-  @Getter private final String location;
+  @Nullable private final String location;
   @Nullable private final Map<String, String> context;
   @Nullable private final String description;
 
@@ -30,6 +30,10 @@ public final class JobRequest {
 
   public List<String> getOutputs() {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
+  }
+
+  public Optional<String> getLocation() {
+    return Optional.ofNullable(location);
   }
 
   public Map<String, String> getContext() {

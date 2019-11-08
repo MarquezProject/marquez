@@ -171,7 +171,7 @@ public final class Mapper {
         JobType.valueOf(request.getType()),
         request.getInputs().stream().map(DatasetName::of).collect(toImmutableList()),
         request.getOutputs().stream().map(DatasetName::of).collect(toImmutableList()),
-        Utils.toUrl(request.getLocation()),
+        request.getLocation().map(Utils::toUrl).orElse(null),
         request.getContext(),
         request.getDescription().orElse(null));
   }
@@ -184,7 +184,7 @@ public final class Mapper {
         ISO_INSTANT.format(job.getUpdatedAt()),
         job.getInputs().stream().map(input -> input.getValue()).collect(toImmutableList()),
         job.getOutputs().stream().map(output -> output.getValue()).collect(toImmutableList()),
-        job.getLocation().toString(),
+        job.getLocation().map(URL::toString).orElse(null),
         job.getContext(),
         job.getDescription().orElse(null));
   }

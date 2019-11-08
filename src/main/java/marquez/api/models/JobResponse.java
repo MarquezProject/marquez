@@ -37,7 +37,7 @@ public final class JobResponse {
   @Getter private final String updatedAt;
   private final List<String> inputs;
   private final List<String> outputs;
-  @Getter private final String location;
+  @Nullable private final String location;
   @Nullable private final Map<String, String> context;
   @Nullable private final String description;
 
@@ -48,7 +48,7 @@ public final class JobResponse {
       @NonNull final String updatedAt,
       @NonNull final List<String> inputs,
       @NonNull final List<String> outputs,
-      @NonNull final String location,
+      @Nullable final String location,
       @Nullable final Map<String, String> context,
       @Nullable final String description) {
     this.type = checkNotBlank(type);
@@ -57,7 +57,7 @@ public final class JobResponse {
     this.updatedAt = checkNotBlank(updatedAt);
     this.inputs = inputs;
     this.outputs = outputs;
-    this.location = checkNotBlank(location);
+    this.location = location;
     this.context = context;
     this.description = description;
   }
@@ -68,6 +68,10 @@ public final class JobResponse {
 
   public List<String> getOutputs() {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
+  }
+
+  public Optional<String> getLocation() {
+    return Optional.ofNullable(location);
   }
 
   public Map<String, String> getContext() {

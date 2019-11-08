@@ -37,7 +37,7 @@ public class Job {
   @NonNull Instant updatedAt;
   @NonNull List<DatasetName> inputs;
   @NonNull List<DatasetName> outputs;
-  @NonNull URL location;
+  @Nullable URL location;
   @Nullable Map<String, String> context;
   @Nullable String description;
 
@@ -47,6 +47,10 @@ public class Job {
 
   public List<DatasetName> getOutputs() {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
+  }
+
+  public Optional<URL> getLocation() {
+    return Optional.ofNullable(location);
   }
 
   public Map<String, String> getContext() {
