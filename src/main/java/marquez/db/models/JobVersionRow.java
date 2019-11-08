@@ -36,9 +36,13 @@ public class JobVersionRow {
   @Getter @NonNull private final UUID jobContextUuid;
   @Getter @NonNull private final List<UUID> inputs;
   @Getter @NonNull private final List<UUID> outputs;
-  @Getter @NonNull private final String location;
+  @Nullable private final String location;
   @Getter @NonNull private final UUID version;
   @Nullable private final UUID latestRunUuid;
+
+  public Optional<String> getLocation() {
+    return Optional.ofNullable(location);
+  }
 
   public Optional<UUID> getLatestRunUuid() {
     return Optional.ofNullable(latestRunUuid);

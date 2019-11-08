@@ -127,7 +127,7 @@ public class JobService {
                 contextRow.getUuid(),
                 inputs,
                 outputs,
-                meta.getLocation(),
+                meta.getLocation().orElse(null),
                 version);
 
         versionDao.insertAndUpdate(newVersionRow);
@@ -215,7 +215,8 @@ public class JobService {
             .collect(toImmutableList());
 
     final JobContextRow contextRow = contextDao.findBy(versionRow.getJobContextUuid()).get();
-    return Mapper.toJob(jobRow, inputs, outputs, versionRow.getLocation(), versionRow.getContext());
+    return Mapper.toJob(
+        jobRow, inputs, outputs, versionRow.getLocation().orElse(null), versionRow.getContext());
   }
 
   public Run createRun(

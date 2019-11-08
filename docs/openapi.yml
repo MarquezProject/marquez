@@ -495,7 +495,6 @@ components:
         - type
         - inputs
         - outputs
-        - location
       example:
         type: BATCH
         inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
