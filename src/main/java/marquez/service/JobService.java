@@ -35,6 +35,7 @@ import marquez.db.NamespaceDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
+import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobContextRow;
@@ -104,20 +105,18 @@ public class JobService {
         final List<UUID> inputs =
             datasetDao
                 .findAllInNameList(
-                    meta.getInputs().stream()
-                        .map(input -> input.getValue())
-                        .collect(toImmutableList()))
+                    meta.getInputs().stream().map(DatasetName::getValue).collect(toImmutableList()))
                 .stream()
-                .map(row -> row.getUuid())
+                .map(DatasetRow::getUuid)
                 .collect(toImmutableList());
         final List<UUID> outputs =
             datasetDao
                 .findAllInNameList(
                     meta.getOutputs().stream()
-                        .map(input -> input.getValue())
+                        .map(DatasetName::getValue)
                         .collect(toImmutableList()))
                 .stream()
-                .map(row -> row.getUuid())
+                .map(DatasetRow::getUuid)
                 .collect(toImmutableList());
 
         final JobContextRow contextRow = contextDao.findBy(checksum).get();
@@ -162,11 +161,7 @@ public class JobService {
   public Optional<Job> get(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)
       throws MarquezServiceException {
     try {
-      Optional<JobRow> jobRow = jobDao.findBy(namespaceName.getValue(), jobName.getValue());
-      if (jobRow.isPresent()) {
-        return Optional.of(toJob(jobRow.get()));
-      }
-      return Optional.empty();
+      return jobDao.findBy(namespaceName.getValue(), jobName.getValue()).map(this::toJob);
     } catch (UnableToExecuteStatementException e) {
       log.error(
           "Failed to get job {} for namespace {}.",

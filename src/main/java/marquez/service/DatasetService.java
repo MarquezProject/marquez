@@ -75,9 +75,9 @@ public class DatasetService {
       final Optional<UUID> version = meta.version(namespaceName, datasetName);
       if (version.isPresent()) {
         if (!versionDao.exists(version.get())) {
-          final ExtendedDatasetRow extendedRow = datasetDao.findBy(datasetName.getValue()).get();
+          final ExtendedDatasetRow row = datasetDao.findBy(datasetName.getValue()).get();
           final DatasetVersionRow newVersionRow =
-              Mapper.toDatasetVersionRow(extendedRow.getUuid(), version.get(), meta);
+              Mapper.toDatasetVersionRow(row.getUuid(), version.get(), meta);
 
           versionDao.insertAndUpdate(newVersionRow);
         }
@@ -105,14 +105,9 @@ public class DatasetService {
 
   public Optional<Dataset> get(@NonNull DatasetName name) throws MarquezServiceException {
     try {
-      final Optional<ExtendedDatasetRow> extendedRow = datasetDao.findBy(name.getValue());
-      if (extendedRow.isPresent()) {
-        final DatasetVersionRow versionRow = getVersionRowOrNull(extendedRow.get());
-        final Dataset dataset = Mapper.toDataset(extendedRow.get(), versionRow);
-        return Optional.of(dataset);
-      }
-
-      return Optional.empty();
+      return datasetDao
+          .findBy(name.getValue())
+          .map(row -> Mapper.toDataset(row, getVersionRowOrNull(row)));
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get dataset {}.", name.getValue(), e.getMessage());
       throw new MarquezServiceException();
@@ -124,14 +119,13 @@ public class DatasetService {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
-      final List<ExtendedDatasetRow> extendedRows =
+      final List<ExtendedDatasetRow> rows =
           datasetDao.findAll(namespaceName.getValue(), limit, offset);
 
       final ImmutableList.Builder<Dataset> builder = ImmutableList.builder();
-      extendedRows.forEach(
-          extendedRow -> {
-            final DatasetVersionRow versionRow = getVersionRowOrNull(extendedRow);
-            final Dataset dataset = Mapper.toDataset(extendedRow, versionRow);
+      rows.forEach(
+          row -> {
+            final Dataset dataset = Mapper.toDataset(row, getVersionRowOrNull(row));
             builder.add(dataset);
           });
 
@@ -147,9 +141,9 @@ public class DatasetService {
     }
   }
 
-  private DatasetVersionRow getVersionRowOrNull(@NonNull ExtendedDatasetRow extendedRow) {
-    return (extendedRow.getCurrentVersionUuid().isPresent())
-        ? versionDao.findBy(extendedRow.getType(), extendedRow.getCurrentVersionUuid().get()).get()
+  private DatasetVersionRow getVersionRowOrNull(@NonNull ExtendedDatasetRow row) {
+    return (row.getCurrentVersionUuid().isPresent())
+        ? versionDao.findBy(row.getType(), row.getCurrentVersionUuid().get()).get()
         : null;
   }
 }
