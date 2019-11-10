@@ -82,9 +82,7 @@ public final class Mapper {
 
   public static List<NamespaceResponse> toNamespaceResponse(
       @NonNull final List<Namespace> namespaces) {
-    return namespaces.stream()
-        .map(namespace -> toNamespaceResponse(namespace))
-        .collect(toImmutableList());
+    return namespaces.stream().map(Mapper::toNamespaceResponse).collect(toImmutableList());
   }
 
   public static NamespacesResponse toNamespacesResponse(@NonNull final List<Namespace> namespaces) {
@@ -109,7 +107,7 @@ public final class Mapper {
   }
 
   public static List<SourceResponse> toSourceResponse(@NonNull final List<Source> sources) {
-    return sources.stream().map(source -> toSourceResponse(source)).collect(toImmutableList());
+    return sources.stream().map(Mapper::toSourceResponse).collect(toImmutableList());
   }
 
   public static SourcesResponse toSourcesResponse(@NonNull final List<Source> sources) {
@@ -159,7 +157,7 @@ public final class Mapper {
   }
 
   public static List<DatasetResponse> toDatasetResponse(@NonNull final List<Dataset> datasets) {
-    return datasets.stream().map(dataset -> toDatasetResponse(dataset)).collect(toImmutableList());
+    return datasets.stream().map(Mapper::toDatasetResponse).collect(toImmutableList());
   }
 
   public static DatasetsResponse toDatasetsResponse(@NonNull final List<Dataset> datasets) {
@@ -182,15 +180,15 @@ public final class Mapper {
         job.getName().getValue(),
         ISO_INSTANT.format(job.getCreatedAt()),
         ISO_INSTANT.format(job.getUpdatedAt()),
-        job.getInputs().stream().map(input -> input.getValue()).collect(toImmutableList()),
-        job.getOutputs().stream().map(output -> output.getValue()).collect(toImmutableList()),
+        job.getInputs().stream().map(DatasetName::getValue).collect(toImmutableList()),
+        job.getOutputs().stream().map(DatasetName::getValue).collect(toImmutableList()),
         job.getLocation().map(URL::toString).orElse(null),
         job.getContext(),
         job.getDescription().orElse(null));
   }
 
   public static List<JobResponse> toJobResponse(@NonNull final List<Job> jobs) {
-    return jobs.stream().map(job -> toJobResponse(job)).collect(toImmutableList());
+    return jobs.stream().map(Mapper::toJobResponse).collect(toImmutableList());
   }
 
   public static JobsResponse toJobsResponse(@NonNull final List<Job> jobs) {
@@ -199,14 +197,8 @@ public final class Mapper {
 
   public static RunMeta toRunMeta(@NonNull final RunRequest request) {
     return new RunMeta(
-        request
-            .getNominalStartTime()
-            .map(nominalStartTime -> Instant.parse(nominalStartTime))
-            .orElse(null),
-        request
-            .getNominalEndTime()
-            .map(nominalEndTime -> Instant.parse(nominalEndTime))
-            .orElse(null),
+        request.getNominalStartTime().map(Instant::parse).orElse(null),
+        request.getNominalEndTime().map(Instant::parse).orElse(null),
         request.getArgs());
   }
 
@@ -215,18 +207,14 @@ public final class Mapper {
         run.getId().toString(),
         ISO_INSTANT.format(run.getCreatedAt()),
         ISO_INSTANT.format(run.getUpdatedAt()),
-        run.getNominalStartTime()
-            .map(nominalStartTime -> ISO_INSTANT.format(nominalStartTime))
-            .orElse(null),
-        run.getNominalEndTime()
-            .map(nominalEndTime -> ISO_INSTANT.format(nominalEndTime))
-            .orElse(null),
+        run.getNominalStartTime().map(ISO_INSTANT::format).orElse(null),
+        run.getNominalEndTime().map(ISO_INSTANT::format).orElse(null),
         run.getState().toString(),
         run.getArgs());
   }
 
   public static List<RunResponse> toRunResponse(@NonNull final List<Run> runs) {
-    return runs.stream().map(run -> toRunResponse(run)).collect(toImmutableList());
+    return runs.stream().map(Mapper::toRunResponse).collect(toImmutableList());
   }
 
   public static RunsResponse toRunsResponse(@NonNull final List<Run> runs) {

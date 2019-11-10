@@ -77,7 +77,7 @@ public final class Mapper {
   }
 
   public static List<Namespace> toNamespace(@NonNull final List<NamespaceRow> rows) {
-    return rows.stream().map(row -> toNamespace(row)).collect(toImmutableList());
+    return rows.stream().map(Mapper::toNamespace).collect(toImmutableList());
   }
 
   public static NamespaceRow toNamespaceRow(
@@ -113,7 +113,7 @@ public final class Mapper {
   }
 
   public static List<Source> toSource(@NonNull final List<SourceRow> rows) {
-    return rows.stream().map(row -> toSource(row)).collect(toImmutableList());
+    return rows.stream().map(Mapper::toSource).collect(toImmutableList());
   }
 
   public static SourceRow toSourceRow(
@@ -266,8 +266,8 @@ public final class Mapper {
         Utils.fromJson(extendedRow.getArgs(), new TypeReference<Map<String, String>>() {}));
   }
 
-  public static List<Run> toRun(@NonNull final List<ExtendedRunRow> extendedRows) {
-    return extendedRows.stream().map(extendedRow -> toRun(extendedRow)).collect(toImmutableList());
+  public static List<Run> toRun(@NonNull final List<ExtendedRunRow> rows) {
+    return rows.stream().map(Mapper::toRun).collect(toImmutableList());
   }
 
   public static RunRow toRunRow(
@@ -286,7 +286,8 @@ public final class Mapper {
         null);
   }
 
-  public static RunArgsRow toRunArgsRow(@NonNull final Map<String, String> args, String checksum) {
+  public static RunArgsRow toRunArgsRow(
+      @NonNull final Map<String, String> args, @NonNull final String checksum) {
     return new RunArgsRow(UUID.randomUUID(), Instant.now(), Utils.toJson(args), checksum);
   }
 
