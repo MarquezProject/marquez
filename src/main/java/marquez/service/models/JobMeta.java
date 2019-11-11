@@ -17,8 +17,9 @@ package marquez.service.models;
 import static com.google.common.base.Charsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static marquez.common.Utils.KV_JOINER;
+import static marquez.common.Utils.VERSION_DELIM;
+import static marquez.common.Utils.VERSION_JOINER;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.net.URL;
@@ -37,9 +38,6 @@ import marquez.common.models.NamespaceName;
 
 @Value
 public class JobMeta {
-  private static final String VERSION_DELIM = ":";
-  private static final Joiner VERSION_JOINER = Joiner.on(VERSION_DELIM).skipNulls();
-
   @NonNull JobType type;
   @NonNull List<DatasetName> inputs;
   @NonNull List<DatasetName> outputs;
@@ -73,12 +71,10 @@ public class JobMeta {
             .join(
                 namespaceName.getValue(),
                 jobName.getValue(),
-                getInputs().stream().map(input -> input.getValue()).collect(joining(VERSION_DELIM)),
-                getOutputs().stream()
-                    .map(output -> output.getValue())
-                    .collect(joining(VERSION_DELIM)),
-                KV_JOINER.join(getContext()),
-                getLocation().map(URL::toString).orElse(null))
+                getInputs().stream().map(DatasetName::getValue).collect(joining(VERSION_DELIM)),
+                getOutputs().stream().map(DatasetName::getValue).collect(joining(VERSION_DELIM)),
+                getLocation().map(URL::toString).orElse(null),
+                KV_JOINER.join(getContext()))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }

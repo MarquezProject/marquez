@@ -35,7 +35,7 @@ public final class DbTableMeta extends DatasetMeta {
   }
 
   @Override
-  public Optional<UUID> version(NamespaceName namespaceName, DatasetName datasetName) {
-    return Optional.empty();
+  public UUID version(NamespaceName namespaceName, DatasetName datasetName) {
+    return null;
   }
 }

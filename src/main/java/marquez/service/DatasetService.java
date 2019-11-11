@@ -72,12 +72,12 @@ public class DatasetService {
         datasetDao.insert(newDatasetRow);
       }
 
-      final Optional<UUID> version = meta.version(namespaceName, datasetName);
-      if (version.isPresent()) {
-        if (!versionDao.exists(version.get())) {
+      final UUID version = meta.version(namespaceName, datasetName);
+      if (version != null) {
+        if (!versionDao.exists(version)) {
           final ExtendedDatasetRow row = datasetDao.findBy(datasetName.getValue()).get();
           final DatasetVersionRow newVersionRow =
-              Mapper.toDatasetVersionRow(row.getUuid(), version.get(), meta);
+              Mapper.toDatasetVersionRow(row.getUuid(), version, meta);
 
           versionDao.insertAndUpdate(newVersionRow);
         }
