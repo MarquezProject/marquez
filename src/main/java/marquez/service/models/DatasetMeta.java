@@ -14,7 +14,6 @@
 
 package marquez.service.models;
 
-import com.google.common.base.Joiner;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -29,8 +28,6 @@ import marquez.common.models.SourceName;
 @EqualsAndHashCode
 @ToString
 public abstract class DatasetMeta {
-  static final Joiner VERSION_JOINER = Joiner.on(":");
-
   @Getter private final DatasetName physicalName;
   @Getter private final SourceName sourceName;
   @Nullable private final String description;
@@ -55,5 +52,5 @@ public abstract class DatasetMeta {
     return Optional.ofNullable(runId);
   }
 
-  public abstract Optional<UUID> version(NamespaceName namespaceName, DatasetName name);
+  public abstract UUID version(NamespaceName namespaceName, DatasetName datasetName);
 }

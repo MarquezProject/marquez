@@ -15,9 +15,9 @@
 package marquez.service.models;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static marquez.common.Utils.VERSION_JOINER;
 
 import java.net.URL;
-import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -44,12 +44,16 @@ public final class StreamMeta extends DatasetMeta {
   }
 
   @Override
-  public Optional<UUID> version(NamespaceName namespaceName, DatasetName datasetName) {
+  public UUID version(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
     final byte[] bytes =
         VERSION_JOINER
-            .join(namespaceName.getValue(), datasetName.getValue(), schemaLocation.toString())
+            .join(
+                namespaceName.getValue(),
+                getSourceName().getValue(),
+                datasetName.getValue(),
+                getPhysicalName().getValue(),
+                schemaLocation.toString())
             .getBytes(UTF_8);
-    final UUID version = UUID.nameUUIDFromBytes(bytes);
-    return Optional.of(version);
+    return UUID.nameUUIDFromBytes(bytes);
   }
 }

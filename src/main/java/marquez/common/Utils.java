@@ -34,6 +34,9 @@ public final class Utils {
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
+  public static final String VERSION_DELIM = ":";
+  public static final Joiner VERSION_JOINER = Joiner.on(VERSION_DELIM).skipNulls();
+
   public static final String KV_DELIM = "#";
   public static final Joiner.MapJoiner KV_JOINER = Joiner.on(KV_DELIM).withKeyValueSeparator("=");
 
