@@ -14,7 +14,6 @@
 
 package marquez.service.models;
 
-import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
