@@ -44,11 +44,11 @@ import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DbColumn;
 import marquez.common.models.JobType;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
-import marquez.common.models.DbColumn;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTable;
@@ -131,7 +131,6 @@ public final class Mapper {
 
     throw new IllegalArgumentException();
   }
-
 
   public static DatasetResponse toDatasetResponse(@NonNull final Dataset dataset) {
     final String datasetString = dataset.getName().getValue();
