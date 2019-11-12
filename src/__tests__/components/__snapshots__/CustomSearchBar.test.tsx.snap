@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CustomSearchBar Component renders a snapshot that matches previous 1`] = `
+<WithStyles(SearchBar)
+  onCancelSearch={[Function]}
+  onChange={[Function]}
+  onRequestSearch={[Function]}
+  value=""
+/>
+`;

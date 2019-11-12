@@ -28,35 +28,27 @@ const styles = theme => ({
 });
 
 class NamespaceSelector extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedNamespace: '',
-      namespaces: [],
-      name: 'ns',
-      labelWidth: 0
-    };
-    this.handleChange = this.handleChange.bind(this);
-  }
+  state = {
+    selectedNamespace: '',
+    namespaces: [],
+    name: 'ns',
+    labelWidth: 0,
+  };
 
   componentDidMount() {
     this.setState({
       labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
     });
+    axios.get('/api/v1/namespaces/').then((response) => {
+      const namespaceList = response.data.namespaces.map(namespace => namespace.name)
+      console.log(namespaceList)
+      this.setState({namespaces: namespaceList})
+    })
   }
 
   handleChange = event => {
-    this.props.onChange(event.target.value);
+    this.setState({ [event.target.name]: event.target.value });
   };
-
-  componentDidUpdate(prevProps) {
-    if(this.props.namespaces != prevProps.namespaces) {
-      this.setState({namespaces: this.props.namespaces});
-    }
-    if(this.props.selectedNamespace != prevProps.selectedNamespace) {
-      this.setState({selectedNamespace: this.props.selectedNamespace});
-    }
-  }
 
   render() {
     const { classes } = this.props;
