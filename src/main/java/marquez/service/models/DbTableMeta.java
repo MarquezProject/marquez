@@ -20,20 +20,21 @@ import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DbColumn;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableMeta extends DatasetMeta {
-  final List<DbTableColumn> columns;
+  final List<DbColumn> columns;
 
   public DbTableMeta(
       final DatasetName physicalName,
       final SourceName sourceName,
       @Nullable final String description,
       @Nullable final UUID runId,
-      @Nullable final List<DbTableColumn> columns) {
+      @Nullable final List<DbColumn> columns) {
     super(physicalName, sourceName, description, runId);
     this.columns = columns;
   }

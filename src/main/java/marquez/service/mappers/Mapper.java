@@ -27,14 +27,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.common.Utils;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetType;
-import marquez.common.models.JobName;
-import marquez.common.models.JobType;
-import marquez.common.models.NamespaceName;
-import marquez.common.models.OwnerName;
-import marquez.common.models.SourceName;
-import marquez.common.models.SourceType;
+import marquez.common.models.*;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
@@ -50,7 +43,20 @@ import marquez.db.models.RunRow;
 import marquez.db.models.RunStateRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.StreamVersionRow;
-import marquez.service.models.*;
+import marquez.service.models.Dataset;
+import marquez.service.models.DatasetMeta;
+import marquez.service.models.DbTable;
+import marquez.service.models.DbTableMeta;
+import marquez.service.models.Job;
+import marquez.service.models.JobMeta;
+import marquez.service.models.Namespace;
+import marquez.service.models.NamespaceMeta;
+import marquez.service.models.Run;
+import marquez.service.models.RunMeta;
+import marquez.service.models.Source;
+import marquez.service.models.SourceMeta;
+import marquez.service.models.Stream;
+import marquez.service.models.StreamMeta;
 
 public final class Mapper {
   private Mapper() {}
@@ -133,7 +139,7 @@ public final class Mapper {
         return new Stream(
             name, physicalName, createdAt, updatedAt, sourceName, schemaLocation, description);
       default:
-        final List<DbTableColumn> columns =
+        final List<DbColumn> columns =
             new ArrayList<>(); // todo: implement DbTableVersionView to pass in column
         return new DbTable(
             name, physicalName, createdAt, updatedAt, sourceName, description, columns);

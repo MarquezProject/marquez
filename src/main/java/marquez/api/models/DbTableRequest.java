@@ -16,16 +16,16 @@ package marquez.api.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import marquez.common.models.DbColumn;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableRequest extends DatasetRequest {
-  @Getter private final List<Map<String, String>> columns;
+  @Getter private final List<DbColumn> columns;
 
   @JsonCreator
   public DbTableRequest(
@@ -33,7 +33,7 @@ public final class DbTableRequest extends DatasetRequest {
       final String sourceName,
       @Nullable final String description,
       @Nullable final String runId,
-      @Nullable final List<Map<String, String>> columns) {
+      @Nullable final List<DbColumn> columns) {
     super(physicalName, sourceName, description, runId);
     this.columns = columns;
   }

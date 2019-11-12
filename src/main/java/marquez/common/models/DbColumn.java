@@ -12,14 +12,31 @@
  * limitations under the License.
  */
 
-package marquez.service.models;
+package marquez.common.models;
 
+import static marquez.common.base.MorePreconditions.checkNotBlank;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.*;
+import lombok.NonNull;
+import lombok.Value;
 
 @Value
-public final class DbTableColumn {
-  @NonNull String name;
-  @NonNull String type;
+public class DbColumn {
+  String name;
+  String type;
   @Nullable String description;
+
+  @JsonCreator
+  public DbColumn(
+      @NonNull final String name, @NonNull final String type, @Nullable final String description) {
+    this.name = checkNotBlank(name);
+    this.type = checkNotBlank(type);
+    this.description = description;
+  }
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
+  }
 }

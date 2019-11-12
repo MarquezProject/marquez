@@ -100,13 +100,10 @@ public final class ModelGenerator extends Generator {
     return UUID.randomUUID();
   }
 
-  public static List<Map<String, String>> newColumns() {
-    Map<String, String> column1 =
-        ImmutableMap.of("name", "val1", "type", "VARCHAR", "description", "col1 description");
-    Map<String, String> column2 =
-        ImmutableMap.of("name", "val2", "type", "VARCHAR", "description", "col2 description");
-    Map<String, String> column3 =
-        ImmutableMap.of("name", "val3", "type", "VARCHAR", "description", "col3 description");
+  public static List<DbColumn> newColumns() {
+    DbColumn column1 = new DbColumn("first name", "VARCHAR", "first name of customer");
+    DbColumn column2 = new DbColumn("last name", "VARCHAR", "last name of customer");
+    DbColumn column3 = new DbColumn("address", "VARCHAR", "address of customer");
     return ImmutableList.of(column1, column2, column3);
   }
 

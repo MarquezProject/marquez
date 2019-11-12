@@ -42,11 +42,7 @@ import marquez.api.models.SourcesResponse;
 import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
 import marquez.common.Utils;
-import marquez.common.models.DatasetName;
-import marquez.common.models.JobType;
-import marquez.common.models.OwnerName;
-import marquez.common.models.SourceName;
-import marquez.common.models.SourceType;
+import marquez.common.models.*;
 import marquez.service.models.*;
 
 public final class Mapper {
@@ -107,9 +103,8 @@ public final class Mapper {
     final UUID runId = request.getRunId().map(UUID::fromString).orElse(null);
 
     if (request instanceof DbTableRequest) {
-      List<Map<String, String>> columns = ((DbTableRequest) request).getColumns();
-      return new DbTableMeta(
-          physicalName, sourceName, description, runId, toDbTableColumn(columns));
+      List<DbColumn> columns = ((DbTableRequest) request).getColumns();
+      return new DbTableMeta(physicalName, sourceName, description, runId, columns);
     } else if (request instanceof StreamRequest) {
       final URL schemaLocation = Utils.toUrl(((StreamRequest) request).getSchemaLocation());
       return new StreamMeta(physicalName, sourceName, schemaLocation, description, runId);
@@ -118,25 +113,13 @@ public final class Mapper {
     throw new IllegalArgumentException();
   }
 
-  private static List<DbTableColumn> toDbTableColumn(final List<Map<String, String>> columns) {
-    List<DbTableColumn> dbTableColumns = new ArrayList<>(); // better way of converting ?
+  private static List<DbColumn> toDbTableColumn(final List<Map<String, String>> columns) {
+    List<DbColumn> dbColumns = new ArrayList<>(); // better way of converting ?
     for (Map<String, String> column : columns) {
-      dbTableColumns.add(
-          new DbTableColumn(column.get("name"), column.get("type"), column.get("description")));
+      dbColumns.add(
+          new DbColumn(column.get("name"), column.get("type"), column.get("description")));
     }
-    return dbTableColumns;
-  }
-
-  private static List<Map<String, String>> toDTableMap(final List<DbTableColumn> columns) {
-    List<Map<String, String>> dbTableColumns = new ArrayList<>(); // better way of converting ?
-    for (DbTableColumn dbTableColumn : columns) {
-      Map<String, String> column = new HashMap<>();
-      column.put("name", dbTableColumn.getName());
-      column.put("type", dbTableColumn.getType());
-      column.put("description", dbTableColumn.getDescription());
-      dbTableColumns.add(column);
-    }
-    return dbTableColumns;
+    return dbColumns;
   }
 
   public static DatasetResponse toDatasetResponse(@NonNull final Dataset dataset) {
@@ -148,7 +131,7 @@ public final class Mapper {
     final String description = dataset.getDescription().orElse(null);
 
     if (dataset instanceof DbTable) {
-      List<DbTableColumn> columns = ((DbTable) dataset).getColumns();
+      List<DbColumn> columns = ((DbTable) dataset).getColumns();
       return new DbTableResponse(
           datasetString,
           physicalString,
@@ -156,7 +139,7 @@ public final class Mapper {
           updatedAtIso,
           sourceString,
           description,
-          toDTableMap(columns));
+          columns);
     } else if (dataset instanceof Stream) {
       final String schemaLocationString = ((Stream) dataset).getSchemaLocation().toString();
       return new StreamResponse(

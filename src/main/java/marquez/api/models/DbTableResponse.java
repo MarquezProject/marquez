@@ -15,15 +15,15 @@
 package marquez.api.models;
 
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import marquez.common.models.DbColumn;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableResponse extends DatasetResponse {
-  final List<Map<String, String>> columns;
+  final List<DbColumn> columns;
 
   public DbTableResponse(
       final String name,
@@ -32,7 +32,7 @@ public final class DbTableResponse extends DatasetResponse {
       final String updatedAt,
       final String sourceName,
       @Nullable final String description,
-      @Nullable final List<Map<String, String>> columns) {
+      @Nullable final List<DbColumn> columns) {
     super(name, physicalName, createdAt, updatedAt, sourceName, description);
     this.columns = columns;
   }
