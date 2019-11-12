@@ -22,14 +22,14 @@ import marquez.db.mappers.ExtendedJobVersionRowMapper;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.JobVersionRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
+import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(ExtendedJobVersionRowMapper.class)
-public interface JobVersionDao {
+public interface JobVersionDao extends SqlObject {
   enum IoType {
     INPUT,
     OUTPUT;
@@ -39,25 +39,27 @@ public interface JobVersionDao {
   JobDao createJobDao();
 
   @Transaction
-  default void insertAndUpdate(JobVersionRow row) {
-    insert(row);
-    row.getInputs()
+  default void insert(JobVersionRow row) {
+    getHandle()
+        .createUpdate(
+            "INSERT INTO job_versions (uuid, created_at, updated_at, job_uuid, version, location, latest_run_uuid, job_context_uuid) "
+                + "VALUES (:uuid, :createdAt, :updateAt, :jobUuid, :version, :location, :latestRunUuid, :jobContextUuid)")
+        .bindBean(row)
+        .execute();
+
+    row.getInputUuids()
         .forEach(
-            datasetUuid -> {
-              insert(row.getUuid(), datasetUuid, IoType.INPUT.toString());
+            inputUuid -> {
+              insert(row.getUuid(), inputUuid, IoType.INPUT.toString());
             });
-    row.getOutputs()
+    row.getOutputUuids()
         .forEach(
-            datasetUuid -> {
-              insert(row.getUuid(), datasetUuid, IoType.OUTPUT.toString());
+            outputUuid -> {
+              insert(row.getUuid(), outputUuid, IoType.OUTPUT.toString());
             });
+
     createJobDao().update(row.getJobUuid(), row.getCreatedAt(), row.getVersion());
   }
-
-  @SqlUpdate(
-      "INSERT INTO job_versions (uuid, created_at, updated_at, job_uuid, version, location, latest_run_uuid, job_context_uuid) "
-          + "VALUES (:uuid, :createdAt, :updateAt, :jobUuid, :version, :location, :latestRunUuid, :jobContextUuid)")
-  void insert(@BindBean JobVersionRow row);
 
   @SqlUpdate(
       "INSERT INTO job_versions_io_mapping (job_version_uuid, dataset_uuid, io_type) "
@@ -79,11 +81,11 @@ public interface JobVersionDao {
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
           + "      WHERE job_version_uuid = jv.uuid AND "
-          + "            io_type = 'INPUT') AS inputs, "
+          + "            io_type = 'INPUT') AS input_uuids, "
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
           + "      WHERE job_version_uuid = jv.uuid AND "
-          + "            io_type = 'OUTPUT') AS outputs "
+          + "            io_type = 'OUTPUT') AS output_uuids "
           + "FROM job_versions AS jv "
           + "INNER JOIN jobs AS j "
           + "  ON (job_uuid = jv.job_uuid AND j.current_version_uuid = :currentVersionUuid)"
@@ -99,11 +101,11 @@ public interface JobVersionDao {
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
           + "      WHERE job_version_uuid = jv.uuid AND "
-          + "            io_type = 'INPUT') AS inputs, "
+          + "            io_type = 'INPUT') AS input_uuids, "
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
           + "      WHERE job_version_uuid = jv.uuid AND "
-          + "            io_type = 'OUTPUT') AS outputs "
+          + "            io_type = 'OUTPUT') AS output_uuids "
           + "FROM job_versions AS jv "
           + "INNER JOIN jobs AS j "
           + "  ON (job_uuid = jv.job_uuid AND j.name = :jobName)"
@@ -120,11 +122,11 @@ public interface JobVersionDao {
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
           + "      WHERE job_version_uuid = jv.uuid AND "
-          + "            io_type = 'INPUT') AS inputs, "
+          + "            io_type = 'INPUT') AS input_uuids, "
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
           + "      WHERE job_version_uuid = jv.uuid AND "
-          + "            io_type = 'OUTPUT') AS outputs "
+          + "            io_type = 'OUTPUT') AS output_uuids "
           + "FROM job_versions AS jv "
           + "INNER JOIN jobs AS j "
           + "  ON (job_uuid = jv.job_uuid AND j.name = :jobName)"

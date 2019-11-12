@@ -55,10 +55,15 @@ public final class Columns {
   public static final String SOURCE_NAME = "source_name";
   public static final String PHYSICAL_NAME = "physical_name";
 
+  /* DATASET VERSION ROW COLUMNS */
+  public static final String FIELD_UUIDS = "field_uuids";
+
   /* STREAM VERSION ROW COLUMNS */
-  public static final String INPUTS = "inputs";
-  public static final String OUTPUTS = "outputs";
   public static final String SCHEMA_LOCATION = "schema_location";
+
+  /* JOB VERSION I/O ROW COLUMNS */
+  public static final String INPUT_UUIDS = "input_uuids";
+  public static final String OUTPUT_UUIDS = "output_uuids";
   public static final String IO_TYPE = "io_type";
 
   /* JOB VERSION ROW COLUMNS */

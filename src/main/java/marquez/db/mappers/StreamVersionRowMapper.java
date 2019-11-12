@@ -16,6 +16,7 @@ package marquez.db.mappers;
 
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidArrayOrThrow;
 import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
@@ -36,6 +37,7 @@ public final class StreamVersionRowMapper implements RowMapper<StreamVersionRow>
         timestampOrThrow(results, Columns.CREATED_AT),
         uuidOrThrow(results, Columns.DATASET_UUID),
         uuidOrThrow(results, Columns.VERSION),
+        uuidArrayOrThrow(results, Columns.FIELD_UUIDS),
         uuidOrNull(results, Columns.RUN_UUID),
         stringOrThrow(results, Columns.SCHEMA_LOCATION));
   }
