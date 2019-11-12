@@ -20,7 +20,8 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import lombok.NonNull;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
@@ -42,8 +43,26 @@ import marquez.api.models.SourcesResponse;
 import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
 import marquez.common.Utils;
-import marquez.common.models.*;
-import marquez.service.models.*;
+import marquez.common.models.DatasetName;
+import marquez.common.models.JobType;
+import marquez.common.models.OwnerName;
+import marquez.common.models.SourceName;
+import marquez.common.models.SourceType;
+import marquez.common.models.DbColumn;
+import marquez.service.models.Dataset;
+import marquez.service.models.DatasetMeta;
+import marquez.service.models.DbTable;
+import marquez.service.models.DbTableMeta;
+import marquez.service.models.Job;
+import marquez.service.models.JobMeta;
+import marquez.service.models.Namespace;
+import marquez.service.models.NamespaceMeta;
+import marquez.service.models.Run;
+import marquez.service.models.RunMeta;
+import marquez.service.models.Source;
+import marquez.service.models.SourceMeta;
+import marquez.service.models.Stream;
+import marquez.service.models.StreamMeta;
 
 public final class Mapper {
   private Mapper() {}
@@ -113,14 +132,6 @@ public final class Mapper {
     throw new IllegalArgumentException();
   }
 
-  private static List<DbColumn> toDbTableColumn(final List<Map<String, String>> columns) {
-    List<DbColumn> dbColumns = new ArrayList<>(); // better way of converting ?
-    for (Map<String, String> column : columns) {
-      dbColumns.add(
-          new DbColumn(column.get("name"), column.get("type"), column.get("description")));
-    }
-    return dbColumns;
-  }
 
   public static DatasetResponse toDatasetResponse(@NonNull final Dataset dataset) {
     final String datasetString = dataset.getName().getValue();
