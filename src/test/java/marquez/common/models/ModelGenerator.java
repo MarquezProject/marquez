@@ -55,12 +55,16 @@ public final class ModelGenerator extends Generator {
     switch (type) {
       case MYSQL:
         connectionUrlString = "jdbc:mysql://localhost:3306/test" + newId();
+        break;
       case POSTGRESQL:
         connectionUrlString = "jdbc:postgresql://localhost:5432/test" + newId();
+        break;
       case REDSHIFT:
         connectionUrlString = "jdbc:snowflake://we.snowflakecomputing.com/?db=test" + newId();
+        break;
       case KAFKA:
         connectionUrlString = "http://localhost:9092";
+        break;
       default:
         connectionUrlString = "http://localhost:5000";
     }

@@ -68,7 +68,7 @@ public class MarquezAppIntegrationTest {
           ConfigOverride.config("db.password", DB.getPassword()));
 
   private static final String BASE_API_PATH = "/api/v1";
-  private final URI BASE_URI = URI.create("http://localhost:" + APP.getLocalPort() + BASE_API_PATH);
+  private final URI baseUri = URI.create("http://localhost:" + APP.getLocalPort() + BASE_API_PATH);
 
   private static final int HTTP_200 = 200;
   private static final int HTTP_201 = 201;
@@ -77,7 +77,7 @@ public class MarquezAppIntegrationTest {
   public void testApp_createNamespace() {
     final Response response =
         APP.client()
-            .target(BASE_URI + "/namespaces/{namespace}")
+            .target(baseUri + "/namespaces/{namespace}")
             .resolveTemplate("namespace", newNamespaceName().getValue())
             .request(APPLICATION_JSON)
             .put(Entity.json(newNamespaceRequest()));
@@ -89,7 +89,7 @@ public class MarquezAppIntegrationTest {
   public void testApp_createSource() {
     final Response response =
         APP.client()
-            .target(BASE_URI + "/sources/{source}")
+            .target(baseUri + "/sources/{source}")
             .resolveTemplate("source", newSourceName().getValue())
             .request(APPLICATION_JSON)
             .put(Entity.json(newSourceRequest()));
@@ -102,7 +102,7 @@ public class MarquezAppIntegrationTest {
     final SourceName sourceName = newSourceName();
 
     APP.client()
-        .target(BASE_URI + "/sources/{source}")
+        .target(baseUri + "/sources/{source}")
         .resolveTemplate("source", sourceName.getValue())
         .request(APPLICATION_JSON)
         .put(Entity.json(newSourceRequestWith(SourceType.POSTGRESQL)));
@@ -111,7 +111,7 @@ public class MarquezAppIntegrationTest {
 
     final Response response =
         APP.client()
-            .target(BASE_URI + "/namespaces/default/datasets/{dataset}")
+            .target(baseUri + "/namespaces/default/datasets/{dataset}")
             .resolveTemplate("dataset", datasetName.getValue())
             .request(APPLICATION_JSON)
             .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
@@ -124,7 +124,7 @@ public class MarquezAppIntegrationTest {
     final SourceName sourceName = newSourceName();
 
     APP.client()
-        .target(BASE_URI + "/sources/{source}")
+        .target(baseUri + "/sources/{source}")
         .resolveTemplate("source", sourceName.getValue())
         .request(APPLICATION_JSON)
         .put(Entity.json(newSourceRequestWith(SourceType.KAFKA)));
@@ -133,7 +133,7 @@ public class MarquezAppIntegrationTest {
 
     final Response response =
         APP.client()
-            .target(BASE_URI + "/namespaces/default/datasets/{dataset}")
+            .target(baseUri + "/namespaces/default/datasets/{dataset}")
             .resolveTemplate("dataset", datasetName.getValue())
             .request(APPLICATION_JSON)
             .put(Entity.json(newStreamRequestWith(datasetName, sourceName)));
@@ -146,7 +146,7 @@ public class MarquezAppIntegrationTest {
     final SourceName sourceName = newSourceName();
 
     APP.client()
-        .target(BASE_URI + "/sources/{source}")
+        .target(baseUri + "/sources/{source}")
         .resolveTemplate("source", sourceName.getValue())
         .request(APPLICATION_JSON)
         .put(Entity.json(newSourceRequestWith(SourceType.POSTGRESQL)));
@@ -157,7 +157,7 @@ public class MarquezAppIntegrationTest {
     inputs.forEach(
         datasetName -> {
           APP.client()
-              .target(BASE_URI + "/namespaces/default/datasets/{dataset}")
+              .target(baseUri + "/namespaces/default/datasets/{dataset}")
               .resolveTemplate("dataset", datasetName.getValue())
               .request(APPLICATION_JSON)
               .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
@@ -166,7 +166,7 @@ public class MarquezAppIntegrationTest {
     outputs.forEach(
         datasetName -> {
           APP.client()
-              .target(BASE_URI + "/namespaces/default/datasets/{dataset}")
+              .target(baseUri + "/namespaces/default/datasets/{dataset}")
               .resolveTemplate("dataset", datasetName.getValue())
               .request(APPLICATION_JSON)
               .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
@@ -174,7 +174,7 @@ public class MarquezAppIntegrationTest {
 
     final Response response =
         APP.client()
-            .target(BASE_URI + "/namespaces/default/jobs/{job}")
+            .target(baseUri + "/namespaces/default/jobs/{job}")
             .resolveTemplate("job", newJobName().getValue())
             .request(APPLICATION_JSON)
             .put(Entity.json(newJobRequestWith(inputs, outputs)));
@@ -187,7 +187,7 @@ public class MarquezAppIntegrationTest {
     final SourceName sourceName = newSourceName();
 
     APP.client()
-        .target(BASE_URI + "/sources/{source}")
+        .target(baseUri + "/sources/{source}")
         .resolveTemplate("source", sourceName.getValue())
         .request(APPLICATION_JSON)
         .put(Entity.json(newSourceRequestWith(SourceType.POSTGRESQL)));
@@ -198,7 +198,7 @@ public class MarquezAppIntegrationTest {
     inputs.forEach(
         datasetName -> {
           APP.client()
-              .target(BASE_URI + "/namespaces/default/datasets/{dataset}")
+              .target(baseUri + "/namespaces/default/datasets/{dataset}")
               .resolveTemplate("dataset", datasetName.getValue())
               .request(APPLICATION_JSON)
               .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
@@ -207,7 +207,7 @@ public class MarquezAppIntegrationTest {
     outputs.forEach(
         datasetName -> {
           APP.client()
-              .target(BASE_URI + "/namespaces/default/datasets/{dataset}")
+              .target(baseUri + "/namespaces/default/datasets/{dataset}")
               .resolveTemplate("dataset", datasetName.getValue())
               .request(APPLICATION_JSON)
               .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
@@ -216,14 +216,14 @@ public class MarquezAppIntegrationTest {
     final JobName jobName = newJobName();
 
     APP.client()
-        .target(BASE_URI + "/namespaces/default/jobs/{job}")
+        .target(baseUri + "/namespaces/default/jobs/{job}")
         .resolveTemplate("job", jobName.getValue())
         .request(APPLICATION_JSON)
         .put(Entity.json(newJobRequestWith(inputs, outputs)));
 
     final Response response0 =
         APP.client()
-            .target(BASE_URI + "/namespaces/default/jobs/{job}/runs")
+            .target(baseUri + "/namespaces/default/jobs/{job}/runs")
             .resolveTemplate("job", jobName.getValue())
             .request(APPLICATION_JSON)
             .post(Entity.json(EMPTY_RUN_REQUEST));
@@ -235,7 +235,7 @@ public class MarquezAppIntegrationTest {
 
     final Response response1 =
         APP.client()
-            .target(BASE_URI + "/jobs/runs/{id}/start")
+            .target(baseUri + "/jobs/runs/{id}/start")
             .resolveTemplate("id", runId)
             .request(APPLICATION_JSON)
             .post(Entity.json(ImmutableMap.of()));
@@ -248,7 +248,7 @@ public class MarquezAppIntegrationTest {
 
     final Response response2 =
         APP.client()
-            .target(BASE_URI + "/jobs/runs/{id}/complete")
+            .target(baseUri + "/jobs/runs/{id}/complete")
             .resolveTemplate("id", runId)
             .request(APPLICATION_JSON)
             .post(Entity.json(ImmutableMap.of()));

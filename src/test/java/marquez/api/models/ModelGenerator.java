@@ -16,7 +16,18 @@ package marquez.api.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static marquez.common.models.ModelGenerator.*;
+import static marquez.common.models.ModelGenerator.newColumns;
+import static marquez.common.models.ModelGenerator.newConnectionUrl;
+import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
+import static marquez.common.models.ModelGenerator.newContext;
+import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newJobType;
+import static marquez.common.models.ModelGenerator.newLocation;
+import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.common.models.ModelGenerator.newOwnerName;
+import static marquez.common.models.ModelGenerator.newRunId;
+import static marquez.common.models.ModelGenerator.newSourceName;
+import static marquez.common.models.ModelGenerator.newSourceType;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -63,16 +74,16 @@ public final class ModelGenerator extends Generator {
     return newSourceRequest(newSourceType(), true);
   }
 
-  public static SourceRequest newSourceRequestWith(final SourceType type) {
-    return newSourceRequest(type, true);
-  }
-
   public static SourceRequest newSourceRequest(
       final SourceType type, final boolean hasDescription) {
     return new SourceRequest(
         newSourceType().toString(),
         newConnectionUrlFor(type).toASCIIString(),
         hasDescription ? newDescription() : null);
+  }
+
+  public static SourceRequest newSourceRequestWith(final SourceType type) {
+    return newSourceRequest(type, true);
   }
 
   public static List<SourceResponse> newSourceResponses(final int limit) {
