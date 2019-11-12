@@ -15,8 +15,10 @@
 package marquez.service.models;
 
 import java.time.Instant;
+import java.util.List;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.SourceName;
@@ -24,13 +26,17 @@ import marquez.common.models.SourceName;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTable extends Dataset {
+  @Getter final List<DbTableColumn> columns;
+
   public DbTable(
       final DatasetName name,
       final DatasetName physicalName,
       final Instant createdAt,
       final Instant updatedAt,
       final SourceName sourceName,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable final List<DbTableColumn> columns) {
     super(name, physicalName, createdAt, updatedAt, sourceName, description);
+    this.columns = columns;
   }
 }

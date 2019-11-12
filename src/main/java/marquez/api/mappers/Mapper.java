@@ -20,8 +20,7 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import lombok.NonNull;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
@@ -48,20 +47,7 @@ import marquez.common.models.JobType;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
-import marquez.service.models.Dataset;
-import marquez.service.models.DatasetMeta;
-import marquez.service.models.DbTable;
-import marquez.service.models.DbTableMeta;
-import marquez.service.models.Job;
-import marquez.service.models.JobMeta;
-import marquez.service.models.Namespace;
-import marquez.service.models.NamespaceMeta;
-import marquez.service.models.Run;
-import marquez.service.models.RunMeta;
-import marquez.service.models.Source;
-import marquez.service.models.SourceMeta;
-import marquez.service.models.Stream;
-import marquez.service.models.StreamMeta;
+import marquez.service.models.*;
 
 public final class Mapper {
   private Mapper() {}
@@ -121,13 +107,36 @@ public final class Mapper {
     final UUID runId = request.getRunId().map(UUID::fromString).orElse(null);
 
     if (request instanceof DbTableRequest) {
-      return new DbTableMeta(physicalName, sourceName, description, runId);
+      List<Map<String, String>> columns = ((DbTableRequest) request).getColumns();
+      return new DbTableMeta(
+          physicalName, sourceName, description, runId, toDbTableColumn(columns));
     } else if (request instanceof StreamRequest) {
       final URL schemaLocation = Utils.toUrl(((StreamRequest) request).getSchemaLocation());
       return new StreamMeta(physicalName, sourceName, schemaLocation, description, runId);
     }
 
     throw new IllegalArgumentException();
+  }
+
+  private static List<DbTableColumn> toDbTableColumn(final List<Map<String, String>> columns) {
+    List<DbTableColumn> dbTableColumns = new ArrayList<>(); // better way of converting ?
+    for (Map<String, String> column : columns) {
+      dbTableColumns.add(
+          new DbTableColumn(column.get("name"), column.get("type"), column.get("description")));
+    }
+    return dbTableColumns;
+  }
+
+  private static List<Map<String, String>> toDTableMap(final List<DbTableColumn> columns) {
+    List<Map<String, String>> dbTableColumns = new ArrayList<>(); // better way of converting ?
+    for (DbTableColumn dbTableColumn : columns) {
+      Map<String, String> column = new HashMap<>();
+      column.put("name", dbTableColumn.getName());
+      column.put("type", dbTableColumn.getType());
+      column.put("description", dbTableColumn.getDescription());
+      dbTableColumns.add(column);
+    }
+    return dbTableColumns;
   }
 
   public static DatasetResponse toDatasetResponse(@NonNull final Dataset dataset) {
@@ -139,8 +148,15 @@ public final class Mapper {
     final String description = dataset.getDescription().orElse(null);
 
     if (dataset instanceof DbTable) {
+      List<DbTableColumn> columns = ((DbTable) dataset).getColumns();
       return new DbTableResponse(
-          datasetString, physicalString, createdAtIso, updatedAtIso, sourceString, description);
+          datasetString,
+          physicalString,
+          createdAtIso,
+          updatedAtIso,
+          sourceString,
+          description,
+          toDTableMap(columns));
     } else if (dataset instanceof Stream) {
       final String schemaLocationString = ((Stream) dataset).getSchemaLocation().toString();
       return new StreamResponse(

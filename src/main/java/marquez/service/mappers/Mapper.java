@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -49,20 +50,7 @@ import marquez.db.models.RunRow;
 import marquez.db.models.RunStateRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.StreamVersionRow;
-import marquez.service.models.Dataset;
-import marquez.service.models.DatasetMeta;
-import marquez.service.models.DbTable;
-import marquez.service.models.DbTableMeta;
-import marquez.service.models.Job;
-import marquez.service.models.JobMeta;
-import marquez.service.models.Namespace;
-import marquez.service.models.NamespaceMeta;
-import marquez.service.models.Run;
-import marquez.service.models.RunMeta;
-import marquez.service.models.Source;
-import marquez.service.models.SourceMeta;
-import marquez.service.models.Stream;
-import marquez.service.models.StreamMeta;
+import marquez.service.models.*;
 
 public final class Mapper {
   private Mapper() {}
@@ -145,7 +133,10 @@ public final class Mapper {
         return new Stream(
             name, physicalName, createdAt, updatedAt, sourceName, schemaLocation, description);
       default:
-        return new DbTable(name, physicalName, createdAt, updatedAt, sourceName, description);
+        final List<DbTableColumn> columns =
+            new ArrayList<>(); // todo: implement DbTableVersionView to pass in column
+        return new DbTable(
+            name, physicalName, createdAt, updatedAt, sourceName, description, columns);
     }
   }
 

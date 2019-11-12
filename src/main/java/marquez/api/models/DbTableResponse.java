@@ -14,6 +14,8 @@
 
 package marquez.api.models;
 
+import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -21,13 +23,17 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableResponse extends DatasetResponse {
+  final List<Map<String, String>> columns;
+
   public DbTableResponse(
       final String name,
       final String physicalName,
       final String createdAt,
       final String updatedAt,
       final String sourceName,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable final List<Map<String, String>> columns) {
     super(name, physicalName, createdAt, updatedAt, sourceName, description);
+    this.columns = columns;
   }
 }

@@ -16,6 +16,7 @@ package marquez.common.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URL;
@@ -93,6 +94,16 @@ public final class ModelGenerator extends Generator {
 
   public static UUID newRunId() {
     return UUID.randomUUID();
+  }
+
+  public static List<Map<String, String>> newColumns() {
+    Map<String, String> column1 =
+        ImmutableMap.of("name", "val1", "type", "VARCHAR", "description", "col1 description");
+    Map<String, String> column2 =
+        ImmutableMap.of("name", "val2", "type", "VARCHAR", "description", "col2 description");
+    Map<String, String> column3 =
+        ImmutableMap.of("name", "val3", "type", "VARCHAR", "description", "col3 description");
+    return ImmutableList.of(column1, column2, column3);
   }
 
   public static String newDescription() {

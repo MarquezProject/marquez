@@ -14,6 +14,7 @@
 
 package marquez.service.models;
 
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -25,16 +26,20 @@ import marquez.common.models.SourceName;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableMeta extends DatasetMeta {
+  final List<DbTableColumn> columns;
+
   public DbTableMeta(
       final DatasetName physicalName,
       final SourceName sourceName,
       @Nullable final String description,
-      @Nullable final UUID runId) {
+      @Nullable final UUID runId,
+      @Nullable final List<DbTableColumn> columns) {
     super(physicalName, sourceName, description, runId);
+    this.columns = columns;
   }
 
   @Override
   public UUID version(NamespaceName namespaceName, DatasetName datasetName) {
-    return null;
+    return null; // todo: implement version logic
   }
 }
