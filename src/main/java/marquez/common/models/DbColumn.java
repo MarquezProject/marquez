@@ -14,6 +14,7 @@
 
 package marquez.common.models;
 
+import static marquez.common.Utils.VERSION_JOINER;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -34,6 +35,10 @@ public class DbColumn {
     this.name = checkNotBlank(name);
     this.type = checkNotBlank(type);
     this.description = description;
+  }
+
+  public String getColumnUUID() {
+    return VERSION_JOINER.join(getName(), getType(), getDescription());
   }
 
   public Optional<String> getDescription() {

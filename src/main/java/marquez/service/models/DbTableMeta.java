@@ -14,10 +14,16 @@
 
 package marquez.service.models;
 
+import static com.google.common.base.Charsets.UTF_8;
+import static java.util.stream.Collectors.joining;
+import static marquez.common.Utils.VERSION_DELIM;
+import static marquez.common.Utils.VERSION_JOINER;
+
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DbColumn;
@@ -27,7 +33,7 @@ import marquez.common.models.SourceName;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableMeta extends DatasetMeta {
-  final List<DbColumn> columns;
+  @Getter final List<DbColumn> columns;
 
   public DbTableMeta(
       final DatasetName physicalName,
@@ -41,6 +47,16 @@ public final class DbTableMeta extends DatasetMeta {
 
   @Override
   public UUID version(NamespaceName namespaceName, DatasetName datasetName) {
-    return null; // todo: implement version logic
+    final byte[] bytes =
+        VERSION_JOINER
+            .join(
+                namespaceName.getValue(),
+                getSourceName().getValue(),
+                datasetName.getValue(),
+                getPhysicalName().getValue(),
+                getDescription(),
+                getColumns().stream().map(DbColumn::getColumnUUID).collect(joining(VERSION_DELIM)))
+            .getBytes(UTF_8);
+    return UUID.nameUUIDFromBytes(bytes);
   }
 }
