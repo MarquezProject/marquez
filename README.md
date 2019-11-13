@@ -73,6 +73,10 @@ $ ./gradlew run --args 'server config.yml'
 
 Then browse to the admin interface: http://localhost:8081
 
+## Related Projects
+
+* [Marquez Web UI](https://github.com/MarquezProject/marquez-web): Web UI used to view metadata collected and cataloged by Marquez.
+
 ## Getting Involved
 
 * Website: https://marquezproject.github.io/marquez
