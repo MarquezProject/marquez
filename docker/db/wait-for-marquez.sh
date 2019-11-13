@@ -18,7 +18,7 @@ set -eu
 
 host="${1}"
 port="${2}"
-timeout="${3:-10}"
+timeout="${3:-30}"
 
 until curl --output /dev/null --silent --head --fail "http://${host}:${port}/ping"; do
   echo "Waiting for Marquez to become available..."
