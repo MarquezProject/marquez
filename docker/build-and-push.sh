@@ -16,7 +16,7 @@
 
 set -eu
 
-readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}$" # X.Y.Z
+readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$" # X.Y.Z
 readonly ORG="marquezproject"
 readonly REPO="marquez"
 readonly NAME="${ORG}/${REPO}"
