@@ -1,0 +1,235 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1`] = `
+<WithStyles(DatasetPreviewCard)
+  description="describes different geometries in the galaxy"
+  name="galaxy.geometry"
+  namespace="central-data"
+  physicalName="galaxy.geometry"
+  sourceName="redshift"
+  tags={
+    Array [
+      "tag_a",
+      "tag_b",
+      "tag_c",
+    ]
+  }
+  type="DB_TABLE"
+>
+  <DatasetPreviewCard
+    classes={
+      Object {
+        "lastUpdated": "DatasetPreviewCard-lastUpdated-2",
+        "rightCol": "DatasetPreviewCard-rightCol-1",
+      }
+    }
+    description="describes different geometries in the galaxy"
+    name="galaxy.geometry"
+    namespace="central-data"
+    physicalName="galaxy.geometry"
+    sourceName="redshift"
+    tags={
+      Array [
+        "tag_a",
+        "tag_b",
+        "tag_c",
+      ]
+    }
+    type="DB_TABLE"
+  >
+    <Styled(MuiBox)
+      bgcolor="white"
+      boxShadow={3}
+      display="flex"
+      justifyContent="space-between"
+      m={1}
+      p={2}
+    >
+      <div
+        className="MuiBox-root MuiBox-root-4"
+      >
+        <div>
+          <WithStyles(ForwardRef(Typography))
+            color="secondary"
+            variant="h3"
+          >
+            <ForwardRef(Typography)
+              classes={
+                Object {
+                  "alignCenter": "MuiTypography-alignCenter",
+                  "alignJustify": "MuiTypography-alignJustify",
+                  "alignLeft": "MuiTypography-alignLeft",
+                  "alignRight": "MuiTypography-alignRight",
+                  "body1": "MuiTypography-body1",
+                  "body2": "MuiTypography-body2",
+                  "button": "MuiTypography-button",
+                  "caption": "MuiTypography-caption",
+                  "colorError": "MuiTypography-colorError",
+                  "colorInherit": "MuiTypography-colorInherit",
+                  "colorPrimary": "MuiTypography-colorPrimary",
+                  "colorSecondary": "MuiTypography-colorSecondary",
+                  "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                  "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                  "displayBlock": "MuiTypography-displayBlock",
+                  "displayInline": "MuiTypography-displayInline",
+                  "gutterBottom": "MuiTypography-gutterBottom",
+                  "h1": "MuiTypography-h1",
+                  "h2": "MuiTypography-h2",
+                  "h3": "MuiTypography-h3",
+                  "h4": "MuiTypography-h4",
+                  "h5": "MuiTypography-h5",
+                  "h6": "MuiTypography-h6",
+                  "noWrap": "MuiTypography-noWrap",
+                  "overline": "MuiTypography-overline",
+                  "paragraph": "MuiTypography-paragraph",
+                  "root": "MuiTypography-root",
+                  "srOnly": "MuiTypography-srOnly",
+                  "subtitle1": "MuiTypography-subtitle1",
+                  "subtitle2": "MuiTypography-subtitle2",
+                }
+              }
+              color="secondary"
+              variant="h3"
+            >
+              <h3
+                className="MuiTypography-root MuiTypography-h3 MuiTypography-colorSecondary"
+              >
+                galaxy.geometry
+              </h3>
+            </ForwardRef(Typography)>
+          </WithStyles(ForwardRef(Typography))>
+          <WithStyles(WithStyles(ForwardRef(Typography)))
+            color="primary"
+          >
+            <WithStyles(ForwardRef(Typography))
+              classes={
+                Object {
+                  "root": "WithStyles(ForwardRef(Typography))-root-35",
+                }
+              }
+              color="primary"
+            >
+              <ForwardRef(Typography)
+                classes={
+                  Object {
+                    "alignCenter": "MuiTypography-alignCenter",
+                    "alignJustify": "MuiTypography-alignJustify",
+                    "alignLeft": "MuiTypography-alignLeft",
+                    "alignRight": "MuiTypography-alignRight",
+                    "body1": "MuiTypography-body1",
+                    "body2": "MuiTypography-body2",
+                    "button": "MuiTypography-button",
+                    "caption": "MuiTypography-caption",
+                    "colorError": "MuiTypography-colorError",
+                    "colorInherit": "MuiTypography-colorInherit",
+                    "colorPrimary": "MuiTypography-colorPrimary",
+                    "colorSecondary": "MuiTypography-colorSecondary",
+                    "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                    "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                    "displayBlock": "MuiTypography-displayBlock",
+                    "displayInline": "MuiTypography-displayInline",
+                    "gutterBottom": "MuiTypography-gutterBottom",
+                    "h1": "MuiTypography-h1",
+                    "h2": "MuiTypography-h2",
+                    "h3": "MuiTypography-h3",
+                    "h4": "MuiTypography-h4",
+                    "h5": "MuiTypography-h5",
+                    "h6": "MuiTypography-h6",
+                    "noWrap": "MuiTypography-noWrap",
+                    "overline": "MuiTypography-overline",
+                    "paragraph": "MuiTypography-paragraph",
+                    "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-35",
+                    "srOnly": "MuiTypography-srOnly",
+                    "subtitle1": "MuiTypography-subtitle1",
+                    "subtitle2": "MuiTypography-subtitle2",
+                  }
+                }
+                color="primary"
+              >
+                <p
+                  className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-35 MuiTypography-body1 MuiTypography-colorPrimary"
+                >
+                  describes different geometries in the galaxy
+                </p>
+              </ForwardRef(Typography)>
+            </WithStyles(ForwardRef(Typography))>
+          </WithStyles(WithStyles(ForwardRef(Typography)))>
+        </div>
+        <Styled(MuiBox)
+          alignItems="flex-end"
+          className="DatasetPreviewCard-rightCol-1"
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-between"
+        >
+          <div
+            className="MuiBox-root MuiBox-root-36 DatasetPreviewCard-rightCol-1"
+          >
+            <div
+              id="tagContainer"
+            >
+              <span
+                key="tag_a"
+              >
+                Pretend Badge
+              </span>
+              <span
+                key="tag_b"
+              >
+                Pretend Badge
+              </span>
+            </div>
+            <WithStyles(ForwardRef(Typography))
+              className="DatasetPreviewCard-lastUpdated-2"
+            >
+              <ForwardRef(Typography)
+                className="DatasetPreviewCard-lastUpdated-2"
+                classes={
+                  Object {
+                    "alignCenter": "MuiTypography-alignCenter",
+                    "alignJustify": "MuiTypography-alignJustify",
+                    "alignLeft": "MuiTypography-alignLeft",
+                    "alignRight": "MuiTypography-alignRight",
+                    "body1": "MuiTypography-body1",
+                    "body2": "MuiTypography-body2",
+                    "button": "MuiTypography-button",
+                    "caption": "MuiTypography-caption",
+                    "colorError": "MuiTypography-colorError",
+                    "colorInherit": "MuiTypography-colorInherit",
+                    "colorPrimary": "MuiTypography-colorPrimary",
+                    "colorSecondary": "MuiTypography-colorSecondary",
+                    "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                    "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                    "displayBlock": "MuiTypography-displayBlock",
+                    "displayInline": "MuiTypography-displayInline",
+                    "gutterBottom": "MuiTypography-gutterBottom",
+                    "h1": "MuiTypography-h1",
+                    "h2": "MuiTypography-h2",
+                    "h3": "MuiTypography-h3",
+                    "h4": "MuiTypography-h4",
+                    "h5": "MuiTypography-h5",
+                    "h6": "MuiTypography-h6",
+                    "noWrap": "MuiTypography-noWrap",
+                    "overline": "MuiTypography-overline",
+                    "paragraph": "MuiTypography-paragraph",
+                    "root": "MuiTypography-root",
+                    "srOnly": "MuiTypography-srOnly",
+                    "subtitle1": "MuiTypography-subtitle1",
+                    "subtitle2": "MuiTypography-subtitle2",
+                  }
+                }
+              >
+                <p
+                  className="MuiTypography-root DatasetPreviewCard-lastUpdated-2 MuiTypography-body1"
+                >
+                  Dec 31, 1969 07:12pm
+                </p>
+              </ForwardRef(Typography)>
+            </WithStyles(ForwardRef(Typography))>
+          </div>
+        </Styled(MuiBox)>
+      </div>
+    </Styled(MuiBox)>
+  </DatasetPreviewCard>
+</WithStyles(DatasetPreviewCard)>
+`;

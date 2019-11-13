@@ -1,0 +1,8 @@
+[
+  {
+    "type": "REDSHIFT",
+    "name": "redshift",
+    "connectionUrl": "abcd:redshift://dummy.url.redshift.amazonaws.com:1234/dev",
+    "description": "dummy redshift cluster"
+  }
+]

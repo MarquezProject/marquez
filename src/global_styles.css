@@ -1,0 +1,21 @@
+/* COLORS */
+@value neptune: #319795;
+@value telescopeBlack: #2B2B33;
+@value offWhite: #E5E5E5;
+@value deepRed: #CC0E1D;
+@value vibrantGreen: #00965D;
+@value jobNodeGrey: #7d7d7d;
+@value datasetNodeWhite: #fff;
+@value linkGrey: #aaa;
+
+body {
+  font-family: 'Karla-Regular', sans-serif;
+  margin: 0px;
+  background-color: offWhite;
+}
+
+/* Example of global class */
+:global .link {
+  text-decoration: none;
+  color: white;
+}

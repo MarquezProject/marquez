@@ -1,48 +1,129 @@
-Install the npm modules with `npm install` and then use `npm start` to run the application. 
+# Marquez Web UI
 
-===
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![CircleCI](https://circleci.com/gh/MarquezProject/marquez-web/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez-web/tree/master)
+[![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marquez-project/community)
+[![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/master/LICENSE)
+[![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez-web)
 
-## Available Scripts
+Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata.
 
-In the project directory, you can run:
+This web UI is used to view metadata collected and cataloged by [Marquez](https://github.com/MarquezProject/marquez).
 
-### `npm start`
+<figure align="center">
+  <img src="./docs/images/preview.png">
+</figure>
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Status
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+This project is under active development at [WeWork](https://www.we.co) (in collaboration with many others organizations).
 
-### `npm test`
+### Requirements
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+To develop on this project, you need to have Node version 10.16.3 installed. In order to easily switch between node versions, we recommend using node version manager like [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md)
 
-### `npm run build`
+### Development
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Install dependencies:
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+   ```
+   $ npm install
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Run webpack (with development server):
 
-### `npm run eject`
+   ```
+   $ npm run dev
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Running with [Docker](./Dockerfile)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Build image:
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+   ```
+   $ docker build -t marquez-web .
+   ```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+2. Run image:
 
-## Learn More
+   ```
+   $ docker run -p 3000:3000 -d marquez-web
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+You can open http://localhost:3000 to begin exploring the web UI.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Testing
+
+1. Run tests in watch mode:
+
+   ```
+   $ npm run test-watch
+   ```
+
+2. Run all tests:
+
+   ```
+   $ npm run test
+   ```
+
+### Deployment
+
+(to-do)
+
+### Testing Setup
+
+- [Jest](https://jestjs.io/en/) is our testing framework. It is the test runner; it provides testing language (describe, it, beforeEach), mocking, snapshot, code coverage.
+- [Enzyme](https://github.com/airbnb/enzyme) - testing utility for testing React components. Provides methods for (mock) rendering components & DOM traversal.
+- run tests by doing `yarn run test`
+- config files:
+  - jest.config.js
+  - setupEnzyme.ts
+- For testing Redux Sagas, we are using `Redux Saga Test Plan`. This library gives us both unit testing and integration test functionality. Check out the [docs](http://redux-saga-test-plan.jeremyfairbank.com/).
+
+### Typescript
+
+This project is written in typescript because it is awesome. See [tsconfig.json](tsconfig.json) for our setup.
+
+Our types are defined in the `src/types` folder
+
+#### Linting
+
+This project uses [ESLint with TypeScript support](https://github.com/typescript-eslint/typescript-eslint).
+
+If you have not already done so, you should [setup eslint with your editor of choice](https://eslint.org/docs/user-guide/integrations)
+
+You can add / edit the linting rules within the [eslintrc.js](eslintrc.js) file.
+
+### Prettifying
+
+We are using [Prettier](https://prettier.io/docs/en/install.html) to ensure uniform code style / formatting. Specifically, we are [using ESLint to run Prettier](https://prettier.io/docs/en/integrating-with-linters.html).
+
+1. Please set up [Prettier integration](https://prettier.io/docs/en/editors.html) with your editor of choice. (Also, be sure to disable any other prettifier, like HookyQR's Beautify tool, for this workspace.)
+
+2. Ensure that your editor formats on save.
+
+3. See [.prettierrc.js](.prettierrc.js) for our Prettier settings. See information on configuration settings [here](https://prettier.io/docs/en/configuration.html)
+
+### Iconography:
+
+We are leveraging [Material UI's SvgIcon components](https://material-ui.com/components/icons/#svg-icons)
+
+Specifically, we are using Icons to represent tags on datasets. In order to customize your app's badges, you can edit `src/config/tag-to-badge.tsx`
+
+### Seeding data
+
+Mock data can be found in the `docker/db/data` folder.
+Feel free to edit the mock data if you like. (Grant worked really hard on making it pretty.)
+
+#### Logging
+
+We are using [Rollbar](https://rollbar.com/WeWork/Marquez-UI/) for front-end logging.
+
+If you are also using Rollbar, be sure to add your Rollbar config as the first `<script/>` in `<head></head>` of `index.prod.html`. (See [Rollbar docs](https://docs.rollbar.com/docs/browser-js) for more info)
+
+If you are NOT using Rollbar, be sure to change the global `__ROLLBAR__` variable in `webpack.prod.js` to `JSON.stringify(false)` (this will disable any functionality in the `createRollbarMessage` function in `src/helpers`)
+
+### Contributing
+
+See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez-web/blob/master/CONTRIBUTING.md) for more details about how to contribute.

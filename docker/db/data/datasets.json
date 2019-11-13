@@ -1,0 +1,114 @@
+[
+  {
+    "name": "galaxy.geometry",
+    "physicalName": "galaxy.geometry",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes different geometries in the galaxy"
+  },
+  {
+    "name": "galaxy.dimensions",
+    "physicalName": "galaxy.dimensions",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all possible dimensions in the galaxy"
+  },
+  {
+    "name": "galaxy.trips",
+    "physicalName": "galaxy.trips",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "all trips taken through the galaxy"
+  },
+  {
+    "name": "earth.dimensions",
+    "physicalName": "earth.dimensions",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all possible dimensions on earth"
+  },
+  {
+    "name": "earth.trips",
+    "physicalName": "earth.trips",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all possible trips taken on earth"
+  },
+  {
+    "name": "objects.stars",
+    "physicalName": "objects.stars",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all stars in the galaxy"
+  },
+  {
+    "name": "objects.planets",
+    "physicalName": "objects.planets",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all planets in the galaxy"
+  },
+  {
+    "name": "objects.life",
+    "physicalName": "objects.life",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all life"
+  },
+  {
+    "name": "environment.universe",
+    "physicalName": "environment.universe",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes the entire universe"
+  },
+  {
+    "name": "galaxy.radiowaves",
+    "physicalName": "galaxy.radiowaves",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all radiowaves"
+  },
+  {
+    "name": "galaxy.satellites",
+    "physicalName": "galaxy.satellites",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all satellites"
+  },
+  {
+    "name": "environment.conversations",
+    "physicalName": "environment.conversations",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all conversations in the galaxy"
+  },
+  {
+    "name": "environment.transcripts",
+    "physicalName": "environment.transcripts",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "describes all transcripts in the galaxy"
+  },
+  {
+    "name": "environment.empty",
+    "physicalName": "environment.empty",
+    "type": "DB_TABLE",
+    "namespace": "central-data",
+    "sourceName": "redshift",
+    "description": "this dataset is never used by a job!"
+  }
+]

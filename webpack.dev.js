@@ -1,0 +1,35 @@
+const merge = require('webpack-merge')
+const webpack = require('webpack')
+const webpackShared = require('./webpack.common.js')
+
+const webpackDev = {
+  mode: 'development',
+  devServer: {
+    contentBase: __dirname + '/src',
+    port: 1337,
+    publicPath: '/',
+    historyApiFallback: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        secure: false,
+        logLevel: 'debug',
+        headers: {
+          'X-Bifrost-Authentication': 'developer'
+        }
+      }
+    }
+  },
+  // Enable sourcemaps for debugging webpack"s output.
+  devtool: 'cheap-eval-source-map',
+  plugins: [
+    new webpack.DefinePlugin({
+      __DEVELOPMENT__: JSON.stringify(true),
+      __API_URL__: JSON.stringify('/api/v1'),
+      __NODE_ENV__: JSON.stringify('development'),
+      __TEMP_ACTOR_STR__: JSON.stringify('me')
+    })
+  ]
+}
+
+module.exports = merge.smart(webpackShared, webpackDev)

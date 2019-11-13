@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JobPreviewCard Component renders a snapshot that matches previous 1`] = `
+<JobPreviewCard
+  classes={
+    Object {
+      "failed": "JobPreviewCard-failed-4",
+      "lastUpdated": "JobPreviewCard-lastUpdated-2",
+      "passed": "JobPreviewCard-passed-5",
+      "rightCol": "JobPreviewCard-rightCol-1",
+      "status": "JobPreviewCard-status-3",
+    }
+  }
+  description="calculates all possible dimensions from input geometry"
+  inputs={
+    Array [
+      "galaxy.geometry",
+    ]
+  }
+  location="https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_dimensions.sql"
+  name="calculate.galaxy_dimensions"
+  namespace="central-data"
+  outputs={
+    Array [
+      "galaxy.dimensions",
+    ]
+  }
+  type="BATCH"
+/>
+`;
