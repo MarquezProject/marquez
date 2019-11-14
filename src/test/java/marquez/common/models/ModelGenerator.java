@@ -100,10 +100,10 @@ public final class ModelGenerator extends Generator {
     return UUID.randomUUID();
   }
 
-  public static List<DbColumn> newColumns() {
-    DbColumn column1 = new DbColumn("first name", "VARCHAR", "first name of customer");
-    DbColumn column2 = new DbColumn("last name", "VARCHAR", "last name of customer");
-    DbColumn column3 = new DbColumn("address", "VARCHAR", "address of customer");
+  public static List<Field> newFields() {
+    Field column1 = new Field("first name", "VARCHAR", "first name of customer");
+    Field column2 = new Field("last name", "VARCHAR", "last name of customer");
+    Field column3 = new Field("address", "VARCHAR", "address of customer");
     return ImmutableList.of(column1, column2, column3);
   }
 

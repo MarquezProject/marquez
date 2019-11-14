@@ -29,7 +29,7 @@ import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
-import marquez.common.models.DbColumn;
+import marquez.common.models.Field;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
@@ -147,10 +147,10 @@ public final class Mapper {
         return new Stream(
             name, physicalName, createdAt, updatedAt, sourceName, schemaLocation, description);
       default:
-        final List<DbColumn> columns =
+        final List<Field> fields =
             new ArrayList<>(); // todo: implement DbTableVersionView to pass in column
         return new DbTable(
-            name, physicalName, createdAt, updatedAt, sourceName, description, columns);
+            name, physicalName, createdAt, updatedAt, sourceName, description, fields);
     }
   }
 

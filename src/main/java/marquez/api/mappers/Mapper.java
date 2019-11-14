@@ -44,7 +44,7 @@ import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
-import marquez.common.models.DbColumn;
+import marquez.common.models.Field;
 import marquez.common.models.JobType;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
@@ -122,8 +122,8 @@ public final class Mapper {
     final UUID runId = request.getRunId().map(UUID::fromString).orElse(null);
 
     if (request instanceof DbTableRequest) {
-      List<DbColumn> columns = ((DbTableRequest) request).getColumns();
-      return new DbTableMeta(physicalName, sourceName, description, runId, columns);
+      List<Field> fields = ((DbTableRequest) request).getFields();
+      return new DbTableMeta(physicalName, sourceName, description, runId, fields);
     } else if (request instanceof StreamRequest) {
       final URL schemaLocation = Utils.toUrl(((StreamRequest) request).getSchemaLocation());
       return new StreamMeta(physicalName, sourceName, schemaLocation, description, runId);
@@ -141,7 +141,7 @@ public final class Mapper {
     final String description = dataset.getDescription().orElse(null);
 
     if (dataset instanceof DbTable) {
-      List<DbColumn> columns = ((DbTable) dataset).getColumns();
+      List<Field> fields = ((DbTable) dataset).getFields();
       return new DbTableResponse(
           datasetString,
           physicalString,
@@ -149,7 +149,7 @@ public final class Mapper {
           updatedAtIso,
           sourceString,
           description,
-          columns);
+          fields);
     } else if (dataset instanceof Stream) {
       final String schemaLocationString = ((Stream) dataset).getSchemaLocation().toString();
       return new StreamResponse(

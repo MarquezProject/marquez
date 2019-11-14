@@ -18,12 +18,12 @@ import java.util.List;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import marquez.common.models.DbColumn;
+import marquez.common.models.Field;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableResponse extends DatasetResponse {
-  final List<DbColumn> columns;
+  final List<Field> fields;
 
   public DbTableResponse(
       final String name,
@@ -32,8 +32,8 @@ public final class DbTableResponse extends DatasetResponse {
       final String updatedAt,
       final String sourceName,
       @Nullable final String description,
-      @Nullable final List<DbColumn> columns) {
+      @Nullable final List<Field> fields) {
     super(name, physicalName, createdAt, updatedAt, sourceName, description);
-    this.columns = columns;
+    this.fields = fields;
   }
 }

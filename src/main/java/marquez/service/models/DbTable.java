@@ -21,13 +21,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
-import marquez.common.models.DbColumn;
+import marquez.common.models.Field;
 import marquez.common.models.SourceName;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTable extends Dataset {
-  @Getter final List<DbColumn> columns;
+  @Getter final List<Field> fields;
 
   public DbTable(
       final DatasetName name,
@@ -36,8 +36,8 @@ public final class DbTable extends Dataset {
       final Instant updatedAt,
       final SourceName sourceName,
       @Nullable final String description,
-      @Nullable final List<DbColumn> columns) {
+      @Nullable final List<Field> fields) {
     super(name, physicalName, createdAt, updatedAt, sourceName, description);
-    this.columns = columns;
+    this.fields = fields;
   }
 }

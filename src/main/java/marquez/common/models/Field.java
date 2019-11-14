@@ -14,7 +14,6 @@
 
 package marquez.common.models;
 
-import static marquez.common.Utils.VERSION_JOINER;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -24,21 +23,17 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public class DbColumn {
+public class Field {
   String name;
   String type;
   @Nullable String description;
 
   @JsonCreator
-  public DbColumn(
+  public Field(
       @NonNull final String name, @NonNull final String type, @Nullable final String description) {
     this.name = checkNotBlank(name);
     this.type = checkNotBlank(type);
     this.description = description;
-  }
-
-  public String getColumnUUID() {
-    return VERSION_JOINER.join(getName(), getType(), getDescription());
   }
 
   public Optional<String> getDescription() {

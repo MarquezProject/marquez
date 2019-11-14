@@ -15,17 +15,15 @@
 package marquez.api.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.google.common.collect.ImmutableList;
 import java.util.List;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import marquez.common.models.DbColumn;
+import marquez.common.models.Field;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableRequest extends DatasetRequest {
-  private final List<DbColumn> columns;
 
   @JsonCreator
   public DbTableRequest(
@@ -33,12 +31,7 @@ public final class DbTableRequest extends DatasetRequest {
       final String sourceName,
       @Nullable final String description,
       @Nullable final String runId,
-      @Nullable final List<DbColumn> columns) {
-    super(physicalName, sourceName, description, runId);
-    this.columns = columns;
-  }
-
-  public List<DbColumn> getColumns() {
-    return (columns == null) ? ImmutableList.of() : ImmutableList.copyOf(columns);
+      @Nullable final List<Field> fields) {
+    super(physicalName, sourceName, description, runId, fields);
   }
 }

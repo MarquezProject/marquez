@@ -26,23 +26,23 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
-import marquez.common.models.DbColumn;
+import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableMeta extends DatasetMeta {
-  @Getter final List<DbColumn> columns;
+  @Getter final List<Field> fields;
 
   public DbTableMeta(
       final DatasetName physicalName,
       final SourceName sourceName,
       @Nullable final String description,
       @Nullable final UUID runId,
-      @Nullable final List<DbColumn> columns) {
+      @Nullable final List<Field> fields) {
     super(physicalName, sourceName, description, runId);
-    this.columns = columns;
+    this.fields = fields;
   }
 
   @Override
@@ -55,8 +55,14 @@ public final class DbTableMeta extends DatasetMeta {
                 datasetName.getValue(),
                 getPhysicalName().getValue(),
                 getDescription(),
-                getColumns().stream().map(DbColumn::getColumnUUID).collect(joining(VERSION_DELIM)))
+                getFields().stream()
+                    .map(DbTableMeta::getColumnUUID)
+                    .collect(joining(VERSION_DELIM)))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
+  }
+
+  private static String getColumnUUID(Field field) {
+    return VERSION_JOINER.join(field.getName(), field.getType(), field.getDescription());
   }
 }
