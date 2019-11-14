@@ -14,29 +14,22 @@
 
 package marquez.common.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.Optional;
-import javax.annotation.Nullable;
-import lombok.NonNull;
-import lombok.Value;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-@Value
-public class Field {
-  FieldName name;
-  FieldType type;
-  @Nullable String description;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-  @JsonCreator
-  public Field(
-      @NonNull final FieldName name,
-      @NonNull final FieldType type,
-      @Nullable final String description) {
-    this.name = name;
-    this.type = type;
-    this.description = description;
+@EqualsAndHashCode
+@ToString
+public final class FieldName {
+  @Getter private final String value;
+
+  private FieldName(final String value) {
+    this.value = checkNotBlank(value, "value must not be blank");
   }
 
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(description);
+  public static FieldName of(final String value) {
+    return new FieldName(value);
   }
 }

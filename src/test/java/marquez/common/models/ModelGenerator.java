@@ -101,9 +101,11 @@ public final class ModelGenerator extends Generator {
   }
 
   public static List<Field> newFields() {
-    Field column1 = new Field("first name", "VARCHAR", "first name of customer");
-    Field column2 = new Field("last name", "VARCHAR", "last name of customer");
-    Field column3 = new Field("address", "VARCHAR", "address of customer");
+    Field column1 =
+        new Field(FieldName.of("first name"), FieldType.VARCHAR, "first name of customer");
+    Field column2 =
+        new Field(FieldName.of("last name"), FieldType.VARCHAR, "last name of customer");
+    Field column3 = new Field(FieldName.of("address"), FieldType.VARCHAR, "address of customer");
     return ImmutableList.of(column1, column2, column3);
   }
 

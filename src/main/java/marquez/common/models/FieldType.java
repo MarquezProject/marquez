@@ -14,29 +14,35 @@
 
 package marquez.common.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.Optional;
-import javax.annotation.Nullable;
-import lombok.NonNull;
-import lombok.Value;
-
-@Value
-public class Field {
-  FieldName name;
-  FieldType type;
-  @Nullable String description;
-
-  @JsonCreator
-  public Field(
-      @NonNull final FieldName name,
-      @NonNull final FieldType type,
-      @Nullable final String description) {
-    this.name = name;
-    this.type = type;
-    this.description = description;
-  }
-
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(description);
-  }
+public enum FieldType {
+  NUMBER,
+  DECIMAL,
+  NUMERIC,
+  INT,
+  INTEGER,
+  BIGINT,
+  SMALLINT,
+  FLOAT,
+  FLOAT4,
+  FLOAT8,
+  DOUBLE,
+  REAL,
+  VARCHAR,
+  CHAR,
+  CHARACTER,
+  STRING,
+  TEXT,
+  BINARY,
+  VARBINARY,
+  BOOLEAN,
+  DATE,
+  DATETIME,
+  TIME,
+  TIMESTAMP,
+  TIMESTAMP_LTZ,
+  TIMESTAMP_NTZ,
+  TIMESTAMP_TZ,
+  VARIANT,
+  OBJECT,
+  ARRAY;
 }
