@@ -145,7 +145,14 @@ public final class Mapper {
       case STREAM:
         final URL schemaLocation = Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation());
         return new Stream(
-            name, physicalName, createdAt, updatedAt, sourceName, schemaLocation, description);
+            name,
+            physicalName,
+            createdAt,
+            updatedAt,
+            sourceName,
+            schemaLocation,
+            description,
+            new ArrayList<>());
       default:
         final List<Field> fields =
             new ArrayList<>(); // todo: implement DbTableVersionView to pass in column

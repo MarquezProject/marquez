@@ -18,7 +18,6 @@ import java.time.Instant;
 import java.util.List;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
@@ -27,7 +26,6 @@ import marquez.common.models.SourceName;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTable extends Dataset {
-  @Getter final List<Field> fields;
 
   public DbTable(
       final DatasetName name,
@@ -37,7 +35,6 @@ public final class DbTable extends Dataset {
       final SourceName sourceName,
       @Nullable final String description,
       @Nullable final List<Field> fields) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, description);
-    this.fields = fields;
+    super(name, physicalName, createdAt, updatedAt, sourceName, description, fields);
   }
 }

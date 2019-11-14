@@ -18,12 +18,14 @@ import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.Field;
 
 @EqualsAndHashCode
 @ToString
@@ -39,6 +41,7 @@ public abstract class DatasetResponse {
   @Getter private final String updatedAt;
   @Getter private final String sourceName;
   @Nullable private final String description;
+  @Nullable private final List<Field> fields;
 
   public DatasetResponse(
       @NonNull final String name,
@@ -46,13 +49,15 @@ public abstract class DatasetResponse {
       @NonNull final String createdAt,
       @NonNull final String updatedAt,
       @NonNull final String sourceName,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable final List<Field> fields) {
     this.name = checkNotBlank(name);
     this.physicalName = checkNotBlank(physicalName);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);
     this.sourceName = checkNotBlank(sourceName);
     this.description = description;
+    this.fields = fields;
   }
 
   public Optional<String> getDescription() {

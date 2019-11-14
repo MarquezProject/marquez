@@ -55,14 +55,12 @@ public final class DbTableMeta extends DatasetMeta {
                 datasetName.getValue(),
                 getPhysicalName().getValue(),
                 getDescription(),
-                getFields().stream()
-                    .map(DbTableMeta::getColumnUUID)
-                    .collect(joining(VERSION_DELIM)))
+                getFields().stream().map(DbTableMeta::joinFields).collect(joining(VERSION_DELIM)))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }
 
-  private static String getColumnUUID(Field field) {
-    return VERSION_JOINER.join(field.getName(), field.getType(), field.getDescription());
+  private static String joinFields(Field field) {
+    return VERSION_JOINER.join(field.getName().getValue(), field.getType(), field.getDescription());
   }
 }

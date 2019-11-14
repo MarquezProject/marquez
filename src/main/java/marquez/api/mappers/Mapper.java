@@ -122,7 +122,7 @@ public final class Mapper {
     final UUID runId = request.getRunId().map(UUID::fromString).orElse(null);
 
     if (request instanceof DbTableRequest) {
-      List<Field> fields = ((DbTableRequest) request).getFields();
+      final List<Field> fields = ((DbTableRequest) request).getFields();
       return new DbTableMeta(physicalName, sourceName, description, runId, fields);
     } else if (request instanceof StreamRequest) {
       final URL schemaLocation = Utils.toUrl(((StreamRequest) request).getSchemaLocation());
@@ -139,9 +139,10 @@ public final class Mapper {
     final String updatedAtIso = ISO_INSTANT.format(dataset.getUpdatedAt());
     final String sourceString = dataset.getSourceName().getValue();
     final String description = dataset.getDescription().orElse(null);
+    final List<Field> fields = dataset.getFields();
 
     if (dataset instanceof DbTable) {
-      List<Field> fields = ((DbTable) dataset).getFields();
+
       return new DbTableResponse(
           datasetString,
           physicalString,
@@ -159,7 +160,8 @@ public final class Mapper {
           updatedAtIso,
           sourceString,
           schemaLocationString,
-          description);
+          description,
+          fields);
     }
 
     throw new IllegalArgumentException();

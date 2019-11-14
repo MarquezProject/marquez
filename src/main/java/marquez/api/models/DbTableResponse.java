@@ -23,7 +23,6 @@ import marquez.common.models.Field;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableResponse extends DatasetResponse {
-  final List<Field> fields;
 
   public DbTableResponse(
       final String name,
@@ -33,7 +32,6 @@ public final class DbTableResponse extends DatasetResponse {
       final String sourceName,
       @Nullable final String description,
       @Nullable final List<Field> fields) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, description);
-    this.fields = fields;
+    super(name, physicalName, createdAt, updatedAt, sourceName, description, fields);
   }
 }

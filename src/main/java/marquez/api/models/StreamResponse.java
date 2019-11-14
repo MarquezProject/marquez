@@ -17,11 +17,13 @@ package marquez.api.models;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.List;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.Field;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -45,8 +47,9 @@ public final class StreamResponse extends DatasetResponse {
       final String updatedAt,
       final String sourceName,
       @NonNull final String schemaLocation,
-      @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, description);
+      @Nullable final String description,
+      @Nullable final List<Field> fields) {
+    super(name, physicalName, createdAt, updatedAt, sourceName, description, fields);
     this.schemaLocation = checkNotBlank(schemaLocation);
   }
 }
