@@ -8,8 +8,7 @@ import {
 const globalStyles = require('../global_styles.css')
 const { vibrantGreen } = globalStyles
 import { Typography, Box } from '@material-ui/core'
-
-import { isoParse, timeFormat } from 'd3-time-format'
+import { formatUpdatedAt } from '../helpers'
 
 import { IJobAPI } from '../types/api'
 
@@ -38,13 +37,6 @@ const styles = ({ palette, spacing }: ITheme) => {
 type IProps = IWithStyles<typeof styles> &
   Pick<IJobAPI, 'name' | 'description' | 'updatedAt' | 'status'>
 interface IState {}
-
-const customTimeFormat = timeFormat('%b %d, %Y %I:%m%p')
-
-const formatUpdatedAt = (updatedAt: string) => {
-  const dateString = customTimeFormat(isoParse(updatedAt))
-  return `${dateString.slice(0, -2)}${dateString.slice(-2).toLowerCase()}`
-}
 
 const StyledTypography = withStyles({
   root: {

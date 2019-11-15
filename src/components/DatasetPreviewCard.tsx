@@ -6,7 +6,7 @@ import {
   Theme as ITheme
 } from '@material-ui/core/styles'
 import { Typography, Box } from '@material-ui/core'
-import { isoParse, timeFormat } from 'd3-time-format'
+import { formatUpdatedAt } from '../helpers'
 import tagToBadge from '../config/tag-to-badge'
 
 import { IDatasetAPI } from '../types/api'
@@ -32,16 +32,6 @@ type IProps = IWithStyles<typeof styles> &
   Pick<IDatasetAPI, 'name' | 'description' | 'updatedAt' | 'tags'>
 interface IState {}
 
-const customTimeFormat = timeFormat('%b %d, %Y %I:%m%p')
-
-export const formatUpdatedAt = (updatedAt: string) => {
-  if (!updatedAt) {
-    return ''
-  } else {
-    const dateString = customTimeFormat(isoParse(updatedAt))
-    return `${dateString.slice(0, -2)}${dateString.slice(-2).toLowerCase()}`
-  }
-}
 class DatasetPreviewCard extends React.Component<IProps, IState> {
   render(): ReactElement {
     const { classes, name, description, updatedAt = 'error', tags = ['is_pii'] } = this.props

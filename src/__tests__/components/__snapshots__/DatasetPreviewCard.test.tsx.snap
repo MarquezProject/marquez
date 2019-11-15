@@ -221,9 +221,7 @@ exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1
               >
                 <p
                   className="MuiTypography-root DatasetPreviewCard-lastUpdated-2 MuiTypography-body1"
-                >
-                  Dec 31, 1969 07:12pm
-                </p>
+                />
               </ForwardRef(Typography)>
             </WithStyles(ForwardRef(Typography))>
           </div>

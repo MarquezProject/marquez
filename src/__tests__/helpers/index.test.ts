@@ -1,6 +1,14 @@
-import { createNetworkData } from '../../helpers'
+import { createNetworkData, formatUpdatedAt } from '../../helpers'
 const datasets = require('../../../docker/db/data/datasets.json')
 const jobs = require('../../../docker/db/data/jobs.json')
+
+describe('formatUpdated Function', () => {
+  const updatedAt = ''
+  const formatedDate = formatUpdatedAt(updatedAt)
+  it('Should return an empty string when passed a falsey value', () => {
+    expect(formatedDate).toBe('')
+  })
+})
 
 describe('createNetworkData helper test', () => {
   const networkData = createNetworkData(datasets, jobs)

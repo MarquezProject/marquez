@@ -2,7 +2,7 @@ import { shallow } from 'enzyme'
 import * as React from 'react'
 
 import JobPreviewCard from '../../components/JobPreviewCard'
-import { formatUpdatedAt } from '../../components/DatasetPreviewCard'
+import { formatUpdatedAt } from '../../helpers'
 
 const jobs = require('../../../docker/db/data/jobs.json')
 

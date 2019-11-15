@@ -21,9 +21,7 @@ const { jobNodeGrey, linkGrey, datasetNodeWhite } = globalStyles
 const width = 960
 const height = 350
 
-const fadedOut = color(jobNodeGrey)
-  .darker(1.5)
-  .toString()
+const fadedOut = (color(jobNodeGrey) as any).darker(1.5).toString()
 
 const styles = ({ palette }: Theme) => {
   return createStyles({
@@ -237,7 +235,7 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
         <svg id='network-graph' className={networkBackground}>
           <g
             ref={node => {
-              this.graph = node
+              this.graph = node as SVGElement
             }}
           >
             <g id='links'></g>
