@@ -14,6 +14,10 @@
 
 package marquez.service.models;
 
+import static marquez.common.Utils.VERSION_JOINER;
+
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -22,6 +26,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 
@@ -30,18 +35,25 @@ import marquez.common.models.SourceName;
 public abstract class DatasetMeta {
   @Getter private final DatasetName physicalName;
   @Getter private final SourceName sourceName;
+  @Nullable final List<Field> fields;
   @Nullable private final String description;
   @Nullable private final UUID runId;
 
   public DatasetMeta(
       @NonNull final DatasetName physicalName,
       @NonNull final SourceName sourceName,
+      @Nullable final List<Field> fields,
       @Nullable final String description,
       @Nullable final UUID runId) {
     this.physicalName = physicalName;
     this.sourceName = sourceName;
+    this.fields = fields;
     this.description = description;
     this.runId = runId;
+  }
+
+  public List<Field> getFields() {
+    return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
   }
 
   public Optional<String> getDescription() {
@@ -53,4 +65,8 @@ public abstract class DatasetMeta {
   }
 
   public abstract UUID version(NamespaceName namespaceName, DatasetName datasetName);
+
+  protected static String joinField(final Field field) {
+    return VERSION_JOINER.join(field.getName().getValue(), field.getType(), field.getDescription());
+  }
 }

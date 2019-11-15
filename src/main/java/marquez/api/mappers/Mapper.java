@@ -118,15 +118,15 @@ public final class Mapper {
   public static DatasetMeta toDatasetMeta(@NonNull final DatasetRequest request) {
     final DatasetName physicalName = DatasetName.of(request.getPhysicalName());
     final SourceName sourceName = SourceName.of(request.getSourceName());
+    final List<Field> fields = request.getFields();
     final String description = request.getDescription().orElse(null);
     final UUID runId = request.getRunId().map(UUID::fromString).orElse(null);
 
     if (request instanceof DbTableRequest) {
-      final List<Field> fields = ((DbTableRequest) request).getFields();
-      return new DbTableMeta(physicalName, sourceName, description, runId, fields);
+      return new DbTableMeta(physicalName, sourceName, fields, description, runId);
     } else if (request instanceof StreamRequest) {
       final URL schemaLocation = Utils.toUrl(((StreamRequest) request).getSchemaLocation());
-      return new StreamMeta(physicalName, sourceName, schemaLocation, description, runId);
+      return new StreamMeta(physicalName, sourceName, schemaLocation, fields, description, runId);
     }
 
     throw new IllegalArgumentException();
@@ -138,8 +138,8 @@ public final class Mapper {
     final String createdAtIso = ISO_INSTANT.format(dataset.getCreatedAt());
     final String updatedAtIso = ISO_INSTANT.format(dataset.getUpdatedAt());
     final String sourceString = dataset.getSourceName().getValue();
-    final String description = dataset.getDescription().orElse(null);
     final List<Field> fields = dataset.getFields();
+    final String description = dataset.getDescription().orElse(null);
 
     if (dataset instanceof DbTable) {
 
@@ -149,8 +149,8 @@ public final class Mapper {
           createdAtIso,
           updatedAtIso,
           sourceString,
-          description,
-          fields);
+          fields,
+          description);
     } else if (dataset instanceof Stream) {
       final String schemaLocationString = ((Stream) dataset).getSchemaLocation().toString();
       return new StreamResponse(
@@ -160,8 +160,8 @@ public final class Mapper {
           updatedAtIso,
           sourceString,
           schemaLocationString,
-          description,
-          fields);
+          fields,
+          description);
     }
 
     throw new IllegalArgumentException();

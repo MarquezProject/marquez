@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
@@ -33,20 +33,17 @@ import marquez.common.models.SourceName;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableMeta extends DatasetMeta {
-  @Getter final List<Field> fields;
-
   public DbTableMeta(
       final DatasetName physicalName,
       final SourceName sourceName,
+      @Nullable final List<Field> fields,
       @Nullable final String description,
-      @Nullable final UUID runId,
-      @Nullable final List<Field> fields) {
-    super(physicalName, sourceName, description, runId);
-    this.fields = fields;
+      @Nullable final UUID runId) {
+    super(physicalName, sourceName, fields, description, runId);
   }
 
   @Override
-  public UUID version(NamespaceName namespaceName, DatasetName datasetName) {
+  public UUID version(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
     final byte[] bytes =
         VERSION_JOINER
             .join(
@@ -54,13 +51,8 @@ public final class DbTableMeta extends DatasetMeta {
                 getSourceName().getValue(),
                 datasetName.getValue(),
                 getPhysicalName().getValue(),
-                getDescription(),
-                getFields().stream().map(DbTableMeta::joinFields).collect(joining(VERSION_DELIM)))
+                getFields().stream().map(DatasetMeta::joinField).collect(joining(VERSION_DELIM)))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
-  }
-
-  private static String joinFields(Field field) {
-    return VERSION_JOINER.join(field.getName().getValue(), field.getType(), field.getDescription());
   }
 }

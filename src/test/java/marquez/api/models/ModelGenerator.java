@@ -107,22 +107,22 @@ public final class ModelGenerator extends Generator {
 
   public static DbTableRequest newDbTableRequestWith(
       final DatasetName physicalName, final SourceName sourceName) {
-    return newDbTableRequestWith(physicalName, sourceName, true, false, true);
+    return newDbTableRequestWith(physicalName, sourceName, true, true, false);
   }
 
   public static DbTableRequest newDbTableRequestWith(
       final DatasetName physicalName,
       final SourceName sourceName,
+      final boolean hasFields,
       final boolean hasDescription,
-      final boolean hasRunId,
-      final boolean hasFields) {
+      final boolean hasRunId) {
     final String timeAsIso = newIsoTimestamp();
     return new DbTableRequest(
         physicalName.getValue(),
         sourceName.getValue(),
+        hasFields ? newFields(4) : null,
         hasDescription ? newDescription() : null,
-        hasRunId ? newRunId().toString() : null,
-        hasFields ? newFields() : null);
+        hasRunId ? newRunId().toString() : null);
   }
 
   public static StreamRequest newStreamRequestWith(
@@ -141,9 +141,9 @@ public final class ModelGenerator extends Generator {
         physicalName.getValue(),
         sourceName.getValue(),
         newLocation().toString(),
+        hasFields ? newFields(4) : null,
         hasDescription ? newDescription() : null,
-        hasRunId ? newRunId().toString() : null,
-        hasFields ? newFields() : null);
+        hasRunId ? newRunId().toString() : null);
   }
 
   public static JobRequest newJobRequestWith(

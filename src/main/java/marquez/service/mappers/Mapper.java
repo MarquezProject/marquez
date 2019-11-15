@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,7 +28,6 @@ import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
-import marquez.common.models.Field;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
@@ -142,6 +140,8 @@ public final class Mapper {
 
     final DatasetType type = DatasetType.valueOf(extendedRow.getType());
     switch (type) {
+      case DB_TABLE:
+        return new DbTable(name, physicalName, createdAt, updatedAt, sourceName, null, description);
       case STREAM:
         final URL schemaLocation = Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation());
         return new Stream(
@@ -151,13 +151,10 @@ public final class Mapper {
             updatedAt,
             sourceName,
             schemaLocation,
-            description,
-            new ArrayList<>());
+            null,
+            description);
       default:
-        final List<Field> fields =
-            new ArrayList<>(); // todo: implement DbTableVersionView to pass in column
-        return new DbTable(
-            name, physicalName, createdAt, updatedAt, sourceName, description, fields);
+        throw new IllegalArgumentException();
     }
   }
 

@@ -38,10 +38,6 @@ public interface DatasetVersionDao {
       insert(row);
       createStreamVersionDao().insert((StreamVersionRow) row);
       createDatasetDao().update(row.getDatasetUuid(), row.getCreatedAt(), row.getVersion());
-    } else {
-      insert(row);
-      // todo: to complete by willy
-      createDatasetDao().update(row.getDatasetUuid(), row.getCreatedAt(), row.getVersion());
     }
   }
 

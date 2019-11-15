@@ -14,6 +14,7 @@
 
 package marquez.service.models;
 
+import com.google.common.collect.ImmutableList;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +35,8 @@ public abstract class Dataset {
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final SourceName sourceName;
+  @Nullable final List<Field> fields;
   @Nullable private final String description;
-  @Getter final List<Field> fields;
 
   public Dataset(
       @NonNull final DatasetName name,
@@ -43,15 +44,19 @@ public abstract class Dataset {
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
       @NonNull final SourceName sourceName,
-      @Nullable final String description,
-      @Nullable final List<Field> fields) {
+      @Nullable final List<Field> fields,
+      @Nullable final String description) {
     this.name = name;
     this.physicalName = physicalName;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.sourceName = sourceName;
-    this.description = description;
     this.fields = fields;
+    this.description = description;
+  }
+
+  public List<Field> getFields() {
+    return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
   }
 
   public Optional<String> getDescription() {

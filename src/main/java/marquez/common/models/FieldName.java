@@ -16,6 +16,7 @@ package marquez.common.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -29,6 +30,7 @@ public final class FieldName {
     this.value = checkNotBlank(value, "value must not be blank");
   }
 
+  @JsonCreator
   public static FieldName of(final String value) {
     return new FieldName(value);
   }

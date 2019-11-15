@@ -16,7 +16,6 @@ package marquez.common.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URL;
@@ -60,13 +59,17 @@ public final class ModelGenerator extends Generator {
         connectionUrlString = "jdbc:postgresql://localhost:5432/test" + newId();
         break;
       case REDSHIFT:
+        connectionUrlString =
+            "jdbc:redshift://we.us-west-2.redshift.amazonaws.com:5439/test" + newId();
+        break;
+      case SNOWFLAKE:
         connectionUrlString = "jdbc:snowflake://we.snowflakecomputing.com/?db=test" + newId();
         break;
       case KAFKA:
-        connectionUrlString = "http://localhost:9092";
+        connectionUrlString = "localhost:9092";
         break;
       default:
-        connectionUrlString = "http://localhost:5000";
+        throw new IllegalArgumentException();
     }
     return URI.create(connectionUrlString);
   }
@@ -77,6 +80,22 @@ public final class ModelGenerator extends Generator {
 
   public static DatasetName newDatasetName() {
     return DatasetName.of("test_dataset" + newId());
+  }
+
+  public static Field newField() {
+    return new Field(newFieldName(), newFieldType(), newDescription());
+  }
+
+  public static FieldName newFieldName() {
+    return FieldName.of("test_field" + newId());
+  }
+
+  public static FieldType newFieldType() {
+    return FieldType.values()[newIdWithBound(FieldType.values().length - 1)];
+  }
+
+  public static List<Field> newFields(final int limit) {
+    return Stream.generate(() -> newField()).limit(limit).collect(toImmutableList());
   }
 
   public static JobName newJobName() {
@@ -98,15 +117,6 @@ public final class ModelGenerator extends Generator {
 
   public static UUID newRunId() {
     return UUID.randomUUID();
-  }
-
-  public static List<Field> newFields() {
-    Field column1 =
-        new Field(FieldName.of("first name"), FieldType.VARCHAR, "first name of customer");
-    Field column2 =
-        new Field(FieldName.of("last name"), FieldType.VARCHAR, "last name of customer");
-    Field column3 = new Field(FieldName.of("address"), FieldType.VARCHAR, "address of customer");
-    return ImmutableList.of(column1, column2, column3);
   }
 
   public static String newDescription() {

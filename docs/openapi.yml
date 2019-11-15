@@ -861,7 +861,7 @@ components:
           description: The URL of the schema for the stream.
           type: string
         fields:
-          description: The fields of the table.
+          description: The schema fields of the stream.
           type: array
           items:
             type: object

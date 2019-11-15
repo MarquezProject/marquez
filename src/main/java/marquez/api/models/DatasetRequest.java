@@ -38,9 +38,13 @@ import marquez.common.models.Field;
 public abstract class DatasetRequest {
   @Getter private final String physicalName;
   @Getter private final String sourceName;
+  @Nullable private final List<Field> fields;
   @Nullable private final String description;
   @Nullable private final String runId;
-  @Nullable private final List<Field> fields;
+
+  public List<Field> getFields() {
+    return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
@@ -48,9 +52,5 @@ public abstract class DatasetRequest {
 
   public Optional<String> getRunId() {
     return Optional.ofNullable(runId);
-  }
-
-  public List<Field> getFields() {
-    return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
   }
 }
