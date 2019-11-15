@@ -12,25 +12,31 @@
  * limitations under the License.
  */
 
-package marquez.api.models;
+package marquez.common.models;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import marquez.common.models.Field;
+import lombok.NonNull;
+import lombok.Value;
 
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class DbTableResponse extends DatasetResponse {
-  public DbTableResponse(
-      final String name,
-      final String physicalName,
-      final String createdAt,
-      final String updatedAt,
-      final String sourceName,
-      @Nullable final List<Field> fields,
+@Value
+public class Field {
+  FieldName name;
+  FieldType type;
+  @Nullable String description;
+
+  @JsonCreator
+  public Field(
+      @NonNull final FieldName name,
+      @NonNull final FieldType type,
       @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, fields, description);
+    this.name = name;
+    this.type = type;
+    this.description = description;
+  }
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
   }
 }

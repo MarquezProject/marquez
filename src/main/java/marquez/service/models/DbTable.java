@@ -15,22 +15,26 @@
 package marquez.service.models;
 
 import java.time.Instant;
+import java.util.List;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
 import marquez.common.models.SourceName;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTable extends Dataset {
+
   public DbTable(
       final DatasetName name,
       final DatasetName physicalName,
       final Instant createdAt,
       final Instant updatedAt,
       final SourceName sourceName,
+      @Nullable final List<Field> fields,
       @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, description);
+    super(name, physicalName, createdAt, updatedAt, sourceName, fields, description);
   }
 }

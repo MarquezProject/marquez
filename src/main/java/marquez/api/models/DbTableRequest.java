@@ -15,9 +15,11 @@
 package marquez.api.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.List;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import marquez.common.models.Field;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -26,8 +28,9 @@ public final class DbTableRequest extends DatasetRequest {
   public DbTableRequest(
       final String physicalName,
       final String sourceName,
+      @Nullable final List<Field> fields,
       @Nullable final String description,
       @Nullable final String runId) {
-    super(physicalName, sourceName, description, runId);
+    super(physicalName, sourceName, fields, description, runId);
   }
 }

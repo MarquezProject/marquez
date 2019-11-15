@@ -44,6 +44,7 @@ import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
 import marquez.common.models.JobType;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
@@ -117,14 +118,15 @@ public final class Mapper {
   public static DatasetMeta toDatasetMeta(@NonNull final DatasetRequest request) {
     final DatasetName physicalName = DatasetName.of(request.getPhysicalName());
     final SourceName sourceName = SourceName.of(request.getSourceName());
+    final List<Field> fields = request.getFields();
     final String description = request.getDescription().orElse(null);
     final UUID runId = request.getRunId().map(UUID::fromString).orElse(null);
 
     if (request instanceof DbTableRequest) {
-      return new DbTableMeta(physicalName, sourceName, description, runId);
+      return new DbTableMeta(physicalName, sourceName, fields, description, runId);
     } else if (request instanceof StreamRequest) {
       final URL schemaLocation = Utils.toUrl(((StreamRequest) request).getSchemaLocation());
-      return new StreamMeta(physicalName, sourceName, schemaLocation, description, runId);
+      return new StreamMeta(physicalName, sourceName, schemaLocation, fields, description, runId);
     }
 
     throw new IllegalArgumentException();
@@ -136,11 +138,19 @@ public final class Mapper {
     final String createdAtIso = ISO_INSTANT.format(dataset.getCreatedAt());
     final String updatedAtIso = ISO_INSTANT.format(dataset.getUpdatedAt());
     final String sourceString = dataset.getSourceName().getValue();
+    final List<Field> fields = dataset.getFields();
     final String description = dataset.getDescription().orElse(null);
 
     if (dataset instanceof DbTable) {
+
       return new DbTableResponse(
-          datasetString, physicalString, createdAtIso, updatedAtIso, sourceString, description);
+          datasetString,
+          physicalString,
+          createdAtIso,
+          updatedAtIso,
+          sourceString,
+          fields,
+          description);
     } else if (dataset instanceof Stream) {
       final String schemaLocationString = ((Stream) dataset).getSchemaLocation().toString();
       return new StreamResponse(
@@ -150,6 +160,7 @@ public final class Mapper {
           updatedAtIso,
           sourceString,
           schemaLocationString,
+          fields,
           description);
     }
 

@@ -140,12 +140,21 @@ public final class Mapper {
 
     final DatasetType type = DatasetType.valueOf(extendedRow.getType());
     switch (type) {
+      case DB_TABLE:
+        return new DbTable(name, physicalName, createdAt, updatedAt, sourceName, null, description);
       case STREAM:
         final URL schemaLocation = Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation());
         return new Stream(
-            name, physicalName, createdAt, updatedAt, sourceName, schemaLocation, description);
+            name,
+            physicalName,
+            createdAt,
+            updatedAt,
+            sourceName,
+            schemaLocation,
+            null,
+            description);
       default:
-        return new DbTable(name, physicalName, createdAt, updatedAt, sourceName, description);
+        throw new IllegalArgumentException();
     }
   }
 

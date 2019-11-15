@@ -130,7 +130,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/newDataset'
+              oneOf:
+                - $ref: '#/components/schemas/DB_TABLE'
+                - $ref: '#/components/schemas/STREAM'
       responses:
         '200':
           description: OK
@@ -790,17 +792,6 @@ components:
           items:
             $ref: '#/components/schemas/runAsNew'
 
-    newDataset:
-      type: object
-      properties:
-        datasets:
-          type: array
-          items:
-            oneOf:
-              - $ref: '#/components/schemas/DB_TABLE'
-              - $ref: '#/components/schemas/STREAM'
-              - $ref: '#/components/schemas/HTTP_ENDPOINT'
-
     DB_TABLE:
       type: object
       properties:
@@ -814,6 +805,22 @@ components:
         sourceName:
           description: The name of the source associated with the table.
           type: string
+        fields:
+          description: The fields of the table.
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                description: The name of the field.
+                type: string
+              type:
+                description: The type of the field.
+                type: enum
+              description:
+                description: The description of the field.
+                type: string 
+          uniqueItems: true
         description:
           description:  The description of the table.
           type: string
@@ -826,9 +833,15 @@ components:
         - sourceName
       example:
         type: DB_TABLE
-        name: wedata.room_bookings
         physicalName: wedata.room_bookings
         sourceName: analytics_db
+        fields: [
+          {'name': 'booking_id', 'type': 'INTEGER'},
+          {'name': 'booked_at', 'type': 'TIMESTAMP'},
+          {'name': 'office_id', 'type': 'INTEGER'},
+          {'name': 'room_id', 'type': 'INTEGER'},
+          {'name': 'member_id', 'type': 'INTEGER'}
+        ]
         description: "All room booking occupancy data."
 
     STREAM:
@@ -847,6 +860,22 @@ components:
         schemaLocation:
           description: The URL of the schema for the stream.
           type: string
+        fields:
+          description: The schema fields of the stream.
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                description: The name of the field.
+                type: string
+              type:
+                description: The type of the field.
+                type: enum
+              description:
+                description: The description of the field.
+                type: string 
+          uniqueItems: true
         description:
           description: The description of the stream.
           type: string
@@ -860,37 +889,10 @@ components:
         - schemaLocation
       example:
         type: STREAM
-        name: room_bookings
+        physicalName: tracking.wedata.room_bookings
         sourceName: kafka_prod
+        schemaLocation: 'http://localhost:8081/schemas/ids/1'
         description: "A stream of room booking occupancy data."
-
-    HTTP_ENDPOINT:
-      type: object
-      properties:
-        type:
-          description: The type of the dataset.
-          type: enum
-          enum: [HTTP_ENDPOINT]
-        physicalName:
-          description: The HTTP path of the endpoint.
-          type: string
-        sourceName:
-          description: The base HTTP URL of the service associated with the endpoint.
-          type: string
-        description:
-          description: The description of the endpoint.
-          type: string
-        runId:
-          description: The ID associated with the run modifying the stream.
-          type: string
-      required:
-        - type
-        - physicalName
-        - sourceName
-      example:
-        type: HTTP_ENDPOINT
-        name: /apps/{app}/events
-        sourceName: https://localhost:5000/api/v1
 
     dataset:
       type: object
@@ -915,6 +917,22 @@ components:
         sourceName:
           description: The name of the source associated with the dataset.
           type: string
+        fields:
+          description: The fields of the dataset.
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                description: The name of the field.
+                type: string
+              type:
+                description: The type of the field.
+                type: enum
+              description:
+                description: The description of the field.
+                type: string 
+          uniqueItems: true
         description:
           description:  The description of the dataset.
           type: string
@@ -925,6 +943,13 @@ components:
         createdAt: 2019-05-09T19:49:24.201361Z
         updatedAt: 2019-05-09T19:49:24.201361Z
         sourceName: analytics_db
+        fields: [
+          {'name': 'booking_id', 'type': 'INTEGER'},
+          {'name': 'booked_at', 'type': 'TIMESTAMP'},
+          {'name': 'office_id', 'type': 'INTEGER'},
+          {'name': 'room_id', 'type': 'INTEGER'},
+          {'name': 'member_id', 'type': 'INTEGER'}
+        ]
         description: "All room booking occupancy data."
 
     datasets:

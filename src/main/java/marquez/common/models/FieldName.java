@@ -12,30 +12,26 @@
  * limitations under the License.
  */
 
-package marquez.api.models;
+package marquez.common.models;
+
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.List;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import marquez.common.models.Field;
 
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class StreamRequest extends DatasetRequest {
-  @Getter private final String schemaLocation;
+@EqualsAndHashCode
+@ToString
+public final class FieldName {
+  @Getter private final String value;
+
+  private FieldName(final String value) {
+    this.value = checkNotBlank(value, "value must not be blank");
+  }
 
   @JsonCreator
-  public StreamRequest(
-      final String physicalName,
-      final String sourceName,
-      final String schemaLocation,
-      @Nullable final List<Field> fields,
-      @Nullable final String description,
-      @Nullable final String runId) {
-    super(physicalName, sourceName, fields, description, runId);
-    this.schemaLocation = schemaLocation;
+  public static FieldName of(final String value) {
+    return new FieldName(value);
   }
 }

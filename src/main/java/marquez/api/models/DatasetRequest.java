@@ -17,12 +17,15 @@ package marquez.api.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import marquez.common.models.Field;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
@@ -35,8 +38,13 @@ import lombok.ToString;
 public abstract class DatasetRequest {
   @Getter private final String physicalName;
   @Getter private final String sourceName;
+  @Nullable private final List<Field> fields;
   @Nullable private final String description;
   @Nullable private final String runId;
+
+  public List<Field> getFields() {
+    return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

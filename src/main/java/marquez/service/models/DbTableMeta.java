@@ -14,11 +14,19 @@
 
 package marquez.service.models;
 
+import static com.google.common.base.Charsets.UTF_8;
+import static java.util.stream.Collectors.joining;
+import static marquez.common.Utils.VERSION_DELIM;
+import static marquez.common.Utils.VERSION_JOINER;
+
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 
@@ -28,13 +36,23 @@ public final class DbTableMeta extends DatasetMeta {
   public DbTableMeta(
       final DatasetName physicalName,
       final SourceName sourceName,
+      @Nullable final List<Field> fields,
       @Nullable final String description,
       @Nullable final UUID runId) {
-    super(physicalName, sourceName, description, runId);
+    super(physicalName, sourceName, fields, description, runId);
   }
 
   @Override
-  public UUID version(NamespaceName namespaceName, DatasetName datasetName) {
-    return null;
+  public UUID version(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
+    final byte[] bytes =
+        VERSION_JOINER
+            .join(
+                namespaceName.getValue(),
+                getSourceName().getValue(),
+                datasetName.getValue(),
+                getPhysicalName().getValue(),
+                getFields().stream().map(DatasetMeta::joinField).collect(joining(VERSION_DELIM)))
+            .getBytes(UTF_8);
+    return UUID.nameUUIDFromBytes(bytes);
   }
 }

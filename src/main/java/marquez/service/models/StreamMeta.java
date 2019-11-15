@@ -15,9 +15,12 @@
 package marquez.service.models;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static java.util.stream.Collectors.joining;
+import static marquez.common.Utils.VERSION_DELIM;
 import static marquez.common.Utils.VERSION_JOINER;
 
 import java.net.URL;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -25,6 +28,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 
@@ -37,9 +41,10 @@ public final class StreamMeta extends DatasetMeta {
       final DatasetName physicalName,
       final SourceName sourceName,
       @NonNull final URL schemaLocation,
+      @Nullable final List<Field> fields,
       @Nullable final String description,
       @Nullable final UUID runId) {
-    super(physicalName, sourceName, description, runId);
+    super(physicalName, sourceName, fields, description, runId);
     this.schemaLocation = schemaLocation;
   }
 
@@ -52,7 +57,8 @@ public final class StreamMeta extends DatasetMeta {
                 getSourceName().getValue(),
                 datasetName.getValue(),
                 getPhysicalName().getValue(),
-                schemaLocation.toString())
+                schemaLocation.toString(),
+                getFields().stream().map(DatasetMeta::joinField).collect(joining(VERSION_DELIM)))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }

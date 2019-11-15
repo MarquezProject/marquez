@@ -20,6 +20,7 @@ import static marquez.common.models.ModelGenerator.newConnectionUrl;
 import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.ModelGenerator.newContext;
 import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newFields;
 import static marquez.common.models.ModelGenerator.newJobType;
 import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
@@ -73,16 +74,16 @@ public final class ModelGenerator extends Generator {
     return newSourceRequest(newSourceType(), true);
   }
 
-  public static SourceRequest newSourceRequestWith(final SourceType type) {
-    return newSourceRequest(type, true);
-  }
-
   public static SourceRequest newSourceRequest(
       final SourceType type, final boolean hasDescription) {
     return new SourceRequest(
         newSourceType().toString(),
         newConnectionUrlFor(type).toASCIIString(),
         hasDescription ? newDescription() : null);
+  }
+
+  public static SourceRequest newSourceRequestWith(final SourceType type) {
+    return newSourceRequest(type, true);
   }
 
   public static List<SourceResponse> newSourceResponses(final int limit) {
@@ -106,37 +107,41 @@ public final class ModelGenerator extends Generator {
 
   public static DbTableRequest newDbTableRequestWith(
       final DatasetName physicalName, final SourceName sourceName) {
-    return newDbTableRequestWith(physicalName, sourceName, true, false);
+    return newDbTableRequestWith(physicalName, sourceName, true, true, false);
   }
 
   public static DbTableRequest newDbTableRequestWith(
       final DatasetName physicalName,
       final SourceName sourceName,
+      final boolean hasFields,
       final boolean hasDescription,
       final boolean hasRunId) {
     final String timeAsIso = newIsoTimestamp();
     return new DbTableRequest(
         physicalName.getValue(),
         sourceName.getValue(),
+        hasFields ? newFields(4) : null,
         hasDescription ? newDescription() : null,
         hasRunId ? newRunId().toString() : null);
   }
 
   public static StreamRequest newStreamRequestWith(
       final DatasetName physicalName, final SourceName sourceName) {
-    return newStreamRequestWith(physicalName, sourceName, true, false);
+    return newStreamRequestWith(physicalName, sourceName, true, false, false);
   }
 
   public static StreamRequest newStreamRequestWith(
       final DatasetName physicalName,
       final SourceName sourceName,
       final boolean hasDescription,
-      final boolean hasRunId) {
+      final boolean hasRunId,
+      final boolean hasFields) {
     final String timeAsIso = newIsoTimestamp();
     return new StreamRequest(
         physicalName.getValue(),
         sourceName.getValue(),
         newLocation().toString(),
+        hasFields ? newFields(4) : null,
         hasDescription ? newDescription() : null,
         hasRunId ? newRunId().toString() : null);
   }

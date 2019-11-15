@@ -14,7 +14,9 @@
 
 package marquez.service.models;
 
+import com.google.common.collect.ImmutableList;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -22,6 +24,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
 import marquez.common.models.SourceName;
 
 @EqualsAndHashCode
@@ -32,6 +35,7 @@ public abstract class Dataset {
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final SourceName sourceName;
+  @Nullable final List<Field> fields;
   @Nullable private final String description;
 
   public Dataset(
@@ -40,13 +44,19 @@ public abstract class Dataset {
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
       @NonNull final SourceName sourceName,
+      @Nullable final List<Field> fields,
       @Nullable final String description) {
     this.name = name;
     this.physicalName = physicalName;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.sourceName = sourceName;
+    this.fields = fields;
     this.description = description;
+  }
+
+  public List<Field> getFields() {
+    return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
   }
 
   public Optional<String> getDescription() {
