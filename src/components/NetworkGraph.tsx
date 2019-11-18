@@ -28,7 +28,8 @@ const styles = ({ palette }: Theme) => {
     networkBackground: {
       background: palette.common.black,
       width: '100%',
-      height: '50vh'
+      height: '50vh',
+      position: 'fixed'
     },
     tooltip: {
       position: 'absolute',
@@ -43,7 +44,7 @@ const styles = ({ palette }: Theme) => {
       opacity: 0.8
     },
     legend: {
-      position: 'absolute',
+      position: 'fixed',
       bottom: '59vh',
       right: '6%'
     }

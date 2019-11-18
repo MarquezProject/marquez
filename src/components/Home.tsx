@@ -30,10 +30,10 @@ const styles = (_theme: ITheme) => {
     row: {
       display: 'flex',
       flexDirection: 'row',
-      padding: '1% 5%'
+      padding: '52vh 5% 1%'
     },
     search: {
-      position: 'absolute',
+      position: 'fixed',
       bottom: '52vh',
       width: '90%',
       left: '5%'
