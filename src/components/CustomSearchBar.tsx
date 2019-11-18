@@ -18,19 +18,15 @@ class CustomSearchBar extends React.Component<IProps, IState> {
     this.state = { value: '' }
   }
 
-  searchRequest = (searchString?: string) => {
-    const search = typeof searchString == 'string' ? searchString : this.state.value
-    this.props.findMatchingEntities(search)
+  searchChanged = (searchString: string) => {
+    this.setState({ value: searchString })
+    this.props.findMatchingEntities(searchString)
     searchString == '' ? this.props.showJobs(false) : this.props.showJobs(true)
   }
 
   cancelledSearch = () => {
     this.setState({ value: '' })
-    this.searchRequest('')
-  }
-
-  searchChanged = (newValue: string) => {
-    this.setState({ value: newValue })
+    this.searchChanged('')
   }
 
   render(): React.ReactElement {
@@ -40,7 +36,6 @@ class CustomSearchBar extends React.Component<IProps, IState> {
         value={this.state.value}
         onChange={this.searchChanged}
         onCancelSearch={this.cancelledSearch}
-        onRequestSearch={this.searchRequest}
       />
     )
   }

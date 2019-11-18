@@ -15,7 +15,6 @@ exports[`CustomSearchBar Component renders a snapshot that matches previous 1`] 
   disabled={false}
   onCancelSearch={[Function]}
   onChange={[Function]}
-  onRequestSearch={[Function]}
   placeholder="Search"
   searchIcon={
     <UNDEFINED
