@@ -32,6 +32,7 @@ import marquez.api.NamespaceResource;
 import marquez.api.SourceResource;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.db.DatasetDao;
+import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.JobContextDao;
 import marquez.db.JobDao;
@@ -139,6 +140,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final NamespaceOwnershipDao namespaceOwnershipDao = jdbi.onDemand(NamespaceOwnershipDao.class);
     final SourceDao sourceDao = jdbi.onDemand(SourceDao.class);
     final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
+    final DatasetFieldDao datasetFieldDao = jdbi.onDemand(DatasetFieldDao.class);
     final DatasetVersionDao datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
     final JobDao jobDao = jdbi.onDemand(JobDao.class);
     final JobVersionDao jobVersionDao = jdbi.onDemand(JobVersionDao.class);
@@ -151,7 +153,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
         new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
     final SourceService sourceService = new SourceService(sourceDao);
     final DatasetService datasetService =
-        new DatasetService(namespaceDao, sourceDao, datasetDao, datasetVersionDao);
+        new DatasetService(namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao);
     final JobService jobService =
         new JobService(
             namespaceDao,

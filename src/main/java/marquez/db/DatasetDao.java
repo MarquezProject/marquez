@@ -70,7 +70,7 @@ public interface DatasetDao {
 
   @SqlQuery("SELECT * FROM datasets WHERE name IN (<names>)")
   @RegisterRowMapper(DatasetRowMapper.class)
-  List<DatasetRow> findAllInNameList(@BindList(onEmpty = NULL_STRING) List<String> names);
+  List<DatasetRow> findAllInStringList(@BindList(onEmpty = NULL_STRING) List<String> names);
 
   @SqlQuery(
       "SELECT d.*, s.name AS source_name "

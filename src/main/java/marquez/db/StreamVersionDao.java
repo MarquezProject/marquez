@@ -31,7 +31,11 @@ public interface StreamVersionDao {
   void insert(@BindBean StreamVersionRow row);
 
   @SqlQuery(
-      "SELECT * FROM dataset_versions AS dv, stream_versions AS sv "
+      "SELECT dv.*, sv.*, "
+          + "ARRAY(SELECT dataset_field_uuid "
+          + "      FROM dataset_versions_field_mapping "
+          + "      WHERE dataset_version_uuid = dv.uuid) AS field_uuids "
+          + "FROM dataset_versions AS dv, stream_versions AS sv "
           + "WHERE dv.version = :version AND sv.dataset_version_uuid = dv.uuid")
   Optional<StreamVersionRow> findBy(UUID version);
 

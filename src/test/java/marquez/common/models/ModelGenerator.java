@@ -42,7 +42,7 @@ public final class ModelGenerator extends Generator {
   }
 
   public static SourceName newSourceName() {
-    return SourceName.of("test_datasource" + newId());
+    return SourceName.of("test_source" + newId());
   }
 
   public static URI newConnectionUrl() {

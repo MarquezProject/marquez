@@ -102,16 +102,17 @@ public class JobService {
         }
 
         final JobRow jobRow = jobDao.findBy(namespaceName.getValue(), jobName.getValue()).get();
-        final List<UUID> inputs =
+        final JobContextRow contextRow = contextDao.findBy(checksum).get();
+        final List<UUID> inputUuids =
             datasetDao
-                .findAllInNameList(
+                .findAllInStringList(
                     meta.getInputs().stream().map(DatasetName::getValue).collect(toImmutableList()))
                 .stream()
                 .map(DatasetRow::getUuid)
                 .collect(toImmutableList());
-        final List<UUID> outputs =
+        final List<UUID> outputUuids =
             datasetDao
-                .findAllInNameList(
+                .findAllInStringList(
                     meta.getOutputs().stream()
                         .map(DatasetName::getValue)
                         .collect(toImmutableList()))
@@ -119,17 +120,16 @@ public class JobService {
                 .map(DatasetRow::getUuid)
                 .collect(toImmutableList());
 
-        final JobContextRow contextRow = contextDao.findBy(checksum).get();
         final JobVersionRow newVersionRow =
             Mapper.toJobVersionRow(
                 jobRow.getUuid(),
                 contextRow.getUuid(),
-                inputs,
-                outputs,
+                inputUuids,
+                outputUuids,
                 meta.getLocation().orElse(null),
                 version);
 
-        versionDao.insertAndUpdate(newVersionRow);
+        versionDao.insert(newVersionRow);
       }
 
       return get(namespaceName, jobName).get();
@@ -198,14 +198,12 @@ public class JobService {
   private Job toJob(@NonNull JobRow jobRow) {
     final UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
     final ExtendedJobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
-
     final List<DatasetName> inputs =
-        datasetDao.findAllInUuidList(versionRow.getInputs()).stream()
+        datasetDao.findAllInUuidList(versionRow.getInputUuids()).stream()
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
-
     final List<DatasetName> outputs =
-        datasetDao.findAllInUuidList(versionRow.getOutputs()).stream()
+        datasetDao.findAllInUuidList(versionRow.getOutputUuids()).stream()
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
 

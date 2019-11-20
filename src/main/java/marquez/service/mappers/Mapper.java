@@ -28,12 +28,16 @@ import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.Field;
+import marquez.common.models.FieldName;
+import marquez.common.models.FieldType;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
@@ -130,7 +134,9 @@ public final class Mapper {
   }
 
   public static Dataset toDataset(
-      @NonNull final ExtendedDatasetRow extendedRow, @Nullable final DatasetVersionRow versionRow) {
+      @NonNull final ExtendedDatasetRow extendedRow,
+      @NonNull final List<DatasetFieldRow> fieldRows,
+      @NonNull final DatasetVersionRow versionRow) {
     final DatasetName name = DatasetName.of(extendedRow.getName());
     final DatasetName physicalName = DatasetName.of(extendedRow.getPhysicalName());
     final Instant createdAt = extendedRow.getCreatedAt();
@@ -141,7 +147,8 @@ public final class Mapper {
     final DatasetType type = DatasetType.valueOf(extendedRow.getType());
     switch (type) {
       case DB_TABLE:
-        return new DbTable(name, physicalName, createdAt, updatedAt, sourceName, null, description);
+        return new DbTable(
+            name, physicalName, createdAt, updatedAt, sourceName, toField(fieldRows), description);
       case STREAM:
         final URL schemaLocation = Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation());
         return new Stream(
@@ -151,11 +158,22 @@ public final class Mapper {
             updatedAt,
             sourceName,
             schemaLocation,
-            null,
+            toField(fieldRows),
             description);
       default:
         throw new IllegalArgumentException();
     }
+  }
+
+  public static Field toField(@NonNull final DatasetFieldRow row) {
+    return new Field(
+        FieldName.of(row.getName()),
+        FieldType.valueOf(row.getType()),
+        row.getDescription().orElse(null));
+  }
+
+  public static List<Field> toField(@NonNull final List<DatasetFieldRow> rows) {
+    return rows.stream().map(Mapper::toField).collect(toImmutableList());
   }
 
   public static DatasetRow toDatasetRow(
@@ -177,7 +195,7 @@ public final class Mapper {
         null);
   }
 
-  private static DatasetType toDatasetType(final DatasetMeta meta) {
+  private static DatasetType toDatasetType(@NonNull final DatasetMeta meta) {
     if (meta instanceof DbTableMeta) {
       return DatasetType.DB_TABLE;
     } else if (meta instanceof StreamMeta) {
@@ -187,23 +205,35 @@ public final class Mapper {
     throw new IllegalArgumentException();
   }
 
+  public static DatasetFieldRow toDatasetFieldRow(
+      @NonNull final UUID datasetUuid, @NonNull final Field field) {
+    final Instant now = Instant.now();
+    return new DatasetFieldRow(
+        UUID.randomUUID(),
+        field.getType().toString(),
+        now,
+        now,
+        datasetUuid,
+        field.getName().getValue(),
+        field.getDescription().orElse(null));
+  }
+
   public static DatasetVersionRow toDatasetVersionRow(
       @NonNull final UUID datasetUuid,
       @NonNull final UUID version,
+      @NonNull final List<UUID> fieldUuids,
       @NonNull final DatasetMeta meta) {
     final UUID rowUuid = UUID.randomUUID();
     final Instant now = Instant.now();
     final UUID runUuid = meta.getRunId().orElse(null);
 
-    if (meta instanceof DbTableMeta) {
-      return null;
-    } else if (meta instanceof StreamMeta) {
+    if (meta instanceof StreamMeta) {
       final String schemaLocationString = ((StreamMeta) meta).getSchemaLocation().toString();
       return new StreamVersionRow(
-          rowUuid, now, datasetUuid, version, runUuid, schemaLocationString);
+          rowUuid, now, datasetUuid, version, fieldUuids, runUuid, schemaLocationString);
     }
 
-    throw new IllegalArgumentException();
+    return new DatasetVersionRow(rowUuid, now, datasetUuid, version, fieldUuids, runUuid);
   }
 
   public static Job toJob(

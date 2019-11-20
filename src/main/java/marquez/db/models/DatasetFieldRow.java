@@ -15,28 +15,23 @@
 package marquez.db.models;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
+import lombok.Value;
 
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class StreamVersionRow extends DatasetVersionRow {
-  @Getter private final String schemaLocation;
+@Value
+public class DatasetFieldRow {
+  @NonNull UUID uuid;
+  @NonNull String type;
+  @NonNull Instant createdAt;
+  @NonNull Instant updatedAt;
+  @NonNull UUID datasetUuid;
+  @NonNull String name;
+  @Nullable String description;
 
-  public StreamVersionRow(
-      final UUID uuid,
-      final Instant createdAt,
-      final UUID datasetUuid,
-      final UUID version,
-      final List<UUID> fieldUuids,
-      @Nullable final UUID runUuid,
-      @NonNull final String schemaLocation) {
-    super(uuid, createdAt, datasetUuid, version, fieldUuids, runUuid);
-    this.schemaLocation = schemaLocation;
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
   }
 }

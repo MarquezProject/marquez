@@ -24,12 +24,15 @@ import static marquez.api.models.ModelGenerator.newSourceRequestWith;
 import static marquez.api.models.ModelGenerator.newStreamRequestWith;
 import static marquez.common.models.ModelGenerator.newDatasetName;
 import static marquez.common.models.ModelGenerator.newDatasetNames;
+import static marquez.common.models.ModelGenerator.newFields;
 import static marquez.common.models.ModelGenerator.newJobName;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newSourceName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
@@ -38,7 +41,10 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
+import marquez.api.models.DatasetRequest;
+import marquez.api.models.DbTableRequest;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
 import marquez.common.models.JobName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
@@ -117,6 +123,48 @@ public class MarquezAppIntegrationTest {
             .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
 
     assertThat(response.getStatus()).isEqualTo(HTTP_200);
+  }
+
+  @Test
+  public void testApp_createDbTableThenAddFields() {
+    final SourceName sourceName = newSourceName();
+
+    APP.client()
+        .target(baseUri + "/sources/{source}")
+        .resolveTemplate("source", sourceName.getValue())
+        .request(APPLICATION_JSON)
+        .put(Entity.json(newSourceRequestWith(SourceType.POSTGRESQL)));
+
+    final DatasetName datasetName = newDatasetName();
+
+    final DatasetRequest request0 = newDbTableRequestWith(datasetName, sourceName);
+    final Response response0 =
+        APP.client()
+            .target(baseUri + "/namespaces/default/datasets/{dataset}")
+            .resolveTemplate("dataset", datasetName.getValue())
+            .request(APPLICATION_JSON)
+            .put(Entity.json(request0));
+
+    assertThat(response0.getStatus()).isEqualTo(HTTP_200);
+
+    final List<Field> original = request0.getFields();
+    final List<Field> fields = Lists.newArrayList(Iterables.concat(original, newFields(2)));
+
+    final DatasetRequest request1 =
+        new DbTableRequest(
+            datasetName.getValue(),
+            sourceName.getValue(),
+            fields,
+            request0.getDescription().get(),
+            null);
+    final Response response1 =
+        APP.client()
+            .target(baseUri + "/namespaces/default/datasets/{dataset}")
+            .resolveTemplate("dataset", datasetName.getValue())
+            .request(APPLICATION_JSON)
+            .put(Entity.json(request1));
+
+    assertThat(response1.getStatus()).isEqualTo(HTTP_200);
   }
 
   @Test
