@@ -12,16 +12,23 @@ export interface IDisplayState {
   success: string
   dialogIsOpen: boolean
   editWarningField?: string
+  isLoading: boolean
 }
 
 const initialState: IDisplayState = {
   error: '',
   success: '',
   dialogIsOpen: false,
-  editWarningField: ''
+  editWarningField: '',
+  isLoading: true
 }
 
 export default (state = initialState, action: IToggleExpandAction) => {
+  if (action.type.toLowerCase().includes('success')) {
+    return { ...state, isLoading: false }
+  } else if (action.type.toLowerCase().includes('fetch')) {
+    return { ...state, isLoading: true }
+  }
   switch (action.type) {
     case APPLICATION_ERROR:
       return { ...state, error: action.payload.message, success: '' }

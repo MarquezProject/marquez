@@ -6,7 +6,8 @@ import { IState } from '../reducers'
 
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets,
-  jobs: state.jobs
+  jobs: state.jobs,
+  isLoading: state.display.isLoading
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) => ({
