@@ -60,6 +60,13 @@ export const createNetworkData = (datasets: IDataset[], jobs: IJob[]): INetworkD
   }
 }
 
+export const capitalize = (word: string) => {
+  if (word.length < 2) {
+    return word.toUpperCase()
+  }
+  return `${word[0].toUpperCase()}${word.slice(1)}`
+}
+
 const customTimeFormat = timeFormat('%b %d, %Y %I:%m%p')
 
 export const formatUpdatedAt = (updatedAt: string) => {

@@ -30,3 +30,6 @@ export interface IDataset extends IDatasetAPI {
 export interface IJob extends IJobAPI {
   matches: boolean
 }
+
+export type IFilterByDisplay = 'namespace' | 'datasource'
+export type IFilterByKey = 'namespace' | 'sourceName' | 'all'

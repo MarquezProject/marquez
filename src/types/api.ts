@@ -3,7 +3,7 @@ export interface IDatasetAPI {
   createdAt: string
   updatedAt: string
   urn: string
-  datasourceUrn: string
+  sourceName: string
   description: string
   tags?: string[]
 }

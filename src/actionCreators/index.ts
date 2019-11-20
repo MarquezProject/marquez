@@ -1,6 +1,7 @@
 import * as actionTypes from '../constants/ActionTypes'
 
 import { IDatasetAPI, IJobAPI, INamespaceAPI } from '../types/api'
+import { IFilterByKey } from '../types'
 
 export const fetchDatasetsSuccess = (datasets: IDatasetAPI[]) => ({
   type: actionTypes.FETCH_DATASETS_SUCCESS,
@@ -9,10 +10,26 @@ export const fetchDatasetsSuccess = (datasets: IDatasetAPI[]) => ({
   }
 })
 
+export const filterDatasets = (filterByKey: IFilterByKey, filterByValue?: string) => ({
+  type: actionTypes.FILTER_DATASETS,
+  payload: {
+    filterByKey,
+    filterByValue
+  }
+})
+
 export const fetchJobsSuccess = (jobs: IJobAPI[]) => ({
   type: actionTypes.FETCH_JOBS_SUCCESS,
   payload: {
     jobs
+  }
+})
+
+export const filterJobs = (filterByKey: IFilterByKey, filterByValue?: string) => ({
+  type: actionTypes.FILTER_JOBS,
+  payload: {
+    filterByKey,
+    filterByValue
   }
 })
 

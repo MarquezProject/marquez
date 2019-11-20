@@ -5,7 +5,7 @@ import jobs, { IJobsState } from './jobs'
 import namespaces, { INamespacesState } from './namespaces'
 import display, { IDisplayState } from './display'
 import { History } from 'history'
-import { IDatasetsAPI } from '../types/api'
+import { IFilterByKey } from '../types'
 
 export interface IState {
   datasets: IDatasetsState
@@ -34,5 +34,16 @@ export function findMatchingEntities(
     matches:
       e.name.toLowerCase().includes(searchString) ||
       (e.description || '').toLowerCase().includes(searchString)
+  }))
+}
+
+export function filterEntities(
+  initialState: Array<any>,
+  filterByKey: IFilterByKey,
+  filterByValue?: string
+): IDatasetsState & IJobsState {
+  return initialState.map(e => ({
+    ...e,
+    matches: filterByKey === 'all' ? true : e[filterByKey] === filterByValue
   }))
 }

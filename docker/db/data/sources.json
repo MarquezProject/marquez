@@ -4,5 +4,11 @@
     "name": "redshift",
     "connectionUrl": "abcd:redshift://dummy.url.redshift.amazonaws.com:1234/dev",
     "description": "dummy redshift cluster"
+  },
+  {
+    "type": "SNOWFLAKE",
+    "name": "snowflake",
+    "connectionUrl": "abcd:snowflake://dummy.url.snowflake.amazonaws.com:1234/dev",
+    "description": "dummy snowflake cluster"
   }
 ]

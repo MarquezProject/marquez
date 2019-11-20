@@ -18,8 +18,8 @@ export function* fetchNamespacesDatasetsAndJobs() {
     const datasetResponses = yield all(namespaces.map((n: INamespaceAPI) => call(fetchDatasets, n)))
 
     const jobResponses = yield all(namespaces.map((n: INamespaceAPI) => call(fetchJobs, n)))
-    const datasets = datasetResponses.map((r: IDatasetsAPI) => r.datasets).flat()
-    const jobs = jobResponses.map((r: IJobsAPI) => r.jobs).flat()
+    const datasets = datasetResponses.flat()
+    const jobs = jobResponses.flat()
 
     yield put(fetchDatasetsSuccess(datasets))
     yield put(fetchJobsSuccess(jobs))

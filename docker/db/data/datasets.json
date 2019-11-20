@@ -19,16 +19,16 @@
     "name": "galaxy.trips",
     "physicalName": "galaxy.trips",
     "type": "DB_TABLE",
+    "sourceName": "snowflake",
     "namespace": "galactic-data",
-    "sourceName": "redshift",
     "description": "all trips taken through the galaxy"
   },
   {
     "name": "earth.dimensions",
     "physicalName": "earth.dimensions",
     "type": "DB_TABLE",
+    "sourceName": "snowflake",
     "namespace": "galactic-data",
-    "sourceName": "redshift",
     "description": "describes all possible dimensions on earth"
   },
   {
