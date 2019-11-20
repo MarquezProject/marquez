@@ -19,7 +19,7 @@ exports[`JobPreviewCard Component renders a snapshot that matches previous 1`] =
   }
   location="https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_dimensions.sql"
   name="calculate.galaxy_dimensions"
-  namespace="central-data"
+  namespace="galactic-data"
   outputs={
     Array [
       "galaxy.dimensions",

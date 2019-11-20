@@ -3,7 +3,7 @@
     "name": "galaxy.geometry",
     "physicalName": "galaxy.geometry",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes different geometries in the galaxy"
   },
@@ -11,7 +11,7 @@
     "name": "galaxy.dimensions",
     "physicalName": "galaxy.dimensions",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all possible dimensions in the galaxy"
   },
@@ -19,7 +19,7 @@
     "name": "galaxy.trips",
     "physicalName": "galaxy.trips",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "all trips taken through the galaxy"
   },
@@ -27,7 +27,7 @@
     "name": "earth.dimensions",
     "physicalName": "earth.dimensions",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all possible dimensions on earth"
   },
@@ -35,7 +35,7 @@
     "name": "earth.trips",
     "physicalName": "earth.trips",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all possible trips taken on earth"
   },
@@ -43,7 +43,7 @@
     "name": "objects.stars",
     "physicalName": "objects.stars",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all stars in the galaxy"
   },
@@ -51,7 +51,7 @@
     "name": "objects.planets",
     "physicalName": "objects.planets",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all planets in the galaxy"
   },
@@ -59,7 +59,7 @@
     "name": "objects.life",
     "physicalName": "objects.life",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all life"
   },
@@ -67,7 +67,7 @@
     "name": "environment.universe",
     "physicalName": "environment.universe",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes the entire universe"
   },
@@ -75,7 +75,7 @@
     "name": "galaxy.radiowaves",
     "physicalName": "galaxy.radiowaves",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all radiowaves"
   },
@@ -83,7 +83,7 @@
     "name": "galaxy.satellites",
     "physicalName": "galaxy.satellites",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all satellites"
   },
@@ -91,7 +91,7 @@
     "name": "environment.conversations",
     "physicalName": "environment.conversations",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all conversations in the galaxy"
   },
@@ -99,7 +99,7 @@
     "name": "environment.transcripts",
     "physicalName": "environment.transcripts",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all transcripts in the galaxy"
   },
@@ -107,8 +107,216 @@
     "name": "environment.empty",
     "physicalName": "environment.empty",
     "type": "DB_TABLE",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "this dataset is never used by a job!"
+    "description": "an empty environment never referenced by a job"
+  },
+  {
+    "name": "rocket.parts",
+    "physicalName": "rocket.parts",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes parts of rockets"
+  },
+  {
+    "name": "rocket.types",
+    "physicalName": "rocket.types",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes types of rockets"
+  },
+  {
+    "name": "station.parts",
+    "physicalName": "station.parts",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes space station parts"
+  },
+  {
+    "name": "station.types",
+    "physicalName": "station.types",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes space station types"
+  },
+  {
+    "name": "alien.parts",
+    "physicalName": "alien.parts",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes alien parts"
+  },
+  {
+    "name": "alien.types",
+    "physicalName": "alien.types",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes types of aliens"
+  },
+  {
+    "name": "interstellar.geometry",
+    "physicalName": "interstellar.geometry",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes different geometries in the galaxy"
+  },
+  {
+    "name": "interstellar.dimensions",
+    "physicalName": "interstellar.dimensions",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all possible dimensions in the galaxy"
+  },
+  {
+    "name": "interstellar.trips",
+    "physicalName": "interstellar.trips",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "all trips taken through the galaxy"
+  },
+  {
+    "name": "cosmic.dimensions",
+    "physicalName": "cosmic.dimensions",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all possible dimensions on earth"
+  },
+  {
+    "name": "cosmic.trips",
+    "physicalName": "cosmic.trips",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all possible trips taken in the cosmics"
+  },
+  {
+    "name": "cosmic.stars",
+    "physicalName": "cosmic.stars",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all stars in the galaxy"
+  },
+  {
+    "name": "cosmic.planets",
+    "physicalName": "cosmic.planets",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all planets in the cosmics"
+  },
+  {
+    "name": "cosmic.life",
+    "physicalName": "cosmic.life",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all life"
+  },
+  {
+    "name": "cosmic.universe",
+    "physicalName": "cosmic.universe",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes the entire universe"
+  },
+  {
+    "name": "cosmic.radiowaves",
+    "physicalName": "cosmic.radiowaves",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all radiowaves"
+  },
+  {
+    "name": "cosmic.satellites",
+    "physicalName": "cosmic.satellites",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all satellites"
+  },
+  {
+    "name": "interstellar.conversations",
+    "physicalName": "interstellar.conversations",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all conversations in interstellar space"
+  },
+  {
+    "name": "interstellar.transcripts",
+    "physicalName": "interstellar.transcripts",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all transcripts in interstellar space"
+  },
+  {
+    "name": "cosmic.empty",
+    "physicalName": "cosmic.empty",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "an empty cosmic dataset not referenced by any job"
+  },
+  {
+    "name": "comet.parts",
+    "physicalName": "comet.parts",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes parts that make up comets"
+  },
+  {
+    "name": "comet.types",
+    "physicalName": "comet.types",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all types of comets"
+  },
+  {
+    "name": "black_hole.parts",
+    "physicalName": "black_hole.parts",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes parts that make up black holes"
+  },
+  {
+    "name": "black_hole.types",
+    "physicalName": "black_hole.types",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all types of black holes"
+  },
+  {
+    "name": "worm_hole.parts",
+    "physicalName": "worm_hole.parts",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes parts that make up worm holes"
+  },
+  {
+    "name": "worm_hole.types",
+    "physicalName": "worm_hole.types",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "describes all types of worm holes"
   }
 ]

@@ -1,6 +1,10 @@
 [
   {
-    "name": "central-data",
-    "ownerName": "central-data"
+    "name": "galactic-data",
+    "ownerName": "galactic-data"
+  },
+  {
+    "name": "interstellar-data",
+    "ownerName": "interstellar-data"
   }
 ]

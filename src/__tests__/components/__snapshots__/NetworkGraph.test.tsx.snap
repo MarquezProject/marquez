@@ -7,7 +7,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes different geometries in the galaxy",
         "name": "galaxy.geometry",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "galaxy.geometry",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -15,7 +15,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all possible dimensions in the galaxy",
         "name": "galaxy.dimensions",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "galaxy.dimensions",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -23,7 +23,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "all trips taken through the galaxy",
         "name": "galaxy.trips",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "galaxy.trips",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -31,7 +31,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all possible dimensions on earth",
         "name": "earth.dimensions",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "earth.dimensions",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -39,7 +39,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all possible trips taken on earth",
         "name": "earth.trips",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "earth.trips",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -47,7 +47,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all stars in the galaxy",
         "name": "objects.stars",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "objects.stars",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -55,7 +55,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all planets in the galaxy",
         "name": "objects.planets",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "objects.planets",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -63,7 +63,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all life",
         "name": "objects.life",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "objects.life",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -71,7 +71,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes the entire universe",
         "name": "environment.universe",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "environment.universe",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -79,7 +79,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all radiowaves",
         "name": "galaxy.radiowaves",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "galaxy.radiowaves",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -87,7 +87,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all satellites",
         "name": "galaxy.satellites",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "galaxy.satellites",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -95,7 +95,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all conversations in the galaxy",
         "name": "environment.conversations",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "environment.conversations",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -103,7 +103,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "describes all transcripts in the galaxy",
         "name": "environment.transcripts",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "environment.transcripts",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -111,7 +111,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
       Object {
         "description": "this dataset is never used by a job!",
         "name": "environment.empty",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "physicalName": "environment.empty",
         "sourceName": "redshift",
         "type": "DB_TABLE",
@@ -127,7 +127,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         ],
         "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_dimensions.sql",
         "name": "calculate.galaxy_dimensions",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "outputs": Array [
           "galaxy.dimensions",
         ],
@@ -140,7 +140,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         ],
         "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
         "name": "calculate.galaxy_trips",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "outputs": Array [
           "galaxy.trips",
         ],
@@ -153,7 +153,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         ],
         "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
         "name": "calculate.earth_dimensions",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "outputs": Array [
           "earth.trips",
         ],
@@ -168,7 +168,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         ],
         "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
         "name": "calculate.universe",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "outputs": Array [
           "environment.universe",
         ],
@@ -182,7 +182,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         ],
         "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
         "name": "calculate.communications",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "outputs": Array [
           "environment.conversations",
           "environment.transcripts",
@@ -194,7 +194,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         "inputs": Array [],
         "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
         "name": "calculate.nothing",
-        "namespace": "central-data",
+        "namespace": "galactic-data",
         "outputs": Array [],
         "type": "BATCH",
       },
@@ -214,7 +214,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes different geometries in the galaxy",
           "name": "galaxy.geometry",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "galaxy.geometry",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -222,7 +222,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all possible dimensions in the galaxy",
           "name": "galaxy.dimensions",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "galaxy.dimensions",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -230,7 +230,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "all trips taken through the galaxy",
           "name": "galaxy.trips",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "galaxy.trips",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -238,7 +238,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all possible dimensions on earth",
           "name": "earth.dimensions",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "earth.dimensions",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -246,7 +246,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all possible trips taken on earth",
           "name": "earth.trips",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "earth.trips",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -254,7 +254,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all stars in the galaxy",
           "name": "objects.stars",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "objects.stars",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -262,7 +262,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all planets in the galaxy",
           "name": "objects.planets",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "objects.planets",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -270,7 +270,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all life",
           "name": "objects.life",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "objects.life",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -278,7 +278,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes the entire universe",
           "name": "environment.universe",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "environment.universe",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -286,7 +286,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all radiowaves",
           "name": "galaxy.radiowaves",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "galaxy.radiowaves",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -294,7 +294,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all satellites",
           "name": "galaxy.satellites",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "galaxy.satellites",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -302,7 +302,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all conversations in the galaxy",
           "name": "environment.conversations",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "environment.conversations",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -310,7 +310,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "describes all transcripts in the galaxy",
           "name": "environment.transcripts",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "environment.transcripts",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -318,7 +318,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
         Object {
           "description": "this dataset is never used by a job!",
           "name": "environment.empty",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "physicalName": "environment.empty",
           "sourceName": "redshift",
           "type": "DB_TABLE",
@@ -334,7 +334,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
           ],
           "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_dimensions.sql",
           "name": "calculate.galaxy_dimensions",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "outputs": Array [
             "galaxy.dimensions",
           ],
@@ -347,7 +347,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
           ],
           "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
           "name": "calculate.galaxy_trips",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "outputs": Array [
             "galaxy.trips",
           ],
@@ -360,7 +360,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
           ],
           "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
           "name": "calculate.earth_dimensions",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "outputs": Array [
             "earth.trips",
           ],
@@ -375,7 +375,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
           ],
           "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
           "name": "calculate.universe",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "outputs": Array [
             "environment.universe",
           ],
@@ -389,7 +389,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
           ],
           "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
           "name": "calculate.communications",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "outputs": Array [
             "environment.conversations",
             "environment.transcripts",
@@ -401,7 +401,7 @@ exports[`NetworkGraph Component renders a snapshot that matches previous 1`] = `
           "inputs": Array [],
           "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
           "name": "calculate.nothing",
-          "namespace": "central-data",
+          "namespace": "galactic-data",
           "outputs": Array [],
           "type": "BATCH",
         },

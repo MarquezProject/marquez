@@ -1,7 +1,7 @@
 [
   {
     "name": "calculate.galaxy_dimensions",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "inputs": ["galaxy.geometry"],
     "outputs": ["galaxy.dimensions"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_dimensions.sql",
@@ -10,7 +10,7 @@
   },
   {
     "name": "calculate.galaxy_trips",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "inputs": ["galaxy.dimensions"],
     "outputs": ["galaxy.trips"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
@@ -19,7 +19,7 @@
   },
   {
     "name": "calculate.earth_dimensions",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "inputs": ["earth.dimensions"],
     "outputs": ["earth.trips"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
@@ -28,7 +28,7 @@
   },
   {
     "name": "calculate.universe",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "inputs": ["objects.stars", "objects.planets", "objects.life"],
     "outputs": ["environment.universe"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
@@ -37,7 +37,7 @@
   },
   {
     "name": "calculate.communications",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "inputs": ["galaxy.radiowaves", "galaxy.satellites"],
     "outputs": ["environment.conversations", "environment.transcripts"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
@@ -46,9 +46,117 @@
   },
   {
     "name": "calculate.nothing",
-    "namespace": "central-data",
+    "namespace": "galactic-data",
     "inputs": [],
     "outputs": [],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates literally nothing!",
+    "type": "BATCH"
+  },
+  {
+    "name": "build.rocket",
+    "namespace": "galactic-data",
+    "inputs": ["rocket.parts"],
+    "outputs": ["rocket.types"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates literally nothing!",
+    "type": "BATCH"
+  },
+  {
+    "name": "build.space_station",
+    "namespace": "galactic-data",
+    "inputs": ["station.parts"],
+    "outputs": ["station.types"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates literally nothing!",
+    "type": "BATCH"
+  },
+  {
+    "name": "build.aliens",
+    "namespace": "galactic-data",
+    "inputs": ["alien.parts"],
+    "outputs": ["alien.types"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates literally nothing!",
+    "type": "BATCH"
+  },
+  {
+    "name": "calculate.interstellar_dimensions",
+    "namespace": "interstellar-data",
+    "inputs": ["interstellar.geometry"],
+    "outputs": ["interstellar.dimensions"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_dimensions.sql",
+    "description": "calculates all possible dimensions from interstellar dimensions",
+    "type": "BATCH"
+  },
+  {
+    "name": "calculate.interstellar_trips",
+    "namespace": "interstellar-data",
+    "inputs": ["interstellar.dimensions"],
+    "outputs": ["interstellar.trips"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates trips taken in the interstellar world",
+    "type": "BATCH"
+  },
+  {
+    "name": "calculate.cosmic_dimensions",
+    "namespace": "interstellar-data",
+    "inputs": ["interstellar.trips"],
+    "outputs": ["cosmic.dimensions"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates the dimensions of the cosmics",
+    "type": "BATCH"
+  },
+  {
+    "name": "calculate.cosmic_universe",
+    "namespace": "interstellar-data",
+    "inputs": ["cosmic.stars", "cosmic.planets", "cosmic.life"],
+    "outputs": ["cosmic.universe"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates the entire cosmic universe",
+    "type": "BATCH"
+  },
+  {
+    "name": "calculate.cosmic_communications",
+    "namespace": "interstellar-data",
+    "inputs": ["cosmic.radiowaves", "cosmic.satellites"],
+    "outputs": ["interstellar.conversations", "interstellar.transcripts"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates all communications in the cosmics",
+    "type": "BATCH"
+  },
+  {
+    "name": "cosmic.nothing",
+    "namespace": "interstellar-data",
+    "inputs": [],
+    "outputs": [],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates literally nothing!",
+    "type": "BATCH"
+  },
+  {
+    "name": "build.comets",
+    "namespace": "interstellar-data",
+    "inputs": ["comet.parts"],
+    "outputs": ["comet.types"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates literally nothing!",
+    "type": "BATCH"
+  },
+  {
+    "name": "build.black_holes",
+    "namespace": "interstellar-data",
+    "inputs": ["black_hole.parts"],
+    "outputs": ["black_hole.types"],
+    "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
+    "description": "calculates literally nothing!",
+    "type": "BATCH"
+  },
+  {
+    "name": "build.worm_holes",
+    "namespace": "interstellar-data",
+    "inputs": ["worm_hole.parts"],
+    "outputs": ["worm_hole.types"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
     "description": "calculates literally nothing!",
     "type": "BATCH"

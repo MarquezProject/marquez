@@ -4,7 +4,7 @@ exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1
 <WithStyles(DatasetPreviewCard)
   description="describes different geometries in the galaxy"
   name="galaxy.geometry"
-  namespace="central-data"
+  namespace="galactic-data"
   physicalName="galaxy.geometry"
   sourceName="redshift"
   tags={
@@ -26,7 +26,7 @@ exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1
     }
     description="describes different geometries in the galaxy"
     name="galaxy.geometry"
-    namespace="central-data"
+    namespace="galactic-data"
     physicalName="galaxy.geometry"
     sourceName="redshift"
     tags={
