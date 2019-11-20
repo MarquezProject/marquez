@@ -5,11 +5,12 @@ import {
   WithStyles as IWithStyles,
   Theme as ITheme
 } from '@material-ui/core/styles'
-import { Typography, Box } from '@material-ui/core'
+import { Typography, Box, Tooltip } from '@material-ui/core'
 import { formatUpdatedAt } from '../helpers'
 import tagToBadge from '../config/tag-to-badge'
 
 import { IDatasetAPI } from '../types/api'
+const _  = require('lodash')
 
 const styles = ({ palette }: ITheme) => {
   return createStyles({
@@ -18,6 +19,9 @@ const styles = ({ palette }: ITheme) => {
     },
     lastUpdated: {
       color: palette.grey[600]
+    },
+    tagContainer: {
+      display: 'flex'
     }
   })
 }
@@ -34,7 +38,8 @@ interface IState {}
 
 class DatasetPreviewCard extends React.Component<IProps, IState> {
   render(): ReactElement {
-    const { classes, name, description, updatedAt = 'error', tags = ['is_pii'] } = this.props
+    const { classes, name, description, updatedAt, tags = [] } = this.props
+    const { tagContainer } = classes
     return (
       <Box p={2} m={1} bgcolor='white' boxShadow={3} display='flex' justifyContent='space-between'>
         <div>
@@ -50,7 +55,17 @@ class DatasetPreviewCard extends React.Component<IProps, IState> {
           alignItems='flex-end'
           justifyContent='space-between'
         >
-          <div id='tagContainer'>{tags.map(t => tagToBadge[t])}</div>
+          <div id='tagContainer' className={tagContainer}>
+            {_.keys(tagToBadge.default).map((key: string) => {
+              return (
+                <div key={key}>
+                  <Tooltip className="tagWrapper" title={key} placement="top">
+                    {tags.includes(key) ? tagToBadge.highlighted[key] : tagToBadge.default[key]}
+                  </Tooltip>
+                </div>
+              )
+            })}
+          </div>
           <Typography className={classes.lastUpdated}>{formatUpdatedAt(updatedAt)}</Typography>
         </Box>
       </Box>

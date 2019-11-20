@@ -1,16 +1,13 @@
 import { mount } from 'enzyme'
 import * as React from 'react'
 import Typography from '@material-ui/core/Typography'
-import fakeTagToBadge from '../../config/__mocks__/tag-to-badge'
+import tagToBadge from '../../config/tag-to-badge'
 import DatasetPreviewCard from '../../components/DatasetPreviewCard'
 import { formatUpdatedAt } from '../../helpers'
 
-/*
-  Mock the functionality of tagToBadge
-  (reads from the __mocks__ folder of src/config)
-*/
-jest.mock('../../config/tag-to-badge')
+jest.mock('../../config/tag-to-badge') // https://jestjs.io/docs/en/manual-mocks
 const datasets = require('../../../docker/db/data/datasets.json')
+
 describe('DatasetPreviewCard Component', () => {
   const wrapper = mount(<DatasetPreviewCard />)
   it('Should render', () => {
@@ -19,6 +16,7 @@ describe('DatasetPreviewCard Component', () => {
 
   const dataset = datasets[0]
   const tags = ['tag_a', 'tag_b', 'tag_c']
+
   wrapper.setProps({ ...dataset, tags })
   const componentText = wrapper.render().text()
 
@@ -36,12 +34,14 @@ describe('DatasetPreviewCard Component', () => {
         .text()
     ).toContain(formatUpdatedAt(dataset.updatedAt))
   })
-  it('should render a badge per tag that has a corresponding entry in the tagToBadge config', () => {
-    const tagIsInFakeConfig = tag => !!fakeTagToBadge[tag]
-
-    expect(wrapper.find('#tagContainer').children()).toHaveLength(
-      tags.filter(tagIsInFakeConfig).length
-    )
+  it('should render a highlighted badge per matching tag in config', () => {
+    const tagIsInFakeConfig = tag => !!tagToBadge.default[tag]
+    expect(
+      wrapper
+        .find('.tagWrapper')
+        .children()
+        .filterWhere(item => item.prop('color') == 'highlighted')
+    ).toHaveLength(tags.filter(tagIsInFakeConfig).length)
   })
   it('renders a snapshot that matches previous', () => {
     expect(wrapper).toMatchSnapshot()

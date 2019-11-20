@@ -21,6 +21,7 @@ exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1
       Object {
         "lastUpdated": "DatasetPreviewCard-lastUpdated-2",
         "rightCol": "DatasetPreviewCard-rightCol-1",
+        "tagContainer": "DatasetPreviewCard-tagContainer-3",
       }
     }
     description="describes different geometries in the galaxy"
@@ -46,7 +47,7 @@ exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1
       p={2}
     >
       <div
-        className="MuiBox-root MuiBox-root-4"
+        className="MuiBox-root MuiBox-root-5"
       >
         <div>
           <WithStyles(ForwardRef(Typography))
@@ -104,7 +105,7 @@ exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1
             <WithStyles(ForwardRef(Typography))
               classes={
                 Object {
-                  "root": "WithStyles(ForwardRef(Typography))-root-35",
+                  "root": "WithStyles(ForwardRef(Typography))-root-36",
                 }
               }
               color="primary"
@@ -138,7 +139,7 @@ exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1
                     "noWrap": "MuiTypography-noWrap",
                     "overline": "MuiTypography-overline",
                     "paragraph": "MuiTypography-paragraph",
-                    "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-35",
+                    "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-36",
                     "srOnly": "MuiTypography-srOnly",
                     "subtitle1": "MuiTypography-subtitle1",
                     "subtitle2": "MuiTypography-subtitle2",
@@ -147,7 +148,7 @@ exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1
                 color="primary"
               >
                 <p
-                  className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-35 MuiTypography-body1 MuiTypography-colorPrimary"
+                  className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-36 MuiTypography-body1 MuiTypography-colorPrimary"
                 >
                   describes different geometries in the galaxy
                 </p>
@@ -163,21 +164,130 @@ exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1
           justifyContent="space-between"
         >
           <div
-            className="MuiBox-root MuiBox-root-36 DatasetPreviewCard-rightCol-1"
+            className="MuiBox-root MuiBox-root-37 DatasetPreviewCard-rightCol-1"
           >
             <div
+              className="DatasetPreviewCard-tagContainer-3"
               id="tagContainer"
             >
-              <span
+              <div
                 key="tag_a"
               >
-                Pretend Badge
-              </span>
-              <span
+                <WithStyles(ForwardRef(Tooltip))
+                  className="tagWrapper"
+                  placement="top"
+                  title="tag_a"
+                >
+                  <ForwardRef(Tooltip)
+                    className="tagWrapper"
+                    classes={
+                      Object {
+                        "popper": "MuiTooltip-popper",
+                        "popperInteractive": "MuiTooltip-popperInteractive",
+                        "tooltip": "MuiTooltip-tooltip",
+                        "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                        "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                        "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                        "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                        "touch": "MuiTooltip-touch",
+                      }
+                    }
+                    placement="top"
+                    title="tag_a"
+                  >
+                    <span
+                      aria-describedby={null}
+                      className="tagWrapper"
+                      color="highlighted"
+                      key="tag_a"
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      onTouchEnd={[Function]}
+                      onTouchStart={[Function]}
+                      title="tag_a"
+                    >
+                      Pretend Badge
+                    </span>
+                    <ForwardRef(Popper)
+                      anchorEl={
+                        <span
+                          class="tagWrapper"
+                          color="highlighted"
+                          title="tag_a"
+                        >
+                          Pretend Badge
+                        </span>
+                      }
+                      className="MuiTooltip-popper"
+                      id={null}
+                      open={false}
+                      placement="top"
+                      transition={true}
+                    />
+                  </ForwardRef(Tooltip)>
+                </WithStyles(ForwardRef(Tooltip))>
+              </div>
+              <div
                 key="tag_b"
               >
-                Pretend Badge
-              </span>
+                <WithStyles(ForwardRef(Tooltip))
+                  className="tagWrapper"
+                  placement="top"
+                  title="tag_b"
+                >
+                  <ForwardRef(Tooltip)
+                    className="tagWrapper"
+                    classes={
+                      Object {
+                        "popper": "MuiTooltip-popper",
+                        "popperInteractive": "MuiTooltip-popperInteractive",
+                        "tooltip": "MuiTooltip-tooltip",
+                        "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                        "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                        "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                        "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                        "touch": "MuiTooltip-touch",
+                      }
+                    }
+                    placement="top"
+                    title="tag_b"
+                  >
+                    <span
+                      aria-describedby={null}
+                      className="tagWrapper"
+                      color="highlighted"
+                      key="tag_b"
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      onTouchEnd={[Function]}
+                      onTouchStart={[Function]}
+                      title="tag_b"
+                    >
+                      Pretend Badge
+                    </span>
+                    <ForwardRef(Popper)
+                      anchorEl={
+                        <span
+                          class="tagWrapper"
+                          color="highlighted"
+                          title="tag_b"
+                        >
+                          Pretend Badge
+                        </span>
+                      }
+                      className="MuiTooltip-popper"
+                      id={null}
+                      open={false}
+                      placement="top"
+                      transition={true}
+                    />
+                  </ForwardRef(Tooltip)>
+                </WithStyles(ForwardRef(Tooltip))>
+              </div>
             </div>
             <WithStyles(ForwardRef(Typography))
               className="DatasetPreviewCard-lastUpdated-2"
