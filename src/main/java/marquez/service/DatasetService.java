@@ -19,8 +19,8 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import java.util.UUID;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetName;
@@ -93,7 +93,8 @@ public class DatasetService {
                 .filter(
                     newFieldRow ->
                         fieldRows.stream()
-                            .noneMatch(fieldRow -> newFieldRow.getName().equals(fieldRow.getName())))
+                            .noneMatch(
+                                fieldRow -> newFieldRow.getName().equals(fieldRow.getName())))
                 .collect(toImmutableList());
 
         log.debug("New fields rows for dataset version {}: {}", version, newFieldRowsForVersion);
