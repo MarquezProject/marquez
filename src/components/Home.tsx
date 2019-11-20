@@ -9,7 +9,6 @@ import {
   Theme as ITheme
 } from '@material-ui/core/styles'
 
-import NetworkGraph from './NetworkGraph'
 import CustomSearchBar from './CustomSearchBar'
 import DatasetPreviewCard from './DatasetPreviewCard'
 import JobPreviewCard from './JobPreviewCard'
@@ -30,7 +29,11 @@ const styles = (_theme: ITheme) => {
     row: {
       display: 'flex',
       flexDirection: 'row',
-      padding: '52vh 5% 1%'
+      padding: '52vh 5% 1%',
+      position: 'absolute',
+      top: 0,
+      zIndex: -1,
+      width: '100%'
     },
     search: {
       position: 'fixed',
@@ -40,14 +43,14 @@ const styles = (_theme: ITheme) => {
     },
     noDatasets: {
       color: '#9e9e9e',
-      position: 'absolute',
-      bottom: '21vh',
+      position: 'fixed',
+      bottom: '20vh',
       left: '21%'
     },
     noJobs: {
       color: '#9e9e9e',
-      position: 'absolute',
-      bottom: '21vh',
+      position: 'fixed',
+      bottom: '20vh',
       right: '21%'
     }
   })
@@ -80,8 +83,7 @@ class Home extends React.Component<IAllProps, IState> {
     const matchingDatasets = datasets.filter(d => d.matches)
     const matchingJobs = jobs.filter(j => j.matches)
     return (
-      <Box display='flex' flexDirection='column' justifyContent='center'>
-        <NetworkGraph jobs={jobs} datasets={datasets}></NetworkGraph>
+      <div>
         <CustomSearchBar
           customClassName={classes.search}
           findMatchingEntities={findMatchingEntities}
@@ -127,7 +129,7 @@ class Home extends React.Component<IAllProps, IState> {
             </Box>
           ) : null}
         </div>
-      </Box>
+      </div>
     )
   }
 }

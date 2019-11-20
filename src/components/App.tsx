@@ -25,6 +25,7 @@ import createRootReducer from '../reducers'
 import rootSaga from '../sagas'
 import HomeContainer from '../containers/HomeContainer'
 import Toast from '../containers/ToastContainer'
+import NetworkGraphContainer from '../containers/NetworkGraphContainer'
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
@@ -88,6 +89,7 @@ const App = ({ classes }: IProps): ReactElement => {
           <CssBaseline />
           <Grid direction='column' alignItems='stretch' classes={classes} justify='space-between'>
             <AppBar />
+            <NetworkGraphContainer />
             <Switch>
               <Route path='/' exact component={HomeContainer} />
             </Switch>
