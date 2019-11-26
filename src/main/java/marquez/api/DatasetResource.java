@@ -21,6 +21,7 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -138,7 +139,7 @@ public final class DatasetResource {
     }
   }
 
-  private void throwIfNotExists(UUID runId) throws MarquezServiceException {
+  private void throwIfNotExists(@Nullable UUID runId) throws MarquezServiceException {
     if (runId != null) {
       if (!jobService.runExists(runId)) {
         throw new RunNotFoundException(runId);

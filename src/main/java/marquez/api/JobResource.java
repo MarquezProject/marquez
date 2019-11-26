@@ -258,7 +258,7 @@ public final class JobResource {
     }
   }
 
-  private void throwIfNotExists(UUID runId) throws MarquezServiceException {
+  private void throwIfNotExists(@NonNull UUID runId) throws MarquezServiceException {
     if (!jobService.runExists(runId)) {
       throw new RunNotFoundException(runId);
     }
