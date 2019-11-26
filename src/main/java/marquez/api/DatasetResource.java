@@ -20,7 +20,6 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -84,7 +83,7 @@ public final class DatasetResource {
 
     final DatasetName datasetName = DatasetName.of(datasetString);
     final DatasetMeta meta = Mapper.toDatasetMeta(request);
-    throwIfNotExists(meta.getRunId());
+    throwIfNotExists(meta.getRunId().orElse(null));
 
     final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, meta);
     final DatasetResponse response = Mapper.toDatasetResponse(dataset);
@@ -133,16 +132,16 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  private void throwIfNotExists(NamespaceName name) throws MarquezServiceException {
+  private void throwIfNotExists(@NonNull NamespaceName name) throws MarquezServiceException {
     if (!namespaceService.exists(name)) {
       throw new NamespaceNotFoundException(name);
     }
   }
 
-  private void throwIfNotExists(Optional<UUID> runId) throws MarquezServiceException {
-    if (runId.isPresent()) {
-      if (!jobService.runExists(runId.get())) {
-        throw new RunNotFoundException(runId.get());
+  private void throwIfNotExists(UUID runId) throws MarquezServiceException {
+    if (runId != null) {
+      if (!jobService.runExists(runId)) {
+        throw new RunNotFoundException(runId);
       }
     }
   }
