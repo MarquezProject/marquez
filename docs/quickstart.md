@@ -101,7 +101,7 @@ Next, we need to create a dataset and associate it with an existing source:
 ##### REQUEST
 
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/public.room_bookings \
+$ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/wedata.room_bookings \
   -H 'Content-Type: application/json' \
   -d '{ 
         "type": "DB_TABLE",
