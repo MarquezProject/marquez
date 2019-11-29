@@ -6,7 +6,7 @@ Python client for [Marquez](https://github.com/MarquezProject/marquez).
 
 ## Status
 
-This library is under active development at [The We Company](https://www.we.co). 
+This library is under active development at [WeWork](https://www.wework.com). 
 
 ## Documentation
 
