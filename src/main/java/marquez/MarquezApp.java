@@ -94,6 +94,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void run(@NonNull MarquezConfig config, @NonNull Environment env) throws MarquezException {
+    log.info("Running startup actions...");
     migrateDbOrError(config);
     registerResources(config, env);
   }

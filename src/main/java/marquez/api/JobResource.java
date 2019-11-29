@@ -85,8 +85,8 @@ public final class JobResource {
     throwIfNotExists(namespaceName);
 
     final JobName jobName = JobName.of(jobString);
-    final JobMeta meta = Mapper.toJobMeta(request);
-    final Job job = jobService.createOrUpdate(namespaceName, jobName, meta);
+    final JobMeta jobMeta = Mapper.toJobMeta(request);
+    final Job job = jobService.createOrUpdate(namespaceName, jobName, jobMeta);
     final JobResponse response = Mapper.toJobResponse(job);
     log.debug("Response: {}", response);
     return Response.ok(response).build();
@@ -245,9 +245,10 @@ public final class JobResource {
     return getRun(runId);
   }
 
-  private void throwIfNotExists(@NonNull NamespaceName name) throws MarquezServiceException {
-    if (!namespaceService.exists(name)) {
-      throw new NamespaceNotFoundException(name);
+  private void throwIfNotExists(@NonNull NamespaceName namespaceName)
+      throws MarquezServiceException {
+    if (!namespaceService.exists(namespaceName)) {
+      throw new NamespaceNotFoundException(namespaceName);
     }
   }
 

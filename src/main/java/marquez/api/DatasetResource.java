@@ -83,10 +83,10 @@ public final class DatasetResource {
     throwIfNotExists(namespaceName);
 
     final DatasetName datasetName = DatasetName.of(datasetString);
-    final DatasetMeta meta = Mapper.toDatasetMeta(request);
-    throwIfNotExists(meta.getRunId().orElse(null));
+    final DatasetMeta datasetMeta = Mapper.toDatasetMeta(request);
+    throwIfNotExists(datasetMeta.getRunId().orElse(null));
 
-    final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, meta);
+    final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, datasetMeta);
     final DatasetResponse response = Mapper.toDatasetResponse(dataset);
     log.debug("Response: {}", response);
     return Response.ok(response).build();
@@ -133,9 +133,10 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  private void throwIfNotExists(@NonNull NamespaceName name) throws MarquezServiceException {
-    if (!namespaceService.exists(name)) {
-      throw new NamespaceNotFoundException(name);
+  private void throwIfNotExists(@NonNull NamespaceName namespaceName)
+      throws MarquezServiceException {
+    if (!namespaceService.exists(namespaceName)) {
+      throw new NamespaceNotFoundException(namespaceName);
     }
   }
 
