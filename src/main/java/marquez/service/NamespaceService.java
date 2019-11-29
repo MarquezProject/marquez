@@ -54,14 +54,13 @@ public class NamespaceService {
 
   private void init() throws MarquezServiceException {
     if (!exists(NamespaceName.DEFAULT)) {
-      log.info("No default namespace found, creating...");
+      log.warn("No 'default' namespace found.");
       final NamespaceMeta meta =
           new NamespaceMeta(
               OwnerName.ANONYMOUS,
               "The default global namespace for job and dataset metadata "
                   + "not belonging to a user-specified namespace.");
       final Namespace namespace = createOrUpdate(NamespaceName.DEFAULT, meta);
-      log.info("Successfully created default namespace with meta: {}", meta);
     }
   }
 
