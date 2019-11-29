@@ -213,8 +213,18 @@ public class JobService {
             .collect(toImmutableList());
 
     final JobContextRow contextRow = contextDao.findBy(versionRow.getJobContextUuid()).get();
+    final ExtendedRunRow runRow =
+        versionRow
+            .getLatestRunUuid()
+            .map(latestRunUuid -> runDao.findBy(latestRunUuid).get())
+            .orElse(null);
     return Mapper.toJob(
-        jobRow, inputs, outputs, versionRow.getLocation().orElse(null), versionRow.getContext());
+        jobRow,
+        inputs,
+        outputs,
+        versionRow.getLocation().orElse(null),
+        versionRow.getContext(),
+        runRow);
   }
 
   public Run createRun(
