@@ -17,6 +17,7 @@ package marquez.service;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
+import io.prometheus.client.Counter;
 import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
@@ -37,6 +38,13 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class NamespaceService {
+  private static final Counter namespaces =
+      Counter.build()
+          .namespace("marquez")
+          .name("namespace_total")
+          .help("Total number of namespaces.")
+          .register();
+
   private final NamespaceDao namespaceDao;
   private final OwnerDao ownerDao;
   private final NamespaceOwnershipDao namespaceOwnershipDao;
@@ -104,6 +112,8 @@ public class NamespaceService {
           namespaceDao.insertWith(newNamespaceRow, newOwnerRow, newNamespaceOwnershipRow);
         }
         log.info("Successfully created namespace '{}'  with meta: {}", name.getValue(), meta);
+
+        namespaces.inc();
       }
 
       return get(name).get();

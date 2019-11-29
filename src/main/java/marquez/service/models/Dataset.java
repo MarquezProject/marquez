@@ -24,12 +24,14 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 import marquez.common.models.SourceName;
 
 @EqualsAndHashCode
 @ToString
 public abstract class Dataset {
+  @Getter private final DatasetType type;
   @Getter private final DatasetName name;
   @Getter private final DatasetName physicalName;
   @Getter private final Instant createdAt;
@@ -39,6 +41,7 @@ public abstract class Dataset {
   @Nullable private final String description;
 
   public Dataset(
+      @NonNull final DatasetType type,
       @NonNull final DatasetName name,
       @NonNull final DatasetName physicalName,
       @NonNull final Instant createdAt,
@@ -46,6 +49,7 @@ public abstract class Dataset {
       @NonNull final SourceName sourceName,
       @Nullable final List<Field> fields,
       @Nullable final String description) {
+    this.type = type;
     this.name = name;
     this.physicalName = physicalName;
     this.createdAt = createdAt;

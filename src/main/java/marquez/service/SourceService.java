@@ -16,6 +16,7 @@ package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import io.prometheus.client.Counter;
 import java.util.List;
 import java.util.Optional;
 import jersey.repackaged.com.google.common.collect.ImmutableList;
@@ -32,6 +33,13 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class SourceService {
+  private static final Counter sources =
+      Counter.build()
+          .namespace("marquez")
+          .name("source_total")
+          .help("Total number of sources.")
+          .register();
+
   private final SourceDao dao;
 
   public SourceService(@NonNull final SourceDao dao) {
@@ -47,6 +55,8 @@ public class SourceService {
 
         dao.insert(newRow);
         log.info("Successfully created source '{}' with meta: {}", name.getValue(), meta);
+
+        sources.inc();
       }
       return get(name).get();
     } catch (UnableToExecuteStatementException e) {

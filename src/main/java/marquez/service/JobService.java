@@ -18,6 +18,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.ImmutableList;
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,6 +57,33 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class JobService {
+  private static final Counter jobs =
+      Counter.build()
+          .namespace("marquez")
+          .name("job_total")
+          .labelNames("namespace_name", "job_type")
+          .help("Total number of jobs.")
+          .register();
+  private static final Counter versions =
+      Counter.build()
+          .namespace("marquez")
+          .name("job_versions_total")
+          .labelNames("namespace_name", "job_type", "job_name")
+          .help("Total number of job versions.")
+          .register();
+  private static final Gauge runsActive =
+      Gauge.build()
+          .namespace("marquez")
+          .name("job_runs_active")
+          .help("Total number of active job runs.")
+          .register();
+  private static final Gauge runsCompleted =
+      Gauge.build()
+          .namespace("marquez")
+          .name("job_runs_completed")
+          .help("Total number of completed job runs.")
+          .register();
+
   private final NamespaceDao namespaceDao;
   private final DatasetDao datasetDao;
   private final JobDao jobDao;
@@ -100,6 +129,8 @@ public class JobService {
             jobName.getValue(),
             namespaceName.getValue(),
             jobMeta);
+
+        jobs.labels(namespaceName.getValue(), jobMeta.getType().toString()).inc();
       }
       final UUID version = jobMeta.version(namespaceName, jobName);
       if (!versionDao.exists(version)) {
@@ -140,6 +171,10 @@ public class JobService {
                 version);
         versionDao.insert(newVersionRow);
         log.info("Successfully created version '{}' for job '{}'.", version, jobName.getValue());
+
+        versions
+            .labels(namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue())
+            .inc();
       }
       return get(namespaceName, jobName).get();
     } catch (UnableToExecuteStatementException e) {
@@ -305,9 +340,26 @@ public class JobService {
       final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
       runStateDao.insertAndUpdate(newRunStateRow);
       log.debug("Marked run with ID '{}' as '{}'.", runId, runState);
+      incOrDecBy(runState);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to mark job run '{}' as '{}'.", runId, runState, e);
       throw new MarquezServiceException();
+    }
+  }
+
+  private void incOrDecBy(@NonNull Run.State runState) {
+    switch (runState) {
+      case RUNNING:
+        runsActive.inc();
+        break;
+      case COMPLETED:
+        runsActive.dec();
+        runsCompleted.inc();
+        break;
+      case ABORTED:
+      case FAILED:
+        runsActive.dec();
+        break;
     }
   }
 }
