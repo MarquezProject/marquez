@@ -67,6 +67,6 @@ public abstract class DatasetMeta {
   public abstract UUID version(NamespaceName namespaceName, DatasetName datasetName);
 
   protected static String joinField(final Field field) {
-    return VERSION_JOINER.join(field.getName().getValue(), field.getType(), field.getDescription());
+    return VERSION_JOINER.join(field.getName(), field.getType(), field.getDescription());
   }
 }

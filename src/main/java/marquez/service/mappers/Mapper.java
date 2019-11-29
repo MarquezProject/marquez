@@ -29,7 +29,6 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
-import marquez.common.models.FieldName;
 import marquez.common.models.FieldType;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
@@ -167,9 +166,7 @@ public final class Mapper {
 
   public static Field toField(@NonNull final DatasetFieldRow row) {
     return new Field(
-        FieldName.of(row.getName()),
-        FieldType.valueOf(row.getType()),
-        row.getDescription().orElse(null));
+        row.getName(), FieldType.valueOf(row.getType()), row.getDescription().orElse(null));
   }
 
   public static List<Field> toField(@NonNull final List<DatasetFieldRow> rows) {
@@ -214,7 +211,7 @@ public final class Mapper {
         now,
         now,
         datasetUuid,
-        field.getName().getValue(),
+        field.getName(),
         field.getDescription().orElse(null));
   }
 
