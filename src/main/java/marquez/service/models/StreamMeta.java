@@ -18,6 +18,7 @@ import static com.google.common.base.Charsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static marquez.common.Utils.VERSION_DELIM;
 import static marquez.common.Utils.VERSION_JOINER;
+import static marquez.common.models.DatasetType.STREAM;
 
 import java.net.URL;
 import java.util.List;
@@ -44,7 +45,7 @@ public final class StreamMeta extends DatasetMeta {
       @Nullable final List<Field> fields,
       @Nullable final String description,
       @Nullable final UUID runId) {
-    super(physicalName, sourceName, fields, description, runId);
+    super(STREAM, physicalName, sourceName, fields, description, runId);
     this.schemaLocation = schemaLocation;
   }
 

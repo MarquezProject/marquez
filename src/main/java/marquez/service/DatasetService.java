@@ -17,6 +17,7 @@ package marquez.service;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import io.prometheus.client.Counter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,6 +45,21 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class DatasetService {
+  private static final Counter datasets =
+      Counter.build()
+          .namespace("marquez")
+          .name("dataset_total")
+          .labelNames("namespace_name", "dataset_type")
+          .help("Total number of datasets.")
+          .register();
+  private static final Counter versions =
+      Counter.build()
+          .namespace("marquez")
+          .name("dataset_versions_total")
+          .labelNames("namespace_name", "dataset_type", "dataset_name")
+          .help("Total number of dataset versions.")
+          .register();
+
   private final NamespaceDao namespaceDao;
   private final SourceDao sourceDao;
   private final DatasetDao datasetDao;
@@ -85,6 +101,8 @@ public class DatasetService {
             datasetName.getValue(),
             namespaceName.getValue(),
             datasetMeta);
+
+        datasets.labels(namespaceName.getValue(), datasetMeta.getType().toString()).inc();
       }
       final UUID version = datasetMeta.version(namespaceName, datasetName);
       if (!versionDao.exists(version)) {
@@ -120,6 +138,11 @@ public class DatasetService {
         versionDao.insertWith(newVersionRow, newFieldRowsForVersion);
         log.info(
             "Successfully created version '{}' for dataset '{}'.", version, datasetName.getValue());
+
+        versions
+            .labels(
+                namespaceName.getValue(), datasetMeta.getType().toString(), datasetName.getValue())
+            .inc();
       }
       return get(datasetName).get();
     } catch (UnableToExecuteStatementException e) {
