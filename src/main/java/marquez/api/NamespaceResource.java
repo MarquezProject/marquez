@@ -31,6 +31,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.NamespaceRequest;
@@ -42,6 +43,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
 
+@Slf4j
 @Path("/api/v1")
 public final class NamespaceResource {
   private final NamespaceService service;
@@ -60,10 +62,12 @@ public final class NamespaceResource {
   public Response createOrUpdate(
       @PathParam("namespace") String namespaceString, @Valid NamespaceRequest request)
       throws MarquezServiceException {
+    log.debug("Request: {}", request);
     final NamespaceName name = NamespaceName.of(namespaceString);
     final NamespaceMeta meta = Mapper.toNamespaceMeta(request);
     final Namespace namespace = service.createOrUpdate(name, meta);
     final NamespaceResponse response = Mapper.toNamespaceResponse(namespace);
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 
@@ -81,6 +85,7 @@ public final class NamespaceResource {
             .get(name)
             .map(Mapper::toNamespaceResponse)
             .orElseThrow(() -> new NamespaceNotFoundException(name));
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 
@@ -96,6 +101,7 @@ public final class NamespaceResource {
       throws MarquezServiceException {
     final List<Namespace> namespaces = service.getAll(limit, offset);
     final NamespacesResponse response = Mapper.toNamespacesResponse(namespaces);
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 }

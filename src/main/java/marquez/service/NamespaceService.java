@@ -61,7 +61,7 @@ public class NamespaceService {
               "The default global namespace for job and dataset metadata "
                   + "not belonging to a user-specified namespace.");
       final Namespace namespace = createOrUpdate(NamespaceName.DEFAULT, meta);
-      log.info("Successfully created default namespace: {}", namespace);
+      log.info("Successfully created default namespace with meta: {}", meta);
     }
   }
 
@@ -90,6 +90,7 @@ public class NamespaceService {
           }
         }
       } else {
+        log.info("No namespace with name '{}' found, creating...", name.getValue());
         final NamespaceRow newNamespaceRow = Mapper.toNamespaceRow(name, meta);
         if (ownerDao.exists(meta.getOwnerName().getValue())) {
           final OwnerRow ownerRow = ownerDao.findBy(meta.getOwnerName().getValue()).get();
@@ -104,11 +105,13 @@ public class NamespaceService {
 
           namespaceDao.insertWith(newNamespaceRow, newOwnerRow, newNamespaceOwnershipRow);
         }
+        log.info("Successfully created namespace '{}'  with meta: {}", name.getValue(), meta);
       }
 
       return get(name).get();
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create or update namespace {} with meta: {}", name.getValue(), meta, e);
+      log.error(
+          "Failed to create or update namespace '{}' with meta: {}", name.getValue(), meta, e);
       throw new MarquezServiceException();
     }
   }
@@ -117,7 +120,7 @@ public class NamespaceService {
     try {
       return namespaceDao.exists(name.getValue());
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to check for namespace {}.", name.getValue(), e);
+      log.error("Failed to check for namespace '{}'.", name.getValue(), e);
       throw new MarquezServiceException();
     }
   }
@@ -126,7 +129,7 @@ public class NamespaceService {
     try {
       return namespaceDao.findBy(name.getValue()).map(Mapper::toNamespace);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get namespace {}.", name.getValue(), e);
+      log.error("Failed to get namespace '{}'.", name.getValue(), e);
       throw new MarquezServiceException();
     }
   }
@@ -139,7 +142,7 @@ public class NamespaceService {
       final List<Namespace> namespaces = Mapper.toNamespace(rows);
       return ImmutableList.copyOf(namespaces);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get namespaces: limit={}, offset={}", limit, offset, e);
+      log.error("Failed to get namespaces.", e);
       throw new MarquezServiceException();
     }
   }

@@ -1,4 +1,5 @@
 /*
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
@@ -54,6 +56,7 @@ import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 
+@Slf4j
 @Path("/api/v1")
 public final class JobResource {
   private final NamespaceService namespaceService;
@@ -77,13 +80,15 @@ public final class JobResource {
       @PathParam("job") String jobString,
       @Valid JobRequest request)
       throws MarquezServiceException {
+    log.debug("Request: {}", request);
     final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
 
     final JobName jobName = JobName.of(jobString);
-    final JobMeta meta = Mapper.toJobMeta(request);
-    final Job job = jobService.createOrUpdate(namespaceName, jobName, meta);
+    final JobMeta jobMeta = Mapper.toJobMeta(request);
+    final Job job = jobService.createOrUpdate(namespaceName, jobName, jobMeta);
     final JobResponse response = Mapper.toJobResponse(job);
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 
@@ -105,6 +110,7 @@ public final class JobResource {
             .get(namespaceName, jobName)
             .map(Mapper::toJobResponse)
             .orElseThrow(() -> new JobNotFoundException(jobName));
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 
@@ -124,6 +130,7 @@ public final class JobResource {
 
     final List<Job> jobs = jobService.getAll(namespaceName, limit, offset);
     final JobsResponse response = Mapper.toJobsResponse(jobs);
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 
@@ -139,6 +146,7 @@ public final class JobResource {
       @PathParam("job") String jobString,
       @Valid RunRequest request)
       throws MarquezServiceException {
+    log.debug("Request: {}", request);
     final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
     final JobName jobName = JobName.of(jobString);
@@ -147,6 +155,7 @@ public final class JobResource {
     final RunMeta runMeta = Mapper.toRunMeta(request);
     final Run run = jobService.createRun(namespaceName, jobName, runMeta);
     final RunResponse response = Mapper.toRunResponse(run);
+    log.debug("Response: {}", response);
     return Response.status(CREATED).entity(response).build();
   }
 
@@ -169,6 +178,7 @@ public final class JobResource {
 
     final List<Run> runs = jobService.getAllRunsFor(namespaceName, jobName, limit, offset);
     final RunsResponse response = Mapper.toRunsResponse(runs);
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 
@@ -184,6 +194,7 @@ public final class JobResource {
             .getRun(runId)
             .map(Mapper::toRunResponse)
             .orElseThrow(() -> new RunNotFoundException(runId));
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 
@@ -234,20 +245,21 @@ public final class JobResource {
     return getRun(runId);
   }
 
-  private void throwIfNotExists(NamespaceName name) throws MarquezServiceException {
-    if (!namespaceService.exists(name)) {
-      throw new NamespaceNotFoundException(name);
+  private void throwIfNotExists(@NonNull NamespaceName namespaceName)
+      throws MarquezServiceException {
+    if (!namespaceService.exists(namespaceName)) {
+      throw new NamespaceNotFoundException(namespaceName);
     }
   }
 
-  private void throwIfNotExists(NamespaceName namespaceName, JobName jobName)
+  private void throwIfNotExists(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)
       throws MarquezServiceException {
     if (!jobService.exists(namespaceName, jobName)) {
       throw new JobNotFoundException(jobName);
     }
   }
 
-  private void throwIfNotExists(UUID runId) throws MarquezServiceException {
+  private void throwIfNotExists(@NonNull UUID runId) throws MarquezServiceException {
     if (!jobService.runExists(runId)) {
       throw new RunNotFoundException(runId);
     }
