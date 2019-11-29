@@ -195,7 +195,8 @@ public final class Mapper {
         job.getOutputs().stream().map(DatasetName::getValue).collect(toImmutableList()),
         job.getLocation().map(URL::toString).orElse(null),
         job.getContext(),
-        job.getDescription().orElse(null));
+        job.getDescription().orElse(null),
+        job.getLatestRun().map(Mapper::toRunResponse).orElse(null));
   }
 
   public static List<JobResponse> toJobResponse(@NonNull final List<Job> jobs) {

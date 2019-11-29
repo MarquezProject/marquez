@@ -241,7 +241,8 @@ public final class Mapper {
       @NonNull final List<DatasetName> inputs,
       @NonNull final List<DatasetName> outputs,
       @Nullable final String locationString,
-      @NonNull final String contextString) {
+      @NonNull final String contextString,
+      @Nullable final ExtendedRunRow runRow) {
     return new Job(
         JobType.valueOf(row.getType()),
         JobName.of(row.getName()),
@@ -251,7 +252,8 @@ public final class Mapper {
         outputs,
         (locationString == null) ? null : Utils.toUrl(locationString),
         Utils.fromJson(contextString, new TypeReference<Map<String, String>>() {}),
-        row.getDescription().orElse(null));
+        row.getDescription().orElse(null),
+        (runRow == null) ? null : toRun(runRow));
   }
 
   public static JobRow toJobRow(

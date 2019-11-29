@@ -504,6 +504,7 @@ components:
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         context: {'sql': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
         description: Determine weekly room booking occupancy patterns.
+        latestRun: null
 
     job:
       type: object
@@ -544,6 +545,37 @@ components:
         description:
           description: The description of the job.
           type: string
+        latestRun:
+          description: The latest run of the job.
+          type: object
+          properties:
+            runId:
+              description: The ID of the run.
+              type: string
+              format: uuid
+            createdAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+              type: string
+              format: date-time
+            updatedAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+              type: string
+              format: date-time
+            nominalStartTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+              type: string
+              format: date-time
+            nominalEndTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+              type: string
+              format: date-time
+            runState:
+              description: The current state of the run.
+              type: string
+              enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+            runArgs:
+              description: The arguments of the run.
+              type: object
       example:
         type: BATCH
         name: room_bookings_7_days
@@ -554,6 +586,7 @@ components:
         location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         context: {'sql': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
         description: Determine weekly room booking occupancy patterns.
+        latestRun: null
 
     jobs:
       type: object
@@ -578,6 +611,7 @@ components:
           description: The arguments of the run.
           type: object
       example:
+        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
 
     runId:
       type: object
