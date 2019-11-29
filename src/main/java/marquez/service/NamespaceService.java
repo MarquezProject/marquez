@@ -54,7 +54,6 @@ public class NamespaceService {
 
   private void init() throws MarquezServiceException {
     if (!exists(NamespaceName.DEFAULT)) {
-      log.warn("No 'default' namespace found.");
       final NamespaceMeta meta =
           new NamespaceMeta(
               OwnerName.ANONYMOUS,
