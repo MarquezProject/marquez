@@ -6,7 +6,7 @@ A library that integrates Airflow DAGs with [Marquez](https://github.com/Marquez
 
 ## Status
 
-This library is under active development at [The We Company](https://www.we.co).
+This library is under active development at [WeWork](https://www.wework.com).
 
 ## Requirements
 
