@@ -22,26 +22,27 @@ import marquez.db.mappers.ExtendedRunRowMapper;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.RunRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
+import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
-public interface RunDao {
+public interface RunDao extends SqlObject {
   @CreateSqlObject
   JobVersionDao createJobVersionDao();
 
   @Transaction
-  default void insertAndUpdate(RunRow row) {
-    insert(row);
+  default void insert(RunRow row) {
+    getHandle()
+        .createUpdate(
+            "INSERT INTO runs (uuid, created_at, updated_at, job_version_uuid, run_args_uuid, nominal_start_time, nominal_end_time) "
+                + "VALUES (:uuid, :createdAt, :updatedAt, :jobVersionUuid, :runArgsUuid, :nominalStartTime, :nominalEndTime)")
+        .bindBean(row)
+        .execute();
+
     createJobVersionDao().update(row.getJobVersionUuid(), row.getCreatedAt(), row.getUuid());
   }
-
-  @SqlUpdate(
-      "INSERT INTO runs (uuid, created_at, updated_at, job_version_uuid, run_args_uuid, nominal_start_time, nominal_end_time) "
-          + "VALUES (:uuid, :createdAt, :updatedAt, :jobVersionUuid, :runArgsUuid, :nominalStartTime, :nominalEndTime)")
-  void insert(@BindBean RunRow row);
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM runs WHERE uuid = :rowUuid)")
   boolean exists(UUID rowUuid);
