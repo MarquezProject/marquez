@@ -279,7 +279,7 @@ public class JobService {
       final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
       final RunRow newRunRow = Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), runMeta);
 
-      runDao.insertAndUpdate(newRunRow);
+      runDao.insert(newRunRow);
       markRunAs(newRunRow.getUuid(), Run.State.NEW);
       log.info(
           "Successfully created run '{}' for job '{}'.", newRunRow.getUuid(), jobName.getValue());
