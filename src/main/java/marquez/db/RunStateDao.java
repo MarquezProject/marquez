@@ -19,27 +19,27 @@ import java.util.UUID;
 import marquez.db.mappers.RunStateRowMapper;
 import marquez.db.models.RunStateRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
+import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(RunStateRowMapper.class)
-public interface RunStateDao {
+public interface RunStateDao extends SqlObject {
   @CreateSqlObject
   RunDao createRunDao();
 
   @Transaction
-  default void insertAndUpdate(RunStateRow row) {
-    insert(row);
+  default void insert(RunStateRow row) {
+    getHandle()
+        .createUpdate(
+            "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
+                + "VALUES (:uuid, :transitionedAt, :runUuid, :state)")
+        .bindBean(row)
+        .execute();
+
     createRunDao().update(row.getRunUuid(), row.getTransitionedAt(), row.getState());
   }
-
-  @SqlUpdate(
-      "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
-          + "VALUES (:uuid, :transitionedAt, :runUuid, :state)")
-  void insert(@BindBean RunStateRow row);
 
   @SqlQuery("SELECT * FROM run_states WHERE uuid = :rowUuid")
   Optional<RunStateRow> findBy(UUID rowUuid);

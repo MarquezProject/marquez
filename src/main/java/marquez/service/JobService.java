@@ -338,7 +338,7 @@ public class JobService {
       throws MarquezServiceException {
     try {
       final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
-      runStateDao.insertAndUpdate(newRunStateRow);
+      runStateDao.insert(newRunStateRow);
       log.debug("Marked run with ID '{}' as '{}'.", runId, runState);
       incOrDecBy(runState);
     } catch (UnableToExecuteStatementException e) {
