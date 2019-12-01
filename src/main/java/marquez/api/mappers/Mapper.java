@@ -44,7 +44,6 @@ import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
-import marquez.common.models.Field;
 import marquez.common.models.JobType;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
@@ -116,55 +115,63 @@ public final class Mapper {
   }
 
   public static DatasetMeta toDatasetMeta(@NonNull final DatasetRequest request) {
-    final DatasetName physicalName = DatasetName.of(request.getPhysicalName());
-    final SourceName sourceName = SourceName.of(request.getSourceName());
-    final List<Field> fields = request.getFields();
-    final String description = request.getDescription().orElse(null);
-    final UUID runId = request.getRunId().map(UUID::fromString).orElse(null);
-
     if (request instanceof DbTableRequest) {
-      return new DbTableMeta(physicalName, sourceName, fields, description, runId);
+      return toDbTableMeta(request);
     } else if (request instanceof StreamRequest) {
-      final URL schemaLocation = Utils.toUrl(((StreamRequest) request).getSchemaLocation());
-      return new StreamMeta(physicalName, sourceName, schemaLocation, fields, description, runId);
+      return toStreamMeta(request);
     }
-
     throw new IllegalArgumentException();
   }
 
+  public static DatasetMeta toDbTableMeta(@NonNull final DatasetRequest request) {
+    return new DbTableMeta(
+        DatasetName.of(request.getPhysicalName()),
+        SourceName.of(request.getSourceName()),
+        request.getFields(),
+        request.getDescription().orElse(null),
+        request.getRunId().map(UUID::fromString).orElse(null));
+  }
+
+  public static DatasetMeta toStreamMeta(@NonNull final DatasetRequest request) {
+    return new StreamMeta(
+        DatasetName.of(request.getPhysicalName()),
+        SourceName.of(request.getSourceName()),
+        Utils.toUrl(((StreamRequest) request).getSchemaLocation()),
+        request.getFields(),
+        request.getDescription().orElse(null),
+        request.getRunId().map(UUID::fromString).orElse(null));
+  }
+
   public static DatasetResponse toDatasetResponse(@NonNull final Dataset dataset) {
-    final String datasetString = dataset.getName().getValue();
-    final String physicalString = dataset.getPhysicalName().getValue();
-    final String createdAtIso = ISO_INSTANT.format(dataset.getCreatedAt());
-    final String updatedAtIso = ISO_INSTANT.format(dataset.getUpdatedAt());
-    final String sourceString = dataset.getSourceName().getValue();
-    final List<Field> fields = dataset.getFields();
-    final String description = dataset.getDescription().orElse(null);
-
     if (dataset instanceof DbTable) {
-
-      return new DbTableResponse(
-          datasetString,
-          physicalString,
-          createdAtIso,
-          updatedAtIso,
-          sourceString,
-          fields,
-          description);
+      return toDbTableResponse(dataset);
     } else if (dataset instanceof Stream) {
-      final String schemaLocationString = ((Stream) dataset).getSchemaLocation().toString();
-      return new StreamResponse(
-          datasetString,
-          physicalString,
-          createdAtIso,
-          updatedAtIso,
-          sourceString,
-          schemaLocationString,
-          fields,
-          description);
+      return toStreamResponse(dataset);
     }
-
     throw new IllegalArgumentException();
+  }
+
+  private static DatasetResponse toDbTableResponse(@NonNull final Dataset dataset) {
+    return new DbTableResponse(
+        dataset.getName().getValue(),
+        dataset.getPhysicalName().getValue(),
+        ISO_INSTANT.format(dataset.getCreatedAt()),
+        ISO_INSTANT.format(dataset.getUpdatedAt()),
+        dataset.getSourceName().getValue(),
+        dataset.getFields(),
+        dataset.getDescription().orElse(null));
+  }
+
+  private static DatasetResponse toStreamResponse(@NonNull final Dataset dataset) {
+    return new StreamResponse(
+        dataset.getName().getValue(),
+        dataset.getPhysicalName().getValue(),
+        ISO_INSTANT.format(dataset.getCreatedAt()),
+        ISO_INSTANT.format(dataset.getUpdatedAt()),
+        dataset.getSourceName().getValue(),
+        ((Stream) dataset).getSchemaLocation().toString(),
+        dataset.getFields(),
+        dataset.getDescription().orElse(null));
   }
 
   public static List<DatasetResponse> toDatasetResponse(@NonNull final List<Dataset> datasets) {
