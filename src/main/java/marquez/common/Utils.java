@@ -40,7 +40,7 @@ public final class Utils {
   public static final String KV_DELIM = "#";
   public static final Joiner.MapJoiner KV_JOINER = Joiner.on(KV_DELIM).withKeyValueSeparator("=");
 
-  public static URL toUrl(final String urlString) {
+  public static URL toUrl(@NonNull final String urlString) {
     try {
       return new URL(urlString);
     } catch (MalformedURLException e) {
