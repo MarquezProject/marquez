@@ -17,6 +17,7 @@ package marquez.service;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
+import io.prometheus.client.Counter;
 import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
@@ -37,6 +38,13 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class NamespaceService {
+  private static final Counter namespaces =
+      Counter.build()
+          .namespace("marquez")
+          .name("namespace_total")
+          .help("Total number of namespaces.")
+          .register();
+
   private final NamespaceDao namespaceDao;
   private final OwnerDao ownerDao;
   private final NamespaceOwnershipDao namespaceOwnershipDao;
@@ -54,14 +62,12 @@ public class NamespaceService {
 
   private void init() throws MarquezServiceException {
     if (!exists(NamespaceName.DEFAULT)) {
-      log.info("No default namespace found, creating...");
       final NamespaceMeta meta =
           new NamespaceMeta(
               OwnerName.ANONYMOUS,
               "The default global namespace for job and dataset metadata "
                   + "not belonging to a user-specified namespace.");
       final Namespace namespace = createOrUpdate(NamespaceName.DEFAULT, meta);
-      log.info("Successfully created default namespace: {}", namespace);
     }
   }
 
@@ -90,6 +96,7 @@ public class NamespaceService {
           }
         }
       } else {
+        log.info("No namespace with name '{}' found, creating...", name.getValue());
         final NamespaceRow newNamespaceRow = Mapper.toNamespaceRow(name, meta);
         if (ownerDao.exists(meta.getOwnerName().getValue())) {
           final OwnerRow ownerRow = ownerDao.findBy(meta.getOwnerName().getValue()).get();
@@ -104,11 +111,15 @@ public class NamespaceService {
 
           namespaceDao.insertWith(newNamespaceRow, newOwnerRow, newNamespaceOwnershipRow);
         }
+        log.info("Successfully created namespace '{}'  with meta: {}", name.getValue(), meta);
+
+        namespaces.inc();
       }
 
       return get(name).get();
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create or update namespace {} with meta: {}", name.getValue(), meta, e);
+      log.error(
+          "Failed to create or update namespace '{}' with meta: {}", name.getValue(), meta, e);
       throw new MarquezServiceException();
     }
   }
@@ -117,7 +128,7 @@ public class NamespaceService {
     try {
       return namespaceDao.exists(name.getValue());
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to check for namespace {}.", name.getValue(), e);
+      log.error("Failed to check for namespace '{}'.", name.getValue(), e);
       throw new MarquezServiceException();
     }
   }
@@ -126,7 +137,7 @@ public class NamespaceService {
     try {
       return namespaceDao.findBy(name.getValue()).map(Mapper::toNamespace);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get namespace {}.", name.getValue(), e);
+      log.error("Failed to get namespace '{}'.", name.getValue(), e);
       throw new MarquezServiceException();
     }
   }
@@ -139,7 +150,7 @@ public class NamespaceService {
       final List<Namespace> namespaces = Mapper.toNamespace(rows);
       return ImmutableList.copyOf(namespaces);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get namespaces: limit={}, offset={}", limit, offset, e);
+      log.error("Failed to get namespaces.", e);
       throw new MarquezServiceException();
     }
   }

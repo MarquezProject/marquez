@@ -40,6 +40,7 @@ public final class JobResponse {
   @Nullable private final String location;
   @Nullable private final Map<String, String> context;
   @Nullable private final String description;
+  @Nullable private final RunResponse latestRun;
 
   public JobResponse(
       @NonNull final String type,
@@ -50,7 +51,8 @@ public final class JobResponse {
       @NonNull final List<String> outputs,
       @Nullable final String location,
       @Nullable final Map<String, String> context,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable final RunResponse latestRun) {
     this.type = checkNotBlank(type);
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
@@ -60,6 +62,7 @@ public final class JobResponse {
     this.location = location;
     this.context = context;
     this.description = description;
+    this.latestRun = latestRun;
   }
 
   public List<String> getInputs() {
@@ -80,5 +83,9 @@ public final class JobResponse {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<RunResponse> getLatestRun() {
+    return Optional.ofNullable(latestRun);
   }
 }

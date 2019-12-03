@@ -29,7 +29,6 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
-import marquez.common.models.FieldName;
 import marquez.common.models.FieldType;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
@@ -86,9 +85,9 @@ public final class Mapper {
 
   public static NamespaceRow toNamespaceRow(
       @NonNull final NamespaceName name, @NonNull final NamespaceMeta meta) {
-    final Instant now = Instant.now();
+    final Instant now = newTimestamp();
     return new NamespaceRow(
-        UUID.randomUUID(),
+        newRowUuid(),
         now,
         now,
         name.getValue(),
@@ -97,13 +96,13 @@ public final class Mapper {
   }
 
   public static OwnerRow toOwnerRow(@NonNull final OwnerName name) {
-    return new OwnerRow(UUID.randomUUID(), Instant.now(), name.getValue());
+    return new OwnerRow(newRowUuid(), newTimestamp(), name.getValue());
   }
 
   public static NamespaceOwnershipRow toNamespaceOwnershipRow(
       @NonNull final UUID namespaceRowUuid, @NonNull final UUID ownerRowUuid) {
     return new NamespaceOwnershipRow(
-        UUID.randomUUID(), Instant.now(), null, namespaceRowUuid, ownerRowUuid);
+        newRowUuid(), newTimestamp(), null, namespaceRowUuid, ownerRowUuid);
   }
 
   public static Source toSource(@NonNull final SourceRow row) {
@@ -122,9 +121,9 @@ public final class Mapper {
 
   public static SourceRow toSourceRow(
       @NonNull final SourceName name, @NonNull final SourceMeta meta) {
-    final Instant now = Instant.now();
+    final Instant now = newTimestamp();
     return new SourceRow(
-        UUID.randomUUID(),
+        newRowUuid(),
         meta.getType().toString(),
         now,
         now,
@@ -134,42 +133,52 @@ public final class Mapper {
   }
 
   public static Dataset toDataset(
-      @NonNull final ExtendedDatasetRow extendedRow,
+      @NonNull final ExtendedDatasetRow row,
       @NonNull final List<DatasetFieldRow> fieldRows,
       @NonNull final DatasetVersionRow versionRow) {
-    final DatasetName name = DatasetName.of(extendedRow.getName());
-    final DatasetName physicalName = DatasetName.of(extendedRow.getPhysicalName());
-    final Instant createdAt = extendedRow.getCreatedAt();
-    final Instant updatedAt = extendedRow.getUpdatedAt();
-    final SourceName sourceName = SourceName.of(extendedRow.getSourceName());
-    final String description = extendedRow.getDescription().orElse(null);
-
-    final DatasetType type = DatasetType.valueOf(extendedRow.getType());
+    final DatasetType type = DatasetType.valueOf(row.getType());
     switch (type) {
       case DB_TABLE:
-        return new DbTable(
-            name, physicalName, createdAt, updatedAt, sourceName, toField(fieldRows), description);
+        return toDbTable(row, fieldRows, versionRow);
       case STREAM:
-        final URL schemaLocation = Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation());
-        return new Stream(
-            name,
-            physicalName,
-            createdAt,
-            updatedAt,
-            sourceName,
-            schemaLocation,
-            toField(fieldRows),
-            description);
+        return toStream(row, fieldRows, versionRow);
       default:
         throw new IllegalArgumentException();
     }
   }
 
+  private static Dataset toDbTable(
+      @NonNull final ExtendedDatasetRow row,
+      @NonNull final List<DatasetFieldRow> fieldRows,
+      @NonNull final DatasetVersionRow versionRow) {
+    return new DbTable(
+        DatasetName.of(row.getName()),
+        DatasetName.of(row.getPhysicalName()),
+        row.getCreatedAt(),
+        row.getUpdatedAt(),
+        SourceName.of(row.getSourceName()),
+        toField(fieldRows),
+        row.getDescription().orElse(null));
+  }
+
+  private static Dataset toStream(
+      @NonNull final ExtendedDatasetRow row,
+      @NonNull final List<DatasetFieldRow> fieldRows,
+      @NonNull final DatasetVersionRow versionRow) {
+    return new Stream(
+        DatasetName.of(row.getName()),
+        DatasetName.of(row.getPhysicalName()),
+        row.getCreatedAt(),
+        row.getUpdatedAt(),
+        SourceName.of(row.getSourceName()),
+        Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation()),
+        toField(fieldRows),
+        row.getDescription().orElse(null));
+  }
+
   public static Field toField(@NonNull final DatasetFieldRow row) {
     return new Field(
-        FieldName.of(row.getName()),
-        FieldType.valueOf(row.getType()),
-        row.getDescription().orElse(null));
+        row.getName(), FieldType.valueOf(row.getType()), row.getDescription().orElse(null));
   }
 
   public static List<Field> toField(@NonNull final List<DatasetFieldRow> rows) {
@@ -181,9 +190,9 @@ public final class Mapper {
       @NonNull final UUID sourceRowUuid,
       @NonNull final DatasetName name,
       @NonNull final DatasetMeta meta) {
-    final Instant now = Instant.now();
+    final Instant now = newTimestamp();
     return new DatasetRow(
-        UUID.randomUUID(),
+        newRowUuid(),
         toDatasetType(meta).toString(),
         now,
         now,
@@ -201,7 +210,6 @@ public final class Mapper {
     } else if (meta instanceof StreamMeta) {
       return DatasetType.STREAM;
     }
-
     throw new IllegalArgumentException();
   }
 
@@ -209,12 +217,12 @@ public final class Mapper {
       @NonNull final UUID datasetUuid, @NonNull final Field field) {
     final Instant now = Instant.now();
     return new DatasetFieldRow(
-        UUID.randomUUID(),
+        newRowUuid(),
         field.getType().toString(),
         now,
         now,
         datasetUuid,
-        field.getName().getValue(),
+        field.getName(),
         field.getDescription().orElse(null));
   }
 
@@ -223,17 +231,31 @@ public final class Mapper {
       @NonNull final UUID version,
       @NonNull final List<UUID> fieldUuids,
       @NonNull final DatasetMeta meta) {
-    final UUID rowUuid = UUID.randomUUID();
-    final Instant now = Instant.now();
-    final UUID runUuid = meta.getRunId().orElse(null);
-
     if (meta instanceof StreamMeta) {
-      final String schemaLocationString = ((StreamMeta) meta).getSchemaLocation().toString();
-      return new StreamVersionRow(
-          rowUuid, now, datasetUuid, version, fieldUuids, runUuid, schemaLocationString);
+      return toStreamVersionRow(datasetUuid, version, fieldUuids, meta);
     }
+    return new DatasetVersionRow(
+        newRowUuid(),
+        newTimestamp(),
+        datasetUuid,
+        version,
+        fieldUuids,
+        meta.getRunId().orElse(null));
+  }
 
-    return new DatasetVersionRow(rowUuid, now, datasetUuid, version, fieldUuids, runUuid);
+  private static DatasetVersionRow toStreamVersionRow(
+      @NonNull final UUID datasetUuid,
+      @NonNull final UUID version,
+      @NonNull final List<UUID> fieldUuids,
+      @NonNull final DatasetMeta meta) {
+    return new StreamVersionRow(
+        newRowUuid(),
+        newTimestamp(),
+        datasetUuid,
+        version,
+        fieldUuids,
+        meta.getRunId().orElse(null),
+        ((StreamMeta) meta).getSchemaLocation().toString());
   }
 
   public static Job toJob(
@@ -241,7 +263,8 @@ public final class Mapper {
       @NonNull final List<DatasetName> inputs,
       @NonNull final List<DatasetName> outputs,
       @Nullable final String locationString,
-      @NonNull final String contextString) {
+      @NonNull final String contextString,
+      @Nullable final ExtendedRunRow runRow) {
     return new Job(
         JobType.valueOf(row.getType()),
         JobName.of(row.getName()),
@@ -251,14 +274,15 @@ public final class Mapper {
         outputs,
         (locationString == null) ? null : Utils.toUrl(locationString),
         Utils.fromJson(contextString, new TypeReference<Map<String, String>>() {}),
-        row.getDescription().orElse(null));
+        row.getDescription().orElse(null),
+        (runRow == null) ? null : toRun(runRow));
   }
 
   public static JobRow toJobRow(
       @NonNull final UUID namespaceUuid, @NonNull final JobName name, @NonNull final JobMeta meta) {
     final Instant now = Instant.now();
     return new JobRow(
-        UUID.randomUUID(),
+        newRowUuid(),
         meta.getType().toString(),
         now,
         now,
@@ -269,8 +293,8 @@ public final class Mapper {
   }
 
   public static JobContextRow toJobContextRow(
-      @NonNull final Map<String, String> context, String checksum) {
-    return new JobContextRow(UUID.randomUUID(), Instant.now(), Utils.toJson(context), checksum);
+      @NonNull final Map<String, String> context, @NonNull final String checksum) {
+    return new JobContextRow(newRowUuid(), newTimestamp(), Utils.toJson(context), checksum);
   }
 
   public static JobVersionRow toJobVersionRow(
@@ -280,9 +304,9 @@ public final class Mapper {
       @NonNull final List<UUID> outputs,
       @Nullable final URL location,
       @NonNull final UUID version) {
-    final Instant now = Instant.now();
+    final Instant now = newTimestamp();
     return new JobVersionRow(
-        UUID.randomUUID(),
+        newRowUuid(),
         now,
         now,
         jobRowUuid,
@@ -294,15 +318,15 @@ public final class Mapper {
         null);
   }
 
-  public static Run toRun(@NonNull final ExtendedRunRow extendedRow) {
+  public static Run toRun(@NonNull final ExtendedRunRow row) {
     return new Run(
-        extendedRow.getUuid(),
-        extendedRow.getCreatedAt(),
-        extendedRow.getUpdatedAt(),
-        extendedRow.getNominalStartTime().orElse(null),
-        extendedRow.getNominalEndTime().orElse(null),
-        Run.State.valueOf(extendedRow.getCurrentRunState().get()),
-        Utils.fromJson(extendedRow.getArgs(), new TypeReference<Map<String, String>>() {}));
+        row.getUuid(),
+        row.getCreatedAt(),
+        row.getUpdatedAt(),
+        row.getNominalStartTime().orElse(null),
+        row.getNominalEndTime().orElse(null),
+        Run.State.valueOf(row.getCurrentRunState().get()),
+        Utils.fromJson(row.getArgs(), new TypeReference<Map<String, String>>() {}));
   }
 
   public static List<Run> toRun(@NonNull final List<ExtendedRunRow> rows) {
@@ -313,9 +337,9 @@ public final class Mapper {
       @NonNull final UUID jobVersionUuid,
       @NonNull final UUID runArgsUuid,
       @NonNull final RunMeta runMeta) {
-    final Instant now = Instant.now();
+    final Instant now = newTimestamp();
     return new RunRow(
-        UUID.randomUUID(),
+        newRowUuid(),
         now,
         now,
         jobVersionUuid,
@@ -327,11 +351,19 @@ public final class Mapper {
 
   public static RunArgsRow toRunArgsRow(
       @NonNull final Map<String, String> args, @NonNull final String checksum) {
-    return new RunArgsRow(UUID.randomUUID(), Instant.now(), Utils.toJson(args), checksum);
+    return new RunArgsRow(newRowUuid(), newTimestamp(), Utils.toJson(args), checksum);
   }
 
   public static RunStateRow toRunStateRow(
       @NonNull final UUID runId, @NonNull final Run.State runState) {
-    return new RunStateRow(UUID.randomUUID(), Instant.now(), runId, runState.toString());
+    return new RunStateRow(newRowUuid(), newTimestamp(), runId, runState.toString());
+  }
+
+  private static UUID newRowUuid() {
+    return UUID.randomUUID();
+  }
+
+  private static Instant newTimestamp() {
+    return Instant.now();
   }
 }

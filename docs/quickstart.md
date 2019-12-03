@@ -35,7 +35,7 @@ Marquez listens on port `5000` for all API calls and port `5001` for the admin i
 
 In this example, we show how you can record job and dataset metadata using Marquez. We encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](./openapi.html) of Marquez.
 
-> **Note:** The example shows how to record metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Python](https://github.com/MarquezProject/marquez-python).
+> **Note:** The example shows how to record metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Java](https://github.com/MarquezProject/marquez-java) or [Python](https://github.com/MarquezProject/marquez-python).
 
 #### STEP 1: CREATE A NAMESPACE
 
@@ -101,12 +101,18 @@ Next, we need to create a dataset and associate it with an existing source:
 ##### REQUEST
 
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/public.room_bookings \
+$ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/wedata.room_bookings \
   -H 'Content-Type: application/json' \
   -d '{ 
         "type": "DB_TABLE",
         "physicalName": "wedata.room_bookings",
         "sourceName": "analytics_db",
+        "fields": [
+          {"name": "booking_id", "type": "INTEGER"},
+          {"name": "booked_at", "type": "TIMESTAMP"},
+          {"name": "office_id", "type": "INTEGER"},
+          {"name": "room_id", "type": "INTEGER"}
+        ],
         "description": "All global room bookings for each office."
       }'
 ```
@@ -121,6 +127,12 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/public.roo
   "createdAt": "2019-06-08T19:13:34.507Z",
   "updatedAt": "2019-06-08T19:13:34.507Z",
   "sourceName": "analytics_db",
+  "fields": [
+    {"name": "booking_id", "type": "INTEGER", "description": null},
+    {"name": "booked_at", "type": "TIMESTAMP", "description": null},
+    {"name": "office_id", "type": "INTEGER", "description": null},
+    {"name": "room_id", "type": "INTEGER", "description": null}
+  ],
   "description": "All global room bookings for each office."
 }
 ```
@@ -152,7 +164,8 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_
   "inputs": ["wedata.room_bookings"],
   "outputs": [],
   "location": "https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
-  "description": "Weekly email of room bookings occupancy patterns."
+  "description": "Weekly email of room bookings occupancy patterns.",
+  "latestRun": null
 }
 ```
 

@@ -20,12 +20,17 @@ ext {
   dropwizardVersion = '1.3.12'
   jdbi3Version = '3.10.1'
   lombokVersion = '1.18.10'
+  prometheusVersion = '0.8.0'
 }
 
 dependencies {
   compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
   compile "io.dropwizard:dropwizard-jdbi3:${dropwizardVersion}"
   compile "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}"
+  compile "io.prometheus:simpleclient:${prometheusVersion}"
+  compile "io.prometheus:simpleclient_dropwizard:${prometheusVersion}"
+  compile "io.prometheus:simpleclient_hotspot:${prometheusVersion}"
+  compile "io.prometheus:simpleclient_servlet:${prometheusVersion}"
   compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
   compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
   compile 'com.google.guava:guava:28.0-jre'  

@@ -12,7 +12,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Status
 
-This project is under active development at [The We Company](https://www.we.co) (in collaboration with many other organizations).
+This project is under active development at [WeWork](https://www.wework.com) (in collaboration with many other organizations).
 
 ## Documentation
 
@@ -75,7 +75,8 @@ Then browse to the admin interface: http://localhost:8081
 
 ## Related Projects
 
-* [Marquez Web UI](https://github.com/MarquezProject/marquez-web): Web UI used to view metadata collected and cataloged by Marquez.
+* [`marquez-web`](https://github.com/MarquezProject/marquez-web): Web UI used to view metadata collected and cataloged by Marquez.
+* [`marquez-airflow`](https://github.com/MarquezProject/marquez-airflow): Airflow support for Marquez.
 
 ## Getting Involved
 

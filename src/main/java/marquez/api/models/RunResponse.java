@@ -17,6 +17,7 @@ package marquez.api.models;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,15 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
+@JsonPropertyOrder({
+  "runId",
+  "createdAt",
+  "updatedAt",
+  "nominalStartTime",
+  "nominalEndTime",
+  "runState",
+  "runArgs"
+})
 public final class RunResponse {
   @Getter
   @JsonProperty("runId")

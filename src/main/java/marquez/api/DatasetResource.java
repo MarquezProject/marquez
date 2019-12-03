@@ -20,8 +20,8 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -83,10 +83,10 @@ public final class DatasetResource {
     throwIfNotExists(namespaceName);
 
     final DatasetName datasetName = DatasetName.of(datasetString);
-    final DatasetMeta meta = Mapper.toDatasetMeta(request);
-    throwIfNotExists(meta.getRunId());
+    final DatasetMeta datasetMeta = Mapper.toDatasetMeta(request);
+    throwIfNotExists(datasetMeta.getRunId().orElse(null));
 
-    final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, meta);
+    final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, datasetMeta);
     final DatasetResponse response = Mapper.toDatasetResponse(dataset);
     log.debug("Response: {}", response);
     return Response.ok(response).build();
@@ -133,16 +133,17 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
-  private void throwIfNotExists(NamespaceName name) throws MarquezServiceException {
-    if (!namespaceService.exists(name)) {
-      throw new NamespaceNotFoundException(name);
+  private void throwIfNotExists(@NonNull NamespaceName namespaceName)
+      throws MarquezServiceException {
+    if (!namespaceService.exists(namespaceName)) {
+      throw new NamespaceNotFoundException(namespaceName);
     }
   }
 
-  private void throwIfNotExists(Optional<UUID> runId) throws MarquezServiceException {
-    if (runId.isPresent()) {
-      if (!jobService.runExists(runId.get())) {
-        throw new RunNotFoundException(runId.get());
+  private void throwIfNotExists(@Nullable UUID runId) throws MarquezServiceException {
+    if (runId != null) {
+      if (!jobService.runExists(runId)) {
+        throw new RunNotFoundException(runId);
       }
     }
   }

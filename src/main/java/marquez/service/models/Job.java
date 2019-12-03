@@ -40,6 +40,7 @@ public class Job {
   @Nullable URL location;
   @Nullable Map<String, String> context;
   @Nullable String description;
+  @Nullable Run latestRun;
 
   public List<DatasetName> getInputs() {
     return ImmutableList.copyOf(new ArrayList<>(inputs));
@@ -59,5 +60,9 @@ public class Job {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<Run> getLatestRun() {
+    return Optional.ofNullable(latestRun);
   }
 }

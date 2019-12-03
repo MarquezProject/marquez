@@ -86,8 +86,8 @@ public final class ModelGenerator extends Generator {
     return new Field(newFieldName(), newFieldType(), newDescription());
   }
 
-  public static FieldName newFieldName() {
-    return FieldName.of("test_field" + newId());
+  public static String newFieldName() {
+    return "test_field" + newId();
   }
 
   public static FieldType newFieldType() {
