@@ -39,6 +39,24 @@ public final class Columns {
   public static final String CURRENT_VERSION_UUID = "current_version_uuid";
   public static final String CHECKSUM = "checksum";
 
+  // TAGGING
+  public static final String DATASET_FIELD_UUID = "dataset_field_uuid";
+  public static final String TAG_UUID = "tag_uuid";
+
+  // EXTENDED DATASET
+  public static final String DATASET_NAME = "dataset_name";
+  public static final String DATASET_FIELD_NAME = "dataset_field_name";
+  public static final String TAG_NAME = "tag_name";
+
+  public static final String DATASET_CREATED_AT = "dataset_created_at";
+  public static final String DATASET_FIELD_CREATED_AT = "dataset_field_created_at";
+  public static final String DATASET_UPDATED_AT = "dataset_updated_at";
+  public static final String DATASET_FIELD_UPDATED_AT = "dataset_field_updated_at";
+  public static final String TAGGED_AT = "tagged_at";
+
+  public static final String DATASET_DESCRIPTION = "dataset_description";
+  public static final String DATASET_FIELD_DESCRIPTION = "dataset_field_description";
+
   /* NAMESPACE ROW COLUMNS */
   public static final String CURRENT_OWNER_NAME = "current_owner_name";
 
