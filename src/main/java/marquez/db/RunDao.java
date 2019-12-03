@@ -33,6 +33,12 @@ public interface RunDao extends SqlObject {
   JobVersionDao createJobVersionDao();
 
   @Transaction
+  default void insertWith(RunRow row, List<UUID> inputVersionUuids) {
+    insert(row);
+    inputVersionUuids.forEach(inputVersionUuid -> insert(row.getUuid(), inputVersionUuid));
+  }
+
+  @Transaction
   default void insert(RunRow row) {
     getHandle()
         .createUpdate(
@@ -43,6 +49,11 @@ public interface RunDao extends SqlObject {
 
     createJobVersionDao().update(row.getJobVersionUuid(), row.getCreatedAt(), row.getUuid());
   }
+
+  @SqlUpdate(
+      "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
+          + "VALUES (:runUuid, :datasetVersionUuid)")
+  void insert(UUID runUuid, UUID datasetVersionUuid);
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM runs WHERE uuid = :rowUuid)")
   boolean exists(UUID rowUuid);

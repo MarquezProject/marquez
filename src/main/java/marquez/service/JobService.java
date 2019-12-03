@@ -30,6 +30,7 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
+import marquez.db.DatasetVersionDao;
 import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
@@ -38,6 +39,7 @@ import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobContextRow;
@@ -86,6 +88,7 @@ public class JobService {
 
   private final NamespaceDao namespaceDao;
   private final DatasetDao datasetDao;
+  private final DatasetVersionDao datasetVersionDao;
   private final JobDao jobDao;
   private final JobVersionDao versionDao;
   private final JobContextDao contextDao;
@@ -96,6 +99,7 @@ public class JobService {
   public JobService(
       @NonNull final NamespaceDao namespaceDao,
       @NonNull final DatasetDao datasetDao,
+      @NonNull final DatasetVersionDao datasetVersionDao,
       @NonNull final JobDao jobDao,
       @NonNull final JobVersionDao versionDao,
       @NonNull final JobContextDao contextDao,
@@ -104,6 +108,7 @@ public class JobService {
       @NonNull final RunStateDao runStateDao) {
     this.namespaceDao = namespaceDao;
     this.datasetDao = datasetDao;
+    this.datasetVersionDao = datasetVersionDao;
     this.jobDao = jobDao;
     this.versionDao = versionDao;
     this.contextDao = contextDao;
@@ -234,6 +239,7 @@ public class JobService {
     }
   }
 
+  /** Creates a {@link Job} instance from the given {@link JobRow}. */
   private Job toJob(@NonNull JobRow jobRow) {
     final UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
     final ExtendedJobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
@@ -253,6 +259,7 @@ public class JobService {
             .getLatestRunUuid()
             .map(latestRunUuid -> runDao.findBy(latestRunUuid).get())
             .orElse(null);
+
     return Mapper.toJob(
         jobRow,
         inputs,
@@ -267,22 +274,31 @@ public class JobService {
       throws MarquezServiceException {
     try {
       log.info("Creating run for job '{}'...", jobName.getValue());
-
       final String checksum = Utils.checksumFor(runMeta.getArgs());
       if (!runArgsDao.exists(checksum)) {
+        log.debug(
+            "New run args with checksum '{}' for job '{}' found: {}",
+            checksum,
+            jobName.getValue(),
+            runMeta.getArgs());
         final RunArgsRow newRunArgsRow = Mapper.toRunArgsRow(runMeta.getArgs(), checksum);
         runArgsDao.insert(newRunArgsRow);
       }
-
       final JobVersionRow versionRow =
           versionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
+
       final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
       final RunRow newRunRow = Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), runMeta);
+      final List<UUID> inputVersionUuids =
+          datasetVersionDao.findAllInUuidList(versionRow.getInputUuids()).stream()
+              .map(DatasetVersionRow::getUuid)
+              .collect(toImmutableList());
 
-      runDao.insert(newRunRow);
-      markRunAs(newRunRow.getUuid(), Run.State.NEW);
+      runDao.insertWith(newRunRow, inputVersionUuids);
       log.info(
           "Successfully created run '{}' for job '{}'.", newRunRow.getUuid(), jobName.getValue());
+
+      markRunAs(newRunRow.getUuid(), Run.State.NEW);
 
       return getRun(newRunRow.getUuid()).get();
     } catch (UnableToExecuteStatementException e) {
@@ -347,6 +363,7 @@ public class JobService {
     }
   }
 
+  /** Determines whether to increment or decrement run counters given {@link Run.State}. */
   private void incOrDecBy(@NonNull Run.State runState) {
     switch (runState) {
       case RUNNING:
