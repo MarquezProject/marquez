@@ -15,6 +15,8 @@
 package marquez.service.mappers;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
@@ -26,46 +28,9 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.common.Utils;
-import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetType;
-import marquez.common.models.Field;
-import marquez.common.models.FieldType;
-import marquez.common.models.JobName;
-import marquez.common.models.JobType;
-import marquez.common.models.NamespaceName;
-import marquez.common.models.OwnerName;
-import marquez.common.models.SourceName;
-import marquez.common.models.SourceType;
-import marquez.db.models.DatasetFieldRow;
-import marquez.db.models.DatasetRow;
-import marquez.db.models.DatasetVersionRow;
-import marquez.db.models.ExtendedDatasetRow;
-import marquez.db.models.ExtendedRunRow;
-import marquez.db.models.JobContextRow;
-import marquez.db.models.JobRow;
-import marquez.db.models.JobVersionRow;
-import marquez.db.models.NamespaceOwnershipRow;
-import marquez.db.models.NamespaceRow;
-import marquez.db.models.OwnerRow;
-import marquez.db.models.RunArgsRow;
-import marquez.db.models.RunRow;
-import marquez.db.models.RunStateRow;
-import marquez.db.models.SourceRow;
-import marquez.db.models.StreamVersionRow;
-import marquez.service.models.Dataset;
-import marquez.service.models.DatasetMeta;
-import marquez.service.models.DbTable;
-import marquez.service.models.DbTableMeta;
-import marquez.service.models.Job;
-import marquez.service.models.JobMeta;
-import marquez.service.models.Namespace;
-import marquez.service.models.NamespaceMeta;
-import marquez.service.models.Run;
-import marquez.service.models.RunMeta;
-import marquez.service.models.Source;
-import marquez.service.models.SourceMeta;
-import marquez.service.models.Stream;
-import marquez.service.models.StreamMeta;
+import marquez.common.models.*;
+import marquez.db.models.*;
+import marquez.service.models.*;
 
 public final class Mapper {
   private Mapper() {}
@@ -365,5 +330,24 @@ public final class Mapper {
 
   private static Instant newTimestamp() {
     return Instant.now();
+  }
+
+  public static List<Tag> toTags(@NonNull List<TagRow> rows) {
+    return unmodifiableList(rows.stream().map(row -> toTag(row)).collect(toList()));
+  }
+
+  public static Tag toTag(@NonNull TagRow row) {
+    return Tag.builder()
+        .name(TagName.fromString(row.getName()))
+        .description(row.getDescription())
+        .build();
+  }
+
+  public static TagRow toTagRow(@NonNull Tag tag) {
+    return TagRow.builder()
+        .uuid(UUID.randomUUID())
+        .name(tag.getName())
+        .description(tag.getDescription().orElse(null))
+        .build();
   }
 }

@@ -42,6 +42,8 @@ import marquez.api.models.SourceResponse;
 import marquez.api.models.SourcesResponse;
 import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
+import marquez.api.models.TagResponse;
+import marquez.api.models.TagsResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobType;
@@ -62,6 +64,7 @@ import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
 import marquez.service.models.Stream;
 import marquez.service.models.StreamMeta;
+import marquez.service.models.Tag;
 
 public final class Mapper {
   private Mapper() {}
@@ -230,6 +233,16 @@ public final class Mapper {
         run.getNominalEndTime().map(ISO_INSTANT::format).orElse(null),
         run.getState().toString(),
         run.getArgs());
+  }
+
+  public static TagResponse toTagResponse(@NonNull Tag tag) {
+
+    return new TagResponse(tag.getName(), tag.getDescription().orElse(null));
+  }
+
+  public static TagsResponse toTagsResponse(@NonNull List<Tag> tags) {
+
+    return new TagsResponse(tags.stream().map(Mapper::toTagResponse).collect(toImmutableList()));
   }
 
   public static List<RunResponse> toRunResponse(@NonNull final List<Run> runs) {
