@@ -15,11 +15,7 @@
 package marquez.db.models;
 
 import static java.util.stream.Collectors.toList;
-import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
-import static marquez.common.models.ModelGenerator.newContext;
-import static marquez.common.models.ModelGenerator.newDescription;
-import static marquez.common.models.ModelGenerator.newSourceName;
-import static marquez.common.models.ModelGenerator.newSourceType;
+import static marquez.common.models.ModelGenerator.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,9 +26,37 @@ import marquez.Generator;
 import marquez.common.Utils;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.common.models.TagName;
 
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}
+
+  public static List<TagRow> newTagRows(int limit) {
+    return Stream.generate(() -> newTagRow()).limit(limit).collect(toList());
+  }
+
+  public static TagRow newTagRow() {
+    return newTagRowWith(newTagName(), true, false);
+  }
+
+  public static TagRow newTagRowWith(TagName name, boolean hasDescription, boolean wasUpdated) {
+    final TagRow.TagRowBuilder builder =
+        TagRow.builder()
+            .uuid(UUID.randomUUID())
+            .createdAt(newTimestamp())
+            .updatedAt(newTimestamp())
+            .name(name.getValue());
+
+    if (hasDescription) {
+      builder.description(newDescription());
+    }
+
+    if (wasUpdated) {
+      builder.updatedAt(newTimestamp());
+    }
+
+    return builder.build();
+  }
 
   public static List<SourceRow> newSourceRows(final int limit) {
     return Stream.generate(() -> newSourceRow()).limit(limit).collect(toList());

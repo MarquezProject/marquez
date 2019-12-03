@@ -16,6 +16,8 @@ package marquez.api.mappers;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
 import java.net.URL;
@@ -23,45 +25,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
-import marquez.api.models.DatasetRequest;
-import marquez.api.models.DatasetResponse;
-import marquez.api.models.DatasetsResponse;
-import marquez.api.models.DbTableRequest;
-import marquez.api.models.DbTableResponse;
-import marquez.api.models.JobRequest;
-import marquez.api.models.JobResponse;
-import marquez.api.models.JobsResponse;
-import marquez.api.models.NamespaceRequest;
-import marquez.api.models.NamespaceResponse;
-import marquez.api.models.NamespacesResponse;
-import marquez.api.models.RunRequest;
-import marquez.api.models.RunResponse;
-import marquez.api.models.RunsResponse;
-import marquez.api.models.SourceRequest;
-import marquez.api.models.SourceResponse;
-import marquez.api.models.SourcesResponse;
-import marquez.api.models.StreamRequest;
-import marquez.api.models.StreamResponse;
+import marquez.api.models.*;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobType;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
-import marquez.service.models.Dataset;
-import marquez.service.models.DatasetMeta;
-import marquez.service.models.DbTable;
-import marquez.service.models.DbTableMeta;
-import marquez.service.models.Job;
-import marquez.service.models.JobMeta;
-import marquez.service.models.Namespace;
-import marquez.service.models.NamespaceMeta;
-import marquez.service.models.Run;
-import marquez.service.models.RunMeta;
-import marquez.service.models.Source;
-import marquez.service.models.SourceMeta;
-import marquez.service.models.Stream;
-import marquez.service.models.StreamMeta;
+import marquez.service.models.*;
 
 public final class Mapper {
   private Mapper() {}
@@ -232,6 +203,16 @@ public final class Mapper {
         run.getArgs());
   }
 
+  public static TagResponse toTagResponse(@NonNull Tag tag) {
+
+    return new TagResponse(tag.getName(), tag.getDescription().orElse(null));
+  }
+  public static TagsResponse toTagsResponse(@NonNull List<Tag> tags) {
+
+    return new TagsResponse(tags.stream().map(Mapper::toTagResponse).collect(toImmutableList()));
+  }
+
+
   public static List<RunResponse> toRunResponse(@NonNull final List<Run> runs) {
     return runs.stream().map(Mapper::toRunResponse).collect(toImmutableList());
   }
@@ -239,4 +220,5 @@ public final class Mapper {
   public static RunsResponse toRunsResponse(@NonNull final List<Run> runs) {
     return new RunsResponse(toRunResponse(runs));
   }
+
 }
