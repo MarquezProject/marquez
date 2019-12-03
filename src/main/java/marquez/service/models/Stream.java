@@ -14,6 +14,8 @@
 
 package marquez.service.models;
 
+import static marquez.common.models.DatasetType.STREAM;
+
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
@@ -40,7 +42,7 @@ public final class Stream extends Dataset {
       @NonNull final URL schemaLocation,
       @Nullable final List<Field> fields,
       @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, fields, description);
+    super(STREAM, name, physicalName, createdAt, updatedAt, sourceName, fields, description);
     this.schemaLocation = schemaLocation;
   }
 }

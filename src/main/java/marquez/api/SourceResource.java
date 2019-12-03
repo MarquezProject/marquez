@@ -31,6 +31,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.SourceNotFoundException;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.SourceRequest;
@@ -42,6 +43,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
 
+@Slf4j
 @Path("/api/v1/sources")
 public final class SourceResource {
   private final SourceService service;
@@ -60,10 +62,12 @@ public final class SourceResource {
   public Response createOrUpdate(
       @PathParam("source") String sourceString, @Valid SourceRequest request)
       throws MarquezServiceException {
+    log.debug("Request: {}", request);
     final SourceName name = SourceName.of(sourceString);
     final SourceMeta meta = Mapper.toSourceMeta(request);
     final Source source = service.createOrUpdate(name, meta);
     final SourceResponse response = Mapper.toSourceResponse(source);
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 
@@ -80,6 +84,7 @@ public final class SourceResource {
             .get(name)
             .map(Mapper::toSourceResponse)
             .orElseThrow(() -> new SourceNotFoundException(name));
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 
@@ -94,6 +99,7 @@ public final class SourceResource {
       throws MarquezServiceException {
     final List<Source> sources = service.getAll(limit, offset);
     final SourcesResponse response = Mapper.toSourcesResponse(sources);
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 }

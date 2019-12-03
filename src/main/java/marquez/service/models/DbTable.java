@@ -14,6 +14,8 @@
 
 package marquez.service.models;
 
+import static marquez.common.models.DatasetType.DB_TABLE;
+
 import java.time.Instant;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -26,7 +28,6 @@ import marquez.common.models.SourceName;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTable extends Dataset {
-
   public DbTable(
       final DatasetName name,
       final DatasetName physicalName,
@@ -35,6 +36,6 @@ public final class DbTable extends Dataset {
       final SourceName sourceName,
       @Nullable final List<Field> fields,
       @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, fields, description);
+    super(DB_TABLE, name, physicalName, createdAt, updatedAt, sourceName, fields, description);
   }
 }

@@ -22,13 +22,13 @@ import lombok.Value;
 
 @Value
 public class Field {
-  FieldName name;
+  String name;
   FieldType type;
   @Nullable String description;
 
   @JsonCreator
   public Field(
-      @NonNull final FieldName name,
+      @NonNull final String name,
       @NonNull final FieldType type,
       @Nullable final String description) {
     this.name = name;

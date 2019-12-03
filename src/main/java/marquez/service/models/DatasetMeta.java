@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
@@ -33,6 +34,7 @@ import marquez.common.models.SourceName;
 @EqualsAndHashCode
 @ToString
 public abstract class DatasetMeta {
+  @Getter private final DatasetType type;
   @Getter private final DatasetName physicalName;
   @Getter private final SourceName sourceName;
   @Nullable final List<Field> fields;
@@ -40,11 +42,13 @@ public abstract class DatasetMeta {
   @Nullable private final UUID runId;
 
   public DatasetMeta(
+      @NonNull final DatasetType type,
       @NonNull final DatasetName physicalName,
       @NonNull final SourceName sourceName,
       @Nullable final List<Field> fields,
       @Nullable final String description,
       @Nullable final UUID runId) {
+    this.type = type;
     this.physicalName = physicalName;
     this.sourceName = sourceName;
     this.fields = fields;
@@ -67,6 +71,6 @@ public abstract class DatasetMeta {
   public abstract UUID version(NamespaceName namespaceName, DatasetName datasetName);
 
   protected static String joinField(final Field field) {
-    return VERSION_JOINER.join(field.getName().getValue(), field.getType(), field.getDescription());
+    return VERSION_JOINER.join(field.getName(), field.getType(), field.getDescription());
   }
 }

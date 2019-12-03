@@ -18,6 +18,7 @@ import static com.google.common.base.Charsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static marquez.common.Utils.VERSION_DELIM;
 import static marquez.common.Utils.VERSION_JOINER;
+import static marquez.common.models.DatasetType.DB_TABLE;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +40,7 @@ public final class DbTableMeta extends DatasetMeta {
       @Nullable final List<Field> fields,
       @Nullable final String description,
       @Nullable final UUID runId) {
-    super(physicalName, sourceName, fields, description, runId);
+    super(DB_TABLE, physicalName, sourceName, fields, description, runId);
   }
 
   @Override
