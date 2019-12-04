@@ -284,22 +284,21 @@ public class JobService {
         final RunArgsRow newRunArgsRow = Mapper.toRunArgsRow(runMeta.getArgs(), checksum);
         runArgsDao.insert(newRunArgsRow);
       }
+
       final JobVersionRow versionRow =
           versionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
-
       final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
       final RunRow newRunRow = Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), runMeta);
+
       final List<UUID> inputVersionUuids =
           datasetVersionDao.findAllInUuidList(versionRow.getInputUuids()).stream()
               .map(DatasetVersionRow::getUuid)
               .collect(toImmutableList());
 
       runDao.insertWith(newRunRow, inputVersionUuids);
+      markRunAs(newRunRow.getUuid(), Run.State.NEW);
       log.info(
           "Successfully created run '{}' for job '{}'.", newRunRow.getUuid(), jobName.getValue());
-
-      markRunAs(newRunRow.getUuid(), Run.State.NEW);
-
       return getRun(newRunRow.getUuid()).get();
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to create run for job '{}' with meta: {}", jobName.getValue(), runMeta, e);
