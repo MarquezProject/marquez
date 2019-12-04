@@ -38,6 +38,7 @@ public abstract class Dataset {
   @Getter private final Instant updatedAt;
   @Getter private final SourceName sourceName;
   @Nullable final List<Field> fields;
+  @Nullable private final Instant lastModified;
   @Nullable private final String description;
 
   public Dataset(
@@ -48,6 +49,7 @@ public abstract class Dataset {
       @NonNull final Instant updatedAt,
       @NonNull final SourceName sourceName,
       @Nullable final List<Field> fields,
+      @Nullable final Instant lastModified,
       @Nullable final String description) {
     this.type = type;
     this.name = name;
@@ -56,11 +58,16 @@ public abstract class Dataset {
     this.updatedAt = updatedAt;
     this.sourceName = sourceName;
     this.fields = fields;
+    this.lastModified = lastModified;
     this.description = description;
   }
 
   public List<Field> getFields() {
     return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
+  }
+
+  public Optional<Instant> getLastModified() {
+    return Optional.ofNullable(lastModified);
   }
 
   public Optional<String> getDescription() {

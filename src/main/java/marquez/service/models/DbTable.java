@@ -35,7 +35,17 @@ public final class DbTable extends Dataset {
       final Instant updatedAt,
       final SourceName sourceName,
       @Nullable final List<Field> fields,
+      @Nullable final Instant lastModified,
       @Nullable final String description) {
-    super(DB_TABLE, name, physicalName, createdAt, updatedAt, sourceName, fields, description);
+    super(
+        DB_TABLE,
+        name,
+        physicalName,
+        createdAt,
+        updatedAt,
+        sourceName,
+        fields,
+        lastModified,
+        description);
   }
 }

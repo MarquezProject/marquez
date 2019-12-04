@@ -48,8 +48,9 @@ public final class StreamResponse extends DatasetResponse {
       final String sourceName,
       @NonNull final String schemaLocation,
       @Nullable final List<Field> fields,
+      @Nullable final String lastModified,
       @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, fields, description);
+    super(name, physicalName, createdAt, updatedAt, sourceName, fields, lastModified, description);
     this.schemaLocation = checkNotBlank(schemaLocation);
   }
 }

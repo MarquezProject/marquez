@@ -37,6 +37,7 @@ public final class ExtendedDatasetRow extends DatasetRow {
       @NonNull final String sourceName,
       final String name,
       final String physicalName,
+      @Nullable final Instant lastModified,
       @Nullable final String description,
       @Nullable final UUID currentVersionUuid) {
     super(
@@ -48,6 +49,7 @@ public final class ExtendedDatasetRow extends DatasetRow {
         sourceUuid,
         name,
         physicalName,
+        lastModified,
         description,
         currentVersionUuid);
     this.sourceName = sourceName;

@@ -54,6 +54,7 @@ public final class Columns {
   public static final String SOURCE_UUID = "source_uuid";
   public static final String SOURCE_NAME = "source_name";
   public static final String PHYSICAL_NAME = "physical_name";
+  public static final String LAST_MODIFIED = "last_modified";
 
   /* DATASET VERSION ROW COLUMNS */
   public static final String FIELD_UUIDS = "field_uuids";

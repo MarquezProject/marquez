@@ -158,6 +158,7 @@ public final class Mapper {
         row.getUpdatedAt(),
         SourceName.of(row.getSourceName()),
         toField(fieldRows),
+        row.getLastModified().orElse(null),
         row.getDescription().orElse(null));
   }
 
@@ -173,6 +174,7 @@ public final class Mapper {
         SourceName.of(row.getSourceName()),
         Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation()),
         toField(fieldRows),
+        row.getLastModified().orElse(null),
         row.getDescription().orElse(null));
   }
 
@@ -200,6 +202,7 @@ public final class Mapper {
         sourceRowUuid,
         name.getValue(),
         meta.getPhysicalName().getValue(),
+        null,
         meta.getDescription().orElse(null),
         null);
   }
