@@ -175,6 +175,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
         new JobService(
             namespaceDao,
             datasetDao,
+            datasetVersionDao,
             jobDao,
             jobVersionDao,
             jobContextDao,

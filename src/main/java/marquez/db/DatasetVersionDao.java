@@ -14,6 +14,8 @@
 
 package marquez.db;
 
+import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +28,7 @@ import marquez.db.models.StreamVersionRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
@@ -94,6 +97,16 @@ public interface DatasetVersionDao {
         return findBy(version);
     }
   }
+
+  @SqlQuery(
+      "SELECT *, "
+          + "ARRAY(SELECT dataset_field_uuid "
+          + "      FROM dataset_versions_field_mapping "
+          + "      WHERE dataset_version_uuid = uuid) AS field_uuids "
+          + "FROM dataset_versions "
+          + "WHERE dataset_uuid IN (<datasetUuids>)")
+  List<DatasetVersionRow> findAllInUuidList(
+      @BindList(onEmpty = NULL_STRING) List<UUID> datasetUuids);
 
   @SqlQuery("SELECT COUNT(*) FROM dataset_versions")
   int count();
