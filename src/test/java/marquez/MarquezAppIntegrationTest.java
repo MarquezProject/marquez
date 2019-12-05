@@ -37,6 +37,7 @@ import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.client.Entity;
@@ -294,6 +295,7 @@ public class MarquezAppIntegrationTest {
     assertThat((String) runStarted.get("runId")).isEqualTo(runId);
     assertThat((String) runStarted.get("runState")).isEqualTo(Run.State.RUNNING.toString());
 
+    final Instant beforeModified = Instant.now();
     final Response response2 =
         APP.client()
             .target(baseUri + "/jobs/runs/{id}/complete")
@@ -306,5 +308,23 @@ public class MarquezAppIntegrationTest {
     assertThat(response2.getStatus()).isEqualTo(HTTP_200);
     assertThat((String) runCompleted.get("runId")).isEqualTo(runId);
     assertThat((String) runCompleted.get("runState")).isEqualTo(Run.State.COMPLETED.toString());
+
+    outputs.forEach(
+        datasetName -> {
+          final Response response3 =
+              APP.client()
+                  .target(baseUri + "/namespaces/default/datasets/{dataset}")
+                  .resolveTemplate("dataset", datasetName.getValue())
+                  .request(APPLICATION_JSON)
+                  .get();
+
+          final Map<String, String> dataset = response3.readEntity(Map.class);
+
+          assertThat(response3.getStatus()).isEqualTo(HTTP_200);
+          assertThat((String) dataset.get("name")).isEqualTo(datasetName.getValue());
+
+          final Instant lastModified = Instant.parse((String) dataset.get("lastModified"));
+          assertThat(lastModified).isAfter(beforeModified);
+        });
   }
 }
