@@ -367,6 +367,7 @@ public class JobService {
               runId,
               versionRow.getVersion(),
               versionRow.getOutputUuids());
+          incOrDecBy(runState);
           return;
         }
       }
