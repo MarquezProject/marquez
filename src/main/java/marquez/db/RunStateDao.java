@@ -37,8 +37,7 @@ public interface RunStateDao extends SqlObject {
   @Transaction
   default void insertWith(RunStateRow row, List<UUID> datasetUuids, Instant lastModified) {
     insert(row);
-    datasetUuids.forEach(
-        datasetUuid -> createDatasetDao().updateLastModifed(datasetUuid, lastModified));
+    createDatasetDao().updateLastModifed(datasetUuids, lastModified);
   }
 
   @Transaction

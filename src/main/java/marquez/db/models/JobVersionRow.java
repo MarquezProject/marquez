@@ -47,4 +47,12 @@ public class JobVersionRow {
   public Optional<UUID> getLatestRunUuid() {
     return Optional.ofNullable(latestRunUuid);
   }
+
+  public boolean hasInputs() {
+    return !inputUuids.isEmpty();
+  }
+
+  public boolean hasOutputs() {
+    return !outputUuids.isEmpty();
+  }
 }
