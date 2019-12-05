@@ -235,14 +235,19 @@ public final class Mapper {
         run.getArgs());
   }
 
-  public static TagResponse toTagResponse(@NonNull Tag tag) {
+  public static TagResponse toTagResponse(@NonNull final Tag tag) {
 
     return new TagResponse(tag.getName(), tag.getDescription().orElse(null));
   }
 
-  public static TagsResponse toTagsResponse(@NonNull List<Tag> tags) {
+  public static List<TagResponse> toTagResponse(@NonNull final List<Tag> tags) {
 
-    return new TagsResponse(tags.stream().map(Mapper::toTagResponse).collect(toImmutableList()));
+    return tags.stream().map(Mapper::toTagResponse).collect(toImmutableList());
+  }
+
+  public static TagsResponse toTagsResponse(@NonNull final List<Tag> tags) {
+
+    return new TagsResponse(toTagResponse(tags));
   }
 
   public static List<RunResponse> toRunResponse(@NonNull final List<Run> runs) {

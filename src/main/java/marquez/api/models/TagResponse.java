@@ -27,7 +27,7 @@ import lombok.ToString;
 @ToString
 public final class TagResponse {
   @Getter private final String name;
-  private final String description;
+  @Nullable private final String description;
 
   public TagResponse(@NonNull final String name, @Nullable String description) {
     this.name = checkNotBlank(name);

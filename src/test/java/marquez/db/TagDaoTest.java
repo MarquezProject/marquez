@@ -26,12 +26,14 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import marquez.DataAccessTests;
+import marquez.MarquezDb;
 import marquez.common.models.TagName;
 import marquez.db.models.TagRow;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
+import org.jdbi.v3.testing.Migration;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -40,13 +42,22 @@ import org.junit.experimental.categories.Category;
 @Category({DataAccessTests.class})
 public class TagDaoTest {
 
+  private static final MarquezDb DB = MarquezDb.create();
+
+  static {
+    DB.start();
+  }
+
   private static TagDao tagDao;
   static final TagRow tagRow = newTagRow();
   static final TagRow tagRow2 = newTagRow();
 
   @ClassRule
   public static final JdbiRule dbRule =
-      JdbiRule.embeddedPostgres().withPlugin(new SqlObjectPlugin()).migrateWithFlyway();
+      JdbiRule.externalPostgres(
+              DB.getHost(), DB.getPort(), DB.getUsername(), DB.getPassword(), DB.getDatabaseName())
+          .withPlugin(new SqlObjectPlugin())
+          .withMigration(Migration.before().withDefaultPath());
 
   @BeforeClass
   public static void setUpOnce() {

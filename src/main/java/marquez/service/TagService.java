@@ -16,6 +16,7 @@ package marquez.service;
 
 import static java.util.Collections.unmodifiableList;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -36,8 +37,16 @@ public class TagService {
   private final Set<Tag> TAGS =
       new HashSet<>(
           Arrays.asList(
-              Tag.builder().name(TagName.fromString("PII")).build(),
-              Tag.builder().name(TagName.fromString("SENSITIVE")).build()));
+              Tag.builder()
+                  .name(TagName.fromString("PII"))
+                  .createdAt(Instant.now())
+                  .updatedAt(Instant.now())
+                  .build(),
+              Tag.builder()
+                  .name(TagName.fromString("SENSITIVE"))
+                  .createdAt(Instant.now())
+                  .updatedAt(Instant.now())
+                  .build()));
 
   private final TagDao tagDao;
 

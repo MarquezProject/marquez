@@ -104,6 +104,14 @@ public class MarquezAppIntegrationTest {
   }
 
   @Test
+  public void testApp_listTag() {
+    final Response response =
+        APP.client().target(baseUri + "/tags").request(APPLICATION_JSON).get();
+
+    assertThat(response.getStatus()).isEqualTo(HTTP_200);
+  }
+
+  @Test
   public void testApp_createDbTable() {
     final SourceName sourceName = newSourceName();
 

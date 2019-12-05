@@ -150,7 +150,8 @@ public final class ModelGenerator extends Generator {
 
     return Tag.builder()
         .name(TagName.fromString(tagRow.getName()))
-        .taggedAt(tagRow.getCreatedAt())
+        .createdAt(tagRow.getCreatedAt())
+        .updatedAt(tagRow.getUpdatedAt())
         .description(description)
         .build();
   }

@@ -27,12 +27,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.TagsResponse;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Tag;
 
+@Slf4j
 @Path("/api/v1")
 public final class TagResource {
   private final TagService tagService;
@@ -53,6 +55,7 @@ public final class TagResource {
       throws MarquezServiceException {
     final List<Tag> tags = tagService.getAll(limit, offset);
     final TagsResponse response = Mapper.toTagsResponse(tags);
+    log.debug("Response: {}", response);
     return Response.ok(response).build();
   }
 }
