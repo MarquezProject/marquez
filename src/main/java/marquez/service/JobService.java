@@ -352,25 +352,25 @@ public class JobService {
 
   public void markRunAs(@NonNull UUID runId, @NonNull Run.State runState)
       throws MarquezServiceException {
+    log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
+    final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
     try {
-      final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
       if (runState.isComplete()) {
         final RunRow runRow = runDao.findBy(runId).get();
         final ExtendedJobVersionRow versionRow =
             versionDao.findBy(runRow.getJobVersionUuid()).get();
-        if (versionRow.hasOutputs()) {
+        if (versionRow.hasOutputUuids()) {
+          final Instant lastModified = Instant.now();
+          runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids(), lastModified);
           log.debug(
-              "Run '{}' for job version '{}' modified datasets with row uuids: {}",
+              "Run '{}' for job version '{}' modified datasets: {}",
               runId,
               versionRow.getVersion(),
               versionRow.getOutputUuids());
-          final Instant lastModified = Instant.now();
-          runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids(), lastModified);
           return;
         }
       }
       runStateDao.insert(newRunStateRow);
-      log.debug("Marked run with ID '{}' as '{}'.", runId, runState);
       incOrDecBy(runState);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to mark job run '{}' as '{}'.", runId, runState, e);

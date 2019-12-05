@@ -40,19 +40,19 @@ public class JobVersionRow {
   @Getter @NonNull private final UUID version;
   @Nullable private final UUID latestRunUuid;
 
+  public boolean hasInputUuids() {
+    return !inputUuids.isEmpty();
+  }
+
+  public boolean hasOutputUuids() {
+    return !outputUuids.isEmpty();
+  }
+
   public Optional<String> getLocation() {
     return Optional.ofNullable(location);
   }
 
   public Optional<UUID> getLatestRunUuid() {
     return Optional.ofNullable(latestRunUuid);
-  }
-
-  public boolean hasInputs() {
-    return !inputUuids.isEmpty();
-  }
-
-  public boolean hasOutputs() {
-    return !outputUuids.isEmpty();
   }
 }

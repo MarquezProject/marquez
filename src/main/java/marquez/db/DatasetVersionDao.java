@@ -47,10 +47,12 @@ public interface DatasetVersionDao {
   @Transaction
   default void insertWith(DatasetVersionRow row, List<DatasetFieldRow> fieldRows) {
     createDatasetFieldDao().insertAll(fieldRows);
+
     insert(row);
     if (row instanceof StreamVersionRow) {
       createStreamVersionDao().insert((StreamVersionRow) row);
     }
+
     row.getFieldUuids()
         .forEach(
             fieldUuid -> {

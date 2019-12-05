@@ -108,13 +108,13 @@ public interface JobVersionDao extends SqlObject {
           + "            io_type = 'OUTPUT') AS output_uuids "
           + "FROM job_versions AS jv "
           + "INNER JOIN jobs AS j "
-          + "  ON (job_uuid = jv.job_uuid AND j.current_version_uuid = :currentVersionUuid)"
+          + "  ON (job_uuid = jv.job_uuid AND j.current_version_uuid = :versionUuid)"
           + "INNER JOIN namespaces AS n "
           + "  ON (j.namespace_uuid = n.uuid) "
           + "INNER JOIN job_contexts AS jc "
           + "  ON (job_context_uuid = jc.uuid) "
-          + "WHERE jv.version = :currentVersionUuid ")
-  Optional<ExtendedJobVersionRow> findVersion(UUID currentVersionUuid);
+          + "WHERE jv.version = :versionUuid ")
+  Optional<ExtendedJobVersionRow> findVersion(UUID versionUuid);
 
   @SqlQuery(
       "SELECT j.uuid AS job_uuid, j.namespace_uuid, jv.*, jc.uuid AS job_context_uuid, jc.context, "
