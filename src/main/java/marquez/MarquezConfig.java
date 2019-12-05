@@ -33,5 +33,5 @@ public final class MarquezConfig extends Configuration {
 
   @Getter
   @JsonProperty("flywayInitSql")
-  private final String flywayInitSql = null;
+  private String flywayInitSql;
 }
