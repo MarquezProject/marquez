@@ -19,8 +19,6 @@ import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.flyway.FlywayBundle;
-import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -89,20 +87,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
         new SubstitutingSourceProvider(
             bootstrap.getConfigurationSourceProvider(),
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
-
-    // Enable Flyway for database migrations.
-    bootstrap.addBundle(
-        new FlywayBundle<MarquezConfig>() {
-          @Override
-          public DataSourceFactory getDataSourceFactory(@NonNull MarquezConfig config) {
-            return config.getDataSourceFactory();
-          }
-
-          @Override
-          public FlywayFactory getFlywayFactory(@NonNull MarquezConfig config) {
-            return config.getFlywayFactory();
-          }
-        });
   }
 
   @Override
@@ -118,7 +102,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
   private void migrateDbOrError(@NonNull MarquezConfig config) {
     final Flyway flyway = new Flyway();
     final DataSourceFactory db = config.getDataSourceFactory();
-    flyway.setDataSource(db.getUrl(), db.getUser(), db.getPassword());
+    String initSql = config.getFlywayInitSql() == null ? "" : config.getFlywayInitSql();
+    flyway.setDataSource(db.getUrl(), db.getUser(), db.getPassword(), initSql);
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts
     // requiring we handle the throwable and apply a repair on the database to fix any
     // issues before app termination.
