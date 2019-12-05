@@ -130,13 +130,12 @@ public class JobService {
         final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
         final JobRow newJobRow = Mapper.toJobRow(namespaceRow.getUuid(), jobName, jobMeta);
         jobDao.insert(newJobRow);
+        jobs.labels(namespaceName.getValue(), jobMeta.getType().toString()).inc();
         log.info(
             "Successfully created job '{}' for namespace '{}' with meta: {}",
             jobName.getValue(),
             namespaceName.getValue(),
             jobMeta);
-
-        jobs.labels(namespaceName.getValue(), jobMeta.getType().toString()).inc();
       }
       final UUID version = jobMeta.version(namespaceName, jobName);
       if (!versionDao.exists(version)) {
@@ -176,11 +175,10 @@ public class JobService {
                 jobMeta.getLocation().orElse(null),
                 version);
         versionDao.insert(newVersionRow);
-        log.info("Successfully created version '{}' for job '{}'.", version, jobName.getValue());
-
         versions
             .labels(namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue())
             .inc();
+        log.info("Successfully created version '{}' for job '{}'.", version, jobName.getValue());
       }
       return get(namespaceName, jobName).get();
     } catch (UnableToExecuteStatementException e) {
@@ -362,12 +360,12 @@ public class JobService {
         if (versionRow.hasOutputUuids()) {
           final Instant lastModified = Instant.now();
           runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids(), lastModified);
+          incOrDecBy(runState);
           log.debug(
               "Run '{}' for job version '{}' modified datasets: {}",
               runId,
               versionRow.getVersion(),
               versionRow.getOutputUuids());
-          incOrDecBy(runState);
           return;
         }
       }
