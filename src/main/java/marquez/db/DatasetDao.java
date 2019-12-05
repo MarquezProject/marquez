@@ -41,6 +41,13 @@ public interface DatasetDao {
 
   @SqlUpdate(
       "UPDATE datasets "
+          + "SET updated_at = :lastModified, "
+          + "    last_modified = :lastModified "
+          + "WHERE uuid = :rowUuid")
+  void updateLastModifed(UUID rowUuid, Instant lastModified);
+
+  @SqlUpdate(
+      "UPDATE datasets "
           + "SET updated_at = :updatedAt, "
           + "    current_version_uuid = :currentVersionUuid "
           + "WHERE uuid = :rowUuid")

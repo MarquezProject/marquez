@@ -20,6 +20,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -242,7 +243,7 @@ public class JobService {
   /** Creates a {@link Job} instance from the given {@link JobRow}. */
   private Job toJob(@NonNull JobRow jobRow) {
     final UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
-    final ExtendedJobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
+    final ExtendedJobVersionRow versionRow = versionDao.findVersion(currentVersionUuid).get();
 
     final List<DatasetName> inputs =
         datasetDao.findAllInUuidList(versionRow.getInputUuids()).stream()
@@ -353,7 +354,15 @@ public class JobService {
       throws MarquezServiceException {
     try {
       final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
-      runStateDao.insert(newRunStateRow);
+      if (runState.isComplete()) {
+        final RunRow runRow = runDao.findBy(runId).get();
+        final ExtendedJobVersionRow versionRow =
+            versionDao.findBy(runRow.getJobVersionUuid()).get();
+        final Instant lastModified = Instant.now();
+        runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids(), lastModified);
+      } else {
+        runStateDao.insert(newRunStateRow);
+      }
       log.debug("Marked run with ID '{}' as '{}'.", runId, runState);
       incOrDecBy(runState);
     } catch (UnableToExecuteStatementException e) {
