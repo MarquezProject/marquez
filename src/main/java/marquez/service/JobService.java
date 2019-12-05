@@ -359,6 +359,11 @@ public class JobService {
         final ExtendedJobVersionRow versionRow =
             versionDao.findBy(runRow.getJobVersionUuid()).get();
         final Instant lastModified = Instant.now();
+        log.debug(
+            "Run '{}' for job version '{}' modified datasets: {}",
+            runId,
+            versionRow.getVersion(),
+            versionRow.getUuid());
         runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids(), lastModified);
       } else {
         runStateDao.insert(newRunStateRow);
