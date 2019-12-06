@@ -18,21 +18,19 @@ import java.time.Instant;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 import marquez.common.models.TagName;
 
 @Data
 @Builder
-public final class Tag {
-  private final TagName name;
-  private final Instant taggedAt;
-  private final String description;
+public class Tag {
+  @NonNull TagName name;
+  @NonNull Instant createdAt;
+  @NonNull Instant updatedAt;
+  String description;
 
   public String getName() {
     return name == null ? null : name.getValue();
-  }
-
-  public String getTaggedAt() {
-    return taggedAt == null ? null : taggedAt.toString();
   }
 
   public Optional<String> getDescription() {

@@ -15,7 +15,12 @@
 package marquez.db.models;
 
 import static java.util.stream.Collectors.toList;
-import static marquez.common.models.ModelGenerator.*;
+import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
+import static marquez.common.models.ModelGenerator.newContext;
+import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newSourceName;
+import static marquez.common.models.ModelGenerator.newSourceType;
+import static marquez.common.models.ModelGenerator.newTagName;
 
 import java.time.Instant;
 import java.util.List;

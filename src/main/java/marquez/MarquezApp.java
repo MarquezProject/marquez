@@ -34,6 +34,7 @@ import marquez.api.DatasetResource;
 import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
 import marquez.api.SourceResource;
+import marquez.api.TagResource;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
@@ -48,10 +49,12 @@ import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
 import marquez.db.SourceDao;
+import marquez.db.TagDao;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.SourceService;
+import marquez.service.TagService;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
@@ -165,6 +168,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final RunDao runDao = jdbi.onDemand(RunDao.class);
     final RunArgsDao runArgsDao = jdbi.onDemand(RunArgsDao.class);
     final RunStateDao runStateDao = jdbi.onDemand(RunStateDao.class);
+    final TagDao tagDao = jdbi.onDemand(TagDao.class);
 
     final NamespaceService namespaceService =
         new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
@@ -182,11 +186,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
             runArgsDao,
             runStateDao);
 
+    final TagService tagService = new TagService(tagDao);
+
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new SourceResource(sourceService));
     env.jersey().register(new DatasetResource(namespaceService, datasetService, jobService));
     env.jersey().register(new JobResource(namespaceService, jobService));
-
+    env.jersey().register(new TagResource(tagService));
     env.jersey().register(new MarquezServiceExceptionMapper());
   }
 }

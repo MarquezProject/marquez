@@ -340,6 +340,8 @@ public final class Mapper {
     return Tag.builder()
         .name(TagName.fromString(row.getName()))
         .description(row.getDescription())
+        .updatedAt(row.getUpdatedAt())
+        .createdAt(row.getCreatedAt())
         .build();
   }
 
@@ -348,6 +350,8 @@ public final class Mapper {
         .uuid(UUID.randomUUID())
         .name(tag.getName())
         .description(tag.getDescription().orElse(null))
+        .createdAt(tag.getCreatedAt())
+        .updatedAt(tag.getUpdatedAt())
         .build();
   }
 }

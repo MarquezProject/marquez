@@ -1051,3 +1051,32 @@ components:
         sources:
           items:
             $ref: '#/components/schemas/source'
+    tag:
+      type: object
+      properties:
+        description:
+          description: The description of the tag.
+          type: string
+        name:
+          description: The name of the tag.
+          type: string
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the tag was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the tag was updated.
+          type: string
+          format: date-time
+      example:
+        description: PII related tag
+        name: PII
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+
+    tags:
+      type: object
+      properties:
+        tags:
+          items:
+            $ref: '#/components/schemas/tag'

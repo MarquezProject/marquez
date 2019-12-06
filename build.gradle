@@ -40,7 +40,6 @@ dependencies {
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-  testCompile 'com.opentable.components:otj-pg-embedded:0.13.1'
   testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
   testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
   testCompile 'junit:junit:4.12'
