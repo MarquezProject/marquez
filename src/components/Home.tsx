@@ -10,14 +10,11 @@ import {
 } from '@material-ui/core/styles'
 
 import FilterContainer from '../containers/FilterContainer'
-import CustomSearchBar from './CustomSearchBar'
 import DatasetPreviewCard from './DatasetPreviewCard'
 import JobPreviewCard from './JobPreviewCard'
 
 import { IDatasetsState } from '../reducers/datasets'
 import { IJobsState } from '../reducers/jobs'
-
-import { findMatchingEntities } from '../actionCreators'
 
 const styles = (_theme: ITheme) => {
   return createStyles({
@@ -33,15 +30,10 @@ const styles = (_theme: ITheme) => {
       padding: '52vh 5% 1%',
       position: 'absolute',
       top: 0,
-      zIndex: -1,
+      zIndex: 1,
       width: '100%'
     },
-    search: {
-      position: 'fixed',
-      bottom: '52vh',
-      width: '90%',
-      left: '5%'
-    },
+
     noDatasets: {
       color: '#9e9e9e',
       position: 'fixed',
@@ -60,42 +52,27 @@ const styles = (_theme: ITheme) => {
 interface IProps {
   datasets: IDatasetsState
   jobs: IJobsState
-  findMatchingEntities: typeof findMatchingEntities
+  showJobs: boolean
+  setShowJobs: (bool: boolean) => void
 }
 
-interface IState {
-  showJobs: boolean
-}
+interface IState {}
 
 type IAllProps = RRD.RouteComponentProps & IWithStyles<typeof styles> & IProps
 
 class Home extends React.Component<IAllProps, IState> {
-  constructor(props: IAllProps) {
-    super(props)
-    this.state = { showJobs: false }
-  }
-
-  showJobs = (bool: boolean) => {
-    this.setState({ showJobs: bool })
-  }
-
   render(): ReactElement {
-    const { datasets, jobs, classes, findMatchingEntities } = this.props
+    const { datasets, jobs, classes, showJobs, setShowJobs } = this.props
     const matchingDatasets = datasets.filter(d => d.matches)
     const matchingJobs = jobs.filter(j => j.matches)
     return (
       <div>
-        <CustomSearchBar
-          customClassName={classes.search}
-          findMatchingEntities={findMatchingEntities}
-          showJobs={this.showJobs}
-        ></CustomSearchBar>
-        <FilterContainer showJobs={this.showJobs} />
+        <FilterContainer showJobs={setShowJobs} />
         <div className={classes.row}>
           <Box className={classes.column}>
             {matchingDatasets.length > 0 ? (
               <Typography className={classes.header} color='secondary' variant='h3'>
-                {!this.state.showJobs ? 'Popular Datasets' : 'Matching Datasets'}
+                {!showJobs ? 'Popular Datasets' : 'Matching Datasets'}
               </Typography>
             ) : (
               <Typography className={classes.noDatasets}>no datasets found!</Typography>
@@ -109,7 +86,7 @@ class Home extends React.Component<IAllProps, IState> {
               />
             ))}
           </Box>
-          {this.state.showJobs ? (
+          {showJobs ? (
             <Box className={classes.column}>
               {matchingJobs.length > 0 ? (
                 <Typography className={classes.header} color='secondary' variant='h3'>

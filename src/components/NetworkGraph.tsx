@@ -29,14 +29,15 @@ const styles = ({ palette }: Theme) => {
       height: '50vh',
       position: 'fixed',
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      zIndex: 2
     },
     tooltip: {
       position: 'absolute',
       visibility: 'hidden',
       background: '#fff',
       color: palette.primary.main,
-      zIndex: 10,
+      zIndex: 3,
       padding: '5px 10px',
       font: '12px sans-serif',
       borderRadius: '2px',
@@ -46,7 +47,8 @@ const styles = ({ palette }: Theme) => {
     legend: {
       position: 'fixed',
       bottom: '59vh',
-      right: '6%'
+      right: '6%',
+      zIndex: 3
     }
   })
 }

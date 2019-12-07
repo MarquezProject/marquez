@@ -8,7 +8,10 @@ const webpackDev = {
     contentBase: __dirname + '/src',
     port: 1337,
     publicPath: '/',
-    historyApiFallback: true,
+    historyApiFallback: {
+      index: './index.html',
+      disableDotRule: true
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:5000',

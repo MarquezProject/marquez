@@ -1,31 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`CustomSearchBar Component renders a snapshot that matches previous 1`] = `
-<WithStyles(SearchBar)
-  className=""
-  closeIcon={
-    <UNDEFINED
-      style={
-        Object {
-          "color": "#9e9e9e",
-        }
-      }
-    />
+<CustomSearchBar
+  classes={
+    Object {
+      "search": "CustomSearchBar-search-1",
+    }
   }
-  disabled={false}
-  onCancelSearch={[Function]}
-  onChange={[Function]}
-  placeholder="Search"
-  searchIcon={
-    <UNDEFINED
-      style={
-        Object {
-          "color": "#9e9e9e",
-        }
-      }
-    />
-  }
-  style={null}
-  value=""
 />
 `;

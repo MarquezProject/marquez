@@ -25,10 +25,12 @@ export interface INetworkData {
 
 export interface IDataset extends IDatasetAPI {
   matches: boolean
+  namespace: string
 }
 
 export interface IJob extends IJobAPI {
   matches: boolean
+  namespace: string
 }
 
 export type IFilterByDisplay = 'namespace' | 'datasource'

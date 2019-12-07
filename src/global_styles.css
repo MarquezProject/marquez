@@ -16,6 +16,5 @@ body {
 
 /* Example of global class */
 :global .link {
-  text-decoration: none;
-  color: white;
+  color: neptune;
 }

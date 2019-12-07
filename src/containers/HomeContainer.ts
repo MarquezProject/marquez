@@ -4,17 +4,23 @@ import { bindActionCreators } from 'redux'
 import Home from '../components/Home'
 import { IState } from '../reducers'
 
-import { findMatchingEntities } from '../actionCreators'
-
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets,
   jobs: state.jobs
 })
 
-const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
-  bindActionCreators({ findMatchingEntities: findMatchingEntities }, dispatch)
+const mapDispatchToProps = (dispatch: Redux.Dispatch) => bindActionCreators({}, dispatch)
 
-export default connect(
+interface IInjectedProps {
+  showJobs: boolean
+  setShowJobs: (bool: boolean) => void
+}
+
+type IStateProps = ReturnType<typeof mapStateToProps>
+
+interface IDispatchProps {}
+
+export default connect<IStateProps, IDispatchProps, IInjectedProps>(
   mapStateToProps,
   mapDispatchToProps
 )(Home)

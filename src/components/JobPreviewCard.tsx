@@ -5,6 +5,8 @@ import {
   WithStyles as IWithStyles,
   Theme as ITheme
 } from '@material-ui/core/styles'
+import { Link } from 'react-router-dom'
+
 const globalStyles = require('../global_styles.css')
 const { vibrantGreen } = globalStyles
 import { Typography, Box } from '@material-ui/core'
@@ -30,6 +32,9 @@ const styles = ({ palette, spacing }: ITheme) => {
     },
     passed: {
       backgroundColor: vibrantGreen
+    },
+    link: {
+      textDecoration: 'none'
     }
   })
 }
@@ -49,24 +54,33 @@ class JobPreviewCard extends React.Component<IProps, IState> {
     const { classes, name, description, updatedAt = '', status = 'passed' } = this.props
 
     return (
-      <Box p={2} m={1} bgcolor='white' boxShadow={3} display='flex' justifyContent='space-between'>
-        <div>
-          <Typography color='secondary' variant='h3'>
-            {name}
-          </Typography>
-          <StyledTypography color='primary'>{description}</StyledTypography>
-        </div>
+      <Link to={`/jobs/${name}`} className={classes.link}>
         <Box
-          className={classes.rightCol}
+          p={2}
+          m={1}
+          bgcolor='white'
+          boxShadow={3}
           display='flex'
-          flexDirection='column'
-          alignItems='flex-end'
           justifyContent='space-between'
         >
-          <div className={`${classes[status]} ${classes.status}`} />
-          <Typography className={classes.lastUpdated}>{formatUpdatedAt(updatedAt)}</Typography>
+          <div>
+            <Typography color='secondary' variant='h3'>
+              {name}
+            </Typography>
+            <StyledTypography color='primary'>{description}</StyledTypography>
+          </div>
+          <Box
+            className={classes.rightCol}
+            display='flex'
+            flexDirection='column'
+            alignItems='flex-end'
+            justifyContent='space-between'
+          >
+            <div className={`${classes[status]} ${classes.status}`} />
+            <Typography className={classes.lastUpdated}>{formatUpdatedAt(updatedAt)}</Typography>
+          </Box>
         </Box>
-      </Box>
+      </Link>
     )
   }
 }

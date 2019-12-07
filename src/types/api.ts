@@ -25,6 +25,9 @@ export interface IJobAPI {
   location: string
   description: string
   status: 'failed' | 'passed'
+  context: {
+    SQL: string
+  }
 }
 
 export interface INamespacesAPI {

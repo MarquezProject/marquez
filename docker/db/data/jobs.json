@@ -6,7 +6,10 @@
     "outputs": ["galaxy.dimensions"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_dimensions.sql",
     "description": "calculates all possible dimensions from input geometry",
-    "type": "BATCH"
+    "type": "BATCH",
+    "context": {
+      "SQL": "\n-- THIS IS SAMPLE SQL\n\n    SELECT 0 AS num UNION ALL\n    SELECT 1 UNION ALL\n    SELECT 2 UNION ALL\n    SELECT 3 UNION ALL\n    SELECT 4 UNION ALL\n    SELECT 5 UNION ALL\n    SELECT 6 UNION ALL\n    SELECT 7 UNION ALL\n    SELECT 8 UNION ALL\n    SELECT 9\n)\n\n, numbers_100 AS\n(\n   FROM the_whole_flippin_universe"
+    }
   },
   {
     "name": "calculate.galaxy_trips",
@@ -24,7 +27,10 @@
     "outputs": ["earth.trips"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
     "description": "calculates the dimensions of earth",
-    "type": "BATCH"
+    "type": "BATCH",
+    "context": {
+      "SQL": "\n-- THIS IS SAMPLE SQL\n\n    SELECT 0 AS num UNION ALL\n    SELECT 1 UNION ALL\n    SELECT 2 UNION ALL\n    SELECT 3 UNION ALL\n    SELECT 4 UNION ALL\n    SELECT 5 UNION ALL\n    SELECT 6 UNION ALL\n    SELECT 7 UNION ALL\n    SELECT 8 UNION ALL\n    SELECT 9\n)\n\n, numbers_100 AS\n(\n   FROM the_whole_flippin_universe"
+    }
   },
   {
     "name": "calculate.universe",
@@ -60,7 +66,10 @@
     "outputs": ["rocket.types"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
     "description": "calculates literally nothing!",
-    "type": "BATCH"
+    "type": "BATCH",
+    "context": {
+      "SQL": "\n-- THIS IS SAMPLE SQL\n\n    SELECT 0 AS num UNION ALL\n    SELECT 1 UNION ALL\n    SELECT 2 UNION ALL\n    SELECT 3 UNION ALL\n    SELECT 4 UNION ALL\n    SELECT 5 UNION ALL\n    SELECT 6 UNION ALL\n    SELECT 7 UNION ALL\n    SELECT 8 UNION ALL\n    SELECT 9\n)\n\n, numbers_100 AS\n(\n   FROM the_whole_flippin_universe"
+    }
   },
   {
     "name": "build.space_station",
@@ -87,7 +96,10 @@
     "outputs": ["interstellar.dimensions"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_dimensions.sql",
     "description": "calculates all possible dimensions from interstellar dimensions",
-    "type": "BATCH"
+    "type": "BATCH",
+    "context": {
+      "SQL": "\n-- THIS IS SAMPLE SQL\n\n    SELECT 0 AS num UNION ALL\n    SELECT 1 UNION ALL\n    SELECT 2 UNION ALL\n    SELECT 3 UNION ALL\n    SELECT 4 UNION ALL\n    SELECT 5 UNION ALL\n    SELECT 6 UNION ALL\n    SELECT 7 UNION ALL\n    SELECT 8 UNION ALL\n    SELECT 9\n)\n\n, numbers_100 AS\n(\n   FROM the_whole_flippin_universe"
+    }
   },
   {
     "name": "calculate.interstellar_trips",
@@ -105,7 +117,10 @@
     "outputs": ["cosmic.dimensions"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
     "description": "calculates the dimensions of the cosmics",
-    "type": "BATCH"
+    "type": "BATCH",
+    "context": {
+      "SQL": "\n-- THIS IS SAMPLE SQL\n\n    SELECT 0 AS num UNION ALL\n    SELECT 1 UNION ALL\n    SELECT 2 UNION ALL\n    SELECT 3 UNION ALL\n    SELECT 4 UNION ALL\n    SELECT 5 UNION ALL\n    SELECT 6 UNION ALL\n    SELECT 7 UNION ALL\n    SELECT 8 UNION ALL\n    SELECT 9\n)\n\n, numbers_100 AS\n(\n   FROM the_whole_flippin_universe"
+    }
   },
   {
     "name": "calculate.cosmic_universe",
@@ -132,7 +147,10 @@
     "outputs": [],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
     "description": "calculates literally nothing!",
-    "type": "BATCH"
+    "type": "BATCH",
+    "context": {
+      "SQL": "\n-- THIS IS SAMPLE SQL\n\n    SELECT 0 AS num UNION ALL\n    SELECT 1 UNION ALL\n    SELECT 2 UNION ALL\n    SELECT 3 UNION ALL\n    SELECT 4 UNION ALL\n    SELECT 5 UNION ALL\n    SELECT 6 UNION ALL\n    SELECT 7 UNION ALL\n    SELECT 8 UNION ALL\n    SELECT 9\n)\n\n, numbers_100 AS\n(\n   FROM the_whole_flippin_universe"
+    }
   },
   {
     "name": "build.comets",
@@ -159,6 +177,9 @@
     "outputs": ["worm_hole.types"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",
     "description": "calculates literally nothing!",
-    "type": "BATCH"
+    "type": "BATCH",
+    "context": {
+      "SQL": "\n-- THIS IS SAMPLE SQL\n\n    SELECT 0 AS num UNION ALL\n    SELECT 1 UNION ALL\n    SELECT 2 UNION ALL\n    SELECT 3 UNION ALL\n    SELECT 4 UNION ALL\n    SELECT 5 UNION ALL\n    SELECT 6 UNION ALL\n    SELECT 7 UNION ALL\n    SELECT 8 UNION ALL\n    SELECT 9\n)\n\n, numbers_100 AS\n(\n   FROM the_whole_flippin_universe"
+    }
   }
 ]

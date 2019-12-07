@@ -1,14 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`JobPreviewCard Component renders a snapshot that matches previous 1`] = `
-<JobPreviewCard
-  classes={
+<MemoryRouter
+  context={
     Object {
-      "failed": "JobPreviewCard-failed-4",
-      "lastUpdated": "JobPreviewCard-lastUpdated-2",
-      "passed": "JobPreviewCard-passed-5",
-      "rightCol": "JobPreviewCard-rightCol-1",
-      "status": "JobPreviewCard-status-3",
+      "SQL": "
+-- THIS IS SAMPLE SQL
+
+    SELECT 0 AS num UNION ALL
+    SELECT 1 UNION ALL
+    SELECT 2 UNION ALL
+    SELECT 3 UNION ALL
+    SELECT 4 UNION ALL
+    SELECT 5 UNION ALL
+    SELECT 6 UNION ALL
+    SELECT 7 UNION ALL
+    SELECT 8 UNION ALL
+    SELECT 9
+)
+
+, numbers_100 AS
+(
+   FROM the_whole_flippin_universe",
     }
   }
   description="calculates all possible dimensions from input geometry"
@@ -26,5 +39,249 @@ exports[`JobPreviewCard Component renders a snapshot that matches previous 1`] =
     ]
   }
   type="BATCH"
-/>
+>
+  <Router
+    history={
+      Object {
+        "action": "POP",
+        "block": [Function],
+        "canGo": [Function],
+        "createHref": [Function],
+        "entries": Array [
+          Object {
+            "hash": "",
+            "key": "fbhrpn",
+            "pathname": "/",
+            "search": "",
+            "state": undefined,
+          },
+        ],
+        "go": [Function],
+        "goBack": [Function],
+        "goForward": [Function],
+        "index": 0,
+        "length": 1,
+        "listen": [Function],
+        "location": Object {
+          "hash": "",
+          "key": "fbhrpn",
+          "pathname": "/",
+          "search": "",
+          "state": undefined,
+        },
+        "push": [Function],
+        "replace": [Function],
+      }
+    }
+  >
+    <WithStyles(JobPreviewCard)>
+      <JobPreviewCard
+        classes={
+          Object {
+            "failed": "JobPreviewCard-failed-4",
+            "lastUpdated": "JobPreviewCard-lastUpdated-2",
+            "link": "JobPreviewCard-link-6",
+            "passed": "JobPreviewCard-passed-5",
+            "rightCol": "JobPreviewCard-rightCol-1",
+            "status": "JobPreviewCard-status-3",
+          }
+        }
+      >
+        <Link
+          className="JobPreviewCard-link-6"
+          to="/jobs/undefined"
+        >
+          <LinkAnchor
+            className="JobPreviewCard-link-6"
+            href="/jobs/undefined"
+            navigate={[Function]}
+          >
+            <a
+              className="JobPreviewCard-link-6"
+              href="/jobs/undefined"
+              onClick={[Function]}
+            >
+              <Styled(MuiBox)
+                bgcolor="white"
+                boxShadow={3}
+                display="flex"
+                justifyContent="space-between"
+                m={1}
+                p={2}
+              >
+                <div
+                  className="MuiBox-root MuiBox-root-8"
+                >
+                  <div>
+                    <WithStyles(ForwardRef(Typography))
+                      color="secondary"
+                      variant="h3"
+                    >
+                      <ForwardRef(Typography)
+                        classes={
+                          Object {
+                            "alignCenter": "MuiTypography-alignCenter",
+                            "alignJustify": "MuiTypography-alignJustify",
+                            "alignLeft": "MuiTypography-alignLeft",
+                            "alignRight": "MuiTypography-alignRight",
+                            "body1": "MuiTypography-body1",
+                            "body2": "MuiTypography-body2",
+                            "button": "MuiTypography-button",
+                            "caption": "MuiTypography-caption",
+                            "colorError": "MuiTypography-colorError",
+                            "colorInherit": "MuiTypography-colorInherit",
+                            "colorPrimary": "MuiTypography-colorPrimary",
+                            "colorSecondary": "MuiTypography-colorSecondary",
+                            "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                            "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                            "displayBlock": "MuiTypography-displayBlock",
+                            "displayInline": "MuiTypography-displayInline",
+                            "gutterBottom": "MuiTypography-gutterBottom",
+                            "h1": "MuiTypography-h1",
+                            "h2": "MuiTypography-h2",
+                            "h3": "MuiTypography-h3",
+                            "h4": "MuiTypography-h4",
+                            "h5": "MuiTypography-h5",
+                            "h6": "MuiTypography-h6",
+                            "noWrap": "MuiTypography-noWrap",
+                            "overline": "MuiTypography-overline",
+                            "paragraph": "MuiTypography-paragraph",
+                            "root": "MuiTypography-root",
+                            "srOnly": "MuiTypography-srOnly",
+                            "subtitle1": "MuiTypography-subtitle1",
+                            "subtitle2": "MuiTypography-subtitle2",
+                          }
+                        }
+                        color="secondary"
+                        variant="h3"
+                      >
+                        <h3
+                          className="MuiTypography-root MuiTypography-h3 MuiTypography-colorSecondary"
+                        />
+                      </ForwardRef(Typography)>
+                    </WithStyles(ForwardRef(Typography))>
+                    <WithStyles(WithStyles(ForwardRef(Typography)))
+                      color="primary"
+                    >
+                      <WithStyles(ForwardRef(Typography))
+                        classes={
+                          Object {
+                            "root": "WithStyles(ForwardRef(Typography))-root-39",
+                          }
+                        }
+                        color="primary"
+                      >
+                        <ForwardRef(Typography)
+                          classes={
+                            Object {
+                              "alignCenter": "MuiTypography-alignCenter",
+                              "alignJustify": "MuiTypography-alignJustify",
+                              "alignLeft": "MuiTypography-alignLeft",
+                              "alignRight": "MuiTypography-alignRight",
+                              "body1": "MuiTypography-body1",
+                              "body2": "MuiTypography-body2",
+                              "button": "MuiTypography-button",
+                              "caption": "MuiTypography-caption",
+                              "colorError": "MuiTypography-colorError",
+                              "colorInherit": "MuiTypography-colorInherit",
+                              "colorPrimary": "MuiTypography-colorPrimary",
+                              "colorSecondary": "MuiTypography-colorSecondary",
+                              "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                              "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                              "displayBlock": "MuiTypography-displayBlock",
+                              "displayInline": "MuiTypography-displayInline",
+                              "gutterBottom": "MuiTypography-gutterBottom",
+                              "h1": "MuiTypography-h1",
+                              "h2": "MuiTypography-h2",
+                              "h3": "MuiTypography-h3",
+                              "h4": "MuiTypography-h4",
+                              "h5": "MuiTypography-h5",
+                              "h6": "MuiTypography-h6",
+                              "noWrap": "MuiTypography-noWrap",
+                              "overline": "MuiTypography-overline",
+                              "paragraph": "MuiTypography-paragraph",
+                              "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-39",
+                              "srOnly": "MuiTypography-srOnly",
+                              "subtitle1": "MuiTypography-subtitle1",
+                              "subtitle2": "MuiTypography-subtitle2",
+                            }
+                          }
+                          color="primary"
+                        >
+                          <p
+                            className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-39 MuiTypography-body1 MuiTypography-colorPrimary"
+                          />
+                        </ForwardRef(Typography)>
+                      </WithStyles(ForwardRef(Typography))>
+                    </WithStyles(WithStyles(ForwardRef(Typography)))>
+                  </div>
+                  <Styled(MuiBox)
+                    alignItems="flex-end"
+                    className="JobPreviewCard-rightCol-1"
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="space-between"
+                  >
+                    <div
+                      className="MuiBox-root MuiBox-root-40 JobPreviewCard-rightCol-1"
+                    >
+                      <div
+                        className="JobPreviewCard-passed-5 JobPreviewCard-status-3"
+                      />
+                      <WithStyles(ForwardRef(Typography))
+                        className="JobPreviewCard-lastUpdated-2"
+                      >
+                        <ForwardRef(Typography)
+                          className="JobPreviewCard-lastUpdated-2"
+                          classes={
+                            Object {
+                              "alignCenter": "MuiTypography-alignCenter",
+                              "alignJustify": "MuiTypography-alignJustify",
+                              "alignLeft": "MuiTypography-alignLeft",
+                              "alignRight": "MuiTypography-alignRight",
+                              "body1": "MuiTypography-body1",
+                              "body2": "MuiTypography-body2",
+                              "button": "MuiTypography-button",
+                              "caption": "MuiTypography-caption",
+                              "colorError": "MuiTypography-colorError",
+                              "colorInherit": "MuiTypography-colorInherit",
+                              "colorPrimary": "MuiTypography-colorPrimary",
+                              "colorSecondary": "MuiTypography-colorSecondary",
+                              "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                              "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                              "displayBlock": "MuiTypography-displayBlock",
+                              "displayInline": "MuiTypography-displayInline",
+                              "gutterBottom": "MuiTypography-gutterBottom",
+                              "h1": "MuiTypography-h1",
+                              "h2": "MuiTypography-h2",
+                              "h3": "MuiTypography-h3",
+                              "h4": "MuiTypography-h4",
+                              "h5": "MuiTypography-h5",
+                              "h6": "MuiTypography-h6",
+                              "noWrap": "MuiTypography-noWrap",
+                              "overline": "MuiTypography-overline",
+                              "paragraph": "MuiTypography-paragraph",
+                              "root": "MuiTypography-root",
+                              "srOnly": "MuiTypography-srOnly",
+                              "subtitle1": "MuiTypography-subtitle1",
+                              "subtitle2": "MuiTypography-subtitle2",
+                            }
+                          }
+                        >
+                          <p
+                            className="MuiTypography-root JobPreviewCard-lastUpdated-2 MuiTypography-body1"
+                          />
+                        </ForwardRef(Typography)>
+                      </WithStyles(ForwardRef(Typography))>
+                    </div>
+                  </Styled(MuiBox)>
+                </div>
+              </Styled(MuiBox)>
+            </a>
+          </LinkAnchor>
+        </Link>
+      </JobPreviewCard>
+    </WithStyles(JobPreviewCard)>
+  </Router>
+</MemoryRouter>
 `;
