@@ -14,6 +14,8 @@
 
 package marquez.db;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.db.mappers.RunStateRowMapper;
@@ -27,7 +29,16 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 @RegisterRowMapper(RunStateRowMapper.class)
 public interface RunStateDao extends SqlObject {
   @CreateSqlObject
+  DatasetDao createDatasetDao();
+
+  @CreateSqlObject
   RunDao createRunDao();
+
+  @Transaction
+  default void insertWith(RunStateRow row, List<UUID> datasetUuids, Instant lastModified) {
+    insert(row);
+    createDatasetDao().updateLastModifed(datasetUuids, lastModified);
+  }
 
   @Transaction
   default void insert(RunStateRow row) {

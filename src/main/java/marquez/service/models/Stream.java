@@ -41,8 +41,18 @@ public final class Stream extends Dataset {
       final SourceName sourceName,
       @NonNull final URL schemaLocation,
       @Nullable final List<Field> fields,
+      @Nullable final Instant lastModified,
       @Nullable final String description) {
-    super(STREAM, name, physicalName, createdAt, updatedAt, sourceName, fields, description);
+    super(
+        STREAM,
+        name,
+        physicalName,
+        createdAt,
+        updatedAt,
+        sourceName,
+        fields,
+        lastModified,
+        description);
     this.schemaLocation = schemaLocation;
   }
 }

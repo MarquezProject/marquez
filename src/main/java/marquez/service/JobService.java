@@ -20,6 +20,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -129,13 +130,12 @@ public class JobService {
         final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
         final JobRow newJobRow = Mapper.toJobRow(namespaceRow.getUuid(), jobName, jobMeta);
         jobDao.insert(newJobRow);
+        jobs.labels(namespaceName.getValue(), jobMeta.getType().toString()).inc();
         log.info(
             "Successfully created job '{}' for namespace '{}' with meta: {}",
             jobName.getValue(),
             namespaceName.getValue(),
             jobMeta);
-
-        jobs.labels(namespaceName.getValue(), jobMeta.getType().toString()).inc();
       }
       final UUID version = jobMeta.version(namespaceName, jobName);
       if (!versionDao.exists(version)) {
@@ -175,11 +175,10 @@ public class JobService {
                 jobMeta.getLocation().orElse(null),
                 version);
         versionDao.insert(newVersionRow);
-        log.info("Successfully created version '{}' for job '{}'.", version, jobName.getValue());
-
         versions
             .labels(namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue())
             .inc();
+        log.info("Successfully created version '{}' for job '{}'.", version, jobName.getValue());
       }
       return get(namespaceName, jobName).get();
     } catch (UnableToExecuteStatementException e) {
@@ -242,7 +241,7 @@ public class JobService {
   /** Creates a {@link Job} instance from the given {@link JobRow}. */
   private Job toJob(@NonNull JobRow jobRow) {
     final UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
-    final ExtendedJobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
+    final ExtendedJobVersionRow versionRow = versionDao.findVersion(currentVersionUuid).get();
 
     final List<DatasetName> inputs =
         datasetDao.findAllInUuidList(versionRow.getInputUuids()).stream()
@@ -351,10 +350,26 @@ public class JobService {
 
   public void markRunAs(@NonNull UUID runId, @NonNull Run.State runState)
       throws MarquezServiceException {
+    log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
+    final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
     try {
-      final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
+      if (runState.isComplete()) {
+        final RunRow runRow = runDao.findBy(runId).get();
+        final ExtendedJobVersionRow versionRow =
+            versionDao.findBy(runRow.getJobVersionUuid()).get();
+        if (versionRow.hasOutputUuids()) {
+          final Instant lastModified = Instant.now();
+          runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids(), lastModified);
+          incOrDecBy(runState);
+          log.debug(
+              "Run '{}' for job version '{}' modified datasets: {}",
+              runId,
+              versionRow.getVersion(),
+              versionRow.getOutputUuids());
+          return;
+        }
+      }
       runStateDao.insert(newRunStateRow);
-      log.debug("Marked run with ID '{}' as '{}'.", runId, runState);
       incOrDecBy(runState);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to mark job run '{}' as '{}'.", runId, runState, e);

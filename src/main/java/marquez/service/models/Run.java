@@ -33,14 +33,6 @@ public class Run {
   @NonNull Run.State state;
   @Nullable Map<String, String> args;
 
-  public enum State {
-    NEW,
-    RUNNING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
-  }
-
   public Optional<Instant> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
   }
@@ -51,5 +43,41 @@ public class Run {
 
   public Map<String, String> getArgs() {
     return (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
+  }
+
+  public enum State {
+    NEW {
+      @Override
+      public boolean isComplete() {
+        return false;
+      }
+    },
+    RUNNING {
+      @Override
+      public boolean isComplete() {
+        return false;
+      }
+    },
+    COMPLETED {
+      @Override
+      public boolean isComplete() {
+        return true;
+      }
+    },
+    ABORTED {
+      @Override
+      public boolean isComplete() {
+        return true;
+      }
+    },
+    FAILED {
+      @Override
+      public boolean isComplete() {
+        return true;
+      }
+    };
+
+    /** Returns true if this state is complete. */
+    public abstract boolean isComplete();
   }
 }

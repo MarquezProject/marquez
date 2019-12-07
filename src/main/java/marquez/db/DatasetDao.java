@@ -41,10 +41,18 @@ public interface DatasetDao {
 
   @SqlUpdate(
       "UPDATE datasets "
+          + "SET updated_at = :lastModified, "
+          + "    last_modified = :lastModified "
+          + "WHERE uuid IN (<rowUuids>)")
+  void updateLastModifed(
+      @BindList(onEmpty = NULL_STRING) List<UUID> rowUuids, Instant lastModified);
+
+  @SqlUpdate(
+      "UPDATE datasets "
           + "SET updated_at = :updatedAt, "
           + "    current_version_uuid = :currentVersionUuid "
           + "WHERE uuid = :rowUuid")
-  void update(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
+  void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
   @SqlQuery(
       "SELECT d.*, s.name AS source_name "

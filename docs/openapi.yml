@@ -967,6 +967,10 @@ components:
                 description: The description of the field.
                 type: string 
           uniqueItems: true
+        lastModified:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a run.
+          type: string
+          format: date-time
         description:
           description:  The description of the dataset.
           type: string
@@ -984,6 +988,7 @@ components:
           {'name': 'room_id', 'type': 'INTEGER'},
           {'name': 'member_id', 'type': 'INTEGER'}
         ]
+        lastModified: null
         description: "All room booking occupancy data."
 
     datasets:

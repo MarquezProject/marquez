@@ -59,7 +59,7 @@ public interface DatasetVersionDao {
               insert(row.getUuid(), fieldUuid);
             });
 
-    createDatasetDao().update(row.getDatasetUuid(), row.getCreatedAt(), row.getVersion());
+    createDatasetDao().updateVersion(row.getDatasetUuid(), row.getCreatedAt(), row.getVersion());
   }
 
   @SqlUpdate(

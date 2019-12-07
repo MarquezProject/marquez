@@ -36,8 +36,13 @@ public class DatasetRow {
   @Getter @NonNull private final UUID sourceUuid;
   @Getter @NonNull private final String name;
   @Getter @NonNull private final String physicalName;
+  @Nullable private final Instant lastModified;
   @Nullable private final String description;
   @Nullable private final UUID currentVersionUuid;
+
+  public Optional<Instant> getLastModified() {
+    return Optional.ofNullable(lastModified);
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
