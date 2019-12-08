@@ -32,7 +32,7 @@ public class MarquezDb extends PostgreSQLContainer<MarquezDb> {
 
   public static MarquezDb create() {
     if (db == null) {
-      db = new MarquezDb();
+      db = new MarquezDb().withInitScript("db-init.sql");
     }
     return db;
   }

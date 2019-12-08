@@ -24,13 +24,13 @@ import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTests.class)
 public class FlywayMigrationTest {
-  private static final String CONFIG_FILE = "config-flyway-initSql.test.yml";
+  private static final String CONFIG_FILE = "config.test.yml";
   private static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
 
   private static final MarquezDb DB = MarquezDb.create();
 
   static {
-    DB.withInitScript("db-init.sql").start();
+    DB.start();
   }
 
   @ClassRule
