@@ -15,6 +15,8 @@
 package marquez.service.mappers;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
@@ -36,6 +38,7 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.common.models.TagName;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -52,6 +55,7 @@ import marquez.db.models.RunRow;
 import marquez.db.models.RunStateRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.StreamVersionRow;
+import marquez.db.models.TagRow;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTable;
@@ -66,6 +70,7 @@ import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
 import marquez.service.models.Stream;
 import marquez.service.models.StreamMeta;
+import marquez.service.models.Tag;
 
 public final class Mapper {
   private Mapper() {}
@@ -368,5 +373,28 @@ public final class Mapper {
 
   private static Instant newTimestamp() {
     return Instant.now();
+  }
+
+  public static List<Tag> toTags(@NonNull List<TagRow> rows) {
+    return unmodifiableList(rows.stream().map(row -> toTag(row)).collect(toList()));
+  }
+
+  public static Tag toTag(@NonNull TagRow row) {
+    return Tag.builder()
+        .name(TagName.fromString(row.getName()))
+        .description(row.getDescription())
+        .updatedAt(row.getUpdatedAt())
+        .createdAt(row.getCreatedAt())
+        .build();
+  }
+
+  public static TagRow toTagRow(@NonNull Tag tag) {
+    return TagRow.builder()
+        .uuid(UUID.randomUUID())
+        .name(tag.getName())
+        .description(tag.getDescription().orElse(null))
+        .createdAt(tag.getCreatedAt())
+        .updatedAt(tag.getUpdatedAt())
+        .build();
   }
 }

@@ -15,6 +15,7 @@
 package marquez.common.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static marquez.db.models.ModelGenerator.newTagRow;
 
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
@@ -22,9 +23,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.Utils;
+import marquez.db.models.TagRow;
+import marquez.service.models.Tag;
 
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}
@@ -121,5 +125,34 @@ public final class ModelGenerator extends Generator {
 
   public static String newDescription() {
     return "test_description" + newId();
+  }
+
+  public static TagName newTagName() {
+    return newTagNameWith("test_tag" + newId());
+  }
+
+  public static TagName newTagNameWith(String value) {
+    return TagName.fromString(value);
+  }
+
+  public static Tag newTag() {
+    return newTag(true);
+  }
+
+  public static List<Tag> newTags(int limit) {
+    return Stream.generate(() -> newTag(true)).limit(limit).collect(Collectors.toList());
+  }
+
+  public static Tag newTag(boolean setDescription) {
+    final TagRow tagRow = newTagRow();
+
+    final String description = setDescription ? tagRow.getDescription() : null;
+
+    return Tag.builder()
+        .name(TagName.fromString(tagRow.getName()))
+        .createdAt(tagRow.getCreatedAt())
+        .updatedAt(tagRow.getUpdatedAt())
+        .description(description)
+        .build();
   }
 }
