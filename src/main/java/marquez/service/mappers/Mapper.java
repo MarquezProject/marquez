@@ -180,7 +180,9 @@ public final class Mapper {
         Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation()),
         toField(fieldRows),
         row.getLastModified().orElse(null),
-        row.getDescription().orElse(null));
+        row.getDescription().orElse(null),
+        null, // todo: fill with dataset
+        row.getCreatedAt());
   }
 
   public static Field toField(@NonNull final DatasetFieldRow row) {

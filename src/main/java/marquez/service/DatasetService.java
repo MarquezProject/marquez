@@ -16,31 +16,44 @@ package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.Collectors.toList;
 
+import com.google.common.base.Joiner;
 import io.prometheus.client.Counter;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
+import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.TagName;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.NamespaceDao;
 import marquez.db.SourceDao;
+import marquez.db.TagDao;
+import marquez.db.TaggedDatasetFieldDao;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
+import marquez.db.models.TagRow;
+import marquez.db.models.TaggedDatasetFieldRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
+import marquez.service.mappers.TaggedDatasetFieldRowMapper;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
+import marquez.service.models.Tag;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -64,19 +77,25 @@ public class DatasetService {
   private final SourceDao sourceDao;
   private final DatasetDao datasetDao;
   private final DatasetFieldDao fieldDao;
+  private final TaggedDatasetFieldDao taggedDatasetFieldDao;
   private final DatasetVersionDao versionDao;
+  private final TagDao tagDao;
 
   public DatasetService(
       @NonNull final NamespaceDao namespaceDao,
       @NonNull final SourceDao sourceDao,
       @NonNull final DatasetDao datasetDao,
       @NonNull final DatasetFieldDao fieldDao,
-      @NonNull final DatasetVersionDao versionDao) {
+      @NonNull final DatasetVersionDao versionDao,
+      @NonNull final TaggedDatasetFieldDao taggedDatasetFieldDao,
+      @NonNull final TagDao tagDao) {
     this.namespaceDao = namespaceDao;
     this.sourceDao = sourceDao;
     this.datasetDao = datasetDao;
     this.fieldDao = fieldDao;
     this.versionDao = versionDao;
+    this.taggedDatasetFieldDao = taggedDatasetFieldDao;
+    this.tagDao = tagDao;
   }
 
   public Dataset createOrUpdate(
@@ -155,6 +174,118 @@ public class DatasetService {
       throw new MarquezServiceException();
     }
   }
+
+  public boolean existsTag(
+      @NonNull DatasetName datasetName, @NonNull FieldName fieldName, @NonNull TagName tagName)
+      throws MarquezServiceException {
+    try {
+      return taggedDatasetFieldDao.exists(datasetName, fieldName, tagName);
+    } catch (UnableToExecuteStatementException e) {
+      log.error(
+          "Failed to verify the existence of tag {} on {}:{}",
+          tagName.getValue(),
+          datasetName.getValue(),
+          fieldName.getValue(),
+          e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public Optional<Field> tagWith(
+      @NonNull String datasetName, @NonNull String fieldName, @NonNull String tagName)
+      throws MarquezServiceException {
+    try {
+      final TagRow tagRow =
+          tagDao
+              .findBy(TagName.of(tagName))
+              .orElseThrow(
+                  () -> new MarquezServiceException("Tag not found: " + tagName));
+      final DatasetRow datasetRow =
+          datasetDao
+              .findBy(datasetName)
+              .orElseThrow(
+                  () ->
+                      new MarquezServiceException("Dataset not found: " + datasetName));
+      final DatasetFieldRow datasetFieldRow =
+          fieldDao
+              .find(datasetRow.getUuid(), fieldName)
+              .orElseThrow(
+                  () ->
+                      new MarquezServiceException(
+                          "Dataset field not found: " + fieldName));
+      final TaggedDatasetFieldRow taggedDatasetFieldRow =
+          TaggedDatasetFieldRowMapper.map(datasetFieldRow.getUuid(), tagRow.getUuid());
+
+      if (!taggedDatasetFieldDao.exists(DatasetName.of(datasetName), FieldName.of(fieldName), TagName.of(tagName))) {
+        taggedDatasetFieldDao.insert(taggedDatasetFieldRow);
+      }
+      return getDatasetField(DatasetName.of(datasetName), FieldName.of(fieldName));
+    } catch (UnableToExecuteStatementException e) {
+      log.error(
+          "Failed to tag field {} for dataset {} with {}",
+          fieldName,
+          datasetName,
+          tagName,
+          e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public Optional<Field> getDatasetField(
+      @NonNull DatasetName datasetName, @NonNull FieldName fieldName)
+      throws MarquezServiceException {
+    Optional<Dataset> dataset = get(datasetName);
+    if (!dataset.isPresent()) {
+      return Optional.empty();
+    }
+    final Optional<Field> datasetField =
+        get(datasetName).get().getFields().stream()
+            .filter(f -> f.getName().equals(fieldName.getValue()))
+            .findFirst();
+    if (datasetField.isPresent()) {
+      return Optional.of(datasetField.get());
+    }
+    return Optional.empty();
+  }
+
+  public void deleteTagFromField(
+      @NonNull DatasetName datasetName,
+      @NonNull FieldName datasetFieldName,
+      @NonNull TagName tagName)
+      throws MarquezServiceException {
+    try {
+      taggedDatasetFieldDao.deleteTagOnField(datasetName, datasetFieldName, tagName);
+    } catch (UnableToExecuteStatementException e) {
+      log.error(
+          "Failed to delete tag {} on field {} for dataset {}",
+          tagName,
+          datasetFieldName.getValue(),
+          datasetName.getValue(),
+          e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public boolean allTagsExist(@NonNull Dataset dataset) {
+    final List<List<Tag>> tags =
+        dataset.getFields().stream().map(field -> field.getTags()).collect(toList());
+
+    final Set<Tag> unknownTags =
+        tags.stream()
+            .filter(t -> t != null)
+            .filter(t -> t.size() > 0)
+            .flatMap(List::stream)
+            .filter(t -> !tagDao.exists(TagName.fromString(t.getName())))
+            .collect(Collectors.toSet());
+    if (!unknownTags.isEmpty()) {
+      final String tagString =
+          Joiner.on(", ").join(unknownTags.stream().map(tag -> tag.getName()).collect(toList()));
+      log.error("Tag(s) " + tagString + " not found!");
+      return false;
+    }
+    return true;
+  }
+
 
   public boolean exists(@NonNull DatasetName datasetName) throws MarquezServiceException {
     try {

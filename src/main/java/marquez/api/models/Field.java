@@ -12,37 +12,43 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.time.Instant;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
-import marquez.service.models.Tag;
+import lombok.ToString;
 
-@Value
-public class Field {
-  String name;
-  FieldType type;
-  Instant createdAt;
-  @Nullable String description;
-  @Nullable List<Tag> tags;
+@EqualsAndHashCode
+@ToString
+public final class Field {
+  @Getter private final String name;
+  @Getter private final String type;
+  @Getter private final String createdAt;
+  private final List<Tag> tags;
+  @Nullable private final String description;
 
-  @JsonCreator
   public Field(
       @NonNull final String name,
-      @NonNull final FieldType type,
-      @Nullable final String description,
-      @Nullable final List<Tag> tags,
-      final Instant createdAt) {
-    this.name = name;
+      @NonNull final String type,
+      final String createdAt,
+      final List<Tag> tags,
+      @Nullable final String description) {
+    this.name = checkNotBlank(name);
     this.type = type;
-    this.description = description;
-    this.tags = tags;
     this.createdAt = createdAt;
+    this.tags = tags;
+    this.description = description;
+  }
+
+  public List<Tag> getTags() {
+    return tags == null ? Collections.emptyList() : tags;
   }
 
   public Optional<String> getDescription() {

@@ -19,6 +19,7 @@ import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRIN
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.FieldName;
 import marquez.db.mappers.DatasetFieldRowMapper;
 import marquez.db.models.DatasetFieldRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -48,6 +49,9 @@ public interface DatasetFieldDao {
 
   @SqlQuery("SELECT * FROM dataset_fields WHERE name = :name")
   Optional<DatasetFieldRow> findBy(String name);
+
+  @SqlQuery("SELECT * FROM dataset_fields WHERE dataset_uuid = :datasetUuid AND name = :value")
+  Optional<DatasetFieldRow> find(UUID datasetUuid, String fieldName);
 
   @SqlQuery("SELECT * FROM dataset_fields WHERE uuid IN (<rowUuids>)")
   List<DatasetFieldRow> findAllInUuidList(@BindList(onEmpty = NULL_STRING) List<UUID> rowUuids);

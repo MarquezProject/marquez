@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -37,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
+import marquez.api.mappers.FieldResponseMapper;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
@@ -90,6 +92,27 @@ public final class DatasetResource {
     final DatasetResponse response = Mapper.toDatasetResponse(dataset);
     log.debug("Response: {}", response);
     return Response.ok(response).build();
+  }
+
+  @POST
+  @Path("/datasets/{dataset}/fields/{field}/tags/{tag}")
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  @ResponseMetered
+  @ExceptionMetered
+  @Timed
+  public Response tag(
+          @PathParam("dataset") String datasetName,
+          @PathParam("field") String fieldName,
+          @PathParam("tag") String tagName)
+          throws MarquezServiceException {
+
+    final marquez.api.models.Field taggedField =
+            FieldResponseMapper.map(
+                    datasetService
+                            .tagWith(datasetName, fieldName, tagName)
+                            .orElseThrow(MarquezServiceException::new));
+    return Response.ok().entity(taggedField).build();
   }
 
   @Timed

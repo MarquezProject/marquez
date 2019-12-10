@@ -48,6 +48,7 @@ import marquez.db.RunDao;
 import marquez.db.RunStateDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
+import marquez.db.TaggedDatasetFieldDao;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -154,12 +155,20 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final RunArgsDao runArgsDao = jdbi.onDemand(RunArgsDao.class);
     final RunStateDao runStateDao = jdbi.onDemand(RunStateDao.class);
     final TagDao tagDao = jdbi.onDemand(TagDao.class);
+    final TaggedDatasetFieldDao taggedDatasetFieldDao = jdbi.onDemand(TaggedDatasetFieldDao.class);
 
     final NamespaceService namespaceService =
         new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
     final SourceService sourceService = new SourceService(sourceDao);
     final DatasetService datasetService =
-        new DatasetService(namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao);
+        new DatasetService(
+            namespaceDao,
+            sourceDao,
+            datasetDao,
+            datasetFieldDao,
+            datasetVersionDao,
+            taggedDatasetFieldDao,
+            tagDao);
     final JobService jobService =
         new JobService(
             namespaceDao,
