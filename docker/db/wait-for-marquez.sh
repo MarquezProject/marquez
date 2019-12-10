@@ -20,7 +20,7 @@ host="${1}"
 port="${2}"
 timeout="${3:-30}"
 
-until curl --output /dev/null --silent --head --fail "http://${host}:${port}/ping"; do
+until curl --silent --output /dev/null --fail -X GET "http://${host}:${port}/ping"; do
   echo "Waiting for Marquez to become available..."
   sleep 1
   timeout=$(( timeout-1 ))
