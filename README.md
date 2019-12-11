@@ -77,6 +77,8 @@ Then browse to the admin interface: http://localhost:8081
 
 * [`marquez-web`](https://github.com/MarquezProject/marquez-web): Web UI used to view metadata collected and cataloged by Marquez.
 * [`marquez-airflow`](https://github.com/MarquezProject/marquez-airflow): Airflow support for Marquez.
+* [`marquez-java`](https://github.com/MarquezProject/marquez-java): Java client for Marquez.
+* [`marquez-python`](https://github.com/MarquezProject/marquez-python): Python client for Marquez.
 
 ## Getting Involved
 
