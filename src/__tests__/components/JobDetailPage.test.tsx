@@ -1,7 +1,9 @@
 import { mount } from 'enzyme'
 import * as React from 'react'
 import Typography from '@material-ui/core/Typography'
+import Modal from '@material-ui/core/Modal'
 import Box from '@material-ui/core/Box'
+import OpenWithSharpIcon from '@material-ui/icons/OpenWithSharp'
 
 import JobDetailPage from '../../components/JobDetailPage'
 import { formatUpdatedAt } from '../../helpers'
@@ -25,7 +27,7 @@ describe('JobDetailPage Component', () => {
     it('should render', () => {
       expect(wrapper.exists()).toBe(true)
     })
-    it('should render text explaning that there was no matching job found', () => {
+    it('should render text explaining that there was no matching job found', () => {
       expect(
         wrapper
           .find(Typography)
@@ -97,9 +99,20 @@ describe('JobDetailPage Component', () => {
         ).toContain(formatUpdatedAt(job.updatedAt))
       })
 
-      it('if there is no SQL, should render text saying so', () => {
-        const job = { ...jobs[0], context: {} }
+      describe('if there is SQL to render', () => {
+        it('should render a Modal', () => {
+          expect(wrapper.find(Modal)).toHaveLength(1)
+        })
+        it(`should render an 'expand' button`, () => {
+          expect(wrapper.find(OpenWithSharpIcon)).toHaveLength(1)
+        })
+        it('renders a snapshot that matches previous', () => {
+          expect(wrapper).toMatchSnapshot()
+        })
+      })
 
+      describe('if there is no SQL', () => {
+        const job = { ...jobs[0], context: {} }
         useParams.mockImplementation(() => ({
           jobName: job.name
         }))
@@ -108,22 +121,24 @@ describe('JobDetailPage Component', () => {
 
         wrapper.setProps({ jobs: jobs.map(j => (j.name === job.name ? job : j)) })
 
-        expect(
-          wrapper
-            .find(Box)
-            .last()
-            .find(Typography)
-            .first()
-            .text()
-        ).toContain('no SQL')
-      })
-      it('renders a snapshot that matches previous', () => {
-        expect(wrapper).toMatchSnapshot()
+        it('should render text saying so', () => {
+          expect(
+            wrapper
+              .find(Box)
+              .last()
+              .find(Typography)
+              .last()
+              .text()
+          ).toContain('no SQL')
+        })
+
+        it('should not render a Modal', () => {
+          expect(wrapper.find(Modal)).toHaveLength(0)
+        })
+        it(`should not render an 'expand' button`, () => {
+          expect(wrapper.find(OpenWithSharpIcon)).toHaveLength(0)
+        })
       })
     })
   })
 })
-//
-
-//
-// const componentText = wrapper.render().text()

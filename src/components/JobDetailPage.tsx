@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useState } from 'react'
 import {
   withStyles,
   createStyles,
@@ -6,6 +6,9 @@ import {
   Theme as ITheme
 } from '@material-ui/core/styles'
 import { Typography, Box } from '@material-ui/core'
+import OpenWithSharpIcon from '@material-ui/icons/OpenWithSharp'
+import CloseIcon from '@material-ui/icons/Close'
+import Modal from '@material-ui/core/Modal'
 import HowToRegIcon from '@material-ui/icons/HowToReg'
 import { useParams } from 'react-router-dom'
 import _find from 'lodash/find'
@@ -16,7 +19,7 @@ import { formatUpdatedAt } from '../helpers'
 
 import { IJob } from '../types'
 
-const styles = ({ palette, spacing }: ITheme) => {
+const styles = ({ palette, spacing, shadows }: ITheme) => {
   return createStyles({
     root: {
       marginTop: '52vh',
@@ -64,6 +67,37 @@ const styles = ({ palette, spacing }: ITheme) => {
     },
     _SQLComment: {
       color: palette.grey[400]
+    },
+    SQLModalContainer: {
+      width: '80%',
+      height: '80%',
+      position: 'relative',
+      margin: '10vh 10%'
+    },
+    SQLModal: {
+      backgroundColor: 'white',
+      width: '100%',
+      height: '100%',
+      overflow: 'scroll',
+      boxShadow: shadows[1],
+      // using border to create effect of padding, which will not work when there's overflow
+      border: '1rem solid white',
+      borderTop: 'none',
+      borderLeft: '2rem solid white'
+    },
+    SQLModalTitle: {
+      fontSize: '2rem',
+      fontWeight: 700,
+      position: 'fixed',
+      width: '100%',
+      right: 0,
+      marginTop: '1rem'
+    },
+    copyToClipboard: {
+      position: 'absolute',
+      bottom: '1rem',
+      right: '1rem',
+      cursor: 'pointer'
     }
   })
 }
@@ -83,7 +117,46 @@ const StyledTypographySQL = withStyles({
   }
 })(Typography)
 
+const StyledExpandButton = withStyles({
+  root: {
+    transform: 'rotate(45deg)',
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'white',
+    cursor: 'pointer'
+  }
+})(OpenWithSharpIcon)
+
+const StyledCloseIcon = withStyles({
+  root: {
+    position: 'absolute',
+    right: '2rem',
+    top: '1rem',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+    zIndex: 10
+  }
+})(CloseIcon)
+
+const displaySQL = (SQL: string, SQLCommentClass: string) => {
+  return !!SQL && SQL !== '' ? (
+    SQL.split('\n').map((line, i) => {
+      const extraClass = line.trim().startsWith('--') ? SQLCommentClass : ''
+      return (
+        <StyledTypographySQL key={i} className={extraClass}>
+          {line}
+        </StyledTypographySQL>
+      )
+    })
+  ) : (
+    <StyledTypographySQL align='center'>
+      There is no SQL for this job at this time.
+    </StyledTypographySQL>
+  )
+}
 const JobDetailPage: FunctionComponent<IProps> = props => {
+  const [SQLModalOpen, setSQLModalOpen] = useState(false)
   const { jobs, classes } = props
   const {
     root,
@@ -92,10 +165,14 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     _description,
     _SQL,
     _SQLComment,
+    SQLModalContainer,
+    SQLModal,
+    SQLModalTitle,
     _owner,
     _ownerIcon,
     lastUpdated,
-    topSection
+    topSection,
+    copyToClipboard
   } = classes
   const { jobName } = useParams()
   const job = _find(jobs, j => j.name === jobName)
@@ -121,7 +198,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     status = 'passed',
     location,
     namespace,
-    context = { SQL: null }
+    context = { SQL: '' }
   } = job
 
   const { SQL } = context
@@ -161,22 +238,38 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         mx='auto'
         my={2}
         borderRadius='3px'
+        position='relative'
       >
-        {SQL ? (
-          SQL.split('\n').map((line, i) => {
-            const extraClass = line.trim().startsWith('--') ? _SQLComment : ''
-
-            return (
-              <StyledTypographySQL key={i} className={extraClass}>
-                {line}
-              </StyledTypographySQL>
-            )
-          })
-        ) : (
-          <StyledTypographySQL align='center'>
-            There is no SQL for this job at this time.
-          </StyledTypographySQL>
+        {!!SQL && SQL !== '' && (
+          <StyledExpandButton color='secondary' onClick={() => setSQLModalOpen(true)} />
         )}
+        {!!SQL && SQL !== '' && (
+          <Modal aria-labelledby='modal-title' open={SQLModalOpen}>
+            <div className={SQLModalContainer}>
+              {/* Need this extra container for the absolutely-positioned elements */}
+              <StyledCloseIcon fontSize='large' onClick={() => setSQLModalOpen(false)} />
+              <Typography
+                color='secondary'
+                className={copyToClipboard}
+                onClick={() => {
+                  if (SQL) {
+                    navigator.clipboard.writeText(SQL)
+                  }
+                }}
+              >
+                copy to clipboard
+              </Typography>
+              <div className={SQLModal}>
+                <Typography id='modal-title' align='center' gutterBottom className={SQLModalTitle}>
+                  {name}
+                </Typography>
+                {/* gutter (because we cannot put margin on the fixed-positioned title)*/}
+                <Box height='4rem'></Box> {displaySQL(SQL, _SQLComment)}
+              </div>
+            </div>
+          </Modal>
+        )}
+        {displaySQL(SQL, _SQLComment)}
       </Box>
       <Typography className={lastUpdated} align='right'>
         {formatUpdatedAt(updatedAt)}
