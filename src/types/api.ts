@@ -1,3 +1,8 @@
+interface IFieldsAPI {
+  name: string,
+  type: string
+}
+
 export interface IDatasetAPI {
   name: string
   createdAt: string
@@ -6,6 +11,7 @@ export interface IDatasetAPI {
   sourceName: string
   description: string
   tags?: string[]
+  fields: IFieldsAPI[]
 }
 
 export interface INamespaceAPI {

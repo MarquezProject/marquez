@@ -5,7 +5,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes different geometries in the galaxy"
+    "description": "describes different geometries in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "galaxy.dimensions",
@@ -13,7 +35,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes all possible dimensions in the galaxy"
+    "description": "describes all possible dimensions in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "galaxy.trips",
@@ -21,7 +65,29 @@
     "type": "DB_TABLE",
     "sourceName": "snowflake",
     "namespace": "galactic-data",
-    "description": "all trips taken through the galaxy"
+    "description": "all trips taken through the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "earth.dimensions",
@@ -29,7 +95,29 @@
     "type": "DB_TABLE",
     "sourceName": "snowflake",
     "namespace": "galactic-data",
-    "description": "describes all possible dimensions on earth"
+    "description": "describes all possible dimensions on earth",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "earth.trips",
@@ -37,7 +125,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes all possible trips taken on earth"
+    "description": "describes all possible trips taken on earth",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "objects.stars",
@@ -45,7 +155,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes all stars in the galaxy"
+    "description": "describes all stars in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "objects.planets",
@@ -53,7 +185,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes all planets in the galaxy"
+    "description": "describes all planets in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "objects.life",
@@ -61,7 +215,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes all life"
+    "description": "describes all life",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "environment.universe",
@@ -69,7 +245,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes the entire universe"
+    "description": "describes the entire universe",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "galaxy.radiowaves",
@@ -77,7 +275,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes all radiowaves"
+    "description": "describes all radiowaves",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "galaxy.satellites",
@@ -85,7 +305,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes all satellites"
+    "description": "describes all satellites",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "environment.conversations",
@@ -93,7 +335,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes all conversations in the galaxy"
+    "description": "describes all conversations in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "environment.transcripts",
@@ -101,7 +365,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes all transcripts in the galaxy"
+    "description": "describes all transcripts in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "environment.empty",
@@ -109,7 +395,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "an empty environment never referenced by a job"
+    "description": "an empty environment never referenced by a job",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "rocket.parts",
@@ -117,7 +425,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes parts of rockets"
+    "description": "describes parts of rockets",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "rocket.types",
@@ -125,7 +455,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes types of rockets"
+    "description": "describes types of rockets",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "station.parts",
@@ -133,7 +485,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes space station parts"
+    "description": "describes space station parts",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "station.types",
@@ -141,7 +515,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes space station types"
+    "description": "describes space station types",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "alien.parts",
@@ -149,7 +545,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes alien parts"
+    "description": "describes alien parts",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "alien.types",
@@ -157,7 +575,29 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes types of aliens"
+    "description": "describes types of aliens",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "interstellar.geometry",
@@ -165,7 +605,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes different geometries in the galaxy"
+    "description": "describes different geometries in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "interstellar.dimensions",
@@ -173,7 +635,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all possible dimensions in the galaxy"
+    "description": "describes all possible dimensions in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "interstellar.trips",
@@ -181,7 +665,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "all trips taken through the galaxy"
+    "description": "all trips taken through the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "cosmic.dimensions",
@@ -189,7 +695,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all possible dimensions on earth"
+    "description": "describes all possible dimensions on earth",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "cosmic.trips",
@@ -197,7 +725,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all possible trips taken in the cosmics"
+    "description": "describes all possible trips taken in the cosmics",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "cosmic.stars",
@@ -205,7 +755,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all stars in the galaxy"
+    "description": "describes all stars in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "cosmic.planets",
@@ -213,7 +785,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all planets in the cosmics"
+    "description": "describes all planets in the cosmics",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "cosmic.life",
@@ -221,7 +815,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all life"
+    "description": "describes all life",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "cosmic.universe",
@@ -229,7 +845,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes the entire universe"
+    "description": "describes the entire universe",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "cosmic.radiowaves",
@@ -237,7 +875,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all radiowaves"
+    "description": "describes all radiowaves",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "cosmic.satellites",
@@ -245,7 +905,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all satellites"
+    "description": "describes all satellites",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "interstellar.conversations",
@@ -253,7 +935,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all conversations in interstellar space"
+    "description": "describes all conversations in interstellar space",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "interstellar.transcripts",
@@ -261,7 +965,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all transcripts in interstellar space"
+    "description": "describes all transcripts in interstellar space",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "cosmic.empty",
@@ -269,7 +995,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "an empty cosmic dataset not referenced by any job"
+    "description": "an empty cosmic dataset not referenced by any job",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "comet.parts",
@@ -277,7 +1025,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes parts that make up comets"
+    "description": "describes parts that make up comets",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "comet.types",
@@ -285,7 +1055,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all types of comets"
+    "description": "describes all types of comets",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "black_hole.parts",
@@ -293,7 +1085,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes parts that make up black holes"
+    "description": "describes parts that make up black holes",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "black_hole.types",
@@ -301,7 +1115,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all types of black holes"
+    "description": "describes all types of black holes",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "worm_hole.parts",
@@ -309,7 +1145,29 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes parts that make up worm holes"
+    "description": "describes parts that make up worm holes",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   },
   {
     "name": "worm_hole.types",
@@ -317,6 +1175,28 @@
     "type": "DB_TABLE",
     "namespace": "interstellar-data",
     "sourceName": "redshift",
-    "description": "describes all types of worm holes"
+    "description": "describes all types of worm holes",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
   }
 ]

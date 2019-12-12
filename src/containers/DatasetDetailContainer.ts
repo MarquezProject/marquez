@@ -1,11 +1,11 @@
 import { connect } from 'react-redux'
 import * as Redux from 'redux'
 import { bindActionCreators } from 'redux'
-import JobDetailPage from '../components/JobDetailPage'
+import DatasetDetailPage from '../components/DatasetDetailPage'
 import { IState } from '../reducers'
 
 const mapStateToProps = (state: IState) => ({
-  jobs: state.jobs
+  datasets: state.datasets
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) => bindActionCreators({}, dispatch)
@@ -13,4 +13,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) => bindActionCreators({}, 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(JobDetailPage)
+)(DatasetDetailPage)

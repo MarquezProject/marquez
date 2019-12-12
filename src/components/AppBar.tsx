@@ -1,6 +1,10 @@
 import React, { ReactElement } from 'react'
 import { AppBar, Toolbar, Typography } from '@material-ui/core'
 import {
+  Link
+} from 'react-router-dom'
+
+import {
   withStyles,
   createStyles,
   WithStyles as IWithStyles,
@@ -22,6 +26,10 @@ const styles = ({ zIndex }: ITheme) => {
     icon: {
       fontFamily: 'Karla',
       fontWeight: 'bold'
+    },
+    link: {
+      textDecoration: 'none',
+      color: 'white'
     }
   })
 }
@@ -30,12 +38,15 @@ interface IProps extends IWithStyles<typeof styles> {}
 
 const MyAppBar = (props: IProps): ReactElement => {
   const { classes } = props
+  const { link } = classes
   return (
     <AppBar position='fixed' className={classes.appBar}>
       <Toolbar>
-        <Typography className={classes.icon} variant='h4' color='inherit' noWrap>
-          MARQUEZ
-        </Typography>
+        <Link className={link} to="/">
+          <Typography className={classes.icon} variant='h4' color='inherit' noWrap>
+            MARQUEZ
+          </Typography>
+        </Link>
         <div className={classes.rightToolbar}>
           <Menu></Menu>
         </div>

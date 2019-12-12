@@ -1,0 +1,5984 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DatasetDetailPage Component when there is a match for the datasetName in url params renders a snapshot that matches previous 1`] = `
+<WithStyles(DatasetDetailPage)
+  datasets={
+    Array [
+      Object {
+        "description": "describes different geometries in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.geometry",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.geometry",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible dimensions in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.dimensions",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.dimensions",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all trips taken through the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.trips",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.trips",
+        "sourceName": "snowflake",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible dimensions on earth",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "earth.dimensions",
+        "namespace": "galactic-data",
+        "physicalName": "earth.dimensions",
+        "sourceName": "snowflake",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible trips taken on earth",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "earth.trips",
+        "namespace": "galactic-data",
+        "physicalName": "earth.trips",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all stars in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "objects.stars",
+        "namespace": "galactic-data",
+        "physicalName": "objects.stars",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all planets in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "objects.planets",
+        "namespace": "galactic-data",
+        "physicalName": "objects.planets",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all life",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "objects.life",
+        "namespace": "galactic-data",
+        "physicalName": "objects.life",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes the entire universe",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "environment.universe",
+        "namespace": "galactic-data",
+        "physicalName": "environment.universe",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all radiowaves",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.radiowaves",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.radiowaves",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all satellites",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.satellites",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.satellites",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all conversations in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "environment.conversations",
+        "namespace": "galactic-data",
+        "physicalName": "environment.conversations",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all transcripts in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "environment.transcripts",
+        "namespace": "galactic-data",
+        "physicalName": "environment.transcripts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "an empty environment never referenced by a job",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "environment.empty",
+        "namespace": "galactic-data",
+        "physicalName": "environment.empty",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes parts of rockets",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "rocket.parts",
+        "namespace": "galactic-data",
+        "physicalName": "rocket.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes types of rockets",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "rocket.types",
+        "namespace": "galactic-data",
+        "physicalName": "rocket.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes space station parts",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "station.parts",
+        "namespace": "galactic-data",
+        "physicalName": "station.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes space station types",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "station.types",
+        "namespace": "galactic-data",
+        "physicalName": "station.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien parts",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.parts",
+        "namespace": "galactic-data",
+        "physicalName": "alien.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes types of aliens",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.types",
+        "namespace": "galactic-data",
+        "physicalName": "alien.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes different geometries in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.geometry",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.geometry",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible dimensions in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.dimensions",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.dimensions",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all trips taken through the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.trips",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.trips",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible dimensions on earth",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.dimensions",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.dimensions",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible trips taken in the cosmics",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.trips",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.trips",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all stars in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.stars",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.stars",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all planets in the cosmics",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.planets",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.planets",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all life",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.life",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.life",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes the entire universe",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.universe",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.universe",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all radiowaves",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.radiowaves",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.radiowaves",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all satellites",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.satellites",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.satellites",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all conversations in interstellar space",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.conversations",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.conversations",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all transcripts in interstellar space",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.transcripts",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.transcripts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "an empty cosmic dataset not referenced by any job",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.empty",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.empty",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes parts that make up comets",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "comet.parts",
+        "namespace": "interstellar-data",
+        "physicalName": "comet.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all types of comets",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "comet.types",
+        "namespace": "interstellar-data",
+        "physicalName": "comet.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes parts that make up black holes",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "black_hole.parts",
+        "namespace": "interstellar-data",
+        "physicalName": "black_hole.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all types of black holes",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "black_hole.types",
+        "namespace": "interstellar-data",
+        "physicalName": "black_hole.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes parts that make up worm holes",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "worm_hole.parts",
+        "namespace": "interstellar-data",
+        "physicalName": "worm_hole.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all types of worm holes",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "worm_hole.types",
+        "namespace": "interstellar-data",
+        "physicalName": "worm_hole.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+    ]
+  }
+>
+  <DatasetDetailPage
+    classes={
+      Object {
+        "infoIcon": "DatasetDetailPage-infoIcon-4",
+        "noData": "DatasetDetailPage-noData-3",
+        "paper": "DatasetDetailPage-paper-6",
+        "root": "DatasetDetailPage-root-1",
+        "tableCell": "DatasetDetailPage-tableCell-5",
+        "tagContainer": "DatasetDetailPage-tagContainer-2",
+        "updated": "DatasetDetailPage-updated-7",
+      }
+    }
+    datasets={
+      Array [
+        Object {
+          "description": "describes different geometries in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.geometry",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.geometry",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible dimensions in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.dimensions",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.dimensions",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all trips taken through the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.trips",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.trips",
+          "sourceName": "snowflake",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible dimensions on earth",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "earth.dimensions",
+          "namespace": "galactic-data",
+          "physicalName": "earth.dimensions",
+          "sourceName": "snowflake",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible trips taken on earth",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "earth.trips",
+          "namespace": "galactic-data",
+          "physicalName": "earth.trips",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all stars in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "objects.stars",
+          "namespace": "galactic-data",
+          "physicalName": "objects.stars",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all planets in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "objects.planets",
+          "namespace": "galactic-data",
+          "physicalName": "objects.planets",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all life",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "objects.life",
+          "namespace": "galactic-data",
+          "physicalName": "objects.life",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes the entire universe",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "environment.universe",
+          "namespace": "galactic-data",
+          "physicalName": "environment.universe",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all radiowaves",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.radiowaves",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.radiowaves",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all satellites",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.satellites",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.satellites",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all conversations in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "environment.conversations",
+          "namespace": "galactic-data",
+          "physicalName": "environment.conversations",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all transcripts in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "environment.transcripts",
+          "namespace": "galactic-data",
+          "physicalName": "environment.transcripts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "an empty environment never referenced by a job",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "environment.empty",
+          "namespace": "galactic-data",
+          "physicalName": "environment.empty",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes parts of rockets",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "rocket.parts",
+          "namespace": "galactic-data",
+          "physicalName": "rocket.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes types of rockets",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "rocket.types",
+          "namespace": "galactic-data",
+          "physicalName": "rocket.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes space station parts",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "station.parts",
+          "namespace": "galactic-data",
+          "physicalName": "station.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes space station types",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "station.types",
+          "namespace": "galactic-data",
+          "physicalName": "station.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien parts",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.parts",
+          "namespace": "galactic-data",
+          "physicalName": "alien.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes types of aliens",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.types",
+          "namespace": "galactic-data",
+          "physicalName": "alien.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes different geometries in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.geometry",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.geometry",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible dimensions in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.dimensions",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.dimensions",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all trips taken through the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.trips",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.trips",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible dimensions on earth",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.dimensions",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.dimensions",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible trips taken in the cosmics",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.trips",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.trips",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all stars in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.stars",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.stars",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all planets in the cosmics",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.planets",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.planets",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all life",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.life",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.life",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes the entire universe",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.universe",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.universe",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all radiowaves",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.radiowaves",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.radiowaves",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all satellites",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.satellites",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.satellites",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all conversations in interstellar space",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.conversations",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.conversations",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all transcripts in interstellar space",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.transcripts",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.transcripts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "an empty cosmic dataset not referenced by any job",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.empty",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.empty",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes parts that make up comets",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "comet.parts",
+          "namespace": "interstellar-data",
+          "physicalName": "comet.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all types of comets",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "comet.types",
+          "namespace": "interstellar-data",
+          "physicalName": "comet.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes parts that make up black holes",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "black_hole.parts",
+          "namespace": "interstellar-data",
+          "physicalName": "black_hole.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all types of black holes",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "black_hole.types",
+          "namespace": "interstellar-data",
+          "physicalName": "black_hole.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes parts that make up worm holes",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "worm_hole.parts",
+          "namespace": "interstellar-data",
+          "physicalName": "worm_hole.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all types of worm holes",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "worm_hole.types",
+          "namespace": "interstellar-data",
+          "physicalName": "worm_hole.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+      ]
+    }
+  >
+    <Styled(MuiBox)
+      className="DatasetDetailPage-root-1"
+      mt={10}
+    >
+      <div
+        className="MuiBox-root MuiBox-root-40 DatasetDetailPage-root-1"
+      >
+        <Styled(MuiBox)
+          display="flex"
+          justifyContent="space-between"
+        >
+          <div
+            className="MuiBox-root MuiBox-root-41"
+          >
+            <div>
+              <WithStyles(ForwardRef(Typography))
+                align="left"
+                color="secondary"
+              >
+                <ForwardRef(Typography)
+                  align="left"
+                  classes={
+                    Object {
+                      "alignCenter": "MuiTypography-alignCenter",
+                      "alignJustify": "MuiTypography-alignJustify",
+                      "alignLeft": "MuiTypography-alignLeft",
+                      "alignRight": "MuiTypography-alignRight",
+                      "body1": "MuiTypography-body1",
+                      "body2": "MuiTypography-body2",
+                      "button": "MuiTypography-button",
+                      "caption": "MuiTypography-caption",
+                      "colorError": "MuiTypography-colorError",
+                      "colorInherit": "MuiTypography-colorInherit",
+                      "colorPrimary": "MuiTypography-colorPrimary",
+                      "colorSecondary": "MuiTypography-colorSecondary",
+                      "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                      "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                      "displayBlock": "MuiTypography-displayBlock",
+                      "displayInline": "MuiTypography-displayInline",
+                      "gutterBottom": "MuiTypography-gutterBottom",
+                      "h1": "MuiTypography-h1",
+                      "h2": "MuiTypography-h2",
+                      "h3": "MuiTypography-h3",
+                      "h4": "MuiTypography-h4",
+                      "h5": "MuiTypography-h5",
+                      "h6": "MuiTypography-h6",
+                      "noWrap": "MuiTypography-noWrap",
+                      "overline": "MuiTypography-overline",
+                      "paragraph": "MuiTypography-paragraph",
+                      "root": "MuiTypography-root",
+                      "srOnly": "MuiTypography-srOnly",
+                      "subtitle1": "MuiTypography-subtitle1",
+                      "subtitle2": "MuiTypography-subtitle2",
+                    }
+                  }
+                  color="secondary"
+                >
+                  <p
+                    className="MuiTypography-root MuiTypography-body1 MuiTypography-colorSecondary MuiTypography-alignLeft"
+                  >
+                    <strong>
+                      galaxy.geometry
+                    </strong>
+                  </p>
+                </ForwardRef(Typography)>
+              </WithStyles(ForwardRef(Typography))>
+              <WithStyles(ForwardRef(Typography))
+                align="left"
+                color="primary"
+              >
+                <ForwardRef(Typography)
+                  align="left"
+                  classes={
+                    Object {
+                      "alignCenter": "MuiTypography-alignCenter",
+                      "alignJustify": "MuiTypography-alignJustify",
+                      "alignLeft": "MuiTypography-alignLeft",
+                      "alignRight": "MuiTypography-alignRight",
+                      "body1": "MuiTypography-body1",
+                      "body2": "MuiTypography-body2",
+                      "button": "MuiTypography-button",
+                      "caption": "MuiTypography-caption",
+                      "colorError": "MuiTypography-colorError",
+                      "colorInherit": "MuiTypography-colorInherit",
+                      "colorPrimary": "MuiTypography-colorPrimary",
+                      "colorSecondary": "MuiTypography-colorSecondary",
+                      "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                      "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                      "displayBlock": "MuiTypography-displayBlock",
+                      "displayInline": "MuiTypography-displayInline",
+                      "gutterBottom": "MuiTypography-gutterBottom",
+                      "h1": "MuiTypography-h1",
+                      "h2": "MuiTypography-h2",
+                      "h3": "MuiTypography-h3",
+                      "h4": "MuiTypography-h4",
+                      "h5": "MuiTypography-h5",
+                      "h6": "MuiTypography-h6",
+                      "noWrap": "MuiTypography-noWrap",
+                      "overline": "MuiTypography-overline",
+                      "paragraph": "MuiTypography-paragraph",
+                      "root": "MuiTypography-root",
+                      "srOnly": "MuiTypography-srOnly",
+                      "subtitle1": "MuiTypography-subtitle1",
+                      "subtitle2": "MuiTypography-subtitle2",
+                    }
+                  }
+                  color="primary"
+                >
+                  <p
+                    className="MuiTypography-root MuiTypography-body1 MuiTypography-colorPrimary MuiTypography-alignLeft"
+                  >
+                    describes different geometries in the galaxy
+                  </p>
+                </ForwardRef(Typography)>
+              </WithStyles(ForwardRef(Typography))>
+            </div>
+            <div
+              className="DatasetDetailPage-tagContainer-2"
+              id="tagContainer"
+            >
+              <div
+                key="is_pii"
+              >
+                <WithStyles(ForwardRef(Tooltip))
+                  className="tagWrapper"
+                  placement="top"
+                  title="is_pii"
+                >
+                  <ForwardRef(Tooltip)
+                    className="tagWrapper"
+                    classes={
+                      Object {
+                        "popper": "MuiTooltip-popper",
+                        "popperInteractive": "MuiTooltip-popperInteractive",
+                        "tooltip": "MuiTooltip-tooltip",
+                        "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                        "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                        "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                        "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                        "touch": "MuiTooltip-touch",
+                      }
+                    }
+                    placement="top"
+                    title="is_pii"
+                  >
+                    <ForwardRef
+                      aria-describedby={null}
+                      className="tagWrapper"
+                      color="disabled"
+                      key="is_pii"
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      onTouchEnd={[Function]}
+                      onTouchStart={[Function]}
+                      title="is_pii"
+                    >
+                      <WithStyles(ForwardRef(SvgIcon))
+                        aria-describedby={null}
+                        className="tagWrapper"
+                        color="disabled"
+                        onBlur={[Function]}
+                        onFocus={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseOver={[Function]}
+                        onTouchEnd={[Function]}
+                        onTouchStart={[Function]}
+                        title="is_pii"
+                      >
+                        <ForwardRef(SvgIcon)
+                          aria-describedby={null}
+                          className="tagWrapper"
+                          classes={
+                            Object {
+                              "colorAction": "MuiSvgIcon-colorAction",
+                              "colorDisabled": "MuiSvgIcon-colorDisabled",
+                              "colorError": "MuiSvgIcon-colorError",
+                              "colorPrimary": "MuiSvgIcon-colorPrimary",
+                              "colorSecondary": "MuiSvgIcon-colorSecondary",
+                              "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                              "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                              "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                              "root": "MuiSvgIcon-root",
+                            }
+                          }
+                          color="disabled"
+                          onBlur={[Function]}
+                          onFocus={[Function]}
+                          onMouseLeave={[Function]}
+                          onMouseOver={[Function]}
+                          onTouchEnd={[Function]}
+                          onTouchStart={[Function]}
+                          title="is_pii"
+                        >
+                          <svg
+                            aria-describedby={null}
+                            aria-hidden="true"
+                            className="MuiSvgIcon-root tagWrapper MuiSvgIcon-colorDisabled"
+                            focusable="false"
+                            onBlur={[Function]}
+                            onFocus={[Function]}
+                            onMouseLeave={[Function]}
+                            onMouseOver={[Function]}
+                            onTouchEnd={[Function]}
+                            onTouchStart={[Function]}
+                            role="presentation"
+                            title="is_pii"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"
+                            />
+                          </svg>
+                        </ForwardRef(SvgIcon)>
+                      </WithStyles(ForwardRef(SvgIcon))>
+                    </ForwardRef>
+                    <ForwardRef(Popper)
+                      className="MuiTooltip-popper"
+                      id={null}
+                      open={false}
+                      placement="top"
+                      transition={true}
+                    />
+                  </ForwardRef(Tooltip)>
+                </WithStyles(ForwardRef(Tooltip))>
+              </div>
+              <div
+                key="is_compliant"
+              >
+                <WithStyles(ForwardRef(Tooltip))
+                  className="tagWrapper"
+                  placement="top"
+                  title="is_compliant"
+                >
+                  <ForwardRef(Tooltip)
+                    className="tagWrapper"
+                    classes={
+                      Object {
+                        "popper": "MuiTooltip-popper",
+                        "popperInteractive": "MuiTooltip-popperInteractive",
+                        "tooltip": "MuiTooltip-tooltip",
+                        "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                        "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                        "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                        "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                        "touch": "MuiTooltip-touch",
+                      }
+                    }
+                    placement="top"
+                    title="is_compliant"
+                  >
+                    <ForwardRef
+                      aria-describedby={null}
+                      className="tagWrapper"
+                      color="disabled"
+                      key="is_compliant"
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      onTouchEnd={[Function]}
+                      onTouchStart={[Function]}
+                      title="is_compliant"
+                    >
+                      <WithStyles(ForwardRef(SvgIcon))
+                        aria-describedby={null}
+                        className="tagWrapper"
+                        color="disabled"
+                        onBlur={[Function]}
+                        onFocus={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseOver={[Function]}
+                        onTouchEnd={[Function]}
+                        onTouchStart={[Function]}
+                        title="is_compliant"
+                      >
+                        <ForwardRef(SvgIcon)
+                          aria-describedby={null}
+                          className="tagWrapper"
+                          classes={
+                            Object {
+                              "colorAction": "MuiSvgIcon-colorAction",
+                              "colorDisabled": "MuiSvgIcon-colorDisabled",
+                              "colorError": "MuiSvgIcon-colorError",
+                              "colorPrimary": "MuiSvgIcon-colorPrimary",
+                              "colorSecondary": "MuiSvgIcon-colorSecondary",
+                              "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                              "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                              "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                              "root": "MuiSvgIcon-root",
+                            }
+                          }
+                          color="disabled"
+                          onBlur={[Function]}
+                          onFocus={[Function]}
+                          onMouseLeave={[Function]}
+                          onMouseOver={[Function]}
+                          onTouchEnd={[Function]}
+                          onTouchStart={[Function]}
+                          title="is_compliant"
+                        >
+                          <svg
+                            aria-describedby={null}
+                            aria-hidden="true"
+                            className="MuiSvgIcon-root tagWrapper MuiSvgIcon-colorDisabled"
+                            focusable="false"
+                            onBlur={[Function]}
+                            onFocus={[Function]}
+                            onMouseLeave={[Function]}
+                            onMouseOver={[Function]}
+                            onTouchEnd={[Function]}
+                            onTouchStart={[Function]}
+                            role="presentation"
+                            title="is_compliant"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm7 10c0 4.52-2.98 8.69-7 9.93-4.02-1.24-7-5.41-7-9.93V6.3l7-3.11 7 3.11V11zm-11.59.59L6 13l4 4 8-8-1.41-1.42L10 14.17z"
+                            />
+                          </svg>
+                        </ForwardRef(SvgIcon)>
+                      </WithStyles(ForwardRef(SvgIcon))>
+                    </ForwardRef>
+                    <ForwardRef(Popper)
+                      className="MuiTooltip-popper"
+                      id={null}
+                      open={false}
+                      placement="top"
+                      transition={true}
+                    />
+                  </ForwardRef(Tooltip)>
+                </WithStyles(ForwardRef(Tooltip))>
+              </div>
+            </div>
+          </div>
+        </Styled(MuiBox)>
+        <WithStyles(ForwardRef(Paper))
+          className="DatasetDetailPage-paper-6"
+        >
+          <ForwardRef(Paper)
+            className="DatasetDetailPage-paper-6"
+            classes={
+              Object {
+                "elevation0": "MuiPaper-elevation0",
+                "elevation1": "MuiPaper-elevation1",
+                "elevation10": "MuiPaper-elevation10",
+                "elevation11": "MuiPaper-elevation11",
+                "elevation12": "MuiPaper-elevation12",
+                "elevation13": "MuiPaper-elevation13",
+                "elevation14": "MuiPaper-elevation14",
+                "elevation15": "MuiPaper-elevation15",
+                "elevation16": "MuiPaper-elevation16",
+                "elevation17": "MuiPaper-elevation17",
+                "elevation18": "MuiPaper-elevation18",
+                "elevation19": "MuiPaper-elevation19",
+                "elevation2": "MuiPaper-elevation2",
+                "elevation20": "MuiPaper-elevation20",
+                "elevation21": "MuiPaper-elevation21",
+                "elevation22": "MuiPaper-elevation22",
+                "elevation23": "MuiPaper-elevation23",
+                "elevation24": "MuiPaper-elevation24",
+                "elevation3": "MuiPaper-elevation3",
+                "elevation4": "MuiPaper-elevation4",
+                "elevation5": "MuiPaper-elevation5",
+                "elevation6": "MuiPaper-elevation6",
+                "elevation7": "MuiPaper-elevation7",
+                "elevation8": "MuiPaper-elevation8",
+                "elevation9": "MuiPaper-elevation9",
+                "root": "MuiPaper-root",
+                "rounded": "MuiPaper-rounded",
+              }
+            }
+          >
+            <div
+              className="MuiPaper-root MuiPaper-elevation1 DatasetDetailPage-paper-6 MuiPaper-rounded"
+            >
+              <WithStyles(ForwardRef(Table))
+                size="small"
+              >
+                <ForwardRef(Table)
+                  classes={
+                    Object {
+                      "root": "MuiTable-root",
+                      "stickyHeader": "MuiTable-stickyHeader",
+                    }
+                  }
+                  size="small"
+                >
+                  <table
+                    className="MuiTable-root"
+                  >
+                    <WithStyles(ForwardRef(TableHead))>
+                      <ForwardRef(TableHead)
+                        classes={
+                          Object {
+                            "root": "MuiTableHead-root",
+                          }
+                        }
+                      >
+                        <thead
+                          className="MuiTableHead-root"
+                        >
+                          <WithStyles(ForwardRef(TableRow))>
+                            <ForwardRef(TableRow)
+                              classes={
+                                Object {
+                                  "footer": "MuiTableRow-footer",
+                                  "head": "MuiTableRow-head",
+                                  "hover": "MuiTableRow-hover",
+                                  "root": "MuiTableRow-root",
+                                  "selected": "Mui-selected",
+                                }
+                              }
+                            >
+                              <tr
+                                className="MuiTableRow-root MuiTableRow-head"
+                              >
+                                <WithStyles(ForwardRef(TableCell))
+                                  align="left"
+                                  className="DatasetDetailPage-tableCell-5"
+                                  key="uuid"
+                                >
+                                  <ForwardRef(TableCell)
+                                    align="left"
+                                    className="DatasetDetailPage-tableCell-5"
+                                    classes={
+                                      Object {
+                                        "alignCenter": "MuiTableCell-alignCenter",
+                                        "alignJustify": "MuiTableCell-alignJustify",
+                                        "alignLeft": "MuiTableCell-alignLeft",
+                                        "alignRight": "MuiTableCell-alignRight",
+                                        "body": "MuiTableCell-body",
+                                        "footer": "MuiTableCell-footer",
+                                        "head": "MuiTableCell-head",
+                                        "paddingCheckbox": "MuiTableCell-paddingCheckbox",
+                                        "paddingNone": "MuiTableCell-paddingNone",
+                                        "root": "MuiTableCell-root",
+                                        "sizeSmall": "MuiTableCell-sizeSmall",
+                                        "stickyHeader": "MuiTableCell-stickyHeader",
+                                      }
+                                    }
+                                  >
+                                    <th
+                                      aria-sort={null}
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      scope="col"
+                                    >
+                                      <strong>
+                                        uuid
+                                      </strong>
+                                      <WithStyles(ForwardRef(Tooltip))
+                                        placement="top"
+                                        title="STRING"
+                                      >
+                                        <ForwardRef(Tooltip)
+                                          classes={
+                                            Object {
+                                              "popper": "MuiTooltip-popper",
+                                              "popperInteractive": "MuiTooltip-popperInteractive",
+                                              "tooltip": "MuiTooltip-tooltip",
+                                              "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                                              "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                                              "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                                              "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                                              "touch": "MuiTooltip-touch",
+                                            }
+                                          }
+                                          placement="top"
+                                          title="STRING"
+                                        >
+                                          <div
+                                            aria-describedby={null}
+                                            className="DatasetDetailPage-infoIcon-4"
+                                            onBlur={[Function]}
+                                            onFocus={[Function]}
+                                            onMouseLeave={[Function]}
+                                            onMouseOver={[Function]}
+                                            onTouchEnd={[Function]}
+                                            onTouchStart={[Function]}
+                                            title="STRING"
+                                          >
+                                            <ForwardRef
+                                              color="disabled"
+                                              fontSize="small"
+                                            >
+                                              <WithStyles(ForwardRef(SvgIcon))
+                                                color="disabled"
+                                                fontSize="small"
+                                              >
+                                                <ForwardRef(SvgIcon)
+                                                  classes={
+                                                    Object {
+                                                      "colorAction": "MuiSvgIcon-colorAction",
+                                                      "colorDisabled": "MuiSvgIcon-colorDisabled",
+                                                      "colorError": "MuiSvgIcon-colorError",
+                                                      "colorPrimary": "MuiSvgIcon-colorPrimary",
+                                                      "colorSecondary": "MuiSvgIcon-colorSecondary",
+                                                      "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                                                      "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                                                      "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                                                      "root": "MuiSvgIcon-root",
+                                                    }
+                                                  }
+                                                  color="disabled"
+                                                  fontSize="small"
+                                                >
+                                                  <svg
+                                                    aria-hidden="true"
+                                                    className="MuiSvgIcon-root MuiSvgIcon-colorDisabled MuiSvgIcon-fontSizeSmall"
+                                                    focusable="false"
+                                                    role="presentation"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                                                    />
+                                                  </svg>
+                                                </ForwardRef(SvgIcon)>
+                                              </WithStyles(ForwardRef(SvgIcon))>
+                                            </ForwardRef>
+                                          </div>
+                                          <ForwardRef(Popper)
+                                            className="MuiTooltip-popper"
+                                            id={null}
+                                            open={false}
+                                            placement="top"
+                                            transition={true}
+                                          />
+                                        </ForwardRef(Tooltip)>
+                                      </WithStyles(ForwardRef(Tooltip))>
+                                    </th>
+                                  </ForwardRef(TableCell)>
+                                </WithStyles(ForwardRef(TableCell))>
+                                <WithStyles(ForwardRef(TableCell))
+                                  align="left"
+                                  className="DatasetDetailPage-tableCell-5"
+                                  key="name"
+                                >
+                                  <ForwardRef(TableCell)
+                                    align="left"
+                                    className="DatasetDetailPage-tableCell-5"
+                                    classes={
+                                      Object {
+                                        "alignCenter": "MuiTableCell-alignCenter",
+                                        "alignJustify": "MuiTableCell-alignJustify",
+                                        "alignLeft": "MuiTableCell-alignLeft",
+                                        "alignRight": "MuiTableCell-alignRight",
+                                        "body": "MuiTableCell-body",
+                                        "footer": "MuiTableCell-footer",
+                                        "head": "MuiTableCell-head",
+                                        "paddingCheckbox": "MuiTableCell-paddingCheckbox",
+                                        "paddingNone": "MuiTableCell-paddingNone",
+                                        "root": "MuiTableCell-root",
+                                        "sizeSmall": "MuiTableCell-sizeSmall",
+                                        "stickyHeader": "MuiTableCell-stickyHeader",
+                                      }
+                                    }
+                                  >
+                                    <th
+                                      aria-sort={null}
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      scope="col"
+                                    >
+                                      <strong>
+                                        name
+                                      </strong>
+                                      <WithStyles(ForwardRef(Tooltip))
+                                        placement="top"
+                                        title="STRING"
+                                      >
+                                        <ForwardRef(Tooltip)
+                                          classes={
+                                            Object {
+                                              "popper": "MuiTooltip-popper",
+                                              "popperInteractive": "MuiTooltip-popperInteractive",
+                                              "tooltip": "MuiTooltip-tooltip",
+                                              "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                                              "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                                              "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                                              "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                                              "touch": "MuiTooltip-touch",
+                                            }
+                                          }
+                                          placement="top"
+                                          title="STRING"
+                                        >
+                                          <div
+                                            aria-describedby={null}
+                                            className="DatasetDetailPage-infoIcon-4"
+                                            onBlur={[Function]}
+                                            onFocus={[Function]}
+                                            onMouseLeave={[Function]}
+                                            onMouseOver={[Function]}
+                                            onTouchEnd={[Function]}
+                                            onTouchStart={[Function]}
+                                            title="STRING"
+                                          >
+                                            <ForwardRef
+                                              color="disabled"
+                                              fontSize="small"
+                                            >
+                                              <WithStyles(ForwardRef(SvgIcon))
+                                                color="disabled"
+                                                fontSize="small"
+                                              >
+                                                <ForwardRef(SvgIcon)
+                                                  classes={
+                                                    Object {
+                                                      "colorAction": "MuiSvgIcon-colorAction",
+                                                      "colorDisabled": "MuiSvgIcon-colorDisabled",
+                                                      "colorError": "MuiSvgIcon-colorError",
+                                                      "colorPrimary": "MuiSvgIcon-colorPrimary",
+                                                      "colorSecondary": "MuiSvgIcon-colorSecondary",
+                                                      "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                                                      "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                                                      "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                                                      "root": "MuiSvgIcon-root",
+                                                    }
+                                                  }
+                                                  color="disabled"
+                                                  fontSize="small"
+                                                >
+                                                  <svg
+                                                    aria-hidden="true"
+                                                    className="MuiSvgIcon-root MuiSvgIcon-colorDisabled MuiSvgIcon-fontSizeSmall"
+                                                    focusable="false"
+                                                    role="presentation"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                                                    />
+                                                  </svg>
+                                                </ForwardRef(SvgIcon)>
+                                              </WithStyles(ForwardRef(SvgIcon))>
+                                            </ForwardRef>
+                                          </div>
+                                          <ForwardRef(Popper)
+                                            className="MuiTooltip-popper"
+                                            id={null}
+                                            open={false}
+                                            placement="top"
+                                            transition={true}
+                                          />
+                                        </ForwardRef(Tooltip)>
+                                      </WithStyles(ForwardRef(Tooltip))>
+                                    </th>
+                                  </ForwardRef(TableCell)>
+                                </WithStyles(ForwardRef(TableCell))>
+                                <WithStyles(ForwardRef(TableCell))
+                                  align="left"
+                                  className="DatasetDetailPage-tableCell-5"
+                                  key="mass"
+                                >
+                                  <ForwardRef(TableCell)
+                                    align="left"
+                                    className="DatasetDetailPage-tableCell-5"
+                                    classes={
+                                      Object {
+                                        "alignCenter": "MuiTableCell-alignCenter",
+                                        "alignJustify": "MuiTableCell-alignJustify",
+                                        "alignLeft": "MuiTableCell-alignLeft",
+                                        "alignRight": "MuiTableCell-alignRight",
+                                        "body": "MuiTableCell-body",
+                                        "footer": "MuiTableCell-footer",
+                                        "head": "MuiTableCell-head",
+                                        "paddingCheckbox": "MuiTableCell-paddingCheckbox",
+                                        "paddingNone": "MuiTableCell-paddingNone",
+                                        "root": "MuiTableCell-root",
+                                        "sizeSmall": "MuiTableCell-sizeSmall",
+                                        "stickyHeader": "MuiTableCell-stickyHeader",
+                                      }
+                                    }
+                                  >
+                                    <th
+                                      aria-sort={null}
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      scope="col"
+                                    >
+                                      <strong>
+                                        mass
+                                      </strong>
+                                      <WithStyles(ForwardRef(Tooltip))
+                                        placement="top"
+                                        title="INTEGER"
+                                      >
+                                        <ForwardRef(Tooltip)
+                                          classes={
+                                            Object {
+                                              "popper": "MuiTooltip-popper",
+                                              "popperInteractive": "MuiTooltip-popperInteractive",
+                                              "tooltip": "MuiTooltip-tooltip",
+                                              "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                                              "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                                              "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                                              "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                                              "touch": "MuiTooltip-touch",
+                                            }
+                                          }
+                                          placement="top"
+                                          title="INTEGER"
+                                        >
+                                          <div
+                                            aria-describedby={null}
+                                            className="DatasetDetailPage-infoIcon-4"
+                                            onBlur={[Function]}
+                                            onFocus={[Function]}
+                                            onMouseLeave={[Function]}
+                                            onMouseOver={[Function]}
+                                            onTouchEnd={[Function]}
+                                            onTouchStart={[Function]}
+                                            title="INTEGER"
+                                          >
+                                            <ForwardRef
+                                              color="disabled"
+                                              fontSize="small"
+                                            >
+                                              <WithStyles(ForwardRef(SvgIcon))
+                                                color="disabled"
+                                                fontSize="small"
+                                              >
+                                                <ForwardRef(SvgIcon)
+                                                  classes={
+                                                    Object {
+                                                      "colorAction": "MuiSvgIcon-colorAction",
+                                                      "colorDisabled": "MuiSvgIcon-colorDisabled",
+                                                      "colorError": "MuiSvgIcon-colorError",
+                                                      "colorPrimary": "MuiSvgIcon-colorPrimary",
+                                                      "colorSecondary": "MuiSvgIcon-colorSecondary",
+                                                      "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                                                      "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                                                      "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                                                      "root": "MuiSvgIcon-root",
+                                                    }
+                                                  }
+                                                  color="disabled"
+                                                  fontSize="small"
+                                                >
+                                                  <svg
+                                                    aria-hidden="true"
+                                                    className="MuiSvgIcon-root MuiSvgIcon-colorDisabled MuiSvgIcon-fontSizeSmall"
+                                                    focusable="false"
+                                                    role="presentation"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                                                    />
+                                                  </svg>
+                                                </ForwardRef(SvgIcon)>
+                                              </WithStyles(ForwardRef(SvgIcon))>
+                                            </ForwardRef>
+                                          </div>
+                                          <ForwardRef(Popper)
+                                            className="MuiTooltip-popper"
+                                            id={null}
+                                            open={false}
+                                            placement="top"
+                                            transition={true}
+                                          />
+                                        </ForwardRef(Tooltip)>
+                                      </WithStyles(ForwardRef(Tooltip))>
+                                    </th>
+                                  </ForwardRef(TableCell)>
+                                </WithStyles(ForwardRef(TableCell))>
+                                <WithStyles(ForwardRef(TableCell))
+                                  align="left"
+                                  className="DatasetDetailPage-tableCell-5"
+                                  key="dimension"
+                                >
+                                  <ForwardRef(TableCell)
+                                    align="left"
+                                    className="DatasetDetailPage-tableCell-5"
+                                    classes={
+                                      Object {
+                                        "alignCenter": "MuiTableCell-alignCenter",
+                                        "alignJustify": "MuiTableCell-alignJustify",
+                                        "alignLeft": "MuiTableCell-alignLeft",
+                                        "alignRight": "MuiTableCell-alignRight",
+                                        "body": "MuiTableCell-body",
+                                        "footer": "MuiTableCell-footer",
+                                        "head": "MuiTableCell-head",
+                                        "paddingCheckbox": "MuiTableCell-paddingCheckbox",
+                                        "paddingNone": "MuiTableCell-paddingNone",
+                                        "root": "MuiTableCell-root",
+                                        "sizeSmall": "MuiTableCell-sizeSmall",
+                                        "stickyHeader": "MuiTableCell-stickyHeader",
+                                      }
+                                    }
+                                  >
+                                    <th
+                                      aria-sort={null}
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      scope="col"
+                                    >
+                                      <strong>
+                                        dimension
+                                      </strong>
+                                      <WithStyles(ForwardRef(Tooltip))
+                                        placement="top"
+                                        title="STRING"
+                                      >
+                                        <ForwardRef(Tooltip)
+                                          classes={
+                                            Object {
+                                              "popper": "MuiTooltip-popper",
+                                              "popperInteractive": "MuiTooltip-popperInteractive",
+                                              "tooltip": "MuiTooltip-tooltip",
+                                              "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                                              "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                                              "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                                              "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                                              "touch": "MuiTooltip-touch",
+                                            }
+                                          }
+                                          placement="top"
+                                          title="STRING"
+                                        >
+                                          <div
+                                            aria-describedby={null}
+                                            className="DatasetDetailPage-infoIcon-4"
+                                            onBlur={[Function]}
+                                            onFocus={[Function]}
+                                            onMouseLeave={[Function]}
+                                            onMouseOver={[Function]}
+                                            onTouchEnd={[Function]}
+                                            onTouchStart={[Function]}
+                                            title="STRING"
+                                          >
+                                            <ForwardRef
+                                              color="disabled"
+                                              fontSize="small"
+                                            >
+                                              <WithStyles(ForwardRef(SvgIcon))
+                                                color="disabled"
+                                                fontSize="small"
+                                              >
+                                                <ForwardRef(SvgIcon)
+                                                  classes={
+                                                    Object {
+                                                      "colorAction": "MuiSvgIcon-colorAction",
+                                                      "colorDisabled": "MuiSvgIcon-colorDisabled",
+                                                      "colorError": "MuiSvgIcon-colorError",
+                                                      "colorPrimary": "MuiSvgIcon-colorPrimary",
+                                                      "colorSecondary": "MuiSvgIcon-colorSecondary",
+                                                      "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                                                      "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                                                      "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                                                      "root": "MuiSvgIcon-root",
+                                                    }
+                                                  }
+                                                  color="disabled"
+                                                  fontSize="small"
+                                                >
+                                                  <svg
+                                                    aria-hidden="true"
+                                                    className="MuiSvgIcon-root MuiSvgIcon-colorDisabled MuiSvgIcon-fontSizeSmall"
+                                                    focusable="false"
+                                                    role="presentation"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                                                    />
+                                                  </svg>
+                                                </ForwardRef(SvgIcon)>
+                                              </WithStyles(ForwardRef(SvgIcon))>
+                                            </ForwardRef>
+                                          </div>
+                                          <ForwardRef(Popper)
+                                            className="MuiTooltip-popper"
+                                            id={null}
+                                            open={false}
+                                            placement="top"
+                                            transition={true}
+                                          />
+                                        </ForwardRef(Tooltip)>
+                                      </WithStyles(ForwardRef(Tooltip))>
+                                    </th>
+                                  </ForwardRef(TableCell)>
+                                </WithStyles(ForwardRef(TableCell))>
+                                <WithStyles(ForwardRef(TableCell))
+                                  align="left"
+                                  className="DatasetDetailPage-tableCell-5"
+                                  key="interstellar"
+                                >
+                                  <ForwardRef(TableCell)
+                                    align="left"
+                                    className="DatasetDetailPage-tableCell-5"
+                                    classes={
+                                      Object {
+                                        "alignCenter": "MuiTableCell-alignCenter",
+                                        "alignJustify": "MuiTableCell-alignJustify",
+                                        "alignLeft": "MuiTableCell-alignLeft",
+                                        "alignRight": "MuiTableCell-alignRight",
+                                        "body": "MuiTableCell-body",
+                                        "footer": "MuiTableCell-footer",
+                                        "head": "MuiTableCell-head",
+                                        "paddingCheckbox": "MuiTableCell-paddingCheckbox",
+                                        "paddingNone": "MuiTableCell-paddingNone",
+                                        "root": "MuiTableCell-root",
+                                        "sizeSmall": "MuiTableCell-sizeSmall",
+                                        "stickyHeader": "MuiTableCell-stickyHeader",
+                                      }
+                                    }
+                                  >
+                                    <th
+                                      aria-sort={null}
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      scope="col"
+                                    >
+                                      <strong>
+                                        interstellar
+                                      </strong>
+                                      <WithStyles(ForwardRef(Tooltip))
+                                        placement="top"
+                                        title="BOOLEAN"
+                                      >
+                                        <ForwardRef(Tooltip)
+                                          classes={
+                                            Object {
+                                              "popper": "MuiTooltip-popper",
+                                              "popperInteractive": "MuiTooltip-popperInteractive",
+                                              "tooltip": "MuiTooltip-tooltip",
+                                              "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                                              "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                                              "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                                              "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                                              "touch": "MuiTooltip-touch",
+                                            }
+                                          }
+                                          placement="top"
+                                          title="BOOLEAN"
+                                        >
+                                          <div
+                                            aria-describedby={null}
+                                            className="DatasetDetailPage-infoIcon-4"
+                                            onBlur={[Function]}
+                                            onFocus={[Function]}
+                                            onMouseLeave={[Function]}
+                                            onMouseOver={[Function]}
+                                            onTouchEnd={[Function]}
+                                            onTouchStart={[Function]}
+                                            title="BOOLEAN"
+                                          >
+                                            <ForwardRef
+                                              color="disabled"
+                                              fontSize="small"
+                                            >
+                                              <WithStyles(ForwardRef(SvgIcon))
+                                                color="disabled"
+                                                fontSize="small"
+                                              >
+                                                <ForwardRef(SvgIcon)
+                                                  classes={
+                                                    Object {
+                                                      "colorAction": "MuiSvgIcon-colorAction",
+                                                      "colorDisabled": "MuiSvgIcon-colorDisabled",
+                                                      "colorError": "MuiSvgIcon-colorError",
+                                                      "colorPrimary": "MuiSvgIcon-colorPrimary",
+                                                      "colorSecondary": "MuiSvgIcon-colorSecondary",
+                                                      "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                                                      "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                                                      "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                                                      "root": "MuiSvgIcon-root",
+                                                    }
+                                                  }
+                                                  color="disabled"
+                                                  fontSize="small"
+                                                >
+                                                  <svg
+                                                    aria-hidden="true"
+                                                    className="MuiSvgIcon-root MuiSvgIcon-colorDisabled MuiSvgIcon-fontSizeSmall"
+                                                    focusable="false"
+                                                    role="presentation"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                                                    />
+                                                  </svg>
+                                                </ForwardRef(SvgIcon)>
+                                              </WithStyles(ForwardRef(SvgIcon))>
+                                            </ForwardRef>
+                                          </div>
+                                          <ForwardRef(Popper)
+                                            className="MuiTooltip-popper"
+                                            id={null}
+                                            open={false}
+                                            placement="top"
+                                            transition={true}
+                                          />
+                                        </ForwardRef(Tooltip)>
+                                      </WithStyles(ForwardRef(Tooltip))>
+                                    </th>
+                                  </ForwardRef(TableCell)>
+                                </WithStyles(ForwardRef(TableCell))>
+                              </tr>
+                            </ForwardRef(TableRow)>
+                          </WithStyles(ForwardRef(TableRow))>
+                        </thead>
+                      </ForwardRef(TableHead)>
+                    </WithStyles(ForwardRef(TableHead))>
+                  </table>
+                </ForwardRef(Table)>
+              </WithStyles(ForwardRef(Table))>
+            </div>
+          </ForwardRef(Paper)>
+        </WithStyles(ForwardRef(Paper))>
+        <WithStyles(ForwardRef(Typography))
+          align="right"
+          className="DatasetDetailPage-updated-7"
+          color="primary"
+        >
+          <ForwardRef(Typography)
+            align="right"
+            className="DatasetDetailPage-updated-7"
+            classes={
+              Object {
+                "alignCenter": "MuiTypography-alignCenter",
+                "alignJustify": "MuiTypography-alignJustify",
+                "alignLeft": "MuiTypography-alignLeft",
+                "alignRight": "MuiTypography-alignRight",
+                "body1": "MuiTypography-body1",
+                "body2": "MuiTypography-body2",
+                "button": "MuiTypography-button",
+                "caption": "MuiTypography-caption",
+                "colorError": "MuiTypography-colorError",
+                "colorInherit": "MuiTypography-colorInherit",
+                "colorPrimary": "MuiTypography-colorPrimary",
+                "colorSecondary": "MuiTypography-colorSecondary",
+                "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                "displayBlock": "MuiTypography-displayBlock",
+                "displayInline": "MuiTypography-displayInline",
+                "gutterBottom": "MuiTypography-gutterBottom",
+                "h1": "MuiTypography-h1",
+                "h2": "MuiTypography-h2",
+                "h3": "MuiTypography-h3",
+                "h4": "MuiTypography-h4",
+                "h5": "MuiTypography-h5",
+                "h6": "MuiTypography-h6",
+                "noWrap": "MuiTypography-noWrap",
+                "overline": "MuiTypography-overline",
+                "paragraph": "MuiTypography-paragraph",
+                "root": "MuiTypography-root",
+                "srOnly": "MuiTypography-srOnly",
+                "subtitle1": "MuiTypography-subtitle1",
+                "subtitle2": "MuiTypography-subtitle2",
+              }
+            }
+            color="primary"
+          >
+            <p
+              className="MuiTypography-root DatasetDetailPage-updated-7 MuiTypography-body1 MuiTypography-colorPrimary MuiTypography-alignRight"
+            />
+          </ForwardRef(Typography)>
+        </WithStyles(ForwardRef(Typography))>
+      </div>
+    </Styled(MuiBox)>
+  </DatasetDetailPage>
+</WithStyles(DatasetDetailPage)>
+`;
+
+exports[`DatasetDetailPage Component when there is no match for the datasetName in url params renders a snapshot that matches previous 1`] = `
+<WithStyles(DatasetDetailPage)
+  datasets={
+    Array [
+      Object {
+        "description": "describes different geometries in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.geometry",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.geometry",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible dimensions in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.dimensions",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.dimensions",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all trips taken through the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.trips",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.trips",
+        "sourceName": "snowflake",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible dimensions on earth",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "earth.dimensions",
+        "namespace": "galactic-data",
+        "physicalName": "earth.dimensions",
+        "sourceName": "snowflake",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible trips taken on earth",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "earth.trips",
+        "namespace": "galactic-data",
+        "physicalName": "earth.trips",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all stars in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "objects.stars",
+        "namespace": "galactic-data",
+        "physicalName": "objects.stars",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all planets in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "objects.planets",
+        "namespace": "galactic-data",
+        "physicalName": "objects.planets",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all life",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "objects.life",
+        "namespace": "galactic-data",
+        "physicalName": "objects.life",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes the entire universe",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "environment.universe",
+        "namespace": "galactic-data",
+        "physicalName": "environment.universe",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all radiowaves",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.radiowaves",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.radiowaves",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all satellites",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "galaxy.satellites",
+        "namespace": "galactic-data",
+        "physicalName": "galaxy.satellites",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all conversations in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "environment.conversations",
+        "namespace": "galactic-data",
+        "physicalName": "environment.conversations",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all transcripts in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "environment.transcripts",
+        "namespace": "galactic-data",
+        "physicalName": "environment.transcripts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "an empty environment never referenced by a job",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "environment.empty",
+        "namespace": "galactic-data",
+        "physicalName": "environment.empty",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes parts of rockets",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "rocket.parts",
+        "namespace": "galactic-data",
+        "physicalName": "rocket.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes types of rockets",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "rocket.types",
+        "namespace": "galactic-data",
+        "physicalName": "rocket.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes space station parts",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "station.parts",
+        "namespace": "galactic-data",
+        "physicalName": "station.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes space station types",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "station.types",
+        "namespace": "galactic-data",
+        "physicalName": "station.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien parts",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.parts",
+        "namespace": "galactic-data",
+        "physicalName": "alien.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes types of aliens",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.types",
+        "namespace": "galactic-data",
+        "physicalName": "alien.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes different geometries in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.geometry",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.geometry",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible dimensions in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.dimensions",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.dimensions",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all trips taken through the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.trips",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.trips",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible dimensions on earth",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.dimensions",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.dimensions",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all possible trips taken in the cosmics",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.trips",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.trips",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all stars in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.stars",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.stars",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all planets in the cosmics",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.planets",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.planets",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all life",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.life",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.life",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes the entire universe",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.universe",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.universe",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all radiowaves",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.radiowaves",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.radiowaves",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all satellites",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.satellites",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.satellites",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all conversations in interstellar space",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.conversations",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.conversations",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all transcripts in interstellar space",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.transcripts",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.transcripts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "an empty cosmic dataset not referenced by any job",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "cosmic.empty",
+        "namespace": "interstellar-data",
+        "physicalName": "cosmic.empty",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes parts that make up comets",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "comet.parts",
+        "namespace": "interstellar-data",
+        "physicalName": "comet.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all types of comets",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "comet.types",
+        "namespace": "interstellar-data",
+        "physicalName": "comet.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes parts that make up black holes",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "black_hole.parts",
+        "namespace": "interstellar-data",
+        "physicalName": "black_hole.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all types of black holes",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "black_hole.types",
+        "namespace": "interstellar-data",
+        "physicalName": "black_hole.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes parts that make up worm holes",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "worm_hole.parts",
+        "namespace": "interstellar-data",
+        "physicalName": "worm_hole.parts",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes all types of worm holes",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "worm_hole.types",
+        "namespace": "interstellar-data",
+        "physicalName": "worm_hole.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+    ]
+  }
+>
+  <DatasetDetailPage
+    classes={
+      Object {
+        "infoIcon": "DatasetDetailPage-infoIcon-4",
+        "noData": "DatasetDetailPage-noData-3",
+        "paper": "DatasetDetailPage-paper-6",
+        "root": "DatasetDetailPage-root-1",
+        "tableCell": "DatasetDetailPage-tableCell-5",
+        "tagContainer": "DatasetDetailPage-tagContainer-2",
+        "updated": "DatasetDetailPage-updated-7",
+      }
+    }
+    datasets={
+      Array [
+        Object {
+          "description": "describes different geometries in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.geometry",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.geometry",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible dimensions in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.dimensions",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.dimensions",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all trips taken through the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.trips",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.trips",
+          "sourceName": "snowflake",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible dimensions on earth",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "earth.dimensions",
+          "namespace": "galactic-data",
+          "physicalName": "earth.dimensions",
+          "sourceName": "snowflake",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible trips taken on earth",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "earth.trips",
+          "namespace": "galactic-data",
+          "physicalName": "earth.trips",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all stars in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "objects.stars",
+          "namespace": "galactic-data",
+          "physicalName": "objects.stars",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all planets in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "objects.planets",
+          "namespace": "galactic-data",
+          "physicalName": "objects.planets",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all life",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "objects.life",
+          "namespace": "galactic-data",
+          "physicalName": "objects.life",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes the entire universe",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "environment.universe",
+          "namespace": "galactic-data",
+          "physicalName": "environment.universe",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all radiowaves",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.radiowaves",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.radiowaves",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all satellites",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "galaxy.satellites",
+          "namespace": "galactic-data",
+          "physicalName": "galaxy.satellites",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all conversations in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "environment.conversations",
+          "namespace": "galactic-data",
+          "physicalName": "environment.conversations",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all transcripts in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "environment.transcripts",
+          "namespace": "galactic-data",
+          "physicalName": "environment.transcripts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "an empty environment never referenced by a job",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "environment.empty",
+          "namespace": "galactic-data",
+          "physicalName": "environment.empty",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes parts of rockets",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "rocket.parts",
+          "namespace": "galactic-data",
+          "physicalName": "rocket.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes types of rockets",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "rocket.types",
+          "namespace": "galactic-data",
+          "physicalName": "rocket.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes space station parts",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "station.parts",
+          "namespace": "galactic-data",
+          "physicalName": "station.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes space station types",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "station.types",
+          "namespace": "galactic-data",
+          "physicalName": "station.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien parts",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.parts",
+          "namespace": "galactic-data",
+          "physicalName": "alien.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes types of aliens",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.types",
+          "namespace": "galactic-data",
+          "physicalName": "alien.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes different geometries in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.geometry",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.geometry",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible dimensions in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.dimensions",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.dimensions",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all trips taken through the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.trips",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.trips",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible dimensions on earth",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.dimensions",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.dimensions",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all possible trips taken in the cosmics",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.trips",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.trips",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all stars in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.stars",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.stars",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all planets in the cosmics",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.planets",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.planets",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all life",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.life",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.life",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes the entire universe",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.universe",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.universe",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all radiowaves",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.radiowaves",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.radiowaves",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all satellites",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.satellites",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.satellites",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all conversations in interstellar space",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.conversations",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.conversations",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all transcripts in interstellar space",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.transcripts",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.transcripts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "an empty cosmic dataset not referenced by any job",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "cosmic.empty",
+          "namespace": "interstellar-data",
+          "physicalName": "cosmic.empty",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes parts that make up comets",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "comet.parts",
+          "namespace": "interstellar-data",
+          "physicalName": "comet.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all types of comets",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "comet.types",
+          "namespace": "interstellar-data",
+          "physicalName": "comet.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes parts that make up black holes",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "black_hole.parts",
+          "namespace": "interstellar-data",
+          "physicalName": "black_hole.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all types of black holes",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "black_hole.types",
+          "namespace": "interstellar-data",
+          "physicalName": "black_hole.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes parts that make up worm holes",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "worm_hole.parts",
+          "namespace": "interstellar-data",
+          "physicalName": "worm_hole.parts",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes all types of worm holes",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "worm_hole.types",
+          "namespace": "interstellar-data",
+          "physicalName": "worm_hole.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+      ]
+    }
+  >
+    <Styled(MuiBox)
+      className="DatasetDetailPage-root-1"
+      display="flex"
+      justifyContent="center"
+      mt={10}
+    >
+      <div
+        className="MuiBox-root MuiBox-root-9 DatasetDetailPage-root-1"
+      >
+        <WithStyles(ForwardRef(Typography))
+          align="center"
+          className="DatasetDetailPage-noData-3"
+        >
+          <ForwardRef(Typography)
+            align="center"
+            className="DatasetDetailPage-noData-3"
+            classes={
+              Object {
+                "alignCenter": "MuiTypography-alignCenter",
+                "alignJustify": "MuiTypography-alignJustify",
+                "alignLeft": "MuiTypography-alignLeft",
+                "alignRight": "MuiTypography-alignRight",
+                "body1": "MuiTypography-body1",
+                "body2": "MuiTypography-body2",
+                "button": "MuiTypography-button",
+                "caption": "MuiTypography-caption",
+                "colorError": "MuiTypography-colorError",
+                "colorInherit": "MuiTypography-colorInherit",
+                "colorPrimary": "MuiTypography-colorPrimary",
+                "colorSecondary": "MuiTypography-colorSecondary",
+                "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                "displayBlock": "MuiTypography-displayBlock",
+                "displayInline": "MuiTypography-displayInline",
+                "gutterBottom": "MuiTypography-gutterBottom",
+                "h1": "MuiTypography-h1",
+                "h2": "MuiTypography-h2",
+                "h3": "MuiTypography-h3",
+                "h4": "MuiTypography-h4",
+                "h5": "MuiTypography-h5",
+                "h6": "MuiTypography-h6",
+                "noWrap": "MuiTypography-noWrap",
+                "overline": "MuiTypography-overline",
+                "paragraph": "MuiTypography-paragraph",
+                "root": "MuiTypography-root",
+                "srOnly": "MuiTypography-srOnly",
+                "subtitle1": "MuiTypography-subtitle1",
+                "subtitle2": "MuiTypography-subtitle2",
+              }
+            }
+          >
+            <p
+              className="MuiTypography-root DatasetDetailPage-noData-3 MuiTypography-body1 MuiTypography-alignCenter"
+            >
+              No dataset by the name of 
+              <strong>
+                "
+                test.dataset
+                "
+              </strong>
+               found
+            </p>
+          </ForwardRef(Typography)>
+        </WithStyles(ForwardRef(Typography))>
+      </div>
+    </Styled(MuiBox)>
+  </DatasetDetailPage>
+</WithStyles(DatasetDetailPage)>
+`;

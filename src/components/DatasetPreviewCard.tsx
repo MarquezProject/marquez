@@ -1,4 +1,9 @@
 import React, { ReactElement } from 'react'
+
+import {
+  Link
+} from 'react-router-dom'
+
 import {
   withStyles,
   createStyles,
@@ -22,6 +27,9 @@ const styles = ({ palette }: ITheme) => {
     },
     tagContainer: {
       display: 'flex'
+    },
+    link: {
+      textDecoration: 'none'
     }
   })
 }
@@ -39,36 +47,38 @@ interface IState {}
 class DatasetPreviewCard extends React.Component<IProps, IState> {
   render(): ReactElement {
     const { classes, name, description, updatedAt, tags = [] } = this.props
-    const { tagContainer } = classes
+    const { tagContainer, link } = classes
     return (
-      <Box p={2} m={1} bgcolor='white' boxShadow={3} display='flex' justifyContent='space-between'>
-        <div>
-          <Typography color='secondary' variant='h3'>
-            {name}
-          </Typography>
-          <StyledTypography color='primary'>{description}</StyledTypography>
-        </div>
-        <Box
-          className={classes.rightCol}
-          display='flex'
-          flexDirection='column'
-          alignItems='flex-end'
-          justifyContent='space-between'
-        >
-          <div id='tagContainer' className={tagContainer}>
-            {_.keys(tagToBadge.default).map((key: string) => {
-              return (
-                <div key={key}>
-                  <Tooltip className="tagWrapper" title={key} placement="top">
-                    {tags.includes(key) ? tagToBadge.highlighted[key] : tagToBadge.default[key]}
-                  </Tooltip>
-                </div>
-              )
-            })}
+      <Link className={link} to={{pathname: `/datasets/${name}`}}>
+        <Box p={2} m={1} bgcolor='white' boxShadow={3} display='flex' justifyContent='space-between'>
+          <div>
+            <Typography color='secondary' variant='h3'>
+              {name}
+            </Typography>
+            <StyledTypography color='primary'>{description}</StyledTypography>
           </div>
-          <Typography className={classes.lastUpdated}>{formatUpdatedAt(updatedAt)}</Typography>
+          <Box
+            className={classes.rightCol}
+            display='flex'
+            flexDirection='column'
+            alignItems='flex-end'
+            justifyContent='space-between'
+          >
+            <div id='tagContainer' className={tagContainer}>
+              {_.keys(tagToBadge.default).map((key: string) => {
+                return (
+                  <div key={key}>
+                    <Tooltip className="tagWrapper" title={key} placement="top">
+                      {tags.includes(key) ? tagToBadge.highlighted[key] : tagToBadge.default[key]}
+                    </Tooltip>
+                  </div>
+                )
+              })}
+            </div>
+            <Typography className={classes.lastUpdated}>{formatUpdatedAt(updatedAt)}</Typography>
+          </Box>
         </Box>
-      </Box>
+      </Link>
     )
   }
 }

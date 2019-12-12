@@ -1,343 +1,450 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DatasetPreviewCard Component renders a snapshot that matches previous 1`] = `
-<WithStyles(DatasetPreviewCard)
-  description="describes different geometries in the galaxy"
-  name="galaxy.geometry"
-  namespace="galactic-data"
-  physicalName="galaxy.geometry"
-  sourceName="redshift"
-  tags={
-    Array [
-      "tag_a",
-      "tag_b",
-      "tag_c",
-    ]
-  }
-  type="DB_TABLE"
->
-  <DatasetPreviewCard
-    classes={
+<MemoryRouter>
+  <Router
+    history={
       Object {
-        "lastUpdated": "DatasetPreviewCard-lastUpdated-2",
-        "rightCol": "DatasetPreviewCard-rightCol-1",
-        "tagContainer": "DatasetPreviewCard-tagContainer-3",
+        "action": "POP",
+        "block": [Function],
+        "canGo": [Function],
+        "createHref": [Function],
+        "entries": Array [
+          Object {
+            "hash": "",
+            "key": "4qlu9f",
+            "pathname": "/",
+            "search": "",
+            "state": undefined,
+          },
+        ],
+        "go": [Function],
+        "goBack": [Function],
+        "goForward": [Function],
+        "index": 0,
+        "length": 1,
+        "listen": [Function],
+        "location": Object {
+          "hash": "",
+          "key": "4qlu9f",
+          "pathname": "/",
+          "search": "",
+          "state": undefined,
+        },
+        "push": [Function],
+        "replace": [Function],
       }
     }
-    description="describes different geometries in the galaxy"
-    name="galaxy.geometry"
-    namespace="galactic-data"
-    physicalName="galaxy.geometry"
-    sourceName="redshift"
-    tags={
-      Array [
-        "tag_a",
-        "tag_b",
-        "tag_c",
-      ]
-    }
-    type="DB_TABLE"
   >
-    <Styled(MuiBox)
-      bgcolor="white"
-      boxShadow={3}
-      display="flex"
-      justifyContent="space-between"
-      m={1}
-      p={2}
+    <WithStyles(DatasetPreviewCard)
+      description="describes different geometries in the galaxy"
+      fields={
+        Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ]
+      }
+      name="galaxy.geometry"
+      namespace="galactic-data"
+      physicalName="galaxy.geometry"
+      sourceName="redshift"
+      tags={
+        Array [
+          "tag_a",
+          "tag_b",
+          "tag_c",
+        ]
+      }
+      type="DB_TABLE"
     >
-      <div
-        className="MuiBox-root MuiBox-root-5"
+      <DatasetPreviewCard
+        classes={
+          Object {
+            "lastUpdated": "DatasetPreviewCard-lastUpdated-2",
+            "link": "DatasetPreviewCard-link-4",
+            "rightCol": "DatasetPreviewCard-rightCol-1",
+            "tagContainer": "DatasetPreviewCard-tagContainer-3",
+          }
+        }
+        description="describes different geometries in the galaxy"
+        fields={
+          Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ]
+        }
+        name="galaxy.geometry"
+        namespace="galactic-data"
+        physicalName="galaxy.geometry"
+        sourceName="redshift"
+        tags={
+          Array [
+            "tag_a",
+            "tag_b",
+            "tag_c",
+          ]
+        }
+        type="DB_TABLE"
       >
-        <div>
-          <WithStyles(ForwardRef(Typography))
-            color="secondary"
-            variant="h3"
-          >
-            <ForwardRef(Typography)
-              classes={
-                Object {
-                  "alignCenter": "MuiTypography-alignCenter",
-                  "alignJustify": "MuiTypography-alignJustify",
-                  "alignLeft": "MuiTypography-alignLeft",
-                  "alignRight": "MuiTypography-alignRight",
-                  "body1": "MuiTypography-body1",
-                  "body2": "MuiTypography-body2",
-                  "button": "MuiTypography-button",
-                  "caption": "MuiTypography-caption",
-                  "colorError": "MuiTypography-colorError",
-                  "colorInherit": "MuiTypography-colorInherit",
-                  "colorPrimary": "MuiTypography-colorPrimary",
-                  "colorSecondary": "MuiTypography-colorSecondary",
-                  "colorTextPrimary": "MuiTypography-colorTextPrimary",
-                  "colorTextSecondary": "MuiTypography-colorTextSecondary",
-                  "displayBlock": "MuiTypography-displayBlock",
-                  "displayInline": "MuiTypography-displayInline",
-                  "gutterBottom": "MuiTypography-gutterBottom",
-                  "h1": "MuiTypography-h1",
-                  "h2": "MuiTypography-h2",
-                  "h3": "MuiTypography-h3",
-                  "h4": "MuiTypography-h4",
-                  "h5": "MuiTypography-h5",
-                  "h6": "MuiTypography-h6",
-                  "noWrap": "MuiTypography-noWrap",
-                  "overline": "MuiTypography-overline",
-                  "paragraph": "MuiTypography-paragraph",
-                  "root": "MuiTypography-root",
-                  "srOnly": "MuiTypography-srOnly",
-                  "subtitle1": "MuiTypography-subtitle1",
-                  "subtitle2": "MuiTypography-subtitle2",
-                }
-              }
-              color="secondary"
-              variant="h3"
-            >
-              <h3
-                className="MuiTypography-root MuiTypography-h3 MuiTypography-colorSecondary"
-              >
-                galaxy.geometry
-              </h3>
-            </ForwardRef(Typography)>
-          </WithStyles(ForwardRef(Typography))>
-          <WithStyles(WithStyles(ForwardRef(Typography)))
-            color="primary"
-          >
-            <WithStyles(ForwardRef(Typography))
-              classes={
-                Object {
-                  "root": "WithStyles(ForwardRef(Typography))-root-36",
-                }
-              }
-              color="primary"
-            >
-              <ForwardRef(Typography)
-                classes={
-                  Object {
-                    "alignCenter": "MuiTypography-alignCenter",
-                    "alignJustify": "MuiTypography-alignJustify",
-                    "alignLeft": "MuiTypography-alignLeft",
-                    "alignRight": "MuiTypography-alignRight",
-                    "body1": "MuiTypography-body1",
-                    "body2": "MuiTypography-body2",
-                    "button": "MuiTypography-button",
-                    "caption": "MuiTypography-caption",
-                    "colorError": "MuiTypography-colorError",
-                    "colorInherit": "MuiTypography-colorInherit",
-                    "colorPrimary": "MuiTypography-colorPrimary",
-                    "colorSecondary": "MuiTypography-colorSecondary",
-                    "colorTextPrimary": "MuiTypography-colorTextPrimary",
-                    "colorTextSecondary": "MuiTypography-colorTextSecondary",
-                    "displayBlock": "MuiTypography-displayBlock",
-                    "displayInline": "MuiTypography-displayInline",
-                    "gutterBottom": "MuiTypography-gutterBottom",
-                    "h1": "MuiTypography-h1",
-                    "h2": "MuiTypography-h2",
-                    "h3": "MuiTypography-h3",
-                    "h4": "MuiTypography-h4",
-                    "h5": "MuiTypography-h5",
-                    "h6": "MuiTypography-h6",
-                    "noWrap": "MuiTypography-noWrap",
-                    "overline": "MuiTypography-overline",
-                    "paragraph": "MuiTypography-paragraph",
-                    "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-36",
-                    "srOnly": "MuiTypography-srOnly",
-                    "subtitle1": "MuiTypography-subtitle1",
-                    "subtitle2": "MuiTypography-subtitle2",
-                  }
-                }
-                color="primary"
-              >
-                <p
-                  className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-36 MuiTypography-body1 MuiTypography-colorPrimary"
-                >
-                  describes different geometries in the galaxy
-                </p>
-              </ForwardRef(Typography)>
-            </WithStyles(ForwardRef(Typography))>
-          </WithStyles(WithStyles(ForwardRef(Typography)))>
-        </div>
-        <Styled(MuiBox)
-          alignItems="flex-end"
-          className="DatasetPreviewCard-rightCol-1"
-          display="flex"
-          flexDirection="column"
-          justifyContent="space-between"
+        <Link
+          className="DatasetPreviewCard-link-4"
+          to={
+            Object {
+              "pathname": "/datasets/galaxy.geometry",
+            }
+          }
         >
-          <div
-            className="MuiBox-root MuiBox-root-37 DatasetPreviewCard-rightCol-1"
+          <LinkAnchor
+            className="DatasetPreviewCard-link-4"
+            href="/datasets/galaxy.geometry"
+            navigate={[Function]}
           >
-            <div
-              className="DatasetPreviewCard-tagContainer-3"
-              id="tagContainer"
+            <a
+              className="DatasetPreviewCard-link-4"
+              href="/datasets/galaxy.geometry"
+              onClick={[Function]}
             >
-              <div
-                key="tag_a"
+              <Styled(MuiBox)
+                bgcolor="white"
+                boxShadow={3}
+                display="flex"
+                justifyContent="space-between"
+                m={1}
+                p={2}
               >
-                <WithStyles(ForwardRef(Tooltip))
-                  className="tagWrapper"
-                  placement="top"
-                  title="tag_a"
+                <div
+                  className="MuiBox-root MuiBox-root-6"
                 >
-                  <ForwardRef(Tooltip)
-                    className="tagWrapper"
-                    classes={
-                      Object {
-                        "popper": "MuiTooltip-popper",
-                        "popperInteractive": "MuiTooltip-popperInteractive",
-                        "tooltip": "MuiTooltip-tooltip",
-                        "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
-                        "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
-                        "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
-                        "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
-                        "touch": "MuiTooltip-touch",
-                      }
-                    }
-                    placement="top"
-                    title="tag_a"
-                  >
-                    <span
-                      aria-describedby={null}
-                      className="tagWrapper"
-                      color="highlighted"
-                      key="tag_a"
-                      onBlur={[Function]}
-                      onFocus={[Function]}
-                      onMouseLeave={[Function]}
-                      onMouseOver={[Function]}
-                      onTouchEnd={[Function]}
-                      onTouchStart={[Function]}
-                      title="tag_a"
+                  <div>
+                    <WithStyles(ForwardRef(Typography))
+                      color="secondary"
+                      variant="h3"
                     >
-                      Pretend Badge
-                    </span>
-                    <ForwardRef(Popper)
-                      anchorEl={
-                        <span
-                          class="tagWrapper"
-                          color="highlighted"
-                          title="tag_a"
+                      <ForwardRef(Typography)
+                        classes={
+                          Object {
+                            "alignCenter": "MuiTypography-alignCenter",
+                            "alignJustify": "MuiTypography-alignJustify",
+                            "alignLeft": "MuiTypography-alignLeft",
+                            "alignRight": "MuiTypography-alignRight",
+                            "body1": "MuiTypography-body1",
+                            "body2": "MuiTypography-body2",
+                            "button": "MuiTypography-button",
+                            "caption": "MuiTypography-caption",
+                            "colorError": "MuiTypography-colorError",
+                            "colorInherit": "MuiTypography-colorInherit",
+                            "colorPrimary": "MuiTypography-colorPrimary",
+                            "colorSecondary": "MuiTypography-colorSecondary",
+                            "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                            "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                            "displayBlock": "MuiTypography-displayBlock",
+                            "displayInline": "MuiTypography-displayInline",
+                            "gutterBottom": "MuiTypography-gutterBottom",
+                            "h1": "MuiTypography-h1",
+                            "h2": "MuiTypography-h2",
+                            "h3": "MuiTypography-h3",
+                            "h4": "MuiTypography-h4",
+                            "h5": "MuiTypography-h5",
+                            "h6": "MuiTypography-h6",
+                            "noWrap": "MuiTypography-noWrap",
+                            "overline": "MuiTypography-overline",
+                            "paragraph": "MuiTypography-paragraph",
+                            "root": "MuiTypography-root",
+                            "srOnly": "MuiTypography-srOnly",
+                            "subtitle1": "MuiTypography-subtitle1",
+                            "subtitle2": "MuiTypography-subtitle2",
+                          }
+                        }
+                        color="secondary"
+                        variant="h3"
+                      >
+                        <h3
+                          className="MuiTypography-root MuiTypography-h3 MuiTypography-colorSecondary"
                         >
-                          Pretend Badge
-                        </span>
-                      }
-                      className="MuiTooltip-popper"
-                      id={null}
-                      open={false}
-                      placement="top"
-                      transition={true}
-                    />
-                  </ForwardRef(Tooltip)>
-                </WithStyles(ForwardRef(Tooltip))>
-              </div>
-              <div
-                key="tag_b"
-              >
-                <WithStyles(ForwardRef(Tooltip))
-                  className="tagWrapper"
-                  placement="top"
-                  title="tag_b"
-                >
-                  <ForwardRef(Tooltip)
-                    className="tagWrapper"
-                    classes={
-                      Object {
-                        "popper": "MuiTooltip-popper",
-                        "popperInteractive": "MuiTooltip-popperInteractive",
-                        "tooltip": "MuiTooltip-tooltip",
-                        "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
-                        "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
-                        "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
-                        "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
-                        "touch": "MuiTooltip-touch",
-                      }
-                    }
-                    placement="top"
-                    title="tag_b"
-                  >
-                    <span
-                      aria-describedby={null}
-                      className="tagWrapper"
-                      color="highlighted"
-                      key="tag_b"
-                      onBlur={[Function]}
-                      onFocus={[Function]}
-                      onMouseLeave={[Function]}
-                      onMouseOver={[Function]}
-                      onTouchEnd={[Function]}
-                      onTouchStart={[Function]}
-                      title="tag_b"
+                          galaxy.geometry
+                        </h3>
+                      </ForwardRef(Typography)>
+                    </WithStyles(ForwardRef(Typography))>
+                    <WithStyles(WithStyles(ForwardRef(Typography)))
+                      color="primary"
                     >
-                      Pretend Badge
-                    </span>
-                    <ForwardRef(Popper)
-                      anchorEl={
-                        <span
-                          class="tagWrapper"
-                          color="highlighted"
-                          title="tag_b"
+                      <WithStyles(ForwardRef(Typography))
+                        classes={
+                          Object {
+                            "root": "WithStyles(ForwardRef(Typography))-root-37",
+                          }
+                        }
+                        color="primary"
+                      >
+                        <ForwardRef(Typography)
+                          classes={
+                            Object {
+                              "alignCenter": "MuiTypography-alignCenter",
+                              "alignJustify": "MuiTypography-alignJustify",
+                              "alignLeft": "MuiTypography-alignLeft",
+                              "alignRight": "MuiTypography-alignRight",
+                              "body1": "MuiTypography-body1",
+                              "body2": "MuiTypography-body2",
+                              "button": "MuiTypography-button",
+                              "caption": "MuiTypography-caption",
+                              "colorError": "MuiTypography-colorError",
+                              "colorInherit": "MuiTypography-colorInherit",
+                              "colorPrimary": "MuiTypography-colorPrimary",
+                              "colorSecondary": "MuiTypography-colorSecondary",
+                              "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                              "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                              "displayBlock": "MuiTypography-displayBlock",
+                              "displayInline": "MuiTypography-displayInline",
+                              "gutterBottom": "MuiTypography-gutterBottom",
+                              "h1": "MuiTypography-h1",
+                              "h2": "MuiTypography-h2",
+                              "h3": "MuiTypography-h3",
+                              "h4": "MuiTypography-h4",
+                              "h5": "MuiTypography-h5",
+                              "h6": "MuiTypography-h6",
+                              "noWrap": "MuiTypography-noWrap",
+                              "overline": "MuiTypography-overline",
+                              "paragraph": "MuiTypography-paragraph",
+                              "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-37",
+                              "srOnly": "MuiTypography-srOnly",
+                              "subtitle1": "MuiTypography-subtitle1",
+                              "subtitle2": "MuiTypography-subtitle2",
+                            }
+                          }
+                          color="primary"
                         >
-                          Pretend Badge
-                        </span>
-                      }
-                      className="MuiTooltip-popper"
-                      id={null}
-                      open={false}
-                      placement="top"
-                      transition={true}
-                    />
-                  </ForwardRef(Tooltip)>
-                </WithStyles(ForwardRef(Tooltip))>
-              </div>
-            </div>
-            <WithStyles(ForwardRef(Typography))
-              className="DatasetPreviewCard-lastUpdated-2"
-            >
-              <ForwardRef(Typography)
-                className="DatasetPreviewCard-lastUpdated-2"
-                classes={
-                  Object {
-                    "alignCenter": "MuiTypography-alignCenter",
-                    "alignJustify": "MuiTypography-alignJustify",
-                    "alignLeft": "MuiTypography-alignLeft",
-                    "alignRight": "MuiTypography-alignRight",
-                    "body1": "MuiTypography-body1",
-                    "body2": "MuiTypography-body2",
-                    "button": "MuiTypography-button",
-                    "caption": "MuiTypography-caption",
-                    "colorError": "MuiTypography-colorError",
-                    "colorInherit": "MuiTypography-colorInherit",
-                    "colorPrimary": "MuiTypography-colorPrimary",
-                    "colorSecondary": "MuiTypography-colorSecondary",
-                    "colorTextPrimary": "MuiTypography-colorTextPrimary",
-                    "colorTextSecondary": "MuiTypography-colorTextSecondary",
-                    "displayBlock": "MuiTypography-displayBlock",
-                    "displayInline": "MuiTypography-displayInline",
-                    "gutterBottom": "MuiTypography-gutterBottom",
-                    "h1": "MuiTypography-h1",
-                    "h2": "MuiTypography-h2",
-                    "h3": "MuiTypography-h3",
-                    "h4": "MuiTypography-h4",
-                    "h5": "MuiTypography-h5",
-                    "h6": "MuiTypography-h6",
-                    "noWrap": "MuiTypography-noWrap",
-                    "overline": "MuiTypography-overline",
-                    "paragraph": "MuiTypography-paragraph",
-                    "root": "MuiTypography-root",
-                    "srOnly": "MuiTypography-srOnly",
-                    "subtitle1": "MuiTypography-subtitle1",
-                    "subtitle2": "MuiTypography-subtitle2",
-                  }
-                }
-              >
-                <p
-                  className="MuiTypography-root DatasetPreviewCard-lastUpdated-2 MuiTypography-body1"
-                />
-              </ForwardRef(Typography)>
-            </WithStyles(ForwardRef(Typography))>
-          </div>
-        </Styled(MuiBox)>
-      </div>
-    </Styled(MuiBox)>
-  </DatasetPreviewCard>
-</WithStyles(DatasetPreviewCard)>
+                          <p
+                            className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-37 MuiTypography-body1 MuiTypography-colorPrimary"
+                          >
+                            describes different geometries in the galaxy
+                          </p>
+                        </ForwardRef(Typography)>
+                      </WithStyles(ForwardRef(Typography))>
+                    </WithStyles(WithStyles(ForwardRef(Typography)))>
+                  </div>
+                  <Styled(MuiBox)
+                    alignItems="flex-end"
+                    className="DatasetPreviewCard-rightCol-1"
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="space-between"
+                  >
+                    <div
+                      className="MuiBox-root MuiBox-root-38 DatasetPreviewCard-rightCol-1"
+                    >
+                      <div
+                        className="DatasetPreviewCard-tagContainer-3"
+                        id="tagContainer"
+                      >
+                        <div
+                          key="tag_a"
+                        >
+                          <WithStyles(ForwardRef(Tooltip))
+                            className="tagWrapper"
+                            placement="top"
+                            title="tag_a"
+                          >
+                            <ForwardRef(Tooltip)
+                              className="tagWrapper"
+                              classes={
+                                Object {
+                                  "popper": "MuiTooltip-popper",
+                                  "popperInteractive": "MuiTooltip-popperInteractive",
+                                  "tooltip": "MuiTooltip-tooltip",
+                                  "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                                  "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                                  "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                                  "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                                  "touch": "MuiTooltip-touch",
+                                }
+                              }
+                              placement="top"
+                              title="tag_a"
+                            >
+                              <span
+                                aria-describedby={null}
+                                className="tagWrapper"
+                                color="highlighted"
+                                key="tag_a"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                onMouseLeave={[Function]}
+                                onMouseOver={[Function]}
+                                onTouchEnd={[Function]}
+                                onTouchStart={[Function]}
+                                title="tag_a"
+                              >
+                                Pretend Badge
+                              </span>
+                              <ForwardRef(Popper)
+                                anchorEl={
+                                  <span
+                                    class="tagWrapper"
+                                    color="highlighted"
+                                    title="tag_a"
+                                  >
+                                    Pretend Badge
+                                  </span>
+                                }
+                                className="MuiTooltip-popper"
+                                id={null}
+                                open={false}
+                                placement="top"
+                                transition={true}
+                              />
+                            </ForwardRef(Tooltip)>
+                          </WithStyles(ForwardRef(Tooltip))>
+                        </div>
+                        <div
+                          key="tag_b"
+                        >
+                          <WithStyles(ForwardRef(Tooltip))
+                            className="tagWrapper"
+                            placement="top"
+                            title="tag_b"
+                          >
+                            <ForwardRef(Tooltip)
+                              className="tagWrapper"
+                              classes={
+                                Object {
+                                  "popper": "MuiTooltip-popper",
+                                  "popperInteractive": "MuiTooltip-popperInteractive",
+                                  "tooltip": "MuiTooltip-tooltip",
+                                  "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                                  "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                                  "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                                  "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                                  "touch": "MuiTooltip-touch",
+                                }
+                              }
+                              placement="top"
+                              title="tag_b"
+                            >
+                              <span
+                                aria-describedby={null}
+                                className="tagWrapper"
+                                color="highlighted"
+                                key="tag_b"
+                                onBlur={[Function]}
+                                onFocus={[Function]}
+                                onMouseLeave={[Function]}
+                                onMouseOver={[Function]}
+                                onTouchEnd={[Function]}
+                                onTouchStart={[Function]}
+                                title="tag_b"
+                              >
+                                Pretend Badge
+                              </span>
+                              <ForwardRef(Popper)
+                                anchorEl={
+                                  <span
+                                    class="tagWrapper"
+                                    color="highlighted"
+                                    title="tag_b"
+                                  >
+                                    Pretend Badge
+                                  </span>
+                                }
+                                className="MuiTooltip-popper"
+                                id={null}
+                                open={false}
+                                placement="top"
+                                transition={true}
+                              />
+                            </ForwardRef(Tooltip)>
+                          </WithStyles(ForwardRef(Tooltip))>
+                        </div>
+                      </div>
+                      <WithStyles(ForwardRef(Typography))
+                        className="DatasetPreviewCard-lastUpdated-2"
+                      >
+                        <ForwardRef(Typography)
+                          className="DatasetPreviewCard-lastUpdated-2"
+                          classes={
+                            Object {
+                              "alignCenter": "MuiTypography-alignCenter",
+                              "alignJustify": "MuiTypography-alignJustify",
+                              "alignLeft": "MuiTypography-alignLeft",
+                              "alignRight": "MuiTypography-alignRight",
+                              "body1": "MuiTypography-body1",
+                              "body2": "MuiTypography-body2",
+                              "button": "MuiTypography-button",
+                              "caption": "MuiTypography-caption",
+                              "colorError": "MuiTypography-colorError",
+                              "colorInherit": "MuiTypography-colorInherit",
+                              "colorPrimary": "MuiTypography-colorPrimary",
+                              "colorSecondary": "MuiTypography-colorSecondary",
+                              "colorTextPrimary": "MuiTypography-colorTextPrimary",
+                              "colorTextSecondary": "MuiTypography-colorTextSecondary",
+                              "displayBlock": "MuiTypography-displayBlock",
+                              "displayInline": "MuiTypography-displayInline",
+                              "gutterBottom": "MuiTypography-gutterBottom",
+                              "h1": "MuiTypography-h1",
+                              "h2": "MuiTypography-h2",
+                              "h3": "MuiTypography-h3",
+                              "h4": "MuiTypography-h4",
+                              "h5": "MuiTypography-h5",
+                              "h6": "MuiTypography-h6",
+                              "noWrap": "MuiTypography-noWrap",
+                              "overline": "MuiTypography-overline",
+                              "paragraph": "MuiTypography-paragraph",
+                              "root": "MuiTypography-root",
+                              "srOnly": "MuiTypography-srOnly",
+                              "subtitle1": "MuiTypography-subtitle1",
+                              "subtitle2": "MuiTypography-subtitle2",
+                            }
+                          }
+                        >
+                          <p
+                            className="MuiTypography-root DatasetPreviewCard-lastUpdated-2 MuiTypography-body1"
+                          />
+                        </ForwardRef(Typography)>
+                      </WithStyles(ForwardRef(Typography))>
+                    </div>
+                  </Styled(MuiBox)>
+                </div>
+              </Styled(MuiBox)>
+            </a>
+          </LinkAnchor>
+        </Link>
+      </DatasetPreviewCard>
+    </WithStyles(DatasetPreviewCard)>
+  </Router>
+</MemoryRouter>
 `;

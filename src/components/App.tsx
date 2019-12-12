@@ -27,6 +27,7 @@ import HomeContainer from '../containers/HomeContainer'
 import CustomSearchBarContainer from '../containers/CustomSearchBarContainer'
 import Toast from '../containers/ToastContainer'
 import NetworkGraphContainer from '../containers/NetworkGraphContainer'
+import DatasetDetailContainer from '../containers/DatasetDetailContainer'
 import JobDetailContainer from '../containers/JobDetailContainer'
 
 const sagaMiddleware = createSagaMiddleware({
@@ -103,8 +104,9 @@ const App = ({ classes }: IProps): ReactElement => {
                 exact
                 render={props => (
                   <HomeContainer {...props} showJobs={showJobs} setShowJobs={setShowJobs} />
-                )}
+                  )}
               />
+              <Route path='/datasets/:datasetName' exact component={DatasetDetailContainer} />
               <Route path='/jobs/:jobName' exact component={JobDetailContainer} />
             </Switch>
             <Toast />

@@ -33,7 +33,6 @@ const styles = (_theme: ITheme) => {
       zIndex: 1,
       width: '100%'
     },
-
     noDatasets: {
       color: '#9e9e9e',
       position: 'fixed',

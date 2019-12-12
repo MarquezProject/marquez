@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { FunctionComponent, useState } from 'react'
 import SearchBar from 'material-ui-search-bar'
 import { findMatchingEntities } from '../actionCreators'
 import {
@@ -8,6 +8,8 @@ import {
   Theme as ITheme
 } from '@material-ui/core/styles'
 
+import { useHistory } from 'react-router-dom'
+
 interface IProps {
   findMatchingEntities: typeof findMatchingEntities
   setShowJobs: (bool: boolean) => void
@@ -15,10 +17,6 @@ interface IProps {
 }
 
 type IAllProps = IWithStyles<typeof styles> & IProps
-
-interface IState {
-  value: string
-}
 
 const styles = (_theme: ITheme) => {
   return createStyles({
@@ -32,34 +30,35 @@ const styles = (_theme: ITheme) => {
   })
 }
 
-class CustomSearchBar extends React.Component<IAllProps, IState> {
-  constructor(props: IAllProps) {
-    super(props)
-    this.state = { value: '' }
+const CustomSearchBar: FunctionComponent<IAllProps> = props => {
+  const [search, setSearch] = useState('')
+  const { classes } = props
+  const history = useHistory()
+
+  const searchChanged = (searchString: string) => {
+    setSearch(searchString)
+    props.findMatchingEntities(searchString)
+    searchString == '' ? props.setShowJobs(false) : props.setShowJobs(true)
   }
 
-  searchChanged = (searchString: string) => {
-    this.setState({ value: searchString })
-    this.props.findMatchingEntities(searchString)
-    searchString == '' ? this.props.setShowJobs(false) : this.props.setShowJobs(true)
+  const cancelledSearch = () => {
+    setSearch('')
+    searchChanged('')
   }
 
-  cancelledSearch = () => {
-    this.setState({ value: '' })
-    this.searchChanged('')
+  const onRequestSearch = () => {
+    history.push('/')
   }
 
-  render(): React.ReactElement {
-    const { classes } = this.props
-    return (
-      <SearchBar
-        className={classes.search}
-        value={this.state.value}
-        onChange={this.searchChanged}
-        onCancelSearch={this.cancelledSearch}
-      />
-    )
-  }
+  return (
+    <SearchBar
+      className={classes.search}
+      value={search}
+      onChange={searchChanged}
+      onCancelSearch={cancelledSearch}
+      onRequestSearch={onRequestSearch}
+    />
+  )
 }
 
 export default withStyles(styles)(CustomSearchBar)
