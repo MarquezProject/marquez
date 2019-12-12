@@ -12,7 +12,7 @@ import Legend from './Legend'
 import { createNetworkData } from '../helpers'
 import { IDataset, IJob, INodeNetwork, INetworkLink } from '../types/'
 import { select } from 'd3-selection'
-import { forceCenter, forceLink, forceSimulation, forceManyBody, forceX, forceY } from 'd3-force'
+import { forceCenter, forceLink, forceSimulation, forceManyBody, forceY } from 'd3-force'
 import { zoom } from 'd3-zoom'
 import { color } from 'd3-color'
 import Loader from './Loader'
@@ -75,10 +75,10 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
     const width = +svg.style('width').replace('px', '')
     const height = +svg.style('height').replace('px', '')
 
-    forceSimulation<IDatumCombined, INetworkLink>(nodes)
-      .force('charge', forceManyBody().strength(-30))
+    const graphLayout = forceSimulation<IDatumCombined, INetworkLink>(nodes)
+      .force('charge', forceManyBody().strength(-50))
       .force('center', forceCenter(width / 2, height / 2))
-      .force('x', forceX(width / 2))
+      .alpha(.2)
       .force('y', forceY(height / 2))
       .force(
         'link',
@@ -87,17 +87,6 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
         })
       )
       .on('tick', ticked)
-
-    // const adjacent = []
-
-    // data.links.forEach(d => {
-    //   adjacent[d.source.index + '-' + d.target.index] = true
-    //   adjacent[d.target.index + '-' + d.source.index] = true
-    // })
-
-    // const neighbor = (a, b) => {
-    //   return a == b || adjacent[a + '-' + b]
-    // }
 
     svg.call(
       zoom()
@@ -208,7 +197,11 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
     }
 
     function updateLink(link: d3.Selection<SVGElement, any, any, any>) {
+      const k = 6 * graphLayout.alpha()
       link
+        .each(function(d) {
+          d.source.x -= k * 7, d.target.x += k * 4
+        })
         .attr('x1', function(d: INetworkLink & d3.SimulationLinkDatum<any>) {
           return d.offset == 'source' ? d.source.x + datasetNodeDimension / 2 : d.source.x
         })
