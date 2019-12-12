@@ -38,7 +38,7 @@ cat ./data/datasets.json | jq -c '.[]' | \
   while read -r i; do
     namespace=$(echo "${i}" | jq -r '.namespace')
     dataset=$(echo "${i}" | jq -r '.name')
-    payload=$(echo "${i}" | jq -c '{type: .type, physicalName: .physicalName, sourceName: .sourceName, description: .description, fields: .fields}')
+    payload=$(echo "${i}" | jq -c '{type: .type, physicalName: .physicalName, sourceName: .sourceName, fields: .fields, description: .description}')
 
     curl --silent --output /dev/null -X PUT "http://${MARQUEZ_HOST}:${MARQUEZ_PORT}/api/v1/namespaces/${namespace}/datasets/${dataset}" \
       -H 'Content-Type: application/json' \
@@ -51,7 +51,7 @@ cat ./data/jobs.json | jq -c '.[]' | \
   while read -r i; do
     namespace=$(echo "${i}" | jq -r '.namespace')
     job=$(echo "${i}" | jq -r '.name')
-    payload=$(echo "${i}" | jq -c '{type: .type, inputs: .inputs, outputs: .outputs, location: .location, description: .description}')
+    payload=$(echo "${i}" | jq -c '{type: .type, inputs: .inputs, outputs: .outputs, location: .location, context: .context, description: .description}')
 
     curl --silent --output /dev/null -X PUT "http://${MARQUEZ_HOST}:${MARQUEZ_PORT}/api/v1/namespaces/${namespace}/jobs/${job}" \
       -H 'Content-Type: application/json' \
