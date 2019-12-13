@@ -86,12 +86,13 @@ const styles = ({ palette, spacing, shadows }: ITheme) => {
       borderLeft: '2rem solid white'
     },
     SQLModalTitle: {
+      backgroundColor: 'white',
+      paddingTop: '1rem',
       fontSize: '2rem',
       fontWeight: 700,
       position: 'fixed',
-      width: '100%',
-      right: 0,
-      marginTop: '1rem'
+      width: '80%',
+      right: '10%'
     },
     copyToClipboard: {
       position: 'absolute',
