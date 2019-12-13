@@ -4,21 +4,16 @@ import {
   createStyles,
   WithStyles as IWithStyles
 } from '@material-ui/core/styles'
-import { Typography, Box, Tooltip } from '@material-ui/core'
+import { Typography, Box, Tooltip, Fab, Table, TableCell, TableHead, TableRow, Paper } from '@material-ui/core'
 
-import Table from '@material-ui/core/Table'
-// import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
-import Paper from '@material-ui/core/Paper'
+import CloseIcon from '@material-ui/icons/Close'
 
 import tagToBadge from '../config/tag-to-badge'
 import InfoIcon from '@material-ui/icons/Info'
 
 import { formatUpdatedAt } from '../helpers' 
 
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import _find from 'lodash/find'
 import _keys from 'lodash/keys'
 
@@ -39,12 +34,17 @@ const styles = () => {
       padding: '125px 0 0 0'
     },
     infoIcon: {
-      float: 'right',
-      paddingRight: '60px',
+      paddingLeft: '3px',
       paddingTop: '3px'
     },
     tableCell: {
+      display: 'flex',
       paddingTop: '12px'
+    },
+    tableRow: {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between'
     },
     paper: {
       overflowX: 'auto',
@@ -52,6 +52,14 @@ const styles = () => {
     },
     updated: {
       marginTop: '10px'
+    },
+    closeButton: {
+      color: '#7D7D7D',
+      backgroundColor: '#ffffff'
+    },
+    tagHolder: {
+      display: 'flex',
+      padding: '9px 12px'
     }
   })
 }
@@ -61,9 +69,10 @@ type IProps = IWithStyles<typeof styles> & { datasets: IDataset[] }
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { datasets, classes } = props
   const {
-    root, paper, updated, tagContainer, noData, infoIcon, tableCell
+    root, paper, updated, tagContainer, noData, infoIcon, tableCell, tableRow, closeButton, tagHolder
   } = classes
   const { datasetName } = useParams()
+  const history = useHistory()
   const dataset = _find(datasets, d => d.name === datasetName)
   if (!dataset) {
     return (
@@ -126,21 +135,26 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             </Typography>
           </div>
           <div id='tagContainer' className={tagContainer}>
-            {_keys(tagToBadge.default).map((key: string) => {
-              return (
-                <div key={key}>
-                  <Tooltip className="tagWrapper" title={key} placement="top">
-                    {tags.includes(key) ? tagToBadge.highlighted[key] : tagToBadge.default[key]}
-                  </Tooltip>
-                </div>
-              )
-            })}
+            <div className={tagHolder}>
+              {_keys(tagToBadge.default).map((key: string) => {
+                return (
+                  <div key={key}>
+                    <Tooltip className="tagWrapper" title={key} placement="top">
+                      {tags.includes(key) ? tagToBadge.highlighted[key] : tagToBadge.default[key]}
+                    </Tooltip>
+                  </div>
+                )
+              })}
+            </div>
+            <Fab className={closeButton} onClick={() => history.push('/')} size="small" aria-label="edit">
+              <CloseIcon />
+            </Fab>
           </div>
         </Box>
         <Paper className={paper}>
           <Table size="small">
             <TableHead>
-              <TableRow>
+              <TableRow className={tableRow}>
                 {
                   fields.map((field) => {
                     return (

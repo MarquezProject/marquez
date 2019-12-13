@@ -15,6 +15,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
         "_owner": "JobDetailPage-_owner-9",
         "_ownerIcon": "JobDetailPage-_ownerIcon-10",
         "_status": "JobDetailPage-_status-4",
+        "closeButton": "JobDetailPage-closeButton-17",
         "copyToClipboard": "JobDetailPage-copyToClipboard-16",
         "failed": "JobDetailPage-failed-5",
         "lastUpdated": "JobDetailPage-lastUpdated-3",
@@ -32,7 +33,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
       p={4}
     >
       <div
-        className="MuiBox-root MuiBox-root-18 JobDetailPage-root-1"
+        className="MuiBox-root MuiBox-root-19 JobDetailPage-root-1"
       >
         <WithStyles(ForwardRef(Typography))
           align="center"
@@ -487,6 +488,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
         "_owner": "JobDetailPage-_owner-9",
         "_ownerIcon": "JobDetailPage-_ownerIcon-10",
         "_status": "JobDetailPage-_status-4",
+        "closeButton": "JobDetailPage-closeButton-17",
         "copyToClipboard": "JobDetailPage-copyToClipboard-16",
         "failed": "JobDetailPage-failed-5",
         "lastUpdated": "JobDetailPage-lastUpdated-3",
@@ -882,7 +884,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
       p={4}
     >
       <div
-        className="MuiBox-root MuiBox-root-49 JobDetailPage-root-1"
+        className="MuiBox-root MuiBox-root-50 JobDetailPage-root-1"
       >
         <div
           className="JobDetailPage-topSection-2"
@@ -955,7 +957,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
               className="JobDetailPage-_description-8"
               classes={
                 Object {
-                  "root": "WithStyles(ForwardRef(Typography))-root-50",
+                  "root": "WithStyles(ForwardRef(Typography))-root-51",
                 }
               }
               color="primary"
@@ -990,7 +992,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                     "noWrap": "MuiTypography-noWrap",
                     "overline": "MuiTypography-overline",
                     "paragraph": "MuiTypography-paragraph",
-                    "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-50",
+                    "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-51",
                     "srOnly": "MuiTypography-srOnly",
                     "subtitle1": "MuiTypography-subtitle1",
                     "subtitle2": "MuiTypography-subtitle2",
@@ -999,7 +1001,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 color="primary"
               >
                 <p
-                  className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-50 JobDetailPage-_description-8 MuiTypography-body1 MuiTypography-colorPrimary"
+                  className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-51 JobDetailPage-_description-8 MuiTypography-body1 MuiTypography-colorPrimary"
                 >
                   calculates all possible dimensions from input geometry
                 </p>
@@ -1102,6 +1104,117 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
               </p>
             </ForwardRef(Typography)>
           </WithStyles(ForwardRef(Typography))>
+          <WithStyles(ForwardRef(Fab))
+            aria-label="edit"
+            className="JobDetailPage-closeButton-17"
+            onClick={[Function]}
+            size="small"
+          >
+            <ForwardRef(Fab)
+              aria-label="edit"
+              className="JobDetailPage-closeButton-17"
+              classes={
+                Object {
+                  "colorInherit": "MuiFab-colorInherit",
+                  "disabled": "Mui-disabled",
+                  "extended": "MuiFab-extended",
+                  "focusVisible": "Mui-focusVisible",
+                  "label": "MuiFab-label",
+                  "primary": "MuiFab-primary",
+                  "root": "MuiFab-root",
+                  "secondary": "MuiFab-secondary",
+                  "sizeMedium": "MuiFab-sizeMedium",
+                  "sizeSmall": "MuiFab-sizeSmall",
+                }
+              }
+              onClick={[Function]}
+              size="small"
+            >
+              <WithStyles(ForwardRef(ButtonBase))
+                aria-label="edit"
+                className="MuiFab-root JobDetailPage-closeButton-17 MuiFab-sizeSmall"
+                component="button"
+                disabled={false}
+                focusRipple={true}
+                focusVisibleClassName="Mui-focusVisible"
+                onClick={[Function]}
+              >
+                <ForwardRef(ButtonBase)
+                  aria-label="edit"
+                  className="MuiFab-root JobDetailPage-closeButton-17 MuiFab-sizeSmall"
+                  classes={
+                    Object {
+                      "disabled": "Mui-disabled",
+                      "focusVisible": "Mui-focusVisible",
+                      "root": "MuiButtonBase-root",
+                    }
+                  }
+                  component="button"
+                  disabled={false}
+                  focusRipple={true}
+                  focusVisibleClassName="Mui-focusVisible"
+                  onClick={[Function]}
+                >
+                  <button
+                    aria-label="edit"
+                    className="MuiButtonBase-root MuiFab-root JobDetailPage-closeButton-17 MuiFab-sizeSmall"
+                    disabled={false}
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onDragLeave={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyUp={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseLeave={[Function]}
+                    onMouseUp={[Function]}
+                    onTouchEnd={[Function]}
+                    onTouchMove={[Function]}
+                    onTouchStart={[Function]}
+                    tabIndex={0}
+                    type="button"
+                  >
+                    <span
+                      className="MuiFab-label"
+                    >
+                      <ForwardRef>
+                        <WithStyles(ForwardRef(SvgIcon))>
+                          <ForwardRef(SvgIcon)
+                            classes={
+                              Object {
+                                "colorAction": "MuiSvgIcon-colorAction",
+                                "colorDisabled": "MuiSvgIcon-colorDisabled",
+                                "colorError": "MuiSvgIcon-colorError",
+                                "colorPrimary": "MuiSvgIcon-colorPrimary",
+                                "colorSecondary": "MuiSvgIcon-colorSecondary",
+                                "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                                "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                                "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                                "root": "MuiSvgIcon-root",
+                              }
+                            }
+                          >
+                            <svg
+                              aria-hidden="true"
+                              className="MuiSvgIcon-root"
+                              focusable="false"
+                              role="presentation"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                              />
+                            </svg>
+                          </ForwardRef(SvgIcon)>
+                        </WithStyles(ForwardRef(SvgIcon))>
+                      </ForwardRef>
+                    </span>
+                    <NoSsr />
+                  </button>
+                </ForwardRef(ButtonBase)>
+              </WithStyles(ForwardRef(ButtonBase))>
+            </ForwardRef(Fab)>
+          </WithStyles(ForwardRef(Fab))>
         </div>
         <Styled(MuiBox)
           bgcolor="white"
@@ -1119,7 +1232,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
           width="80%"
         >
           <div
-            className="MuiBox-root MuiBox-root-60 JobDetailPage-_SQL-11"
+            className="MuiBox-root MuiBox-root-74 JobDetailPage-_SQL-11"
           >
             <WithStyles(undefined)
               color="secondary"
@@ -1128,7 +1241,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
               <ForwardRef
                 classes={
                   Object {
-                    "root": "OpenWithSharpIcon-root-61",
+                    "root": "OpenWithSharpIcon-root-75",
                   }
                 }
                 color="secondary"
@@ -1137,7 +1250,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 <WithStyles(ForwardRef(SvgIcon))
                   classes={
                     Object {
-                      "root": "OpenWithSharpIcon-root-61",
+                      "root": "OpenWithSharpIcon-root-75",
                     }
                   }
                   color="secondary"
@@ -1154,7 +1267,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                         "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
                         "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
                         "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
-                        "root": "MuiSvgIcon-root OpenWithSharpIcon-root-61",
+                        "root": "MuiSvgIcon-root OpenWithSharpIcon-root-75",
                       }
                     }
                     color="secondary"
@@ -1162,7 +1275,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   >
                     <svg
                       aria-hidden="true"
-                      className="MuiSvgIcon-root OpenWithSharpIcon-root-61 MuiSvgIcon-colorSecondary"
+                      className="MuiSvgIcon-root OpenWithSharpIcon-root-75 MuiSvgIcon-colorSecondary"
                       focusable="false"
                       onClick={[Function]}
                       role="presentation"
@@ -1188,7 +1301,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1222,7 +1335,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1230,7 +1343,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   />
                 </ForwardRef(Typography)>
               </WithStyles(ForwardRef(Typography))>
@@ -1243,7 +1356,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className="JobDetailPage-_SQLComment-12"
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1277,7 +1390,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1285,7 +1398,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 JobDetailPage-_SQLComment-12 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 JobDetailPage-_SQLComment-12 MuiTypography-body1"
                   >
                     -- THIS IS SAMPLE SQL
                   </p>
@@ -1300,7 +1413,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1334,7 +1447,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1342,7 +1455,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   />
                 </ForwardRef(Typography)>
               </WithStyles(ForwardRef(Typography))>
@@ -1355,7 +1468,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1389,7 +1502,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1397,7 +1510,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 0 AS num UNION ALL
                   </p>
@@ -1412,7 +1525,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1446,7 +1559,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1454,7 +1567,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 1 UNION ALL
                   </p>
@@ -1469,7 +1582,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1503,7 +1616,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1511,7 +1624,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 2 UNION ALL
                   </p>
@@ -1526,7 +1639,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1560,7 +1673,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1568,7 +1681,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 3 UNION ALL
                   </p>
@@ -1583,7 +1696,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1617,7 +1730,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1625,7 +1738,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 4 UNION ALL
                   </p>
@@ -1640,7 +1753,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1674,7 +1787,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1682,7 +1795,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 5 UNION ALL
                   </p>
@@ -1697,7 +1810,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1731,7 +1844,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1739,7 +1852,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 6 UNION ALL
                   </p>
@@ -1754,7 +1867,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1788,7 +1901,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1796,7 +1909,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 7 UNION ALL
                   </p>
@@ -1811,7 +1924,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1845,7 +1958,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1853,7 +1966,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 8 UNION ALL
                   </p>
@@ -1868,7 +1981,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1902,7 +2015,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1910,7 +2023,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                         SELECT 9
                   </p>
@@ -1925,7 +2038,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -1959,7 +2072,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -1967,7 +2080,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                     )
                   </p>
@@ -1982,7 +2095,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -2016,7 +2129,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -2024,7 +2137,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   />
                 </ForwardRef(Typography)>
               </WithStyles(ForwardRef(Typography))>
@@ -2037,7 +2150,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -2071,7 +2184,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -2079,7 +2192,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                     , numbers_100 AS
                   </p>
@@ -2094,7 +2207,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -2128,7 +2241,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -2136,7 +2249,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                     (
                   </p>
@@ -2151,7 +2264,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                 className=""
                 classes={
                   Object {
-                    "root": "WithStyles(ForwardRef(Typography))-root-62",
+                    "root": "WithStyles(ForwardRef(Typography))-root-76",
                   }
                 }
               >
@@ -2185,7 +2298,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                       "noWrap": "MuiTypography-noWrap",
                       "overline": "MuiTypography-overline",
                       "paragraph": "MuiTypography-paragraph",
-                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-62",
+                      "root": "MuiTypography-root WithStyles(ForwardRef(Typography))-root-76",
                       "srOnly": "MuiTypography-srOnly",
                       "subtitle1": "MuiTypography-subtitle1",
                       "subtitle2": "MuiTypography-subtitle2",
@@ -2193,7 +2306,7 @@ exports[`JobDetailPage Component when there is no match for the jobName in url p
                   }
                 >
                   <p
-                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-62 MuiTypography-body1"
+                    className="MuiTypography-root WithStyles(ForwardRef(Typography))-root-76 MuiTypography-body1"
                   >
                        FROM the_whole_flippin_universe
                   </p>

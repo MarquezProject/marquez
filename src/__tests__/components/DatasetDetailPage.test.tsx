@@ -11,7 +11,10 @@ const dataset = datasets[0]
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'), // use actual for all non-hook parts
-  useParams: jest.fn()
+  useParams: jest.fn(),
+  useHistory: () => ({
+    push: jest.fn()
+  })
 }))
 
 import { useParams } from 'react-router-dom'

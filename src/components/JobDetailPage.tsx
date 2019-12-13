@@ -5,12 +5,12 @@ import {
   WithStyles as IWithStyles,
   Theme as ITheme
 } from '@material-ui/core/styles'
-import { Typography, Box } from '@material-ui/core'
-import OpenWithSharpIcon from '@material-ui/icons/OpenWithSharp'
+import { Typography, Box, Fab } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
+import OpenWithSharpIcon from '@material-ui/icons/OpenWithSharp'
 import Modal from '@material-ui/core/Modal'
 import HowToRegIcon from '@material-ui/icons/HowToReg'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import _find from 'lodash/find'
 
 const globalStyles = require('../global_styles.css')
@@ -23,7 +23,8 @@ const styles = ({ palette, spacing, shadows }: ITheme) => {
   return createStyles({
     root: {
       marginTop: '52vh',
-      height: '48vh'
+      height: '48vh',
+      padding: '0 6% 1%',
     },
     topSection: {
       display: 'grid',
@@ -31,7 +32,8 @@ const styles = ({ palette, spacing, shadows }: ITheme) => {
       gridTemplateRows: '1fr 1fr',
       /* eslint-disable @typescript-eslint/quotes */
       gridTemplateAreas: `'status name owner-icon' '. description owner'`,
-      alignItems: 'center'
+      alignItems: 'center',
+      margin: '0px 6% 0px 0px'
     },
     lastUpdated: {
       color: palette.grey[600]
@@ -99,6 +101,13 @@ const styles = ({ palette, spacing, shadows }: ITheme) => {
       bottom: '1rem',
       right: '1rem',
       cursor: 'pointer'
+    },
+    closeButton: {
+      color: '#7D7D7D',
+      backgroundColor: '#ffffff',
+      position: "absolute",
+      right: '6%',
+      marginTop: '12px'
     }
   })
 }
@@ -173,9 +182,11 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     _ownerIcon,
     lastUpdated,
     topSection,
-    copyToClipboard
+    copyToClipboard,
+    closeButton
   } = classes
   const { jobName } = useParams()
+  const history = useHistory()
   const job = _find(jobs, j => j.name === jobName)
   if (!job) {
     return (
@@ -224,6 +235,9 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         </StyledTypography>
         <HowToRegIcon color='secondary' className={_ownerIcon} />
         <Typography className={_owner}>{namespace}</Typography>
+        <Fab className={closeButton} onClick={() => history.push('/')} size="small" aria-label="edit">
+          <CloseIcon />
+        </Fab>
       </div>
       <Box
         className={_SQL}

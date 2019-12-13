@@ -1210,13 +1210,16 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
   <DatasetDetailPage
     classes={
       Object {
+        "closeButton": "DatasetDetailPage-closeButton-9",
         "infoIcon": "DatasetDetailPage-infoIcon-4",
         "noData": "DatasetDetailPage-noData-3",
-        "paper": "DatasetDetailPage-paper-6",
+        "paper": "DatasetDetailPage-paper-7",
         "root": "DatasetDetailPage-root-1",
         "tableCell": "DatasetDetailPage-tableCell-5",
+        "tableRow": "DatasetDetailPage-tableRow-6",
         "tagContainer": "DatasetDetailPage-tagContainer-2",
-        "updated": "DatasetDetailPage-updated-7",
+        "tagHolder": "DatasetDetailPage-tagHolder-10",
+        "updated": "DatasetDetailPage-updated-8",
       }
     }
     datasets={
@@ -2429,14 +2432,14 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
       mt={10}
     >
       <div
-        className="MuiBox-root MuiBox-root-40 DatasetDetailPage-root-1"
+        className="MuiBox-root MuiBox-root-43 DatasetDetailPage-root-1"
       >
         <Styled(MuiBox)
           display="flex"
           justifyContent="space-between"
         >
           <div
-            className="MuiBox-root MuiBox-root-41"
+            className="MuiBox-root MuiBox-root-44"
           >
             <div>
               <WithStyles(ForwardRef(Typography))
@@ -2545,47 +2548,38 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
               id="tagContainer"
             >
               <div
-                key="is_pii"
+                className="DatasetDetailPage-tagHolder-10"
               >
-                <WithStyles(ForwardRef(Tooltip))
-                  className="tagWrapper"
-                  placement="top"
-                  title="is_pii"
+                <div
+                  key="is_pii"
                 >
-                  <ForwardRef(Tooltip)
+                  <WithStyles(ForwardRef(Tooltip))
                     className="tagWrapper"
-                    classes={
-                      Object {
-                        "popper": "MuiTooltip-popper",
-                        "popperInteractive": "MuiTooltip-popperInteractive",
-                        "tooltip": "MuiTooltip-tooltip",
-                        "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
-                        "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
-                        "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
-                        "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
-                        "touch": "MuiTooltip-touch",
-                      }
-                    }
                     placement="top"
                     title="is_pii"
                   >
-                    <ForwardRef
-                      aria-describedby={null}
+                    <ForwardRef(Tooltip)
                       className="tagWrapper"
-                      color="disabled"
-                      key="is_pii"
-                      onBlur={[Function]}
-                      onFocus={[Function]}
-                      onMouseLeave={[Function]}
-                      onMouseOver={[Function]}
-                      onTouchEnd={[Function]}
-                      onTouchStart={[Function]}
+                      classes={
+                        Object {
+                          "popper": "MuiTooltip-popper",
+                          "popperInteractive": "MuiTooltip-popperInteractive",
+                          "tooltip": "MuiTooltip-tooltip",
+                          "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                          "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                          "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                          "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                          "touch": "MuiTooltip-touch",
+                        }
+                      }
+                      placement="top"
                       title="is_pii"
                     >
-                      <WithStyles(ForwardRef(SvgIcon))
+                      <ForwardRef
                         aria-describedby={null}
                         className="tagWrapper"
                         color="disabled"
+                        key="is_pii"
                         onBlur={[Function]}
                         onFocus={[Function]}
                         onMouseLeave={[Function]}
@@ -2594,22 +2588,9 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                         onTouchStart={[Function]}
                         title="is_pii"
                       >
-                        <ForwardRef(SvgIcon)
+                        <WithStyles(ForwardRef(SvgIcon))
                           aria-describedby={null}
                           className="tagWrapper"
-                          classes={
-                            Object {
-                              "colorAction": "MuiSvgIcon-colorAction",
-                              "colorDisabled": "MuiSvgIcon-colorDisabled",
-                              "colorError": "MuiSvgIcon-colorError",
-                              "colorPrimary": "MuiSvgIcon-colorPrimary",
-                              "colorSecondary": "MuiSvgIcon-colorSecondary",
-                              "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
-                              "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
-                              "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
-                              "root": "MuiSvgIcon-root",
-                            }
-                          }
                           color="disabled"
                           onBlur={[Function]}
                           onFocus={[Function]}
@@ -2619,80 +2600,93 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                           onTouchStart={[Function]}
                           title="is_pii"
                         >
-                          <svg
+                          <ForwardRef(SvgIcon)
                             aria-describedby={null}
-                            aria-hidden="true"
-                            className="MuiSvgIcon-root tagWrapper MuiSvgIcon-colorDisabled"
-                            focusable="false"
+                            className="tagWrapper"
+                            classes={
+                              Object {
+                                "colorAction": "MuiSvgIcon-colorAction",
+                                "colorDisabled": "MuiSvgIcon-colorDisabled",
+                                "colorError": "MuiSvgIcon-colorError",
+                                "colorPrimary": "MuiSvgIcon-colorPrimary",
+                                "colorSecondary": "MuiSvgIcon-colorSecondary",
+                                "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                                "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                                "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                                "root": "MuiSvgIcon-root",
+                              }
+                            }
+                            color="disabled"
                             onBlur={[Function]}
                             onFocus={[Function]}
                             onMouseLeave={[Function]}
                             onMouseOver={[Function]}
                             onTouchEnd={[Function]}
                             onTouchStart={[Function]}
-                            role="presentation"
                             title="is_pii"
-                            viewBox="0 0 24 24"
                           >
-                            <path
-                              d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"
-                            />
-                          </svg>
-                        </ForwardRef(SvgIcon)>
-                      </WithStyles(ForwardRef(SvgIcon))>
-                    </ForwardRef>
-                    <ForwardRef(Popper)
-                      className="MuiTooltip-popper"
-                      id={null}
-                      open={false}
-                      placement="top"
-                      transition={true}
-                    />
-                  </ForwardRef(Tooltip)>
-                </WithStyles(ForwardRef(Tooltip))>
-              </div>
-              <div
-                key="is_compliant"
-              >
-                <WithStyles(ForwardRef(Tooltip))
-                  className="tagWrapper"
-                  placement="top"
-                  title="is_compliant"
+                            <svg
+                              aria-describedby={null}
+                              aria-hidden="true"
+                              className="MuiSvgIcon-root tagWrapper MuiSvgIcon-colorDisabled"
+                              focusable="false"
+                              onBlur={[Function]}
+                              onFocus={[Function]}
+                              onMouseLeave={[Function]}
+                              onMouseOver={[Function]}
+                              onTouchEnd={[Function]}
+                              onTouchStart={[Function]}
+                              role="presentation"
+                              title="is_pii"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"
+                              />
+                            </svg>
+                          </ForwardRef(SvgIcon)>
+                        </WithStyles(ForwardRef(SvgIcon))>
+                      </ForwardRef>
+                      <ForwardRef(Popper)
+                        className="MuiTooltip-popper"
+                        id={null}
+                        open={false}
+                        placement="top"
+                        transition={true}
+                      />
+                    </ForwardRef(Tooltip)>
+                  </WithStyles(ForwardRef(Tooltip))>
+                </div>
+                <div
+                  key="is_compliant"
                 >
-                  <ForwardRef(Tooltip)
+                  <WithStyles(ForwardRef(Tooltip))
                     className="tagWrapper"
-                    classes={
-                      Object {
-                        "popper": "MuiTooltip-popper",
-                        "popperInteractive": "MuiTooltip-popperInteractive",
-                        "tooltip": "MuiTooltip-tooltip",
-                        "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
-                        "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
-                        "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
-                        "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
-                        "touch": "MuiTooltip-touch",
-                      }
-                    }
                     placement="top"
                     title="is_compliant"
                   >
-                    <ForwardRef
-                      aria-describedby={null}
+                    <ForwardRef(Tooltip)
                       className="tagWrapper"
-                      color="disabled"
-                      key="is_compliant"
-                      onBlur={[Function]}
-                      onFocus={[Function]}
-                      onMouseLeave={[Function]}
-                      onMouseOver={[Function]}
-                      onTouchEnd={[Function]}
-                      onTouchStart={[Function]}
+                      classes={
+                        Object {
+                          "popper": "MuiTooltip-popper",
+                          "popperInteractive": "MuiTooltip-popperInteractive",
+                          "tooltip": "MuiTooltip-tooltip",
+                          "tooltipPlacementBottom": "MuiTooltip-tooltipPlacementBottom",
+                          "tooltipPlacementLeft": "MuiTooltip-tooltipPlacementLeft",
+                          "tooltipPlacementRight": "MuiTooltip-tooltipPlacementRight",
+                          "tooltipPlacementTop": "MuiTooltip-tooltipPlacementTop",
+                          "touch": "MuiTooltip-touch",
+                        }
+                      }
+                      placement="top"
                       title="is_compliant"
                     >
-                      <WithStyles(ForwardRef(SvgIcon))
+                      <ForwardRef
                         aria-describedby={null}
                         className="tagWrapper"
                         color="disabled"
+                        key="is_compliant"
                         onBlur={[Function]}
                         onFocus={[Function]}
                         onMouseLeave={[Function]}
@@ -2701,22 +2695,9 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                         onTouchStart={[Function]}
                         title="is_compliant"
                       >
-                        <ForwardRef(SvgIcon)
+                        <WithStyles(ForwardRef(SvgIcon))
                           aria-describedby={null}
                           className="tagWrapper"
-                          classes={
-                            Object {
-                              "colorAction": "MuiSvgIcon-colorAction",
-                              "colorDisabled": "MuiSvgIcon-colorDisabled",
-                              "colorError": "MuiSvgIcon-colorError",
-                              "colorPrimary": "MuiSvgIcon-colorPrimary",
-                              "colorSecondary": "MuiSvgIcon-colorSecondary",
-                              "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
-                              "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
-                              "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
-                              "root": "MuiSvgIcon-root",
-                            }
-                          }
                           color="disabled"
                           onBlur={[Function]}
                           onFocus={[Function]}
@@ -2726,46 +2707,183 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                           onTouchStart={[Function]}
                           title="is_compliant"
                         >
-                          <svg
+                          <ForwardRef(SvgIcon)
                             aria-describedby={null}
-                            aria-hidden="true"
-                            className="MuiSvgIcon-root tagWrapper MuiSvgIcon-colorDisabled"
-                            focusable="false"
+                            className="tagWrapper"
+                            classes={
+                              Object {
+                                "colorAction": "MuiSvgIcon-colorAction",
+                                "colorDisabled": "MuiSvgIcon-colorDisabled",
+                                "colorError": "MuiSvgIcon-colorError",
+                                "colorPrimary": "MuiSvgIcon-colorPrimary",
+                                "colorSecondary": "MuiSvgIcon-colorSecondary",
+                                "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                                "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                                "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                                "root": "MuiSvgIcon-root",
+                              }
+                            }
+                            color="disabled"
                             onBlur={[Function]}
                             onFocus={[Function]}
                             onMouseLeave={[Function]}
                             onMouseOver={[Function]}
                             onTouchEnd={[Function]}
                             onTouchStart={[Function]}
-                            role="presentation"
                             title="is_compliant"
-                            viewBox="0 0 24 24"
                           >
-                            <path
-                              d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm7 10c0 4.52-2.98 8.69-7 9.93-4.02-1.24-7-5.41-7-9.93V6.3l7-3.11 7 3.11V11zm-11.59.59L6 13l4 4 8-8-1.41-1.42L10 14.17z"
-                            />
-                          </svg>
-                        </ForwardRef(SvgIcon)>
-                      </WithStyles(ForwardRef(SvgIcon))>
-                    </ForwardRef>
-                    <ForwardRef(Popper)
-                      className="MuiTooltip-popper"
-                      id={null}
-                      open={false}
-                      placement="top"
-                      transition={true}
-                    />
-                  </ForwardRef(Tooltip)>
-                </WithStyles(ForwardRef(Tooltip))>
+                            <svg
+                              aria-describedby={null}
+                              aria-hidden="true"
+                              className="MuiSvgIcon-root tagWrapper MuiSvgIcon-colorDisabled"
+                              focusable="false"
+                              onBlur={[Function]}
+                              onFocus={[Function]}
+                              onMouseLeave={[Function]}
+                              onMouseOver={[Function]}
+                              onTouchEnd={[Function]}
+                              onTouchStart={[Function]}
+                              role="presentation"
+                              title="is_compliant"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm7 10c0 4.52-2.98 8.69-7 9.93-4.02-1.24-7-5.41-7-9.93V6.3l7-3.11 7 3.11V11zm-11.59.59L6 13l4 4 8-8-1.41-1.42L10 14.17z"
+                              />
+                            </svg>
+                          </ForwardRef(SvgIcon)>
+                        </WithStyles(ForwardRef(SvgIcon))>
+                      </ForwardRef>
+                      <ForwardRef(Popper)
+                        className="MuiTooltip-popper"
+                        id={null}
+                        open={false}
+                        placement="top"
+                        transition={true}
+                      />
+                    </ForwardRef(Tooltip)>
+                  </WithStyles(ForwardRef(Tooltip))>
+                </div>
               </div>
+              <WithStyles(ForwardRef(Fab))
+                aria-label="edit"
+                className="DatasetDetailPage-closeButton-9"
+                onClick={[Function]}
+                size="small"
+              >
+                <ForwardRef(Fab)
+                  aria-label="edit"
+                  className="DatasetDetailPage-closeButton-9"
+                  classes={
+                    Object {
+                      "colorInherit": "MuiFab-colorInherit",
+                      "disabled": "Mui-disabled",
+                      "extended": "MuiFab-extended",
+                      "focusVisible": "Mui-focusVisible",
+                      "label": "MuiFab-label",
+                      "primary": "MuiFab-primary",
+                      "root": "MuiFab-root",
+                      "secondary": "MuiFab-secondary",
+                      "sizeMedium": "MuiFab-sizeMedium",
+                      "sizeSmall": "MuiFab-sizeSmall",
+                    }
+                  }
+                  onClick={[Function]}
+                  size="small"
+                >
+                  <WithStyles(ForwardRef(ButtonBase))
+                    aria-label="edit"
+                    className="MuiFab-root DatasetDetailPage-closeButton-9 MuiFab-sizeSmall"
+                    component="button"
+                    disabled={false}
+                    focusRipple={true}
+                    focusVisibleClassName="Mui-focusVisible"
+                    onClick={[Function]}
+                  >
+                    <ForwardRef(ButtonBase)
+                      aria-label="edit"
+                      className="MuiFab-root DatasetDetailPage-closeButton-9 MuiFab-sizeSmall"
+                      classes={
+                        Object {
+                          "disabled": "Mui-disabled",
+                          "focusVisible": "Mui-focusVisible",
+                          "root": "MuiButtonBase-root",
+                        }
+                      }
+                      component="button"
+                      disabled={false}
+                      focusRipple={true}
+                      focusVisibleClassName="Mui-focusVisible"
+                      onClick={[Function]}
+                    >
+                      <button
+                        aria-label="edit"
+                        className="MuiButtonBase-root MuiFab-root DatasetDetailPage-closeButton-9 MuiFab-sizeSmall"
+                        disabled={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onDragLeave={[Function]}
+                        onFocus={[Function]}
+                        onKeyDown={[Function]}
+                        onKeyUp={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseUp={[Function]}
+                        onTouchEnd={[Function]}
+                        onTouchMove={[Function]}
+                        onTouchStart={[Function]}
+                        tabIndex={0}
+                        type="button"
+                      >
+                        <span
+                          className="MuiFab-label"
+                        >
+                          <ForwardRef>
+                            <WithStyles(ForwardRef(SvgIcon))>
+                              <ForwardRef(SvgIcon)
+                                classes={
+                                  Object {
+                                    "colorAction": "MuiSvgIcon-colorAction",
+                                    "colorDisabled": "MuiSvgIcon-colorDisabled",
+                                    "colorError": "MuiSvgIcon-colorError",
+                                    "colorPrimary": "MuiSvgIcon-colorPrimary",
+                                    "colorSecondary": "MuiSvgIcon-colorSecondary",
+                                    "fontSizeInherit": "MuiSvgIcon-fontSizeInherit",
+                                    "fontSizeLarge": "MuiSvgIcon-fontSizeLarge",
+                                    "fontSizeSmall": "MuiSvgIcon-fontSizeSmall",
+                                    "root": "MuiSvgIcon-root",
+                                  }
+                                }
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  className="MuiSvgIcon-root"
+                                  focusable="false"
+                                  role="presentation"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                                  />
+                                </svg>
+                              </ForwardRef(SvgIcon)>
+                            </WithStyles(ForwardRef(SvgIcon))>
+                          </ForwardRef>
+                        </span>
+                        <NoSsr />
+                      </button>
+                    </ForwardRef(ButtonBase)>
+                  </WithStyles(ForwardRef(ButtonBase))>
+                </ForwardRef(Fab)>
+              </WithStyles(ForwardRef(Fab))>
             </div>
           </div>
         </Styled(MuiBox)>
         <WithStyles(ForwardRef(Paper))
-          className="DatasetDetailPage-paper-6"
+          className="DatasetDetailPage-paper-7"
         >
           <ForwardRef(Paper)
-            className="DatasetDetailPage-paper-6"
+            className="DatasetDetailPage-paper-7"
             classes={
               Object {
                 "elevation0": "MuiPaper-elevation0",
@@ -2799,7 +2917,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
             }
           >
             <div
-              className="MuiPaper-root MuiPaper-elevation1 DatasetDetailPage-paper-6 MuiPaper-rounded"
+              className="MuiPaper-root MuiPaper-elevation1 DatasetDetailPage-paper-7 MuiPaper-rounded"
             >
               <WithStyles(ForwardRef(Table))
                 size="small"
@@ -2827,8 +2945,11 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                         <thead
                           className="MuiTableHead-root"
                         >
-                          <WithStyles(ForwardRef(TableRow))>
+                          <WithStyles(ForwardRef(TableRow))
+                            className="DatasetDetailPage-tableRow-6"
+                          >
                             <ForwardRef(TableRow)
+                              className="DatasetDetailPage-tableRow-6"
                               classes={
                                 Object {
                                   "footer": "MuiTableRow-footer",
@@ -2840,7 +2961,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                               }
                             >
                               <tr
-                                className="MuiTableRow-root MuiTableRow-head"
+                                className="MuiTableRow-root DatasetDetailPage-tableRow-6 MuiTableRow-head"
                               >
                                 <WithStyles(ForwardRef(TableCell))
                                   align="left"
@@ -3436,12 +3557,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
         </WithStyles(ForwardRef(Paper))>
         <WithStyles(ForwardRef(Typography))
           align="right"
-          className="DatasetDetailPage-updated-7"
+          className="DatasetDetailPage-updated-8"
           color="primary"
         >
           <ForwardRef(Typography)
             align="right"
-            className="DatasetDetailPage-updated-7"
+            className="DatasetDetailPage-updated-8"
             classes={
               Object {
                 "alignCenter": "MuiTypography-alignCenter",
@@ -3479,7 +3600,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
             color="primary"
           >
             <p
-              className="MuiTypography-root DatasetDetailPage-updated-7 MuiTypography-body1 MuiTypography-colorPrimary MuiTypography-alignRight"
+              className="MuiTypography-root DatasetDetailPage-updated-8 MuiTypography-body1 MuiTypography-colorPrimary MuiTypography-alignRight"
             />
           </ForwardRef(Typography)>
         </WithStyles(ForwardRef(Typography))>
@@ -4699,13 +4820,16 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
   <DatasetDetailPage
     classes={
       Object {
+        "closeButton": "DatasetDetailPage-closeButton-9",
         "infoIcon": "DatasetDetailPage-infoIcon-4",
         "noData": "DatasetDetailPage-noData-3",
-        "paper": "DatasetDetailPage-paper-6",
+        "paper": "DatasetDetailPage-paper-7",
         "root": "DatasetDetailPage-root-1",
         "tableCell": "DatasetDetailPage-tableCell-5",
+        "tableRow": "DatasetDetailPage-tableRow-6",
         "tagContainer": "DatasetDetailPage-tagContainer-2",
-        "updated": "DatasetDetailPage-updated-7",
+        "tagHolder": "DatasetDetailPage-tagHolder-10",
+        "updated": "DatasetDetailPage-updated-8",
       }
     }
     datasets={
@@ -5920,7 +6044,7 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
       mt={10}
     >
       <div
-        className="MuiBox-root MuiBox-root-9 DatasetDetailPage-root-1"
+        className="MuiBox-root MuiBox-root-12 DatasetDetailPage-root-1"
       >
         <WithStyles(ForwardRef(Typography))
           align="center"
