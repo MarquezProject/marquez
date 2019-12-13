@@ -59,7 +59,8 @@ cat ./data/jobs.json | jq -c '.[]' | \
 
     if [[ "( $RANDOM % 2 )" -ge 0 ]]; then
       n=0
-      while [[ "${n}" -lt $RUNS ]]; do
+      runs=$(( $RANDOM % $RUNS ))
+      while [[ "${n}" -lt $runs ]]; do
         response=$(curl --silent -X POST "http://${MARQUEZ_HOST}:${MARQUEZ_PORT}/api/v1/namespaces/${namespace}/jobs/${job}/runs" \
           -H 'Content-Type: application/json' \
           -d "{}")
