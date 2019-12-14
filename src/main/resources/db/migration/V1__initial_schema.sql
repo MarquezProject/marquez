@@ -23,13 +23,13 @@ CREATE TABLE namespace_ownerships (
 );
 
 CREATE TABLE sources (
-  uuid            UUID PRIMARY KEY,
-  type            VARCHAR(64) NOT NULL,
-  created_at      TIMESTAMP NOT NULL,
-  updated_at      TIMESTAMP NOT NULL,
-  name            VARCHAR(64) UNIQUE NOT NULL,
-  connection_url  VARCHAR(255) NOT NULL,
-  description     TEXT,
+  uuid           UUID PRIMARY KEY,
+  type           VARCHAR(64) NOT NULL,
+  created_at     TIMESTAMP NOT NULL,
+  updated_at     TIMESTAMP NOT NULL,
+  name           VARCHAR(64) UNIQUE NOT NULL,
+  connection_url VARCHAR(255) NOT NULL,
+  description    TEXT,
   UNIQUE (name, connection_url)
 );
 
@@ -85,14 +85,14 @@ CREATE TABLE run_args (
 );
 
 CREATE TABLE runs (
-  uuid                UUID PRIMARY KEY,
-  created_at          TIMESTAMP NOT NULL,
-  updated_at          TIMESTAMP NOT NULL,
-  job_version_uuid    UUID REFERENCES job_versions(uuid),
-  run_args_uuid       UUID REFERENCES run_args(uuid),
-  nominal_start_time  TIMESTAMP,
-  nominal_end_time    TIMESTAMP,
-  current_run_state   VARCHAR(64)
+  uuid               UUID PRIMARY KEY,
+  created_at         TIMESTAMP NOT NULL,
+  updated_at         TIMESTAMP NOT NULL,
+  job_version_uuid   UUID REFERENCES job_versions(uuid),
+  run_args_uuid      UUID REFERENCES run_args(uuid),
+  nominal_start_time TIMESTAMP,
+  nominal_end_time   TIMESTAMP,
+  current_run_state  VARCHAR(64)
 );
 
 CREATE TABLE run_states (
