@@ -1,0 +1,35 @@
+server:
+  applicationConnectors:
+  - type: http
+    port: ${MARQUEZ_PORT:-8080}
+  adminConnectors:
+  - type: http
+    port: ${MARQUEZ_ADMIN_PORT:-8081}
+  # Enables access logs formatted as JSON
+  # requestLog:
+  #   appenders:
+  #     - type: console
+  #       layout:
+  #         type: access-json
+
+db:
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
+  user: ${POSTGRES_USER}
+  password: ${POSTGRES_PASSWORD}
+
+logging:
+  level: ${LOG_LEVEL:-INFO}
+  appenders:
+    - type: console
+      # Enables app logs formatted as JSON
+      # layout:
+      #   type: json
+
+# Enables metric reportering to the console
+# metrics:
+#  frequency: ${METRICS_FREQUENCY:-1 minute}
+#  reporters:
+#    - type: console
+#      timeZone: UTC
+#      output: stdout
