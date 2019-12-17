@@ -42,10 +42,15 @@ public abstract class Dataset {
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
   @Getter @NonNull private final String sourceName;
+  @Nullable private final Instant lastModified;
   @Nullable private final String description;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<Instant> getLastModified() {
+    return Optional.ofNullable(lastModified);
   }
 
   public static Dataset fromJson(@NonNull final String json) {

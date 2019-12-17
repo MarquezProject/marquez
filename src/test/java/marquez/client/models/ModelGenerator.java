@@ -82,7 +82,13 @@ public final class ModelGenerator {
   public static DbTable newDbTable() {
     final Instant now = newTimestamp();
     return new DbTable(
-        newDatasetName(), newDatasetPhysicalName(), now, now, newSourceName(), newDescription());
+        newDatasetName(),
+        newDatasetPhysicalName(),
+        now,
+        now,
+        newSourceName(),
+        null,
+        newDescription());
   }
 
   public static StreamMeta newStreamMeta() {
@@ -102,6 +108,7 @@ public final class ModelGenerator {
         now,
         now,
         newSourceName(),
+        null,
         newSchemaLocation(),
         newDescription());
   }

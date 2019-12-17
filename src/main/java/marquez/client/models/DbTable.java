@@ -28,7 +28,8 @@ public final class DbTable extends Dataset {
       final Instant createdAt,
       final Instant updatedAt,
       final String sourceName,
+      @Nullable final Instant lastModified,
       @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, description);
+    super(name, physicalName, createdAt, updatedAt, sourceName, lastModified, description);
   }
 }

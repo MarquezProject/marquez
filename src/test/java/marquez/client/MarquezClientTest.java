@@ -76,6 +76,7 @@ public class MarquezClientTest {
   // COMMON
   private static final Instant CREATED_AT = newTimestamp();
   private static final Instant UPDATED_AT = CREATED_AT;
+  private static final Instant LAST_MODIFIED = newTimestamp();
 
   // NAMESPACE
   private static final String NAMESPACE_NAME = newNamespaceName();
@@ -105,6 +106,16 @@ public class MarquezClientTest {
           CREATED_AT,
           UPDATED_AT,
           DB_TABLE_SOURCE_NAME,
+          null,
+          DB_TABLE_DESCRIPTION);
+  private static final DbTable DB_TABLE_MODIFIED =
+      new DbTable(
+          DB_TABLE_NAME,
+          DB_TABLE_PHYSICAL_NAME,
+          CREATED_AT,
+          UPDATED_AT,
+          DB_TABLE_SOURCE_NAME,
+          LAST_MODIFIED,
           DB_TABLE_DESCRIPTION);
 
   // STREAM DATASET
@@ -120,6 +131,17 @@ public class MarquezClientTest {
           CREATED_AT,
           UPDATED_AT,
           STREAM_SOURCE_NAME,
+          null,
+          STREAM_SCHEMA_LOCATION,
+          STREAM_DESCRIPTION);
+  private static final Stream STREAM_MODIFIED =
+      new Stream(
+          STREAM_NAME,
+          STREAM_PHYSICAL_NAME,
+          CREATED_AT,
+          UPDATED_AT,
+          STREAM_SOURCE_NAME,
+          LAST_MODIFIED,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION);
 
@@ -319,6 +341,37 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testModifiedDbTable() throws Exception {
+    final String pathTemplate = "/namespaces/%s/datasets/%s";
+    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME);
+    final URL url = buildUrlFor(path);
+    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+
+    final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
+    when(http.get(url)).thenReturn(dbTableAsJson);
+
+    final DbTable dataset = (DbTable) client.getDataset(DB_TABLE_NAME);
+
+    final DbTableMeta modifiedMeta =
+        DbTableMeta.builder()
+            .physicalName(dataset.getPhysicalName())
+            .sourceName(dataset.getSourceName())
+            .description(dataset.getDescription().get())
+            .runId(RUN_ID)
+            .build();
+
+    final Instant beforeModified = Instant.now();
+    final String modifiedMetaAsJson = JsonGenerator.newJsonFor(modifiedMeta);
+    final String modifiedDbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE_MODIFIED);
+    when(http.put(url, modifiedMetaAsJson)).thenReturn(modifiedDbTableAsJson);
+
+    final Dataset modifiedDataset = client.createDataset(DB_TABLE_NAME, modifiedMeta);
+    assertThat(modifiedDataset).isInstanceOf(DbTable.class);
+    assertThat((DbTable) modifiedDataset).isEqualTo(DB_TABLE_MODIFIED);
+    assertThat(modifiedDataset.getLastModified().get().isAfter(beforeModified));
+  }
+
+  @Test
   public void testCreateStream() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
     final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME);
@@ -353,6 +406,38 @@ public class MarquezClientTest {
 
     final Dataset dataset = client.getDataset(STREAM_NAME);
     assertThat(dataset).isEqualTo(STREAM);
+  }
+
+  @Test
+  public void testModifiedStream() throws Exception {
+    final String pathTemplate = "/namespaces/%s/datasets/%s";
+    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME);
+    final URL url = buildUrlFor(path);
+    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+
+    final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
+    when(http.get(url)).thenReturn(streamAsJson);
+
+    final Stream dataset = (Stream) client.getDataset(STREAM_NAME);
+
+    final StreamMeta modifiedMeta =
+        StreamMeta.builder()
+            .physicalName(dataset.getPhysicalName())
+            .sourceName(dataset.getSourceName())
+            .description(dataset.getDescription().get())
+            .schemaLocation(dataset.getSchemaLocation())
+            .runId(RUN_ID)
+            .build();
+
+    final Instant beforeModified = Instant.now();
+    final String modifiedMetaAsJson = JsonGenerator.newJsonFor(modifiedMeta);
+    final String modifiedStreamAsJson = JsonGenerator.newJsonFor(STREAM_MODIFIED);
+    when(http.put(url, modifiedMetaAsJson)).thenReturn(modifiedStreamAsJson);
+
+    final Dataset modifiedDataset = client.createDataset(STREAM_NAME, modifiedMeta);
+    assertThat(modifiedDataset).isInstanceOf(Stream.class);
+    assertThat((Stream) modifiedDataset).isEqualTo(STREAM_MODIFIED);
+    assertThat(modifiedDataset.getLastModified().get().isAfter(beforeModified));
   }
 
   @Test
