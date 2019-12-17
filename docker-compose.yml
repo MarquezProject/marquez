@@ -1,11 +1,5 @@
 version: '3'
 
-volumes:
-  airflow-data:
-    external: false
-  marquez-data:
-    external: false
-
 services:
 
   airflow-db:
@@ -68,4 +62,21 @@ services:
     depends_on:
       - marquez-db
 
+  marquez-web:
+    image: 'marquezproject/marquez-web:latest'
+    ports:
+      - "3000:3000"
+    environment:
+      - MARQUEZ_HOST=marquez-api
+      - MARQUEZ_PORT=5000
+    volumes:
+      - ./docker/wait-for-it.sh:/usr/local/bin/wait-for-it.sh
+    depends_on:
+      - marquez-api
+    command: ["wait-for-it.sh", "marquez-api:5000", "--", "/usr/src/app/entrypoint.sh"]
 
+volumes:
+  airflow-data:
+    external: false
+  marquez-data:
+    external: false
