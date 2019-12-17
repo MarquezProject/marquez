@@ -116,8 +116,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
     // issues before app termination.
     try {
       log.info("Migrating database...");
-      flyway.migrate();
-      log.info("Successfully migrated database.");
+      final int migrations = flyway.migrate();
+      log.info("Successfully applied '{}' migrations to database.", migrations);
     } catch (FlywayException errorOnDbMigrate) {
       log.error("Failed to apply migration to database.", errorOnDbMigrate);
       try {

@@ -45,7 +45,7 @@ public final class FlywayFactory {
   private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
   private static final String DEFAULT_TABLE = "flyway_schema_history";
   private static final boolean DEFAULT_PLACEHOLDER_REPLACEMENT = false;
-  private static final Map DEFAULT_PLACEHOLDERS = ImmutableMap.of();
+  private static final Map<String, String> DEFAULT_PLACEHOLDERS = ImmutableMap.of();
   private static final String DEFAULT_PLACEHOLDER_PREFIX = "${";
   private static final String DEFAULT_PLACEHOLDER_SUFFIX = "}";
   private static final String DEFAULT_SQL_MIGRATION_PREFIX = "V";
