@@ -18,7 +18,13 @@ db:
   user: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}
 
+# Enables flyway configuration overrides (see: https://flywaydb.org/documentation/configfiles)
+# flyway:
+#   connectRetries: 3
+#   cleanDisabled: true
+
 logging:
+  # Levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, ALL, OFF
   level: ${LOG_LEVEL:-INFO}
   appenders:
     - type: console

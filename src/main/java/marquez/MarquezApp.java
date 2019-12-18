@@ -14,11 +14,11 @@
 
 package marquez;
 
-import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -26,6 +26,7 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.hotspot.DefaultExports;
+import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.DatasetResource;
@@ -37,6 +38,7 @@ import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
+import marquez.db.FlywayFactory;
 import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
@@ -62,7 +64,8 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 @Slf4j
 public final class MarquezApp extends Application<MarquezConfig> {
   private static final String APP_NAME = "MarquezApp";
-  private static final String POSTGRES_DB = "postgresql";
+  private static final String DB_SOURCE_NAME = APP_NAME + "-source";
+  private static final String DB_POSTGRES = "postgresql";
   private static final boolean ERROR_ON_UNDEFINED = false;
 
   // Monitoring
@@ -94,26 +97,27 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void run(@NonNull MarquezConfig config, @NonNull Environment env) throws MarquezException {
+    final DataSourceFactory sourceFactory = config.getDataSourceFactory();
+    final DataSource source = sourceFactory.build(env.metrics(), DB_SOURCE_NAME);
+
     log.info("Running startup actions...");
-    migrateDbOrError(config);
-    registerResources(config, env);
+    migrateDbOrError(config, source);
+    registerResources(config, env, source);
 
     // Expose metrics for monitoring.
     env.servlets().addServlet(PROMETHEUS, new MetricsServlet()).addMapping(PROMETHEUS_ENDPOINT);
   }
 
-  private void migrateDbOrError(@NonNull MarquezConfig config) {
-    final Flyway flyway = new Flyway();
-    final DataSourceFactory db = config.getDataSourceFactory();
-    String initSql = config.getFlywayInitSql() == null ? "" : config.getFlywayInitSql();
-    flyway.setDataSource(db.getUrl(), db.getUser(), db.getPassword(), initSql);
+  private void migrateDbOrError(@NonNull MarquezConfig config, @NonNull DataSource source) {
+    final FlywayFactory flywayFactory = config.getFlywayFactory();
+    final Flyway flyway = flywayFactory.build(source);
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts
     // requiring we handle the throwable and apply a repair on the database to fix any
     // issues before app termination.
     try {
       log.info("Migrating database...");
-      flyway.migrate();
-      log.info("Successfully migrated database.");
+      final int migrations = flyway.migrate();
+      log.info("Successfully applied '{}' migrations to database.", migrations);
     } catch (FlywayException errorOnDbMigrate) {
       log.error("Failed to apply migration to database.", errorOnDbMigrate);
       try {
@@ -130,15 +134,15 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
   }
 
-  private void registerResources(@NonNull MarquezConfig config, @NonNull Environment env)
+  private void registerResources(
+      @NonNull MarquezConfig config, @NonNull Environment env, @NonNull DataSource source)
       throws MarquezException {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
-            .build(env, config.getDataSourceFactory(), POSTGRES_DB)
+            .build(env, config.getDataSourceFactory(), (ManagedDataSource) source, DB_POSTGRES)
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
-    jdbi.setSqlLogger(new InstrumentedSqlLogger(env.metrics()));
 
     final NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
     final OwnerDao ownerDao = jdbi.onDemand(OwnerDao.class);
@@ -171,7 +175,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
             runDao,
             runArgsDao,
             runStateDao);
-
     final TagService tagService = new TagService(tagDao);
 
     env.jersey().register(new NamespaceResource(namespaceService));
