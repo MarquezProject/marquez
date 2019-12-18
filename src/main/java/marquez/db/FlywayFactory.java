@@ -32,7 +32,7 @@ import org.flywaydb.core.Flyway;
 public final class FlywayFactory {
   private static final int DEFAULT_CONNECT_RETRIES = 0;
   private static final boolean DEFAULT_GROUP = false;
-  private static final boolean DEFAULT_MIX = false;
+  private static final boolean DEFAULT_MIXED = false;
   private static final boolean DEFAULT_IGNORE_MISSING_MIGRATIONS = false;
   private static final boolean DEFAULT_IGNORE_IGNORED_MIGRATIONS = false;
   private static final boolean DEFAULT_IGNORE_PENDING_MIGRATIONS = false;
@@ -55,7 +55,7 @@ public final class FlywayFactory {
   @Setter @Nullable private String initSql;
   @Getter @Setter private boolean group = DEFAULT_GROUP;
   @Setter @Nullable private String installedBy;
-  @Getter @Setter private boolean mixed = DEFAULT_MIX;
+  @Getter @Setter private boolean mixed = DEFAULT_MIXED;
   @Getter @Setter private boolean ignoreMissingMigrations = DEFAULT_IGNORE_MISSING_MIGRATIONS;
   @Getter @Setter private boolean ignoreIgnoredMigrations = DEFAULT_IGNORE_IGNORED_MIGRATIONS;
   @Getter @Setter private boolean ignorePendingMigrations = DEFAULT_IGNORE_PENDING_MIGRATIONS;
