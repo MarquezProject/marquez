@@ -116,23 +116,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/sources'
 
-  /tags:
-    get:
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
-      summary: List all tags
-      description: Returns a list of tags.
-      tags:
-        - Tags
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/tags'
-
   /namespaces/{namespace}/datasets/{dataset}:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -361,6 +344,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runAsAborted'
+
+  /tags:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      summary: List all tags
+      description: Returns a list of tags.
+      tags:
+        - Tags
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tags'
 
 components:
   parameters:
@@ -1072,12 +1072,10 @@ components:
         sources:
           items:
             $ref: '#/components/schemas/source'
+
     tag:
       type: object
       properties:
-        description:
-          description: The description of the tag.
-          type: string
         name:
           description: The name of the tag.
           type: string
@@ -1089,11 +1087,14 @@ components:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the tag was updated.
           type: string
           format: date-time
+        description:
+          description: The description of the tag.
+          type: string
       example:
-        description: PII related tag
         name: PII
         createdAt: 2019-05-09T19:49:24.201361Z
         updatedAt: 2019-05-09T19:49:24.201361Z
+        description: PII related tag
 
     tags:
       type: object
