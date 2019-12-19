@@ -14,11 +14,11 @@
 
 plugins {
   id 'checkstyle'
-  id 'findbugs'
   id 'jacoco'
   id 'java-library'
   id 'maven-publish'
   id 'signing'
+  id "com.github.spotbugs" version "3.0.0"
   id 'com.adarshr.test-logger' version '1.7.0'
   id 'com.diffplug.gradle.spotless' version '3.23.1'
   id 'com.github.jk1.dependency-license-report' version '1.9'
@@ -181,7 +181,7 @@ checkstyleTest {
   source = 'src/test/java'
 }
 
-findbugsMain {
+spotbugsMain {
   ignoreFailures = false
   effort = 'max'
   reportLevel = 'low'

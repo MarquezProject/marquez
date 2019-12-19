@@ -322,10 +322,8 @@ public class MarquezClient {
       final Properties properties = new Properties();
       try (final InputStream stream =
           MarquezClient.class.getClassLoader().getResourceAsStream(CONFIG_PROPERTIES)) {
-        if (stream != null) {
-          properties.load(stream);
-          return new Version(properties.getProperty(VERSION_PROPERTY_NAME, VERSION_UNKNOWN));
-        }
+        properties.load(stream);
+        return new Version(properties.getProperty(VERSION_PROPERTY_NAME, VERSION_UNKNOWN));
       } catch (IOException e) {
         log.warn("Failed to load properties file: {}", CONFIG_PROPERTIES, e);
       }
