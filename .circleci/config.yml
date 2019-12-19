@@ -35,7 +35,7 @@ jobs:
 
 workflows:
   version: 2
-  marquez:
+  marquez_java:
     jobs:
       - build
       - test:
