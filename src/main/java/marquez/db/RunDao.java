@@ -42,11 +42,24 @@ public interface RunDao extends SqlObject {
   default void insert(RunRow row) {
     getHandle()
         .createUpdate(
-            "INSERT INTO runs (uuid, created_at, updated_at, job_version_uuid, run_args_uuid, nominal_start_time, nominal_end_time) "
-                + "VALUES (:uuid, :createdAt, :updatedAt, :jobVersionUuid, :runArgsUuid, :nominalStartTime, :nominalEndTime)")
+            "INSERT INTO runs ("
+                + "uuid, "
+                + "created_at, "
+                + "updated_at, "
+                + "job_version_uuid, "
+                + "run_args_uuid, "
+                + "nominal_start_time, "
+                + "nominal_end_time"
+                + ") VALUES ("
+                + ":uuid, "
+                + ":createdAt, "
+                + ":updatedAt, "
+                + ":jobVersionUuid, "
+                + ":runArgsUuid, "
+                + ":nominalStartTime, "
+                + ":nominalEndTime)")
         .bindBean(row)
         .execute();
-
     createJobVersionDao().update(row.getJobVersionUuid(), row.getCreatedAt(), row.getUuid());
   }
 

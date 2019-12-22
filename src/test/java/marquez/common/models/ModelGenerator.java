@@ -84,11 +84,7 @@ public final class ModelGenerator extends Generator {
   }
 
   public static Field newField() {
-    return new Field(
-        newFieldName(),
-        newFieldType(),
-        newTags(2),
-        newDescription());
+    return new Field(newFieldName(), newFieldType(), newTags(2), newDescription());
   }
 
   public static String newFieldName() {

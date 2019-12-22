@@ -16,6 +16,7 @@ package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import io.prometheus.client.Counter;
 import java.time.Instant;
@@ -171,7 +172,21 @@ public class DatasetService {
   public boolean exists(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName)
       throws MarquezServiceException {
     try {
-      return datasetDao.exists(datasetName.getValue());
+      return datasetDao.exists(namespaceName.getValue(), datasetName.getValue());
+    } catch (UnableToExecuteStatementException e) {
+      log.error("Failed to check dataset '{}'.", datasetName.getValue(), e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public boolean exists(
+      @NonNull NamespaceName namespaceName,
+      @NonNull DatasetName datasetName,
+      @NonNull String fieldName)
+      throws MarquezServiceException {
+    checkNotBlank(fieldName, "fieldName must not be blank");
+    try {
+      return fieldDao.exists(namespaceName.getValue(), datasetName.getValue(), fieldName);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to check dataset '{}'.", datasetName.getValue(), e);
       throw new MarquezServiceException();
@@ -234,6 +249,7 @@ public class DatasetService {
       @NonNull DatasetName datasetName,
       @NonNull String tagName)
       throws MarquezServiceException {
+    checkNotBlank(tagName, "tagName must not be blank");
     try {
       final ExtendedDatasetRow datasetRow =
           datasetDao.find(namespaceName.getValue(), datasetName.getValue()).get();
@@ -254,6 +270,8 @@ public class DatasetService {
       @NonNull String fieldName,
       @NonNull String tagName)
       throws MarquezServiceException {
+    checkNotBlank(fieldName, "fieldName must not be blank");
+    checkNotBlank(tagName, "tagName must not be blank");
     try {
       final ExtendedDatasetRow datasetRow =
           datasetDao.find(namespaceName.getValue(), datasetName.getValue()).get();

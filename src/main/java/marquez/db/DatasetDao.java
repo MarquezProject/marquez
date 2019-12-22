@@ -24,40 +24,49 @@ import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.mappers.ExtendedDatasetRowMapper;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedDatasetRow;
+import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.jdbi.v3.sqlobject.transaction.Transaction;
 
-public interface DatasetDao {
-  @SqlUpdate(
-      "INSERT INTO datasets ("
-          + "uuid, "
-          + "type, "
-          + "created_at, "
-          + "updated_at, "
-          + "namespace_uuid, "
-          + "source_uuid, "
-          + "name, "
-          + "physical_name, "
-          + "description, "
-          + "current_version_uuid"
-          + ") VALUES ("
-          + ":uuid, "
-          + ":type, "
-          + ":createdAt, "
-          + ":updatedAt, "
-          + ":namespaceUuid, "
-          + ":sourceUuid, "
-          + ":name, "
-          + ":physicalName, "
-          + ":description, "
-          + ":currentVersionUuid)")
-  void insert(@BindBean DatasetRow row);
+public interface DatasetDao extends SqlObject {
+  @Transaction
+  default void insert(DatasetRow row) {
+    getHandle()
+        .createUpdate(
+            "INSERT INTO datasets ("
+                + "uuid, "
+                + "type, "
+                + "created_at, "
+                + "updated_at, "
+                + "namespace_uuid, "
+                + "source_uuid, "
+                + "name, "
+                + "physical_name, "
+                + "description, "
+                + "current_version_uuid"
+                + ") VALUES ("
+                + ":uuid, "
+                + ":type, "
+                + ":createdAt, "
+                + ":updatedAt, "
+                + ":namespaceUuid, "
+                + ":sourceUuid, "
+                + ":name, "
+                + ":physicalName, "
+                + ":description, "
+                + ":currentVersionUuid)")
+        .bindBean(row)
+        .execute();
+    // Tags
+    final Instant taggedAt = row.getCreatedAt();
+    row.getTagUuids().forEach(tagUuid -> updateTags(row.getUuid(), tagUuid, taggedAt));
+  }
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM datasets WHERE name = :name)")
-  boolean exists(String name);
+  boolean exists(String namespaceName, String name);
 
   @SqlUpdate(
       "UPDATE datasets "

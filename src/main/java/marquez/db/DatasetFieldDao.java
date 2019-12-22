@@ -22,41 +22,49 @@ import java.util.Optional;
 import java.util.UUID;
 import marquez.db.mappers.DatasetFieldRowMapper;
 import marquez.db.models.DatasetFieldRow;
+import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(DatasetFieldRowMapper.class)
-public interface DatasetFieldDao {
+public interface DatasetFieldDao extends SqlObject {
   @Transaction
   default void insertAll(List<DatasetFieldRow> rows) {
     rows.forEach(row -> insert(row));
   }
 
-  @SqlUpdate(
-      "INSERT INTO dataset_fields ("
-          + "uuid, "
-          + "type, "
-          + "created_at, "
-          + "updated_at, "
-          + "dataset_uuid, "
-          + "name, "
-          + "description"
-          + ") VALUES ("
-          + ":uuid, "
-          + ":type, "
-          + ":createdAt, "
-          + ":updatedAt, "
-          + ":datasetUuid, "
-          + ":name, "
-          + ":description)")
-  void insert(@BindBean DatasetFieldRow row);
+  @Transaction
+  default void insert(DatasetFieldRow row) {
+    getHandle()
+        .createUpdate(
+            "INSERT INTO dataset_fields ("
+                + "uuid, "
+                + "type, "
+                + "created_at, "
+                + "updated_at, "
+                + "dataset_uuid, "
+                + "name, "
+                + "description"
+                + ") VALUES ("
+                + ":uuid, "
+                + ":type, "
+                + ":createdAt, "
+                + ":updatedAt, "
+                + ":datasetUuid, "
+                + ":name, "
+                + ":description)")
+        .bindBean(row)
+        .execute();
+    // Tags
+    final Instant taggedAt = row.getCreatedAt();
+    row.getTagUuids().forEach(tagUuid -> updateTags(row.getUuid(), tagUuid, taggedAt));
+  }
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM dataset_fields WHERE name = :name)")
-  boolean exists(String name);
+  boolean exists(String namespaceName, String datasetName, String name);
 
   @SqlUpdate(
       "INSERT INTO dataset_fields_tag_mapping (dataset_field_uuid, tag_uuid, tagged_at) "

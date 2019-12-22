@@ -51,7 +51,6 @@ import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
-import marquez.service.exceptions.NoFieldFoundException;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 
@@ -180,13 +179,10 @@ public final class DatasetResource {
     throwIfNotExists(namespaceName);
     final DatasetName datasetName = DatasetName.of(datasetString);
     throwIfNotExists(namespaceName, datasetName);
+    throwIfNotExists(namespaceName, datasetName, fieldName);
     throwIfNotExists(tagName);
 
-    try {
-      datasetService.tagWith(namespaceName, datasetName, fieldName, tagName);
-    } catch (NoFieldFoundException e) {
-      throw new FieldNotFoundException(datasetName, fieldName);
-    }
+    datasetService.tagWith(namespaceName, datasetName, fieldName, tagName);
     return get(namespaceString, datasetString);
   }
 
@@ -202,6 +198,16 @@ public final class DatasetResource {
       throws MarquezServiceException {
     if (!datasetService.exists(namespaceName, datasetName)) {
       throw new DatasetNotFoundException(datasetName);
+    }
+  }
+
+  private void throwIfNotExists(
+      @NonNull NamespaceName namespaceName,
+      @NonNull DatasetName datasetName,
+      @NonNull String fieldName)
+      throws MarquezServiceException {
+    if (!datasetService.exists(namespaceName, datasetName, fieldName)) {
+      throw new FieldNotFoundException(datasetName, fieldName);
     }
   }
 
