@@ -32,7 +32,6 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
-import marquez.common.models.Tag;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -44,7 +43,7 @@ public final class StreamMeta extends DatasetMeta {
       final SourceName sourceName,
       @NonNull final URL schemaLocation,
       @Nullable final List<Field> fields,
-      @Nullable final List<Tag> tags,
+      @Nullable final List<String> tags,
       @Nullable final String description,
       @Nullable final UUID runId) {
     super(STREAM, physicalName, sourceName, fields, tags, description, runId);

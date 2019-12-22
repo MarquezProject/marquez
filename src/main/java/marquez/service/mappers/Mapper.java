@@ -36,7 +36,6 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
-import marquez.common.models.Tag;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -68,6 +67,7 @@ import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
 import marquez.service.models.Stream;
 import marquez.service.models.StreamMeta;
+import marquez.service.models.Tag;
 
 public final class Mapper {
   private Mapper() {}
@@ -136,7 +136,7 @@ public final class Mapper {
 
   public static Dataset toDataset(
       @NonNull final ExtendedDatasetRow row,
-      @NonNull final List<Tag> tags,
+      @NonNull final List<String> tags,
       @NonNull final DatasetVersionRow versionRow,
       @NonNull final List<Field> fields) {
     final DatasetType type = DatasetType.valueOf(row.getType());
@@ -152,7 +152,7 @@ public final class Mapper {
 
   private static Dataset toDbTable(
       @NonNull final ExtendedDatasetRow row,
-      @NonNull final List<Tag> tags,
+      @NonNull final List<String> tags,
       @NonNull final List<Field> fields) {
     return new DbTable(
         DatasetName.of(row.getName()),
@@ -168,7 +168,7 @@ public final class Mapper {
 
   private static Dataset toStream(
       @NonNull final ExtendedDatasetRow row,
-      @NonNull final List<Tag> tags,
+      @NonNull final List<String> tags,
       @NonNull final DatasetVersionRow versionRow,
       @NonNull final List<Field> fields) {
     return new Stream(
@@ -215,12 +215,10 @@ public final class Mapper {
     throw new IllegalArgumentException();
   }
 
-  public static Field toField(@NonNull final DatasetFieldRow row, @NonNull final List<Tag> tags) {
+  public static Field toField(
+      @NonNull final DatasetFieldRow row, @NonNull final List<String> tags) {
     return new Field(
-        row.getName(),
-        FieldType.valueOf(row.getType()),
-        tags.stream().map(Tag::getName).collect(toImmutableList()),
-        row.getDescription().orElse(null));
+        row.getName(), FieldType.valueOf(row.getType()), tags, row.getDescription().orElse(null));
   }
 
   public static DatasetFieldRow toDatasetFieldRow(

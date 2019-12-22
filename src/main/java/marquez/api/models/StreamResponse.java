@@ -24,7 +24,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.Field;
-import marquez.common.models.Tag;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -52,7 +51,7 @@ public final class StreamResponse extends DatasetResponse {
       final String sourceName,
       @NonNull final String schemaLocation,
       @Nullable final List<Field> fields,
-      @Nullable final List<Tag> tags,
+      @Nullable final List<String> tags,
       @Nullable final String lastModified,
       @Nullable final String description) {
     super(

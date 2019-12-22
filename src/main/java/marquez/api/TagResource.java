@@ -30,9 +30,9 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.TagsResponse;
-import marquez.common.models.Tag;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.models.Tag;
 
 @Slf4j
 @Path("/api/v1/tags")

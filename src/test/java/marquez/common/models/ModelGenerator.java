@@ -87,7 +87,7 @@ public final class ModelGenerator extends Generator {
     return new Field(
         newFieldName(),
         newFieldType(),
-        newTags(2).stream().map(Tag::getName).collect(toImmutableList()),
+        newTags(2),
         newDescription());
   }
 
@@ -103,15 +103,11 @@ public final class ModelGenerator extends Generator {
     return Stream.generate(() -> newField()).limit(limit).collect(toImmutableList());
   }
 
-  public static List<Tag> newTags(final int limit) {
-    return Stream.generate(() -> newTag(true)).limit(limit).collect(Collectors.toList());
+  public static List<String> newTags(final int limit) {
+    return Stream.generate(() -> newTag()).limit(limit).collect(Collectors.toList());
   }
 
-  public static Tag newTag(boolean setDescription) {
-    return new Tag(newTagName(), newDescription());
-  }
-
-  public static String newTagName() {
+  public static String newTag() {
     return "test_tag" + newId();
   }
 

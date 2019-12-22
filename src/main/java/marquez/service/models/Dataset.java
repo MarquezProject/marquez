@@ -27,7 +27,6 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 import marquez.common.models.SourceName;
-import marquez.common.models.Tag;
 
 @EqualsAndHashCode
 @ToString
@@ -39,7 +38,7 @@ public abstract class Dataset {
   @Getter private final Instant updatedAt;
   @Getter private final SourceName sourceName;
   @Nullable private final List<Field> fields;
-  @Nullable private final List<Tag> tags;
+  @Nullable private final List<String> tags;
   @Nullable private final Instant lastModified;
   @Nullable private final String description;
 
@@ -51,7 +50,7 @@ public abstract class Dataset {
       @NonNull final Instant updatedAt,
       @NonNull final SourceName sourceName,
       @Nullable final List<Field> fields,
-      @Nullable final List<Tag> tags,
+      @Nullable final List<String> tags,
       @Nullable final Instant lastModified,
       @Nullable final String description) {
     this.type = type;
@@ -70,7 +69,7 @@ public abstract class Dataset {
     return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
   }
 
-  public List<Tag> getTags() {
+  public List<String> getTags() {
     return (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
   }
 

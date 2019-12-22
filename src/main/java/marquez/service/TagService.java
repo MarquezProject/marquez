@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.common.models.Tag;
 import marquez.db.TagDao;
 import marquez.db.models.TagRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
+import marquez.service.models.Tag;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j

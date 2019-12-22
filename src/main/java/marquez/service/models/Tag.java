@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.service.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 

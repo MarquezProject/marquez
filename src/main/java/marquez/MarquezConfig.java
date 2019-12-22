@@ -21,8 +21,8 @@ import io.dropwizard.db.DataSourceFactory;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import marquez.common.models.Tag;
 import marquez.db.FlywayFactory;
+import marquez.service.models.Tag;
 
 @NoArgsConstructor
 public final class MarquezConfig extends Configuration {

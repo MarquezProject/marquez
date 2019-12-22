@@ -68,7 +68,7 @@ public interface DatasetFieldDao {
           + "ARRAY(SELECT tag_uuid "
           + "      FROM dataset_fields_tag_mapping "
           + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
-          + " FROM dataset_fields WHERE uuid = :rowUuid")
+          + "FROM dataset_fields WHERE uuid = :rowUuid")
   Optional<DatasetFieldRow> findBy(UUID rowUuid);
 
   @SqlQuery(
@@ -76,7 +76,8 @@ public interface DatasetFieldDao {
           + "ARRAY(SELECT tag_uuid "
           + "      FROM dataset_fields_tag_mapping "
           + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
-          + " FROM dataset_fields WHERE dataset_uuid = :datasetUuid AND name = :name")
+          + "FROM dataset_fields "
+          + "WHERE dataset_uuid = :datasetUuid AND name = :name")
   Optional<DatasetFieldRow> find(UUID datasetUuid, String name);
 
   @SqlQuery(
@@ -84,7 +85,7 @@ public interface DatasetFieldDao {
           + "ARRAY(SELECT tag_uuid "
           + "      FROM dataset_fields_tag_mapping "
           + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
-          + " FROM dataset_fields WHERE uuid IN (<rowUuids>)")
+          + "FROM dataset_fields WHERE uuid IN (<rowUuids>)")
   List<DatasetFieldRow> findAllInUuidList(@BindList(onEmpty = NULL_STRING) List<UUID> rowUuids);
 
   @SqlQuery(
@@ -92,7 +93,8 @@ public interface DatasetFieldDao {
           + "ARRAY(SELECT tag_uuid "
           + "      FROM dataset_fields_tag_mapping "
           + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
-          + " FROM dataset_fields WHERE dataset_uuid = :datasetUuid ORDER BY created_at")
+          + "FROM dataset_fields "
+          + "WHERE dataset_uuid = :datasetUuid ORDER BY created_at")
   List<DatasetFieldRow> findAll(UUID datasetUuid);
 
   @SqlQuery("SELECT COUNT(*) FROM dataset_fields")

@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
-import marquez.common.models.Tag;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
@@ -100,10 +99,8 @@ public class DatasetService {
             namespaceName.getValue());
         final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
         final SourceRow sourceRow = sourceDao.findBy(datasetMeta.getSourceName().getValue()).get();
-        final List<String> tagNames =
-            datasetMeta.getTags().stream().map(Tag::getName).collect(toImmutableList());
         final List<UUID> tagUuids =
-            tagDao.findAllInStringList(tagNames).stream()
+            tagDao.findAllInStringList(datasetMeta.getTags()).stream()
                 .map(TagRow::getUuid)
                 .collect(toImmutableList());
         final DatasetRow newDatasetRow =
@@ -208,9 +205,9 @@ public class DatasetService {
 
   /** Creates a {@link Dataset} instance from the given {@link ExtendedDatasetRow}. */
   private Dataset toDataset(@NonNull ExtendedDatasetRow datasetRow) {
-    final List<Tag> tags =
+    final List<String> tags =
         tagDao.findAllInUuidList(datasetRow.getTagUuids()).stream()
-            .map(Mapper::toTag)
+            .map(TagRow::getName)
             .collect(toImmutableList());
     final DatasetVersionRow versionRow =
         versionDao
@@ -225,9 +222,9 @@ public class DatasetService {
 
   /** Creates a {@link Field} instance from the given {@link DatasetFieldRow}. */
   private Field toField(@NonNull DatasetFieldRow fieldRow) {
-    final List<Tag> tags =
+    final List<String> tags =
         tagDao.findAllInUuidList(fieldRow.getTagUuids()).stream()
-            .map(Mapper::toTag)
+            .map(TagRow::getName)
             .collect(toImmutableList());
     return Mapper.toField(fieldRow, tags);
   }

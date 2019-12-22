@@ -19,7 +19,6 @@ import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import marquez.common.models.Field;
-import marquez.common.models.Tag;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -31,7 +30,7 @@ public final class DbTableResponse extends DatasetResponse {
       final String updatedAt,
       final String sourceName,
       @Nullable final List<Field> fields,
-      @Nullable final List<Tag> tags,
+      @Nullable final List<String> tags,
       @Nullable final String lastModified,
       @Nullable final String description) {
     super(

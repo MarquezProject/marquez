@@ -30,7 +30,6 @@ import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
-import marquez.common.models.Tag;
 
 @EqualsAndHashCode
 @ToString
@@ -39,7 +38,7 @@ public abstract class DatasetMeta {
   @Getter private final DatasetName physicalName;
   @Getter private final SourceName sourceName;
   @Nullable private final List<Field> fields;
-  @Nullable private final List<Tag> tags;
+  @Nullable private final List<String> tags;
   @Nullable private final String description;
   @Nullable private final UUID runId;
 
@@ -48,7 +47,7 @@ public abstract class DatasetMeta {
       @NonNull final DatasetName physicalName,
       @NonNull final SourceName sourceName,
       @Nullable final List<Field> fields,
-      @Nullable final List<Tag> tags,
+      @Nullable final List<String> tags,
       @Nullable final String description,
       @Nullable final UUID runId) {
     this.type = type;
@@ -64,7 +63,7 @@ public abstract class DatasetMeta {
     return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
   }
 
-  public List<Tag> getTags() {
+  public List<String> getTags() {
     return (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
   }
 

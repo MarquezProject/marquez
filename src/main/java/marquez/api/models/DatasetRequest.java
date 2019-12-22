@@ -26,7 +26,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import marquez.common.models.Field;
-import marquez.common.models.Tag;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
@@ -40,7 +39,7 @@ public abstract class DatasetRequest {
   @Getter private final String physicalName;
   @Getter private final String sourceName;
   @Nullable private final List<Field> fields;
-  @Nullable private final List<Tag> tags;
+  @Nullable private final List<String> tags;
   @Nullable private final String description;
   @Nullable private final String runId;
 
@@ -48,7 +47,7 @@ public abstract class DatasetRequest {
     return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
   }
 
-  public List<Tag> getTags() {
+  public List<String> getTags() {
     return (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
   }
 
