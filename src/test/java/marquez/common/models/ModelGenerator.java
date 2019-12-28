@@ -83,6 +83,10 @@ public final class ModelGenerator extends Generator {
     return DatasetName.of("test_dataset" + newId());
   }
 
+  public static DatasetType newDatasetType() {
+    return DatasetType.values()[newIdWithBound(DatasetType.values().length - 1)];
+  }
+
   public static Field newField() {
     return new Field(newFieldName(), newFieldType(), newTags(2), newDescription());
   }
@@ -100,10 +104,10 @@ public final class ModelGenerator extends Generator {
   }
 
   public static List<String> newTags(final int limit) {
-    return Stream.generate(() -> newTag()).limit(limit).collect(Collectors.toList());
+    return Stream.generate(() -> newTagName()).limit(limit).collect(Collectors.toList());
   }
 
-  public static String newTag() {
+  public static String newTagName() {
     return "test_tag" + newId();
   }
 

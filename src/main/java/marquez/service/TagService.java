@@ -80,7 +80,7 @@ public class TagService {
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
       final List<TagRow> rows = dao.findAll(limit, offset);
-      final List<Tag> tags = Mapper.toTag(rows);
+      final List<Tag> tags = Mapper.toTags(rows);
       return ImmutableList.copyOf(tags);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get tags.", e);

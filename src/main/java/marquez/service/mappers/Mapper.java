@@ -81,7 +81,7 @@ public final class Mapper {
         row.getDescription().orElse(null));
   }
 
-  public static List<Namespace> toNamespace(@NonNull final List<NamespaceRow> rows) {
+  public static List<Namespace> toNamespaces(@NonNull final List<NamespaceRow> rows) {
     return rows.stream().map(Mapper::toNamespace).collect(toImmutableList());
   }
 
@@ -117,7 +117,7 @@ public final class Mapper {
         row.getDescription().orElse(null));
   }
 
-  public static List<Source> toSource(@NonNull final List<SourceRow> rows) {
+  public static List<Source> toSources(@NonNull final List<SourceRow> rows) {
     return rows.stream().map(Mapper::toSource).collect(toImmutableList());
   }
 
@@ -267,6 +267,19 @@ public final class Mapper {
         ((StreamMeta) meta).getSchemaLocation().toString());
   }
 
+  public static Tag toTag(@NonNull final TagRow row) {
+    return new Tag(row.getName(), row.getDescription().orElse(null));
+  }
+
+  public static List<Tag> toTags(@NonNull final List<TagRow> rows) {
+    return rows.stream().map(Mapper::toTag).collect(toImmutableList());
+  }
+
+  public static TagRow toTagRow(@NonNull final Tag tag) {
+    final Instant now = newTimestamp();
+    return new TagRow(newRowUuid(), now, now, tag.getName(), tag.getDescription().orElse(null));
+  }
+
   public static Job toJob(
       @NonNull final JobRow row,
       @NonNull final List<DatasetName> inputs,
@@ -338,13 +351,14 @@ public final class Mapper {
         Utils.fromJson(row.getArgs(), new TypeReference<Map<String, String>>() {}));
   }
 
-  public static List<Run> toRun(@NonNull final List<ExtendedRunRow> rows) {
+  public static List<Run> toRuns(@NonNull final List<ExtendedRunRow> rows) {
     return rows.stream().map(Mapper::toRun).collect(toImmutableList());
   }
 
   public static RunRow toRunRow(
       @NonNull final UUID jobVersionUuid,
       @NonNull final UUID runArgsUuid,
+      @NonNull final List<UUID> inputVersionUuids,
       @NonNull final RunMeta runMeta) {
     final Instant now = newTimestamp();
     return new RunRow(
@@ -353,6 +367,7 @@ public final class Mapper {
         now,
         jobVersionUuid,
         runArgsUuid,
+        inputVersionUuids,
         runMeta.getNominalStartTime().orElse(null),
         runMeta.getNominalEndTime().orElse(null),
         null);
@@ -366,19 +381,6 @@ public final class Mapper {
   public static RunStateRow toRunStateRow(
       @NonNull final UUID runId, @NonNull final Run.State runState) {
     return new RunStateRow(newRowUuid(), newTimestamp(), runId, runState.toString());
-  }
-
-  public static Tag toTag(@NonNull final TagRow row) {
-    return new Tag(row.getName(), row.getDescription().orElse(null));
-  }
-
-  public static List<Tag> toTag(@NonNull final List<TagRow> rows) {
-    return rows.stream().map(Mapper::toTag).collect(toImmutableList());
-  }
-
-  public static TagRow toTagRow(@NonNull final Tag tag) {
-    final Instant now = newTimestamp();
-    return new TagRow(newRowUuid(), now, now, tag.getName(), tag.getDescription().orElse(null));
   }
 
   private static UUID newRowUuid() {

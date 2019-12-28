@@ -72,18 +72,17 @@ public class SourceDaoTest {
 
   @Test
   public void testExists() {
-    final SourceName sourceName = newSourceName();
-    final SourceRow newRow = newSourceRowWith(sourceName);
+    final SourceName name = newSourceName();
+    final SourceRow newRow = newSourceRowWith(name);
     sourceDao.insert(newRow);
 
-    final boolean exists = sourceDao.exists(sourceName.getValue());
+    final boolean exists = sourceDao.exists(name.getValue());
     assertThat(exists).isTrue();
   }
 
   @Test
   public void testFindBy_uuid() {
-    final SourceName sourceName = newSourceName();
-    final SourceRow newRow = newSourceRowWith(sourceName);
+    final SourceRow newRow = newSourceRow();
     sourceDao.insert(newRow);
 
     final Optional<SourceRow> row = sourceDao.findBy(newRow.getUuid());
@@ -93,8 +92,8 @@ public class SourceDaoTest {
 
   @Test
   public void testFindBy_name() {
-    final SourceName sourceName = newSourceName();
-    final SourceRow newRow = newSourceRowWith(sourceName);
+    final SourceName name = newSourceName();
+    final SourceRow newRow = newSourceRowWith(name);
     sourceDao.insert(newRow);
 
     final Optional<SourceRow> row = sourceDao.findBy(newRow.getName());

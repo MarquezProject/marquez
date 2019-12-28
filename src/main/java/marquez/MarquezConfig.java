@@ -36,5 +36,5 @@ public final class MarquezConfig extends Configuration {
 
   @Getter private boolean migrateOnStartup = true;
 
-  @Getter List<Tag> tags = Lists.newArrayList();
+  @Getter private List<Tag> tags = Lists.newArrayList();
 }

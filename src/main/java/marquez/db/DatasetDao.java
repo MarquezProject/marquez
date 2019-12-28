@@ -45,8 +45,7 @@ public interface DatasetDao extends SqlObject {
                 + "source_uuid, "
                 + "name, "
                 + "physical_name, "
-                + "description, "
-                + "current_version_uuid"
+                + "description"
                 + ") VALUES ("
                 + ":uuid, "
                 + ":type, "
@@ -56,8 +55,7 @@ public interface DatasetDao extends SqlObject {
                 + ":sourceUuid, "
                 + ":name, "
                 + ":physicalName, "
-                + ":description, "
-                + ":currentVersionUuid)")
+                + ":description)")
         .bindBean(row)
         .execute();
     // Tags
@@ -65,8 +63,18 @@ public interface DatasetDao extends SqlObject {
     row.getTagUuids().forEach(tagUuid -> updateTags(row.getUuid(), tagUuid, taggedAt));
   }
 
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM datasets WHERE name = :name)")
-  boolean exists(String namespaceName, String name);
+  @SqlQuery(
+      "SELECT EXISTS ("
+          + "SELECT 1 FROM datasets AS d "
+          + "INNER JOIN namespaces AS n "
+          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
+          + "WHERE d.name = :datasetName)")
+  boolean exists(String namespaceName, String datasetName);
+
+  @SqlUpdate(
+      "INSERT INTO dataset_tag_mapping (dataset_uuid, tag_uuid, tagged_at) "
+          + "VALUES (:rowUuid, :tagUuid, :taggedAt)")
+  void updateTags(UUID rowUuid, UUID tagUuid, Instant taggedAt);
 
   @SqlUpdate(
       "UPDATE datasets "
@@ -82,11 +90,6 @@ public interface DatasetDao extends SqlObject {
           + "    current_version_uuid = :currentVersionUuid "
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
-
-  @SqlUpdate(
-      "INSERT INTO dataset_tag_mapping (dataset_uuid, tag_uuid, tagged_at) "
-          + "VALUES (:rowUuid, :tagUuid, :taggedAt)")
-  void updateTags(UUID rowUuid, UUID tagUuid, Instant taggedAt);
 
   @SqlQuery(
       "SELECT d.*, s.name AS source_name, "
@@ -110,9 +113,9 @@ public interface DatasetDao extends SqlObject {
           + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
           + "INNER JOIN sources AS s "
           + "  ON (s.uuid = d.source_uuid) "
-          + "WHERE d.name = :name")
+          + "WHERE d.name = :datasetName")
   @RegisterRowMapper(ExtendedDatasetRowMapper.class)
-  Optional<ExtendedDatasetRow> find(String namespaceName, String name);
+  Optional<ExtendedDatasetRow> find(String namespaceName, String datasetName);
 
   @SqlQuery(
       "SELECT *, "
@@ -131,10 +134,10 @@ public interface DatasetDao extends SqlObject {
           + "FROM datasets AS d "
           + "INNER JOIN namespaces AS n "
           + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
-          + "WHERE d.name IN (<names>)")
+          + "WHERE d.name IN (<datasetNames>)")
   @RegisterRowMapper(DatasetRowMapper.class)
   List<DatasetRow> findAllInStringList(
-      String namespaceName, @BindList(onEmpty = NULL_STRING) List<String> names);
+      String namespaceName, @BindList(onEmpty = NULL_STRING) List<String> datasetNames);
 
   @SqlQuery(
       "SELECT d.*, s.name AS source_name, "

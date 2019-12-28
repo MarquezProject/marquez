@@ -35,9 +35,11 @@ public interface RunStateDao extends SqlObject {
   RunDao createRunDao();
 
   @Transaction
-  default void insertWith(RunStateRow row, List<UUID> datasetUuids, Instant lastModified) {
+  default void insertWith(RunStateRow row, List<UUID> inputVersionUuids) {
     insert(row);
-    createDatasetDao().updateLastModifed(datasetUuids, lastModified);
+    // Modified
+    final Instant lastModified = row.getTransitionedAt();
+    createDatasetDao().updateLastModifed(inputVersionUuids, lastModified);
   }
 
   @Transaction
@@ -48,8 +50,9 @@ public interface RunStateDao extends SqlObject {
                 + "VALUES (:uuid, :transitionedAt, :runUuid, :state)")
         .bindBean(row)
         .execute();
-
-    createRunDao().update(row.getRunUuid(), row.getTransitionedAt(), row.getState());
+    // State transition
+    final Instant updateAt = row.getTransitionedAt();
+    createRunDao().updateRunState(row.getRunUuid(), updateAt, row.getState());
   }
 
   @SqlQuery("SELECT * FROM run_states WHERE uuid = :rowUuid")

@@ -147,7 +147,7 @@ public class NamespaceService {
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
       final List<NamespaceRow> rows = namespaceDao.findAll(limit, offset);
-      final List<Namespace> namespaces = Mapper.toNamespace(rows);
+      final List<Namespace> namespaces = Mapper.toNamespaces(rows);
       return ImmutableList.copyOf(namespaces);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get namespaces.", e);

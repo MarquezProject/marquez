@@ -40,16 +40,6 @@ public final class Utils {
   public static final String KV_DELIM = "#";
   public static final Joiner.MapJoiner KV_JOINER = Joiner.on(KV_DELIM).withKeyValueSeparator("=");
 
-  public static URL toUrl(@NonNull final String urlString) {
-    try {
-      return new URL(urlString);
-    } catch (MalformedURLException e) {
-      final AssertionError error = new AssertionError("Malformed URL: " + urlString);
-      error.initCause(e);
-      throw error;
-    }
-  }
-
   public static String toJson(@NonNull final Object value) {
     try {
       return MAPPER.writeValueAsString(value);
@@ -63,6 +53,16 @@ public final class Utils {
       return MAPPER.readValue(json, type);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
+    }
+  }
+
+  public static URL toUrl(@NonNull final String urlString) {
+    try {
+      return new URL(urlString);
+    } catch (MalformedURLException e) {
+      final AssertionError error = new AssertionError("Malformed URL: " + urlString);
+      error.initCause(e);
+      throw error;
     }
   }
 

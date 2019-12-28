@@ -63,7 +63,14 @@ public interface DatasetFieldDao extends SqlObject {
     row.getTagUuids().forEach(tagUuid -> updateTags(row.getUuid(), tagUuid, taggedAt));
   }
 
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM dataset_fields WHERE name = :name)")
+  @SqlQuery(
+      "SELECT EXISTS ("
+          + "SELECT 1 FROM dataset_fields AS df "
+          + "INNER JOIN namespaces AS n "
+          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
+          + "INNER JOIN datasets AS d "
+          + "  ON (d.uuid = df.dataset_uuid AND d.name = :datasetName) "
+          + "WHERE df.name = :name)")
   boolean exists(String namespaceName, String datasetName, String name);
 
   @SqlUpdate(

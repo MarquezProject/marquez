@@ -82,6 +82,7 @@ public final class Columns {
 
   /* RUN ROW COLUMNS */
   public static final String RUN_ARGS_UUID = "run_args_uuid";
+  public static final String INPUT_VERSION_UUIDS = "input_version_uuids";
   public static final String NOMINAL_START_TIME = "nominal_start_time";
   public static final String NOMINAL_END_TIME = "nominal_end_time";
   public static final String CURRENT_RUN_STATE = "current_run_state";
