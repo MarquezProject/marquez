@@ -62,10 +62,11 @@ public interface JobVersionDao extends SqlObject {
                 + ":jobContextUuid)")
         .bindBean(row)
         .execute();
-    // Inputs / outputs
+    // I/O
     row.getInputUuids().forEach(inputUuid -> updateInputs(row.getUuid(), inputUuid));
     row.getOutputUuids().forEach(outputUuid -> updateOutputs(row.getUuid(), outputUuid));
-    // Current
+
+    // Version
     createJobDao().updateVersion(row.getJobUuid(), row.getCreatedAt(), row.getVersion());
   }
 

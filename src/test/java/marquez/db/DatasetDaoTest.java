@@ -14,9 +14,11 @@
 
 package marquez.db;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static marquez.Generator.newTimestamp;
 import static marquez.common.models.ModelGenerator.newDatasetName;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.db.models.ModelGenerator.newDatasetRow;
 import static marquez.db.models.ModelGenerator.newDatasetRowWith;
 import static marquez.db.models.ModelGenerator.newDatasetRowsWith;
 import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
@@ -30,6 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
 import marquez.MarquezDb;
@@ -107,22 +111,25 @@ public class DatasetDaoTest {
 
   @Test
   public void testExists() {
-    final DatasetName name = newDatasetName();
+    final DatasetName datasetName = newDatasetName();
     final DatasetRow newRow =
-        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), name);
+        newDatasetRowWith(
+            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
     datasetDao.insert(newRow);
 
-    final boolean exists = datasetDao.exists(NAMESPACE_NAME.getValue(), name.getValue());
+    final boolean exists = datasetDao.exists(NAMESPACE_NAME.getValue(), datasetName.getValue());
     assertThat(exists).isTrue();
   }
 
   @Test
   public void testUpdateTags() {
-    final DatasetName name = newDatasetName();
+    final DatasetName datasetName = newDatasetName();
     final DatasetRow newRow =
-        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), name);
+        newDatasetRowWith(
+            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
     datasetDao.insert(newRow);
 
+    // Tag
     final TagRow newTagRow = newTagRow();
     tagDao.insert(newTagRow);
 
@@ -136,16 +143,95 @@ public class DatasetDaoTest {
 
   @Test
   public void testLastModified() {
-    final DatasetName name = newDatasetName();
+    final DatasetName datasetName = newDatasetName();
     final DatasetRow newRow =
-        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), name);
+        newDatasetRowWith(
+            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
     datasetDao.insert(newRow);
 
+    // Modified
     final Instant lastModified = newTimestamp();
     datasetDao.updateLastModifed(Lists.newArrayList(newRow.getUuid()), lastModified);
 
     final ExtendedDatasetRow row = datasetDao.findBy(newRow.getUuid()).get();
     assertThat(row.getLastModified()).isPresent().hasValue(lastModified);
+  }
+
+  @Test
+  public void testFindBy() {
+    final DatasetName datasetName = newDatasetName();
+    final DatasetRow newRow =
+        newDatasetRowWith(
+            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
+    datasetDao.insert(newRow);
+
+    final Optional<ExtendedDatasetRow> row = datasetDao.findBy(newRow.getUuid());
+    assertThat(row).isPresent();
+  }
+
+  @Test
+  public void testFindBy_notFound() {
+    final DatasetRow newRow = newDatasetRow();
+
+    final Optional<ExtendedDatasetRow> row = datasetDao.findBy(newRow.getUuid());
+    assertThat(row).isEmpty();
+  }
+
+  @Test
+  public void testFind() {
+    final DatasetName datasetName = newDatasetName();
+    final DatasetRow newRow =
+        newDatasetRowWith(
+            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
+    datasetDao.insert(newRow);
+
+    final Optional<ExtendedDatasetRow> row =
+        datasetDao.find(NAMESPACE_NAME.getValue(), datasetName.getValue());
+    assertThat(row).isPresent();
+  }
+
+  @Test
+  public void testFind_notFound() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final DatasetName datasetName = newDatasetName();
+
+    final Optional<ExtendedDatasetRow> row =
+        datasetDao.find(namespaceName.getValue(), datasetName.getValue());
+    assertThat(row).isEmpty();
+  }
+
+  @Test
+  public void testFindAllInUuidList() {
+    final List<DatasetRow> newRows =
+        newDatasetRowsWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), 4);
+    newRows.forEach(newRow -> datasetDao.insert(newRow));
+
+    final List<UUID> newRowUuids =
+        newRows.stream().map(newRow -> newRow.getUuid()).collect(toImmutableList());
+
+    final List<DatasetRow> rows = datasetDao.findAllInUuidList(newRowUuids);
+    assertThat(rows).hasSize(4);
+
+    final List<UUID> rowUuids = rows.stream().map(row -> row.getUuid()).collect(toImmutableList());
+    assertThat(rowUuids).containsAll(newRowUuids);
+  }
+
+  @Test
+  public void testFindAllInStringList() {
+    final List<DatasetRow> newRows =
+        newDatasetRowsWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), 4);
+    newRows.forEach(newRow -> datasetDao.insert(newRow));
+
+    final List<String> newDatasetNames =
+        newRows.stream().map(newRow -> newRow.getName()).collect(toImmutableList());
+
+    final List<DatasetRow> rows =
+        datasetDao.findAllInStringList(NAMESPACE_NAME.getValue(), newDatasetNames);
+    assertThat(rows).hasSize(4);
+
+    final List<String> datasetNames =
+        rows.stream().map(row -> row.getName()).collect(toImmutableList());
+    assertThat(datasetNames).containsAll(newDatasetNames);
   }
 
   @Test
