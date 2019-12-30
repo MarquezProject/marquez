@@ -16,7 +16,6 @@ package marquez.service.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.NonNull;
@@ -27,9 +26,8 @@ public class Tag {
   String name;
   @Nullable String description;
 
-  @JsonCreator
   public Tag(@NonNull final String name, @Nullable final String description) {
-    this.name = checkNotBlank(name);
+    this.name = checkNotBlank(name, "name must not be blank").toUpperCase();
     this.description = description;
   }
 
