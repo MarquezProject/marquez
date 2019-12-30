@@ -14,8 +14,12 @@
 #
 # Usage: $ ./entrypoint.sh
 
-set -eu
+set -e
 
-./wait-for-db.sh "${POSTGRES_HOST:-localhost}" "${POSTGRES_PORT:-5432}"
+if [[ -z "${MARQUEZ_CONFIG}" ]]; then
+  MARQUEZ_CONFIG='config.dev.yml'
+  echo "WARNING 'MARQUEZ_CONFIG' not set, using development configuration."
+fi
 
+# Start http server with configuration
 java -Duser.timezone=UTC -jar marquez-*.jar server "${MARQUEZ_CONFIG}"

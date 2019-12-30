@@ -30,4 +30,6 @@ public final class MarquezConfig extends Configuration {
   @Getter
   @JsonProperty("flyway")
   private final FlywayFactory flywayFactory = new FlywayFactory();
+
+  @Getter private boolean migrateOnStartup = true;
 }

@@ -23,6 +23,9 @@ db:
 #   connectRetries: 3
 #   cleanDisabled: true
 
+# Enables db migration on startup (default: true)
+migrateOnStartup: ${MIGRATE_ON_STARTUP:-true}
+
 logging:
   # Levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, ALL, OFF
   level: ${LOG_LEVEL:-INFO}
