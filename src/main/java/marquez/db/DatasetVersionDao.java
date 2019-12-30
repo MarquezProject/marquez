@@ -84,7 +84,7 @@ public interface DatasetVersionDao {
           + "WHERE version = :version")
   Optional<DatasetVersionRow> findBy(UUID version);
 
-  default Optional<DatasetVersionRow> findBy(String typeString, @Nullable UUID version) {
+  default Optional<DatasetVersionRow> find(String typeString, @Nullable UUID version) {
     if (version == null) {
       return Optional.empty();
     }

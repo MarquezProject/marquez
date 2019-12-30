@@ -12,25 +12,24 @@
  * limitations under the License.
  */
 
-package marquez.service.exceptions;
+package marquez.db.exceptions;
 
 import javax.annotation.Nullable;
 import lombok.NoArgsConstructor;
-import marquez.MarquezException;
 
 @NoArgsConstructor
-public class MarquezServiceException extends MarquezException {
+public class DbException extends Exception {
   private static final long serialVersionUID = 1L;
 
-  public MarquezServiceException(@Nullable final String message) {
+  public DbException(@Nullable final String message) {
     super(message);
   }
 
-  public MarquezServiceException(@Nullable final Throwable cause) {
+  public DbException(@Nullable final Throwable cause) {
     super(cause);
   }
 
-  public MarquezServiceException(@Nullable final String message, @Nullable final Throwable cause) {
+  public DbException(@Nullable final String message, @Nullable final Throwable cause) {
     super(message, cause);
   }
 }

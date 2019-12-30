@@ -12,28 +12,16 @@
  * limitations under the License.
  */
 
-package marquez.service.models;
+package marquez.service.exceptions;
 
-import java.time.Instant;
-import java.util.Optional;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import marquez.common.models.TagName;
+import javax.annotation.Nullable;
+import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-public class Tag {
-  @NonNull TagName name;
-  @NonNull Instant createdAt;
-  @NonNull Instant updatedAt;
-  String description;
+@NoArgsConstructor
+public final class NoFieldFoundException extends MarquezServiceException {
+  private static final long serialVersionUID = 1L;
 
-  public String getName() {
-    return name == null ? null : name.getValue();
-  }
-
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(description);
+  public NoFieldFoundException(@Nullable final String message) {
+    super(message);
   }
 }

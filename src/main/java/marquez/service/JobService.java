@@ -151,6 +151,7 @@ public class JobService {
         final List<UUID> inputUuids =
             datasetDao
                 .findAllInStringList(
+                    namespaceName.getValue(),
                     jobMeta.getInputs().stream()
                         .map(DatasetName::getValue)
                         .collect(toImmutableList()))
@@ -160,6 +161,7 @@ public class JobService {
         final List<UUID> outputUuids =
             datasetDao
                 .findAllInStringList(
+                    namespaceName.getValue(),
                     jobMeta.getOutputs().stream()
                         .map(DatasetName::getValue)
                         .collect(toImmutableList()))

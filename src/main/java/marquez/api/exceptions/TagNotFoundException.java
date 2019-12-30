@@ -12,16 +12,16 @@
  * limitations under the License.
  */
 
-package marquez.api.models;
+package marquez.api.exceptions;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
-import lombok.NonNull;
-import lombok.Value;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-@Value
-public class TagsResponse {
-  @NonNull
-  @JsonProperty("tags")
-  List<TagResponse> responses;
+import javax.ws.rs.NotFoundException;
+
+public final class TagNotFoundException extends NotFoundException {
+  private static final long serialVersionUID = 1L;
+
+  public TagNotFoundException(final String name) {
+    super(String.format("Tag '%s' not found.", checkNotBlank(name)));
+  }
 }

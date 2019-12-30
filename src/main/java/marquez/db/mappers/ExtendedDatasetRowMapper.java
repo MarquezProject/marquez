@@ -18,6 +18,7 @@ import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidArrayOrThrow;
 import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
@@ -43,6 +44,7 @@ public final class ExtendedDatasetRowMapper implements RowMapper<ExtendedDataset
         stringOrThrow(results, Columns.SOURCE_NAME),
         stringOrThrow(results, Columns.NAME),
         stringOrThrow(results, Columns.PHYSICAL_NAME),
+        uuidArrayOrThrow(results, Columns.TAG_UUIDS),
         timestampOrNull(results, Columns.LAST_MODIFIED),
         stringOrNull(results, Columns.DESCRIPTION),
         uuidOrNull(results, Columns.CURRENT_VERSION_UUID));

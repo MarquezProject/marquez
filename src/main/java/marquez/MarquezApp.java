@@ -164,7 +164,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
         new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
     final SourceService sourceService = new SourceService(sourceDao);
     final DatasetService datasetService =
-        new DatasetService(namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao);
+        new DatasetService(
+            namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao, tagDao);
     final JobService jobService =
         new JobService(
             namespaceDao,
@@ -177,11 +178,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
             runArgsDao,
             runStateDao);
     final TagService tagService = new TagService(tagDao);
+    tagService.init(config.getTags());
 
     log.debug("Registering resources...");
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new SourceResource(sourceService));
-    env.jersey().register(new DatasetResource(namespaceService, datasetService, jobService));
+    env.jersey()
+        .register(new DatasetResource(namespaceService, datasetService, jobService, tagService));
     env.jersey().register(new JobResource(namespaceService, jobService));
     env.jersey().register(new TagResource(tagService));
     env.jersey().register(new MarquezServiceExceptionMapper());

@@ -12,16 +12,21 @@
  * limitations under the License.
  */
 
-package marquez.db.exceptions;
+package marquez.api.exceptions;
 
-import javax.annotation.Nullable;
-import lombok.NoArgsConstructor;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-@NoArgsConstructor
-public final class RowNotFoundException extends Exception {
+import javax.ws.rs.NotFoundException;
+import marquez.common.models.DatasetName;
+
+public final class FieldNotFoundException extends NotFoundException {
   private static final long serialVersionUID = 1L;
 
-  public RowNotFoundException(@Nullable final String message) {
-    super(message);
+  public FieldNotFoundException(final DatasetName datasetName, final String fieldName) {
+    super(
+        String.format(
+            "Field '%s' not found for dataset '%s'.",
+            checkNotBlank(fieldName), checkNotNull(datasetName).getValue()));
   }
 }

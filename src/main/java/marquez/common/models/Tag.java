@@ -12,16 +12,28 @@
  * limitations under the License.
  */
 
-package marquez.api.models;
+package marquez.common.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public class TagsResponse {
-  @NonNull
-  @JsonProperty("tags")
-  List<TagResponse> responses;
+public class Tag {
+  String name;
+  @Nullable String description;
+
+  @JsonCreator
+  public Tag(@NonNull final String name, @Nullable final String description) {
+    this.name = checkNotBlank(name);
+    this.description = description;
+  }
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
+  }
 }

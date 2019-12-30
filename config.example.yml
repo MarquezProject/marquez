@@ -42,3 +42,9 @@ logging:
 #    - type: console
 #      timeZone: UTC
 #      output: stdout
+
+tags:
+  - name: PII
+    description: Personally identifiable information
+  - name: SENSITIVE
+    description: Contains sensitive information

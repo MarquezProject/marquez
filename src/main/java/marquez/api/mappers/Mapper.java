@@ -50,6 +50,7 @@ import marquez.common.models.JobType;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.common.models.Tag;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTable;
@@ -64,7 +65,6 @@ import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
 import marquez.service.models.Stream;
 import marquez.service.models.StreamMeta;
-import marquez.service.models.Tag;
 
 public final class Mapper {
   private Mapper() {}
@@ -131,6 +131,7 @@ public final class Mapper {
         DatasetName.of(request.getPhysicalName()),
         SourceName.of(request.getSourceName()),
         request.getFields(),
+        request.getTags(),
         request.getDescription().orElse(null),
         request.getRunId().map(UUID::fromString).orElse(null));
   }
@@ -141,6 +142,7 @@ public final class Mapper {
         SourceName.of(request.getSourceName()),
         Utils.toUrl(((StreamRequest) request).getSchemaLocation()),
         request.getFields(),
+        request.getTags(),
         request.getDescription().orElse(null),
         request.getRunId().map(UUID::fromString).orElse(null));
   }
@@ -162,6 +164,7 @@ public final class Mapper {
         ISO_INSTANT.format(dataset.getUpdatedAt()),
         dataset.getSourceName().getValue(),
         dataset.getFields(),
+        dataset.getTags(),
         dataset.getLastModified().map(ISO_INSTANT::format).orElse(null),
         dataset.getDescription().orElse(null));
   }
@@ -175,6 +178,7 @@ public final class Mapper {
         dataset.getSourceName().getValue(),
         ((Stream) dataset).getSchemaLocation().toString(),
         dataset.getFields(),
+        dataset.getTags(),
         dataset.getLastModified().map(ISO_INSTANT::format).orElse(null),
         dataset.getDescription().orElse(null));
   }
@@ -237,26 +241,23 @@ public final class Mapper {
         run.getArgs());
   }
 
-  public static TagResponse toTagResponse(@NonNull final Tag tag) {
-
-    return new TagResponse(tag.getName(), tag.getDescription().orElse(null));
-  }
-
-  public static List<TagResponse> toTagResponse(@NonNull final List<Tag> tags) {
-
-    return tags.stream().map(Mapper::toTagResponse).collect(toImmutableList());
-  }
-
-  public static TagsResponse toTagsResponse(@NonNull final List<Tag> tags) {
-
-    return new TagsResponse(toTagResponse(tags));
-  }
-
   public static List<RunResponse> toRunResponse(@NonNull final List<Run> runs) {
     return runs.stream().map(Mapper::toRunResponse).collect(toImmutableList());
   }
 
   public static RunsResponse toRunsResponse(@NonNull final List<Run> runs) {
     return new RunsResponse(toRunResponse(runs));
+  }
+
+  public static TagResponse toTagResponse(@NonNull final Tag tag) {
+    return new TagResponse(tag.getName(), tag.getDescription().orElse(null));
+  }
+
+  public static List<TagResponse> toTagResponse(@NonNull final List<Tag> tags) {
+    return tags.stream().map(Mapper::toTagResponse).collect(toImmutableList());
+  }
+
+  public static TagsResponse toTagsResponse(@NonNull final List<Tag> tags) {
+    return new TagsResponse(toTagResponse(tags));
   }
 }

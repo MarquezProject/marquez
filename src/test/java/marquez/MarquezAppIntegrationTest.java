@@ -28,6 +28,7 @@ import static marquez.common.models.ModelGenerator.newFields;
 import static marquez.common.models.ModelGenerator.newJobName;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newSourceName;
+import static marquez.common.models.ModelGenerator.newTags;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableMap;
@@ -105,14 +106,6 @@ public class MarquezAppIntegrationTest {
   }
 
   @Test
-  public void testApp_listTag() {
-    final Response response =
-        APP.client().target(baseUri + "/tags").request(APPLICATION_JSON).get();
-
-    assertThat(response.getStatus()).isEqualTo(HTTP_200);
-  }
-
-  @Test
   public void testApp_createDbTable() {
     final SourceName sourceName = newSourceName();
 
@@ -164,6 +157,7 @@ public class MarquezAppIntegrationTest {
             datasetName.getValue(),
             sourceName.getValue(),
             fields,
+            newTags(2),
             request0.getDescription().get(),
             null);
     final Response response1 =
@@ -194,6 +188,14 @@ public class MarquezAppIntegrationTest {
             .resolveTemplate("dataset", datasetName.getValue())
             .request(APPLICATION_JSON)
             .put(Entity.json(newStreamRequestWith(datasetName, sourceName)));
+
+    assertThat(response.getStatus()).isEqualTo(HTTP_200);
+  }
+
+  @Test
+  public void testApp_listTags() {
+    final Response response =
+        APP.client().target(baseUri + "/tags").request(APPLICATION_JSON).get();
 
     assertThat(response.getStatus()).isEqualTo(HTTP_200);
   }

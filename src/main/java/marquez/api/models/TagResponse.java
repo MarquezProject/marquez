@@ -29,7 +29,7 @@ public final class TagResponse {
   @Getter private final String name;
   @Nullable private final String description;
 
-  public TagResponse(@NonNull final String name, @Nullable String description) {
+  public TagResponse(@NonNull final String name, @Nullable final String description) {
     this.name = checkNotBlank(name);
     this.description = description;
   }

@@ -108,11 +108,12 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/wedata.roo
         "physicalName": "wedata.room_bookings",
         "sourceName": "analytics_db",
         "fields": [
-          {"name": "booking_id", "type": "INTEGER"},
-          {"name": "booked_at", "type": "TIMESTAMP"},
-          {"name": "office_id", "type": "INTEGER"},
-          {"name": "room_id", "type": "INTEGER"}
+          {"name": "booking_id", "type": "INTEGER", "tags": []},
+          {"name": "booked_at", "type": "TIMESTAMP", "tags": []},
+          {"name": "office_id", "type": "INTEGER", "tags": []},
+          {"name": "room_id", "type": "INTEGER", "tags": []}
         ],
+        "tags": ["SENSITIVE"],
         "description": "All global room bookings for each office."
       }'
 ```
@@ -128,11 +129,13 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/wedata.roo
   "updatedAt": "2019-06-08T19:13:34.507Z",
   "sourceName": "analytics_db",
   "fields": [
-    {"name": "booking_id", "type": "INTEGER", "description": null},
-    {"name": "booked_at", "type": "TIMESTAMP", "description": null},
-    {"name": "office_id", "type": "INTEGER", "description": null},
-    {"name": "room_id", "type": "INTEGER", "description": null}
+    {"name": "booking_id", "type": "INTEGER", "tags": [], "description": null},
+    {"name": "booked_at", "type": "TIMESTAMP", "tags": [], "description": null},
+    {"name": "office_id", "type": "INTEGER", "tags": [], "description": null},
+    {"name": "room_id", "type": "INTEGER", "tags": [], "description": null}
   ],
+  "tags": ["SENSITIVE"],
+  "lastModified": null,
   "description": "All global room bookings for each office."
 }
 ```
