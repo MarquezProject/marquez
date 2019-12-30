@@ -1,17 +1,13 @@
 server:
   applicationConnectors:
   - type: http
-    port: ${MARQUEZ_PORT:-8080}
+    port: 8080
   adminConnectors:
   - type: http
-    port: ${MARQUEZ_ADMIN_PORT:-8081}
+    port: 8081
 
 db:
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
-  user: ${POSTGRES_USER}
-  password: ${POSTGRES_PASSWORD}
 
 flyway:
-  connectRetries: 3
-  cleanDisabled: true
+  connectRetries: 2

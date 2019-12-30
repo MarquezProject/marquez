@@ -101,16 +101,17 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final DataSource source = sourceFactory.build(env.metrics(), DB_SOURCE_NAME);
 
     log.info("Running startup actions...");
-    migrateDbOrError(config, source);
+    if (config.isMigrateOnStartup()) {
+      migrateDbOrError(config, source);
+    }
     registerResources(config, env, source);
-
-    // Expose metrics for monitoring.
-    env.servlets().addServlet(PROMETHEUS, new MetricsServlet()).addMapping(PROMETHEUS_ENDPOINT);
+    registerServlets(env);
   }
 
   private void migrateDbOrError(@NonNull MarquezConfig config, @NonNull DataSource source) {
     final FlywayFactory flywayFactory = config.getFlywayFactory();
     final Flyway flyway = flywayFactory.build(source);
+
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts
     // requiring we handle the throwable and apply a repair on the database to fix any
     // issues before app termination.
@@ -177,11 +178,19 @@ public final class MarquezApp extends Application<MarquezConfig> {
             runStateDao);
     final TagService tagService = new TagService(tagDao);
 
+    log.debug("Registering resources...");
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new SourceResource(sourceService));
     env.jersey().register(new DatasetResource(namespaceService, datasetService, jobService));
     env.jersey().register(new JobResource(namespaceService, jobService));
     env.jersey().register(new TagResource(tagService));
     env.jersey().register(new MarquezServiceExceptionMapper());
+  }
+
+  private void registerServlets(@NonNull Environment env) {
+    log.debug("Registering servlets...");
+
+    // Expose metrics for monitoring.
+    env.servlets().addServlet(PROMETHEUS, new MetricsServlet()).addMapping(PROMETHEUS_ENDPOINT);
   }
 }

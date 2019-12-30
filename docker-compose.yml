@@ -15,9 +15,11 @@ services:
       - POSTGRES_USER=buendia
       - POSTGRES_PASSWORD=macondo
     volumes:
+      - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
       - ./config.example.yml:/usr/src/app/config.yml
     depends_on:
       - db
+    entrypoint: ["./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
 
   db:
     image: 'postgres:9.6'

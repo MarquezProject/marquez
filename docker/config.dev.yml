@@ -1,0 +1,18 @@
+server:
+  applicationConnectors:
+  - type: http
+    port: 5000
+  adminConnectors:
+  - type: http
+    port: 5001
+
+db:
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/marquez
+  user: postgres
+# password:
+
+logging:
+  level: INFO
+  appenders:
+    - type: console
