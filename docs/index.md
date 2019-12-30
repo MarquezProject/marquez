@@ -92,7 +92,7 @@ If you’re interested in using or learning more about Marquez, reach out to us 
 
 ## Marquez Talks
 
-* [Solving Data Lineage Tracking And Data Discovery At WeWork - Episode 111](https://www.dataengineeringpodcast.com/marquez-data-lineage-episode-111) on [The Data Engineering Podcast](https://www.dataengineeringpodcast.com/)
+* [Solving Data Lineage Tracking And Data Discovery At WeWork](https://www.dataengineeringpodcast.com/marquez-data-lineage-episode-111) on [The Data Engineering Podcast](https://www.dataengineeringpodcast.com/)
 * [Data Lineage with Apache Airflow using Marquez](https://www.youtube.com/watch?v=BIVUXruv5io) by Willy Lulciuc at CRUNCH '19
 * [Marquez: An Open Source Metadata Service for ML Platforms](https://www.slideshare.net/WillyLulciuc/marquez-an-open-source-metadata-service-for-ml-platforms) by Willy Lulciuc, Shawn Shah at AI NEXTCon SF '19
 * [Marquez: A Metadata Service for Data Abstraction, Data Lineage, and Event-based Triggers](https://www.datacouncil.ai/speaker/marquez-a-metadata-service-for-data-abstraction-data-lineage-and-event-based-triggers) by Willy Lulciuc at DataEngConf NYC '18
