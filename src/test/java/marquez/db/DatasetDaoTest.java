@@ -27,6 +27,8 @@ import static marquez.db.models.ModelGenerator.newTimestamp;
 import static marquez.db.models.ModelGenerator.toTagUuids;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.Lists;
+import java.time.Instant;
 import java.util.List;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
@@ -124,11 +126,26 @@ public class DatasetDaoTest {
     final TagRow newTagRow = newTagRow();
     tagDao.insert(newTagRow);
 
-    datasetDao.updateTags(newRow.getUuid(), newTagRow.getUuid(), newTimestamp());
+    final Instant taggedAt = newTimestamp();
+    datasetDao.updateTags(newRow.getUuid(), newTagRow.getUuid(), taggedAt);
 
     final ExtendedDatasetRow row = datasetDao.findBy(newRow.getUuid()).get();
     assertThat(row).isNotNull();
     assertThat(row.getTagUuids()).contains(newTagRow.getUuid());
+  }
+
+  @Test
+  public void testLastModified() {
+    final DatasetName name = newDatasetName();
+    final DatasetRow newRow =
+        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), name);
+    datasetDao.insert(newRow);
+
+    final Instant lastModified = newTimestamp();
+    datasetDao.updateLastModifed(Lists.newArrayList(newRow.getUuid()), lastModified);
+
+    final ExtendedDatasetRow row = datasetDao.findBy(newRow.getUuid()).get();
+    assertThat(row.getLastModified()).isPresent().hasValue(lastModified);
   }
 
   @Test
