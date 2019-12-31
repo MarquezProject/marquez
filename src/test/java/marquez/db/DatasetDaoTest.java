@@ -111,22 +111,18 @@ public class DatasetDaoTest {
 
   @Test
   public void testExists() {
-    final DatasetName datasetName = newDatasetName();
     final DatasetRow newRow =
-        newDatasetRowWith(
-            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
+        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows));
     datasetDao.insert(newRow);
 
-    final boolean exists = datasetDao.exists(NAMESPACE_NAME.getValue(), datasetName.getValue());
+    final boolean exists = datasetDao.exists(NAMESPACE_NAME.getValue(), newRow.getName());
     assertThat(exists).isTrue();
   }
 
   @Test
   public void testUpdateTags() {
-    final DatasetName datasetName = newDatasetName();
     final DatasetRow newRow =
-        newDatasetRowWith(
-            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
+        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows));
     datasetDao.insert(newRow);
 
     // Tag
@@ -143,10 +139,8 @@ public class DatasetDaoTest {
 
   @Test
   public void testLastModified() {
-    final DatasetName datasetName = newDatasetName();
     final DatasetRow newRow =
-        newDatasetRowWith(
-            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
+        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows));
     datasetDao.insert(newRow);
 
     // Modified
@@ -159,10 +153,8 @@ public class DatasetDaoTest {
 
   @Test
   public void testFindBy() {
-    final DatasetName datasetName = newDatasetName();
     final DatasetRow newRow =
-        newDatasetRowWith(
-            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
+        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows));
     datasetDao.insert(newRow);
 
     final Optional<ExtendedDatasetRow> row = datasetDao.findBy(newRow.getUuid());
@@ -179,14 +171,12 @@ public class DatasetDaoTest {
 
   @Test
   public void testFind() {
-    final DatasetName datasetName = newDatasetName();
     final DatasetRow newRow =
-        newDatasetRowWith(
-            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), datasetName);
+        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows));
     datasetDao.insert(newRow);
 
     final Optional<ExtendedDatasetRow> row =
-        datasetDao.find(NAMESPACE_NAME.getValue(), datasetName.getValue());
+        datasetDao.find(NAMESPACE_NAME.getValue(), newRow.getName());
     assertThat(row).isPresent();
   }
 
@@ -236,19 +226,11 @@ public class DatasetDaoTest {
 
   @Test
   public void testFindAll() {
-    final int rowsBefore = datasetDao.count();
-    final int rowsToInsert = 4;
-
     final List<DatasetRow> newRows =
-        newDatasetRowsWith(
-            namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), rowsToInsert);
+        newDatasetRowsWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), 4);
     newRows.forEach(newRow -> datasetDao.insert(newRow));
 
     final List<ExtendedDatasetRow> rows = datasetDao.findAll(NAMESPACE_NAME.getValue(), 4, 0);
-    assertThat(rows).isNotNull();
-    assertThat(rows).hasSize(4);
-
-    final int rowsAfter = datasetDao.count();
-    assertThat(rowsAfter).isEqualTo(rowsBefore + rowsToInsert);
+    assertThat(rows).isNotNull().hasSize(4);
   }
 }

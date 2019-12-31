@@ -127,8 +127,12 @@ public final class ModelGenerator extends Generator {
   }
 
   public static TagRow newTagRow() {
+    return newTagRowWith(newTagName());
+  }
+
+  public static TagRow newTagRowWith(final String name) {
     final Instant now = newTimestamp();
-    return new TagRow(newRowUuid(), now, now, newTagName(), newDescription());
+    return new TagRow(newRowUuid(), now, now, name, newDescription());
   }
 
   public static List<UUID> toTagUuids(final List<TagRow> rows) {

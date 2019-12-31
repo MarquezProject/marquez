@@ -14,20 +14,19 @@
 
 package marquez.db;
 
-import static marquez.common.models.ModelGenerator.newContext;
-import static marquez.db.models.ModelGenerator.newJobContextRow;
-import static marquez.db.models.ModelGenerator.newJobContextRowWith;
-import static marquez.db.models.ModelGenerator.newJobContextRows;
+import static marquez.common.models.ModelGenerator.newTagName;
+import static marquez.db.models.ModelGenerator.newRowUuid;
+import static marquez.db.models.ModelGenerator.newTagRow;
+import static marquez.db.models.ModelGenerator.newTagRows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
 import marquez.MarquezDb;
-import marquez.common.Utils;
-import marquez.db.models.JobContextRow;
+import marquez.db.models.TagRow;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
@@ -38,7 +37,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category({DataAccessTests.class, IntegrationTests.class})
-public class JobContextDaoTest {
+public class TagDaoTest {
   private static final MarquezDb DB = MarquezDb.create();
 
   static {
@@ -52,62 +51,74 @@ public class JobContextDaoTest {
           .withPlugin(new SqlObjectPlugin())
           .withMigration(Migration.before().withDefaultPath());
 
-  private static JobContextDao jobContextDao;
+  private static TagDao tagDao;
 
   @BeforeClass
   public static void setUpOnce() {
     final Jdbi jdbi = dbRule.getJdbi();
-    jobContextDao = jdbi.onDemand(JobContextDao.class);
+    tagDao = jdbi.onDemand(TagDao.class);
   }
 
   @Test
   public void testInsert() {
-    final int rowsBefore = jobContextDao.count();
+    final int rowsBefore = tagDao.count();
 
-    final JobContextRow newRow = newJobContextRow();
-    jobContextDao.insert(newRow);
+    final TagRow newRow = newTagRow();
+    tagDao.insert(newRow);
 
-    final int rowsAfter = jobContextDao.count();
+    final int rowsAfter = tagDao.count();
     assertThat(rowsAfter).isEqualTo(rowsBefore + 1);
   }
 
   @Test
   public void testExists() {
-    final Map<String, String> context = newContext();
-    final JobContextRow newRow = newJobContextRowWith(context);
-    jobContextDao.insert(newRow);
+    final TagRow newRow = newTagRow();
+    tagDao.insert(newRow);
 
-    final String checksum = Utils.checksumFor(context);
-    final boolean exists = jobContextDao.exists(checksum);
+    final boolean exists = tagDao.exists(newRow.getName());
     assertThat(exists).isTrue();
   }
 
   @Test
   public void testFindBy_uuid() {
-    final JobContextRow newRow = newJobContextRow();
-    jobContextDao.insert(newRow);
+    final TagRow newRow = newTagRow();
+    tagDao.insert(newRow);
 
-    final Optional<JobContextRow> row = jobContextDao.findBy(newRow.getUuid());
+    final Optional<TagRow> row = tagDao.findBy(newRow.getUuid());
     assertThat(row).isPresent();
   }
 
   @Test
-  public void testFindBy_checksum() {
-    final Map<String, String> context = newContext();
-    final JobContextRow newRow = newJobContextRowWith(context);
-    jobContextDao.insert(newRow);
+  public void testFindBy_uuidNotFound() {
+    final UUID rowUuid = newRowUuid();
 
-    final String checksum = Utils.checksumFor(context);
-    final Optional<JobContextRow> row = jobContextDao.findBy(checksum);
+    final Optional<TagRow> row = tagDao.findBy(rowUuid);
+    assertThat(row).isEmpty();
+  }
+
+  @Test
+  public void testFindBy_name() {
+    final TagRow newRow = newTagRow();
+    tagDao.insert(newRow);
+
+    final Optional<TagRow> row = tagDao.findBy(newRow.getName());
     assertThat(row).isPresent();
+  }
+
+  @Test
+  public void testFindBy_nameNotFound() {
+    final String tagName = newTagName();
+
+    final Optional<TagRow> row = tagDao.findBy(tagName);
+    assertThat(row).isEmpty();
   }
 
   @Test
   public void testFindAll() {
-    final List<JobContextRow> newRows = newJobContextRows(4);
-    newRows.forEach(newRow -> jobContextDao.insert(newRow));
+    final List<TagRow> newRows = newTagRows(4);
+    newRows.forEach(newRow -> tagDao.insert(newRow));
 
-    final List<JobContextRow> rows = jobContextDao.findAll(4, 0);
+    final List<TagRow> rows = tagDao.findAll(4, 0);
     assertThat(rows).isNotNull().hasSize(4);
   }
 }
