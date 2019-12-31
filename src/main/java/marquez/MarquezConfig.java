@@ -35,6 +35,5 @@ public final class MarquezConfig extends Configuration {
   private final FlywayFactory flywayFactory = new FlywayFactory();
 
   @Getter private boolean migrateOnStartup = true;
-
   @Getter private List<Tag> tags = Lists.newArrayList();
 }
