@@ -83,9 +83,7 @@ Then browse to the admin interface: http://localhost:8081
 ## Getting Involved
 
 * Website: https://marquezproject.github.io/marquez
-* Mailing Lists:
-  * [marquez-user@googlegroups.com](https://groups.google.com/group/marquez-user) (_user support and questions_)
-  * [marquez-dev@googlegroups.com](https://groups.google.com/group/marquez-dev) (_development discussions_)
+* Source: https://github.com/MarquezProject/marquez
 * Chat: https://gitter.im/marquez-project/community
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
