@@ -30,8 +30,18 @@ public final class DbTableResponse extends DatasetResponse {
       final String updatedAt,
       final String sourceName,
       @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
       @Nullable final String lastModified,
       @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, fields, lastModified, description);
+    super(
+        name,
+        physicalName,
+        createdAt,
+        updatedAt,
+        sourceName,
+        fields,
+        tags,
+        lastModified,
+        description);
   }
 }

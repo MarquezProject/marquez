@@ -14,11 +14,14 @@
 
 package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public final class TagsResponse {
-  @NonNull private final List<TagResponse> tags;
+public class TagsResponse {
+  @NonNull
+  @JsonProperty("tags")
+  List<TagResponse> responses;
 }

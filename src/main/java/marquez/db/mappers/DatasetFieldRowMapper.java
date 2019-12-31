@@ -17,6 +17,7 @@ package marquez.db.mappers;
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidArrayOrThrow;
 import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
@@ -38,6 +39,7 @@ public final class DatasetFieldRowMapper implements RowMapper<DatasetFieldRow> {
         timestampOrThrow(results, Columns.UPDATED_AT),
         uuidOrThrow(results, Columns.DATASET_UUID),
         stringOrThrow(results, Columns.NAME),
+        uuidArrayOrThrow(results, Columns.TAG_UUIDS),
         stringOrNull(results, Columns.DESCRIPTION));
   }
 }

@@ -15,6 +15,7 @@
 package marquez.db.models;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -33,6 +34,7 @@ public class ExtendedRunRow extends RunRow {
       final Instant updatedAt,
       final UUID jobVersionUuid,
       final UUID runArgsUuid,
+      final List<UUID> inputVersionUuids,
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
       @Nullable final String currentRunState,
@@ -43,6 +45,7 @@ public class ExtendedRunRow extends RunRow {
         updatedAt,
         jobVersionUuid,
         runArgsUuid,
+        inputVersionUuids,
         nominalStartTime,
         nominalEndTime,
         currentRunState);

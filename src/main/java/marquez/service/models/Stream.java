@@ -41,6 +41,7 @@ public final class Stream extends Dataset {
       final SourceName sourceName,
       @NonNull final URL schemaLocation,
       @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
       @Nullable final Instant lastModified,
       @Nullable final String description) {
     super(
@@ -51,6 +52,7 @@ public final class Stream extends Dataset {
         updatedAt,
         sourceName,
         fields,
+        tags,
         lastModified,
         description);
     this.schemaLocation = schemaLocation;

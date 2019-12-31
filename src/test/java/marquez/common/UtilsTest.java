@@ -37,36 +37,6 @@ public class UtilsTest {
   private static final String JSON = "{\"value\":\"" + VALUE + "\"}";
 
   @Test
-  public void testToUrl() throws Exception {
-    final String urlString = "http://test.com:8080";
-    final URL expected = new URL(urlString);
-    final URL actual = Utils.toUrl(urlString);
-    assertThat(actual).isEqualTo(expected);
-  }
-
-  @Test
-  public void testToUrl_throwsOnNull() {
-    assertThatNullPointerException().isThrownBy(() -> Utils.toUrl(null));
-  }
-
-  @Test
-  public void testToUrl_throwsOnMalformed() {
-    final String urlStringMalformed = "http://test.com:-8080";
-    assertThatExceptionOfType(AssertionError.class)
-        .isThrownBy(() -> Utils.toUrl(urlStringMalformed));
-  }
-
-  @JsonAutoDetect(fieldVisibility = Visibility.ANY)
-  static final class Object {
-    final String value;
-
-    @JsonCreator
-    Object(final String value) {
-      this.value = value;
-    }
-  }
-
-  @Test
   public void testToJson() {
     final String actual = Utils.toJson(OBJECT);
     assertThat(actual).isEqualTo(JSON);
@@ -90,6 +60,26 @@ public class UtilsTest {
   }
 
   @Test
+  public void testToUrl() throws Exception {
+    final String urlString = "http://test.com:8080";
+    final URL expected = new URL(urlString);
+    final URL actual = Utils.toUrl(urlString);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testToUrl_throwsOnNull() {
+    assertThatNullPointerException().isThrownBy(() -> Utils.toUrl(null));
+  }
+
+  @Test
+  public void testToUrl_throwsOnMalformed() {
+    final String urlStringMalformed = "http://test.com:-8080";
+    assertThatExceptionOfType(AssertionError.class)
+        .isThrownBy(() -> Utils.toUrl(urlStringMalformed));
+  }
+
+  @Test
   public void testChecksumFor_equal() {
     final Map<String, String> kvMap = ImmutableMap.of("key0", "value0", "key1", "value1");
 
@@ -106,5 +96,15 @@ public class UtilsTest {
     final String checksum0 = Utils.checksumFor(kvMap0);
     final String checksum1 = Utils.checksumFor(kvMap1);
     assertThat(checksum0).isNotEqualTo(checksum1);
+  }
+
+  @JsonAutoDetect(fieldVisibility = Visibility.ANY)
+  static final class Object {
+    final String value;
+
+    @JsonCreator
+    Object(final String value) {
+      this.value = value;
+    }
   }
 }

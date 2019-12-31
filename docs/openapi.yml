@@ -172,6 +172,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/datasets'
 
+  /namespaces/{namespace}/datasets/{dataset}/tags/{tag}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/dataset'
+      - $ref: '#/components/parameters/tag'
+    post:
+      summary: Tag a dataset
+      description: Tag an existing dataset.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dataset'
+
+  /namespaces/{namespace}/datasets/{dataset}/fields/{field}/tags/{tag}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/dataset'
+      - $ref: '#/components/parameters/field'
+      - $ref: '#/components/parameters/tag'
+    post:
+      summary: Tag a field
+      description: Tag an existing field of a dataset.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/taggedField'
+
   /namespaces/{namespace}/jobs/{job}:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -374,25 +411,6 @@ components:
         maxLength: 1024
         example: wework
 
-    job:
-      name: job
-      in: path
-      description: The name of the job.
-      required: true
-      schema:
-        type: string
-        maxLength: 1024
-        example: room_bookings_7_days
-
-    runId:
-      name: id
-      in: path
-      description: The ID of the run.
-      required: true
-      schema:
-        type: string
-        format: uuid
-
     source:
       name: source
       in: path
@@ -412,6 +430,43 @@ components:
         type: string
         maxLength: 1024
         example: wedata.room_bookings
+
+    tag:
+      name: tag
+      in: path
+      description: The name of the tag.
+      required: true
+      schema:
+        type: string
+        example: SENSITIVE
+
+    field:
+      name: field
+      in: path
+      description: The name of the field.
+      required: true
+      schema:
+        type: string
+        example: member_id
+
+    job:
+      name: job
+      in: path
+      description: The name of the job.
+      required: true
+      schema:
+        type: string
+        maxLength: 1024
+        example: room_bookings_7_days
+
+    runId:
+      name: id
+      in: path
+      description: The ID of the run.
+      required: true
+      schema:
+        type: string
+        format: uuid
 
     limit:
       name: limit
@@ -867,10 +922,18 @@ components:
               type:
                 description: The type of the field.
                 type: enum
+              tags:
+                description: List of tags.
+                type: array
               description:
                 description: The description of the field.
                 type: string 
-          uniqueItems: true
+            required:
+              - name
+              - type
+        tags:
+          description: List of tags.
+          type: array
         description:
           description:  The description of the table.
           type: string
@@ -886,12 +949,13 @@ components:
         physicalName: wedata.room_bookings
         sourceName: analytics_db
         fields: [
-          {'name': 'booking_id', 'type': 'INTEGER'},
-          {'name': 'booked_at', 'type': 'TIMESTAMP'},
-          {'name': 'office_id', 'type': 'INTEGER'},
-          {'name': 'room_id', 'type': 'INTEGER'},
-          {'name': 'member_id', 'type': 'INTEGER'}
+          {'name': 'booking_id', 'type': 'INTEGER', 'tags': []},
+          {'name': 'booked_at', 'type': 'TIMESTAMP', 'tags': []},
+          {'name': 'office_id', 'type': 'INTEGER', 'tags': []},
+          {'name': 'room_id', 'type': 'INTEGER', 'tags': []},
+          {'name': 'member_id', 'type': 'INTEGER', 'tags': []}
         ]
+        tags: ['SENSITIVE']
         description: "All room booking occupancy data."
 
     STREAM:
@@ -922,10 +986,18 @@ components:
               type:
                 description: The type of the field.
                 type: enum
+              tags:
+                description: List of tags.
+                type: array
               description:
                 description: The description of the field.
                 type: string 
-          uniqueItems: true
+            required:
+              - name
+              - type
+        tags:
+          description: List of tags.
+          type: array
         description:
           description: The description of the stream.
           type: string
@@ -942,6 +1014,7 @@ components:
         physicalName: tracking.wedata.room_bookings
         sourceName: kafka_prod
         schemaLocation: 'http://localhost:8081/schemas/ids/1'
+        tags: []
         description: "A stream of room booking occupancy data."
 
     dataset:
@@ -982,7 +1055,12 @@ components:
               description:
                 description: The description of the field.
                 type: string 
-          uniqueItems: true
+            required:
+              - name
+              - type
+        tags:
+          description: List of tags.
+          type: array
         lastModified:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a run.
           type: string
@@ -998,12 +1076,13 @@ components:
         updatedAt: 2019-05-09T19:49:24.201361Z
         sourceName: analytics_db
         fields: [
-          {'name': 'booking_id', 'type': 'INTEGER'},
-          {'name': 'booked_at', 'type': 'TIMESTAMP'},
-          {'name': 'office_id', 'type': 'INTEGER'},
-          {'name': 'room_id', 'type': 'INTEGER'},
-          {'name': 'member_id', 'type': 'INTEGER'}
+          {'name': 'booking_id', 'type': 'INTEGER', 'tags': []},
+          {'name': 'booked_at', 'type': 'TIMESTAMP', 'tags': []},
+          {'name': 'office_id', 'type': 'INTEGER', 'tags': []},
+          {'name': 'room_id', 'type': 'INTEGER', 'tags': []},
+          {'name': 'member_id', 'type': 'INTEGER', 'tags': []}
         ]
+        tags: ['SENSITIVE']
         lastModified: null
         description: "All room booking occupancy data."
 
@@ -1013,6 +1092,75 @@ components:
         datasets:
           items:
             $ref: '#/components/schemas/dataset'
+
+    taggedField:
+      type: object
+      properties:
+        type:
+          description: The type of the dataset.
+          type: string
+        name:
+          description: The name of the dataset.
+          type: string
+        physicalName:
+          description: The physical name of the dataset.
+          type: string
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was updated.
+          type: string
+          format: date-time
+        sourceName:
+          description: The name of the source associated with the dataset.
+          type: string
+        fields:
+          description: The fields of the dataset.
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                description: The name of the field.
+                type: string
+              type:
+                description: The type of the field.
+                type: enum
+              description:
+                description: The description of the field.
+                type: string 
+            required:
+              - name
+              - type
+        tags:
+          description: List of tags.
+          type: array
+        lastModified:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a run.
+          type: string
+          format: date-time
+        description:
+          description:  The description of the dataset.
+          type: string
+      example:
+        type: DB_TABLE
+        name: wedata.room_bookings
+        physicalName: wedata.room_bookings
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        sourceName: analytics_db
+        fields: [
+          {'name': 'booking_id', 'type': 'INTEGER', 'tags': []},
+          {'name': 'booked_at', 'type': 'TIMESTAMP', 'tags': []},
+          {'name': 'office_id', 'type': 'INTEGER', 'tags': []},
+          {'name': 'room_id', 'type': 'INTEGER', 'tags': []},
+          {'name': 'member_id', 'type': 'INTEGER', 'tags': ['SENSITIVE']}
+        ]
+        tags: ['SENSITIVE']
+        lastModified: null
+        description: "All room booking occupancy data."
 
     newSource:
       type: object
@@ -1079,22 +1227,12 @@ components:
         name:
           description: The name of the tag.
           type: string
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the tag was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the tag was updated.
-          type: string
-          format: date-time
         description:
           description: The description of the tag.
           type: string
       example:
-        name: PII
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        description: PII related tag
+        name: SENSITIVE
+        description: Contains sensitive information
 
     tags:
       type: object

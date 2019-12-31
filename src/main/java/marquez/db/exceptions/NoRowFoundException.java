@@ -12,21 +12,16 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.db.exceptions;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import javax.annotation.Nullable;
+import lombok.NoArgsConstructor;
 
-@RequiredArgsConstructor(staticName = "fromString")
-@EqualsAndHashCode
-@ToString
-public final class TagName {
-  @Getter @NonNull private final String value;
+@NoArgsConstructor
+public final class NoRowFoundException extends DbException {
+  private static final long serialVersionUID = 1L;
 
-  public static TagName of(final String value) {
-    return new TagName(value);
+  public NoRowFoundException(@Nullable final String message) {
+    super(message);
   }
 }

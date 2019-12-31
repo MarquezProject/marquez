@@ -12,26 +12,16 @@
  * limitations under the License.
  */
 
-package marquez.service.models;
+package marquez.api.exceptions;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-import java.util.Optional;
-import javax.annotation.Nullable;
-import lombok.NonNull;
-import lombok.Value;
+import javax.ws.rs.NotFoundException;
 
-@Value
-public class Tag {
-  String name;
-  @Nullable String description;
+public final class TagNotFoundException extends NotFoundException {
+  private static final long serialVersionUID = 1L;
 
-  public Tag(@NonNull final String name, @Nullable final String description) {
-    this.name = checkNotBlank(name, "name must not be blank").toUpperCase();
-    this.description = description;
-  }
-
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(description);
+  public TagNotFoundException(final String name) {
+    super(String.format("Tag '%s' not found.", checkNotBlank(name)));
   }
 }

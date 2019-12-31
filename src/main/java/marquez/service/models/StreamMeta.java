@@ -43,9 +43,10 @@ public final class StreamMeta extends DatasetMeta {
       final SourceName sourceName,
       @NonNull final URL schemaLocation,
       @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
       @Nullable final String description,
       @Nullable final UUID runId) {
-    super(STREAM, physicalName, sourceName, fields, description, runId);
+    super(STREAM, physicalName, sourceName, fields, tags, description, runId);
     this.schemaLocation = schemaLocation;
   }
 

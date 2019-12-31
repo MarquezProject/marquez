@@ -28,6 +28,7 @@ import static marquez.common.models.ModelGenerator.newOwnerName;
 import static marquez.common.models.ModelGenerator.newRunId;
 import static marquez.common.models.ModelGenerator.newSourceName;
 import static marquez.common.models.ModelGenerator.newSourceType;
+import static marquez.common.models.ModelGenerator.newTags;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -107,13 +108,14 @@ public final class ModelGenerator extends Generator {
 
   public static DbTableRequest newDbTableRequestWith(
       final DatasetName physicalName, final SourceName sourceName) {
-    return newDbTableRequestWith(physicalName, sourceName, true, true, false);
+    return newDbTableRequestWith(physicalName, sourceName, true, true, true, false);
   }
 
   public static DbTableRequest newDbTableRequestWith(
       final DatasetName physicalName,
       final SourceName sourceName,
       final boolean hasFields,
+      final boolean hasTags,
       final boolean hasDescription,
       final boolean hasRunId) {
     final String timeAsIso = newIsoTimestamp();
@@ -121,27 +123,30 @@ public final class ModelGenerator extends Generator {
         physicalName.getValue(),
         sourceName.getValue(),
         hasFields ? newFields(4) : null,
+        hasTags ? newTags(2) : null,
         hasDescription ? newDescription() : null,
         hasRunId ? newRunId().toString() : null);
   }
 
   public static StreamRequest newStreamRequestWith(
       final DatasetName physicalName, final SourceName sourceName) {
-    return newStreamRequestWith(physicalName, sourceName, true, false, false);
+    return newStreamRequestWith(physicalName, sourceName, true, true, false, false);
   }
 
   public static StreamRequest newStreamRequestWith(
       final DatasetName physicalName,
       final SourceName sourceName,
+      final boolean hasFields,
+      final boolean hasTags,
       final boolean hasDescription,
-      final boolean hasRunId,
-      final boolean hasFields) {
+      final boolean hasRunId) {
     final String timeAsIso = newIsoTimestamp();
     return new StreamRequest(
         physicalName.getValue(),
         sourceName.getValue(),
         newLocation().toString(),
         hasFields ? newFields(4) : null,
+        hasTags ? newTags(2) : null,
         hasDescription ? newDescription() : null,
         hasRunId ? newRunId().toString() : null);
   }

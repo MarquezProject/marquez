@@ -38,9 +38,10 @@ public final class DbTableMeta extends DatasetMeta {
       final DatasetName physicalName,
       final SourceName sourceName,
       @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
       @Nullable final String description,
       @Nullable final UUID runId) {
-    super(DB_TABLE, physicalName, sourceName, fields, description, runId);
+    super(DB_TABLE, physicalName, sourceName, fields, tags, description, runId);
   }
 
   @Override

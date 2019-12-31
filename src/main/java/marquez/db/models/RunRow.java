@@ -15,6 +15,7 @@
 package marquez.db.models;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -33,9 +34,14 @@ public class RunRow {
   @Getter @NonNull private final Instant updatedAt;
   @Getter @NonNull private final UUID jobVersionUuid;
   @Getter @NonNull private final UUID runArgsUuid;
+  @Getter @NonNull private final List<UUID> inputVersionUuids;
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
   @Nullable private final String currentRunState;
+
+  public boolean hasInputVersionUuids() {
+    return !inputVersionUuids.isEmpty();
+  }
 
   public Optional<Instant> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);

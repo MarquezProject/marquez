@@ -28,8 +28,24 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(JobRowMapper.class)
 public interface JobDao {
   @SqlUpdate(
-      "INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, description, current_version_uuid) "
-          + "VALUES (:uuid, :type, :createdAt, :updatedAt, :namespaceUuid, :name, :description, :currentVersionUuid)")
+      "INSERT INTO jobs ("
+          + "uuid, "
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "namespace_uuid, "
+          + "name, "
+          + "description, "
+          + "current_version_uuid"
+          + ") VALUES ("
+          + ":uuid, "
+          + ":type, "
+          + ":createdAt, "
+          + ":updatedAt, "
+          + ":namespaceUuid, "
+          + ":name, "
+          + ":description, "
+          + ":currentVersionUuid)")
   void insert(@BindBean JobRow row);
 
   @SqlQuery(
@@ -45,7 +61,7 @@ public interface JobDao {
           + "SET updated_at = :updatedAt, "
           + "    current_version_uuid = :currentVersionUuid "
           + "WHERE uuid = :rowUuid")
-  void update(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
+  void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
   @SqlQuery(
       "SELECT j.* FROM jobs AS j "
@@ -53,7 +69,7 @@ public interface JobDao {
           + "  ON (n.name = :namespaceName AND "
           + "      j.namespace_uuid = n.uuid AND "
           + "      j.name = :jobName)")
-  Optional<JobRow> findBy(String namespaceName, String jobName);
+  Optional<JobRow> find(String namespaceName, String jobName);
 
   @SqlQuery(
       "SELECT j.* FROM jobs AS j "

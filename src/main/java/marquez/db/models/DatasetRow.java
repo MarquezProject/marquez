@@ -15,6 +15,7 @@
 package marquez.db.models;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -36,6 +37,7 @@ public class DatasetRow {
   @Getter @NonNull private final UUID sourceUuid;
   @Getter @NonNull private final String name;
   @Getter @NonNull private final String physicalName;
+  @Getter @NonNull List<UUID> tagUuids;
   @Nullable private final Instant lastModified;
   @Nullable private final String description;
   @Nullable private final UUID currentVersionUuid;

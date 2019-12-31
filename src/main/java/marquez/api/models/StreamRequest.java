@@ -33,9 +33,10 @@ public final class StreamRequest extends DatasetRequest {
       final String sourceName,
       final String schemaLocation,
       @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
       @Nullable final String description,
       @Nullable final String runId) {
-    super(physicalName, sourceName, fields, description, runId);
+    super(physicalName, sourceName, fields, tags, description, runId);
     this.schemaLocation = schemaLocation;
   }
 }

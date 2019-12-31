@@ -14,10 +14,11 @@
 
 package marquez.db;
 
+import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.models.TagName;
 import marquez.db.mappers.TagRowMapper;
 import marquez.db.models.TagRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -29,30 +30,28 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(TagRowMapper.class)
 public interface TagDao {
   @SqlUpdate(
-      "INSERT INTO tags (uuid, name, description, created_at, updated_at) VALUES (:uuid, :name, :description, :createdAt, :updatedAt)")
+      "INSERT INTO tags (uuid, created_at, updated_at, name, description) "
+          + "VALUES (:uuid, :createdAt, :updatedAt, :name, :description)")
   void insert(@BindBean TagRow row);
 
-  @SqlQuery(
-      "INSERT INTO tags (uuid, name, description, created_at, updated_at) "
-          + "VALUES (:uuid, :name, :description, :createdAt, :updatedAt) "
-          + "RETURNING *")
-  Optional<TagRow> insertAndGet(@BindBean TagRow row);
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM tags WHERE name = :name)")
+  boolean exists(String name);
 
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM tags WHERE name = :value)")
-  boolean exists(@BindBean TagName name);
+  @SqlQuery("SELECT * FROM tags WHERE uuid = :rowUuid")
+  Optional<TagRow> findBy(UUID rowUuid);
 
-  @SqlQuery("SELECT * FROM tags WHERE uuid = :uuid")
-  Optional<TagRow> findBy(UUID uuid);
+  @SqlQuery("SELECT * FROM tags WHERE name = :name")
+  Optional<TagRow> findBy(String name);
 
-  @SqlQuery("SELECT * FROM tags WHERE uuid in (<uuids>)")
-  List<TagRow> findBy(@BindList(onEmpty = BindList.EmptyHandling.NULL_STRING) List<UUID> uuids);
+  @SqlQuery("SELECT * FROM tags WHERE uuid IN (<rowUuids>)")
+  List<TagRow> findAllInUuidList(@BindList(onEmpty = NULL_STRING) List<UUID> rowUuids);
 
-  @SqlQuery("SELECT * FROM tags WHERE name = :value")
-  Optional<TagRow> findBy(@BindBean TagName name);
+  @SqlQuery("SELECT * FROM tags WHERE name IN (<names>)")
+  List<TagRow> findAllInStringList(@BindList(onEmpty = NULL_STRING) List<String> names);
 
   @SqlQuery("SELECT * FROM tags ORDER BY name LIMIT :limit OFFSET :offset")
-  List<TagRow> findAll(Integer limit, Integer offset);
+  List<TagRow> findAll(int limit, int offset);
 
   @SqlQuery("SELECT COUNT(*) FROM tags")
-  Integer count();
+  int count();
 }

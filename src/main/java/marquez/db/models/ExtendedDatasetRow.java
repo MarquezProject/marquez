@@ -15,6 +15,7 @@
 package marquez.db.models;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -37,6 +38,7 @@ public final class ExtendedDatasetRow extends DatasetRow {
       @NonNull final String sourceName,
       final String name,
       final String physicalName,
+      final List<UUID> tagUuids,
       @Nullable final Instant lastModified,
       @Nullable final String description,
       @Nullable final UUID currentVersionUuid) {
@@ -49,6 +51,7 @@ public final class ExtendedDatasetRow extends DatasetRow {
         sourceUuid,
         name,
         physicalName,
+        tagUuids,
         lastModified,
         description,
         currentVersionUuid);

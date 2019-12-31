@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import marquez.MarquezException;
 
 @NoArgsConstructor
-public final class MarquezServiceException extends MarquezException {
+public class MarquezServiceException extends MarquezException {
   private static final long serialVersionUID = 1L;
 
   public MarquezServiceException(@Nullable final String message) {

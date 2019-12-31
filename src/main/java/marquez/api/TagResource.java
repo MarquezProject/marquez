@@ -35,25 +35,24 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Tag;
 
 @Slf4j
-@Path("/api/v1")
+@Path("/api/v1/tags")
 public final class TagResource {
-  private final TagService tagService;
+  private final TagService service;
 
-  public TagResource(@NonNull final TagService tagService) {
-    this.tagService = tagService;
+  public TagResource(@NonNull final TagService service) {
+    this.service = service;
   }
 
-  @GET
-  @Path("/tags")
-  @Produces(APPLICATION_JSON)
+  @Timed
   @ResponseMetered
   @ExceptionMetered
-  @Timed
+  @GET
+  @Produces(APPLICATION_JSON)
   public Response list(
-      @QueryParam("limit") @DefaultValue("100") Integer limit,
-      @QueryParam("offset") @DefaultValue("0") Integer offset)
+      @QueryParam("limit") @DefaultValue("100") int limit,
+      @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final List<Tag> tags = tagService.getAll(limit, offset);
+    final List<Tag> tags = service.getAll(limit, offset);
     final TagsResponse response = Mapper.toTagsResponse(tags);
     log.debug("Response: {}", response);
     return Response.ok(response).build();

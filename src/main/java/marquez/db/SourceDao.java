@@ -27,8 +27,22 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(SourceRowMapper.class)
 public interface SourceDao {
   @SqlUpdate(
-      "INSERT INTO sources (uuid, type, created_at, updated_at, name, connection_url, description) "
-          + "VALUES (:uuid, :type, :createdAt, :updatedAt, :name, :connectionUrl, :description)")
+      "INSERT INTO sources ("
+          + "uuid, "
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "name, "
+          + "connection_url, "
+          + "description"
+          + ") VALUES ("
+          + ":uuid, "
+          + ":type, "
+          + ":createdAt, "
+          + ":updatedAt, "
+          + ":name, "
+          + ":connectionUrl, "
+          + ":description)")
   void insert(@BindBean SourceRow row);
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM sources WHERE name = :name)")

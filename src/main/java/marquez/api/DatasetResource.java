@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -35,8 +36,10 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetNotFoundException;
+import marquez.api.exceptions.FieldNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
+import marquez.api.exceptions.TagNotFoundException;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
@@ -46,6 +49,7 @@ import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
@@ -56,14 +60,17 @@ public final class DatasetResource {
   private final NamespaceService namespaceService;
   private final DatasetService datasetService;
   private final JobService jobService;
+  private final TagService tagService;
 
   public DatasetResource(
       @NonNull final NamespaceService namespaceService,
       @NonNull final DatasetService datasetService,
-      @NonNull final JobService jobService) {
+      @NonNull final JobService jobService,
+      @NonNull final TagService tagService) {
     this.namespaceService = namespaceService;
     this.datasetService = datasetService;
     this.jobService = jobService;
+    this.tagService = tagService;
   }
 
   @Timed
@@ -81,8 +88,8 @@ public final class DatasetResource {
     log.debug("Request: {}", request);
     final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
-
     final DatasetName datasetName = DatasetName.of(datasetString);
+
     final DatasetMeta datasetMeta = Mapper.toDatasetMeta(request);
     throwIfNotExists(datasetMeta.getRunId().orElse(null));
 
@@ -107,7 +114,7 @@ public final class DatasetResource {
     final DatasetName datasetName = DatasetName.of(datasetString);
     final DatasetResponse response =
         datasetService
-            .get(datasetName)
+            .get(namespaceName, datasetName)
             .map(Mapper::toDatasetResponse)
             .orElseThrow(() -> new DatasetNotFoundException(datasetName));
     log.debug("Response: {}", response);
@@ -133,10 +140,80 @@ public final class DatasetResource {
     return Response.ok(response).build();
   }
 
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @POST
+  @Path("/datasets/{dataset}/tags/{tag}")
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  public Response tag(
+      @PathParam("namespace") String namespaceString,
+      @PathParam("dataset") String datasetString,
+      @PathParam("tag") String tagName)
+      throws MarquezServiceException {
+    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
+    throwIfNotExists(namespaceName);
+    final DatasetName datasetName = DatasetName.of(datasetString);
+    throwIfNotExists(namespaceName, datasetName);
+    throwIfNotExists(tagName);
+
+    datasetService.tagWith(namespaceName, datasetName, tagName);
+    return get(namespaceString, datasetString);
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @POST
+  @Path("/datasets/{dataset}/fields/{field}/tags/{tag}")
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  public Response tag(
+      @PathParam("namespace") String namespaceString,
+      @PathParam("dataset") String datasetString,
+      @PathParam("field") String fieldName,
+      @PathParam("tag") String tagName)
+      throws MarquezServiceException {
+    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
+    throwIfNotExists(namespaceName);
+    final DatasetName datasetName = DatasetName.of(datasetString);
+    throwIfNotExists(namespaceName, datasetName);
+    throwIfNotExists(namespaceName, datasetName, fieldName);
+    throwIfNotExists(tagName);
+
+    datasetService.tagWith(namespaceName, datasetName, fieldName, tagName);
+    return get(namespaceString, datasetString);
+  }
+
   private void throwIfNotExists(@NonNull NamespaceName namespaceName)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       throw new NamespaceNotFoundException(namespaceName);
+    }
+  }
+
+  private void throwIfNotExists(
+      @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName)
+      throws MarquezServiceException {
+    if (!datasetService.exists(namespaceName, datasetName)) {
+      throw new DatasetNotFoundException(datasetName);
+    }
+  }
+
+  private void throwIfNotExists(
+      @NonNull NamespaceName namespaceName,
+      @NonNull DatasetName datasetName,
+      @NonNull String fieldName)
+      throws MarquezServiceException {
+    if (!datasetService.exists(namespaceName, datasetName, fieldName)) {
+      throw new FieldNotFoundException(datasetName, fieldName);
+    }
+  }
+
+  private void throwIfNotExists(@NonNull String tagName) throws MarquezServiceException {
+    if (!tagService.exists(tagName)) {
+      throw new TagNotFoundException(tagName);
     }
   }
 

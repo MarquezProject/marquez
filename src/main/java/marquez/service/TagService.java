@@ -14,16 +14,13 @@
 
 package marquez.service;
 
-import static java.util.Collections.unmodifiableList;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashSet;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.common.models.TagName;
 import marquez.db.TagDao;
 import marquez.db.models.TagRow;
 import marquez.service.exceptions.MarquezServiceException;
@@ -33,60 +30,58 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class TagService {
-  /* PREDEFINED TAGS */
-  private final Set<Tag> TAGS =
-      new HashSet<>(
-          Arrays.asList(
-              Tag.builder()
-                  .name(TagName.fromString("PII"))
-                  .createdAt(Instant.now())
-                  .updatedAt(Instant.now())
-                  .build(),
-              Tag.builder()
-                  .name(TagName.fromString("SENSITIVE"))
-                  .createdAt(Instant.now())
-                  .updatedAt(Instant.now())
-                  .build()));
+  private final TagDao dao;
 
-  private final TagDao tagDao;
-
-  public TagService(@NonNull final TagDao tagDao) throws MarquezServiceException {
-    this.tagDao = tagDao;
-    init();
+  public TagService(@NonNull final TagDao dao) {
+    this.dao = dao;
   }
 
-  private void init() throws MarquezServiceException {
-    for (final Tag tag : TAGS) {
-      if (!exists(TagName.fromString(tag.getName()))) {
-        create(tag);
+  public void init(@NonNull List<Tag> tags) throws MarquezServiceException {
+    for (final Tag tag : tags) {
+      createOrUpdate(tag);
+    }
+  }
+
+  public Tag createOrUpdate(@NonNull Tag tag) throws MarquezServiceException {
+    try {
+      if (!exists(tag.getName())) {
+        log.info("No tag with name '{}' found, creating...", tag.getName());
+        final TagRow newRow = Mapper.toTagRow(tag);
+        dao.insert(newRow);
+        log.info("Successfully created tag '{}'.", tag.getName());
       }
-    }
-  }
-
-  public void create(@NonNull Tag tag) throws MarquezServiceException {
-    try {
-      final TagRow newRow = Mapper.toTagRow(tag);
-      tagDao.insert(newRow);
+      return get(tag.getName()).get();
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create tag: {}", tag, e);
+      log.error("Failed to create or update tag '{}'.", tag.getName(), e);
       throw new MarquezServiceException();
     }
   }
 
-  public boolean exists(@NonNull TagName name) throws MarquezServiceException {
+  public boolean exists(@NonNull String name) throws MarquezServiceException {
     try {
-      return tagDao.exists(name);
+      return dao.exists(name);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to check tag: {}", name.getValue(), e);
+      log.error("Failed to check for tag '{}'.", name, e);
       throw new MarquezServiceException();
     }
   }
 
-  public List<Tag> getAll(@NonNull Integer limit, @NonNull Integer offset)
-      throws MarquezServiceException {
+  public Optional<Tag> get(@NonNull String name) throws MarquezServiceException {
     try {
-      final List<TagRow> rows = tagDao.findAll(limit, offset);
-      return unmodifiableList(Mapper.toTags(rows));
+      return dao.findBy(name).map(Mapper::toTag);
+    } catch (UnableToExecuteStatementException e) {
+      log.error("Failed to get tag '{}'.", name, e);
+      throw new MarquezServiceException();
+    }
+  }
+
+  public List<Tag> getAll(int limit, int offset) throws MarquezServiceException {
+    checkArgument(limit >= 0, "limit must be >= 0");
+    checkArgument(offset >= 0, "offset must be >= 0");
+    try {
+      final List<TagRow> rows = dao.findAll(limit, offset);
+      final List<Tag> tags = Mapper.toTags(rows);
+      return ImmutableList.copyOf(tags);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get tags.", e);
       throw new MarquezServiceException();

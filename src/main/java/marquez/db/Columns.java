@@ -54,6 +54,10 @@ public final class Columns {
   public static final String SOURCE_UUID = "source_uuid";
   public static final String SOURCE_NAME = "source_name";
   public static final String PHYSICAL_NAME = "physical_name";
+  public static final String DATASET_FIELD_UUID = "dataset_field_uuid";
+  public static final String TAG_UUID = "tag_uuid";
+  public static final String TAG_UUIDS = "tag_uuids";
+  public static final String TAGGED_AT = "tagged_at";
   public static final String LAST_MODIFIED = "last_modified";
 
   /* DATASET VERSION ROW COLUMNS */
@@ -78,6 +82,7 @@ public final class Columns {
 
   /* RUN ROW COLUMNS */
   public static final String RUN_ARGS_UUID = "run_args_uuid";
+  public static final String INPUT_VERSION_UUIDS = "input_version_uuids";
   public static final String NOMINAL_START_TIME = "nominal_start_time";
   public static final String NOMINAL_END_TIME = "nominal_end_time";
   public static final String CURRENT_RUN_STATE = "current_run_state";

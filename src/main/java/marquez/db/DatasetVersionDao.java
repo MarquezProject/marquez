@@ -16,6 +16,7 @@ package marquez.db;
 
 import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,20 +47,17 @@ public interface DatasetVersionDao {
 
   @Transaction
   default void insertWith(DatasetVersionRow row, List<DatasetFieldRow> fieldRows) {
+    // Fields
     createDatasetFieldDao().insertAll(fieldRows);
-
     insert(row);
+    // Version
     if (row instanceof StreamVersionRow) {
       createStreamVersionDao().insert((StreamVersionRow) row);
     }
-
-    row.getFieldUuids()
-        .forEach(
-            fieldUuid -> {
-              insert(row.getUuid(), fieldUuid);
-            });
-
-    createDatasetDao().updateVersion(row.getDatasetUuid(), row.getCreatedAt(), row.getVersion());
+    row.getFieldUuids().forEach(fieldUuid -> updateFields(row.getUuid(), fieldUuid));
+    // Current
+    final Instant updatedAt = row.getCreatedAt();
+    createDatasetDao().updateVersion(row.getDatasetUuid(), updatedAt, row.getVersion());
   }
 
   @SqlUpdate(
@@ -67,13 +65,13 @@ public interface DatasetVersionDao {
           + "VALUES (:uuid, :createdAt, :datasetUuid, :version, :runUuid)")
   void insert(@BindBean DatasetVersionRow row);
 
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM dataset_versions WHERE version = :version)")
+  boolean exists(UUID version);
+
   @SqlUpdate(
       "INSERT INTO dataset_versions_field_mapping (dataset_version_uuid, dataset_field_uuid) "
           + "VALUES (:datasetVersionUuid, :datasetFieldUuid)")
-  void insert(UUID datasetVersionUuid, UUID datasetFieldUuid);
-
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM dataset_versions WHERE version = :version)")
-  boolean exists(UUID version);
+  void updateFields(UUID datasetVersionUuid, UUID datasetFieldUuid);
 
   @SqlQuery(
       "SELECT *, "
@@ -84,7 +82,7 @@ public interface DatasetVersionDao {
           + "WHERE version = :version")
   Optional<DatasetVersionRow> findBy(UUID version);
 
-  default Optional<DatasetVersionRow> findBy(String typeString, @Nullable UUID version) {
+  default Optional<DatasetVersionRow> find(String typeString, @Nullable UUID version) {
     if (version == null) {
       return Optional.empty();
     }

@@ -35,6 +35,9 @@ import marquez.common.models.Field;
   "updatedAt",
   "sourceName",
   "schemaLocation",
+  "fields",
+  "tags",
+  "lastModified",
   "description"
 })
 public final class StreamResponse extends DatasetResponse {
@@ -48,9 +51,19 @@ public final class StreamResponse extends DatasetResponse {
       final String sourceName,
       @NonNull final String schemaLocation,
       @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
       @Nullable final String lastModified,
       @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, fields, lastModified, description);
+    super(
+        name,
+        physicalName,
+        createdAt,
+        updatedAt,
+        sourceName,
+        fields,
+        tags,
+        lastModified,
+        description);
     this.schemaLocation = checkNotBlank(schemaLocation);
   }
 }

@@ -16,10 +16,10 @@ package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
 import java.util.List;
 import java.util.Optional;
-import jersey.repackaged.com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.SourceName;
@@ -52,7 +52,6 @@ public class SourceService {
       if (!exists(name)) {
         log.info("No source with name '{}' found, creating...", name.getValue());
         final SourceRow newRow = Mapper.toSourceRow(name, meta);
-
         dao.insert(newRow);
         log.info("Successfully created source '{}' with meta: {}", name.getValue(), meta);
 
@@ -88,7 +87,7 @@ public class SourceService {
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
       final List<SourceRow> rows = dao.findAll(limit, offset);
-      final List<Source> sources = Mapper.toSource(rows);
+      final List<Source> sources = Mapper.toSources(rows);
       return ImmutableList.copyOf(sources);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get sources.", e);

@@ -42,39 +42,56 @@ public interface JobVersionDao extends SqlObject {
   default void insert(JobVersionRow row) {
     getHandle()
         .createUpdate(
-            "INSERT INTO job_versions (uuid, created_at, updated_at, job_uuid, version, location, latest_run_uuid, job_context_uuid) "
-                + "VALUES (:uuid, :createdAt, :updateAt, :jobUuid, :version, :location, :latestRunUuid, :jobContextUuid)")
+            "INSERT INTO job_versions ("
+                + "uuid, "
+                + "created_at, "
+                + "updated_at, "
+                + "job_uuid, "
+                + "version, "
+                + "location, "
+                + "latest_run_uuid, "
+                + "job_context_uuid"
+                + ") VALUES ("
+                + ":uuid, "
+                + ":createdAt, "
+                + ":updateAt, "
+                + ":jobUuid, "
+                + ":version, "
+                + ":location, "
+                + ":latestRunUuid, "
+                + ":jobContextUuid)")
         .bindBean(row)
         .execute();
+    // I/O
+    row.getInputUuids().forEach(inputUuid -> updateInputs(row.getUuid(), inputUuid));
+    row.getOutputUuids().forEach(outputUuid -> updateOutputs(row.getUuid(), outputUuid));
 
-    row.getInputUuids()
-        .forEach(
-            inputUuid -> {
-              insert(row.getUuid(), inputUuid, IoType.INPUT.toString());
-            });
-    row.getOutputUuids()
-        .forEach(
-            outputUuid -> {
-              insert(row.getUuid(), outputUuid, IoType.OUTPUT.toString());
-            });
+    // Version
+    createJobDao().updateVersion(row.getJobUuid(), row.getCreatedAt(), row.getVersion());
+  }
 
-    createJobDao().update(row.getJobUuid(), row.getCreatedAt(), row.getVersion());
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM job_versions WHERE version = :version)")
+  boolean exists(UUID version);
+
+  default void updateInputs(UUID versionUuid, UUID inputUuid) {
+    updateInputsOrOutputs(versionUuid, inputUuid, IoType.INPUT.name());
+  }
+
+  default void updateOutputs(UUID versionUuid, UUID outputUuid) {
+    updateInputsOrOutputs(versionUuid, outputUuid, IoType.OUTPUT.name());
   }
 
   @SqlUpdate(
       "INSERT INTO job_versions_io_mapping (job_version_uuid, dataset_uuid, io_type) "
-          + "VALUES (:jobVersionUuid, :datasetUuid, :ioType)")
-  void insert(UUID jobVersionUuid, UUID datasetUuid, String ioType);
-
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM job_versions WHERE version = :version)")
-  boolean exists(UUID version);
+          + "VALUES (:versionUuid, :datasetUuid, :ioType)")
+  void updateInputsOrOutputs(UUID versionUuid, UUID datasetUuid, String ioType);
 
   @SqlUpdate(
       "UPDATE job_versions "
           + "SET updated_at = :updatedAt, "
           + "    latest_run_uuid = :latestRunUuid "
           + "WHERE uuid = :rowUuid")
-  void update(UUID rowUuid, Instant updatedAt, UUID latestRunUuid);
+  void updateLatestRun(UUID rowUuid, Instant updatedAt, UUID latestRunUuid);
 
   @SqlQuery(
       "SELECT j.uuid AS job_uuid, j.namespace_uuid, jv.*, jc.uuid AS job_context_uuid, jc.context, "

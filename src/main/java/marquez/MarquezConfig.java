@@ -15,11 +15,14 @@
 package marquez;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.Lists;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import marquez.db.FlywayFactory;
+import marquez.service.models.Tag;
 
 @NoArgsConstructor
 public final class MarquezConfig extends Configuration {
@@ -32,4 +35,6 @@ public final class MarquezConfig extends Configuration {
   private final FlywayFactory flywayFactory = new FlywayFactory();
 
   @Getter private boolean migrateOnStartup = true;
+
+  @Getter private List<Tag> tags = Lists.newArrayList();
 }

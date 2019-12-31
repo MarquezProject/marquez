@@ -35,38 +35,58 @@ public interface RunDao extends SqlObject {
   @Transaction
   default void insertWith(RunRow row, List<UUID> inputVersionUuids) {
     insert(row);
-    inputVersionUuids.forEach(inputVersionUuid -> insert(row.getUuid(), inputVersionUuid));
   }
 
   @Transaction
   default void insert(RunRow row) {
     getHandle()
         .createUpdate(
-            "INSERT INTO runs (uuid, created_at, updated_at, job_version_uuid, run_args_uuid, nominal_start_time, nominal_end_time) "
-                + "VALUES (:uuid, :createdAt, :updatedAt, :jobVersionUuid, :runArgsUuid, :nominalStartTime, :nominalEndTime)")
+            "INSERT INTO runs ("
+                + "uuid, "
+                + "created_at, "
+                + "updated_at, "
+                + "job_version_uuid, "
+                + "run_args_uuid, "
+                + "nominal_start_time, "
+                + "nominal_end_time"
+                + ") VALUES ("
+                + ":uuid, "
+                + ":createdAt, "
+                + ":updatedAt, "
+                + ":jobVersionUuid, "
+                + ":runArgsUuid, "
+                + ":nominalStartTime, "
+                + ":nominalEndTime)")
         .bindBean(row)
         .execute();
-
-    createJobVersionDao().update(row.getJobVersionUuid(), row.getCreatedAt(), row.getUuid());
+    // Input versions
+    row.getInputVersionUuids()
+        .forEach(inputVersionUuid -> updateInputVersions(row.getUuid(), inputVersionUuid));
+    // Latest run
+    final Instant updateAt = row.getCreatedAt();
+    createJobVersionDao().updateLatestRun(row.getJobVersionUuid(), updateAt, row.getUuid());
   }
+
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM runs WHERE uuid = :rowUuid)")
+  boolean exists(UUID rowUuid);
 
   @SqlUpdate(
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
           + "VALUES (:runUuid, :datasetVersionUuid)")
-  void insert(UUID runUuid, UUID datasetVersionUuid);
-
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM runs WHERE uuid = :rowUuid)")
-  boolean exists(UUID rowUuid);
+  void updateInputVersions(UUID runUuid, UUID datasetVersionUuid);
 
   @SqlUpdate(
       "UPDATE runs "
           + "SET updated_at = :updatedAt, "
           + "    current_run_state = :currentRunState "
           + "WHERE uuid = :rowUuid")
-  void update(UUID rowUuid, Instant updatedAt, String currentRunState);
+  void updateRunState(UUID rowUuid, Instant updatedAt, String currentRunState);
 
   @SqlQuery(
-      "SELECT r.*, ra.args "
+      "SELECT r.*, ra.args, "
+          + "ARRAY(SELECT dataset_version_uuid "
+          + "      FROM runs_input_mapping "
+          + "      WHERE run_uuid = r.uuid) AS input_version_uuids "
           + "FROM runs AS r "
           + "INNER JOIN run_args AS ra"
           + "  ON (ra.uuid = r.run_args_uuid) "
@@ -76,6 +96,9 @@ public interface RunDao extends SqlObject {
 
   @SqlQuery(
       "SELECT r.*, ra.args "
+          + "ARRAY(SELECT dataset_version_uuid "
+          + "      FROM runs_input_mapping "
+          + "      WHERE run_uuid = r.uuid) AS input_version_uuids "
           + "FROM runs AS r "
           + "INNER JOIN run_args AS ra"
           + "  ON (ra.uuid = r.run_args_uuid)"

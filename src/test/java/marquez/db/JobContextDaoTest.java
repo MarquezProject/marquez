@@ -89,7 +89,6 @@ public class JobContextDaoTest {
 
     final Optional<JobContextRow> row = jobContextDao.findBy(newRow.getUuid());
     assertThat(row).isPresent();
-    assertThat(row.get().getUuid()).isEqualTo(newRow.getUuid());
   }
 
   @Test
@@ -101,7 +100,6 @@ public class JobContextDaoTest {
     final String checksum = Utils.checksumFor(context);
     final Optional<JobContextRow> row = jobContextDao.findBy(checksum);
     assertThat(row).isPresent();
-    assertThat(row.get().getUuid()).isEqualTo(newRow.getUuid());
   }
 
   @Test
@@ -110,7 +108,6 @@ public class JobContextDaoTest {
     newRows.forEach(newRow -> jobContextDao.insert(newRow));
 
     final List<JobContextRow> rows = jobContextDao.findAll(4, 0);
-    assertThat(rows).isNotNull();
-    assertThat(rows).hasSize(4);
+    assertThat(rows).isNotNull().hasSize(4);
   }
 }

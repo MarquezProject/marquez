@@ -20,7 +20,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -146,11 +145,12 @@ public class JobService {
               Mapper.toJobContextRow(jobMeta.getContext(), checksum);
           contextDao.insert(newContextRow);
         }
-        final JobRow jobRow = jobDao.findBy(namespaceName.getValue(), jobName.getValue()).get();
+        final JobRow jobRow = jobDao.find(namespaceName.getValue(), jobName.getValue()).get();
         final JobContextRow contextRow = contextDao.findBy(checksum).get();
         final List<UUID> inputUuids =
             datasetDao
                 .findAllInStringList(
+                    namespaceName.getValue(),
                     jobMeta.getInputs().stream()
                         .map(DatasetName::getValue)
                         .collect(toImmutableList()))
@@ -160,6 +160,7 @@ public class JobService {
         final List<UUID> outputUuids =
             datasetDao
                 .findAllInStringList(
+                    namespaceName.getValue(),
                     jobMeta.getOutputs().stream()
                         .map(DatasetName::getValue)
                         .collect(toImmutableList()))
@@ -209,7 +210,7 @@ public class JobService {
   public Optional<Job> get(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)
       throws MarquezServiceException {
     try {
-      return jobDao.findBy(namespaceName.getValue(), jobName.getValue()).map(this::toJob);
+      return jobDao.find(namespaceName.getValue(), jobName.getValue()).map(this::toJob);
     } catch (UnableToExecuteStatementException e) {
       log.error(
           "Failed to get job '{}' for namespace '{}'.",
@@ -240,9 +241,8 @@ public class JobService {
 
   /** Creates a {@link Job} instance from the given {@link JobRow}. */
   private Job toJob(@NonNull JobRow jobRow) {
-    final UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
-    final ExtendedJobVersionRow versionRow = versionDao.findVersion(currentVersionUuid).get();
-
+    final ExtendedJobVersionRow versionRow =
+        versionDao.findVersion(jobRow.getCurrentVersionUuid().get()).get();
     final List<DatasetName> inputs =
         datasetDao.findAllInUuidList(versionRow.getInputUuids()).stream()
             .map(row -> DatasetName.of(row.getName()))
@@ -251,14 +251,12 @@ public class JobService {
         datasetDao.findAllInUuidList(versionRow.getOutputUuids()).stream()
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
-
     final JobContextRow contextRow = contextDao.findBy(versionRow.getJobContextUuid()).get();
     final ExtendedRunRow runRow =
         versionRow
             .getLatestRunUuid()
             .map(latestRunUuid -> runDao.findBy(latestRunUuid).get())
             .orElse(null);
-
     return Mapper.toJob(
         jobRow,
         inputs,
@@ -283,18 +281,16 @@ public class JobService {
         final RunArgsRow newRunArgsRow = Mapper.toRunArgsRow(runMeta.getArgs(), checksum);
         runArgsDao.insert(newRunArgsRow);
       }
-
       final JobVersionRow versionRow =
           versionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
       final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
-      final RunRow newRunRow = Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), runMeta);
-
       final List<UUID> inputVersionUuids =
           datasetVersionDao.findAllInUuidList(versionRow.getInputUuids()).stream()
               .map(DatasetVersionRow::getUuid)
               .collect(toImmutableList());
-
-      runDao.insertWith(newRunRow, inputVersionUuids);
+      final RunRow newRunRow =
+          Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), inputVersionUuids, runMeta);
+      runDao.insert(newRunRow);
       markRunAs(newRunRow.getUuid(), Run.State.NEW);
       log.info(
           "Successfully created run '{}' for job '{}'.", newRunRow.getUuid(), jobName.getValue());
@@ -334,7 +330,7 @@ public class JobService {
       if (versionRow.isPresent()) {
         final List<ExtendedRunRow> runRows =
             runDao.findAll(versionRow.get().getUuid(), limit, offset);
-        final List<Run> runs = Mapper.toRun(runRows);
+        final List<Run> runs = Mapper.toRuns(runRows);
         return ImmutableList.copyOf(runs);
       }
       return ImmutableList.of();
@@ -358,8 +354,7 @@ public class JobService {
         final ExtendedJobVersionRow versionRow =
             versionDao.findBy(runRow.getJobVersionUuid()).get();
         if (versionRow.hasOutputUuids()) {
-          final Instant lastModified = Instant.now();
-          runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids(), lastModified);
+          runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids());
           incOrDecBy(runState);
           log.debug(
               "Run '{}' for job version '{}' modified datasets: {}",

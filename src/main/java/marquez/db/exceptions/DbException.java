@@ -12,26 +12,24 @@
  * limitations under the License.
  */
 
-package marquez.service.models;
+package marquez.db.exceptions;
 
-import static marquez.common.base.MorePreconditions.checkNotBlank;
-
-import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.NoArgsConstructor;
 
-@Value
-public class Tag {
-  String name;
-  @Nullable String description;
+@NoArgsConstructor
+public class DbException extends Exception {
+  private static final long serialVersionUID = 1L;
 
-  public Tag(@NonNull final String name, @Nullable final String description) {
-    this.name = checkNotBlank(name, "name must not be blank").toUpperCase();
-    this.description = description;
+  public DbException(@Nullable final String message) {
+    super(message);
   }
 
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(description);
+  public DbException(@Nullable final Throwable cause) {
+    super(cause);
+  }
+
+  public DbException(@Nullable final String message, @Nullable final Throwable cause) {
+    super(message, cause);
   }
 }
