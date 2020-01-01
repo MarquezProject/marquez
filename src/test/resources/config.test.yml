@@ -11,3 +11,9 @@ db:
 
 flyway:
   connectRetries: 2
+
+tags:
+  - name: PII
+    description: Personally identifiable information
+  - name: SENSITIVE
+    description: Contains sensitive information
