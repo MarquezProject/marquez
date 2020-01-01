@@ -16,3 +16,9 @@ logging:
   level: INFO
   appenders:
     - type: console
+
+tags:
+  - name: PII
+    description: Personally identifiable information
+  - name: SENSITIVE
+    description: Contains sensitive information

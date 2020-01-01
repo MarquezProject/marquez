@@ -26,6 +26,12 @@ import marquez.service.models.Tag;
 
 @NoArgsConstructor
 public final class MarquezConfig extends Configuration {
+  private static final boolean DEFAULT_MIGRATE_ON_STARTUP = true;
+  private static final List DEFAULT_TAGS = Lists.newArrayList();
+
+  @Getter private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
+  @Getter private List<Tag> tags = DEFAULT_TAGS;
+
   @Getter
   @JsonProperty("db")
   private final DataSourceFactory dataSourceFactory = new DataSourceFactory();
@@ -33,7 +39,4 @@ public final class MarquezConfig extends Configuration {
   @Getter
   @JsonProperty("flyway")
   private final FlywayFactory flywayFactory = new FlywayFactory();
-
-  @Getter private boolean migrateOnStartup = true;
-  @Getter private List<Tag> tags = Lists.newArrayList();
 }
