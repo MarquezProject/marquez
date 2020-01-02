@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static marquez.common.models.ModelGenerator.newTagName;
 import static marquez.db.models.ModelGenerator.newRowUuid;
 import static marquez.db.models.ModelGenerator.newTagRow;
@@ -90,9 +91,7 @@ public class TagDaoTest {
 
   @Test
   public void testFindBy_uuidNotFound() {
-    final UUID rowUuid = newRowUuid();
-
-    final Optional<TagRow> row = tagDao.findBy(rowUuid);
+    final Optional<TagRow> row = tagDao.findBy(newRowUuid());
     assertThat(row).isEmpty();
   }
 
@@ -107,10 +106,39 @@ public class TagDaoTest {
 
   @Test
   public void testFindBy_nameNotFound() {
-    final String tagName = newTagName();
-
-    final Optional<TagRow> row = tagDao.findBy(tagName);
+    final Optional<TagRow> row = tagDao.findBy(newTagName());
     assertThat(row).isEmpty();
+  }
+
+  @Test
+  public void testFindAllInUuidList() {
+    final List<TagRow> newRows = newTagRows(4);
+    newRows.forEach(newRow -> tagDao.insert(newRow));
+
+    final List<UUID> newRowUuids =
+        newRows.stream().map(newRow -> newRow.getUuid()).collect(toImmutableList());
+
+    final List<TagRow> rows = tagDao.findAllInUuidList(newRowUuids);
+    assertThat(rows).hasSize(4);
+
+    final List<UUID> rowUuids = rows.stream().map(row -> row.getUuid()).collect(toImmutableList());
+    assertThat(rowUuids).containsAll(newRowUuids);
+  }
+
+  @Test
+  public void testFindAllInStringList() {
+    final List<TagRow> newRows = newTagRows(4);
+    newRows.forEach(newRow -> tagDao.insert(newRow));
+
+    final List<String> newTagNames =
+        newRows.stream().map(newRow -> newRow.getName()).collect(toImmutableList());
+
+    final List<TagRow> rows = tagDao.findAllInStringList(newTagNames);
+    assertThat(rows).hasSize(4);
+
+    final List<String> tagNames =
+        rows.stream().map(row -> row.getName()).collect(toImmutableList());
+    assertThat(tagNames).containsAll(newTagNames);
   }
 
   @Test
