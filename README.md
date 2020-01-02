@@ -3,6 +3,7 @@
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez-java/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez-java/tree/master) 
 [![codecov](https://codecov.io/gh/MarquezProject/marquez-java/branch/master/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez-java/branch/master)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marquez-project/community)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez-java/master/LICENSE)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez-java.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
 [![Known Vulnerabilities](https://snyk.io/test/github/MarquezProject/marquez-java/badge.svg)](https://snyk.io/test/github/MarquezProject/marquez-java)
