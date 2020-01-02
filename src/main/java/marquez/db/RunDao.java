@@ -95,7 +95,7 @@ public interface RunDao extends SqlObject {
   Optional<ExtendedRunRow> findBy(UUID rowUuid);
 
   @SqlQuery(
-      "SELECT r.*, ra.args "
+      "SELECT r.*, ra.args, "
           + "ARRAY(SELECT dataset_version_uuid "
           + "      FROM runs_input_mapping "
           + "      WHERE run_uuid = r.uuid) AS input_version_uuids "
