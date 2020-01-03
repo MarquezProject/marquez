@@ -39,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
+import marquez.api.exceptions.RunNotValidException;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.JobRequest;
 import marquez.api.models.JobResponse;
@@ -46,6 +47,7 @@ import marquez.api.models.JobsResponse;
 import marquez.api.models.RunRequest;
 import marquez.api.models.RunResponse;
 import marquez.api.models.RunsResponse;
+import marquez.common.Utils;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
@@ -188,7 +190,8 @@ public final class JobResource {
   @GET
   @Path("/jobs/runs/{id}")
   @Produces(APPLICATION_JSON)
-  public Response getRun(@PathParam("id") UUID runId) throws MarquezServiceException {
+  public Response getRun(@PathParam("id") String runIdString) throws MarquezServiceException {
+    final UUID runId = toRunIdOrThrow(runIdString);
     final RunResponse response =
         jobService
             .getRun(runId)
@@ -204,8 +207,9 @@ public final class JobResource {
   @POST
   @Path("/jobs/runs/{id}/start")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsRunning(@PathParam("id") UUID runId) throws MarquezServiceException {
-    return markRunAs(runId, Run.State.RUNNING);
+  public Response markRunAsRunning(@PathParam("id") String runIdString)
+      throws MarquezServiceException {
+    return markRunAs(runIdString, Run.State.RUNNING);
   }
 
   @Timed
@@ -214,8 +218,9 @@ public final class JobResource {
   @POST
   @Path("/jobs/runs/{id}/complete")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsCompleted(@PathParam("id") UUID runId) throws MarquezServiceException {
-    return markRunAs(runId, Run.State.COMPLETED);
+  public Response markRunAsCompleted(@PathParam("id") String runIdString)
+      throws MarquezServiceException {
+    return markRunAs(runIdString, Run.State.COMPLETED);
   }
 
   @Timed
@@ -224,8 +229,9 @@ public final class JobResource {
   @POST
   @Path("/jobs/runs/{id}/fail")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsFailed(@PathParam("id") UUID runId) throws MarquezServiceException {
-    return markRunAs(runId, Run.State.FAILED);
+  public Response markRunAsFailed(@PathParam("id") String runIdString)
+      throws MarquezServiceException {
+    return markRunAs(runIdString, Run.State.FAILED);
   }
 
   @Timed
@@ -234,15 +240,26 @@ public final class JobResource {
   @POST
   @Path("/jobs/runs/{id}/abort")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsAborted(@PathParam("id") UUID runId) throws MarquezServiceException {
-    return markRunAs(runId, Run.State.ABORTED);
+  public Response markRunAsAborted(@PathParam("id") String runIdString)
+      throws MarquezServiceException {
+    return markRunAs(runIdString, Run.State.ABORTED);
   }
 
-  private Response markRunAs(UUID runId, Run.State runState) throws MarquezServiceException {
+  private UUID toRunIdOrThrow(@NonNull String runIdString) {
+    try {
+      return Utils.toUuid(runIdString);
+    } catch (IllegalArgumentException e) {
+      throw new RunNotValidException(runIdString);
+    }
+  }
+
+  private Response markRunAs(String runIdString, Run.State runState)
+      throws MarquezServiceException {
+    final UUID runId = toRunIdOrThrow(runIdString);
     throwIfNotExists(runId);
 
     jobService.markRunAs(runId, runState);
-    return getRun(runId);
+    return getRun(runIdString);
   }
 
   private void throwIfNotExists(@NonNull NamespaceName namespaceName)

@@ -15,6 +15,8 @@
 package marquez.common;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.base.Preconditions.checkArgument;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,6 +29,7 @@ import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.UUID;
 import lombok.NonNull;
 
 public final class Utils {
@@ -39,6 +42,8 @@ public final class Utils {
 
   public static final String KV_DELIM = "#";
   public static final Joiner.MapJoiner KV_JOINER = Joiner.on(KV_DELIM).withKeyValueSeparator("=");
+
+  private static final int UUID_LENGTH = 36;
 
   public static String toJson(@NonNull final Object value) {
     try {
@@ -57,6 +62,7 @@ public final class Utils {
   }
 
   public static URL toUrl(@NonNull final String urlString) {
+    checkNotBlank(urlString, "urlString must not be blank or empty");
     try {
       return new URL(urlString);
     } catch (MalformedURLException e) {
@@ -68,5 +74,13 @@ public final class Utils {
 
   public static String checksumFor(@NonNull final Map<String, String> kvMap) {
     return Hashing.sha256().hashString(KV_JOINER.join(kvMap), UTF_8).toString();
+  }
+
+  public static UUID toUuid(@NonNull final String uuidString) {
+    checkNotBlank(uuidString, "uuidString must not be blank or empty");
+    checkArgument(
+        uuidString.length() == UUID_LENGTH,
+        String.format("uuidString length must = %d", UUID_LENGTH));
+    return UUID.fromString(uuidString);
   }
 }
