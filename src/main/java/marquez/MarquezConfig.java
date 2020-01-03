@@ -27,7 +27,7 @@ import marquez.service.models.Tag;
 @NoArgsConstructor
 public final class MarquezConfig extends Configuration {
   private static final boolean DEFAULT_MIGRATE_ON_STARTUP = true;
-  private static final List DEFAULT_TAGS = Lists.newArrayList();
+  private static final List<Tag> DEFAULT_TAGS = Lists.newArrayList();
 
   @Getter private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
   @Getter private List<Tag> tags = DEFAULT_TAGS;
