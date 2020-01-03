@@ -39,11 +39,13 @@ import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.FieldNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
+import marquez.api.exceptions.RunNotValidException;
 import marquez.api.exceptions.TagNotFoundException;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
+import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.service.DatasetService;
@@ -88,11 +90,10 @@ public final class DatasetResource {
     log.debug("Request: {}", request);
     final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
+    throwIfNotExists(request.getRunId().map(this::toRunIdOrThrow).orElse(null));
+
     final DatasetName datasetName = DatasetName.of(datasetString);
-
     final DatasetMeta datasetMeta = Mapper.toDatasetMeta(request);
-    throwIfNotExists(datasetMeta.getRunId().orElse(null));
-
     final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, datasetMeta);
     final DatasetResponse response = Mapper.toDatasetResponse(dataset);
     log.debug("Response: {}", response);
@@ -222,6 +223,14 @@ public final class DatasetResource {
       if (!jobService.runExists(runId)) {
         throw new RunNotFoundException(runId);
       }
+    }
+  }
+
+  private UUID toRunIdOrThrow(@NonNull String runIdString) {
+    try {
+      return Utils.toUuid(runIdString);
+    } catch (IllegalArgumentException e) {
+      throw new RunNotValidException(runIdString);
     }
   }
 }
