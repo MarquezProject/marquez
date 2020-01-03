@@ -16,13 +16,12 @@ package marquez.api.exceptions;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.BadRequestException;
 
 public final class RunNotValidException extends BadRequestException {
   private static final long serialVersionUID = 1L;
 
-  public RunNotValidException(@Nullable final String runIdString) {
-    super(String.format("'%s' is not a valid run ID.", checkNotBlank(runIdString)));
+  public RunNotValidException(final String runIdString) {
+    super(String.format("Run '%s' is invalid.", checkNotBlank(runIdString)));
   }
 }

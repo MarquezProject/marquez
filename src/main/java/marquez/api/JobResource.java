@@ -253,7 +253,7 @@ public final class JobResource {
     jobService.markRunAs(runId, runState);
     return getRun(runIdString);
   }
-  
+
   private UUID toRunIdOrThrow(@NonNull String runIdString) {
     try {
       return Utils.toUuid(runIdString);
@@ -261,7 +261,7 @@ public final class JobResource {
       throw new RunNotValidException(runIdString);
     }
   }
-  
+
   private void throwIfNotExists(@NonNull NamespaceName namespaceName)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
