@@ -87,7 +87,7 @@ To ensure your pull request is accepted, follow these guidelines:
 * Use dashes (`-`) to separate _words_ in branch names
 * Use _lowercase_ in branch names
 
-# [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
+# API [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
 
 To bundle:
 
