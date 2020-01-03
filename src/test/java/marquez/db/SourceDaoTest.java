@@ -14,6 +14,8 @@
 
 package marquez.db;
 
+import static marquez.common.models.ModelGenerator.newSourceName;
+import static marquez.db.models.ModelGenerator.newRowUuid;
 import static marquez.db.models.ModelGenerator.newSourceRow;
 import static marquez.db.models.ModelGenerator.newSourceRows;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,12 +88,24 @@ public class SourceDaoTest {
   }
 
   @Test
+  public void testFindBy_uuidNotFound() {
+    final Optional<SourceRow> row = sourceDao.findBy(newRowUuid());
+    assertThat(row).isEmpty();
+  }
+
+  @Test
   public void testFindBy_name() {
     final SourceRow newRow = newSourceRow();
     sourceDao.insert(newRow);
 
     final Optional<SourceRow> row = sourceDao.findBy(newRow.getName());
     assertThat(row).isPresent();
+  }
+
+  @Test
+  public void testFindBy_nameNotFound() {
+    final Optional<SourceRow> row = sourceDao.findBy(newSourceName().getValue());
+    assertThat(row).isEmpty();
   }
 
   @Test
