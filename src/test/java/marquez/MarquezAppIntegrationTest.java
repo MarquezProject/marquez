@@ -242,6 +242,7 @@ public class MarquezAppIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testApp_createRunAndMarkAsComplete() {
     final SourceName sourceName = newSourceName();
 
