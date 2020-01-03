@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -277,7 +278,12 @@ public final class Mapper {
 
   public static TagRow toTagRow(@NonNull final Tag tag) {
     final Instant now = newTimestamp();
-    return new TagRow(newRowUuid(), now, now, tag.getName(), tag.getDescription().orElse(null));
+    return new TagRow(
+        newRowUuid(),
+        now,
+        now,
+        tag.getName().toUpperCase(Locale.getDefault()),
+        tag.getDescription().orElse(null));
   }
 
   public static Job toJob(

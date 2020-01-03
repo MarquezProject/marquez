@@ -18,6 +18,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class TagService {
 
   public boolean exists(@NonNull String name) throws MarquezServiceException {
     try {
-      return dao.exists(name);
+      return dao.exists(name.toUpperCase(Locale.getDefault()));
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to check for tag '{}'.", name, e);
       throw new MarquezServiceException();
@@ -68,7 +69,7 @@ public class TagService {
 
   public Optional<Tag> get(@NonNull String name) throws MarquezServiceException {
     try {
-      return dao.findBy(name).map(Mapper::toTag);
+      return dao.findBy(name.toUpperCase(Locale.getDefault())).map(Mapper::toTag);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get tag '{}'.", name, e);
       throw new MarquezServiceException();

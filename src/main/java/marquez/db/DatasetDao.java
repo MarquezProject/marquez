@@ -73,7 +73,8 @@ public interface DatasetDao extends SqlObject {
 
   @SqlUpdate(
       "INSERT INTO dataset_tag_mapping (dataset_uuid, tag_uuid, tagged_at) "
-          + "VALUES (:rowUuid, :tagUuid, :taggedAt)")
+          + "VALUES (:rowUuid, :tagUuid, :taggedAt) "
+          + "ON CONFLICT DO NOTHING")
   void updateTags(UUID rowUuid, UUID tagUuid, Instant taggedAt);
 
   @SqlUpdate(

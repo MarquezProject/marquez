@@ -144,7 +144,7 @@ public final class DatasetResource {
   @ResponseMetered
   @ExceptionMetered
   @POST
-  @Path("/datasets/{dataset}/tags/{tag}")
+  @Path("/{dataset}/tags/{tag}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response tag(
@@ -166,7 +166,7 @@ public final class DatasetResource {
   @ResponseMetered
   @ExceptionMetered
   @POST
-  @Path("/datasets/{dataset}/fields/{field}/tags/{tag}")
+  @Path("/{dataset}/fields/{field}/tags/{tag}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response tag(
