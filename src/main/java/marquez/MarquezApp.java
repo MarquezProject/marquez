@@ -130,8 +130,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
       }
 
       log.info("Stopping app...");
-      // The throwable is not propagating up the stack.
-      onFatalError(); // Signal app termination.
+      // Propagate throwable up the stack.
+      onFatalError(errorOnDbMigrate); // Signal app termination.
     }
   }
 
