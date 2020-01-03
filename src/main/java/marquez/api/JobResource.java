@@ -245,14 +245,6 @@ public final class JobResource {
     return markRunAs(runIdString, Run.State.ABORTED);
   }
 
-  private UUID toRunIdOrThrow(@NonNull String runIdString) {
-    try {
-      return Utils.toUuid(runIdString);
-    } catch (IllegalArgumentException e) {
-      throw new RunNotValidException(runIdString);
-    }
-  }
-
   private Response markRunAs(String runIdString, Run.State runState)
       throws MarquezServiceException {
     final UUID runId = toRunIdOrThrow(runIdString);
@@ -261,7 +253,15 @@ public final class JobResource {
     jobService.markRunAs(runId, runState);
     return getRun(runIdString);
   }
-
+  
+  private UUID toRunIdOrThrow(@NonNull String runIdString) {
+    try {
+      return Utils.toUuid(runIdString);
+    } catch (IllegalArgumentException e) {
+      throw new RunNotValidException(runIdString);
+    }
+  }
+  
   private void throwIfNotExists(@NonNull NamespaceName namespaceName)
       throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
