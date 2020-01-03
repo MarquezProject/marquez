@@ -103,7 +103,7 @@ $ redoc-cli serve docs/openapi.yml
 
 Then browse to: http://localhost:8080
 
-> **Note:** To bundle or serve the API reference, please install [redoc-cli](https://www.npmjs.com/package/redoc-cli).
+> **Note:** To bundle or serve the API docs, please install [redoc-cli](https://www.npmjs.com/package/redoc-cli).
 
 # Resources
 
