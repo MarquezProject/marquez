@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.5.0
+  version: 0.8.0
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -1052,6 +1052,9 @@ components:
               type:
                 description: The type of the field.
                 type: enum
+              tags:
+                description: List of tags.
+                type: array
               description:
                 description: The description of the field.
                 type: string 
@@ -1128,6 +1131,9 @@ components:
               type:
                 description: The type of the field.
                 type: enum
+              tags:
+                description: List of tags.
+                type: array
               description:
                 description: The description of the field.
                 type: string 
