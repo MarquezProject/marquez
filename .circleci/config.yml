@@ -16,7 +16,7 @@ jobs:
       - checkout
       - restore_cache:
           <<: *cache
-      - run: .circleci/get-jdk8.sh
+      - run: ./.circleci/get-jdk8.sh
       - run: ./gradlew --no-daemon --stacktrace build -x test
       - save_cache:
           paths:
@@ -29,7 +29,7 @@ jobs:
       - checkout
       - restore_cache:
           <<: *cache
-      - run: .circleci/get-jdk8.sh
+      - run: ./.circleci/get-jdk8.sh
       - run: ./gradlew --no-daemon --stacktrace test
       - run: ./gradlew --no-daemon jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
@@ -38,7 +38,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: .circleci/get-docker.sh
+      - run: ./.circleci/get-docker.sh
       - run: ./docker/login.sh
       - run: ./docker/build-and-push.sh $CIRCLE_TAG
 
