@@ -82,7 +82,7 @@ Then browse to the admin interface: http://localhost:8081
 
 ## Getting Involved
 
-* Website: https://marquezproject.github.io/marquez
+* Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
 * Chat: https://gitter.im/marquez-project/community
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
