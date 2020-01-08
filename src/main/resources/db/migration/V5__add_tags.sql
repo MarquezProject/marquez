@@ -6,7 +6,7 @@ CREATE TABLE tags (
   description TEXT
 );
 
-CREATE TABLE dataset_tag_mapping (
+CREATE TABLE datasets_tag_mapping (
   dataset_uuid UUID REFERENCES datasets(uuid),
   tag_uuid     UUID REFERENCES tags(uuid),
   tagged_at    TIMESTAMP NOT NULL,
