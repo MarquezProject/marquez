@@ -72,7 +72,7 @@ public interface DatasetDao extends SqlObject {
   boolean exists(String namespaceName, String datasetName);
 
   @SqlUpdate(
-      "INSERT INTO dataset_tag_mapping (dataset_uuid, tag_uuid, tagged_at) "
+      "INSERT INTO datasets_tag_mapping (dataset_uuid, tag_uuid, tagged_at) "
           + "VALUES (:rowUuid, :tagUuid, :taggedAt) "
           + "ON CONFLICT DO NOTHING")
   void updateTags(UUID rowUuid, UUID tagUuid, Instant taggedAt);
@@ -95,7 +95,7 @@ public interface DatasetDao extends SqlObject {
   @SqlQuery(
       "SELECT d.*, s.name AS source_name, "
           + "ARRAY(SELECT tag_uuid "
-          + "      FROM dataset_tag_mapping "
+          + "      FROM datasets_tag_mapping "
           + "      WHERE dataset_uuid = d.uuid) AS tag_uuids "
           + "FROM datasets AS d "
           + "INNER JOIN sources AS s "
@@ -107,7 +107,7 @@ public interface DatasetDao extends SqlObject {
   @SqlQuery(
       "SELECT d.*, s.name AS source_name, "
           + "ARRAY(SELECT tag_uuid "
-          + "      FROM dataset_tag_mapping "
+          + "      FROM datasets_tag_mapping "
           + "      WHERE dataset_uuid = d.uuid) AS tag_uuids "
           + "FROM datasets AS d "
           + "INNER JOIN namespaces AS n "
@@ -121,7 +121,7 @@ public interface DatasetDao extends SqlObject {
   @SqlQuery(
       "SELECT *, "
           + "ARRAY(SELECT tag_uuid "
-          + "      FROM dataset_tag_mapping "
+          + "      FROM datasets_tag_mapping "
           + "      WHERE dataset_uuid = uuid) AS tag_uuids "
           + "FROM datasets WHERE uuid IN (<rowUuids>)")
   @RegisterRowMapper(DatasetRowMapper.class)
@@ -130,7 +130,7 @@ public interface DatasetDao extends SqlObject {
   @SqlQuery(
       "SELECT d.*, "
           + "ARRAY(SELECT tag_uuid "
-          + "      FROM dataset_tag_mapping "
+          + "      FROM datasets_tag_mapping "
           + "      WHERE dataset_uuid = d.uuid) AS tag_uuids "
           + "FROM datasets AS d "
           + "INNER JOIN namespaces AS n "
@@ -143,7 +143,7 @@ public interface DatasetDao extends SqlObject {
   @SqlQuery(
       "SELECT d.*, s.name AS source_name, "
           + "ARRAY(SELECT tag_uuid "
-          + "      FROM dataset_tag_mapping "
+          + "      FROM datasets_tag_mapping "
           + "      WHERE dataset_uuid = d.uuid) AS tag_uuids "
           + "FROM datasets AS d "
           + "INNER JOIN namespaces AS n "
