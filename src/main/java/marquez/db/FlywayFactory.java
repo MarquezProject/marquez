@@ -31,6 +31,7 @@ import org.flywaydb.core.Flyway;
 @NoArgsConstructor
 public final class FlywayFactory {
   private static final int DEFAULT_CONNECT_RETRIES = 0;
+  private static final boolean DEFAULT_BASELINE_ON_MIGRATE = false;
   private static final boolean DEFAULT_GROUP = false;
   private static final boolean DEFAULT_MIXED = false;
   private static final boolean DEFAULT_IGNORE_MISSING_MIGRATIONS = false;
@@ -53,6 +54,7 @@ public final class FlywayFactory {
 
   @Getter @Setter private int connectRetries = DEFAULT_CONNECT_RETRIES;
   @Setter @Nullable private String initSql;
+  @Getter @Setter private boolean baselineOnMigrate = DEFAULT_BASELINE_ON_MIGRATE;
   @Getter @Setter private boolean group = DEFAULT_GROUP;
   @Setter @Nullable private String installedBy;
   @Getter @Setter private boolean mixed = DEFAULT_MIXED;
@@ -93,6 +95,7 @@ public final class FlywayFactory {
         .dataSource(source)
         .connectRetries(connectRetries)
         .initSql(initSql)
+        .baselineOnMigrate(baselineOnMigrate)
         .group(group)
         .installedBy(installedBy)
         .mixed(mixed)
