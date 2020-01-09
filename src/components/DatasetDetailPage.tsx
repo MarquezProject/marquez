@@ -4,7 +4,7 @@ import {
   createStyles,
   WithStyles as IWithStyles
 } from '@material-ui/core/styles'
-import { Typography, Box, Tooltip, Fab, Table, TableCell, TableHead, TableRow, Paper } from '@material-ui/core'
+import { Typography, Box, Tooltip, Fab, Table, TableCell, TableHead, TableRow, TableBody, Paper } from '@material-ui/core'
 
 import CloseIcon from '@material-ui/icons/Close'
 
@@ -39,16 +39,16 @@ const styles = () => {
     },
     tableCell: {
       display: 'flex',
+      flexDirection: 'row',
       paddingTop: '12px'
     },
     tableRow: {
       display: 'flex',
-      flexDirection: 'row',
       justifyContent: 'space-between'
     },
     paper: {
       overflowX: 'auto',
-      marginTop: '10px'
+      marginTop: '10px',
     },
     updated: {
       marginTop: '10px'
@@ -92,36 +92,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
       name,
       description,
       tags = [],
-      updatedAt
-    } = dataset
-
-    let {
+      updatedAt,
       fields
     } = dataset
-    
-    // placeholder logic to seed 'fields' attribute if API returns nothing
-    !fields ? fields = [
-      {
-      'name': 'uuid',
-      'type': 'STRING'
-      },
-      {
-      'name': 'name',
-      'type': 'STRING'
-      },
-      {
-      'name': 'mass',
-      'type': 'INTEGER'
-      },
-      {
-      'name': 'dimension',
-      'type': 'STRING'
-      },
-      {
-      'name': 'interstellar',
-      'type': 'BOOLEAN'
-      }
-    ] : null
 
     return (
       <Box mt={10} className={root}>
@@ -158,7 +131,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
                 {
                   fields.map((field) => {
                     return (
-                    <TableCell className={tableCell} key={field.name} align="left"><strong>{field.name}</strong>
+                    <TableCell className={tableCell} key={field.name} align="center"><strong>{field.name}</strong>
                       <Tooltip title={field.type} placement="top">
                         <div className={infoIcon}>
                           <InfoIcon color='disabled' fontSize='small' />
@@ -170,17 +143,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
                 }
               </TableRow>
             </TableHead>
-            {/* <TableBody>
-              {rows.map(row => (
-                <TableRow key={row.id}>
-                  {
-                    fields.map(field => {
-                      return <TableCell key={field} align="left">{row[field].toString()}</TableCell>
-                    })
-                  }
-                </TableRow>
-              ))}
-            </TableBody> */}
+            <TableBody>
+              <TableRow className={tableRow}>
+                {fields.map(field => {
+                  return <TableCell key={field.name} align="left">{field.description || 'no description'}</TableCell>
+                })}
+              </TableRow>
+            </TableBody>
           </Table>
         </Paper>
         <Typography className={updated} color='primary' align='right'>
@@ -192,4 +161,3 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
 }
 
 export default withStyles(styles)(DatasetDetailPage)
-
