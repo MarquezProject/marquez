@@ -1,6 +1,7 @@
 interface IFieldsAPI {
-  name: string,
+  name: string
   type: string
+  description?: string
 }
 
 export interface IDatasetAPI {

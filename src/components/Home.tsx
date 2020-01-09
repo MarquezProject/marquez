@@ -1,6 +1,9 @@
-import React, { ReactElement } from 'react'
+import React, { FunctionComponent, useState } from 'react'
 import * as RRD from 'react-router-dom'
 import { Box, Typography } from '@material-ui/core'
+
+import Pagination from 'material-ui-flat-pagination'
+import _chunk from 'lodash/chunk'
 
 import {
   withStyles,
@@ -28,10 +31,13 @@ const styles = (_theme: ITheme) => {
       display: 'flex',
       flexDirection: 'row'
     },
+    filter: {
+      marginLeft: '-4%'
+    },
     lowerHalf: {
       display: 'flex',
       flexDirection: 'column',
-      padding: '52vh 5% 1%',
+      padding: '50vh 5% 1%',
       position: 'absolute',
       top: 0,
       zIndex: 1,
@@ -59,63 +65,86 @@ interface IProps {
   setShowJobs: (bool: boolean) => void
 }
 
-interface IState {}
-
 type IAllProps = RRD.RouteComponentProps & IWithStyles<typeof styles> & IProps
 
-class Home extends React.Component<IAllProps, IState> {
-  render(): ReactElement {
-    const { datasets, jobs, classes, showJobs, setShowJobs } = this.props
-    const matchingDatasets = datasets.filter(d => d.matches)
-    const matchingJobs = jobs.filter(j => j.matches)
-    return (
-      <div>
-        <Box justifyContent='center' className={classes.lowerHalf}>
-          <FilterContainer showJobs={setShowJobs} />
-          <div className={classes.row}>
-            <Box className={classes.column}>
-              {matchingDatasets.length > 0 ? (
-                <Typography className={classes.header} color='secondary' variant='h3'>
-                  {!showJobs ? 'Popular Datasets' : 'Matching Datasets'}
-                </Typography>
-              ) : (
-                <Typography className={classes.noDatasets}>no datasets found!</Typography>
-              )}
-              {matchingDatasets.map(d => (
-                <DatasetPreviewCard
-                  key={d.name}
-                  name={d.name}
-                  description={d.description}
-                  updatedAt={d.createdAt}
-                />
-              ))}
-            </Box>
-            {showJobs ? (
-              <Box className={classes.column}>
-                {matchingJobs.length > 0 ? (
-                  <Typography className={classes.header} color='secondary' variant='h3'>
-                    Matching Jobs
-                  </Typography>
-                ) : (
-                  <Typography className={classes.noJobs}>no jobs found!</Typography>
-                )}
-                {matchingJobs.map(d => (
-                  <JobPreviewCard
-                    /* should change to unique identifier */
-                    key={d.name}
-                    name={d.name}
-                    description={d.description}
-                    updatedAt={d.createdAt}
-                    status={d.status}
-                  />
-                ))}
-              </Box>
-            ) : null}
-          </div>
-        </Box>
+const Home:  FunctionComponent<IAllProps> = props => {
+  const [datasetPageIndex, setDatasetPageIndex] = useState(0)
+  const [jobPageIndex, setJobPageIndex] = useState(0)
+  
+  const limit = 10
+  
+  const { datasets, jobs, classes, showJobs, setShowJobs } = props
+  const matchingDatasets = datasets.filter(d => d.matches)
+  const matchingJobs = jobs.filter(j => j.matches)
+  
+  const chunkedDatasets = _chunk(matchingDatasets, limit)
+  const chunkedJobs = _chunk(matchingJobs, limit)
+
+  const displayDatasets = chunkedDatasets[datasetPageIndex] || matchingDatasets
+  const displayJobs = chunkedJobs[jobPageIndex] || matchingJobs
+
+  return (
+    <div className={classes.lowerHalf}>
+      <div className={classes.filter}>
+        <FilterContainer showJobs={setShowJobs} />
       </div>
-    )
-  }
+      <div className={classes.row}>
+        <Box className={classes.column}>
+          {matchingDatasets.length > 0 ? (
+            <Typography className={classes.header} color='secondary' variant='h3'>
+              {!showJobs ? 'Popular Datasets' : 'Matching Datasets'}
+            </Typography>
+          ) : (
+            <Typography className={classes.noDatasets}>no datasets found!</Typography>
+          )}
+          {displayDatasets.map(d => (
+            <DatasetPreviewCard
+              key={d.name}
+              name={d.name}
+              description={d.description}
+              updatedAt={d.createdAt}
+            />
+          ))}
+          {matchingDatasets.length > 0 ? (
+          <Pagination
+            limit={limit}
+            offset={datasetPageIndex * limit}
+            total={matchingDatasets.length}
+            onClick={(e, offset, page) => setDatasetPageIndex(page - 1)}
+          />
+          ) : null}
+        </Box>
+        {showJobs ? (
+          <Box className={classes.column}>
+            {matchingJobs.length > 0 ? (
+              <Typography className={classes.header} color='secondary' variant='h3'>
+                Matching Jobs
+              </Typography>
+            ) : (
+              <Typography className={classes.noJobs}>no jobs found!</Typography>
+            )}
+            {displayJobs.map(d => (
+              <JobPreviewCard
+                key={d.name}
+                name={d.name}
+                description={d.description}
+                updatedAt={d.createdAt}
+                status={d.status}
+              />
+            ))}
+            {matchingJobs.length > 0 ? (
+              <Pagination
+                limit={limit}
+                offset={jobPageIndex * limit}
+                total={matchingJobs.length}
+                onClick={(e, offset, page) => setJobPageIndex(page - 1)}
+              />
+            ) : null}
+          </Box>
+        ) : null}
+      </div>
+    </div>
+  )
 }
 
 export default withStyles(styles)(Home)
