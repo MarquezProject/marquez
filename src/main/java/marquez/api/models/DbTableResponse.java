@@ -31,7 +31,7 @@ public final class DbTableResponse extends DatasetResponse {
       final String sourceName,
       @Nullable final List<Field> fields,
       @Nullable final List<String> tags,
-      @Nullable final String lastModified,
+      @Nullable final String lastModifiedAt,
       @Nullable final String description) {
     super(
         name,
@@ -41,7 +41,7 @@ public final class DbTableResponse extends DatasetResponse {
         sourceName,
         fields,
         tags,
-        lastModified,
+        lastModifiedAt,
         description);
   }
 }

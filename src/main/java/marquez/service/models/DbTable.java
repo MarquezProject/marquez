@@ -36,7 +36,7 @@ public final class DbTable extends Dataset {
       final SourceName sourceName,
       @Nullable final List<Field> fields,
       @Nullable final List<String> tags,
-      @Nullable final Instant lastModified,
+      @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
     super(
         DB_TABLE,
@@ -47,7 +47,7 @@ public final class DbTable extends Dataset {
         sourceName,
         fields,
         tags,
-        lastModified,
+        lastModifiedAt,
         description);
   }
 }

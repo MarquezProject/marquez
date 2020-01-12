@@ -1064,8 +1064,8 @@ components:
         tags:
           description: List of tags.
           type: array
-        lastModified:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a run.
+        lastModifiedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a successful run.
           type: string
           format: date-time
         description:
@@ -1086,7 +1086,7 @@ components:
           {'name': 'member_id', 'type': 'INTEGER', 'tags': []}
         ]
         tags: ['SENSITIVE']
-        lastModified: null
+        lastModifiedAt: null
         description: "All room booking occupancy data."
 
     datasets:
@@ -1143,8 +1143,8 @@ components:
         tags:
           description: List of tags.
           type: array
-        lastModified:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a run.
+        lastModifiedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a successful run.
           type: string
           format: date-time
         description:
@@ -1165,7 +1165,7 @@ components:
           {'name': 'member_id', 'type': 'INTEGER', 'tags': ['SENSITIVE']}
         ]
         tags: ['SENSITIVE']
-        lastModified: null
+        lastModifiedAt: null
         description: "All room booking occupancy data."
 
     newSource:

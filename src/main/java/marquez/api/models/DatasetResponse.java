@@ -43,7 +43,7 @@ public abstract class DatasetResponse {
   @Getter private final String sourceName;
   @Nullable private final List<Field> fields;
   @Nullable private final List<String> tags;
-  @Nullable private final String lastModified;
+  @Nullable private final String lastModifiedAt;
   @Nullable private final String description;
 
   public DatasetResponse(
@@ -54,7 +54,7 @@ public abstract class DatasetResponse {
       @NonNull final String sourceName,
       @Nullable final List<Field> fields,
       @Nullable final List<String> tags,
-      @Nullable final String lastModified,
+      @Nullable final String lastModifiedAt,
       @Nullable final String description) {
     this.name = checkNotBlank(name);
     this.physicalName = checkNotBlank(physicalName);
@@ -63,7 +63,7 @@ public abstract class DatasetResponse {
     this.sourceName = checkNotBlank(sourceName);
     this.fields = fields;
     this.tags = tags;
-    this.lastModified = lastModified;
+    this.lastModifiedAt = lastModifiedAt;
     this.description = description;
   }
 
@@ -75,8 +75,8 @@ public abstract class DatasetResponse {
     return (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
   }
 
-  public Optional<String> getLastModified() {
-    return Optional.ofNullable(lastModified);
+  public Optional<String> getLastModifiedAt() {
+    return Optional.ofNullable(lastModifiedAt);
   }
 
   public Optional<String> getDescription() {

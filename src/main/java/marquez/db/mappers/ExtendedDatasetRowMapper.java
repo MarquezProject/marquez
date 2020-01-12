@@ -45,7 +45,7 @@ public final class ExtendedDatasetRowMapper implements RowMapper<ExtendedDataset
         stringOrThrow(results, Columns.NAME),
         stringOrThrow(results, Columns.PHYSICAL_NAME),
         uuidArrayOrThrow(results, Columns.TAG_UUIDS),
-        timestampOrNull(results, Columns.LAST_MODIFIED),
+        timestampOrNull(results, Columns.LAST_MODIFIED_AT),
         stringOrNull(results, Columns.DESCRIPTION),
         uuidOrNull(results, Columns.CURRENT_VERSION_UUID));
   }

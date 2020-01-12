@@ -79,11 +79,11 @@ public interface DatasetDao extends SqlObject {
 
   @SqlUpdate(
       "UPDATE datasets "
-          + "SET updated_at = :lastModified, "
-          + "    last_modified = :lastModified "
+          + "SET updated_at = :lastModifiedAt, "
+          + "    last_modified_at = :lastModifiedAt "
           + "WHERE uuid IN (<rowUuids>)")
   void updateLastModifed(
-      @BindList(onEmpty = NULL_STRING) List<UUID> rowUuids, Instant lastModified);
+      @BindList(onEmpty = NULL_STRING) List<UUID> rowUuids, Instant lastModifiedAt);
 
   @SqlUpdate(
       "UPDATE datasets "
