@@ -144,11 +144,11 @@ public class DatasetDaoTest {
     datasetDao.insert(newRow);
 
     // Modified
-    final Instant lastModified = newTimestamp();
-    datasetDao.updateLastModifed(Lists.newArrayList(newRow.getUuid()), lastModified);
+    final Instant lastModifiedAt = newTimestamp();
+    datasetDao.updateLastModifed(Lists.newArrayList(newRow.getUuid()), lastModifiedAt);
 
     final ExtendedDatasetRow row = datasetDao.findBy(newRow.getUuid()).get();
-    assertThat(row.getLastModified()).isPresent().hasValue(lastModified);
+    assertThat(row.getLastModifiedAt()).isPresent().hasValue(lastModifiedAt);
   }
 
   @Test

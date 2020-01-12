@@ -165,7 +165,7 @@ public final class Mapper {
         dataset.getSourceName().getValue(),
         dataset.getFields(),
         dataset.getTags(),
-        dataset.getLastModified().map(ISO_INSTANT::format).orElse(null),
+        dataset.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null),
         dataset.getDescription().orElse(null));
   }
 
@@ -179,7 +179,7 @@ public final class Mapper {
         ((Stream) dataset).getSchemaLocation().toString(),
         dataset.getFields(),
         dataset.getTags(),
-        dataset.getLastModified().map(ISO_INSTANT::format).orElse(null),
+        dataset.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null),
         dataset.getDescription().orElse(null));
   }
 

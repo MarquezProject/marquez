@@ -38,12 +38,12 @@ public class DatasetRow {
   @Getter @NonNull private final String name;
   @Getter @NonNull private final String physicalName;
   @Getter @NonNull List<UUID> tagUuids;
-  @Nullable private final Instant lastModified;
+  @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
   @Nullable private final UUID currentVersionUuid;
 
-  public Optional<Instant> getLastModified() {
-    return Optional.ofNullable(lastModified);
+  public Optional<Instant> getLastModifiedAt() {
+    return Optional.ofNullable(lastModifiedAt);
   }
 
   public Optional<String> getDescription() {

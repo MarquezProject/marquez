@@ -334,8 +334,8 @@ public class MarquezAppIntegrationTest {
           assertThat(response3.getStatus()).isEqualTo(HTTP_200);
           assertThat((String) dataset.get("name")).isEqualTo(datasetName.getValue());
 
-          final Instant lastModified = Instant.parse((String) dataset.get("lastModified"));
-          assertThat(lastModified).isAfter(beforeModified);
+          final Instant lastModifiedAt = Instant.parse((String) dataset.get("lastModifiedAt"));
+          assertThat(lastModifiedAt).isAfter(beforeModified);
         });
   }
 }

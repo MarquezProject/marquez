@@ -58,7 +58,7 @@ public final class Columns {
   public static final String TAG_UUID = "tag_uuid";
   public static final String TAG_UUIDS = "tag_uuids";
   public static final String TAGGED_AT = "tagged_at";
-  public static final String LAST_MODIFIED = "last_modified";
+  public static final String LAST_MODIFIED_AT = "last_modified_at";
 
   /* DATASET VERSION ROW COLUMNS */
   public static final String FIELD_UUIDS = "field_uuids";
