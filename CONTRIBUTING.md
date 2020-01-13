@@ -19,7 +19,7 @@ $ ./gradlew test
 You can also run individual tests using the flag `--tests`:
 
 ```bash
-$ ./gradlew test --tests marquez.api.resources.DatasetResourceTest
+$ ./gradlew test --tests marquez.api.DatasetResourceTest
 $ ./gradlew test --tests marquez.service.DatasetServiceTest
 $ ./gradlew test --tests marquez.db.DatasetDaoTest
 ```
