@@ -1,4 +1,5 @@
-apache-airflow==1.10.3
+apache-airflow==1.10.6
+marquez-python==0.5.6
 codecov
 pytest
 pytest-cov

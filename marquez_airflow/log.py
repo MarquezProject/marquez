@@ -49,7 +49,7 @@ def info(msg, **extra):
 
 
 def warn(msg, **extra):
-    _LOG.warn(_fmt(msg, **extra))
+    _LOG.warning(_fmt(msg, **extra))
 
 
 def error(msg, **extra):

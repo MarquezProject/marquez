@@ -30,7 +30,7 @@ $ python setup.py install
  
  ## Usage
  
- Once the library is installed in your system, your current DAGs need to be modified slightly by changing the import of `airflow.models.DAG` to `marquez.airflow.DAG`, see example below:
+To use this library, the line `from airflow import DAG` needs to be replaced by `from marquez_airflow import DAG`, see example below:
  
 ```python
 from marquez_airflow import DAG
