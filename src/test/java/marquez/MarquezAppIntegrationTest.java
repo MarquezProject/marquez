@@ -293,6 +293,8 @@ public class MarquezAppIntegrationTest {
     final Map<String, Object> run = response0.readEntity(Map.class);
     final String runId = (String) run.get("runId");
 
+    assertThat(response0.getHeaderString("Location")).isEqualTo(baseUri + "/jobs/runs/" + runId);
+
     final Response response1 =
         APP.client()
             .target(baseUri + "/jobs/runs/{id}/start")

@@ -16,11 +16,11 @@
 package marquez.api;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.CREATED;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -33,7 +33,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.JobNotFoundException;
@@ -146,7 +148,8 @@ public final class JobResource {
   public Response createRun(
       @PathParam("namespace") String namespaceString,
       @PathParam("job") String jobString,
-      @Valid RunRequest request)
+      @Valid RunRequest request,
+      @Context UriInfo uriInfo)
       throws MarquezServiceException {
     log.debug("Request: {}", request);
     final NamespaceName namespaceName = NamespaceName.of(namespaceString);
@@ -158,7 +161,15 @@ public final class JobResource {
     final Run run = jobService.createRun(namespaceName, jobName, runMeta);
     final RunResponse response = Mapper.toRunResponse(run);
     log.debug("Response: {}", response);
-    return Response.status(CREATED).entity(response).build();
+    final URI runLocation =
+        uriInfo
+            .getBaseUriBuilder()
+            .clone()
+            .path(this.getClass())
+            .path(this.getClass(), "getRun")
+            .build(run.getId());
+
+    return Response.created(runLocation).entity(response).build();
   }
 
   @Timed
