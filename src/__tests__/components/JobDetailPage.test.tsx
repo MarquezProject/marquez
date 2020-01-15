@@ -16,8 +16,8 @@ jest.mock('react-router-dom', () => ({
 
 import { useParams } from 'react-router-dom'
 
-describe('JobDetailPage Component', () => {
-  test.skip('when there is no match for the jobName in url params', () => {
+test.skip('JobDetailPage Component', () => {
+  describe('when there is no match for the jobName in url params', () => {
     useParams.mockImplementation(() => ({
       jobName: 'job.nomatch'
     }))

@@ -11,7 +11,7 @@ import CloseIcon from '@material-ui/icons/Close'
 import tagToBadge from '../config/tag-to-badge'
 import InfoIcon from '@material-ui/icons/Info'
 
-import { formatUpdatedAt } from '../helpers' 
+import { formatUpdatedAt } from '../helpers'
 
 import { useParams, useHistory } from 'react-router-dom'
 import _find from 'lodash/find'
@@ -39,16 +39,20 @@ const styles = () => {
     },
     tableCell: {
       display: 'flex',
-      flexDirection: 'row',
-      paddingTop: '12px'
+      paddingTop: '12px',
+      flexFlow: 'row nowrap',
+      flexGrow: 1,
+      flexBasis: 0
     },
     tableRow: {
       display: 'flex',
-      justifyContent: 'space-between'
+      width: '100%'
     },
     paper: {
       overflowX: 'auto',
       marginTop: '10px',
+      display: 'flex',
+      flexFlow: 'column nowrap'
     },
     updated: {
       marginTop: '10px'
@@ -145,15 +149,15 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             </TableHead>
             <TableBody>
               <TableRow className={tableRow}>
-                {fields.map(field => {
-                  return <TableCell key={field.name} align="left">{field.description || 'no description'}</TableCell>
+                {fields.map((field) => {
+                  return <TableCell className={tableCell} key={field.name} align="left">{field.description || 'no description'}</TableCell>
                 })}
               </TableRow>
             </TableBody>
           </Table>
         </Paper>
         <Typography className={updated} color='primary' align='right'>
-          {formatUpdatedAt(updatedAt)}
+          last updated: {formatUpdatedAt(updatedAt)}
         </Typography>
       </Box>
     )
