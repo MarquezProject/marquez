@@ -9,10 +9,20 @@ import { Link } from 'react-router-dom'
 
 const globalStyles = require('../global_styles.css')
 const { vibrantGreen } = globalStyles
-import { Typography, Box } from '@material-ui/core'
+import { Typography, Box, Tooltip } from '@material-ui/core'
 import { formatUpdatedAt } from '../helpers'
 
 import { IJobAPI } from '../types/api'
+
+const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
+
+const colorMap = {
+  NEW: jobRunNew,
+  FAILED: jobRunFailed,
+  COMPLETED: jobRunCompleted,
+  ABORTED: jobRunAborted,
+  RUNNING: jobRunRunning
+}
 
 const styles = ({ palette, spacing }: ITheme) => {
   return createStyles({
@@ -40,7 +50,7 @@ const styles = ({ palette, spacing }: ITheme) => {
 }
 
 type IProps = IWithStyles<typeof styles> &
-  Pick<IJobAPI, 'name' | 'description' | 'updatedAt' | 'status'>
+  Pick<IJobAPI, 'name' | 'description' | 'updatedAt' | 'latestRun'>
 interface IState {}
 
 const StyledTypography = withStyles({
@@ -51,7 +61,7 @@ const StyledTypography = withStyles({
 
 class JobPreviewCard extends React.Component<IProps, IState> {
   render(): ReactElement {
-    const { classes, name, description, updatedAt = '', status = 'passed' } = this.props
+    const { classes, name, description, updatedAt = '', latestRun } = this.props
 
     return (
       <Link to={`/jobs/${name}`} className={classes.link}>
@@ -76,7 +86,9 @@ class JobPreviewCard extends React.Component<IProps, IState> {
             alignItems='flex-end'
             justifyContent='space-between'
           >
-            <div className={`${classes[status]} ${classes.status}`} />
+            <Tooltip className="tagWrapper" title={latestRun.runState} placement="top">
+              <div className={classes.status} style={{backgroundColor: colorMap[latestRun.runState]}} />
+            </Tooltip>
             <Typography className={classes.lastUpdated}>{formatUpdatedAt(updatedAt)}</Typography>
           </Box>
         </Box>

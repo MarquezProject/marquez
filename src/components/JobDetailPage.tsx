@@ -1,11 +1,11 @@
-import React, { FunctionComponent, useState } from 'react'
+import React, { FunctionComponent, useState, useEffect } from 'react'
 import {
   withStyles,
   createStyles,
   WithStyles as IWithStyles,
   Theme as ITheme
 } from '@material-ui/core/styles'
-import { Typography, Box, Fab } from '@material-ui/core'
+import { Typography, Box, Fab, Tooltip } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
 import OpenWithSharpIcon from '@material-ui/icons/OpenWithSharp'
 import Modal from '@material-ui/core/Modal'
@@ -14,10 +14,18 @@ import { useParams, useHistory } from 'react-router-dom'
 import _find from 'lodash/find'
 
 const globalStyles = require('../global_styles.css')
-const { vibrantGreen } = globalStyles
+const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
 import { formatUpdatedAt } from '../helpers'
 
 import { IJob } from '../types'
+
+const colorMap = {
+  NEW: jobRunNew,
+  FAILED: jobRunFailed,
+  COMPLETED: jobRunCompleted,
+  ABORTED: jobRunAborted,
+  RUNNING: jobRunRunning
+}
 
 const styles = ({ palette, spacing, shadows }: ITheme) => {
   return createStyles({
@@ -35,20 +43,31 @@ const styles = ({ palette, spacing, shadows }: ITheme) => {
       alignItems: 'center',
       margin: '0px 6% 0px 0px'
     },
-    lastUpdated: {
-      color: palette.grey[600]
-    },
     _status: {
       gridArea: 'status',
       width: spacing(2),
       height: spacing(2),
       borderRadius: '50%'
     },
+    squareShape: {
+      width: spacing(2),
+      height: spacing(2),
+      marginLeft: '5px',
+      borderRadius: '50%'
+    },
+    lastUpdated: {
+      color: palette.grey[600],
+      padding: '0px 0px 5px 5px'
+    },
+    latestRunContainer: {
+      float: 'right',
+      display: 'flex'
+    },
     failed: {
-      backgroundColor: palette.error.main
+      backgroundColor: jobRunFailed
     },
     passed: {
-      backgroundColor: vibrantGreen
+      backgroundColor: jobRunCompleted
     },
     _name: {
       gridArea: 'name'
@@ -112,7 +131,7 @@ const styles = ({ palette, spacing, shadows }: ITheme) => {
   })
 }
 
-type IProps = IWithStyles<typeof styles> & { jobs: IJob[] }
+type IProps = IWithStyles<typeof styles> & { jobs: IJob[] } & { fetchJobRuns: any}
 
 const StyledTypography = withStyles({
   root: {
@@ -166,8 +185,35 @@ const displaySQL = (SQL: string, SQLCommentClass: string) => {
   )
 }
 const JobDetailPage: FunctionComponent<IProps> = props => {
+  const { jobs, classes, fetchJobRuns } = props
   const [SQLModalOpen, setSQLModalOpen] = useState(false)
-  const { jobs, classes } = props
+  
+  const { jobName } = useParams()
+  const history = useHistory()
+
+  const job = _find(jobs, j => j.name === jobName)
+
+  // useEffect hook to run on any change to jobName
+  useEffect(() => {
+    job ? fetchJobRuns(job.name, job.namespace) : null
+  })
+
+  if (!job || jobs.length == 0) {
+    return (
+      <Box
+      p={4}
+      display='flex'
+      flexDirection='column'
+      justifyContent='space-between'
+      className={classes.root}
+      >
+        <Typography align='center'>
+          No job by the name of <strong>&quot;{jobName}&quot;</strong> found
+        </Typography>
+      </Box>
+    )
+  }
+
   const {
     root,
     _status,
@@ -185,34 +231,18 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     copyToClipboard,
     closeButton
   } = classes
-  const { jobName } = useParams()
-  const history = useHistory()
-  const job = _find(jobs, j => j.name === jobName)
-  if (!job) {
-    return (
-      <Box
-        p={4}
-        display='flex'
-        flexDirection='column'
-        justifyContent='space-between'
-        className={root}
-      >
-        <Typography align='center'>
-          No job by the name of <strong>&quot;{jobName}&quot;</strong> found
-        </Typography>
-      </Box>
-    )
-  }
+
   const {
     name,
     description,
     updatedAt = '',
-    status = 'passed',
+    latestRun,
     location,
     namespace,
     context = { SQL: '' }
-  } = job
+  } = job as IJob
 
+  const latestRuns = job ? job.latestRuns || [] : []
   const { SQL } = context
 
   return (
@@ -224,7 +254,9 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       className={root}
     >
       <div className={topSection}>
-        <div className={`${_status} ${classes[status]}`} />
+        <Tooltip title={latestRun.runState} placement="top">
+          <div className={`${_status}`} style={{backgroundColor: colorMap[latestRun.runState]}} />
+        </Tooltip>
         <Typography color='secondary' variant='h3' className={_name}>
           <a href={location} className='link' target='_'>
             {name}
@@ -286,9 +318,24 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         )}
         {displaySQL(SQL, _SQLComment)}
       </Box>
-      <Typography className={lastUpdated} align='right'>
-        {formatUpdatedAt(updatedAt)}
-      </Typography>
+      <div style={{display: 'flex'}}>
+        <div className={classes.latestRunContainer}>
+          {
+            latestRuns.map(r => {
+              return (
+                <Tooltip key={r.runId} title={r.runState} placement="top">
+                  <div key={r.runId} className={classes.squareShape} style={{backgroundColor: colorMap[r.runState]}}></div>
+                </Tooltip>
+              )
+            })
+          }
+        </div>
+        <div>
+          <Typography className={lastUpdated}>
+            {formatUpdatedAt(updatedAt)}
+          </Typography>
+        </div>
+      </div>
     </Box>
   )
 }

@@ -129,7 +129,7 @@ const Home:  FunctionComponent<IAllProps> = props => {
                 name={d.name}
                 description={d.description}
                 updatedAt={d.createdAt}
-                status={d.status}
+                latestRun={d.latestRun}
               />
             ))}
             {matchingJobs.length > 0 ? (

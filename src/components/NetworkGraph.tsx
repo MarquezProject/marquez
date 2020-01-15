@@ -19,7 +19,7 @@ import Loader from './Loader'
 const globalStyles = require('../global_styles.css')
 const { jobNodeGrey, linkGrey, datasetNodeWhite } = globalStyles
 
-const fadedOut = (color(jobNodeGrey) as any).darker(1.5).toString()
+const fadedOut = (color(jobNodeGrey) as any).darker(1.7).toString()
 
 const styles = ({ palette }: Theme) => {
   return createStyles({

@@ -7,6 +7,11 @@
 @value jobNodeGrey: #7d7d7d;
 @value datasetNodeWhite: #fff;
 @value linkGrey: #aaa;
+@value jobRunNew: #3199FF;
+@value jobRunFailed: #CC101D;
+@value jobRunCompleted: #01965C;
+@value jobRunAborted: #7D7D7D;
+@value jobRunRunning: #FECC00;
 
 body {
   font-family: 'Karla-Regular', sans-serif;

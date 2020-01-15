@@ -1,4 +1,4 @@
-import { IDatasetAPI, IJobAPI } from './api'
+import { IDatasetAPI, IJobAPI, IJobRunAPI } from './api'
 
 export type IMethods = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
 
@@ -31,6 +31,7 @@ export interface IDataset extends IDatasetAPI {
 export interface IJob extends IJobAPI {
   matches: boolean
   namespace: string
+  latestRuns?: IJobRunAPI[]
 }
 
 export type IFilterByDisplay = 'namespace' | 'datasource'
