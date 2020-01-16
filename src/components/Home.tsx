@@ -71,7 +71,7 @@ const Home:  FunctionComponent<IAllProps> = props => {
   const [datasetPageIndex, setDatasetPageIndex] = useState(0)
   const [jobPageIndex, setJobPageIndex] = useState(0)
   
-  const limit = 10
+  const limit = 5
   
   const { datasets, jobs, classes, showJobs, setShowJobs } = props
   const matchingDatasets = datasets.filter(d => d.matches)

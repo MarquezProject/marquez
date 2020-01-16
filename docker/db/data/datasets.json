@@ -3,7 +3,7 @@
     "name": "galaxy.geometry",
     "physicalName": "galaxy.geometry",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
+    "namespace": "default",
     "sourceName": "redshift",
     "description": "describes different geometries in the galaxy",
     "fields": [
@@ -33,7 +33,7 @@
     "name": "galaxy.dimensions",
     "physicalName": "galaxy.dimensions",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
+    "namespace": "default",
     "sourceName": "redshift",
     "description": "describes all possible dimensions in the galaxy",
     "fields": [

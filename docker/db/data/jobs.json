@@ -1,7 +1,7 @@
 [
   {
     "name": "calculate.galaxy_dimensions",
-    "namespace": "galactic-data",
+    "namespace": "default",
     "inputs": ["galaxy.geometry"],
     "outputs": ["galaxy.dimensions"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_dimensions.sql",
@@ -13,7 +13,7 @@
   },
   {
     "name": "calculate.galaxy_trips",
-    "namespace": "galactic-data",
+    "namespace": "default",
     "inputs": ["galaxy.dimensions"],
     "outputs": ["galaxy.trips"],
     "location": "https://github.com/Galaxy/blob/ecfc04de65137bfd25a0416d227eaba5325c8c63/calculate.galaxy_trips.sql",

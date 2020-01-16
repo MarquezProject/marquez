@@ -34,14 +34,16 @@ export function* fetchNamespacesDatasetsAndJobs() {
 }
 
 export function* fetchJobRunsSaga() {
-  try {
-    const { payload } = yield take(FETCH_JOB_RUNS)
-    const { runs } = yield call(fetchLatestJobRuns, payload.jobName, payload.namespaceName)
-    const runsOrderedByStartTime = _orderBy(runs, ['nominalStartTime'], ['asc'])
-    yield put(fetchJobRunsSuccess(payload.jobName, runsOrderedByStartTime))
-  } catch (e) {
-    createRollbarMessage('fetchJobRuns', e)
-    yield put(applicationError('Something went wrong while fetching job runs'))
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_JOB_RUNS)
+      const { runs } = yield call(fetchLatestJobRuns, payload.jobName, payload.namespaceName)
+      const runsOrderedByStartTime = _orderBy(runs, ['nominalStartTime'], ['asc'])
+      yield put(fetchJobRunsSuccess(payload.jobName, runsOrderedByStartTime))
+    } catch (e) {
+      createRollbarMessage('fetchJobRuns', e)
+      yield put(applicationError('Something went wrong while fetching job runs'))
+    }
   }
 }
 

@@ -6,5 +6,9 @@
   {
     "name": "interstellar-data",
     "ownerName": "interstellar-data"
+  },
+  {
+    "name": "default",
+    "ownerName": "default"
   }
 ]

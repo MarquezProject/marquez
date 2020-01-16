@@ -8,15 +8,10 @@ exports[`Filters component renders a snapshot that matches previous 1`] = `
   <WithStyles(WithStyles(ForwardRef(FormControl)))
     margin="normal"
   >
-    <WithStyles(ForwardRef(InputLabel))
-      id="filter-by-label"
-    >
-      Filter by
-    </WithStyles(ForwardRef(InputLabel))>
     <WithStyles(ForwardRef(Select))
       onChange={[Function]}
       renderValue={[Function]}
-      value="namespace"
+      value="all"
     >
       <WithStyles(ForwardRef(MenuItem))
         key="namespace"
@@ -34,49 +29,7 @@ exports[`Filters component renders a snapshot that matches previous 1`] = `
         key="all"
         value="all"
       >
-        All
-      </WithStyles(ForwardRef(MenuItem))>
-    </WithStyles(ForwardRef(Select))>
-  </WithStyles(WithStyles(ForwardRef(FormControl)))>
-  <WithStyles(WithStyles(ForwardRef(FormControl)))
-    margin="normal"
-  >
-    <WithStyles(ForwardRef(InputLabel))
-      id="secondary-filter"
-    >
-      namespace
-    </WithStyles(ForwardRef(InputLabel))>
-    <WithStyles(ForwardRef(Select))
-      onChange={[Function]}
-      renderValue={[Function]}
-      value={
-        Object {
-          "name": "galactic-data",
-          "ownerName": "galactic-data",
-        }
-      }
-    >
-      <WithStyles(ForwardRef(MenuItem))
-        key="galactic-data"
-        value={
-          Object {
-            "name": "galactic-data",
-            "ownerName": "galactic-data",
-          }
-        }
-      >
-        galactic-data
-      </WithStyles(ForwardRef(MenuItem))>
-      <WithStyles(ForwardRef(MenuItem))
-        key="interstellar-data"
-        value={
-          Object {
-            "name": "interstellar-data",
-            "ownerName": "interstellar-data",
-          }
-        }
-      >
-        interstellar-data
+        all
       </WithStyles(ForwardRef(MenuItem))>
     </WithStyles(ForwardRef(Select))>
   </WithStyles(WithStyles(ForwardRef(FormControl)))>

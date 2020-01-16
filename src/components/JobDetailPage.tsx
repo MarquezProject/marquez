@@ -196,7 +196,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
   // useEffect hook to run on any change to jobName
   useEffect(() => {
     job ? fetchJobRuns(job.name, job.namespace) : null
-  })
+  }, [jobs.length])
 
   if (!job || jobs.length == 0) {
     return (
@@ -254,8 +254,8 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       className={root}
     >
       <div className={topSection}>
-        <Tooltip title={latestRun.runState} placement="top">
-          <div className={`${_status}`} style={{backgroundColor: colorMap[latestRun.runState]}} />
+        <Tooltip title={latestRun ? latestRun.runState : ''} placement="top">
+          {latestRun ? <div className={`${_status}`} style={{backgroundColor: colorMap[latestRun.runState]}} /> : <div></div>}
         </Tooltip>
         <Typography color='secondary' variant='h3' className={_name}>
           <a href={location} className='link' target='_'>
