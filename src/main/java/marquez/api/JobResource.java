@@ -161,14 +161,7 @@ public final class JobResource {
     final Run run = jobService.createRun(namespaceName, jobName, runMeta);
     final RunResponse response = Mapper.toRunResponse(run);
     log.debug("Response: {}", response);
-    final URI runLocation =
-        uriInfo
-            .getBaseUriBuilder()
-            .clone()
-            .path(this.getClass())
-            .path(this.getClass(), "getRun")
-            .build(run.getId());
-
+    final URI runLocation = locationFor(uriInfo, run);
     return Response.created(runLocation).entity(response).build();
   }
 
@@ -291,5 +284,13 @@ public final class JobResource {
     if (!jobService.runExists(runId)) {
       throw new RunNotFoundException(runId);
     }
+  }
+
+  private URI locationFor(@NonNull UriInfo uriInfo, @NonNull Run run) {
+    return uriInfo
+        .getBaseUriBuilder()
+        .path(JobResource.class)
+        .path(JobResource.class, "getRun")
+        .build(run.getId());
   }
 }
