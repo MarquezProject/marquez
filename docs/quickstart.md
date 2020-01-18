@@ -135,7 +135,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/wedata.roo
     {"name": "room_id", "type": "INTEGER", "tags": [], "description": null}
   ],
   "tags": ["SENSITIVE"],
-  "lastModified": null,
+  "lastModifiedAt": null,
   "description": "All global room bookings for each office."
 }
 ```
