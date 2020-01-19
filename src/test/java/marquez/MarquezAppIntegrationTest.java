@@ -14,6 +14,7 @@
 
 package marquez;
 
+import static javax.ws.rs.core.HttpHeaders.LOCATION;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static marquez.api.models.ModelGenerator.EMPTY_RUN_REQUEST;
 import static marquez.api.models.ModelGenerator.newDbTableRequestWith;
@@ -293,7 +294,7 @@ public class MarquezAppIntegrationTest {
     final Map<String, Object> run = response0.readEntity(Map.class);
     final String runId = (String) run.get("runId");
 
-    assertThat(response0.getHeaderString("Location")).isEqualTo(baseUri + "/jobs/runs/" + runId);
+    assertThat(response0.getHeaderString(LOCATION)).isEqualTo(baseUri + "/jobs/runs/" + runId);
 
     final Response response1 =
         APP.client()
