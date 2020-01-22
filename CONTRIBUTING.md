@@ -89,9 +89,7 @@ To ensure your pull request is accepted, follow these guidelines:
 
 # Sign Your Work
 
-The _sign-off_ is a simple line at the end of the message for a commit. All commits needs to be signed. Your signature certifies that you wrote the patch or otherwise have the right to contribute the material (see [Developer Certificate of Origin](https://developercertificate.org)).
-
-Contributors must add a `Signed-off-by` line to every git commit message:
+The _sign-off_ is a simple line at the end of the message for a commit. All commits needs to be signed. Your signature certifies that you wrote the patch or otherwise have the right to contribute the material (see [Developer Certificate of Origin](https://developercertificate.org)):
 
 ```
 This is my commit message
