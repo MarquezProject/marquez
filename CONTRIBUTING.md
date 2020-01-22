@@ -48,9 +48,10 @@ $ ./gradlew spotlessApply
 4. Make change on your cool new branch
 5. Write a test for your change
 6. Make sure `.java` files are formatted: `./gradlew spotlessJavaCheck`
-7. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
-8. Work with project maintainers to get your change reviewed and merged into the `master` branch
-9. Delete your branch
+7. Make sure to [_sign you work_](#sign-your-work)
+8. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
+9. Work with project maintainers to get your change reviewed and merged into the `master` branch
+10. Delete your branch
 
 To ensure your pull request is accepted, follow these guidelines:
 
@@ -85,6 +86,22 @@ To ensure your pull request is accepted, follow these guidelines:
 * Choose _short_ and _descriptive_ branch names
 * Use dashes (`-`) to separate _words_ in branch names
 * Use _lowercase_ in branch names
+
+# Sign Your Work
+
+The _sign-off_ is a simple line at the end of the message for a commit. All commits needs to be signed. Your signature certifies that you wrote the patch or otherwise have the right to contribute the material (see [Developer Certificate of Origin](https://developercertificate.org)):
+
+```
+This is my commit message
+
+Signed-off-by: Joe Smith <joe.smith@example.com>
+```
+
+Git has a [`-s`](https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---signoff) command line option to append this automatically to your commit message:
+
+```bash
+$ git commit -s -m 'This is my commit message'
+```
 
 # API [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
 
