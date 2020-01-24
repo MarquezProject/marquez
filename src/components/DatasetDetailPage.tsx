@@ -2,7 +2,8 @@ import React, { FunctionComponent } from 'react'
 import {
   withStyles,
   createStyles,
-  WithStyles as IWithStyles
+  WithStyles as IWithStyles,
+  Theme as ITheme
 } from '@material-ui/core/styles'
 import { Typography, Box, Tooltip, Fab, Table, TableCell, TableHead, TableRow, TableBody, Paper } from '@material-ui/core'
 
@@ -19,7 +20,7 @@ import _keys from 'lodash/keys'
 
 import { IDataset } from '../types'
 
-const styles = () => {
+const styles = ({ shadows }: ITheme) => {
   return createStyles({
     root: {
       marginTop: '52vh',
@@ -32,6 +33,13 @@ const styles = () => {
     },
     noData: {
       padding: '125px 0 0 0'
+    },
+    noSchema: {
+      boxShadow: shadows[1],
+      padding: '1rem'
+    },
+    noSchemaTitle: {
+      fontSize: '14px'
     },
     infoIcon: {
       paddingLeft: '3px',
@@ -73,7 +81,7 @@ type IProps = IWithStyles<typeof styles> & { datasets: IDataset[] }
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { datasets, classes } = props
   const {
-    root, paper, updated, tagContainer, noData, infoIcon, tableCell, tableRow, closeButton, tagHolder
+    root, paper, updated, tagContainer, noData, noSchema, noSchemaTitle, infoIcon, tableCell, tableRow, closeButton, tagHolder
   } = classes
   const { datasetName } = useParams()
   const history = useHistory()
@@ -128,34 +136,42 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             </Fab>
           </div>
         </Box>
-        <Paper className={paper}>
-          <Table size="small">
-            <TableHead>
-              <TableRow className={tableRow}>
-                {
-                  fields.map((field) => {
-                    return (
-                    <TableCell className={tableCell} key={field.name} align="center"><strong>{field.name}</strong>
-                      <Tooltip title={field.type} placement="top">
-                        <div className={infoIcon}>
-                          <InfoIcon color='disabled' fontSize='small' />
-                        </div>
-                      </Tooltip>
-                    </TableCell>
-                    )
-                  })
-                }
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow className={tableRow}>
-                {fields.map((field) => {
-                  return <TableCell className={tableCell} key={field.name} align="left">{field.description || 'no description'}</TableCell>
-                })}
-              </TableRow>
-            </TableBody>
-          </Table>
-        </Paper>
+        {fields && fields.length > 0 ? (
+          <Paper className={paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow className={tableRow}>
+                  {
+                    fields.map((field) => {
+                      return (
+                      <TableCell className={tableCell} key={field.name} align="center"><strong>{field.name}</strong>
+                        <Tooltip title={field.type} placement="top">
+                          <div className={infoIcon}>
+                            <InfoIcon color='disabled' fontSize='small' />
+                          </div>
+                        </Tooltip>
+                      </TableCell>
+                      )
+                    })
+                  }
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow className={tableRow}>
+                  {fields.map((field) => {
+                    return <TableCell className={tableCell} key={field.name} align="left">{field.description || 'no description'}</TableCell>
+                  })}
+                </TableRow>
+              </TableBody>
+            </Table>
+          </Paper>
+        ) : (
+          <div className={noSchema}>
+            <Typography className={noSchemaTitle}>
+              schema not present
+            </Typography>
+          </div>
+        )}
         <Typography className={updated} color='primary' align='right'>
           last updated: {formatUpdatedAt(updatedAt)}
         </Typography>

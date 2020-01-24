@@ -66,28 +66,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
       },
       Object {
         "description": "all trips taken through the galaxy",
-        "fields": Array [
-          Object {
-            "name": "uuid",
-            "type": "STRING",
-          },
-          Object {
-            "name": "name",
-            "type": "STRING",
-          },
-          Object {
-            "name": "mass",
-            "type": "INTEGER",
-          },
-          Object {
-            "name": "dimension",
-            "type": "STRING",
-          },
-          Object {
-            "name": "interstellar",
-            "type": "BOOLEAN",
-          },
-        ],
+        "fields": Array [],
         "name": "galaxy.trips",
         "namespace": "galactic-data",
         "physicalName": "galaxy.trips",
@@ -216,28 +195,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
       },
       Object {
         "description": "describes all life",
-        "fields": Array [
-          Object {
-            "name": "uuid",
-            "type": "STRING",
-          },
-          Object {
-            "name": "name",
-            "type": "STRING",
-          },
-          Object {
-            "name": "mass",
-            "type": "INTEGER",
-          },
-          Object {
-            "name": "dimension",
-            "type": "STRING",
-          },
-          Object {
-            "name": "interstellar",
-            "type": "BOOLEAN",
-          },
-        ],
+        "fields": Array [],
         "name": "objects.life",
         "namespace": "galactic-data",
         "physicalName": "objects.life",
@@ -246,28 +204,6 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
       },
       Object {
         "description": "describes the entire universe",
-        "fields": Array [
-          Object {
-            "name": "uuid",
-            "type": "STRING",
-          },
-          Object {
-            "name": "name",
-            "type": "STRING",
-          },
-          Object {
-            "name": "mass",
-            "type": "INTEGER",
-          },
-          Object {
-            "name": "dimension",
-            "type": "STRING",
-          },
-          Object {
-            "name": "interstellar",
-            "type": "BOOLEAN",
-          },
-        ],
         "name": "environment.universe",
         "namespace": "galactic-data",
         "physicalName": "environment.universe",
@@ -1210,16 +1146,18 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
   <DatasetDetailPage
     classes={
       Object {
-        "closeButton": "DatasetDetailPage-closeButton-9",
-        "infoIcon": "DatasetDetailPage-infoIcon-4",
+        "closeButton": "DatasetDetailPage-closeButton-11",
+        "infoIcon": "DatasetDetailPage-infoIcon-6",
         "noData": "DatasetDetailPage-noData-3",
-        "paper": "DatasetDetailPage-paper-7",
+        "noSchema": "DatasetDetailPage-noSchema-4",
+        "noSchemaTitle": "DatasetDetailPage-noSchemaTitle-5",
+        "paper": "DatasetDetailPage-paper-9",
         "root": "DatasetDetailPage-root-1",
-        "tableCell": "DatasetDetailPage-tableCell-5",
-        "tableRow": "DatasetDetailPage-tableRow-6",
+        "tableCell": "DatasetDetailPage-tableCell-7",
+        "tableRow": "DatasetDetailPage-tableRow-8",
         "tagContainer": "DatasetDetailPage-tagContainer-2",
-        "tagHolder": "DatasetDetailPage-tagHolder-10",
-        "updated": "DatasetDetailPage-updated-8",
+        "tagHolder": "DatasetDetailPage-tagHolder-12",
+        "updated": "DatasetDetailPage-updated-10",
       }
     }
     datasets={
@@ -1286,28 +1224,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
         },
         Object {
           "description": "all trips taken through the galaxy",
-          "fields": Array [
-            Object {
-              "name": "uuid",
-              "type": "STRING",
-            },
-            Object {
-              "name": "name",
-              "type": "STRING",
-            },
-            Object {
-              "name": "mass",
-              "type": "INTEGER",
-            },
-            Object {
-              "name": "dimension",
-              "type": "STRING",
-            },
-            Object {
-              "name": "interstellar",
-              "type": "BOOLEAN",
-            },
-          ],
+          "fields": Array [],
           "name": "galaxy.trips",
           "namespace": "galactic-data",
           "physicalName": "galaxy.trips",
@@ -1436,28 +1353,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
         },
         Object {
           "description": "describes all life",
-          "fields": Array [
-            Object {
-              "name": "uuid",
-              "type": "STRING",
-            },
-            Object {
-              "name": "name",
-              "type": "STRING",
-            },
-            Object {
-              "name": "mass",
-              "type": "INTEGER",
-            },
-            Object {
-              "name": "dimension",
-              "type": "STRING",
-            },
-            Object {
-              "name": "interstellar",
-              "type": "BOOLEAN",
-            },
-          ],
+          "fields": Array [],
           "name": "objects.life",
           "namespace": "galactic-data",
           "physicalName": "objects.life",
@@ -1466,28 +1362,6 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
         },
         Object {
           "description": "describes the entire universe",
-          "fields": Array [
-            Object {
-              "name": "uuid",
-              "type": "STRING",
-            },
-            Object {
-              "name": "name",
-              "type": "STRING",
-            },
-            Object {
-              "name": "mass",
-              "type": "INTEGER",
-            },
-            Object {
-              "name": "dimension",
-              "type": "STRING",
-            },
-            Object {
-              "name": "interstellar",
-              "type": "BOOLEAN",
-            },
-          ],
           "name": "environment.universe",
           "namespace": "galactic-data",
           "physicalName": "environment.universe",
@@ -2432,14 +2306,14 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
       mt={10}
     >
       <div
-        className="MuiBox-root MuiBox-root-43 DatasetDetailPage-root-1"
+        className="MuiBox-root MuiBox-root-45 DatasetDetailPage-root-1"
       >
         <Styled(MuiBox)
           display="flex"
           justifyContent="space-between"
         >
           <div
-            className="MuiBox-root MuiBox-root-44"
+            className="MuiBox-root MuiBox-root-46"
           >
             <div>
               <WithStyles(ForwardRef(Typography))
@@ -2548,7 +2422,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
               id="tagContainer"
             >
               <div
-                className="DatasetDetailPage-tagHolder-10"
+                className="DatasetDetailPage-tagHolder-12"
               >
                 <div
                   key="is_pii"
@@ -2767,13 +2641,13 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
               </div>
               <WithStyles(ForwardRef(Fab))
                 aria-label="edit"
-                className="DatasetDetailPage-closeButton-9"
+                className="DatasetDetailPage-closeButton-11"
                 onClick={[Function]}
                 size="small"
               >
                 <ForwardRef(Fab)
                   aria-label="edit"
-                  className="DatasetDetailPage-closeButton-9"
+                  className="DatasetDetailPage-closeButton-11"
                   classes={
                     Object {
                       "colorInherit": "MuiFab-colorInherit",
@@ -2793,7 +2667,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                 >
                   <WithStyles(ForwardRef(ButtonBase))
                     aria-label="edit"
-                    className="MuiFab-root DatasetDetailPage-closeButton-9 MuiFab-sizeSmall"
+                    className="MuiFab-root DatasetDetailPage-closeButton-11 MuiFab-sizeSmall"
                     component="button"
                     disabled={false}
                     focusRipple={true}
@@ -2802,7 +2676,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                   >
                     <ForwardRef(ButtonBase)
                       aria-label="edit"
-                      className="MuiFab-root DatasetDetailPage-closeButton-9 MuiFab-sizeSmall"
+                      className="MuiFab-root DatasetDetailPage-closeButton-11 MuiFab-sizeSmall"
                       classes={
                         Object {
                           "disabled": "Mui-disabled",
@@ -2818,7 +2692,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                     >
                       <button
                         aria-label="edit"
-                        className="MuiButtonBase-root MuiFab-root DatasetDetailPage-closeButton-9 MuiFab-sizeSmall"
+                        className="MuiButtonBase-root MuiFab-root DatasetDetailPage-closeButton-11 MuiFab-sizeSmall"
                         disabled={false}
                         onBlur={[Function]}
                         onClick={[Function]}
@@ -2880,10 +2754,10 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
           </div>
         </Styled(MuiBox)>
         <WithStyles(ForwardRef(Paper))
-          className="DatasetDetailPage-paper-7"
+          className="DatasetDetailPage-paper-9"
         >
           <ForwardRef(Paper)
-            className="DatasetDetailPage-paper-7"
+            className="DatasetDetailPage-paper-9"
             classes={
               Object {
                 "elevation0": "MuiPaper-elevation0",
@@ -2917,7 +2791,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
             }
           >
             <div
-              className="MuiPaper-root MuiPaper-elevation1 DatasetDetailPage-paper-7 MuiPaper-rounded"
+              className="MuiPaper-root MuiPaper-elevation1 DatasetDetailPage-paper-9 MuiPaper-rounded"
             >
               <WithStyles(ForwardRef(Table))
                 size="small"
@@ -2946,10 +2820,10 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                           className="MuiTableHead-root"
                         >
                           <WithStyles(ForwardRef(TableRow))
-                            className="DatasetDetailPage-tableRow-6"
+                            className="DatasetDetailPage-tableRow-8"
                           >
                             <ForwardRef(TableRow)
-                              className="DatasetDetailPage-tableRow-6"
+                              className="DatasetDetailPage-tableRow-8"
                               classes={
                                 Object {
                                   "footer": "MuiTableRow-footer",
@@ -2961,16 +2835,16 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                               }
                             >
                               <tr
-                                className="MuiTableRow-root DatasetDetailPage-tableRow-6 MuiTableRow-head"
+                                className="MuiTableRow-root DatasetDetailPage-tableRow-8 MuiTableRow-head"
                               >
                                 <WithStyles(ForwardRef(TableCell))
                                   align="center"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="uuid"
                                 >
                                   <ForwardRef(TableCell)
                                     align="center"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -2990,7 +2864,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <th
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-7 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
                                       scope="col"
                                     >
                                       <strong>
@@ -3018,7 +2892,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                         >
                                           <div
                                             aria-describedby={null}
-                                            className="DatasetDetailPage-infoIcon-4"
+                                            className="DatasetDetailPage-infoIcon-6"
                                             onBlur={[Function]}
                                             onFocus={[Function]}
                                             onMouseLeave={[Function]}
@@ -3081,12 +2955,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                 </WithStyles(ForwardRef(TableCell))>
                                 <WithStyles(ForwardRef(TableCell))
                                   align="center"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="name"
                                 >
                                   <ForwardRef(TableCell)
                                     align="center"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -3106,7 +2980,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <th
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-7 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
                                       scope="col"
                                     >
                                       <strong>
@@ -3134,7 +3008,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                         >
                                           <div
                                             aria-describedby={null}
-                                            className="DatasetDetailPage-infoIcon-4"
+                                            className="DatasetDetailPage-infoIcon-6"
                                             onBlur={[Function]}
                                             onFocus={[Function]}
                                             onMouseLeave={[Function]}
@@ -3197,12 +3071,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                 </WithStyles(ForwardRef(TableCell))>
                                 <WithStyles(ForwardRef(TableCell))
                                   align="center"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="mass"
                                 >
                                   <ForwardRef(TableCell)
                                     align="center"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -3222,7 +3096,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <th
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-7 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
                                       scope="col"
                                     >
                                       <strong>
@@ -3250,7 +3124,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                         >
                                           <div
                                             aria-describedby={null}
-                                            className="DatasetDetailPage-infoIcon-4"
+                                            className="DatasetDetailPage-infoIcon-6"
                                             onBlur={[Function]}
                                             onFocus={[Function]}
                                             onMouseLeave={[Function]}
@@ -3313,12 +3187,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                 </WithStyles(ForwardRef(TableCell))>
                                 <WithStyles(ForwardRef(TableCell))
                                   align="center"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="dimension"
                                 >
                                   <ForwardRef(TableCell)
                                     align="center"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -3338,7 +3212,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <th
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-7 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
                                       scope="col"
                                     >
                                       <strong>
@@ -3366,7 +3240,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                         >
                                           <div
                                             aria-describedby={null}
-                                            className="DatasetDetailPage-infoIcon-4"
+                                            className="DatasetDetailPage-infoIcon-6"
                                             onBlur={[Function]}
                                             onFocus={[Function]}
                                             onMouseLeave={[Function]}
@@ -3429,12 +3303,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                 </WithStyles(ForwardRef(TableCell))>
                                 <WithStyles(ForwardRef(TableCell))
                                   align="center"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="interstellar"
                                 >
                                   <ForwardRef(TableCell)
                                     align="center"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -3454,7 +3328,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <th
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-5 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-head DatasetDetailPage-tableCell-7 MuiTableCell-alignCenter MuiTableCell-sizeSmall"
                                       scope="col"
                                     >
                                       <strong>
@@ -3482,7 +3356,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                         >
                                           <div
                                             aria-describedby={null}
-                                            className="DatasetDetailPage-infoIcon-4"
+                                            className="DatasetDetailPage-infoIcon-6"
                                             onBlur={[Function]}
                                             onFocus={[Function]}
                                             onMouseLeave={[Function]}
@@ -3561,10 +3435,10 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                           className="MuiTableBody-root"
                         >
                           <WithStyles(ForwardRef(TableRow))
-                            className="DatasetDetailPage-tableRow-6"
+                            className="DatasetDetailPage-tableRow-8"
                           >
                             <ForwardRef(TableRow)
-                              className="DatasetDetailPage-tableRow-6"
+                              className="DatasetDetailPage-tableRow-8"
                               classes={
                                 Object {
                                   "footer": "MuiTableRow-footer",
@@ -3576,16 +3450,16 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                               }
                             >
                               <tr
-                                className="MuiTableRow-root DatasetDetailPage-tableRow-6"
+                                className="MuiTableRow-root DatasetDetailPage-tableRow-8"
                               >
                                 <WithStyles(ForwardRef(TableCell))
                                   align="left"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="uuid"
                                 >
                                   <ForwardRef(TableCell)
                                     align="left"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -3605,7 +3479,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <td
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-7 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
                                     >
                                       no description
                                     </td>
@@ -3613,12 +3487,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                 </WithStyles(ForwardRef(TableCell))>
                                 <WithStyles(ForwardRef(TableCell))
                                   align="left"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="name"
                                 >
                                   <ForwardRef(TableCell)
                                     align="left"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -3638,7 +3512,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <td
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-7 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
                                     >
                                       no description
                                     </td>
@@ -3646,12 +3520,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                 </WithStyles(ForwardRef(TableCell))>
                                 <WithStyles(ForwardRef(TableCell))
                                   align="left"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="mass"
                                 >
                                   <ForwardRef(TableCell)
                                     align="left"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -3671,7 +3545,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <td
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-7 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
                                     >
                                       no description
                                     </td>
@@ -3679,12 +3553,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                 </WithStyles(ForwardRef(TableCell))>
                                 <WithStyles(ForwardRef(TableCell))
                                   align="left"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="dimension"
                                 >
                                   <ForwardRef(TableCell)
                                     align="left"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -3704,7 +3578,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <td
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-7 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
                                     >
                                       no description
                                     </td>
@@ -3712,12 +3586,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                 </WithStyles(ForwardRef(TableCell))>
                                 <WithStyles(ForwardRef(TableCell))
                                   align="left"
-                                  className="DatasetDetailPage-tableCell-5"
+                                  className="DatasetDetailPage-tableCell-7"
                                   key="interstellar"
                                 >
                                   <ForwardRef(TableCell)
                                     align="left"
-                                    className="DatasetDetailPage-tableCell-5"
+                                    className="DatasetDetailPage-tableCell-7"
                                     classes={
                                       Object {
                                         "alignCenter": "MuiTableCell-alignCenter",
@@ -3737,7 +3611,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
                                   >
                                     <td
                                       aria-sort={null}
-                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-5 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
+                                      className="MuiTableCell-root MuiTableCell-body DatasetDetailPage-tableCell-7 MuiTableCell-alignLeft MuiTableCell-sizeSmall"
                                     >
                                       no description
                                     </td>
@@ -3757,12 +3631,12 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
         </WithStyles(ForwardRef(Paper))>
         <WithStyles(ForwardRef(Typography))
           align="right"
-          className="DatasetDetailPage-updated-8"
+          className="DatasetDetailPage-updated-10"
           color="primary"
         >
           <ForwardRef(Typography)
             align="right"
-            className="DatasetDetailPage-updated-8"
+            className="DatasetDetailPage-updated-10"
             classes={
               Object {
                 "alignCenter": "MuiTypography-alignCenter",
@@ -3800,7 +3674,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
             color="primary"
           >
             <p
-              className="MuiTypography-root DatasetDetailPage-updated-8 MuiTypography-body1 MuiTypography-colorPrimary MuiTypography-alignRight"
+              className="MuiTypography-root DatasetDetailPage-updated-10 MuiTypography-body1 MuiTypography-colorPrimary MuiTypography-alignRight"
             >
               last updated: 
             </p>
@@ -3878,28 +3752,7 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
       },
       Object {
         "description": "all trips taken through the galaxy",
-        "fields": Array [
-          Object {
-            "name": "uuid",
-            "type": "STRING",
-          },
-          Object {
-            "name": "name",
-            "type": "STRING",
-          },
-          Object {
-            "name": "mass",
-            "type": "INTEGER",
-          },
-          Object {
-            "name": "dimension",
-            "type": "STRING",
-          },
-          Object {
-            "name": "interstellar",
-            "type": "BOOLEAN",
-          },
-        ],
+        "fields": Array [],
         "name": "galaxy.trips",
         "namespace": "galactic-data",
         "physicalName": "galaxy.trips",
@@ -4028,28 +3881,7 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
       },
       Object {
         "description": "describes all life",
-        "fields": Array [
-          Object {
-            "name": "uuid",
-            "type": "STRING",
-          },
-          Object {
-            "name": "name",
-            "type": "STRING",
-          },
-          Object {
-            "name": "mass",
-            "type": "INTEGER",
-          },
-          Object {
-            "name": "dimension",
-            "type": "STRING",
-          },
-          Object {
-            "name": "interstellar",
-            "type": "BOOLEAN",
-          },
-        ],
+        "fields": Array [],
         "name": "objects.life",
         "namespace": "galactic-data",
         "physicalName": "objects.life",
@@ -4058,28 +3890,6 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
       },
       Object {
         "description": "describes the entire universe",
-        "fields": Array [
-          Object {
-            "name": "uuid",
-            "type": "STRING",
-          },
-          Object {
-            "name": "name",
-            "type": "STRING",
-          },
-          Object {
-            "name": "mass",
-            "type": "INTEGER",
-          },
-          Object {
-            "name": "dimension",
-            "type": "STRING",
-          },
-          Object {
-            "name": "interstellar",
-            "type": "BOOLEAN",
-          },
-        ],
         "name": "environment.universe",
         "namespace": "galactic-data",
         "physicalName": "environment.universe",
@@ -5022,16 +4832,18 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
   <DatasetDetailPage
     classes={
       Object {
-        "closeButton": "DatasetDetailPage-closeButton-9",
-        "infoIcon": "DatasetDetailPage-infoIcon-4",
+        "closeButton": "DatasetDetailPage-closeButton-11",
+        "infoIcon": "DatasetDetailPage-infoIcon-6",
         "noData": "DatasetDetailPage-noData-3",
-        "paper": "DatasetDetailPage-paper-7",
+        "noSchema": "DatasetDetailPage-noSchema-4",
+        "noSchemaTitle": "DatasetDetailPage-noSchemaTitle-5",
+        "paper": "DatasetDetailPage-paper-9",
         "root": "DatasetDetailPage-root-1",
-        "tableCell": "DatasetDetailPage-tableCell-5",
-        "tableRow": "DatasetDetailPage-tableRow-6",
+        "tableCell": "DatasetDetailPage-tableCell-7",
+        "tableRow": "DatasetDetailPage-tableRow-8",
         "tagContainer": "DatasetDetailPage-tagContainer-2",
-        "tagHolder": "DatasetDetailPage-tagHolder-10",
-        "updated": "DatasetDetailPage-updated-8",
+        "tagHolder": "DatasetDetailPage-tagHolder-12",
+        "updated": "DatasetDetailPage-updated-10",
       }
     }
     datasets={
@@ -5098,28 +4910,7 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
         },
         Object {
           "description": "all trips taken through the galaxy",
-          "fields": Array [
-            Object {
-              "name": "uuid",
-              "type": "STRING",
-            },
-            Object {
-              "name": "name",
-              "type": "STRING",
-            },
-            Object {
-              "name": "mass",
-              "type": "INTEGER",
-            },
-            Object {
-              "name": "dimension",
-              "type": "STRING",
-            },
-            Object {
-              "name": "interstellar",
-              "type": "BOOLEAN",
-            },
-          ],
+          "fields": Array [],
           "name": "galaxy.trips",
           "namespace": "galactic-data",
           "physicalName": "galaxy.trips",
@@ -5248,28 +5039,7 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
         },
         Object {
           "description": "describes all life",
-          "fields": Array [
-            Object {
-              "name": "uuid",
-              "type": "STRING",
-            },
-            Object {
-              "name": "name",
-              "type": "STRING",
-            },
-            Object {
-              "name": "mass",
-              "type": "INTEGER",
-            },
-            Object {
-              "name": "dimension",
-              "type": "STRING",
-            },
-            Object {
-              "name": "interstellar",
-              "type": "BOOLEAN",
-            },
-          ],
+          "fields": Array [],
           "name": "objects.life",
           "namespace": "galactic-data",
           "physicalName": "objects.life",
@@ -5278,28 +5048,6 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
         },
         Object {
           "description": "describes the entire universe",
-          "fields": Array [
-            Object {
-              "name": "uuid",
-              "type": "STRING",
-            },
-            Object {
-              "name": "name",
-              "type": "STRING",
-            },
-            Object {
-              "name": "mass",
-              "type": "INTEGER",
-            },
-            Object {
-              "name": "dimension",
-              "type": "STRING",
-            },
-            Object {
-              "name": "interstellar",
-              "type": "BOOLEAN",
-            },
-          ],
           "name": "environment.universe",
           "namespace": "galactic-data",
           "physicalName": "environment.universe",
@@ -6246,7 +5994,7 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
       mt={10}
     >
       <div
-        className="MuiBox-root MuiBox-root-12 DatasetDetailPage-root-1"
+        className="MuiBox-root MuiBox-root-14 DatasetDetailPage-root-1"
       >
         <WithStyles(ForwardRef(Typography))
           align="center"

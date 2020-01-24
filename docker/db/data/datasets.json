@@ -66,28 +66,7 @@
     "sourceName": "snowflake",
     "namespace": "galactic-data",
     "description": "all trips taken through the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+    "fields": []
   },
   {
     "name": "earth.dimensions",
@@ -216,28 +195,7 @@
     "namespace": "galactic-data",
     "sourceName": "redshift",
     "description": "describes all life",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+    "fields": []
   },
   {
     "name": "environment.universe",
@@ -245,29 +203,7 @@
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes the entire universe",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+    "description": "describes the entire universe"
   },
   {
     "name": "galaxy.radiowaves",

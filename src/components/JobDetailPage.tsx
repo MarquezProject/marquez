@@ -187,7 +187,7 @@ const displaySQL = (SQL: string, SQLCommentClass: string) => {
 const JobDetailPage: FunctionComponent<IProps> = props => {
   const { jobs, classes, fetchJobRuns } = props
   const [SQLModalOpen, setSQLModalOpen] = useState(false)
-  
+
   const { jobName } = useParams()
   const history = useHistory()
 
