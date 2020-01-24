@@ -14,10 +14,11 @@ We feel that a welcoming community is important and we ask that you follow the [
 3. Create a new [branch](#branching): `git checkout -b feature/my-cool-new-feature`
 3. Make change on your cool new branch
 4. Write a test for your change
-5. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez-web/compare)
-6. Add the ["review"](https://github.com/MarquezProject/marquez-web/labels/review) label to your pull request
-7. Work with project maintainers to get your change reviewed and merged into the `master` branch
-8. Delete your branch
+5. Make sure to [sign you work](#sign-your-work)
+6. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez-web/compare)
+7. Add the ["review"](https://github.com/MarquezProject/marquez-web/labels/review) label to your pull request
+8. Work with project maintainers to get your change reviewed and merged into the `master` branch
+9. Delete your branch
 
 To ensure your pull request is accepted, follow these guidelines:
 
@@ -51,6 +52,22 @@ To ensure your pull request is accepted, follow these guidelines:
 * Choose _short_ and _descriptive_ branch names
 * Use dashes (`-`) to separate _words_ in branch names
 * Use _lowercase_ in branch names
+
+# Sign Your Work
+
+The _sign-off_ is a simple line at the end of the message for a commit. All commits needs to be signed. Your signature certifies that you wrote the patch or otherwise have the right to contribute the material (see [Developer Certificate of Origin](https://developercertificate.org)):
+
+```
+This is my commit message
+
+Signed-off-by: Remedios Moscote <remedios.moscote@buendía.com>
+```
+
+Git has a [`-s`](https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---signoff) command line option to append this automatically to your commit message:
+
+```bash
+$ git commit -s -m 'This is my commit message'
+```
 
 # Resources
 
