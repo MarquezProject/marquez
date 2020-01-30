@@ -34,3 +34,36 @@ class RunState(Enum):
     COMPLETED = 'COMPLETED'
     FAILED = 'FAILED'
     ABORTED = 'ABORTED'
+
+
+class DatasetFieldType(Enum):
+    NUMBER = 1
+    DECIMAL = 2
+    NUMERIC = 3
+    INT = 4
+    INTEGER = 5
+    BIGINT = 6
+    SMALLINT = 7
+    FLOAT = 8
+    FLOAT4 = 9
+    FLOAT8 = 10
+    DOUBLE = 11
+    REAL = 12
+    VARCHAR = 13
+    CHAR = 14
+    CHARACTER = 15
+    STRING = 16
+    TEXT = 17
+    BINARY = 18
+    VARBINARY = 19
+    BOOLEAN = 20
+    DATE = 21
+    DATETIME = 22
+    TIME = 23
+    TIMESTAMP = 24
+    TIMESTAMP_LTZ = 25
+    TIMESTAMP_NTZ = 26
+    TIMESTAMP_TZ = 27
+    VARIANT = 28
+    OBJECT = 29
+    ARRAY = 30

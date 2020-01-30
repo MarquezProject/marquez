@@ -15,7 +15,7 @@ import os
 import requests
 import time
 
-from .models import DatasetType, SourceType
+from .models import DatasetType, SourceType, DatasetFieldType
 from marquez_client import errors
 from marquez_client import log
 from marquez_client.constants import (
@@ -245,7 +245,8 @@ class MarquezClient(object):
                        physical_name, source_name,
                        description=None, run_id=None,
                        schema_location=None,
-                       namespace_name=None):
+                       namespace_name=None,
+                       fields=None):
         if not dataset_name:
             raise ValueError('dataset_name must not be None')
         if not isinstance(dataset_type, DatasetType):
@@ -272,6 +273,9 @@ class MarquezClient(object):
 
         if run_id:
             payload['runId'] = run_id
+
+        if fields:
+            payload['fields'] = fields
 
         if schema_location:
             payload['schemaLocation'] = schema_location
