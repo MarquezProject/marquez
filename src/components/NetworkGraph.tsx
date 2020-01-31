@@ -127,11 +127,14 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
       .join(
         enter =>
           enter
+            .append('a')
+            .attr('href', d => ('/jobs/' + d.id))
             .append('circle')
             .attr('class', 'jobNode')
             .attr('r', 5)
             .attr('fill', n => (n.matches ? jobNodeGrey : fadedOut)),
-        update => update.attr('fill', n => (n.matches ? jobNodeGrey : fadedOut)),
+        update => update
+          .attr('fill', n => (n.matches ? jobNodeGrey : fadedOut)),
         exit => exit.remove()
       )
 
@@ -151,6 +154,8 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
       .join(
         enter =>
           enter
+            .append('a')
+            .attr('href', d => ('/datasets/' + d.id))
             .append('rect')
             .attr('class', 'datasetNode')
             .attr('width', datasetNodeDimension)
