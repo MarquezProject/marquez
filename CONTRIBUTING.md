@@ -61,7 +61,7 @@ To ensure your pull request is accepted, follow these guidelines:
 * If your change fixes a bug, please [link the issue](https://help.github.com/articles/closing-issues-using-keywords) in your pull request description
 * Any changes to the API reference requires [regenerating](#docs) the static `openapi.html` file.
 
-> **Note:** A pull request should generally contain only one commit (use `git commit --amend` and `git --force push` or [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) existing commits into one).
+> **Note:** A pull request should generally contain only one commit (use `git commit --amend` and `git push --force` or [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) existing commits into one).
 
 # Branching
 
@@ -100,7 +100,7 @@ Signed-off-by: Remedios Moscote <remedios.moscote@buendía.com>
 Git has a [`-s`](https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---signoff) command line option to append this automatically to your commit message:
 
 ```bash
-$ git commit -s -m 'This is my commit message'
+$ git commit -s -m "This is my commit message"
 ```
 
 # API [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
