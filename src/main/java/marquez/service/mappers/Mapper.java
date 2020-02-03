@@ -36,7 +36,7 @@ import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
-import marquez.common.models.SourceType;
+import marquez.common.models.SourceQualifier;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -110,7 +110,8 @@ public final class Mapper {
 
   public static Source toSource(@NonNull final SourceRow row) {
     return new Source(
-        SourceType.valueOf(row.getType()),
+        row.getType(),
+        SourceQualifier.valueOf(row.getQualifier()),
         SourceName.of(row.getName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
@@ -127,7 +128,8 @@ public final class Mapper {
     final Instant now = newTimestamp();
     return new SourceRow(
         newRowUuid(),
-        meta.getType().toString(),
+        meta.getType().toString().toUpperCase(),
+        meta.getQualifier().toString(),
         now,
         now,
         name.getValue(),

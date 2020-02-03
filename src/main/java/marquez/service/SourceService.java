@@ -15,6 +15,7 @@
 package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
@@ -23,12 +24,14 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.SourceName;
+import marquez.common.models.SourceQualifier;
 import marquez.db.SourceDao;
 import marquez.db.models.SourceRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
 import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
+import marquez.service.models.SourceTypes;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -40,9 +43,11 @@ public class SourceService {
           .help("Total number of sources.")
           .register();
 
+  private final SourceTypes types;
   private final SourceDao dao;
 
-  public SourceService(@NonNull final SourceDao dao) {
+  public SourceService(@NonNull final SourceTypes types, @NonNull final SourceDao dao) {
+    this.types = types;
     this.dao = dao;
   }
 
@@ -71,6 +76,18 @@ public class SourceService {
       log.error("Failed to check for source '{}'.", name.getValue(), e);
       throw new MarquezServiceException();
     }
+  }
+
+  public boolean hasSupportFor(@NonNull String type, @NonNull SourceQualifier qualifier) {
+    checkNotBlank(type, "type must not be blank");
+    return types.exists(type, qualifier);
+  }
+
+  public boolean typeHasSupportFor(
+      @NonNull String type, @NonNull SourceQualifier qualifier, @NonNull String dataType) {
+    checkNotBlank(type, "type must not be blank");
+    checkNotBlank(dataType, "dataType must not be blank");
+    return types.typeHasSupportFor(type, qualifier, dataType);
   }
 
   public Optional<Source> get(@NonNull SourceName name) throws MarquezServiceException {

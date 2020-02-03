@@ -25,6 +25,7 @@ import lombok.Value;
 public class SourceRow {
   @NonNull UUID uuid;
   @NonNull String type;
+  @NonNull String qualifier;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
   @NonNull String name;

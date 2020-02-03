@@ -27,6 +27,7 @@ import lombok.ToString;
 @ToString
 public final class SourceResponse {
   @Getter private final String type;
+  @Getter private final String qualifier;
   @Getter private final String name;
   @Getter private final String createdAt;
   @Getter private final String updatedAt;
@@ -35,16 +36,18 @@ public final class SourceResponse {
 
   public SourceResponse(
       @NonNull final String type,
+      @NonNull final String qualifier,
       @NonNull final String name,
       @NonNull final String createdAt,
       @NonNull final String updatedAt,
       @NonNull final String connectionUrl,
       @Nullable final String description) {
     this.type = checkNotBlank(type);
+    this.qualifier = checkNotBlank(qualifier);
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);
-    this.connectionUrl = connectionUrl;
+    this.connectionUrl = checkNotBlank(connectionUrl);
     this.description = description;
   }
 

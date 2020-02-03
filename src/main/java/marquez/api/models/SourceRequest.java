@@ -27,6 +27,7 @@ import lombok.ToString;
 @ToString
 public final class SourceRequest {
   @Getter private final String type;
+  @Getter private final String qualifier;
   @Getter private final String connectionUrl;
   @Nullable private final String description;
 

@@ -34,7 +34,8 @@ public interface SourceDao {
           + "updated_at, "
           + "name, "
           + "connection_url, "
-          + "description"
+          + "description, "
+          + "qualifier"
           + ") VALUES ("
           + ":uuid, "
           + ":type, "
@@ -42,7 +43,8 @@ public interface SourceDao {
           + ":updatedAt, "
           + ":name, "
           + ":connectionUrl, "
-          + ":description)")
+          + ":description, "
+          + ":qualifier)")
   void insert(@BindBean SourceRow row);
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM sources WHERE name = :name)")

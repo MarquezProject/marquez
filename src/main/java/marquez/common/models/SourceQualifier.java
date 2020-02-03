@@ -14,10 +14,8 @@
 
 package marquez.common.models;
 
-public enum SourceType {
-  MYSQL,
-  POSTGRESQL,
-  REDSHIFT,
-  SNOWFLAKE,
-  KAFKA;
+public enum SourceQualifier {
+  DB,
+  STREAM,
+  FILESYSTEM;
 }

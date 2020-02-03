@@ -21,11 +21,12 @@ import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.models.SourceName;
-import marquez.common.models.SourceType;
+import marquez.common.models.SourceQualifier;
 
 @Value
 public class Source {
-  @NonNull SourceType type;
+  @NonNull String type;
+  @NonNull SourceQualifier qualifier;
   @NonNull SourceName name;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;

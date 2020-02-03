@@ -34,6 +34,7 @@ public final class SourceRowMapper implements RowMapper<SourceRow> {
     return new SourceRow(
         uuidOrThrow(results, Columns.ROW_UUID),
         stringOrThrow(results, Columns.TYPE),
+        stringOrThrow(results, Columns.QUALIFIER),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         stringOrThrow(results, Columns.NAME),

@@ -19,11 +19,12 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
-import marquez.common.models.SourceType;
+import marquez.common.models.SourceQualifier;
 
 @Value
 public class SourceMeta {
-  @NonNull SourceType type;
+  @NonNull String type;
+  @NonNull SourceQualifier qualifier;
   @NonNull URI connectionUrl;
   @Nullable String description;
 

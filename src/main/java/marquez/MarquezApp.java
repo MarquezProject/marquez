@@ -162,7 +162,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     final NamespaceService namespaceService =
         new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
-    final SourceService sourceService = new SourceService(sourceDao);
+    final SourceService sourceService = new SourceService(config.getSourceTypes(), sourceDao);
     final DatasetService datasetService =
         new DatasetService(
             namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao, tagDao);

@@ -15,22 +15,24 @@
 package marquez;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import marquez.db.FlywayFactory;
+import marquez.service.models.SourceTypes;
 import marquez.service.models.Tag;
 
 @NoArgsConstructor
 public final class MarquezConfig extends Configuration {
   private static final boolean DEFAULT_MIGRATE_ON_STARTUP = true;
-  private static final List<Tag> DEFAULT_TAGS = Lists.newArrayList();
+  private static final List<Tag> DEFAULT_TAGS = ImmutableList.of();
 
   @Getter private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
   @Getter private List<Tag> tags = DEFAULT_TAGS;
+  @Getter private SourceTypes sourceTypes = new SourceTypes();
 
   @Getter
   @JsonProperty("db")

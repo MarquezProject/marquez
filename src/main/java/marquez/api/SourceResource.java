@@ -33,11 +33,13 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.SourceNotFoundException;
+import marquez.api.exceptions.SourceNotSupportedException;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.SourceRequest;
 import marquez.api.models.SourceResponse;
 import marquez.api.models.SourcesResponse;
 import marquez.common.models.SourceName;
+import marquez.common.models.SourceQualifier;
 import marquez.service.SourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Source;
@@ -63,6 +65,8 @@ public final class SourceResource {
       @PathParam("source") String sourceString, @Valid SourceRequest request)
       throws MarquezServiceException {
     log.debug("Request: {}", request);
+    throwIfNotSupported(request.getType(), request.getQualifier());
+
     final SourceName name = SourceName.of(sourceString);
     final SourceMeta meta = Mapper.toSourceMeta(request);
     final Source source = service.createOrUpdate(name, meta);
@@ -101,5 +105,12 @@ public final class SourceResource {
     final SourcesResponse response = Mapper.toSourcesResponse(sources);
     log.debug("Response: {}", response);
     return Response.ok(response).build();
+  }
+
+  private void throwIfNotSupported(@NonNull String type, @NonNull String qualifierString) {
+    final SourceQualifier qualifier = SourceQualifier.valueOf(qualifierString);
+    if (!service.hasSupportFor(type, qualifier)) {
+      throw new SourceNotSupportedException(type, qualifier);
+    }
   }
 }

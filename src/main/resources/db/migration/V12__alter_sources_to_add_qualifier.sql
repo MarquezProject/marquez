@@ -1,0 +1,1 @@
+ALTER TABLE sources ADD qualifier VARCHAR(64) NOT NULL;

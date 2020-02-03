@@ -48,6 +48,7 @@ public final class Columns {
   public static final String OWNER_UUID = "owner_uuid";
 
   /* SOURCE ROW COLUMNS */
+  public static final String QUALIFIER = "qualifier";
   public static final String CONNECTION_URL = "connection_url";
 
   /* DATASET ROW COLUMNS */
