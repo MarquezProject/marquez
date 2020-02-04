@@ -1,8 +1,10 @@
 # marquez-airflow
 
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez-airflow/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez-airflow/tree/master)
+[![codecov](https://codecov.io/gh/MarquezProject/marquez-airflow/branch/master/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez-airflow/branch/master)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marquez-project/community)
+[![version](https://img.shields.io/pypi/v/marquez-python.svg)](https://pypi.python.org/pypi/marquez-airflow)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez-airflow/master/LICENSE)
 
 A library that integrates Airflow DAGs with [Marquez](https://github.com/MarquezProject/marquez) for automatic metadata collection.
