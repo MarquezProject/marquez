@@ -53,8 +53,8 @@ $ /gradlew -Pversion=0.2.0-rc.4-SNAPSHOT publishToMavenLocal
 5. Write a test for your change
 6. Make sure `.java` files are formatted: `./gradlew spotlessJavaCheck`
 7. Run code lint checks: `./gradlew check`
-8. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez-java/compare)
-9. Add the ["review"](https://github.com/MarquezProject/marquez-java/labels/review) label to your pull request
+8. Make sure to [sign you work](#sign-your-work)
+9. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez-java/compare)
 10. Work with project maintainers to get your change reviewed and merged into the `master` branch
 11. Delete your branch
 
@@ -64,6 +64,8 @@ To ensure your pull request is accepted, follow these guidelines:
 * Do your best to have a [well-formed commit message](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for your change
 * [Keep diffs small](https://graysonkoonce.com/stacked-pull-requests-keeping-github-diffs-small) and self-contained
 * If your change fixes a bug, please [link the issue](https://help.github.com/articles/closing-issues-using-keywords) in your pull request description
+
+> **Note:** A pull request should generally contain only one commit (use `git commit --amend` and `git push --force` or [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) existing commits into one).
 
 # Branching
 
@@ -84,13 +86,30 @@ To ensure your pull request is accepted, follow these guidelines:
   bug/my-bug-fix
   bug/my-other-bug-fix
   ```
-  
+
 * Choose _short_ and _descriptive_ branch names
 * Use dashes (`-`) to separate _words_ in branch names
 * Use _lowercase_ in branch names
+
+# Sign Your Work
+
+The _sign-off_ is a simple line at the end of the message for a commit. All commits needs to be signed. Your signature certifies that you wrote the patch or otherwise have the right to contribute the material (see [Developer Certificate of Origin](https://developercertificate.org)):
+
+```
+This is my commit message
+
+Signed-off-by: Remedios Moscote <remedios.moscote@buendía.com>
+```
+
+Git has a [`-s`](https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---signoff) command line option to append this automatically to your commit message:
+
+```bash
+$ git commit -s -m "This is my commit message"
+```
 
 # Resources
 
 * [How to Contribute to Open Source](https://opensource.guide/how-to-contribute)
 * [Using the Fork-and-Branch Git Workflow](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow)
 * [Keep a Changelog](https://keepachangelog.com)
+* [Code Review Developer Guide](https://google.github.io/eng-practices/review)
