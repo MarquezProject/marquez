@@ -22,7 +22,7 @@ services:
     entrypoint: ["./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
 
   db:
-    image: 'postgres:9.6'
+    image: 'postgres:12.1'
     ports:
       - '5432:5432'
     environment:
