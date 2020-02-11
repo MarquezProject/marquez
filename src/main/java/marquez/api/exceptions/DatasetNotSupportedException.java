@@ -18,16 +18,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import javax.ws.rs.BadRequestException;
-import marquez.common.models.SourceQualifier;
+import marquez.common.models.DatasetType;
+import marquez.common.models.SourceName;
 
-public final class SourceNotSupportedException extends BadRequestException {
+public final class DatasetNotSupportedException extends BadRequestException {
   private static final long serialVersionUID = 1L;
 
-  public SourceNotSupportedException(final String type, final SourceQualifier qualifier) {
+  public DatasetNotSupportedException(
+      final String sourceType, final SourceName sourceName, final DatasetType datasetType) {
     super(
         String.format(
-            "Source type '%s' not supported. "
-                + "Please see your configuration to make sure the type has been enabled for '%s'.",
-            checkNotBlank(type), checkNotNull(qualifier)));
+            "Dataset cannot be added to '%s'. Type '%s' not supported for '%s'.",
+            checkNotNull(sourceName).getValue(),
+            checkNotNull(datasetType),
+            checkNotBlank(sourceType)));
   }
 }

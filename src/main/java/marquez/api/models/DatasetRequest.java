@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
@@ -36,6 +37,7 @@ import marquez.common.models.Field;
   @JsonSubTypes.Type(value = StreamRequest.class, name = "STREAM")
 })
 public abstract class DatasetRequest {
+  @Getter private final DatasetType type;
   @Getter private final String physicalName;
   @Getter private final String sourceName;
   @Nullable private final List<Field> fields;

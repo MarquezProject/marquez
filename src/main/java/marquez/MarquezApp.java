@@ -184,7 +184,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
     env.jersey().register(new NamespaceResource(namespaceService));
     env.jersey().register(new SourceResource(sourceService));
     env.jersey()
-        .register(new DatasetResource(namespaceService, datasetService, jobService, tagService));
+        .register(
+            new DatasetResource(
+                namespaceService, sourceService, datasetService, jobService, tagService));
     env.jersey().register(new JobResource(namespaceService, jobService));
     env.jersey().register(new TagResource(tagService));
     env.jersey().register(new MarquezServiceExceptionMapper());

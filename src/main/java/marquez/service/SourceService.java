@@ -78,7 +78,7 @@ public class SourceService {
     }
   }
 
-  public boolean hasSupportFor(@NonNull String type, @NonNull SourceQualifier qualifier) {
+  public boolean exists(@NonNull String type, @NonNull SourceQualifier qualifier) {
     checkNotBlank(type, "type must not be blank");
     return types.exists(type, qualifier);
   }

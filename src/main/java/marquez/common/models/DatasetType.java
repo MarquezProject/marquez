@@ -16,5 +16,6 @@ package marquez.common.models;
 
 public enum DatasetType {
   DB_TABLE,
-  STREAM;
+  STREAM,
+  OBJECT;
 }

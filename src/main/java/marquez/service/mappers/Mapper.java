@@ -30,7 +30,6 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
-import marquez.common.models.FieldType;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
@@ -220,8 +219,7 @@ public final class Mapper {
 
   public static Field toField(
       @NonNull final DatasetFieldRow row, @NonNull final List<String> tags) {
-    return new Field(
-        row.getName(), FieldType.valueOf(row.getType()), tags, row.getDescription().orElse(null));
+    return new Field(row.getName(), row.getType(), tags, row.getDescription().orElse(null));
   }
 
   public static DatasetFieldRow toDatasetFieldRow(

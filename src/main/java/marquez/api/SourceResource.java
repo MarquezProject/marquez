@@ -109,7 +109,7 @@ public final class SourceResource {
 
   private void throwIfNotSupported(@NonNull String type, @NonNull String qualifierString) {
     final SourceQualifier qualifier = SourceQualifier.valueOf(qualifierString);
-    if (!service.hasSupportFor(type, qualifier)) {
+    if (!service.exists(type, qualifier)) {
       throw new SourceNotSupportedException(type, qualifier);
     }
   }

@@ -27,18 +27,18 @@ import lombok.Value;
 @Value
 public class Field {
   String name;
-  FieldType type;
+  String type;
   @Nullable List<String> tags;
   @Nullable String description;
 
   @JsonCreator
   public Field(
       @NonNull final String name,
-      @NonNull final FieldType type,
+      @NonNull final String type,
       @Nullable final List<String> tags,
       @Nullable final String description) {
     this.name = checkNotBlank(name);
-    this.type = type;
+    this.type = checkNotBlank(type);
     this.tags = tags;
     this.description = description;
   }

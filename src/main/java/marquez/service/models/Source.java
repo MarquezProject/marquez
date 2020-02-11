@@ -20,6 +20,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
+import marquez.common.models.DatasetType;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceQualifier;
 
@@ -35,5 +36,18 @@ public class Source {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public boolean canAdd(@NonNull DatasetType datasetType) {
+    switch (qualifier) {
+      case DB:
+        return datasetType == DatasetType.DB_TABLE;
+      case STREAM:
+        return datasetType == DatasetType.STREAM;
+      case FILESYSTEM:
+        return datasetType == DatasetType.OBJECT;
+      default:
+        throw new AssertionError();
+    }
   }
 }

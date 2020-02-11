@@ -14,6 +14,8 @@
 
 package marquez.api.models;
 
+import static marquez.common.models.DatasetType.STREAM;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -36,7 +38,7 @@ public final class StreamRequest extends DatasetRequest {
       @Nullable final List<String> tags,
       @Nullable final String description,
       @Nullable final String runId) {
-    super(physicalName, sourceName, fields, tags, description, runId);
+    super(STREAM, physicalName, sourceName, fields, tags, description, runId);
     this.schemaLocation = schemaLocation;
   }
 }

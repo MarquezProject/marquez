@@ -14,6 +14,8 @@
 
 package marquez.api.models;
 
+import static marquez.common.models.DatasetType.DB_TABLE;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -32,6 +34,6 @@ public final class DbTableRequest extends DatasetRequest {
       @Nullable final List<String> tags,
       @Nullable final String description,
       @Nullable final String runId) {
-    super(physicalName, sourceName, fields, tags, description, runId);
+    super(DB_TABLE, physicalName, sourceName, fields, tags, description, runId);
   }
 }

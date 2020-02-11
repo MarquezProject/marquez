@@ -14,20 +14,18 @@
 
 package marquez.api.exceptions;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import javax.ws.rs.BadRequestException;
-import marquez.common.models.SourceQualifier;
 
-public final class SourceNotSupportedException extends BadRequestException {
+public final class FieldNotSupportedException extends BadRequestException {
   private static final long serialVersionUID = 1L;
 
-  public SourceNotSupportedException(final String type, final SourceQualifier qualifier) {
+  public FieldNotSupportedException(final String sourceType, final String fieldType) {
     super(
         String.format(
-            "Source type '%s' not supported. "
+            "Field type '%s' not supported. "
                 + "Please see your configuration to make sure the type has been enabled for '%s'.",
-            checkNotBlank(type), checkNotNull(qualifier)));
+            checkNotBlank(fieldType), checkNotBlank(sourceType)));
   }
 }

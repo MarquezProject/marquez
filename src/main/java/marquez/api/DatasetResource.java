@@ -36,10 +36,13 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetNotFoundException;
+import marquez.api.exceptions.DatasetNotSupportedException;
 import marquez.api.exceptions.FieldNotFoundException;
+import marquez.api.exceptions.FieldNotSupportedException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
 import marquez.api.exceptions.RunNotValidException;
+import marquez.api.exceptions.SourceNotFoundException;
 import marquez.api.exceptions.TagNotFoundException;
 import marquez.api.mappers.Mapper;
 import marquez.api.models.DatasetRequest;
@@ -47,29 +50,37 @@ import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetType;
+import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.SourceName;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.SourceService;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
+import marquez.service.models.Source;
 
 @Slf4j
 @Path("/api/v1/namespaces/{namespace}/datasets")
 public final class DatasetResource {
   private final NamespaceService namespaceService;
+  private final SourceService sourceService;
   private final DatasetService datasetService;
   private final JobService jobService;
   private final TagService tagService;
 
   public DatasetResource(
       @NonNull final NamespaceService namespaceService,
+      @NonNull final SourceService sourceService,
       @NonNull final DatasetService datasetService,
       @NonNull final JobService jobService,
       @NonNull final TagService tagService) {
     this.namespaceService = namespaceService;
+    this.sourceService = sourceService;
     this.datasetService = datasetService;
     this.jobService = jobService;
     this.tagService = tagService;
@@ -90,6 +101,7 @@ public final class DatasetResource {
     log.debug("Request: {}", request);
     final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
+    throwIfNotSupported(request.getSourceName(), request.getType(), request.getFields());
     throwIfNotExists(request.getRunId().map(this::toRunIdOrThrow).orElse(null));
 
     final DatasetName datasetName = DatasetName.of(datasetString);
@@ -200,6 +212,27 @@ public final class DatasetResource {
     if (!datasetService.exists(namespaceName, datasetName)) {
       throw new DatasetNotFoundException(datasetName);
     }
+  }
+
+  private void throwIfNotSupported(
+      @NonNull String sourceString, @NonNull DatasetType datasetType, @NonNull List<Field> fields)
+      throws MarquezServiceException {
+    final SourceName sourceName = SourceName.of(sourceString);
+    final Source source =
+        sourceService.get(sourceName).orElseThrow(() -> new SourceNotFoundException(sourceName));
+
+    // Ensure dataset support.
+    if (!source.canAdd(datasetType)) {
+      throw new DatasetNotSupportedException(source.getType(), source.getName(), datasetType);
+    }
+    // Ensure field support.
+    fields.forEach(
+        field -> {
+          if (!sourceService.typeHasSupportFor(
+              source.getType(), source.getQualifier(), field.getType())) {
+            throw new FieldNotSupportedException(source.getType(), field.getType());
+          }
+        });
   }
 
   private void throwIfNotExists(
