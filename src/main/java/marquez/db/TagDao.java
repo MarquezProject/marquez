@@ -44,10 +44,10 @@ public interface TagDao {
   Optional<TagRow> findBy(String name);
 
   @SqlQuery("SELECT * FROM tags WHERE uuid IN (<rowUuids>)")
-  List<TagRow> findAllInUuidList(@BindList(onEmpty = NULL_STRING) List<UUID> rowUuids);
+  List<TagRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... rowUuids);
 
   @SqlQuery("SELECT * FROM tags WHERE name IN (<names>)")
-  List<TagRow> findAllInStringList(@BindList(onEmpty = NULL_STRING) List<String> names);
+  List<TagRow> findAllIn(@BindList(onEmpty = NULL_STRING) String... names);
 
   @SqlQuery("SELECT * FROM tags ORDER BY name LIMIT :limit OFFSET :offset")
   List<TagRow> findAll(int limit, int offset);

@@ -16,6 +16,7 @@ package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Iterables.toArray;
 
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
@@ -149,21 +150,17 @@ public class JobService {
         final JobContextRow contextRow = contextDao.findBy(checksum).get();
         final List<UUID> inputUuids =
             datasetDao
-                .findAllInStringList(
+                .findAllIn(
                     namespaceName.getValue(),
-                    jobMeta.getInputs().stream()
-                        .map(DatasetName::getValue)
-                        .collect(toImmutableList()))
+                    jobMeta.getInputs().stream().map(DatasetName::getValue).toArray(String[]::new))
                 .stream()
                 .map(DatasetRow::getUuid)
                 .collect(toImmutableList());
         final List<UUID> outputUuids =
             datasetDao
-                .findAllInStringList(
+                .findAllIn(
                     namespaceName.getValue(),
-                    jobMeta.getOutputs().stream()
-                        .map(DatasetName::getValue)
-                        .collect(toImmutableList()))
+                    jobMeta.getOutputs().stream().map(DatasetName::getValue).toArray(String[]::new))
                 .stream()
                 .map(DatasetRow::getUuid)
                 .collect(toImmutableList());
@@ -244,11 +241,11 @@ public class JobService {
     final ExtendedJobVersionRow versionRow =
         versionDao.findVersion(jobRow.getCurrentVersionUuid().get()).get();
     final List<DatasetName> inputs =
-        datasetDao.findAllInUuidList(versionRow.getInputUuids()).stream()
+        datasetDao.findAllIn(toArray(versionRow.getInputUuids(), UUID.class)).stream()
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
     final List<DatasetName> outputs =
-        datasetDao.findAllInUuidList(versionRow.getOutputUuids()).stream()
+        datasetDao.findAllIn(toArray(versionRow.getOutputUuids(), UUID.class)).stream()
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
     final JobContextRow contextRow = contextDao.findBy(versionRow.getJobContextUuid()).get();
@@ -285,7 +282,7 @@ public class JobService {
           versionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
       final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
       final List<UUID> inputVersionUuids =
-          datasetVersionDao.findAllInUuidList(versionRow.getInputUuids()).stream()
+          datasetVersionDao.findAllIn(toArray(versionRow.getInputUuids(), UUID.class)).stream()
               .map(DatasetVersionRow::getUuid)
               .collect(toImmutableList());
       final RunRow newRunRow =

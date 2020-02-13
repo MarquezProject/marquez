@@ -15,6 +15,7 @@
 package marquez.db;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Iterables.toArray;
 import static marquez.Generator.newTimestamp;
 import static marquez.common.models.ModelGenerator.newDatasetName;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
@@ -145,7 +146,7 @@ public class DatasetDaoTest {
 
     // Modified
     final Instant lastModifiedAt = newTimestamp();
-    datasetDao.updateLastModifed(Lists.newArrayList(newRow.getUuid()), lastModifiedAt);
+    datasetDao.updateLastModifedAt(Lists.newArrayList(newRow.getUuid()), lastModifiedAt);
 
     final ExtendedDatasetRow row = datasetDao.findBy(newRow.getUuid()).get();
     assertThat(row.getLastModifiedAt()).isPresent().hasValue(lastModifiedAt);
@@ -199,7 +200,7 @@ public class DatasetDaoTest {
     final List<UUID> newRowUuids =
         newRows.stream().map(newRow -> newRow.getUuid()).collect(toImmutableList());
 
-    final List<DatasetRow> rows = datasetDao.findAllInUuidList(newRowUuids);
+    final List<DatasetRow> rows = datasetDao.findAllIn(toArray(newRowUuids, UUID.class));
     assertThat(rows).hasSize(4);
 
     final List<UUID> rowUuids = rows.stream().map(row -> row.getUuid()).collect(toImmutableList());
@@ -216,7 +217,7 @@ public class DatasetDaoTest {
         newRows.stream().map(newRow -> newRow.getName()).collect(toImmutableList());
 
     final List<DatasetRow> rows =
-        datasetDao.findAllInStringList(NAMESPACE_NAME.getValue(), newDatasetNames);
+        datasetDao.findAllIn(NAMESPACE_NAME.getValue(), toArray(newDatasetNames, String.class));
     assertThat(rows).hasSize(4);
 
     final List<String> datasetNames =

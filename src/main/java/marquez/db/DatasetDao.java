@@ -82,7 +82,7 @@ public interface DatasetDao extends SqlObject {
           + "SET updated_at = :lastModifiedAt, "
           + "    last_modified_at = :lastModifiedAt "
           + "WHERE uuid IN (<rowUuids>)")
-  void updateLastModifed(
+  void updateLastModifedAt(
       @BindList(onEmpty = NULL_STRING) List<UUID> rowUuids, Instant lastModifiedAt);
 
   @SqlUpdate(
@@ -125,7 +125,7 @@ public interface DatasetDao extends SqlObject {
           + "      WHERE dataset_uuid = uuid) AS tag_uuids "
           + "FROM datasets WHERE uuid IN (<rowUuids>)")
   @RegisterRowMapper(DatasetRowMapper.class)
-  List<DatasetRow> findAllInUuidList(@BindList(onEmpty = NULL_STRING) List<UUID> rowUuids);
+  List<DatasetRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... rowUuids);
 
   @SqlQuery(
       "SELECT d.*, "
@@ -137,8 +137,8 @@ public interface DatasetDao extends SqlObject {
           + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
           + "WHERE d.name IN (<datasetNames>)")
   @RegisterRowMapper(DatasetRowMapper.class)
-  List<DatasetRow> findAllInStringList(
-      String namespaceName, @BindList(onEmpty = NULL_STRING) List<String> datasetNames);
+  List<DatasetRow> findAllIn(
+      String namespaceName, @BindList(onEmpty = NULL_STRING) String... datasetNames);
 
   @SqlQuery(
       "SELECT d.*, s.name AS source_name, "

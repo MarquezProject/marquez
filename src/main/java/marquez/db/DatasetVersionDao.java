@@ -103,8 +103,7 @@ public interface DatasetVersionDao {
           + "      WHERE dataset_version_uuid = uuid) AS field_uuids "
           + "FROM dataset_versions "
           + "WHERE dataset_uuid IN (<datasetUuids>)")
-  List<DatasetVersionRow> findAllInUuidList(
-      @BindList(onEmpty = NULL_STRING) List<UUID> datasetUuids);
+  List<DatasetVersionRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... datasetUuids);
 
   @SqlQuery("SELECT COUNT(*) FROM dataset_versions")
   int count();
