@@ -15,6 +15,7 @@
 package marquez.db;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Iterables.toArray;
 import static marquez.common.models.ModelGenerator.newTagName;
 import static marquez.db.models.ModelGenerator.newRowUuid;
 import static marquez.db.models.ModelGenerator.newTagRow;
@@ -118,7 +119,7 @@ public class TagDaoTest {
     final List<UUID> newRowUuids =
         newRows.stream().map(newRow -> newRow.getUuid()).collect(toImmutableList());
 
-    final List<TagRow> rows = tagDao.findAllInUuidList(newRowUuids);
+    final List<TagRow> rows = tagDao.findAllIn(toArray(newRowUuids, UUID.class));
     assertThat(rows).hasSize(4);
 
     final List<UUID> rowUuids = rows.stream().map(row -> row.getUuid()).collect(toImmutableList());
@@ -133,7 +134,7 @@ public class TagDaoTest {
     final List<String> newTagNames =
         newRows.stream().map(newRow -> newRow.getName()).collect(toImmutableList());
 
-    final List<TagRow> rows = tagDao.findAllInStringList(newTagNames);
+    final List<TagRow> rows = tagDao.findAllIn(toArray(newTagNames, String.class));
     assertThat(rows).hasSize(4);
 
     final List<String> tagNames =

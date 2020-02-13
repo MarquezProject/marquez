@@ -103,7 +103,7 @@ public class DatasetService {
         final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
         final SourceRow sourceRow = sourceDao.findBy(datasetMeta.getSourceName().getValue()).get();
         final List<UUID> tagUuids =
-            tagDao.findAllInStringList(datasetMeta.getTags()).stream()
+            tagDao.findAllIn(toArray(datasetMeta.getTags(), String.class)).stream()
                 .map(TagRow::getUuid)
                 .collect(toImmutableList());
         final DatasetRow newDatasetRow =
@@ -165,7 +165,7 @@ public class DatasetService {
   /** Creates a {@link DatasetFieldRow} instance from the given {@link Field}. */
   private DatasetFieldRow toDatasetFieldRow(@NonNull UUID datasetUuid, @NonNull Field field) {
     final List<UUID> tagUuids =
-        tagDao.findAllInStringList(field.getTags()).stream()
+        tagDao.findAllIn(toArray(field.getTags(), String.class)).stream()
             .map(TagRow::getUuid)
             .collect(toImmutableList());
     return Mapper.toDatasetFieldRow(datasetUuid, field, tagUuids);
@@ -223,7 +223,7 @@ public class DatasetService {
   /** Creates a {@link Dataset} instance from the given {@link ExtendedDatasetRow}. */
   private Dataset toDataset(@NonNull ExtendedDatasetRow datasetRow) {
     final List<String> tags =
-        tagDao.findAllInUuidList(datasetRow.getTagUuids()).stream()
+        tagDao.findAllIn(toArray(datasetRow.getTagUuids(), UUID.class)).stream()
             .map(TagRow::getName)
             .collect(toImmutableList());
     final DatasetVersionRow versionRow =
@@ -240,7 +240,7 @@ public class DatasetService {
   /** Creates a {@link Field} instance from the given {@link DatasetFieldRow}. */
   private Field toField(@NonNull DatasetFieldRow fieldRow) {
     final List<String> tags =
-        tagDao.findAllInUuidList(fieldRow.getTagUuids()).stream()
+        tagDao.findAllIn(toArray(fieldRow.getTagUuids(), UUID.class)).stream()
             .map(TagRow::getName)
             .collect(toImmutableList());
     return Mapper.toField(fieldRow, tags);
