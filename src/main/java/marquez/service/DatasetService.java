@@ -16,6 +16,7 @@ package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Iterables.toArray;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import io.prometheus.client.Counter;
@@ -230,7 +231,7 @@ public class DatasetService {
             .find(datasetRow.getType(), datasetRow.getCurrentVersionUuid().orElse(null))
             .get();
     final List<Field> fields =
-        fieldDao.findAllInUuidList(versionRow.getFieldUuids()).stream()
+        fieldDao.findAllIn(toArray(versionRow.getFieldUuids(), UUID.class)).stream()
             .map(this::toField)
             .collect(toImmutableList());
     return Mapper.toDataset(datasetRow, tags, versionRow, fields);
