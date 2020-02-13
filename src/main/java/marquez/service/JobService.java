@@ -282,7 +282,7 @@ public class JobService {
           versionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
       final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
       final List<UUID> inputVersionUuids =
-          datasetVersionDao.findAllInUuidList(versionRow.getInputUuids()).stream()
+          datasetVersionDao.findAllIn(toArray(versionRow.getInputUuids(), UUID.class)).stream()
               .map(DatasetVersionRow::getUuid)
               .collect(toImmutableList());
       final RunRow newRunRow =
