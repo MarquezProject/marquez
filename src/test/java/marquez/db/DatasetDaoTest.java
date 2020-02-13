@@ -217,7 +217,7 @@ public class DatasetDaoTest {
         newRows.stream().map(newRow -> newRow.getName()).collect(toImmutableList());
 
     final List<DatasetRow> rows =
-        datasetDao.findAllInStringList(NAMESPACE_NAME.getValue(), newDatasetNames);
+        datasetDao.findAllIn(NAMESPACE_NAME.getValue(), toArray(newDatasetNames, String.class));
     assertThat(rows).hasSize(4);
 
     final List<String> datasetNames =

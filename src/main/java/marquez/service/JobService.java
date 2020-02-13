@@ -150,21 +150,17 @@ public class JobService {
         final JobContextRow contextRow = contextDao.findBy(checksum).get();
         final List<UUID> inputUuids =
             datasetDao
-                .findAllInStringList(
+                .findAllIn(
                     namespaceName.getValue(),
-                    jobMeta.getInputs().stream()
-                        .map(DatasetName::getValue)
-                        .collect(toImmutableList()))
+                    jobMeta.getInputs().stream().map(DatasetName::getValue).toArray(String[]::new))
                 .stream()
                 .map(DatasetRow::getUuid)
                 .collect(toImmutableList());
         final List<UUID> outputUuids =
             datasetDao
-                .findAllInStringList(
+                .findAllIn(
                     namespaceName.getValue(),
-                    jobMeta.getOutputs().stream()
-                        .map(DatasetName::getValue)
-                        .collect(toImmutableList()))
+                    jobMeta.getOutputs().stream().map(DatasetName::getValue).toArray(String[]::new))
                 .stream()
                 .map(DatasetRow::getUuid)
                 .collect(toImmutableList());

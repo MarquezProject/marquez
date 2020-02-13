@@ -137,8 +137,8 @@ public interface DatasetDao extends SqlObject {
           + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
           + "WHERE d.name IN (<datasetNames>)")
   @RegisterRowMapper(DatasetRowMapper.class)
-  List<DatasetRow> findAllInStringList(
-      String namespaceName, @BindList(onEmpty = NULL_STRING) List<String> datasetNames);
+  List<DatasetRow> findAllIn(
+      String namespaceName, @BindList(onEmpty = NULL_STRING) String... datasetNames);
 
   @SqlQuery(
       "SELECT d.*, s.name AS source_name, "
