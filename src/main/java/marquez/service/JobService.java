@@ -16,6 +16,7 @@ package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Iterables.toArray;
 
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
@@ -244,11 +245,11 @@ public class JobService {
     final ExtendedJobVersionRow versionRow =
         versionDao.findVersion(jobRow.getCurrentVersionUuid().get()).get();
     final List<DatasetName> inputs =
-        datasetDao.findAllInUuidList(versionRow.getInputUuids()).stream()
+        datasetDao.findAllIn(toArray(versionRow.getInputUuids(), UUID.class)).stream()
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
     final List<DatasetName> outputs =
-        datasetDao.findAllInUuidList(versionRow.getOutputUuids()).stream()
+        datasetDao.findAllIn(toArray(versionRow.getOutputUuids(), UUID.class)).stream()
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
     final JobContextRow contextRow = contextDao.findBy(versionRow.getJobContextUuid()).get();

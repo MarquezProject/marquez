@@ -125,7 +125,7 @@ public interface DatasetDao extends SqlObject {
           + "      WHERE dataset_uuid = uuid) AS tag_uuids "
           + "FROM datasets WHERE uuid IN (<rowUuids>)")
   @RegisterRowMapper(DatasetRowMapper.class)
-  List<DatasetRow> findAllInUuidList(@BindList(onEmpty = NULL_STRING) List<UUID> rowUuids);
+  List<DatasetRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... rowUuids);
 
   @SqlQuery(
       "SELECT d.*, "
