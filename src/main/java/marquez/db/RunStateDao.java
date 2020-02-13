@@ -39,7 +39,7 @@ public interface RunStateDao extends SqlObject {
     insert(row);
     // Modified
     final Instant lastModifiedAt = row.getTransitionedAt();
-    createDatasetDao().updateLastModifed(inputVersionUuids, lastModifiedAt);
+    createDatasetDao().updateLastModifedAt(inputVersionUuids, lastModifiedAt);
   }
 
   @Transaction
