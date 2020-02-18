@@ -133,10 +133,23 @@ public class DatasetService {
                     newFieldRow ->
                         fieldRows.stream()
                             .noneMatch(
-                                fieldRow -> newFieldRow.getName().equals(fieldRow.getName())))
+                                fieldRow ->
+                                    newFieldRow.getName().equals(fieldRow.getName())
+                                        && newFieldRow.getType().equals(fieldRow.getType())))
                 .collect(toImmutableList());
         final List<DatasetFieldRow> fieldRowsForVersion =
-            Stream.concat(fieldRows.stream(), newFieldRowsForVersion.stream())
+            Stream.concat(
+                    fieldRows.stream()
+                        .filter(
+                            fieldRow ->
+                                newFieldRows.stream()
+                                    .noneMatch(
+                                        newFieldRow ->
+                                            newFieldRow.getName().equals(fieldRow.getName())
+                                                && !newFieldRow
+                                                    .getType()
+                                                    .equals(fieldRow.getType()))),
+                    newFieldRowsForVersion.stream())
                 .collect(toImmutableList());
         final List<UUID> fieldUuids =
             fieldRowsForVersion.stream().map(DatasetFieldRow::getUuid).collect(toImmutableList());
