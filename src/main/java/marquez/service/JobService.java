@@ -290,7 +290,9 @@ public class JobService {
       runDao.insert(newRunRow);
       markRunAs(newRunRow.getUuid(), Run.State.NEW);
       log.info(
-          "Successfully created run '{}' for job '{}'.", newRunRow.getUuid(), jobName.getValue());
+          "Successfully created run '{}' for job version '{}'.",
+          newRunRow.getUuid(),
+          newRunRow.getJobVersionUuid());
       return getRun(newRunRow.getUuid()).get();
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to create run for job '{}' with meta: {}", jobName.getValue(), runMeta, e);
