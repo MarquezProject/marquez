@@ -100,7 +100,8 @@ public interface DatasetFieldDao extends SqlObject {
           + "ARRAY(SELECT tag_uuid "
           + "      FROM dataset_fields_tag_mapping "
           + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
-          + "FROM dataset_fields WHERE uuid IN (<rowUuids>)")
+          + "FROM dataset_fields WHERE uuid IN (<rowUuids>) "
+	  + "ORDER BY name")
   List<DatasetFieldRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... rowUuids);
 
   @SqlQuery(
@@ -109,7 +110,8 @@ public interface DatasetFieldDao extends SqlObject {
           + "      FROM dataset_fields_tag_mapping "
           + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
           + "FROM dataset_fields "
-          + "WHERE dataset_uuid = :datasetUuid ORDER BY created_at")
+          + "WHERE dataset_uuid = :datasetUuid "
+	  + "ORDER BY name")
   List<DatasetFieldRow> findAll(UUID datasetUuid);
 
   @SqlQuery("SELECT COUNT(*) FROM dataset_fields")
