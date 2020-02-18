@@ -101,7 +101,7 @@ public interface DatasetFieldDao extends SqlObject {
           + "      FROM dataset_fields_tag_mapping "
           + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
           + "FROM dataset_fields WHERE uuid IN (<rowUuids>)")
-  List<DatasetFieldRow> findAllInUuidList(@BindList(onEmpty = NULL_STRING) List<UUID> rowUuids);
+  List<DatasetFieldRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... rowUuids);
 
   @SqlQuery(
       "SELECT *, "
