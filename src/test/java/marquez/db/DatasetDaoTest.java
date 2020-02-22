@@ -139,7 +139,7 @@ public class DatasetDaoTest {
   }
 
   @Test
-  public void testLastModified() {
+  public void testUpdateLastModifiedAt() {
     final DatasetRow newRow =
         newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows));
     datasetDao.insert(newRow);
@@ -192,7 +192,7 @@ public class DatasetDaoTest {
   }
 
   @Test
-  public void testFindAllInUuidList() {
+  public void testFindAllIn_uuidList() {
     final List<DatasetRow> newRows =
         newDatasetRowsWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), 4);
     newRows.forEach(newRow -> datasetDao.insert(newRow));
@@ -208,7 +208,7 @@ public class DatasetDaoTest {
   }
 
   @Test
-  public void testFindAllInStringList() {
+  public void testFindAllIn_stringList() {
     final List<DatasetRow> newRows =
         newDatasetRowsWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows), 4);
     newRows.forEach(newRow -> datasetDao.insert(newRow));
