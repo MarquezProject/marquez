@@ -92,6 +92,14 @@ public class JobContextDaoTest {
   }
 
   @Test
+  public void testFindBy_uuidNotFound() {
+    final JobContextRow newRow = newJobContextRow();
+
+    final Optional<JobContextRow> row = jobContextDao.findBy(newRow.getUuid());
+    assertThat(row).isNotPresent();
+  }
+
+  @Test
   public void testFindBy_checksum() {
     final Map<String, String> context = newContext();
     final JobContextRow newRow = newJobContextRowWith(context);
@@ -100,6 +108,16 @@ public class JobContextDaoTest {
     final String checksum = Utils.checksumFor(context);
     final Optional<JobContextRow> row = jobContextDao.findBy(checksum);
     assertThat(row).isPresent();
+  }
+
+  @Test
+  public void testFindBy_checksumNotFound() {
+    final Map<String, String> context = newContext();
+    final JobContextRow newRow = newJobContextRowWith(context);
+
+    final String checksum = Utils.checksumFor(context);
+    final Optional<JobContextRow> row = jobContextDao.findBy(checksum);
+    assertThat(row).isNotPresent();
   }
 
   @Test

@@ -112,7 +112,7 @@ public class TagDaoTest {
   }
 
   @Test
-  public void testFindAllInUuidList() {
+  public void testFindAllIn_uuidList() {
     final List<TagRow> newRows = newTagRows(4);
     newRows.forEach(newRow -> tagDao.insert(newRow));
 
@@ -127,7 +127,7 @@ public class TagDaoTest {
   }
 
   @Test
-  public void testFindAllInStringList() {
+  public void testFindAllIn_stringList() {
     final List<TagRow> newRows = newTagRows(4);
     newRows.forEach(newRow -> tagDao.insert(newRow));
 
