@@ -67,13 +67,13 @@ public class Run {
     ABORTED {
       @Override
       public boolean isComplete() {
-        return true;
+        return false;
       }
     },
     FAILED {
       @Override
       public boolean isComplete() {
-        return true;
+        return false;
       }
     };
 

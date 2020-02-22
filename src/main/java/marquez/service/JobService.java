@@ -355,7 +355,7 @@ public class JobService {
         if (versionRow.hasOutputUuids()) {
           runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids());
           incOrDecBy(runState);
-          log.debug(
+          log.info(
               "Run '{}' for job version '{}' modified datasets: {}",
               runId,
               versionRow.getVersion(),
