@@ -25,7 +25,8 @@ const styles = ({ zIndex }: ITheme) => {
     },
     icon: {
       fontFamily: 'Karla',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      marginTop: 3
     },
     link: {
       textDecoration: 'none',
@@ -42,6 +43,9 @@ const MyAppBar = (props: IProps): ReactElement => {
   return (
     <AppBar position='fixed' className={classes.appBar}>
       <Toolbar>
+        <Link className={link} to="/">
+          <img src='img/marquez-logo.png' height={60} alt='Marquez Logo' />
+        </Link>
         <Link className={link} to="/">
           <Typography className={classes.icon} variant='h4' color='inherit' noWrap>
             MARQUEZ
