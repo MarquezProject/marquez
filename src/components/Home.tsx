@@ -74,6 +74,7 @@ const Home:  FunctionComponent<IAllProps> = props => {
   const limit = 5
   
   const { datasets, jobs, classes, showJobs, setShowJobs } = props
+
   const matchingDatasets = datasets.filter(d => d.matches)
   const matchingJobs = jobs.filter(j => j.matches)
   

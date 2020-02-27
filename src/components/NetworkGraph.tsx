@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as d3 from 'd3'
+
 import {
   withStyles,
   createStyles,
@@ -9,17 +10,24 @@ import {
 
 import Legend from './Legend'
 
-import { createNetworkData } from '../helpers'
-import { IDataset, IJob, INodeNetwork, INetworkLink } from '../types/'
-import { select } from 'd3-selection'
-import { forceCenter, forceLink, forceSimulation, forceManyBody, forceY } from 'd3-force'
-import { zoom } from 'd3-zoom'
-import { color } from 'd3-color'
-import Loader from './Loader'
-const globalStyles = require('../global_styles.css')
-const { jobNodeGrey, linkGrey, datasetNodeWhite } = globalStyles
+import { IDataset, IJob } from '../types/'
 
-const fadedOut = (color(jobNodeGrey) as any).darker(1.7).toString()
+import _find from 'lodash/find'
+import _filter from 'lodash/filter'
+import _flatten from 'lodash/flatten'
+import _map from 'lodash/map'
+import _sortBy from 'lodash/sortBy'
+
+import { select } from 'd3-selection'
+import { hierarchy, tree } from 'd3-hierarchy'
+import { linkHorizontal } from 'd3-shape'
+
+import Loader from './Loader'
+
+// import { zoom } from 'd3-zoom'
+// import { IDatasetAPI } from '../types/api'
+// const globalStyles = require('../global_styles.css')
+// const { jobNodeGrey, linkGrey, datasetNodeWhite } = globalStyles
 
 const styles = ({ palette }: Theme) => {
   return createStyles({
@@ -63,171 +71,184 @@ type IAllProps = IWithStyles<typeof styles> & IProps
 
 export class NetworkGraph extends React.Component<IAllProps, {}> {
   shouldComponentUpdate(newProps: IProps) {
-    type IDatumCombined = INodeNetwork & d3.SimulationNodeDatum
-    const networkData = createNetworkData(newProps.datasets, newProps.jobs)
-    const { nodes, links } = networkData
-
+    
     const svg: d3.Selection<SVGElement, void, HTMLElement, void> = select('#network-graph')
 
     if (svg.empty()) {
       return true
     }
-    const width = +svg.style('width').replace('px', '')
+
+    // const width = +svg.style('width').replace('px', '')
     const height = +svg.style('height').replace('px', '')
 
-    const graphLayout = forceSimulation<IDatumCombined, INetworkLink>(nodes)
-      .force('charge', forceManyBody().strength(-50))
-      .force('center', forceCenter(width / 2, height / 2))
-      .alpha(.2)
-      .force('y', forceY(height / 2))
-      .force(
-        'link',
-        forceLink(links).id((d: any) => {
-          return d.id
-        })
-      )
-      .on('tick', ticked)
+    const isDataset = (node: any) => {
+      const name = node.name || node.data.name
+      return _find(newProps.datasets, d => d.name == name)
+    }
 
-    svg.call(
-      zoom()
-        .scaleExtent([0.5, 3])
-        .on('zoom', () => {
-          svg.attr('transform', (event as any).transform)
-        })
-    )
+    const findChildren = (node: any) => {
+      let children
+      if (isDataset(node)) {
+        children = _filter(newProps.jobs, j => j.inputs.includes(node.name))
+      } else {
+        const job = _find(newProps.jobs, j => j.name == node.name)
+        children = job ? _filter(newProps.datasets, d => job.outputs.includes(d.name) && !job.inputs.includes(d.name)) : []
+      }
+      return children
+    }
 
-    const linkContainer: d3.Selection<SVGElement, void, HTMLElement, void> = svg.select('#links')
+    const findParents = (node: any) => {
+      let parents
+      if (isDataset(node)) {
+        parents = _filter(newProps.jobs, j => j.outputs.includes(node.name))
+      } else {
+        const job = _find(newProps.jobs, j => j.name == node.name)
+        parents = job ? _filter(newProps.datasets, j => job.inputs.includes(j.name) && !job.outputs.includes(j.name)) : []
+      }
+      return parents
+    }
 
-    const linkSelection = linkContainer
-      .selectAll('.link')
-      .data(links, (l: INetworkLink) => l.source + l.target)
-      .join(
-        enter =>
-          enter
-            .append('line')
-            .attr('class', 'link')
-            .style('stroke', l => (l.connectsToMatchingNode ? linkGrey : fadedOut))
-            .style('stroke-width', 2),
-        update => update.style('stroke', l => (l.connectsToMatchingNode ? linkGrey : fadedOut)),
-        exit => exit.remove()
-      )
-
-    const jobNodeContainer: d3.Selection<SVGElement, void, HTMLElement, void> = svg.select(
-      '#jobNodes'
-    )
-
-    const jobNodeSelection = jobNodeContainer
-      .selectAll('.jobNode')
-      .data(
-        nodes.filter((d: IDatumCombined) => {
-          return d.tag == 'job'
-        }),
-        (j: any) => j.id
-      )
-      .join(
-        enter =>
-          enter
-            .append('a')
-            .attr('href', d => ('/jobs/' + d.id))
-            .append('circle')
-            .attr('class', 'jobNode')
-            .attr('r', 5)
-            .attr('fill', n => (n.matches ? jobNodeGrey : fadedOut)),
-        update => update
-          .attr('fill', n => (n.matches ? jobNodeGrey : fadedOut)),
-        exit => exit.remove()
-      )
-
-    const datasetNodeContainer: d3.Selection<SVGElement, void, HTMLElement, void> = svg.select(
-      '#datasetNodes'
-    )
-
-    const datasetNodeDimension = 10
-    const datasetNodeSelection = datasetNodeContainer
-      .selectAll('.datasetNode')
-      .data(
-        nodes.filter((d: any) => {
-          return d.tag == 'dataset'
-        }),
-        (d: any) => d.id
-      )
-      .join(
-        enter =>
-          enter
-            .append('a')
-            .attr('href', d => ('/datasets/' + d.id))
-            .append('rect')
-            .attr('class', 'datasetNode')
-            .attr('width', datasetNodeDimension)
-            .attr('height', datasetNodeDimension)
-            .attr('fill', n => (n.matches ? datasetNodeWhite : fadedOut)),
-        update => update.attr('fill', n => (n.matches ? datasetNodeWhite : fadedOut)),
-        exit => {
-          return exit.remove()
+    const getLineages = () => {
+      const searchedDatasets = _filter(newProps.datasets, d => d.matches)
+      const searchedJobs = _filter(newProps.jobs, j => j.matches)
+      const allNodes = [...searchedDatasets, ...searchedJobs]
+      
+      const lineages = _map(allNodes, (rootNode: any) => {
+        rootNode.children = findChildren(rootNode)
+        let children = rootNode.children
+        while (children.length > 0) {
+          _map(children, child => {
+            child.children = findChildren(child)
+          })
+          children = _flatten(_map(children, chi => chi.children))
         }
-      )
-
-    function ticked() {
-      jobNodeSelection.call(updateNode)
-
-      datasetNodeSelection.call(updateNode)
-
-      linkSelection.call(updateLink)
-    }
-
-    const tooltip = select('#tooltip')
-
-    datasetNodeSelection
-      .on('mouseover', focus)
-      .on('mousemove', move)
-      .on('mouseout', unfocus)
-
-    jobNodeSelection
-      .on('mouseover', focus)
-      .on('mousemove', move)
-      .on('mouseout', unfocus)
-
-    function focus(d: INodeNetwork) {
-      tooltip.text(d.id).style('visibility', 'visible')
-    }
-
-    function move() {
-      return tooltip
-        .style('top', (event as any).pageY - 10 + 'px')
-        .style('left', (event as any).pageX + 10 + 'px')
-    }
-
-    function unfocus() {
-      return tooltip.style('visibility', 'hidden')
-    }
-
-    function updateLink(link: d3.Selection<SVGElement, any, any, any>) {
-      const k = 6 * graphLayout.alpha()
-      link
-        .each(function(d) {
-          d.source.x -= k * 7, d.target.x += k * 4
-        })
-        .attr('x1', function(d: INetworkLink & d3.SimulationLinkDatum<any>) {
-          return d.offset == 'source' ? d.source.x + datasetNodeDimension / 2 : d.source.x
-        })
-        .attr('y1', function(d: INetworkLink & d3.SimulationLinkDatum<any>) {
-          return d.offset == 'source' ? d.source.y + datasetNodeDimension / 2 : d.source.y
-        })
-        .attr('x2', function(d: INetworkLink & d3.SimulationLinkDatum<any>) {
-          return d.offset == 'target' ? d.target.x + datasetNodeDimension / 2 : d.target.x
-        })
-        .attr('y2', function(d: INetworkLink & d3.SimulationLinkDatum<any>) {
-          return d.offset == 'target' ? d.target.y + datasetNodeDimension / 2 : d.target.y
-        })
-    }
-
-    function updateNode() {
-      jobNodeSelection.attr('transform', (d: any) => {
-        return 'translate(' + d.x + ',' + d.y + ')'
+        return rootNode
       })
-      datasetNodeSelection.attr('transform', (d: any) => {
-        return 'translate(' + d.x + ',' + d.y + ')'
-      })
+      return lineages
+    }
+
+    const getReverseLineage = (node: any) => {
+      node.children = findParents(node)
+      let children = node.children
+      while (children.length > 0) {
+        _map(children, child => {
+          child.children = findParents(child)
+        })
+        children = _flatten(_map(children, chi => chi.children))
+      }
+      return node
+    }
+
+    const circleHighlight = '#ffffff'
+    const linkHighlight = '#b0b0b0'
+    const defaultHighlight = '#575757'
+    const labelHighlight = '#ffffff'
+    const radius = 8
+    const square = 13
+    const strokeWidth = 5
+
+    function graph(cluster: any, reverse: boolean) {
+      
+      cluster = tree().nodeSize([20, 70])(cluster)
+      
+      const g = svg.append('g')
+        .attr('font-family', 'sans-serif')
+        .attr('font-size', 10)
+        .attr('transform', `translate(${200}, ${height/2})`)
+        
+      g.append('g')
+        .attr('fill', 'none')
+        .attr('stroke-width', strokeWidth)
+        .selectAll('path')
+        .data(cluster.links())
+        .join('path')
+        .attr('d', linkHorizontal().x((d: any) => reverse ? -d.y : d.y).y((d: any) => d.x))
+        .attr('stroke', (d: any) => d.target.data.matches && d.source.data.matches ? linkHighlight : defaultHighlight)
+      
+      const datasets = _filter(cluster.descendants(), d => isDataset(d))
+      const jobs = _filter(cluster.descendants(), d => !isDataset(d))
+      
+      const datasetNode = g.append('g')
+        .attr('stroke-linejoin', 'round')
+        .selectAll('g')
+        .data(datasets)
+        .join('g')
+        .attr('transform', d => `translate(${reverse ? -d.y : d.y},${d.x})`)
+    
+      const jobNode = g
+        .append('g')
+        .attr('stroke-linejoin', 'round')
+        .selectAll('g')
+        .data(jobs)
+        .join('g')
+        .attr('transform', d => `translate(${reverse ? -d.y : d.y},${d.x})`)
+        
+      datasetNode
+        .append('a')
+        .attr('href', (d: any) => ('/datasets/' + d.data.name))
+        .append('rect')
+        .attr('fill', d => d.data.matches ? circleHighlight : defaultHighlight)
+        .attr('x', -square/2)
+        .attr('y', -square/2)
+        .attr('width', square)
+        .attr('height', square)
+    
+      jobNode
+        .append('a')
+        .attr('href', (d: any) => ('/jobs/' + d.data.name))
+        .append('circle')
+        .attr('fill', d => d.data.matches ? circleHighlight : defaultHighlight)
+        .attr('r', radius)
+      
+      // Add text to nodes
+      datasetNode.append('text')
+        .text(d => d.data.matches ? d.data.name : null)
+        .attr('dy', 10)
+        .attr('font-size', 8)
+        .attr('font-family', 'sans-serif')
+        .attr('transform', `rotate(45) translate(${-(radius + 4)}, ${-radius})`)
+        .attr('text-anchor', 'end')
+        .attr('fill', labelHighlight)
+      
+      // Add text to nodes
+      jobNode.append('text')
+        .text(d => d.data.matches ? d.data.name : null)
+        .attr('dy', 10)
+        .attr('font-size', 8)
+        .attr('font-family', 'sans-serif')
+        .attr('transform', `rotate(45) translate(${-(radius + 4)}, ${-radius})`)
+        .attr('text-anchor', 'end')
+        .attr('fill', labelHighlight)
+      
+      // jobNode.on("mouseover", focus).on("mouseout", unfocus)
+      // datasetNode.on("mouseover", focus).on("mouseout", unfocus)
+      
+      // function focus(d) {
+      //   d3.select(this).attr('fill', d => circleHighlight)
+      // }
+      
+      // function unfocus(d) {
+      //   d3.select(this).attr('fill', d => isSearched(d.data.name) ? circleHighlight : defaultHighlight)
+      // }
+      
+      return svg.node()
+    }
+    
+    // run calculations for network graph
+    const lineages = getLineages()
+    let clusters = _map(lineages, lineage => hierarchy(lineage))
+    clusters = _sortBy(clusters, l => l.descendants().length)
+    const largestCluster = clusters[clusters.length - 1]
+    if (largestCluster) {
+      const rootNode = largestCluster.data
+      const reverseLineage = getReverseLineage(rootNode)
+      const reverseCluster = hierarchy(reverseLineage)
+    
+      // remove svg elements
+      svg.selectAll('*').remove()
+    
+      graph(largestCluster, false)
+      graph(reverseCluster, true)
     }
 
     if (this.props.isLoading !== newProps.isLoading) {
@@ -242,23 +263,19 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
   render(): React.ReactElement {
     const { classes, isLoading } = this.props
 
-    const { tooltip, networkBackground } = classes
     return (
-      <div className={networkBackground}>
-        <div id='tooltip' className={tooltip}></div>
+      <div className={classes.networkBackground}>
+        <div id='tooltip' className={classes.tooltip}></div>
         <Legend customClassName={classes.legend}></Legend>
         {isLoading ? (
           <Loader />
         ) : (
-          <svg id='network-graph' className={networkBackground}>
+          <svg id='network-graph' className={classes.networkBackground}>
             <g
               ref={node => {
                 this.graph = node as SVGElement
               }}
             >
-              <g id='links'></g>
-              <g id='jobNodes'></g>
-              <g id='datasetNodes'></g>
             </g>
           </svg>
         )}
