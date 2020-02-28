@@ -16,8 +16,11 @@ services:
       - MARQUEZ_HOST=marquez
       - MARQUEZ_PORT=5000
       - MARQUEZ_ADMIN_PORT=5001
+    volumes:
+      - ./docker/wait-for-it.sh:/usr/local/bin/wait-for-it.sh
     depends_on:
       - marquez
+    entrypoint: ["./wait-for-it.sh", "marquez:5000", "--", "./entrypoint.sh"]
 
   marquez:
     image: marquezproject/marquez:latest
@@ -34,9 +37,11 @@ services:
       - POSTGRES_USER=buendia
       - POSTGRES_PASSWORD=macondo
     volumes:
+      - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
       - ./docker/marquez.yml:/usr/src/app/config.yml
     depends_on:
       - marquez_db
+    entrypoint: ["./wait-for-it.sh", "marquez_db:5432", "--", "./entrypoint.sh"]
 
   marquez_db:
     image: "postgres:9.6"

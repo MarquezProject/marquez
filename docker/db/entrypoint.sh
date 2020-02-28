@@ -16,5 +16,4 @@
 
 set -e
 
-./wait-for-marquez.sh "${MARQUEZ_HOST:-marquez}" "${MARQUEZ_ADMIN_PORT:-5001}" && \
-  ./seed-db.sh
+./seed-db.sh
