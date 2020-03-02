@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -16,8 +17,8 @@ import lombok.ToString;
 @ToString
 public final class JobRequest {
   @Getter @NotEmpty private final String type;
-  @Getter @NotEmpty private final List<String> inputs;
-  @Getter @NotEmpty private final List<String> outputs;
+  @Getter @NotNull private final List<String> inputs;
+  @Getter @NotNull private final List<String> outputs;
   @Nullable private final String location;
   @Getter @Nullable private final Map<String, String> context;
   @Nullable private final String description;
