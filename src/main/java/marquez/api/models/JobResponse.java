@@ -18,7 +18,6 @@ import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,8 +56,8 @@ public final class JobResponse {
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);
-    this.inputs = ImmutableList.copyOf(new ArrayList<>(inputs));
-    this.outputs = ImmutableList.copyOf(new ArrayList<>(outputs));
+    this.inputs = ImmutableList.copyOf(inputs);
+    this.outputs = ImmutableList.copyOf(outputs);
     this.location = location;
     this.context = (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
     this.description = description;
