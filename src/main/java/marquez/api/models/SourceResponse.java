@@ -44,7 +44,7 @@ public final class SourceResponse {
     this.name = checkNotBlank(name);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);
-    this.connectionUrl = connectionUrl;
+    this.connectionUrl = checkNotBlank(connectionUrl);
     this.description = description;
   }
 

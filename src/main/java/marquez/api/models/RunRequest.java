@@ -20,20 +20,30 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
-@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
 public final class RunRequest {
   @Nullable private final String nominalStartTime;
   @Nullable private final String nominalEndTime;
 
+  @Getter
   @Nullable
   @JsonProperty("runArgs")
   private final Map<String, String> args;
+
+  @JsonCreator
+  public RunRequest(
+      @Nullable final String nominalStartTime,
+      @Nullable final String nominalEndTime,
+      @Nullable @JsonProperty("runArgs") final Map<String, String> args) {
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
+    this.args = (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
+  }
 
   public Optional<String> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
@@ -41,9 +51,5 @@ public final class RunRequest {
 
   public Optional<String> getNominalEndTime() {
     return Optional.ofNullable(nominalEndTime);
-  }
-
-  public Map<String, String> getArgs() {
-    return (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
   }
 }

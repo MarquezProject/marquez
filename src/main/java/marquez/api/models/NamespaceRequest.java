@@ -17,17 +17,22 @@ package marquez.api.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
+import javax.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
 public final class NamespaceRequest {
-  @Getter private final String ownerName;
+  @Getter @NotEmpty private final String ownerName;
   @Nullable private final String description;
+
+  @JsonCreator
+  public NamespaceRequest(final String ownerName, @Nullable final String description) {
+    this.ownerName = ownerName;
+    this.description = description;
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

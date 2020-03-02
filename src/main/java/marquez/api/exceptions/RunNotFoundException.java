@@ -21,7 +21,7 @@ import javax.ws.rs.NotFoundException;
 public final class RunNotFoundException extends NotFoundException {
   private static final long serialVersionUID = 1L;
 
-  public RunNotFoundException(@Nullable final UUID runId) {
-    super(String.format("Run '%s' not found.", runId));
+  public RunNotFoundException(@Nullable final UUID id) {
+    super(String.format("Run '%s' not found.", id));
   }
 }
