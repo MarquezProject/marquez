@@ -21,13 +21,12 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
+import javax.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import marquez.common.models.Field;
 
-@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
@@ -36,19 +35,27 @@ import marquez.common.models.Field;
   @JsonSubTypes.Type(value = StreamRequest.class, name = "STREAM")
 })
 public abstract class DatasetRequest {
-  @Getter private final String physicalName;
-  @Getter private final String sourceName;
-  @Nullable private final List<Field> fields;
-  @Nullable private final List<String> tags;
+  @Getter @NotEmpty private final String physicalName;
+  @Getter @NotEmpty private final String sourceName;
+  @Getter private final List<Field> fields;
+  @Getter private final List<String> tags;
   @Nullable private final String description;
   @Nullable private final String runId;
 
-  public List<Field> getFields() {
-    return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
-  }
-
-  public List<String> getTags() {
-    return (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
+  @JsonCreator
+  public DatasetRequest(
+      final String physicalName,
+      final String sourceName,
+      @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
+      @Nullable final String description,
+      @Nullable final String runId) {
+    this.physicalName = physicalName;
+    this.sourceName = sourceName;
+    this.fields = (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
+    this.tags = (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
+    this.description = description;
+    this.runId = runId;
   }
 
   public Optional<String> getDescription() {

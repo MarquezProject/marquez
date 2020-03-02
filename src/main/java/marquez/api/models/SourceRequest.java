@@ -17,18 +17,25 @@ package marquez.api.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
+import javax.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @EqualsAndHashCode
 @ToString
 public final class SourceRequest {
-  @Getter private final String type;
-  @Getter private final String connectionUrl;
+  @Getter @NotEmpty private final String type;
+  @Getter @NotEmpty private final String connectionUrl;
   @Nullable private final String description;
+
+  @JsonCreator
+  public SourceRequest(
+      final String type, final String connectionUrl, @Nullable final String description) {
+    this.type = type;
+    this.connectionUrl = connectionUrl;
+    this.description = description;
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

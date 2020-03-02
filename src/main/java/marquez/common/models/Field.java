@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -28,7 +29,7 @@ import lombok.Value;
 public class Field {
   String name;
   FieldType type;
-  @Nullable List<String> tags;
+  @Getter @Nullable List<String> tags;
   @Nullable String description;
 
   @JsonCreator
@@ -39,12 +40,8 @@ public class Field {
       @Nullable final String description) {
     this.name = checkNotBlank(name);
     this.type = type;
-    this.tags = tags;
+    this.tags = (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
     this.description = description;
-  }
-
-  public List<String> getTags() {
-    return (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
   }
 
   public Optional<String> getDescription() {

@@ -17,6 +17,7 @@ package marquez.api.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -25,7 +26,7 @@ import marquez.common.models.Field;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class StreamRequest extends DatasetRequest {
-  @Getter private final String schemaLocation;
+  @Getter @NotEmpty private final String schemaLocation;
 
   @JsonCreator
   public StreamRequest(

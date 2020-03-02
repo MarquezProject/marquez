@@ -53,25 +53,26 @@ public final class RunResponse {
   @JsonProperty("runState")
   private final String state;
 
+  @Getter
   @Nullable
   @JsonProperty("runArgs")
   private final Map<String, String> args;
 
   public RunResponse(
-      @NonNull final String id,
+      @JsonProperty("runId") @NonNull final String id,
       @NonNull final String createdAt,
       @NonNull final String updatedAt,
       @Nullable final String nominalStartTime,
       @Nullable final String nominalEndTime,
-      @NonNull final String state,
-      @Nullable final Map<String, String> args) {
+      @JsonProperty("runState") @NonNull final String state,
+      @JsonProperty("runArgs") @Nullable final Map<String, String> args) {
     this.id = checkNotBlank(id);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;
     this.state = checkNotBlank(state);
-    this.args = args;
+    this.args = (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
   }
 
   public Optional<String> getNominalStartTime() {
@@ -80,9 +81,5 @@ public final class RunResponse {
 
   public Optional<String> getNominalEndTime() {
     return Optional.ofNullable(nominalEndTime);
-  }
-
-  public Map<String, String> getArgs() {
-    return (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
   }
 }
