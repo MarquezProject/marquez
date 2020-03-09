@@ -17,7 +17,7 @@ repositories {
 }
 
 ext {
-  dropwizardVersion = '2.0.1'
+  dropwizardVersion = '2.0.2'
   jdbi3Version = '3.12.0'
   lombokVersion = '1.18.10'
   prometheusVersion = '0.8.0'
