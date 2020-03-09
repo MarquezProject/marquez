@@ -43,7 +43,7 @@ dependencies {
   testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
   testCompile 'junit:junit:4.12'
   testCompile 'org.mockito:mockito-core:3.0.0'
-  testCompile 'org.testcontainers:postgresql:1.12.2'
+  testCompile 'org.testcontainers:postgresql:1.13.0'
 }
 
 compileJava {
