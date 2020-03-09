@@ -34,7 +34,7 @@ dependencies {
   compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
   compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
   compile 'com.google.guava:guava:28.0-jre'
-  compile 'org.flywaydb:flyway-core:6.1.1'
+  compile 'org.flywaydb:flyway-core:6.3.0'
   compile 'org.postgresql:postgresql:42.2.5'
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
