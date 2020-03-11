@@ -43,7 +43,6 @@ jobs:
       - run: ./docker/build-and-push.sh $CIRCLE_TAG
 
 workflows:
-  version: 2
   marquez:
     jobs:
       - build
