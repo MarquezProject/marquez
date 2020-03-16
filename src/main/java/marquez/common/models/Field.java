@@ -14,31 +14,43 @@
 
 package marquez.common.models;
 
-import static marquez.common.base.MorePreconditions.checkNotBlank;
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
 public class Field {
-  String name;
+  @JsonUnwrapped
+  @JsonProperty(access = READ_ONLY)
+  FieldName name;
+
   FieldType type;
-  @Getter @Nullable List<String> tags;
+  @Nullable List<String> tags;
   @Nullable String description;
 
   @JsonCreator
   public Field(
-      @NonNull final String name,
+      @JsonProperty("name") final String nameAsString,
+      @JsonProperty("type") final String typeAsString,
+      final List<String> tags,
+      final String description) {
+    this(FieldName.fromString(nameAsString), FieldType.valueOf(typeAsString), tags, description);
+  }
+
+  public Field(
+      @NonNull final FieldName name,
       @NonNull final FieldType type,
       @Nullable final List<String> tags,
       @Nullable final String description) {
-    this.name = checkNotBlank(name);
+    this.name = name;
     this.type = type;
     this.tags = (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
     this.description = description;

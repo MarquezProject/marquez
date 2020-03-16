@@ -59,11 +59,9 @@ public final class SourceResource {
   @Path("{source}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
-  public Response createOrUpdate(
-      @PathParam("source") String sourceString, @Valid SourceRequest request)
+  public Response createOrUpdate(@PathParam("source") SourceName name, @Valid SourceRequest request)
       throws MarquezServiceException {
     log.debug("Request: {}", request);
-    final SourceName name = SourceName.of(sourceString);
     final SourceMeta meta = Mapper.toSourceMeta(request);
     final Source source = service.createOrUpdate(name, meta);
     final SourceResponse response = Mapper.toSourceResponse(source);
@@ -77,8 +75,7 @@ public final class SourceResource {
   @GET
   @Path("{source}")
   @Produces(APPLICATION_JSON)
-  public Response get(@PathParam("source") String sourceString) throws MarquezServiceException {
-    final SourceName name = SourceName.of(sourceString);
+  public Response get(@PathParam("source") SourceName name) throws MarquezServiceException {
     final SourceResponse response =
         service
             .get(name)

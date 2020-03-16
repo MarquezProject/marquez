@@ -12,12 +12,13 @@
  * limitations under the License.
  */
 
-package marquez.api.models;
+package marquez.common.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-import java.util.Optional;
-import javax.annotation.Nullable;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -25,16 +26,15 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
-public final class TagResponse {
-  @Getter private final String name;
-  @Nullable private final String description;
+public final class FieldName {
+  @Getter @NotEmpty private final String value;
 
-  public TagResponse(@NonNull final String name, @Nullable final String description) {
-    this.name = checkNotBlank(name);
-    this.description = description;
+  private FieldName(@NonNull final String value) {
+    this.value = checkNotBlank(value, "value must not be blank");
   }
 
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(description);
+  @JsonCreator
+  public static FieldName fromString(@JsonProperty("name") final String value) {
+    return new FieldName(value);
   }
 }

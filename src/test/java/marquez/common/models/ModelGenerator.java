@@ -43,7 +43,7 @@ public final class ModelGenerator extends Generator {
   }
 
   public static SourceName newSourceName() {
-    return SourceName.of("test_source" + newId());
+    return SourceName.fromString("test_source" + newId());
   }
 
   public static URI newConnectionUrl() {
@@ -91,8 +91,8 @@ public final class ModelGenerator extends Generator {
     return new Field(newFieldName(), newFieldType(), newTags(2), newDescription());
   }
 
-  public static String newFieldName() {
-    return "test_field" + newId();
+  public static FieldName newFieldName() {
+    return FieldName.fromString("test_field" + newId());
   }
 
   public static FieldType newFieldType() {

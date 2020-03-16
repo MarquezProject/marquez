@@ -16,20 +16,23 @@ package marquez.common.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
 public final class SourceName {
-  @Getter private final String value;
+  @Getter @NotEmpty private final String value;
 
-  private SourceName(final String value) {
+  private SourceName(@NonNull final String value) {
     this.value = checkNotBlank(value, "value must not be blank");
   }
 
-  public static SourceName of(final String value) {
+  public static SourceName fromString(@JsonProperty("name") final String value) {
     return new SourceName(value);
   }
 }

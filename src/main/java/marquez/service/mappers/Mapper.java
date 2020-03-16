@@ -30,6 +30,7 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
+import marquez.common.models.FieldName;
 import marquez.common.models.FieldType;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
@@ -111,7 +112,7 @@ public final class Mapper {
   public static Source toSource(@NonNull final SourceRow row) {
     return new Source(
         SourceType.valueOf(row.getType()),
-        SourceName.of(row.getName()),
+        SourceName.fromString(row.getName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
         URI.create(row.getConnectionUrl()),
@@ -160,7 +161,7 @@ public final class Mapper {
         DatasetName.of(row.getPhysicalName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
-        SourceName.of(row.getSourceName()),
+        SourceName.fromString(row.getSourceName()),
         fields,
         tags,
         row.getLastModifiedAt().orElse(null),
@@ -177,7 +178,7 @@ public final class Mapper {
         DatasetName.of(row.getPhysicalName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
-        SourceName.of(row.getSourceName()),
+        SourceName.fromString(row.getSourceName()),
         Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation()),
         fields,
         tags,
@@ -219,7 +220,10 @@ public final class Mapper {
   public static Field toField(
       @NonNull final DatasetFieldRow row, @NonNull final List<String> tags) {
     return new Field(
-        row.getName(), FieldType.valueOf(row.getType()), tags, row.getDescription().orElse(null));
+        FieldName.fromString(row.getName()),
+        FieldType.valueOf(row.getType()),
+        tags,
+        row.getDescription().orElse(null));
   }
 
   public static DatasetFieldRow toDatasetFieldRow(
@@ -231,7 +235,7 @@ public final class Mapper {
         now,
         now,
         datasetUuid,
-        field.getName(),
+        field.getName().getValue(),
         tagUuids,
         field.getDescription().orElse(null));
   }

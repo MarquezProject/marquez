@@ -42,7 +42,6 @@ import marquez.api.models.SourceResponse;
 import marquez.api.models.SourcesResponse;
 import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
-import marquez.api.models.TagResponse;
 import marquez.api.models.TagsResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
@@ -129,7 +128,7 @@ public final class Mapper {
   public static DatasetMeta toDbTableMeta(@NonNull final DatasetRequest request) {
     return new DbTableMeta(
         DatasetName.of(request.getPhysicalName()),
-        SourceName.of(request.getSourceName()),
+        SourceName.fromString(request.getSourceName()),
         request.getFields(),
         request.getTags(),
         request.getDescription().orElse(null),
@@ -139,7 +138,7 @@ public final class Mapper {
   public static DatasetMeta toStreamMeta(@NonNull final DatasetRequest request) {
     return new StreamMeta(
         DatasetName.of(request.getPhysicalName()),
-        SourceName.of(request.getSourceName()),
+        SourceName.fromString(request.getSourceName()),
         Utils.toUrl(((StreamRequest) request).getSchemaLocation()),
         request.getFields(),
         request.getTags(),
@@ -249,15 +248,7 @@ public final class Mapper {
     return new RunsResponse(toRunResponses(runs));
   }
 
-  public static TagResponse toTagResponse(@NonNull final Tag tag) {
-    return new TagResponse(tag.getName(), tag.getDescription().orElse(null));
-  }
-
-  public static List<TagResponse> toTagResponses(@NonNull final List<Tag> tags) {
-    return tags.stream().map(Mapper::toTagResponse).collect(toImmutableList());
-  }
-
   public static TagsResponse toTagsResponse(@NonNull final List<Tag> tags) {
-    return new TagsResponse(toTagResponses(tags));
+    return new TagsResponse(tags);
   }
 }
