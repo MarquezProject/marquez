@@ -16,15 +16,12 @@ package marquez.api.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-import java.util.Map;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.ImmutableMap;
-
+import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

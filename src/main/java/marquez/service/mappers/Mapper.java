@@ -16,6 +16,7 @@ package marquez.service.mappers;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
@@ -23,11 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-
 import javax.annotation.Nullable;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;

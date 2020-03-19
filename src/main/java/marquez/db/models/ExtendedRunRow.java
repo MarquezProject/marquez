@@ -17,9 +17,7 @@ package marquez.db.models;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-
 import javax.annotation.Nullable;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

@@ -14,15 +14,12 @@
 
 package marquez.service.models;
 
+import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
 import javax.annotation.Nullable;
-
-import com.google.common.collect.ImmutableMap;
-
 import lombok.NonNull;
 import lombok.Value;
 
@@ -70,6 +67,7 @@ public class Run {
       public boolean isComplete() {
         return false;
       }
+
       @Override
       public boolean isStarting() {
         return true;

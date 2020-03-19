@@ -23,13 +23,11 @@ import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.jdbi.v3.core.mapper.RowMapper;
-import org.jdbi.v3.core.statement.StatementContext;
-
 import lombok.NonNull;
 import marquez.db.Columns;
 import marquez.db.models.ExtendedRunRow;
+import org.jdbi.v3.core.mapper.RowMapper;
+import org.jdbi.v3.core.statement.StatementContext;
 
 public final class ExtendedRunRowMapper implements RowMapper<ExtendedRunRow> {
   @Override

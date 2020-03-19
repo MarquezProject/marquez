@@ -32,25 +32,18 @@ import static marquez.common.models.ModelGenerator.newSourceName;
 import static marquez.common.models.ModelGenerator.newTags;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import io.dropwizard.testing.ConfigOverride;
+import io.dropwizard.testing.ResourceHelpers;
+import io.dropwizard.testing.junit.DropwizardAppRule;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
-
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
-import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DbTableRequest;
 import marquez.common.models.DatasetName;
@@ -59,6 +52,9 @@ import marquez.common.models.JobName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
 import marquez.service.models.Run;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTests.class)
 public class MarquezAppIntegrationTest {

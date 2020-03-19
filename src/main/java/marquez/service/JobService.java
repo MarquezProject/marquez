@@ -18,16 +18,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Iterables.toArray;
 
+import com.google.common.collect.ImmutableList;
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
-
-import com.google.common.collect.ImmutableList;
-
-import io.prometheus.client.Counter;
-import io.prometheus.client.Gauge;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
@@ -60,6 +56,7 @@ import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class JobService {
@@ -360,7 +357,9 @@ public class JobService {
           outputUuids = versionRow.getOutputUuids();
           log.info(
               "Run '{}' for job version '{}' modified datasets: {}",
-              runId, versionRow.getVersion(), outputUuids);
+              runId,
+              versionRow.getVersion(),
+              outputUuids);
         } else {
           outputUuids = null;
         }

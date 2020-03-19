@@ -21,17 +21,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+import marquez.db.mappers.ExtendedRunRowMapper;
+import marquez.db.models.ExtendedRunRow;
+import marquez.db.models.RunRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
-
-import marquez.db.mappers.ExtendedRunRowMapper;
-import marquez.db.models.ExtendedRunRow;
-import marquez.db.models.RunRow;
 
 public interface RunDao extends SqlObject {
   @CreateSqlObject
@@ -101,23 +99,30 @@ public interface RunDao extends SqlObject {
           + "WHERE uuid = :rowUuid")
   void updateEndState(UUID rowUuid, Instant updatedAt, UUID endRunStateUuid);
 
-  static final String SELECT_RUN = "SELECT r.*, ra.args, rs_s.transitioned_at as " + STARTED_AT + ", rs_e.transitioned_at as " + ENDED_AT + ", "
-      + "ARRAY(SELECT dataset_version_uuid "
-      + "      FROM runs_input_mapping "
-      + "      WHERE run_uuid = r.uuid) AS input_version_uuids "
-      + "FROM runs AS r "
-      + "INNER JOIN run_args AS ra"
-      + "  ON (ra.uuid = r.run_args_uuid) "
-      + "LEFT JOIN run_states AS rs_s"
-      + "  ON (rs_s.uuid = r.start_run_state_uuid) "
-      + "LEFT JOIN run_states AS rs_e"
-      + "  ON (rs_e.uuid = r.end_run_state_uuid) ";
+  static final String SELECT_RUN =
+      "SELECT r.*, ra.args, rs_s.transitioned_at as "
+          + STARTED_AT
+          + ", rs_e.transitioned_at as "
+          + ENDED_AT
+          + ", "
+          + "ARRAY(SELECT dataset_version_uuid "
+          + "      FROM runs_input_mapping "
+          + "      WHERE run_uuid = r.uuid) AS input_version_uuids "
+          + "FROM runs AS r "
+          + "INNER JOIN run_args AS ra"
+          + "  ON (ra.uuid = r.run_args_uuid) "
+          + "LEFT JOIN run_states AS rs_s"
+          + "  ON (rs_s.uuid = r.start_run_state_uuid) "
+          + "LEFT JOIN run_states AS rs_e"
+          + "  ON (rs_e.uuid = r.end_run_state_uuid) ";
 
   @SqlQuery(SELECT_RUN + " WHERE r.uuid = :rowUuid")
   @RegisterRowMapper(ExtendedRunRowMapper.class)
   Optional<ExtendedRunRow> findBy(UUID rowUuid);
 
-  @SqlQuery(SELECT_RUN + "WHERE r.job_version_uuid = :jobVersionUuid "
+  @SqlQuery(
+      SELECT_RUN
+          + "WHERE r.job_version_uuid = :jobVersionUuid "
           + "ORDER BY r.created_at "
           + "LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(ExtendedRunRowMapper.class)

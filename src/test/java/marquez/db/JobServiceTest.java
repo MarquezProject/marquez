@@ -25,17 +25,6 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-
-import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.postgres.PostgresPlugin;
-import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.jdbi.v3.testing.JdbiRule;
-import org.jdbi.v3.testing.Migration;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
 import marquez.MarquezDb;
@@ -52,6 +41,15 @@ import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.postgres.PostgresPlugin;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.jdbi.v3.testing.JdbiRule;
+import org.jdbi.v3.testing.Migration;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 @Category({DataAccessTests.class, IntegrationTests.class})
 public class JobServiceTest {
@@ -113,16 +111,33 @@ public class JobServiceTest {
     tagRows = newTagRows(2);
     tagRows.forEach(tagRow -> tagDao.insert(tagRow));
 
-    jobService = new JobService(namespaceDao, datasetDao, datasetVersionDao, jobDao, versionDao, contextDao, runDao, runArgsDao, runStateDao);
+    jobService =
+        new JobService(
+            namespaceDao,
+            datasetDao,
+            datasetVersionDao,
+            jobDao,
+            versionDao,
+            contextDao,
+            runDao,
+            runArgsDao,
+            runStateDao);
   }
 
   @Test
   public void testRun() throws MarquezServiceException, MalformedURLException {
     JobName jobName = JobName.of("MY_JOB");
-    Job job = jobService.createOrUpdate(NAMESPACE_NAME, jobName, new JobMeta(
-        JobType.BATCH,
-        emptyList(),
-        emptyList(), Utils.toUrl("https://github.com/repo/test/commit/foo"), new HashMap<>(), "description"));
+    Job job =
+        jobService.createOrUpdate(
+            NAMESPACE_NAME,
+            jobName,
+            new JobMeta(
+                JobType.BATCH,
+                emptyList(),
+                emptyList(),
+                Utils.toUrl("https://github.com/repo/test/commit/foo"),
+                new HashMap<>(),
+                "description"));
     assertThat(job.getName()).isEqualTo(jobName);
     Run run = jobService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
     assertThat(run.getId()).isNotNull();
@@ -133,7 +148,7 @@ public class JobServiceTest {
     assertThat(startedRun.get().getStartedAt()).isNotNull();
     assertThat(startedRun.get().getEndedAt().isPresent()).isFalse();
     jobService.markRunAs(run.getId(), Run.State.COMPLETED);
-    Optional<Run>endedRun = jobService.getRun(run.getId());
+    Optional<Run> endedRun = jobService.getRun(run.getId());
     assertThat(endedRun.isPresent()).isTrue();
     assertThat(endedRun.get().getStartedAt()).isEqualTo(startedRun.get().getStartedAt());
     assertThat(endedRun.get().getEndedAt()).isNotNull();
@@ -141,6 +156,4 @@ public class JobServiceTest {
     assertThat(allRuns.size()).isEqualTo(1);
     assertThat(allRuns.get(0).getEndedAt()).isEqualTo(endedRun.get().getEndedAt());
   }
-
-
 }
