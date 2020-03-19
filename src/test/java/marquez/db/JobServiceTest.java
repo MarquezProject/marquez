@@ -126,12 +126,12 @@ public class JobServiceTest {
     assertThat(job.getName()).isEqualTo(jobName);
     Run run = jobService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
     assertThat(run.getId()).isNotNull();
-    assertThat(run.getStartedAt().isEmpty()).isTrue();
+    assertThat(run.getStartedAt().isPresent()).isFalse();
     jobService.markRunAs(run.getId(), Run.State.RUNNING);
     Optional<Run> startedRun = jobService.getRun(run.getId());
     assertThat(startedRun.isPresent()).isTrue();
     assertThat(startedRun.get().getStartedAt()).isNotNull();
-    assertThat(startedRun.get().getEndedAt().isEmpty()).isTrue();
+    assertThat(startedRun.get().getEndedAt().isPresent()).isFalse();
     jobService.markRunAs(run.getId(), Run.State.COMPLETED);
     Optional<Run>endedRun = jobService.getRun(run.getId());
     assertThat(endedRun.isPresent()).isTrue();
