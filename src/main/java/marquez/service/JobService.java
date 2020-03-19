@@ -18,12 +18,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Iterables.toArray;
 
-import com.google.common.collect.ImmutableList;
-import io.prometheus.client.Counter;
-import io.prometheus.client.Gauge;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
+
+import com.google.common.collect.ImmutableList;
+
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
@@ -56,7 +60,6 @@ import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
-import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class JobService {
@@ -348,22 +351,23 @@ public class JobService {
     log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
     final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
     try {
+      @NonNull final List<UUID> outputUuids;
       if (runState.isComplete()) {
         final RunRow runRow = runDao.findBy(runId).get();
         final ExtendedJobVersionRow versionRow =
             versionDao.findBy(runRow.getJobVersionUuid()).get();
         if (versionRow.hasOutputUuids()) {
-          runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids());
-          incOrDecBy(runState);
+          outputUuids = versionRow.getOutputUuids();
           log.info(
               "Run '{}' for job version '{}' modified datasets: {}",
-              runId,
-              versionRow.getVersion(),
-              versionRow.getOutputUuids());
-          return;
+              runId, versionRow.getVersion(), outputUuids);
+        } else {
+          outputUuids = null;
         }
+      } else {
+        outputUuids = null;
       }
-      runStateDao.insert(newRunStateRow);
+      runStateDao.insert(newRunStateRow, outputUuids, runState.isStarting(), runState.isComplete());
       incOrDecBy(runState);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to mark job run '{}' as '{}'.", runId, runState, e);
@@ -374,6 +378,8 @@ public class JobService {
   /** Determines whether to increment or decrement run counters given {@link Run.State}. */
   private void incOrDecBy(@NonNull Run.State runState) {
     switch (runState) {
+      case NEW:
+        break;
       case RUNNING:
         runsActive.inc();
         break;

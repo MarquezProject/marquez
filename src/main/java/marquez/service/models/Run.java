@@ -14,12 +14,15 @@
 
 package marquez.service.models;
 
-import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
 import javax.annotation.Nullable;
+
+import com.google.common.collect.ImmutableMap;
+
 import lombok.NonNull;
 import lombok.Value;
 
@@ -31,6 +34,8 @@ public class Run {
   @Nullable Instant nominalStartTime;
   @Nullable Instant nominalEndTime;
   @NonNull Run.State state;
+  @Nullable Instant startedAt;
+  @Nullable Instant endedAt;
   @Nullable Map<String, String> args;
 
   public Optional<Instant> getNominalStartTime() {
@@ -39,6 +44,14 @@ public class Run {
 
   public Optional<Instant> getNominalEndTime() {
     return Optional.ofNullable(nominalEndTime);
+  }
+
+  public Optional<Instant> getStartedAt() {
+    return Optional.ofNullable(startedAt);
+  }
+
+  public Optional<Instant> getEndedAt() {
+    return Optional.ofNullable(endedAt);
   }
 
   public Map<String, String> getArgs() {
@@ -56,6 +69,10 @@ public class Run {
       @Override
       public boolean isComplete() {
         return false;
+      }
+      @Override
+      public boolean isStarting() {
+        return true;
       }
     },
     COMPLETED {
@@ -79,5 +96,10 @@ public class Run {
 
     /** Returns true if this state is complete. */
     public abstract boolean isComplete();
+
+    /** Returns true if this state is Running. */
+    public boolean isStarting() {
+      return false;
+    }
   }
 }

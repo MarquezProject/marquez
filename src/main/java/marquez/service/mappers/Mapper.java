@@ -16,7 +16,6 @@ package marquez.service.mappers;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
@@ -24,7 +23,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+
 import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
@@ -354,6 +357,8 @@ public final class Mapper {
         row.getNominalStartTime().orElse(null),
         row.getNominalEndTime().orElse(null),
         Run.State.valueOf(row.getCurrentRunState().get()),
+        row.getStartedAt().orElse(null),
+        row.getEndedAt().orElse(null),
         Utils.fromJson(row.getArgs(), new TypeReference<Map<String, String>>() {}));
   }
 
@@ -376,6 +381,8 @@ public final class Mapper {
         inputVersionUuids,
         runMeta.getNominalStartTime().orElse(null),
         runMeta.getNominalEndTime().orElse(null),
+        null,
+        null,
         null);
   }
 

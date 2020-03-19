@@ -18,13 +18,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.db.mappers.RunStateRowMapper;
-import marquez.db.models.RunStateRow;
+
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+
+import marquez.db.mappers.RunStateRowMapper;
+import marquez.db.models.RunStateRow;
 
 @RegisterRowMapper(RunStateRowMapper.class)
 public interface RunStateDao extends SqlObject {
@@ -35,25 +37,28 @@ public interface RunStateDao extends SqlObject {
   RunDao createRunDao();
 
   @Transaction
-  default void insertWith(RunStateRow row, List<UUID> inputVersionUuids) {
-    insert(row);
-    // Modified
-    final Instant lastModifiedAt = row.getTransitionedAt();
-    createDatasetDao().updateLastModifedAt(inputVersionUuids, lastModifiedAt);
-  }
-
-  @Transaction
-  default void insert(RunStateRow row) {
+  default void insert(RunStateRow row, List<UUID> outputVersionUuids, boolean starting, boolean ending) {
     getHandle()
-        .createUpdate(
-            "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
-                + "VALUES (:uuid, :transitionedAt, :runUuid, :state)")
-        .bindBean(row)
-        .execute();
+      .createUpdate(
+        "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
+            + "VALUES (:uuid, :transitionedAt, :runUuid, :state)")
+      .bindBean(row)
+      .execute();
     // State transition
     final Instant updateAt = row.getTransitionedAt();
     createRunDao().updateRunState(row.getRunUuid(), updateAt, row.getState());
+    if (starting) {
+      createRunDao().updateStartState(row.getRunUuid(), updateAt, row.getUuid());
+    }
+    if (ending) {
+      createRunDao().updateEndState(row.getRunUuid(), updateAt, row.getUuid());
+    }
+    // Modified
+    if (outputVersionUuids != null && outputVersionUuids.size() > 0) {
+      createDatasetDao().updateLastModifedAt(outputVersionUuids, updateAt);
+    }
   }
+
 
   @SqlQuery("SELECT * FROM run_states WHERE uuid = :rowUuid")
   Optional<RunStateRow> findBy(UUID rowUuid);

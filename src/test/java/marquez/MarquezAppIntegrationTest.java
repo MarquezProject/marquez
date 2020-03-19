@@ -32,18 +32,25 @@ import static marquez.common.models.ModelGenerator.newSourceName;
 import static marquez.common.models.ModelGenerator.newTags;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
+
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import io.dropwizard.testing.ConfigOverride;
+import io.dropwizard.testing.ResourceHelpers;
+import io.dropwizard.testing.junit.DropwizardAppRule;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DbTableRequest;
 import marquez.common.models.DatasetName;
@@ -52,9 +59,6 @@ import marquez.common.models.JobName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
 import marquez.service.models.Run;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTests.class)
 public class MarquezAppIntegrationTest {
@@ -308,6 +312,9 @@ public class MarquezAppIntegrationTest {
     assertThat(response1.getStatus()).isEqualTo(HTTP_200);
     assertThat((String) runStarted.get("runId")).isEqualTo(runId);
     assertThat((String) runStarted.get("runState")).isEqualTo(Run.State.RUNNING.toString());
+    assertThat((String) runStarted.get("startedAt")).isNotBlank();
+    assertThat((String) runStarted.get("endedAt")).isBlank();
+    assertThat((String) runStarted.get("duration")).isBlank();
 
     final Instant beforeModified = Instant.now();
     final Response response2 =
@@ -318,10 +325,12 @@ public class MarquezAppIntegrationTest {
             .post(Entity.json(ImmutableMap.of()));
 
     final Map<String, Object> runCompleted = response2.readEntity(Map.class);
-
     assertThat(response2.getStatus()).isEqualTo(HTTP_200);
     assertThat((String) runCompleted.get("runId")).isEqualTo(runId);
     assertThat((String) runCompleted.get("runState")).isEqualTo(Run.State.COMPLETED.toString());
+    assertThat((String) runCompleted.get("startedAt")).isNotBlank();
+    assertThat((String) runCompleted.get("endedAt")).isNotBlank();
+    assertThat((Integer) runCompleted.get("duration")).isGreaterThan(0);
 
     outputs.forEach(
         datasetName -> {
@@ -335,9 +344,9 @@ public class MarquezAppIntegrationTest {
           final Map<String, String> dataset = response3.readEntity(Map.class);
 
           assertThat(response3.getStatus()).isEqualTo(HTTP_200);
-          assertThat((String) dataset.get("name")).isEqualTo(datasetName.getValue());
+          assertThat(dataset.get("name")).isEqualTo(datasetName.getValue());
 
-          final Instant lastModifiedAt = Instant.parse((String) dataset.get("lastModifiedAt"));
+          final Instant lastModifiedAt = Instant.parse(dataset.get("lastModifiedAt"));
           assertThat(lastModifiedAt).isAfter(beforeModified);
         });
   }

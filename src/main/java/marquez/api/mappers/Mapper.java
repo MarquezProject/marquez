@@ -20,8 +20,11 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
 import lombok.NonNull;
 import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
@@ -231,12 +234,18 @@ public final class Mapper {
   }
 
   public static RunResponse toRunResponse(@NonNull final Run run) {
+    Optional<Long> duration =
+        run.getEndedAt().flatMap((e) ->
+          run.getStartedAt().map((s) -> s.until(e, ChronoUnit.MILLIS)));
     return new RunResponse(
         run.getId().toString(),
         ISO_INSTANT.format(run.getCreatedAt()),
         ISO_INSTANT.format(run.getUpdatedAt()),
         run.getNominalStartTime().map(ISO_INSTANT::format).orElse(null),
         run.getNominalEndTime().map(ISO_INSTANT::format).orElse(null),
+        run.getStartedAt().map(ISO_INSTANT::format).orElse(null),
+        run.getEndedAt().map(ISO_INSTANT::format).orElse(null),
+        duration.orElse(null),
         run.getState().toString(),
         run.getArgs());
   }
