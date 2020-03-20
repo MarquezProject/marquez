@@ -721,6 +721,18 @@ components:
           description: The current state of the run.
           type: string
           enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        startedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was started (went from NEW to RUNNING). Or null if not started.
+          type: string
+          format: date-time
+        endedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was ended (went from RUNNING to COMPLETED|ABORTED|FAILED). Or null if not finished.
+          type: string
+          format: date-time
+        duration:
+          description: The duration of the run (time in ms elapsed between startedAt and endedAt if present)
+          type: number
+          format: int64
         runArgs:
           description: The arguments of the run.
           type: object
