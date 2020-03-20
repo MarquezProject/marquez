@@ -38,6 +38,8 @@ public class RunRow {
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
   @Nullable private final String currentRunState;
+  @Nullable private final Instant startedAt;
+  @Nullable private final Instant endedAt;
 
   public boolean hasInputVersionUuids() {
     return !inputVersionUuids.isEmpty();
@@ -53,5 +55,13 @@ public class RunRow {
 
   public Optional<String> getCurrentRunState() {
     return Optional.ofNullable(currentRunState);
+  }
+
+  public Optional<Instant> getStartedAt() {
+    return Optional.ofNullable(startedAt);
+  }
+
+  public Optional<Instant> getEndedAt() {
+    return Optional.ofNullable(endedAt);
   }
 }

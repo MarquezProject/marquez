@@ -43,6 +43,8 @@ public final class ExtendedRunRowMapper implements RowMapper<ExtendedRunRow> {
         timestampOrNull(results, Columns.NOMINAL_START_TIME),
         timestampOrNull(results, Columns.NOMINAL_END_TIME),
         stringOrNull(results, Columns.CURRENT_RUN_STATE),
+        timestampOrNull(results, Columns.STARTED_AT),
+        timestampOrNull(results, Columns.ENDED_AT),
         stringOrThrow(results, Columns.ARGS));
   }
 }

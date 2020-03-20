@@ -49,6 +49,10 @@ public final class RunResponse {
   @Nullable private final String nominalStartTime;
   @Nullable private final String nominalEndTime;
 
+  @Getter @Nullable private final String startedAt;
+  @Getter @Nullable private final String endedAt;
+  @Getter @Nullable private final Long duration;
+
   @Getter
   @JsonProperty("runState")
   private final String state;
@@ -64,6 +68,9 @@ public final class RunResponse {
       @NonNull final String updatedAt,
       @Nullable final String nominalStartTime,
       @Nullable final String nominalEndTime,
+      @Nullable final String startedAt,
+      @Nullable final String endedAt,
+      @Nullable final Long duration,
       @JsonProperty("runState") @NonNull final String state,
       @JsonProperty("runArgs") @Nullable final Map<String, String> args) {
     this.id = checkNotBlank(id);
@@ -71,6 +78,9 @@ public final class RunResponse {
     this.updatedAt = checkNotBlank(updatedAt);
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;
+    this.startedAt = startedAt;
+    this.endedAt = endedAt;
+    this.duration = duration;
     this.state = checkNotBlank(state);
     this.args = (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
   }

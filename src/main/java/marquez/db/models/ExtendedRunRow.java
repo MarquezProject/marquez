@@ -38,6 +38,8 @@ public class ExtendedRunRow extends RunRow {
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
       @Nullable final String currentRunState,
+      @Nullable final Instant startedAt,
+      @Nullable final Instant endedAt,
       @NonNull final String args) {
     super(
         uuid,
@@ -48,7 +50,9 @@ public class ExtendedRunRow extends RunRow {
         inputVersionUuids,
         nominalStartTime,
         nominalEndTime,
-        currentRunState);
+        currentRunState,
+        startedAt,
+        endedAt);
     this.args = args;
   }
 }

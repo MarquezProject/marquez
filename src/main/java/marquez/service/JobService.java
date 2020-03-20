@@ -348,22 +348,25 @@ public class JobService {
     log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
     final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
     try {
+      @NonNull final List<UUID> outputUuids;
       if (runState.isComplete()) {
         final RunRow runRow = runDao.findBy(runId).get();
         final ExtendedJobVersionRow versionRow =
             versionDao.findBy(runRow.getJobVersionUuid()).get();
         if (versionRow.hasOutputUuids()) {
-          runStateDao.insertWith(newRunStateRow, versionRow.getOutputUuids());
-          incOrDecBy(runState);
+          outputUuids = versionRow.getOutputUuids();
           log.info(
               "Run '{}' for job version '{}' modified datasets: {}",
               runId,
               versionRow.getVersion(),
-              versionRow.getOutputUuids());
-          return;
+              outputUuids);
+        } else {
+          outputUuids = null;
         }
+      } else {
+        outputUuids = null;
       }
-      runStateDao.insert(newRunStateRow);
+      runStateDao.insert(newRunStateRow, outputUuids, runState.isStarting(), runState.isComplete());
       incOrDecBy(runState);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to mark job run '{}' as '{}'.", runId, runState, e);
@@ -374,6 +377,8 @@ public class JobService {
   /** Determines whether to increment or decrement run counters given {@link Run.State}. */
   private void incOrDecBy(@NonNull Run.State runState) {
     switch (runState) {
+      case NEW:
+        break;
       case RUNNING:
         runsActive.inc();
         break;

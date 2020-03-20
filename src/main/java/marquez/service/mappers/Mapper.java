@@ -354,6 +354,8 @@ public final class Mapper {
         row.getNominalStartTime().orElse(null),
         row.getNominalEndTime().orElse(null),
         Run.State.valueOf(row.getCurrentRunState().get()),
+        row.getStartedAt().orElse(null),
+        row.getEndedAt().orElse(null),
         Utils.fromJson(row.getArgs(), new TypeReference<Map<String, String>>() {}));
   }
 
@@ -376,6 +378,8 @@ public final class Mapper {
         inputVersionUuids,
         runMeta.getNominalStartTime().orElse(null),
         runMeta.getNominalEndTime().orElse(null),
+        null,
+        null,
         null);
   }
 

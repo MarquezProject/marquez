@@ -14,6 +14,9 @@
 
 package marquez.db;
 
+import static marquez.db.Columns.ENDED_AT;
+import static marquez.db.Columns.STARTED_AT;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -82,26 +85,43 @@ public interface RunDao extends SqlObject {
           + "WHERE uuid = :rowUuid")
   void updateRunState(UUID rowUuid, Instant updatedAt, String currentRunState);
 
-  @SqlQuery(
-      "SELECT r.*, ra.args, "
+  @SqlUpdate(
+      "UPDATE runs "
+          + "SET updated_at = :updatedAt, "
+          + "    start_run_state_uuid = :startRunStateUuid "
+          + "WHERE uuid = :rowUuid")
+  void updateStartState(UUID rowUuid, Instant updatedAt, UUID startRunStateUuid);
+
+  @SqlUpdate(
+      "UPDATE runs "
+          + "SET updated_at = :updatedAt, "
+          + "    end_run_state_uuid = :endRunStateUuid "
+          + "WHERE uuid = :rowUuid")
+  void updateEndState(UUID rowUuid, Instant updatedAt, UUID endRunStateUuid);
+
+  static final String SELECT_RUN =
+      "SELECT r.*, ra.args, rs_s.transitioned_at as "
+          + STARTED_AT
+          + ", rs_e.transitioned_at as "
+          + ENDED_AT
+          + ", "
           + "ARRAY(SELECT dataset_version_uuid "
           + "      FROM runs_input_mapping "
           + "      WHERE run_uuid = r.uuid) AS input_version_uuids "
           + "FROM runs AS r "
           + "INNER JOIN run_args AS ra"
           + "  ON (ra.uuid = r.run_args_uuid) "
-          + "WHERE r.uuid = :rowUuid")
+          + "LEFT JOIN run_states AS rs_s"
+          + "  ON (rs_s.uuid = r.start_run_state_uuid) "
+          + "LEFT JOIN run_states AS rs_e"
+          + "  ON (rs_e.uuid = r.end_run_state_uuid) ";
+
+  @SqlQuery(SELECT_RUN + " WHERE r.uuid = :rowUuid")
   @RegisterRowMapper(ExtendedRunRowMapper.class)
   Optional<ExtendedRunRow> findBy(UUID rowUuid);
 
   @SqlQuery(
-      "SELECT r.*, ra.args, "
-          + "ARRAY(SELECT dataset_version_uuid "
-          + "      FROM runs_input_mapping "
-          + "      WHERE run_uuid = r.uuid) AS input_version_uuids "
-          + "FROM runs AS r "
-          + "INNER JOIN run_args AS ra"
-          + "  ON (ra.uuid = r.run_args_uuid)"
+      SELECT_RUN
           + "WHERE r.job_version_uuid = :jobVersionUuid "
           + "ORDER BY r.created_at "
           + "LIMIT :limit OFFSET :offset")
