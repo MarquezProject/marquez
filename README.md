@@ -1,6 +1,5 @@
 # Marquez Web UI
 
-
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez-web/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez-web/tree/master)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marquez-project/community)
@@ -123,6 +122,12 @@ We are using [Rollbar](https://rollbar.com/WeWork/Marquez-UI/) for front-end log
 If you are also using Rollbar, be sure to add your Rollbar config as the first `<script/>` in `<head></head>` of `index.prod.html`. (See [Rollbar docs](https://docs.rollbar.com/docs/browser-js) for more info)
 
 If you are NOT using Rollbar, be sure to change the global `__ROLLBAR__` variable in `webpack.prod.js` to `JSON.stringify(false)` (this will disable any functionality in the `createRollbarMessage` function in `src/helpers`)
+
+#### Customization
+
+We encourage you to make Marquez your own! Feel free to change styles, add new components, etc.
+
+To get feedback on your customized version of Marquez, update the **FEEDBACK_FORM_URL** variable in the "plugins" section of `./webpack.prod.js`
 
 ### Contributing
 

@@ -13,3 +13,5 @@ declare const Rollbar: {
   info: (message: any, callback?: any) => void
   debug: (message: any, callback?: any) => void
 }
+
+declare const __FEEDBACK_FORM_URL__: string

@@ -30,7 +30,8 @@ const webpackDev = {
       __DEVELOPMENT__: JSON.stringify(true),
       __API_URL__: JSON.stringify('/api/v1'),
       __NODE_ENV__: JSON.stringify('development'),
-      __TEMP_ACTOR_STR__: JSON.stringify('me')
+      __TEMP_ACTOR_STR__: JSON.stringify('me'),
+      __FEEDBACK_FORM_URL__: JSON.stringify('https://forms.gle/f3tTSrZ8wPj3sHTA7')
     })
   ]
 }
