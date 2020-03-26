@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
-import marquez.MarquezDb;
 import marquez.common.Utils;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
@@ -42,10 +41,7 @@ import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.postgres.PostgresPlugin;
-import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
-import org.jdbi.v3.testing.Migration;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -53,19 +49,8 @@ import org.junit.experimental.categories.Category;
 
 @Category({DataAccessTests.class, IntegrationTests.class})
 public class JobServiceTest {
-  private static final MarquezDb DB = MarquezDb.create();
 
-  static {
-    DB.start();
-  }
-
-  @ClassRule
-  public static final JdbiRule dbRule =
-      JdbiRule.externalPostgres(
-              DB.getHost(), DB.getPort(), DB.getUsername(), DB.getPassword(), DB.getDatabaseName())
-          .withPlugin(new SqlObjectPlugin())
-          .withPlugin(new PostgresPlugin())
-          .withMigration(Migration.before().withDefaultPath());
+  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
 
   private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
 
