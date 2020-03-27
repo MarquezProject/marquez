@@ -40,6 +40,7 @@ public final class ExtendedDatasetRowMapper implements RowMapper<ExtendedDataset
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         uuidOrThrow(results, Columns.NAMESPACE_UUID),
+        stringOrThrow(results, Columns.NAMESPACE_NAME),
         uuidOrThrow(results, Columns.SOURCE_UUID),
         stringOrThrow(results, Columns.SOURCE_NAME),
         stringOrThrow(results, Columns.NAME),

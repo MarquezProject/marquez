@@ -27,6 +27,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public final class ExtendedDatasetRow extends DatasetRow {
   @Getter private String sourceName;
+  @Getter private String namespaceName;
 
   public ExtendedDatasetRow(
       final UUID uuid,
@@ -34,6 +35,7 @@ public final class ExtendedDatasetRow extends DatasetRow {
       final Instant createdAt,
       final Instant updatedAt,
       final UUID namespaceUuid,
+      final String namespaceName,
       final UUID sourceUuid,
       @NonNull final String sourceName,
       final String name,
@@ -55,6 +57,7 @@ public final class ExtendedDatasetRow extends DatasetRow {
         lastModified,
         description,
         currentVersionUuid);
+    this.namespaceName = namespaceName;
     this.sourceName = sourceName;
   }
 }

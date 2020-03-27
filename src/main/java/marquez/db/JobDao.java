@@ -56,6 +56,13 @@ public interface JobDao {
           + "      j.name = :jobName))")
   boolean exists(String namespaceName, String jobName);
 
+  /**
+   * Updates the current version of the job
+   *
+   * @param rowUuid the jobs.uuid
+   * @param updatedAt when it was updated
+   * @param currentVersionUuid job_versions.uuid for the current version
+   */
   @SqlUpdate(
       "UPDATE jobs "
           + "SET updated_at = :updatedAt, "

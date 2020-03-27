@@ -24,38 +24,22 @@ import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ExtendedJobVersionRow extends JobVersionRow {
-  @Getter private final String context;
-  @Getter private @NonNull String namespaceName;
-  @Getter private @NonNull String name;
+public class ExtendedDatasetVersionRow extends DatasetVersionRow {
 
-  public ExtendedJobVersionRow(
-      final UUID uuid,
-      final Instant createdAt,
-      final Instant updatedAt,
-      final UUID jobUuid,
-      final UUID jobContextUuid,
-      final List<UUID> inputUuids,
-      final List<UUID> outputUuids,
-      final String location,
-      final UUID version,
-      final UUID latestRunUuid,
-      @NonNull final String context,
+  @Getter private @NonNull String namespaceName;
+  @Getter private @NonNull String datasetName;
+
+  public ExtendedDatasetVersionRow(
+      @NonNull UUID uuid,
+      @NonNull Instant createdAt,
+      @NonNull UUID datasetUuid,
+      @NonNull UUID version,
+      @NonNull List<UUID> fieldUuids,
+      UUID runUuid,
       @NonNull final String namespaceName,
-      @NonNull final String name) {
-    super(
-        uuid,
-        createdAt,
-        updatedAt,
-        jobUuid,
-        jobContextUuid,
-        inputUuids,
-        outputUuids,
-        location,
-        version,
-        latestRunUuid);
-    this.context = context;
+      @NonNull final String datasetName) {
+    super(uuid, createdAt, datasetUuid, version, fieldUuids, runUuid);
     this.namespaceName = namespaceName;
-    this.name = name;
+    this.datasetName = datasetName;
   }
 }
