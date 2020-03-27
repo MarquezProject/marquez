@@ -17,4 +17,3 @@ build/
 
 # Marquez configuration
 config.yml
-node_modules
