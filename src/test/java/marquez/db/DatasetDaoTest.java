@@ -26,7 +26,6 @@ import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
 import static marquez.db.models.ModelGenerator.newSourceRow;
 import static marquez.db.models.ModelGenerator.newTagRow;
 import static marquez.db.models.ModelGenerator.newTagRows;
-import static marquez.db.models.ModelGenerator.newTimestamp;
 import static marquez.db.models.ModelGenerator.toTagUuids;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,7 +36,6 @@ import java.util.Optional;
 import java.util.UUID;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
-import marquez.MarquezDb;
 import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
@@ -46,9 +44,7 @@ import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.TagRow;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
-import org.jdbi.v3.testing.Migration;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -56,18 +52,8 @@ import org.junit.experimental.categories.Category;
 
 @Category({DataAccessTests.class, IntegrationTests.class})
 public class DatasetDaoTest {
-  private static final MarquezDb DB = MarquezDb.create();
 
-  static {
-    DB.start();
-  }
-
-  @ClassRule
-  public static final JdbiRule dbRule =
-      JdbiRule.externalPostgres(
-              DB.getHost(), DB.getPort(), DB.getUsername(), DB.getPassword(), DB.getDatabaseName())
-          .withPlugin(new SqlObjectPlugin())
-          .withMigration(Migration.before().withDefaultPath());
+  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
 
   private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
 
