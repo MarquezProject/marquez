@@ -14,22 +14,22 @@
 
 package marquez.db;
 
-import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import lombok.NonNull;
 import marquez.common.models.DatasetType;
 import marquez.db.mappers.DatasetVersionRowMapper;
+import marquez.db.mappers.ExtendedDatasetVersionRowMapper;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.StreamVersionRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
@@ -57,7 +57,7 @@ public interface DatasetVersionDao {
     row.getFieldUuids().forEach(fieldUuid -> updateFields(row.getUuid(), fieldUuid));
     // Current
     final Instant updatedAt = row.getCreatedAt();
-    createDatasetDao().updateVersion(row.getDatasetUuid(), updatedAt, row.getVersion());
+    createDatasetDao().updateVersion(row.getDatasetUuid(), updatedAt, row.getUuid());
   }
 
   @SqlUpdate(
@@ -73,38 +73,48 @@ public interface DatasetVersionDao {
           + "VALUES (:datasetVersionUuid, :datasetFieldUuid)")
   void updateFields(UUID datasetVersionUuid, UUID datasetFieldUuid);
 
-  @SqlQuery(
+  public static final String SELECT =
       "SELECT *, "
           + "ARRAY(SELECT dataset_field_uuid "
           + "      FROM dataset_versions_field_mapping "
           + "      WHERE dataset_version_uuid = uuid) AS field_uuids "
-          + "FROM dataset_versions "
-          + "WHERE version = :version")
-  Optional<DatasetVersionRow> findBy(UUID version);
+          + "FROM dataset_versions ";
 
-  default Optional<DatasetVersionRow> find(String typeString, @Nullable UUID version) {
-    if (version == null) {
+  public static final String EXTENDED_SELECT =
+      "SELECT dv.*, d.name as dataset_name, n.name as namespace_name, "
+          + "ARRAY(SELECT dataset_field_uuid "
+          + "      FROM dataset_versions_field_mapping "
+          + "      WHERE dataset_version_uuid = dv.uuid) AS field_uuids "
+          + "FROM dataset_versions AS dv "
+          + "INNER JOIN datasets AS d ON d.uuid = dv.dataset_uuid "
+          + "INNER JOIN namespaces AS n ON n.uuid = d.namespace_uuid ";
+
+  @SqlQuery(SELECT + "WHERE uuid = :uuid")
+  Optional<DatasetVersionRow> findBy(UUID uuid);
+
+  default Optional<DatasetVersionRow> find(String typeString, @Nullable UUID uuid) {
+    if (uuid == null) {
       return Optional.empty();
     }
 
     final DatasetType type = DatasetType.valueOf(typeString);
     switch (type) {
       case STREAM:
-        return createStreamVersionDao().findBy(version).map(DatasetVersionRow.class::cast);
+        return createStreamVersionDao().findBy(uuid).map(DatasetVersionRow.class::cast);
       default:
-        return findBy(version);
+        return findBy(uuid);
     }
   }
 
-  @SqlQuery(
-      "SELECT *, "
-          + "ARRAY(SELECT dataset_field_uuid "
-          + "      FROM dataset_versions_field_mapping "
-          + "      WHERE dataset_version_uuid = uuid) AS field_uuids "
-          + "FROM dataset_versions "
-          + "WHERE dataset_uuid IN (<datasetUuids>)")
-  List<DatasetVersionRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... datasetUuids);
-
   @SqlQuery("SELECT COUNT(*) FROM dataset_versions")
   int count();
+
+  /**
+   * returns all Dataset Versions created by this run id
+   *
+   * @param runId
+   */
+  @SqlQuery(EXTENDED_SELECT + " WHERE run_uuid = :runId")
+  @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
+  List<ExtendedDatasetVersionRow> findByRunId(@NonNull UUID runId);
 }

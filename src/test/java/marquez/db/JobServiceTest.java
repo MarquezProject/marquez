@@ -14,14 +14,19 @@
 
 package marquez.db;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
 import static marquez.db.models.ModelGenerator.newSourceRow;
 import static marquez.db.models.ModelGenerator.newTagRows;
+import static marquez.service.models.Run.State.COMPLETED;
+import static marquez.service.models.Run.State.NEW;
+import static marquez.service.models.Run.State.RUNNING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +40,10 @@ import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.TagRow;
 import marquez.service.JobService;
+import marquez.service.RunTransitionListener;
+import marquez.service.RunTransitionListener.JobInputUpdate;
+import marquez.service.RunTransitionListener.JobOutputUpdate;
+import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
@@ -72,6 +81,10 @@ public class JobServiceTest {
   private static RunArgsDao runArgsDao;
   private static RunDao runDao;
 
+  private static List<JobInputUpdate> jobInputUpdates = new ArrayList<>();
+  private static List<JobOutputUpdate> jobOutputUpdates = new ArrayList<>();
+  private static List<RunTransition> runTransitions = new ArrayList<>();
+
   @BeforeClass
   public static void setUpOnce() {
     final Jdbi jdbi = dbRule.getJdbi();
@@ -96,6 +109,25 @@ public class JobServiceTest {
     tagRows = newTagRows(2);
     tagRows.forEach(tagRow -> tagDao.insert(tagRow));
 
+    RunTransitionListener listener =
+        new RunTransitionListener() {
+
+          @Override
+          public void notify(JobInputUpdate jobInputUpdate) {
+            jobInputUpdates.add(jobInputUpdate);
+          }
+
+          @Override
+          public void notify(JobOutputUpdate jobOutputUpdate) {
+            jobOutputUpdates.add(jobOutputUpdate);
+          }
+
+          @Override
+          public void notify(RunTransition transition) {
+            runTransitions.add(transition);
+          }
+        };
+
     jobService =
         new JobService(
             namespaceDao,
@@ -106,7 +138,8 @@ public class JobServiceTest {
             contextDao,
             runDao,
             runArgsDao,
-            runStateDao);
+            runStateDao,
+            asList(listener));
   }
 
   @Test
@@ -140,5 +173,25 @@ public class JobServiceTest {
     List<Run> allRuns = jobService.getAllRunsFor(NAMESPACE_NAME, jobName, 10, 0);
     assertThat(allRuns.size()).isEqualTo(1);
     assertThat(allRuns.get(0).getEndedAt()).isEqualTo(endedRun.get().getEndedAt());
+
+    assertThat(jobInputUpdates.size()).isEqualTo(1);
+    JobInputUpdate jobInputUpdate = jobInputUpdates.get(0);
+    assertThat(jobInputUpdate.getRunId()).isEqualTo(run.getId());
+    assertThat(jobInputUpdate.getJobVersion().getJobName()).isEqualTo(jobName);
+
+    assertThat(jobOutputUpdates.size()).isEqualTo(1);
+    JobOutputUpdate jobOutputUpdate = jobOutputUpdates.get(0);
+    assertThat(jobOutputUpdate.getRunId()).isEqualTo(run.getId());
+
+    assertThat(runTransitions.size()).isEqualTo(3);
+    RunTransition newRun = runTransitions.get(0);
+    assertThat(newRun.getRunId()).isEqualTo(run.getId());
+    assertThat(newRun.getNewState()).isEqualTo(NEW);
+    RunTransition runningRun = runTransitions.get(1);
+    assertThat(runningRun.getRunId()).isEqualTo(run.getId());
+    assertThat(runningRun.getNewState()).isEqualTo(RUNNING);
+    RunTransition completedRun = runTransitions.get(2);
+    assertThat(completedRun.getRunId()).isEqualTo(run.getId());
+    assertThat(completedRun.getNewState()).isEqualTo(COMPLETED);
   }
 }

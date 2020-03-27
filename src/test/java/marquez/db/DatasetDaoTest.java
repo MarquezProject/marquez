@@ -16,13 +16,16 @@ package marquez.db;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Iterables.toArray;
+import static java.util.Collections.emptyList;
 import static marquez.Generator.newTimestamp;
 import static marquez.common.models.ModelGenerator.newDatasetName;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.db.models.ModelGenerator.newDatasetRow;
 import static marquez.db.models.ModelGenerator.newDatasetRowWith;
 import static marquez.db.models.ModelGenerator.newDatasetRowsWith;
+import static marquez.db.models.ModelGenerator.newDatasetVersionRowWith;
 import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
+import static marquez.db.models.ModelGenerator.newRowUuid;
 import static marquez.db.models.ModelGenerator.newSourceRow;
 import static marquez.db.models.ModelGenerator.newTagRow;
 import static marquez.db.models.ModelGenerator.newTagRows;
@@ -39,7 +42,9 @@ import marquez.IntegrationTests;
 import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
+import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.TagRow;
@@ -60,6 +65,7 @@ public class DatasetDaoTest {
   private static NamespaceDao namespaceDao;
   private static SourceDao sourceDao;
   private static DatasetDao datasetDao;
+  private static DatasetVersionDao datasetVersionDao;
   private static TagDao tagDao;
 
   private static NamespaceRow namespaceRow;
@@ -72,6 +78,7 @@ public class DatasetDaoTest {
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
     sourceDao = jdbi.onDemand(SourceDao.class);
     datasetDao = jdbi.onDemand(DatasetDao.class);
+    datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
     tagDao = jdbi.onDemand(TagDao.class);
 
     namespaceRow = newNamespaceRowWith(NAMESPACE_NAME);
@@ -186,7 +193,7 @@ public class DatasetDaoTest {
     final List<UUID> newRowUuids =
         newRows.stream().map(newRow -> newRow.getUuid()).collect(toImmutableList());
 
-    final List<DatasetRow> rows = datasetDao.findAllIn(toArray(newRowUuids, UUID.class));
+    final List<DatasetRow> rows = datasetDao.findAllIn(newRowUuids);
     assertThat(rows).hasSize(4);
 
     final List<UUID> rowUuids = rows.stream().map(row -> row.getUuid()).collect(toImmutableList());
@@ -209,6 +216,14 @@ public class DatasetDaoTest {
     final List<String> datasetNames =
         rows.stream().map(row -> row.getName()).collect(toImmutableList());
     assertThat(datasetNames).containsAll(newDatasetNames);
+
+    List<ExtendedDatasetRow> findAllExtendedIn =
+        datasetDao.findAllExtendedIn(
+            rows.stream().map(DatasetRow::getUuid).collect(toImmutableList()));
+
+    assertThat(
+            findAllExtendedIn.stream().map(ExtendedDatasetRow::getName).collect(toImmutableList()))
+        .containsAll(newDatasetNames);
   }
 
   @Test
@@ -219,5 +234,21 @@ public class DatasetDaoTest {
 
     final List<ExtendedDatasetRow> rows = datasetDao.findAll(NAMESPACE_NAME.getValue(), 4, 0);
     assertThat(rows).isNotNull().hasSize(4);
+  }
+
+  @Test
+  public void testDatasetVersions() {
+    final DatasetRow ds =
+        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows));
+    datasetDao.insert(ds);
+
+    DatasetVersionRow dsv =
+        newDatasetVersionRowWith(ds.getUuid(), newRowUuid(), emptyList(), newRowUuid());
+
+    datasetVersionDao.insert(dsv);
+
+    final List<ExtendedDatasetVersionRow> rows =
+        datasetVersionDao.findByRunId(dsv.getRunUuid().get());
+    assertThat(rows).isNotNull().hasSize(1);
   }
 }

@@ -36,8 +36,8 @@ public interface StreamVersionDao {
           + "      FROM dataset_versions_field_mapping "
           + "      WHERE dataset_version_uuid = dv.uuid) AS field_uuids "
           + "FROM dataset_versions AS dv, stream_versions AS sv "
-          + "WHERE dv.version = :version AND sv.dataset_version_uuid = dv.uuid")
-  Optional<StreamVersionRow> findBy(UUID version);
+          + "WHERE dv.uuid = :uuid AND sv.dataset_version_uuid = dv.uuid")
+  Optional<StreamVersionRow> findBy(UUID uuid);
 
   @SqlQuery("SELECT COUNT(*) FROM stream_versions")
   int count();

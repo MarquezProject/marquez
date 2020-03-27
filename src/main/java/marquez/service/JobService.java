@@ -16,14 +16,17 @@ package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Iterables.toArray;
+import static java.util.Collections.emptyList;
 
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
@@ -40,7 +43,7 @@ import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
 import marquez.db.models.DatasetRow;
-import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobContextRow;
@@ -50,10 +53,17 @@ import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
 import marquez.db.models.RunStateRow;
+import marquez.service.RunTransitionListener.JobInputUpdate;
+import marquez.service.RunTransitionListener.JobOutputUpdate;
+import marquez.service.RunTransitionListener.RunInput;
+import marquez.service.RunTransitionListener.RunOutput;
+import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
+import marquez.service.models.DatasetVersionId;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
+import marquez.service.models.JobVersionId;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
@@ -96,6 +106,7 @@ public class JobService {
   private final RunDao runDao;
   private final RunArgsDao runArgsDao;
   private final RunStateDao runStateDao;
+  private final Collection<RunTransitionListener> runTransitionListeners;
 
   public JobService(
       @NonNull final NamespaceDao namespaceDao,
@@ -107,6 +118,30 @@ public class JobService {
       @NonNull final RunDao runDao,
       @NonNull final RunArgsDao runArgsDao,
       @NonNull final RunStateDao runStateDao) {
+    this(
+        namespaceDao,
+        datasetDao,
+        datasetVersionDao,
+        jobDao,
+        versionDao,
+        contextDao,
+        runDao,
+        runArgsDao,
+        runStateDao,
+        emptyList());
+  }
+
+  public JobService(
+      @NonNull final NamespaceDao namespaceDao,
+      @NonNull final DatasetDao datasetDao,
+      @NonNull final DatasetVersionDao datasetVersionDao,
+      @NonNull final JobDao jobDao,
+      @NonNull final JobVersionDao versionDao,
+      @NonNull final JobContextDao contextDao,
+      @NonNull final RunDao runDao,
+      @NonNull final RunArgsDao runArgsDao,
+      @NonNull final RunStateDao runStateDao,
+      @Nullable final Collection<RunTransitionListener> runTransitionListeners) {
     this.namespaceDao = namespaceDao;
     this.datasetDao = datasetDao;
     this.datasetVersionDao = datasetVersionDao;
@@ -116,6 +151,7 @@ public class JobService {
     this.runDao = runDao;
     this.runArgsDao = runArgsDao;
     this.runStateDao = runStateDao;
+    this.runTransitionListeners = runTransitionListeners;
   }
 
   public Job createOrUpdate(
@@ -236,19 +272,24 @@ public class JobService {
     }
   }
 
-  /** Creates a {@link Job} instance from the given {@link JobRow}. */
+  /**
+   * Creates a {@link Job} instance from the given {@link JobRow}.
+   *
+   * @param jobRow
+   * @return a Job
+   * @throws MarquezServiceException
+   */
   private Job toJob(@NonNull JobRow jobRow) {
-    final ExtendedJobVersionRow versionRow =
-        versionDao.findVersion(jobRow.getCurrentVersionUuid().get()).get();
+    UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
+    final ExtendedJobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
     final List<DatasetName> inputs =
-        datasetDao.findAllIn(toArray(versionRow.getInputUuids(), UUID.class)).stream()
+        datasetDao.findAllIn(versionRow.getInputUuids()).stream()
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
     final List<DatasetName> outputs =
-        datasetDao.findAllIn(toArray(versionRow.getOutputUuids(), UUID.class)).stream()
+        datasetDao.findAllIn(versionRow.getOutputUuids()).stream()
             .map(row -> DatasetName.of(row.getName()))
             .collect(toImmutableList());
-    final JobContextRow contextRow = contextDao.findBy(versionRow.getJobContextUuid()).get();
     final ExtendedRunRow runRow =
         versionRow
             .getLatestRunUuid()
@@ -281,13 +322,29 @@ public class JobService {
       final JobVersionRow versionRow =
           versionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
       final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
+      final List<RunInput> inputVersions =
+          datasetDao.findAllExtendedIn(versionRow.getInputUuids()).stream()
+              .map(
+                  (row) ->
+                      new RunInput(
+                          new DatasetVersionId(
+                              NamespaceName.of(row.getNamespaceName()),
+                              DatasetName.of(row.getName()),
+                              row.getCurrentVersionUuid().get())))
+              .collect(toImmutableList());
       final List<UUID> inputVersionUuids =
-          datasetVersionDao.findAllIn(toArray(versionRow.getInputUuids(), UUID.class)).stream()
-              .map(DatasetVersionRow::getUuid)
+          inputVersions.stream()
+              .map((i) -> i.getDatasetVersion().getVersion())
               .collect(toImmutableList());
       final RunRow newRunRow =
           Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), inputVersionUuids, runMeta);
       runDao.insert(newRunRow);
+      notify(
+          new JobInputUpdate(
+              newRunRow.getUuid(),
+              runMeta,
+              new JobVersionId(namespaceName, jobName, versionRow.getUuid()),
+              inputVersions));
       markRunAs(newRunRow.getUuid(), Run.State.NEW);
       log.info(
           "Successfully created run '{}' for job version '{}'.",
@@ -353,6 +410,18 @@ public class JobService {
         final RunRow runRow = runDao.findBy(runId).get();
         final ExtendedJobVersionRow versionRow =
             versionDao.findBy(runRow.getJobVersionUuid()).get();
+        List<ExtendedDatasetVersionRow> outputVersions = datasetVersionDao.findByRunId(runId);
+        List<RunOutput> outputs =
+            outputVersions.stream()
+                .map(
+                    (v) ->
+                        new RunOutput(
+                            new DatasetVersionId(
+                                NamespaceName.of(v.getNamespaceName()),
+                                DatasetName.of(v.getDatasetName()),
+                                v.getUuid())))
+                .collect(toImmutableList());
+        notify(new JobOutputUpdate(runId, outputs));
         if (versionRow.hasOutputUuids()) {
           outputUuids = versionRow.getOutputUuids();
           log.info(
@@ -367,6 +436,7 @@ public class JobService {
         outputUuids = null;
       }
       runStateDao.insert(newRunStateRow, outputUuids, runState.isStarting(), runState.isComplete());
+      notify(new RunTransition(runId, runState));
       incOrDecBy(runState);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to mark job run '{}' as '{}'.", runId, runState, e);
@@ -390,6 +460,28 @@ public class JobService {
       case FAILED:
         runsActive.dec();
         break;
+    }
+  }
+
+  private void notify(JobInputUpdate update) {
+    notify(RunTransitionListener::notify, update);
+  }
+
+  private void notify(JobOutputUpdate update) {
+    notify(RunTransitionListener::notify, update);
+  }
+
+  private void notify(RunTransition transition) {
+    notify(RunTransitionListener::notify, transition);
+  }
+
+  private <T> void notify(BiConsumer<RunTransitionListener, T> f, T param) {
+    for (RunTransitionListener runTransitionListener : runTransitionListeners) {
+      try {
+        f.accept(runTransitionListener, param);
+      } catch (Exception e) {
+        log.error("Exception from listener " + runTransitionListener, e);
+      }
     }
   }
 }

@@ -39,6 +39,10 @@ public final class Columns {
   public static final String CURRENT_VERSION_UUID = "current_version_uuid";
   public static final String CHECKSUM = "checksum";
 
+  /* COMMON RESULTSET COLUMNS */
+  public static final String NAMESPACE_NAME = "namespace_name";
+  public static final String DATASET_NAME = "dataset_name";
+
   /* NAMESPACE ROW COLUMNS */
   public static final String CURRENT_OWNER_NAME = "current_owner_name";
 
