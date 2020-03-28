@@ -193,7 +193,7 @@ public class DatasetDaoTest {
     final List<UUID> newRowUuids =
         newRows.stream().map(newRow -> newRow.getUuid()).collect(toImmutableList());
 
-    final List<DatasetRow> rows = datasetDao.findAllIn(newRowUuids);
+    final List<ExtendedDatasetRow> rows = datasetDao.findAllIn(newRowUuids);
     assertThat(rows).hasSize(4);
 
     final List<UUID> rowUuids = rows.stream().map(row -> row.getUuid()).collect(toImmutableList());
@@ -218,8 +218,7 @@ public class DatasetDaoTest {
     assertThat(datasetNames).containsAll(newDatasetNames);
 
     List<ExtendedDatasetRow> findAllExtendedIn =
-        datasetDao.findAllExtendedIn(
-            rows.stream().map(DatasetRow::getUuid).collect(toImmutableList()));
+        datasetDao.findAllIn(rows.stream().map(DatasetRow::getUuid).collect(toImmutableList()));
 
     assertThat(
             findAllExtendedIn.stream().map(ExtendedDatasetRow::getName).collect(toImmutableList()))

@@ -71,7 +71,7 @@ public interface JobDao {
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
   @SqlQuery(
-      "SELECT j.* FROM jobs AS j "
+      "SELECT j.*, n.name AS namespace_name FROM jobs AS j "
           + "INNER JOIN namespaces AS n "
           + "  ON (n.name = :namespaceName AND "
           + "      j.namespace_uuid = n.uuid AND "
@@ -79,7 +79,7 @@ public interface JobDao {
   Optional<JobRow> find(String namespaceName, String jobName);
 
   @SqlQuery(
-      "SELECT j.* FROM jobs AS j "
+      "SELECT j.*, n.name AS namespace_name FROM jobs AS j "
           + "INNER JOIN namespaces AS n "
           + "  ON (n.name = :namespaceName AND j.namespace_uuid = n.uuid) "
           + "ORDER BY j.name "

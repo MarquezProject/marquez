@@ -60,6 +60,7 @@ import marquez.service.RunTransitionListener.RunOutput;
 import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
+import marquez.service.models.DatasetId;
 import marquez.service.models.DatasetVersionId;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
@@ -164,7 +165,7 @@ public class JobService {
             jobName.getValue(),
             namespaceName.getValue());
         final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
-        final JobRow newJobRow = Mapper.toJobRow(namespaceRow.getUuid(), jobName, jobMeta);
+        final JobRow newJobRow = Mapper.toJobRow(namespaceRow, jobName, jobMeta);
         jobDao.insert(newJobRow);
         jobs.labels(namespaceName.getValue(), jobMeta.getType().toString()).inc();
         log.info(
@@ -282,13 +283,13 @@ public class JobService {
   private Job toJob(@NonNull JobRow jobRow) {
     UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
     final ExtendedJobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
-    final List<DatasetName> inputs =
+    final List<DatasetId> inputs =
         datasetDao.findAllIn(versionRow.getInputUuids()).stream()
-            .map(row -> DatasetName.of(row.getName()))
+            .map(Mapper::toDatasetId)
             .collect(toImmutableList());
-    final List<DatasetName> outputs =
+    final List<DatasetId> outputs =
         datasetDao.findAllIn(versionRow.getOutputUuids()).stream()
-            .map(row -> DatasetName.of(row.getName()))
+            .map(Mapper::toDatasetId)
             .collect(toImmutableList());
     final ExtendedRunRow runRow =
         versionRow
@@ -323,7 +324,7 @@ public class JobService {
           versionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
       final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
       final List<RunInput> inputVersions =
-          datasetDao.findAllExtendedIn(versionRow.getInputUuids()).stream()
+          datasetDao.findAllIn(versionRow.getInputUuids()).stream()
               .map(
                   (row) ->
                       new RunInput(

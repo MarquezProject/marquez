@@ -17,13 +17,16 @@ package marquez.api.models;
 import java.util.List;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.Field;
+import marquez.service.models.DatasetId;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class DbTableResponse extends DatasetResponse {
   public DbTableResponse(
+      @NonNull final DatasetId id,
       final String name,
       final String physicalName,
       final String createdAt,
@@ -34,6 +37,7 @@ public final class DbTableResponse extends DatasetResponse {
       @Nullable final String lastModifiedAt,
       @Nullable final String description) {
     super(
+        id,
         name,
         physicalName,
         createdAt,

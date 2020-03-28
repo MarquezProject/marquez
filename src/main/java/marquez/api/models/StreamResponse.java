@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.Field;
+import marquez.service.models.DatasetId;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -44,6 +45,7 @@ public final class StreamResponse extends DatasetResponse {
   @Getter private final String schemaLocation;
 
   public StreamResponse(
+      @NonNull final DatasetId id,
       final String name,
       final String physicalName,
       final String createdAt,
@@ -55,6 +57,7 @@ public final class StreamResponse extends DatasetResponse {
       @Nullable final String lastModifiedAt,
       @Nullable final String description) {
     super(
+        id,
         name,
         physicalName,
         createdAt,

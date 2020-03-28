@@ -16,12 +16,19 @@ package marquez.common.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import marquez.common.models.JobName.JobToString;
+import marquez.common.models.JobName.StringToJob;
 
 @EqualsAndHashCode
 @ToString
+@JsonDeserialize(converter = StringToJob.class)
+@JsonSerialize(converter = JobToString.class)
 public final class JobName {
   @Getter private final String value;
 
@@ -31,5 +38,19 @@ public final class JobName {
 
   public static JobName of(final String value) {
     return new JobName(value);
+  }
+
+  public static class JobToString extends StdConverter<JobName, String> {
+    @Override
+    public String convert(JobName value) {
+      return value.getValue();
+    }
+  }
+
+  public static class StringToJob extends StdConverter<String, JobName> {
+    @Override
+    public JobName convert(String value) {
+      return JobName.of(value);
+    }
   }
 }

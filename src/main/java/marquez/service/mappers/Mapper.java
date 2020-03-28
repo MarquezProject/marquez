@@ -55,10 +55,12 @@ import marquez.db.models.SourceRow;
 import marquez.db.models.StreamVersionRow;
 import marquez.db.models.TagRow;
 import marquez.service.models.Dataset;
+import marquez.service.models.DatasetId;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTable;
 import marquez.service.models.DbTableMeta;
 import marquez.service.models.Job;
+import marquez.service.models.JobId;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
@@ -135,6 +137,14 @@ public final class Mapper {
         meta.getDescription().orElse(null));
   }
 
+  public static DatasetId toDatasetId(@NonNull final ExtendedDatasetRow row) {
+    return new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName()));
+  }
+
+  public static JobId toJobId(@NonNull final JobRow row) {
+    return new JobId(NamespaceName.of(row.getNamespaceName()), JobName.of(row.getName()));
+  }
+
   public static Dataset toDataset(
       @NonNull final ExtendedDatasetRow row,
       @NonNull final List<String> tags,
@@ -156,6 +166,7 @@ public final class Mapper {
       @NonNull final List<String> tags,
       @NonNull final List<Field> fields) {
     return new DbTable(
+        new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName())),
         DatasetName.of(row.getName()),
         DatasetName.of(row.getPhysicalName()),
         row.getCreatedAt(),
@@ -173,6 +184,7 @@ public final class Mapper {
       @NonNull final DatasetVersionRow versionRow,
       @NonNull final List<Field> fields) {
     return new Stream(
+        new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName())),
         DatasetName.of(row.getName()),
         DatasetName.of(row.getPhysicalName()),
         row.getCreatedAt(),
@@ -288,14 +300,16 @@ public final class Mapper {
 
   public static Job toJob(
       @NonNull final JobRow row,
-      @NonNull final List<DatasetName> inputs,
-      @NonNull final List<DatasetName> outputs,
+      @NonNull final List<DatasetId> inputs,
+      @NonNull final List<DatasetId> outputs,
       @Nullable final String locationString,
       @NonNull final String contextString,
       @Nullable final ExtendedRunRow runRow) {
+    JobName jobName = JobName.of(row.getName());
     return new Job(
+        Mapper.toJobId(row),
         JobType.valueOf(row.getType()),
-        JobName.of(row.getName()),
+        jobName,
         row.getCreatedAt(),
         row.getUpdatedAt(),
         inputs,
@@ -307,14 +321,17 @@ public final class Mapper {
   }
 
   public static JobRow toJobRow(
-      @NonNull final UUID namespaceUuid, @NonNull final JobName name, @NonNull final JobMeta meta) {
+      @NonNull final NamespaceRow namespace,
+      @NonNull final JobName name,
+      @NonNull final JobMeta meta) {
     final Instant now = Instant.now();
     return new JobRow(
         newRowUuid(),
         meta.getType().toString(),
         now,
         now,
-        namespaceUuid,
+        namespace.getUuid(),
+        namespace.getName(),
         name.getValue(),
         meta.getDescription().orElse(null),
         null);

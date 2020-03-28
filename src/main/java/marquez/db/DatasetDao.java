@@ -124,14 +124,9 @@ public interface DatasetDao extends SqlObject {
   @RegisterRowMapper(ExtendedDatasetRowMapper.class)
   Optional<ExtendedDatasetRow> find(String namespaceName, String datasetName);
 
-  @SqlQuery(SELECT + " WHERE uuid IN (<rowUuids>)")
-  @RegisterRowMapper(DatasetRowMapper.class)
-  List<DatasetRow> findAllIn(@BindList(onEmpty = NULL_STRING) Collection<UUID> rowUuids);
-
   @SqlQuery(EXTENDED_SELECT + " WHERE d.uuid IN (<rowUuids>)")
   @RegisterRowMapper(ExtendedDatasetRowMapper.class)
-  List<ExtendedDatasetRow> findAllExtendedIn(
-      @BindList(onEmpty = NULL_STRING) Collection<UUID> rowUuids);
+  List<ExtendedDatasetRow> findAllIn(@BindList(onEmpty = NULL_STRING) Collection<UUID> rowUuids);
 
   @SqlQuery(
       SELECT

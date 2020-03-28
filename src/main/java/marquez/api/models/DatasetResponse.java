@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.Field;
+import marquez.service.models.DatasetId;
 
 @EqualsAndHashCode
 @ToString
@@ -36,6 +37,7 @@ import marquez.common.models.Field;
   @JsonSubTypes.Type(value = StreamResponse.class, name = "STREAM")
 })
 public abstract class DatasetResponse {
+  @Getter private final DatasetId id;
   @Getter private final String name;
   @Getter private final String physicalName;
   @Getter private final String createdAt;
@@ -47,6 +49,7 @@ public abstract class DatasetResponse {
   @Nullable private final String description;
 
   public DatasetResponse(
+      @NonNull final DatasetId id,
       @NonNull final String name,
       @NonNull final String physicalName,
       @NonNull final String createdAt,
@@ -56,6 +59,7 @@ public abstract class DatasetResponse {
       @Nullable final List<String> tags,
       @Nullable final String lastModifiedAt,
       @Nullable final String description) {
+    this.id = id;
     this.name = checkNotBlank(name);
     this.physicalName = checkNotBlank(physicalName);
     this.createdAt = checkNotBlank(createdAt);

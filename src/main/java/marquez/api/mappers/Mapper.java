@@ -160,6 +160,7 @@ public final class Mapper {
 
   private static DatasetResponse toDbTableResponse(@NonNull final Dataset dataset) {
     return new DbTableResponse(
+        dataset.getId(),
         dataset.getName().getValue(),
         dataset.getPhysicalName().getValue(),
         ISO_INSTANT.format(dataset.getCreatedAt()),
@@ -173,6 +174,7 @@ public final class Mapper {
 
   private static DatasetResponse toStreamResponse(@NonNull final Dataset dataset) {
     return new StreamResponse(
+        dataset.getId(),
         dataset.getName().getValue(),
         dataset.getPhysicalName().getValue(),
         ISO_INSTANT.format(dataset.getCreatedAt()),
@@ -205,12 +207,13 @@ public final class Mapper {
 
   public static JobResponse toJobResponse(@NonNull final Job job) {
     return new JobResponse(
+        job.getId(),
         job.getType().toString(),
         job.getName().getValue(),
         ISO_INSTANT.format(job.getCreatedAt()),
         ISO_INSTANT.format(job.getUpdatedAt()),
-        job.getInputs().stream().map(DatasetName::getValue).collect(toImmutableList()),
-        job.getOutputs().stream().map(DatasetName::getValue).collect(toImmutableList()),
+        job.getInputs(),
+        job.getOutputs(),
         job.getLocation().map(URL::toString).orElse(null),
         job.getContext(),
         job.getDescription().orElse(null),
