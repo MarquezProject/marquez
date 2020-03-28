@@ -14,7 +14,7 @@
 
 package marquez.api.models;
 
-import static java.util.stream.Collectors.toUnmodifiableList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.google.common.collect.ImmutableList;
@@ -66,10 +66,8 @@ public final class JobResponse {
     this.updatedAt = checkNotBlank(updatedAt);
     this.inputIds = ImmutableList.copyOf(inputIds);
     this.outputIds = ImmutableList.copyOf(outputIds);
-    this.inputs =
-        inputIds.stream().map((i) -> i.getName().getValue()).collect(toUnmodifiableList());
-    this.outputs =
-        outputIds.stream().map((i) -> i.getName().getValue()).collect(toUnmodifiableList());
+    this.inputs = inputIds.stream().map((i) -> i.getName().getValue()).collect(toImmutableList());
+    this.outputs = outputIds.stream().map((i) -> i.getName().getValue()).collect(toImmutableList());
     this.location = location;
     this.context = (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
     this.description = description;
