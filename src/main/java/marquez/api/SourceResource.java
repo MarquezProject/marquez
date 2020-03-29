@@ -88,14 +88,14 @@ public final class SourceResource {
     return Response.ok(toSources(sources)).build();
   }
 
+  Sources toSources(@NonNull final List<Source> sources) {
+    return new Sources(sources);
+  }
+
   @Value
   class Sources {
     @NonNull
     @JsonProperty("sources")
     List<Source> value;
-  }
-
-  Sources toSources(@NonNull final List<Source> sources) {
-    return new Sources(sources);
   }
 }

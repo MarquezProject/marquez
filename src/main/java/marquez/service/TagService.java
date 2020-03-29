@@ -45,13 +45,13 @@ public class TagService {
 
   public Tag createOrUpdate(@NonNull Tag tag) throws MarquezServiceException {
     try {
-      if (!exists(tag.getName())) {
+      if (!exists(tag.getName().getValue())) {
         log.info("No tag with name '{}' found, creating...", tag.getName());
         final TagRow newRow = Mapper.toTagRow(tag);
         dao.insert(newRow);
         log.info("Successfully created tag '{}'.", tag.getName());
       }
-      return get(tag.getName()).get();
+      return get(tag.getName().getValue()).get();
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to create or update tag '{}'.", tag.getName(), e);
       throw new MarquezServiceException();

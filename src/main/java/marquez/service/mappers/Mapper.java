@@ -38,6 +38,7 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.common.models.TagName;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -273,7 +274,7 @@ public final class Mapper {
   }
 
   public static Tag toTag(@NonNull final TagRow row) {
-    return new Tag(row.getName(), row.getDescription().orElse(null));
+    return new Tag(TagName.fromString(row.getName()), row.getDescription().orElse(null));
   }
 
   public static List<Tag> toTags(@NonNull final List<TagRow> rows) {
@@ -286,7 +287,7 @@ public final class Mapper {
         newRowUuid(),
         now,
         now,
-        tag.getName().toUpperCase(Locale.getDefault()),
+        tag.getName().getValue().toUpperCase(Locale.getDefault()),
         tag.getDescription().orElse(null));
   }
 

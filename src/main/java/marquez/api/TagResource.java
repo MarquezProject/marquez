@@ -20,7 +20,6 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -57,12 +56,14 @@ public final class TagResource {
     return Response.ok(toTags(tags)).build();
   }
 
-  @Value
-  class Tags {
-    @NonNull @JsonProperty("tags") List<Tag> value;
-  }
-
   Tags toTags(@NonNull final List<Tag> tags) {
     return new Tags(tags);
+  }
+
+  @Value
+  class Tags {
+    @NonNull
+    @JsonProperty("tags")
+    List<Tag> value;
   }
 }

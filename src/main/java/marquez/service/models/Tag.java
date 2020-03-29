@@ -14,20 +14,32 @@
 
 package marquez.service.models;
 
-import static marquez.common.base.MorePreconditions.checkNotBlank;
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
+import marquez.common.models.TagName;
 
 @Value
 public class Tag {
-  String name;
+  @JsonUnwrapped
+  @JsonProperty(access = READ_ONLY)
+  TagName name;
+
   @Nullable String description;
 
-  public Tag(@NonNull final String name, @Nullable final String description) {
-    this.name = checkNotBlank(name, "name must not be blank").toUpperCase();
+  @JsonCreator
+  public Tag(@JsonProperty("name") final String nameAsString, final String description) {
+    this(TagName.fromString(nameAsString), description);
+  }
+
+  public Tag(@NonNull final TagName name, @Nullable final String description) {
+    this.name = name;
     this.description = description;
   }
 
