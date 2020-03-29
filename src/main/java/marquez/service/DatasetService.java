@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.TagName;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
@@ -178,7 +179,12 @@ public class DatasetService {
   /** Creates a {@link DatasetFieldRow} instance from the given {@link Field}. */
   private DatasetFieldRow toDatasetFieldRow(@NonNull UUID datasetUuid, @NonNull Field field) {
     final List<UUID> tagUuids =
-        tagDao.findAllIn(toArray(field.getTags(), String.class)).stream()
+        tagDao
+            .findAllIn(
+                toArray(
+                    field.getTags().stream().map(TagName::getValue).collect(toImmutableList()),
+                    String.class))
+            .stream()
             .map(TagRow::getUuid)
             .collect(toImmutableList());
     return Mapper.toDatasetFieldRow(datasetUuid, field, tagUuids);

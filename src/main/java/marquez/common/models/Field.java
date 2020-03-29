@@ -15,6 +15,7 @@
 package marquez.common.models;
 
 import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,22 +34,26 @@ public class Field {
   FieldName name;
 
   FieldType type;
-  @Nullable List<String> tags;
+  @Nullable List<TagName> tags;
   @Nullable String description;
 
   @JsonCreator
   public Field(
       @JsonProperty("name") final String nameAsString,
       @JsonProperty("type") final String typeAsString,
-      final List<String> tags,
+      @JsonProperty("tags") final List<String> tagsAsString,
       final String description) {
-    this(FieldName.fromString(nameAsString), FieldType.valueOf(typeAsString), tags, description);
+    this(
+        FieldName.fromString(nameAsString),
+        FieldType.valueOf(typeAsString),
+        tagsAsString.stream().map(TagName::fromString).collect(toImmutableList()),
+        description);
   }
 
   public Field(
       @NonNull final FieldName name,
       @NonNull final FieldType type,
-      @Nullable final List<String> tags,
+      @Nullable final List<TagName> tags,
       @Nullable final String description) {
     this.name = name;
     this.type = type;

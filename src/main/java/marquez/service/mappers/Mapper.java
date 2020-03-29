@@ -223,7 +223,7 @@ public final class Mapper {
     return new Field(
         FieldName.fromString(row.getName()),
         FieldType.valueOf(row.getType()),
-        tags,
+        tags.stream().map(TagName::fromString).collect(toImmutableList()),
         row.getDescription().orElse(null));
   }
 
