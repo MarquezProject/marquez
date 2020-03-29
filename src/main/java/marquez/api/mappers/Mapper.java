@@ -17,7 +17,6 @@ package marquez.api.mappers;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
-import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
@@ -37,18 +36,13 @@ import marquez.api.models.NamespacesResponse;
 import marquez.api.models.RunRequest;
 import marquez.api.models.RunResponse;
 import marquez.api.models.RunsResponse;
-import marquez.api.models.SourceRequest;
-import marquez.api.models.SourceResponse;
-import marquez.api.models.SourcesResponse;
 import marquez.api.models.StreamRequest;
 import marquez.api.models.StreamResponse;
-import marquez.api.models.TagsResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobType;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
-import marquez.common.models.SourceType;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTable;
@@ -59,11 +53,8 @@ import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
-import marquez.service.models.Source;
-import marquez.service.models.SourceMeta;
 import marquez.service.models.Stream;
 import marquez.service.models.StreamMeta;
-import marquez.service.models.Tag;
 
 public final class Mapper {
   private Mapper() {}
@@ -89,31 +80,6 @@ public final class Mapper {
 
   public static NamespacesResponse toNamespacesResponse(@NonNull final List<Namespace> namespaces) {
     return new NamespacesResponse(toNamespaceResponses(namespaces));
-  }
-
-  public static SourceMeta toSourceMeta(@NonNull final SourceRequest request) {
-    return new SourceMeta(
-        SourceType.valueOf(request.getType()),
-        URI.create(request.getConnectionUrl()),
-        request.getDescription().orElse(null));
-  }
-
-  public static SourceResponse toSourceResponse(@NonNull final Source source) {
-    return new SourceResponse(
-        source.getType().toString(),
-        source.getName().getValue(),
-        ISO_INSTANT.format(source.getCreatedAt()),
-        ISO_INSTANT.format(source.getUpdatedAt()),
-        source.getConnectionUrl().toASCIIString(),
-        source.getDescription().orElse(null));
-  }
-
-  public static List<SourceResponse> toSourceResponses(@NonNull final List<Source> sources) {
-    return sources.stream().map(Mapper::toSourceResponse).collect(toImmutableList());
-  }
-
-  public static SourcesResponse toSourcesResponse(@NonNull final List<Source> sources) {
-    return new SourcesResponse(toSourceResponses(sources));
   }
 
   public static DatasetMeta toDatasetMeta(@NonNull final DatasetRequest request) {
@@ -246,9 +212,5 @@ public final class Mapper {
 
   public static RunsResponse toRunsResponse(@NonNull final List<Run> runs) {
     return new RunsResponse(toRunResponses(runs));
-  }
-
-  public static TagsResponse toTagsResponse(@NonNull final List<Tag> tags) {
-    return new TagsResponse(tags);
   }
 }

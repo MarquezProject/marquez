@@ -19,6 +19,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -27,9 +29,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.mappers.Mapper;
-import marquez.api.models.TagsResponse;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Tag;
@@ -53,8 +54,15 @@ public final class TagResource {
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
     final List<Tag> tags = service.getAll(limit, offset);
-    final TagsResponse response = Mapper.toTagsResponse(tags);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    return Response.ok(toTags(tags)).build();
+  }
+
+  @Value
+  class Tags {
+    @NonNull @JsonProperty("tags") List<Tag> value;
+  }
+
+  Tags toTags(@NonNull final List<Tag> tags) {
+    return new Tags(tags);
   }
 }
