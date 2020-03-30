@@ -27,6 +27,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetName;
+import marquez.common.models.JobName;
 import marquez.service.models.DatasetId;
 import marquez.service.models.JobId;
 
@@ -35,11 +37,11 @@ import marquez.service.models.JobId;
 public final class JobResponse {
   @Getter private final JobId id;
   @Getter private final String type;
-  @Getter private final String name;
+  @Getter private final JobName name;
   @Getter private final String createdAt;
   @Getter private final String updatedAt;
-  @Deprecated @Getter private final List<String> inputs;
-  @Deprecated @Getter private final List<String> outputs;
+  @Deprecated @Getter private final List<DatasetName> inputs;
+  @Deprecated @Getter private final List<DatasetName> outputs;
   @Getter private final List<DatasetId> inputIds;
   @Getter private final List<DatasetId> outputIds;
   @Nullable private final String location;
@@ -50,7 +52,7 @@ public final class JobResponse {
   public JobResponse(
       @NonNull final JobId id,
       @NonNull final String type,
-      @NonNull final String name,
+      @NonNull final JobName name,
       @NonNull final String createdAt,
       @NonNull final String updatedAt,
       @NonNull final List<DatasetId> inputIds,
@@ -61,13 +63,13 @@ public final class JobResponse {
       @Nullable final RunResponse latestRun) {
     this.id = id;
     this.type = checkNotBlank(type);
-    this.name = checkNotBlank(name);
+    this.name = name;
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);
     this.inputIds = ImmutableList.copyOf(inputIds);
     this.outputIds = ImmutableList.copyOf(outputIds);
-    this.inputs = inputIds.stream().map((i) -> i.getName().getValue()).collect(toImmutableList());
-    this.outputs = outputIds.stream().map((i) -> i.getName().getValue()).collect(toImmutableList());
+    this.inputs = inputIds.stream().map((i) -> i.getName()).collect(toImmutableList());
+    this.outputs = outputIds.stream().map((i) -> i.getName()).collect(toImmutableList());
     this.location = location;
     this.context = (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
     this.description = description;

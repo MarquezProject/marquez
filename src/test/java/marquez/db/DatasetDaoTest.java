@@ -15,7 +15,7 @@
 package marquez.db;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Iterables.toArray;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static marquez.Generator.newTimestamp;
 import static marquez.common.models.ModelGenerator.newDatasetName;
@@ -37,6 +37,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
 import marquez.common.models.DatasetName;
@@ -61,6 +62,28 @@ public class DatasetDaoTest {
   @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
 
   private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
+
+  private static List<Function<DatasetRow, ? extends Object>> DATASET_ROW_GETTERS =
+      asList(
+          DatasetRow::getUuid,
+          DatasetRow::getType,
+          DatasetRow::getName,
+          DatasetRow::getCreatedAt,
+          DatasetRow::getUpdatedAt,
+          DatasetRow::getNamespaceUuid,
+          DatasetRow::getSourceUuid,
+          DatasetRow::getName,
+          DatasetRow::getPhysicalName,
+          DatasetRow::getTagUuids,
+          DatasetRow::getLastModifiedAt,
+          DatasetRow::getDescription,
+          DatasetRow::getCurrentVersionUuid);
+
+  private static void assertEquals(DatasetRow actual, DatasetRow expected) {
+    for (Function<DatasetRow, ? extends Object> getter : DATASET_ROW_GETTERS) {
+      assertThat(getter.apply(actual)).isEqualTo(getter.apply(expected));
+    }
+  }
 
   private static NamespaceDao namespaceDao;
   private static SourceDao sourceDao;
@@ -153,6 +176,7 @@ public class DatasetDaoTest {
 
     final Optional<ExtendedDatasetRow> row = datasetDao.findBy(newRow.getUuid());
     assertThat(row).isPresent();
+    assertEquals(newRow, row.get());
   }
 
   @Test
@@ -172,6 +196,8 @@ public class DatasetDaoTest {
     final Optional<ExtendedDatasetRow> row =
         datasetDao.find(NAMESPACE_NAME.getValue(), newRow.getName());
     assertThat(row).isPresent();
+    ExtendedDatasetRow dsRow = row.get();
+    assertEquals(newRow, dsRow);
   }
 
   @Test
@@ -209,8 +235,7 @@ public class DatasetDaoTest {
     final List<String> newDatasetNames =
         newRows.stream().map(newRow -> newRow.getName()).collect(toImmutableList());
 
-    final List<DatasetRow> rows =
-        datasetDao.findAllIn(NAMESPACE_NAME.getValue(), toArray(newDatasetNames, String.class));
+    final List<DatasetRow> rows = datasetDao.findAllIn(NAMESPACE_NAME.getValue(), newDatasetNames);
     assertThat(rows).hasSize(4);
 
     final List<String> datasetNames =

@@ -25,4 +25,8 @@ public final class DatasetNotFoundException extends NotFoundException {
   public DatasetNotFoundException(final DatasetName name) {
     super(String.format("Dataset '%s' not found.", checkNotNull(name).getValue()));
   }
+
+  public DatasetNotFoundException(final String message) {
+    super(message);
+  }
 }

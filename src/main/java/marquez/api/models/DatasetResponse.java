@@ -26,6 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.service.models.DatasetId;
 
@@ -38,7 +39,7 @@ import marquez.service.models.DatasetId;
 })
 public abstract class DatasetResponse {
   @Getter private final DatasetId id;
-  @Getter private final String name;
+  @Getter private final DatasetName name;
   @Getter private final String physicalName;
   @Getter private final String createdAt;
   @Getter private final String updatedAt;
@@ -50,7 +51,7 @@ public abstract class DatasetResponse {
 
   public DatasetResponse(
       @NonNull final DatasetId id,
-      @NonNull final String name,
+      @NonNull final DatasetName name,
       @NonNull final String physicalName,
       @NonNull final String createdAt,
       @NonNull final String updatedAt,
@@ -60,7 +61,7 @@ public abstract class DatasetResponse {
       @Nullable final String lastModifiedAt,
       @Nullable final String description) {
     this.id = id;
-    this.name = checkNotBlank(name);
+    this.name = name;
     this.physicalName = checkNotBlank(physicalName);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);

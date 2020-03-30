@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.service.models.DatasetId;
 
@@ -46,7 +47,7 @@ public final class StreamResponse extends DatasetResponse {
 
   public StreamResponse(
       @NonNull final DatasetId id,
-      final String name,
+      final DatasetName name,
       final String physicalName,
       final String createdAt,
       final String updatedAt,

@@ -135,7 +135,7 @@ public interface DatasetDao extends SqlObject {
           + "WHERE d.name IN (<datasetNames>)")
   @RegisterRowMapper(DatasetRowMapper.class)
   List<DatasetRow> findAllIn(
-      String namespaceName, @BindList(onEmpty = NULL_STRING) String... datasetNames);
+      String namespaceName, @BindList(onEmpty = NULL_STRING) Collection<String> datasetNames);
 
   @SqlQuery(
       EXTENDED_SELECT

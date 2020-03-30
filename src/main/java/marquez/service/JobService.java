@@ -17,18 +17,21 @@ package marquez.service;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.groupingBy;
 
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
@@ -185,22 +188,8 @@ public class JobService {
         }
         final JobRow jobRow = jobDao.find(namespaceName.getValue(), jobName.getValue()).get();
         final JobContextRow contextRow = contextDao.findBy(checksum).get();
-        final List<UUID> inputUuids =
-            datasetDao
-                .findAllIn(
-                    namespaceName.getValue(),
-                    jobMeta.getInputs().stream().map(DatasetName::getValue).toArray(String[]::new))
-                .stream()
-                .map(DatasetRow::getUuid)
-                .collect(toImmutableList());
-        final List<UUID> outputUuids =
-            datasetDao
-                .findAllIn(
-                    namespaceName.getValue(),
-                    jobMeta.getOutputs().stream().map(DatasetName::getValue).toArray(String[]::new))
-                .stream()
-                .map(DatasetRow::getUuid)
-                .collect(toImmutableList());
+        final List<UUID> inputUuids = findUuids(jobMeta.getInputs());
+        final List<UUID> outputUuids = findUuids(jobMeta.getOutputs());
         final JobVersionRow newVersionRow =
             Mapper.toJobVersionRow(
                 jobRow.getUuid(),
@@ -225,6 +214,39 @@ public class JobService {
           e);
       throw new MarquezServiceException();
     }
+  }
+
+  /**
+   * find the uuids for the datsets based on their namespace/name
+   *
+   * @param ids the namespace/name ids of the datasets
+   * @return their uuids
+   */
+  private List<UUID> findUuids(List<DatasetId> ids) {
+    // group per namespace since that's how we can query the db
+    Map<@NonNull NamespaceName, List<DatasetId>> byNamespace =
+        ids.stream().collect(groupingBy(DatasetId::getNamespace));
+    // query the db for all ds uuids for each namespace and combine them back in one list
+    return byNamespace.entrySet().stream()
+        .flatMap(
+            (e) -> {
+              String namespace = e.getKey().getValue();
+              List<String> names =
+                  e.getValue().stream()
+                      .map((id) -> id.getName().getValue())
+                      .collect(toImmutableList());
+              List<DatasetRow> results = datasetDao.findAllIn(namespace, names);
+              if (results.size() < names.size()) {
+                List<String> actual =
+                    results.stream().map(DatasetRow::getName).collect(toImmutableList());
+                throw new DatasetNotFoundException(
+                    String.format(
+                        "Some datasets not found in namespace %s \nExpected: %s\nActual: %s",
+                        namespace, names, actual));
+              }
+              return results.stream().map(DatasetRow::getUuid);
+            })
+        .collect(toImmutableList());
   }
 
   public boolean exists(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)

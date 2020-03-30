@@ -46,6 +46,7 @@ import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
+import marquez.service.models.JobId;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
@@ -157,6 +158,9 @@ public class JobServiceTest {
                 new HashMap<>(),
                 "description"));
     assertThat(job.getName()).isEqualTo(jobName);
+    assertThat(job.getId().getNamespace()).isEqualTo(NAMESPACE_NAME);
+    assertThat(job.getId().getName()).isEqualTo(jobName);
+    assertThat(job.getId()).isEqualTo(new JobId(NAMESPACE_NAME, jobName));
     Run run = jobService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
     assertThat(run.getId()).isNotNull();
     assertThat(run.getStartedAt().isPresent()).isFalse();
