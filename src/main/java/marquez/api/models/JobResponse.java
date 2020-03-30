@@ -14,6 +14,7 @@
 
 package marquez.api.models;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.google.common.collect.ImmutableList;
@@ -26,38 +27,53 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetName;
+import marquez.common.models.JobName;
+import marquez.common.models.NamespaceName;
+import marquez.service.models.DatasetId;
+import marquez.service.models.JobId;
 
 @EqualsAndHashCode
 @ToString
 public final class JobResponse {
+  @Getter private final JobId id;
+  @Getter private final NamespaceName namespace;
   @Getter private final String type;
-  @Getter private final String name;
+  @Getter private final JobName name;
   @Getter private final String createdAt;
   @Getter private final String updatedAt;
-  @Getter private final List<String> inputs;
-  @Getter private final List<String> outputs;
+  @Deprecated @Getter private final List<DatasetName> inputs;
+  @Deprecated @Getter private final List<DatasetName> outputs;
+  @Getter private final List<DatasetId> inputIds;
+  @Getter private final List<DatasetId> outputIds;
   @Nullable private final String location;
   @Getter @Nullable private final Map<String, String> context;
   @Nullable private final String description;
   @Nullable private final RunResponse latestRun;
 
   public JobResponse(
+      @NonNull final JobId id,
+      @NonNull final NamespaceName namespace,
       @NonNull final String type,
-      @NonNull final String name,
+      @NonNull final JobName name,
       @NonNull final String createdAt,
       @NonNull final String updatedAt,
-      @NonNull final List<String> inputs,
-      @NonNull final List<String> outputs,
+      @NonNull final List<DatasetId> inputIds,
+      @NonNull final List<DatasetId> outputIds,
       @Nullable final String location,
       @Nullable final Map<String, String> context,
       @Nullable final String description,
       @Nullable final RunResponse latestRun) {
+    this.id = id;
+    this.namespace = namespace;
     this.type = checkNotBlank(type);
-    this.name = checkNotBlank(name);
+    this.name = name;
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);
-    this.inputs = ImmutableList.copyOf(inputs);
-    this.outputs = ImmutableList.copyOf(outputs);
+    this.inputIds = ImmutableList.copyOf(inputIds);
+    this.outputIds = ImmutableList.copyOf(outputIds);
+    this.inputs = inputIds.stream().map((i) -> i.getName()).collect(toImmutableList());
+    this.outputs = outputIds.stream().map((i) -> i.getName()).collect(toImmutableList());
     this.location = location;
     this.context = (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
     this.description = description;

@@ -16,12 +16,19 @@ package marquez.common.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import marquez.common.models.DatasetName.DatasetToString;
+import marquez.common.models.DatasetName.StringToDataset;
 
 @EqualsAndHashCode
 @ToString
+@JsonDeserialize(converter = StringToDataset.class)
+@JsonSerialize(converter = DatasetToString.class)
 public final class DatasetName {
   @Getter private final String value;
 
@@ -31,5 +38,19 @@ public final class DatasetName {
 
   public static DatasetName of(final String value) {
     return new DatasetName(value);
+  }
+
+  public static class DatasetToString extends StdConverter<DatasetName, String> {
+    @Override
+    public String convert(DatasetName value) {
+      return value.getValue();
+    }
+  }
+
+  public static class StringToDataset extends StdConverter<String, DatasetName> {
+    @Override
+    public DatasetName convert(String value) {
+      return DatasetName.of(value);
+    }
   }
 }

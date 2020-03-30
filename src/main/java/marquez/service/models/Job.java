@@ -25,28 +25,28 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
-import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 
 @Value
 public class Job {
+  @NonNull JobId id;
   @NonNull JobType type;
   @NonNull JobName name;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
-  @NonNull List<DatasetName> inputs;
-  @NonNull List<DatasetName> outputs;
+  @NonNull List<DatasetId> inputs;
+  @NonNull List<DatasetId> outputs;
   @Nullable URL location;
   @Nullable Map<String, String> context;
   @Nullable String description;
   @Nullable Run latestRun;
 
-  public List<DatasetName> getInputs() {
+  public List<DatasetId> getInputs() {
     return ImmutableList.copyOf(new ArrayList<>(inputs));
   }
 
-  public List<DatasetName> getOutputs() {
+  public List<DatasetId> getOutputs() {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
   }
 

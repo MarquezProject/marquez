@@ -26,7 +26,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
+import marquez.common.models.NamespaceName;
+import marquez.service.models.DatasetId;
 
 @EqualsAndHashCode
 @ToString
@@ -36,7 +39,9 @@ import marquez.common.models.Field;
   @JsonSubTypes.Type(value = StreamResponse.class, name = "STREAM")
 })
 public abstract class DatasetResponse {
-  @Getter private final String name;
+  @Getter private final DatasetId id;
+  @Getter private final NamespaceName namespace;
+  @Getter private final DatasetName name;
   @Getter private final String physicalName;
   @Getter private final String createdAt;
   @Getter private final String updatedAt;
@@ -47,7 +52,9 @@ public abstract class DatasetResponse {
   @Nullable private final String description;
 
   public DatasetResponse(
-      @NonNull final String name,
+      @NonNull final DatasetId id,
+      @NonNull final NamespaceName namespace,
+      @NonNull final DatasetName name,
       @NonNull final String physicalName,
       @NonNull final String createdAt,
       @NonNull final String updatedAt,
@@ -56,7 +63,9 @@ public abstract class DatasetResponse {
       @Nullable final List<String> tags,
       @Nullable final String lastModifiedAt,
       @Nullable final String description) {
-    this.name = checkNotBlank(name);
+    this.id = id;
+    this.namespace = namespace;
+    this.name = name;
     this.physicalName = checkNotBlank(physicalName);
     this.createdAt = checkNotBlank(createdAt);
     this.updatedAt = checkNotBlank(updatedAt);

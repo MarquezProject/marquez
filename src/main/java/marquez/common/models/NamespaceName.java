@@ -16,13 +16,20 @@ package marquez.common.models;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import marquez.common.models.NamespaceName.NamespaceToString;
+import marquez.common.models.NamespaceName.StringToNamespace;
 
 @EqualsAndHashCode
 @ToString
+@JsonDeserialize(converter = StringToNamespace.class)
+@JsonSerialize(converter = NamespaceToString.class)
 public final class NamespaceName {
   private static final int MIN_SIZE = 1;
   private static final int MAX_SIZE = 1024;
@@ -45,4 +52,18 @@ public final class NamespaceName {
   }
 
   public static final NamespaceName DEFAULT = NamespaceName.of("default");
+
+  public static class NamespaceToString extends StdConverter<NamespaceName, String> {
+    @Override
+    public String convert(NamespaceName value) {
+      return value.getValue();
+    }
+  }
+
+  public static class StringToNamespace extends StdConverter<String, NamespaceName> {
+    @Override
+    public NamespaceName convert(String value) {
+      return NamespaceName.of(value);
+    }
+  }
 }

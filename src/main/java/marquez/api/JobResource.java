@@ -89,7 +89,7 @@ public final class JobResource {
     throwIfNotExists(namespaceName);
 
     final JobName jobName = JobName.of(jobString);
-    final JobMeta jobMeta = Mapper.toJobMeta(request);
+    final JobMeta jobMeta = Mapper.toJobMeta(namespaceName, request);
     final Job job = jobService.createOrUpdate(namespaceName, jobName, jobMeta);
     final JobResponse response = Mapper.toJobResponse(job);
     log.debug("Response: {}", response);

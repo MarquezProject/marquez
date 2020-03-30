@@ -15,6 +15,7 @@
 package marquez.service.models;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static marquez.common.Utils.KV_JOINER;
 import static marquez.common.Utils.VERSION_DELIM;
@@ -31,7 +32,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
-import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
@@ -39,17 +39,17 @@ import marquez.common.models.NamespaceName;
 @Value
 public class JobMeta {
   @NonNull JobType type;
-  @NonNull List<DatasetName> inputs;
-  @NonNull List<DatasetName> outputs;
+  @NonNull List<DatasetId> inputs;
+  @NonNull List<DatasetId> outputs;
   @Nullable URL location;
   @Nullable Map<String, String> context;
   @Nullable String description;
 
-  public List<DatasetName> getInputs() {
+  public List<DatasetId> getInputs() {
     return ImmutableList.copyOf(new ArrayList<>(inputs));
   }
 
-  public List<DatasetName> getOutputs() {
+  public List<DatasetId> getOutputs() {
     return ImmutableList.copyOf(new ArrayList<>(outputs));
   }
 
@@ -71,11 +71,15 @@ public class JobMeta {
             .join(
                 namespaceName.getValue(),
                 jobName.getValue(),
-                getInputs().stream().map(DatasetName::getValue).collect(joining(VERSION_DELIM)),
-                getOutputs().stream().map(DatasetName::getValue).collect(joining(VERSION_DELIM)),
+                getInputs().stream().flatMap(JobMeta::idToStream).collect(joining(VERSION_DELIM)),
+                getOutputs().stream().flatMap(JobMeta::idToStream).collect(joining(VERSION_DELIM)),
                 getLocation().map(URL::toString).orElse(null),
                 KV_JOINER.join(getContext()))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
+  }
+
+  private static java.util.stream.Stream<String> idToStream(DatasetId id) {
+    return asList(id.getNamespace().getValue(), id.getName().getValue()).stream();
   }
 }

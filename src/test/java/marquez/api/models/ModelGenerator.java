@@ -36,6 +36,7 @@ import marquez.Generator;
 import marquez.common.models.DatasetName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.service.models.DatasetId;
 
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}
@@ -151,12 +152,12 @@ public final class ModelGenerator extends Generator {
         hasRunId ? newRunId().toString() : null);
   }
 
-  public static JobRequest newJobRequestWith(
+  public static JobRequest newJobRequestV1With(
       final List<DatasetName> inputs, final List<DatasetName> outputs) {
-    return newJobRequestWith(inputs, outputs, true);
+    return newJobRequestV1With(inputs, outputs, true);
   }
 
-  public static JobRequest newJobRequestWith(
+  public static JobRequest newJobRequestV1With(
       final List<DatasetName> inputs,
       final List<DatasetName> outputs,
       final boolean hasDescription) {
@@ -164,6 +165,26 @@ public final class ModelGenerator extends Generator {
         newJobType().toString(),
         inputs.stream().map(DatasetName::getValue).collect(toImmutableList()),
         outputs.stream().map(DatasetName::getValue).collect(toImmutableList()),
+        null,
+        null, // the old request type (defaults to the current namespace)
+        newLocation().toString(),
+        newContext(),
+        hasDescription ? newDescription() : null);
+  }
+
+  public static JobRequest newJobRequestV2With(
+      final List<DatasetId> inputs, final List<DatasetId> outputs) {
+    return newJobRequestV2With(inputs, outputs, true);
+  }
+
+  public static JobRequest newJobRequestV2With(
+      final List<DatasetId> inputs, final List<DatasetId> outputs, final boolean hasDescription) {
+    return new JobRequest(
+        newJobType().toString(),
+        null,
+        null,
+        inputs,
+        outputs,
         newLocation().toString(),
         newContext(),
         hasDescription ? newDescription() : null);

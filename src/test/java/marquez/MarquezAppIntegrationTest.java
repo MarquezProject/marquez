@@ -14,11 +14,13 @@
 
 package marquez;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static javax.ws.rs.core.HttpHeaders.LOCATION;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static marquez.api.models.ModelGenerator.EMPTY_RUN_REQUEST;
 import static marquez.api.models.ModelGenerator.newDbTableRequestWith;
-import static marquez.api.models.ModelGenerator.newJobRequestWith;
+import static marquez.api.models.ModelGenerator.newJobRequestV1With;
+import static marquez.api.models.ModelGenerator.newJobRequestV2With;
 import static marquez.api.models.ModelGenerator.newNamespaceRequest;
 import static marquez.api.models.ModelGenerator.newSourceRequest;
 import static marquez.api.models.ModelGenerator.newSourceRequestWith;
@@ -32,6 +34,7 @@ import static marquez.common.models.ModelGenerator.newSourceName;
 import static marquez.common.models.ModelGenerator.newTags;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -45,12 +48,26 @@ import java.util.Map;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import marquez.api.models.DatasetRequest;
+import marquez.api.models.DatasetResponse;
+import marquez.api.models.DatasetsResponse;
 import marquez.api.models.DbTableRequest;
+import marquez.api.models.DbTableResponse;
+import marquez.api.models.JobResponse;
+import marquez.api.models.JobsResponse;
+import marquez.api.models.NamespaceResponse;
+import marquez.api.models.NamespacesResponse;
+import marquez.api.models.RunsResponse;
+import marquez.api.models.SourceResponse;
+import marquez.api.models.SourcesResponse;
+import marquez.api.models.StreamResponse;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.JobName;
+import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.service.models.DatasetId;
+import marquez.service.models.JobId;
 import marquez.service.models.Run;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -82,28 +99,74 @@ public class MarquezAppIntegrationTest {
   private static final int HTTP_200 = 200;
   private static final int HTTP_201 = 201;
 
+  private static NamespaceName defaultNamespace = NamespaceName.of("default");
+
   @Test
   public void testApp_createNamespace() {
+    NamespaceName newNamespaceName = newNamespaceName();
     final Response response =
         APP.client()
             .target(baseUri + "/namespaces/{namespace}")
-            .resolveTemplate("namespace", newNamespaceName().getValue())
+            .resolveTemplate("namespace", newNamespaceName.getValue())
             .request(APPLICATION_JSON)
             .put(Entity.json(newNamespaceRequest()));
 
     assertThat(response.getStatus()).isEqualTo(HTTP_200);
+
+    final NamespaceResponse ns =
+        APP.client()
+            .target(baseUri + "/namespaces/{namespace}")
+            .resolveTemplate("namespace", newNamespaceName.getValue())
+            .request(APPLICATION_JSON)
+            .get(NamespaceResponse.class);
+
+    assertThat(ns.getName()).isEqualTo(newNamespaceName.getValue());
+
+    final NamespacesResponse nss =
+        APP.client()
+            .target(baseUri + "/namespaces")
+            .request(APPLICATION_JSON)
+            .get(NamespacesResponse.class);
+
+    ImmutableList<NamespaceResponse> filtered =
+        nss.getNamespaces().stream()
+            .filter((n) -> n.getName().equals(newNamespaceName.getValue()))
+            .collect(toImmutableList());
+    assertThat(filtered.size()).isEqualTo(1);
   }
 
   @Test
   public void testApp_createSource() {
+    SourceName newSourceName = newSourceName();
     final Response response =
         APP.client()
             .target(baseUri + "/sources/{source}")
-            .resolveTemplate("source", newSourceName().getValue())
+            .resolveTemplate("source", newSourceName.getValue())
             .request(APPLICATION_JSON)
             .put(Entity.json(newSourceRequest()));
 
     assertThat(response.getStatus()).isEqualTo(HTTP_200);
+
+    final SourceResponse source =
+        APP.client()
+            .target(baseUri + "/sources/{source}")
+            .resolveTemplate("source", newSourceName.getValue())
+            .request(APPLICATION_JSON)
+            .get(SourceResponse.class);
+
+    assertThat(source.getName()).isEqualTo(newSourceName.getValue());
+
+    final SourcesResponse sources =
+        APP.client()
+            .target(baseUri + "/sources")
+            .request(APPLICATION_JSON)
+            .get(SourcesResponse.class);
+
+    ImmutableList<SourceResponse> filtered =
+        sources.getSources().stream()
+            .filter((s) -> s.getName().equals(newSourceName.getValue()))
+            .collect(toImmutableList());
+    assertThat(filtered.size()).isEqualTo(1);
   }
 
   @Test
@@ -126,6 +189,27 @@ public class MarquezAppIntegrationTest {
             .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
 
     assertThat(response.getStatus()).isEqualTo(HTTP_200);
+
+    final DbTableResponse dbTable =
+        APP.client()
+            .target(baseUri + "/namespaces/default/datasets/{dataset}")
+            .resolveTemplate("dataset", datasetName.getValue())
+            .request(APPLICATION_JSON)
+            .get(DbTableResponse.class);
+    assertThat(dbTable.getName()).isEqualTo(datasetName);
+    assertThat(dbTable.getNamespace().getValue()).isEqualTo("default");
+
+    final DatasetsResponse datasets =
+        APP.client()
+            .target(baseUri + "/namespaces/default/datasets")
+            .request(APPLICATION_JSON)
+            .get(DatasetsResponse.class);
+    assertThat(dbTable.getName()).isEqualTo(datasetName);
+    ImmutableList<DatasetResponse> filtered =
+        datasets.getDatasets().stream()
+            .filter((d) -> d.getName().equals(datasetName))
+            .collect(toImmutableList());
+    assertThat(filtered.size()).isEqualTo(1);
   }
 
   @Test
@@ -191,6 +275,19 @@ public class MarquezAppIntegrationTest {
             .put(Entity.json(newStreamRequestWith(datasetName, sourceName)));
 
     assertThat(response.getStatus()).isEqualTo(HTTP_200);
+
+    final StreamResponse responseGet =
+        APP.client()
+            .target(baseUri + "/namespaces/default/datasets/{dataset}")
+            .resolveTemplate("dataset", datasetName.getValue())
+            .request(APPLICATION_JSON)
+            .get(StreamResponse.class);
+
+    assertThat(responseGet.getId())
+        .isEqualTo(new DatasetId(NamespaceName.of("default"), datasetName));
+    assertThat(responseGet.getName()).isEqualTo(datasetName);
+    assertThat(responseGet.getSourceName()).isEqualTo(sourceName.getValue());
+    assertThat(responseGet.getNamespace().getValue()).isEqualTo("default");
   }
 
   @Test
@@ -214,32 +311,115 @@ public class MarquezAppIntegrationTest {
     final List<DatasetName> inputs = newDatasetNames(2);
     final List<DatasetName> outputs = newDatasetNames(4);
 
+    // old input definition: Input and output are defined by name only, ns is assumed the same as
+    // the job
+    {
+      createDatasets(defaultNamespace, sourceName, inputs);
+
+      createDatasets(defaultNamespace, sourceName, outputs);
+
+      JobName jobName = newJobName();
+      final Response responsePut =
+          APP.client()
+              .target(baseUri + "/namespaces/default/jobs/{job}")
+              .resolveTemplate("job", jobName.getValue())
+              .request(APPLICATION_JSON)
+              .put(Entity.json(newJobRequestV1With(inputs, outputs)));
+
+      assertThat(responsePut.getStatus()).isEqualTo(HTTP_200);
+
+      ImmutableList<DatasetId> inputIds =
+          inputs.stream()
+              .map((n) -> new DatasetId(NamespaceName.of("default"), n))
+              .collect(toImmutableList());
+      ImmutableList<DatasetId> outputIds =
+          outputs.stream()
+              .map((n) -> new DatasetId(NamespaceName.of("default"), n))
+              .collect(toImmutableList());
+
+      final JobResponse responseGet =
+          APP.client()
+              .target(baseUri + "/namespaces/default/jobs/{job}")
+              .resolveTemplate("job", jobName.getValue())
+              .request(APPLICATION_JSON)
+              .get(JobResponse.class);
+      assertThat(responseGet.getId()).isEqualTo(new JobId(NamespaceName.of("default"), jobName));
+      assertThat(responseGet.getName()).isEqualTo(jobName);
+      assertThat(responseGet.getInputs()).isEqualTo(inputs);
+      assertThat(responseGet.getOutputs()).isEqualTo(outputs);
+      assertThat(responseGet.getInputIds()).isEqualTo(inputIds);
+      assertThat(responseGet.getOutputIds()).isEqualTo(outputIds);
+      assertThat(responseGet.getNamespace().getValue()).isEqualTo("default");
+    }
+
+    // new input definition: Input and output are defined by DatasetId
+    {
+      NamespaceName newNamespaceName = newNamespaceName();
+      final NamespaceResponse newNamespace =
+          APP.client()
+              .target(baseUri + "/namespaces/{namespace}")
+              .resolveTemplate("namespace", newNamespaceName.getValue())
+              .request(APPLICATION_JSON)
+              .put(Entity.json(newNamespaceRequest()), NamespaceResponse.class);
+
+      final SourceName sourceName2 = newSourceName();
+
+      APP.client()
+          .target(baseUri + "/sources/{source}")
+          .resolveTemplate("source", sourceName2.getValue())
+          .request(APPLICATION_JSON)
+          .put(Entity.json(newSourceRequestWith(SourceType.KAFKA)));
+
+      createDatasets(newNamespaceName, sourceName2, inputs);
+      createDatasets(newNamespaceName, sourceName2, outputs);
+
+      ImmutableList<DatasetId> inputIds2 =
+          inputs.stream()
+              .map((n) -> new DatasetId(NamespaceName.of(newNamespace.getName()), n))
+              .collect(toImmutableList());
+      ImmutableList<DatasetId> outputIds2 =
+          outputs.stream()
+              .map((n) -> new DatasetId(NamespaceName.of(newNamespace.getName()), n))
+              .collect(toImmutableList());
+
+      JobName jobName2 = newJobName();
+      final Response responsePut2 =
+          APP.client()
+              .target(baseUri + "/namespaces/default/jobs/{job}")
+              .resolveTemplate("job", jobName2.getValue())
+              .request(APPLICATION_JSON)
+              .put(Entity.json(newJobRequestV2With(inputIds2, outputIds2)));
+
+      assertThat(responsePut2.getStatus()).isEqualTo(HTTP_200);
+
+      final JobResponse responseGet2 =
+          APP.client()
+              .target(baseUri + "/namespaces/default/jobs/{job}")
+              .resolveTemplate("job", jobName2.getValue())
+              .request(APPLICATION_JSON)
+              .get(JobResponse.class);
+      assertThat(responseGet2.getId()).isEqualTo(new JobId(NamespaceName.of("default"), jobName2));
+      assertThat(responseGet2.getName()).isEqualTo(jobName2);
+      assertThat(responseGet2.getInputIds()).isEqualTo(inputIds2);
+      assertThat(responseGet2.getOutputIds()).isEqualTo(outputIds2);
+      assertThat(responseGet2.getInputs()).isEqualTo(inputs);
+      assertThat(responseGet2.getOutputs()).isEqualTo(outputs);
+    }
+  }
+
+  private void createDatasets(
+      NamespaceName namespace, final SourceName sourceName, final List<DatasetName> inputs) {
     inputs.forEach(
         datasetName -> {
-          APP.client()
-              .target(baseUri + "/namespaces/default/datasets/{dataset}")
-              .resolveTemplate("dataset", datasetName.getValue())
-              .request(APPLICATION_JSON)
-              .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
+          Response r =
+              APP.client()
+                  .target(baseUri + "/namespaces/{ns}/datasets/{dataset}")
+                  .resolveTemplate("ns", namespace.getValue())
+                  .resolveTemplate("dataset", datasetName.getValue())
+                  .request(APPLICATION_JSON)
+                  .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
+          assertThat(r.getStatus()).isEqualTo(HTTP_200);
         });
-
-    outputs.forEach(
-        datasetName -> {
-          APP.client()
-              .target(baseUri + "/namespaces/default/datasets/{dataset}")
-              .resolveTemplate("dataset", datasetName.getValue())
-              .request(APPLICATION_JSON)
-              .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
-        });
-
-    final Response response =
-        APP.client()
-            .target(baseUri + "/namespaces/default/jobs/{job}")
-            .resolveTemplate("job", newJobName().getValue())
-            .request(APPLICATION_JSON)
-            .put(Entity.json(newJobRequestWith(inputs, outputs)));
-
-    assertThat(response.getStatus()).isEqualTo(HTTP_200);
   }
 
   @Test
@@ -256,23 +436,9 @@ public class MarquezAppIntegrationTest {
     final List<DatasetName> inputs = newDatasetNames(2);
     final List<DatasetName> outputs = newDatasetNames(4);
 
-    inputs.forEach(
-        datasetName -> {
-          APP.client()
-              .target(baseUri + "/namespaces/default/datasets/{dataset}")
-              .resolveTemplate("dataset", datasetName.getValue())
-              .request(APPLICATION_JSON)
-              .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
-        });
+    createDatasets(defaultNamespace, sourceName, inputs);
 
-    outputs.forEach(
-        datasetName -> {
-          APP.client()
-              .target(baseUri + "/namespaces/default/datasets/{dataset}")
-              .resolveTemplate("dataset", datasetName.getValue())
-              .request(APPLICATION_JSON)
-              .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
-        });
+    createDatasets(defaultNamespace, sourceName, outputs);
 
     final JobName jobName = newJobName();
 
@@ -280,7 +446,7 @@ public class MarquezAppIntegrationTest {
         .target(baseUri + "/namespaces/default/jobs/{job}")
         .resolveTemplate("job", jobName.getValue())
         .request(APPLICATION_JSON)
-        .put(Entity.json(newJobRequestWith(inputs, outputs)));
+        .put(Entity.json(newJobRequestV1With(inputs, outputs)));
 
     final Response response0 =
         APP.client()
@@ -345,5 +511,50 @@ public class MarquezAppIntegrationTest {
           final Instant lastModifiedAt = Instant.parse(dataset.get("lastModifiedAt"));
           assertThat(lastModifiedAt).isAfter(beforeModified);
         });
+
+    final Response response3 =
+        APP.client()
+            .target(baseUri + "/jobs/runs/{id}/fail")
+            .resolveTemplate("id", runId)
+            .request(APPLICATION_JSON)
+            .post(Entity.json(ImmutableMap.of()));
+    assertThat(response3.getStatus()).isEqualTo(HTTP_200);
+
+    final RunsResponse response3Run =
+        APP.client()
+            .target(baseUri + "/namespaces/default/jobs/{job}/runs")
+            .resolveTemplate("job", jobName.getValue())
+            .request(APPLICATION_JSON)
+            .get(RunsResponse.class);
+    assertThat(response3Run.getRuns().get(0).getState()).isEqualTo("FAILED");
+
+    final Response response4 =
+        APP.client()
+            .target(baseUri + "/jobs/runs/{id}/abort")
+            .resolveTemplate("id", runId)
+            .request(APPLICATION_JSON)
+            .post(Entity.json(ImmutableMap.of()));
+    assertThat(response4.getStatus()).isEqualTo(HTTP_200);
+
+    final RunsResponse response4Run =
+        APP.client()
+            .target(baseUri + "/namespaces/default/jobs/{job}/runs")
+            .resolveTemplate("job", jobName.getValue())
+            .request(APPLICATION_JSON)
+            .get(RunsResponse.class);
+    assertThat(response4Run.getRuns().get(0).getState()).isEqualTo("ABORTED");
+
+    final JobsResponse responseJobs =
+        APP.client()
+            .target(baseUri + "/namespaces/default/jobs")
+            .resolveTemplate("job", jobName.getValue())
+            .request(APPLICATION_JSON)
+            .get(JobsResponse.class);
+    int size =
+        responseJobs.getJobs().stream()
+            .filter((j) -> j.getName().equals(jobName))
+            .collect(toImmutableList())
+            .size();
+    assertThat(size).isEqualTo(1);
   }
 }

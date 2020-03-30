@@ -31,6 +31,7 @@ import marquez.common.models.SourceName;
 @EqualsAndHashCode
 @ToString
 public abstract class Dataset {
+  @Getter private final DatasetId id;
   @Getter private final DatasetType type;
   @Getter private final DatasetName name;
   @Getter private final DatasetName physicalName;
@@ -43,6 +44,7 @@ public abstract class Dataset {
   @Nullable private final String description;
 
   public Dataset(
+      @NonNull final DatasetId id,
       @NonNull final DatasetType type,
       @NonNull final DatasetName name,
       @NonNull final DatasetName physicalName,
@@ -53,6 +55,7 @@ public abstract class Dataset {
       @Nullable final List<String> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
+    this.id = id;
     this.type = type;
     this.name = name;
     this.physicalName = physicalName;

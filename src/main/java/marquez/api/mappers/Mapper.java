@@ -16,11 +16,13 @@ package marquez.api.mappers;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static java.util.Collections.emptyList;
 
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,10 +51,12 @@ import marquez.api.models.TagsResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobType;
+import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
 import marquez.service.models.Dataset;
+import marquez.service.models.DatasetId;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTable;
 import marquez.service.models.DbTableMeta;
@@ -160,7 +164,9 @@ public final class Mapper {
 
   private static DatasetResponse toDbTableResponse(@NonNull final Dataset dataset) {
     return new DbTableResponse(
-        dataset.getName().getValue(),
+        dataset.getId(),
+        dataset.getId().getNamespace(),
+        dataset.getName(),
         dataset.getPhysicalName().getValue(),
         ISO_INSTANT.format(dataset.getCreatedAt()),
         ISO_INSTANT.format(dataset.getUpdatedAt()),
@@ -173,7 +179,9 @@ public final class Mapper {
 
   private static DatasetResponse toStreamResponse(@NonNull final Dataset dataset) {
     return new StreamResponse(
-        dataset.getName().getValue(),
+        dataset.getId(),
+        dataset.getId().getNamespace(),
+        dataset.getName(),
         dataset.getPhysicalName().getValue(),
         ISO_INSTANT.format(dataset.getCreatedAt()),
         ISO_INSTANT.format(dataset.getUpdatedAt()),
@@ -193,11 +201,36 @@ public final class Mapper {
     return new DatasetsResponse(toDatasetResponses(datasets));
   }
 
-  public static JobMeta toJobMeta(@NonNull final JobRequest request) {
+  private static List<DatasetId> toIds(NamespaceName namespace, Collection<String> names) {
+    return names == null
+        ? null
+        : names.stream()
+            .map((n) -> new DatasetId(namespace, DatasetName.of(n)))
+            .collect(toImmutableList());
+  }
+
+  public static JobMeta toJobMeta(NamespaceName namespace, @NonNull final JobRequest request) {
+    List<DatasetId> inputs = null;
+    List<DatasetId> outputs = null;
+    if (request.getInputIds() != null || request.getOutputIds() != null) {
+      // new style inputs/outputs with namespace
+      inputs = request.getInputIds();
+      outputs = request.getOutputIds();
+    } else if (request.getInputs() != null || request.getOutputs() != null) {
+      // old style inputs/outputs, defaults to job namespace
+      inputs = toIds(namespace, request.getInputs());
+      outputs = toIds(namespace, request.getOutputs());
+    }
+    if (inputs == null) {
+      inputs = emptyList();
+    }
+    if (outputs == null) {
+      outputs = emptyList();
+    }
     return new JobMeta(
         JobType.valueOf(request.getType()),
-        request.getInputs().stream().map(DatasetName::of).collect(toImmutableList()),
-        request.getOutputs().stream().map(DatasetName::of).collect(toImmutableList()),
+        inputs,
+        outputs,
         request.getLocation().map(Utils::toUrl).orElse(null),
         request.getContext(),
         request.getDescription().orElse(null));
@@ -205,12 +238,14 @@ public final class Mapper {
 
   public static JobResponse toJobResponse(@NonNull final Job job) {
     return new JobResponse(
+        job.getId(),
+        job.getId().getNamespace(),
         job.getType().toString(),
-        job.getName().getValue(),
+        job.getName(),
         ISO_INSTANT.format(job.getCreatedAt()),
         ISO_INSTANT.format(job.getUpdatedAt()),
-        job.getInputs().stream().map(DatasetName::getValue).collect(toImmutableList()),
-        job.getOutputs().stream().map(DatasetName::getValue).collect(toImmutableList()),
+        job.getInputs(),
+        job.getOutputs(),
         job.getLocation().map(URL::toString).orElse(null),
         job.getContext(),
         job.getDescription().orElse(null),

@@ -29,6 +29,7 @@ import marquez.common.models.SourceName;
 @ToString(callSuper = true)
 public final class DbTable extends Dataset {
   public DbTable(
+      final DatasetId id,
       final DatasetName name,
       final DatasetName physicalName,
       final Instant createdAt,
@@ -39,6 +40,7 @@ public final class DbTable extends Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
     super(
+        id,
         DB_TABLE,
         name,
         physicalName,

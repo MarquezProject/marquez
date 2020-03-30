@@ -12,19 +12,24 @@
  * limitations under the License.
  */
 
-package marquez.api.models;
+package marquez;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.List;
-import lombok.NonNull;
-import lombok.Value;
+import javax.annotation.Nullable;
+import lombok.NoArgsConstructor;
 
-@Value
-public class NamespacesResponse {
-  @NonNull List<NamespaceResponse> namespaces;
+@NoArgsConstructor
+public class MarquezRuntimeException extends RuntimeException {
+  private static final long serialVersionUID = 1L;
 
-  @JsonCreator
-  public NamespacesResponse(@NonNull List<NamespaceResponse> namespaces) {
-    this.namespaces = namespaces;
+  public MarquezRuntimeException(@Nullable final String message) {
+    super(message);
+  }
+
+  public MarquezRuntimeException(@Nullable final Throwable cause) {
+    super(cause);
+  }
+
+  public MarquezRuntimeException(@Nullable final String message, @Nullable final Throwable cause) {
+    super(message, cause);
   }
 }
