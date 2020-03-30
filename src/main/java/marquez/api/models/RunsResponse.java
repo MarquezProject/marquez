@@ -14,6 +14,7 @@
 
 package marquez.api.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.NonNull;
@@ -23,5 +24,11 @@ import lombok.Value;
 public class RunsResponse {
   @NonNull
   @JsonProperty("runs")
-  List<RunResponse> responses;
+  List<RunResponse> runs;
+
+  @JsonCreator
+  public RunsResponse(@NonNull List<RunResponse> runs) {
+    super();
+    this.runs = runs;
+  }
 }
