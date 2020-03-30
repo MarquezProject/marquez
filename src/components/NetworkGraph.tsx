@@ -72,19 +72,21 @@ interface IProps {
   jobs: IJob[]
   datasets: IDataset[]
   isLoading: boolean
+  router: any
 }
 
 type IAllProps = IWithStyles<typeof styles> & IProps
 
 export class NetworkGraph extends React.Component<IAllProps, {}> {
   shouldComponentUpdate(newProps: IProps) {
-    
+    const urlBreakdown = newProps.router.location.pathname.split('/')
+    const nodeId = urlBreakdown[2]
+
     const svg: d3.Selection<SVGElement, void, HTMLElement, void> = select('#network-graph')
 
     if (svg.empty()) {
       return true
     }
-
     const height = +svg.style('height').replace('px', '')
 
     const isDataset = (node: any) => {
@@ -248,7 +250,8 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
     }
     
     // run calculations for network graph
-    const lineages = getLineages()
+    let lineages = getLineages()
+    lineages = nodeId ? [_find(lineages, lineage => lineage.name == nodeId)] : lineages
     let clusters = _map(lineages, lineage => hierarchy(lineage))
     clusters = _sortBy(clusters, l => l.descendants().length)
     const largestCluster = clusters[clusters.length - 1]
@@ -296,5 +299,5 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
     )
   }
 }
-
-export default withStyles(styles)(NetworkGraph)
+ 
+export default (withStyles(styles)(NetworkGraph))

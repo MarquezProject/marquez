@@ -12,6 +12,7 @@ export interface IState {
   jobs: IJobsState
   namespaces: INamespacesState
   display: IDisplayState
+  router: any
 }
 
 export default (history: History): Reducer =>
