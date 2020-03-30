@@ -547,7 +547,6 @@ public class MarquezAppIntegrationTest {
             .resolveTemplate("job", jobName.getValue())
             .request(APPLICATION_JSON)
             .get(JobsResponse.class);
-    System.out.println(responseJobs);
     int size =
         responseJobs.getJobs().stream()
             .filter((j) -> j.getName().equals(jobName))
