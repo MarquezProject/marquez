@@ -77,22 +77,17 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     log.info("Running startup actions...");
     if (config.isMigrateOnStartup()) {
-      migrateDbOrError(config, source);
+      final FlywayFactory flywayFactory = config.getFlywayFactory();
+      try {
+        DbMigration.migrateDbOrError(flywayFactory, source);
+      } catch (FlywayException errorOnDbMigrate) {
+        log.info("Stopping app...");
+        // Propagate throwable up the stack.
+        onFatalError(errorOnDbMigrate); // Signal app termination.
+      }
     }
     registerResources(config, env, source);
     registerServlets(env);
-  }
-
-  private void migrateDbOrError(@NonNull MarquezConfig config, @NonNull DataSource source) {
-    final FlywayFactory flywayFactory = config.getFlywayFactory();
-    DbMigration dbMigration = new DbMigration();
-    try {
-      dbMigration.migrateDbOrError(flywayFactory, source);
-    } catch (FlywayException errorOnDbMigrate) {
-      log.info("Stopping app...");
-      // Propagate throwable up the stack.
-      onFatalError(errorOnDbMigrate); // Signal app termination.
-    }
   }
 
   public void registerResources(
@@ -105,7 +100,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
 
-    MarquezContext context = MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
+    final MarquezContext context =
+        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
 
     log.debug("Registering resources...");
     for (Object resource : context.getResources()) {
