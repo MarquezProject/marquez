@@ -31,7 +31,6 @@ import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
@@ -239,7 +238,7 @@ public class JobService {
               if (results.size() < names.size()) {
                 List<String> actual =
                     results.stream().map(DatasetRow::getName).collect(toImmutableList());
-                throw new DatasetNotFoundException(
+                throw new MarquezServiceException(
                     String.format(
                         "Some datasets not found in namespace %s \nExpected: %s\nActual: %s",
                         namespace, names, actual));

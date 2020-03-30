@@ -165,6 +165,7 @@ public final class Mapper {
   private static DatasetResponse toDbTableResponse(@NonNull final Dataset dataset) {
     return new DbTableResponse(
         dataset.getId(),
+        dataset.getId().getNamespace(),
         dataset.getName(),
         dataset.getPhysicalName().getValue(),
         ISO_INSTANT.format(dataset.getCreatedAt()),
@@ -179,6 +180,7 @@ public final class Mapper {
   private static DatasetResponse toStreamResponse(@NonNull final Dataset dataset) {
     return new StreamResponse(
         dataset.getId(),
+        dataset.getId().getNamespace(),
         dataset.getName(),
         dataset.getPhysicalName().getValue(),
         ISO_INSTANT.format(dataset.getCreatedAt()),
@@ -237,6 +239,7 @@ public final class Mapper {
   public static JobResponse toJobResponse(@NonNull final Job job) {
     return new JobResponse(
         job.getId(),
+        job.getId().getNamespace(),
         job.getType().toString(),
         job.getName(),
         ISO_INSTANT.format(job.getCreatedAt()),

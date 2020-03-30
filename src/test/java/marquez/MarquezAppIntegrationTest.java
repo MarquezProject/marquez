@@ -51,6 +51,7 @@ import marquez.api.models.DatasetRequest;
 import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.api.models.DbTableRequest;
+import marquez.api.models.DbTableResponse;
 import marquez.api.models.JobResponse;
 import marquez.api.models.JobsResponse;
 import marquez.api.models.NamespaceResponse;
@@ -66,7 +67,6 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
 import marquez.service.models.DatasetId;
-import marquez.service.models.DbTable;
 import marquez.service.models.JobId;
 import marquez.service.models.Run;
 import org.junit.ClassRule;
@@ -190,13 +190,14 @@ public class MarquezAppIntegrationTest {
 
     assertThat(response.getStatus()).isEqualTo(HTTP_200);
 
-    final DbTable dbTable =
+    final DbTableResponse dbTable =
         APP.client()
             .target(baseUri + "/namespaces/default/datasets/{dataset}")
             .resolveTemplate("dataset", datasetName.getValue())
             .request(APPLICATION_JSON)
-            .get(DbTable.class);
+            .get(DbTableResponse.class);
     assertThat(dbTable.getName()).isEqualTo(datasetName);
+    assertThat(dbTable.getNamespace().getValue()).isEqualTo("default");
 
     final DatasetsResponse datasets =
         APP.client()
@@ -286,6 +287,7 @@ public class MarquezAppIntegrationTest {
         .isEqualTo(new DatasetId(NamespaceName.of("default"), datasetName));
     assertThat(responseGet.getName()).isEqualTo(datasetName);
     assertThat(responseGet.getSourceName()).isEqualTo(sourceName.getValue());
+    assertThat(responseGet.getNamespace().getValue()).isEqualTo("default");
   }
 
   @Test
@@ -347,6 +349,7 @@ public class MarquezAppIntegrationTest {
       assertThat(responseGet.getOutputs()).isEqualTo(outputs);
       assertThat(responseGet.getInputIds()).isEqualTo(inputIds);
       assertThat(responseGet.getOutputIds()).isEqualTo(outputIds);
+      assertThat(responseGet.getNamespace().getValue()).isEqualTo("default");
     }
 
     // new input definition: Input and output are defined by DatasetId

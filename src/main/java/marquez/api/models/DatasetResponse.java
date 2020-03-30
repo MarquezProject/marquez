@@ -28,6 +28,7 @@ import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
+import marquez.common.models.NamespaceName;
 import marquez.service.models.DatasetId;
 
 @EqualsAndHashCode
@@ -39,6 +40,7 @@ import marquez.service.models.DatasetId;
 })
 public abstract class DatasetResponse {
   @Getter private final DatasetId id;
+  @Getter private final NamespaceName namespace;
   @Getter private final DatasetName name;
   @Getter private final String physicalName;
   @Getter private final String createdAt;
@@ -51,6 +53,7 @@ public abstract class DatasetResponse {
 
   public DatasetResponse(
       @NonNull final DatasetId id,
+      @NonNull final NamespaceName namespace,
       @NonNull final DatasetName name,
       @NonNull final String physicalName,
       @NonNull final String createdAt,
@@ -61,6 +64,7 @@ public abstract class DatasetResponse {
       @Nullable final String lastModifiedAt,
       @Nullable final String description) {
     this.id = id;
+    this.namespace = namespace;
     this.name = name;
     this.physicalName = checkNotBlank(physicalName);
     this.createdAt = checkNotBlank(createdAt);

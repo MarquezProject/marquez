@@ -29,6 +29,7 @@ import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
+import marquez.common.models.NamespaceName;
 import marquez.service.models.DatasetId;
 import marquez.service.models.JobId;
 
@@ -36,6 +37,7 @@ import marquez.service.models.JobId;
 @ToString
 public final class JobResponse {
   @Getter private final JobId id;
+  @Getter private final NamespaceName namespace;
   @Getter private final String type;
   @Getter private final JobName name;
   @Getter private final String createdAt;
@@ -51,6 +53,7 @@ public final class JobResponse {
 
   public JobResponse(
       @NonNull final JobId id,
+      @NonNull final NamespaceName namespace,
       @NonNull final String type,
       @NonNull final JobName name,
       @NonNull final String createdAt,
@@ -62,6 +65,7 @@ public final class JobResponse {
       @Nullable final String description,
       @Nullable final RunResponse latestRun) {
     this.id = id;
+    this.namespace = namespace;
     this.type = checkNotBlank(type);
     this.name = name;
     this.createdAt = checkNotBlank(createdAt);
