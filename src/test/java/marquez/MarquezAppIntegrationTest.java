@@ -20,8 +20,6 @@ import static marquez.api.models.ModelGenerator.EMPTY_RUN_REQUEST;
 import static marquez.api.models.ModelGenerator.newDbTableRequestWith;
 import static marquez.api.models.ModelGenerator.newJobRequestWith;
 import static marquez.api.models.ModelGenerator.newNamespaceRequest;
-import static marquez.api.models.ModelGenerator.newSourceRequest;
-import static marquez.api.models.ModelGenerator.newSourceRequestWith;
 import static marquez.api.models.ModelGenerator.newStreamRequestWith;
 import static marquez.common.models.ModelGenerator.newDatasetName;
 import static marquez.common.models.ModelGenerator.newDatasetNames;
