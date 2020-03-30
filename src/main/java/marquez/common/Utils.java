@@ -18,9 +18,11 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkArgument;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Joiner;
 import com.google.common.hash.Hashing;
 import io.dropwizard.jackson.Jackson;
@@ -35,7 +37,7 @@ import lombok.NonNull;
 public final class Utils {
   private Utils() {}
 
-  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
+  private static final ObjectMapper MAPPER = newObjectMapper();
 
   public static final String VERSION_DELIM = ":";
   public static final Joiner VERSION_JOINER = Joiner.on(VERSION_DELIM).skipNulls();
@@ -44,6 +46,13 @@ public final class Utils {
   public static final Joiner.MapJoiner KV_JOINER = Joiner.on(KV_DELIM).withKeyValueSeparator("=");
 
   private static final int UUID_LENGTH = 36;
+
+  public static ObjectMapper newObjectMapper() {
+    final ObjectMapper mapper = Jackson.newObjectMapper();
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    return mapper;
+  }
 
   public static String toJson(@NonNull final Object value) {
     try {

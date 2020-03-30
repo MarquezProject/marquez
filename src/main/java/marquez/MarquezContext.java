@@ -1,8 +1,9 @@
 package marquez;
 
-import java.util.Arrays;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import lombok.Getter;
+import lombok.NonNull;
 import marquez.api.DatasetResource;
 import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
@@ -32,8 +33,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Tag;
 import org.jdbi.v3.core.Jdbi;
 
-public class MarquezContext {
-
+public final class MarquezContext {
   @Getter private final NamespaceDao namespaceDao;
   @Getter private final OwnerDao ownerDao;
   @Getter private final NamespaceOwnershipDao namespaceOwnershipDao;
@@ -60,12 +60,13 @@ public class MarquezContext {
   @Getter private final DatasetResource datasetResource;
   @Getter private final JobResource jobResource;
   @Getter private final TagResource tagResource;
-  @Getter private final MarquezServiceExceptionMapper marquezServiceExceptionMapper;
+
+  @Getter private final MarquezServiceExceptionMapper serviceExceptionMapper;
 
   @Getter private final List<Object> resources;
 
-  public MarquezContext(Jdbi jdbi, List<Tag> tags) throws MarquezServiceException {
-
+  private MarquezContext(@NonNull final Jdbi jdbi, @NonNull final List<Tag> tags)
+      throws MarquezServiceException {
     this.namespaceDao = jdbi.onDemand(NamespaceDao.class);
     this.ownerDao = jdbi.onDemand(OwnerDao.class);
     this.namespaceOwnershipDao = jdbi.onDemand(NamespaceOwnershipDao.class);
@@ -106,43 +107,38 @@ public class MarquezContext {
         new DatasetResource(namespaceService, datasetService, jobService, tagService);
     this.jobResource = new JobResource(namespaceService, jobService);
     this.tagResource = new TagResource(tagService);
-    this.marquezServiceExceptionMapper = new MarquezServiceExceptionMapper();
+    this.serviceExceptionMapper = new MarquezServiceExceptionMapper();
 
     this.resources =
-        Arrays.asList(
+        ImmutableList.of(
             namespaceResource,
             sourceResource,
             datasetResource,
             jobResource,
             tagResource,
-            marquezServiceExceptionMapper);
+            serviceExceptionMapper);
   }
 
-  public static MarquezContextBuilder builder() {
-    return new MarquezContextBuilder();
+  public static Builder builder() {
+    return new Builder();
   }
 
-  public static class MarquezContextBuilder {
+  public static class Builder {
+    private Jdbi jdbi;
+    private List<Tag> tags;
 
-    private final Jdbi jdbi;
-    private final List<Tag> tags;
-
-    private MarquezContextBuilder() {
-      this(null, null);
+    Builder() {
+      this.tags = ImmutableList.of();
     }
 
-    private MarquezContextBuilder(Jdbi jdbi, List<Tag> tags) {
-      super();
+    public Builder jdbi(@NonNull Jdbi jdbi) {
       this.jdbi = jdbi;
-      this.tags = tags;
+      return this;
     }
 
-    public MarquezContextBuilder jdbi(Jdbi jdbi) {
-      return new MarquezContextBuilder(jdbi, this.tags);
-    }
-
-    public MarquezContextBuilder tags(List<Tag> tags) {
-      return new MarquezContextBuilder(this.jdbi, tags);
+    public Builder tags(@NonNull List<Tag> tags) {
+      this.tags = ImmutableList.copyOf(tags);
+      return this;
     }
 
     public MarquezContext build() throws MarquezServiceException {
