@@ -88,6 +88,7 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
       return true
     }
     const height = +svg.style('height').replace('px', '')
+    const width = +svg.style('width').replace('px', '')
 
     const isDataset = (node: any) => {
       const name = node.name || node.data.name
@@ -120,7 +121,7 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
       const searchedDatasets = _filter(newProps.datasets, d => d.matches)
       const searchedJobs = _filter(newProps.jobs, j => j.matches)
       const allNodes = [...searchedDatasets, ...searchedJobs]
-      
+
       const lineages = _map(allNodes, (rootNode: any) => {
         rootNode.children = findChildren(rootNode)
         let children = rootNode.children
@@ -163,14 +164,14 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
     }
 
     function graph(cluster: any, reverse: boolean) {
-      
+
       cluster = tree().nodeSize([20, 70])(cluster)
-      
+
       const g = svg.append('g')
         .attr('font-family', 'sans-serif')
         .attr('font-size', 10)
-        .attr('transform', `translate(${200}, ${height/2})`)
-        
+        .attr('transform', `translate(${width/2}, ${height/2})`)
+
       g.append('g')
         .attr('fill', 'none')
         .attr('stroke-width', strokeWidth)
@@ -179,17 +180,17 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
         .join('path')
         .attr('d', linkHorizontal().x((d: any) => reverse ? -d.y : d.y).y((d: any) => d.x))
         .attr('stroke', (d: any) => d.target.data.matches && d.source.data.matches ? linkHighlight : defaultHighlight)
-      
+
       const datasets = _filter(cluster.descendants(), d => isDataset(d))
       const jobs = _filter(cluster.descendants(), d => !isDataset(d))
-      
+
       const datasetNode = g.append('g')
         .attr('stroke-linejoin', 'round')
         .selectAll('g')
         .data(datasets)
         .join('g')
         .attr('transform', d => `translate(${reverse ? -d.y : d.y},${d.x})`)
-    
+
       const jobNode = g
         .append('g')
         .attr('stroke-linejoin', 'round')
@@ -197,7 +198,7 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
         .data(jobs)
         .join('g')
         .attr('transform', d => `translate(${reverse ? -d.y : d.y},${d.x})`)
-        
+
       datasetNode
         .append('a')
         .attr('href', (d: any) => ('/datasets/' + d.data.name))
@@ -207,14 +208,14 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
         .attr('y', -square/2)
         .attr('width', square)
         .attr('height', square)
-    
+
       jobNode
         .append('a')
         .attr('href', (d: any) => ('/jobs/' + d.data.name))
         .append('circle')
         .attr('fill', d => d.data.matches ? findJobColor(d) : defaultHighlight)
         .attr('r', radius)
-      
+
       // Add text to nodes
       datasetNode.append('text')
         .text(d => d.data.matches ? d.data.name : null)
@@ -224,7 +225,7 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
         .attr('transform', `rotate(45) translate(${-(radius + 4)}, ${-radius})`)
         .attr('text-anchor', 'end')
         .attr('fill', labelHighlight)
-      
+
       // Add text to nodes
       jobNode.append('text')
         .text(d => d.data.matches ? d.data.name : null)
@@ -234,21 +235,21 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
         .attr('transform', `rotate(45) translate(${-(radius + 4)}, ${-radius})`)
         .attr('text-anchor', 'end')
         .attr('fill', labelHighlight)
-      
+
       // jobNode.on("mouseover", focus).on("mouseout", unfocus)
       // datasetNode.on("mouseover", focus).on("mouseout", unfocus)
-      
+
       // function focus(d) {
       //   d3.select(this).attr('fill', d => circleHighlight)
       // }
-      
+
       // function unfocus(d) {
       //   d3.select(this).attr('fill', d => isSearched(d.data.name) ? circleHighlight : defaultHighlight)
       // }
-      
+
       return svg.node()
     }
-    
+
     // run calculations for network graph
     let lineages = getLineages()
     lineages = nodeId ? [_find(lineages, lineage => lineage.name == nodeId)] : lineages
@@ -259,10 +260,10 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
       const rootNode = largestCluster.data
       const reverseLineage = getReverseLineage(rootNode)
       const reverseCluster = hierarchy(reverseLineage)
-    
+
       // remove svg elements
       svg.selectAll('*').remove()
-    
+
       graph(largestCluster, false)
       graph(reverseCluster, true)
     }
@@ -299,5 +300,5 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
     )
   }
 }
- 
+
 export default (withStyles(styles)(NetworkGraph))
