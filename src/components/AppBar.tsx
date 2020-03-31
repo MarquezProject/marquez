@@ -44,7 +44,7 @@ const MyAppBar = (props: IProps): ReactElement => {
     <AppBar position='fixed' className={classes.appBar}>
       <Toolbar>
         <Link className={link} to="/">
-          <img src='img/marquez-logo.png' height={60} alt='Marquez Logo' />
+          <img src={require('../img/marquez-logo.png')} height={60} alt='Marquez Logo' />
         </Link>
         <Link className={link} to="/">
           <Typography className={classes.icon} variant='h4' color='inherit' noWrap>
