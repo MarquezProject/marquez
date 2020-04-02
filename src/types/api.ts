@@ -13,6 +13,7 @@ export interface IDatasetAPI {
   description: string
   tags?: string[]
   fields: IFieldsAPI[]
+  matches?: boolean
 }
 
 export interface INamespaceAPI {
@@ -35,6 +36,7 @@ export interface IJobAPI {
   context: {
     SQL: string
   }
+  matches?: boolean
 }
 
 export interface INamespacesAPI {

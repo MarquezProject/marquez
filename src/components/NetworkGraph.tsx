@@ -79,6 +79,10 @@ type IAllProps = IWithStyles<typeof styles> & IProps
 
 export class NetworkGraph extends React.Component<IAllProps, {}> {
   shouldComponentUpdate(newProps: IProps) {
+    const allNodes = [...newProps.datasets, ...newProps.jobs]
+    const matchingNodes = _filter(allNodes, node => node.matches)
+    const searchExists = matchingNodes.length != allNodes.length
+
     const urlBreakdown = newProps.router.location.pathname.split('/')
     const nodeId = urlBreakdown[2]
 
@@ -157,7 +161,6 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
     const strokeWidth = 5
 
     function findJobColor(job: any) {
-      console.log('Job: ', job)
       const key = job.data.latestRun.runState as IJobRunAPI['runState']
       const color = colorMap[key]
       return color
@@ -252,7 +255,7 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
 
     // run calculations for network graph
     let lineages = getLineages()
-    lineages = nodeId ? [_find(lineages, lineage => lineage.name == nodeId)] : lineages
+    lineages = nodeId && !searchExists ? [_find(lineages, lineage => lineage.name == nodeId)] : lineages
     let clusters = _map(lineages, lineage => hierarchy(lineage))
     clusters = _sortBy(clusters, l => l.descendants().length)
     const largestCluster = clusters[clusters.length - 1]
