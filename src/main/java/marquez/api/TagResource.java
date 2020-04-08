@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
+import java.util.Set;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -52,18 +52,17 @@ public final class TagResource {
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final List<Tag> tags = service.getAll(limit, offset);
+    final Set<Tag> tags = service.getAll(limit, offset);
     return Response.ok(toTags(tags)).build();
-  }
-
-  Tags toTags(@NonNull final List<Tag> tags) {
-    return new Tags(tags);
   }
 
   @Value
   class Tags {
-    @NonNull
     @JsonProperty("tags")
-    List<Tag> value;
+    Set<Tag> value;
+  }
+
+  Tags toTags(@NonNull final Set<Tag> tags) {
+    return new Tags(tags);
   }
 }

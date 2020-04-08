@@ -281,16 +281,6 @@ public final class Mapper {
     return rows.stream().map(Mapper::toTag).collect(toImmutableList());
   }
 
-  public static TagRow toTagRow(@NonNull final Tag tag) {
-    final Instant now = newTimestamp();
-    return new TagRow(
-        newRowUuid(),
-        now,
-        now,
-        tag.getName().getValue().toUpperCase(Locale.getDefault()),
-        tag.getDescription().orElse(null));
-  }
-
   public static Job toJob(
       @NonNull final JobRow row,
       @NonNull final List<DatasetName> inputs,

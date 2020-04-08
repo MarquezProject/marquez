@@ -76,16 +76,25 @@ public class TagService {
     }
   }
 
-  public List<Tag> getAll(int limit, int offset) throws MarquezServiceException {
+  public Set<Tag> getAll(int limit, int offset) throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
       final List<TagRow> rows = dao.findAll(limit, offset);
-      final List<Tag> tags = Mapper.toTags(rows);
-      return ImmutableList.copyOf(tags);
+      return toTags(rows);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get tags.", e);
       throw new MarquezServiceException();
     }
+  }
+
+
+  TagRow toTagRow(@NonNull final Tag tag) {
+    final Instant now = newTimestamp();
+    return new TagRow(
+        now,
+        now,
+        tag.getName().getValue().toUpperCase(Locale.getDefault()),
+        tag.getDescription().orElse(null));
   }
 }
