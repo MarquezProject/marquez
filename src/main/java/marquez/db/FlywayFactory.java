@@ -42,7 +42,7 @@ public final class FlywayFactory {
   private static final boolean DEFAULT_VALIDATE_ON_MIGRATE = false;
   private static final boolean DEFAULT_CLEAN_ON_VALIDATION_ERROR = false;
   private static final boolean DEFAULT_CLEAN_DISABLED = false;
-  private static final String DEFAULT_LOCATION = "db/migration";
+  private static final String DEFAULT_LOCATION = "marquez/db/migration";
   private static final List<String> DEFAULT_LOCATIONS = ImmutableList.of(DEFAULT_LOCATION);
   private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
   private static final String DEFAULT_TABLE = "flyway_schema_history";
