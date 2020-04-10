@@ -70,14 +70,14 @@ type IAllProps = RRD.RouteComponentProps & IWithStyles<typeof styles> & IProps
 const Home:  FunctionComponent<IAllProps> = props => {
   const [datasetPageIndex, setDatasetPageIndex] = useState(0)
   const [jobPageIndex, setJobPageIndex] = useState(0)
-  
+
   const limit = 5
-  
+
   const { datasets, jobs, classes, showJobs, setShowJobs } = props
 
   const matchingDatasets = datasets.filter(d => d.matches)
   const matchingJobs = jobs.filter(j => j.matches)
-  
+
   const chunkedDatasets = _chunk(matchingDatasets, limit)
   const chunkedJobs = _chunk(matchingJobs, limit)
 
