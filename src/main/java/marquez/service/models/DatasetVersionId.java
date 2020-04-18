@@ -11,5 +11,5 @@ import marquez.common.models.NamespaceName;
 public class DatasetVersionId {
   @NonNull NamespaceName namespace;
   @NonNull DatasetName datasetName;
-  @NonNull UUID version;
+  @NonNull Version<UUID> version;
 }

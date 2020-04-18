@@ -69,6 +69,7 @@ import marquez.service.models.JobMeta;
 import marquez.service.models.JobVersionId;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
+import marquez.service.models.Version;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -352,11 +353,11 @@ public class JobService {
                           new DatasetVersionId(
                               NamespaceName.of(row.getNamespaceName()),
                               DatasetName.of(row.getName()),
-                              row.getCurrentVersionUuid().get())))
+                              Version.of(row.getCurrentVersionUuid().get()))))
               .collect(toImmutableList());
       final List<UUID> inputVersionUuids =
           inputVersions.stream()
-              .map((i) -> i.getDatasetVersion().getVersion())
+              .map((i) -> i.getDatasetVersion().getVersion().getValue())
               .collect(toImmutableList());
       final RunRow newRunRow =
           Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), inputVersionUuids, runMeta);
@@ -365,7 +366,7 @@ public class JobService {
           new JobInputUpdate(
               newRunRow.getUuid(),
               runMeta,
-              new JobVersionId(namespaceName, jobName, versionRow.getUuid()),
+              new JobVersionId(namespaceName, jobName, Version.of(versionRow.getUuid())),
               inputVersions));
       markRunAs(newRunRow.getUuid(), Run.State.NEW);
       log.info(
@@ -441,7 +442,7 @@ public class JobService {
                             new DatasetVersionId(
                                 NamespaceName.of(v.getNamespaceName()),
                                 DatasetName.of(v.getDatasetName()),
-                                v.getUuid())))
+                                Version.of(v.getUuid()))))
                 .collect(toImmutableList());
         notify(new JobOutputUpdate(runId, outputs));
         if (versionRow.hasOutputUuids()) {

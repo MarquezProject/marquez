@@ -11,5 +11,5 @@ import marquez.common.models.NamespaceName;
 public class JobVersionId {
   @NonNull NamespaceName namespace;
   @NonNull JobName jobName;
-  @NonNull UUID version;
+  @NonNull Version<UUID> version;
 }
