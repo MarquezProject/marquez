@@ -35,6 +35,7 @@ import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
+import marquez.common.models.RunState;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
 import marquez.db.models.DatasetFieldRow;
@@ -370,7 +371,7 @@ public final class Mapper {
         row.getUpdatedAt(),
         row.getNominalStartTime().orElse(null),
         row.getNominalEndTime().orElse(null),
-        Run.State.valueOf(row.getCurrentRunState().get()),
+        RunState.valueOf(row.getCurrentRunState().get()),
         row.getStartedAt().orElse(null),
         row.getEndedAt().orElse(null),
         Utils.fromJson(row.getArgs(), new TypeReference<Map<String, String>>() {}));
@@ -406,7 +407,7 @@ public final class Mapper {
   }
 
   public static RunStateRow toRunStateRow(
-      @NonNull final UUID runId, @NonNull final Run.State runState) {
+      @NonNull final UUID runId, @NonNull final RunState runState) {
     return new RunStateRow(newRowUuid(), newTimestamp(), runId, runState.toString());
   }
 

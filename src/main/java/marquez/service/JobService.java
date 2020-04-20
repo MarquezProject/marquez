@@ -18,6 +18,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.groupingBy;
+import static marquez.common.models.RunState.NEW;
 
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
@@ -35,6 +36,7 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunState;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.JobContextDao;
@@ -367,7 +369,7 @@ public class JobService {
               runMeta,
               new JobVersionId(namespaceName, jobName, versionRow.getUuid()),
               inputVersions));
-      markRunAs(newRunRow.getUuid(), Run.State.NEW);
+      markRunAs(newRunRow.getUuid(), NEW);
       log.info(
           "Successfully created run '{}' for job version '{}'.",
           newRunRow.getUuid(),
@@ -422,7 +424,7 @@ public class JobService {
     }
   }
 
-  public void markRunAs(@NonNull UUID runId, @NonNull Run.State runState)
+  public void markRunAs(@NonNull UUID runId, @NonNull RunState runState)
       throws MarquezServiceException {
     log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
     final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId, runState);
@@ -466,8 +468,8 @@ public class JobService {
     }
   }
 
-  /** Determines whether to increment or decrement run counters given {@link Run.State}. */
-  private void incOrDecBy(@NonNull Run.State runState) {
+  /** Determines whether to increment or decrement run counters given {@link RunState}. */
+  private void incOrDecBy(@NonNull RunState runState) {
     switch (runState) {
       case NEW:
         break;
