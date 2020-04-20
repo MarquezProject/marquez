@@ -16,6 +16,10 @@
 package marquez.api;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static marquez.common.models.RunState.ABORTED;
+import static marquez.common.models.RunState.COMPLETED;
+import static marquez.common.models.RunState.FAILED;
+import static marquez.common.models.RunState.RUNNING;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -52,6 +56,7 @@ import marquez.api.models.RunsResponse;
 import marquez.common.Utils;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunState;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
@@ -213,7 +218,7 @@ public final class JobResource {
   @Produces(APPLICATION_JSON)
   public Response markRunAsRunning(@PathParam("id") String runIdString)
       throws MarquezServiceException {
-    return markRunAs(runIdString, Run.State.RUNNING);
+    return markRunAs(runIdString, RUNNING);
   }
 
   @Timed
@@ -224,7 +229,7 @@ public final class JobResource {
   @Produces(APPLICATION_JSON)
   public Response markRunAsCompleted(@PathParam("id") String runIdString)
       throws MarquezServiceException {
-    return markRunAs(runIdString, Run.State.COMPLETED);
+    return markRunAs(runIdString, COMPLETED);
   }
 
   @Timed
@@ -235,7 +240,7 @@ public final class JobResource {
   @Produces(APPLICATION_JSON)
   public Response markRunAsFailed(@PathParam("id") String runIdString)
       throws MarquezServiceException {
-    return markRunAs(runIdString, Run.State.FAILED);
+    return markRunAs(runIdString, FAILED);
   }
 
   @Timed
@@ -246,11 +251,10 @@ public final class JobResource {
   @Produces(APPLICATION_JSON)
   public Response markRunAsAborted(@PathParam("id") String runIdString)
       throws MarquezServiceException {
-    return markRunAs(runIdString, Run.State.ABORTED);
+    return markRunAs(runIdString, ABORTED);
   }
 
-  private Response markRunAs(String runIdString, Run.State runState)
-      throws MarquezServiceException {
+  private Response markRunAs(String runIdString, RunState runState) throws MarquezServiceException {
     final UUID runId = toRunIdOrThrow(runIdString);
     throwIfNotExists(runId);
 
