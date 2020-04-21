@@ -69,12 +69,12 @@
     "fields": []
   },
   {
-    "name": "earth.dimensions",
-    "physicalName": "earth.dimensions",
+    "name": "earth.circumference",
+    "physicalName": "earth.circumference",
     "type": "DB_TABLE",
     "sourceName": "snowflake",
     "namespace": "galactic-data",
-    "description": "describes all possible dimensions on earth",
+    "description": "describes the earth's circumference",
     "fields": [
       {
       "name": "uuid",
@@ -85,12 +85,34 @@
       "type": "STRING"
       },
       {
-      "name": "mass",
+      "name": "linear distance",
       "type": "INTEGER"
       },
       {
-      "name": "dimension",
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
+  },
+  {
+    "name": "earth.radius",
+    "physicalName": "earth.radius",
+    "type": "DB_TABLE",
+    "sourceName": "snowflake",
+    "namespace": "galactic-data",
+    "description": "describes the earth's radius",
+    "fields": [
+      {
+      "name": "uuid",
       "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "linear distance",
+      "type": "INTEGER"
       },
       {
       "name": "interstellar",
@@ -476,12 +498,72 @@
     ]
   },
   {
-    "name": "alien.parts",
-    "physicalName": "alien.parts",
+    "name": "interstellar.waves",
+    "physicalName": "interstellar.waves",
     "type": "DB_TABLE",
     "namespace": "galactic-data",
     "sourceName": "redshift",
-    "description": "describes alien parts",
+    "description": "measures all waves in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "speed",
+      "type": "INTEGER"
+      },
+      {
+      "name": "height",
+      "type": "INTEGER"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.geomorphology",
+    "physicalName": "interstellar.geomorphology",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "measurements of geomorphology of matter in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "process",
+      "type": "STRING"
+      },
+      {
+      "name": "time",
+      "type": "INTEGER"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
+  },
+  {
+    "name": "alien.heads",
+    "physicalName": "alien.heads",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes alien heads",
     "fields": [
       {
       "name": "uuid",
@@ -493,6 +575,126 @@
       },
       {
       "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
+  },
+  {
+    "name": "alien.hands",
+    "physicalName": "alien.hands",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes alien hands",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "amount",
+      "type": "INTEGER"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
+  },
+  {
+    "name": "alien.arms",
+    "physicalName": "alien.arms",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes alien arms",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "amount",
+      "type": "INTEGER"
+      },
+      {
+      "name": "mass",
+      "type": "INTEGER"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
+  },
+  {
+    "name": "alien.torsos",
+    "physicalName": "alien.torsos",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes alien torsos",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "length",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
+  },
+  {
+    "name": "alien.legs",
+    "physicalName": "alien.legs",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes alien legs",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "amount",
       "type": "INTEGER"
       },
       {
@@ -532,6 +734,302 @@
       {
       "name": "interstellar",
       "type": "BOOLEAN"
+      }
+    ]
+  },
+  {
+    "name": "alien.locations",
+    "physicalName": "alien.locations",
+    "type": "DB_TABLE",
+    "namespace": "galactic-data",
+    "sourceName": "redshift",
+    "description": "describes locations of aliens",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "planet",
+      "type": "STRING"
+      },
+      {
+      "name": "galaxy",
+      "type": "INTEGER"
+      },
+      {
+      "name": "dimension",
+      "type": "STRING"
+      },
+      {
+      "name": "interstellar",
+      "type": "BOOLEAN"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.points",
+    "physicalName": "interstellar.points",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "all points in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "x",
+      "type": "INTEGER"
+      },
+      {
+      "name": "y",
+      "type": "INTEGER"
+      },
+      {
+      "name": "z",
+      "type": "INTEGER"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.surfaces",
+    "physicalName": "interstellar.surfaces",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "all surfaces in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "x",
+      "type": "INTEGER"
+      },
+      {
+      "name": "y",
+      "type": "INTEGER"
+      },
+      {
+      "name": "z",
+      "type": "INTEGER"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.curves",
+    "physicalName": "interstellar.curves",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "all curves in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "x",
+      "type": "INTEGER"
+      },
+      {
+      "name": "y",
+      "type": "INTEGER"
+      },
+      {
+      "name": "z",
+      "type": "INTEGER"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.seismology",
+    "physicalName": "interstellar.seismology",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "galactic seismology readings",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "wave type",
+      "type": "STRING"
+      },
+      {
+      "name": "wave scale",
+      "type": "INTEGER"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.geophysical_fluid_dynamics",
+    "physicalName": "interstellar.geophysical_fluid_dynamics",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "galactic geophysical fluid dynamics measurements",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "viscosity",
+      "type": "STRING"
+      },
+      {
+      "name": "buoyancy",
+      "type": "INTEGER"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.mineral_physics",
+    "physicalName": "interstellar.mineral_physics",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "galactic mineral physics measurements",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "viscosity",
+      "type": "STRING"
+      },
+      {
+      "name": "electrical conduction",
+      "type": "INTEGER"
+      },
+      {
+      "name": "seismic velocity",
+      "type": "INTEGER"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.geodynamics",
+    "physicalName": "interstellar.geodynamics",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "galactic geodynamics readings",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "viscosity",
+      "type": "STRING"
+      },
+      {
+      "name": "electrical conduction",
+      "type": "INTEGER"
+      },
+      {
+      "name": "seismic velocity",
+      "type": "INTEGER"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.angles",
+    "physicalName": "interstellar.angles",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "all angles in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "x",
+      "type": "INTEGER"
+      },
+      {
+      "name": "y",
+      "type": "INTEGER"
+      },
+      {
+      "name": "z",
+      "type": "INTEGER"
+      }
+    ]
+  },
+  {
+    "name": "interstellar.planes",
+    "physicalName": "interstellar.planes",
+    "type": "DB_TABLE",
+    "namespace": "interstellar-data",
+    "sourceName": "redshift",
+    "description": "all planes in the galaxy",
+    "fields": [
+      {
+      "name": "uuid",
+      "type": "STRING"
+      },
+      {
+      "name": "name",
+      "type": "STRING"
+      },
+      {
+      "name": "length",
+      "type": "INTEGER"
+      },
+      {
+      "name": "width",
+      "type": "INTEGER"
+      },
+      {
+      "name": "x",
+      "type": "INTEGER"
+      },
+      {
+      "name": "y",
+      "type": "INTEGER"
       }
     ]
   },

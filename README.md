@@ -82,7 +82,7 @@ You can open http://localhost:3000 to begin exploring the web UI.
 
 ### Typescript
 
-This project is written in typescript because it is awesome. See [tsconfig.json](tsconfig.json) for our setup.
+This project is written in typescript. See [tsconfig.json](tsconfig.json) for our setup.
 
 Our types are defined in the `src/types` folder
 

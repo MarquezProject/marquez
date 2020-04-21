@@ -74,7 +74,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
         "type": "DB_TABLE",
       },
       Object {
-        "description": "describes all possible dimensions on earth",
+        "description": "describes the earth's circumference",
         "fields": Array [
           Object {
             "name": "uuid",
@@ -85,21 +85,43 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
             "type": "STRING",
           },
           Object {
-            "name": "mass",
+            "name": "linear distance",
             "type": "INTEGER",
-          },
-          Object {
-            "name": "dimension",
-            "type": "STRING",
           },
           Object {
             "name": "interstellar",
             "type": "BOOLEAN",
           },
         ],
-        "name": "earth.dimensions",
+        "name": "earth.circumference",
         "namespace": "galactic-data",
-        "physicalName": "earth.dimensions",
+        "physicalName": "earth.circumference",
+        "sourceName": "snowflake",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes the earth's radius",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "linear distance",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "earth.radius",
+        "namespace": "galactic-data",
+        "physicalName": "earth.radius",
         "sourceName": "snowflake",
         "type": "DB_TABLE",
       },
@@ -481,7 +503,67 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
         "type": "DB_TABLE",
       },
       Object {
-        "description": "describes alien parts",
+        "description": "measures all waves in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "speed",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "height",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.waves",
+        "namespace": "galactic-data",
+        "physicalName": "interstellar.waves",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "measurements of geomorphology of matter in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "process",
+            "type": "STRING",
+          },
+          Object {
+            "name": "time",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.geomorphology",
+        "namespace": "galactic-data",
+        "physicalName": "interstellar.geomorphology",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien heads",
         "fields": Array [
           Object {
             "name": "uuid",
@@ -504,9 +586,129 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
             "type": "BOOLEAN",
           },
         ],
-        "name": "alien.parts",
+        "name": "alien.heads",
         "namespace": "galactic-data",
-        "physicalName": "alien.parts",
+        "physicalName": "alien.heads",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien hands",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "amount",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.hands",
+        "namespace": "galactic-data",
+        "physicalName": "alien.hands",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien arms",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "amount",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.arms",
+        "namespace": "galactic-data",
+        "physicalName": "alien.arms",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien torsos",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "length",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.torsos",
+        "namespace": "galactic-data",
+        "physicalName": "alien.torsos",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien legs",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "amount",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.legs",
+        "namespace": "galactic-data",
+        "physicalName": "alien.legs",
         "sourceName": "redshift",
         "type": "DB_TABLE",
       },
@@ -537,6 +739,302 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
         "name": "alien.types",
         "namespace": "galactic-data",
         "physicalName": "alien.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes locations of aliens",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "planet",
+            "type": "STRING",
+          },
+          Object {
+            "name": "galaxy",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.locations",
+        "namespace": "galactic-data",
+        "physicalName": "alien.locations",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all points in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "z",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.points",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.points",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all surfaces in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "z",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.surfaces",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.surfaces",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all curves in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "z",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.curves",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.curves",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "galactic seismology readings",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "wave type",
+            "type": "STRING",
+          },
+          Object {
+            "name": "wave scale",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.seismology",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.seismology",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "galactic geophysical fluid dynamics measurements",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "viscosity",
+            "type": "STRING",
+          },
+          Object {
+            "name": "buoyancy",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.geophysical_fluid_dynamics",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.geophysical_fluid_dynamics",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "galactic mineral physics measurements",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "viscosity",
+            "type": "STRING",
+          },
+          Object {
+            "name": "electrical conduction",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "seismic velocity",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.mineral_physics",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.mineral_physics",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "galactic geodynamics readings",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "viscosity",
+            "type": "STRING",
+          },
+          Object {
+            "name": "electrical conduction",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "seismic velocity",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.geodynamics",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.geodynamics",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all angles in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "z",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.angles",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.angles",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all planes in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "length",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "width",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.planes",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.planes",
         "sourceName": "redshift",
         "type": "DB_TABLE",
       },
@@ -1232,7 +1730,7 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
           "type": "DB_TABLE",
         },
         Object {
-          "description": "describes all possible dimensions on earth",
+          "description": "describes the earth's circumference",
           "fields": Array [
             Object {
               "name": "uuid",
@@ -1243,21 +1741,43 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
               "type": "STRING",
             },
             Object {
-              "name": "mass",
+              "name": "linear distance",
               "type": "INTEGER",
-            },
-            Object {
-              "name": "dimension",
-              "type": "STRING",
             },
             Object {
               "name": "interstellar",
               "type": "BOOLEAN",
             },
           ],
-          "name": "earth.dimensions",
+          "name": "earth.circumference",
           "namespace": "galactic-data",
-          "physicalName": "earth.dimensions",
+          "physicalName": "earth.circumference",
+          "sourceName": "snowflake",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes the earth's radius",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "linear distance",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "earth.radius",
+          "namespace": "galactic-data",
+          "physicalName": "earth.radius",
           "sourceName": "snowflake",
           "type": "DB_TABLE",
         },
@@ -1639,7 +2159,67 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
           "type": "DB_TABLE",
         },
         Object {
-          "description": "describes alien parts",
+          "description": "measures all waves in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "speed",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "height",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.waves",
+          "namespace": "galactic-data",
+          "physicalName": "interstellar.waves",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "measurements of geomorphology of matter in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "process",
+              "type": "STRING",
+            },
+            Object {
+              "name": "time",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.geomorphology",
+          "namespace": "galactic-data",
+          "physicalName": "interstellar.geomorphology",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien heads",
           "fields": Array [
             Object {
               "name": "uuid",
@@ -1662,9 +2242,129 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
               "type": "BOOLEAN",
             },
           ],
-          "name": "alien.parts",
+          "name": "alien.heads",
           "namespace": "galactic-data",
-          "physicalName": "alien.parts",
+          "physicalName": "alien.heads",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien hands",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "amount",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.hands",
+          "namespace": "galactic-data",
+          "physicalName": "alien.hands",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien arms",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "amount",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.arms",
+          "namespace": "galactic-data",
+          "physicalName": "alien.arms",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien torsos",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "length",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.torsos",
+          "namespace": "galactic-data",
+          "physicalName": "alien.torsos",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien legs",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "amount",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.legs",
+          "namespace": "galactic-data",
+          "physicalName": "alien.legs",
           "sourceName": "redshift",
           "type": "DB_TABLE",
         },
@@ -1695,6 +2395,302 @@ exports[`DatasetDetailPage Component when there is a match for the datasetName i
           "name": "alien.types",
           "namespace": "galactic-data",
           "physicalName": "alien.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes locations of aliens",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "planet",
+              "type": "STRING",
+            },
+            Object {
+              "name": "galaxy",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.locations",
+          "namespace": "galactic-data",
+          "physicalName": "alien.locations",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all points in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "z",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.points",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.points",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all surfaces in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "z",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.surfaces",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.surfaces",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all curves in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "z",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.curves",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.curves",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "galactic seismology readings",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "wave type",
+              "type": "STRING",
+            },
+            Object {
+              "name": "wave scale",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.seismology",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.seismology",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "galactic geophysical fluid dynamics measurements",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "viscosity",
+              "type": "STRING",
+            },
+            Object {
+              "name": "buoyancy",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.geophysical_fluid_dynamics",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.geophysical_fluid_dynamics",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "galactic mineral physics measurements",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "viscosity",
+              "type": "STRING",
+            },
+            Object {
+              "name": "electrical conduction",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "seismic velocity",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.mineral_physics",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.mineral_physics",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "galactic geodynamics readings",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "viscosity",
+              "type": "STRING",
+            },
+            Object {
+              "name": "electrical conduction",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "seismic velocity",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.geodynamics",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.geodynamics",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all angles in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "z",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.angles",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.angles",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all planes in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "length",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "width",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.planes",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.planes",
           "sourceName": "redshift",
           "type": "DB_TABLE",
         },
@@ -3760,7 +4756,7 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
         "type": "DB_TABLE",
       },
       Object {
-        "description": "describes all possible dimensions on earth",
+        "description": "describes the earth's circumference",
         "fields": Array [
           Object {
             "name": "uuid",
@@ -3771,21 +4767,43 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
             "type": "STRING",
           },
           Object {
-            "name": "mass",
+            "name": "linear distance",
             "type": "INTEGER",
-          },
-          Object {
-            "name": "dimension",
-            "type": "STRING",
           },
           Object {
             "name": "interstellar",
             "type": "BOOLEAN",
           },
         ],
-        "name": "earth.dimensions",
+        "name": "earth.circumference",
         "namespace": "galactic-data",
-        "physicalName": "earth.dimensions",
+        "physicalName": "earth.circumference",
+        "sourceName": "snowflake",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes the earth's radius",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "linear distance",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "earth.radius",
+        "namespace": "galactic-data",
+        "physicalName": "earth.radius",
         "sourceName": "snowflake",
         "type": "DB_TABLE",
       },
@@ -4167,7 +5185,67 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
         "type": "DB_TABLE",
       },
       Object {
-        "description": "describes alien parts",
+        "description": "measures all waves in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "speed",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "height",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.waves",
+        "namespace": "galactic-data",
+        "physicalName": "interstellar.waves",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "measurements of geomorphology of matter in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "process",
+            "type": "STRING",
+          },
+          Object {
+            "name": "time",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "interstellar.geomorphology",
+        "namespace": "galactic-data",
+        "physicalName": "interstellar.geomorphology",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien heads",
         "fields": Array [
           Object {
             "name": "uuid",
@@ -4190,9 +5268,129 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
             "type": "BOOLEAN",
           },
         ],
-        "name": "alien.parts",
+        "name": "alien.heads",
         "namespace": "galactic-data",
-        "physicalName": "alien.parts",
+        "physicalName": "alien.heads",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien hands",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "amount",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.hands",
+        "namespace": "galactic-data",
+        "physicalName": "alien.hands",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien arms",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "amount",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "mass",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.arms",
+        "namespace": "galactic-data",
+        "physicalName": "alien.arms",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien torsos",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "length",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.torsos",
+        "namespace": "galactic-data",
+        "physicalName": "alien.torsos",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes alien legs",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "amount",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.legs",
+        "namespace": "galactic-data",
+        "physicalName": "alien.legs",
         "sourceName": "redshift",
         "type": "DB_TABLE",
       },
@@ -4223,6 +5421,302 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
         "name": "alien.types",
         "namespace": "galactic-data",
         "physicalName": "alien.types",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "describes locations of aliens",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "planet",
+            "type": "STRING",
+          },
+          Object {
+            "name": "galaxy",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "dimension",
+            "type": "STRING",
+          },
+          Object {
+            "name": "interstellar",
+            "type": "BOOLEAN",
+          },
+        ],
+        "name": "alien.locations",
+        "namespace": "galactic-data",
+        "physicalName": "alien.locations",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all points in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "z",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.points",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.points",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all surfaces in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "z",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.surfaces",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.surfaces",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all curves in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "z",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.curves",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.curves",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "galactic seismology readings",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "wave type",
+            "type": "STRING",
+          },
+          Object {
+            "name": "wave scale",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.seismology",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.seismology",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "galactic geophysical fluid dynamics measurements",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "viscosity",
+            "type": "STRING",
+          },
+          Object {
+            "name": "buoyancy",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.geophysical_fluid_dynamics",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.geophysical_fluid_dynamics",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "galactic mineral physics measurements",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "viscosity",
+            "type": "STRING",
+          },
+          Object {
+            "name": "electrical conduction",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "seismic velocity",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.mineral_physics",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.mineral_physics",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "galactic geodynamics readings",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "viscosity",
+            "type": "STRING",
+          },
+          Object {
+            "name": "electrical conduction",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "seismic velocity",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.geodynamics",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.geodynamics",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all angles in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "z",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.angles",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.angles",
+        "sourceName": "redshift",
+        "type": "DB_TABLE",
+      },
+      Object {
+        "description": "all planes in the galaxy",
+        "fields": Array [
+          Object {
+            "name": "uuid",
+            "type": "STRING",
+          },
+          Object {
+            "name": "name",
+            "type": "STRING",
+          },
+          Object {
+            "name": "length",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "width",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "x",
+            "type": "INTEGER",
+          },
+          Object {
+            "name": "y",
+            "type": "INTEGER",
+          },
+        ],
+        "name": "interstellar.planes",
+        "namespace": "interstellar-data",
+        "physicalName": "interstellar.planes",
         "sourceName": "redshift",
         "type": "DB_TABLE",
       },
@@ -4918,7 +6412,7 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
           "type": "DB_TABLE",
         },
         Object {
-          "description": "describes all possible dimensions on earth",
+          "description": "describes the earth's circumference",
           "fields": Array [
             Object {
               "name": "uuid",
@@ -4929,21 +6423,43 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
               "type": "STRING",
             },
             Object {
-              "name": "mass",
+              "name": "linear distance",
               "type": "INTEGER",
-            },
-            Object {
-              "name": "dimension",
-              "type": "STRING",
             },
             Object {
               "name": "interstellar",
               "type": "BOOLEAN",
             },
           ],
-          "name": "earth.dimensions",
+          "name": "earth.circumference",
           "namespace": "galactic-data",
-          "physicalName": "earth.dimensions",
+          "physicalName": "earth.circumference",
+          "sourceName": "snowflake",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes the earth's radius",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "linear distance",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "earth.radius",
+          "namespace": "galactic-data",
+          "physicalName": "earth.radius",
           "sourceName": "snowflake",
           "type": "DB_TABLE",
         },
@@ -5325,7 +6841,67 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
           "type": "DB_TABLE",
         },
         Object {
-          "description": "describes alien parts",
+          "description": "measures all waves in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "speed",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "height",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.waves",
+          "namespace": "galactic-data",
+          "physicalName": "interstellar.waves",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "measurements of geomorphology of matter in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "process",
+              "type": "STRING",
+            },
+            Object {
+              "name": "time",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "interstellar.geomorphology",
+          "namespace": "galactic-data",
+          "physicalName": "interstellar.geomorphology",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien heads",
           "fields": Array [
             Object {
               "name": "uuid",
@@ -5348,9 +6924,129 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
               "type": "BOOLEAN",
             },
           ],
-          "name": "alien.parts",
+          "name": "alien.heads",
           "namespace": "galactic-data",
-          "physicalName": "alien.parts",
+          "physicalName": "alien.heads",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien hands",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "amount",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.hands",
+          "namespace": "galactic-data",
+          "physicalName": "alien.hands",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien arms",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "amount",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "mass",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.arms",
+          "namespace": "galactic-data",
+          "physicalName": "alien.arms",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien torsos",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "length",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.torsos",
+          "namespace": "galactic-data",
+          "physicalName": "alien.torsos",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes alien legs",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "amount",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.legs",
+          "namespace": "galactic-data",
+          "physicalName": "alien.legs",
           "sourceName": "redshift",
           "type": "DB_TABLE",
         },
@@ -5381,6 +7077,302 @@ exports[`DatasetDetailPage Component when there is no match for the datasetName 
           "name": "alien.types",
           "namespace": "galactic-data",
           "physicalName": "alien.types",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "describes locations of aliens",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "planet",
+              "type": "STRING",
+            },
+            Object {
+              "name": "galaxy",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "dimension",
+              "type": "STRING",
+            },
+            Object {
+              "name": "interstellar",
+              "type": "BOOLEAN",
+            },
+          ],
+          "name": "alien.locations",
+          "namespace": "galactic-data",
+          "physicalName": "alien.locations",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all points in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "z",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.points",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.points",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all surfaces in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "z",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.surfaces",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.surfaces",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all curves in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "z",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.curves",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.curves",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "galactic seismology readings",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "wave type",
+              "type": "STRING",
+            },
+            Object {
+              "name": "wave scale",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.seismology",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.seismology",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "galactic geophysical fluid dynamics measurements",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "viscosity",
+              "type": "STRING",
+            },
+            Object {
+              "name": "buoyancy",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.geophysical_fluid_dynamics",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.geophysical_fluid_dynamics",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "galactic mineral physics measurements",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "viscosity",
+              "type": "STRING",
+            },
+            Object {
+              "name": "electrical conduction",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "seismic velocity",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.mineral_physics",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.mineral_physics",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "galactic geodynamics readings",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "viscosity",
+              "type": "STRING",
+            },
+            Object {
+              "name": "electrical conduction",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "seismic velocity",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.geodynamics",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.geodynamics",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all angles in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "z",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.angles",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.angles",
+          "sourceName": "redshift",
+          "type": "DB_TABLE",
+        },
+        Object {
+          "description": "all planes in the galaxy",
+          "fields": Array [
+            Object {
+              "name": "uuid",
+              "type": "STRING",
+            },
+            Object {
+              "name": "name",
+              "type": "STRING",
+            },
+            Object {
+              "name": "length",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "width",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "x",
+              "type": "INTEGER",
+            },
+            Object {
+              "name": "y",
+              "type": "INTEGER",
+            },
+          ],
+          "name": "interstellar.planes",
+          "namespace": "interstellar-data",
+          "physicalName": "interstellar.planes",
           "sourceName": "redshift",
           "type": "DB_TABLE",
         },
