@@ -162,6 +162,7 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
     const strokeWidth = 5
 
     function findJobColor(job: any) {
+      if (!job.data.latestRun) return circleHighlight
       const key = job.data.latestRun.runState as IJobRunAPI['runState']
       const color = colorMap[key]
       return color
