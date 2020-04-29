@@ -15,3 +15,4 @@ declare const Rollbar: {
 }
 
 declare const __FEEDBACK_FORM_URL__: string
+declare const __API_DOCS_URL__: string

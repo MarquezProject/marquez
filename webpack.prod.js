@@ -24,7 +24,8 @@ const webpackProd = {
       __API_URL__: JSON.stringify('/api/v1'),
       __TEMP_ACTOR_STR__: JSON.stringify('me'),
       __ROLLBAR__: JSON.stringify(true),
-      __FEEDBACK_FORM_URL__: JSON.stringify('https://forms.gle/f3tTSrZ8wPj3sHTA7')
+      __FEEDBACK_FORM_URL__: JSON.stringify('https://forms.gle/f3tTSrZ8wPj3sHTA7'),
+      __API_DOCS_URL__: JSON.stringify('https://marquezproject.github.io/marquez/openapi.html')
     })
     //new BundleAnalyzerPlugin(),
   ]

@@ -31,7 +31,8 @@ const webpackDev = {
       __API_URL__: JSON.stringify('/api/v1'),
       __NODE_ENV__: JSON.stringify('development'),
       __TEMP_ACTOR_STR__: JSON.stringify('me'),
-      __FEEDBACK_FORM_URL__: JSON.stringify('https://forms.gle/f3tTSrZ8wPj3sHTA7')
+      __FEEDBACK_FORM_URL__: JSON.stringify('https://forms.gle/f3tTSrZ8wPj3sHTA7'),
+      __API_DOCS_URL__: JSON.stringify('https://marquezproject.github.io/marquez/openapi.html')
     })
   ]
 }

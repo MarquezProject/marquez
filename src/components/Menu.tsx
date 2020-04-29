@@ -20,6 +20,11 @@ export default function SimpleMenu() {
     const link = __FEEDBACK_FORM_URL__
     window.open(link, '_blank')
   }
+  const apiDocsClicked = () => {
+    handleClose()
+    const link = __API_DOCS_URL__
+    window.open(link, '_blank')
+  }
 
   return (
     <div>
@@ -34,6 +39,7 @@ export default function SimpleMenu() {
         onClose={handleClose}
       >
         <MenuItem onClick={feedBackClicked}>Feedback</MenuItem>
+        <MenuItem onClick={apiDocsClicked}>API Docs</MenuItem>
       </Menu>
     </div>
   )
