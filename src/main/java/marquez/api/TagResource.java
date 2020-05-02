@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -52,17 +52,17 @@ public final class TagResource {
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final Set<Tag> tags = service.getAll(limit, offset);
+    final ImmutableSet<Tag> tags = service.getAll(limit, offset);
     return Response.ok(toTags(tags)).build();
   }
 
   @Value
   class Tags {
     @JsonProperty("tags")
-    Set<Tag> value;
+    ImmutableSet<Tag> value;
   }
 
-  Tags toTags(@NonNull final Set<Tag> tags) {
+  Tags toTags(@NonNull final ImmutableSet<Tag> tags) {
     return new Tags(tags);
   }
 }
