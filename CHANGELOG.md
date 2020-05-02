@@ -8,7 +8,7 @@
 
 ### Changed
 
-* Support dashes (-) in the namespace name
+* Support dashes (`-`) in namespace
 
 ## [0.2.0](https://github.com/MarquezProject/marquez/releases/tag/0.2.0) - 2019-04-15
 
@@ -27,7 +27,7 @@
 ### Changed
 
 * Minor pkg restructuring
-* Throw NamespaceNotFoundException on NamespaceResource.get() 
+* Throw [**`NamespaceNotFoundException`**](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/api/exceptions/NamespaceNotFoundException.java) on [`NamespaceResource.get()`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/api/NamespaceResource.java#L80) 
 
 ## [0.1.0](https://github.com/MarquezProject/marquez/releases/tag/0.1.0) - 2018-12-18
 
