@@ -1,7 +1,14 @@
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/master...HEAD)
+
 ### Added
+
+## [0.2.1](https://github.com/MarquezProject/marquez/releases/tag/0.2.1) - 2019-04-22
+
+### Changed
+
+* Support dashes (-) in the namespace name
 
 ## [0.2.0](https://github.com/MarquezProject/marquez/releases/tag/0.2.0) - 2019-04-15
 
