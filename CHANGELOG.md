@@ -4,6 +4,13 @@
 
 ### Added
 
+## [0.4.0](https://github.com/MarquezProject/marquez/releases/tag/0.4.0) - 2019-06-04
+
+### Added
+
+* Add quickstart
+* Add **`GET`** `/namespaces/{namespace}/jobs/{job}/runs`
+
 ## [0.3.4](https://github.com/MarquezProject/marquez/releases/tag/0.3.4) - 2019-05-17
 
 ### Changed
@@ -53,20 +60,28 @@
 
 ### Added
 
+* Add `@NoArgsConstructor` to exceptions
+* Add license to `*.java`
+* Add column constants
+* Add response/error metrics to API endpoints
 * Add build info to jar manifest
 * Add release steps and plugin
 * Add `/jobs/runs/{id}/run`
 * Add jdbi metrics
 * Add gitter link
 * Add column constants
-* Add MarquezServiceException
-* Add -parameters compiler flag
+* Add **`MarquezServiceException`**
+* Add `-parameters` compiler flag
 * Add JSON logging support
 
 ### Changed
 
 * Minor pkg restructuring
-* Throw [**`NamespaceNotFoundException`**](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/api/exceptions/NamespaceNotFoundException.java) on [`NamespaceResource.get()`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/api/NamespaceResource.java#L80) 
+* Throw [**`NamespaceNotFoundException`**](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/api/exceptions/NamespaceNotFoundException.java) on [`NamespaceResource.get()`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/api/NamespaceResource.java#L80)
+
+### Fixed
+
+* Fix dataset list error
 
 ## [0.1.0](https://github.com/MarquezProject/marquez/releases/tag/0.1.0) - 2018-12-18
 
