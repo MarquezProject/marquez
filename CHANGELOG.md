@@ -4,16 +4,37 @@
 
 ### Added
 
+## [0.9.0](https://github.com/MarquezProject/marquez/releases/tag/0.9.0) - 2020-01-05
+
+### Added
+
+* Validate `runID` when linked to dataset change
+* Add `Utils.toUuid()`
+* Add tests for class `TagDao`
+* Add default tags to config
+* Add tagging support for dataset fields
+* Add `docker/config.dev.yml`
+* Add flyway config support
+
+### Changed
+
+* Replace deprecated `App.onFatalError()`
+
+### Fixed
+
+* Fix error on tag exists
+* Fix malformed sql in `RunDao.findAll()`
+
 ## [0.8.0](https://github.com/MarquezProject/marquez/releases/tag/0.8.0) - 2019-12-12
 
 ### Added
 
 * Add `Dataset.lastModified`
-* Modify `args` column in table `run_args` 
+* Modify `args` column in table `run_args`
 
 ### Changed
 
-* Use new Flyway version to fix migration with custom roles 
+* Use new Flyway version to fix migration with custom roles
 
 ## [0.7.0](https://github.com/MarquezProject/marquez/releases/tag/0.7.0) - 2019-12-05
 
@@ -30,7 +51,7 @@
 
 ### Fixed
 
-* Fix dataset field serialization 
+* Fix dataset field serialization
 
 ## [0.6.0](https://github.com/MarquezProject/marquez/releases/tag/0.6.0) - 2019-11-29
 
@@ -56,7 +77,7 @@
 
 * Update semver regex in build-and-push.sh
 * Minor updates to job and dataset versioning functions
-* Make `Job.location` optional 
+* Make `Job.location` optional
 
 ## [0.5.0](https://github.com/MarquezProject/marquez/releases/tag/0.5.0) - 2019-11-04
 
