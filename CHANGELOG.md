@@ -4,6 +4,21 @@
 
 ### Added
 
+## [0.3.0](https://github.com/MarquezProject/marquez/releases/tag/0.3.0) - 2019-05-14
+
+### Added
+
+* Add JobResponse.updatedAt
+
+### Changed
+
+* Return timestamp strings as ISO format 
+
+### Removed
+
+* Remove unused tables in db schema
+
+
 ## [0.2.1](https://github.com/MarquezProject/marquez/releases/tag/0.2.1) - 2019-04-22
 
 ### Changed
