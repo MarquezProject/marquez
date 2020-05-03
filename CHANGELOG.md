@@ -4,6 +4,13 @@
 
 ### Added
 
+## [0.9.1](https://github.com/MarquezProject/marquez/releases/tag/0.9.0) - 2020-01-05
+
+### Added
+
+* Add redshift data types
+* Add links to dropwizard overrides in `config.yml`
+
 ## [0.9.0](https://github.com/MarquezProject/marquez/releases/tag/0.9.0) - 2020-01-05
 
 ### Added
