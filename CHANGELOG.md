@@ -4,6 +4,12 @@
 
 ### Added
 
+## [0.3.3](https://github.com/MarquezProject/marquez/releases/tag/0.3.3) - 2019-05-14
+
+### Changed
+
+* Set timestamps to `CURRENT_TIMESTAMP` 
+
 ## [0.3.2](https://github.com/MarquezProject/marquez/releases/tag/0.3.2) - 2019-05-14
 
 ### Changed
