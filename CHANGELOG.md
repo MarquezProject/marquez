@@ -4,6 +4,17 @@
 
 ### Added
 
+## [0.8.0](https://github.com/MarquezProject/marquez/releases/tag/0.8.0) - 2019-12-12
+
+### Added
+
+* Add `Dataset.lastModified`
+* Modify `args` column in table `run_args` 
+
+### Changed
+
+* Use new Flyway version to fix migration with custom roles 
+
 ## [0.7.0](https://github.com/MarquezProject/marquez/releases/tag/0.7.0) - 2019-12-05
 
 ### Added
