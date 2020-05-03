@@ -4,11 +4,17 @@
 
 ### Added
 
+## [0.3.1](https://github.com/MarquezProject/marquez/releases/tag/0.3.1) - 2019-05-14
+
+### Added
+
+* Handle `Flyway.repair()` error 
+
 ## [0.3.0](https://github.com/MarquezProject/marquez/releases/tag/0.3.0) - 2019-05-14
 
 ### Added
 
-* Add JobResponse.updatedAt
+* Add `JobResponse.updatedAt`
 
 ### Changed
 
