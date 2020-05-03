@@ -4,7 +4,7 @@
 
 ### Added
 
-## [0.5.1](https://github.com/MarquezProject/marquez/releases/tag/0.5.0) - 2019-11-04
+## [0.5.1](https://github.com/MarquezProject/marquez/releases/tag/0.5.0) - 2019-11-20
 
 ### Added
 
