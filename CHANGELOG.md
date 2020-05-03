@@ -104,7 +104,7 @@
 
 * Fix dataset field serialization
 
-## [0.6.0](https://github.com/MarquezProject/marquez/releases/tag/0.6.0) - 2019-11-29
+## [0.6.0](https://github.com/MarquezProject/marquez/compare/0.5.1...0.6.0) - 2019-11-29
 
 ### Added
 
@@ -116,7 +116,7 @@
 * Adjust class RunResponse property ordering on serialization
 * Update logging on default namespace creation
 
-## [0.5.1](https://github.com/MarquezProject/marquez/releases/tag/0.5.1) - 2019-11-20
+## [0.5.1](https://github.com/MarquezProject/marquez/compare/0.5.0...0.5.1) - 2019-11-20
 
 ### Added
 
@@ -130,7 +130,7 @@
 * Minor updates to job and dataset versioning functions
 * Make `Job.location` optional
 
-## [0.5.0](https://github.com/MarquezProject/marquez/releases/tag/0.5.0) - 2019-11-04
+## [0.5.0](https://github.com/MarquezProject/marquez/compare/0.4.0...0.5.0) - 2019-11-04
 
 ### Added
 
@@ -157,38 +157,38 @@
 
 * Fix `marquez.jar` rename on `COPY` 
 
-## [0.4.0](https://github.com/MarquezProject/marquez/releases/tag/0.4.0) - 2019-06-04
+## [0.4.0](https://github.com/MarquezProject/marquez/compare/0.3.4...0.4.0) - 2019-06-04
 
 ### Added
 
 * Add quickstart
 * Add **`GET`** `/namespaces/{namespace}/jobs/{job}/runs`
 
-## [0.3.4](https://github.com/MarquezProject/marquez/releases/tag/0.3.4) - 2019-05-17
+## [0.3.4](https://github.com/MarquezProject/marquez/compare/0.3.3...0.3.4) - 2019-05-17
 
 ### Changed
 
 * Change `Datasetdao.findAll()` to order by `Dataset.name`
 
-## [0.3.3](https://github.com/MarquezProject/marquez/releases/tag/0.3.3) - 2019-05-14
+## [0.3.3](https://github.com/MarquezProject/marquez/compare/0.3.2...0.3.3) - 2019-05-14
 
 ### Changed
 
 * Set timestamps to `CURRENT_TIMESTAMP` 
 
-## [0.3.2](https://github.com/MarquezProject/marquez/releases/tag/0.3.2) - 2019-05-14
+## [0.3.2](https://github.com/MarquezProject/marquez/compare/0.3.1...0.3.2) - 2019-05-14
 
 ### Changed
 
 * Set `job_versions.updated_at` to `CURRENT_TIMESTAMP` 
 
-## [0.3.1](https://github.com/MarquezProject/marquez/releases/tag/0.3.1) - 2019-05-14
+## [0.3.1](https://github.com/MarquezProject/marquez/compare/0.3.0...0.3.1) - 2019-05-14
 
 ### Added
 
 * Handle `Flyway.repair()` error 
 
-## [0.3.0](https://github.com/MarquezProject/marquez/releases/tag/0.3.0) - 2019-05-14
+## [0.3.0](https://github.com/MarquezProject/marquez/compare/0.2.1...0.3.0) - 2019-05-14
 
 ### Added
 
@@ -203,13 +203,13 @@
 * Remove unused tables in db schema
 
 
-## [0.2.1](https://github.com/MarquezProject/marquez/releases/tag/0.2.1) - 2019-04-22
+## [0.2.1](https://github.com/MarquezProject/marquez/compare/0.2.0...0.2.1) - 2019-04-22
 
 ### Changed
 
 * Support dashes (`-`) in namespace
 
-## [0.2.0](https://github.com/MarquezProject/marquez/releases/tag/0.2.0) - 2019-04-15
+## [0.2.0](https://github.com/MarquezProject/marquez/compare/0.1.0...0.2.0) - 2019-04-15
 
 ### Added
 
