@@ -4,6 +4,12 @@
 
 ### Added
 
+## [0.10.0](https://github.com/MarquezProject/marquez/releases/tag/0.10.0) - 2020-01-05
+
+### Changed
+
+* Rename table `dataset_tag_mapping`
+
 ## [0.9.2](https://github.com/MarquezProject/marquez/releases/tag/0.9.2) - 2020-01-05
 
 ### Added
@@ -109,7 +115,7 @@
 
 * Rename guid column to uuid 
 * Use admin ping and health
-* pdate owner to ownerName
+* Update `owner` to `ownerName`
 
 ### Removed
 
