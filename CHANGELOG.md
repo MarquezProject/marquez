@@ -4,6 +4,12 @@
 
 ### Added
 
+## [0.10.2](https://github.com/MarquezProject/marquez/releases/tag/0.10.2) - 2020-01-16
+
+### Added
+
+* Added Location header to run creation @nkijak
+
 ## [0.10.1](https://github.com/MarquezProject/marquez/releases/tag/0.10.1) - 2020-01-11
 
 ### Changed
