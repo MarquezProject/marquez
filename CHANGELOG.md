@@ -4,11 +4,22 @@
 
 ### Added
 
+## [0.10.3](https://github.com/MarquezProject/marquez/releases/tag/0.10.3) - 2020-01-17
+
+### Added
+
+* Add `JobResource.locationFor()`
+
+### Fixed
+
+* Fix dataset field versioning
+* Fix list job runs
+
 ## [0.10.2](https://github.com/MarquezProject/marquez/releases/tag/0.10.2) - 2020-01-16
 
 ### Added
 
-* Added Location header to run creation @nkijak
+* Added Location header to run creation
 
 ## [0.10.1](https://github.com/MarquezProject/marquez/releases/tag/0.10.1) - 2020-01-11
 
