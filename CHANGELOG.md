@@ -4,6 +4,12 @@
 
 ### Added
 
+## [0.3.4](https://github.com/MarquezProject/marquez/releases/tag/0.3.4) - 2019-05-17
+
+### Changed
+
+* Change `Datasetdao.findAll()` to order by `Dataset.name`
+
 ## [0.3.3](https://github.com/MarquezProject/marquez/releases/tag/0.3.3) - 2019-05-14
 
 ### Changed
