@@ -4,6 +4,12 @@
 
 ### Added
 
+## [0.3.2](https://github.com/MarquezProject/marquez/releases/tag/0.3.2) - 2019-05-14
+
+### Changed
+
+* Set `job_versions.updated_at` to `CURRENT_TIMESTAMP` 
+
 ## [0.3.1](https://github.com/MarquezProject/marquez/releases/tag/0.3.1) - 2019-05-14
 
 ### Added
