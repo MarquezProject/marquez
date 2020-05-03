@@ -4,6 +4,12 @@
 
 ### Added
 
+## [0.10.4](https://github.com/MarquezProject/marquez/releases/tag/0.10.4) - 2020-01-17
+
+### Fixed
+
+* Fix `RunState.isComplete()`
+
 ## [0.10.3](https://github.com/MarquezProject/marquez/releases/tag/0.10.3) - 2020-01-17
 
 ### Added
