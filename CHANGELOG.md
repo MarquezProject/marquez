@@ -1,19 +1,20 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/master...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.10.4...HEAD)
 
 ### Added
 
-## [0.10.4](https://github.com/MarquezProject/marquez/releases/tag/0.10.4) - 2020-01-17
+## [0.10.4](https://github.com/MarquezProject/marquez/compare/0.10.3...0.10.4) - 2020-01-17
 
 ### Fixed
 
 * Fix `RunState.isComplete()`
 
-## [0.10.3](https://github.com/MarquezProject/marquez/releases/tag/0.10.3) - 2020-01-17
+## [0.10.3](https://github.com/MarquezProject/marquez/compare/0.10.2...0.10.3) - 2020-01-17
 
 ### Added
 
+* Add new logo
 * Add `JobResource.locationFor()`
 
 ### Fixed
@@ -21,38 +22,38 @@
 * Fix dataset field versioning
 * Fix list job runs
 
-## [0.10.2](https://github.com/MarquezProject/marquez/releases/tag/0.10.2) - 2020-01-16
+## [0.10.2](https://github.com/MarquezProject/marquez/compare/0.10.1...0.10.2) - 2020-01-16
 
 ### Added
 
-* Added Location header to run creation
+* Added Location header to run creation [@nkijak](https://github.com/nkijak)
 
-## [0.10.1](https://github.com/MarquezProject/marquez/releases/tag/0.10.1) - 2020-01-11
+## [0.10.1](https://github.com/MarquezProject/marquez/compare/0.10.0...0.10.1) - 2020-01-11
 
 ### Changed
 
 * Rename `datasets.last_modified`
 
-## [0.10.0](https://github.com/MarquezProject/marquez/releases/tag/0.10.0) - 2020-01-08
+## [0.10.0](https://github.com/MarquezProject/marquez/compare/0.9.2...0.10.0) - 2020-01-08
 
 ### Changed
 
 * Rename table `dataset_tag_mapping`
 
-## [0.9.2](https://github.com/MarquezProject/marquez/releases/tag/0.9.2) - 2020-01-07
+## [0.9.2](https://github.com/MarquezProject/marquez/compare/0.9.1...0.9.2) - 2020-01-07
 
 ### Added
 
 * Add `Flyway.baselineOnMigrate` flag
 
-## [0.9.1](https://github.com/MarquezProject/marquez/releases/tag/0.9.1) - 2020-01-06
+## [0.9.1](https://github.com/MarquezProject/marquez/compare/0.9.0...0.9.1) - 2020-01-06
 
 ### Added
 
 * Add redshift data types
 * Add links to dropwizard overrides in `config.yml`
 
-## [0.9.0](https://github.com/MarquezProject/marquez/releases/tag/0.9.0) - 2020-01-05
+## [0.9.0](https://github.com/MarquezProject/marquez/compare/0.8.0...0.9.0) - 2020-01-05
 
 ### Added
 
@@ -73,18 +74,20 @@
 * Fix error on tag exists
 * Fix malformed sql in `RunDao.findAll()`
 
-## [0.8.0](https://github.com/MarquezProject/marquez/releases/tag/0.8.0) - 2019-12-12
+## [0.8.0](https://github.com/MarquezProject/marquez/compare/0.7.0...0.8.0) - 2019-12-12
 
 ### Added
 
-* Add `Dataset.lastModified`
-* Modify `args` column in table `run_args`
+* Add `Dataset.lastModified``
+* Add `tags` table schema
+* Add **`GET`** `/tags`
 
 ### Changed
 
 * Use new Flyway version to fix migration with custom roles
+* Modify `args` column in table `run_args
 
-## [0.7.0](https://github.com/MarquezProject/marquez/releases/tag/0.7.0) - 2019-12-05
+## [0.7.0](https://github.com/MarquezProject/marquez/compare/0.6.0...0.7.0) - 2019-12-05
 
 ### Added
 
@@ -94,8 +97,8 @@
 * Add `ColumnsTest`
 * Add `RunDao.insert()`
 * Add `RunStateDao.insert()`
-* Add custom metrics
-* Add prometheus dep and expose metrics endpoint
+* Add [`METRICS.md`](https://github.com/MarquezProject/marquez/blob/master/METRICS.md)
+* Add prometheus dep and expose **`GET`** `/metrics`
 
 ### Fixed
 
