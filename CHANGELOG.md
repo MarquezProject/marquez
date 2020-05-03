@@ -4,6 +4,33 @@
 
 ### Added
 
+## [0.5.0](https://github.com/MarquezProject/marquez/releases/tag/0.5.0) - 2019-11-04
+
+### Added
+
+* Add `lombok.config`
+* Add code review guidelines
+* Add JobType
+* Add limit and offset support to NamespaceAPI
+* Add Development section to `CONTRIBUTING.md`
+* Add class **`DatasetMeta`**
+* Add class **`MorePreconditions`**
+* Added install instructions for docker
+
+### Changed
+
+* Rename guid column to uuid 
+* Use admin ping and health
+* pdate owner to ownerName
+
+### Removed
+
+* Remove experimental db table versioning code
+
+### Fixed
+
+* Fix `marquez.jar` rename on `COPY` 
+
 ## [0.4.0](https://github.com/MarquezProject/marquez/releases/tag/0.4.0) - 2019-06-04
 
 ### Added
