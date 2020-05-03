@@ -4,7 +4,13 @@
 
 ### Added
 
-## [0.9.1](https://github.com/MarquezProject/marquez/releases/tag/0.9.0) - 2020-01-05
+## [0.9.2](https://github.com/MarquezProject/marquez/releases/tag/0.9.2) - 2020-01-05
+
+### Added
+
+* Add `Flyway.baselineOnMigrate` flag
+
+## [0.9.1](https://github.com/MarquezProject/marquez/releases/tag/0.9.1) - 2020-01-05
 
 ### Added
 
