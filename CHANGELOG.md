@@ -4,7 +4,19 @@
 
 ### Added
 
-## [0.5.1](https://github.com/MarquezProject/marquez/releases/tag/0.5.0) - 2019-11-20
+## [0.6.0](https://github.com/MarquezProject/marquez/releases/tag/0.6.0) - 2019-11-29
+
+### Added
+
+* Add `Job.latestRun`
+* Add debug logging 
+
+### Changed
+
+* Adjust class RunResponse property ordering on serialization
+* Update logging on default namespace creation
+
+## [0.5.1](https://github.com/MarquezProject/marquez/releases/tag/0.5.1) - 2019-11-20
 
 ### Added
 
