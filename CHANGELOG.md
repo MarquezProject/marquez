@@ -4,6 +4,23 @@
 
 ### Added
 
+## [0.7.0](https://github.com/MarquezProject/marquez/releases/tag/0.7.0) - 2019-12-05
+
+### Added
+
+* Link dataset versions with run inputs 
+* Add schema required by tagging
+* More tests for class `common.Utils`
+* Add `ColumnsTest`
+* Add `RunDao.insert()`
+* Add `RunStateDao.insert()`
+* Add custom metrics
+* Add prometheus dep and expose metrics endpoint
+
+### Fixed
+
+* Fix dataset field serialization 
+
 ## [0.6.0](https://github.com/MarquezProject/marquez/releases/tag/0.6.0) - 2019-11-29
 
 ### Added
@@ -36,7 +53,7 @@
 
 * Add `lombok.config`
 * Add code review guidelines
-* Add JobType
+* Add `JobType`
 * Add limit and offset support to NamespaceAPI
 * Add Development section to `CONTRIBUTING.md`
 * Add class **`DatasetMeta`**
