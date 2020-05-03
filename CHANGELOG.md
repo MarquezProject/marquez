@@ -4,6 +4,20 @@
 
 ### Added
 
+## [0.5.1](https://github.com/MarquezProject/marquez/releases/tag/0.5.0) - 2019-11-04
+
+### Added
+
+* Add dataset field versioning support
+* Add link to web UI
+* Add `Job.context`
+
+### Changed
+
+* Update semver regex in build-and-push.sh
+* Minor updates to job and dataset versioning functions
+* Make `Job.location` optional 
+
 ## [0.5.0](https://github.com/MarquezProject/marquez/releases/tag/0.5.0) - 2019-11-04
 
 ### Added
