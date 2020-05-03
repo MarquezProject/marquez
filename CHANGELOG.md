@@ -4,19 +4,25 @@
 
 ### Added
 
-## [0.10.0](https://github.com/MarquezProject/marquez/releases/tag/0.10.0) - 2020-01-05
+## [0.10.1](https://github.com/MarquezProject/marquez/releases/tag/0.10.1) - 2020-01-11
+
+### Changed
+
+* Rename `datasets.last_modified`
+
+## [0.10.0](https://github.com/MarquezProject/marquez/releases/tag/0.10.0) - 2020-01-08
 
 ### Changed
 
 * Rename table `dataset_tag_mapping`
 
-## [0.9.2](https://github.com/MarquezProject/marquez/releases/tag/0.9.2) - 2020-01-05
+## [0.9.2](https://github.com/MarquezProject/marquez/releases/tag/0.9.2) - 2020-01-07
 
 ### Added
 
 * Add `Flyway.baselineOnMigrate` flag
 
-## [0.9.1](https://github.com/MarquezProject/marquez/releases/tag/0.9.1) - 2020-01-05
+## [0.9.1](https://github.com/MarquezProject/marquez/releases/tag/0.9.1) - 2020-01-06
 
 ### Added
 
