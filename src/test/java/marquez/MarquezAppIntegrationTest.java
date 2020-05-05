@@ -32,6 +32,8 @@ import static marquez.common.models.ModelGenerator.newJobName;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newSourceName;
 import static marquez.common.models.ModelGenerator.newTags;
+import static marquez.common.models.RunState.COMPLETED;
+import static marquez.common.models.RunState.RUNNING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -68,7 +70,6 @@ import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
 import marquez.service.models.DatasetId;
 import marquez.service.models.JobId;
-import marquez.service.models.Run;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -473,7 +474,7 @@ public class MarquezAppIntegrationTest {
 
     assertThat(response1.getStatus()).isEqualTo(HTTP_200);
     assertThat((String) runStarted.get("runId")).isEqualTo(runId);
-    assertThat((String) runStarted.get("runState")).isEqualTo(Run.State.RUNNING.toString());
+    assertThat((String) runStarted.get("runState")).isEqualTo(RUNNING.toString());
     assertThat((String) runStarted.get("startedAt")).isNotBlank();
     assertThat((String) runStarted.get("endedAt")).isBlank();
     assertThat((String) runStarted.get("duration")).isBlank();
@@ -489,7 +490,7 @@ public class MarquezAppIntegrationTest {
     final Map<String, Object> runCompleted = response2.readEntity(Map.class);
     assertThat(response2.getStatus()).isEqualTo(HTTP_200);
     assertThat((String) runCompleted.get("runId")).isEqualTo(runId);
-    assertThat((String) runCompleted.get("runState")).isEqualTo(Run.State.COMPLETED.toString());
+    assertThat((String) runCompleted.get("runState")).isEqualTo(COMPLETED.toString());
     assertThat((String) runCompleted.get("startedAt")).isNotBlank();
     assertThat((String) runCompleted.get("endedAt")).isNotBlank();
     assertThat((Integer) runCompleted.get("duration")).isGreaterThan(0);

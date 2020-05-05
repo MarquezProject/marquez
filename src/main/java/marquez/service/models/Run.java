@@ -22,6 +22,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
+import marquez.common.models.RunState;
 
 @Value
 public class Run {
@@ -30,7 +31,7 @@ public class Run {
   @NonNull Instant updatedAt;
   @Nullable Instant nominalStartTime;
   @Nullable Instant nominalEndTime;
-  @NonNull Run.State state;
+  @NonNull RunState state;
   @Nullable Instant startedAt;
   @Nullable Instant endedAt;
   @Nullable Map<String, String> args;
@@ -53,51 +54,5 @@ public class Run {
 
   public Map<String, String> getArgs() {
     return (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
-  }
-
-  public enum State {
-    NEW {
-      @Override
-      public boolean isComplete() {
-        return false;
-      }
-    },
-    RUNNING {
-      @Override
-      public boolean isComplete() {
-        return false;
-      }
-
-      @Override
-      public boolean isStarting() {
-        return true;
-      }
-    },
-    COMPLETED {
-      @Override
-      public boolean isComplete() {
-        return true;
-      }
-    },
-    ABORTED {
-      @Override
-      public boolean isComplete() {
-        return false;
-      }
-    },
-    FAILED {
-      @Override
-      public boolean isComplete() {
-        return false;
-      }
-    };
-
-    /** Returns true if this state is complete. */
-    public abstract boolean isComplete();
-
-    /** Returns true if this state is Running. */
-    public boolean isStarting() {
-      return false;
-    }
   }
 }

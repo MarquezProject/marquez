@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.Value;
+import marquez.common.models.RunState;
 import marquez.service.models.DatasetVersionId;
 import marquez.service.models.JobVersionId;
-import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 
 /**
@@ -74,6 +74,6 @@ public interface RunTransitionListener {
     /** the unique ID of the run */
     @NonNull UUID runId;
     /** the new state */
-    @NonNull Run.State newState;
+    @NonNull RunState newState;
   }
 }
