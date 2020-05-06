@@ -104,6 +104,7 @@ const Home:  FunctionComponent<IAllProps> = props => {
               name={d.name}
               description={d.description}
               updatedAt={d.createdAt}
+              tags={d.tags}
             />
           ))}
           {matchingDatasets.length > 0 ? (
