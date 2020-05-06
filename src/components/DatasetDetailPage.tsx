@@ -125,7 +125,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
                 return (
                   <div key={key}>
                     <Tooltip className="tagWrapper" title={key} placement="top">
-                      {tags.includes(key) ? tagToBadge.highlighted[key] : tagToBadge.default[key]}
+                      {tags.includes(key.toUpperCase()) ? tagToBadge.highlighted[key] : tagToBadge.default[key]}
                     </Tooltip>
                   </div>
                 )
