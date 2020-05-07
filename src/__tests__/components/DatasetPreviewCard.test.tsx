@@ -9,7 +9,7 @@ import { MemoryRouter } from 'react-router-dom'
 jest.mock('../../config/tag-to-badge') // https://jestjs.io/docs/en/manual-mocks
 const datasets = require('../../../docker/db/data/datasets.json')
 const dataset = datasets[0]
-const tags = ['tag_a', 'tag_b', 'tag_c']
+const tags = ['TAG_A', 'TAG_B', 'TAG_C']
 dataset.tags = tags
 
 describe('DatasetPreviewCard Component', () => {
