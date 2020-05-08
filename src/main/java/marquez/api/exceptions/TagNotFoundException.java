@@ -14,14 +14,15 @@
 
 package marquez.api.exceptions;
 
-import static marquez.common.base.MorePreconditions.checkNotBlank;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.ws.rs.NotFoundException;
+import marquez.common.models.TagName;
 
 public final class TagNotFoundException extends NotFoundException {
   private static final long serialVersionUID = 1L;
 
-  public TagNotFoundException(final String name) {
-    super(String.format("Tag '%s' not found.", checkNotBlank(name)));
+  public TagNotFoundException(final TagName name) {
+    super(String.format("Tag '%s' not found.", checkNotNull(name.getValue())));
   }
 }

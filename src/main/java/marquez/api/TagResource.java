@@ -57,7 +57,7 @@ public final class TagResource {
   }
 
   @Value
-  class Tags {
+  static class Tags {
     @JsonProperty("tags")
     ImmutableSet<Tag> value;
   }

@@ -47,7 +47,9 @@ import marquez.api.models.DatasetResponse;
 import marquez.api.models.DatasetsResponse;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
+import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.TagName;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -83,16 +85,14 @@ public final class DatasetResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
-      @PathParam("namespace") String namespaceString,
-      @PathParam("dataset") String datasetString,
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("dataset") DatasetName datasetName,
       @Valid DatasetRequest request)
       throws MarquezServiceException {
     log.debug("Request: {}", request);
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
     throwIfNotExists(request.getRunId().map(this::toRunIdOrThrow).orElse(null));
 
-    final DatasetName datasetName = DatasetName.of(datasetString);
     final DatasetMeta datasetMeta = Mapper.toDatasetMeta(request);
     final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, datasetMeta);
     final DatasetResponse response = Mapper.toDatasetResponse(dataset);
@@ -107,12 +107,11 @@ public final class DatasetResource {
   @Path("{dataset}")
   @Produces(APPLICATION_JSON)
   public Response get(
-      @PathParam("namespace") String namespaceString, @PathParam("dataset") String datasetString)
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("dataset") DatasetName datasetName)
       throws MarquezServiceException {
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
 
-    final DatasetName datasetName = DatasetName.of(datasetString);
     final DatasetResponse response =
         datasetService
             .get(namespaceName, datasetName)
@@ -128,11 +127,10 @@ public final class DatasetResource {
   @GET
   @Produces(APPLICATION_JSON)
   public Response list(
-      @PathParam("namespace") String namespaceString,
+      @PathParam("namespace") NamespaceName namespaceName,
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
 
     final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
@@ -149,18 +147,16 @@ public final class DatasetResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response tag(
-      @PathParam("namespace") String namespaceString,
-      @PathParam("dataset") String datasetString,
-      @PathParam("tag") String tagName)
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("dataset") DatasetName datasetName,
+      @PathParam("tag") TagName tagName)
       throws MarquezServiceException {
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
-    final DatasetName datasetName = DatasetName.of(datasetString);
     throwIfNotExists(namespaceName, datasetName);
     throwIfNotExists(tagName);
 
     datasetService.tagWith(namespaceName, datasetName, tagName);
-    return get(namespaceString, datasetString);
+    return get(namespaceName, datasetName);
   }
 
   @Timed
@@ -171,20 +167,18 @@ public final class DatasetResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response tag(
-      @PathParam("namespace") String namespaceString,
-      @PathParam("dataset") String datasetString,
-      @PathParam("field") String fieldName,
-      @PathParam("tag") String tagName)
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("dataset") DatasetName datasetName,
+      @PathParam("field") FieldName fieldName,
+      @PathParam("tag") TagName tagName)
       throws MarquezServiceException {
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
-    final DatasetName datasetName = DatasetName.of(datasetString);
     throwIfNotExists(namespaceName, datasetName);
     throwIfNotExists(namespaceName, datasetName, fieldName);
     throwIfNotExists(tagName);
 
     datasetService.tagWith(namespaceName, datasetName, fieldName, tagName);
-    return get(namespaceString, datasetString);
+    return get(namespaceName, datasetName);
   }
 
   private void throwIfNotExists(@NonNull NamespaceName namespaceName)
@@ -205,14 +199,14 @@ public final class DatasetResource {
   private void throwIfNotExists(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
-      @NonNull String fieldName)
+      @NonNull FieldName fieldName)
       throws MarquezServiceException {
     if (!datasetService.exists(namespaceName, datasetName, fieldName)) {
       throw new FieldNotFoundException(datasetName, fieldName);
     }
   }
 
-  private void throwIfNotExists(@NonNull String tagName) throws MarquezServiceException {
+  private void throwIfNotExists(@NonNull TagName tagName) throws MarquezServiceException {
     if (!tagService.exists(tagName)) {
       throw new TagNotFoundException(tagName);
     }

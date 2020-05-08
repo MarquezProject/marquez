@@ -17,6 +17,7 @@ package marquez.service.mappers;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
@@ -218,11 +219,11 @@ public final class Mapper {
   }
 
   public static Field toField(
-      @NonNull final DatasetFieldRow row, @NonNull final List<String> tags) {
+      @NonNull final DatasetFieldRow row, @NonNull final ImmutableSet<TagName> tags) {
     return new Field(
         FieldName.fromString(row.getName()),
         FieldType.valueOf(row.getType()),
-        tags.stream().map(TagName::fromString).collect(toImmutableList()),
+        tags,
         row.getDescription().orElse(null));
   }
 

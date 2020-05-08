@@ -107,7 +107,7 @@ public class TagDaoTest {
 
   @Test
   public void testFindBy_nameNotFound() {
-    final Optional<TagRow> row = tagDao.findBy(newTagName());
+    final Optional<TagRow> row = tagDao.findBy(newTagName().getValue());
     assertThat(row).isEmpty();
   }
 

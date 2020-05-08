@@ -15,18 +15,18 @@
 package marquez.api.exceptions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import javax.ws.rs.NotFoundException;
 import marquez.common.models.DatasetName;
+import marquez.common.models.FieldName;
 
 public final class FieldNotFoundException extends NotFoundException {
   private static final long serialVersionUID = 1L;
 
-  public FieldNotFoundException(final DatasetName datasetName, final String fieldName) {
+  public FieldNotFoundException(final DatasetName datasetName, final FieldName fieldName) {
     super(
         String.format(
             "Field '%s' not found for dataset '%s'.",
-            checkNotBlank(fieldName), checkNotNull(datasetName).getValue()));
+            checkNotNull(fieldName.getValue()), checkNotNull(datasetName).getValue()));
   }
 }

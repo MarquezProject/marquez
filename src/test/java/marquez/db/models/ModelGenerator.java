@@ -127,7 +127,7 @@ public final class ModelGenerator extends Generator {
   }
 
   public static TagRow newTagRow() {
-    return newTagRowWith(newTagName());
+    return newTagRowWith(newTagName().getValue());
   }
 
   public static TagRow newTagRowWith(final String name) {

@@ -17,8 +17,10 @@ package marquez.service;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableSet;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.TagName;
@@ -58,7 +60,7 @@ public class TagService {
 
   public boolean exists(@NonNull TagName name) throws MarquezServiceException {
     try {
-      return dao.exists(Utils.toUpperCase(name.getValue()));
+      return dao.exists(name.getValue());
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to check for tag '{}'.", name.getValue(), e);
       throw new MarquezServiceException(e);
@@ -67,7 +69,7 @@ public class TagService {
 
   public Optional<Tag> get(@NonNull TagName name) throws MarquezServiceException {
     try {
-      return dao.findBy(Utils.toUpperCase(name.getValue())).map(this::toTag);
+      return dao.findBy(name.getValue()).map(this::toTag);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get tag '{}'.", name.getValue(), e);
       throw new MarquezServiceException(e);
@@ -89,10 +91,14 @@ public class TagService {
   TagRow toTagRow(@NonNull final Tag tag) {
     final Instant now = Instant.now();
     return new TagRow(
-        now, now, Utils.toUpperCase(tag.getName().getValue()), tag.getDescription().orElse(null));
+        UUID.randomUUID(), now, now, tag.getName().getValue(), tag.getDescription().orElse(null));
   }
 
-  Tag toTag() {
+  ImmutableSet<Tag> toTags(@NonNull final List<TagRow> rows) {
+    return null;
+  }
+
+  Tag toTag(@NonNull final TagRow row) {
     return null;
   }
 }

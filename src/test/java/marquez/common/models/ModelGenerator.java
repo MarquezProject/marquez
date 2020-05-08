@@ -15,14 +15,15 @@
 package marquez.common.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.Utils;
@@ -103,12 +104,12 @@ public final class ModelGenerator extends Generator {
     return Stream.generate(() -> newField()).limit(limit).collect(toImmutableList());
   }
 
-  public static List<String> newTags(final int limit) {
-    return Stream.generate(() -> newTagName()).limit(limit).collect(Collectors.toList());
+  public static ImmutableSet<TagName> newTags(final int limit) {
+    return Stream.generate(() -> newTagName()).limit(limit).collect(toImmutableSet());
   }
 
-  public static String newTagName() {
-    return "test_tag" + newId();
+  public static TagName newTagName() {
+    return TagName.fromString("test_tag" + newId());
   }
 
   public static JobName newJobName() {
