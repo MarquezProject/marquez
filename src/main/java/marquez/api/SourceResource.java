@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -84,18 +84,14 @@ public final class SourceResource {
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final List<Source> sources = service.getAll(limit, offset);
-    return Response.ok(toSources(sources)).build();
-  }
-
-  Sources toSources(@NonNull final List<Source> sources) {
-    return new Sources(sources);
+    final ImmutableList<Source> sources = service.getAll(limit, offset);
+    return Response.ok(new Sources(sources)).build();
   }
 
   @Value
-  class Sources {
+  static class Sources {
     @NonNull
     @JsonProperty("sources")
-    List<Source> value;
+    ImmutableList<Source> value;
   }
 }

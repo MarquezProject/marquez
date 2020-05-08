@@ -53,16 +53,12 @@ public final class TagResource {
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
     final ImmutableSet<Tag> tags = service.getAll(limit, offset);
-    return Response.ok(toTags(tags)).build();
+    return Response.ok(new Tags(tags)).build();
   }
 
   @Value
   static class Tags {
     @JsonProperty("tags")
     ImmutableSet<Tag> value;
-  }
-
-  Tags toTags(@NonNull final ImmutableSet<Tag> tags) {
-    return new Tags(tags);
   }
 }

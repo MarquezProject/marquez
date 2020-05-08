@@ -69,7 +69,7 @@ public class TagService {
 
   public Optional<Tag> get(@NonNull TagName name) throws MarquezServiceException {
     try {
-      return dao.findBy(name.getValue()).map(this::toTag);
+      return dao.findBy(name.getValue()).map(row -> toTag(row));
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get tag '{}'.", name.getValue(), e);
       throw new MarquezServiceException(e);
@@ -92,13 +92,13 @@ public class TagService {
     }
   }
 
-  TagRow toTagRow(@NonNull final Tag tag) {
+  static TagRow toTagRow(@NonNull final Tag tag) {
     final Instant now = Instant.now();
     return new TagRow(
         UUID.randomUUID(), now, now, tag.getName().getValue(), tag.getDescription().orElse(null));
   }
 
-  Tag toTag(@NonNull final TagRow row) {
+  static Tag toTag(@NonNull final TagRow row) {
     return new Tag(row.getName(), row.getDescription().orElse(null));
   }
 }

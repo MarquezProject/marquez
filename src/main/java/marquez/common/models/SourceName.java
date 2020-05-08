@@ -19,7 +19,6 @@ import static marquez.common.base.MorePreconditions.checkNotBlank;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
-import javax.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -30,7 +29,7 @@ import lombok.ToString;
 @JsonDeserialize(converter = SourceName.FromValue.class)
 @JsonSerialize(converter = SourceName.ToValue.class)
 public final class SourceName {
-  @Getter @NotEmpty private final String value;
+  @Getter private final String value;
 
   public SourceName(@NonNull final String value) {
     this.value = checkNotBlank(value, "value must not be blank");

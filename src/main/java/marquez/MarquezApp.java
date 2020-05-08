@@ -14,6 +14,7 @@
 
 package marquez;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
@@ -93,6 +94,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
         new SubstitutingSourceProvider(
             bootstrap.getConfigurationSourceProvider(),
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
+
+    // Disable [...]
+    bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 
   @Override
