@@ -1,0 +1,83 @@
+package marquez.api;
+
+import static marquez.api.NamespaceResource.Namespaces;
+import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.service.models.ModelGenerator.newNamespace;
+import static marquez.service.models.ModelGenerator.newNamespaceWith;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.when;
+
+import com.google.common.collect.ImmutableList;
+import java.util.Optional;
+import javax.ws.rs.core.Response;
+import marquez.UnitTests;
+import marquez.api.exceptions.NamespaceNotFoundException;
+import marquez.common.models.NamespaceName;
+import marquez.service.NamespaceService;
+import marquez.service.models.Namespace;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+@Category(UnitTests.class)
+public class NamespaceResourceTest {
+  private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
+  private static final Namespace NAMESPACE_0 = newNamespace();
+  private static final Namespace NAMESPACE_1 = newNamespace();
+  private static final Namespace NAMESPACE_2 = newNamespace();
+  private static final ImmutableList<Namespace> NAMESPACES =
+      ImmutableList.of(NAMESPACE_0, NAMESPACE_1, NAMESPACE_2);
+
+  @Rule public MockitoRule rule = MockitoJUnit.rule();
+
+  @Mock private NamespaceService service;
+  private NamespaceResource resource;
+
+  @Before
+  public void setUp() {
+    resource = new NamespaceResource(service);
+  }
+
+  @Test
+  public void testGet() throws Exception {
+    final Namespace namespace = newNamespaceWith(NAMESPACE_NAME);
+    when(service.get(NAMESPACE_NAME)).thenReturn(Optional.of(namespace));
+
+    final Response response = resource.get(NAMESPACE_NAME);
+    assertThat((Namespace) response.getEntity()).isEqualTo(namespace);
+  }
+
+  @Test
+  public void testGet_notFound() throws Exception {
+    when(service.get(NAMESPACE_NAME)).thenReturn(Optional.empty());
+
+    assertThatExceptionOfType(NamespaceNotFoundException.class)
+        .isThrownBy(
+            () -> {
+              resource.get(NAMESPACE_NAME);
+            })
+        .withMessageContaining(NAMESPACE_NAME.getValue());
+  }
+
+  @Test
+  public void testList() throws Exception {
+    when(service.getAll(4, 0)).thenReturn(NAMESPACES);
+
+    final Response response = resource.list(4, 0);
+    assertThat(((Namespaces) response.getEntity()).getValue())
+        .contains(NAMESPACE_0, NAMESPACE_1, NAMESPACE_2);
+  }
+
+  @Test
+  public void testList_empty() throws Exception {
+    when(service.getAll(4, 0)).thenReturn(ImmutableList.of());
+
+    final Response response = resource.list(4, 0);
+    assertThat(((Namespaces) response.getEntity()).getValue()).isEmpty();
+  }
+}

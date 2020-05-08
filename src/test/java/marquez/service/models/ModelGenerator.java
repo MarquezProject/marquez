@@ -15,15 +15,44 @@
 package marquez.service.models;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.common.models.ModelGenerator.newOwnerName;
+import static marquez.common.models.ModelGenerator.newSourceName;
+import static marquez.common.models.ModelGenerator.newSourceType;
 import static marquez.common.models.ModelGenerator.newTagName;
 
 import com.google.common.collect.ImmutableSet;
+import java.time.Instant;
 import java.util.stream.Stream;
 import marquez.Generator;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.SourceName;
+import marquez.common.models.SourceType;
 
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}
+
+  public static Namespace newNamespace() {
+    return newNamespaceWith(newNamespaceName());
+  }
+
+  public static Namespace newNamespaceWith(final NamespaceName namespaceName) {
+    final Instant now = newTimestamp();
+    return new Namespace(namespaceName, now, now, newOwnerName(), newDescription());
+  }
+
+  public static Source newSource() {
+    return newSourceWith(newSourceName());
+  }
+
+  public static Source newSourceWith(final SourceName sourceName) {
+    final Instant now = newTimestamp();
+    final SourceType sourceType = newSourceType();
+    return new Source(
+        sourceType, sourceName, now, now, newConnectionUrlFor(sourceType), newDescription());
+  }
 
   public static ImmutableSet<Tag> newTags(final int limit) {
     return Stream.generate(() -> newTag()).limit(limit).collect(toImmutableSet());
