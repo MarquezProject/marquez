@@ -218,21 +218,20 @@ public class JobService {
     }
   }
 
-  public List<Job> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
+  public ImmutableList<Job> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
       throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
+      final ImmutableList.Builder<Job> jobs = ImmutableList.builder();
       final List<JobRow> jobRows = jobDao.findAll(namespaceName.getValue(), limit, offset);
-      final ImmutableList.Builder<Job> builder = ImmutableList.builder();
-      jobRows.forEach(
-          jobRow -> {
-            builder.add(toJob(jobRow));
-          });
-      return builder.build();
+      for (final JobRow jobRow : jobRows) {
+        jobs.add(toJob(jobRow));
+      }
+      return jobs.build();
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get jobs for namespace '{}'.", namespaceName.getValue(), e);
-      throw new MarquezServiceException();
+      throw new MarquezServiceException(e);
     }
   }
 
@@ -318,7 +317,7 @@ public class JobService {
     }
   }
 
-  public List<Run> getAllRunsFor(
+  public ImmutableList<Run> getAllRunsFor(
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, int limit, int offset)
       throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");

@@ -19,6 +19,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Iterables.toArray;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.prometheus.client.Counter;
 import java.time.Instant;
@@ -227,7 +228,7 @@ public class DatasetService {
     }
   }
 
-  public List<Dataset> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
+  public ImmutableList<Dataset> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
       throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");

@@ -35,8 +35,6 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.NamespaceNotFoundException;
-import marquez.api.mappers.Mapper;
-import marquez.api.models.NamespaceRequest;
 import marquez.common.models.NamespaceName;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
@@ -60,10 +58,9 @@ public final class NamespaceResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
-      @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceRequest request)
+      @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceMeta meta)
       throws MarquezServiceException {
-    log.debug("Request: {}", request);
-    final NamespaceMeta meta = Mapper.toNamespaceMeta(request);
+    log.debug("Meta: {}", meta);
     final Namespace namespace = service.createOrUpdate(namespaceName, meta);
     return Response.ok(namespace).build();
   }
@@ -98,7 +95,7 @@ public final class NamespaceResource {
   @Value
   static class Namespaces {
     @NonNull
-    @JsonProperty("sources")
+    @JsonProperty("namespaces")
     ImmutableList<Namespace> value;
   }
 }

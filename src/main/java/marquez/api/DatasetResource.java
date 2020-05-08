@@ -19,7 +19,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -34,18 +35,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.FieldNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
-import marquez.api.exceptions.RunNotValidException;
 import marquez.api.exceptions.TagNotFoundException;
-import marquez.api.mappers.Mapper;
-import marquez.api.models.DatasetRequest;
-import marquez.api.models.DatasetResponse;
-import marquez.api.models.DatasetsResponse;
-import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
@@ -87,17 +83,13 @@ public final class DatasetResource {
   public Response createOrUpdate(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName,
-      @Valid DatasetRequest request)
+      @Valid DatasetMeta datasetMeta)
       throws MarquezServiceException {
-    log.debug("Request: {}", request);
     throwIfNotExists(namespaceName);
-    throwIfNotExists(request.getRunId().map(this::toRunIdOrThrow).orElse(null));
+    throwIfNotExists(datasetMeta.getRunId().orElse(null));
 
-    final DatasetMeta datasetMeta = Mapper.toDatasetMeta(request);
     final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, datasetMeta);
-    final DatasetResponse response = Mapper.toDatasetResponse(dataset);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    return Response.ok(dataset).build();
   }
 
   @Timed
@@ -112,13 +104,11 @@ public final class DatasetResource {
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
 
-    final DatasetResponse response =
+    final Dataset dataset =
         datasetService
             .get(namespaceName, datasetName)
-            .map(Mapper::toDatasetResponse)
             .orElseThrow(() -> new DatasetNotFoundException(datasetName));
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    return Response.ok(dataset).build();
   }
 
   @Timed
@@ -133,10 +123,8 @@ public final class DatasetResource {
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
 
-    final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
-    final DatasetsResponse response = Mapper.toDatasetsResponse(datasets);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    final ImmutableList<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
+    return Response.ok(new Datasets(datasets)).build();
   }
 
   @Timed
@@ -181,22 +169,26 @@ public final class DatasetResource {
     return get(namespaceName, datasetName);
   }
 
-  private void throwIfNotExists(@NonNull NamespaceName namespaceName)
-      throws MarquezServiceException {
+  @Value
+  static class Datasets {
+    @JsonProperty("datasets")
+    ImmutableList<Dataset> value;
+  }
+
+  void throwIfNotExists(@NonNull NamespaceName namespaceName) throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       throw new NamespaceNotFoundException(namespaceName);
     }
   }
 
-  private void throwIfNotExists(
-      @NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName)
+  void throwIfNotExists(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName)
       throws MarquezServiceException {
     if (!datasetService.exists(namespaceName, datasetName)) {
       throw new DatasetNotFoundException(datasetName);
     }
   }
 
-  private void throwIfNotExists(
+  void throwIfNotExists(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
       @NonNull FieldName fieldName)
@@ -206,25 +198,17 @@ public final class DatasetResource {
     }
   }
 
-  private void throwIfNotExists(@NonNull TagName tagName) throws MarquezServiceException {
+  void throwIfNotExists(@NonNull TagName tagName) throws MarquezServiceException {
     if (!tagService.exists(tagName)) {
       throw new TagNotFoundException(tagName);
     }
   }
 
-  private void throwIfNotExists(@Nullable UUID runId) throws MarquezServiceException {
+  void throwIfNotExists(@Nullable UUID runId) throws MarquezServiceException {
     if (runId != null) {
       if (!jobService.runExists(runId)) {
         throw new RunNotFoundException(runId);
       }
-    }
-  }
-
-  private UUID toRunIdOrThrow(@NonNull String runIdString) {
-    try {
-      return Utils.toUuid(runIdString);
-    } catch (IllegalArgumentException e) {
-      throw new RunNotValidException(runIdString);
     }
   }
 }

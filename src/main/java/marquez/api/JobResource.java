@@ -20,8 +20,9 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -37,19 +38,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import lombok.NonNull;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
-import marquez.api.exceptions.RunNotValidException;
-import marquez.api.mappers.Mapper;
-import marquez.api.models.JobRequest;
-import marquez.api.models.JobResponse;
-import marquez.api.models.JobsResponse;
-import marquez.api.models.RunRequest;
-import marquez.api.models.RunResponse;
-import marquez.api.models.RunsResponse;
-import marquez.common.Utils;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.service.JobService;
@@ -80,20 +73,15 @@ public final class JobResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
-      @PathParam("namespace") String namespaceString,
-      @PathParam("job") String jobString,
-      @Valid JobRequest request)
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("job") JobName jobName,
+      @Valid JobMeta jobMeta)
       throws MarquezServiceException {
-    log.debug("Request: {}", request);
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
+    log.debug("Meta: {}", jobMeta);
     throwIfNotExists(namespaceName);
 
-    final JobName jobName = JobName.of(jobString);
-    final JobMeta jobMeta = Mapper.toJobMeta(request);
     final Job job = jobService.createOrUpdate(namespaceName, jobName, jobMeta);
-    final JobResponse response = Mapper.toJobResponse(job);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    return Response.ok(job).build();
   }
 
   @Timed
@@ -103,19 +91,13 @@ public final class JobResource {
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Produces(APPLICATION_JSON)
   public Response get(
-      @PathParam("namespace") String namespaceString, @PathParam("job") String jobString)
+      @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") JobName jobName)
       throws MarquezServiceException {
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
 
-    final JobName jobName = JobName.of(jobString);
-    final JobResponse response =
-        jobService
-            .get(namespaceName, jobName)
-            .map(Mapper::toJobResponse)
-            .orElseThrow(() -> new JobNotFoundException(jobName));
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    final Job job =
+        jobService.get(namespaceName, jobName).orElseThrow(() -> new JobNotFoundException(jobName));
+    return Response.ok(job).build();
   }
 
   @Timed
@@ -125,17 +107,14 @@ public final class JobResource {
   @Path("/namespaces/{namespace}/jobs")
   @Produces(APPLICATION_JSON)
   public Response list(
-      @PathParam("namespace") String namespaceString,
+      @PathParam("namespace") NamespaceName namespaceName,
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
 
-    final List<Job> jobs = jobService.getAll(namespaceName, limit, offset);
-    final JobsResponse response = Mapper.toJobsResponse(jobs);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    final ImmutableList<Job> jobs = jobService.getAll(namespaceName, limit, offset);
+    return Response.ok(new Jobs(jobs)).build();
   }
 
   @Timed
@@ -146,23 +125,18 @@ public final class JobResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createRun(
-      @PathParam("namespace") String namespaceString,
-      @PathParam("job") String jobString,
-      @Valid RunRequest request,
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("job") JobName jobName,
+      @Valid RunMeta runMeta,
       @Context UriInfo uriInfo)
       throws MarquezServiceException {
-    log.debug("Request: {}", request);
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
+    log.debug("Meta: {}", runMeta);
     throwIfNotExists(namespaceName);
-    final JobName jobName = JobName.of(jobString);
     throwIfNotExists(namespaceName, jobName);
 
-    final RunMeta runMeta = Mapper.toRunMeta(request);
     final Run run = jobService.createRun(namespaceName, jobName, runMeta);
-    final RunResponse response = Mapper.toRunResponse(run);
-    log.debug("Response: {}", response);
     final URI runLocation = locationFor(uriInfo, run);
-    return Response.created(runLocation).entity(response).build();
+    return Response.created(runLocation).entity(run).build();
   }
 
   @Timed
@@ -172,20 +146,16 @@ public final class JobResource {
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
   @Produces(APPLICATION_JSON)
   public Response listRuns(
-      @PathParam("namespace") String namespaceString,
-      @PathParam("job") String jobString,
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("job") JobName jobName,
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final NamespaceName namespaceName = NamespaceName.of(namespaceString);
     throwIfNotExists(namespaceName);
-    final JobName jobName = JobName.of(jobString);
     throwIfNotExists(namespaceName, jobName);
 
-    final List<Run> runs = jobService.getAllRunsFor(namespaceName, jobName, limit, offset);
-    final RunsResponse response = Mapper.toRunsResponse(runs);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    final ImmutableList<Run> runs = jobService.getAllRunsFor(namespaceName, jobName, limit, offset);
+    return Response.ok(new Runs(runs)).build();
   }
 
   @Timed
@@ -194,15 +164,9 @@ public final class JobResource {
   @GET
   @Path("/jobs/runs/{id}")
   @Produces(APPLICATION_JSON)
-  public Response getRun(@PathParam("id") String runIdString) throws MarquezServiceException {
-    final UUID runId = toRunIdOrThrow(runIdString);
-    final RunResponse response =
-        jobService
-            .getRun(runId)
-            .map(Mapper::toRunResponse)
-            .orElseThrow(() -> new RunNotFoundException(runId));
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+  public Response getRun(@PathParam("id") UUID runId) throws MarquezServiceException {
+    final Run run = jobService.getRun(runId).orElseThrow(() -> new RunNotFoundException(runId));
+    return Response.ok(run).build();
   }
 
   @Timed
@@ -211,9 +175,8 @@ public final class JobResource {
   @POST
   @Path("/jobs/runs/{id}/start")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsRunning(@PathParam("id") String runIdString)
-      throws MarquezServiceException {
-    return markRunAs(runIdString, Run.State.RUNNING);
+  public Response markRunAsRunning(@PathParam("id") UUID runId) throws MarquezServiceException {
+    return markRunAs(runId, Run.State.RUNNING);
   }
 
   @Timed
@@ -222,9 +185,8 @@ public final class JobResource {
   @POST
   @Path("/jobs/runs/{id}/complete")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsCompleted(@PathParam("id") String runIdString)
-      throws MarquezServiceException {
-    return markRunAs(runIdString, Run.State.COMPLETED);
+  public Response markRunAsCompleted(@PathParam("id") UUID runId) throws MarquezServiceException {
+    return markRunAs(runId, Run.State.COMPLETED);
   }
 
   @Timed
@@ -233,9 +195,8 @@ public final class JobResource {
   @POST
   @Path("/jobs/runs/{id}/fail")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsFailed(@PathParam("id") String runIdString)
-      throws MarquezServiceException {
-    return markRunAs(runIdString, Run.State.FAILED);
+  public Response markRunAsFailed(@PathParam("id") UUID runId) throws MarquezServiceException {
+    return markRunAs(runId, Run.State.FAILED);
   }
 
   @Timed
@@ -244,49 +205,51 @@ public final class JobResource {
   @POST
   @Path("/jobs/runs/{id}/abort")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsAborted(@PathParam("id") String runIdString)
-      throws MarquezServiceException {
-    return markRunAs(runIdString, Run.State.ABORTED);
+  public Response markRunAsAborted(@PathParam("id") UUID runId) throws MarquezServiceException {
+    return markRunAs(runId, Run.State.ABORTED);
   }
 
-  private Response markRunAs(String runIdString, Run.State runState)
+  @Value
+  static class Jobs {
+    @NonNull
+    @JsonProperty("jobs")
+    ImmutableList<Job> value;
+  }
+
+  @Value
+  static class Runs {
+    @JsonProperty("runs")
+    ImmutableList<Run> value;
+  }
+
+  Response markRunAs(@NonNull UUID runId, @NonNull Run.State runState)
       throws MarquezServiceException {
-    final UUID runId = toRunIdOrThrow(runIdString);
     throwIfNotExists(runId);
 
     jobService.markRunAs(runId, runState);
-    return getRun(runIdString);
+    return getRun(runId);
   }
 
-  private UUID toRunIdOrThrow(@NonNull String runIdString) {
-    try {
-      return Utils.toUuid(runIdString);
-    } catch (IllegalArgumentException e) {
-      throw new RunNotValidException(runIdString);
-    }
-  }
-
-  private void throwIfNotExists(@NonNull NamespaceName namespaceName)
-      throws MarquezServiceException {
+  void throwIfNotExists(@NonNull NamespaceName namespaceName) throws MarquezServiceException {
     if (!namespaceService.exists(namespaceName)) {
       throw new NamespaceNotFoundException(namespaceName);
     }
   }
 
-  private void throwIfNotExists(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)
+  void throwIfNotExists(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)
       throws MarquezServiceException {
     if (!jobService.exists(namespaceName, jobName)) {
       throw new JobNotFoundException(jobName);
     }
   }
 
-  private void throwIfNotExists(@NonNull UUID runId) throws MarquezServiceException {
+  void throwIfNotExists(@NonNull UUID runId) throws MarquezServiceException {
     if (!jobService.runExists(runId)) {
       throw new RunNotFoundException(runId);
     }
   }
 
-  private URI locationFor(@NonNull UriInfo uriInfo, @NonNull Run run) {
+  URI locationFor(@NonNull UriInfo uriInfo, @NonNull Run run) {
     return uriInfo
         .getBaseUriBuilder()
         .path(JobResource.class)
