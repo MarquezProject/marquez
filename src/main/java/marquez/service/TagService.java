@@ -47,13 +47,13 @@ public class TagService {
   public Tag createOrUpdate(@NonNull Tag tag) throws MarquezServiceException {
     try {
       if (!exists(tag.getName())) {
-        log.info("No tag with name '{}' found, creating...", tag.getName());
+        log.info("Tag '{}' not found, creating...", tag.getName().getValue());
         dao.insert(toTagRow(tag));
-        log.info("Successfully created tag '{}'.", tag.getName());
+        log.info("Successfully created tag '{}'", tag.getName().getValue());
       }
-      return get(tag.getName()).orElseThrow(MarquezServiceException::new);
+      return get(tag.getName()).get();
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create or update tag '{}'.", tag.getName(), e);
+      log.error("Failed to create or update tag '{}'", tag.getName().getValue(), e);
       throw new MarquezServiceException(e);
     }
   }
@@ -80,8 +80,12 @@ public class TagService {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
+      final ImmutableSet.Builder<Tag> tags = ImmutableSet.builder();
       final List<TagRow> rows = dao.findAll(limit, offset);
-      return toTags(rows);
+      for (final TagRow row : rows) {
+        tags.add(toTag(row));
+      }
+      return tags.build();
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get tags.", e);
       throw new MarquezServiceException(e);
@@ -94,11 +98,7 @@ public class TagService {
         UUID.randomUUID(), now, now, tag.getName().getValue(), tag.getDescription().orElse(null));
   }
 
-  ImmutableSet<Tag> toTags(@NonNull final List<TagRow> rows) {
-    return null;
-  }
-
   Tag toTag(@NonNull final TagRow row) {
-    return null;
+    return new Tag(row.getName(), row.getDescription().orElse(null));
   }
 }

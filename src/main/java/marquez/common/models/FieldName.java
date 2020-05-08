@@ -16,8 +16,9 @@ package marquez.common.models;
 
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import javax.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,15 +27,30 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
+@JsonDeserialize(converter = FieldName.FromValue.class)
+@JsonSerialize(converter = FieldName.ToValue.class)
 public final class FieldName {
   @Getter @NotEmpty private final String value;
 
-  private FieldName(@NonNull final String value) {
+  public FieldName(@NonNull final String value) {
     this.value = checkNotBlank(value, "value must not be blank");
   }
 
-  @JsonCreator
-  public static FieldName fromString(@JsonProperty("name") final String value) {
+  public static FieldName of(final String value) {
     return new FieldName(value);
+  }
+
+  public static class FromValue extends StdConverter<String, FieldName> {
+    @Override
+    public FieldName convert(@NonNull String value) {
+      return FieldName.of(value);
+    }
+  }
+
+  public static class ToValue extends StdConverter<FieldName, String> {
+    @Override
+    public String convert(@NonNull FieldName name) {
+      return name.getValue();
+    }
   }
 }

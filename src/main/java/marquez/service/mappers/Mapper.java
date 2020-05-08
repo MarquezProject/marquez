@@ -113,7 +113,7 @@ public final class Mapper {
   public static Source toSource(@NonNull final SourceRow row) {
     return new Source(
         SourceType.valueOf(row.getType()),
-        SourceName.fromString(row.getName()),
+        SourceName.of(row.getName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
         URI.create(row.getConnectionUrl()),
@@ -162,7 +162,7 @@ public final class Mapper {
         DatasetName.of(row.getPhysicalName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
-        SourceName.fromString(row.getSourceName()),
+        SourceName.of(row.getSourceName()),
         fields,
         tags,
         row.getLastModifiedAt().orElse(null),
@@ -179,7 +179,7 @@ public final class Mapper {
         DatasetName.of(row.getPhysicalName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
-        SourceName.fromString(row.getSourceName()),
+        SourceName.of(row.getSourceName()),
         Utils.toUrl(((StreamVersionRow) versionRow).getSchemaLocation()),
         fields,
         tags,
@@ -221,7 +221,7 @@ public final class Mapper {
   public static Field toField(
       @NonNull final DatasetFieldRow row, @NonNull final ImmutableSet<TagName> tags) {
     return new Field(
-        FieldName.fromString(row.getName()),
+        FieldName.of(row.getName()),
         FieldType.valueOf(row.getType()),
         tags,
         row.getDescription().orElse(null));
@@ -274,7 +274,7 @@ public final class Mapper {
   }
 
   public static Tag toTag(@NonNull final TagRow row) {
-    return new Tag(TagName.fromString(row.getName()), row.getDescription().orElse(null));
+    return new Tag(TagName.of(row.getName()), row.getDescription().orElse(null));
   }
 
   public static List<Tag> toTags(@NonNull final List<TagRow> rows) {

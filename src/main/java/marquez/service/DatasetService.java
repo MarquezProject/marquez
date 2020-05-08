@@ -262,7 +262,7 @@ public class DatasetService {
   private Field toField(@NonNull DatasetFieldRow fieldRow) {
     final ImmutableSet<TagName> tags =
         tagDao.findAllIn(toArray(fieldRow.getTagUuids(), UUID.class)).stream()
-            .map(row -> TagName.fromString(row.getName()))
+            .map(row -> TagName.of(row.getName()))
             .collect(toImmutableSet());
     return Mapper.toField(fieldRow, tags);
   }

@@ -94,7 +94,7 @@ public final class Mapper {
   public static DatasetMeta toDbTableMeta(@NonNull final DatasetRequest request) {
     return new DbTableMeta(
         DatasetName.of(request.getPhysicalName()),
-        SourceName.fromString(request.getSourceName()),
+        SourceName.of(request.getSourceName()),
         request.getFields(),
         request.getTags(),
         request.getDescription().orElse(null),
@@ -104,7 +104,7 @@ public final class Mapper {
   public static DatasetMeta toStreamMeta(@NonNull final DatasetRequest request) {
     return new StreamMeta(
         DatasetName.of(request.getPhysicalName()),
-        SourceName.fromString(request.getSourceName()),
+        SourceName.of(request.getSourceName()),
         Utils.toUrl(((StreamRequest) request).getSchemaLocation()),
         request.getFields(),
         request.getTags(),

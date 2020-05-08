@@ -24,18 +24,22 @@ import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 
-@Value
-public class Field {
+@EqualsAndHashCode
+@ToString
+public final class Field {
   @JsonUnwrapped
   @JsonProperty(access = READ_ONLY)
-  FieldName name;
+  @Getter
+  private final FieldName name;
 
-  FieldType type;
-  ImmutableSet<TagName> tags;
-  @Nullable String description;
+  @Getter private final FieldType type;
+  @Getter private final ImmutableSet<TagName> tags;
+  @Nullable private final String description;
 
   @JsonCreator
   public Field(
@@ -44,9 +48,9 @@ public class Field {
       @JsonProperty("tags") final List<String> tagsAsString,
       final String description) {
     this(
-        FieldName.fromString(nameAsString),
+        FieldName.of(nameAsString),
         FieldType.valueOf(typeAsString),
-        tagsAsString.stream().map(TagName::fromString).collect(toImmutableSet()),
+        tagsAsString.stream().map(TagName::of).collect(toImmutableSet()),
         description);
   }
 
@@ -57,7 +61,7 @@ public class Field {
       @Nullable final String description) {
     this.name = name;
     this.type = type;
-    this.tags = (tags == null) ? ImmutableSet.of() : ImmutableSet.copyOf(tags);
+    this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.description = description;
   }
 
