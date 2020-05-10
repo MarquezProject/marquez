@@ -69,7 +69,8 @@ public class SourceResourceTest {
     when(service.getAll(4, 0)).thenReturn(SOURCES);
 
     final Response response = resource.list(4, 0);
-    assertThat(((Sources) response.getEntity()).getValue()).contains(SOURCE_0, SOURCE_1, SOURCE_2);
+    assertThat(((Sources) response.getEntity()).getValue())
+        .containsOnly(SOURCE_0, SOURCE_1, SOURCE_2);
   }
 
   @Test

@@ -1,14 +1,17 @@
 package marquez.api;
 
+import static marquez.Generator.newTimestamp;
 import static marquez.api.NamespaceResource.Namespaces;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.service.models.ModelGenerator.newNamespace;
+import static marquez.service.models.ModelGenerator.newNamespaceMeta;
 import static marquez.service.models.ModelGenerator.newNamespaceWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
+import java.time.Instant;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
 import marquez.UnitTests;
@@ -16,6 +19,7 @@ import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.common.models.NamespaceName;
 import marquez.service.NamespaceService;
 import marquez.service.models.Namespace;
+import marquez.service.models.NamespaceMeta;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,6 +45,16 @@ public class NamespaceResourceTest {
   @Before
   public void setUp() {
     resource = new NamespaceResource(service);
+  }
+
+  @Test
+  public void testCreateOrUpdate() throws Exception {
+    final NamespaceMeta meta = newNamespaceMeta();
+    final Namespace namespace = toNamespace(meta);
+    when(service.createOrUpdate(NAMESPACE_NAME, meta)).thenReturn(namespace);
+
+    final Response response = resource.createOrUpdate(NAMESPACE_NAME, meta);
+    assertThat((Namespace) response.getEntity()).isEqualTo(namespace);
   }
 
   @Test
@@ -70,7 +84,7 @@ public class NamespaceResourceTest {
 
     final Response response = resource.list(4, 0);
     assertThat(((Namespaces) response.getEntity()).getValue())
-        .contains(NAMESPACE_0, NAMESPACE_1, NAMESPACE_2);
+        .containsOnly(NAMESPACE_0, NAMESPACE_1, NAMESPACE_2);
   }
 
   @Test
@@ -79,5 +93,11 @@ public class NamespaceResourceTest {
 
     final Response response = resource.list(4, 0);
     assertThat(((Namespaces) response.getEntity()).getValue()).isEmpty();
+  }
+
+  private Namespace toNamespace(final NamespaceMeta meta) {
+    final Instant now = newTimestamp();
+    return new Namespace(
+        NAMESPACE_NAME, now, now, meta.getOwnerName(), meta.getDescription().orElse(null));
   }
 }

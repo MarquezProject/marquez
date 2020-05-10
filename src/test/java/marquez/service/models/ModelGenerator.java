@@ -34,6 +34,10 @@ import marquez.common.models.SourceType;
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}
 
+  public static NamespaceMeta newNamespaceMeta() {
+    return new NamespaceMeta(newOwnerName(), newDescription());
+  }
+
   public static Namespace newNamespace() {
     return newNamespaceWith(newNamespaceName());
   }

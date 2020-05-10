@@ -209,6 +209,14 @@ public final class JobResource {
     return markRunAs(runId, Run.State.ABORTED);
   }
 
+  Response markRunAs(@NonNull UUID runId, @NonNull Run.State runState)
+      throws MarquezServiceException {
+    throwIfNotExists(runId);
+
+    jobService.markRunAs(runId, runState);
+    return getRun(runId);
+  }
+
   @Value
   static class Jobs {
     @NonNull
@@ -220,14 +228,6 @@ public final class JobResource {
   static class Runs {
     @JsonProperty("runs")
     ImmutableList<Run> value;
-  }
-
-  Response markRunAs(@NonNull UUID runId, @NonNull Run.State runState)
-      throws MarquezServiceException {
-    throwIfNotExists(runId);
-
-    jobService.markRunAs(runId, runState);
-    return getRun(runId);
   }
 
   void throwIfNotExists(@NonNull NamespaceName namespaceName) throws MarquezServiceException {

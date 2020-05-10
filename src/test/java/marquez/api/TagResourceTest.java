@@ -54,7 +54,7 @@ public class TagResourceTest {
     when(service.getAll(4, 0)).thenReturn(TAGS);
 
     final Response response = resource.list(4, 0);
-    assertThat(((Tags) response.getEntity()).getValue()).contains(TAG_0, TAG_1, TAG_2);
+    assertThat(((Tags) response.getEntity()).getValue()).containsOnly(TAG_0, TAG_1, TAG_2);
   }
 
   @Test
