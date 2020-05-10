@@ -214,36 +214,36 @@ public class JobResourceTest {
   public void testMarkRunAsCompleted() throws Exception {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run running = newRunWith(RUN_ID, COMPLETED);
-    doReturn(Response.ok(running).build()).when(jobResource).getRun(RUN_ID);
+    final Run completed = newRunWith(RUN_ID, COMPLETED);
+    doReturn(Response.ok(completed).build()).when(jobResource).getRun(RUN_ID);
 
     final Response response = jobResource.markRunAs(RUN_ID, RUNNING);
     assertThat(response.getStatus()).isEqualTo(200);
-    assertThat((Run) response.getEntity()).isEqualTo(running);
+    assertThat((Run) response.getEntity()).isEqualTo(completed);
   }
 
   @Test
   public void testMarkRunAsFailed() throws Exception {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run running = newRunWith(RUN_ID, FAILED);
-    doReturn(Response.ok(running).build()).when(jobResource).getRun(RUN_ID);
+    final Run failed = newRunWith(RUN_ID, FAILED);
+    doReturn(Response.ok(failed).build()).when(jobResource).getRun(RUN_ID);
 
     final Response response = jobResource.markRunAs(RUN_ID, RUNNING);
     assertThat(response.getStatus()).isEqualTo(200);
-    assertThat((Run) response.getEntity()).isEqualTo(running);
+    assertThat((Run) response.getEntity()).isEqualTo(failed);
   }
 
   @Test
   public void testMarkRunAsAborted() throws Exception {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run running = newRunWith(RUN_ID, ABORTED);
-    doReturn(Response.ok(running).build()).when(jobResource).getRun(RUN_ID);
+    final Run aborted = newRunWith(RUN_ID, ABORTED);
+    doReturn(Response.ok(aborted).build()).when(jobResource).getRun(RUN_ID);
 
     final Response response = jobResource.markRunAs(RUN_ID, RUNNING);
     assertThat(response.getStatus()).isEqualTo(200);
-    assertThat((Run) response.getEntity()).isEqualTo(running);
+    assertThat((Run) response.getEntity()).isEqualTo(aborted);
   }
 
   private static Job toJob(final JobName jobName, final JobMeta jobMeta) {
