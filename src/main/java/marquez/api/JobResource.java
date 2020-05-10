@@ -55,7 +55,7 @@ import marquez.service.models.RunMeta;
 
 @Slf4j
 @Path("/api/v1")
-public final class JobResource {
+public class JobResource {
   private final NamespaceService namespaceService;
   private final JobService jobService;
 
@@ -143,6 +143,17 @@ public final class JobResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
+  @Path("/jobs/runs/{id}")
+  @Produces(APPLICATION_JSON)
+  public Response getRun(@PathParam("id") UUID runId) throws MarquezServiceException {
+    final Run run = jobService.getRun(runId).orElseThrow(() -> new RunNotFoundException(runId));
+    return Response.ok(run).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
   @Produces(APPLICATION_JSON)
   public Response listRuns(
@@ -156,17 +167,6 @@ public final class JobResource {
 
     final ImmutableList<Run> runs = jobService.getAllRunsFor(namespaceName, jobName, limit, offset);
     return Response.ok(new Runs(runs)).build();
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @GET
-  @Path("/jobs/runs/{id}")
-  @Produces(APPLICATION_JSON)
-  public Response getRun(@PathParam("id") UUID runId) throws MarquezServiceException {
-    final Run run = jobService.getRun(runId).orElseThrow(() -> new RunNotFoundException(runId));
-    return Response.ok(run).build();
   }
 
   @Timed

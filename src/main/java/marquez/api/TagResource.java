@@ -36,7 +36,7 @@ import marquez.service.models.Tag;
 
 @Slf4j
 @Path("/api/v1/tags")
-public final class TagResource {
+public class TagResource {
   private final TagService service;
 
   public TagResource(@NonNull final TagService service) {

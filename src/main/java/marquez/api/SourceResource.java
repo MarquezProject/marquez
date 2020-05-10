@@ -43,7 +43,7 @@ import marquez.service.models.SourceMeta;
 
 @Slf4j
 @Path("/api/v1/sources")
-public final class SourceResource {
+public class SourceResource {
   private final SourceService service;
 
   public SourceResource(@NonNull final SourceService service) {

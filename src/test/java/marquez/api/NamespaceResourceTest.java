@@ -31,6 +31,7 @@ import org.mockito.junit.MockitoRule;
 @Category(UnitTests.class)
 public class NamespaceResourceTest {
   private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
+
   private static final Namespace NAMESPACE_0 = newNamespace();
   private static final Namespace NAMESPACE_1 = newNamespace();
   private static final Namespace NAMESPACE_2 = newNamespace();
@@ -73,10 +74,7 @@ public class NamespaceResourceTest {
     when(service.get(NAMESPACE_NAME)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(NamespaceNotFoundException.class)
-        .isThrownBy(
-            () -> {
-              resource.get(NAMESPACE_NAME);
-            })
+        .isThrownBy(() -> resource.get(NAMESPACE_NAME))
         .withMessageContaining(NAMESPACE_NAME.getValue());
   }
 

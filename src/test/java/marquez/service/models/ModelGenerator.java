@@ -15,6 +15,7 @@
 package marquez.service.models;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.time.temporal.ChronoUnit.HOURS;
 import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.ModelGenerator.newContext;
 import static marquez.common.models.ModelGenerator.newDatasetNames;
@@ -24,13 +25,17 @@ import static marquez.common.models.ModelGenerator.newJobType;
 import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newOwnerName;
+import static marquez.common.models.ModelGenerator.newRunId;
 import static marquez.common.models.ModelGenerator.newSourceName;
 import static marquez.common.models.ModelGenerator.newSourceType;
 import static marquez.common.models.ModelGenerator.newTagName;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.models.DatasetName;
@@ -107,6 +112,51 @@ public final class ModelGenerator extends Generator {
         jobMeta.getContext(),
         jobMeta.getDescription().orElse(null),
         null);
+  }
+
+  public static RunMeta newRunMeta() {
+    final Instant nominalStartTime = Instant.now();
+    final Instant nominalEndTime = nominalStartTime.plus(1, HOURS);
+    return new RunMeta(nominalStartTime, nominalEndTime, newRunArgs());
+  }
+
+  public static Run newRun() {
+    return newRunWith(newRunId(), newRunState());
+  }
+
+  public static Run newRunWith(final UUID runId) {
+    return newRunWith(runId, newRunState());
+  }
+
+  public static Run newRunWith(final Run.State runState) {
+    return newRunWith(newRunId(), runState);
+  }
+
+  public static Run newRunWith(final UUID runId, final Run.State runState) {
+    final Instant now = Instant.now();
+    final RunMeta runMeta = newRunMeta();
+    return new Run(
+        runId,
+        now,
+        now,
+        runMeta.getNominalStartTime().orElse(null),
+        runMeta.getNominalEndTime().orElse(null),
+        runState,
+        newRunArgs());
+  }
+
+  public static Run.State newRunState() {
+    return Run.State.values()[newIdWithBound(Run.State.values().length - 1)];
+  }
+
+  public static Map<String, String> newRunArgs() {
+    return ImmutableMap.of(
+        ("test_key" + newId()),
+        ("test_value" + newId()),
+        ("test_key" + newId()),
+        ("test_value" + newId()),
+        ("test_key" + newId()),
+        ("test_value" + newId()));
   }
 
   public static Tag newTag() {

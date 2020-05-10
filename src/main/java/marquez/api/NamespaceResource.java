@@ -43,7 +43,7 @@ import marquez.service.models.NamespaceMeta;
 
 @Slf4j
 @Path("/api/v1")
-public final class NamespaceResource {
+public class NamespaceResource {
   private final NamespaceService service;
 
   public NamespaceResource(@NonNull final NamespaceService service) {

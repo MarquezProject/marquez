@@ -27,6 +27,7 @@ import org.mockito.junit.MockitoRule;
 @Category(UnitTests.class)
 public class SourceResourceTest {
   private static final SourceName SOURCE_NAME = newSourceName();
+
   private static final Source SOURCE_0 = newSource();
   private static final Source SOURCE_1 = newSource();
   private static final Source SOURCE_2 = newSource();
@@ -58,10 +59,7 @@ public class SourceResourceTest {
     when(service.get(SOURCE_NAME)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(SourceNotFoundException.class)
-        .isThrownBy(
-            () -> {
-              resource.get(SOURCE_NAME);
-            })
+        .isThrownBy(() -> resource.get(SOURCE_NAME))
         .withMessageContaining(SOURCE_NAME.getValue());
   }
 

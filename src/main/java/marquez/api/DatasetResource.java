@@ -56,7 +56,7 @@ import marquez.service.models.DatasetMeta;
 
 @Slf4j
 @Path("/api/v1/namespaces/{namespace}/datasets")
-public final class DatasetResource {
+public class DatasetResource {
   private final NamespaceService namespaceService;
   private final DatasetService datasetService;
   private final JobService jobService;
