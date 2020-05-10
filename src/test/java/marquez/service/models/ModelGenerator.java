@@ -16,7 +16,12 @@ package marquez.service.models;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
+import static marquez.common.models.ModelGenerator.newContext;
+import static marquez.common.models.ModelGenerator.newDatasetNames;
 import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newJobName;
+import static marquez.common.models.ModelGenerator.newJobType;
+import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newOwnerName;
 import static marquez.common.models.ModelGenerator.newSourceName;
@@ -25,8 +30,11 @@ import static marquez.common.models.ModelGenerator.newTagName;
 
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
+import java.util.List;
 import java.util.stream.Stream;
 import marquez.Generator;
+import marquez.common.models.DatasetName;
+import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
@@ -62,7 +70,54 @@ public final class ModelGenerator extends Generator {
     return Stream.generate(() -> newTag()).limit(limit).collect(toImmutableSet());
   }
 
+  public static JobMeta newJobMeta() {
+    return newJobMetaWith(4, 2);
+  }
+
+  public static JobMeta newJobMetaWith(final int numOfInputs, final int numOfOutputs) {
+    return new JobMeta(
+        newJobType(),
+        newInputs(numOfInputs),
+        newOutputs(numOfOutputs),
+        newLocation(),
+        newContext(),
+        newDescription());
+  }
+
+  public static Job newJob() {
+    return newJobWith(newJobName(), 4, 2);
+  }
+
+  public static Job newJobWith(final JobName jobName) {
+    return newJobWith(jobName, 4, 2);
+  }
+
+  public static Job newJobWith(
+      final JobName jobName, final int numOfInputs, final int numOfOutputs) {
+    final Instant now = Instant.now();
+    final JobMeta jobMeta = newJobMetaWith(numOfInputs, numOfOutputs);
+    return new Job(
+        jobMeta.getType(),
+        jobName,
+        now,
+        now,
+        jobMeta.getInputs(),
+        jobMeta.getOutputs(),
+        jobMeta.getLocation().orElse(null),
+        jobMeta.getContext(),
+        jobMeta.getDescription().orElse(null),
+        null);
+  }
+
   public static Tag newTag() {
     return new Tag(newTagName(), newDescription());
+  }
+
+  public static List<DatasetName> newInputs(final int limit) {
+    return newDatasetNames(limit);
+  }
+
+  public static List<DatasetName> newOutputs(final int limit) {
+    return newDatasetNames(limit);
   }
 }

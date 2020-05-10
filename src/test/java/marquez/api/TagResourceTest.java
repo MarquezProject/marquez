@@ -54,6 +54,7 @@ public class TagResourceTest {
     when(service.getAll(4, 0)).thenReturn(TAGS);
 
     final Response response = resource.list(4, 0);
+    assertThat(response.getStatus()).isEqualTo(200);
     assertThat(((Tags) response.getEntity()).getValue()).containsOnly(TAG_0, TAG_1, TAG_2);
   }
 
@@ -62,6 +63,7 @@ public class TagResourceTest {
     when(service.getAll(4, 0)).thenReturn(ImmutableSet.of());
 
     final Response response = resource.list(4, 0);
+    assertThat(response.getStatus()).isEqualTo(200);
     assertThat(((Tags) response.getEntity()).getValue()).isEmpty();
   }
 }

@@ -49,6 +49,7 @@ public class SourceResourceTest {
     when(service.get(SOURCE_NAME)).thenReturn(Optional.of(source));
 
     final Response response = resource.get(SOURCE_NAME);
+    assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Source) response.getEntity()).isEqualTo(source);
   }
 
@@ -69,6 +70,7 @@ public class SourceResourceTest {
     when(service.getAll(4, 0)).thenReturn(SOURCES);
 
     final Response response = resource.list(4, 0);
+    assertThat(response.getStatus()).isEqualTo(200);
     assertThat(((Sources) response.getEntity()).getValue())
         .containsOnly(SOURCE_0, SOURCE_1, SOURCE_2);
   }
@@ -78,6 +80,7 @@ public class SourceResourceTest {
     when(service.getAll(4, 0)).thenReturn(ImmutableList.of());
 
     final Response response = resource.list(4, 0);
+    assertThat(response.getStatus()).isEqualTo(200);
     assertThat(((Sources) response.getEntity()).getValue()).isEmpty();
   }
 }

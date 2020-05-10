@@ -50,10 +50,11 @@ public class NamespaceResourceTest {
   @Test
   public void testCreateOrUpdate() throws Exception {
     final NamespaceMeta meta = newNamespaceMeta();
-    final Namespace namespace = toNamespace(meta);
+    final Namespace namespace = toNamespace(NAMESPACE_NAME, meta);
     when(service.createOrUpdate(NAMESPACE_NAME, meta)).thenReturn(namespace);
 
     final Response response = resource.createOrUpdate(NAMESPACE_NAME, meta);
+    assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Namespace) response.getEntity()).isEqualTo(namespace);
   }
 
@@ -63,6 +64,7 @@ public class NamespaceResourceTest {
     when(service.get(NAMESPACE_NAME)).thenReturn(Optional.of(namespace));
 
     final Response response = resource.get(NAMESPACE_NAME);
+    assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Namespace) response.getEntity()).isEqualTo(namespace);
   }
 
@@ -83,6 +85,7 @@ public class NamespaceResourceTest {
     when(service.getAll(4, 0)).thenReturn(NAMESPACES);
 
     final Response response = resource.list(4, 0);
+    assertThat(response.getStatus()).isEqualTo(200);
     assertThat(((Namespaces) response.getEntity()).getValue())
         .containsOnly(NAMESPACE_0, NAMESPACE_1, NAMESPACE_2);
   }
@@ -92,12 +95,14 @@ public class NamespaceResourceTest {
     when(service.getAll(4, 0)).thenReturn(ImmutableList.of());
 
     final Response response = resource.list(4, 0);
+    assertThat(response.getStatus()).isEqualTo(200);
     assertThat(((Namespaces) response.getEntity()).getValue()).isEmpty();
   }
 
-  private Namespace toNamespace(final NamespaceMeta meta) {
+  private static Namespace toNamespace(
+      final NamespaceName namespaceName, final NamespaceMeta meta) {
     final Instant now = newTimestamp();
     return new Namespace(
-        NAMESPACE_NAME, now, now, meta.getOwnerName(), meta.getDescription().orElse(null));
+        namespaceName, now, now, meta.getOwnerName(), meta.getDescription().orElse(null));
   }
 }
