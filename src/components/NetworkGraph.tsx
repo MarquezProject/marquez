@@ -7,6 +7,8 @@ import {
   WithStyles as IWithStyles,
   Theme
 } from '@material-ui/core/styles'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { History } from 'history'
 
 import Legend from './Legend'
 
@@ -76,14 +78,15 @@ interface IProps {
   router: any
 }
 
-type IAllProps = IWithStyles<typeof styles> & IProps
+type IAllProps = IWithStyles<typeof styles> & IProps & RouteComponentProps
 
-export class NetworkGraph extends React.Component<IAllProps, {}> {
-  shouldComponentUpdate(newProps: IProps) {
+export class NetworkGraph extends React.Component<IAllProps> {
+  shouldComponentUpdate(newProps: any) {
     const allNodes = [...newProps.datasets, ...newProps.jobs]
     const matchingNodes = _filter(allNodes, node => node.matches)
     const searchExists = matchingNodes.length != allNodes.length
 
+    console.log(newProps)
     const urlBreakdown = newProps.router.location.pathname.split('/')
     const nodeId = urlBreakdown[2]
 
@@ -168,7 +171,7 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
       return color
     }
 
-    function graph(cluster: any, reverse: boolean) {
+    function graph(cluster: any, reverse: boolean, history: History) {
 
       cluster = tree().nodeSize([20, 70])(cluster)
 
@@ -207,20 +210,24 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
 
       datasetNode
         .append('a')
-        .attr('href', (d: any) => ('/datasets/' + d.data.name))
         .append('rect')
         .attr('fill', d => d.data.matches ? circleHighlight : defaultHighlight)
         .attr('x', -square/2)
         .attr('y', -square/2)
         .attr('width', square)
         .attr('height', square)
+        .on('click', (node: { data: IDataset }) => {
+          history.push(`/datasets/${node.data.name}`)
+        })
 
       jobNode
         .append('a')
-        .attr('href', (d: any) => ('/jobs/' + d.data.name))
         .append('circle')
         .attr('fill', d => d.data.matches ? findJobColor(d) : defaultHighlight)
         .attr('r', radius)
+        .on('click', (node: { data: IJob }) => {
+          history.push(`/jobs/${node.data.name}`)
+        })
 
       // Add text to nodes
       datasetNode.append('text')
@@ -275,15 +282,11 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
       // remove svg elements
       svg.selectAll('*').remove()
 
-      graph(largestCluster, false)
-      graph(reverseCluster, true)
+      graph(largestCluster, false, this.props.history)
+      graph(reverseCluster, true, this.props.history)
     }
 
-    if (this.props.isLoading !== newProps.isLoading) {
-      return true
-    } else {
-      return false
-    }
+    return this.props.isLoading !== newProps.isLoading
   }
 
   graph: SVGElement
@@ -293,8 +296,8 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
 
     return (
       <div id='network-graph-container' className={classes.networkBackground}>
-        <div id='tooltip' className={classes.tooltip}></div>
-        <Legend customClassName={classes.legend}></Legend>
+        <div id='tooltip' className={classes.tooltip} />
+        <Legend customClassName={classes.legend} />
         {isLoading ? (
           <Loader />
         ) : (
@@ -312,4 +315,4 @@ export class NetworkGraph extends React.Component<IAllProps, {}> {
   }
 }
 
-export default (withStyles(styles)(NetworkGraph))
+export default withStyles(styles)(withRouter(NetworkGraph))
