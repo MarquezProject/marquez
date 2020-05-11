@@ -21,20 +21,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 import marquez.common.models.TagName;
 
-@Value
+@EqualsAndHashCode
+@ToString
 public class Tag {
   @JsonUnwrapped
   @JsonProperty(access = READ_ONLY)
-  TagName name;
+  @Getter
+  private final TagName name;
 
   @Nullable String description;
 
   @JsonCreator
-  public Tag(@JsonProperty("name") final String nameAsString, final String description) {
+  public Tag(
+      @JsonProperty("name") @NonNull final String nameAsString,
+      @Nullable final String description) {
     this(TagName.of(nameAsString), description);
   }
 

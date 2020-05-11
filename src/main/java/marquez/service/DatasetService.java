@@ -107,7 +107,14 @@ public class DatasetService {
         final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
         final SourceRow sourceRow = sourceDao.findBy(datasetMeta.getSourceName().getValue()).get();
         final List<UUID> tagUuids =
-            tagDao.findAllIn(toArray(datasetMeta.getTags(), String.class)).stream()
+            tagDao
+                .findAllIn(
+                    toArray(
+                        datasetMeta.getTags().stream()
+                            .map(TagName::getValue)
+                            .collect(toImmutableList()),
+                        String.class))
+                .stream()
                 .map(TagRow::getUuid)
                 .collect(toImmutableList());
         final DatasetRow newDatasetRow =
@@ -244,15 +251,15 @@ public class DatasetService {
 
   /** Creates a {@link Dataset} instance from the given {@link ExtendedDatasetRow}. */
   private Dataset toDataset(@NonNull ExtendedDatasetRow datasetRow) {
-    final List<String> tags =
+    final ImmutableSet<TagName> tags =
         tagDao.findAllIn(toArray(datasetRow.getTagUuids(), UUID.class)).stream()
-            .map(TagRow::getName)
-            .collect(toImmutableList());
+            .map(row -> TagName.of(row.getName()))
+            .collect(toImmutableSet());
     final DatasetVersionRow versionRow =
         versionDao
             .find(datasetRow.getType(), datasetRow.getCurrentVersionUuid().orElse(null))
             .get();
-    final List<Field> fields =
+    final ImmutableList<Field> fields =
         fieldDao.findAllIn(toArray(versionRow.getFieldUuids(), UUID.class)).stream()
             .map(this::toField)
             .collect(toImmutableList());

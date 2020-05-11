@@ -16,22 +16,41 @@ package marquez.service.models;
 
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 
-@Value
-public class Run {
-  @NonNull UUID id;
-  @NonNull Instant createdAt;
-  @NonNull Instant updatedAt;
-  @Nullable Instant nominalStartTime;
-  @Nullable Instant nominalEndTime;
-  @NonNull Run.State state;
-  @Nullable Map<String, String> args;
+@EqualsAndHashCode
+@ToString
+public final class Run {
+  @Getter @NonNull private final UUID id;
+  @Getter @NonNull private final Instant createdAt;
+  @Getter @NonNull private final Instant updatedAt;
+  @Nullable private final Instant nominalStartTime;
+  @Nullable private final Instant nominalEndTime;
+  @Getter @NonNull private final Run.State state;
+  @Getter @NonNull private final ImmutableMap<String, String> args;
+
+  public Run(
+      @NonNull final UUID id,
+      @NonNull final Instant createdAt,
+      @NonNull final Instant updatedAt,
+      @Nullable final Instant nominalStartTime,
+      @Nullable final Instant nominalEndTime,
+      @NonNull final Run.State state,
+      @Nullable final ImmutableMap<String, String> args) {
+    this.id = id;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
+    this.state = state;
+    this.args = (args == null) ? ImmutableMap.of() : args;
+  }
 
   public Optional<Instant> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
@@ -39,10 +58,6 @@ public class Run {
 
   public Optional<Instant> getNominalEndTime() {
     return Optional.ofNullable(nominalEndTime);
-  }
-
-  public Map<String, String> getArgs() {
-    return (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
   }
 
   public enum State {

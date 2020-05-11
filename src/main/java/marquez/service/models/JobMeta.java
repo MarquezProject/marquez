@@ -20,45 +20,48 @@ import static marquez.common.Utils.KV_JOINER;
 import static marquez.common.Utils.VERSION_DELIM;
 import static marquez.common.Utils.VERSION_JOINER;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 
-@Value
-public class JobMeta {
-  @NonNull JobType type;
-  @NonNull List<DatasetName> inputs;
-  @NonNull List<DatasetName> outputs;
-  @Nullable URL location;
-  @Nullable Map<String, String> context;
-  @Nullable String description;
+@EqualsAndHashCode
+@ToString
+public final class JobMeta {
+  @Getter @NonNull private final JobType type;
+  @Getter @NonNull private final ImmutableSet<DatasetName> inputs;
+  @Getter @NonNull private final ImmutableSet<DatasetName> outputs;
+  @Nullable private final URL location;
+  @Getter @NonNull private final ImmutableMap<String, String> context;
+  @Nullable private final String description;
 
-  public List<DatasetName> getInputs() {
-    return ImmutableList.copyOf(new ArrayList<>(inputs));
-  }
-
-  public List<DatasetName> getOutputs() {
-    return ImmutableList.copyOf(new ArrayList<>(outputs));
+  public JobMeta(
+      @NonNull final JobType type,
+      @NonNull final ImmutableSet<DatasetName> inputs,
+      @NonNull final ImmutableSet<DatasetName> outputs,
+      @Nullable final URL location,
+      @Nullable final ImmutableMap<String, String> context,
+      @Nullable final String description) {
+    this.type = type;
+    this.inputs = inputs;
+    this.outputs = outputs;
+    this.location = location;
+    this.context = (context == null) ? ImmutableMap.of() : context;
+    this.description = description;
   }
 
   public Optional<URL> getLocation() {
     return Optional.ofNullable(location);
-  }
-
-  public Map<String, String> getContext() {
-    return (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
   }
 
   public Optional<String> getDescription() {

@@ -17,12 +17,11 @@ package marquez.common.models;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import marquez.Generator;
@@ -76,8 +75,8 @@ public final class ModelGenerator extends Generator {
     return URI.create(connectionUrlString);
   }
 
-  public static List<DatasetName> newDatasetNames(final int limit) {
-    return Stream.generate(() -> newDatasetName()).limit(limit).collect(toImmutableList());
+  public static ImmutableSet<DatasetName> newDatasetNames(final int limit) {
+    return Stream.generate(() -> newDatasetName()).limit(limit).collect(toImmutableSet());
   }
 
   public static DatasetName newDatasetName() {
@@ -89,7 +88,7 @@ public final class ModelGenerator extends Generator {
   }
 
   public static Field newField() {
-    return new Field(newFieldName(), newFieldType(), newTags(2), newDescription());
+    return new Field(newFieldName(), newFieldType(), newTagNames(2), newDescription());
   }
 
   public static FieldName newFieldName() {
@@ -100,11 +99,11 @@ public final class ModelGenerator extends Generator {
     return FieldType.values()[newIdWithBound(FieldType.values().length - 1)];
   }
 
-  public static List<Field> newFields(final int limit) {
+  public static ImmutableList<Field> newFields(final int limit) {
     return Stream.generate(() -> newField()).limit(limit).collect(toImmutableList());
   }
 
-  public static ImmutableSet<TagName> newTags(final int limit) {
+  public static ImmutableSet<TagName> newTagNames(final int limit) {
     return Stream.generate(() -> newTagName()).limit(limit).collect(toImmutableSet());
   }
 
@@ -124,7 +123,7 @@ public final class ModelGenerator extends Generator {
     return Utils.toUrl("https://github.com/repo/test/commit/" + newId());
   }
 
-  public static Map<String, String> newContext() {
+  public static ImmutableMap<String, String> newContext() {
     return ImmutableMap.of(
         "sql", String.format("SELECT * FROM room_bookings WHERE room = '%dH';", newId()));
   }

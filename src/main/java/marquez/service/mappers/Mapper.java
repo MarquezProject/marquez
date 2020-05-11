@@ -17,6 +17,8 @@ package marquez.service.mappers;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
@@ -139,9 +141,9 @@ public final class Mapper {
 
   public static Dataset toDataset(
       @NonNull final ExtendedDatasetRow row,
-      @NonNull final List<String> tags,
+      @NonNull final ImmutableSet<TagName> tags,
       @NonNull final DatasetVersionRow versionRow,
-      @NonNull final List<Field> fields) {
+      @NonNull final ImmutableList<Field> fields) {
     final DatasetType type = DatasetType.valueOf(row.getType());
     switch (type) {
       case DB_TABLE:
@@ -155,8 +157,8 @@ public final class Mapper {
 
   private static Dataset toDbTable(
       @NonNull final ExtendedDatasetRow row,
-      @NonNull final List<String> tags,
-      @NonNull final List<Field> fields) {
+      @NonNull final ImmutableSet<TagName> tags,
+      @NonNull final ImmutableList<Field> fields) {
     return new DbTable(
         DatasetName.of(row.getName()),
         DatasetName.of(row.getPhysicalName()),
@@ -171,9 +173,9 @@ public final class Mapper {
 
   private static Dataset toStream(
       @NonNull final ExtendedDatasetRow row,
-      @NonNull final List<String> tags,
+      @NonNull final ImmutableSet<TagName> tags,
       @NonNull final DatasetVersionRow versionRow,
-      @NonNull final List<Field> fields) {
+      @NonNull final ImmutableList<Field> fields) {
     return new Stream(
         DatasetName.of(row.getName()),
         DatasetName.of(row.getPhysicalName()),
@@ -283,8 +285,8 @@ public final class Mapper {
 
   public static Job toJob(
       @NonNull final JobRow row,
-      @NonNull final List<DatasetName> inputs,
-      @NonNull final List<DatasetName> outputs,
+      @NonNull final ImmutableSet<DatasetName> inputs,
+      @NonNull final ImmutableSet<DatasetName> outputs,
       @Nullable final String locationString,
       @NonNull final String contextString,
       @Nullable final ExtendedRunRow runRow) {
@@ -296,7 +298,7 @@ public final class Mapper {
         inputs,
         outputs,
         (locationString == null) ? null : Utils.toUrl(locationString),
-        Utils.fromJson(contextString, new TypeReference<Map<String, String>>() {}),
+        Utils.fromJson(contextString, new TypeReference<ImmutableMap<String, String>>() {}),
         row.getDescription().orElse(null),
         (runRow == null) ? null : toRun(runRow));
   }
@@ -349,7 +351,7 @@ public final class Mapper {
         row.getNominalStartTime().orElse(null),
         row.getNominalEndTime().orElse(null),
         Run.State.valueOf(row.getCurrentRunState().get()),
-        Utils.fromJson(row.getArgs(), new TypeReference<Map<String, String>>() {}));
+        Utils.fromJson(row.getArgs(), new TypeReference<ImmutableMap<String, String>>() {}));
   }
 
   public static List<Run> toRuns(@NonNull final List<ExtendedRunRow> rows) {

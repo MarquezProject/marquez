@@ -18,8 +18,10 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.ModelGenerator.newContext;
+import static marquez.common.models.ModelGenerator.newDatasetName;
 import static marquez.common.models.ModelGenerator.newDatasetNames;
 import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newFields;
 import static marquez.common.models.ModelGenerator.newJobName;
 import static marquez.common.models.ModelGenerator.newJobType;
 import static marquez.common.models.ModelGenerator.newLocation;
@@ -29,13 +31,13 @@ import static marquez.common.models.ModelGenerator.newRunId;
 import static marquez.common.models.ModelGenerator.newSourceName;
 import static marquez.common.models.ModelGenerator.newSourceType;
 import static marquez.common.models.ModelGenerator.newTagName;
+import static marquez.common.models.ModelGenerator.newTagNames;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.models.DatasetName;
@@ -71,8 +73,28 @@ public final class ModelGenerator extends Generator {
         sourceType, sourceName, now, now, newConnectionUrlFor(sourceType), newDescription());
   }
 
-  public static ImmutableSet<Tag> newTags(final int limit) {
-    return Stream.generate(() -> newTag()).limit(limit).collect(toImmutableSet());
+  public static DbTable newDbTable() {
+    return newDbTableWith(newDatasetName());
+  }
+
+  public static DbTable newDbTableWith(final DatasetName dbTableName) {
+    final Instant now = newTimestamp();
+    final DatasetName physicalName = newDatasetName();
+    return new DbTable(
+        dbTableName,
+        physicalName,
+        now,
+        now,
+        newSourceName(),
+        newFields(4),
+        newTagNames(2),
+        null,
+        newDescription());
+  }
+
+  public static DbTableMeta newDbTableMeta() {
+    return new DbTableMeta(
+        newDatasetName(), newSourceName(), newFields(4), newTagNames(2), newDescription(), null);
   }
 
   public static JobMeta newJobMeta() {
@@ -149,25 +171,37 @@ public final class ModelGenerator extends Generator {
     return Run.State.values()[newIdWithBound(Run.State.values().length - 1)];
   }
 
-  public static Map<String, String> newRunArgs() {
-    return ImmutableMap.of(
-        ("test_key" + newId()),
-        ("test_value" + newId()),
-        ("test_key" + newId()),
-        ("test_value" + newId()),
-        ("test_key" + newId()),
-        ("test_value" + newId()));
+  public static ImmutableMap<String, String> newRunArgs() {
+    return newRunArgsWith(4);
+  }
+
+  public static ImmutableMap<String, String> newRunArgsWith(final int limit) {
+    final ImmutableMap.Builder<String, String> runArgs = ImmutableMap.builder();
+    IntStream.range(1, limit).forEach(i -> runArgs.put(runArgKey(i), runArgValue(i)));
+    return runArgs.build();
+  }
+
+  private static String runArgKey(final int i) {
+    return "test_key" + i + newId();
+  }
+
+  private static String runArgValue(final int i) {
+    return "test_value" + i + newId();
+  }
+
+  public static ImmutableSet<Tag> newTags(final int limit) {
+    return Stream.generate(() -> newTag()).limit(limit).collect(toImmutableSet());
   }
 
   public static Tag newTag() {
     return new Tag(newTagName(), newDescription());
   }
 
-  public static List<DatasetName> newInputs(final int limit) {
+  public static ImmutableSet<DatasetName> newInputs(final int limit) {
     return newDatasetNames(limit);
   }
 
-  public static List<DatasetName> newOutputs(final int limit) {
+  public static ImmutableSet<DatasetName> newOutputs(final int limit) {
     return newDatasetNames(limit);
   }
 }
