@@ -97,8 +97,7 @@ public class NamespaceResourceTest {
     assertThat(((Namespaces) response.getEntity()).getValue()).isEmpty();
   }
 
-  private static Namespace toNamespace(
-      final NamespaceName namespaceName, final NamespaceMeta meta) {
+  static Namespace toNamespace(final NamespaceName namespaceName, final NamespaceMeta meta) {
     final Instant now = newTimestamp();
     return new Namespace(
         namespaceName, now, now, meta.getOwnerName(), meta.getDescription().orElse(null));

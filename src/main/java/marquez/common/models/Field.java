@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableSet;
-import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -45,12 +44,14 @@ public final class Field {
   public Field(
       @JsonProperty("name") final String nameAsString,
       @JsonProperty("type") final String typeAsString,
-      @JsonProperty("tags") final List<String> tagsAsString,
+      @JsonProperty("tags") final ImmutableSet<String> tagsAsString,
       final String description) {
     this(
         FieldName.of(nameAsString),
         FieldType.valueOf(typeAsString),
-        tagsAsString.stream().map(TagName::of).collect(toImmutableSet()),
+        (tagsAsString == null)
+            ? ImmutableSet.of()
+            : tagsAsString.stream().map(TagName::of).collect(toImmutableSet()),
         description);
   }
 

@@ -36,7 +36,10 @@ import marquez.common.models.TagName;
 
 @EqualsAndHashCode
 @ToString
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = DbTableMeta.class, name = "DB_TABLE"),
   @JsonSubTypes.Type(value = StreamMeta.class, name = "STREAM")

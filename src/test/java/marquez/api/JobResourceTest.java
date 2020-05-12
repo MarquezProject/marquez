@@ -246,7 +246,7 @@ public class JobResourceTest {
     assertThat((Run) response.getEntity()).isEqualTo(aborted);
   }
 
-  private static Job toJob(final JobName jobName, final JobMeta jobMeta) {
+  static Job toJob(final JobName jobName, final JobMeta jobMeta) {
     final Instant now = newTimestamp();
     return new Job(
         jobMeta.getType(),
@@ -261,7 +261,7 @@ public class JobResourceTest {
         null);
   }
 
-  private static Run toRun(final RunMeta runMeta) {
+  static Run toRun(final RunMeta runMeta) {
     final Instant now = newTimestamp();
     return new Run(
         newRunId(),

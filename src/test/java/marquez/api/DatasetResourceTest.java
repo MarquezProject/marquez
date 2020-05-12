@@ -164,7 +164,7 @@ public class DatasetResourceTest {
     }
   }
 
-  private static DbTable toDbTable(final DatasetName dbTableName, final DbTableMeta dbTableMeta) {
+  static DbTable toDbTable(final DatasetName dbTableName, final DbTableMeta dbTableMeta) {
     final Instant now = Instant.now();
     return new DbTable(
         dbTableName,
@@ -178,7 +178,7 @@ public class DatasetResourceTest {
         dbTableMeta.getDescription().orElse(null));
   }
 
-  private static DbTable tagDatasetWith(final TagName tagName, final DbTable dbTable) {
+  static DbTable tagDatasetWith(final TagName tagName, final DbTable dbTable) {
     final ImmutableSet<TagName> tags =
         ImmutableSet.<TagName>builder().addAll(dbTable.getTags()).add(tagName).build();
     return new DbTable(
@@ -193,7 +193,7 @@ public class DatasetResourceTest {
         dbTable.getDescription().orElse(null));
   }
 
-  private static DbTable tagAllFieldsWith(final TagName tagName, final DbTable dbTable) {
+  static DbTable tagAllFieldsWith(final TagName tagName, final DbTable dbTable) {
     final ImmutableList.Builder<Field> fields = ImmutableList.builder();
     for (final Field field : dbTable.getFields()) {
       final ImmutableSet<TagName> tags =
