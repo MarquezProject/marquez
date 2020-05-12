@@ -75,19 +75,17 @@ interface IProps {
   jobs: IJob[]
   datasets: IDataset[]
   isLoading: boolean
-  router: any
 }
 
 type IAllProps = IWithStyles<typeof styles> & IProps & RouteComponentProps
 
 export class NetworkGraph extends React.Component<IAllProps> {
-  shouldComponentUpdate(newProps: any) {
+  shouldComponentUpdate(newProps: IAllProps) {
     const allNodes = [...newProps.datasets, ...newProps.jobs]
     const matchingNodes = _filter(allNodes, node => node.matches)
     const searchExists = matchingNodes.length != allNodes.length
 
-    console.log(newProps)
-    const urlBreakdown = newProps.router.location.pathname.split('/')
+    const urlBreakdown = newProps.location.pathname.split('/')
     const nodeId = urlBreakdown[2]
 
     const svg: d3.Selection<SVGElement, void, HTMLElement, void> = select('#network-graph')
@@ -253,7 +251,7 @@ export class NetworkGraph extends React.Component<IAllProps> {
     }
 
     function dragstarted() {
-        event.sourceEvent.stopPropagation()
+      event.sourceEvent.stopPropagation()
     }
 
     function dragged() {
@@ -264,8 +262,8 @@ export class NetworkGraph extends React.Component<IAllProps> {
 
     svg.call(
       drag()
-          .on('start', dragstarted)
-          .on('drag', dragged)
+        .on('start', dragstarted)
+        .on('drag', dragged)
     )
 
     // run calculations for network graph
