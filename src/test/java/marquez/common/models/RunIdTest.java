@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.service.models;
+package marquez.common.models;
 
 import static java.util.UUID.fromString;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,22 +23,22 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class VersionTest {
+public class RunIdTest {
   private static final UUID ACTUAL = fromString("225adbdd-2a5d-4b5f-89b3-06a7cd47cc87");
   private static final UUID EXPECTED = fromString("225adbdd-2a5d-4b5f-89b3-06a7cd47cc87");
 
   @Test(expected = NullPointerException.class)
   public void testNull() {
-    Version.of(null);
+    RunId.of(null);
   }
 
   @Test
   public void testForValue() {
-    assertThat(Version.of(ACTUAL).getValue()).isEqualByComparingTo(EXPECTED);
+    assertThat(RunId.of(ACTUAL).getValue()).isEqualByComparingTo(EXPECTED);
   }
 
   @Test
   public void testForEquals() {
-    assertThat(Version.of(ACTUAL)).isEqualTo(Version.of(EXPECTED));
+    assertThat(RunId.of(ACTUAL)).isEqualTo(RunId.of(EXPECTED));
   }
 }

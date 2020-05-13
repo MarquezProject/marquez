@@ -36,6 +36,7 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
@@ -366,7 +367,7 @@ public class JobService {
       runDao.insert(newRunRow);
       notify(
           new JobInputUpdate(
-              newRunRow.getUuid(),
+              RunId.of(newRunRow.getUuid()),
               runMeta,
               new JobVersionId(namespaceName, jobName, Version.of(versionRow.getUuid())),
               inputVersions));
@@ -446,7 +447,7 @@ public class JobService {
                                 DatasetName.of(v.getDatasetName()),
                                 Version.of(v.getUuid()))))
                 .collect(toImmutableList());
-        notify(new JobOutputUpdate(runId, outputs));
+        notify(new JobOutputUpdate(RunId.of(runId), outputs));
         if (versionRow.hasOutputUuids()) {
           outputUuids = versionRow.getOutputUuids();
           log.info(
@@ -461,7 +462,7 @@ public class JobService {
         outputUuids = null;
       }
       runStateDao.insert(newRunStateRow, outputUuids, runState.isStarting(), runState.isComplete());
-      notify(new RunTransition(runId, runState));
+      notify(new RunTransition(RunId.of(runId), runState));
       incOrDecBy(runState);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to mark job run '{}' as '{}'.", runId, runState, e);
