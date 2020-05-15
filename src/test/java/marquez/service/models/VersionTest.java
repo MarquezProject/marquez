@@ -39,6 +39,6 @@ public class VersionTest {
 
   @Test
   public void testForEquals() {
-    assertThat(ACTUAL).isEqualTo(EXPECTED);
+    assertThat(Version.of(ACTUAL)).isEqualTo(Version.of(EXPECTED));
   }
 }

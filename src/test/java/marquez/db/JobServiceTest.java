@@ -180,22 +180,22 @@ public class JobServiceTest {
 
     assertThat(jobInputUpdates.size()).isEqualTo(1);
     JobInputUpdate jobInputUpdate = jobInputUpdates.get(0);
-    assertThat(jobInputUpdate.getRunId()).isEqualTo(run.getId());
+    assertThat(jobInputUpdate.getRunId().getValue()).isEqualTo(run.getId());
     assertThat(jobInputUpdate.getJobVersion().getJobName()).isEqualTo(jobName);
 
     assertThat(jobOutputUpdates.size()).isEqualTo(1);
     JobOutputUpdate jobOutputUpdate = jobOutputUpdates.get(0);
-    assertThat(jobOutputUpdate.getRunId()).isEqualTo(run.getId());
+    assertThat(jobOutputUpdate.getRunId().getValue()).isEqualTo(run.getId());
 
     assertThat(runTransitions.size()).isEqualTo(3);
     RunTransition newRun = runTransitions.get(0);
-    assertThat(newRun.getRunId()).isEqualTo(run.getId());
+    assertThat(newRun.getRunId().getValue()).isEqualTo(run.getId());
     assertThat(newRun.getNewState()).isEqualTo(NEW);
     RunTransition runningRun = runTransitions.get(1);
-    assertThat(runningRun.getRunId()).isEqualTo(run.getId());
+    assertThat(runningRun.getRunId().getValue()).isEqualTo(run.getId());
     assertThat(runningRun.getNewState()).isEqualTo(RUNNING);
     RunTransition completedRun = runTransitions.get(2);
-    assertThat(completedRun.getRunId()).isEqualTo(run.getId());
+    assertThat(completedRun.getRunId().getValue()).isEqualTo(run.getId());
     assertThat(completedRun.getNewState()).isEqualTo(COMPLETED);
   }
 }
