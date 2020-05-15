@@ -29,7 +29,7 @@ import marquez.common.models.TagName;
 
 @EqualsAndHashCode
 @ToString
-public class Tag {
+public final class Tag {
   @JsonUnwrapped
   @JsonProperty(access = READ_ONLY)
   @Getter
