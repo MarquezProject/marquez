@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./up.sh
+# Usage: $ ./up.sh [--local]
 
 set -e
 
