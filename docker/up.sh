@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./up.sh
+# Usage: $ ./up.sh [--local]
 
 set -e
 
@@ -20,4 +20,10 @@ set -e
 project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}"
 
-docker-compose up -V --force-recreate --build
+files="-f docker-compose.yml"
+
+if [ "${1}" = "--local" ]; then
+  files+=" -f docker-compose.local.yml"
+fi
+
+docker-compose down && docker-compose $files up -V --force-recreate --build
