@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   marquez_web:
-    build: .
+    image: marquezproject/marquez-web:latest
     environment:
       - MARQUEZ_HOST=marquez
       - MARQUEZ_PORT=5000
@@ -44,7 +44,7 @@ services:
     entrypoint: ["./wait-for-it.sh", "marquez_db:5432", "--", "./entrypoint.sh"]
 
   marquez_db:
-    image: "postgres:9.6"
+    image: postgres:9.6
     ports:
       - "5432:5432"
     environment:
