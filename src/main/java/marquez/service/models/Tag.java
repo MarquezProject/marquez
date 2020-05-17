@@ -40,7 +40,7 @@ public final class Tag {
   @JsonCreator
   public Tag(
       @JsonProperty("name") @NonNull final String nameAsString,
-      @Nullable final String description) {
+      @JsonProperty("description") @Nullable final String description) {
     this(TagName.of(nameAsString), description);
   }
 
