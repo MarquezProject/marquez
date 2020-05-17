@@ -42,7 +42,8 @@ public final class NamespaceName {
         PATTERN.matcher(value).matches(),
         "namespaces '%s' must contain only letters (a-z, A-Z), numbers (0-9), "
             + "underscores (_) or dashes (-) with a maximum length of %s characters.",
-        value, MAX_SIZE);
+        value,
+        MAX_SIZE);
     this.value = value;
   }
 
