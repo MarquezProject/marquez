@@ -34,7 +34,11 @@ import marquez.common.models.RunId.UUIDToRunId;
 public class RunId {
   @Getter private final UUID value;
 
-  private RunId(final UUID value) {
+  public RunId(final String valueAsString) {
+    this(UUID.fromString(valueAsString));
+  }
+
+  public RunId(final UUID value) {
     checkNotNull(value, "UUID must not be null");
     checkNotBlank(value.toString(), "UUID value must not be blank");
     this.value = value;

@@ -6,6 +6,6 @@ import lombok.Value;
 /** ID for {@link Job}. */
 @Value
 public class JobId {
-  @NonNull NamespaceName namespace;
+  @NonNull NamespaceName namespaceName;
   @NonNull JobName name;
 }
