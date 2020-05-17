@@ -25,12 +25,13 @@ import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
@@ -39,16 +40,16 @@ import marquez.common.models.NamespaceName;
 @ToString
 public final class JobMeta {
   @Getter @NonNull private final JobType type;
-  @Getter @NonNull private final ImmutableSet<DatasetName> inputs;
-  @Getter @NonNull private final ImmutableSet<DatasetName> outputs;
+  @Getter @NonNull private final ImmutableSet<DatasetId> inputs;
+  @Getter @NonNull private final ImmutableSet<DatasetId> outputs;
   @Nullable private final URL location;
   @Getter @NonNull private final ImmutableMap<String, String> context;
   @Nullable private final String description;
 
   public JobMeta(
       @NonNull final JobType type,
-      @NonNull final ImmutableSet<DatasetName> inputs,
-      @NonNull final ImmutableSet<DatasetName> outputs,
+      @NonNull final ImmutableSet<DatasetId> inputs,
+      @NonNull final ImmutableSet<DatasetId> outputs,
       @Nullable final URL location,
       @Nullable final ImmutableMap<String, String> context,
       @Nullable final String description) {
@@ -74,11 +75,15 @@ public final class JobMeta {
             .join(
                 namespaceName.getValue(),
                 jobName.getValue(),
-                getInputs().stream().map(DatasetName::getValue).collect(joining(VERSION_DELIM)),
-                getOutputs().stream().map(DatasetName::getValue).collect(joining(VERSION_DELIM)),
+                getInputs().stream().flatMap(JobMeta::idToStream).collect(joining(VERSION_DELIM)),
+                getOutputs().stream().flatMap(JobMeta::idToStream).collect(joining(VERSION_DELIM)),
                 getLocation().map(URL::toString).orElse(null),
                 KV_JOINER.join(getContext()))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
+  }
+
+  private static java.util.stream.Stream<String> idToStream(DatasetId datasetId) {
+    return Stream.of(datasetId.getNamespaceName().getValue(), datasetId.getName().getValue());
   }
 }

@@ -15,6 +15,7 @@ import marquez.UnitTests;
 import marquez.api.exceptions.SourceNotFoundException;
 import marquez.common.models.SourceName;
 import marquez.service.SourceService;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Source;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +46,7 @@ public class SourceResourceTest {
   }
 
   @Test
-  public void testGet() throws Exception {
+  public void testGet() throws MarquezServiceException {
     final Source source = newSourceWith(SOURCE_NAME);
     when(service.get(SOURCE_NAME)).thenReturn(Optional.of(source));
 
@@ -55,16 +56,16 @@ public class SourceResourceTest {
   }
 
   @Test
-  public void testGet_notFound() throws Exception {
+  public void testGet_notFound() throws MarquezServiceException {
     when(service.get(SOURCE_NAME)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(SourceNotFoundException.class)
         .isThrownBy(() -> resource.get(SOURCE_NAME))
-        .withMessageContaining(SOURCE_NAME.getValue());
+        .withMessageContaining(String.format("'%s' not found", SOURCE_NAME.getValue()));
   }
 
   @Test
-  public void testList() throws Exception {
+  public void testList() throws MarquezServiceException {
     when(service.getAll(4, 0)).thenReturn(SOURCES);
 
     final Response response = resource.list(4, 0);
@@ -74,7 +75,7 @@ public class SourceResourceTest {
   }
 
   @Test
-  public void testList_empty() throws Exception {
+  public void testList_empty() throws MarquezServiceException {
     when(service.getAll(4, 0)).thenReturn(ImmutableList.of());
 
     final Response response = resource.list(4, 0);

@@ -12,10 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./get-jdk8.sh
+# Usage: $ ./up.sh [--local]
 
 set -e
 
-sudo apt-get install openjdk-8-jdk
+# Change working directory to project root
+project_root=$(git rev-parse --show-toplevel)
+cd "${project_root}"
 
-echo "DONE!"
+files="-f docker-compose.yml"
+
+if [ "${1}" = "--local" ]; then
+  files+=" -f docker-compose.local.yml"
+fi
+
+docker-compose down && docker-compose $files up -V --force-recreate --build

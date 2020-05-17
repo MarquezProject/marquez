@@ -17,6 +17,7 @@ package marquez.db;
 import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -85,6 +86,13 @@ public interface DatasetDao extends SqlObject {
   void updateLastModifedAt(
       @BindList(onEmpty = NULL_STRING) List<UUID> rowUuids, Instant lastModifiedAt);
 
+  /**
+   * Updates the current version of the dataset
+   *
+   * @param rowUuid the datasets.uuid
+   * @param updatedAt when it was updated
+   * @param currentVersionUuid dataset_versions.uuid for the current version
+   */
   @SqlUpdate(
       "UPDATE datasets "
           + "SET updated_at = :updatedAt, "
@@ -92,64 +100,46 @@ public interface DatasetDao extends SqlObject {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  @SqlQuery(
-      "SELECT d.*, s.name AS source_name, "
-          + "ARRAY(SELECT tag_uuid "
+  static final String TAG_UUIDS =
+      "ARRAY(SELECT tag_uuid "
           + "      FROM datasets_tag_mapping "
-          + "      WHERE dataset_uuid = d.uuid) AS tag_uuids "
+          + "      WHERE dataset_uuid = d.uuid) AS tag_uuids ";
+
+  static final String SELECT = "SELECT d.*, " + TAG_UUIDS + "FROM datasets AS d ";
+
+  static final String EXTENDED_SELECT =
+      "SELECT d.*, s.name AS source_name, n.name as namespace_name, "
+          + TAG_UUIDS
           + "FROM datasets AS d "
+          + "INNER JOIN namespaces AS n "
+          + "  ON (n.uuid = d.namespace_uuid) "
           + "INNER JOIN sources AS s "
-          + "  ON (s.uuid = d.source_uuid) "
-          + "WHERE d.uuid = :rowUuid")
+          + "  ON (s.uuid = d.source_uuid) ";
+
+  @SqlQuery(EXTENDED_SELECT + " WHERE d.uuid = :rowUuid")
   @RegisterRowMapper(ExtendedDatasetRowMapper.class)
   Optional<ExtendedDatasetRow> findBy(UUID rowUuid);
 
-  @SqlQuery(
-      "SELECT d.*, s.name AS source_name, "
-          + "ARRAY(SELECT tag_uuid "
-          + "      FROM datasets_tag_mapping "
-          + "      WHERE dataset_uuid = d.uuid) AS tag_uuids "
-          + "FROM datasets AS d "
-          + "INNER JOIN namespaces AS n "
-          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
-          + "INNER JOIN sources AS s "
-          + "  ON (s.uuid = d.source_uuid) "
-          + "WHERE d.name = :datasetName")
+  @SqlQuery(EXTENDED_SELECT + "WHERE d.name = :datasetName AND n.name = :namespaceName")
   @RegisterRowMapper(ExtendedDatasetRowMapper.class)
   Optional<ExtendedDatasetRow> find(String namespaceName, String datasetName);
 
-  @SqlQuery(
-      "SELECT *, "
-          + "ARRAY(SELECT tag_uuid "
-          + "      FROM datasets_tag_mapping "
-          + "      WHERE dataset_uuid = uuid) AS tag_uuids "
-          + "FROM datasets WHERE uuid IN (<rowUuids>)")
-  @RegisterRowMapper(DatasetRowMapper.class)
-  List<DatasetRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... rowUuids);
+  @SqlQuery(EXTENDED_SELECT + " WHERE d.uuid IN (<rowUuids>)")
+  @RegisterRowMapper(ExtendedDatasetRowMapper.class)
+  List<ExtendedDatasetRow> findAllIn(@BindList(onEmpty = NULL_STRING) Collection<UUID> rowUuids);
 
   @SqlQuery(
-      "SELECT d.*, "
-          + "ARRAY(SELECT tag_uuid "
-          + "      FROM datasets_tag_mapping "
-          + "      WHERE dataset_uuid = d.uuid) AS tag_uuids "
-          + "FROM datasets AS d "
-          + "INNER JOIN namespaces AS n "
+      SELECT
+          + " INNER JOIN namespaces AS n "
           + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
           + "WHERE d.name IN (<datasetNames>)")
   @RegisterRowMapper(DatasetRowMapper.class)
   List<DatasetRow> findAllIn(
-      String namespaceName, @BindList(onEmpty = NULL_STRING) String... datasetNames);
+      String namespaceName, @BindList(onEmpty = NULL_STRING) Collection<String> datasetNames);
 
   @SqlQuery(
-      "SELECT d.*, s.name AS source_name, "
-          + "ARRAY(SELECT tag_uuid "
-          + "      FROM datasets_tag_mapping "
-          + "      WHERE dataset_uuid = d.uuid) AS tag_uuids "
-          + "FROM datasets AS d "
-          + "INNER JOIN namespaces AS n "
-          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
-          + "INNER JOIN sources AS s "
-          + "  ON (s.uuid = d.source_uuid)"
+      EXTENDED_SELECT
+          + "WHERE n.name = :namespaceName "
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(ExtendedDatasetRowMapper.class)

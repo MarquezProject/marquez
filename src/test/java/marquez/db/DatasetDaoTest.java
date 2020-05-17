@@ -15,18 +15,20 @@
 package marquez.db;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Iterables.toArray;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static marquez.Generator.newTimestamp;
 import static marquez.common.models.ModelGenerator.newDatasetName;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.db.models.ModelGenerator.newDatasetRow;
 import static marquez.db.models.ModelGenerator.newDatasetRowWith;
 import static marquez.db.models.ModelGenerator.newDatasetRowsWith;
+import static marquez.db.models.ModelGenerator.newDatasetVersionRowWith;
 import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
+import static marquez.db.models.ModelGenerator.newRowUuid;
 import static marquez.db.models.ModelGenerator.newSourceRow;
 import static marquez.db.models.ModelGenerator.newTagRow;
 import static marquez.db.models.ModelGenerator.newTagRows;
-import static marquez.db.models.ModelGenerator.newTimestamp;
 import static marquez.db.models.ModelGenerator.toTagUuids;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,20 +37,20 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
-import marquez.MarquezDb;
 import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
+import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.TagRow;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
-import org.jdbi.v3.testing.Migration;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -56,24 +58,37 @@ import org.junit.experimental.categories.Category;
 
 @Category({DataAccessTests.class, IntegrationTests.class})
 public class DatasetDaoTest {
-  private static final MarquezDb DB = MarquezDb.create();
 
-  static {
-    DB.start();
-  }
-
-  @ClassRule
-  public static final JdbiRule dbRule =
-      JdbiRule.externalPostgres(
-              DB.getHost(), DB.getPort(), DB.getUsername(), DB.getPassword(), DB.getDatabaseName())
-          .withPlugin(new SqlObjectPlugin())
-          .withMigration(Migration.before().withDefaultPath());
+  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
 
   private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
+
+  private static List<Function<DatasetRow, ? extends Object>> DATASET_ROW_GETTERS =
+      asList(
+          DatasetRow::getUuid,
+          DatasetRow::getType,
+          DatasetRow::getName,
+          DatasetRow::getCreatedAt,
+          DatasetRow::getUpdatedAt,
+          DatasetRow::getNamespaceUuid,
+          DatasetRow::getSourceUuid,
+          DatasetRow::getName,
+          DatasetRow::getPhysicalName,
+          DatasetRow::getTagUuids,
+          DatasetRow::getLastModifiedAt,
+          DatasetRow::getDescription,
+          DatasetRow::getCurrentVersionUuid);
+
+  private static void assertEquals(DatasetRow actual, DatasetRow expected) {
+    for (Function<DatasetRow, ? extends Object> getter : DATASET_ROW_GETTERS) {
+      assertThat(getter.apply(actual)).isEqualTo(getter.apply(expected));
+    }
+  }
 
   private static NamespaceDao namespaceDao;
   private static SourceDao sourceDao;
   private static DatasetDao datasetDao;
+  private static DatasetVersionDao datasetVersionDao;
   private static TagDao tagDao;
 
   private static NamespaceRow namespaceRow;
@@ -86,6 +101,7 @@ public class DatasetDaoTest {
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
     sourceDao = jdbi.onDemand(SourceDao.class);
     datasetDao = jdbi.onDemand(DatasetDao.class);
+    datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
     tagDao = jdbi.onDemand(TagDao.class);
 
     namespaceRow = newNamespaceRowWith(NAMESPACE_NAME);
@@ -160,6 +176,7 @@ public class DatasetDaoTest {
 
     final Optional<ExtendedDatasetRow> row = datasetDao.findBy(newRow.getUuid());
     assertThat(row).isPresent();
+    assertEquals(newRow, row.get());
   }
 
   @Test
@@ -179,6 +196,8 @@ public class DatasetDaoTest {
     final Optional<ExtendedDatasetRow> row =
         datasetDao.find(NAMESPACE_NAME.getValue(), newRow.getName());
     assertThat(row).isPresent();
+    ExtendedDatasetRow dsRow = row.get();
+    assertEquals(newRow, dsRow);
   }
 
   @Test
@@ -200,7 +219,7 @@ public class DatasetDaoTest {
     final List<UUID> newRowUuids =
         newRows.stream().map(newRow -> newRow.getUuid()).collect(toImmutableList());
 
-    final List<DatasetRow> rows = datasetDao.findAllIn(toArray(newRowUuids, UUID.class));
+    final List<ExtendedDatasetRow> rows = datasetDao.findAllIn(newRowUuids);
     assertThat(rows).hasSize(4);
 
     final List<UUID> rowUuids = rows.stream().map(row -> row.getUuid()).collect(toImmutableList());
@@ -216,13 +235,19 @@ public class DatasetDaoTest {
     final List<String> newDatasetNames =
         newRows.stream().map(newRow -> newRow.getName()).collect(toImmutableList());
 
-    final List<DatasetRow> rows =
-        datasetDao.findAllIn(NAMESPACE_NAME.getValue(), toArray(newDatasetNames, String.class));
+    final List<DatasetRow> rows = datasetDao.findAllIn(NAMESPACE_NAME.getValue(), newDatasetNames);
     assertThat(rows).hasSize(4);
 
     final List<String> datasetNames =
         rows.stream().map(row -> row.getName()).collect(toImmutableList());
     assertThat(datasetNames).containsAll(newDatasetNames);
+
+    List<ExtendedDatasetRow> findAllExtendedIn =
+        datasetDao.findAllIn(rows.stream().map(DatasetRow::getUuid).collect(toImmutableList()));
+
+    assertThat(
+            findAllExtendedIn.stream().map(ExtendedDatasetRow::getName).collect(toImmutableList()))
+        .containsAll(newDatasetNames);
   }
 
   @Test
@@ -233,5 +258,21 @@ public class DatasetDaoTest {
 
     final List<ExtendedDatasetRow> rows = datasetDao.findAll(NAMESPACE_NAME.getValue(), 4, 0);
     assertThat(rows).isNotNull().hasSize(4);
+  }
+
+  @Test
+  public void testDatasetVersions() {
+    final DatasetRow ds =
+        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows));
+    datasetDao.insert(ds);
+
+    DatasetVersionRow dsv =
+        newDatasetVersionRowWith(ds.getUuid(), newRowUuid(), emptyList(), newRowUuid());
+
+    datasetVersionDao.insert(dsv);
+
+    final List<ExtendedDatasetVersionRow> rows =
+        datasetVersionDao.findByRunId(dsv.getRunUuid().get());
+    assertThat(rows).isNotNull().hasSize(1);
   }
 }

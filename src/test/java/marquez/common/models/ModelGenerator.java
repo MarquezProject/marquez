@@ -75,8 +75,20 @@ public final class ModelGenerator extends Generator {
     return URI.create(connectionUrlString);
   }
 
+  public static ImmutableSet<DatasetId> newDatasetIds(final int limit) {
+    return Stream.generate(ModelGenerator::newDatasetId).limit(limit).collect(toImmutableSet());
+  }
+
+  public static DatasetId newDatasetId() {
+    return newDatasetIdWith(newNamespaceName());
+  }
+
+  public static DatasetId newDatasetIdWith(final NamespaceName namespaceName) {
+    return new DatasetId(namespaceName, newDatasetName());
+  }
+
   public static ImmutableSet<DatasetName> newDatasetNames(final int limit) {
-    return Stream.generate(() -> newDatasetName()).limit(limit).collect(toImmutableSet());
+    return Stream.generate(ModelGenerator::newDatasetName).limit(limit).collect(toImmutableSet());
   }
 
   public static DatasetName newDatasetName() {
@@ -100,15 +112,23 @@ public final class ModelGenerator extends Generator {
   }
 
   public static ImmutableList<Field> newFields(final int limit) {
-    return Stream.generate(() -> newField()).limit(limit).collect(toImmutableList());
+    return Stream.generate(ModelGenerator::newField).limit(limit).collect(toImmutableList());
   }
 
   public static ImmutableSet<TagName> newTagNames(final int limit) {
-    return Stream.generate(() -> newTagName()).limit(limit).collect(toImmutableSet());
+    return Stream.generate(ModelGenerator::newTagName).limit(limit).collect(toImmutableSet());
   }
 
   public static TagName newTagName() {
     return TagName.of("test_tag" + newId());
+  }
+
+  public static JobId newJobId() {
+    return newJobIdWith(newNamespaceName());
+  }
+
+  public static JobId newJobIdWith(final NamespaceName namespaceName) {
+    return new JobId(namespaceName, newJobName());
   }
 
   public static JobName newJobName() {
@@ -128,8 +148,8 @@ public final class ModelGenerator extends Generator {
         "sql", String.format("SELECT * FROM room_bookings WHERE room = '%dH';", newId()));
   }
 
-  public static UUID newRunId() {
-    return UUID.randomUUID();
+  public static RunId newRunId() {
+    return RunId.of(UUID.randomUUID());
   }
 
   public static String newDescription() {

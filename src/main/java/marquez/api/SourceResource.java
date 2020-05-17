@@ -33,7 +33,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.SourceNotFoundException;
 import marquez.common.models.SourceName;
 import marquez.service.SourceService;

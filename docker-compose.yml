@@ -1,10 +1,10 @@
-version: '3'
+version: "3.7"
 services:
   app:
-    build: .
+    image: marquezproject/marquez:latest
     ports:
-      - '5000:5000'
-      - '5001:5001'
+      - "5000:5000"
+      - "5001:5001"
     environment:
       - MARQUEZ_PORT=5000
       - MARQUEZ_ADMIN_PORT=5001
@@ -22,9 +22,9 @@ services:
     entrypoint: ["./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
 
   db:
-    image: 'postgres:12.1'
+    image: postgres:12.1
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password

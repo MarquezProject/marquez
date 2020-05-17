@@ -11,6 +11,7 @@ db:
 
 flyway:
   connectRetries: 2
+  validateMigrationNaming: true
 
 tags:
   - name: PII

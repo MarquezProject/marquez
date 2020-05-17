@@ -25,6 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.SourceName;
@@ -36,6 +37,7 @@ public final class Stream extends Dataset {
   @Getter private final URL schemaLocation;
 
   public Stream(
+      final DatasetId id,
       final DatasetName name,
       final DatasetName physicalName,
       final Instant createdAt,
@@ -47,6 +49,7 @@ public final class Stream extends Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
     super(
+        id,
         STREAM,
         name,
         physicalName,

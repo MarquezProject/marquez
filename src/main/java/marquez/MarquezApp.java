@@ -30,33 +30,8 @@ import io.prometheus.client.hotspot.DefaultExports;
 import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.DatasetResource;
-import marquez.api.JobResource;
-import marquez.api.NamespaceResource;
-import marquez.api.SourceResource;
-import marquez.api.TagResource;
-import marquez.api.exceptions.MarquezServiceExceptionMapper;
-import marquez.db.DatasetDao;
-import marquez.db.DatasetFieldDao;
-import marquez.db.DatasetVersionDao;
+import marquez.db.DbMigration;
 import marquez.db.FlywayFactory;
-import marquez.db.JobContextDao;
-import marquez.db.JobDao;
-import marquez.db.JobVersionDao;
-import marquez.db.NamespaceDao;
-import marquez.db.NamespaceOwnershipDao;
-import marquez.db.OwnerDao;
-import marquez.db.RunArgsDao;
-import marquez.db.RunDao;
-import marquez.db.RunStateDao;
-import marquez.db.SourceDao;
-import marquez.db.TagDao;
-import marquez.service.DatasetService;
-import marquez.service.JobService;
-import marquez.service.NamespaceService;
-import marquez.service.SourceService;
-import marquez.service.TagService;
-import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -106,42 +81,21 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     log.info("Running startup actions...");
     if (config.isMigrateOnStartup()) {
-      migrateDbOrError(config, source);
+      final FlywayFactory flywayFactory = config.getFlywayFactory();
+      try {
+        DbMigration.migrateDbOrError(flywayFactory, source);
+      } catch (FlywayException errorOnDbMigrate) {
+        log.info("Stopping app...");
+        // Propagate throwable up the stack.
+        onFatalError(errorOnDbMigrate); // Signal app termination.
+      }
     }
     registerResources(config, env, source);
     registerServlets(env);
   }
 
-  private void migrateDbOrError(@NonNull MarquezConfig config, @NonNull DataSource source) {
-    final FlywayFactory flywayFactory = config.getFlywayFactory();
-    final Flyway flyway = flywayFactory.build(source);
-
-    // Attempt to perform a database migration. An exception is thrown on failed migration attempts
-    // requiring we handle the throwable and apply a repair on the database to fix any
-    // issues before app termination.
-    try {
-      log.info("Migrating database...");
-      final int migrations = flyway.migrate();
-      log.info("Successfully applied '{}' migrations to database.", migrations);
-    } catch (FlywayException errorOnDbMigrate) {
-      log.error("Failed to apply migration to database.", errorOnDbMigrate);
-      try {
-        log.info("Repairing failed database migration...");
-        flyway.repair();
-        log.info("Successfully repaired database.");
-      } catch (FlywayException errorOnDbRepair) {
-        log.error("Failed to apply repair to database.", errorOnDbRepair);
-      }
-
-      log.info("Stopping app...");
-      // Propagate throwable up the stack.
-      onFatalError(errorOnDbMigrate); // Signal app termination.
-    }
-  }
-
-  private void registerResources(
-      @NonNull MarquezConfig config, @NonNull Environment env, @NonNull DataSource source)
-      throws MarquezException {
+  public void registerResources(
+      @NonNull MarquezConfig config, @NonNull Environment env, @NonNull DataSource source) {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
@@ -149,49 +103,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
 
-    final NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
-    final OwnerDao ownerDao = jdbi.onDemand(OwnerDao.class);
-    final NamespaceOwnershipDao namespaceOwnershipDao = jdbi.onDemand(NamespaceOwnershipDao.class);
-    final SourceDao sourceDao = jdbi.onDemand(SourceDao.class);
-    final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
-    final DatasetFieldDao datasetFieldDao = jdbi.onDemand(DatasetFieldDao.class);
-    final DatasetVersionDao datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
-    final JobDao jobDao = jdbi.onDemand(JobDao.class);
-    final JobVersionDao jobVersionDao = jdbi.onDemand(JobVersionDao.class);
-    final JobContextDao jobContextDao = jdbi.onDemand(JobContextDao.class);
-    final RunDao runDao = jdbi.onDemand(RunDao.class);
-    final RunArgsDao runArgsDao = jdbi.onDemand(RunArgsDao.class);
-    final RunStateDao runStateDao = jdbi.onDemand(RunStateDao.class);
-    final TagDao tagDao = jdbi.onDemand(TagDao.class);
-
-    final NamespaceService namespaceService =
-        new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
-    final SourceService sourceService = new SourceService(sourceDao);
-    final DatasetService datasetService =
-        new DatasetService(
-            namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao, tagDao);
-    final JobService jobService =
-        new JobService(
-            namespaceDao,
-            datasetDao,
-            datasetVersionDao,
-            jobDao,
-            jobVersionDao,
-            jobContextDao,
-            runDao,
-            runArgsDao,
-            runStateDao);
-    final TagService tagService = new TagService(tagDao);
-    tagService.init(config.getTags());
+    final MarquezContext context =
+        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
 
     log.debug("Registering resources...");
-    env.jersey().register(new NamespaceResource(namespaceService));
-    env.jersey().register(new SourceResource(sourceService));
-    env.jersey()
-        .register(new DatasetResource(namespaceService, datasetService, jobService, tagService));
-    env.jersey().register(new JobResource(namespaceService, jobService));
-    env.jersey().register(new TagResource(tagService));
-    env.jersey().register(new MarquezServiceExceptionMapper());
+    for (final Object resource : context.getResources()) {
+      env.jersey().register(resource);
+    }
   }
 
   private void registerServlets(@NonNull Environment env) {

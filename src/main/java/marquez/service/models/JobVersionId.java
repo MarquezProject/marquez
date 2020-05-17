@@ -12,16 +12,17 @@
  * limitations under the License.
  */
 
-package marquez.api.exceptions;
+package marquez.service.models;
 
-import static marquez.common.base.MorePreconditions.checkNotBlank;
+import lombok.NonNull;
+import lombok.Value;
+import marquez.common.models.JobName;
+import marquez.common.models.NamespaceName;
 
-import javax.ws.rs.BadRequestException;
-
-public final class RunNotValidException extends BadRequestException {
-  private static final long serialVersionUID = 1L;
-
-  public RunNotValidException(final String idString) {
-    super(String.format("Run '%s' is invalid.", checkNotBlank(idString)));
-  }
+/** The unique identifier of a Job Version in the lineage graph */
+@Value
+public class JobVersionId {
+  @NonNull NamespaceName namespace;
+  @NonNull JobName jobName;
+  @NonNull Version version;
 }

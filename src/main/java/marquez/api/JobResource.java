@@ -23,7 +23,6 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import java.net.URI;
-import java.util.UUID;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -44,6 +43,8 @@ import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
+import marquez.common.models.RunState;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
@@ -141,7 +142,7 @@ public class JobResource {
   @GET
   @Path("/jobs/runs/{id}")
   @Produces(APPLICATION_JSON)
-  public Response getRun(@PathParam("id") UUID runId) throws MarquezServiceException {
+  public Response getRun(@PathParam("id") RunId runId) throws MarquezServiceException {
     final Run run = jobService.getRun(runId).orElseThrow(() -> new RunNotFoundException(runId));
     return Response.ok(run).build();
   }
@@ -171,8 +172,8 @@ public class JobResource {
   @POST
   @Path("/jobs/runs/{id}/start")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsRunning(@PathParam("id") UUID runId) throws MarquezServiceException {
-    return markRunAs(runId, Run.State.RUNNING);
+  public Response markRunAsRunning(@PathParam("id") RunId runId) throws MarquezServiceException {
+    return markRunAs(runId, RunState.RUNNING);
   }
 
   @Timed
@@ -181,8 +182,8 @@ public class JobResource {
   @POST
   @Path("/jobs/runs/{id}/complete")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsCompleted(@PathParam("id") UUID runId) throws MarquezServiceException {
-    return markRunAs(runId, Run.State.COMPLETED);
+  public Response markRunAsCompleted(@PathParam("id") RunId runId) throws MarquezServiceException {
+    return markRunAs(runId, RunState.COMPLETED);
   }
 
   @Timed
@@ -191,8 +192,8 @@ public class JobResource {
   @POST
   @Path("/jobs/runs/{id}/fail")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsFailed(@PathParam("id") UUID runId) throws MarquezServiceException {
-    return markRunAs(runId, Run.State.FAILED);
+  public Response markRunAsFailed(@PathParam("id") RunId runId) throws MarquezServiceException {
+    return markRunAs(runId, RunState.FAILED);
   }
 
   @Timed
@@ -201,11 +202,11 @@ public class JobResource {
   @POST
   @Path("/jobs/runs/{id}/abort")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsAborted(@PathParam("id") UUID runId) throws MarquezServiceException {
-    return markRunAs(runId, Run.State.ABORTED);
+  public Response markRunAsAborted(@PathParam("id") RunId runId) throws MarquezServiceException {
+    return markRunAs(runId, RunState.ABORTED);
   }
 
-  Response markRunAs(@NonNull UUID runId, @NonNull Run.State runState)
+  Response markRunAs(@NonNull RunId runId, @NonNull RunState runState)
       throws MarquezServiceException {
     throwIfNotExists(runId);
 
@@ -240,7 +241,7 @@ public class JobResource {
     }
   }
 
-  void throwIfNotExists(@NonNull UUID runId) throws MarquezServiceException {
+  void throwIfNotExists(@NonNull RunId runId) throws MarquezServiceException {
     if (!jobService.runExists(runId)) {
       throw new RunNotFoundException(runId);
     }

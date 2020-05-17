@@ -31,6 +31,7 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 
@@ -51,7 +52,7 @@ public abstract class DatasetMeta {
   @Getter private final ImmutableList<Field> fields;
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final String description;
-  @Nullable private final UUID runId;
+  @Nullable private final RunId runId;
 
   public DatasetMeta(
       @NonNull final DatasetType type,
@@ -60,7 +61,7 @@ public abstract class DatasetMeta {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final UUID runId) {
+      @Nullable final RunId runId) {
     this.type = type;
     this.physicalName = physicalName;
     this.sourceName = sourceName;
@@ -74,7 +75,7 @@ public abstract class DatasetMeta {
     return Optional.ofNullable(description);
   }
 
-  public Optional<UUID> getRunId() {
+  public Optional<RunId> getRunId() {
     return Optional.ofNullable(runId);
   }
 

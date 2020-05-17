@@ -21,7 +21,6 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -44,6 +43,7 @@ import marquez.api.exceptions.TagNotFoundException;
 import marquez.common.models.DatasetName;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.common.models.TagName;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
@@ -203,7 +203,7 @@ public class DatasetResource {
     }
   }
 
-  void throwIfNotExists(@Nullable UUID runId) throws MarquezServiceException {
+  void throwIfNotExists(@Nullable RunId runId) throws MarquezServiceException {
     if (runId != null) {
       if (!jobService.runExists(runId)) {
         throw new RunNotFoundException(runId);

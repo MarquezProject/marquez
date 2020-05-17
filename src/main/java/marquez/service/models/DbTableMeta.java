@@ -30,6 +30,7 @@ import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 
@@ -42,7 +43,7 @@ public final class DbTableMeta extends DatasetMeta {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final UUID runId) {
+      @Nullable final RunId runId) {
     super(DB_TABLE, physicalName, sourceName, fields, tags, description, runId);
   }
 
@@ -56,7 +57,7 @@ public final class DbTableMeta extends DatasetMeta {
                 datasetName.getValue(),
                 getPhysicalName().getValue(),
                 getFields().stream().map(DatasetMeta::joinField).collect(joining(VERSION_DELIM)),
-                getRunId().map(UUID::toString).orElse(null))
+                getRunId().map(RunId::getValue).orElse(null))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }

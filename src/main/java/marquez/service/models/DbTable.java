@@ -22,6 +22,7 @@ import java.time.Instant;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.SourceName;
@@ -31,6 +32,7 @@ import marquez.common.models.TagName;
 @ToString(callSuper = true)
 public final class DbTable extends Dataset {
   public DbTable(
+      final DatasetId id,
       final DatasetName name,
       final DatasetName physicalName,
       final Instant createdAt,
@@ -41,6 +43,7 @@ public final class DbTable extends Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
     super(
+        id,
         DB_TABLE,
         name,
         physicalName,

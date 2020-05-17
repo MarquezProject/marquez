@@ -25,6 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
@@ -42,6 +43,7 @@ import marquez.common.models.TagName;
   @JsonSubTypes.Type(value = Stream.class, name = "STREAM")
 })
 public abstract class Dataset {
+  @Getter private final DatasetId id;
   @Getter private final DatasetType type;
   @Getter private final DatasetName name;
   @Getter private final DatasetName physicalName;
@@ -54,6 +56,7 @@ public abstract class Dataset {
   @Nullable private final String description;
 
   public Dataset(
+      @NonNull final DatasetId id,
       @NonNull final DatasetType type,
       @NonNull final DatasetName name,
       @NonNull final DatasetName physicalName,
@@ -64,6 +67,7 @@ public abstract class Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
+    this.id = id;
     this.type = type;
     this.name = name;
     this.physicalName = physicalName;

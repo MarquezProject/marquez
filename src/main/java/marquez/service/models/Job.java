@@ -18,42 +18,45 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
-import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetId;
+import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 
 @EqualsAndHashCode
 @ToString
 public final class Job {
+  @Getter @NonNull private final JobId id;
   @Getter @NonNull private final JobType type;
   @Getter @NonNull private final JobName name;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
-  @Getter @NonNull private final ImmutableSet<DatasetName> inputs;
-  @Getter @NonNull private final ImmutableSet<DatasetName> outputs;
+  @Getter @NonNull private final ImmutableSet<DatasetId> inputs;
+  @Getter @NonNull private final ImmutableSet<DatasetId> outputs;
   @Nullable private final URL location;
-  @Getter @NonNull private final Map<String, String> context;
+  @Getter @NonNull private final ImmutableMap<String, String> context;
   @Nullable private final String description;
   @Nullable private final Run latestRun;
 
   public Job(
+      @NonNull final JobId id,
       @NonNull final JobType type,
       @NonNull final JobName name,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
-      @NonNull final ImmutableSet<DatasetName> inputs,
-      @NonNull final ImmutableSet<DatasetName> outputs,
+      @NonNull final ImmutableSet<DatasetId> inputs,
+      @NonNull final ImmutableSet<DatasetId> outputs,
       @Nullable final URL location,
       @Nullable final ImmutableMap<String, String> context,
       @Nullable final String description,
       @Nullable final Run latestRun) {
+    this.id = id;
     this.type = type;
     this.name = name;
     this.createdAt = createdAt;

@@ -1,8 +1,7 @@
 package marquez.api;
 
 import static marquez.api.DatasetResource.Datasets;
-import static marquez.common.models.ModelGenerator.newDatasetName;
-import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.common.models.ModelGenerator.newDatasetId;
 import static marquez.common.models.ModelGenerator.newRunId;
 import static marquez.common.models.ModelGenerator.newTagName;
 import static marquez.service.models.ModelGenerator.newDbTable;
@@ -18,18 +17,20 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 import javax.ws.rs.core.Response;
 import marquez.UnitTests;
 import marquez.api.exceptions.DatasetNotFoundException;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.common.models.TagName;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.TagService;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 import marquez.service.models.DbTable;
 import marquez.service.models.DbTableMeta;
@@ -43,9 +44,10 @@ import org.mockito.junit.MockitoRule;
 
 @Category(UnitTests.class)
 public class DatasetResourceTest {
-  private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
+  private static final DatasetId DB_TABLE_ID = newDatasetId();
+  private static final NamespaceName NAMESPACE_NAME = DB_TABLE_ID.getNamespaceName();
+  private static final DatasetName DB_TABLE_NAME = DB_TABLE_ID.getName();
 
-  private static final DatasetName DB_TABLE_NAME = newDatasetName();
   private static final DbTable DB_TABLE_0 = newDbTable();
   private static final DbTable DB_TABLE_1 = newDbTable();
   private static final DbTable DB_TABLE_2 = newDbTable();
@@ -53,7 +55,7 @@ public class DatasetResourceTest {
       ImmutableList.of(DB_TABLE_0, DB_TABLE_1, DB_TABLE_2);
 
   private static final TagName TAG_NAME = newTagName();
-  private static final UUID RUN_ID = newRunId();
+  private static final RunId RUN_ID = newRunId();
 
   @Rule public MockitoRule rule = MockitoJUnit.rule();
 
@@ -70,9 +72,9 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testCreateOrUpdate() throws Exception {
+  public void testCreateOrUpdate() throws MarquezServiceException {
     final DbTableMeta dbTableMeta = newDbTableMeta();
-    final DbTable dbTable = toDbTable(DB_TABLE_NAME, dbTableMeta);
+    final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.runExists(RUN_ID)).thenReturn(true);
@@ -86,8 +88,8 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testGet() throws Exception {
-    final DbTable dbTable = newDbTableWith(DB_TABLE_NAME);
+  public void testGet() throws MarquezServiceException {
+    final DbTable dbTable = newDbTableWith(DB_TABLE_ID);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.get(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(Optional.of(dbTable));
@@ -98,17 +100,17 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testGet_notFound() throws Exception {
+  public void testGet_notFound() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.get(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(DatasetNotFoundException.class)
         .isThrownBy(() -> datasetResource.get(NAMESPACE_NAME, DB_TABLE_NAME))
-        .withMessageContaining(DB_TABLE_NAME.getValue());
+        .withMessageContaining(String.format("'%s' not found", DB_TABLE_NAME.getValue()));
   }
 
   @Test
-  public void testList() throws Exception {
+  public void testList() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.getAll(NAMESPACE_NAME, 4, 0)).thenReturn(DATASETS);
 
@@ -119,7 +121,7 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testList_empty() throws Exception {
+  public void testList_empty() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.getAll(NAMESPACE_NAME, 4, 0)).thenReturn(ImmutableList.of());
 
@@ -129,12 +131,12 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testTag_dataset() throws Exception {
+  public void testTag_dataset() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
     when(tagService.exists(TAG_NAME)).thenReturn(true);
 
-    final DbTable dbTable = tagDatasetWith(TAG_NAME, newDbTableWith(DB_TABLE_NAME));
+    final DbTable dbTable = tagWith(TAG_NAME, newDbTableWith(DB_TABLE_ID));
     doReturn(Response.ok(dbTable).build()).when(datasetResource).get(NAMESPACE_NAME, DB_TABLE_NAME);
 
     final Response response = datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME);
@@ -146,12 +148,12 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testTag_datasetField() throws Exception {
+  public void testTag_datasetField() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
     when(tagService.exists(TAG_NAME)).thenReturn(true);
 
-    final DbTable dbTable = tagAllFieldsWith(TAG_NAME, newDbTableWith(DB_TABLE_NAME));
+    final DbTable dbTable = tagAllWith(TAG_NAME, newDbTableWith(DB_TABLE_ID));
     doReturn(Response.ok(dbTable).build()).when(datasetResource).get(NAMESPACE_NAME, DB_TABLE_NAME);
 
     final Response response = datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME);
@@ -164,10 +166,11 @@ public class DatasetResourceTest {
     }
   }
 
-  static DbTable toDbTable(final DatasetName dbTableName, final DbTableMeta dbTableMeta) {
+  static DbTable toDbTable(final DatasetId dbTableId, final DbTableMeta dbTableMeta) {
     final Instant now = Instant.now();
     return new DbTable(
-        dbTableName,
+        dbTableId,
+        dbTableId.getName(),
         dbTableMeta.getPhysicalName(),
         now,
         now,
@@ -178,10 +181,11 @@ public class DatasetResourceTest {
         dbTableMeta.getDescription().orElse(null));
   }
 
-  static DbTable tagDatasetWith(final TagName tagName, final DbTable dbTable) {
+  static DbTable tagWith(final TagName tagName, final DbTable dbTable) {
     final ImmutableSet<TagName> tags =
         ImmutableSet.<TagName>builder().addAll(dbTable.getTags()).add(tagName).build();
     return new DbTable(
+        dbTable.getId(),
         dbTable.getName(),
         dbTable.getPhysicalName(),
         dbTable.getCreatedAt(),
@@ -193,7 +197,7 @@ public class DatasetResourceTest {
         dbTable.getDescription().orElse(null));
   }
 
-  static DbTable tagAllFieldsWith(final TagName tagName, final DbTable dbTable) {
+  static DbTable tagAllWith(final TagName tagName, final DbTable dbTable) {
     final ImmutableList.Builder<Field> fields = ImmutableList.builder();
     for (final Field field : dbTable.getFields()) {
       final ImmutableSet<TagName> tags =
@@ -202,6 +206,7 @@ public class DatasetResourceTest {
           new Field(field.getName(), field.getType(), tags, field.getDescription().orElse(null)));
     }
     return new DbTable(
+        dbTable.getId(),
         dbTable.getName(),
         dbTable.getPhysicalName(),
         dbTable.getCreatedAt(),

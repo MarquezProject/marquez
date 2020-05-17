@@ -17,31 +17,36 @@ package marquez.service.models;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.RunId;
+import marquez.common.models.RunState;
 
 @EqualsAndHashCode
 @ToString
 public final class Run {
-  @Getter @NonNull private final UUID id;
+  @Getter @NonNull private final RunId id;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
-  @Getter @NonNull private final Run.State state;
+  @Getter @NonNull private final RunState state;
+  @Nullable private final Instant startedAt;
+  @Nullable private final Instant endedAt;
   @Getter @NonNull private final ImmutableMap<String, String> args;
 
   public Run(
-      @NonNull final UUID id,
+      @NonNull final RunId id,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
-      @NonNull final Run.State state,
+      @NonNull final RunState state,
+      @Nullable final Instant startedAt,
+      @Nullable final Instant endedAt,
       @Nullable final ImmutableMap<String, String> args) {
     this.id = id;
     this.createdAt = createdAt;
@@ -49,6 +54,8 @@ public final class Run {
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;
     this.state = state;
+    this.startedAt = startedAt;
+    this.endedAt = endedAt;
     this.args = (args == null) ? ImmutableMap.of() : args;
   }
 
@@ -60,39 +67,11 @@ public final class Run {
     return Optional.ofNullable(nominalEndTime);
   }
 
-  public enum State {
-    NEW {
-      @Override
-      public boolean isComplete() {
-        return false;
-      }
-    },
-    RUNNING {
-      @Override
-      public boolean isComplete() {
-        return false;
-      }
-    },
-    COMPLETED {
-      @Override
-      public boolean isComplete() {
-        return true;
-      }
-    },
-    ABORTED {
-      @Override
-      public boolean isComplete() {
-        return false;
-      }
-    },
-    FAILED {
-      @Override
-      public boolean isComplete() {
-        return false;
-      }
-    };
+  public Optional<Instant> getStartedAt() {
+    return Optional.ofNullable(startedAt);
+  }
 
-    /** Returns true if this state is complete. */
-    public abstract boolean isComplete();
+  public Optional<Instant> getEndedAt() {
+    return Optional.ofNullable(endedAt);
   }
 }

@@ -122,6 +122,12 @@ public final class ModelGenerator extends Generator {
         null);
   }
 
+  public static DatasetVersionRow newDatasetVersionRowWith(
+      UUID datasetUuid, UUID version, List<UUID> fieldUuids, UUID runUuid) {
+    return new DatasetVersionRow(
+        newRowUuid(), newTimestamp(), datasetUuid, version, fieldUuids, runUuid);
+  }
+
   public static List<TagRow> newTagRows(final int limit) {
     return Stream.generate(() -> newTagRow()).limit(limit).collect(toImmutableList());
   }

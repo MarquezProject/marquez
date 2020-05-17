@@ -24,12 +24,9 @@ import java.util.List;
 import java.util.Optional;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
-import marquez.MarquezDb;
 import marquez.db.models.SourceRow;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
-import org.jdbi.v3.testing.Migration;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -37,18 +34,8 @@ import org.junit.experimental.categories.Category;
 
 @Category({DataAccessTests.class, IntegrationTests.class})
 public class SourceDaoTest {
-  private static final MarquezDb DB = MarquezDb.create();
 
-  static {
-    DB.start();
-  }
-
-  @ClassRule
-  public static final JdbiRule dbRule =
-      JdbiRule.externalPostgres(
-              DB.getHost(), DB.getPort(), DB.getUsername(), DB.getPassword(), DB.getDatabaseName())
-          .withPlugin(new SqlObjectPlugin())
-          .withMigration(Migration.before().withDefaultPath());
+  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
 
   private static SourceDao sourceDao;
 

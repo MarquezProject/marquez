@@ -32,6 +32,7 @@ import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 
@@ -47,7 +48,7 @@ public final class StreamMeta extends DatasetMeta {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final UUID runId) {
+      @Nullable final RunId runId) {
     super(STREAM, physicalName, sourceName, fields, tags, description, runId);
     this.schemaLocation = schemaLocation;
   }

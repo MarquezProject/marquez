@@ -38,10 +38,11 @@ public final class FlywayFactory {
   private static final boolean DEFAULT_IGNORE_IGNORED_MIGRATIONS = false;
   private static final boolean DEFAULT_IGNORE_PENDING_MIGRATIONS = false;
   private static final boolean DEFAULT_IGNORE_FUTURE_MIGRATIONS = false;
+  private static final boolean DEFAULT_VALIDATE_MIGRATION_NAMING = false;
   private static final boolean DEFAULT_VALIDATE_ON_MIGRATE = false;
   private static final boolean DEFAULT_CLEAN_ON_VALIDATION_ERROR = false;
   private static final boolean DEFAULT_CLEAN_DISABLED = false;
-  private static final String DEFAULT_LOCATION = "db/migration";
+  private static final String DEFAULT_LOCATION = "marquez/db/migration";
   private static final List<String> DEFAULT_LOCATIONS = ImmutableList.of(DEFAULT_LOCATION);
   private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
   private static final String DEFAULT_TABLE = "flyway_schema_history";
@@ -62,6 +63,7 @@ public final class FlywayFactory {
   @Getter @Setter private boolean ignoreIgnoredMigrations = DEFAULT_IGNORE_IGNORED_MIGRATIONS;
   @Getter @Setter private boolean ignorePendingMigrations = DEFAULT_IGNORE_PENDING_MIGRATIONS;
   @Getter @Setter private boolean ignoreFutureMigrations = DEFAULT_IGNORE_FUTURE_MIGRATIONS;
+  @Getter @Setter private boolean validateMigrationNaming = DEFAULT_VALIDATE_MIGRATION_NAMING;
   @Getter @Setter private boolean validateOnMigrate = DEFAULT_VALIDATE_ON_MIGRATE;
   @Getter @Setter private boolean cleanOnValidationError = DEFAULT_CLEAN_ON_VALIDATION_ERROR;
   @Getter @Setter private boolean cleanDisabled = DEFAULT_CLEAN_DISABLED;
@@ -103,6 +105,7 @@ public final class FlywayFactory {
         .ignoreIgnoredMigrations(ignoreIgnoredMigrations)
         .ignorePendingMigrations(ignorePendingMigrations)
         .ignoreFutureMigrations(ignoreFutureMigrations)
+        .validateMigrationNaming(validateMigrationNaming)
         .validateOnMigrate(validateOnMigrate)
         .cleanOnValidationError(cleanOnValidationError)
         .cleanDisabled(cleanDisabled)

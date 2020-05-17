@@ -16,7 +16,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Status
 
-This project is under active development at [WeWork](https://www.wework.com) (in collaboration with many other organizations).
+This project is under active development at [WeWork](https://www.wework.com) and [Datakin](https://twitter.com/DatakinHQ) (in collaboration with many other organizations).
 
 ## Documentation
 

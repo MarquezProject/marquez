@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableSet;
 import javax.ws.rs.core.Response;
 import marquez.UnitTests;
 import marquez.service.TagService;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Tag;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +51,7 @@ public class TagResourceTest {
   }
 
   @Test
-  public void testList() throws Exception {
+  public void testList() throws MarquezServiceException {
     when(service.getAll(4, 0)).thenReturn(TAGS);
 
     final Response response = resource.list(4, 0);
@@ -59,7 +60,7 @@ public class TagResourceTest {
   }
 
   @Test
-  public void testList_empty() throws Exception {
+  public void testList_empty() throws MarquezServiceException {
     when(service.getAll(4, 0)).thenReturn(ImmutableSet.of());
 
     final Response response = resource.list(4, 0);

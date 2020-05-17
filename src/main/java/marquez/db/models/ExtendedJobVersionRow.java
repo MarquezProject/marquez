@@ -26,6 +26,8 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class ExtendedJobVersionRow extends JobVersionRow {
   @Getter private final String context;
+  @Getter private @NonNull String namespaceName;
+  @Getter private @NonNull String name;
 
   public ExtendedJobVersionRow(
       final UUID uuid,
@@ -38,7 +40,9 @@ public class ExtendedJobVersionRow extends JobVersionRow {
       final String location,
       final UUID version,
       final UUID latestRunUuid,
-      @NonNull final String context) {
+      @NonNull final String context,
+      @NonNull final String namespaceName,
+      @NonNull final String name) {
     super(
         uuid,
         createdAt,
@@ -51,5 +55,7 @@ public class ExtendedJobVersionRow extends JobVersionRow {
         version,
         latestRunUuid);
     this.context = context;
+    this.namespaceName = namespaceName;
+    this.name = name;
   }
 }

@@ -18,6 +18,7 @@ import marquez.UnitTests;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.common.models.NamespaceName;
 import marquez.service.NamespaceService;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
 import org.junit.Before;
@@ -49,7 +50,7 @@ public class NamespaceResourceTest {
   }
 
   @Test
-  public void testCreateOrUpdate() throws Exception {
+  public void testCreateOrUpdate() throws MarquezServiceException {
     final NamespaceMeta meta = newNamespaceMeta();
     final Namespace namespace = toNamespace(NAMESPACE_NAME, meta);
     when(service.createOrUpdate(NAMESPACE_NAME, meta)).thenReturn(namespace);
@@ -60,7 +61,7 @@ public class NamespaceResourceTest {
   }
 
   @Test
-  public void testGet() throws Exception {
+  public void testGet() throws MarquezServiceException {
     final Namespace namespace = newNamespaceWith(NAMESPACE_NAME);
     when(service.get(NAMESPACE_NAME)).thenReturn(Optional.of(namespace));
 
@@ -70,16 +71,16 @@ public class NamespaceResourceTest {
   }
 
   @Test
-  public void testGet_notFound() throws Exception {
+  public void testGet_notFound() throws MarquezServiceException {
     when(service.get(NAMESPACE_NAME)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(NamespaceNotFoundException.class)
         .isThrownBy(() -> resource.get(NAMESPACE_NAME))
-        .withMessageContaining(NAMESPACE_NAME.getValue());
+        .withMessageContaining(String.format("'%s' not found", NAMESPACE_NAME.getValue()));
   }
 
   @Test
-  public void testList() throws Exception {
+  public void testList() throws MarquezServiceException {
     when(service.getAll(4, 0)).thenReturn(NAMESPACES);
 
     final Response response = resource.list(4, 0);
@@ -89,7 +90,7 @@ public class NamespaceResourceTest {
   }
 
   @Test
-  public void testList_empty() throws Exception {
+  public void testList_empty() throws MarquezServiceException {
     when(service.getAll(4, 0)).thenReturn(ImmutableList.of());
 
     final Response response = resource.list(4, 0);

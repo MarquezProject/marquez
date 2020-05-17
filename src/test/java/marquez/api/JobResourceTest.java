@@ -3,9 +3,12 @@ package marquez.api;
 import static marquez.Generator.newTimestamp;
 import static marquez.api.JobResource.Jobs;
 import static marquez.api.JobResource.Runs;
-import static marquez.common.models.ModelGenerator.newJobName;
-import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.common.models.ModelGenerator.newJobId;
 import static marquez.common.models.ModelGenerator.newRunId;
+import static marquez.common.models.RunState.ABORTED;
+import static marquez.common.models.RunState.COMPLETED;
+import static marquez.common.models.RunState.FAILED;
+import static marquez.common.models.RunState.RUNNING;
 import static marquez.service.models.ModelGenerator.newJob;
 import static marquez.service.models.ModelGenerator.newJobMeta;
 import static marquez.service.models.ModelGenerator.newJobWith;
@@ -13,10 +16,6 @@ import static marquez.service.models.ModelGenerator.newRun;
 import static marquez.service.models.ModelGenerator.newRunMeta;
 import static marquez.service.models.ModelGenerator.newRunState;
 import static marquez.service.models.ModelGenerator.newRunWith;
-import static marquez.service.models.Run.State.ABORTED;
-import static marquez.service.models.Run.State.COMPLETED;
-import static marquez.service.models.Run.State.FAILED;
-import static marquez.service.models.Run.State.RUNNING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.doReturn;
@@ -28,16 +27,18 @@ import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import marquez.UnitTests;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
+import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
@@ -52,15 +53,16 @@ import org.mockito.junit.MockitoRule;
 
 @Category(UnitTests.class)
 public class JobResourceTest {
-  private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
+  private static final JobId JOB_ID = newJobId();
+  private static final NamespaceName NAMESPACE_NAME = JOB_ID.getNamespace();
+  private static final JobName JOB_NAME = JOB_ID.getName();
 
-  private static final JobName JOB_NAME = newJobName();
   private static final Job JOB_0 = newJob();
   private static final Job JOB_1 = newJob();
   private static final Job JOB_2 = newJob();
   private static final ImmutableList<Job> JOBS = ImmutableList.of(JOB_0, JOB_1, JOB_2);
 
-  private static final UUID RUN_ID = newRunId();
+  private static final RunId RUN_ID = newRunId();
   private static final Run RUN_0 = newRun();
   private static final Run RUN_1 = newRun();
   private static final Run RUN_2 = newRun();
@@ -78,9 +80,9 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testCreateOrUpdate() throws Exception {
+  public void testCreateOrUpdate() throws MarquezServiceException {
     final JobMeta jobMeta = newJobMeta();
-    final Job job = toJob(JOB_NAME, jobMeta);
+    final Job job = toJob(JOB_ID, jobMeta);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.createOrUpdate(NAMESPACE_NAME, JOB_NAME, jobMeta)).thenReturn(job);
@@ -91,8 +93,8 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testGet() throws Exception {
-    final Job job = newJobWith(JOB_NAME);
+  public void testGet() throws MarquezServiceException {
+    final Job job = newJobWith(JOB_ID);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.get(NAMESPACE_NAME, JOB_NAME)).thenReturn(Optional.of(job));
@@ -103,17 +105,17 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testGet_notFound() throws Exception {
+  public void testGet_notFound() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.get(NAMESPACE_NAME, JOB_NAME)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(JobNotFoundException.class)
         .isThrownBy(() -> jobResource.get(NAMESPACE_NAME, JOB_NAME))
-        .withMessageContaining(JOB_NAME.getValue());
+        .withMessageContaining(String.format("'%s' not found", JOB_NAME.getValue()));
   }
 
   @Test
-  public void testList() throws Exception {
+  public void testList() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.getAll(NAMESPACE_NAME, 4, 0)).thenReturn(JOBS);
 
@@ -123,7 +125,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testList_empty() throws Exception {
+  public void testList_empty() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.getAll(NAMESPACE_NAME, 4, 0)).thenReturn(ImmutableList.of());
 
@@ -133,7 +135,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testCreateRun() throws Exception {
+  public void testCreateRun() throws MarquezServiceException {
     final UriInfo uriInfo = mock(UriInfo.class);
 
     final RunMeta runMeta = newRunMeta();
@@ -157,7 +159,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testGetRun() throws Exception {
+  public void testGetRun() throws MarquezServiceException {
     final Run run = newRunWith(RUN_ID);
 
     when(jobService.getRun(RUN_ID)).thenReturn(Optional.of(run));
@@ -168,16 +170,16 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testGetRun_notFound() throws Exception {
+  public void testGetRun_notFound() throws MarquezServiceException {
     when(jobService.getRun(RUN_ID)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(RunNotFoundException.class)
         .isThrownBy(() -> jobResource.getRun(RUN_ID))
-        .withMessageContaining(RUN_ID.toString());
+        .withMessageContaining(String.format("'%s' not found", RUN_ID.getValue()));
   }
 
   @Test
-  public void testListRuns() throws Exception {
+  public void testListRuns() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.exists(NAMESPACE_NAME, JOB_NAME)).thenReturn(true);
     when(jobService.getAllRunsFor(NAMESPACE_NAME, JOB_NAME, 4, 0)).thenReturn(RUNS);
@@ -188,7 +190,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testListRuns_empty() throws Exception {
+  public void testListRuns_empty() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.exists(NAMESPACE_NAME, JOB_NAME)).thenReturn(true);
     when(jobService.getAllRunsFor(NAMESPACE_NAME, JOB_NAME, 4, 0)).thenReturn(ImmutableList.of());
@@ -199,7 +201,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testMarkRunAsRunning() throws Exception {
+  public void testMarkRunAsRunning() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
     final Run running = newRunWith(RUN_ID, RUNNING);
@@ -211,7 +213,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testMarkRunAsCompleted() throws Exception {
+  public void testMarkRunAsCompleted() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
     final Run completed = newRunWith(RUN_ID, COMPLETED);
@@ -223,7 +225,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testMarkRunAsFailed() throws Exception {
+  public void testMarkRunAsFailed() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
     final Run failed = newRunWith(RUN_ID, FAILED);
@@ -235,7 +237,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testMarkRunAsAborted() throws Exception {
+  public void testMarkRunAsAborted() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
     final Run aborted = newRunWith(RUN_ID, ABORTED);
@@ -246,11 +248,12 @@ public class JobResourceTest {
     assertThat((Run) response.getEntity()).isEqualTo(aborted);
   }
 
-  static Job toJob(final JobName jobName, final JobMeta jobMeta) {
+  static Job toJob(final JobId jobId, final JobMeta jobMeta) {
     final Instant now = newTimestamp();
     return new Job(
+        jobId,
         jobMeta.getType(),
-        jobName,
+        jobId.getName(),
         now,
         now,
         jobMeta.getInputs(),
@@ -270,6 +273,8 @@ public class JobResourceTest {
         runMeta.getNominalStartTime().orElse(null),
         runMeta.getNominalEndTime().orElse(null),
         newRunState(),
+        null,
+        null,
         runMeta.getArgs());
   }
 }

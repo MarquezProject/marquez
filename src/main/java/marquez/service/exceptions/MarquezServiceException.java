@@ -16,10 +16,10 @@ package marquez.service.exceptions;
 
 import javax.annotation.Nullable;
 import lombok.NoArgsConstructor;
-import marquez.MarquezException;
+import marquez.MarquezRuntimeException;
 
 @NoArgsConstructor
-public class MarquezServiceException extends MarquezException {
+public class MarquezServiceException extends MarquezRuntimeException {
   private static final long serialVersionUID = 1L;
 
   public MarquezServiceException(@Nullable final String message) {
