@@ -41,7 +41,6 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
 
-@Slf4j
 @Path("/api/v1")
 public class NamespaceResource {
   private final NamespaceService service;
@@ -60,7 +59,6 @@ public class NamespaceResource {
   public Response createOrUpdate(
       @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceMeta meta)
       throws MarquezServiceException {
-    log.debug("Meta: {}", meta);
     final Namespace namespace = service.createOrUpdate(namespaceName, meta);
     return Response.ok(namespace).build();
   }

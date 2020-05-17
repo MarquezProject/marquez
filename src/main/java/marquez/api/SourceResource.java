@@ -41,7 +41,6 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
 
-@Slf4j
 @Path("/api/v1/sources")
 public class SourceResource {
   private final SourceService service;
@@ -59,7 +58,6 @@ public class SourceResource {
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(@PathParam("source") SourceName name, @Valid SourceMeta meta)
       throws MarquezServiceException {
-    log.debug("Meta: {}", meta);
     final Source source = service.createOrUpdate(name, meta);
     return Response.ok(source).build();
   }

@@ -77,7 +77,7 @@ public class SourceService {
 
   public Optional<Source> get(@NonNull SourceName name) throws MarquezServiceException {
     try {
-      return dao.findBy(name.getValue()).map(row -> toSource(row));
+      return dao.findBy(name.getValue()).map(SourceService::toSource);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get source '{}'.", name.getValue(), e);
       throw new MarquezServiceException();

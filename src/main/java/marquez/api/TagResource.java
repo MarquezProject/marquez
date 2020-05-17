@@ -34,7 +34,6 @@ import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Tag;
 
-@Slf4j
 @Path("/api/v1/tags")
 public class TagResource {
   private final TagService service;
@@ -58,6 +57,7 @@ public class TagResource {
 
   @Value
   static class Tags {
+    @NonNull
     @JsonProperty("tags")
     ImmutableSet<Tag> value;
   }

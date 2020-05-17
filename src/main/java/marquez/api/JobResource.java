@@ -39,7 +39,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import lombok.NonNull;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
@@ -53,7 +52,6 @@ import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 
-@Slf4j
 @Path("/api/v1")
 public class JobResource {
   private final NamespaceService namespaceService;
@@ -77,7 +75,6 @@ public class JobResource {
       @PathParam("job") JobName jobName,
       @Valid JobMeta jobMeta)
       throws MarquezServiceException {
-    log.debug("Meta: {}", jobMeta);
     throwIfNotExists(namespaceName);
 
     final Job job = jobService.createOrUpdate(namespaceName, jobName, jobMeta);
@@ -130,7 +127,6 @@ public class JobResource {
       @Valid RunMeta runMeta,
       @Context UriInfo uriInfo)
       throws MarquezServiceException {
-    log.debug("Meta: {}", runMeta);
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, jobName);
 
@@ -226,6 +222,7 @@ public class JobResource {
 
   @Value
   static class Runs {
+    @NonNull
     @JsonProperty("runs")
     ImmutableList<Run> value;
   }

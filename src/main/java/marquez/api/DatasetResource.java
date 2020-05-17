@@ -36,7 +36,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.FieldNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
@@ -54,7 +53,6 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 
-@Slf4j
 @Path("/api/v1/namespaces/{namespace}/datasets")
 public class DatasetResource {
   private final NamespaceService namespaceService;
@@ -171,6 +169,7 @@ public class DatasetResource {
 
   @Value
   static class Datasets {
+    @NonNull
     @JsonProperty("datasets")
     ImmutableList<Dataset> value;
   }

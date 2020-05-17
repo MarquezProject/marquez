@@ -69,7 +69,7 @@ public class TagService {
 
   public Optional<Tag> get(@NonNull TagName name) throws MarquezServiceException {
     try {
-      return dao.findBy(name.getValue()).map(row -> toTag(row));
+      return dao.findBy(name.getValue()).map(TagService::toTag);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get tag '{}'.", name.getValue(), e);
       throw new MarquezServiceException(e);

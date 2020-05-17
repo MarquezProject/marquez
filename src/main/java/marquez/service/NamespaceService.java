@@ -65,9 +65,9 @@ public class NamespaceService {
       final NamespaceMeta meta =
           new NamespaceMeta(
               OwnerName.ANONYMOUS,
-              "The default global namespace for job and dataset metadata "
+              "The default global namespace for dataset, job, and run metadata "
                   + "not belonging to a user-specified namespace.");
-      final Namespace namespace = createOrUpdate(NamespaceName.DEFAULT, meta);
+      createOrUpdate(NamespaceName.DEFAULT, meta);
     }
   }
 

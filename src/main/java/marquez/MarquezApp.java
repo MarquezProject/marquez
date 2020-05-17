@@ -95,7 +95,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
             bootstrap.getConfigurationSourceProvider(),
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
 
-    // Disable [...]
+    // Disable numeric timestamp format on serialization.
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 
