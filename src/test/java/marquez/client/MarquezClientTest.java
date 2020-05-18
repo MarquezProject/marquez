@@ -40,7 +40,6 @@ import static marquez.client.models.ModelGenerator.newTagNames;
 import static marquez.client.models.ModelGenerator.newTimestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -223,20 +222,6 @@ public class MarquezClientTest {
     assertThat(client.getNamespaceName()).isEqualTo(namespaceName);
 
     System.clearProperty(NAMESPACE_NAME_ENV_VAR);
-  }
-
-  @Test
-  public void testClientBuilder_throwsOnNull() {
-    final String nullUrlString = null;
-    assertThatNullPointerException()
-        .isThrownBy(() -> MarquezClient.builder().baseUrl(nullUrlString).build());
-
-    final URL nullUrl = null;
-    assertThatNullPointerException()
-        .isThrownBy(() -> MarquezClient.builder().baseUrl(nullUrl).build());
-
-    assertThatNullPointerException()
-        .isThrownBy(() -> MarquezClient.builder().namespaceName(null).build());
   }
 
   @Test

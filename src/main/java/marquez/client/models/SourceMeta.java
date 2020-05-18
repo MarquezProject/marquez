@@ -17,18 +17,27 @@ package marquez.client.models;
 import java.net.URI;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 import marquez.client.Utils;
 
-@Value
-@Builder
+@EqualsAndHashCode
+@ToString
 public class SourceMeta {
-  @Getter @NonNull SourceType type;
-  @Getter @NonNull URI connectionUrl;
-  @Nullable String description;
+  @Getter @NonNull private final SourceType type;
+  @Getter @NonNull private final URI connectionUrl;
+  @Nullable private final String description;
+
+  public SourceMeta(
+      @NonNull final SourceType type,
+      @NonNull final URI connectionUrl,
+      @Nullable final String description) {
+    this.type = type;
+    this.connectionUrl = connectionUrl;
+    this.description = description;
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
@@ -36,5 +45,42 @@ public class SourceMeta {
 
   public String toJson() {
     return Utils.toJson(this);
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    private SourceType type;
+    private URI connectionUrl;
+    @Nullable private String description;
+
+    public Builder type(@NonNull String typeString) {
+      return type(SourceType.valueOf(typeString));
+    }
+
+    public Builder type(@NonNull SourceType type) {
+      this.type = type;
+      return this;
+    }
+
+    public Builder connectionUrl(@NonNull String connectionUrlString) {
+      return connectionUrl(URI.create(connectionUrlString));
+    }
+
+    public Builder connectionUrl(@NonNull URI connectionUrl) {
+      this.connectionUrl = connectionUrl;
+      return this;
+    }
+
+    public Builder description(@Nullable String description) {
+      this.description = description;
+      return this;
+    }
+
+    public SourceMeta build() {
+      return new SourceMeta(type, connectionUrl, description);
+    }
   }
 }
