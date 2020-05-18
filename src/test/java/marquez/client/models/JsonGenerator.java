@@ -52,7 +52,7 @@ public final class JsonGenerator {
     return MAPPER
         .createObjectNode()
         .put("type", meta.getType().toString())
-        .put("connectionUrl", meta.getConnectionUrl())
+        .put("connectionUrl", meta.getConnectionUrl().toString())
         .put("description", meta.getDescription().orElse(null))
         .toString();
   }
@@ -64,7 +64,7 @@ public final class JsonGenerator {
         .put("name", source.getName())
         .put("createdAt", ISO_INSTANT.format(source.getCreatedAt()))
         .put("updatedAt", ISO_INSTANT.format(source.getUpdatedAt()))
-        .put("connectionUrl", source.getConnectionUrl())
+        .put("connectionUrl", source.getConnectionUrl().toString())
         .put("description", source.getDescription().orElse(null))
         .toString();
   }
@@ -105,11 +105,11 @@ public final class JsonGenerator {
             .put("type", STREAM)
             .put("physicalName", meta.getPhysicalName())
             .put("sourceName", meta.getSourceName())
-            .put("schemaLocation", meta.getSchemaLocation().toString())
-            .put("description", meta.getDescription().orElse(null))
-            .put("runId", meta.getRunId().orElse(null));
+            .put("schemaLocation", meta.getSchemaLocation().toString());
     obj.putArray("fields").addAll(fields);
     obj.putArray("tags").addAll(tags);
+    obj.put("description", meta.getDescription().orElse(null));
+    obj.put("runId", meta.getRunId().orElse(null));
     return obj.toString();
   }
 
@@ -169,12 +169,12 @@ public final class JsonGenerator {
     final ArrayNode outputs = MAPPER.valueToTree(meta.getOutputs());
     final ObjectNode obj = MAPPER.createObjectNode();
     final ObjectNode context = MAPPER.createObjectNode();
-    meta.getContext().forEach((k, v) -> context.put(k, v));
+    meta.getContext().forEach(context::put);
 
     obj.put("type", meta.getType().toString());
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
-    obj.put("location", meta.getLocation());
+    obj.put("location", meta.getLocation().toString());
     obj.put("description", meta.getDescription().orElse(null));
     obj.set("context", context);
 
@@ -185,7 +185,7 @@ public final class JsonGenerator {
     final ArrayNode inputs = MAPPER.valueToTree(job.getInputs());
     final ArrayNode outputs = MAPPER.valueToTree(job.getOutputs());
     final ObjectNode context = MAPPER.createObjectNode();
-    job.getContext().forEach((k, v) -> context.put(k, v));
+    job.getContext().forEach(context::put);
 
     final ObjectNode obj =
         MAPPER
@@ -196,7 +196,7 @@ public final class JsonGenerator {
             .put("updatedAt", ISO_INSTANT.format(job.getUpdatedAt()));
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
-    obj.put("location", job.getLocation());
+    obj.put("location", job.getLocation().toString());
     obj.put("description", job.getDescription().orElse(null));
     obj.set("context", context);
 
@@ -209,7 +209,7 @@ public final class JsonGenerator {
     obj.put("nominalEndTime", meta.getNominalEndTime().map(ISO_INSTANT::format).orElse(null));
 
     final ObjectNode runArgs = MAPPER.createObjectNode();
-    meta.getArgs().forEach((k, v) -> runArgs.put(k, v));
+    meta.getArgs().forEach(runArgs::put);
     obj.set("runArgs", runArgs);
 
     return obj.toString();
@@ -227,7 +227,7 @@ public final class JsonGenerator {
     obj.put("runState", run.getState().toString());
 
     final ObjectNode runArgs = MAPPER.createObjectNode();
-    run.getArgs().forEach((k, v) -> runArgs.put(k, v));
+    run.getArgs().forEach(runArgs::put);
     obj.set("runArgs", runArgs);
 
     return obj.toString();

@@ -16,6 +16,7 @@ package marquez.client.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.net.URI;
 import java.time.Instant;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -34,7 +35,7 @@ public final class Source {
   @Getter private final String name;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
-  @Getter private final String connectionUrl;
+  @Getter private final URI connectionUrl;
   @Nullable private final String description;
 
   public Optional<String> getDescription() {

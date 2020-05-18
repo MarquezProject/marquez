@@ -14,7 +14,10 @@
 
 package marquez.client.models;
 
+import static marquez.client.models.DatasetType.DB_TABLE;
+
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -29,10 +32,10 @@ public final class DbTableMeta extends DatasetMeta {
       final String physicalName,
       final String sourceName,
       @Nullable final List<Field> fields,
-      @Nullable final List<String> tags,
+      @Nullable final Set<String> tags,
       @Nullable final String description,
       @Nullable final String runId) {
-    super(physicalName, sourceName, fields, tags, description, runId);
+    super(DB_TABLE, physicalName, sourceName, fields, tags, description, runId);
   }
 
   @Override

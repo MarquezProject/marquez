@@ -14,41 +14,38 @@
 
 package marquez.client.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.ImmutableMap;
+import java.net.URL;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.client.Utils;
 
-@AllArgsConstructor(onConstructor = @__(@JsonCreator))
-@EqualsAndHashCode
-@ToString
-public final class Job {
-  @Getter @NonNull private final JobType type;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class Job extends JobMeta {
   @Getter @NonNull private final String name;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
-  @Getter @NonNull private final List<String> inputs;
-  @Getter @NonNull private final List<String> outputs;
-  @Getter @NonNull private final String location;
-  @Nullable private final String description;
-  @Nullable private Map<String, String> context;
 
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(description);
-  }
-
-  public Map<String, String> getContext() {
-    return (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
+  public Job(
+      final JobType type,
+      @NonNull final String name,
+      @NonNull final Instant createdAt,
+      @NonNull final Instant updatedAt,
+      final Set<String> inputs,
+      final Set<String> outputs,
+      final URL location,
+      final String description,
+      final Map<String, String> context) {
+    super(type, inputs, outputs, location, description, context);
+    this.name = name;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 
   public static Job fromJson(@NonNull final String json) {

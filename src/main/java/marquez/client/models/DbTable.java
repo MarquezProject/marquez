@@ -14,8 +14,11 @@
 
 package marquez.client.models;
 
+import static marquez.client.models.DatasetType.DB_TABLE;
+
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -30,10 +33,11 @@ public final class DbTable extends Dataset {
       final Instant updatedAt,
       final String sourceName,
       @Nullable final List<Field> fields,
-      @Nullable final List<String> tags,
+      @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
     super(
+        DB_TABLE,
         name,
         physicalName,
         createdAt,

@@ -14,25 +14,43 @@
 
 package marquez.client.models;
 
-import com.google.common.collect.ImmutableList;
-import java.util.List;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 import marquez.client.Utils;
 
-@Value
+@EqualsAndHashCode
+@ToString
 public class JobMeta {
   @Getter @NonNull JobType type;
-  @Getter @NonNull List<String> inputs;
-  @Getter @NonNull List<String> outputs;
-  @Getter @NonNull String location;
+  @Getter @NonNull Set<String> inputs;
+  @Getter @NonNull Set<String> outputs;
+  @Getter @NonNull URL location;
   @Nullable String description;
-  @Nullable Map<String, String> context;
+  @Getter @NonNull Map<String, String> context;
+
+  public JobMeta(
+      @NonNull final JobType type,
+      @NonNull final Set<String> inputs,
+      @NonNull final Set<String> outputs,
+      @NonNull final URL location,
+      @Nullable final String description,
+      @Nullable final Map<String, String> context) {
+    this.type = type;
+    this.inputs = inputs;
+    this.outputs = outputs;
+    this.location = location;
+    this.description = description;
+    this.context = (context == null) ? ImmutableMap.of() : context;
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
@@ -48,15 +66,15 @@ public class JobMeta {
 
   public static final class Builder {
     private JobType type;
-    private List<String> inputs;
-    private List<String> outputs;
-    private String location;
+    private Set<String> inputs;
+    private Set<String> outputs;
+    private URL location;
     @Nullable private String description;
     @Nullable Map<String, String> context;
 
     private Builder() {
-      this.inputs = ImmutableList.of();
-      this.outputs = ImmutableList.of();
+      this.inputs = ImmutableSet.of();
+      this.outputs = ImmutableSet.of();
     }
 
     public Builder type(@NonNull String typeString) {
@@ -68,17 +86,17 @@ public class JobMeta {
       return this;
     }
 
-    public Builder inputs(@NonNull List<String> inputs) {
-      this.inputs = ImmutableList.copyOf(inputs);
+    public Builder inputs(@NonNull Set<String> inputs) {
+      this.inputs = ImmutableSet.copyOf(inputs);
       return this;
     }
 
-    public Builder outputs(@NonNull List<String> outputs) {
-      this.outputs = ImmutableList.copyOf(outputs);
+    public Builder outputs(@NonNull Set<String> outputs) {
+      this.outputs = ImmutableSet.copyOf(outputs);
       return this;
     }
 
-    public Builder location(@NonNull String location) {
+    public Builder location(@NonNull URL location) {
       this.location = location;
       return this;
     }

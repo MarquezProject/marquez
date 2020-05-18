@@ -14,13 +14,19 @@
 
 package marquez.client.models;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static marquez.client.models.SourceType.POSTGRESQL;
 
 import com.google.common.collect.ImmutableMap;
+import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 import marquez.client.Utils;
 
 public final class ModelGenerator {
@@ -33,9 +39,9 @@ public final class ModelGenerator {
   }
 
   public static List<Namespace> newNamespaces(final int limit) {
-    return java.util.stream.Stream.generate(() -> newNamespace())
+    return java.util.stream.Stream.generate(ModelGenerator::newNamespace)
         .limit(limit)
-        .collect(toImmutableList());
+        .collect(toList());
   }
 
   public static Namespace newNamespace() {
@@ -52,28 +58,23 @@ public final class ModelGenerator {
   }
 
   public static List<Source> newSources(final int limit) {
-    return java.util.stream.Stream.generate(() -> newSource())
+    return java.util.stream.Stream.generate(ModelGenerator::newSource)
         .limit(limit)
-        .collect(toImmutableList());
+        .collect(toList());
   }
 
   public static Source newSource() {
     final Instant now = newTimestamp();
     return new Source(
-        newSourceType(),
-        newSourceName(),
-        now,
-        now,
-        newConnectionUrl().toString(),
-        newDescription());
+        newSourceType(), newSourceName(), now, now, newConnectionUrl(), newDescription());
   }
 
   public static DbTableMeta newDbTableMeta() {
     return DbTableMeta.builder()
         .physicalName(newDatasetPhysicalName())
         .sourceName(newSourceName())
-        .fields(newFields())
-        .tags(newTags())
+        .fields(newFields(2))
+        .tags(newTagNames(2))
         .description(newDescription())
         .build();
   }
@@ -86,8 +87,8 @@ public final class ModelGenerator {
         now,
         now,
         newSourceName(),
-        newFields(),
-        newTags(),
+        newFields(2),
+        newTagNames(2),
         null,
         newDescription());
   }
@@ -96,8 +97,8 @@ public final class ModelGenerator {
     return StreamMeta.builder()
         .physicalName(newStreamName())
         .sourceName(newSourceName())
-        .fields(newFields())
-        .tags(newTags())
+        .fields(newFields(2))
+        .tags(newTagNames(2))
         .description(newDescription())
         .schemaLocation(newSchemaLocation())
         .build();
@@ -111,8 +112,8 @@ public final class ModelGenerator {
         now,
         now,
         newSourceName(),
-        newFields(),
-        newTags(),
+        newFields(2),
+        newTagNames(2),
         null,
         newSchemaLocation(),
         newDescription());
@@ -130,7 +131,7 @@ public final class ModelGenerator {
   }
 
   public static List<Job> newJobs(final int limit) {
-    return java.util.stream.Stream.generate(() -> newJob()).limit(limit).collect(toImmutableList());
+    return java.util.stream.Stream.generate(ModelGenerator::newJob).limit(limit).collect(toList());
   }
 
   public static Job newJob() {
@@ -142,7 +143,7 @@ public final class ModelGenerator {
         now,
         newInputs(2),
         newOutputs(4),
-        newLocation().toString(),
+        newLocation(),
         newDescription(),
         newContext());
   }
@@ -156,7 +157,7 @@ public final class ModelGenerator {
   }
 
   public static List<Run> newRuns(final int limit) {
-    return java.util.stream.Stream.generate(() -> newRun()).limit(limit).collect(toImmutableList());
+    return java.util.stream.Stream.generate(ModelGenerator::newRun).limit(limit).collect(toList());
   }
 
   public static Run newRun() {
@@ -180,18 +181,18 @@ public final class ModelGenerator {
     return "test_source" + newId();
   }
 
-  public static String newConnectionUrl() {
-    return "jdbc:postgresql://localhost:5431/test_db" + newId();
+  public static URI newConnectionUrl() {
+    return URI.create("jdbc:postgresql://localhost:5431/test_db" + newId());
   }
 
   public static String newDatasetName() {
     return "test_dataset" + newId();
   }
 
-  private static List<String> newDatasetNames(final int limit) {
-    return java.util.stream.Stream.generate(() -> newDatasetName())
+  private static Set<String> newDatasetNames(final int limit) {
+    return java.util.stream.Stream.generate(ModelGenerator::newDatasetName)
         .limit(limit)
-        .collect(toImmutableList());
+        .collect(toSet());
   }
 
   public static String newDatasetPhysicalName() {
@@ -202,10 +203,6 @@ public final class ModelGenerator {
     return "test." + newId();
   }
 
-  public static String newHttpPath() {
-    return "/test/" + newId();
-  }
-
   public static JobType newJobType() {
     return JobType.values()[newIdWithBound(JobType.values().length)];
   }
@@ -214,16 +211,16 @@ public final class ModelGenerator {
     return "test_job" + newId();
   }
 
-  public static List<String> newInputs(final int limit) {
+  public static Set<String> newInputs(final int limit) {
     return newDatasetNames(limit);
   }
 
-  public static List<String> newOutputs(final int limit) {
+  public static Set<String> newOutputs(final int limit) {
     return newDatasetNames(limit);
   }
 
-  public static String newLocation() {
-    return "https://github.com/repo/test/commit/" + newId();
+  public static URL newLocation() {
+    return Utils.toUrl("https://github.com/repo/test/commit/" + newId());
   }
 
   public static Map<String, String> newContext() {
@@ -263,11 +260,31 @@ public final class ModelGenerator {
     return Instant.now();
   }
 
-  public static List<Field> newFields() {
-    return new ArrayList<>();
+  public static List<Field> newFields(final int limit) {
+    return java.util.stream.Stream.generate(ModelGenerator::newField)
+        .limit(limit)
+        .collect(toList());
   }
 
-  public static List<String> newTags() {
-    return new ArrayList<>();
+  public static Field newField() {
+    return new Field(newFieldName(), newFieldType(), newTagNames(2), newDescription());
+  }
+
+  public static String newFieldName() {
+    return "test_field" + newId();
+  }
+
+  public static FieldType newFieldType() {
+    return FieldType.values()[newIdWithBound(FieldType.values().length - 1)];
+  }
+
+  public static Set<String> newTagNames(final int limit) {
+    return java.util.stream.Stream.generate(ModelGenerator::newTagName)
+        .limit(limit)
+        .collect(toSet());
+  }
+
+  public static String newTagName() {
+    return "test_tag" + newId();
   }
 }

@@ -64,6 +64,7 @@ public class RunMeta {
     }
 
     public Builder nominalEndTime(@NonNull Instant nominalEndTime) {
+      this.nominalEndTime = nominalEndTime;
       return this;
     }
 

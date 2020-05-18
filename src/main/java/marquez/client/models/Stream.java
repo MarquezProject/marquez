@@ -14,9 +14,12 @@
 
 package marquez.client.models;
 
+import static marquez.client.models.DatasetType.STREAM;
+
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,17 +32,18 @@ public final class Stream extends Dataset {
   @Getter URL schemaLocation;
 
   public Stream(
-      String name,
-      String physicalName,
-      Instant createdAt,
-      Instant updatedAt,
-      String sourceName,
-      @Nullable List<Field> fields,
-      @Nullable List<String> tags,
-      @Nullable Instant lastModifiedAt,
-      @NonNull URL schemaLocation,
-      @Nullable String description) {
+      final String name,
+      final String physicalName,
+      final Instant createdAt,
+      final Instant updatedAt,
+      final String sourceName,
+      @Nullable final List<Field> fields,
+      @Nullable final Set<String> tags,
+      @Nullable final Instant lastModifiedAt,
+      @NonNull final URL schemaLocation,
+      @Nullable final String description) {
     super(
+        STREAM,
         name,
         physicalName,
         createdAt,

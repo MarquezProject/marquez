@@ -18,9 +18,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,39 +32,45 @@ import marquez.client.Utils;
 
 @EqualsAndHashCode
 @ToString
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = DbTable.class, name = "DB_TABLE"),
   @JsonSubTypes.Type(value = Stream.class, name = "STREAM")
 })
 public abstract class Dataset {
+  @Getter @NonNull private final DatasetType type;
   @Getter @NonNull private final String name;
   @Getter @NonNull private final String physicalName;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
   @Getter @NonNull private final String sourceName;
   @Getter @NonNull private final List<Field> fields;
-  @Getter @NonNull private final List<String> tags;
+  @Getter @NonNull private final Set<String> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
 
   public Dataset(
-      @NonNull String name,
-      @NonNull String physicalName,
-      @NonNull Instant createdAt,
-      @NonNull Instant updatedAt,
-      @NonNull String sourceName,
-      @Nullable List<Field> fields,
-      @Nullable List<String> tags,
-      @Nullable Instant lastModifiedAt,
-      @Nullable String description) {
+      @NonNull final DatasetType type,
+      @NonNull final String name,
+      @NonNull final String physicalName,
+      @NonNull final Instant createdAt,
+      @NonNull final Instant updatedAt,
+      @NonNull final String sourceName,
+      @Nullable final List<Field> fields,
+      @Nullable final Set<String> tags,
+      @Nullable final Instant lastModifiedAt,
+      @Nullable final String description) {
+    this.type = type;
     this.name = name;
     this.physicalName = physicalName;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.sourceName = sourceName;
     this.fields = (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
-    this.tags = (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
+    this.tags = (tags == null) ? ImmutableSet.of() : ImmutableSet.copyOf(tags);
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
   }

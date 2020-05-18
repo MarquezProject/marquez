@@ -36,7 +36,7 @@ import static marquez.client.models.ModelGenerator.newRunState;
 import static marquez.client.models.ModelGenerator.newSchemaLocation;
 import static marquez.client.models.ModelGenerator.newSourceName;
 import static marquez.client.models.ModelGenerator.newStreamName;
-import static marquez.client.models.ModelGenerator.newTags;
+import static marquez.client.models.ModelGenerator.newTagNames;
 import static marquez.client.models.ModelGenerator.newTimestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -45,10 +45,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import marquez.client.models.Dataset;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
@@ -91,7 +93,7 @@ public class MarquezClientTest {
   // SOURCE
   private static final SourceType SOURCE_TYPE = SourceType.POSTGRESQL;
   private static final String SOURCE_NAME = newSourceName();
-  private static final String CONNECTION_URL = newConnectionUrl();
+  private static final URI CONNECTION_URL = newConnectionUrl();
   private static final String SOURCE_DESCRIPTION = newDescription();
   private static final Source SOURCE =
       new Source(
@@ -102,8 +104,8 @@ public class MarquezClientTest {
   private static final String DB_TABLE_PHYSICAL_NAME = newDatasetPhysicalName();
   private static final String DB_TABLE_SOURCE_NAME = newSourceName();
   private static final String DB_TABLE_DESCRIPTION = newDescription();
-  private static final List<Field> FIELDS = newFields();
-  private static final List<String> TAGS = newTags();
+  private static final List<Field> FIELDS = newFields(4);
+  private static final Set<String> TAGS = newTagNames(4);
 
   private static final DbTable DB_TABLE =
       new DbTable(
@@ -161,9 +163,9 @@ public class MarquezClientTest {
 
   // JOB
   private static final String JOB_NAME = newJobName();
-  private static final List<String> INPUTS = newInputs(2);
-  private static final List<String> OUTPUTS = newOutputs(4);
-  private static final String LOCATION = newLocation();
+  private static final Set<String> INPUTS = newInputs(2);
+  private static final Set<String> OUTPUTS = newOutputs(4);
+  private static final URL LOCATION = newLocation();
   private static final JobType JOB_TYPE = newJobType();
   private static final String JOB_DESCRIPTION = newDescription();
   private static final Map<String, String> JOB_CONTEXT = newContext();
@@ -245,7 +247,7 @@ public class MarquezClientTest {
   }
 
   @Test
-  public void testClientBuilder_throwsOnBadUrl() throws Exception {
+  public void testClientBuilder_throwsOnBadUrl() {
     final String badUrlString = "test.com/api/v1";
     assertThatExceptionOfType(AssertionError.class)
         .isThrownBy(() -> MarquezClient.builder().baseUrl(badUrlString).build());
