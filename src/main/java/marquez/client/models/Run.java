@@ -14,59 +14,44 @@
 
 package marquez.client.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.client.Utils;
 
-@AllArgsConstructor(onConstructor = @__(@JsonCreator))
-@EqualsAndHashCode
-@ToString
-public final class Run {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class Run extends RunMeta {
   @Getter
-  @NonNull
   @JsonProperty("runId")
   private final String id;
 
-  @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final Instant updatedAt;
-
-  @Nullable private final Instant nominalStartTime;
-  @Nullable private final Instant nominalEndTime;
+  @Getter private final Instant createdAt;
+  @Getter private final Instant updatedAt;
 
   @Getter
-  @NonNull
   @JsonProperty("runState")
-  private final State state;
+  private final RunState state;
 
-  @Getter
-  @NonNull
-  @JsonProperty("runArgs")
-  private final Map<String, String> args;
-
-  public enum State {
-    NEW,
-    RUNNING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
-  }
-
-  public Optional<Instant> getNominalStartTime() {
-    return Optional.ofNullable(nominalStartTime);
-  }
-
-  public Optional<Instant> getNominalEndTime() {
-    return Optional.ofNullable(nominalEndTime);
+  public Run(
+      @JsonProperty("runId") @NonNull final String id,
+      @NonNull final Instant createdAt,
+      @NonNull final Instant updatedAt,
+      @Nullable final Instant nominalStartTime,
+      @Nullable final Instant nominalEndTime,
+      @JsonProperty("runState") @NonNull final RunState state,
+      @JsonProperty("runArgs") @Nullable final Map<String, String> args) {
+    super(nominalStartTime, nominalEndTime, args);
+    this.id = id;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.state = state;
   }
 
   public static Run fromJson(@NonNull final String json) {

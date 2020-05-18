@@ -26,8 +26,8 @@ import marquez.client.Utils;
 @EqualsAndHashCode
 @ToString
 public class SourceMeta {
-  @Getter @NonNull private final SourceType type;
-  @Getter @NonNull private final URI connectionUrl;
+  @Getter private final SourceType type;
+  @Getter private final URI connectionUrl;
   @Nullable private final String description;
 
   public SourceMeta(

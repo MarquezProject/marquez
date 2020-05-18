@@ -15,23 +15,44 @@
 package marquez.client.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import marquez.client.Utils;
 
-@Value
+@EqualsAndHashCode
+@ToString
+@JsonPropertyOrder({
+  "runId",
+  "createdAt",
+  "updatedAt",
+  "nominalStartTime",
+  "nominalEndTime",
+  "runState",
+  "runArgs"
+})
 public class RunMeta {
-  @Nullable Instant nominalStartTime;
-  @Nullable Instant nominalEndTime;
+  @Nullable private final Instant nominalStartTime;
+  @Nullable private final Instant nominalEndTime;
 
-  @NonNull
+  @Getter
   @JsonProperty("runArgs")
-  Map<String, String> args;
+  private final Map<String, String> args;
+
+  public RunMeta(
+      @Nullable final Instant nominalStartTime,
+      @Nullable final Instant nominalEndTime,
+      @JsonProperty("runArgs") @Nullable final Map<String, String> args) {
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
+    this.args = (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
+  }
 
   public Optional<Instant> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
@@ -52,24 +73,24 @@ public class RunMeta {
   public static final class Builder {
     @Nullable private Instant nominalStartTime;
     @Nullable private Instant nominalEndTime;
-    private Map<String, String> args;
+    @Nullable private Map<String, String> args;
 
     private Builder() {
       this.args = ImmutableMap.of();
     }
 
-    public Builder nominalStartTime(@NonNull Instant nominalStartTime) {
+    public Builder nominalStartTime(@Nullable Instant nominalStartTime) {
       this.nominalStartTime = nominalStartTime;
       return this;
     }
 
-    public Builder nominalEndTime(@NonNull Instant nominalEndTime) {
+    public Builder nominalEndTime(@Nullable Instant nominalEndTime) {
       this.nominalEndTime = nominalEndTime;
       return this;
     }
 
-    public Builder args(@NonNull Map<String, String> args) {
-      this.args = ImmutableMap.copyOf(args);
+    public Builder args(@Nullable Map<String, String> args) {
+      this.args = (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
       return this;
     }
 

@@ -62,6 +62,7 @@ import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
+import marquez.client.models.RunState;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.SourceType;
@@ -184,7 +185,7 @@ public class MarquezClientTest {
   private static final String RUN_ID = newRunId();
   private static final Instant NOMINAL_START_TIME = newTimestamp();
   private static final Instant NOMINAL_END_TIME = newTimestamp();
-  private static final Run.State RUN_STATE = newRunState();
+  private static final RunState RUN_STATE = newRunState();
   private static final Map<String, String> RUN_ARGS = newRunArgs();
   private static final Run RUN =
       new Run(

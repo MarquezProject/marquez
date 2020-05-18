@@ -162,7 +162,7 @@ public final class ModelGenerator {
 
   public static Run newRun() {
     final Instant now = newTimestamp();
-    return new Run(newRunId(), now, now, now, now, Run.State.NEW, newRunArgs());
+    return new Run(newRunId(), now, now, now, now, RunState.NEW, newRunArgs());
   }
 
   public static String newOwnerName() {
@@ -236,8 +236,8 @@ public final class ModelGenerator {
     return "test_description" + newId();
   }
 
-  public static Run.State newRunState() {
-    return Run.State.values()[newIdWithBound(Run.State.values().length)];
+  public static RunState newRunState() {
+    return RunState.values()[newIdWithBound(RunState.values().length)];
   }
 
   public static Map<String, String> newRunArgs() {
