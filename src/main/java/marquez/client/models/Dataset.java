@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -42,8 +41,8 @@ public abstract class Dataset {
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
   @Getter @NonNull private final String sourceName;
-  @Nullable private final List<Field> fields;
-  @Nullable private final List<String> tags;
+  @Getter @NonNull private final List<Field> fields;
+  @Getter @NonNull private final List<String> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
 
@@ -62,18 +61,10 @@ public abstract class Dataset {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.sourceName = sourceName;
-    this.fields = ImmutableList.copyOf(new ArrayList<>(fields));
-    this.tags = ImmutableList.copyOf(new ArrayList<>(tags));
+    this.fields = (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
+    this.tags = (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
-  }
-
-  public List<Field> getFields() {
-    return fields;
-  }
-
-  public List<String> getTags() {
-    return tags;
   }
 
   public Optional<String> getDescription() {

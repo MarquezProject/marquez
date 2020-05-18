@@ -17,7 +17,6 @@ package marquez.client.models;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -36,8 +35,8 @@ import lombok.ToString;
 public abstract class DatasetMeta {
   @Getter @NonNull private final String physicalName;
   @Getter @NonNull private final String sourceName;
-  @Nullable private final List<Field> fields;
-  @Nullable private final List<String> tags;
+  @Getter @NonNull private final List<Field> fields;
+  @Getter @NonNull private final List<String> tags;
   @Nullable private final String description;
   @Nullable private final String runId;
 
@@ -50,18 +49,10 @@ public abstract class DatasetMeta {
       @Nullable String runId) {
     this.physicalName = physicalName;
     this.sourceName = sourceName;
-    this.fields = ImmutableList.copyOf(new ArrayList<>(fields));
-    this.tags = ImmutableList.copyOf(new ArrayList<>(tags));
+    this.fields = (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
+    this.tags = (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
     this.description = description;
     this.runId = runId;
-  }
-
-  public List<Field> getFields() {
-    return fields;
-  }
-
-  public List<String> getTags() {
-    return tags;
   }
 
   public Optional<String> getDescription() {
