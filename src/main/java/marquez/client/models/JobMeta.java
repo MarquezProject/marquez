@@ -31,16 +31,16 @@ import marquez.client.Utils;
 @ToString
 public class JobMeta {
   @Getter @NonNull JobType type;
-  @Getter @NonNull Set<String> inputs;
-  @Getter @NonNull Set<String> outputs;
+  @Getter @NonNull Set<DatasetId> inputs;
+  @Getter @NonNull Set<DatasetId> outputs;
   @Getter @NonNull URL location;
   @Nullable String description;
   @Getter @NonNull Map<String, String> context;
 
   public JobMeta(
       @NonNull final JobType type,
-      @NonNull final Set<String> inputs,
-      @NonNull final Set<String> outputs,
+      @NonNull final Set<DatasetId> inputs,
+      @NonNull final Set<DatasetId> outputs,
       @NonNull final URL location,
       @Nullable final String description,
       @Nullable final Map<String, String> context) {
@@ -66,8 +66,8 @@ public class JobMeta {
 
   public static final class Builder {
     private JobType type;
-    private Set<String> inputs;
-    private Set<String> outputs;
+    private Set<DatasetId> inputs;
+    private Set<DatasetId> outputs;
     private URL location;
     @Nullable private String description;
     @Nullable Map<String, String> context;
@@ -86,12 +86,12 @@ public class JobMeta {
       return this;
     }
 
-    public Builder inputs(@NonNull Set<String> inputs) {
+    public Builder inputs(@NonNull Set<DatasetId> inputs) {
       this.inputs = ImmutableSet.copyOf(inputs);
       return this;
     }
 
-    public Builder outputs(@NonNull Set<String> outputs) {
+    public Builder outputs(@NonNull Set<DatasetId> outputs) {
       this.outputs = ImmutableSet.copyOf(outputs);
       return this;
     }

@@ -81,8 +81,10 @@ public final class ModelGenerator {
 
   public static DbTable newDbTable() {
     final Instant now = newTimestamp();
+    final DatasetId dbTableId = newDatasetId();
     return new DbTable(
-        newDatasetName(),
+        dbTableId,
+        dbTableId.getName(),
         newDatasetPhysicalName(),
         now,
         now,
@@ -106,8 +108,10 @@ public final class ModelGenerator {
 
   public static Stream newStream() {
     final Instant now = newTimestamp();
+    final DatasetId streamId = newDatasetId();
     return new Stream(
-        newDatasetName(),
+        streamId,
+        streamId.getName(),
         newStreamName(),
         now,
         now,
@@ -117,6 +121,20 @@ public final class ModelGenerator {
         null,
         newSchemaLocation(),
         newDescription());
+  }
+
+  public static Set<DatasetId> newDatasetIds(final int limit) {
+    return java.util.stream.Stream.generate(ModelGenerator::newDatasetId)
+        .limit(limit)
+        .collect(toSet());
+  }
+
+  public static DatasetId newDatasetId() {
+    return newDatasetIdWith(newNamespaceName());
+  }
+
+  public static DatasetId newDatasetIdWith(final String namespaceName) {
+    return new DatasetId(namespaceName, newDatasetName());
   }
 
   public static JobMeta newJobMeta() {
@@ -211,12 +229,12 @@ public final class ModelGenerator {
     return "test_job" + newId();
   }
 
-  public static Set<String> newInputs(final int limit) {
-    return newDatasetNames(limit);
+  public static Set<DatasetId> newInputs(final int limit) {
+    return newDatasetIds(limit);
   }
 
-  public static Set<String> newOutputs(final int limit) {
-    return newDatasetNames(limit);
+  public static Set<DatasetId> newOutputs(final int limit) {
+    return newDatasetIds(limit);
   }
 
   public static URL newLocation() {

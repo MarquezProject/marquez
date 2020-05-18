@@ -32,6 +32,7 @@ public final class Stream extends Dataset {
   @Getter URL schemaLocation;
 
   public Stream(
+      final DatasetId id,
       final String name,
       final String physicalName,
       final Instant createdAt,
@@ -43,6 +44,7 @@ public final class Stream extends Dataset {
       @NonNull final URL schemaLocation,
       @Nullable final String description) {
     super(
+        id,
         STREAM,
         name,
         physicalName,

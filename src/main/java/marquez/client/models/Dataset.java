@@ -41,6 +41,7 @@ import marquez.client.Utils;
   @JsonSubTypes.Type(value = Stream.class, name = "STREAM")
 })
 public abstract class Dataset {
+  @Getter @NonNull private final DatasetId id;
   @Getter @NonNull private final DatasetType type;
   @Getter @NonNull private final String name;
   @Getter @NonNull private final String physicalName;
@@ -53,6 +54,7 @@ public abstract class Dataset {
   @Nullable private final String description;
 
   public Dataset(
+      @NonNull final DatasetId id,
       @NonNull final DatasetType type,
       @NonNull final String name,
       @NonNull final String physicalName,
@@ -63,6 +65,7 @@ public abstract class Dataset {
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
+    this.id = id;
     this.type = type;
     this.name = name;
     this.physicalName = physicalName;

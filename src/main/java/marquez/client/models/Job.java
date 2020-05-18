@@ -37,8 +37,8 @@ public final class Job extends JobMeta {
       @NonNull final String name,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
-      final Set<String> inputs,
-      final Set<String> outputs,
+      final Set<DatasetId> inputs,
+      final Set<DatasetId> outputs,
       final URL location,
       final String description,
       final Map<String, String> context) {

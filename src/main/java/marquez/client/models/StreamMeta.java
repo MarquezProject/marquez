@@ -31,6 +31,7 @@ import marquez.client.Utils;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @JsonPropertyOrder({
+  "id",
   "type",
   "physicalName",
   "sourceName",

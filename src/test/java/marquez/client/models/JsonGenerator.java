@@ -124,17 +124,22 @@ public final class JsonGenerator {
   }
 
   private static String newJsonFor(final DbTable dbTable) {
-    final ArrayNode fields = MAPPER.valueToTree(dbTable.getFields());
-    final ArrayNode tags = MAPPER.valueToTree(dbTable.getTags());
-    final ObjectNode obj =
+    final ObjectNode id =
         MAPPER
             .createObjectNode()
-            .put("type", DB_TABLE)
-            .put("name", dbTable.getName())
-            .put("physicalName", dbTable.getPhysicalName())
-            .put("createdAt", ISO_INSTANT.format(dbTable.getCreatedAt()))
-            .put("updatedAt", ISO_INSTANT.format(dbTable.getUpdatedAt()))
-            .put("sourceName", dbTable.getSourceName());
+            .put("namespaceName", dbTable.getId().getNamespaceName())
+            .put("name", dbTable.getId().getName());
+    final ArrayNode fields = MAPPER.valueToTree(dbTable.getFields());
+    final ArrayNode tags = MAPPER.valueToTree(dbTable.getTags());
+
+    final ObjectNode obj = MAPPER.createObjectNode();
+    obj.set("id", id);
+    obj.put("type", DB_TABLE);
+    obj.put("name", dbTable.getName());
+    obj.put("physicalName", dbTable.getPhysicalName());
+    obj.put("createdAt", ISO_INSTANT.format(dbTable.getCreatedAt()));
+    obj.put("updatedAt", ISO_INSTANT.format(dbTable.getUpdatedAt()));
+    obj.put("sourceName", dbTable.getSourceName());
     obj.putArray("fields").addAll(fields);
     obj.putArray("tags").addAll(tags);
     obj.put("lastModifiedAt", dbTable.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));
@@ -144,17 +149,22 @@ public final class JsonGenerator {
   }
 
   private static String newJsonFor(final Stream stream) {
-    final ArrayNode fields = MAPPER.valueToTree(stream.getFields());
-    final ArrayNode tags = MAPPER.valueToTree(stream.getTags());
-    final ObjectNode obj =
+    final ObjectNode id =
         MAPPER
             .createObjectNode()
-            .put("type", STREAM)
-            .put("name", stream.getName())
-            .put("physicalName", stream.getPhysicalName())
-            .put("createdAt", ISO_INSTANT.format(stream.getCreatedAt()))
-            .put("updatedAt", ISO_INSTANT.format(stream.getUpdatedAt()))
-            .put("sourceName", stream.getSourceName());
+            .put("namespaceName", stream.getId().getNamespaceName())
+            .put("name", stream.getId().getName());
+    final ArrayNode fields = MAPPER.valueToTree(stream.getFields());
+    final ArrayNode tags = MAPPER.valueToTree(stream.getTags());
+
+    final ObjectNode obj = MAPPER.createObjectNode();
+    obj.set("id", id);
+    obj.put("type", STREAM);
+    obj.put("name", stream.getName());
+    obj.put("physicalName", stream.getPhysicalName());
+    obj.put("createdAt", ISO_INSTANT.format(stream.getCreatedAt()));
+    obj.put("updatedAt", ISO_INSTANT.format(stream.getUpdatedAt()));
+    obj.put("sourceName", stream.getSourceName());
     obj.putArray("fields").addAll(fields);
     obj.putArray("tags").addAll(tags);
     obj.put("lastModifiedAt", stream.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));

@@ -19,7 +19,7 @@ import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
 import static marquez.client.MarquezClient.DEFAULT_NAMESPACE_NAME;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newContext;
-import static marquez.client.models.ModelGenerator.newDatasetName;
+import static marquez.client.models.ModelGenerator.newDatasetIdWith;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
 import static marquez.client.models.ModelGenerator.newFields;
@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import marquez.client.models.Dataset;
+import marquez.client.models.DatasetId;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.Field;
@@ -100,7 +101,8 @@ public class MarquezClientTest {
           SOURCE_TYPE, SOURCE_NAME, CREATED_AT, UPDATED_AT, CONNECTION_URL, SOURCE_DESCRIPTION);
 
   // DB TABLE DATASET
-  private static final String DB_TABLE_NAME = newDatasetName();
+  private static final DatasetId DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
+  private static final String DB_TABLE_NAME = DB_TABLE_ID.getName();
   private static final String DB_TABLE_PHYSICAL_NAME = newDatasetPhysicalName();
   private static final String DB_TABLE_SOURCE_NAME = newSourceName();
   private static final String DB_TABLE_DESCRIPTION = newDescription();
@@ -109,6 +111,7 @@ public class MarquezClientTest {
 
   private static final DbTable DB_TABLE =
       new DbTable(
+          DB_TABLE_ID,
           DB_TABLE_NAME,
           DB_TABLE_PHYSICAL_NAME,
           CREATED_AT,
@@ -120,6 +123,7 @@ public class MarquezClientTest {
           DB_TABLE_DESCRIPTION);
   private static final DbTable DB_TABLE_MODIFIED =
       new DbTable(
+          DB_TABLE_ID,
           DB_TABLE_NAME,
           DB_TABLE_PHYSICAL_NAME,
           CREATED_AT,
@@ -131,13 +135,15 @@ public class MarquezClientTest {
           DB_TABLE_DESCRIPTION);
 
   // STREAM DATASET
-  private static final String STREAM_NAME = newDatasetName();
+  private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
+  private static final String STREAM_NAME = STREAM_ID.getName();
   private static final String STREAM_PHYSICAL_NAME = newStreamName();
   private static final String STREAM_SOURCE_NAME = newSourceName();
   private static final URL STREAM_SCHEMA_LOCATION = newSchemaLocation();
   private static final String STREAM_DESCRIPTION = newDescription();
   private static final Stream STREAM =
       new Stream(
+          STREAM_ID,
           STREAM_NAME,
           STREAM_PHYSICAL_NAME,
           CREATED_AT,
@@ -150,6 +156,7 @@ public class MarquezClientTest {
           STREAM_DESCRIPTION);
   private static final Stream STREAM_MODIFIED =
       new Stream(
+          STREAM_ID,
           STREAM_NAME,
           STREAM_PHYSICAL_NAME,
           CREATED_AT,
@@ -163,8 +170,8 @@ public class MarquezClientTest {
 
   // JOB
   private static final String JOB_NAME = newJobName();
-  private static final Set<String> INPUTS = newInputs(2);
-  private static final Set<String> OUTPUTS = newOutputs(4);
+  private static final Set<DatasetId> INPUTS = newInputs(2);
+  private static final Set<DatasetId> OUTPUTS = newOutputs(4);
   private static final URL LOCATION = newLocation();
   private static final JobType JOB_TYPE = newJobType();
   private static final String JOB_DESCRIPTION = newDescription();

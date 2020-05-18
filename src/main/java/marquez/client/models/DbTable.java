@@ -27,6 +27,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public final class DbTable extends Dataset {
   public DbTable(
+      final DatasetId id,
       final String name,
       final String physicalName,
       final Instant createdAt,
@@ -37,6 +38,7 @@ public final class DbTable extends Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
     super(
+        id,
         DB_TABLE,
         name,
         physicalName,
