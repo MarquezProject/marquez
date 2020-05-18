@@ -27,7 +27,6 @@ import marquez.client.Utils;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class Source extends SourceMeta {
-  @Getter private final SourceType type;
   @Getter private final String name;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
@@ -40,7 +39,6 @@ public final class Source extends SourceMeta {
       final URI connectionUrl,
       @Nullable final String description) {
     super(type, connectionUrl, description);
-    this.type = type;
     this.name = name;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
