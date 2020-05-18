@@ -22,6 +22,7 @@ import static marquez.client.models.ModelGenerator.newContext;
 import static marquez.client.models.ModelGenerator.newDatasetName;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
+import static marquez.client.models.ModelGenerator.newFields;
 import static marquez.client.models.ModelGenerator.newInputs;
 import static marquez.client.models.ModelGenerator.newJobName;
 import static marquez.client.models.ModelGenerator.newJobType;
@@ -35,6 +36,7 @@ import static marquez.client.models.ModelGenerator.newRunState;
 import static marquez.client.models.ModelGenerator.newSchemaLocation;
 import static marquez.client.models.ModelGenerator.newSourceName;
 import static marquez.client.models.ModelGenerator.newStreamName;
+import static marquez.client.models.ModelGenerator.newTags;
 import static marquez.client.models.ModelGenerator.newTimestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -50,6 +52,7 @@ import java.util.Map;
 import marquez.client.models.Dataset;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
+import marquez.client.models.Field;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobType;
@@ -76,7 +79,7 @@ public class MarquezClientTest {
   // COMMON
   private static final Instant CREATED_AT = newTimestamp();
   private static final Instant UPDATED_AT = CREATED_AT;
-  private static final Instant LAST_MODIFIED = newTimestamp();
+  private static final Instant LAST_MODIFIED_AT = newTimestamp();
 
   // NAMESPACE
   private static final String NAMESPACE_NAME = newNamespaceName();
@@ -99,6 +102,9 @@ public class MarquezClientTest {
   private static final String DB_TABLE_PHYSICAL_NAME = newDatasetPhysicalName();
   private static final String DB_TABLE_SOURCE_NAME = newSourceName();
   private static final String DB_TABLE_DESCRIPTION = newDescription();
+  private static final List<Field> FIELDS = newFields();
+  private static final List<String> TAGS = newTags();
+
   private static final DbTable DB_TABLE =
       new DbTable(
           DB_TABLE_NAME,
@@ -106,6 +112,8 @@ public class MarquezClientTest {
           CREATED_AT,
           UPDATED_AT,
           DB_TABLE_SOURCE_NAME,
+          FIELDS,
+          TAGS,
           null,
           DB_TABLE_DESCRIPTION);
   private static final DbTable DB_TABLE_MODIFIED =
@@ -115,7 +123,9 @@ public class MarquezClientTest {
           CREATED_AT,
           UPDATED_AT,
           DB_TABLE_SOURCE_NAME,
-          LAST_MODIFIED,
+          FIELDS,
+          TAGS,
+          LAST_MODIFIED_AT,
           DB_TABLE_DESCRIPTION);
 
   // STREAM DATASET
@@ -131,6 +141,8 @@ public class MarquezClientTest {
           CREATED_AT,
           UPDATED_AT,
           STREAM_SOURCE_NAME,
+          FIELDS,
+          TAGS,
           null,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION);
@@ -141,7 +153,9 @@ public class MarquezClientTest {
           CREATED_AT,
           UPDATED_AT,
           STREAM_SOURCE_NAME,
-          LAST_MODIFIED,
+          FIELDS,
+          TAGS,
+          LAST_MODIFIED_AT,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION);
 
@@ -314,8 +328,11 @@ public class MarquezClientTest {
         DbTableMeta.builder()
             .physicalName(DB_TABLE_PHYSICAL_NAME)
             .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(FIELDS)
+            .tags(TAGS)
             .description(DB_TABLE_DESCRIPTION)
             .build();
+
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
     final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
     when(http.put(url, metaAsJson)).thenReturn(dbTableAsJson);
@@ -356,6 +373,8 @@ public class MarquezClientTest {
         DbTableMeta.builder()
             .physicalName(dataset.getPhysicalName())
             .sourceName(dataset.getSourceName())
+            .fields(FIELDS)
+            .tags(TAGS)
             .description(dataset.getDescription().get())
             .runId(RUN_ID)
             .build();
@@ -368,7 +387,7 @@ public class MarquezClientTest {
     final Dataset modifiedDataset = client.createDataset(DB_TABLE_NAME, modifiedMeta);
     assertThat(modifiedDataset).isInstanceOf(DbTable.class);
     assertThat((DbTable) modifiedDataset).isEqualTo(DB_TABLE_MODIFIED);
-    assertThat(modifiedDataset.getLastModified().get().isAfter(beforeModified));
+    assertThat(modifiedDataset.getLastModifiedAt().get().isAfter(beforeModified));
   }
 
   @Test
@@ -382,6 +401,8 @@ public class MarquezClientTest {
         StreamMeta.builder()
             .physicalName(STREAM_PHYSICAL_NAME)
             .sourceName(STREAM_SOURCE_NAME)
+            .fields(FIELDS)
+            .tags(TAGS)
             .description(STREAM_DESCRIPTION)
             .schemaLocation(STREAM_SCHEMA_LOCATION)
             .build();
@@ -424,6 +445,8 @@ public class MarquezClientTest {
         StreamMeta.builder()
             .physicalName(dataset.getPhysicalName())
             .sourceName(dataset.getSourceName())
+            .fields(FIELDS)
+            .tags(TAGS)
             .description(dataset.getDescription().get())
             .schemaLocation(dataset.getSchemaLocation())
             .runId(RUN_ID)
@@ -437,7 +460,7 @@ public class MarquezClientTest {
     final Dataset modifiedDataset = client.createDataset(STREAM_NAME, modifiedMeta);
     assertThat(modifiedDataset).isInstanceOf(Stream.class);
     assertThat((Stream) modifiedDataset).isEqualTo(STREAM_MODIFIED);
-    assertThat(modifiedDataset.getLastModified().get().isAfter(beforeModified));
+    assertThat(modifiedDataset.getLastModifiedAt().get().isAfter(beforeModified));
   }
 
   @Test

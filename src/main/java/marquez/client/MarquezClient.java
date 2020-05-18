@@ -167,6 +167,27 @@ public class MarquezClient {
     return Datasets.fromJson(bodyAsJson).getValue();
   }
 
+  public Dataset tagDataset(
+      @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
+    final String bodyAsJson =
+        http.post(
+            http.url("/namespaces/%s/datasets/%s/tags/%s", namespaceName, datasetName, tagName));
+    return Dataset.fromJson(bodyAsJson);
+  }
+
+  public Dataset tagDatasetField(
+      @NonNull String namespaceName,
+      @NonNull String datasetName,
+      @NonNull String fieldName,
+      @NonNull String tagName) {
+    final String bodyAsJson =
+        http.post(
+            http.url(
+                "/namespaces/%s/datasets/%s/fields/%s/tags/%s",
+                namespaceName, datasetName, fieldName, tagName));
+    return Dataset.fromJson(bodyAsJson);
+  }
+
   public Job createJob(String jobName, JobMeta meta) {
     return createJob(namespaceName, jobName, meta);
   }

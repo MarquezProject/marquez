@@ -14,6 +14,7 @@
 
 package marquez.client.models;
 
+import java.util.List;
 import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -27,9 +28,11 @@ public final class DbTableMeta extends DatasetMeta {
   private DbTableMeta(
       final String physicalName,
       final String sourceName,
+      @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
       @Nullable final String description,
       @Nullable final String runId) {
-    super(physicalName, sourceName, description, runId);
+    super(physicalName, sourceName, fields, tags, description, runId);
   }
 
   @Override

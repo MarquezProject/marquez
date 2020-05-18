@@ -15,6 +15,7 @@
 package marquez.client.models;
 
 import java.time.Instant;
+import java.util.List;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -28,8 +29,19 @@ public final class DbTable extends Dataset {
       final Instant createdAt,
       final Instant updatedAt,
       final String sourceName,
-      @Nullable final Instant lastModified,
+      @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
+      @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
-    super(name, physicalName, createdAt, updatedAt, sourceName, lastModified, description);
+    super(
+        name,
+        physicalName,
+        createdAt,
+        updatedAt,
+        sourceName,
+        fields,
+        tags,
+        lastModifiedAt,
+        description);
   }
 }

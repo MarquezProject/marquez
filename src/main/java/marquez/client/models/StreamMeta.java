@@ -16,6 +16,7 @@ package marquez.client.models;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URL;
+import java.util.List;
 import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -30,13 +31,16 @@ import marquez.client.Utils;
 public final class StreamMeta extends DatasetMeta {
   @Getter private final URL schemaLocation;
 
+  @Builder
   public StreamMeta(
       final String physicalName,
       final String sourceName,
       @NonNull final URL schemaLocation,
+      @Nullable final List<Field> fields,
+      @Nullable final List<String> tags,
       @Nullable final String description,
       @Nullable final String runId) {
-    super(physicalName, sourceName, description, runId);
+    super(physicalName, sourceName, fields, tags, description, runId);
     this.schemaLocation = schemaLocation;
   }
 
@@ -45,48 +49,16 @@ public final class StreamMeta extends DatasetMeta {
     return Utils.toJson(this);
   }
 
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  public static final class Builder {
-    private String physicalName;
-    private String sourceName;
+  public static class StreamMetaBuilder {
     private URL schemaLocation;
-    @Nullable private String description;
-    @Nullable private String runId;
 
-    public Builder physicalName(@NonNull String physicalName) {
-      this.physicalName = physicalName;
-      return this;
-    }
-
-    public Builder sourceName(@NonNull String sourceName) {
-      this.sourceName = sourceName;
-      return this;
-    }
-
-    public Builder schemaLocation(@NonNull String schemaLocationString) {
+    public StreamMetaBuilder schemaLocation(@NonNull String schemaLocationString) {
       return schemaLocation(Utils.toUrl(schemaLocationString));
     }
 
-    public Builder schemaLocation(@NonNull URL schemaLocation) {
+    public StreamMetaBuilder schemaLocation(@NonNull URL schemaLocation) {
       this.schemaLocation = schemaLocation;
       return this;
-    }
-
-    public Builder description(@Nullable String description) {
-      this.description = description;
-      return this;
-    }
-
-    public Builder runId(@Nullable String runId) {
-      this.runId = runId;
-      return this;
-    }
-
-    public StreamMeta build() {
-      return new StreamMeta(physicalName, sourceName, schemaLocation, description, runId);
     }
   }
 }

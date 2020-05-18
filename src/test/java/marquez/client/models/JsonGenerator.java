@@ -80,26 +80,37 @@ public final class JsonGenerator {
   }
 
   private static String newJsonFor(final DbTableMeta meta) {
-    return MAPPER
-        .createObjectNode()
-        .put("type", DB_TABLE)
-        .put("physicalName", meta.getPhysicalName())
-        .put("sourceName", meta.getSourceName())
-        .put("description", meta.getDescription().orElse(null))
-        .put("runId", meta.getRunId().orElse(null))
-        .toString();
+    final ArrayNode fields = MAPPER.valueToTree(meta.getFields());
+    final ArrayNode tags = MAPPER.valueToTree(meta.getTags());
+    final ObjectNode obj =
+        MAPPER
+            .createObjectNode()
+            .put("type", DB_TABLE)
+            .put("physicalName", meta.getPhysicalName())
+            .put("sourceName", meta.getSourceName());
+    obj.putArray("fields").addAll(fields);
+    obj.putArray("tags").addAll(tags);
+    obj.put("description", meta.getDescription().orElse(null));
+    obj.put("runId", meta.getRunId().orElse(null));
+
+    return obj.toString();
   }
 
   private static String newJsonFor(final StreamMeta meta) {
-    return MAPPER
-        .createObjectNode()
-        .put("type", STREAM)
-        .put("physicalName", meta.getPhysicalName())
-        .put("sourceName", meta.getSourceName())
-        .put("schemaLocation", meta.getSchemaLocation().toString())
-        .put("description", meta.getDescription().orElse(null))
-        .put("runId", meta.getRunId().orElse(null))
-        .toString();
+    final ArrayNode fields = MAPPER.valueToTree(meta.getFields());
+    final ArrayNode tags = MAPPER.valueToTree(meta.getTags());
+    final ObjectNode obj =
+        MAPPER
+            .createObjectNode()
+            .put("type", STREAM)
+            .put("physicalName", meta.getPhysicalName())
+            .put("sourceName", meta.getSourceName())
+            .put("schemaLocation", meta.getSchemaLocation().toString())
+            .put("description", meta.getDescription().orElse(null))
+            .put("runId", meta.getRunId().orElse(null));
+    obj.putArray("fields").addAll(fields);
+    obj.putArray("tags").addAll(tags);
+    return obj.toString();
   }
 
   public static String newJsonFor(final Dataset dataset) {
@@ -113,32 +124,44 @@ public final class JsonGenerator {
   }
 
   private static String newJsonFor(final DbTable dbTable) {
-    return MAPPER
-        .createObjectNode()
-        .put("type", DB_TABLE)
-        .put("name", dbTable.getName())
-        .put("physicalName", dbTable.getPhysicalName())
-        .put("createdAt", ISO_INSTANT.format(dbTable.getCreatedAt()))
-        .put("updatedAt", ISO_INSTANT.format(dbTable.getUpdatedAt()))
-        .put("sourceName", dbTable.getSourceName())
-        .put("lastModified", dbTable.getLastModified().map(ISO_INSTANT::format).orElse(null))
-        .put("description", dbTable.getDescription().orElse(null))
-        .toString();
+    final ArrayNode fields = MAPPER.valueToTree(dbTable.getFields());
+    final ArrayNode tags = MAPPER.valueToTree(dbTable.getTags());
+    final ObjectNode obj =
+        MAPPER
+            .createObjectNode()
+            .put("type", DB_TABLE)
+            .put("name", dbTable.getName())
+            .put("physicalName", dbTable.getPhysicalName())
+            .put("createdAt", ISO_INSTANT.format(dbTable.getCreatedAt()))
+            .put("updatedAt", ISO_INSTANT.format(dbTable.getUpdatedAt()))
+            .put("sourceName", dbTable.getSourceName());
+    obj.putArray("fields").addAll(fields);
+    obj.putArray("tags").addAll(tags);
+    obj.put("lastModifiedAt", dbTable.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));
+    obj.put("description", dbTable.getDescription().orElse(null));
+
+    return obj.toString();
   }
 
   private static String newJsonFor(final Stream stream) {
-    return MAPPER
-        .createObjectNode()
-        .put("type", STREAM)
-        .put("name", stream.getName())
-        .put("physicalName", stream.getPhysicalName())
-        .put("createdAt", ISO_INSTANT.format(stream.getCreatedAt()))
-        .put("updatedAt", ISO_INSTANT.format(stream.getUpdatedAt()))
-        .put("sourceName", stream.getSourceName())
-        .put("lastModified", stream.getLastModified().map(ISO_INSTANT::format).orElse(null))
-        .put("schemaLocation", stream.getSchemaLocation().toString())
-        .put("description", stream.getDescription().orElse(null))
-        .toString();
+    final ArrayNode fields = MAPPER.valueToTree(stream.getFields());
+    final ArrayNode tags = MAPPER.valueToTree(stream.getTags());
+    final ObjectNode obj =
+        MAPPER
+            .createObjectNode()
+            .put("type", STREAM)
+            .put("name", stream.getName())
+            .put("physicalName", stream.getPhysicalName())
+            .put("createdAt", ISO_INSTANT.format(stream.getCreatedAt()))
+            .put("updatedAt", ISO_INSTANT.format(stream.getUpdatedAt()))
+            .put("sourceName", stream.getSourceName());
+    obj.putArray("fields").addAll(fields);
+    obj.putArray("tags").addAll(tags);
+    obj.put("lastModifiedAt", stream.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));
+    obj.put("schemaLocation", stream.getSchemaLocation().toString());
+    obj.put("description", stream.getDescription().orElse(null));
+
+    return obj.toString();
   }
 
   public static String newJsonFor(final JobMeta meta) {
