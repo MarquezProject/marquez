@@ -12,7 +12,7 @@ Java client for [Marquez](https://github.com/MarquezProject/marquez).
 
 ## Status
 
-This library is under active development at [WeWork](https://www.wework.com). 
+This library is under active development at [WeWork](https://www.wework.com) and [Datakin](https://twitter.com/DatakinHQ). 
 
 ## Documentation
 
