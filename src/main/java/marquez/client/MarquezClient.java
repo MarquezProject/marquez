@@ -167,7 +167,11 @@ public class MarquezClient {
     return Datasets.fromJson(bodyAsJson).getValue();
   }
 
-  public Dataset tagDataset(
+  public Dataset tagDatasetWith(@NonNull String datasetName, @NonNull String tagName) {
+    return tagDatasetWith(namespaceName, datasetName, tagName);
+  }
+
+  public Dataset tagDatasetWith(
       @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
     final String bodyAsJson =
         http.post(
@@ -175,7 +179,12 @@ public class MarquezClient {
     return Dataset.fromJson(bodyAsJson);
   }
 
-  public Dataset tagDatasetField(
+  public Dataset tagDatasetFieldWith(
+      @NonNull String datasetName, @NonNull String fieldName, @NonNull String tagName) {
+    return tagDatasetFieldWith(namespaceName, datasetName, fieldName, tagName);
+  }
+
+  public Dataset tagDatasetFieldWith(
       @NonNull String namespaceName,
       @NonNull String datasetName,
       @NonNull String fieldName,
