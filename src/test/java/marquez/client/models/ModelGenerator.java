@@ -153,6 +153,10 @@ public final class ModelGenerator {
   }
 
   public static Job newJob() {
+    return newJobWith(null);
+  }
+
+  public static Job newJobWith(final Run latestRun) {
     final Instant now = newTimestamp();
     final JobId jobId = newJobId();
     return new Job(
@@ -165,7 +169,8 @@ public final class ModelGenerator {
         newOutputs(4),
         newLocation(),
         newContext(),
-        newDescription());
+        newDescription(),
+        latestRun);
   }
 
   public static JobId newJobId() {

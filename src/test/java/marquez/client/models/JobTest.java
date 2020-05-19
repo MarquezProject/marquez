@@ -14,7 +14,8 @@
 
 package marquez.client.models;
 
-import static marquez.client.models.ModelGenerator.newJob;
+import static marquez.client.models.ModelGenerator.newJobWith;
+import static marquez.client.models.ModelGenerator.newRun;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import marquez.client.UnitTests;
@@ -23,7 +24,7 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
 public class JobTest {
-  private static final Job JOB = newJob();
+  private static final Job JOB = newJobWith(newRun());
   private static final String JSON = JsonGenerator.newJsonFor(JOB);
 
   @Test

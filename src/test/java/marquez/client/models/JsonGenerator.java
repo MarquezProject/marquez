@@ -213,6 +213,7 @@ public final class JsonGenerator {
     obj.put("location", job.getLocation().toString());
     obj.set("context", context);
     obj.put("description", job.getDescription().orElse(null));
+    obj.set("latestRun", toObj(job.getLatestRun().orElse(null)));
 
     return obj.toString();
   }
@@ -230,6 +231,14 @@ public final class JsonGenerator {
   }
 
   public static String newJsonFor(final Run run) {
+    return toObj(run).toString();
+  }
+
+  private static ObjectNode toObj(final Run run) {
+    if (run == null) {
+      return null;
+    }
+
     final ObjectNode obj =
         MAPPER
             .createObjectNode()
@@ -244,6 +253,6 @@ public final class JsonGenerator {
     run.getArgs().forEach(runArgs::put);
     obj.set("runArgs", runArgs);
 
-    return obj.toString();
+    return obj;
   }
 }

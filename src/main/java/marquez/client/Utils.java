@@ -34,7 +34,7 @@ public final class Utils {
   public static ObjectMapper newObjectMapper() {
     final ObjectMapper mapper = Jackson.newObjectMapper();
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     return mapper;
   }
 

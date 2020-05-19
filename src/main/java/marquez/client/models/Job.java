@@ -18,7 +18,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -32,6 +34,7 @@ public final class Job extends JobMeta {
   @Getter private final String name;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
+  @Nullable private final Run latestRun;
 
   public Job(
       @NonNull final JobId id,
@@ -43,12 +46,18 @@ public final class Job extends JobMeta {
       final Set<DatasetId> outputs,
       final URL location,
       final Map<String, String> context,
-      final String description) {
+      final String description,
+      @Nullable final Run latestRun) {
     super(type, inputs, outputs, location, context, description);
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.latestRun = latestRun;
+  }
+
+  public Optional<Run> getLatestRun() {
+    return Optional.ofNullable(latestRun);
   }
 
   public static Job fromJson(@NonNull final String json) {
