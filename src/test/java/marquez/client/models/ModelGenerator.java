@@ -164,8 +164,8 @@ public final class ModelGenerator {
         newInputs(2),
         newOutputs(4),
         newLocation(),
-        newDescription(),
-        newContext());
+        newContext(),
+        newDescription());
   }
 
   public static JobId newJobId() {

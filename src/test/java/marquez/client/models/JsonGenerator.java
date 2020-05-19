@@ -185,8 +185,8 @@ public final class JsonGenerator {
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", meta.getLocation().toString());
-    obj.put("description", meta.getDescription().orElse(null));
     obj.set("context", context);
+    obj.put("description", meta.getDescription().orElse(null));
 
     return obj.toString();
   }
@@ -211,8 +211,8 @@ public final class JsonGenerator {
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", job.getLocation().toString());
-    obj.put("description", job.getDescription().orElse(null));
     obj.set("context", context);
+    obj.put("description", job.getDescription().orElse(null));
 
     return obj.toString();
   }

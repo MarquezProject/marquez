@@ -42,9 +42,9 @@ public final class Job extends JobMeta {
       final Set<DatasetId> inputs,
       final Set<DatasetId> outputs,
       final URL location,
-      final String description,
-      final Map<String, String> context) {
-    super(type, inputs, outputs, location, description, context);
+      final Map<String, String> context,
+      final String description) {
+    super(type, inputs, outputs, location, context, description);
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;

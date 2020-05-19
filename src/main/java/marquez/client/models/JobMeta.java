@@ -30,26 +30,26 @@ import marquez.client.Utils;
 @EqualsAndHashCode
 @ToString
 public class JobMeta {
-  @Getter @NonNull JobType type;
-  @Getter @NonNull Set<DatasetId> inputs;
-  @Getter @NonNull Set<DatasetId> outputs;
-  @Getter @NonNull URL location;
+  @Getter private final JobType type;
+  @Getter private final Set<DatasetId> inputs;
+  @Getter private final Set<DatasetId> outputs;
+  @Getter private final URL location;
+  @Getter private final Map<String, String> context;
   @Nullable String description;
-  @Getter @NonNull Map<String, String> context;
 
   public JobMeta(
       @NonNull final JobType type,
       @NonNull final Set<DatasetId> inputs,
       @NonNull final Set<DatasetId> outputs,
       @NonNull final URL location,
-      @Nullable final String description,
-      @Nullable final Map<String, String> context) {
+      @Nullable final Map<String, String> context,
+      @Nullable final String description) {
     this.type = type;
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
-    this.description = description;
     this.context = (context == null) ? ImmutableMap.of() : context;
+    this.description = description;
   }
 
   public Optional<String> getDescription() {
@@ -101,18 +101,18 @@ public class JobMeta {
       return this;
     }
 
-    public Builder description(@Nullable String description) {
-      this.description = description;
-      return this;
-    }
-
     public Builder context(@Nullable Map<String, String> context) {
       this.context = context;
       return this;
     }
 
+    public Builder description(@Nullable String description) {
+      this.description = description;
+      return this;
+    }
+
     public JobMeta build() {
-      return new JobMeta(type, inputs, outputs, location, description, context);
+      return new JobMeta(type, inputs, outputs, location, context, description);
     }
   }
 }

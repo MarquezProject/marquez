@@ -188,8 +188,8 @@ public class MarquezClientTest {
           INPUTS,
           OUTPUTS,
           LOCATION,
-          JOB_DESCRIPTION,
-          JOB_CONTEXT);
+          JOB_CONTEXT,
+          JOB_DESCRIPTION);
 
   // RUN
   private static final String RUN_ID = newRunId();
