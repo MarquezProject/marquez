@@ -248,6 +248,8 @@ public final class JsonGenerator {
     obj.put("nominalStartTime", run.getNominalStartTime().map(ISO_INSTANT::format).orElse(null));
     obj.put("nominalEndTime", run.getNominalEndTime().map(ISO_INSTANT::format).orElse(null));
     obj.put("runState", run.getState().toString());
+    obj.put("startedAt", run.getStartedAt().map(ISO_INSTANT::format).orElse(null));
+    obj.put("endedAt", run.getEndedAt().map(ISO_INSTANT::format).orElse(null));
 
     final ObjectNode runArgs = MAPPER.createObjectNode();
     run.getArgs().forEach(runArgs::put);

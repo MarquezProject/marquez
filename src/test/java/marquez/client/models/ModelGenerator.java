@@ -195,7 +195,7 @@ public final class ModelGenerator {
 
   public static Run newRun() {
     final Instant now = newTimestamp();
-    return new Run(newRunId(), now, now, now, now, RunState.NEW, newRunArgs());
+    return new Run(newRunId(), now, now, now, now, RunState.NEW, null, null, newRunArgs());
   }
 
   public static String newOwnerName() {

@@ -197,6 +197,8 @@ public class MarquezClientTest {
   private static final Instant NOMINAL_START_TIME = newTimestamp();
   private static final Instant NOMINAL_END_TIME = newTimestamp();
   private static final RunState RUN_STATE = newRunState();
+  private static final Instant START_AT = newTimestamp();
+  private static final Instant ENDED_AT = newTimestamp();
   private static final Map<String, String> RUN_ARGS = newRunArgs();
   private static final Run RUN =
       new Run(
@@ -206,6 +208,8 @@ public class MarquezClientTest {
           NOMINAL_START_TIME,
           NOMINAL_END_TIME,
           RUN_STATE,
+          START_AT,
+          ENDED_AT,
           RUN_ARGS);
 
   @Rule public final MockitoRule rule = MockitoJUnit.rule();

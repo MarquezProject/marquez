@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -39,6 +40,9 @@ public final class Run extends RunMeta {
   @JsonProperty("runState")
   private final RunState state;
 
+  @Nullable private final Instant startedAt;
+  @Nullable private final Instant endedAt;
+
   public Run(
       @JsonProperty("runId") @NonNull final String id,
       @NonNull final Instant createdAt,
@@ -46,12 +50,24 @@ public final class Run extends RunMeta {
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
       @JsonProperty("runState") @NonNull final RunState state,
+      @Nullable final Instant startedAt,
+      @Nullable final Instant endedAt,
       @JsonProperty("runArgs") @Nullable final Map<String, String> args) {
     super(nominalStartTime, nominalEndTime, args);
     this.id = id;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.state = state;
+    this.startedAt = startedAt;
+    this.endedAt = endedAt;
+  }
+
+  public Optional<Instant> getStartedAt() {
+    return Optional.ofNullable(startedAt);
+  }
+
+  public Optional<Instant> getEndedAt() {
+    return Optional.ofNullable(endedAt);
   }
 
   public static Run fromJson(@NonNull final String json) {
