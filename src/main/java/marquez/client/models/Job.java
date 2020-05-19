@@ -28,11 +28,13 @@ import marquez.client.Utils;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class Job extends JobMeta {
-  @Getter @NonNull private final String name;
-  @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final Instant updatedAt;
+  @Getter private final JobId id;
+  @Getter private final String name;
+  @Getter private final Instant createdAt;
+  @Getter private final Instant updatedAt;
 
   public Job(
+      @NonNull final JobId id,
       final JobType type,
       @NonNull final String name,
       @NonNull final Instant createdAt,
@@ -43,6 +45,7 @@ public final class Job extends JobMeta {
       final String description,
       final Map<String, String> context) {
     super(type, inputs, outputs, location, description, context);
+    this.id = id;
     this.name = name;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;

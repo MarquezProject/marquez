@@ -24,7 +24,7 @@ import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
 import static marquez.client.models.ModelGenerator.newFields;
 import static marquez.client.models.ModelGenerator.newInputs;
-import static marquez.client.models.ModelGenerator.newJobName;
+import static marquez.client.models.ModelGenerator.newJobIdWith;
 import static marquez.client.models.ModelGenerator.newJobType;
 import static marquez.client.models.ModelGenerator.newLocation;
 import static marquez.client.models.ModelGenerator.newNamespaceName;
@@ -56,6 +56,7 @@ import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.Field;
 import marquez.client.models.Job;
+import marquez.client.models.JobId;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobType;
 import marquez.client.models.JsonGenerator;
@@ -169,7 +170,8 @@ public class MarquezClientTest {
           STREAM_DESCRIPTION);
 
   // JOB
-  private static final String JOB_NAME = newJobName();
+  private static final JobId JOB_ID = newJobIdWith(NAMESPACE_NAME);
+  private static final String JOB_NAME = JOB_ID.getName();
   private static final Set<DatasetId> INPUTS = newInputs(2);
   private static final Set<DatasetId> OUTPUTS = newOutputs(4);
   private static final URL LOCATION = newLocation();
@@ -178,6 +180,7 @@ public class MarquezClientTest {
   private static final Map<String, String> JOB_CONTEXT = newContext();
   private static final Job JOB =
       new Job(
+          JOB_ID,
           JOB_TYPE,
           JOB_NAME,
           CREATED_AT,

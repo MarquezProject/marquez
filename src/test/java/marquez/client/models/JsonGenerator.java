@@ -192,18 +192,22 @@ public final class JsonGenerator {
   }
 
   public static String newJsonFor(final Job job) {
+    final ObjectNode id =
+        MAPPER
+            .createObjectNode()
+            .put("namespaceName", job.getId().getNamespaceName())
+            .put("name", job.getId().getName());
     final ArrayNode inputs = MAPPER.valueToTree(job.getInputs());
     final ArrayNode outputs = MAPPER.valueToTree(job.getOutputs());
     final ObjectNode context = MAPPER.createObjectNode();
     job.getContext().forEach(context::put);
 
-    final ObjectNode obj =
-        MAPPER
-            .createObjectNode()
-            .put("type", job.getType().toString())
-            .put("name", job.getName())
-            .put("createdAt", ISO_INSTANT.format(job.getCreatedAt()))
-            .put("updatedAt", ISO_INSTANT.format(job.getUpdatedAt()));
+    final ObjectNode obj = MAPPER.createObjectNode();
+    obj.set("id", id);
+    obj.put("type", job.getType().toString());
+    obj.put("name", job.getName());
+    obj.put("createdAt", ISO_INSTANT.format(job.getCreatedAt()));
+    obj.put("updatedAt", ISO_INSTANT.format(job.getUpdatedAt()));
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", job.getLocation().toString());

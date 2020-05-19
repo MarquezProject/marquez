@@ -154,9 +154,11 @@ public final class ModelGenerator {
 
   public static Job newJob() {
     final Instant now = newTimestamp();
+    final JobId jobId = newJobId();
     return new Job(
+        jobId,
         newJobType(),
-        newJobName(),
+        jobId.getName(),
         now,
         now,
         newInputs(2),
@@ -164,6 +166,14 @@ public final class ModelGenerator {
         newLocation(),
         newDescription(),
         newContext());
+  }
+
+  public static JobId newJobId() {
+    return newJobIdWith(newNamespaceName());
+  }
+
+  public static JobId newJobIdWith(final String namespaceName) {
+    return new JobId(namespaceName, newJobName());
   }
 
   public static RunMeta newRunMeta() {
