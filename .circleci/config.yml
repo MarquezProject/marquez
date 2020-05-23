@@ -11,8 +11,7 @@ jobs:
           keys:
             - v1-jvm-{{ .Branch }}-{{ .Revision }}
             - v1-jvm-{{ .Branch }}
-      - run: ./gradlew --no-daemon --stacktrace build -x test
-      - run: ./gradlew --no-daemon --stacktrace test
+      - run: ./gradlew --no-daemon --stacktrace build
       - run: ./gradlew --no-daemon jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - save_cache:
