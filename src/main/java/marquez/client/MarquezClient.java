@@ -60,6 +60,10 @@ public class MarquezClient {
     this(DEFAULT_BASE_URL, DEFAULT_NAMESPACE_NAME);
   }
 
+  public MarquezClient(@NonNull final URL baseUrl) {
+    this(baseUrl, DEFAULT_NAMESPACE_NAME);
+  }
+
   public MarquezClient(final String namespaceName) {
     this(DEFAULT_BASE_URL, namespaceName);
   }
