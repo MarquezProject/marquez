@@ -39,11 +39,11 @@ import marquez.common.models.NamespaceName;
 @EqualsAndHashCode
 @ToString
 public final class JobMeta {
-  @Getter @NonNull private final JobType type;
-  @Getter @NonNull private final ImmutableSet<DatasetId> inputs;
-  @Getter @NonNull private final ImmutableSet<DatasetId> outputs;
+  @Getter private final JobType type;
+  @Getter private final ImmutableSet<DatasetId> inputs;
+  @Getter private final ImmutableSet<DatasetId> outputs;
   @Nullable private final URL location;
-  @Getter @NonNull private final ImmutableMap<String, String> context;
+  @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
 
   public JobMeta(

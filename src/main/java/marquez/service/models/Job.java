@@ -32,15 +32,15 @@ import marquez.common.models.JobType;
 @EqualsAndHashCode
 @ToString
 public final class Job {
-  @Getter @NonNull private final JobId id;
-  @Getter @NonNull private final JobType type;
-  @Getter @NonNull private final JobName name;
-  @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final Instant updatedAt;
-  @Getter @NonNull private final ImmutableSet<DatasetId> inputs;
-  @Getter @NonNull private final ImmutableSet<DatasetId> outputs;
+  @Getter private final JobId id;
+  @Getter private final JobType type;
+  @Getter private final JobName name;
+  @Getter private final Instant createdAt;
+  @Getter private final Instant updatedAt;
+  @Getter private final ImmutableSet<DatasetId> inputs;
+  @Getter private final ImmutableSet<DatasetId> outputs;
   @Nullable private final URL location;
-  @Getter @NonNull private final ImmutableMap<String, String> context;
+  @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
   @Nullable private final Run latestRun;
 

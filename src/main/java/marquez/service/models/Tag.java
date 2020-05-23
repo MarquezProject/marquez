@@ -30,9 +30,9 @@ import marquez.common.models.TagName;
 @EqualsAndHashCode
 @ToString
 public final class Tag {
+  @Getter
   @JsonUnwrapped
   @JsonProperty(access = READ_ONLY)
-  @Getter
   private final TagName name;
 
   @Nullable String description;

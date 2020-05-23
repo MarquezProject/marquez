@@ -28,7 +28,7 @@ import lombok.ToString;
 public final class RunMeta {
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
-  @Getter @NonNull private final ImmutableMap<String, String> args;
+  @Getter private final ImmutableMap<String, String> args;
 
   public RunMeta(
       @Nullable final Instant nominalStartTime,

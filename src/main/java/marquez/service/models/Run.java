@@ -28,15 +28,15 @@ import marquez.common.models.RunState;
 @EqualsAndHashCode
 @ToString
 public final class Run {
-  @Getter @NonNull private final RunId id;
-  @Getter @NonNull private final Instant createdAt;
-  @Getter @NonNull private final Instant updatedAt;
+  @Getter private final RunId id;
+  @Getter private final Instant createdAt;
+  @Getter private final Instant updatedAt;
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
-  @Getter @NonNull private final RunState state;
+  @Getter private final RunState state;
   @Nullable private final Instant startedAt;
   @Nullable private final Instant endedAt;
-  @Getter @NonNull private final ImmutableMap<String, String> args;
+  @Getter private final ImmutableMap<String, String> args;
 
   public Run(
       @NonNull final RunId id,
