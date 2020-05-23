@@ -19,3 +19,8 @@ jobs:
           key: v1-jvm-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.gradle
+
+workflows:
+  marquez_java:
+    jobs:
+      - build
