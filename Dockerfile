@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk AS base
+FROM openjdk:11-jdk AS base
 WORKDIR /usr/src/app
 COPY gradle gradle
 COPY gradle.properties gradle.properties
@@ -12,7 +12,7 @@ COPY src ./src
 COPY build.gradle build.gradle
 RUN ./gradlew --no-daemon shadowJar
 
-FROM openjdk:8-jre
+FROM openjdk:11-jre
 RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build/libs/marquez-*.jar /usr/src/app
