@@ -21,12 +21,12 @@ public enum RunState {
   ABORTED,
   FAILED;
 
-  /** Returns true if this state is complete. */
+  /* Returns true if this state is complete. */
   public boolean isComplete() {
     return this == COMPLETED;
   }
 
-  /** Returns true if this state is running. */
+  /* Returns true if this state is running. */
   public boolean isStarting() {
     return this == RUNNING;
   }
