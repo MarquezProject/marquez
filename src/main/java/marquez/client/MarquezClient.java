@@ -60,7 +60,7 @@ public class MarquezClient {
     this(DEFAULT_BASE_URL, DEFAULT_NAMESPACE_NAME);
   }
 
-  public MarquezClient(@NonNull final URL baseUrl) {
+  public MarquezClient(final URL baseUrl) {
     this(baseUrl, DEFAULT_NAMESPACE_NAME);
   }
 
