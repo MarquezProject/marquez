@@ -1,13 +1,8 @@
 version: 2.1
 
 defaults: &defaults
-  machine: true
   working_directory: ~/marquez
-
-cache: &cache
-  keys:
-    - v1-deps-{{ .Branch }}-{{ .Revision }}
-    - v1-deps-{{ .Branch }}
+  machine: true
 
 jobs:
   build:
@@ -15,22 +10,16 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          <<: *cache
-      - run: ./gradlew --no-daemon --stacktrace build -x test
-      - save_cache:
-          key: v1-deps-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ~/.gradle
-
-  test:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *cache
-      - run: ./gradlew --no-daemon --stacktrace test
+          keys:
+            - v1-jvm-{{ .Branch }}-{{ .Revision }}
+            - v1-jvm-{{ .Branch }}
+      - run: ./gradlew --no-daemon --stacktrace build
       - run: ./gradlew --no-daemon jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
+      - save_cache:
+          key: v1-jvm-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.gradle
 
   release:
     <<: *defaults
@@ -43,9 +32,6 @@ workflows:
   marquez:
     jobs:
       - build
-      - test:
-          requires:
-            - build
       - release:
           filters:
             tags:
