@@ -7,12 +7,15 @@ defaults: &defaults
 jobs:
   build:
     <<: *defaults
+    environment:
+      TESTCONTAINERS_RYUK_DISABLED: true
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-jvm-{{ .Branch }}-{{ .Revision }}
             - v1-jvm-{{ .Branch }}
+      - run: echo "checks.disable=true" > ~/.testcontainers.properties
       - run: ./gradlew --no-daemon --stacktrace build
       - run: ./gradlew --no-daemon jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
