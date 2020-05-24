@@ -39,9 +39,10 @@ $ ./gradlew spotlessApply
 
 # Local Publishing
 
-You can publish SNAPSHOT releases to your local maven repository with the following:
+To publish a snapshot to your local maven repository, run:
+
 ```
-$ /gradlew -Pversion=0.2.0-rc.4-SNAPSHOT publishToMavenLocal
+$ ./gradlew -Pversion=<SNAPSHOT> publishToMavenLocal
 ```
 
 # Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
