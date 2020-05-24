@@ -32,9 +32,6 @@ workflows:
   marquez:
     jobs:
       - build
-      - test:
-          requires:
-            - build
       - release:
           filters:
             tags:
