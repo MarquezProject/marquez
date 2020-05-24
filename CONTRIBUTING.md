@@ -39,7 +39,7 @@ $ ./gradlew spotlessApply
 
 # Local Publishing
 
-To publish a snapshot to your local maven repository, run:
+Use [`publishToMavenLocal`](https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:tasks) to publish snapshots to your local maven repository:
 
 ```
 $ ./gradlew -Pversion=<SNAPSHOT> publishToMavenLocal
