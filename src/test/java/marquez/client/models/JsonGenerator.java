@@ -225,7 +225,7 @@ public final class JsonGenerator {
 
     final ObjectNode runArgs = MAPPER.createObjectNode();
     meta.getArgs().forEach(runArgs::put);
-    obj.set("runArgs", runArgs);
+    obj.set("args", runArgs);
 
     return obj.toString();
   }
@@ -242,18 +242,18 @@ public final class JsonGenerator {
     final ObjectNode obj =
         MAPPER
             .createObjectNode()
-            .put("runId", run.getId())
+            .put("id", run.getId())
             .put("createdAt", ISO_INSTANT.format(run.getCreatedAt()))
             .put("updatedAt", ISO_INSTANT.format(run.getUpdatedAt()));
     obj.put("nominalStartTime", run.getNominalStartTime().map(ISO_INSTANT::format).orElse(null));
     obj.put("nominalEndTime", run.getNominalEndTime().map(ISO_INSTANT::format).orElse(null));
-    obj.put("runState", run.getState().toString());
+    obj.put("state", run.getState().toString());
     obj.put("startedAt", run.getStartedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("endedAt", run.getEndedAt().map(ISO_INSTANT::format).orElse(null));
 
     final ObjectNode runArgs = MAPPER.createObjectNode();
     run.getArgs().forEach(runArgs::put);
-    obj.set("runArgs", runArgs);
+    obj.set("args", runArgs);
 
     return obj;
   }

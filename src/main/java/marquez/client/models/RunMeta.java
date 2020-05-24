@@ -14,8 +14,6 @@
 
 package marquez.client.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.Map;
@@ -28,27 +26,15 @@ import marquez.client.Utils;
 
 @EqualsAndHashCode
 @ToString
-@JsonPropertyOrder({
-  "runId",
-  "createdAt",
-  "updatedAt",
-  "nominalStartTime",
-  "nominalEndTime",
-  "runState",
-  "runArgs"
-})
 public class RunMeta {
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
-
-  @Getter
-  @JsonProperty("runArgs")
-  private final Map<String, String> args;
+  @Getter private final Map<String, String> args;
 
   public RunMeta(
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
-      @JsonProperty("runArgs") @Nullable final Map<String, String> args) {
+      @Nullable final Map<String, String> args) {
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;
     this.args = (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);

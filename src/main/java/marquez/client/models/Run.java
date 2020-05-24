@@ -14,7 +14,6 @@
 
 package marquez.client.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
 import java.util.Map;
@@ -29,30 +28,23 @@ import marquez.client.Utils;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class Run extends RunMeta {
-  @Getter
-  @JsonProperty("runId")
-  private final String id;
-
+  @Getter private final String id;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
-
-  @Getter
-  @JsonProperty("runState")
-  private final RunState state;
-
+  @Getter private final RunState state;
   @Nullable private final Instant startedAt;
   @Nullable private final Instant endedAt;
 
   public Run(
-      @JsonProperty("runId") @NonNull final String id,
+      @NonNull final String id,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
-      @JsonProperty("runState") @NonNull final RunState state,
+      @NonNull final RunState state,
       @Nullable final Instant startedAt,
       @Nullable final Instant endedAt,
-      @JsonProperty("runArgs") @Nullable final Map<String, String> args) {
+      @Nullable final Map<String, String> args) {
     super(nominalStartTime, nominalEndTime, args);
     this.id = id;
     this.createdAt = createdAt;
