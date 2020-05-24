@@ -20,10 +20,12 @@ set -e
 project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}"
 
-files="-f docker-compose.yml"
+compose_files="-f docker-compose.yml"
+args="-V --force-recreate"
 
 if [ "${1}" = "--local" ]; then
-  files+=" -f docker-compose.local.yml"
+  compose_files+=" -f docker-compose.local.yml"
+  args+=" --build"
 fi
 
-docker-compose down && docker-compose $files up -V --force-recreate --build
+docker-compose down && docker-compose $compose_files up $args
