@@ -20,7 +20,6 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode

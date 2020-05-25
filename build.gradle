@@ -13,6 +13,7 @@ plugins {
 }
 
 repositories {
+  mavenLocal()
   mavenCentral()
 }
 
@@ -40,7 +41,7 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
   testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
-  testCompile 'io.github.marquezproject:marquez-java:0.4.0-rc.1'
+  testCompile 'io.github.marquezproject:marquez-java:0.4.0-SNAPSHOT'
   testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:3.11.1'
