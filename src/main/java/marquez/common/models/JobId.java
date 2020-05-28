@@ -3,7 +3,7 @@ package marquez.common.models;
 import lombok.NonNull;
 import lombok.Value;
 
-/** ID for {@link Job}. */
+/** ID for {@code Job}. */
 @Value
 public class JobId {
   @NonNull NamespaceName namespaceName;

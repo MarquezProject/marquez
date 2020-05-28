@@ -20,27 +20,27 @@ public interface RunTransitionListener {
    * Typically called when a run is created or starts Can also be called as the job is running as
    * new inputs are discovered
    *
-   * @param jobInputUpdate
+   * @param jobInputUpdate - the job input update
    */
   void notify(JobInputUpdate jobInputUpdate);
 
   /**
    * Typically called when a run is Complete
    *
-   * @param jobOutputUpdate
+   * @param jobOutputUpdate - the job output update
    */
   void notify(JobOutputUpdate jobOutputUpdate);
 
   /**
    * Called when the job transitions from one state to another
    *
-   * @param transition
+   * @param transition - the run transition
    */
   void notify(RunTransition transition);
 
   /** Job input update event lists all the input versions for a given run of a job */
   @Value
-  public class JobInputUpdate {
+  class JobInputUpdate {
     @NonNull RunId runId;
     @NonNull RunMeta runMeta;
     @NonNull JobVersionId jobVersion;
@@ -49,28 +49,28 @@ public interface RunTransitionListener {
 
   /** metadata for a specific input of a job. the version of the dataset consumed */
   @Value
-  public class RunInput {
+  class RunInput {
     @NonNull DatasetVersionId datasetVersion;
     // TODO(Julien): add metadata attached to an input (ex: range predicate)
   }
 
   /** Job output update event */
   @Value
-  public class JobOutputUpdate {
+  class JobOutputUpdate {
     @NonNull RunId runId;
     @NonNull List<RunOutput> outputs;
   }
 
   /** metadata for a specific output of a job. the version of the dataset produced */
   @Value
-  public class RunOutput {
+  class RunOutput {
     @NonNull DatasetVersionId datasetVersion;
     // TODO(Julien): add metadata attached to an output (ex: output partition key(s))
   }
 
   /** run state transition event */
   @Value
-  public static class RunTransition {
+  class RunTransition {
     /** the unique ID of the run */
     @NonNull RunId runId;
     /** the new state */

@@ -95,7 +95,7 @@ public interface JobVersionDao extends SqlObject {
           + "WHERE uuid = :rowUuid")
   void updateLatestRun(UUID rowUuid, Instant updatedAt, UUID latestRunUuid);
 
-  static final String EXTENDED_SELECT =
+  String EXTENDED_SELECT =
       "SELECT j.namespace_uuid, jv.*, jc.uuid AS job_context_uuid, jc.context, n.name as namespace_name, j.name, "
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
