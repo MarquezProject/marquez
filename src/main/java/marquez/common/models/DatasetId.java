@@ -3,7 +3,7 @@ package marquez.common.models;
 import lombok.NonNull;
 import lombok.Value;
 
-/** ID for {@link Dataset}. */
+/** ID for {@code Dataset}. */
 @Value
 public class DatasetId {
   @NonNull NamespaceName namespaceName;

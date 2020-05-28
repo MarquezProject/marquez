@@ -73,14 +73,14 @@ public interface DatasetVersionDao {
           + "VALUES (:datasetVersionUuid, :datasetFieldUuid)")
   void updateFields(UUID datasetVersionUuid, UUID datasetFieldUuid);
 
-  public static final String SELECT =
+  String SELECT =
       "SELECT *, "
           + "ARRAY(SELECT dataset_field_uuid "
           + "      FROM dataset_versions_field_mapping "
           + "      WHERE dataset_version_uuid = uuid) AS field_uuids "
           + "FROM dataset_versions ";
 
-  public static final String EXTENDED_SELECT =
+  String EXTENDED_SELECT =
       "SELECT dv.*, d.name as dataset_name, n.name as namespace_name, "
           + "ARRAY(SELECT dataset_field_uuid "
           + "      FROM dataset_versions_field_mapping "
@@ -112,7 +112,7 @@ public interface DatasetVersionDao {
   /**
    * returns all Dataset Versions created by this run id
    *
-   * @param runId
+   * @param runId - the run ID
    */
   @SqlQuery(EXTENDED_SELECT + " WHERE run_uuid = :runId")
   @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)

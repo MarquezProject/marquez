@@ -13,12 +13,14 @@
  */
 
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import org.apache.tools.ant.filters.*
 
 plugins {
   id 'application'
   id 'checkstyle'
   id 'jacoco'
   id 'java'
+  id 'java-library'
   id 'maven-publish'
   id 'signing'
   id 'com.adarshr.test-logger' version '2.0.0'
@@ -104,11 +106,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
   from javadoc.destinationDir
 }
 
-signing {
-  required { isReleaseVersion }
-  sign publishing.publications.mavenJava
-}
-
 publishing {
   publications {
     mavenJava(MavenPublication) {
@@ -160,6 +157,11 @@ publishing {
       }
     }
   }
+}
+
+signing {
+  required { isReleaseVersion }
+  sign publishing.publications.mavenJava
 }
 
 mainClassName = 'marquez.MarquezApp'
