@@ -65,9 +65,9 @@ public class NamespaceService {
       final NamespaceMeta meta =
           new NamespaceMeta(
               OwnerName.ANONYMOUS,
-              "The default global namespace for job and dataset metadata "
+              "The default global namespace for dataset, job, and run metadata "
                   + "not belonging to a user-specified namespace.");
-      final Namespace namespace = createOrUpdate(NamespaceName.DEFAULT, meta);
+      createOrUpdate(NamespaceName.DEFAULT, meta);
     }
   }
 
@@ -142,16 +142,28 @@ public class NamespaceService {
     }
   }
 
-  public List<Namespace> getAll(int limit, int offset) throws MarquezServiceException {
+  public ImmutableList<Namespace> getAll(int limit, int offset) throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
+      final ImmutableList.Builder<Namespace> namespaces = ImmutableList.builder();
       final List<NamespaceRow> rows = namespaceDao.findAll(limit, offset);
-      final List<Namespace> namespaces = Mapper.toNamespaces(rows);
-      return ImmutableList.copyOf(namespaces);
+      for (final NamespaceRow row : rows) {
+        namespaces.add(toNamespace(row));
+      }
+      return namespaces.build();
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get namespaces.", e);
       throw new MarquezServiceException();
     }
+  }
+
+  static Namespace toNamespace(@NonNull final NamespaceRow row) {
+    return new Namespace(
+        NamespaceName.of(row.getName()),
+        row.getCreatedAt(),
+        row.getUpdatedAt(),
+        OwnerName.of(row.getCurrentOwnerName()),
+        row.getDescription().orElse(null));
   }
 }

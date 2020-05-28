@@ -22,14 +22,13 @@ import com.fasterxml.jackson.databind.util.StdConverter;
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
-import marquez.common.models.NamespaceName.NamespaceToString;
-import marquez.common.models.NamespaceName.StringToNamespace;
 
 @EqualsAndHashCode
 @ToString
-@JsonDeserialize(converter = StringToNamespace.class)
-@JsonSerialize(converter = NamespaceToString.class)
+@JsonDeserialize(converter = NamespaceName.FromValue.class)
+@JsonSerialize(converter = NamespaceName.ToValue.class)
 public final class NamespaceName {
   private static final int MIN_SIZE = 1;
   private static final int MAX_SIZE = 1024;
@@ -38,12 +37,13 @@ public final class NamespaceName {
 
   @Getter private final String value;
 
-  private NamespaceName(final String value) {
+  public NamespaceName(@NonNull final String value) {
     checkArgument(
         PATTERN.matcher(value).matches(),
-        "namespaces (%s) must contain only letters (a-z, A-Z), numbers (0-9), "
-            + "underscores (_) or dashes (-) with a maximum length of 1024 characters.",
-        value);
+        "namespaces '%s' must contain only letters (a-z, A-Z), numbers (0-9), "
+            + "underscores (_) or dashes (-) with a maximum length of %s characters.",
+        value,
+        MAX_SIZE);
     this.value = value;
   }
 
@@ -51,19 +51,19 @@ public final class NamespaceName {
     return new NamespaceName(value);
   }
 
-  public static final NamespaceName DEFAULT = NamespaceName.of("default");
-
-  public static class NamespaceToString extends StdConverter<NamespaceName, String> {
+  public static class FromValue extends StdConverter<String, NamespaceName> {
     @Override
-    public String convert(NamespaceName value) {
-      return value.getValue();
-    }
-  }
-
-  public static class StringToNamespace extends StdConverter<String, NamespaceName> {
-    @Override
-    public NamespaceName convert(String value) {
+    public NamespaceName convert(@NonNull String value) {
       return NamespaceName.of(value);
     }
   }
+
+  public static class ToValue extends StdConverter<NamespaceName, String> {
+    @Override
+    public String convert(@NonNull NamespaceName name) {
+      return name.getValue();
+    }
+  }
+
+  public static final NamespaceName DEFAULT = NamespaceName.of("default");
 }

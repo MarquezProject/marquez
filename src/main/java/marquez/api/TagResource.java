@@ -19,7 +19,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableSet;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -27,16 +28,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import marquez.api.mappers.Mapper;
-import marquez.api.models.TagsResponse;
+import lombok.Value;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Tag;
 
-@Slf4j
 @Path("/api/v1/tags")
-public final class TagResource {
+public class TagResource {
   private final TagService service;
 
   public TagResource(@NonNull final TagService service) {
@@ -52,9 +50,14 @@ public final class TagResource {
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final List<Tag> tags = service.getAll(limit, offset);
-    final TagsResponse response = Mapper.toTagsResponse(tags);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    final ImmutableSet<Tag> tags = service.getAll(limit, offset);
+    return Response.ok(new Tags(tags)).build();
+  }
+
+  @Value
+  static class Tags {
+    @NonNull
+    @JsonProperty("tags")
+    ImmutableSet<Tag> value;
   }
 }

@@ -14,16 +14,15 @@
 
 package marquez.common.models;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static marquez.common.base.MorePreconditions.checkNotBlank;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.Utils;
 import marquez.common.models.RunId.RunIdToUUID;
 import marquez.common.models.RunId.UUIDToRunId;
 
@@ -34,9 +33,11 @@ import marquez.common.models.RunId.UUIDToRunId;
 public class RunId {
   @Getter private final UUID value;
 
-  private RunId(final UUID value) {
-    checkNotNull(value, "UUID must not be null");
-    checkNotBlank(value.toString(), "UUID value must not be blank");
+  public RunId(final String valueAsString) {
+    this(Utils.toUuid(valueAsString));
+  }
+
+  public RunId(@NonNull final UUID value) {
     this.value = value;
   }
 

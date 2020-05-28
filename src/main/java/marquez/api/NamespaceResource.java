@@ -19,7 +19,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -31,21 +32,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Value;
 import marquez.api.exceptions.NamespaceNotFoundException;
-import marquez.api.mappers.Mapper;
-import marquez.api.models.NamespaceRequest;
-import marquez.api.models.NamespaceResponse;
-import marquez.api.models.NamespacesResponse;
 import marquez.common.models.NamespaceName;
 import marquez.service.NamespaceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
 
-@Slf4j
 @Path("/api/v1")
-public final class NamespaceResource {
+public class NamespaceResource {
   private final NamespaceService service;
 
   public NamespaceResource(@NonNull final NamespaceService service) {
@@ -60,15 +56,10 @@ public final class NamespaceResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
-      @PathParam("namespace") String namespaceString, @Valid NamespaceRequest request)
+      @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceMeta meta)
       throws MarquezServiceException {
-    log.debug("Request: {}", request);
-    final NamespaceName name = NamespaceName.of(namespaceString);
-    final NamespaceMeta meta = Mapper.toNamespaceMeta(request);
-    final Namespace namespace = service.createOrUpdate(name, meta);
-    final NamespaceResponse response = Mapper.toNamespaceResponse(namespace);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    final Namespace namespace = service.createOrUpdate(namespaceName, meta);
+    return Response.ok(namespace).build();
   }
 
   @Timed
@@ -77,16 +68,11 @@ public final class NamespaceResource {
   @GET
   @Path("/namespaces/{namespace}")
   @Produces(APPLICATION_JSON)
-  public Response get(@PathParam("namespace") String namespaceString)
+  public Response get(@PathParam("namespace") NamespaceName namespaceName)
       throws MarquezServiceException {
-    final NamespaceName name = NamespaceName.of(namespaceString);
-    final NamespaceResponse response =
-        service
-            .get(name)
-            .map(Mapper::toNamespaceResponse)
-            .orElseThrow(() -> new NamespaceNotFoundException(name));
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    final Namespace namespace =
+        service.get(namespaceName).orElseThrow(() -> new NamespaceNotFoundException(namespaceName));
+    return Response.ok(namespace).build();
   }
 
   @Timed
@@ -99,9 +85,14 @@ public final class NamespaceResource {
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final List<Namespace> namespaces = service.getAll(limit, offset);
-    final NamespacesResponse response = Mapper.toNamespacesResponse(namespaces);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    final ImmutableList<Namespace> namespaces = service.getAll(limit, offset);
+    return Response.ok(new Namespaces(namespaces)).build();
+  }
+
+  @Value
+  static class Namespaces {
+    @NonNull
+    @JsonProperty("namespaces")
+    ImmutableList<Namespace> value;
   }
 }

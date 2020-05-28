@@ -19,7 +19,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -31,21 +32,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Value;
 import marquez.api.exceptions.SourceNotFoundException;
-import marquez.api.mappers.Mapper;
-import marquez.api.models.SourceRequest;
-import marquez.api.models.SourceResponse;
-import marquez.api.models.SourcesResponse;
 import marquez.common.models.SourceName;
 import marquez.service.SourceService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
 
-@Slf4j
 @Path("/api/v1/sources")
-public final class SourceResource {
+public class SourceResource {
   private final SourceService service;
 
   public SourceResource(@NonNull final SourceService service) {
@@ -59,16 +55,10 @@ public final class SourceResource {
   @Path("{source}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
-  public Response createOrUpdate(
-      @PathParam("source") String sourceString, @Valid SourceRequest request)
+  public Response createOrUpdate(@PathParam("source") SourceName name, @Valid SourceMeta meta)
       throws MarquezServiceException {
-    log.debug("Request: {}", request);
-    final SourceName name = SourceName.of(sourceString);
-    final SourceMeta meta = Mapper.toSourceMeta(request);
     final Source source = service.createOrUpdate(name, meta);
-    final SourceResponse response = Mapper.toSourceResponse(source);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    return Response.ok(source).build();
   }
 
   @Timed
@@ -77,15 +67,9 @@ public final class SourceResource {
   @GET
   @Path("{source}")
   @Produces(APPLICATION_JSON)
-  public Response get(@PathParam("source") String sourceString) throws MarquezServiceException {
-    final SourceName name = SourceName.of(sourceString);
-    final SourceResponse response =
-        service
-            .get(name)
-            .map(Mapper::toSourceResponse)
-            .orElseThrow(() -> new SourceNotFoundException(name));
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+  public Response get(@PathParam("source") SourceName name) throws MarquezServiceException {
+    final Source source = service.get(name).orElseThrow(() -> new SourceNotFoundException(name));
+    return Response.ok(source).build();
   }
 
   @Timed
@@ -97,9 +81,14 @@ public final class SourceResource {
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset)
       throws MarquezServiceException {
-    final List<Source> sources = service.getAll(limit, offset);
-    final SourcesResponse response = Mapper.toSourcesResponse(sources);
-    log.debug("Response: {}", response);
-    return Response.ok(response).build();
+    final ImmutableList<Source> sources = service.getAll(limit, offset);
+    return Response.ok(new Sources(sources)).build();
+  }
+
+  @Value
+  static class Sources {
+    @NonNull
+    @JsonProperty("sources")
+    ImmutableList<Source> value;
   }
 }

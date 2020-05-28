@@ -14,48 +14,63 @@
 
 package marquez.service.models;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
+import marquez.common.models.DatasetId;
+import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 
-@Value
-public class Job {
-  @NonNull JobId id;
-  @NonNull JobType type;
-  @NonNull JobName name;
-  @NonNull Instant createdAt;
-  @NonNull Instant updatedAt;
-  @NonNull List<DatasetId> inputs;
-  @NonNull List<DatasetId> outputs;
-  @Nullable URL location;
-  @Nullable Map<String, String> context;
-  @Nullable String description;
-  @Nullable Run latestRun;
+@EqualsAndHashCode
+@ToString
+public final class Job {
+  @Getter private final JobId id;
+  @Getter private final JobType type;
+  @Getter private final JobName name;
+  @Getter private final Instant createdAt;
+  @Getter private final Instant updatedAt;
+  @Getter private final ImmutableSet<DatasetId> inputs;
+  @Getter private final ImmutableSet<DatasetId> outputs;
+  @Nullable private final URL location;
+  @Getter private final ImmutableMap<String, String> context;
+  @Nullable private final String description;
+  @Nullable private final Run latestRun;
 
-  public List<DatasetId> getInputs() {
-    return ImmutableList.copyOf(new ArrayList<>(inputs));
-  }
-
-  public List<DatasetId> getOutputs() {
-    return ImmutableList.copyOf(new ArrayList<>(outputs));
+  public Job(
+      @NonNull final JobId id,
+      @NonNull final JobType type,
+      @NonNull final JobName name,
+      @NonNull final Instant createdAt,
+      @NonNull final Instant updatedAt,
+      @NonNull final ImmutableSet<DatasetId> inputs,
+      @NonNull final ImmutableSet<DatasetId> outputs,
+      @Nullable final URL location,
+      @Nullable final ImmutableMap<String, String> context,
+      @Nullable final String description,
+      @Nullable final Run latestRun) {
+    this.id = id;
+    this.type = type;
+    this.name = name;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.inputs = inputs;
+    this.outputs = outputs;
+    this.location = location;
+    this.context = (context == null) ? ImmutableMap.of() : context;
+    this.description = description;
+    this.latestRun = latestRun;
   }
 
   public Optional<URL> getLocation() {
     return Optional.ofNullable(location);
-  }
-
-  public Map<String, String> getContext() {
-    return (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
   }
 
   public Optional<String> getDescription() {

@@ -26,29 +26,29 @@ import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
-@JsonDeserialize(converter = JobName.FromValue.class)
-@JsonSerialize(converter = JobName.ToValue.class)
-public final class JobName {
+@JsonDeserialize(converter = FieldName.FromValue.class)
+@JsonSerialize(converter = FieldName.ToValue.class)
+public final class FieldName {
   @Getter private final String value;
 
-  public JobName(@NonNull final String value) {
+  public FieldName(@NonNull final String value) {
     this.value = checkNotBlank(value, "value must not be blank");
   }
 
-  public static JobName of(final String value) {
-    return new JobName(value);
+  public static FieldName of(final String value) {
+    return new FieldName(value);
   }
 
-  public static class FromValue extends StdConverter<String, JobName> {
+  public static class FromValue extends StdConverter<String, FieldName> {
     @Override
-    public JobName convert(@NonNull String value) {
-      return JobName.of(value);
+    public FieldName convert(@NonNull String value) {
+      return FieldName.of(value);
     }
   }
 
-  public static class ToValue extends StdConverter<JobName, String> {
+  public static class ToValue extends StdConverter<FieldName, String> {
     @Override
-    public String convert(@NonNull JobName name) {
+    public String convert(@NonNull FieldName name) {
       return name.getValue();
     }
   }

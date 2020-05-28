@@ -16,16 +16,27 @@ package marquez.service.models;
 
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
-import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.Value;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-@Value
-public class RunMeta {
-  @Nullable Instant nominalStartTime;
-  @Nullable Instant nominalEndTime;
-  @Nullable Map<String, String> args;
+@EqualsAndHashCode
+@ToString
+public final class RunMeta {
+  @Nullable private final Instant nominalStartTime;
+  @Nullable private final Instant nominalEndTime;
+  @Getter private final ImmutableMap<String, String> args;
+
+  public RunMeta(
+      @Nullable final Instant nominalStartTime,
+      @Nullable final Instant nominalEndTime,
+      @Nullable final ImmutableMap<String, String> args) {
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
+    this.args = (args == null) ? ImmutableMap.of() : args;
+  }
 
   public Optional<Instant> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
@@ -33,9 +44,5 @@ public class RunMeta {
 
   public Optional<Instant> getNominalEndTime() {
     return Optional.ofNullable(nominalEndTime);
-  }
-
-  public Map<String, String> getArgs() {
-    return (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
   }
 }

@@ -18,11 +18,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
 import io.prometheus.client.Counter;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.SourceName;
+import marquez.common.models.SourceType;
 import marquez.db.SourceDao;
 import marquez.db.models.SourceRow;
 import marquez.service.exceptions.MarquezServiceException;
@@ -50,7 +52,7 @@ public class SourceService {
       throws MarquezServiceException {
     try {
       if (!exists(name)) {
-        log.info("No source with name '{}' found, creating...", name.getValue());
+        log.info("Source '{}' not found, creating...", name.getValue());
         final SourceRow newRow = Mapper.toSourceRow(name, meta);
         dao.insert(newRow);
         log.info("Successfully created source '{}' with meta: {}", name.getValue(), meta);
@@ -75,23 +77,36 @@ public class SourceService {
 
   public Optional<Source> get(@NonNull SourceName name) throws MarquezServiceException {
     try {
-      return dao.findBy(name.getValue()).map(Mapper::toSource);
+      return dao.findBy(name.getValue()).map(SourceService::toSource);
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get source '{}'.", name.getValue(), e);
       throw new MarquezServiceException();
     }
   }
 
-  public List<Source> getAll(int limit, int offset) throws MarquezServiceException {
+  public ImmutableList<Source> getAll(int limit, int offset) throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
+      final ImmutableList.Builder<Source> sources = ImmutableList.builder();
       final List<SourceRow> rows = dao.findAll(limit, offset);
-      final List<Source> sources = Mapper.toSources(rows);
-      return ImmutableList.copyOf(sources);
+      for (final SourceRow row : rows) {
+        sources.add(toSource(row));
+      }
+      return sources.build();
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to get sources.", e);
       throw new MarquezServiceException();
     }
+  }
+
+  static Source toSource(@NonNull final SourceRow row) {
+    return new Source(
+        SourceType.valueOf(row.getType()),
+        SourceName.of(row.getName()),
+        row.getCreatedAt(),
+        row.getUpdatedAt(),
+        URI.create(row.getConnectionUrl()),
+        row.getDescription().orElse(null));
   }
 }

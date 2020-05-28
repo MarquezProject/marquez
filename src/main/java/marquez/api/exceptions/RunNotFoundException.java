@@ -14,14 +14,15 @@
 
 package marquez.api.exceptions;
 
-import java.util.UUID;
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.ws.rs.NotFoundException;
+import marquez.common.models.RunId;
 
 public final class RunNotFoundException extends NotFoundException {
   private static final long serialVersionUID = 1L;
 
-  public RunNotFoundException(@Nullable final UUID id) {
-    super(String.format("Run '%s' not found.", id));
+  public RunNotFoundException(final RunId id) {
+    super(String.format("Run '%s' not found.", checkNotNull(id).getValue()));
   }
 }

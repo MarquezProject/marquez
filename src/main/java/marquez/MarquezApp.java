@@ -14,6 +14,7 @@
 
 package marquez;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
@@ -68,6 +69,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
         new SubstitutingSourceProvider(
             bootstrap.getConfigurationSourceProvider(),
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
+
+    bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 
   @Override
@@ -91,8 +94,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
   }
 
   public void registerResources(
-      @NonNull MarquezConfig config, @NonNull Environment env, @NonNull DataSource source)
-      throws MarquezException {
+      @NonNull MarquezConfig config, @NonNull Environment env, @NonNull DataSource source) {
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi =
         factory
@@ -104,7 +106,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
         MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
 
     log.debug("Registering resources...");
-    for (Object resource : context.getResources()) {
+    for (final Object resource : context.getResources()) {
       env.jersey().register(resource);
     }
   }

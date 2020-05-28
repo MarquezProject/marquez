@@ -16,8 +16,10 @@ package marquez.service.models;
 
 import static marquez.common.Utils.VERSION_JOINER;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
-import java.util.List;
+import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -29,49 +31,51 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
+import marquez.common.models.TagName;
 
 @EqualsAndHashCode
 @ToString
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type")
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = DbTableMeta.class, name = "DB_TABLE"),
+  @JsonSubTypes.Type(value = StreamMeta.class, name = "STREAM")
+})
 public abstract class DatasetMeta {
   @Getter private final DatasetType type;
   @Getter private final DatasetName physicalName;
   @Getter private final SourceName sourceName;
-  @Nullable private final List<Field> fields;
-  @Nullable private final List<String> tags;
+  @Getter private final ImmutableList<Field> fields;
+  @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final String description;
-  @Nullable private final UUID runId;
+  @Nullable private final RunId runId;
 
   public DatasetMeta(
       @NonNull final DatasetType type,
       @NonNull final DatasetName physicalName,
       @NonNull final SourceName sourceName,
-      @Nullable final List<Field> fields,
-      @Nullable final List<String> tags,
+      @Nullable final ImmutableList<Field> fields,
+      @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final UUID runId) {
+      @Nullable final RunId runId) {
     this.type = type;
     this.physicalName = physicalName;
     this.sourceName = sourceName;
-    this.fields = fields;
-    this.tags = tags;
+    this.fields = (fields == null) ? ImmutableList.of() : fields;
+    this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.description = description;
     this.runId = runId;
-  }
-
-  public List<Field> getFields() {
-    return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
-  }
-
-  public List<String> getTags() {
-    return (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
   }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
   }
 
-  public Optional<UUID> getRunId() {
+  public Optional<RunId> getRunId() {
     return Optional.ofNullable(runId);
   }
 

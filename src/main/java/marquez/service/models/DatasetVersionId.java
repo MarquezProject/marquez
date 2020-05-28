@@ -19,10 +19,10 @@ import lombok.Value;
 import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 
-/** The unique ID of a dataset version in the lineage graph */
+/** Version ID for {@link Dataset}. */
 @Value
 public class DatasetVersionId {
-  @NonNull NamespaceName namespace;
+  @NonNull NamespaceName namespaceName;
   @NonNull DatasetName datasetName;
   @NonNull Version version;
 }

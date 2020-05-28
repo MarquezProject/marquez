@@ -16,9 +16,11 @@ package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Iterables.toArray;
-import static marquez.common.base.MorePreconditions.checkNotBlank;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import io.prometheus.client.Counter;
 import java.time.Instant;
 import java.util.List;
@@ -30,7 +32,9 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
+import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.TagName;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
@@ -103,7 +107,14 @@ public class DatasetService {
         final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
         final SourceRow sourceRow = sourceDao.findBy(datasetMeta.getSourceName().getValue()).get();
         final List<UUID> tagUuids =
-            tagDao.findAllIn(toArray(datasetMeta.getTags(), String.class)).stream()
+            tagDao
+                .findAllIn(
+                    toArray(
+                        datasetMeta.getTags().stream()
+                            .map(TagName::getValue)
+                            .collect(toImmutableList()),
+                        String.class))
+                .stream()
                 .map(TagRow::getUuid)
                 .collect(toImmutableList());
         final DatasetRow newDatasetRow =
@@ -178,7 +189,12 @@ public class DatasetService {
   /** Creates a {@link DatasetFieldRow} instance from the given {@link Field}. */
   private DatasetFieldRow toDatasetFieldRow(@NonNull UUID datasetUuid, @NonNull Field field) {
     final List<UUID> tagUuids =
-        tagDao.findAllIn(toArray(field.getTags(), String.class)).stream()
+        tagDao
+            .findAllIn(
+                toArray(
+                    field.getTags().stream().map(TagName::getValue).collect(toImmutableList()),
+                    String.class))
+            .stream()
             .map(TagRow::getUuid)
             .collect(toImmutableList());
     return Mapper.toDatasetFieldRow(datasetUuid, field, tagUuids);
@@ -197,11 +213,11 @@ public class DatasetService {
   public boolean exists(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
-      @NonNull String fieldName)
+      @NonNull FieldName fieldName)
       throws MarquezServiceException {
-    checkNotBlank(fieldName, "fieldName must not be blank");
     try {
-      return fieldDao.exists(namespaceName.getValue(), datasetName.getValue(), fieldName);
+      return fieldDao.exists(
+          namespaceName.getValue(), datasetName.getValue(), fieldName.getValue());
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to check dataset '{}'.", datasetName.getValue(), e);
       throw new MarquezServiceException();
@@ -219,7 +235,7 @@ public class DatasetService {
     }
   }
 
-  public List<Dataset> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
+  public ImmutableList<Dataset> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
       throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
@@ -235,15 +251,15 @@ public class DatasetService {
 
   /** Creates a {@link Dataset} instance from the given {@link ExtendedDatasetRow}. */
   private Dataset toDataset(@NonNull ExtendedDatasetRow datasetRow) {
-    final List<String> tags =
+    final ImmutableSet<TagName> tags =
         tagDao.findAllIn(toArray(datasetRow.getTagUuids(), UUID.class)).stream()
-            .map(TagRow::getName)
-            .collect(toImmutableList());
+            .map(row -> TagName.of(row.getName()))
+            .collect(toImmutableSet());
     final DatasetVersionRow versionRow =
         versionDao
             .find(datasetRow.getType(), datasetRow.getCurrentVersionUuid().orElse(null))
             .get();
-    final List<Field> fields =
+    final ImmutableList<Field> fields =
         fieldDao.findAllIn(toArray(versionRow.getFieldUuids(), UUID.class)).stream()
             .map(this::toField)
             .collect(toImmutableList());
@@ -252,23 +268,23 @@ public class DatasetService {
 
   /** Creates a {@link Field} instance from the given {@link DatasetFieldRow}. */
   private Field toField(@NonNull DatasetFieldRow fieldRow) {
-    final List<String> tags =
+    final ImmutableSet<TagName> tags =
         tagDao.findAllIn(toArray(fieldRow.getTagUuids(), UUID.class)).stream()
-            .map(TagRow::getName)
-            .collect(toImmutableList());
+            .map(row -> TagName.of(row.getName()))
+            .collect(toImmutableSet());
     return Mapper.toField(fieldRow, tags);
   }
 
   public Dataset tagWith(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
-      @NonNull String tagName)
+      @NonNull TagName tagName)
       throws MarquezServiceException {
-    checkNotBlank(tagName, "tagName must not be blank");
     try {
       final ExtendedDatasetRow datasetRow =
           datasetDao.find(namespaceName.getValue(), datasetName.getValue()).get();
-      final TagRow tagRow = tagDao.findBy(tagName.toUpperCase(Locale.getDefault())).get();
+      final TagRow tagRow =
+          tagDao.findBy(tagName.getValue().toUpperCase(Locale.getDefault())).get();
       final Instant taggedAt = Instant.now();
       datasetDao.updateTags(datasetRow.getUuid(), tagRow.getUuid(), taggedAt);
       log.info("Successfully tagged dataset '{}' with '{}'.", datasetName.getValue(), tagName);
@@ -282,16 +298,16 @@ public class DatasetService {
   public Dataset tagWith(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
-      @NonNull String fieldName,
-      @NonNull String tagName)
+      @NonNull FieldName fieldName,
+      @NonNull TagName tagName)
       throws MarquezServiceException {
-    checkNotBlank(fieldName, "fieldName must not be blank");
-    checkNotBlank(tagName, "tagName must not be blank");
     try {
       final ExtendedDatasetRow datasetRow =
           datasetDao.find(namespaceName.getValue(), datasetName.getValue()).get();
-      final DatasetFieldRow fieldRow = fieldDao.find(datasetRow.getUuid(), fieldName).get();
-      final TagRow tagRow = tagDao.findBy(tagName.toUpperCase(Locale.getDefault())).get();
+      final DatasetFieldRow fieldRow =
+          fieldDao.find(datasetRow.getUuid(), fieldName.getValue()).get();
+      final TagRow tagRow =
+          tagDao.findBy(tagName.getValue().toUpperCase(Locale.getDefault())).get();
       final Instant taggedAt = Instant.now();
       fieldDao.updateTags(fieldRow.getUuid(), tagRow.getUuid(), taggedAt);
       log.info(

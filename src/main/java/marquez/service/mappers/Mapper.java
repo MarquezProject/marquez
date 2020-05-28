@@ -15,29 +15,38 @@
 package marquez.service.mappers;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.common.Utils;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
+import marquez.common.models.FieldName;
 import marquez.common.models.FieldType;
+import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
+import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.common.models.TagName;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -56,12 +65,10 @@ import marquez.db.models.SourceRow;
 import marquez.db.models.StreamVersionRow;
 import marquez.db.models.TagRow;
 import marquez.service.models.Dataset;
-import marquez.service.models.DatasetId;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTable;
 import marquez.service.models.DbTableMeta;
 import marquez.service.models.Job;
-import marquez.service.models.JobId;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
@@ -148,9 +155,9 @@ public final class Mapper {
 
   public static Dataset toDataset(
       @NonNull final ExtendedDatasetRow row,
-      @NonNull final List<String> tags,
+      @NonNull final ImmutableSet<TagName> tags,
       @NonNull final DatasetVersionRow versionRow,
-      @NonNull final List<Field> fields) {
+      @NonNull final ImmutableList<Field> fields) {
     final DatasetType type = DatasetType.valueOf(row.getType());
     switch (type) {
       case DB_TABLE:
@@ -164,8 +171,8 @@ public final class Mapper {
 
   private static Dataset toDbTable(
       @NonNull final ExtendedDatasetRow row,
-      @NonNull final List<String> tags,
-      @NonNull final List<Field> fields) {
+      @NonNull final ImmutableSet<TagName> tags,
+      @NonNull final ImmutableList<Field> fields) {
     return new DbTable(
         new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName())),
         DatasetName.of(row.getName()),
@@ -181,9 +188,9 @@ public final class Mapper {
 
   private static Dataset toStream(
       @NonNull final ExtendedDatasetRow row,
-      @NonNull final List<String> tags,
+      @NonNull final ImmutableSet<TagName> tags,
       @NonNull final DatasetVersionRow versionRow,
-      @NonNull final List<Field> fields) {
+      @NonNull final ImmutableList<Field> fields) {
     return new Stream(
         new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName())),
         DatasetName.of(row.getName()),
@@ -230,9 +237,12 @@ public final class Mapper {
   }
 
   public static Field toField(
-      @NonNull final DatasetFieldRow row, @NonNull final List<String> tags) {
+      @NonNull final DatasetFieldRow row, @NonNull final ImmutableSet<TagName> tags) {
     return new Field(
-        row.getName(), FieldType.valueOf(row.getType()), tags, row.getDescription().orElse(null));
+        FieldName.of(row.getName()),
+        FieldType.valueOf(row.getType()),
+        tags,
+        row.getDescription().orElse(null));
   }
 
   public static DatasetFieldRow toDatasetFieldRow(
@@ -244,7 +254,7 @@ public final class Mapper {
         now,
         now,
         datasetUuid,
-        field.getName(),
+        field.getName().getValue(),
         tagUuids,
         field.getDescription().orElse(null));
   }
@@ -263,7 +273,7 @@ public final class Mapper {
         datasetUuid,
         version,
         fieldUuids,
-        meta.getRunId().orElse(null));
+        meta.getRunId().map(RunId::getValue).orElse(null));
   }
 
   private static DatasetVersionRow toStreamVersionRow(
@@ -277,46 +287,35 @@ public final class Mapper {
         datasetUuid,
         version,
         fieldUuids,
-        meta.getRunId().orElse(null),
+        meta.getRunId().map(RunId::getValue).orElse(null),
         ((StreamMeta) meta).getSchemaLocation().toString());
   }
 
   public static Tag toTag(@NonNull final TagRow row) {
-    return new Tag(row.getName(), row.getDescription().orElse(null));
+    return new Tag(TagName.of(row.getName()), row.getDescription().orElse(null));
   }
 
   public static List<Tag> toTags(@NonNull final List<TagRow> rows) {
     return rows.stream().map(Mapper::toTag).collect(toImmutableList());
   }
 
-  public static TagRow toTagRow(@NonNull final Tag tag) {
-    final Instant now = newTimestamp();
-    return new TagRow(
-        newRowUuid(),
-        now,
-        now,
-        tag.getName().toUpperCase(Locale.getDefault()),
-        tag.getDescription().orElse(null));
-  }
-
   public static Job toJob(
       @NonNull final JobRow row,
-      @NonNull final List<DatasetId> inputs,
-      @NonNull final List<DatasetId> outputs,
+      @NonNull final ImmutableSet<DatasetId> inputs,
+      @NonNull final ImmutableSet<DatasetId> outputs,
       @Nullable final String locationString,
       @NonNull final String contextString,
       @Nullable final ExtendedRunRow runRow) {
-    JobName jobName = JobName.of(row.getName());
     return new Job(
-        Mapper.toJobId(row),
+        toJobId(row),
         JobType.valueOf(row.getType()),
-        jobName,
+        JobName.of(row.getName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
         inputs,
         outputs,
         (locationString == null) ? null : Utils.toUrl(locationString),
-        Utils.fromJson(contextString, new TypeReference<Map<String, String>>() {}),
+        Utils.fromJson(contextString, new TypeReference<ImmutableMap<String, String>>() {}),
         row.getDescription().orElse(null),
         (runRow == null) ? null : toRun(runRow));
   }
@@ -365,8 +364,12 @@ public final class Mapper {
   }
 
   public static Run toRun(@NonNull final ExtendedRunRow row) {
+    Optional<Long> durationMs =
+        row.getEndedAt()
+            .flatMap(
+                endedAt -> row.getStartedAt().map(startedAt -> startedAt.until(endedAt, MILLIS)));
     return new Run(
-        row.getUuid(),
+        RunId.of(row.getUuid()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
         row.getNominalStartTime().orElse(null),
@@ -374,7 +377,8 @@ public final class Mapper {
         RunState.valueOf(row.getCurrentRunState().get()),
         row.getStartedAt().orElse(null),
         row.getEndedAt().orElse(null),
-        Utils.fromJson(row.getArgs(), new TypeReference<Map<String, String>>() {}));
+        durationMs.orElse(null),
+        Utils.fromJson(row.getArgs(), new TypeReference<ImmutableMap<String, String>>() {}));
   }
 
   public static List<Run> toRuns(@NonNull final List<ExtendedRunRow> rows) {

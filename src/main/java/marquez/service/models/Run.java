@@ -16,25 +16,51 @@ package marquez.service.models;
 
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
+import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 
-@Value
-public class Run {
-  @NonNull UUID id;
-  @NonNull Instant createdAt;
-  @NonNull Instant updatedAt;
-  @Nullable Instant nominalStartTime;
-  @Nullable Instant nominalEndTime;
-  @NonNull RunState state;
-  @Nullable Instant startedAt;
-  @Nullable Instant endedAt;
-  @Nullable Map<String, String> args;
+@EqualsAndHashCode
+@ToString
+public final class Run {
+  @Getter private final RunId id;
+  @Getter private final Instant createdAt;
+  @Getter private final Instant updatedAt;
+  @Nullable private final Instant nominalStartTime;
+  @Nullable private final Instant nominalEndTime;
+  @Getter private final RunState state;
+  @Nullable private final Instant startedAt;
+  @Nullable private final Instant endedAt;
+  @Nullable private final Long durationMs;
+  @Getter private final ImmutableMap<String, String> args;
+
+  public Run(
+      @NonNull final RunId id,
+      @NonNull final Instant createdAt,
+      @NonNull final Instant updatedAt,
+      @Nullable final Instant nominalStartTime,
+      @Nullable final Instant nominalEndTime,
+      @NonNull final RunState state,
+      @Nullable final Instant startedAt,
+      @Nullable final Instant endedAt,
+      @Nullable final Long durationMs,
+      @Nullable final ImmutableMap<String, String> args) {
+    this.id = id;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
+    this.state = state;
+    this.startedAt = startedAt;
+    this.endedAt = endedAt;
+    this.durationMs = durationMs;
+    this.args = (args == null) ? ImmutableMap.of() : args;
+  }
 
   public Optional<Instant> getNominalStartTime() {
     return Optional.ofNullable(nominalStartTime);
@@ -52,7 +78,7 @@ public class Run {
     return Optional.ofNullable(endedAt);
   }
 
-  public Map<String, String> getArgs() {
-    return (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
+  public Optional<Long> getDurationMs() {
+    return Optional.ofNullable(durationMs);
   }
 }

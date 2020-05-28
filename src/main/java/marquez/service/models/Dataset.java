@@ -14,22 +14,34 @@
 
 package marquez.service.models;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 import marquez.common.models.SourceName;
+import marquez.common.models.TagName;
 
 @EqualsAndHashCode
 @ToString
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type")
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = DbTable.class, name = "DB_TABLE"),
+  @JsonSubTypes.Type(value = Stream.class, name = "STREAM")
+})
 public abstract class Dataset {
   @Getter private final DatasetId id;
   @Getter private final DatasetType type;
@@ -38,8 +50,8 @@ public abstract class Dataset {
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final SourceName sourceName;
-  @Nullable private final List<Field> fields;
-  @Nullable private final List<String> tags;
+  @Getter private final ImmutableList<Field> fields;
+  @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
 
@@ -51,8 +63,8 @@ public abstract class Dataset {
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
       @NonNull final SourceName sourceName,
-      @Nullable final List<Field> fields,
-      @Nullable final List<String> tags,
+      @Nullable final ImmutableList<Field> fields,
+      @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description) {
     this.id = id;
@@ -62,18 +74,10 @@ public abstract class Dataset {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.sourceName = sourceName;
-    this.fields = fields;
-    this.tags = tags;
+    this.fields = (fields == null) ? ImmutableList.of() : fields;
+    this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
-  }
-
-  public List<Field> getFields() {
-    return (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
-  }
-
-  public List<String> getTags() {
-    return (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
   }
 
   public Optional<Instant> getLastModifiedAt() {

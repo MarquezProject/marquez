@@ -15,47 +15,19 @@
 package marquez.common.models;
 
 public enum RunState {
-  NEW {
-    @Override
-    public boolean isComplete() {
-      return false;
-    }
-  },
-  RUNNING {
-    @Override
-    public boolean isComplete() {
-      return false;
-    }
-
-    @Override
-    public boolean isStarting() {
-      return true;
-    }
-  },
-  COMPLETED {
-    @Override
-    public boolean isComplete() {
-      return true;
-    }
-  },
-  ABORTED {
-    @Override
-    public boolean isComplete() {
-      return false;
-    }
-  },
-  FAILED {
-    @Override
-    public boolean isComplete() {
-      return false;
-    }
-  };
+  NEW,
+  RUNNING,
+  COMPLETED,
+  ABORTED,
+  FAILED;
 
   /** Returns true if this state is complete. */
-  public abstract boolean isComplete();
+  public boolean isComplete() {
+    return this == COMPLETED;
+  }
 
-  /** Returns true if this state is Running. */
+  /** Returns true if this state is running. */
   public boolean isStarting() {
-    return false;
+    return this == RUNNING;
   }
 }

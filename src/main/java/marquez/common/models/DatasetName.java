@@ -21,18 +21,17 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
-import marquez.common.models.DatasetName.DatasetToString;
-import marquez.common.models.DatasetName.StringToDataset;
 
 @EqualsAndHashCode
 @ToString
-@JsonDeserialize(converter = StringToDataset.class)
-@JsonSerialize(converter = DatasetToString.class)
+@JsonDeserialize(converter = DatasetName.FromValue.class)
+@JsonSerialize(converter = DatasetName.ToValue.class)
 public final class DatasetName {
   @Getter private final String value;
 
-  private DatasetName(final String value) {
+  public DatasetName(@NonNull final String value) {
     this.value = checkNotBlank(value, "value must not be blank");
   }
 
@@ -40,17 +39,17 @@ public final class DatasetName {
     return new DatasetName(value);
   }
 
-  public static class DatasetToString extends StdConverter<DatasetName, String> {
+  public static class FromValue extends StdConverter<String, DatasetName> {
     @Override
-    public String convert(DatasetName value) {
-      return value.getValue();
+    public DatasetName convert(@NonNull String value) {
+      return DatasetName.of(value);
     }
   }
 
-  public static class StringToDataset extends StdConverter<String, DatasetName> {
+  public static class ToValue extends StdConverter<DatasetName, String> {
     @Override
-    public DatasetName convert(String value) {
-      return DatasetName.of(value);
+    public String convert(@NonNull DatasetName name) {
+      return name.getValue();
     }
   }
 }

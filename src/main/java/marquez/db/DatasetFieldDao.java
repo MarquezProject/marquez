@@ -66,10 +66,10 @@ public interface DatasetFieldDao extends SqlObject {
   @SqlQuery(
       "SELECT EXISTS ("
           + "SELECT 1 FROM dataset_fields AS df "
-          + "INNER JOIN namespaces AS n "
-          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
           + "INNER JOIN datasets AS d "
           + "  ON (d.uuid = df.dataset_uuid AND d.name = :datasetName) "
+          + "INNER JOIN namespaces AS n "
+          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
           + "WHERE df.name = :name)")
   boolean exists(String namespaceName, String datasetName, String name);
 

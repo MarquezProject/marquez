@@ -14,33 +14,55 @@
 
 package marquez.common.models;
 
-import static marquez.common.base.MorePreconditions.checkNotBlank;
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.google.common.collect.ImmutableList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 
-@Value
-public class Field {
-  String name;
-  FieldType type;
-  @Getter @Nullable List<String> tags;
-  @Nullable String description;
+@EqualsAndHashCode
+@ToString
+public final class Field {
+  @JsonUnwrapped
+  @JsonProperty(access = READ_ONLY)
+  @Getter
+  private final FieldName name;
+
+  @Getter private final FieldType type;
+  @Getter private final ImmutableSet<TagName> tags;
+  @Nullable private final String description;
 
   @JsonCreator
   public Field(
-      @NonNull final String name,
+      @JsonProperty("name") final String nameAsString,
+      @JsonProperty("type") final String typeAsString,
+      @JsonProperty("tags") final ImmutableSet<String> tagsAsString,
+      final String description) {
+    this(
+        FieldName.of(nameAsString),
+        FieldType.valueOf(typeAsString),
+        (tagsAsString == null)
+            ? ImmutableSet.of()
+            : tagsAsString.stream().map(TagName::of).collect(toImmutableSet()),
+        description);
+  }
+
+  public Field(
+      @NonNull final FieldName name,
       @NonNull final FieldType type,
-      @Nullable final List<String> tags,
+      @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description) {
-    this.name = checkNotBlank(name);
+    this.name = name;
     this.type = type;
-    this.tags = (tags == null) ? ImmutableList.of() : ImmutableList.copyOf(tags);
+    this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.description = description;
   }
 

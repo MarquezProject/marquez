@@ -1,6 +1,8 @@
 package marquez;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
@@ -27,6 +29,7 @@ import marquez.db.TagDao;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.RunTransitionListener;
 import marquez.service.SourceService;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
@@ -65,7 +68,12 @@ public final class MarquezContext {
 
   @Getter private final List<Object> resources;
 
-  private MarquezContext(@NonNull final Jdbi jdbi, @NonNull final List<Tag> tags)
+  private final List<RunTransitionListener> runTransitionListeners;
+
+  private MarquezContext(
+      @NonNull final Jdbi jdbi,
+      @NonNull final ImmutableSet<Tag> tags,
+      @NonNull final List<RunTransitionListener> runTransitionListeners)
       throws MarquezServiceException {
     this.namespaceDao = jdbi.onDemand(NamespaceDao.class);
     this.ownerDao = jdbi.onDemand(OwnerDao.class);
@@ -82,6 +90,8 @@ public final class MarquezContext {
     this.runStateDao = jdbi.onDemand(RunStateDao.class);
     this.tagDao = jdbi.onDemand(TagDao.class);
 
+    this.runTransitionListeners = runTransitionListeners;
+
     this.namespaceService = new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
     this.sourceService = new SourceService(sourceDao);
     this.datasetService =
@@ -97,7 +107,8 @@ public final class MarquezContext {
             jobContextDao,
             runDao,
             runArgsDao,
-            runStateDao);
+            runStateDao,
+            runTransitionListeners);
     this.tagService = new TagService(tagDao);
     this.tagService.init(tags);
 
@@ -119,16 +130,22 @@ public final class MarquezContext {
             serviceExceptionMapper);
   }
 
+  public void registerListener(@NonNull RunTransitionListener listener) {
+    runTransitionListeners.add(listener);
+  }
+
   public static Builder builder() {
     return new Builder();
   }
 
   public static class Builder {
     private Jdbi jdbi;
-    private List<Tag> tags;
+    private ImmutableSet<Tag> tags;
+    private List<RunTransitionListener> runTransitionListeners;
 
     Builder() {
-      this.tags = ImmutableList.of();
+      this.tags = ImmutableSet.of();
+      this.runTransitionListeners = Lists.newArrayList();
     }
 
     public Builder jdbi(@NonNull Jdbi jdbi) {
@@ -136,13 +153,23 @@ public final class MarquezContext {
       return this;
     }
 
-    public Builder tags(@NonNull List<Tag> tags) {
-      this.tags = ImmutableList.copyOf(tags);
+    public Builder tags(@NonNull ImmutableSet<Tag> tags) {
+      this.tags = tags;
+      return this;
+    }
+
+    public Builder runTransitionListener(@NonNull RunTransitionListener runTransitionListener) {
+      return runTransitionListeners(ImmutableList.of(runTransitionListener));
+    }
+
+    public Builder runTransitionListeners(
+        @NonNull List<RunTransitionListener> runTransitionListeners) {
+      this.runTransitionListeners = ImmutableList.copyOf(runTransitionListeners);
       return this;
     }
 
     public MarquezContext build() throws MarquezServiceException {
-      return new MarquezContext(jdbi, tags);
+      return new MarquezContext(jdbi, tags, runTransitionListeners);
     }
   }
 }

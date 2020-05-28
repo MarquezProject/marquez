@@ -1,75 +1,59 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package marquez;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static javax.ws.rs.core.HttpHeaders.LOCATION;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static marquez.api.models.ModelGenerator.EMPTY_RUN_REQUEST;
-import static marquez.api.models.ModelGenerator.newDbTableRequestWith;
-import static marquez.api.models.ModelGenerator.newJobRequestV1With;
-import static marquez.api.models.ModelGenerator.newJobRequestV2With;
-import static marquez.api.models.ModelGenerator.newNamespaceRequest;
-import static marquez.api.models.ModelGenerator.newSourceRequest;
-import static marquez.api.models.ModelGenerator.newSourceRequestWith;
-import static marquez.api.models.ModelGenerator.newStreamRequestWith;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.time.Instant.EPOCH;
+import static marquez.common.models.ModelGenerator.newConnectionUrl;
+import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
+import static marquez.common.models.ModelGenerator.newContext;
 import static marquez.common.models.ModelGenerator.newDatasetName;
-import static marquez.common.models.ModelGenerator.newDatasetNames;
-import static marquez.common.models.ModelGenerator.newFields;
+import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newFieldName;
+import static marquez.common.models.ModelGenerator.newFieldType;
 import static marquez.common.models.ModelGenerator.newJobName;
+import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.common.models.ModelGenerator.newOwnerName;
 import static marquez.common.models.ModelGenerator.newSourceName;
-import static marquez.common.models.ModelGenerator.newTags;
-import static marquez.common.models.RunState.COMPLETED;
-import static marquez.common.models.RunState.RUNNING;
+import static marquez.common.models.ModelGenerator.newSourceType;
+import static marquez.service.models.ModelGenerator.newSchemaLocation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import java.net.URI;
-import java.time.Instant;
+import java.net.URL;
 import java.util.List;
-import java.util.Map;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
-import marquez.api.models.DatasetRequest;
-import marquez.api.models.DatasetResponse;
-import marquez.api.models.DatasetsResponse;
-import marquez.api.models.DbTableRequest;
-import marquez.api.models.DbTableResponse;
-import marquez.api.models.JobResponse;
-import marquez.api.models.JobsResponse;
-import marquez.api.models.NamespaceResponse;
-import marquez.api.models.NamespacesResponse;
-import marquez.api.models.RunsResponse;
-import marquez.api.models.SourceResponse;
-import marquez.api.models.SourcesResponse;
-import marquez.api.models.StreamResponse;
-import marquez.common.models.DatasetName;
-import marquez.common.models.Field;
-import marquez.common.models.JobName;
-import marquez.common.models.NamespaceName;
-import marquez.common.models.SourceName;
+import java.util.Optional;
+import java.util.Set;
+import marquez.client.MarquezClient;
+import marquez.client.Utils;
+import marquez.client.models.DatasetId;
+import marquez.client.models.DbTable;
+import marquez.client.models.DbTableMeta;
+import marquez.client.models.Field;
+import marquez.client.models.Job;
+import marquez.client.models.JobId;
+import marquez.client.models.JobMeta;
+import marquez.client.models.JobType;
+import marquez.client.models.Namespace;
+import marquez.client.models.NamespaceMeta;
+import marquez.client.models.Run;
+import marquez.client.models.RunMeta;
+import marquez.client.models.RunState;
+import marquez.client.models.Source;
+import marquez.client.models.SourceMeta;
+import marquez.client.models.Stream;
+import marquez.client.models.StreamMeta;
+import marquez.client.models.Tag;
 import marquez.common.models.SourceType;
-import marquez.service.models.DatasetId;
-import marquez.service.models.JobId;
+import marquez.db.JdbiRuleInit;
+import org.jdbi.v3.testing.JdbiRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -85,6 +69,8 @@ public class MarquezAppIntegrationTest {
     DB.start();
   }
 
+  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
+
   @ClassRule
   public static final DropwizardAppRule<MarquezConfig> APP =
       new DropwizardAppRule<>(
@@ -94,468 +80,380 @@ public class MarquezAppIntegrationTest {
           ConfigOverride.config("db.user", DB.getUsername()),
           ConfigOverride.config("db.password", DB.getPassword()));
 
-  private static final String BASE_API_PATH = "/api/v1";
-  private final URI baseUri = URI.create("http://localhost:" + APP.getLocalPort() + BASE_API_PATH);
+  // TAGS
+  private static final Tag PII = new Tag("PII", "Personally identifiable information");
+  private static final Tag SENSITIVE = new Tag("SENSITIVE", "Contains sensitive information");
 
-  private static final int HTTP_200 = 200;
-  private static final int HTTP_201 = 201;
+  // NAMESPACE
+  private static final String NAMESPACE_NAME = newNamespaceName().getValue();
+  private static final String OWNER_NAME = newOwnerName().getValue();
+  private static final String NAMESPACE_DESCRIPTION = newDescription();
 
-  private static NamespaceName defaultNamespace = NamespaceName.of("default");
+  // SOURCE
+  private static final String SOURCE_TYPE = newSourceType().name();
+  private static final String SOURCE_NAME = newSourceName().getValue();
+  private static final URI CONNECTION_URL = newConnectionUrl();
+  private static final String SOURCE_DESCRIPTION = newDescription();
+
+  // DB TABLE DATASET
+  private static final String DB_TABLE_SOURCE_TYPE = SourceType.POSTGRESQL.name();
+  private static final String DB_TABLE_SOURCE_NAME = newSourceName().getValue();
+  private static final URI DB_TABLE_CONNECTION_URL = newConnectionUrlFor(SourceType.POSTGRESQL);
+  private static final String DB_TABLE_SOURCE_DESCRIPTION = newDescription();
+  private static final DatasetId DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
+  private static final String DB_TABLE_NAME = DB_TABLE_ID.getName();
+  private static final String DB_TABLE_PHYSICAL_NAME = DB_TABLE_NAME;
+  private static final String DB_TABLE_DESCRIPTION = newDescription();
+  private static final ImmutableList<Field> DB_TABLE_FIELDS =
+      ImmutableList.of(newFieldWith(SENSITIVE.getName()), newField());
+  private static final Set<String> DB_TABLE_TAGS = ImmutableSet.of(PII.getName());
+
+  // STREAM DATASET
+  private static final String STREAM_SOURCE_TYPE = SourceType.KAFKA.name();
+  private static final String STREAM_SOURCE_NAME = newSourceName().getValue();
+  private static final URI STREAM_CONNECTION_URL = newConnectionUrlFor(SourceType.KAFKA);
+  private static final String STREAM_SOURCE_DESCRIPTION = newDescription();
+  private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
+  private static final String STREAM_NAME = STREAM_ID.getName();
+  private static final String STREAM_PHYSICAL_NAME = STREAM_NAME;
+  private static final URL STREAM_SCHEMA_LOCATION = newSchemaLocation();
+  private static final String STREAM_DESCRIPTION = newDescription();
+
+  // JOB
+  private static final String JOB_NAME = newJobName().getValue();
+  private static final JobId JOB_ID = new JobId(NAMESPACE_NAME, JOB_NAME);
+  private static final JobType JOB_TYPE = JobType.BATCH;
+  private static final URL JOB_LOCATION = newLocation();
+  private static final ImmutableMap<String, String> JOB_CONTEXT = newContext();
+  private static final String JOB_DESCRIPTION = newDescription();
+
+  private final URL baseUrl = Utils.toUrl("http://localhost:" + APP.getLocalPort() + "/api/v1");
+  private final MarquezClient client = MarquezClient.builder().baseUrl(baseUrl).build();
 
   @Test
   public void testApp_createNamespace() {
-    NamespaceName newNamespaceName = newNamespaceName();
-    final Response response =
-        APP.client()
-            .target(baseUri + "/namespaces/{namespace}")
-            .resolveTemplate("namespace", newNamespaceName.getValue())
-            .request(APPLICATION_JSON)
-            .put(Entity.json(newNamespaceRequest()));
+    final NamespaceMeta namespaceMeta =
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    assertThat(response.getStatus()).isEqualTo(HTTP_200);
+    final Namespace namespace = client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+    assertThat(namespace.getName()).isEqualTo(NAMESPACE_NAME);
+    assertThat(namespace.getCreatedAt()).isAfter(EPOCH);
+    assertThat(namespace.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(namespace.getOwnerName()).isEqualTo(OWNER_NAME);
+    assertThat(namespace.getDescription()).isEqualTo(Optional.of(NAMESPACE_DESCRIPTION));
 
-    final NamespaceResponse ns =
-        APP.client()
-            .target(baseUri + "/namespaces/{namespace}")
-            .resolveTemplate("namespace", newNamespaceName.getValue())
-            .request(APPLICATION_JSON)
-            .get(NamespaceResponse.class);
-
-    assertThat(ns.getName()).isEqualTo(newNamespaceName.getValue());
-
-    final NamespacesResponse nss =
-        APP.client()
-            .target(baseUri + "/namespaces")
-            .request(APPLICATION_JSON)
-            .get(NamespacesResponse.class);
-
-    ImmutableList<NamespaceResponse> filtered =
-        nss.getNamespaces().stream()
-            .filter((n) -> n.getName().equals(newNamespaceName.getValue()))
-            .collect(toImmutableList());
-    assertThat(filtered.size()).isEqualTo(1);
+    assertThat(
+            client.listNamespaces().stream()
+                .filter(other -> other.getName().equals(NAMESPACE_NAME))
+                .count())
+        .isEqualTo(1);
   }
 
   @Test
   public void testApp_createSource() {
-    SourceName newSourceName = newSourceName();
-    final Response response =
-        APP.client()
-            .target(baseUri + "/sources/{source}")
-            .resolveTemplate("source", newSourceName.getValue())
-            .request(APPLICATION_JSON)
-            .put(Entity.json(newSourceRequest()));
+    final SourceMeta sourceMeta =
+        SourceMeta.builder()
+            .type(SOURCE_TYPE)
+            .connectionUrl(CONNECTION_URL)
+            .description(SOURCE_DESCRIPTION)
+            .build();
 
-    assertThat(response.getStatus()).isEqualTo(HTTP_200);
+    final Source source = client.createSource(SOURCE_NAME, sourceMeta);
+    assertThat(source.getType()).isEqualTo(SOURCE_TYPE);
+    assertThat(source.getName()).isEqualTo(SOURCE_NAME);
+    assertThat(source.getCreatedAt()).isAfter(EPOCH);
+    assertThat(source.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(source.getConnectionUrl()).isEqualTo(CONNECTION_URL);
+    assertThat(source.getDescription()).isEqualTo(Optional.of(SOURCE_DESCRIPTION));
 
-    final SourceResponse source =
-        APP.client()
-            .target(baseUri + "/sources/{source}")
-            .resolveTemplate("source", newSourceName.getValue())
-            .request(APPLICATION_JSON)
-            .get(SourceResponse.class);
-
-    assertThat(source.getName()).isEqualTo(newSourceName.getValue());
-
-    final SourcesResponse sources =
-        APP.client()
-            .target(baseUri + "/sources")
-            .request(APPLICATION_JSON)
-            .get(SourcesResponse.class);
-
-    ImmutableList<SourceResponse> filtered =
-        sources.getSources().stream()
-            .filter((s) -> s.getName().equals(newSourceName.getValue()))
-            .collect(toImmutableList());
-    assertThat(filtered.size()).isEqualTo(1);
+    assertThat(
+            client.listSources().stream()
+                .filter(other -> other.getName().equals(SOURCE_NAME))
+                .count())
+        .isEqualTo(1);
   }
 
   @Test
   public void testApp_createDbTable() {
-    final SourceName sourceName = newSourceName();
+    // (1) Create namespace for db table
+    final NamespaceMeta namespaceMeta =
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    APP.client()
-        .target(baseUri + "/sources/{source}")
-        .resolveTemplate("source", sourceName.getValue())
-        .request(APPLICATION_JSON)
-        .put(Entity.json(newSourceRequestWith(SourceType.POSTGRESQL)));
+    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
 
-    final DatasetName datasetName = newDatasetName();
+    // (2) Create source for db table
+    final SourceMeta sourceMeta =
+        SourceMeta.builder()
+            .type(DB_TABLE_SOURCE_TYPE)
+            .connectionUrl(DB_TABLE_CONNECTION_URL)
+            .description(DB_TABLE_SOURCE_DESCRIPTION)
+            .build();
 
-    final Response response =
-        APP.client()
-            .target(baseUri + "/namespaces/default/datasets/{dataset}")
-            .resolveTemplate("dataset", datasetName.getValue())
-            .request(APPLICATION_JSON)
-            .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
+    client.createSource(DB_TABLE_SOURCE_NAME, sourceMeta);
 
-    assertThat(response.getStatus()).isEqualTo(HTTP_200);
+    // (3) Add db table to namespace and associate with source
+    final DbTableMeta dbTableMeta =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(DB_TABLE_FIELDS)
+            .tags(DB_TABLE_TAGS)
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
 
-    final DbTableResponse dbTable =
-        APP.client()
-            .target(baseUri + "/namespaces/default/datasets/{dataset}")
-            .resolveTemplate("dataset", datasetName.getValue())
-            .request(APPLICATION_JSON)
-            .get(DbTableResponse.class);
-    assertThat(dbTable.getName()).isEqualTo(datasetName);
-    assertThat(dbTable.getNamespace().getValue()).isEqualTo("default");
+    final DbTable dbTable =
+        (DbTable) client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta);
+    assertThat(dbTable.getId()).isEqualTo(DB_TABLE_ID);
+    assertThat(dbTable.getName()).isEqualTo(DB_TABLE_NAME);
+    assertThat(dbTable.getPhysicalName()).isEqualTo(DB_TABLE_PHYSICAL_NAME);
+    assertThat(dbTable.getCreatedAt()).isAfter(EPOCH);
+    assertThat(dbTable.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(dbTable.getSourceName()).isEqualTo(DB_TABLE_SOURCE_NAME);
+    assertThat(dbTable.getFields()).containsExactlyInAnyOrderElementsOf(DB_TABLE_FIELDS);
+    assertThat(dbTable.getTags()).isEqualTo(DB_TABLE_TAGS);
+    assertThat(dbTable.getLastModifiedAt()).isEmpty();
+    assertThat(dbTable.getDescription()).isEqualTo(Optional.of(DB_TABLE_DESCRIPTION));
 
-    final DatasetsResponse datasets =
-        APP.client()
-            .target(baseUri + "/namespaces/default/datasets")
-            .request(APPLICATION_JSON)
-            .get(DatasetsResponse.class);
-    assertThat(dbTable.getName()).isEqualTo(datasetName);
-    ImmutableList<DatasetResponse> filtered =
-        datasets.getDatasets().stream()
-            .filter((d) -> d.getName().equals(datasetName))
-            .collect(toImmutableList());
-    assertThat(filtered.size()).isEqualTo(1);
-  }
+    assertThat(
+            client.listDatasets(NAMESPACE_NAME).stream()
+                .filter(other -> other.getName().equals(DB_TABLE_NAME))
+                .count())
+        .isEqualTo(1);
 
-  @Test
-  public void testApp_createDbTableThenAddFields() {
-    final SourceName sourceName = newSourceName();
+    // (4) Add field to db table
+    final List<Field> original = dbTable.getFields();
+    final List<Field> added = ImmutableList.of(newFieldWith(PII.getName()), newField(), newField());
+    final List<Field> modifiedFields = Lists.newArrayList(Iterables.concat(original, added));
 
-    APP.client()
-        .target(baseUri + "/sources/{source}")
-        .resolveTemplate("source", sourceName.getValue())
-        .request(APPLICATION_JSON)
-        .put(Entity.json(newSourceRequestWith(SourceType.POSTGRESQL)));
+    final DbTableMeta modifiedDbTableMeta =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(modifiedFields)
+            .tags(DB_TABLE_TAGS)
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
 
-    final DatasetName datasetName = newDatasetName();
-
-    final DatasetRequest request0 = newDbTableRequestWith(datasetName, sourceName);
-    final Response response0 =
-        APP.client()
-            .target(baseUri + "/namespaces/default/datasets/{dataset}")
-            .resolveTemplate("dataset", datasetName.getValue())
-            .request(APPLICATION_JSON)
-            .put(Entity.json(request0));
-
-    assertThat(response0.getStatus()).isEqualTo(HTTP_200);
-
-    final List<Field> original = request0.getFields();
-    final List<Field> fields = Lists.newArrayList(Iterables.concat(original, newFields(2)));
-
-    final DatasetRequest request1 =
-        new DbTableRequest(
-            datasetName.getValue(),
-            sourceName.getValue(),
-            fields,
-            newTags(2),
-            request0.getDescription().get(),
-            null);
-    final Response response1 =
-        APP.client()
-            .target(baseUri + "/namespaces/default/datasets/{dataset}")
-            .resolveTemplate("dataset", datasetName.getValue())
-            .request(APPLICATION_JSON)
-            .put(Entity.json(request1));
-
-    assertThat(response1.getStatus()).isEqualTo(HTTP_200);
+    final DbTable modifiedDbTable =
+        (DbTable) client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, modifiedDbTableMeta);
+    assertThat(modifiedDbTable.getId()).isEqualTo(DB_TABLE_ID);
+    assertThat(modifiedDbTable.getName()).isEqualTo(DB_TABLE_NAME);
+    assertThat(modifiedDbTable.getPhysicalName()).isEqualTo(DB_TABLE_PHYSICAL_NAME);
+    assertThat(modifiedDbTable.getCreatedAt()).isAfter(EPOCH);
+    assertThat(modifiedDbTable.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(modifiedDbTable.getSourceName()).isEqualTo(DB_TABLE_SOURCE_NAME);
+    assertThat(modifiedDbTable.getFields()).containsExactlyInAnyOrderElementsOf(modifiedFields);
+    assertThat(modifiedDbTable.getTags()).isEqualTo(DB_TABLE_TAGS);
+    assertThat(modifiedDbTable.getLastModifiedAt()).isEmpty();
+    assertThat(modifiedDbTable.getDescription()).isEqualTo(Optional.of(DB_TABLE_DESCRIPTION));
   }
 
   @Test
   public void testApp_createStream() {
-    final SourceName sourceName = newSourceName();
+    // (1) Create namespace for stream
+    final NamespaceMeta namespaceMeta =
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    APP.client()
-        .target(baseUri + "/sources/{source}")
-        .resolveTemplate("source", sourceName.getValue())
-        .request(APPLICATION_JSON)
-        .put(Entity.json(newSourceRequestWith(SourceType.KAFKA)));
+    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
 
-    final DatasetName datasetName = newDatasetName();
+    // (2) Create source for stream
+    final SourceMeta sourceMeta =
+        SourceMeta.builder()
+            .type(STREAM_SOURCE_TYPE)
+            .connectionUrl(STREAM_CONNECTION_URL)
+            .description(STREAM_SOURCE_DESCRIPTION)
+            .build();
 
-    final Response response =
-        APP.client()
-            .target(baseUri + "/namespaces/default/datasets/{dataset}")
-            .resolveTemplate("dataset", datasetName.getValue())
-            .request(APPLICATION_JSON)
-            .put(Entity.json(newStreamRequestWith(datasetName, sourceName)));
+    client.createSource(STREAM_SOURCE_NAME, sourceMeta);
 
-    assertThat(response.getStatus()).isEqualTo(HTTP_200);
+    // (3) Add stream to namespace and associate with source
+    final StreamMeta streamMeta =
+        StreamMeta.builder()
+            .physicalName(STREAM_PHYSICAL_NAME)
+            .sourceName(STREAM_SOURCE_NAME)
+            .schemaLocation(STREAM_SCHEMA_LOCATION)
+            .description(STREAM_DESCRIPTION)
+            .build();
 
-    final StreamResponse responseGet =
-        APP.client()
-            .target(baseUri + "/namespaces/default/datasets/{dataset}")
-            .resolveTemplate("dataset", datasetName.getValue())
-            .request(APPLICATION_JSON)
-            .get(StreamResponse.class);
+    final Stream stream = (Stream) client.createDataset(NAMESPACE_NAME, STREAM_NAME, streamMeta);
+    assertThat(stream.getId()).isEqualTo(STREAM_ID);
+    assertThat(stream.getName()).isEqualTo(STREAM_NAME);
+    assertThat(stream.getPhysicalName()).isEqualTo(STREAM_PHYSICAL_NAME);
+    assertThat(stream.getCreatedAt()).isAfter(EPOCH);
+    assertThat(stream.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(stream.getSourceName()).isEqualTo(STREAM_SOURCE_NAME);
+    assertThat(stream.getFields()).isEmpty();
+    assertThat(stream.getTags()).isEmpty();
+    assertThat(stream.getLastModifiedAt()).isEmpty();
+    assertThat(stream.getSchemaLocation()).isEqualTo(Optional.of(STREAM_SCHEMA_LOCATION));
+    assertThat(stream.getDescription()).isEqualTo(Optional.of(STREAM_DESCRIPTION));
 
-    assertThat(responseGet.getId())
-        .isEqualTo(new DatasetId(NamespaceName.of("default"), datasetName));
-    assertThat(responseGet.getName()).isEqualTo(datasetName);
-    assertThat(responseGet.getSourceName()).isEqualTo(sourceName.getValue());
-    assertThat(responseGet.getNamespace().getValue()).isEqualTo("default");
+    assertThat(
+            client.listDatasets(NAMESPACE_NAME).stream()
+                .filter(other -> other.getName().equals(STREAM_NAME))
+                .count())
+        .isEqualTo(1);
+
+    // (4) Change schema location
+    final URL modifiedSchemaLocation = newSchemaLocation();
+    final StreamMeta modifiedStreamMeta =
+        StreamMeta.builder()
+            .physicalName(STREAM_PHYSICAL_NAME)
+            .sourceName(STREAM_SOURCE_NAME)
+            .schemaLocation(modifiedSchemaLocation)
+            .description(STREAM_DESCRIPTION)
+            .build();
+
+    final Stream modifiedStream =
+        (Stream) client.createDataset(NAMESPACE_NAME, STREAM_NAME, modifiedStreamMeta);
+    assertThat(modifiedStream.getId()).isEqualTo(STREAM_ID);
+    assertThat(modifiedStream.getName()).isEqualTo(STREAM_NAME);
+    assertThat(modifiedStream.getPhysicalName()).isEqualTo(STREAM_PHYSICAL_NAME);
+    assertThat(modifiedStream.getCreatedAt()).isAfter(EPOCH);
+    assertThat(modifiedStream.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(modifiedStream.getSourceName()).isEqualTo(STREAM_SOURCE_NAME);
+    assertThat(modifiedStream.getFields()).isEmpty();
+    assertThat(modifiedStream.getTags()).isEmpty();
+    assertThat(modifiedStream.getLastModifiedAt()).isEmpty();
+    assertThat(modifiedStream.getSchemaLocation()).isEqualTo(Optional.of(modifiedSchemaLocation));
+    assertThat(modifiedStream.getDescription()).isEqualTo(Optional.of(STREAM_DESCRIPTION));
+  }
+
+  @Test
+  public void testApp_createJobAndMarkRunAsComplete() {
+    // (1) Create namespace for job
+    final NamespaceMeta namespaceMeta =
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
+
+    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+
+    // (2) Create source for input / output db tables
+    final SourceMeta sourceMeta =
+        SourceMeta.builder()
+            .type(STREAM_SOURCE_TYPE)
+            .connectionUrl(STREAM_CONNECTION_URL)
+            .description(STREAM_SOURCE_DESCRIPTION)
+            .build();
+
+    client.createSource(STREAM_SOURCE_NAME, sourceMeta);
+
+    // (3) Add input db tables to namespace and associate with source
+    final ImmutableSet<DatasetId> inputs = newDatasetIdsWith(NAMESPACE_NAME, 4);
+    for (final DatasetId inputId : inputs) {
+      final DbTableMeta dbTableMeta =
+          DbTableMeta.builder()
+              .physicalName(inputId.getName())
+              .sourceName(STREAM_SOURCE_NAME)
+              .description(newDescription())
+              .build();
+
+      client.createDataset(inputId.getNamespaceName(), inputId.getName(), dbTableMeta);
+    }
+
+    // (3) Add outputs db tables to namespace and associate with source
+    final ImmutableSet<DatasetId> outputs = newDatasetIdsWith(NAMESPACE_NAME, 2);
+    for (final DatasetId outputId : outputs) {
+      final DbTableMeta dbTableMeta =
+          DbTableMeta.builder()
+              .physicalName(outputId.getName())
+              .sourceName(STREAM_SOURCE_NAME)
+              .description(newDescription())
+              .build();
+
+      client.createDataset(outputId.getNamespaceName(), outputId.getName(), dbTableMeta);
+    }
+
+    // (4) Add job to namespace
+    final JobMeta jobMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(inputs)
+            .outputs(outputs)
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+
+    final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, jobMeta);
+    assertThat(job.getId()).isEqualTo(JOB_ID);
+    assertThat(job.getType()).isEqualTo(JOB_TYPE);
+    assertThat(job.getName()).isEqualTo(JOB_NAME);
+    assertThat(job.getCreatedAt()).isAfter(EPOCH);
+    assertThat(job.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(job.getInputs()).isEqualTo(inputs);
+    assertThat(job.getOutputs()).isEqualTo(outputs);
+    assertThat(job.getLocation()).isEqualTo(Optional.of(JOB_LOCATION));
+    assertThat(job.getContext()).isEqualTo(JOB_CONTEXT);
+    assertThat(job.getDescription()).isEqualTo(Optional.of(JOB_DESCRIPTION));
+    assertThat(job.getLatestRun()).isEmpty();
+
+    // (5) Create a run
+    final RunMeta runMeta = RunMeta.builder().build();
+    final Run run = client.createRun(NAMESPACE_NAME, JOB_NAME, runMeta);
+    assertThat(run.getId()).isNotNull();
+    assertThat(run.getCreatedAt()).isAfter(EPOCH);
+    assertThat(run.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(run.getNominalStartTime()).isEmpty();
+    assertThat(run.getNominalEndTime()).isEmpty();
+    assertThat(run.getState()).isEqualTo(RunState.NEW);
+    assertThat(run.getStartedAt()).isEmpty();
+    assertThat(run.getEndedAt()).isEmpty();
+    assertThat(run.getDurationMs()).isEmpty();
+    assertThat(run.getArgs()).isEmpty();
+
+    // (6) Start a run
+    final Run runStarted = client.markRunAsRunning(run.getId());
+    assertThat(runStarted.getId()).isEqualTo(run.getId());
+    assertThat(runStarted.getCreatedAt()).isAfter(EPOCH);
+    assertThat(runStarted.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(runStarted.getNominalStartTime()).isEmpty();
+    assertThat(runStarted.getNominalEndTime()).isEmpty();
+    assertThat(runStarted.getState()).isEqualTo(RunState.RUNNING);
+    assertThat(runStarted.getStartedAt().get()).isAfter(EPOCH);
+    assertThat(runStarted.getEndedAt()).isEmpty();
+    assertThat(runStarted.getDurationMs()).isEmpty();
+    assertThat(runStarted.getArgs()).isEmpty();
+
+    // (7) Complete a run
+    final Run runCompleted = client.markRunAsCompleted(run.getId());
+    assertThat(runCompleted.getId()).isEqualTo(run.getId());
+    assertThat(runCompleted.getCreatedAt()).isAfter(EPOCH);
+    assertThat(runCompleted.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(runCompleted.getNominalStartTime()).isEmpty();
+    assertThat(runCompleted.getNominalEndTime()).isEmpty();
+    assertThat(runCompleted.getState()).isEqualTo(RunState.COMPLETED);
+    assertThat(runCompleted.getStartedAt().get()).isAfter(EPOCH);
+    assertThat(runCompleted.getEndedAt().get()).isAfter(EPOCH);
+    assertThat(runCompleted.getDurationMs()).isNotEmpty();
+    assertThat(runCompleted.getArgs()).isEmpty();
   }
 
   @Test
   public void testApp_listTags() {
-    final Response response =
-        APP.client().target(baseUri + "/tags").request(APPLICATION_JSON).get();
-
-    assertThat(response.getStatus()).isEqualTo(HTTP_200);
+    final Set<Tag> tags = client.listTags();
+    assertThat(tags).containsExactlyInAnyOrder(PII, SENSITIVE);
   }
 
-  @Test
-  public void testApp_createJob() {
-    final SourceName sourceName = newSourceName();
-
-    APP.client()
-        .target(baseUri + "/sources/{source}")
-        .resolveTemplate("source", sourceName.getValue())
-        .request(APPLICATION_JSON)
-        .put(Entity.json(newSourceRequestWith(SourceType.POSTGRESQL)));
-
-    final List<DatasetName> inputs = newDatasetNames(2);
-    final List<DatasetName> outputs = newDatasetNames(4);
-
-    // old input definition: Input and output are defined by name only, ns is assumed the same as
-    // the job
-    {
-      createDatasets(defaultNamespace, sourceName, inputs);
-
-      createDatasets(defaultNamespace, sourceName, outputs);
-
-      JobName jobName = newJobName();
-      final Response responsePut =
-          APP.client()
-              .target(baseUri + "/namespaces/default/jobs/{job}")
-              .resolveTemplate("job", jobName.getValue())
-              .request(APPLICATION_JSON)
-              .put(Entity.json(newJobRequestV1With(inputs, outputs)));
-
-      assertThat(responsePut.getStatus()).isEqualTo(HTTP_200);
-
-      ImmutableList<DatasetId> inputIds =
-          inputs.stream()
-              .map((n) -> new DatasetId(NamespaceName.of("default"), n))
-              .collect(toImmutableList());
-      ImmutableList<DatasetId> outputIds =
-          outputs.stream()
-              .map((n) -> new DatasetId(NamespaceName.of("default"), n))
-              .collect(toImmutableList());
-
-      final JobResponse responseGet =
-          APP.client()
-              .target(baseUri + "/namespaces/default/jobs/{job}")
-              .resolveTemplate("job", jobName.getValue())
-              .request(APPLICATION_JSON)
-              .get(JobResponse.class);
-      assertThat(responseGet.getId()).isEqualTo(new JobId(NamespaceName.of("default"), jobName));
-      assertThat(responseGet.getName()).isEqualTo(jobName);
-      assertThat(responseGet.getInputs()).isEqualTo(inputs);
-      assertThat(responseGet.getOutputs()).isEqualTo(outputs);
-      assertThat(responseGet.getInputIds()).isEqualTo(inputIds);
-      assertThat(responseGet.getOutputIds()).isEqualTo(outputIds);
-      assertThat(responseGet.getNamespace().getValue()).isEqualTo("default");
-    }
-
-    // new input definition: Input and output are defined by DatasetId
-    {
-      NamespaceName newNamespaceName = newNamespaceName();
-      final NamespaceResponse newNamespace =
-          APP.client()
-              .target(baseUri + "/namespaces/{namespace}")
-              .resolveTemplate("namespace", newNamespaceName.getValue())
-              .request(APPLICATION_JSON)
-              .put(Entity.json(newNamespaceRequest()), NamespaceResponse.class);
-
-      final SourceName sourceName2 = newSourceName();
-
-      APP.client()
-          .target(baseUri + "/sources/{source}")
-          .resolveTemplate("source", sourceName2.getValue())
-          .request(APPLICATION_JSON)
-          .put(Entity.json(newSourceRequestWith(SourceType.KAFKA)));
-
-      createDatasets(newNamespaceName, sourceName2, inputs);
-      createDatasets(newNamespaceName, sourceName2, outputs);
-
-      ImmutableList<DatasetId> inputIds2 =
-          inputs.stream()
-              .map((n) -> new DatasetId(NamespaceName.of(newNamespace.getName()), n))
-              .collect(toImmutableList());
-      ImmutableList<DatasetId> outputIds2 =
-          outputs.stream()
-              .map((n) -> new DatasetId(NamespaceName.of(newNamespace.getName()), n))
-              .collect(toImmutableList());
-
-      JobName jobName2 = newJobName();
-      final Response responsePut2 =
-          APP.client()
-              .target(baseUri + "/namespaces/default/jobs/{job}")
-              .resolveTemplate("job", jobName2.getValue())
-              .request(APPLICATION_JSON)
-              .put(Entity.json(newJobRequestV2With(inputIds2, outputIds2)));
-
-      assertThat(responsePut2.getStatus()).isEqualTo(HTTP_200);
-
-      final JobResponse responseGet2 =
-          APP.client()
-              .target(baseUri + "/namespaces/default/jobs/{job}")
-              .resolveTemplate("job", jobName2.getValue())
-              .request(APPLICATION_JSON)
-              .get(JobResponse.class);
-      assertThat(responseGet2.getId()).isEqualTo(new JobId(NamespaceName.of("default"), jobName2));
-      assertThat(responseGet2.getName()).isEqualTo(jobName2);
-      assertThat(responseGet2.getInputIds()).isEqualTo(inputIds2);
-      assertThat(responseGet2.getOutputIds()).isEqualTo(outputIds2);
-      assertThat(responseGet2.getInputs()).isEqualTo(inputs);
-      assertThat(responseGet2.getOutputs()).isEqualTo(outputs);
-    }
+  private static ImmutableSet<DatasetId> newDatasetIdsWith(
+      final String namespaceName, final int limit) {
+    return java.util.stream.Stream.generate(() -> newDatasetIdWith(namespaceName))
+        .limit(limit)
+        .collect(toImmutableSet());
   }
 
-  private void createDatasets(
-      NamespaceName namespace, final SourceName sourceName, final List<DatasetName> inputs) {
-    inputs.forEach(
-        datasetName -> {
-          Response r =
-              APP.client()
-                  .target(baseUri + "/namespaces/{ns}/datasets/{dataset}")
-                  .resolveTemplate("ns", namespace.getValue())
-                  .resolveTemplate("dataset", datasetName.getValue())
-                  .request(APPLICATION_JSON)
-                  .put(Entity.json(newDbTableRequestWith(datasetName, sourceName)));
-          assertThat(r.getStatus()).isEqualTo(HTTP_200);
-        });
+  private static DatasetId newDatasetIdWith(final String namespaceName) {
+    return new DatasetId(namespaceName, newDatasetName().getValue());
   }
 
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testApp_createRunAndMarkAsComplete() {
-    final SourceName sourceName = newSourceName();
+  private static Field newField() {
+    return newFieldWith(ImmutableSet.of());
+  }
 
-    APP.client()
-        .target(baseUri + "/sources/{source}")
-        .resolveTemplate("source", sourceName.getValue())
-        .request(APPLICATION_JSON)
-        .put(Entity.json(newSourceRequestWith(SourceType.POSTGRESQL)));
+  private static Field newFieldWith(final String tag) {
+    return newFieldWith(ImmutableSet.of(tag));
+  }
 
-    final List<DatasetName> inputs = newDatasetNames(2);
-    final List<DatasetName> outputs = newDatasetNames(4);
-
-    createDatasets(defaultNamespace, sourceName, inputs);
-
-    createDatasets(defaultNamespace, sourceName, outputs);
-
-    final JobName jobName = newJobName();
-
-    APP.client()
-        .target(baseUri + "/namespaces/default/jobs/{job}")
-        .resolveTemplate("job", jobName.getValue())
-        .request(APPLICATION_JSON)
-        .put(Entity.json(newJobRequestV1With(inputs, outputs)));
-
-    final Response response0 =
-        APP.client()
-            .target(baseUri + "/namespaces/default/jobs/{job}/runs")
-            .resolveTemplate("job", jobName.getValue())
-            .request(APPLICATION_JSON)
-            .post(Entity.json(EMPTY_RUN_REQUEST));
-
-    assertThat(response0.getStatus()).isEqualTo(HTTP_201);
-
-    final Map<String, Object> run = response0.readEntity(Map.class);
-    final String runId = (String) run.get("runId");
-
-    assertThat(response0.getHeaderString(LOCATION)).isEqualTo(baseUri + "/jobs/runs/" + runId);
-
-    final Response response1 =
-        APP.client()
-            .target(baseUri + "/jobs/runs/{id}/start")
-            .resolveTemplate("id", runId)
-            .request(APPLICATION_JSON)
-            .post(Entity.json(ImmutableMap.of()));
-
-    final Map<String, Object> runStarted = response1.readEntity(Map.class);
-
-    assertThat(response1.getStatus()).isEqualTo(HTTP_200);
-    assertThat((String) runStarted.get("runId")).isEqualTo(runId);
-    assertThat((String) runStarted.get("runState")).isEqualTo(RUNNING.toString());
-    assertThat((String) runStarted.get("startedAt")).isNotBlank();
-    assertThat((String) runStarted.get("endedAt")).isBlank();
-    assertThat((String) runStarted.get("duration")).isBlank();
-
-    final Instant beforeModified = Instant.now();
-    final Response response2 =
-        APP.client()
-            .target(baseUri + "/jobs/runs/{id}/complete")
-            .resolveTemplate("id", runId)
-            .request(APPLICATION_JSON)
-            .post(Entity.json(ImmutableMap.of()));
-
-    final Map<String, Object> runCompleted = response2.readEntity(Map.class);
-    assertThat(response2.getStatus()).isEqualTo(HTTP_200);
-    assertThat((String) runCompleted.get("runId")).isEqualTo(runId);
-    assertThat((String) runCompleted.get("runState")).isEqualTo(COMPLETED.toString());
-    assertThat((String) runCompleted.get("startedAt")).isNotBlank();
-    assertThat((String) runCompleted.get("endedAt")).isNotBlank();
-    assertThat((Integer) runCompleted.get("duration")).isGreaterThan(0);
-
-    outputs.forEach(
-        datasetName -> {
-          final Response response3 =
-              APP.client()
-                  .target(baseUri + "/namespaces/default/datasets/{dataset}")
-                  .resolveTemplate("dataset", datasetName.getValue())
-                  .request(APPLICATION_JSON)
-                  .get();
-
-          final Map<String, String> dataset = response3.readEntity(Map.class);
-
-          assertThat(response3.getStatus()).isEqualTo(HTTP_200);
-          assertThat(dataset.get("name")).isEqualTo(datasetName.getValue());
-
-          final Instant lastModifiedAt = Instant.parse(dataset.get("lastModifiedAt"));
-          assertThat(lastModifiedAt).isAfter(beforeModified);
-        });
-
-    final Response response3 =
-        APP.client()
-            .target(baseUri + "/jobs/runs/{id}/fail")
-            .resolveTemplate("id", runId)
-            .request(APPLICATION_JSON)
-            .post(Entity.json(ImmutableMap.of()));
-    assertThat(response3.getStatus()).isEqualTo(HTTP_200);
-
-    final RunsResponse response3Run =
-        APP.client()
-            .target(baseUri + "/namespaces/default/jobs/{job}/runs")
-            .resolveTemplate("job", jobName.getValue())
-            .request(APPLICATION_JSON)
-            .get(RunsResponse.class);
-    assertThat(response3Run.getRuns().get(0).getState()).isEqualTo("FAILED");
-
-    final Response response4 =
-        APP.client()
-            .target(baseUri + "/jobs/runs/{id}/abort")
-            .resolveTemplate("id", runId)
-            .request(APPLICATION_JSON)
-            .post(Entity.json(ImmutableMap.of()));
-    assertThat(response4.getStatus()).isEqualTo(HTTP_200);
-
-    final RunsResponse response4Run =
-        APP.client()
-            .target(baseUri + "/namespaces/default/jobs/{job}/runs")
-            .resolveTemplate("job", jobName.getValue())
-            .request(APPLICATION_JSON)
-            .get(RunsResponse.class);
-    assertThat(response4Run.getRuns().get(0).getState()).isEqualTo("ABORTED");
-
-    final JobsResponse responseJobs =
-        APP.client()
-            .target(baseUri + "/namespaces/default/jobs")
-            .resolveTemplate("job", jobName.getValue())
-            .request(APPLICATION_JSON)
-            .get(JobsResponse.class);
-    int size =
-        responseJobs.getJobs().stream()
-            .filter((j) -> j.getName().equals(jobName))
-            .collect(toImmutableList())
-            .size();
-    assertThat(size).isEqualTo(1);
+  private static Field newFieldWith(final ImmutableSet<String> tags) {
+    return new Field(newFieldName().getValue(), newFieldType().name(), tags, newDescription());
   }
 }
