@@ -1,8 +1,32 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.10.4...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.0...HEAD)
+
+## [0.11.0](https://github.com/MarquezProject/marquez/compare/0.10.4...0.11.0) - 2020-05-27
 
 ### Added
+
+* `Run.startedAt`, `Run.endedAt`, `Run.duration` [@julienledem](https://github.com/julienledem)
+* **class** [`MarquezContext`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezContext.java) [@julienledem](https://github.com/julienledem)
+* **class** [`RunTransitionListener`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/service/RunTransitionListener.java) [@julienledem](https://github.com/julienledem)
+* Unique identifier **class** [`DatasetId`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/DatasetId.java) for datasets [@julienledem](https://github.com/julienledem)
+* Unique identifier **class** [`JobId`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/JobId.java) for jobs [@julienledem](https://github.com/julienledem)
+* **class** [`RunId`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/RunId.java) [@ravikamaraj](https://github.com/ravikamaraj)
+* **enum** [`RunState`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/RunState.java) [@ravikamaraj](https://github.com/ravikamaraj)
+* **class** [`Version`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/service/models/Version.java) [@ravikamaraj](https://github.com/ravikamaraj)
+
+### Changed
+
+* Job inputs / outputs are defined as [`DatasetId`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/DatasetId.java)
+* Bump to JDK 11
+
+### Removed
+
+* Use of API models under `marquez.api.models` pkg
+
+### Fixed
+
+* API docs example to show correct `SQL` key in job context [@frankcash](https://github.com/frankcash)
 
 ## [0.10.4](https://github.com/MarquezProject/marquez/compare/0.10.3...0.10.4) - 2020-01-17
 
