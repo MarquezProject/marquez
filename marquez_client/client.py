@@ -246,7 +246,7 @@ class MarquezClient(object):
                        description=None, run_id=None,
                        schema_location=None,
                        namespace_name=None,
-                       fields=None):
+                       fields=None, tags=None):
         if not dataset_name:
             raise ValueError('dataset_name must not be None')
         if not isinstance(dataset_type, DatasetType):
@@ -276,6 +276,9 @@ class MarquezClient(object):
 
         if fields:
             payload['fields'] = fields
+
+        if tags:
+            payload['tags'] = tags
 
         if schema_location:
             payload['schemaLocation'] = schema_location
