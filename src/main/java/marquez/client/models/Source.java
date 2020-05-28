@@ -32,7 +32,7 @@ public final class Source extends SourceMeta {
   @Getter private final Instant updatedAt;
 
   public Source(
-      final SourceType type,
+      final String type,
       @NonNull final String name,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,

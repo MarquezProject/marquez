@@ -19,12 +19,11 @@ import static marquez.client.models.DatasetType.STREAM;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 import marquez.client.Utils;
 
@@ -42,19 +41,23 @@ import marquez.client.Utils;
   "runId"
 })
 public final class StreamMeta extends DatasetMeta {
-  @Getter private final URL schemaLocation;
+  @Nullable private final URL schemaLocation;
 
   @Builder
   public StreamMeta(
       final String physicalName,
       final String sourceName,
-      @NonNull final URL schemaLocation,
+      @Nullable final URL schemaLocation,
       @Nullable final List<Field> fields,
       @Nullable final Set<String> tags,
       @Nullable final String description,
       @Nullable final String runId) {
     super(STREAM, physicalName, sourceName, fields, tags, description, runId);
     this.schemaLocation = schemaLocation;
+  }
+
+  public Optional<URL> getSchemaLocation() {
+    return Optional.ofNullable(schemaLocation);
   }
 
   @Override

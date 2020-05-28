@@ -19,17 +19,16 @@ import static marquez.client.models.DatasetType.STREAM;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class Stream extends Dataset {
-  @Getter URL schemaLocation;
+  @Nullable URL schemaLocation;
 
   public Stream(
       final DatasetId id,
@@ -41,7 +40,7 @@ public final class Stream extends Dataset {
       @Nullable final List<Field> fields,
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
-      @NonNull final URL schemaLocation,
+      @Nullable final URL schemaLocation,
       @Nullable final String description) {
     super(
         id,
@@ -56,5 +55,9 @@ public final class Stream extends Dataset {
         lastModifiedAt,
         description);
     this.schemaLocation = schemaLocation;
+  }
+
+  public Optional<URL> getSchemaLocation() {
+    return Optional.ofNullable(schemaLocation);
   }
 }

@@ -16,7 +16,6 @@ package marquez.client.models;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static marquez.client.models.SourceType.POSTGRESQL;
 
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
@@ -51,7 +50,7 @@ public final class ModelGenerator {
 
   public static SourceMeta newSourceMeta() {
     return SourceMeta.builder()
-        .type(POSTGRESQL)
+        .type("postgresql")
         .connectionUrl(newConnectionUrl())
         .description(newDescription())
         .build();
@@ -195,7 +194,7 @@ public final class ModelGenerator {
 
   public static Run newRun() {
     final Instant now = newTimestamp();
-    return new Run(newRunId(), now, now, now, now, RunState.NEW, null, null, newRunArgs());
+    return new Run(newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs());
   }
 
   public static String newOwnerName() {
@@ -206,8 +205,8 @@ public final class ModelGenerator {
     return "test_namespace" + newId();
   }
 
-  public static SourceType newSourceType() {
-    return SourceType.values()[newIdWithBound(SourceType.values().length)];
+  public static String newSourceType() {
+    return "test_source_type" + newId();
   }
 
   public static String newSourceName() {
@@ -307,8 +306,8 @@ public final class ModelGenerator {
     return "test_field" + newId();
   }
 
-  public static FieldType newFieldType() {
-    return FieldType.values()[newIdWithBound(FieldType.values().length - 1)];
+  public static String newFieldType() {
+    return "test_field_type" + newId();
   }
 
   public static Set<String> newTagNames(final int limit) {

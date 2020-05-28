@@ -26,12 +26,12 @@ import marquez.client.Utils;
 @EqualsAndHashCode
 @ToString
 public class SourceMeta {
-  @Getter private final SourceType type;
+  @Getter private final String type;
   @Getter private final URI connectionUrl;
   @Nullable private final String description;
 
   public SourceMeta(
-      @NonNull final SourceType type,
+      @NonNull final String type,
       @NonNull final URI connectionUrl,
       @Nullable final String description) {
     this.type = type;
@@ -52,21 +52,17 @@ public class SourceMeta {
   }
 
   public static class Builder {
-    private SourceType type;
+    private String type;
     private URI connectionUrl;
     @Nullable private String description;
 
-    public Builder type(@NonNull String typeString) {
-      return type(SourceType.valueOf(typeString));
-    }
-
-    public Builder type(@NonNull SourceType type) {
+    public Builder type(@NonNull String type) {
       this.type = type;
       return this;
     }
 
-    public Builder connectionUrl(@NonNull String connectionUrlString) {
-      return connectionUrl(URI.create(connectionUrlString));
+    public Builder connectionUrl(@NonNull String connectionUrlAsString) {
+      return connectionUrl(URI.create(connectionUrlAsString));
     }
 
     public Builder connectionUrl(@NonNull URI connectionUrl) {

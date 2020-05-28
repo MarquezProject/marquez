@@ -14,6 +14,7 @@
 
 package marquez.client;
 
+import static java.time.temporal.ChronoUnit.MILLIS;
 import static marquez.client.MarquezClient.Builder.NAMESPACE_NAME_ENV_VAR;
 import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
 import static marquez.client.MarquezClient.DEFAULT_NAMESPACE_NAME;
@@ -35,6 +36,7 @@ import static marquez.client.models.ModelGenerator.newRunId;
 import static marquez.client.models.ModelGenerator.newRunState;
 import static marquez.client.models.ModelGenerator.newSchemaLocation;
 import static marquez.client.models.ModelGenerator.newSourceName;
+import static marquez.client.models.ModelGenerator.newSourceType;
 import static marquez.client.models.ModelGenerator.newStreamName;
 import static marquez.client.models.ModelGenerator.newTagNames;
 import static marquez.client.models.ModelGenerator.newTimestamp;
@@ -67,7 +69,6 @@ import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
-import marquez.client.models.SourceType;
 import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import org.junit.Before;
@@ -93,7 +94,7 @@ public class MarquezClientTest {
       new Namespace(NAMESPACE_NAME, CREATED_AT, UPDATED_AT, OWNER_NAME, NAMESPACE_DESCRIPTION);
 
   // SOURCE
-  private static final SourceType SOURCE_TYPE = SourceType.POSTGRESQL;
+  private static final String SOURCE_TYPE = newSourceType();
   private static final String SOURCE_NAME = newSourceName();
   private static final URI CONNECTION_URL = newConnectionUrl();
   private static final String SOURCE_DESCRIPTION = newDescription();
@@ -198,7 +199,8 @@ public class MarquezClientTest {
   private static final Instant NOMINAL_END_TIME = newTimestamp();
   private static final RunState RUN_STATE = newRunState();
   private static final Instant START_AT = newTimestamp();
-  private static final Instant ENDED_AT = newTimestamp();
+  private static final Instant ENDED_AT = START_AT.plusMillis(1000L);
+  private static final long DURATION = START_AT.until(ENDED_AT, MILLIS);
   private static final Map<String, String> RUN_ARGS = newRunArgs();
   private static final Run RUN =
       new Run(
@@ -210,6 +212,7 @@ public class MarquezClientTest {
           RUN_STATE,
           START_AT,
           ENDED_AT,
+          DURATION,
           RUN_ARGS);
 
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
@@ -451,7 +454,7 @@ public class MarquezClientTest {
             .fields(FIELDS)
             .tags(TAGS)
             .description(dataset.getDescription().get())
-            .schemaLocation(dataset.getSchemaLocation())
+            .schemaLocation(dataset.getSchemaLocation().get())
             .runId(RUN_ID)
             .build();
 

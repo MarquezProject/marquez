@@ -33,7 +33,7 @@ public class JobMeta {
   @Getter private final JobType type;
   @Getter private final Set<DatasetId> inputs;
   @Getter private final Set<DatasetId> outputs;
-  @Getter private final URL location;
+  @Nullable private final URL location;
   @Getter private final Map<String, String> context;
   @Nullable String description;
 
@@ -41,15 +41,19 @@ public class JobMeta {
       @NonNull final JobType type,
       @NonNull final Set<DatasetId> inputs,
       @NonNull final Set<DatasetId> outputs,
-      @NonNull final URL location,
+      @Nullable final URL location,
       @Nullable final Map<String, String> context,
       @Nullable final String description) {
     this.type = type;
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
-    this.context = (context == null) ? ImmutableMap.of() : context;
+    this.context = (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
     this.description = description;
+  }
+
+  public Optional<URL> getLocation() {
+    return Optional.ofNullable(location);
   }
 
   public Optional<String> getDescription() {
@@ -68,7 +72,7 @@ public class JobMeta {
     private JobType type;
     private Set<DatasetId> inputs;
     private Set<DatasetId> outputs;
-    private URL location;
+    @Nullable private URL location;
     @Nullable private String description;
     @Nullable Map<String, String> context;
 
@@ -94,6 +98,10 @@ public class JobMeta {
     public Builder outputs(@NonNull Set<DatasetId> outputs) {
       this.outputs = ImmutableSet.copyOf(outputs);
       return this;
+    }
+
+    public Builder location(@NonNull String locationAsString) {
+      return location(Utils.toUrl(locationAsString));
     }
 
     public Builder location(@NonNull URL location) {

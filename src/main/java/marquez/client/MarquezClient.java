@@ -22,12 +22,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
@@ -42,6 +44,7 @@ import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
+import marquez.client.models.Tag;
 
 @Slf4j
 public class MarquezClient {
@@ -99,7 +102,7 @@ public class MarquezClient {
     return listNamespaces(DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<Namespace> listNamespaces(Integer limit, Integer offset) {
+  public List<Namespace> listNamespaces(int limit, int offset) {
     final String bodyAsJson = http.get(http.url("/namespaces", newQueryParamsWith(limit, offset)));
     return Namespaces.fromJson(bodyAsJson).getValue();
   }
@@ -118,7 +121,7 @@ public class MarquezClient {
     return listSources(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<Source> listSources(Integer limit, Integer offset) {
+  public List<Source> listSources(int limit, int offset) {
     return listSources(namespaceName, limit, offset);
   }
 
@@ -126,7 +129,7 @@ public class MarquezClient {
     return listSources(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<Source> listSources(@NonNull String namespaceName, Integer limit, Integer offset) {
+  public List<Source> listSources(@NonNull String namespaceName, int limit, int offset) {
     final String bodyAsJson = http.get(http.url("/sources", newQueryParamsWith(limit, offset)));
     return Sources.fromJson(bodyAsJson).getValue();
   }
@@ -156,7 +159,7 @@ public class MarquezClient {
     return listDatasets(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<Dataset> listDatasets(Integer limit, Integer offset) {
+  public List<Dataset> listDatasets(int limit, int offset) {
     return listDatasets(namespaceName, limit, offset);
   }
 
@@ -164,7 +167,7 @@ public class MarquezClient {
     return listDatasets(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<Dataset> listDatasets(@NonNull String namespaceName, Integer limit, Integer offset) {
+  public List<Dataset> listDatasets(@NonNull String namespaceName, int limit, int offset) {
     final String bodyAsJson =
         http.get(
             http.url("/namespaces/%s/datasets", newQueryParamsWith(limit, offset), namespaceName));
@@ -225,7 +228,7 @@ public class MarquezClient {
     return listJobs(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<Job> listJobs(Integer limit, Integer offset) {
+  public List<Job> listJobs(int limit, int offset) {
     return listJobs(namespaceName, limit, offset);
   }
 
@@ -233,7 +236,7 @@ public class MarquezClient {
     return listJobs(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<Job> listJobs(@NonNull String namespaceName, Integer limit, Integer offset) {
+  public List<Job> listJobs(@NonNull String namespaceName, int limit, int offset) {
     final String bodyAsJson =
         http.get(http.url("/namespaces/%s/jobs", newQueryParamsWith(limit, offset), namespaceName));
     return Jobs.fromJson(bodyAsJson).getValue();
@@ -259,7 +262,7 @@ public class MarquezClient {
     return listRuns(namespaceName, jobName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<Run> listRuns(String jobName, Integer limit, Integer offset) {
+  public List<Run> listRuns(String jobName, int limit, int offset) {
     return listRuns(namespaceName, jobName, limit, offset);
   }
 
@@ -268,7 +271,7 @@ public class MarquezClient {
   }
 
   public List<Run> listRuns(
-      @NonNull String namespaceName, @NonNull String jobName, Integer limit, Integer offset) {
+      @NonNull String namespaceName, @NonNull String jobName, int limit, int offset) {
     final String bodyAsJson =
         http.get(
             http.url(
@@ -298,7 +301,16 @@ public class MarquezClient {
     return Run.fromJson(bodyAsJson);
   }
 
-  private Map<String, Object> newQueryParamsWith(@NonNull Integer limit, @NonNull Integer offset) {
+  public Set<Tag> listTags() {
+    return listTags(DEFAULT_LIMIT, DEFAULT_OFFSET);
+  }
+
+  public Set<Tag> listTags(int limit, int offset) {
+    final String bodyAsJson = http.get(http.url("/tags", newQueryParamsWith(limit, offset)));
+    return Tags.fromJson(bodyAsJson).getValue();
+  }
+
+  private Map<String, Object> newQueryParamsWith(int limit, int offset) {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
     return ImmutableMap.of("limit", limit, "offset", offset);
@@ -434,6 +446,20 @@ public class MarquezClient {
 
     static Runs fromJson(final String json) {
       return Utils.fromJson(json, new TypeReference<Runs>() {});
+    }
+  }
+
+  @Value
+  static class Tags {
+    @Getter Set<Tag> value;
+
+    @JsonCreator
+    Tags(@JsonProperty("tags") final Set<Tag> value) {
+      this.value = ImmutableSet.copyOf(value);
+    }
+
+    static Tags fromJson(final String json) {
+      return Utils.fromJson(json, new TypeReference<Tags>() {});
     }
   }
 }

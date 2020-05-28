@@ -19,6 +19,7 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.URL;
 import marquez.client.Utils;
 
 public final class JsonGenerator {
@@ -105,7 +106,7 @@ public final class JsonGenerator {
             .put("type", STREAM)
             .put("physicalName", meta.getPhysicalName())
             .put("sourceName", meta.getSourceName())
-            .put("schemaLocation", meta.getSchemaLocation().toString());
+            .put("schemaLocation", meta.getSchemaLocation().map(URL::toString).orElse(null));
     obj.putArray("fields").addAll(fields);
     obj.putArray("tags").addAll(tags);
     obj.put("description", meta.getDescription().orElse(null));
@@ -168,7 +169,7 @@ public final class JsonGenerator {
     obj.putArray("fields").addAll(fields);
     obj.putArray("tags").addAll(tags);
     obj.put("lastModifiedAt", stream.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));
-    obj.put("schemaLocation", stream.getSchemaLocation().toString());
+    obj.put("schemaLocation", stream.getSchemaLocation().map(URL::toString).orElse(null));
     obj.put("description", stream.getDescription().orElse(null));
 
     return obj.toString();
@@ -184,7 +185,7 @@ public final class JsonGenerator {
     obj.put("type", meta.getType().toString());
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
-    obj.put("location", meta.getLocation().toString());
+    obj.put("location", meta.getLocation().map(URL::toString).orElse(null));
     obj.set("context", context);
     obj.put("description", meta.getDescription().orElse(null));
 
@@ -210,7 +211,7 @@ public final class JsonGenerator {
     obj.put("updatedAt", ISO_INSTANT.format(job.getUpdatedAt()));
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
-    obj.put("location", job.getLocation().toString());
+    obj.put("location", job.getLocation().map(URL::toString).orElse(null));
     obj.set("context", context);
     obj.put("description", job.getDescription().orElse(null));
     obj.set("latestRun", toObj(job.getLatestRun().orElse(null)));
@@ -247,9 +248,10 @@ public final class JsonGenerator {
             .put("updatedAt", ISO_INSTANT.format(run.getUpdatedAt()));
     obj.put("nominalStartTime", run.getNominalStartTime().map(ISO_INSTANT::format).orElse(null));
     obj.put("nominalEndTime", run.getNominalEndTime().map(ISO_INSTANT::format).orElse(null));
-    obj.put("state", run.getState().toString());
+    obj.put("state", run.getState().name());
     obj.put("startedAt", run.getStartedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("endedAt", run.getEndedAt().map(ISO_INSTANT::format).orElse(null));
+    obj.put("durationMs", run.getDurationMs().orElse(null));
 
     final ObjectNode runArgs = MAPPER.createObjectNode();
     run.getArgs().forEach(runArgs::put);
