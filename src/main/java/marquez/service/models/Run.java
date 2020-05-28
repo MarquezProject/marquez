@@ -36,6 +36,7 @@ public final class Run {
   @Getter private final RunState state;
   @Nullable private final Instant startedAt;
   @Nullable private final Instant endedAt;
+  @Nullable private final Long durationMs;
   @Getter private final ImmutableMap<String, String> args;
 
   public Run(
@@ -47,6 +48,7 @@ public final class Run {
       @NonNull final RunState state,
       @Nullable final Instant startedAt,
       @Nullable final Instant endedAt,
+      @Nullable final Long durationMs,
       @Nullable final ImmutableMap<String, String> args) {
     this.id = id;
     this.createdAt = createdAt;
@@ -56,6 +58,7 @@ public final class Run {
     this.state = state;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
+    this.durationMs = durationMs;
     this.args = (args == null) ? ImmutableMap.of() : args;
   }
 
@@ -73,5 +76,9 @@ public final class Run {
 
   public Optional<Instant> getEndedAt() {
     return Optional.ofNullable(endedAt);
+  }
+
+  public Optional<Long> getDurationMs() {
+    return Optional.ofNullable(durationMs);
   }
 }

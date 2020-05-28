@@ -36,10 +36,12 @@ import static marquez.common.models.ModelGenerator.newTagNames;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.net.URL;
 import java.time.Instant;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import marquez.Generator;
+import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobId;
@@ -170,6 +172,7 @@ public final class ModelGenerator extends Generator {
         runState,
         null,
         null,
+        null,
         newRunArgs());
   }
 
@@ -209,5 +212,9 @@ public final class ModelGenerator extends Generator {
 
   public static ImmutableSet<DatasetId> newOutputs(final int limit) {
     return newDatasetIds(limit);
+  }
+
+  public static URL newSchemaLocation() {
+    return Utils.toUrl("http://localhost:8081/schemas/ids/" + newId());
   }
 }

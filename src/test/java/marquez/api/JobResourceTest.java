@@ -275,6 +275,7 @@ public class JobResourceTest {
         newRunState(),
         null,
         null,
+        null,
         runMeta.getArgs());
   }
 }

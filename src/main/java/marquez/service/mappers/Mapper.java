@@ -15,6 +15,7 @@
 package marquez.service.mappers;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
@@ -25,6 +26,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
@@ -362,6 +364,11 @@ public final class Mapper {
   }
 
   public static Run toRun(@NonNull final ExtendedRunRow row) {
+    Optional<Long> durationMs =
+        row.getEndedAt()
+            .flatMap(
+                endedAt ->
+                    row.getStartedAt().map(startedAt -> startedAt.until(endedAt, MILLIS)));
     return new Run(
         RunId.of(row.getUuid()),
         row.getCreatedAt(),
@@ -371,6 +378,7 @@ public final class Mapper {
         RunState.valueOf(row.getCurrentRunState().get()),
         row.getStartedAt().orElse(null),
         row.getEndedAt().orElse(null),
+        durationMs.orElse(null),
         Utils.fromJson(row.getArgs(), new TypeReference<ImmutableMap<String, String>>() {}));
   }
 
