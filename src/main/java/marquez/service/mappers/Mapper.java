@@ -367,8 +367,7 @@ public final class Mapper {
     Optional<Long> durationMs =
         row.getEndedAt()
             .flatMap(
-                endedAt ->
-                    row.getStartedAt().map(startedAt -> startedAt.until(endedAt, MILLIS)));
+                endedAt -> row.getStartedAt().map(startedAt -> startedAt.until(endedAt, MILLIS)));
     return new Run(
         RunId.of(row.getUuid()),
         row.getCreatedAt(),
