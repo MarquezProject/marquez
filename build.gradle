@@ -110,7 +110,7 @@ publishing {
   publications {
     mavenJava(MavenPublication) {
       groupId = 'io.github.marquezproject'
-      artifactId = 'marquez-java'
+      artifactId = 'marquez'
 
       from components.java
 
