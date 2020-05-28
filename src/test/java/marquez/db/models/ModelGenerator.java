@@ -141,6 +141,11 @@ public final class ModelGenerator extends Generator {
     return new TagRow(newRowUuid(), now, now, name, newDescription());
   }
 
+  public static TagRow newTagRowWith(final String name, final String description) {
+    final Instant now = newTimestamp();
+    return new TagRow(newRowUuid(), now, now, name, description);
+  }
+
   public static List<UUID> toTagUuids(final List<TagRow> rows) {
     return rows.stream().map(row -> row.getUuid()).collect(toImmutableList());
   }
