@@ -23,7 +23,7 @@ services:
     entrypoint: ["./wait-for-it.sh", "marquez:5000", "--", "./entrypoint.sh"]
 
   marquez:
-    image: marquezproject/marquez:latest
+    image: marquezproject/marquez:0.10.4
     ports:
       - "5000:5000"
       - "5001:5001"
