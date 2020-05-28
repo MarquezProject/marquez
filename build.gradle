@@ -20,7 +20,6 @@ plugins {
   id 'checkstyle'
   id 'jacoco'
   id 'java'
-  id 'java-library'
   id 'maven-publish'
   id 'signing'
   id 'com.adarshr.test-logger' version '2.0.0'
