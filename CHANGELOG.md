@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.0...HEAD)
 
+Changed
+
+* `config.yml` -> `marquez.yml`
+
 ## [0.11.0](https://github.com/MarquezProject/marquez/compare/0.10.4...0.11.0) - 2020-05-27
 
 ### Added
