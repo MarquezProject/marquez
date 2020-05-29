@@ -24,7 +24,7 @@ This project is under active development at [WeWork](https://www.wework.com) and
 The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
-$ docker-compose up --build
+$ docker-compose up
 ```
 
 Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
