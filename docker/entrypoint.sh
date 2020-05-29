@@ -17,7 +17,7 @@
 set -e
 
 if [[ -z "${MARQUEZ_CONFIG}" ]]; then
-  MARQUEZ_CONFIG='config.dev.yml'
+  MARQUEZ_CONFIG='marquez.dev.yml'
   echo "WARNING 'MARQUEZ_CONFIG' not set, using development configuration."
 fi
 

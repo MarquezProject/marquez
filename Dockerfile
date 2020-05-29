@@ -16,7 +16,7 @@ FROM openjdk:11-jre
 RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build/libs/marquez-*.jar /usr/src/app
-COPY docker/config.dev.yml config.dev.yml
+COPY marquez.dev.yml marquez.dev.yml
 COPY docker/entrypoint.sh entrypoint.sh
 EXPOSE 5000 5001
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
