@@ -19,6 +19,18 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 This project is under active development at [WeWork](https://www.wework.com) and [Datakin](https://twitter.com/DatakinHQ) (in collaboration with many other organizations).
 
+## Quickstart
+
+The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
+
+```
+$ docker-compose up --build
+```
+
+Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
+
+> **Note:** By default, the HTTP API does not require any form of authentication or authorization.
+
 ## Documentation
 
 We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/master/docs).
