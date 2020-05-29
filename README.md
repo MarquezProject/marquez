@@ -65,12 +65,12 @@ When creating your database using [`psql`](https://www.postgresql.org/docs/9.6/a
 $ psql -c 'CREATE DATABASE marquez;'
 ```
 
-### Step 2: Create `config.yml`
+### Step 2: Create `marquez.yml`
 
-With your database created, you can now copy [`config.example.yml`](https://github.com/MarquezProject/marquez/blob/master/config.example.yml):
+With your database created, you can now copy [`marquez.example.yml`](https://github.com/MarquezProject/marquez/blob/master/marquez.example.yml):
 
 ```
-$ cp config.example.yml config.yml
+$ cp marquez.example.yml marquez.yml
 ```
 
 You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`. The environment variables override the equivalent option in the configuration file. 
@@ -85,7 +85,7 @@ By default, Marquez uses the following ports:
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
 
 ```bash
-$ ./gradlew run --args 'server config.yml'
+$ ./gradlew run --args 'server marquez.yml'
 ```
 
 Then browse to the admin interface: http://localhost:8081
