@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.0...HEAD)
 
-Changed
+### Changed
 
 * `config.yml` -> `marquez.yml`
 
