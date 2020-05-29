@@ -55,7 +55,7 @@ The executable can be found under `build/libs/`
 
 ## Configuration
 
-To run Marquez, you will have to define `config.yml`. The configuration file is passed to the application and used to specify your database connection. The configuration file creation steps are outlined below.
+To run Marquez, you will have to define `marquez.yml`. The configuration file is passed to the application and used to specify your database connection. The configuration file creation steps are outlined below.
 
 ### Step 1: Create Database
 
@@ -80,7 +80,7 @@ By default, Marquez uses the following ports:
 * TCP port `8080` is available for the HTTP API server.
 * TCP port `8081` is available for the admin interface.
 
-> **Note:** All of the configuration settings in `config.yml` can be specified either in the configuration file or in an environment variable.
+> **Note:** All of the configuration settings in `marquez.yml` can be specified either in the configuration file or in an environment variable.
 
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
 
