@@ -182,7 +182,7 @@ shadowJar {
 }
 
 runShadow {
-  args = ['server', 'config.yml']
+  args = ['server', 'marquez.yml']
 }
 
 spotless {
