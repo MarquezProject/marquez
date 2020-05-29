@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./up.sh [--local]
+# Usage: $ ./up.sh [--build]
 
 set -e
 
@@ -23,8 +23,8 @@ cd "${project_root}"
 compose_files="-f docker-compose.yml"
 args="-V --force-recreate"
 
-if [ "${1}" = "--local" ]; then
-  compose_files+=" -f docker-compose.local.yml"
+if [ "${1}" = "--build" ]; then
+  compose_files+=" -f docker-compose.dev.yml"
   args+=" --build"
 fi
 
