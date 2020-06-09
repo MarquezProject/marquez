@@ -1,5 +1,6 @@
 package marquez.api;
 
+import static marquez.Generator.newIsoTimestamp;
 import static marquez.Generator.newTimestamp;
 import static marquez.api.JobResource.Jobs;
 import static marquez.api.JobResource.Runs;
@@ -67,6 +68,7 @@ public class JobResourceTest {
   private static final Run RUN_1 = newRun();
   private static final Run RUN_2 = newRun();
   private static final ImmutableList<Run> RUNS = ImmutableList.of(RUN_0, RUN_1, RUN_2);
+  private static final String TRANSITIONED_AT = newIsoTimestamp();
 
   @Rule public MockitoRule rule = MockitoJUnit.rule();
 
@@ -204,10 +206,10 @@ public class JobResourceTest {
   public void testMarkRunAsRunning() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run running = newRunWith(RUN_ID, RUNNING);
+    final Run running = newRunWith(RUN_ID, RUNNING, TRANSITIONED_AT);
     doReturn(Response.ok(running).build()).when(jobResource).getRun(RUN_ID);
 
-    final Response response = jobResource.markRunAs(RUN_ID, RUNNING);
+    final Response response = jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(running);
   }
@@ -216,10 +218,10 @@ public class JobResourceTest {
   public void testMarkRunAsCompleted() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run completed = newRunWith(RUN_ID, COMPLETED);
+    final Run completed = newRunWith(RUN_ID, COMPLETED, TRANSITIONED_AT);
     doReturn(Response.ok(completed).build()).when(jobResource).getRun(RUN_ID);
 
-    final Response response = jobResource.markRunAs(RUN_ID, RUNNING);
+    final Response response = jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(completed);
   }
@@ -228,10 +230,10 @@ public class JobResourceTest {
   public void testMarkRunAsFailed() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run failed = newRunWith(RUN_ID, FAILED);
+    final Run failed = newRunWith(RUN_ID, FAILED, TRANSITIONED_AT);
     doReturn(Response.ok(failed).build()).when(jobResource).getRun(RUN_ID);
 
-    final Response response = jobResource.markRunAs(RUN_ID, RUNNING);
+    final Response response = jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(failed);
   }
@@ -240,10 +242,10 @@ public class JobResourceTest {
   public void testMarkRunAsAborted() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run aborted = newRunWith(RUN_ID, ABORTED);
+    final Run aborted = newRunWith(RUN_ID, ABORTED, TRANSITIONED_AT);
     doReturn(Response.ok(aborted).build()).when(jobResource).getRun(RUN_ID);
 
-    final Response response = jobResource.markRunAs(RUN_ID, RUNNING);
+    final Response response = jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(aborted);
   }

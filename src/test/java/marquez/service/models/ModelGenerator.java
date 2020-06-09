@@ -126,7 +126,7 @@ public final class ModelGenerator extends Generator {
   }
 
   public static Job newJobWith(final JobId jobId, final int numOfInputs, final int numOfOutputs) {
-    final Instant now = Instant.now();
+    final Instant now = newTimestamp();
     final JobMeta jobMeta = newJobMetaWith(numOfInputs, numOfOutputs);
     return new Job(
         jobId,
@@ -143,25 +143,26 @@ public final class ModelGenerator extends Generator {
   }
 
   public static RunMeta newRunMeta() {
-    final Instant nominalStartTime = Instant.now();
+    final Instant nominalStartTime = newTimestamp();
     final Instant nominalEndTime = nominalStartTime.plus(1, HOURS);
     return new RunMeta(nominalStartTime, nominalEndTime, newRunArgs());
   }
 
   public static Run newRun() {
-    return newRunWith(newRunId(), newRunState());
+    return newRunWith(newRunId(), newRunState(), newIsoTimestamp());
   }
 
   public static Run newRunWith(final RunId runId) {
-    return newRunWith(runId, newRunState());
+    return newRunWith(runId, newRunState(), newIsoTimestamp());
   }
 
   public static Run newRunWith(final RunState runState) {
-    return newRunWith(newRunId(), runState);
+    return newRunWith(newRunId(), runState, newIsoTimestamp());
   }
 
-  public static Run newRunWith(final RunId runId, final RunState runState) {
-    final Instant now = Instant.now();
+  public static Run newRunWith(
+      final RunId runId, final RunState runState, final String transitionedAt) {
+    final Instant now = Utils.toInstant(transitionedAt);
     final RunMeta runMeta = newRunMeta();
     return new Run(
         runId,

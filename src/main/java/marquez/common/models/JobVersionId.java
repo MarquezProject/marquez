@@ -12,17 +12,16 @@
  * limitations under the License.
  */
 
-package marquez.service.models;
+package marquez.common.models;
 
 import lombok.NonNull;
 import lombok.Value;
-import marquez.common.models.DatasetName;
-import marquez.common.models.NamespaceName;
+import marquez.service.models.Version;
 
-/** Version ID for {@link Dataset}. */
+/** The unique identifier of a Job Version in the lineage graph */
 @Value
-public class DatasetVersionId {
-  @NonNull NamespaceName namespaceName;
-  @NonNull DatasetName datasetName;
+public class JobVersionId {
+  @NonNull NamespaceName namespace;
+  @NonNull JobName jobName;
   @NonNull Version version;
 }

@@ -14,6 +14,8 @@
 
 package marquez;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+
 import java.time.Instant;
 import java.util.Random;
 
@@ -35,5 +37,9 @@ public abstract class Generator {
 
   public static Instant newTimestamp() {
     return Instant.now();
+  }
+
+  public static String newIsoTimestamp() {
+    return ISO_INSTANT.format(newTimestamp());
   }
 }
