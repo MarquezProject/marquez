@@ -52,11 +52,14 @@ public final class MarquezContext {
   @Getter private final RunStateDao runStateDao;
   @Getter private final TagDao tagDao;
 
+  private final List<RunTransitionListener> runTransitionListeners;
+
   @Getter private final NamespaceService namespaceService;
   @Getter private final SourceService sourceService;
   @Getter private final DatasetService datasetService;
   @Getter private final JobService jobService;
   @Getter private final TagService tagService;
+  @Getter private final MarquezServiceExceptionMapper serviceExceptionMapper;
 
   @Getter private final NamespaceResource namespaceResource;
   @Getter private final SourceResource sourceResource;
@@ -64,11 +67,7 @@ public final class MarquezContext {
   @Getter private final JobResource jobResource;
   @Getter private final TagResource tagResource;
 
-  @Getter private final MarquezServiceExceptionMapper serviceExceptionMapper;
-
-  @Getter private final List<Object> resources;
-
-  private final List<RunTransitionListener> runTransitionListeners;
+  @Getter private final ImmutableList<Object> resources;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
@@ -111,6 +110,7 @@ public final class MarquezContext {
             runTransitionListeners);
     this.tagService = new TagService(tagDao);
     this.tagService.init(tags);
+    this.serviceExceptionMapper = new MarquezServiceExceptionMapper();
 
     this.namespaceResource = new NamespaceResource(namespaceService);
     this.sourceResource = new SourceResource(sourceService);
@@ -118,7 +118,6 @@ public final class MarquezContext {
         new DatasetResource(namespaceService, datasetService, jobService, tagService);
     this.jobResource = new JobResource(namespaceService, jobService);
     this.tagResource = new TagResource(tagService);
-    this.serviceExceptionMapper = new MarquezServiceExceptionMapper();
 
     this.resources =
         ImmutableList.of(
@@ -159,12 +158,12 @@ public final class MarquezContext {
     }
 
     public Builder runTransitionListener(@NonNull RunTransitionListener runTransitionListener) {
-      return runTransitionListeners(ImmutableList.of(runTransitionListener));
+      return runTransitionListeners(Lists.newArrayList(runTransitionListener));
     }
 
     public Builder runTransitionListeners(
         @NonNull List<RunTransitionListener> runTransitionListeners) {
-      this.runTransitionListeners = ImmutableList.copyOf(runTransitionListeners);
+      this.runTransitionListeners = runTransitionListeners;
       return this;
     }
 

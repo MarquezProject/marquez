@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,9 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetVersionId;
 import marquez.common.models.JobName;
+import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
@@ -68,10 +71,8 @@ import marquez.service.RunTransitionListener.RunOutput;
 import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
-import marquez.service.models.DatasetVersionId;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
-import marquez.service.models.JobVersionId;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 import marquez.service.models.Version;
@@ -427,19 +428,25 @@ public class JobService {
     }
   }
 
-  public void markRunAs(@NonNull RunId runId, @NonNull RunState runState)
+  public void markRunAs(@NonNull RunId runId, @NonNull RunState newRunState) {
+    markRunAs(runId, newRunState, null);
+  }
+
+  public void markRunAs(
+      @NonNull RunId runId, @NonNull RunState newRunState, @Nullable Instant transitionedAt)
       throws MarquezServiceException {
-    log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
-    final RunStateRow newRunStateRow = Mapper.toRunStateRow(runId.getValue(), runState);
+    log.debug("Marking run with ID '{}' as '{}'...", runId, newRunState);
+    final RunStateRow newRunStateRow =
+        Mapper.toRunStateRow(runId.getValue(), newRunState, transitionedAt);
+    final RunRow runRow = runDao.findBy(runId.getValue()).get();
     try {
-      @NonNull final List<UUID> outputUuids;
-      if (runState.isComplete()) {
-        final RunRow runRow = runDao.findBy(runId.getValue()).get();
+      final List<UUID> outputUuids;
+      if (newRunState.isComplete()) {
         final ExtendedJobVersionRow versionRow =
             versionDao.findBy(runRow.getJobVersionUuid()).get();
-        List<ExtendedDatasetVersionRow> outputVersions =
+        final List<ExtendedDatasetVersionRow> outputVersions =
             datasetVersionDao.findByRunId(runId.getValue());
-        List<RunOutput> outputs =
+        final List<RunOutput> outputs =
             outputVersions.stream()
                 .map(
                     (v) ->
@@ -449,7 +456,14 @@ public class JobService {
                                 DatasetName.of(v.getDatasetName()),
                                 Version.of(v.getUuid()))))
                 .collect(toImmutableList());
-        notify(new JobOutputUpdate(runId, outputs));
+        notify(
+            new JobOutputUpdate(
+                runId,
+                new JobVersionId(
+                    NamespaceName.of(versionRow.getNamespaceName()),
+                    JobName.of(versionRow.getName()),
+                    Version.of(versionRow.getUuid())),
+                outputs));
         if (versionRow.hasOutputUuids()) {
           outputUuids = versionRow.getOutputUuids();
           log.info(
@@ -463,11 +477,17 @@ public class JobService {
       } else {
         outputUuids = null;
       }
-      runStateDao.insert(newRunStateRow, outputUuids, runState.isStarting(), runState.isComplete());
-      notify(new RunTransition(runId, runState));
-      incOrDecBy(runState);
+      runStateDao.insert(
+          newRunStateRow,
+          outputUuids,
+          newRunState.isStarting(),
+          newRunState.isDone(),
+          newRunState.isComplete());
+      final RunState oldRunState = runRow.getCurrentRunState().map(RunState::valueOf).orElse(null);
+      notify(new RunTransition(runId, oldRunState, newRunState));
+      incOrDecBy(newRunState);
     } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to mark job run '{}' as '{}'.", runId.getValue(), runState, e);
+      log.error("Failed to mark job run '{}' as '{}'.", runId, newRunState, e);
       throw new MarquezServiceException();
     }
   }

@@ -1,12 +1,14 @@
 package marquez.service;
 
 import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
+import marquez.common.models.DatasetVersionId;
+import marquez.common.models.JobVersionId;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
-import marquez.service.models.DatasetVersionId;
-import marquez.service.models.JobVersionId;
 import marquez.service.models.RunMeta;
 
 /**
@@ -34,9 +36,9 @@ public interface RunTransitionListener {
   /**
    * Called when the job transitions from one state to another
    *
-   * @param transition - the run transition
+   * @param runTransition - the run transition
    */
-  void notify(RunTransition transition);
+  void notify(RunTransition runTransition);
 
   /** Job input update event lists all the input versions for a given run of a job */
   @Value
@@ -58,6 +60,7 @@ public interface RunTransitionListener {
   @Value
   class JobOutputUpdate {
     @NonNull RunId runId;
+    @NonNull JobVersionId jobVersion;
     @NonNull List<RunOutput> outputs;
   }
 
@@ -68,12 +71,18 @@ public interface RunTransitionListener {
     // TODO(Julien): add metadata attached to an output (ex: output partition key(s))
   }
 
-  /** run state transition event */
+  /** The run state transition event. */
   @Value
   class RunTransition {
-    /** the unique ID of the run */
+    /** the unique ID of the run. */
     @NonNull RunId runId;
-    /** the new state */
+    /** The old state of the run. */
+    @Nullable RunState oldState;
+    /** The new state of the run. */
     @NonNull RunState newState;
+
+    public Optional<RunState> getOldState() {
+      return Optional.ofNullable(oldState);
+    }
   }
 }

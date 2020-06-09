@@ -48,7 +48,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
   private static final String PROMETHEUS = "prometheus";
   private static final String PROMETHEUS_ENDPOINT = "/metrics";
 
-  public static void main(String[] args) throws Exception {
+  public static void main(final String[] args) throws Exception {
     new MarquezApp().run(args);
   }
 

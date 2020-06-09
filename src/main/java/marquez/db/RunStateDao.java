@@ -36,7 +36,11 @@ public interface RunStateDao extends SqlObject {
 
   @Transaction
   default void insert(
-      RunStateRow row, List<UUID> outputVersionUuids, boolean starting, boolean ending) {
+      RunStateRow row,
+      List<UUID> outputVersionUuids,
+      boolean starting,
+      boolean done,
+      boolean complete) {
     getHandle()
         .createUpdate(
             "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
@@ -49,11 +53,11 @@ public interface RunStateDao extends SqlObject {
     if (starting) {
       createRunDao().updateStartState(row.getRunUuid(), updateAt, row.getUuid());
     }
-    if (ending) {
+    if (done) {
       createRunDao().updateEndState(row.getRunUuid(), updateAt, row.getUuid());
     }
     // Modified
-    if (outputVersionUuids != null && outputVersionUuids.size() > 0) {
+    if (complete && outputVersionUuids != null && outputVersionUuids.size() > 0) {
       createDatasetDao().updateLastModifedAt(outputVersionUuids, updateAt);
     }
   }

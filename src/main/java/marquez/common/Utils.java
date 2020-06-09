@@ -16,6 +16,7 @@ package marquez.common;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -30,8 +31,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 
 public final class Utils {
@@ -91,5 +94,9 @@ public final class Utils {
         uuidString.length() == UUID_LENGTH,
         String.format("uuidString length must = %d", UUID_LENGTH));
     return UUID.fromString(uuidString);
+  }
+
+  public static Instant toInstant(@Nullable final String asIso) {
+    return (asIso == null) ? null : Instant.from(ISO_INSTANT.parse(asIso));
   }
 }

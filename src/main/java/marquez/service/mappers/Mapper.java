@@ -411,8 +411,14 @@ public final class Mapper {
   }
 
   public static RunStateRow toRunStateRow(
-      @NonNull final UUID runId, @NonNull final RunState runState) {
-    return new RunStateRow(newRowUuid(), newTimestamp(), runId, runState.toString());
+      @NonNull final UUID runId,
+      @NonNull final RunState runState,
+      @Nullable Instant transitionedAt) {
+    return new RunStateRow(
+        newRowUuid(),
+        transitionedAt == null ? newTimestamp() : transitionedAt,
+        runId,
+        runState.name());
   }
 
   private static UUID newRowUuid() {

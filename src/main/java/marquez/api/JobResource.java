@@ -41,6 +41,7 @@ import lombok.Value;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
+import marquez.common.Utils;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
@@ -172,8 +173,9 @@ public class JobResource {
   @POST
   @Path("/jobs/runs/{id}/start")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsRunning(@PathParam("id") RunId runId) throws MarquezServiceException {
-    return markRunAs(runId, RunState.RUNNING);
+  public Response markRunAsRunning(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
+      throws MarquezServiceException {
+    return markRunAs(runId, RunState.RUNNING, atAsIso);
   }
 
   @Timed
@@ -182,8 +184,9 @@ public class JobResource {
   @POST
   @Path("/jobs/runs/{id}/complete")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsCompleted(@PathParam("id") RunId runId) throws MarquezServiceException {
-    return markRunAs(runId, RunState.COMPLETED);
+  public Response markRunAsCompleted(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
+      throws MarquezServiceException {
+    return markRunAs(runId, RunState.COMPLETED, atAsIso);
   }
 
   @Timed
@@ -192,8 +195,9 @@ public class JobResource {
   @POST
   @Path("/jobs/runs/{id}/fail")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsFailed(@PathParam("id") RunId runId) throws MarquezServiceException {
-    return markRunAs(runId, RunState.FAILED);
+  public Response markRunAsFailed(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
+      throws MarquezServiceException {
+    return markRunAs(runId, RunState.FAILED, atAsIso);
   }
 
   @Timed
@@ -202,15 +206,17 @@ public class JobResource {
   @POST
   @Path("/jobs/runs/{id}/abort")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsAborted(@PathParam("id") RunId runId) throws MarquezServiceException {
-    return markRunAs(runId, RunState.ABORTED);
+  public Response markRunAsAborted(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
+      throws MarquezServiceException {
+    return markRunAs(runId, RunState.ABORTED, atAsIso);
   }
 
-  Response markRunAs(@NonNull RunId runId, @NonNull RunState runState)
+  Response markRunAs(
+      @NonNull RunId runId, @NonNull RunState runState, @QueryParam("at") String atAsIso)
       throws MarquezServiceException {
     throwIfNotExists(runId);
 
-    jobService.markRunAs(runId, runState);
+    jobService.markRunAs(runId, runState, Utils.toInstant(atAsIso));
     return getRun(runId);
   }
 
