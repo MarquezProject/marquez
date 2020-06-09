@@ -37,12 +37,12 @@ $ ./gradlew spotlessApply
 
 > **Note:** To make formatting code simple, we recommend installing a [plugin](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides) for your favorite IDE. We also us [Lombok](https://projectlombok.org). Though not required, you might want to install the [plugin](https://projectlombok.org/setup/overview) as well. 
 
-# Local Publishing
+# Publish to Local Maven Repository
 
-Use [`publishToMavenLocal`](https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:tasks) to publish snapshots to your local maven repository:
+Use [`publishToMavenLocal`](https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:tasks) to publish artifacts to your local maven repository:
 
 ```
-$ ./gradlew -Pversion=<SNAPSHOT> publishToMavenLocal
+$ ./gradlew publishToMavenLocal
 ```
 
 # Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
