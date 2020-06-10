@@ -2,6 +2,7 @@ package marquez;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.Instant.EPOCH;
+import static marquez.Generator.newTimestamp;
 import static marquez.common.models.ModelGenerator.newConnectionUrl;
 import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.ModelGenerator.newContext;
@@ -28,6 +29,7 @@ import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import java.net.URI;
 import java.net.URL;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -402,28 +404,30 @@ public class MarquezAppIntegrationTest {
     assertThat(run.getArgs()).isEmpty();
 
     // (6) Start a run
-    final Run runStarted = client.markRunAsRunning(run.getId());
+    final Instant startedAt = newTimestamp();
+    final Run runStarted = client.markRunAsRunning(run.getId(), startedAt);
     assertThat(runStarted.getId()).isEqualTo(run.getId());
     assertThat(runStarted.getCreatedAt()).isAfter(EPOCH);
     assertThat(runStarted.getUpdatedAt()).isAfter(EPOCH);
     assertThat(runStarted.getNominalStartTime()).isEmpty();
     assertThat(runStarted.getNominalEndTime()).isEmpty();
     assertThat(runStarted.getState()).isEqualTo(RunState.RUNNING);
-    assertThat(runStarted.getStartedAt().get()).isAfter(EPOCH);
+    assertThat(runStarted.getStartedAt().get()).isEqualTo(startedAt);
     assertThat(runStarted.getEndedAt()).isEmpty();
     assertThat(runStarted.getDurationMs()).isEmpty();
     assertThat(runStarted.getArgs()).isEmpty();
 
     // (7) Complete a run
-    final Run runCompleted = client.markRunAsCompleted(run.getId());
+    final Instant endedAt = newTimestamp();
+    final Run runCompleted = client.markRunAsCompleted(run.getId(), endedAt);
     assertThat(runCompleted.getId()).isEqualTo(run.getId());
     assertThat(runCompleted.getCreatedAt()).isAfter(EPOCH);
     assertThat(runCompleted.getUpdatedAt()).isAfter(EPOCH);
     assertThat(runCompleted.getNominalStartTime()).isEmpty();
     assertThat(runCompleted.getNominalEndTime()).isEmpty();
     assertThat(runCompleted.getState()).isEqualTo(RunState.COMPLETED);
-    assertThat(runCompleted.getStartedAt().get()).isAfter(EPOCH);
-    assertThat(runCompleted.getEndedAt().get()).isAfter(EPOCH);
+    assertThat(runCompleted.getStartedAt().get()).isEqualTo(startedAt);
+    assertThat(runCompleted.getEndedAt().get()).isEqualTo(endedAt);
     assertThat(runCompleted.getDurationMs()).isNotEmpty();
     assertThat(runCompleted.getArgs()).isEmpty();
   }
