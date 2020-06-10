@@ -16,7 +16,6 @@ package marquez.db;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static marquez.Generator.newTimestamp;
 import static marquez.common.models.ModelGenerator.newDatasetName;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
@@ -30,8 +29,10 @@ import static marquez.db.models.ModelGenerator.newSourceRow;
 import static marquez.db.models.ModelGenerator.newTagRow;
 import static marquez.db.models.ModelGenerator.newTagRows;
 import static marquez.db.models.ModelGenerator.toTagUuids;
+import static marquez.service.models.ModelGenerator.newVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.util.List;
@@ -267,7 +268,7 @@ public class DatasetDaoTest {
     datasetDao.insert(ds);
 
     DatasetVersionRow dsv =
-        newDatasetVersionRowWith(ds.getUuid(), newRowUuid(), emptyList(), newRowUuid());
+        newDatasetVersionRowWith(ds.getUuid(), newVersion(), ImmutableList.of(), newRowUuid());
 
     datasetVersionDao.insert(dsv);
 

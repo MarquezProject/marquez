@@ -38,6 +38,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
+import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import marquez.Generator;
@@ -217,5 +218,9 @@ public final class ModelGenerator extends Generator {
 
   public static URL newSchemaLocation() {
     return Utils.toUrl("http://localhost:8081/schemas/ids/" + newId());
+  }
+
+  public static Version newVersion() {
+    return Version.of(UUID.randomUUID());
   }
 }

@@ -14,15 +14,14 @@
 
 package marquez.common.models;
 
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.Value;
-import marquez.service.models.Dataset;
-import marquez.service.models.Version;
 
-/** Version ID for {@link Dataset}. */
+/** Version ID for {@code Dataset}. */
 @Value
 public class DatasetVersionId {
   @NonNull NamespaceName namespaceName;
   @NonNull DatasetName datasetName;
-  @NonNull Version version;
+  @NonNull UUID datasetVersionUuid;
 }

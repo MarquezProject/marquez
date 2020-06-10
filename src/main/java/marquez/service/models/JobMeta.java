@@ -69,7 +69,7 @@ public final class JobMeta {
     return Optional.ofNullable(description);
   }
 
-  public UUID version(@NonNull NamespaceName namespaceName, @NonNull JobName jobName) {
+  public Version version(@NonNull NamespaceName namespaceName, @NonNull JobName jobName) {
     final byte[] bytes =
         VERSION_JOINER
             .join(
@@ -80,7 +80,7 @@ public final class JobMeta {
                 getLocation().map(URL::toString).orElse(null),
                 KV_JOINER.join(getContext()))
             .getBytes(UTF_8);
-    return UUID.nameUUIDFromBytes(bytes);
+    return Version.of(UUID.nameUUIDFromBytes(bytes));
   }
 
   private static java.util.stream.Stream<String> idToStream(DatasetId datasetId) {

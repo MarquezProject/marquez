@@ -45,14 +45,14 @@ public interface RunTransitionListener {
   class JobInputUpdate {
     @NonNull RunId runId;
     @NonNull RunMeta runMeta;
-    @NonNull JobVersionId jobVersion;
+    @NonNull JobVersionId jobVersionId;
     @NonNull List<RunInput> inputs;
   }
 
   /** metadata for a specific input of a job. the version of the dataset consumed */
   @Value
   class RunInput {
-    @NonNull DatasetVersionId datasetVersion;
+    @NonNull DatasetVersionId datasetVersionId;
     // TODO(Julien): add metadata attached to an input (ex: range predicate)
   }
 
@@ -60,14 +60,14 @@ public interface RunTransitionListener {
   @Value
   class JobOutputUpdate {
     @NonNull RunId runId;
-    @NonNull JobVersionId jobVersion;
+    @NonNull JobVersionId jobVersionId;
     @NonNull List<RunOutput> outputs;
   }
 
   /** metadata for a specific output of a job. the version of the dataset produced */
   @Value
   class RunOutput {
-    @NonNull DatasetVersionId datasetVersion;
+    @NonNull DatasetVersionId datasetVersionId;
     // TODO(Julien): add metadata attached to an output (ex: output partition key(s))
   }
 

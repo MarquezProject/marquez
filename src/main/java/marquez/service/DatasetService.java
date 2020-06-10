@@ -52,6 +52,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
+import marquez.service.models.Version;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -128,8 +129,8 @@ public class DatasetService {
             datasetMeta);
         datasets.labels(namespaceName.getValue(), datasetMeta.getType().toString()).inc();
       }
-      final UUID version = datasetMeta.version(namespaceName, datasetName);
-      if (!versionDao.exists(version)) {
+      final Version version = datasetMeta.version(namespaceName, datasetName);
+      if (!versionDao.exists(version.getValue())) {
         log.info("Creating version '{}' for dataset '{}'...", version, datasetName.getValue());
         final ExtendedDatasetRow datasetRow =
             datasetDao.find(namespaceName.getValue(), datasetName.getValue()).get();

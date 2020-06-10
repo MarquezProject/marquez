@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -79,7 +78,7 @@ public abstract class DatasetMeta {
     return Optional.ofNullable(runId);
   }
 
-  public abstract UUID version(NamespaceName namespaceName, DatasetName datasetName);
+  public abstract Version version(NamespaceName namespaceName, DatasetName datasetName);
 
   protected static String joinField(final Field field) {
     return VERSION_JOINER.join(field.getName(), field.getType(), field.getDescription());
