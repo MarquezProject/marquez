@@ -2,7 +2,7 @@
   <img src="https://github.com/MarquezProject/marquez/blob/master/docs/assets/images/marquez-logo.png" width="500px" />
 </p>
 
-Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the provenance of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more.
+Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the provenance of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more. Marquez was released and open sourced by [WeWork](https://www.wework.com).
 
 ## Badges
 
@@ -17,7 +17,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Status
 
-This project is under active development at [WeWork](https://www.wework.com) and [Datakin](https://twitter.com/DatakinHQ) (in collaboration with many other organizations).
+This project is under active development at [Datakin](https://twitter.com/DatakinHQ) (in collaboration with many other organizations).
 
 ## Quickstart
 
