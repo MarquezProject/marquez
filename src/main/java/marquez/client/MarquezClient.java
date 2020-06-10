@@ -15,6 +15,7 @@
 package marquez.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,10 +27,12 @@ import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
@@ -281,23 +284,39 @@ public class MarquezClient {
   }
 
   public Run markRunAsRunning(String runId) {
-    return markRunWith("/jobs/runs/%s/start", runId);
+    return markRunAsRunning(runId, null);
+  }
+
+  public Run markRunAsRunning(String runId, @Nullable Instant at) {
+    return markRunWith("/jobs/runs/%s/start", runId, at);
   }
 
   public Run markRunAsCompleted(String runId) {
-    return markRunWith("/jobs/runs/%s/complete", runId);
+    return markRunAsCompleted(runId, null);
+  }
+
+  public Run markRunAsCompleted(String runId, @Nullable Instant at) {
+    return markRunWith("/jobs/runs/%s/complete", runId, at);
   }
 
   public Run markRunAsAborted(String runId) {
-    return markRunWith("/jobs/runs/%s/abort", runId);
+    return markRunAsAborted(runId, null);
+  }
+
+  public Run markRunAsAborted(String runId, @Nullable Instant at) {
+    return markRunWith("/jobs/runs/%s/abort", runId, at);
   }
 
   public Run markRunAsFailed(String runId) {
-    return markRunWith("/jobs/runs/%s/fail", runId);
+    return markRunAsFailed(runId, null);
   }
 
-  private Run markRunWith(String pathTemplate, @NonNull String runId) {
-    final String bodyAsJson = http.post(http.url(pathTemplate, runId));
+  public Run markRunAsFailed(String runId, @Nullable Instant at) {
+    return markRunWith("/jobs/runs/%s/fail", runId, at);
+  }
+
+  private Run markRunWith(String pathTemplate, @NonNull String runId, @Nullable Instant at) {
+    final String bodyAsJson = http.post(http.url(pathTemplate, newQueryParamsWith(at), runId));
     return Run.fromJson(bodyAsJson);
   }
 
@@ -308,6 +327,10 @@ public class MarquezClient {
   public Set<Tag> listTags(int limit, int offset) {
     final String bodyAsJson = http.get(http.url("/tags", newQueryParamsWith(limit, offset)));
     return Tags.fromJson(bodyAsJson).getValue();
+  }
+
+  private Map<String, Object> newQueryParamsWith(@Nullable Instant at) {
+    return (at == null) ? ImmutableMap.of() : ImmutableMap.of("at", ISO_INSTANT.format(at));
   }
 
   private Map<String, Object> newQueryParamsWith(int limit, int offset) {

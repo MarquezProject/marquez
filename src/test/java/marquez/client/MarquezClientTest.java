@@ -46,6 +46,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
@@ -547,7 +548,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/jobs/runs/%s/start";
     final String path = buildPathFor(pathTemplate, RUN_ID);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, RUN_ID)).thenReturn(url);
+    when(http.url(pathTemplate, ImmutableMap.of(), RUN_ID)).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(RUN);
     when(http.post(url)).thenReturn(runAsJson);
@@ -563,7 +564,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/jobs/runs/%s/complete";
     final String path = buildPathFor(pathTemplate, RUN_ID);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, RUN_ID)).thenReturn(url);
+    when(http.url(pathTemplate, ImmutableMap.of(), RUN_ID)).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(RUN);
     when(http.post(url)).thenReturn(runAsJson);
@@ -579,7 +580,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/jobs/runs/%s/abort";
     final String path = buildPathFor(pathTemplate, RUN_ID);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, RUN_ID)).thenReturn(url);
+    when(http.url(pathTemplate, ImmutableMap.of(), RUN_ID)).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(RUN);
     when(http.post(url)).thenReturn(runAsJson);
@@ -595,7 +596,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/jobs/runs/%s/fail";
     final String path = buildPathFor(pathTemplate, RUN_ID);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, RUN_ID)).thenReturn(url);
+    when(http.url(pathTemplate, ImmutableMap.of(), RUN_ID)).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(RUN);
     when(http.post(url)).thenReturn(runAsJson);
