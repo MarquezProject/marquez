@@ -183,9 +183,9 @@ public class JobService {
             namespaceName.getValue(),
             jobMeta);
       }
-      final UUID version = jobMeta.version(namespaceName, jobName);
-      if (!versionDao.exists(version)) {
-        log.info("Creating version '{}' for job '{}'...", version, jobName.getValue());
+      final Version version = jobMeta.version(namespaceName, jobName);
+      if (!versionDao.exists(version.getValue())) {
+        log.info("Creating version '{}' for job '{}'...", version.getValue(), jobName.getValue());
         final String checksum = Utils.checksumFor(jobMeta.getContext());
         if (!contextDao.exists(checksum)) {
           final JobContextRow newContextRow =
@@ -283,6 +283,17 @@ public class JobService {
     }
   }
 
+  public Optional<Job> getBy(@NonNull JobVersionId jobVersionId) throws MarquezServiceException {
+    try {
+      return jobDao
+          .find(jobVersionId.getNamespaceName().getValue(), jobVersionId.getJobName().getValue())
+          .map(jobRow -> toJob(jobRow, jobVersionId.getJobVersionUuid()));
+    } catch (UnableToExecuteStatementException e) {
+      throw new MarquezServiceException(
+          String.format("Failed to get job version: '%s'.", jobVersionId), e);
+    }
+  }
+
   public ImmutableList<Job> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
       throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
@@ -300,26 +311,40 @@ public class JobService {
     }
   }
 
-  /**
-   * Creates a {@link Job} instance from the given {@link JobRow}.
-   *
-   * @param jobRow
-   * @return a Job
-   * @throws MarquezServiceException
-   */
+  /** Creates a {@link Job} instance from the given {@link JobRow}. */
   private Job toJob(@NonNull JobRow jobRow) {
-    UUID currentVersionUuid = jobRow.getCurrentVersionUuid().get();
-    final ExtendedJobVersionRow versionRow = versionDao.findBy(currentVersionUuid).get();
+    return toJob(jobRow, null);
+  }
+
+  private Job toJob(@NonNull JobRow jobRow, @Nullable UUID jobVersionUuid) {
+    final UUID currentJobVersionUuid =
+        (jobVersionUuid == null)
+            ? jobRow
+                .getCurrentVersionUuid()
+                .orElseThrow(
+                    () ->
+                        new MarquezServiceException(
+                            String.format("Version missing for job row '%s'.", jobRow.getUuid())))
+            : jobVersionUuid;
+    final ExtendedJobVersionRow jobVersionRow =
+        versionDao
+            .findBy(currentJobVersionUuid)
+            .orElseThrow(
+                () ->
+                    new MarquezServiceException(
+                        String.format(
+                            "Version '%s' not found for job row '%s'.",
+                            currentJobVersionUuid, jobRow)));
     final ImmutableSet<DatasetId> inputs =
-        datasetDao.findAllIn(versionRow.getInputUuids()).stream()
+        datasetDao.findAllIn(jobVersionRow.getInputUuids()).stream()
             .map(Mapper::toDatasetId)
             .collect(toImmutableSet());
     final ImmutableSet<DatasetId> outputs =
-        datasetDao.findAllIn(versionRow.getOutputUuids()).stream()
+        datasetDao.findAllIn(jobVersionRow.getOutputUuids()).stream()
             .map(Mapper::toDatasetId)
             .collect(toImmutableSet());
     final ExtendedRunRow runRow =
-        versionRow
+        jobVersionRow
             .getLatestRunUuid()
             .map(latestRunUuid -> runDao.findBy(latestRunUuid).get())
             .orElse(null);
@@ -327,8 +352,8 @@ public class JobService {
         jobRow,
         inputs,
         outputs,
-        versionRow.getLocation().orElse(null),
-        versionRow.getContext(),
+        jobVersionRow.getLocation().orElse(null),
+        jobVersionRow.getContext(),
         runRow);
   }
 
@@ -358,11 +383,11 @@ public class JobService {
                           new DatasetVersionId(
                               NamespaceName.of(row.getNamespaceName()),
                               DatasetName.of(row.getName()),
-                              Version.of(row.getCurrentVersionUuid().get()))))
+                              row.getCurrentVersionUuid().get())))
               .collect(toImmutableList());
       final List<UUID> inputVersionUuids =
           inputVersions.stream()
-              .map((i) -> i.getDatasetVersion().getVersion().getValue())
+              .map((i) -> i.getDatasetVersionId().getDatasetVersionUuid())
               .collect(toImmutableList());
       final RunRow newRunRow =
           Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), inputVersionUuids, runMeta);
@@ -371,7 +396,7 @@ public class JobService {
           new JobInputUpdate(
               RunId.of(newRunRow.getUuid()),
               runMeta,
-              new JobVersionId(namespaceName, jobName, Version.of(versionRow.getUuid())),
+              new JobVersionId(namespaceName, jobName, versionRow.getUuid()),
               inputVersions));
       markRunAs(RunId.of(newRunRow.getUuid()), NEW);
       log.info(
@@ -454,7 +479,7 @@ public class JobService {
                             new DatasetVersionId(
                                 NamespaceName.of(v.getNamespaceName()),
                                 DatasetName.of(v.getDatasetName()),
-                                Version.of(v.getUuid()))))
+                                v.getUuid())))
                 .collect(toImmutableList());
         notify(
             new JobOutputUpdate(
@@ -462,7 +487,7 @@ public class JobService {
                 new JobVersionId(
                     NamespaceName.of(versionRow.getNamespaceName()),
                     JobName.of(versionRow.getName()),
-                    Version.of(versionRow.getUuid())),
+                    versionRow.getUuid()),
                 outputs));
         if (versionRow.hasOutputUuids()) {
           outputUuids = versionRow.getOutputUuids();

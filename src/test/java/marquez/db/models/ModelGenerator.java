@@ -26,6 +26,7 @@ import static marquez.common.models.ModelGenerator.newSourceName;
 import static marquez.common.models.ModelGenerator.newSourceType;
 import static marquez.common.models.ModelGenerator.newTagName;
 
+import com.google.common.collect.ImmutableList;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.service.models.Version;
 
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}
@@ -123,9 +125,9 @@ public final class ModelGenerator extends Generator {
   }
 
   public static DatasetVersionRow newDatasetVersionRowWith(
-      UUID datasetUuid, UUID version, List<UUID> fieldUuids, UUID runUuid) {
+      UUID datasetUuid, Version version, ImmutableList<UUID> fieldUuids, UUID runUuid) {
     return new DatasetVersionRow(
-        newRowUuid(), newTimestamp(), datasetUuid, version, fieldUuids, runUuid);
+        newRowUuid(), newTimestamp(), datasetUuid, version.getValue(), fieldUuids, runUuid);
   }
 
   public static List<TagRow> newTagRows(final int limit) {

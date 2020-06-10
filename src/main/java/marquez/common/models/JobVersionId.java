@@ -14,14 +14,14 @@
 
 package marquez.common.models;
 
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.Value;
-import marquez.service.models.Version;
 
-/** The unique identifier of a Job Version in the lineage graph */
+/** Version ID for {@code Job}. */
 @Value
 public class JobVersionId {
-  @NonNull NamespaceName namespace;
+  @NonNull NamespaceName namespaceName;
   @NonNull JobName jobName;
-  @NonNull Version version;
+  @NonNull UUID jobVersionUuid;
 }

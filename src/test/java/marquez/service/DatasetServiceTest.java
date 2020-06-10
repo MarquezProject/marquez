@@ -26,11 +26,13 @@ import static marquez.db.models.ModelGenerator.newDatasetVersionRowWith;
 import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
 import static marquez.db.models.ModelGenerator.newRowUuid;
 import static marquez.db.models.ModelGenerator.newSourceRowWith;
+import static marquez.service.models.ModelGenerator.newVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.util.List;
@@ -60,6 +62,7 @@ import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTable;
 import marquez.service.models.DbTableMeta;
+import marquez.service.models.Version;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -73,9 +76,9 @@ public class DatasetServiceTest {
   private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
   private static final Instant NOW = newTimestamp();
 
-  private static final List<UUID> NO_TAG_UUIDS = Lists.newArrayList();
-  private static final List<TagRow> NO_TAG_ROWS = Lists.newArrayList();
-  private static final List<DatasetFieldRow> NO_FIELD_ROWS = Lists.newArrayList();
+  private static final ImmutableList<UUID> NO_TAG_UUIDS = ImmutableList.of();
+  private static final ImmutableList<TagRow> NO_TAG_ROWS = ImmutableList.of();
+  private static final ImmutableList<DatasetFieldRow> NO_FIELD_ROWS = ImmutableList.of();
 
   // DB TABLE DATASET
   private static final DatasetId DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
@@ -142,8 +145,8 @@ public class DatasetServiceTest {
             DB_TABLE_PHYSICAL_NAME, DB_TABLE_SOURCE_NAME, null, null, DB_TABLE_DESCRIPTION, null);
 
     // Version
-    final UUID version = dbTableMeta.version(NAMESPACE_NAME, DB_TABLE_NAME);
-    when(datasetVersionDao.exists(version)).thenReturn(false);
+    final Version version = dbTableMeta.version(NAMESPACE_NAME, DB_TABLE_NAME);
+    when(datasetVersionDao.exists(version.getValue())).thenReturn(false);
 
     final DatasetVersionRow datasetVersionRow =
         newDatasetVersionRowWith(DATASET_ROW.getUuid(), version, NO_TAG_UUIDS, null);
@@ -173,7 +176,7 @@ public class DatasetServiceTest {
     verify(datasetDao, times(2)).find(NAMESPACE_NAME.getValue(), DB_TABLE_NAME.getValue());
     verify(datasetFieldDao, times(1))
         .findAllIn(toArray(datasetVersionRow.getFieldUuids(), UUID.class));
-    verify(datasetVersionDao, times(1)).exists(version);
+    verify(datasetVersionDao, times(1)).exists(version.getValue());
     verify(datasetVersionDao, times(1))
         .find(DATASET_ROW.getType(), DATASET_ROW.getCurrentVersionUuid().orElse(null));
     verify(tagDao, times(1)).findAllIn(toArray(DATASET_ROW.getTagUuids(), UUID.class));
@@ -234,7 +237,7 @@ public class DatasetServiceTest {
     when(tagDao.findAllIn(toArray(DATASET_ROW.getTagUuids(), UUID.class))).thenReturn(NO_TAG_ROWS);
 
     // Version
-    final UUID version = UUID.randomUUID();
+    final Version version = newVersion();
     final DatasetVersionRow datasetVersionRow =
         newDatasetVersionRowWith(DATASET_ROW.getUuid(), version, NO_TAG_UUIDS, null);
     when(datasetVersionDao.find(
@@ -268,7 +271,7 @@ public class DatasetServiceTest {
     when(tagDao.findAllIn(toArray(DATASET_ROW.getTagUuids(), UUID.class))).thenReturn(NO_TAG_ROWS);
 
     // Version
-    final UUID version = UUID.randomUUID();
+    final Version version = newVersion();
     final DatasetVersionRow datasetVersionRow =
         newDatasetVersionRowWith(DATASET_ROW.getUuid(), version, NO_TAG_UUIDS, null);
     when(datasetVersionDao.find(

@@ -48,7 +48,7 @@ public final class DbTableMeta extends DatasetMeta {
   }
 
   @Override
-  public UUID version(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
+  public Version version(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
     final byte[] bytes =
         VERSION_JOINER
             .join(
@@ -59,6 +59,6 @@ public final class DbTableMeta extends DatasetMeta {
                 getFields().stream().map(DatasetMeta::joinField).collect(joining(VERSION_DELIM)),
                 getRunId().map(RunId::getValue).orElse(null))
             .getBytes(UTF_8);
-    return UUID.nameUUIDFromBytes(bytes);
+    return Version.of(UUID.nameUUIDFromBytes(bytes));
   }
 }

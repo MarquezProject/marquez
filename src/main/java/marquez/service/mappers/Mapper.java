@@ -79,6 +79,7 @@ import marquez.service.models.SourceMeta;
 import marquez.service.models.Stream;
 import marquez.service.models.StreamMeta;
 import marquez.service.models.Tag;
+import marquez.service.models.Version;
 
 public final class Mapper {
   private Mapper() {}
@@ -261,7 +262,7 @@ public final class Mapper {
 
   public static DatasetVersionRow toDatasetVersionRow(
       @NonNull final UUID datasetUuid,
-      @NonNull final UUID version,
+      @NonNull final Version version,
       @NonNull final List<UUID> fieldUuids,
       @NonNull final DatasetMeta meta) {
     if (meta instanceof StreamMeta) {
@@ -271,21 +272,21 @@ public final class Mapper {
         newRowUuid(),
         newTimestamp(),
         datasetUuid,
-        version,
+        version.getValue(),
         fieldUuids,
         meta.getRunId().map(RunId::getValue).orElse(null));
   }
 
   private static DatasetVersionRow toStreamVersionRow(
       @NonNull final UUID datasetUuid,
-      @NonNull final UUID version,
+      @NonNull final Version version,
       @NonNull final List<UUID> fieldUuids,
       @NonNull final DatasetMeta meta) {
     return new StreamVersionRow(
         newRowUuid(),
         newTimestamp(),
         datasetUuid,
-        version,
+        version.getValue(),
         fieldUuids,
         meta.getRunId().map(RunId::getValue).orElse(null),
         ((StreamMeta) meta).getSchemaLocation().toString());
@@ -348,7 +349,7 @@ public final class Mapper {
       @NonNull final List<UUID> inputs,
       @NonNull final List<UUID> outputs,
       @Nullable final URL location,
-      @NonNull final UUID version) {
+      @NonNull final Version version) {
     final Instant now = newTimestamp();
     return new JobVersionRow(
         newRowUuid(),
@@ -359,7 +360,7 @@ public final class Mapper {
         inputs,
         outputs,
         (location == null) ? null : location.toString(),
-        version,
+        version.getValue(),
         null);
   }
 

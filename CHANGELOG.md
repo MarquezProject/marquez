@@ -4,6 +4,7 @@
 
 ### Added
 
+* Add `JobService.getBy(JobVersionId): Job`
 * Allow for run transition override via `at=<TIMESTAMP>`, where `TIMESTMAP` is an ISO 8601 timestamp representing the date/time of the [state](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/RunState.java) transition. For example:
 
   ```
