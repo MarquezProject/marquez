@@ -28,9 +28,11 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetVersionId;
 import marquez.common.models.Field;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
@@ -236,6 +238,20 @@ public class DatasetService {
     }
   }
 
+  public Optional<Dataset> getBy(@NonNull DatasetVersionId datasetVersionId)
+      throws MarquezServiceException {
+    try {
+      return datasetDao
+          .find(
+              datasetVersionId.getNamespaceName().getValue(),
+              datasetVersionId.getDatasetName().getValue())
+          .map(datasetRow -> toDataset(datasetRow, datasetVersionId.getDatasetVersionUuid()));
+    } catch (UnableToExecuteStatementException e) {
+      throw new MarquezServiceException(
+          String.format("Failed to get dataset version with ID '%s'.", datasetVersionId), e);
+    }
+  }
+
   public ImmutableList<Dataset> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
       throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
@@ -252,13 +268,23 @@ public class DatasetService {
 
   /** Creates a {@link Dataset} instance from the given {@link ExtendedDatasetRow}. */
   private Dataset toDataset(@NonNull ExtendedDatasetRow datasetRow) {
+    return toDataset(datasetRow, null);
+  }
+
+  private Dataset toDataset(
+      @NonNull ExtendedDatasetRow datasetRow, @Nullable UUID datasetVersionUuid) {
     final ImmutableSet<TagName> tags =
         tagDao.findAllIn(toArray(datasetRow.getTagUuids(), UUID.class)).stream()
-            .map(row -> TagName.of(row.getName()))
+            .map(TagRow::getName)
+            .map(TagName::of)
             .collect(toImmutableSet());
     final DatasetVersionRow versionRow =
         versionDao
-            .find(datasetRow.getType(), datasetRow.getCurrentVersionUuid().orElse(null))
+            .find(
+                datasetRow.getType(),
+                (datasetVersionUuid == null)
+                    ? datasetRow.getCurrentVersionUuid().orElse(null)
+                    : datasetVersionUuid)
             .get();
     final ImmutableList<Field> fields =
         fieldDao.findAllIn(toArray(versionRow.getFieldUuids(), UUID.class)).stream()
