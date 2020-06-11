@@ -39,9 +39,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.UnitTests;
-import marquez.client.models.DatasetType;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetType;
+import marquez.common.models.DatasetVersionId;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
@@ -80,6 +81,7 @@ public class DatasetServiceTest {
   private static final ImmutableList<TagRow> NO_TAG_ROWS = ImmutableList.of();
   private static final ImmutableList<DatasetFieldRow> NO_FIELD_ROWS = ImmutableList.of();
 
+  // DB TABLE DATASET
   // DB TABLE DATASET
   private static final DatasetId DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
   private static final DatasetName DB_TABLE_NAME = DB_TABLE_ID.getName();
@@ -267,7 +269,45 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void testGetAll() {
+  public void testGetBy() throws MarquezServiceException {
+    final UUID datasetVersionUuid = UUID.randomUUID();
+    final DatasetVersionId datasetVersionId =
+        new DatasetVersionId(NAMESPACE_NAME, DB_TABLE_NAME, datasetVersionUuid);
+
+    when(datasetDao.find(NAMESPACE_NAME.getValue(), DB_TABLE_NAME.getValue()))
+        .thenReturn(Optional.of(DATASET_ROW));
+    when(tagDao.findAllIn(toArray(DATASET_ROW.getTagUuids(), UUID.class))).thenReturn(NO_TAG_ROWS);
+
+    // Version
+    final Version version = newVersion();
+    final DatasetVersionRow datasetVersionRow =
+        newDatasetVersionRowWith(DATASET_ROW.getUuid(), version, NO_TAG_UUIDS, null);
+    when(datasetVersionDao.find(DATASET_ROW.getType(), datasetVersionUuid))
+        .thenReturn(Optional.of(datasetVersionRow));
+    when(datasetFieldDao.findAllIn(toArray(datasetVersionRow.getFieldUuids(), UUID.class)))
+        .thenReturn(NO_FIELD_ROWS);
+
+    final DbTable dbTable = (DbTable) datasetService.getBy(datasetVersionId).get();
+    assertThat(dbTable.getId()).isEqualTo(DB_TABLE_ID);
+    assertThat(dbTable.getName()).isEqualTo(DB_TABLE_NAME);
+    assertThat(dbTable.getPhysicalName()).isEqualTo(DB_TABLE_PHYSICAL_NAME);
+    assertThat(dbTable.getCreatedAt()).isEqualTo(NOW);
+    assertThat(dbTable.getUpdatedAt()).isEqualTo(NOW);
+    assertThat(dbTable.getSourceName()).isEqualTo(DB_TABLE_SOURCE_NAME);
+    assertThat(dbTable.getFields()).isEqualTo(NO_FIELD_ROWS);
+    assertThat(dbTable.getTags()).isEmpty();
+    assertThat(dbTable.getLastModifiedAt()).isEmpty();
+    assertThat(dbTable.getDescription()).isEqualTo(Optional.of(DB_TABLE_DESCRIPTION));
+
+    verify(datasetDao, times(1)).find(NAMESPACE_NAME.getValue(), DB_TABLE_NAME.getValue());
+    verify(datasetFieldDao, times(1))
+        .findAllIn(toArray(datasetVersionRow.getFieldUuids(), UUID.class));
+    verify(datasetVersionDao, times(1)).find(DATASET_ROW.getType(), datasetVersionUuid);
+    verify(tagDao, times(1)).findAllIn(toArray(DATASET_ROW.getTagUuids(), UUID.class));
+  }
+
+  @Test
+  public void testGetAll() throws MarquezServiceException {
     when(tagDao.findAllIn(toArray(DATASET_ROW.getTagUuids(), UUID.class))).thenReturn(NO_TAG_ROWS);
 
     // Version

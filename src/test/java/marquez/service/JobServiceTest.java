@@ -82,8 +82,7 @@ import org.mockito.junit.MockitoRule;
 @Category(UnitTests.class)
 public class JobServiceTest {
   private static final NamespaceName NAMESPACE_NAME = newNamespaceName();
-  private static final Instant CREATED_AT = newTimestamp();
-  private static final Instant UPDATED_AT = CREATED_AT;
+  private static final Instant NOW = newTimestamp();
   private static final URL LOCATION = newLocation();
   private static final ImmutableMap<String, String> CONTEXT = newContext();
   private static final String DESCRIPTION = newDescription();
@@ -106,8 +105,8 @@ public class JobServiceTest {
           JOB_ID,
           BATCH,
           JOB_NAME,
-          CREATED_AT,
-          UPDATED_AT,
+          NOW,
+          NOW,
           ImmutableSet.of(),
           ImmutableSet.of(),
           LOCATION,
@@ -120,8 +119,8 @@ public class JobServiceTest {
       new JobRow(
           newRowUuid(),
           BATCH.toString(),
-          CREATED_AT,
-          UPDATED_AT,
+          NOW,
+          NOW,
           NAMESPACE_ROW.getUuid(),
           NAMESPACE_NAME.getValue(),
           JOB_NAME.getValue(),
@@ -134,8 +133,8 @@ public class JobServiceTest {
   private static final ExtendedJobVersionRow JOB_VERSION_ROW =
       new ExtendedJobVersionRow(
           JOB_VERSION_ROW_UUID,
-          CREATED_AT,
-          UPDATED_AT,
+          NOW,
+          NOW,
           JOB_ROW.getUuid(),
           JOB_CONTEXT_ROW.getUuid(),
           Lists.newArrayList(),
