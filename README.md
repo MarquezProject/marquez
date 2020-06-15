@@ -1,16 +1,16 @@
 <p align="center">
-  <img src="https://github.com/MarquezProject/marquez/blob/master/docs/assets/images/marquez-logo.png" width="500px" />
+  <img src="https://github.com/MarquezProject/marquez/blob/main/docs/assets/images/marquez-logo.png" width="500px" />
 </p>
 
 Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the provenance of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more. Marquez was released and open sourced by [WeWork](https://www.wework.com).
 
 ## Badges
 
-[![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/master)
-[![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/master/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/master)
+[![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
+[![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marquez-project/community)
-[![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/master/LICENSE)
+[![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
 [![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez)
 [![Known Vulnerabilities](https://snyk.io/test/github/MarquezProject/marquez/badge.svg)](https://snyk.io/test/github/MarquezProject/marquez)
@@ -33,7 +33,7 @@ Marquez listens on port `5000` for all API calls and port `5001` for the admin i
 
 ## Documentation
 
-We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/master/docs).
+We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/main/docs).
 
 > **Note:** To begin collecting metadata with Marquez, follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide. Below you will find the steps to get up and running from source.
 
@@ -67,7 +67,7 @@ $ psql -c 'CREATE DATABASE marquez;'
 
 ### Step 2: Create `marquez.yml`
 
-With your database created, you can now copy [`marquez.example.yml`](https://github.com/MarquezProject/marquez/blob/master/marquez.example.yml):
+With your database created, you can now copy [`marquez.example.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.example.yml):
 
 ```
 $ cp marquez.example.yml marquez.yml
@@ -82,7 +82,7 @@ By default, Marquez uses the following ports:
 
 > **Note:** All of the configuration settings in `marquez.yml` can be specified either in the configuration file or in an environment variable.
 
-## Running the [Application](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezApp.java)
+## Running the [Application](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/MarquezApp.java)
 
 ```bash
 $ ./gradlew run --args 'server marquez.yml'
@@ -106,4 +106,4 @@ Then browse to the admin interface: http://localhost:8081
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez/blob/master/CONTRIBUTING.md) for more details about how to contribute.
+See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md) for more details about how to contribute.
