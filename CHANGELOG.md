@@ -6,7 +6,7 @@
 
 * Add `DatasetService.getBy(DatasetVersionId): Dataset`
 * Add `JobService.getBy(JobVersionId): Job`
-* Allow for run transition override via `at=<TIMESTAMP>`, where `TIMESTMAP` is an ISO 8601 timestamp representing the date/time of the [state](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/RunState.java) transition. For example:
+* Allow for run transition override via `at=<TIMESTAMP>`, where `TIMESTMAP` is an ISO 8601 timestamp representing the date/time of the [state](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/common/models/RunState.java) transition. For example:
 
   ```
   POST /jobs/runs/{id}/start?at=<TIMESTAMP>
@@ -21,17 +21,17 @@
 ### Added
 
 * `Run.startedAt`, `Run.endedAt`, `Run.duration` [@julienledem](https://github.com/julienledem)
-* **class** [`MarquezContext`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/MarquezContext.java) [@julienledem](https://github.com/julienledem)
-* **class** [`RunTransitionListener`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/service/RunTransitionListener.java) [@julienledem](https://github.com/julienledem)
-* Unique identifier **class** [`DatasetId`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/DatasetId.java) for datasets [@julienledem](https://github.com/julienledem)
-* Unique identifier **class** [`JobId`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/JobId.java) for jobs [@julienledem](https://github.com/julienledem)
-* **class** [`RunId`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/RunId.java) [@ravikamaraj](https://github.com/ravikamaraj)
-* **enum** [`RunState`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/RunState.java) [@ravikamaraj](https://github.com/ravikamaraj)
-* **class** [`Version`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/service/models/Version.java) [@ravikamaraj](https://github.com/ravikamaraj)
+* **class** [`MarquezContext`](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/MarquezContext.java) [@julienledem](https://github.com/julienledem)
+* **class** [`RunTransitionListener`](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/service/RunTransitionListener.java) [@julienledem](https://github.com/julienledem)
+* Unique identifier **class** [`DatasetId`](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/common/models/DatasetId.java) for datasets [@julienledem](https://github.com/julienledem)
+* Unique identifier **class** [`JobId`](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/common/models/JobId.java) for jobs [@julienledem](https://github.com/julienledem)
+* **class** [`RunId`](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/common/models/RunId.java) [@ravikamaraj](https://github.com/ravikamaraj)
+* **enum** [`RunState`](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/common/models/RunState.java) [@ravikamaraj](https://github.com/ravikamaraj)
+* **class** [`Version`](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/service/models/Version.java) [@ravikamaraj](https://github.com/ravikamaraj)
 
 ### Changed
 
-* Job inputs / outputs are defined as [`DatasetId`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/common/models/DatasetId.java)
+* Job inputs / outputs are defined as [`DatasetId`](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/common/models/DatasetId.java)
 * Bump to JDK 11
 
 ### Removed
@@ -135,7 +135,7 @@
 * Add `ColumnsTest`
 * Add `RunDao.insert()`
 * Add `RunStateDao.insert()`
-* Add [`METRICS.md`](https://github.com/MarquezProject/marquez/blob/master/METRICS.md)
+* Add [`METRICS.md`](https://github.com/MarquezProject/marquez/blob/main/METRICS.md)
 * Add prometheus dep and expose **`GET`** `/metrics`
 
 ### Fixed
@@ -268,7 +268,7 @@
 ### Changed
 
 * Minor pkg restructuring
-* Throw [**`NamespaceNotFoundException`**](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/api/exceptions/NamespaceNotFoundException.java) on [`NamespaceResource.get()`](https://github.com/MarquezProject/marquez/blob/master/src/main/java/marquez/api/NamespaceResource.java#L80)
+* Throw [**`NamespaceNotFoundException`**](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/api/exceptions/NamespaceNotFoundException.java) on [`NamespaceResource.get()`](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/api/NamespaceResource.java#L80)
 
 ### Fixed
 
