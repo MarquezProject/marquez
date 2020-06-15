@@ -19,7 +19,7 @@ To checkout the Marquez source code run:
 $ git clone git@github.com:MarquezProject/marquez.git && cd marquez
 ```
 
-#### RUNNING WITH [DOCKER](https://github.com/MarquezProject/marquez/blob/master/Dockerfile)
+#### RUNNING WITH [DOCKER](https://github.com/MarquezProject/marquez/blob/main/Dockerfile)
 
 The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
