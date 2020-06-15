@@ -58,7 +58,7 @@ $ ./gradlew publishToMavenLocal
 6. Make sure `.java` files are formatted: `./gradlew spotlessJavaCheck`
 7. Make sure to [sign you work](#sign-your-work)
 8. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
-9. Work with project maintainers to get your change reviewed and merged into the `master` branch
+9. Work with project maintainers to get your change reviewed and merged into the `main` branch
 10. Delete your branch
 
 To ensure your pull request is accepted, follow these guidelines:
@@ -111,7 +111,7 @@ Git has a [`-s`](https://git-scm.com/docs/git-commit#Documentation/git-commit.tx
 $ git commit -s -m "This is my commit message"
 ```
 
-# API [Docs](https://github.com/MarquezProject/marquez/tree/master/docs)
+# API [Docs](https://github.com/MarquezProject/marquez/tree/main/docs)
 
 To bundle:
 
