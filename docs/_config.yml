@@ -1,9 +1,0 @@
-title: Marquez
-description: Collect, aggregate, and visualize a data ecosystem's metadata
-
-repository: MarquezProject/marquez
-theme: jekyll-theme-cayman
-
-plugins:
-  - jekyll-seo-tag
-  - jekyll-sitemap
