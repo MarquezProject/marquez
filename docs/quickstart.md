@@ -24,8 +24,10 @@ $ git clone git@github.com:MarquezProject/marquez.git && cd marquez
 The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
-$ docker-compose up --build
+$ docker-compose up
 ```
+
+> **Tip:** Use the `--build` flag to build images from source, or `--pull` to pull a tagged image.
 
 Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
 
@@ -33,22 +35,22 @@ Marquez listens on port `5000` for all API calls and port `5001` for the admin i
 
 ## Example
 
-In this example, we show how you can record job and dataset metadata using Marquez. We encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](./openapi.html) of Marquez.
+In this example, we show how you can collect dataset and job metadata using Marquez. We also encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](./openapi.html) of Marquez.
 
-> **Note:** The example shows how to record metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Java](https://github.com/MarquezProject/marquez-java) or [Python](https://github.com/MarquezProject/marquez-python).
+> **Note:** The example shows how to collect metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Java](https://github.com/MarquezProject/marquez-java) or [Python](https://github.com/MarquezProject/marquez-python).
 
 #### STEP 1: CREATE A NAMESPACE
 
-Before we can begin recording metadata, we must first create a _namespace_. A `namespace` enables the contextual grouping of metadata for related jobs and datasets. Note that jobs and datasets are unique within a namespace, but not across namespaces. In this example, we will use the namespace `wedata`:
+Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` helps you organize related dataset and job metadata. Note that datasets and jobs are unique within a namespace, but not across namespaces. In this example, we will use the namespace `my-namespace`:
 
 ##### REQUEST
 
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
+$ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace \
   -H 'Content-Type: application/json' \
   -d '{
-        "ownerName": "analytics",
-        "description": "Contains datasets such as room bookings for each office."
+        "ownerName": "me",
+        "description": "My first namespace."
       }'
 ```
 
@@ -56,28 +58,29 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata \
 
 ```bash
 {
-  "name": "wedata",
+  "name": "my-namespace",
   "createdAt": "2019-06-08T19:11:59.430Z",
   "updatedAt": "2019-06-08T19:11:59.430Z",
-  "ownerName": "analytics",
-  "description": "Contains datasets such as room bookings for each office."
+  "ownerName": "me",
+  "description": "My first namespace."
 }
 ```
 
-> **Note:** Marquez provides a `default` namespace to record metadata, but we encourage you to create your own.
+> **Note:** Marquez provides a `default` namespace to collect metadata, but we encourage you to create your own.
 
 #### STEP 2: CREATE A SOURCE
 
-Each dataset must be associated with a _source_. A `source` is the physical location of a dataset, such as a table in a database, or a file on cloud storage. A source enables the logical grouping and mapping of physical datasets to their physical source.
+Each dataset must be associated with a _source_. A `source` is the physical location of a dataset, such as a table in a database, or a file on cloud storage. A source enables the logical grouping and mapping of physical datasets to their physical source. Below, let's create the source `my-source` for the database `mydb`:
 
 ##### REQUEST
 
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/sources/analytics_db \
+$ curl -X PUT http://localhost:5000/api/v1/sources/my-source \
   -H 'Content-Type: application/json' \
   -d '{
         "type": "POSTGRESQL",
-        "connectionUrl": "jdbc:postgresql://localhost:5431/analytics"
+        "connectionUrl": "jdbc:postgresql://localhost:5431/mydb",
+        "description": "My first source."
       }'  
 ```
 
@@ -86,35 +89,35 @@ $ curl -X PUT http://localhost:5000/api/v1/sources/analytics_db \
 ```bash
 {
   "type": "POSTGRESQL",
-  "name": "analytics_db",
+  "name": "my-source",
   "createdAt": "2019-06-08T19:13:00.749Z",
   "updatedAt": "2019-06-08T19:13:00.749Z",
-  "connectionUrl": "jdbc:postgresql://localhost:5431/analytics",
-  "description": null
+  "connectionUrl": "jdbc:postgresql://localhost:5431/mydb",
+  "description": "My first source."
 }
 ```
 
 #### STEP 3: ADD DATASET TO NAMESPACE
 
-Next, we need to create a dataset and associate it with an existing source:
+Next, we need to create the dataset `mydb.users` and associate it with the existing source `my-source`:
 
 ##### REQUEST
 
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/wedata.room_bookings \
+$ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/mydb.foo \
   -H 'Content-Type: application/json' \
   -d '{ 
         "type": "DB_TABLE",
-        "physicalName": "wedata.room_bookings",
-        "sourceName": "analytics_db",
+        "physicalName": "mydb.foo",
+        "sourceName": "my-source",
         "fields": [
-          {"name": "booking_id", "type": "INTEGER", "tags": []},
-          {"name": "booked_at", "type": "TIMESTAMP", "tags": []},
-          {"name": "office_id", "type": "INTEGER", "tags": []},
-          {"name": "room_id", "type": "INTEGER", "tags": []}
+          {"name": "a", "type": "INTEGER", "tags": []},
+          {"name": "b", "type": "TIMESTAMP", "tags": []},
+          {"name": "c", "type": "INTEGER", "tags": []},
+          {"name": "d", "type": "INTEGER", "tags": []}
         ],
-        "tags": ["SENSITIVE"],
-        "description": "All global room bookings for each office."
+        "tags": [],
+        "description": "My first dataset."
       }'
 ```
 
@@ -122,21 +125,25 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/wedata.roo
 
 ```bash
 {
+  "id": {
+    "namespaceName": "my-namespace",
+    "name": "mydb.foo"
+  },
   "type": "DB_TABLE",
-  "name": "wedata.room_bookings",
-  "physicalName": "wedata.room_bookings",
+  "name": "mydb.foo",
+  "physicalName": "mydb.foo",
   "createdAt": "2019-06-08T19:13:34.507Z",
   "updatedAt": "2019-06-08T19:13:34.507Z",
-  "sourceName": "analytics_db",
+  "sourceName": "my-source",
   "fields": [
-    {"name": "booking_id", "type": "INTEGER", "tags": [], "description": null},
-    {"name": "booked_at", "type": "TIMESTAMP", "tags": [], "description": null},
-    {"name": "office_id", "type": "INTEGER", "tags": [], "description": null},
-    {"name": "room_id", "type": "INTEGER", "tags": [], "description": null}
+    {"name": "a", "type": "INTEGER", "tags": [], "description": null},
+    {"name": "b", "type": "TIMESTAMP", "tags": [], "description": null},
+    {"name": "c", "type": "INTEGER", "tags": [], "description": null},
+    {"name": "d", "type": "INTEGER", "tags": [], "description": null}
   ],
-  "tags": ["SENSITIVE"],
+  "tags": [],
   "lastModifiedAt": null,
-  "description": "All global room bookings for each office."
+  "description": "My first dataset."
 }
 ```
 
@@ -145,14 +152,17 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/datasets/wedata.roo
 ##### REQUEST
 
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_7_days \
+$ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job \
   -H 'Content-Type: application/json' \
   -d '{
         "type": "BATCH",
-        "inputs": ["wedata.room_bookings"],
+        "inputs": [{
+          "namespaceName": "my-namespace", 
+          "name": "mydb.foo"
+        }],
         "outputs": [],
-        "location": "https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
-        "description": "Weekly email of room bookings occupancy patterns."
+        "location": "https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
+        "description": "My first job!"
       }'
 ```
 
@@ -160,14 +170,22 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_
 
 ```bash
 {
+  "id": {
+    "namespaceName": "my-namespace",
+    "name": "my-job"
+  },
   "type": "BATCH",
   "name": "room_bookings_7_days",
   "createdAt": "2019-06-08T19:13:58.434Z",
   "updatedAt": "2019-06-08T19:13:58.434Z",
-  "inputs": ["wedata.room_bookings"],
+  "inputs": [{
+      "namespaceName": "my-namespace",
+      "name": "mydb.foo"
+  }],
   "outputs": [],
-  "location": "https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
-  "description": "Weekly email of room bookings occupancy patterns.",
+  "location": "https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
+  "context": {},
+  "description": "My first job!",
   "latestRun": null
 }
 ```
@@ -177,11 +195,11 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_
 ##### REQUEST
 
 ```bash
-$ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings_7_days/runs \
+$ curl -X POST http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job/runs \
   -H 'Content-Type: application/json' \
   -d '{
-        "runArgs": {
-          "email": "data@wework.com",
+        "args": {
+          "email": "data@example.com",
           "emailOnFailure": false,
           "emailOnRetry": true,
           "retries": 1
@@ -193,14 +211,17 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings
 
 ```bash
 {
-  "runId": "099a7574-e518-4e05-877a-6f2749e92791",
+  "id": "e994be10-3833-40e7-83c3-ce778e5f4993",
   "createdAt": "2019-06-08T19:14:30.679Z",
   "updatedAt": "2019-06-08T19:14:30.694Z",
   "nominalStartTime": null,
   "nominalEndTime": null,
-  "runState": "NEW",
-  "runArgs": {
-    "email": "data@wework.com",
+  "state": "NEW",
+  "startedAt": null,
+  "endedAt": null,
+  "durationMs": null,
+  "args": {
+    "email": "data@example.com",
     "emailOnFailure": "false",
     "emailOnRetry": "true",
     "retries": "1"
@@ -213,21 +234,24 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/wedata/jobs/room_bookings
 ##### REQUEST
 
 ```bash
-$ curl -X POST http://localhost:5000/api/v1/jobs/runs/099a7574-e518-4e05-877a-6f2749e92791/start
+$ curl -X POST http://localhost:5000/api/v1/jobs/runs/e994be10-3833-40e7-83c3-ce778e5f4993/start
 ```
 
 ##### RESPONSE
 
 ```bash
 {
-  "runId": "099a7574-e518-4e05-877a-6f2749e92791",
+  "id": "e994be10-3833-40e7-83c3-ce778e5f4993",
   "createdAt": "2019-06-08T19:14:30.679Z",
   "updatedAt": "2019-06-08T19:24:23.443Z",
   "nominalStartTime": null,
   "nominalEndTime": null,
-  "runState": "RUNNING",
-  "runArgs": {
-    "email": "data@wework.com",
+  "state": "RUNNING",
+  "startedAt": "2019-06-08T20:06:45.313Z",
+  "endedAt": null,
+  "durationMs": null,
+  "args": {
+    "email": "data@example.com",
     "emailOnFailure": "false",
     "emailOnRetry": "true",
     "retries": "1"
@@ -240,20 +264,23 @@ $ curl -X POST http://localhost:5000/api/v1/jobs/runs/099a7574-e518-4e05-877a-6f
 ##### REQUEST
 
 ```bash
-$ curl -X POST http://localhost:5000/api/v1/jobs/runs/099a7574-e518-4e05-877a-6f2749e92791/complete
+$ curl -X POST http://localhost:5000/api/v1/jobs/runs/e994be10-3833-40e7-83c3-ce778e5f4993/complete
 ```
 
 ##### RESPONSE
 
 ```bash
 {
-  "runId": "099a7574-e518-4e05-877a-6f2749e92791",
+  "id": "e994be10-3833-40e7-83c3-ce778e5f4993",
   "createdAt": "2019-06-08T19:14:30.679Z",
   "updatedAt": "2019-06-08T19:26:31.492Z",
   "nominalStartTime": null,
   "nominalEndTime": null,
-  "runState": "COMPLETED",
-  "runArgs": {
+  "state": "COMPLETED",
+  "startedAt": "2019-06-08T20:06:45.313Z",
+  "endedAt": "2019-06-08T20:14:40.489Z",
+  "durationMs": 475176,
+  "args": {
     "email": "data@wework.com",
     "emailOnFailure": "false",
     "emailOnRetry": "true",
