@@ -41,7 +41,7 @@ In this example, we show how you can collect dataset and job metadata using Marq
 
 #### STEP 1: CREATE A NAMESPACE
 
-Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` helps you organize related dataset and job metadata. Note that datasets and jobs are unique within a namespace, but not across namespaces. For example, the job `my-job` may exist in the namespace `this-namespace` and `other-namespace`, but not both. In this example, we will use the namespace `my-namespace`:
+Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` helps you organize related dataset and job metadata. Note that datasets and jobs are unique within a namespace, but not across namespaces. For example, the job `my-job` may exist in the namespace `this-namespace` and `other-namespace`, but not both. In this example, we'll use the namespace `my-namespace`:
 
 ##### REQUEST
 
@@ -59,8 +59,8 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace \
 ```bash
 {
   "name": "my-namespace",
-  "createdAt": "2019-06-08T19:11:59.430Z",
-  "updatedAt": "2019-06-08T19:11:59.430Z",
+  "createdAt": "2020-06-30T20:29:53.521534Z",
+  "updatedAt": "2020-06-30T20:29:53.525528Z",
   "ownerName": "me",
   "description": "My first namespace."
 }
@@ -90,8 +90,8 @@ $ curl -X PUT http://localhost:5000/api/v1/sources/my-source \
 {
   "type": "POSTGRESQL",
   "name": "my-source",
-  "createdAt": "2019-06-08T19:13:00.749Z",
-  "updatedAt": "2019-06-08T19:13:00.749Z",
+  "createdAt": "2020-06-30T20:30:56.535357Z",
+  "updatedAt": "2020-06-30T20:30:56.535357Z",
   "connectionUrl": "jdbc:postgresql://localhost:5431/mydb",
   "description": "My first source."
 }
@@ -131,8 +131,8 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
   "type": "DB_TABLE",
   "name": "my-dataset",
   "physicalName": "mydb.foo",
-  "createdAt": "2019-06-08T19:13:34.507Z",
-  "updatedAt": "2019-06-08T19:13:34.507Z",
+  "createdAt": "2020-06-30T20:31:39.129483Z",
+  "updatedAt": "2020-06-30T20:31:39.259853Z",
   "sourceName": "my-source",
   "fields": [
     {"name": "a", "type": "INTEGER", "tags": [], "description": null},
@@ -157,7 +157,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job \
         "type": "BATCH",
         "inputs": [{
           "namespaceName": "my-namespace", 
-          "name": "mydb.foo"
+          "name": "my-dataset"
         }],
         "outputs": [],
         "location": "https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
@@ -174,12 +174,12 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job \
     "name": "my-job"
   },
   "type": "BATCH",
-  "name": "room_bookings_7_days",
-  "createdAt": "2019-06-08T19:13:58.434Z",
-  "updatedAt": "2019-06-08T19:13:58.434Z",
+  "name": "my-job",
+  "createdAt": "2020-06-30T20:32:55.570981Z",
+  "updatedAt": "2020-06-30T20:32:55.658594Z",
   "inputs": [{
       "namespaceName": "my-namespace",
-      "name": "mydb.foo"
+      "name": "my-dataset"
   }],
   "outputs": [],
   "location": "https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
@@ -198,7 +198,7 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job/
   -H 'Content-Type: application/json' \
   -d '{
         "args": {
-          "email": "data@example.com",
+          "email": "me@example.com",
           "emailOnFailure": false,
           "emailOnRetry": true,
           "retries": 1
@@ -210,9 +210,9 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job/
 
 ```bash
 {
-  "id": "e994be10-3833-40e7-83c3-ce778e5f4993",
-  "createdAt": "2019-06-08T19:14:30.679Z",
-  "updatedAt": "2019-06-08T19:14:30.694Z",
+  "id": "d46e465b-d358-4d32-83d4-df660ff614dd",
+  "createdAt": "2020-06-30T20:34:40.146354Z",
+  "updatedAt": "2020-06-30T20:34:40.165768Z",
   "nominalStartTime": null,
   "nominalEndTime": null,
   "state": "NEW",
@@ -220,7 +220,7 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job/
   "endedAt": null,
   "durationMs": null,
   "args": {
-    "email": "data@example.com",
+    "email": "me@example.com",
     "emailOnFailure": "false",
     "emailOnRetry": "true",
     "retries": "1"
@@ -228,29 +228,29 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job/
 }
 ```
 
-#### STEP 6: RECORD A RUN
+#### STEP 6: START A RUN
 
 ##### REQUEST
 
 ```bash
-$ curl -X POST http://localhost:5000/api/v1/jobs/runs/e994be10-3833-40e7-83c3-ce778e5f4993/start
+$ curl -X POST http://localhost:5000/api/v1/jobs/runs/d46e465b-d358-4d32-83d4-df660ff614dd/start
 ```
 
 ##### RESPONSE
 
 ```bash
 {
-  "id": "e994be10-3833-40e7-83c3-ce778e5f4993",
-  "createdAt": "2019-06-08T19:14:30.679Z",
-  "updatedAt": "2019-06-08T19:24:23.443Z",
+  "id": "d46e465b-d358-4d32-83d4-df660ff614dd",
+  "createdAt": "2020-06-30T20:34:40.146354Z",
+  "updatedAt": "2020-06-30T20:37:43.746677Z",
   "nominalStartTime": null,
   "nominalEndTime": null,
   "state": "RUNNING",
-  "startedAt": "2019-06-08T20:06:45.313Z",
+  "startedAt": "2020-06-30T20:37:43.746677Z",
   "endedAt": null,
   "durationMs": null,
   "args": {
-    "email": "data@example.com",
+    "email": "me@example.com",
     "emailOnFailure": "false",
     "emailOnRetry": "true",
     "retries": "1"
@@ -258,29 +258,29 @@ $ curl -X POST http://localhost:5000/api/v1/jobs/runs/e994be10-3833-40e7-83c3-ce
 }
 ```
 
-#### STEP 7: RECORD A COMPLETE RUN
+#### STEP 7: COMPLETE A RUN
 
 ##### REQUEST
 
 ```bash
-$ curl -X POST http://localhost:5000/api/v1/jobs/runs/e994be10-3833-40e7-83c3-ce778e5f4993/complete
+$ curl -X POST http://localhost:5000/api/v1/jobs/runs/d46e465b-d358-4d32-83d4-df660ff614dd/complete
 ```
 
 ##### RESPONSE
 
 ```bash
 {
-  "id": "e994be10-3833-40e7-83c3-ce778e5f4993",
-  "createdAt": "2019-06-08T19:14:30.679Z",
-  "updatedAt": "2019-06-08T19:26:31.492Z",
+  "id": "d46e465b-d358-4d32-83d4-df660ff614dd",
+  "createdAt": "2020-06-30T20:34:40.146354Z",
+  "updatedAt": "2020-06-30T20:38:25.657449Z",
   "nominalStartTime": null,
   "nominalEndTime": null,
   "state": "COMPLETED",
-  "startedAt": "2019-06-08T20:06:45.313Z",
-  "endedAt": "2019-06-08T20:14:40.489Z",
-  "durationMs": 475176,
+  "startedAt": "2020-06-30T20:37:43.746677Z",
+  "endedAt": "2020-06-30T20:38:25.657449Z",
+  "durationMs": 41911,
   "args": {
-    "email": "data@wework.com",
+    "email": "me@example.com",
     "emailOnFailure": "false",
     "emailOnRetry": "true",
     "retries": "1"
