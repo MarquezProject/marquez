@@ -35,13 +35,13 @@ Marquez listens on port `5000` for all API calls and port `5001` for the admin i
 
 ## Example
 
-In this example, we show how you can collect dataset and job metadata using Marquez. We also encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](./openapi.html) of Marquez.
+In this example, we show how you can collect dataset and job metadata using Marquez. We encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](./openapi.html) of Marquez.
 
 > **Note:** The example shows how to collect metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Java](https://github.com/MarquezProject/marquez-java) or [Python](https://github.com/MarquezProject/marquez-python).
 
 #### STEP 1: CREATE A NAMESPACE
 
-Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` helps you organize related dataset and job metadata. Note that datasets and jobs are unique within a namespace, but not across namespaces. In this example, we will use the namespace `my-namespace`:
+Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` helps you organize related dataset and job metadata. Note that datasets and jobs are unique within a namespace, but not across namespaces. For example, the job `my-job` may exist in the namespace `this-namespace` and `other-namespace`, but not both. In this example, we will use the namespace `my-namespace`:
 
 ##### REQUEST
 
@@ -99,24 +99,23 @@ $ curl -X PUT http://localhost:5000/api/v1/sources/my-source \
 
 #### STEP 3: ADD DATASET TO NAMESPACE
 
-Next, we need to create the dataset `mydb.users` and associate it with the existing source `my-source`:
+Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. A dataset has both a _logcal_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name how your dataset is known to your source.
 
 ##### REQUEST
 
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/mydb.foo \
+$ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-dataset \
   -H 'Content-Type: application/json' \
   -d '{ 
         "type": "DB_TABLE",
         "physicalName": "mydb.foo",
         "sourceName": "my-source",
         "fields": [
-          {"name": "a", "type": "INTEGER", "tags": []},
-          {"name": "b", "type": "TIMESTAMP", "tags": []},
-          {"name": "c", "type": "INTEGER", "tags": []},
-          {"name": "d", "type": "INTEGER", "tags": []}
+          {"name": "a", "type": "INTEGER"},
+          {"name": "b", "type": "TIMESTAMP"},
+          {"name": "c", "type": "INTEGER"},
+          {"name": "d", "type": "INTEGER"}
         ],
-        "tags": [],
         "description": "My first dataset."
       }'
 ```
