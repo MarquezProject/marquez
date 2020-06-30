@@ -99,7 +99,7 @@ $ curl -X PUT http://localhost:5000/api/v1/sources/my-source \
 
 #### STEP 3: ADD DATASET TO NAMESPACE
 
-Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. A dataset has both a _logcal_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name how your dataset is known to your source.
+Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. In Marquez, datasets have both a _logcal_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name how your dataset is known to your source. In this example, we refer to `my-dataset` as the logical name and `mydb.foo` as the physical name:
 
 ##### REQUEST
 
@@ -126,10 +126,10 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
 {
   "id": {
     "namespaceName": "my-namespace",
-    "name": "mydb.foo"
+    "name": "my-dataset"
   },
   "type": "DB_TABLE",
-  "name": "mydb.foo",
+  "name": "my-dataset",
   "physicalName": "mydb.foo",
   "createdAt": "2019-06-08T19:13:34.507Z",
   "updatedAt": "2019-06-08T19:13:34.507Z",
