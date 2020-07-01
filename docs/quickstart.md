@@ -99,7 +99,7 @@ $ curl -X PUT http://localhost:5000/api/v1/sources/my-source \
 
 #### STEP 3: ADD DATASET TO NAMESPACE
 
-Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. In Marquez, datasets have both a _logcal_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name how your dataset is known to your source. In this example, we refer to `my-dataset` as the logical name and `mydb.foo` as the physical name:
+Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. In Marquez, datasets have both a _logcal_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name how your dataset is known to your source. In this example, we refer to `my-dataset` as the logical name and `public.mytable` (=`schema.table`) as the physical name:
 
 ##### REQUEST
 
@@ -108,7 +108,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
   -H 'Content-Type: application/json' \
   -d '{ 
         "type": "DB_TABLE",
-        "physicalName": "mydb.foo",
+        "physicalName": "public.mytable",
         "sourceName": "my-source",
         "fields": [
           {"name": "a", "type": "INTEGER"},
@@ -130,7 +130,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
   },
   "type": "DB_TABLE",
   "name": "my-dataset",
-  "physicalName": "mydb.foo",
+  "physicalName": "public.mytable",
   "createdAt": "2020-06-30T20:31:39.129483Z",
   "updatedAt": "2020-06-30T20:31:39.259853Z",
   "sourceName": "my-source",
@@ -147,6 +147,8 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
 ```
 
 #### STEP 4: ADD JOB TO NAMESPACE
+
+With metadata for `my-dataset` in Marquez, let's add the job `my-job`:
 
 ##### REQUEST
 
