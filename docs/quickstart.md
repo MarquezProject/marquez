@@ -99,7 +99,7 @@ $ curl -X PUT http://localhost:5000/api/v1/sources/my-source \
 
 #### STEP 3: ADD DATASET TO NAMESPACE
 
-Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. In Marquez, datasets have both a _logcal_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name how your dataset is known to your source. In this example, we refer to `my-dataset` as the logical name and `public.mytable` (=`schema.table`) as the physical name:
+Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. In Marquez, datasets have both a _logical_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name how your dataset is known to your source. In this example, we refer to `my-dataset` as the logical name and `public.mytable` (=`schema.table`) as the physical name:
 
 ##### REQUEST
 
@@ -232,6 +232,8 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job/
 
 #### STEP 6: START A RUN
 
+Use `d46e465b-d358-4d32-83d4-df660ff614dd` to _start_ the run for `my-job`:
+
 ##### REQUEST
 
 ```bash
@@ -261,6 +263,8 @@ $ curl -X POST http://localhost:5000/api/v1/jobs/runs/d46e465b-d358-4d32-83d4-df
 ```
 
 #### STEP 7: COMPLETE A RUN
+
+Use `d46e465b-d358-4d32-83d4-df660ff614dd` to _complete_ the run for `my-job`:
 
 ##### REQUEST
 
