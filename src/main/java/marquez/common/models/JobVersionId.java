@@ -24,4 +24,8 @@ public class JobVersionId {
   @NonNull NamespaceName namespaceName;
   @NonNull JobName jobName;
   @NonNull UUID jobVersionUuid;
+
+  public JobId asJobId() {
+    return new JobId(namespaceName, jobName);
+  }
 }

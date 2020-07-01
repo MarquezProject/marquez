@@ -24,4 +24,8 @@ public class DatasetVersionId {
   @NonNull NamespaceName namespaceName;
   @NonNull DatasetName datasetName;
   @NonNull UUID datasetVersionUuid;
+
+  public DatasetId asDatasetId() {
+    return new DatasetId(namespaceName, datasetName);
+  }
 }
