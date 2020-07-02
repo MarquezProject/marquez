@@ -59,10 +59,10 @@ To run Marquez, you will have to define `marquez.yml`. The configuration file is
 
 ### Step 1: Create Database
 
-When creating your database using [`psql`](https://www.postgresql.org/docs/9.6/app-psql.html), we recommend calling it `marquez`:
+When creating your database using [`createdb`](https://www.postgresql.org/docs/12/app-createdb.html), we recommend calling it `marquez`:
 
 ```bash
-$ psql -c 'CREATE DATABASE marquez;'
+$ createdb marquez
 ```
 
 ### Step 2: Create `marquez.yml`
@@ -85,7 +85,7 @@ By default, Marquez uses the following ports:
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/MarquezApp.java)
 
 ```bash
-$ ./gradlew run --args 'server marquez.yml'
+$ ./gradlew runShadow
 ```
 
 Then browse to the admin interface: http://localhost:8081
