@@ -16,4 +16,4 @@ bin/
 build/
 
 # Marquez configuration
-config.yml
+marquez.yml
