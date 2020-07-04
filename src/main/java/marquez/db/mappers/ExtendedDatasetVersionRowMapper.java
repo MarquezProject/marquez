@@ -39,7 +39,7 @@ public final class ExtendedDatasetVersionRowMapper implements RowMapper<Extended
         uuidOrThrow(results, Columns.VERSION),
         uuidArrayOrThrow(results, Columns.FIELD_UUIDS),
         uuidOrNull(results, Columns.RUN_UUID),
-        stringOrNull(results, Columns.DATASET_NAME),
-        stringOrNull(results, Columns.NAMESPACE_NAME));
+        stringOrNull(results, Columns.NAMESPACE_NAME),
+        stringOrNull(results, Columns.DATASET_NAME));
   }
 }
