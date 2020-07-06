@@ -99,7 +99,7 @@ $ curl -X PUT http://localhost:5000/api/v1/sources/my-source \
 
 #### STEP 3: ADD DATASET TO NAMESPACE
 
-Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. In Marquez, datasets have both a _logical_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name how your dataset is known to your source. In this example, we refer to `my-dataset` as the logical name and `public.mytable` (=`schema.table`) as the physical name:
+Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. In Marquez, datasets have both a _logical_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name is how your dataset is known to your source. In this example, we refer to `my-dataset` as the logical name and `public.mytable` (_format_:`schema.table`) as the physical name:
 
 ##### REQUEST
 
@@ -125,7 +125,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
 ```bash
 {
   "id": {
-    "namespaceName": "my-namespace",
+    "namespace": "my-namespace",
     "name": "my-dataset"
   },
   "type": "DB_TABLE",
@@ -148,7 +148,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
 
 #### STEP 4: ADD JOB TO NAMESPACE
 
-With metadata for `my-dataset` in Marquez, let's add the job `my-job`:
+With `my-dataset` in Marquez, we can collect metadata for the job `my-job`:
 
 ##### REQUEST
 
@@ -158,7 +158,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job \
   -d '{
         "type": "BATCH",
         "inputs": [{
-          "namespaceName": "my-namespace", 
+          "namespace": "my-namespace", 
           "name": "my-dataset"
         }],
         "outputs": [],
@@ -172,7 +172,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job \
 ```bash
 {
   "id": {
-    "namespaceName": "my-namespace",
+    "namespace": "my-namespace",
     "name": "my-job"
   },
   "type": "BATCH",
@@ -180,7 +180,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job \
   "createdAt": "2020-06-30T20:32:55.570981Z",
   "updatedAt": "2020-06-30T20:32:55.658594Z",
   "inputs": [{
-      "namespaceName": "my-namespace",
+      "namespace": "my-namespace",
       "name": "my-dataset"
   }],
   "outputs": [],
@@ -192,6 +192,8 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job \
 ```
 
 #### STEP 5: CREATE A RUN
+
+Now, let's create a run for `my-job` and capture any runtime arguments:
 
 ##### REQUEST
 
@@ -230,9 +232,13 @@ $ curl -X POST http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job/
 }
 ```
 
+The call returns a **run ID** used to track the execution of our job.
+
+> **Note:** In this example, we use the ID `d46e465b-d358-4d32-83d4-df660ff614dd` to update the run metadata for `my-job`, but you'll want to replace the ID with your own.
+
 #### STEP 6: START A RUN
 
-Use `d46e465b-d358-4d32-83d4-df660ff614dd` to _start_ the run for `my-job`:
+Use `d46e465b-d358-4d32-83d4-df660ff614dd` to **start** the run for `my-job`:
 
 ##### REQUEST
 
@@ -264,7 +270,7 @@ $ curl -X POST http://localhost:5000/api/v1/jobs/runs/d46e465b-d358-4d32-83d4-df
 
 #### STEP 7: COMPLETE A RUN
 
-Use `d46e465b-d358-4d32-83d4-df660ff614dd` to _complete_ the run for `my-job`:
+Use `d46e465b-d358-4d32-83d4-df660ff614dd` to **complete** the run for `my-job`:
 
 ##### REQUEST
 

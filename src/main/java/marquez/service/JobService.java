@@ -239,7 +239,7 @@ public class JobService {
               String namespace = e.getKey().getValue();
               List<String> names =
                   e.getValue().stream()
-                      .map((id) -> id.getName().getValue())
+                      .map((id) -> id.getDatasetName().getValue())
                       .collect(toImmutableList());
               List<DatasetRow> results = datasetDao.findAllIn(namespace, names);
               if (results.size() < names.size()) {
