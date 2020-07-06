@@ -83,7 +83,7 @@ public final class ModelGenerator {
     final DatasetId dbTableId = newDatasetId();
     return new DbTable(
         dbTableId,
-        dbTableId.getName(),
+        dbTableId.getDatasetName(),
         newDatasetPhysicalName(),
         now,
         now,
@@ -110,7 +110,7 @@ public final class ModelGenerator {
     final DatasetId streamId = newDatasetId();
     return new Stream(
         streamId,
-        streamId.getName(),
+        streamId.getDatasetName(),
         newStreamName(),
         now,
         now,
@@ -161,7 +161,7 @@ public final class ModelGenerator {
     return new Job(
         jobId,
         newJobType(),
-        jobId.getName(),
+        jobId.getJobName(),
         now,
         now,
         newInputs(2),

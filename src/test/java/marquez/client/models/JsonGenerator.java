@@ -128,8 +128,8 @@ public final class JsonGenerator {
     final ObjectNode id =
         MAPPER
             .createObjectNode()
-            .put("namespaceName", dbTable.getId().getNamespaceName())
-            .put("name", dbTable.getId().getName());
+            .put("namespace", dbTable.getId().getNamespaceName())
+            .put("name", dbTable.getId().getDatasetName());
     final ArrayNode fields = MAPPER.valueToTree(dbTable.getFields());
     final ArrayNode tags = MAPPER.valueToTree(dbTable.getTags());
 
@@ -153,8 +153,8 @@ public final class JsonGenerator {
     final ObjectNode id =
         MAPPER
             .createObjectNode()
-            .put("namespaceName", stream.getId().getNamespaceName())
-            .put("name", stream.getId().getName());
+            .put("namespace", stream.getId().getNamespaceName())
+            .put("name", stream.getId().getDatasetName());
     final ArrayNode fields = MAPPER.valueToTree(stream.getFields());
     final ArrayNode tags = MAPPER.valueToTree(stream.getTags());
 
@@ -196,8 +196,8 @@ public final class JsonGenerator {
     final ObjectNode id =
         MAPPER
             .createObjectNode()
-            .put("namespaceName", job.getId().getNamespaceName())
-            .put("name", job.getId().getName());
+            .put("namespace", job.getId().getNamespaceName())
+            .put("name", job.getId().getJobName());
     final ArrayNode inputs = MAPPER.valueToTree(job.getInputs());
     final ArrayNode outputs = MAPPER.valueToTree(job.getOutputs());
     final ObjectNode context = MAPPER.createObjectNode();
