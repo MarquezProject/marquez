@@ -105,7 +105,7 @@ public class MarquezClientTest {
 
   // DB TABLE DATASET
   private static final DatasetId DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
-  private static final String DB_TABLE_NAME = DB_TABLE_ID.getDatasetName();
+  private static final String DB_TABLE_NAME = DB_TABLE_ID.name();
   private static final String DB_TABLE_PHYSICAL_NAME = newDatasetPhysicalName();
   private static final String DB_TABLE_SOURCE_NAME = newSourceName();
   private static final String DB_TABLE_DESCRIPTION = newDescription();
@@ -139,7 +139,7 @@ public class MarquezClientTest {
 
   // STREAM DATASET
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
-  private static final String STREAM_NAME = STREAM_ID.getDatasetName();
+  private static final String STREAM_NAME = STREAM_ID.name();
   private static final String STREAM_PHYSICAL_NAME = newStreamName();
   private static final String STREAM_SOURCE_NAME = newSourceName();
   private static final URL STREAM_SCHEMA_LOCATION = newSchemaLocation();
@@ -173,7 +173,7 @@ public class MarquezClientTest {
 
   // JOB
   private static final JobId JOB_ID = newJobIdWith(NAMESPACE_NAME);
-  private static final String JOB_NAME = JOB_ID.getJobName();
+  private static final String JOB_NAME = JOB_ID.name();
   private static final Set<DatasetId> INPUTS = newInputs(2);
   private static final Set<DatasetId> OUTPUTS = newOutputs(4);
   private static final URL LOCATION = newLocation();
