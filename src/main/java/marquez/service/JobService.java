@@ -286,8 +286,8 @@ public class JobService {
   public Optional<Job> getBy(@NonNull JobVersionId jobVersionId) throws MarquezServiceException {
     try {
       return jobDao
-          .find(jobVersionId.getNamespaceName().getValue(), jobVersionId.getJobName().getValue())
-          .map(jobRow -> toJob(jobRow, jobVersionId.getJobVersionUuid()));
+          .find(jobVersionId.getNamespace().getValue(), jobVersionId.getName().getValue())
+          .map(jobRow -> toJob(jobRow, jobVersionId.getVersionUuid()));
     } catch (UnableToExecuteStatementException e) {
       throw new MarquezServiceException(
           String.format("Failed to get job version: '%s'.", jobVersionId), e);
@@ -387,7 +387,7 @@ public class JobService {
               .collect(toImmutableList());
       final List<UUID> inputVersionUuids =
           inputVersions.stream()
-              .map((i) -> i.getDatasetVersionId().getDatasetVersionUuid())
+              .map((i) -> i.getDatasetVersionId().getVersionUuid())
               .collect(toImmutableList());
       final RunRow newRunRow =
           Mapper.toRunRow(versionRow.getUuid(), runArgsRow.getUuid(), inputVersionUuids, runMeta);

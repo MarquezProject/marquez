@@ -21,11 +21,11 @@ import lombok.Value;
 /** Version ID for {@code Dataset}. */
 @Value
 public class DatasetVersionId {
-  @NonNull NamespaceName namespaceName;
-  @NonNull DatasetName datasetName;
-  @NonNull UUID datasetVersionUuid;
+  @NonNull NamespaceName namespace;
+  @NonNull DatasetName name;
+  @NonNull UUID versionUuid;
 
   public DatasetId asDatasetId() {
-    return new DatasetId(namespaceName, datasetName);
+    return new DatasetId(namespace, name);
   }
 }

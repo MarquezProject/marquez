@@ -181,7 +181,7 @@ public class JobServiceTest {
     assertThat(jobInputUpdates.size()).isEqualTo(1);
     JobInputUpdate jobInputUpdate = jobInputUpdates.get(0);
     assertThat(jobInputUpdate.getRunId()).isEqualTo(run.getId());
-    assertThat(jobInputUpdate.getJobVersionId().getJobName()).isEqualTo(jobName);
+    assertThat(jobInputUpdate.getJobVersionId().getName()).isEqualTo(jobName);
 
     assertThat(jobOutputUpdates.size()).isEqualTo(1);
     JobOutputUpdate jobOutputUpdate = jobOutputUpdates.get(0);

@@ -242,10 +242,8 @@ public class DatasetService {
       throws MarquezServiceException {
     try {
       return datasetDao
-          .find(
-              datasetVersionId.getNamespaceName().getValue(),
-              datasetVersionId.getDatasetName().getValue())
-          .map(datasetRow -> toDataset(datasetRow, datasetVersionId.getDatasetVersionUuid()));
+          .find(datasetVersionId.getNamespace().getValue(), datasetVersionId.getName().getValue())
+          .map(datasetRow -> toDataset(datasetRow, datasetVersionId.getVersionUuid()));
     } catch (UnableToExecuteStatementException e) {
       throw new MarquezServiceException(
           String.format("Failed to get dataset version with ID '%s'.", datasetVersionId), e);
