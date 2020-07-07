@@ -29,6 +29,7 @@ import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
+import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 
@@ -49,6 +50,7 @@ public abstract class Dataset {
   @Getter private final DatasetName physicalName;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
+  @Getter private final NamespaceName namespace;
   @Getter private final SourceName sourceName;
   @Getter private final ImmutableList<Field> fields;
   @Getter private final ImmutableSet<TagName> tags;
@@ -73,6 +75,7 @@ public abstract class Dataset {
     this.physicalName = physicalName;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.namespace = id.getNamespace();
     this.sourceName = sourceName;
     this.fields = (fields == null) ? ImmutableList.of() : fields;
     this.tags = (tags == null) ? ImmutableSet.of() : tags;

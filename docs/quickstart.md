@@ -133,6 +133,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
   "physicalName": "public.mytable",
   "createdAt": "2020-06-30T20:31:39.129483Z",
   "updatedAt": "2020-06-30T20:31:39.259853Z",
+  "namespace": "my-namespace",
   "sourceName": "my-source",
   "fields": [
     {"name": "a", "type": "INTEGER", "tags": [], "description": null},
@@ -179,6 +180,7 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job \
   "name": "my-job",
   "createdAt": "2020-06-30T20:32:55.570981Z",
   "updatedAt": "2020-06-30T20:32:55.658594Z",
+  "namespace": "my-namespace",
   "inputs": [{
       "namespace": "my-namespace",
       "name": "my-dataset"
