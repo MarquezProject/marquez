@@ -140,6 +140,7 @@ public final class JsonGenerator {
     obj.put("physicalName", dbTable.getPhysicalName());
     obj.put("createdAt", ISO_INSTANT.format(dbTable.getCreatedAt()));
     obj.put("updatedAt", ISO_INSTANT.format(dbTable.getUpdatedAt()));
+    obj.put("namespace", dbTable.getNamespace());
     obj.put("sourceName", dbTable.getSourceName());
     obj.putArray("fields").addAll(fields);
     obj.putArray("tags").addAll(tags);
@@ -165,6 +166,7 @@ public final class JsonGenerator {
     obj.put("physicalName", stream.getPhysicalName());
     obj.put("createdAt", ISO_INSTANT.format(stream.getCreatedAt()));
     obj.put("updatedAt", ISO_INSTANT.format(stream.getUpdatedAt()));
+    obj.put("namespace", stream.getNamespace());
     obj.put("sourceName", stream.getSourceName());
     obj.putArray("fields").addAll(fields);
     obj.putArray("tags").addAll(tags);
@@ -209,6 +211,7 @@ public final class JsonGenerator {
     obj.put("name", job.getName());
     obj.put("createdAt", ISO_INSTANT.format(job.getCreatedAt()));
     obj.put("updatedAt", ISO_INSTANT.format(job.getUpdatedAt()));
+    obj.put("namespace", job.getNamespace());
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", job.getLocation().map(URL::toString).orElse(null));

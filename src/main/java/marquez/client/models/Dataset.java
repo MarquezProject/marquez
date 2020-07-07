@@ -47,6 +47,7 @@ public abstract class Dataset {
   @Getter @NonNull private final String physicalName;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
+  @Getter @NonNull private final String namespace;
   @Getter @NonNull private final String sourceName;
   @Getter @NonNull private final List<Field> fields;
   @Getter @NonNull private final Set<String> tags;
@@ -60,6 +61,7 @@ public abstract class Dataset {
       @NonNull final String physicalName,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
+      @NonNull final String namespace,
       @NonNull final String sourceName,
       @Nullable final List<Field> fields,
       @Nullable final Set<String> tags,
@@ -71,6 +73,7 @@ public abstract class Dataset {
     this.physicalName = physicalName;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.namespace = namespace;
     this.sourceName = sourceName;
     this.fields = (fields == null) ? ImmutableList.of() : ImmutableList.copyOf(fields);
     this.tags = (tags == null) ? ImmutableSet.of() : ImmutableSet.copyOf(tags);

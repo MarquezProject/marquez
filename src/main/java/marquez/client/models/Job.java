@@ -34,6 +34,7 @@ public final class Job extends JobMeta {
   @Getter private final String name;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
+  @Getter private final String namespace;
   @Nullable private final Run latestRun;
 
   public Job(
@@ -42,6 +43,7 @@ public final class Job extends JobMeta {
       @NonNull final String name,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
+      @NonNull final String namespace,
       final Set<DatasetId> inputs,
       final Set<DatasetId> outputs,
       @Nullable final URL location,
@@ -53,6 +55,7 @@ public final class Job extends JobMeta {
     this.name = name;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.namespace = namespace;
     this.latestRun = latestRun;
   }
 
