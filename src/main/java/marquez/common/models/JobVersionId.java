@@ -21,11 +21,11 @@ import lombok.Value;
 /** Version ID for {@code Job}. */
 @Value
 public class JobVersionId {
-  @NonNull NamespaceName namespaceName;
-  @NonNull JobName jobName;
-  @NonNull UUID jobVersionUuid;
+  @NonNull NamespaceName namespace;
+  @NonNull JobName name;
+  @NonNull UUID versionUuid;
 
   public JobId asJobId() {
-    return new JobId(namespaceName, jobName);
+    return new JobId(namespace, name);
   }
 }
