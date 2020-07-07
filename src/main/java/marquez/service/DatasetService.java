@@ -242,9 +242,7 @@ public class DatasetService {
       throws MarquezServiceException {
     try {
       return datasetDao
-          .find(
-              datasetVersionId.getNamespace().getValue(),
-              datasetVersionId.getName().getValue())
+          .find(datasetVersionId.getNamespace().getValue(), datasetVersionId.getName().getValue())
           .map(datasetRow -> toDataset(datasetRow, datasetVersionId.getVersionUuid()));
     } catch (UnableToExecuteStatementException e) {
       throw new MarquezServiceException(
