@@ -84,7 +84,6 @@ public final class JobMeta {
   }
 
   private static java.util.stream.Stream<String> idToStream(DatasetId datasetId) {
-    return Stream.of(
-        datasetId.getNamespaceName().getValue(), datasetId.getDatasetName().getValue());
+    return Stream.of(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
   }
 }

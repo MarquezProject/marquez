@@ -302,4 +302,4 @@ $ curl -X POST http://localhost:5000/api/v1/jobs/runs/d46e465b-d358-4d32-83d4-df
 
 ## Summary
 
-In this example, we showed you how to use Marquez to collect dataset and job metadata. We also walked you through the set of [API](https://marquezproject.github.io/marquez/openapi.html) calls to successfully mark a run as **complete**.
+In this example, we showed you how to use Marquez to collect dataset and job metadata. We also walked you through the set of [API](https://marquezproject.github.io/marquez/openapi.html) calls to successfully mark a run as complete.

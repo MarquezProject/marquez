@@ -55,7 +55,7 @@ import org.mockito.junit.MockitoRule;
 @Category(UnitTests.class)
 public class JobResourceTest {
   private static final JobId JOB_ID = newJobId();
-  private static final NamespaceName NAMESPACE_NAME = JOB_ID.getNamespaceName();
+  private static final NamespaceName NAMESPACE_NAME = JOB_ID.getNamespace();
   private static final JobName JOB_NAME = JOB_ID.getName();
 
   private static final Job JOB_0 = newJob();

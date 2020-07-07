@@ -45,7 +45,7 @@ import org.mockito.junit.MockitoRule;
 @Category(UnitTests.class)
 public class DatasetResourceTest {
   private static final DatasetId DB_TABLE_ID = newDatasetId();
-  private static final NamespaceName NAMESPACE_NAME = DB_TABLE_ID.getNamespaceName();
+  private static final NamespaceName NAMESPACE_NAME = DB_TABLE_ID.getNamespace();
   private static final DatasetName DB_TABLE_NAME = DB_TABLE_ID.getName();
 
   private static final DbTable DB_TABLE_0 = newDbTable();

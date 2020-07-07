@@ -349,7 +349,7 @@ public class MarquezAppIntegrationTest {
               .description(newDescription())
               .build();
 
-      client.createDataset(inputId.getNamespaceName(), inputId.getName(), dbTableMeta);
+      client.createDataset(inputId.getNamespace(), inputId.getName(), dbTableMeta);
     }
 
     // (3) Add outputs db tables to namespace and associate with source
@@ -362,7 +362,7 @@ public class MarquezAppIntegrationTest {
               .description(newDescription())
               .build();
 
-      client.createDataset(outputId.getNamespaceName(), outputId.getName(), dbTableMeta);
+      client.createDataset(outputId.getNamespace(), outputId.getName(), dbTableMeta);
     }
 
     // (4) Add job to namespace
