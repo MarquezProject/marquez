@@ -28,6 +28,7 @@ import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
+import marquez.common.models.NamespaceName;
 
 @EqualsAndHashCode
 @ToString
@@ -37,6 +38,7 @@ public final class Job {
   @Getter private final JobName name;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
+  @Getter private final NamespaceName namespace;
   @Getter private final ImmutableSet<DatasetId> inputs;
   @Getter private final ImmutableSet<DatasetId> outputs;
   @Nullable private final URL location;
@@ -61,6 +63,7 @@ public final class Job {
     this.name = name;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.namespace = id.getNamespace();
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
