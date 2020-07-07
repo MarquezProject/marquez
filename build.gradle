@@ -105,6 +105,13 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
   from javadoc.destinationDir
 }
 
+release {
+  failOnCommitNeeded = false
+  git {
+    requireBranch = 'main'
+  }
+}
+
 publishing {
   publications {
     mavenJava(MavenPublication) {
