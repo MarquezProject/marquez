@@ -225,13 +225,13 @@ public class JobService {
   /**
    * find the uuids for the datsets based on their namespace/name
    *
-   * @param ids the namespace/name ids of the datasets
+   * @param datasetIds the namespace/name ids of the datasets
    * @return their uuids
    */
-  private List<UUID> findUuids(ImmutableSet<DatasetId> ids) {
+  private List<UUID> findUuids(ImmutableSet<DatasetId> datasetIds) {
     // group per namespace since that's how we can query the db
     Map<@NonNull NamespaceName, List<DatasetId>> byNamespace =
-        ids.stream().collect(groupingBy(DatasetId::getNamespaceName));
+        datasetIds.stream().collect(groupingBy(DatasetId::getNamespace));
     // query the db for all ds uuids for each namespace and combine them back in one list
     return byNamespace.entrySet().stream()
         .flatMap(
@@ -239,7 +239,7 @@ public class JobService {
               String namespace = e.getKey().getValue();
               List<String> names =
                   e.getValue().stream()
-                      .map((id) -> id.getDatasetName().getValue())
+                      .map(datasetId -> datasetId.getName().getValue())
                       .collect(toImmutableList());
               List<DatasetRow> results = datasetDao.findAllIn(namespace, names);
               if (results.size() < names.size()) {

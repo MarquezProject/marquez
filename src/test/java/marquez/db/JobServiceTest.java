@@ -158,7 +158,7 @@ public class JobServiceTest {
                 ImmutableMap.of(),
                 "description"));
     assertThat(job.getName()).isEqualTo(jobName);
-    assertThat(job.getId().getNamespaceName()).isEqualTo(NAMESPACE_NAME);
+    assertThat(job.getId().getNamespace()).isEqualTo(NAMESPACE_NAME);
     assertThat(job.getId().getName()).isEqualTo(jobName);
     assertThat(job.getId()).isEqualTo(new JobId(NAMESPACE_NAME, jobName));
     Run run = jobService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
