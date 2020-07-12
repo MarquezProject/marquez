@@ -60,7 +60,7 @@ public class MarquezClient {
   @VisibleForTesting static final int DEFAULT_OFFSET = 0;
 
   @VisibleForTesting final MarquezHttp http;
-  @Getter private final String namespaceName;
+  @VisibleForTesting final String namespaceName;
 
   public MarquezClient() {
     this(DEFAULT_BASE_URL, DEFAULT_NAMESPACE_NAME);
@@ -359,7 +359,7 @@ public class MarquezClient {
       return this;
     }
 
-    public Builder namespaceName(@NonNull String namespaceName) {
+    public Builder namespace(@NonNull String namespaceName) {
       this.namespaceName = namespaceName;
       return this;
     }

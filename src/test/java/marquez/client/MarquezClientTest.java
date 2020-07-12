@@ -235,7 +235,7 @@ public class MarquezClientTest {
   public void testClientBuilder_default() {
     final MarquezClient client = MarquezClient.builder().build();
     assertThat(client.http.baseUrl).isEqualTo(DEFAULT_BASE_URL);
-    assertThat(client.getNamespaceName()).isEqualTo(DEFAULT_NAMESPACE_NAME);
+    assertThat(client.namespaceName).isEqualTo(DEFAULT_NAMESPACE_NAME);
   }
 
   @Test
@@ -243,8 +243,8 @@ public class MarquezClientTest {
     final String namespaceName = newNamespaceName();
     System.setProperty(NAMESPACE_NAME_ENV_VAR, namespaceName);
 
-    final MarquezClient client = MarquezClient.builder().namespaceName(namespaceName).build();
-    assertThat(client.getNamespaceName()).isEqualTo(namespaceName);
+    final MarquezClient client = MarquezClient.builder().namespace(namespaceName).build();
+    assertThat(client.namespaceName).isEqualTo(namespaceName);
 
     System.clearProperty(NAMESPACE_NAME_ENV_VAR);
   }
