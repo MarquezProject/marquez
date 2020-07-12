@@ -90,8 +90,26 @@ public class JobMeta {
       return this;
     }
 
+    public Builder inputs(@NonNull String namespaceName, String... datasetNames) {
+      final ImmutableSet.Builder<DatasetId> datasetIds = ImmutableSet.builder();
+      for (final String datasetName : datasetNames) {
+        datasetIds.add(new DatasetId(namespaceName, datasetName));
+      }
+      inputs(datasetIds.build());
+      return this;
+    }
+
     public Builder inputs(@NonNull Set<DatasetId> inputs) {
       this.inputs = ImmutableSet.copyOf(inputs);
+      return this;
+    }
+
+    public Builder outputs(@NonNull String namespaceName, String... datasetNames) {
+      final ImmutableSet.Builder<DatasetId> datasetIds = ImmutableSet.builder();
+      for (final String datasetName : datasetNames) {
+        datasetIds.add(new DatasetId(namespaceName, datasetName));
+      }
+      outputs(datasetIds.build());
       return this;
     }
 
@@ -100,8 +118,8 @@ public class JobMeta {
       return this;
     }
 
-    public Builder location(@NonNull String locationAsString) {
-      return location(Utils.toUrl(locationAsString));
+    public Builder location(@NonNull String locationString) {
+      return location(Utils.toUrl(locationString));
     }
 
     public Builder location(@NonNull URL location) {

@@ -255,7 +255,8 @@ public final class ModelGenerator {
   }
 
   public static URL newLocation() {
-    return Utils.toUrl("https://github.com/repo/test/commit/" + newId());
+    return Utils.toUrl(
+        String.format("https://github.com/test-org/test-repo/blob/%s/test.java", newId()));
   }
 
   public static Map<String, String> newContext() {
