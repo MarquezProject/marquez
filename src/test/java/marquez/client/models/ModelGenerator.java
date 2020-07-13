@@ -303,7 +303,12 @@ public final class ModelGenerator {
   }
 
   public static Field newField() {
-    return new Field(newFieldName(), newFieldType(), newTagNames(2), newDescription());
+    return Field.builder()
+        .name(newFieldName())
+        .type(newFieldType())
+        .tags(newTagNames(2))
+        .description(newDescription())
+        .build();
   }
 
   public static String newFieldName() {
