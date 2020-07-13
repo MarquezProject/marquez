@@ -1,7 +1,7 @@
 package marquez.client.models;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.internal.util.Sets;
+import com.google.common.collect.Sets;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
