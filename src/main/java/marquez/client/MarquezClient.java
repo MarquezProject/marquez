@@ -45,6 +45,7 @@ import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
+import marquez.client.models.RunState;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Tag;
@@ -281,6 +282,26 @@ public class MarquezClient {
                 "/namespaces/%s/jobs/%s/runs",
                 newQueryParamsWith(limit, offset), namespaceName, jobName));
     return Runs.fromJson(bodyAsJson).getValue();
+  }
+
+  public Run markRunAs(String runId, RunState runState) {
+    return markRunAs(runId, runState, null);
+  }
+
+  public Run markRunAs(String runId, @NonNull RunState runState, @Nullable Instant at) {
+    switch (runState) {
+      case RUNNING:
+        return markRunAsRunning(runId, at);
+      case COMPLETED:
+        return markRunAsCompleted(runId, at);
+      case ABORTED:
+        return markRunAsAborted(runId, at);
+      case FAILED:
+        return markRunAsFailed(runId, at);
+      default:
+        throw new IllegalArgumentException(
+            String.format("Unexpected run state type: %s", runState.name()));
+    }
   }
 
   public Run markRunAsRunning(String runId) {

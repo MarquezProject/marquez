@@ -33,8 +33,8 @@ public class Field {
     return Optional.ofNullable(description);
   }
 
-  public static Field.Builder builder() {
-    return new Field.Builder();
+  public static Builder builder() {
+    return new Builder();
   }
 
   public static final class Builder {
