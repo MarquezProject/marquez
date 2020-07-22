@@ -246,15 +246,23 @@ public class MarquezClient {
     return Jobs.fromJson(bodyAsJson).getValue();
   }
 
+  public Run createRun(String jobName, RunMeta meta, boolean markRunAsRunning) {
+    return createRun(namespaceName, jobName, meta, markRunAsRunning);
+  }
+
   public Run createRun(String jobName, RunMeta meta) {
-    return createRun(namespaceName, jobName, meta);
+    return createRun(namespaceName, jobName, meta, false);
   }
 
   public Run createRun(
-      @NonNull String namespaceName, @NonNull String jobName, @NonNull RunMeta meta) {
+      @NonNull String namespaceName,
+      @NonNull String jobName,
+      @NonNull RunMeta meta,
+      boolean markRunAsRunning) {
     final String bodyAsJson =
         http.post(http.url("/namespaces/%s/jobs/%s/runs", namespaceName, jobName), meta.toJson());
-    return Run.fromJson(bodyAsJson);
+    final Run run = Run.fromJson(bodyAsJson);
+    return (markRunAsRunning) ? markRunAsRunning(run.getId()) : run;
   }
 
   public Run getRun(@NonNull String runId) {
