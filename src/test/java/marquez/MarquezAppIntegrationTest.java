@@ -54,7 +54,6 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.SourceType;
-import marquez.db.JdbiRuleInit;
 import org.jdbi.v3.testing.JdbiRule;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -65,7 +64,7 @@ public class MarquezAppIntegrationTest {
   private static final String CONFIG_FILE = "config.test.yml";
   private static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
 
-  private static final MarquezDb DB = MarquezDb.create();
+  private static final PostgresContainer DB = PostgresContainer.create();
 
   static {
     DB.start();
@@ -341,31 +340,31 @@ public class MarquezAppIntegrationTest {
 
     // (3) Add input db tables to namespace and associate with source
     final ImmutableSet<DatasetId> inputs = newDatasetIdsWith(NAMESPACE_NAME, 4);
-    for (final DatasetId inputId : inputs) {
+    for (final DatasetId input : inputs) {
       final DbTableMeta dbTableMeta =
           DbTableMeta.builder()
-              .physicalName(inputId.getName())
+              .physicalName(input.getName())
               .sourceName(STREAM_SOURCE_NAME)
               .description(newDescription())
               .build();
 
-      client.createDataset(inputId.getNamespace(), inputId.getName(), dbTableMeta);
+      client.createDataset(input.getNamespace(), input.getName(), dbTableMeta);
     }
 
-    // (3) Add outputs db tables to namespace and associate with source
+    // (4) Add output db tables to namespace and associate with source
     final ImmutableSet<DatasetId> outputs = newDatasetIdsWith(NAMESPACE_NAME, 2);
-    for (final DatasetId outputId : outputs) {
+    for (final DatasetId output : outputs) {
       final DbTableMeta dbTableMeta =
           DbTableMeta.builder()
-              .physicalName(outputId.getName())
+              .physicalName(output.getName())
               .sourceName(STREAM_SOURCE_NAME)
               .description(newDescription())
               .build();
 
-      client.createDataset(outputId.getNamespace(), outputId.getName(), dbTableMeta);
+      client.createDataset(output.getNamespace(), output.getName(), dbTableMeta);
     }
 
-    // (4) Add job to namespace
+    // (5) Add job to namespace
     final JobMeta jobMeta =
         JobMeta.builder()
             .type(JOB_TYPE)
@@ -389,7 +388,7 @@ public class MarquezAppIntegrationTest {
     assertThat(job.getDescription()).isEqualTo(Optional.of(JOB_DESCRIPTION));
     assertThat(job.getLatestRun()).isEmpty();
 
-    // (5) Create a run
+    // (6) Create a run
     final RunMeta runMeta = RunMeta.builder().build();
     final Run run = client.createRun(NAMESPACE_NAME, JOB_NAME, runMeta);
     assertThat(run.getId()).isNotNull();
@@ -403,7 +402,7 @@ public class MarquezAppIntegrationTest {
     assertThat(run.getDurationMs()).isEmpty();
     assertThat(run.getArgs()).isEmpty();
 
-    // (6) Start a run
+    // (7) Start a run
     final Instant startedAt = newTimestamp();
     final Run runStarted = client.markRunAsRunning(run.getId(), startedAt);
     assertThat(runStarted.getId()).isEqualTo(run.getId());
@@ -417,7 +416,7 @@ public class MarquezAppIntegrationTest {
     assertThat(runStarted.getDurationMs()).isEmpty();
     assertThat(runStarted.getArgs()).isEmpty();
 
-    // (7) Complete a run
+    // (8) Complete a run
     final Instant endedAt = newTimestamp();
     final Run runCompleted = client.markRunAsCompleted(run.getId(), endedAt);
     assertThat(runCompleted.getId()).isEqualTo(run.getId());

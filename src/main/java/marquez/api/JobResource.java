@@ -258,6 +258,6 @@ public class JobResource {
         .getBaseUriBuilder()
         .path(JobResource.class)
         .path(JobResource.class, "getRun")
-        .build(run.getId());
+        .build(run.getId().getValue());
   }
 }

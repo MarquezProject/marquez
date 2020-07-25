@@ -1,11 +1,29 @@
 package marquez.common.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 
 /** ID for {@code Job}. */
-@Value
+@EqualsAndHashCode
+@ToString
 public class JobId {
-  @NonNull NamespaceName namespace;
-  @NonNull JobName name;
+  private final NamespaceName namespaceName;
+  private final JobName jobName;
+
+  public JobId(
+      @JsonProperty("namespace") @NonNull NamespaceName namespaceName,
+      @JsonProperty("name") @NonNull JobName jobName) {
+    this.namespaceName = namespaceName;
+    this.jobName = jobName;
+  }
+
+  public NamespaceName getNamespace() {
+    return namespaceName;
+  }
+
+  public JobName getName() {
+    return jobName;
+  }
 }

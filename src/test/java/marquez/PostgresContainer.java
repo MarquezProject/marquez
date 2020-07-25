@@ -17,24 +17,24 @@ package marquez;
 import java.net.URI;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-public class MarquezDb extends PostgreSQLContainer<MarquezDb> {
+public class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
   private static final String POSTGRES_9_6 = "postgres:9.6";
   private static final int JDBC = 5;
 
-  private static MarquezDb db;
+  private static PostgresContainer container;
 
   private String host;
   private int port;
 
-  private MarquezDb() {
+  private PostgresContainer() {
     super(POSTGRES_9_6);
   }
 
-  public static MarquezDb create() {
-    if (db == null) {
-      db = new MarquezDb();
+  public static PostgresContainer create() {
+    if (container == null) {
+      container = new PostgresContainer();
     }
-    return db;
+    return container;
   }
 
   public String getHost() {
@@ -49,7 +49,7 @@ public class MarquezDb extends PostgreSQLContainer<MarquezDb> {
   public void start() {
     super.start();
 
-    final URI jdbcUri = URI.create(db.getJdbcUrl().substring(JDBC));
+    final URI jdbcUri = URI.create(container.getJdbcUrl().substring(JDBC));
     host = jdbcUri.getHost();
     port = jdbcUri.getPort();
   }

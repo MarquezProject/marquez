@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
+import marquez.JdbiRuleInit;
 import marquez.db.models.SourceRow;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.testing.JdbiRule;

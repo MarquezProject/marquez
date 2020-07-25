@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
+import marquez.JdbiRuleInit;
 import marquez.common.Utils;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
+import marquez.JdbiRuleInit;
 import marquez.common.Utils;
 import marquez.db.models.JobContextRow;
 import org.jdbi.v3.core.Jdbi;

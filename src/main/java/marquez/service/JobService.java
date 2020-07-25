@@ -111,8 +111,8 @@ public class JobService {
   private final DatasetDao datasetDao;
   private final DatasetVersionDao datasetVersionDao;
   private final JobDao jobDao;
-  private final JobVersionDao versionDao;
-  private final JobContextDao contextDao;
+  private final JobVersionDao jobVersionDao;
+  private final JobContextDao jobContextDao;
   private final RunDao runDao;
   private final RunArgsDao runArgsDao;
   private final RunStateDao runStateDao;
@@ -156,8 +156,8 @@ public class JobService {
     this.datasetDao = datasetDao;
     this.datasetVersionDao = datasetVersionDao;
     this.jobDao = jobDao;
-    this.versionDao = versionDao;
-    this.contextDao = contextDao;
+    this.jobVersionDao = versionDao;
+    this.jobContextDao = contextDao;
     this.runDao = runDao;
     this.runArgsDao = runArgsDao;
     this.runStateDao = runStateDao;
@@ -184,16 +184,16 @@ public class JobService {
             jobMeta);
       }
       final Version version = jobMeta.version(namespaceName, jobName);
-      if (!versionDao.exists(version.getValue())) {
+      if (!jobVersionDao.exists(version.getValue())) {
         log.info("Creating version '{}' for job '{}'...", version.getValue(), jobName.getValue());
         final String checksum = Utils.checksumFor(jobMeta.getContext());
-        if (!contextDao.exists(checksum)) {
+        if (!jobContextDao.exists(checksum)) {
           final JobContextRow newContextRow =
               Mapper.toJobContextRow(jobMeta.getContext(), checksum);
-          contextDao.insert(newContextRow);
+          jobContextDao.insert(newContextRow);
         }
         final JobRow jobRow = jobDao.find(namespaceName.getValue(), jobName.getValue()).get();
-        final JobContextRow contextRow = contextDao.findBy(checksum).get();
+        final JobContextRow contextRow = jobContextDao.findBy(checksum).get();
         final List<UUID> inputUuids = findUuids(jobMeta.getInputs());
         final List<UUID> outputUuids = findUuids(jobMeta.getOutputs());
         final JobVersionRow newVersionRow =
@@ -204,7 +204,7 @@ public class JobService {
                 outputUuids,
                 jobMeta.getLocation().orElse(null),
                 version);
-        versionDao.insert(newVersionRow);
+        jobVersionDao.insert(newVersionRow);
         versions
             .labels(namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue())
             .inc();
@@ -327,7 +327,7 @@ public class JobService {
                             String.format("Version missing for job row '%s'.", jobRow.getUuid())))
             : jobVersionUuid;
     final ExtendedJobVersionRow jobVersionRow =
-        versionDao
+        jobVersionDao
             .findBy(currentJobVersionUuid)
             .orElseThrow(
                 () ->
@@ -373,7 +373,7 @@ public class JobService {
         runArgsDao.insert(newRunArgsRow);
       }
       final JobVersionRow versionRow =
-          versionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
+          jobVersionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
       final RunArgsRow runArgsRow = runArgsDao.findBy(checksum).get();
       final List<RunInput> inputVersions =
           datasetDao.findAllIn(versionRow.getInputUuids()).stream()
@@ -435,7 +435,7 @@ public class JobService {
     checkArgument(offset >= 0, "offset must be >= 0");
     try {
       final Optional<ExtendedJobVersionRow> versionRow =
-          versionDao.findLatest(namespaceName.getValue(), jobName.getValue());
+          jobVersionDao.findLatest(namespaceName.getValue(), jobName.getValue());
       if (versionRow.isPresent()) {
         final List<ExtendedRunRow> runRows =
             runDao.findAll(versionRow.get().getUuid(), limit, offset);
@@ -467,8 +467,8 @@ public class JobService {
     try {
       final List<UUID> outputUuids;
       if (newRunState.isComplete()) {
-        final ExtendedJobVersionRow versionRow =
-            versionDao.findBy(runRow.getJobVersionUuid()).get();
+        final ExtendedJobVersionRow jobVersionRow =
+            jobVersionDao.findBy(runRow.getJobVersionUuid()).get();
         final List<ExtendedDatasetVersionRow> outputVersions =
             datasetVersionDao.findByRunId(runId.getValue());
         final List<RunOutput> outputs =
@@ -485,16 +485,16 @@ public class JobService {
             new JobOutputUpdate(
                 runId,
                 new JobVersionId(
-                    NamespaceName.of(versionRow.getNamespaceName()),
-                    JobName.of(versionRow.getName()),
-                    versionRow.getUuid()),
+                    NamespaceName.of(jobVersionRow.getNamespaceName()),
+                    JobName.of(jobVersionRow.getName()),
+                    jobVersionRow.getUuid()),
                 outputs));
-        if (versionRow.hasOutputUuids()) {
-          outputUuids = versionRow.getOutputUuids();
+        if (jobVersionRow.hasOutputUuids()) {
+          outputUuids = jobVersionRow.getOutputUuids();
           log.info(
               "Run '{}' for job version '{}' modified datasets: {}",
               runId,
-              versionRow.getVersion(),
+              jobVersionRow.getVersion(),
               outputUuids);
         } else {
           outputUuids = null;
