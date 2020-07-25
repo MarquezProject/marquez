@@ -64,10 +64,10 @@ public class MarquezAppIntegrationTest {
   private static final String CONFIG_FILE = "config.test.yml";
   private static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
 
-  private static final PostgresContainer DB = PostgresContainer.create();
+  private static final PostgresContainer POSTGRES = PostgresContainer.create();
 
   static {
-    DB.start();
+    POSTGRES.start();
   }
 
   @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
@@ -77,9 +77,9 @@ public class MarquezAppIntegrationTest {
       new DropwizardAppRule<>(
           MarquezApp.class,
           CONFIG_FILE_PATH,
-          ConfigOverride.config("db.url", DB.getJdbcUrl()),
-          ConfigOverride.config("db.user", DB.getUsername()),
-          ConfigOverride.config("db.password", DB.getPassword()));
+          ConfigOverride.config("db.url", POSTGRES.getJdbcUrl()),
+          ConfigOverride.config("db.user", POSTGRES.getUsername()),
+          ConfigOverride.config("db.password", POSTGRES.getPassword()));
 
   // TAGS
   private static final Tag PII = new Tag("PII", "Personally identifiable information");
