@@ -133,7 +133,10 @@ public class DatasetService {
       }
       final Version version = datasetMeta.version(namespaceName, datasetName);
       if (!versionDao.exists(version.getValue())) {
-        log.info("Creating version '{}' for dataset '{}'...", version, datasetName.getValue());
+        log.info(
+            "Creating version '{}' for dataset '{}'...",
+            version.getValue(),
+            datasetName.getValue());
         final ExtendedDatasetRow datasetRow =
             datasetDao.find(namespaceName.getValue(), datasetName.getValue()).get();
         final List<DatasetFieldRow> fieldRows = fieldDao.findAll(datasetRow.getUuid());
@@ -171,7 +174,9 @@ public class DatasetService {
             Mapper.toDatasetVersionRow(datasetRow.getUuid(), version, fieldUuids, datasetMeta);
         versionDao.insertWith(newVersionRow, newFieldRowsForVersion);
         log.info(
-            "Successfully created version '{}' for dataset '{}'.", version, datasetName.getValue());
+            "Successfully created version '{}' for dataset '{}'.",
+            version.getValue(),
+            datasetName.getValue());
         versions
             .labels(
                 namespaceName.getValue(), datasetMeta.getType().toString(), datasetName.getValue())

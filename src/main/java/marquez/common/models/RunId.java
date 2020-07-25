@@ -23,13 +23,11 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.Utils;
-import marquez.common.models.RunId.RunIdToUUID;
-import marquez.common.models.RunId.UUIDToRunId;
 
 @EqualsAndHashCode
 @ToString
-@JsonDeserialize(converter = UUIDToRunId.class)
-@JsonSerialize(converter = RunIdToUUID.class)
+@JsonDeserialize(converter = RunId.FromValue.class)
+@JsonSerialize(converter = RunId.ToValue.class)
 public class RunId {
   @Getter private final UUID value;
 
@@ -45,17 +43,17 @@ public class RunId {
     return new RunId(value);
   }
 
-  public static class RunIdToUUID extends StdConverter<RunId, UUID> {
-    @Override
-    public UUID convert(RunId value) {
-      return value.getValue();
-    }
-  }
-
-  public static class UUIDToRunId extends StdConverter<UUID, RunId> {
+  public static class FromValue extends StdConverter<UUID, RunId> {
     @Override
     public RunId convert(UUID value) {
       return RunId.of(value);
+    }
+  }
+
+  public static class ToValue extends StdConverter<RunId, UUID> {
+    @Override
+    public UUID convert(RunId value) {
+      return value.getValue();
     }
   }
 }

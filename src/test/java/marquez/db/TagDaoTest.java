@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
+import marquez.JdbiRuleInit;
 import marquez.db.models.TagRow;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.testing.JdbiRule;

@@ -1,6 +1,5 @@
-package marquez.db;
+package marquez;
 
-import marquez.MarquezDb;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.JdbiRule;
@@ -8,15 +7,19 @@ import org.jdbi.v3.testing.Migration;
 
 public class JdbiRuleInit {
 
-  private static final MarquezDb DB = MarquezDb.create();
+  private static final PostgresContainer POSTGRES = PostgresContainer.create();
 
   static {
-    DB.start();
+    POSTGRES.start();
   }
 
   public static JdbiRule init() {
     return JdbiRule.externalPostgres(
-            DB.getHost(), DB.getPort(), DB.getUsername(), DB.getPassword(), DB.getDatabaseName())
+            POSTGRES.getHost(),
+            POSTGRES.getPort(),
+            POSTGRES.getUsername(),
+            POSTGRES.getPassword(),
+            POSTGRES.getDatabaseName())
         .withPlugin(new SqlObjectPlugin())
         .withPlugin(new PostgresPlugin())
         .withMigration(Migration.before().withPath("marquez/db/migration"));

@@ -41,6 +41,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
+import marquez.JdbiRuleInit;
 import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;

@@ -39,7 +39,7 @@ public final class MorePreconditions {
     return arg;
   }
 
-  private static Boolean emptyOrBlank(final String arg) {
+  private static boolean emptyOrBlank(final String arg) {
     return arg.trim().isEmpty();
   }
 }
