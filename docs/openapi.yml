@@ -674,10 +674,10 @@ components:
           description: The name of the source associated with the stream.
           type: string
         schemaLocation:
-          description: The URL of the schema for the stream.
+          description: The URL of the schema for the stream data.
           type: string
         fields:
-          description: The schema fields of the stream.
+          description: The schema fields for the stream data.
           type: array
           items:
             type: object
@@ -714,7 +714,7 @@ components:
       example:
         type: STREAM
         physicalName: my-stream
-        sourceName: my-source
+        sourceName: my-stream-source
         schemaLocation: 'http://registry.example.com/schemas/ids/1'
         fields: []
         description: "My first stream dataset!"
