@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.10.4
+  version: 0.11.1
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -207,7 +207,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/taggedField'
+                $ref: '#/components/schemas/dataset'
 
   /namespaces/{namespace}/jobs/{job}:
     parameters:
@@ -409,7 +409,7 @@ components:
       schema:
         type: string
         maxLength: 1024
-        example: wework
+        example: my-namespace
 
     source:
       name: source
@@ -419,7 +419,7 @@ components:
       schema:
         type: string
         maxLength: 1024
-        example: analytics_db
+        example: my-source
 
     dataset:
       name: dataset
@@ -429,7 +429,7 @@ components:
       schema:
         type: string
         maxLength: 1024
-        example: wedata.room_bookings
+        example: my-dataset
 
     tag:
       name: tag
@@ -447,7 +447,7 @@ components:
       required: true
       schema:
         type: string
-        example: member_id
+        example: my_field
 
     job:
       name: job
@@ -457,7 +457,7 @@ components:
       schema:
         type: string
         maxLength: 1024
-        example: room_bookings_7_days
+        example: my-job
 
     runId:
       name: id
@@ -467,6 +467,7 @@ components:
       schema:
         type: string
         format: uuid
+        example: ea9badc5-7cb2-49af-9a9f-155771d3a797
 
     limit:
       name: limit
@@ -475,6 +476,8 @@ components:
       required: false
       schema:
         type: integer
+        example: 25
+        default: 100
 
     offset:
       name: offset
@@ -483,6 +486,7 @@ components:
       required: false
       schema:
         type: integer
+        default: 0
 
   schemas:
     newNamespace:
@@ -497,8 +501,8 @@ components:
       required:
         - ownerName
       example:
-        ownerName: dataengineering
-        description: A namespace for core jobs and datasets at wework.
+        ownerName: me
+        description: My first namespace!
 
     namespace:
       type: object
@@ -521,11 +525,11 @@ components:
           description: The description of the namespace.
           type: string
       example:
-        name: wework
+        name: my-namespace
         createdAt: 2019-05-09T19:49:24.201361Z
         updatedAt: 2019-05-09T19:49:24.201361Z
-        ownerName: dataengineering
-        description: A namespace for core jobs and datasets at wework.
+        ownerName: me
+        description: My first namespace!
 
     namespaces:
       type: object
@@ -535,379 +539,66 @@ components:
           items:
             $ref: '#/components/schemas/namespace'
 
-    newJob:
+    newSource:
       type: object
       properties:
         type:
-          description: The type of the job.
+          description: The type of the source.
           type: string
-          enum: [BATCH, STREAM, SERVICE]
-        inputs:
-          description: The list of input datasets.
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        outputs:
-          description: The list of output datasets.
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        location:
-          description: The URL of the job source code or artifact.
+          enum: [MYSQL, POSTGRESQL, REDSHIFT, SNOWFLAKE, KAFKA]
+        connectionUrl:
+          description: The URL to be used to connect to the source.
           type: string
           format: URL
-        context:
-          description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
-          type: object
         description:
-          description: The description of the job.
+          description:  The description of the source.
           type: string
       required:
         - type
-        - inputs
-        - outputs
+        - connectionUrl
       example:
-        type: BATCH
-        inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
-        outputs: ["wedata.room_bookings_7_days"]
-        location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-        context: {'SQL': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
-        description: Determine weekly room booking occupancy patterns.
-        latestRun: null
+        type: POSTGRESQL
+        connectionUrl: jdbc:postgresql://db.example.com/mydb
+        description: My first source!
 
-    job:
+    source:
       type: object
       properties:
         type:
-          description: The type of the job.
+          description: The type of the source.
           type: string
         name:
-          description: The name of the job.
+          description: The name of the source.
           type: string
         createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the source was created.
           type: string
           format: date-time
         updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the source was updated.
           type: string
           format: date-time
-        inputs:
-          description: The list of input datasets.
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        outputs:
-          description: The list of output datasets.
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        location:
-          description: The URL of the job source code or artifact.
+        connectionUrl:
+          description: The URL to be used to connect to the source.
           type: string
           format: URL
-        context:
-          description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
-          type: object
         description:
-          description: The description of the job.
+          description:  The description of the dataset.
           type: string
-        latestRun:
-          description: The latest run of the job.
-          type: object
-          properties:
-            runId:
-              description: The ID of the run.
-              type: string
-              format: uuid
-            createdAt:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-              type: string
-              format: date-time
-            updatedAt:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-              type: string
-              format: date-time
-            nominalStartTime:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-              type: string
-              format: date-time
-            nominalEndTime:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-              type: string
-              format: date-time
-            runState:
-              description: The current state of the run.
-              type: string
-              enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-            runArgs:
-              description: The arguments of the run.
-              type: object
       example:
-        type: BATCH
-        name: room_bookings_7_days
+        type: POSTGRESQL
+        name: my-source
         createdAt: 2019-05-09T19:49:24.201361Z
         updatedAt: 2019-05-09T19:49:24.201361Z
-        inputs: ["wedata.room_bookings", "analytics.scheduled_events"]
-        outputs: ["wedata.room_bookings_7_days"]
-        location: https://github.com/wework/jobs/commit/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-        context: {'SQL': "SELECT * FROM room_bookings WHERE room_num = '2H';"}
-        description: Determine weekly room booking occupancy patterns.
-        latestRun: null
+        connectionUrl: jdbc:postgresql://db.example.com/mydb
+        description: My first source!
 
-    jobs:
+    sources:
       type: object
       properties:
-        jobs:
-          type: array
+        sources:
           items:
-            $ref: '#/components/schemas/job'
-
-    newRun:
-      type: object
-      properties:
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        runArgs:
-          description: The arguments of the run.
-          type: object
-      example:
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
-
-    runId:
-      type: object
-      properties:
-        runId:
-          description: The ID of the run.
-          type: string
-          format: uuid
-      example:
-        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-
-    runAsNew:
-      type: object
-      properties:
-        runId:
-          description: The ID of the run.
-          type: string
-          format: uuid
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-          type: string
-          format: date-time
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        runState:
-          description: The current state of the run.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        startedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was started (went from NEW to RUNNING). Or null if not started.
-          type: string
-          format: date-time
-        endedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was ended (went from RUNNING to COMPLETED|ABORTED|FAILED). Or null if not finished.
-          type: string
-          format: date-time
-        duration:
-          description: The duration of the run (time in ms elapsed between startedAt and endedAt if present)
-          type: number
-          format: int64
-        runArgs:
-          description: The arguments of the run.
-          type: object
-      example:
-        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        nominalStartTime: null
-        nominalEndTime: null
-        runState: NEW
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
-
-    runAsRunning:
-      type: object
-      properties:
-        runId:
-          description: The ID of the run.
-          type: string
-          format: uuid
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-          type: string
-          format: date-time
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        runState:
-          description: The current state of the run.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        runArgs:
-          description: The arguments of the run.
-          type: object
-      example:
-        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        nominalStartTime: null
-        nominalEndTime: null
-        runState: RUNNING
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
-
-    runAsCompleted:
-      type: object
-      properties:
-        runId:
-          description: The ID of the run.
-          type: string
-          format: uuid
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-          type: string
-          format: date-time
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        runState:
-          description: The current state of the run.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        runArgs:
-          description: The arguments of the run.
-          type: object
-      example:
-        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        nominalStartTime: null
-        nominalEndTime: null
-        runState: COMPLETED
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
-
-    runAsFailed:
-      type: object
-      properties:
-        runId:
-          description: The ID of the run.
-          type: string
-          format: uuid
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-          type: string
-          format: date-time
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        runState:
-          description: The current state of the run.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        runArgs:
-          description: The arguments of the run.
-          type: object
-      example:
-        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        nominalStartTime: null
-        nominalEndTime: null
-        runState: FAILED
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
-
-    runAsAborted:
-      type: object
-      properties:
-        runId:
-          description: The ID of the run.
-          type: string
-          format: uuid
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-          type: string
-          format: date-time
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        runState:
-          description: The current state of the run.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        runArgs:
-          description: The arguments of the run.
-          type: object
-      example:
-        runId: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        nominalStartTime: null
-        nominalEndTime: null
-        runState: ABORTED
-        runArgs: {'email': 'data@wework.com', 'emailOnFailure': "false", 'emailOnRetry': "true", 'retries': "1"}
-
-    runs:
-      type: object
-      properties:
-        runs:
-          type: array
-          items:
-            $ref: '#/components/schemas/runAsNew'
+            $ref: '#/components/schemas/source'
 
     DB_TABLE:
       type: object
@@ -917,7 +608,7 @@ components:
           type: enum
           enum: [DB_TABLE]
         physicalName:
-          description: The physical name of the table.
+          description: The **physical** name of the table.
           type: string
         sourceName:
           description: The name of the source associated with the table.
@@ -956,19 +647,18 @@ components:
         - type
         - physicalName
         - sourceName
+        - fields
       example:
         type: DB_TABLE
-        physicalName: wedata.room_bookings
-        sourceName: analytics_db
+        physicalName: public.mytable
+        sourceName: my-source
         fields: [
-          {'name': 'booking_id', 'type': 'INTEGER', 'tags': []},
-          {'name': 'booked_at', 'type': 'TIMESTAMP', 'tags': []},
-          {'name': 'office_id', 'type': 'INTEGER', 'tags': []},
-          {'name': 'room_id', 'type': 'INTEGER', 'tags': []},
-          {'name': 'member_id', 'type': 'INTEGER', 'tags': []}
+          {'name': 'a', 'type': 'INTEGER'},
+          {'name': 'b', 'type': 'TIMESTAMP'},
+          {'name': 'c', 'type': 'INTEGER'},
+          {'name': 'd', 'type': 'INTEGER'}
         ]
-        tags: ['SENSITIVE']
-        description: "All room booking occupancy data."
+        description: "My first dataset!"
 
     STREAM:
       type: object
@@ -978,7 +668,7 @@ components:
           type: enum
           enum: [STREAM]
         physicalName:
-          description: The physical name of the stream.
+          description: The **physical** name of the stream.
           type: string
         sourceName:
           description: The name of the source associated with the stream.
@@ -1020,26 +710,36 @@ components:
         - type
         - physicalName
         - sourceName
-        - schemaLocation
+        - fields
       example:
         type: STREAM
-        physicalName: tracking.wedata.room_bookings
-        sourceName: kafka_prod
-        schemaLocation: 'http://localhost:8081/schemas/ids/1'
-        tags: []
-        description: "A stream of room booking occupancy data."
+        physicalName: my-stream
+        sourceName: my-source
+        schemaLocation: 'http://registry.example.com/schemas/ids/1'
+        fields: []
+        description: "My first stream dataset!"
 
     dataset:
       type: object
       properties:
+        id:
+          description: The ID of the dataset.
+          type: object
+          properties:
+            namespace:
+              type: string
+              description: The namespace of the dataset.
+            name:
+              type: string
+              description: The name of the dataset.
         type:
           description: The type of the dataset.
           type: string
         name:
-          description: The name of the dataset.
+          description: The **logical** name of the dataset.
           type: string
         physicalName:
-          description: The physical name of the dataset.
+          description: The **physical** name of the dataset.
           type: string
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
@@ -1049,6 +749,9 @@ components:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was updated.
           type: string
           format: date-time
+        namespace:
+          type: string
+          description: The namespace of the dataset.
         sourceName:
           description: The name of the source associated with the dataset.
           type: string
@@ -1070,9 +773,6 @@ components:
               description:
                 description: The description of the field.
                 type: string 
-            required:
-              - name
-              - type
         tags:
           description: List of tags.
           type: array
@@ -1084,22 +784,25 @@ components:
           description:  The description of the dataset.
           type: string
       example:
+        id:
+          namespace: my-namespace
+          name: my-dataset
         type: DB_TABLE
-        name: wedata.room_bookings
-        physicalName: wedata.room_bookings
+        name: my-dataset
+        physicalName: public.mytable
         createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        sourceName: analytics_db
+        upodatedAt: 2019-05-09T19:49:24.201361Z
+        namespace: my-namespace
+        sourceName: my-source
         fields: [
-          {'name': 'booking_id', 'type': 'INTEGER', 'tags': []},
-          {'name': 'booked_at', 'type': 'TIMESTAMP', 'tags': []},
-          {'name': 'office_id', 'type': 'INTEGER', 'tags': []},
-          {'name': 'room_id', 'type': 'INTEGER', 'tags': []},
-          {'name': 'member_id', 'type': 'INTEGER', 'tags': []}
+          {'name': 'a', 'type': 'INTEGER', 'tags': []},
+          {'name': 'b', 'type': 'TIMESTAMP', 'tags': []},
+          {'name': 'c', 'type': 'INTEGER', 'tags': []},
+          {'name': 'd', 'type': 'INTEGER', 'tags': []}
         ]
-        tags: ['SENSITIVE']
+        tags: []
         lastModifiedAt: null
-        description: "All room booking occupancy data."
+        description: "My first dataset!"
 
     datasets:
       type: object
@@ -1107,137 +810,6 @@ components:
         datasets:
           items:
             $ref: '#/components/schemas/dataset'
-
-    taggedField:
-      type: object
-      properties:
-        type:
-          description: The type of the dataset.
-          type: string
-        name:
-          description: The name of the dataset.
-          type: string
-        physicalName:
-          description: The physical name of the dataset.
-          type: string
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was updated.
-          type: string
-          format: date-time
-        sourceName:
-          description: The name of the source associated with the dataset.
-          type: string
-        fields:
-          description: The fields of the dataset.
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                description: The name of the field.
-                type: string
-              type:
-                description: The type of the field.
-                type: enum
-              tags:
-                description: List of tags.
-                type: array
-              description:
-                description: The description of the field.
-                type: string 
-            required:
-              - name
-              - type
-        tags:
-          description: List of tags.
-          type: array
-        lastModifiedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a successful run.
-          type: string
-          format: date-time
-        description:
-          description:  The description of the dataset.
-          type: string
-      example:
-        type: DB_TABLE
-        name: wedata.room_bookings
-        physicalName: wedata.room_bookings
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        sourceName: analytics_db
-        fields: [
-          {'name': 'booking_id', 'type': 'INTEGER', 'tags': []},
-          {'name': 'booked_at', 'type': 'TIMESTAMP', 'tags': []},
-          {'name': 'office_id', 'type': 'INTEGER', 'tags': []},
-          {'name': 'room_id', 'type': 'INTEGER', 'tags': []},
-          {'name': 'member_id', 'type': 'INTEGER', 'tags': ['SENSITIVE']}
-        ]
-        tags: ['SENSITIVE']
-        lastModifiedAt: null
-        description: "All room booking occupancy data."
-
-    newSource:
-      type: object
-      properties:
-        type:
-          description: The type of the source.
-          type: string
-          enum: [MYSQL, POSTGRESQL, REDSHIFT, SNOWFLAKE, KAFKA]
-        connectionUrl:
-          description: The URL to be used to connect to the source.
-          type: string
-          format: URL
-        description:
-          description:  The description of the source.
-          type: string
-      required:
-        - type
-        - connectionUrl
-      example:
-        type: POSTGRESQL
-        connectionUrl: jdbc:postgresql://localhost:5431/reports
-
-    source:
-      type: object
-      properties:
-        type:
-          description: The type of the source.
-          type: string
-        name:
-          description: The name of the source.
-          type: string
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the source was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the source was updated.
-          type: string
-          format: date-time
-        connectionUrl:
-          description: The URL to be used to connect to the source.
-          type: string
-          format: URL
-        description:
-          description:  The description of the dataset.
-          type: string
-      example:
-        type: POSTGRESQL
-        name: analytics_db
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        connectionUrl: jdbc:postgresql://localhost:5431/reports
-
-    sources:
-      type: object
-      properties:
-        sources:
-          items:
-            $ref: '#/components/schemas/source'
 
     tag:
       type: object
@@ -1258,3 +830,490 @@ components:
         tags:
           items:
             $ref: '#/components/schemas/tag'
+    newJob:
+      type: object
+      properties:
+        id:
+          description: The ID of the job.
+          type: object
+          properties:
+            namespace:
+              type: string
+              description: The namespace of the job.
+            name:
+              type: string
+              description: The name of the job.
+        type:
+          description: The type of the job.
+          type: string
+          enum: [BATCH, STREAM, SERVICE]
+        inputs:
+          description: The set of **input** datasets.
+          type: array
+          items:
+            type: object
+            properties:
+              namespace:
+                type: string
+                description: The namespace of the **input** dataset.
+              name:
+                type: string
+                description: The name of the **input** dataset.
+          uniqueItems: true
+        outputs:
+          description: The set of **output** datasets.
+          type: array
+          items:
+            type: object
+            properties:
+              namespace:
+                type: string
+                description: The namespace of the **output** dataset.
+              name:
+                type: string
+                description: The name of the **output** dataset.
+          uniqueItems: true
+        location:
+          description: The URL of the job source code or artifact.
+          type: string
+          format: URL
+        context:
+          description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
+          type: object
+        description:
+          description: The description of the job.
+          type: string
+      required:
+        - type
+        - inputs
+        - outputs
+      example:
+        type: BATCH
+        inputs: [{ namespace: my-namespace, name: my-dataset}]
+        outputs: []
+        location: https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+        context: {'SQL': "SELECT * FROM mytable;"}
+        description: My first job!
+
+    job:
+      type: object
+      properties:
+        id:
+          description: The ID of the job.
+          type: object
+          properties:
+            namespace:
+              type: string
+              description: The namespace of the job.
+            name:
+              type: string
+              description: The name of the job.
+        type:
+          description: The type of the job.
+          type: string
+        name:
+          description: The name of the job.
+          type: string
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was updated.
+          type: string
+          format: date-time
+        namespace:
+          description: The namespace of the job.
+          type: string
+        inputs:
+          description: The set of **input** datasets.
+          type: array
+          items:
+            type: object
+            properties:
+              namespace:
+                type: string
+                description: The namespace of the **input** dataset.
+              name:
+                type: string
+                description: The name of the **input** dataset.
+          uniqueItems: true
+        outputs:
+          description: The set of **output** datasets.
+          type: array
+          items:
+            type: object
+            properties:
+              namespace:
+                type: string
+                description: The namespace of the **output** dataset.
+              name:
+                type: string
+                description: The name of the **output** dataset.
+          uniqueItems: true
+        location:
+          description: The URL of the job source code or artifact.
+          type: string
+          format: URL
+        context:
+          description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
+          type: object
+        description:
+          description: The description of the job.
+          type: string
+        latestRun:
+          description: The latest run of the job.
+          type: object
+          properties:
+            id:
+              description: The ID of the run.
+              type: string
+              format: uuid
+            createdAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+              type: string
+              format: date-time
+            updatedAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+              type: string
+              format: date-time
+            nominalStartTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+              type: string
+              format: date-time
+            nominalEndTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+              type: string
+              format: date-time
+            state:
+              description: The current state of the run.
+              type: string
+              enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+            startedAt:
+              type: integer
+              description: The time at which the run was started. Measured in seconds since the Unix epoch.
+            endedAt:
+              type: integer
+              description: The time at which the run was ended. Measured in seconds since the Unix epoch.
+            durationMs:
+              type: integer
+              description: The total duration of the run. Measured in milliseconds.
+            args:
+              description: The arguments of the run.
+              type: object
+      example:
+        id:
+          namespace: my-namespace
+          name: my-job
+        type: BATCH
+        name: my-job
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        namespace: my-namespace
+        inputs: [{namespace: my-namespace, name: my-dataset}]
+        outputs: []
+        location: https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+        context: {'SQL': "SELECT * FROM mytable;"}
+        description: My first job!
+        latestRun: null
+
+    jobs:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/job'
+
+    newRun:
+      type: object
+      properties:
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        args:
+          description: The arguments of the run.
+          type: object
+      example:
+        args: {'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+
+    runAsNew:
+      type: object
+      properties:
+        id:
+          description: The ID of the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+          type: string
+          format: date-time
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        state:
+          description: The current state of the run.
+          type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        startedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the start time of the run.
+          type: string
+          format: date-time
+        endedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the end time of the run.
+          type: string
+          format: date-time
+        durationMs:
+          type: integer
+          description: The total duration of the run. Measured in milliseconds.
+        args:
+          description: The arguments of the run.
+          type: object
+      example:
+        id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        state: NEW
+        startedAt: null
+        endedAt: null
+        durationMs: null
+        args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
+
+    runAsRunning:
+      type: object
+      properties:
+        id:
+          description: The ID of the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+          type: string
+          format: date-time
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        state:
+          description: The current state of the run.
+          type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        startedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the start time of the run.
+          type: string
+          format: date-time
+        endedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the end time of the run.
+          type: string
+          format: date-time
+        durationMs:
+          type: integer
+          description: The total duration of the run. Measured in milliseconds.
+        args:
+          description: The arguments of the run.
+          type: object
+      example:
+        id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        state: RUNNING
+        startedAt: 2019-05-09T15:17:32.690346
+        endedAt: null
+        durationMs: null
+        args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
+
+    runAsCompleted:
+      type: object
+      properties:
+        id:
+          description: The ID of the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+          type: string
+          format: date-time
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        state:
+          description: The current state of the run.
+          type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        startedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the start time of the run.
+          type: string
+          format: date-time
+        endedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the end time of the run.
+          type: string
+          format: date-time
+        durationMs:
+          type: integer
+          description: The total duration of the run. Measured in milliseconds.
+        args:
+          description: The arguments of the run.
+          type: object
+      example:
+        id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        state: COMPLETED
+        startedAt: 2019-05-09T15:17:32.690346
+        endedAt: 2019-05-09T20:05:46.815920Z
+        durationMs: 4250894125
+        args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
+
+
+    runAsFailed:
+      type: object
+      properties:
+        id:
+          description: The ID of the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+          type: string
+          format: date-time
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        state:
+          description: The current state of the run.
+          type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        startedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the start time of the run.
+          type: string
+          format: date-time
+        endedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the end time of the run.
+          type: string
+          format: date-time
+        durationMs:
+          type: integer
+          description: The total duration of the run. Measured in milliseconds.
+        args:
+          description: The arguments of the run.
+          type: object
+      example:
+        id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        state: FAILED
+        startedAt: 2019-05-09T15:17:32.690346
+        endedAt: 2019-05-09T20:05:46.815920Z
+        durationMs: 4250894125
+        args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
+
+
+    runAsAborted:
+      type: object
+      properties:
+        id:
+          description: The ID of the run.
+          type: string
+          format: uuid
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+          type: string
+          format: date-time
+        updatedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+          type: string
+          format: date-time
+        nominalStartTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+          type: string
+          format: date-time
+        nominalEndTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+          type: string
+          format: date-time
+        state:
+          description: The current state of the run.
+          type: string
+          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
+        startedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the start time of the run.
+          type: string
+          format: date-time
+        endedAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the end time of the run.
+          type: string
+          format: date-time
+        durationMs:
+          type: integer
+          description: The total duration of the run. Measured in milliseconds.
+        args:
+          description: The arguments of the run.
+          type: object
+      example:
+        id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
+        createdAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
+        nominalStartTime: null
+        nominalEndTime: null
+        state: ABORTED
+        startedAt: 2019-05-09T15:17:32.690346
+        endedAt: 2019-05-09T20:05:46.815920Z
+        durationMs: 4250894125
+        args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
+
+    runs:
+      type: object
+      properties:
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/runAsCompleted'
+
