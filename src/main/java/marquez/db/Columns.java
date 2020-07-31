@@ -145,6 +145,14 @@ public final class Columns {
     return results.getString(column);
   }
 
+  public static int intOrThrow(final ResultSet results, final String column)
+          throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
+    }
+    return results.getInt(column);
+  }
+
   public static List<UUID> uuidArrayOrThrow(final ResultSet results, final String column)
       throws SQLException {
     if (results.getObject(column) == null) {
