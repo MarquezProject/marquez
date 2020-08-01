@@ -6,7 +6,7 @@ import { IState } from '../reducers'
 
 import { findMatchingEntities, filterDatasets, filterJobs } from '../actionCreators'
 import React, { FunctionComponent } from 'react'
-import { INamespaceAPI, IDatasetAPI } from '../types/api'
+import { Namespace, Dataset } from '../types/api'
 
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets,
@@ -17,8 +17,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators({ findMatchingEntities, filterDatasets, filterJobs }, dispatch)
 
 export interface IProps {
-  namespaces: INamespaceAPI[]
-  datasets: IDatasetAPI[]
+  namespaces: Namespace[]
+  datasets: Dataset[]
   filterJobs: typeof filterJobs
   filterDatasets: typeof filterDatasets
   showJobs: (bool: boolean) => void

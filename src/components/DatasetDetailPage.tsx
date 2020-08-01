@@ -18,7 +18,7 @@ import { useParams, useHistory } from 'react-router-dom'
 import _find from 'lodash/find'
 import _keys from 'lodash/keys'
 
-import { IDataset } from '../types'
+import { Dataset } from '../types/api'
 
 const styles = ({ shadows }: ITheme) => {
   return createStyles({
@@ -76,7 +76,7 @@ const styles = ({ shadows }: ITheme) => {
   })
 }
 
-type IProps = IWithStyles<typeof styles> & { datasets: IDataset[] }
+type IProps = IWithStyles<typeof styles> & { datasets: Dataset[] }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { datasets, classes } = props

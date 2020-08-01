@@ -1,4 +1,4 @@
-import { IDataset } from '../types/'
+import { IDataset } from '../types'
 import { findMatchingEntities, filterEntities } from './'
 import {
   FETCH_DATASETS_SUCCESS,

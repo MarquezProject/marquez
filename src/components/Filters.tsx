@@ -7,7 +7,7 @@ import uniq from 'lodash/uniq'
 import { withStyles } from '@material-ui/core/styles'
 import { capitalize } from '../helpers'
 import { IProps } from '../containers/FilterContainer'
-import { INamespaceAPI } from '../types/api'
+import { Namespace } from '../types/api'
 
 const StyledFormControl = withStyles({
   root: {
@@ -16,7 +16,7 @@ const StyledFormControl = withStyles({
   }
 })(FormControl)
 
-type IEntity = INamespaceAPI | string
+type IEntity = Namespace | string
 interface IFilterDictionary {
   [key: string]: {
     entities: IEntity[]
@@ -28,7 +28,7 @@ interface IFilterDictionary {
 const filterByOptions: { [key: string]: 'namespace' | 'sourceName' } = {
   /* display name: entitiy name on dataset schema */
   namespace: 'namespace',
-  datasource: 'sourceName'
+  source: 'sourceName'
 }
 
 const Filters = (props: IProps): ReactElement => {
@@ -38,15 +38,15 @@ const Filters = (props: IProps): ReactElement => {
   const [currentFilterValue, setCurrentFilterValue] = useState({})
   const [subFilterVisible, setSubFilterVisibility] = useState(false)
 
-  const datasources = uniq(datasets.map(d => d.sourceName))
+  const sources = uniq(datasets.map(d => d.sourceName))
   const filterDictionary: IFilterDictionary = {
     namespace: {
       entities: namespaces,
-      accessor: n => (n as INamespaceAPI).name,
+      accessor: n => (n as Namespace).name,
       default: { name: '' }
     },
-    datasource: {
-      entities: datasources,
+    source: {
+      entities: sources,
       accessor: (n: string): string => n,
       default: ''
     }
@@ -55,7 +55,7 @@ const Filters = (props: IProps): ReactElement => {
 
   /* Set the category we will be filtering by */
   const onPrimaryFilterChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const newPrimaryFilter = e.target.value as 'namespace' | 'datasource' | 'all'
+    const newPrimaryFilter = e.target.value as 'namespace' | 'source' | 'all'
     setCurrentFilter(newPrimaryFilter)
     if (newPrimaryFilter === 'all') {
       setSubFilterVisibility(false)

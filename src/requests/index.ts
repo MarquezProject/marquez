@@ -1,12 +1,12 @@
-import { IMethods, IAPIError } from '../types'
+import { HttpMethod, APIError } from '../types'
 
-export const genericErrorMessageConstructor = (functionName: string, error: IAPIError): string => {
+export const genericErrorMessageConstructor = (functionName: string, error: APIError): string => {
   const { code, message, details } = error
   throw `${functionName} responded with error code ${code}: ${message}.  Here are the details: ${details}`
 }
 
 interface IParams {
-  method: IMethods
+  method: HttpMethod
   body?: string
 }
 

@@ -29,7 +29,7 @@ export const createNetworkData = (datasets: IDataset[], jobs: IJob[]): INetworkD
 
   const links = jobs.reduce((links, singleJob) => {
     const inLinks = singleJob.inputs.map(input => {
-      const matchingDataset = _find(datasets, d => d.name === input)
+      const matchingDataset = _find(datasets, d => d.name === input.name)
       const connectsToMatchingDataset = matchingDataset && matchingDataset.matches
       const connectsToMatchingJob = singleJob.matches
       return {
@@ -41,13 +41,13 @@ export const createNetworkData = (datasets: IDataset[], jobs: IJob[]): INetworkD
     })
 
     const outLinks = singleJob.outputs.map(output => {
-      const matchingDataset = _find(datasets, d => d.name === output)
+      const matchingDataset = _find(datasets, d => d.name === output.name)
       const connectsToMatchingDataset = matchingDataset && matchingDataset.matches
       const connectsToMatchingJob = singleJob.matches
       return {
         offset: 'target',
         source: singleJob.name,
-        target: output,
+        target: output.name,
         connectsToMatchingNode: !!(connectsToMatchingDataset && connectsToMatchingJob)
       }
     })

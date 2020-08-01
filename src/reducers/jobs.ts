@@ -1,4 +1,4 @@
-import { IJob } from '../types/'
+import { IJob } from '../types'
 import _find from 'lodash/find'
 import { findMatchingEntities, filterEntities } from './'
 import {

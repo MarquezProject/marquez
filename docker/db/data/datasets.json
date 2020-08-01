@@ -1,1636 +1,254 @@
 [
   {
-    "name": "galaxy.geometry",
-    "physicalName": "galaxy.geometry",
     "type": "DB_TABLE",
-    "namespace": "default",
-    "sourceName": "redshift",
-    "description": "describes different geometries in the galaxy",
+    "name": "public.top_orders",
+    "physicalName": "public.top_orders",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
+    "fields": [],
+    "tags": []
+  },
+  {
+    "type": "DB_TABLE",
+    "name": "public.customers",
+    "physicalName": "public.customers",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INT", "tags": [], "description": "The unique ID of the customer."},
+      {"name": "created_at", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the customer was created."},
+      {"name": "updated_at", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the customer was updated."},
+      {"name": "name", "type": "VARCHAR", "tags": [], "description": "The name of the customer."},
+      {"name": "email", "type": "VARCHAR", "tags": ["PII"], "description": "The email address of the customer."},
+      {"name": "address", "type": "VARCHAR", "tags": [], "description": "The address of the customer."},
+      {"name": "phone", "type": "VARCHAR", "tags": [], "description": "The phone number of the customer."},
+      {"name": "city_id", "type": "INT", "tags": [], "description": "The ID of the city related to the customer."}
+    ],
+    "tags": ["PII"]
   },
   {
-    "name": "galaxy.dimensions",
-    "physicalName": "galaxy.dimensions",
     "type": "DB_TABLE",
-    "namespace": "default",
-    "sourceName": "redshift",
-    "description": "describes all possible dimensions in the galaxy",
+    "name": "public.restaurants",
+    "physicalName": "public.restaurants",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INT", "tags": [], "description": "The unique ID of the restaurant."},
+      {"name": "created_at", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the restaurant was created."},
+      {"name": "updated_at", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the restaurant was updated."},
+      {"name": "name", "type": "VARCHAR", "tags": [], "description": "The name of the restaurant."},
+      {"name": "email", "type": "VARCHAR", "tags": [], "description": "The email address of the restaurant."},
+      {"name": "address", "type": "VARCHAR", "tags": [], "description": "The address of the restaurant."},
+      {"name": "phone", "type": "VARCHAR", "tags": [], "description": "The phone number of the restaurant."},
+      {"name": "city_id", "type": "INT", "tags": [], "description": "The ID of the city related to the restaurant."},
+      {"name": "business_hours_id", "type": "INT", "tags": [], "description": "The ID of the business hours related to the restaurant."},
+      {"name": "description", "type": "TEXT", "tags": [], "description": "The description of the restaurant."}
+    ],
+    "tags": []
   },
   {
-    "name": "galaxy.trips",
-    "physicalName": "galaxy.trips",
     "type": "DB_TABLE",
-    "sourceName": "snowflake",
-    "namespace": "galactic-data",
-    "description": "all trips taken through the galaxy",
-    "fields": []
-  },
-  {
-    "name": "earth.circumference",
-    "physicalName": "earth.circumference",
-    "type": "DB_TABLE",
-    "sourceName": "snowflake",
-    "namespace": "galactic-data",
-    "description": "describes the earth's circumference",
+    "name": "public.business_hours",
+    "physicalName": "public.business_hours",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "linear distance",
-      "type": "INTEGER"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INT", "tags": [], "description": null},
+      {"name": "day_of_week", "type": "VARCHAR", "tags": [], "description": null},
+      {"name": "opens_at", "type": "TIMESTAMP", "tags": [], "description": null},
+      {"name": "closes_at", "type": "TIMESTAMP", "tags": [], "description": null}
+    ],
+    "tags": []
   },
   {
-    "name": "earth.radius",
-    "physicalName": "earth.radius",
     "type": "DB_TABLE",
-    "sourceName": "snowflake",
-    "namespace": "galactic-data",
-    "description": "describes the earth's radius",
+    "name": "public.cities",
+    "physicalName": "public.cities",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "linear distance",
-      "type": "INTEGER"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INTEGER", "tags": [], "description": "The unique ID of the city."},
+      {"name": "name", "type": "VARCHAR", "tags": [], "description": "The name of the city."},
+      {"name": "state", "type": "VARCHAR", "tags": [], "description": "The zip code of the city."},
+      {"name": "zip_code", "type": "VARCHAR", "tags": [], "description": "The phone number of the city."}
+    ],
+    "tags": []
   },
   {
-    "name": "earth.trips",
-    "physicalName": "earth.trips",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes all possible trips taken on earth",
+    "name": "public.menus",
+    "physicalName": "public.menus",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INTEGER", "tags": [], "description": "The unique ID of the menu."},
+      {"name": "name", "type": "VARCHAR", "tags": [], "description": "The name of the menu."},
+      {"name": "restaurant_id", "type": "INTEGER", "tags": [], "description": "The ID of the restaurant related to the menu."},
+      {"name": "description", "type": "TEXT", "tags": [], "description": "The description of the menu."}
+    ],
+    "tags": []
   },
   {
-    "name": "objects.stars",
-    "physicalName": "objects.stars",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes all stars in the galaxy",
+    "name": "public.categories",
+    "physicalName": "public.categories",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INTEGER", "tags": [], "description": "The unique ID of the category."},
+      {"name": "name", "type": "VARCHAR", "tags": [], "description": "The name of the category."},
+      {"name": "menu_id", "type": "INTEGER", "tags": [], "description": "The ID of the menu related to the category."},
+      {"name": "description", "type": "TEXT", "tags": [], "description": "The description of the category."}
+    ],
+    "tags": []
   },
   {
-    "name": "objects.planets",
-    "physicalName": "objects.planets",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes all planets in the galaxy",
+    "name": "public.orders_7_days",
+    "physicalName": "public.orders_7_days",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "order_id", "type": "INTEGER", "tags": [], "description": "The ID of the order."},
+      {"name": "placed_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order was placed."},
+      {"name": "menu_id", "type": "INTEGER", "tags": [], "description": "The ID of the menu related to the order."},
+      {"name": "menu_item_id", "type": "INTEGER", "tags": [], "description": "The ID of the menu item related to the order."},
+      {"name": "category_id", "type": "INTEGER", "tags": [], "description": "The ID of category related to the order."},
+      {"name": "discount_id", "type": "INTEGER", "tags": [], "description": "The ID of the discount applied to the order"},
+      {"name": "city_id", "type": "INTEGER", "tags": [], "description": "The ID of the city related to the order."}
+    ],"tags": []
   },
   {
-    "name": "objects.life",
-    "physicalName": "objects.life",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes all life",
-    "fields": []
-  },
-  {
-    "name": "environment.universe",
-    "physicalName": "environment.universe",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes the entire universe"
-  },
-  {
-    "name": "galaxy.radiowaves",
-    "physicalName": "galaxy.radiowaves",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes all radiowaves",
+    "name": "public.menu_items",
+    "physicalName": "public.menu_items",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INTEGER", "tags": [], "description": "The ID of the menu item."},
+      {"name": "name", "type": "VARCHAR", "tags": [], "description": "The name of the menu item."},
+      {"name": "price", "type": "VARCHAR", "tags": [], "description": "The price of the menu item."},
+      {"name": "category_id", "type": "VARCHAR", "tags": [], "description": "The ID of the category related to the item."},
+      {"name": "description", "type": "TEXT", "tags": [], "description": "The description of the menu item."}
+    ],"tags": []
   },
   {
-    "name": "galaxy.satellites",
-    "physicalName": "galaxy.satellites",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes all satellites",
+    "name": "public.top_delivery_times",
+    "physicalName": "public.top_delivery_times",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "order_id", "type": "INTEGER", "tags": [], "description": "The ID of the order."},
+      {"name": "order_placed_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order was placed."},
+      {"name": "order_dispatched_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order was dispatched."},
+      {"name": "order_delivered_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order was delivered."},
+      {"name": "order_delivered_time", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the total time of delivery."},
+      {"name": "customer_email", "type": "VARCHAR", "tags": [], "description": "The email address of the customer."},
+      {"name": "restaurant_id", "type": "INTEGER", "tags": [], "description": "The ID of the restaurant related to the order."},
+      {"name": "driver_id", "type": "INTEGER", "tags": [], "description": "The ID of the driver related to the order."}
+    ],"tags": []
   },
   {
-    "name": "environment.conversations",
-    "physicalName": "environment.conversations",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes all conversations in the galaxy",
+    "name": "public.discounts",
+    "physicalName": "public.discounts",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INTEGER", "tags": [], "description": "The unique ID of the discount."},
+      {"name": "amount_off", "type": "INTEGER", "tags": [], "description": "The amount of the discount."},
+      {"name": "customer_email", "type": "VARCHAR", "tags": [], "description": "The email address of the customer."},
+      {"name": "starts_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the discount starts."},
+      {"name": "ends_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the discount ends."}
+    ],"tags": []
   },
   {
-    "name": "environment.transcripts",
-    "physicalName": "environment.transcripts",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes all transcripts in the galaxy",
+    "name": "public.order_status",
+    "physicalName": "public.order_status",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INTEGER", "tags": [], "description": "The unique ID of the order status."},
+      {"name": "transitioned_at", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order status was transitioned."},
+      {"name": "status", "type": "VARCHAR", "tags": [], "description": "The status of the order status."},
+      {"name": "order_id", "type": "INTEGER", "tags": [], "description": "The ID of the order related to the order status."},
+      {"name": "customer_id", "type": "INTEGER", "tags": [], "description": "The ID of the customer related to the order status."},
+      {"name": "restaurant_id", "type": "INTEGER", "tags": [], "description": "The ID of the restaurant related to the order status."},
+      {"name": "driver_id", "type": "INTEGER", "tags": [], "description": "The ID of the driver related to the order status."}
+    ],
+    "tags": []
   },
   {
-    "name": "environment.empty",
-    "physicalName": "environment.empty",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "an empty environment never referenced by a job",
+    "name": "public.orders",
+    "physicalName": "public.orders",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INTEGER", "tags": [], "description": "The unique ID of the order."},
+      {"name": "placed_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order was placed."},
+      {"name": "menu_item_id", "type": "INTEGER", "tags": [], "description": "The ID of the menu item related to the order."},
+      {"name": "quantity", "type": "INTEGER", "tags": [], "description": "The number of the item in the order."},
+      {"name": "discount_id", "type": "INTEGER", "tags": [], "description": "The unique ID of the discount applied to the order"},
+      {"name": "comment", "type": "INTEGER", "tags": [], "description": "The comment of the order"}
+    ],
+    "tags": []
   },
   {
-    "name": "rocket.parts",
-    "physicalName": "rocket.parts",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes parts of rockets",
+    "name": "public.popular_orders_day_of_week",
+    "physicalName": "public.popular_orders_day_of_week",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "order_day_of_week", "type": "VARCHAR", "tags": [], "description": "The day of week of the order."},
+      {"name": "order_placed_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order was placed."},
+      {"name": "orders_placed", "type": "INTEGER", "tags": [], "description": "The number of orders placed on day of week."}
+    ],
+    "tags": []
   },
   {
-    "name": "rocket.types",
-    "physicalName": "rocket.types",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes types of rockets",
+    "name": "public.delivery_7_days",
+    "physicalName": "public.delivery_7_days",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "order_id", "type": "INTEGER", "tags": [], "description": "The ID of the order."},
+      {"name": "order_placed_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order was placed."},
+      {"name": "order_dispatched_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order was dispatched."},
+      {"name": "order_delivered_on", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the order was delivered."},
+      {"name": "customer_email", "type": "VARCHAR", "tags": [], "description": "The email address of the customer."},
+      {"name": "menu_id", "type": "INTEGER", "tags": [], "description": "The ID of the menu related to the order."},
+      {"name": "menu_item_id", "type": "INTEGER", "tags": [], "description": "The ID of the menu item related to the order."},
+      {"name": "category_id", "type": "INTEGER", "tags": [], "description": "The ID of category related to the order."},
+      {"name": "discount_id", "type": "INTEGER", "tags": [], "description": "The ID of the discount applied to the order"},
+      {"name": "city_id", "type": "INTEGER", "tags": [], "description": "The ID of the city related to the order."},
+      {"name": "driver_id", "type": "INTEGER", "tags": [], "description": "The ID of the driver related to the order."}
+    ],
+    "tags": []
   },
   {
-    "name": "station.parts",
-    "physicalName": "station.parts",
     "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes space station parts",
+    "name": "public.drivers",
+    "physicalName": "public.drivers",
+    "namespace": "food_delivery",
+    "sourceName": "analytics_db",
     "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "station.types",
-    "physicalName": "station.types",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes space station types",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.waves",
-    "physicalName": "interstellar.waves",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "measures all waves in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "speed",
-      "type": "INTEGER"
-      },
-      {
-      "name": "height",
-      "type": "INTEGER"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.geomorphology",
-    "physicalName": "interstellar.geomorphology",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "measurements of geomorphology of matter in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "process",
-      "type": "STRING"
-      },
-      {
-      "name": "time",
-      "type": "INTEGER"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "alien.heads",
-    "physicalName": "alien.heads",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes alien heads",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "alien.hands",
-    "physicalName": "alien.hands",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes alien hands",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "amount",
-      "type": "INTEGER"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "alien.arms",
-    "physicalName": "alien.arms",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes alien arms",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "amount",
-      "type": "INTEGER"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "alien.torsos",
-    "physicalName": "alien.torsos",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes alien torsos",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "length",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "alien.legs",
-    "physicalName": "alien.legs",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes alien legs",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "amount",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "alien.types",
-    "physicalName": "alien.types",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes types of aliens",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "alien.locations",
-    "physicalName": "alien.locations",
-    "type": "DB_TABLE",
-    "namespace": "galactic-data",
-    "sourceName": "redshift",
-    "description": "describes locations of aliens",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "planet",
-      "type": "STRING"
-      },
-      {
-      "name": "galaxy",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.points",
-    "physicalName": "interstellar.points",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "all points in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "x",
-      "type": "INTEGER"
-      },
-      {
-      "name": "y",
-      "type": "INTEGER"
-      },
-      {
-      "name": "z",
-      "type": "INTEGER"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.surfaces",
-    "physicalName": "interstellar.surfaces",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "all surfaces in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "x",
-      "type": "INTEGER"
-      },
-      {
-      "name": "y",
-      "type": "INTEGER"
-      },
-      {
-      "name": "z",
-      "type": "INTEGER"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.curves",
-    "physicalName": "interstellar.curves",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "all curves in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "x",
-      "type": "INTEGER"
-      },
-      {
-      "name": "y",
-      "type": "INTEGER"
-      },
-      {
-      "name": "z",
-      "type": "INTEGER"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.seismology",
-    "physicalName": "interstellar.seismology",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "galactic seismology readings",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "wave type",
-      "type": "STRING"
-      },
-      {
-      "name": "wave scale",
-      "type": "INTEGER"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.geophysical_fluid_dynamics",
-    "physicalName": "interstellar.geophysical_fluid_dynamics",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "galactic geophysical fluid dynamics measurements",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "viscosity",
-      "type": "STRING"
-      },
-      {
-      "name": "buoyancy",
-      "type": "INTEGER"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.mineral_physics",
-    "physicalName": "interstellar.mineral_physics",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "galactic mineral physics measurements",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "viscosity",
-      "type": "STRING"
-      },
-      {
-      "name": "electrical conduction",
-      "type": "INTEGER"
-      },
-      {
-      "name": "seismic velocity",
-      "type": "INTEGER"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.geodynamics",
-    "physicalName": "interstellar.geodynamics",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "galactic geodynamics readings",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "viscosity",
-      "type": "STRING"
-      },
-      {
-      "name": "electrical conduction",
-      "type": "INTEGER"
-      },
-      {
-      "name": "seismic velocity",
-      "type": "INTEGER"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.angles",
-    "physicalName": "interstellar.angles",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "all angles in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "x",
-      "type": "INTEGER"
-      },
-      {
-      "name": "y",
-      "type": "INTEGER"
-      },
-      {
-      "name": "z",
-      "type": "INTEGER"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.planes",
-    "physicalName": "interstellar.planes",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "all planes in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "length",
-      "type": "INTEGER"
-      },
-      {
-      "name": "width",
-      "type": "INTEGER"
-      },
-      {
-      "name": "x",
-      "type": "INTEGER"
-      },
-      {
-      "name": "y",
-      "type": "INTEGER"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.geometry",
-    "physicalName": "interstellar.geometry",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes different geometries in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.dimensions",
-    "physicalName": "interstellar.dimensions",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all possible dimensions in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.trips",
-    "physicalName": "interstellar.trips",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "all trips taken through the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "cosmic.dimensions",
-    "physicalName": "cosmic.dimensions",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all possible dimensions on earth",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "cosmic.trips",
-    "physicalName": "cosmic.trips",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all possible trips taken in the cosmics",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "cosmic.stars",
-    "physicalName": "cosmic.stars",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all stars in the galaxy",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "cosmic.planets",
-    "physicalName": "cosmic.planets",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all planets in the cosmics",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "cosmic.life",
-    "physicalName": "cosmic.life",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all life",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "cosmic.universe",
-    "physicalName": "cosmic.universe",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes the entire universe",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "cosmic.radiowaves",
-    "physicalName": "cosmic.radiowaves",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all radiowaves",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "cosmic.satellites",
-    "physicalName": "cosmic.satellites",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all satellites",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.conversations",
-    "physicalName": "interstellar.conversations",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all conversations in interstellar space",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "interstellar.transcripts",
-    "physicalName": "interstellar.transcripts",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all transcripts in interstellar space",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "cosmic.empty",
-    "physicalName": "cosmic.empty",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "an empty cosmic dataset not referenced by any job",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "comet.parts",
-    "physicalName": "comet.parts",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes parts that make up comets",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "comet.types",
-    "physicalName": "comet.types",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all types of comets",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "black_hole.parts",
-    "physicalName": "black_hole.parts",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes parts that make up black holes",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "black_hole.types",
-    "physicalName": "black_hole.types",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all types of black holes",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "worm_hole.parts",
-    "physicalName": "worm_hole.parts",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes parts that make up worm holes",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
-  },
-  {
-    "name": "worm_hole.types",
-    "physicalName": "worm_hole.types",
-    "type": "DB_TABLE",
-    "namespace": "interstellar-data",
-    "sourceName": "redshift",
-    "description": "describes all types of worm holes",
-    "fields": [
-      {
-      "name": "uuid",
-      "type": "STRING"
-      },
-      {
-      "name": "name",
-      "type": "STRING"
-      },
-      {
-      "name": "mass",
-      "type": "INTEGER"
-      },
-      {
-      "name": "dimension",
-      "type": "STRING"
-      },
-      {
-      "name": "interstellar",
-      "type": "BOOLEAN"
-      }
-    ]
+      {"name": "id", "type": "INTEGER", "tags": [], "description": "The unique ID of the driver."},
+      {"name": "created_at", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the driver was created."},
+      {"name": "updated_at", "type": "TIMESTAMP", "tags": [], "description": "An ISO-8601 timestamp representing the date/time the drivre was updated."},
+      {"name": "name", "type": "VARCHAR", "tags": [], "description": "The name of the driver."},
+      {"name": "email", "type": "VARCHAR", "tags": [], "description": "The email of the driver."},
+      {"name": "phone", "type": "VARCHAR", "tags": [], "description": "The phone number of the driver."},
+      {"name": "car_make", "type": "VARCHAR", "tags": [], "description": "The make of the car."},
+      {"name": "car_model", "type": "VARCHAR", "tags": [], "description": "The model of the car."},
+      {"name": "car_year", "type": "VARCHAR", "tags": [], "description": "The year of the car."},
+      {"name": "car_color", "type": "VARCHAR", "tags": [], "description": "The color of the car."},
+      {"name": "car_license_plate", "type": "VARCHAR", "tags": [], "description": "The license plate number of the car."}
+    ],
+    "tags": []
   }
 ]

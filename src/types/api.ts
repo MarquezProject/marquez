@@ -1,65 +1,115 @@
-interface IFieldsAPI {
-  name: string
-  type: string
-  description: string
+export interface Tag {
+  name: string;
+  description: string;
+}
+export interface Runs {
+  runs: Run[];
 }
 
-export interface IDatasetAPI {
+export interface Runs {
+  runs: Run[];
+}
+
+export interface Runs {
+  runs: Run[];
+}
+
+export interface Runs {
+  runs: Run[];
+}
+
+
+export interface Namespaces {
+  namespaces: Namespace[];
+}
+
+export interface Namespace {
   name: string
   createdAt: string
   updatedAt: string
-  urn: string
-  sourceName: string
-  description: string
-  tags?: string[]
-  fields: IFieldsAPI[]
-  matches?: boolean
-}
-
-export interface INamespaceAPI {
-  name: string
-  createdAt: string // timestamp
   ownerName: string
   description: string
 }
 
-export interface IJobAPI {
-  type: string
+export interface Datasets {
+  datasets: Dataset[];
+}
+
+export interface Dataset {
+  id: DatasetId;
+  type: DatasetType;
+  name: string;
+  physicalName: string;
+  createdAt: string;
+  updatedAt: string;
+  namespace: string;
+  sourceName: string;
+  fields: Field[];
+  tags: string[];
+  lastModifiedAt: string;
+  description: string;
+}
+
+export interface DatasetId {
+  namespace: string;
+  name: string;
+}
+
+export type DatasetType = "DB_TABLE" | "STREAM";
+
+export interface Field {
   name: string
-  createdAt: string
-  updatedAt: string
-  inputs: string[] // array of dataset urns
-  outputs: string[] // array of dataset urns
-  location: string
+  type: string
+  tags: string[]
   description: string
-  latestRun: IJobRunAPI
+}
+
+export interface Jobs {
+  jobs: Job[];
+}
+
+
+export interface Job {
+  id: JobId;
+  type: JobType;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  inputs: DatasetId[];
+  outputs: DatasetId[];
+  namespace: string;
+  location: string;
   context: {
-    SQL: string
-  }
-  matches?: boolean
+    [key: string]: string;
+  };
+  description: string;
+  latestRun: Run;
 }
 
-export interface INamespacesAPI {
-  namespaces: INamespaceAPI[]
-}
-export interface IDatasetsAPI {
-  datasets: IDatasetAPI[]
-}
-export interface IJobsAPI {
-  jobs: IJobAPI[]
+export interface JobId {
+  namespace: string;
+  name: string;
 }
 
-export interface IJobRunAPI {
-  runId: string
-  createdAt: string // timestamp
-  updatedAt: string // timestamp
-  nominalStartTime: string // timestamp
-  nominalEndTime: string // timestamp
-  runState: 'NEW' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'ABORTED'
-  runArgs: {
-    email: string
-    emailOnFailure: boolean
-    emailOnRetry: boolean
-    retries: number
-  }
+export type JobType = "BATCH" | "STREAM" | "SERVICE";
+
+export interface Runs {
+  runs: Run[];
 }
+
+export interface Run {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  nominalStartTime: string;
+  nominalEndTime: string;
+  state: RunState;
+  startedAt: string;
+  endedAt: string;
+  durationMs: number;
+  args: {
+    [key: string]: string;
+  };
+}
+
+export type RunState = "NEW" | "COMPLETED" | "FAILED" | "ABORTED";

@@ -1,14 +1,15 @@
 import * as actionTypes from '../constants/ActionTypes'
 
-import { INamespaceAPI, IJobRunAPI } from '../types/api'
-import { IFilterByKey, IDataset, IJob } from '../types'
+import { Namespace, Dataset, Job,Run } from '../types/api'
+import { IFilterByKey } from '../types'
 
-export const fetchDatasetsSuccess = (datasets: IDataset[]) => ({
+export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   type: actionTypes.FETCH_DATASETS_SUCCESS,
   payload: {
     datasets
   }
 })
+
 
 export const filterDatasets = (filterByKey: IFilterByKey, filterByValue?: string) => ({
   type: actionTypes.FILTER_DATASETS,
@@ -18,22 +19,22 @@ export const filterDatasets = (filterByKey: IFilterByKey, filterByValue?: string
   }
 })
 
-export const fetchJobsSuccess = (jobs: IJob[]) => ({
+export const fetchJobsSuccess = (jobs: Job[]) => ({
   type: actionTypes.FETCH_JOBS_SUCCESS,
   payload: {
     jobs
   }
 })
 
-export const fetchJobRuns = (jobName: string, namespaceName: string) => ({
+export const fetchJobRuns = (jobName: string, namespace: string) => ({
   type: actionTypes.FETCH_JOB_RUNS,
   payload: {
     jobName,
-    namespaceName
+    namespace
   }
 })
 
-export const fetchJobRunsSuccess = (jobName: string, jobRuns: IJobRunAPI[]) => ({
+export const fetchJobRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
   type: actionTypes.FETCH_JOB_RUNS_SUCCESS,
   payload: {
     jobName,
@@ -49,7 +50,7 @@ export const filterJobs = (filterByKey: IFilterByKey, filterByValue?: string) =>
   }
 })
 
-export const fetchNamespacesSuccess = (namespaces: INamespaceAPI[]) => ({
+export const fetchNamespacesSuccess = (namespaces: Namespace[]) => ({
   type: actionTypes.FETCH_NAMESPACES_SUCCESS,
   payload: {
     namespaces

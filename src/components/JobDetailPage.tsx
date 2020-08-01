@@ -254,8 +254,8 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       className={root}
     >
       <div className={topSection}>
-        <Tooltip title={latestRun ? latestRun.runState : ''} placement="top">
-          {latestRun ? <div className={`${_status}`} style={{backgroundColor: colorMap[latestRun.runState]}} /> : <div></div>}
+        <Tooltip title={latestRun ? latestRun.state : ''} placement="top">
+          {latestRun ? <div className={`${_status}`} style={{backgroundColor: colorMap[latestRun.state]}} /> : <div></div>}
         </Tooltip>
         <Typography color='secondary' variant='h3' className={_name}>
           <a href={location} className='link' target='_'>
@@ -323,8 +323,8 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           {
             latestRuns.map(r => {
               return (
-                <Tooltip key={r.runId} title={r.runState} placement="top">
-                  <div key={r.runId} className={classes.squareShape} style={{backgroundColor: colorMap[r.runState]}}></div>
+                <Tooltip key={r.id} title={r.state} placement="top">
+                  <div key={r.id} className={classes.squareShape} style={{backgroundColor: colorMap[r.state]}}></div>
                 </Tooltip>
               )
             })

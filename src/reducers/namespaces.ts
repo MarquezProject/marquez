@@ -1,14 +1,14 @@
-import { INamespaceAPI } from '../types/api'
+import { Namespace } from '../types/api'
 
 import { FETCH_NAMESPACES_SUCCESS } from '../constants/ActionTypes'
 
-export type INamespacesState = INamespaceAPI[]
+export type INamespacesState = Namespace[]
 const initialState: INamespacesState = []
 
 interface INamespacesAction {
   type: string
   payload: {
-    namespaces: INamespaceAPI[]
+    namespaces: Namespace[]
   }
 }
 

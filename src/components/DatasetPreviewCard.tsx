@@ -14,7 +14,7 @@ import { Typography, Box, Tooltip } from '@material-ui/core'
 import { formatUpdatedAt } from '../helpers'
 import tagToBadge from '../config/tag-to-badge'
 
-import { IDatasetAPI } from '../types/api'
+import { Dataset } from '../types/api'
 const _  = require('lodash')
 
 const styles = ({ palette }: ITheme) => {
@@ -41,7 +41,7 @@ const StyledTypography = withStyles({
 })(Typography)
 
 type IProps = IWithStyles<typeof styles> &
-  Pick<IDatasetAPI, 'name' | 'description' | 'updatedAt' | 'tags'>
+  Pick<Dataset, 'name' | 'description' | 'updatedAt' | 'tags'>
 interface IState {}
 
 class DatasetPreviewCard extends React.Component<IProps, IState> {

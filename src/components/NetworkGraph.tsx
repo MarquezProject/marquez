@@ -28,7 +28,7 @@ import {zoom} from 'd3-zoom'
 import {D3ZoomEvent} from 'd3'
 
 import Loader from './Loader'
-import {IJobRunAPI} from '../types/api'
+import {Run} from '../types/api'
 
 const globalStyles = require('../global_styles.css')
 const {jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning} = globalStyles
@@ -118,7 +118,7 @@ export class NetworkGraph extends React.Component<IAllProps> {
         children = _filter(newProps.jobs, j => j.inputs.includes(node.name))
       } else {
         const job = _find(newProps.jobs, j => j.name == node.name)
-        children = job ? _filter(newProps.datasets, d => job.outputs.includes(d.name) && !job.inputs.includes(d.name)) : []
+        children = job ? _filter(newProps.datasets, d => job.outputs.some(output => output.name === d.name) && !job.inputs.some(input => input.name === d.name)) : []
       }
       return children
     }
@@ -129,7 +129,8 @@ export class NetworkGraph extends React.Component<IAllProps> {
         parents = _filter(newProps.jobs, j => j.outputs.includes(node.name))
       } else {
         const job = _find(newProps.jobs, j => j.name == node.name)
-        parents = job ? _filter(newProps.datasets, j => job.inputs.includes(j.name) && !job.outputs.includes(j.name)) : []
+        // TODO: Bug? Let's confirm input / output comparision on job name is correct; should be by dataset name?
+        parents = job ? _filter(newProps.datasets, j => job.inputs.some(input => input.name === j.name) && !job.outputs.some(output => output.name === j.name)) : []
       }
       return parents
     }
@@ -175,7 +176,7 @@ export class NetworkGraph extends React.Component<IAllProps> {
 
     function findJobColor(job: any) {
       if (!job.data.latestRun) return circleHighlight
-      const key = job.data.latestRun.runState as IJobRunAPI['runState']
+      const key = job.data.latestRun.state as Run['state']
       const color = colorMap[key]
       return color
     }

@@ -12,7 +12,7 @@ const { vibrantGreen } = globalStyles
 import { Typography, Box, Tooltip } from '@material-ui/core'
 import { formatUpdatedAt } from '../helpers'
 
-import { IJobAPI } from '../types/api'
+import { Job } from '../types/api'
 
 const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
 
@@ -50,7 +50,7 @@ const styles = ({ palette, spacing }: ITheme) => {
 }
 
 type IProps = IWithStyles<typeof styles> &
-  Pick<IJobAPI, 'name' | 'description' | 'updatedAt' | 'latestRun'>
+  Pick<Job, 'name' | 'description' | 'updatedAt' | 'latestRun'>
 interface IState {}
 
 const StyledTypography = withStyles({
@@ -84,8 +84,8 @@ class JobPreviewCard extends React.Component<IProps, IState> {
             alignItems='flex-end'
             justifyContent='space-between'
           >
-            <Tooltip className="tagWrapper" title={latestRun ? latestRun.runState : ''} placement="top">
-              {latestRun ? <div className={classes.status} style={{backgroundColor: colorMap[latestRun.runState]}} /> : <div></div>}
+            <Tooltip className="tagWrapper" title={latestRun ? latestRun.state : ''} placement="top">
+              {latestRun ? <div className={classes.status} style={{backgroundColor: colorMap[latestRun.state]}} /> : <div></div>}
             </Tooltip>
             <Typography className={classes.lastUpdated}>{formatUpdatedAt(updatedAt)}</Typography>
           </Box>

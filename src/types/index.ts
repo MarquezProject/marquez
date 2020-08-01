@@ -1,9 +1,8 @@
-import { IDatasetAPI, IJobAPI, IJobRunAPI } from './api'
+import { Dataset, Job, Run } from './api'
 
-export type IMethods = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
+export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
 
-// To-do
-export type IAPIError = any
+export type APIError = any
 
 export interface INetworkLink {
   source: string
@@ -23,16 +22,14 @@ export interface INetworkData {
   links: INetworkLink[]
 }
 
-export interface IDataset extends IDatasetAPI {
+export interface IDataset extends Dataset {
   matches: boolean
-  namespace: string
 }
 
-export interface IJob extends IJobAPI {
+export interface IJob extends Job {
   matches: boolean
-  namespace: string
-  latestRuns?: IJobRunAPI[]
+  latestRuns?: Run[]
 }
 
-export type IFilterByDisplay = 'namespace' | 'datasource'
+export type IFilterByDisplay = 'namespace' | 'sourceName'
 export type IFilterByKey = 'namespace' | 'sourceName' | 'all'
