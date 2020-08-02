@@ -22,7 +22,7 @@ plugins {
   id 'java'
   id 'maven-publish'
   id 'signing'
-  id 'com.adarshr.test-logger' version '2.0.0'
+  id 'com.adarshr.test-logger' version '2.1.0'
   id 'com.diffplug.gradle.spotless' version '3.27.0'
   id 'com.github.jk1.dependency-license-report' version '1.11'
   id 'com.github.johnrengelman.shadow' version '6.0.0'
