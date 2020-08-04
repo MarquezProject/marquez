@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,6 +34,7 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.postgresql.util.PGInterval;
 
 @Category(UnitTests.class)
 public class ColumnsTest {
@@ -163,6 +165,28 @@ public class ColumnsTest {
     when(results.getInt(column)).thenReturn(expected);
 
     final int actual = Columns.intOrThrow(results, column);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testPgIntervalOrThrow_pgInterval() throws SQLException {
+    final String column = "with_interval";
+    final String expected = "0 years 0 mons 0 days 0 hours 5 mins 5.00 secs";
+    when(results.getObject(column)).thenReturn(expected);
+    when(results.getString(column)).thenReturn(expected);
+
+    final PGInterval actual = Columns.pgIntervalOrThrow(results, column);
+    assertThat(actual.toString()).isEqualTo(expected);
+  }
+
+  @Test
+  public void testBigDecimalOrThrow_bigDecimal() throws SQLException {
+    final String column = "with_big_decimal";
+    final BigDecimal expected = new BigDecimal("3.14159");
+    when(results.getObject(column)).thenReturn(expected);
+    when(results.getBigDecimal(column)).thenReturn(expected);
+
+    final BigDecimal actual = Columns.bigDecimalOrThrow(results, column);
     assertThat(actual).isEqualTo(expected);
   }
 
