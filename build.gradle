@@ -22,11 +22,11 @@ plugins {
   id 'java'
   id 'maven-publish'
   id 'signing'
-  id 'com.adarshr.test-logger' version '2.0.0'
-  id 'com.diffplug.gradle.spotless' version '3.27.0'
-  id 'com.github.jk1.dependency-license-report' version '1.11'
+  id 'com.adarshr.test-logger' version '2.1.0'
+  id 'com.diffplug.spotless' version '5.1.0'
+  id 'com.github.jk1.dependency-license-report' version '1.14'
   id 'com.github.johnrengelman.shadow' version '6.0.0'
-  id 'net.researchgate.release' version '2.8.0'
+  id 'net.researchgate.release' version '2.8.1'
 }
 
 repositories {
@@ -59,7 +59,7 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
   testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
-  testCompile 'io.github.marquezproject:marquez-java:0.4.1-rc.4'
+  testCompile 'io.github.marquezproject:marquez-java:0.4.1'
   testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:3.11.1'

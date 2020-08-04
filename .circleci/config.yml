@@ -19,6 +19,11 @@ jobs:
       - run: ./gradlew --no-daemon --stacktrace build
       - run: ./gradlew --no-daemon jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
+      - store_test_results:
+          path: build/test-results/test
+      - store_artifacts:
+          path: build/reports/tests/test
+          destination: test-report
       - save_cache:
           key: v1-jvm-{{ .Branch }}-{{ .Revision }}
           paths:
