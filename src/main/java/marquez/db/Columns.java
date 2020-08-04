@@ -145,8 +145,7 @@ public final class Columns {
     return results.getString(column);
   }
 
-  public static int intOrThrow(final ResultSet results, final String column)
-          throws SQLException {
+  public static int intOrThrow(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {
       throw new IllegalArgumentException();
     }
