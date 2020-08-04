@@ -14,12 +14,14 @@
 
 package marquez.db;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.postgresql.util.PGInterval;
 
 public final class Columns {
   private Columns() {}
@@ -150,6 +152,22 @@ public final class Columns {
       throw new IllegalArgumentException();
     }
     return results.getInt(column);
+  }
+
+  public static PGInterval pgIntervalOrThrow(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
+    }
+    return new PGInterval(results.getString(column));
+  }
+
+  public static BigDecimal bigDecimalOrThrow(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
+    }
+    return results.getBigDecimal(column);
   }
 
   public static List<UUID> uuidArrayOrThrow(final ResultSet results, final String column)
