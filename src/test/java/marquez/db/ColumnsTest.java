@@ -144,6 +144,7 @@ public class ColumnsTest {
     assertThat(actual).isEqualTo(expected);
   }
 
+  @Test
   public void testStringOrThrow_string() throws SQLException {
     final String column = "with_string";
     final String expected = "string";
@@ -151,6 +152,17 @@ public class ColumnsTest {
     when(results.getString(column)).thenReturn(expected);
 
     final String actual = Columns.stringOrThrow(results, column);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testIntOrThrow_int() throws SQLException {
+    final String column = "count";
+    final int expected = 1;
+    when(results.getObject(column)).thenReturn(expected);
+    when(results.getInt(column)).thenReturn(expected);
+
+    final int actual = Columns.intOrThrow(results, column);
     assertThat(actual).isEqualTo(expected);
   }
 
