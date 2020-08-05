@@ -40,7 +40,7 @@ We invite everyone to help us improve and keep documentation up to date. Documen
 ## Requirements
 
 * [Java 11](https://openjdk.java.net/install)
-* [PostgreSQL 9.6](https://www.postgresql.org/download)
+* [PostgreSQL 12.1](https://www.postgresql.org/download)
 
 > **Note:** To connect to your running PostgreSQL instance, you will need the standard [`psql`](https://www.postgresql.org/docs/9.6/app-psql.html) tool.
 
