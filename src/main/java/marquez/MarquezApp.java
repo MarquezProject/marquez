@@ -14,6 +14,7 @@
 
 package marquez;
 
+import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -101,6 +102,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
             .build(env, config.getDataSourceFactory(), (ManagedDataSource) source, DB_POSTGRES)
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
+    jdbi.setSqlLogger(new InstrumentedSqlLogger(env.metrics()));
 
     final MarquezContext context =
         MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
