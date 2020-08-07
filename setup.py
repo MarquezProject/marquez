@@ -17,12 +17,29 @@
 
     Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata.  # noqa: E501
 """
-
+import codecs
+import os
 
 from setuptools import find_packages, setup
 
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith('VERSION'):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
+
 NAME = "marquez-python"
-VERSION = "0.5.8"
+
 # To install the library, run the following
 #
 # python setup.py install
@@ -33,7 +50,7 @@ VERSION = "0.5.8"
 setup(
     name=NAME,
     python_requires='>3.5.0',
-    version=VERSION,
+    version=get_version('marquez_client/version.py'),
     description="Marquez Python Client",
     author_email="",
     url="",
