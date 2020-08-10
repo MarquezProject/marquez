@@ -116,12 +116,6 @@ We are using [Prettier](https://prettier.io/docs/en/install.html) to ensure unif
 
 3. See [.prettierrc.js](.prettierrc.js) for our Prettier settings. See information on configuration settings [here](https://prettier.io/docs/en/configuration.html)
 
-### Iconography:
-
-We are leveraging [Material UI's SvgIcon components](https://material-ui.com/components/icons/#svg-icons)
-
-Specifically, we are using Icons to represent tags on datasets. In order to customize your app's badges, you can edit `src/config/tag-to-badge.tsx`
-
 ### Seeding data
 
 Mock data can be found in the `docker/db/data` folder.

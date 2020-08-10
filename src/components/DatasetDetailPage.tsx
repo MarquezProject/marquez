@@ -5,18 +5,14 @@ import {
   WithStyles as IWithStyles,
   Theme as ITheme
 } from '@material-ui/core/styles'
-import { Typography, Box, Tooltip, Fab, Table, TableCell, TableHead, TableRow, TableBody, Paper } from '@material-ui/core'
+import { Typography, Box, Tooltip, Table, TableCell, TableHead, TableRow, TableBody, Paper } from '@material-ui/core'
 
-import CloseIcon from '@material-ui/icons/Close'
-
-import tagToBadge from '../config/tag-to-badge'
 import InfoIcon from '@material-ui/icons/Info'
 
 import { formatUpdatedAt } from '../helpers'
 
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import _find from 'lodash/find'
-import _keys from 'lodash/keys'
 
 import { Dataset } from '../types/api'
 
@@ -26,10 +22,6 @@ const styles = ({ shadows }: ITheme) => {
       marginTop: '52vh',
       height: '48vh',
       padding: '0 6% 1%',
-    },
-    tagContainer: {
-      display: 'flex',
-      margin: '12px 12px 0px 0px'
     },
     noData: {
       padding: '125px 0 0 0'
@@ -65,14 +57,6 @@ const styles = ({ shadows }: ITheme) => {
     updated: {
       marginTop: '10px'
     },
-    closeButton: {
-      color: '#7D7D7D',
-      backgroundColor: '#ffffff'
-    },
-    tagHolder: {
-      display: 'flex',
-      padding: '9px 12px'
-    }
   })
 }
 
@@ -81,10 +65,9 @@ type IProps = IWithStyles<typeof styles> & { datasets: Dataset[] }
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { datasets, classes } = props
   const {
-    root, paper, updated, tagContainer, noData, noSchema, noSchemaTitle, infoIcon, tableCell, tableRow, closeButton, tagHolder
+    root, paper, updated, noData, noSchema, noSchemaTitle, infoIcon, tableCell, tableRow
   } = classes
   const { datasetName } = useParams()
-  const history = useHistory()
   const dataset = _find(datasets, d => d.name === datasetName)
   if (!dataset) {
     return (
@@ -103,7 +86,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     const {
       name,
       description,
-      tags = [],
       updatedAt,
       fields
     } = dataset
@@ -118,22 +100,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             <Typography color='primary' align='left'>
               {description}
             </Typography>
-          </div>
-          <div id='tagContainer' className={tagContainer}>
-            <div className={tagHolder}>
-              {_keys(tagToBadge.default).map((key: string) => {
-                return (
-                  <div key={key}>
-                    <Tooltip className="tagWrapper" title={key} placement="top">
-                      {tags.includes(key.toUpperCase()) ? tagToBadge.highlighted[key] : tagToBadge.default[key]}
-                    </Tooltip>
-                  </div>
-                )
-              })}
-            </div>
-            <Fab className={closeButton} onClick={() => history.push('/')} size="small" aria-label="edit">
-              <CloseIcon />
-            </Fab>
           </div>
         </Box>
         {fields && fields.length > 0 ? (
