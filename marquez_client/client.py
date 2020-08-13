@@ -16,7 +16,7 @@ import requests
 import time
 import uuid
 
-from .models import DatasetType, SourceType, JobType, RunCommands
+from .models import DatasetType, SourceType, JobType
 from marquez_client import errors
 from marquez_client import log
 from marquez_client.constants import (
@@ -85,7 +85,7 @@ class MarquezClient(object):
     # Source API
     def create_source(self, source_name, source_type, connection_url, description=None):
         MarquezClient._check_name_length(source_name, 'source_name')
-        MarquezClient._is_instance_of(source_type, 'source_type', SourceType, 'SourceType')
+        MarquezClient._is_instance_of(source_type, SourceType)
 
         MarquezClient._is_valid_connection_url(connection_url)
 
@@ -122,7 +122,7 @@ class MarquezClient(object):
                        fields=None, tags=None):
         MarquezClient._check_name_length(namespace_name, 'namespace_name')
         MarquezClient._check_name_length(dataset_name, 'dataset_name')
-        MarquezClient._is_instance_of(dataset_type, 'dataset_type', DatasetType, 'DatasetType')
+        MarquezClient._is_instance_of(dataset_type, DatasetType)
 
         if dataset_type == DatasetType.STREAM:
             MarquezClient._is_none(schema_location, 'schema_location')
@@ -205,12 +205,12 @@ class MarquezClient(object):
                    output_dataset=None, description=None, context=None):
         MarquezClient._check_name_length(namespace_name, 'namespace_name')
         MarquezClient._check_name_length(job_name, 'job_name')
-        MarquezClient._is_instance_of(job_type, 'job_type', JobType, 'JobType')
+        MarquezClient._is_instance_of(job_type, JobType)
 
         payload = {
             'inputs': input_dataset or [],
             'outputs': output_dataset or [],
-            'type': job_type
+            'type': job_type.name
         }
 
         if context:
@@ -316,9 +316,8 @@ class MarquezClient(object):
             }
         )
 
-    def _mark_job_run_as(self, run_id, action):
+    def __mark_job_run_as(self, run_id, action):
         MarquezClient._is_valid_uuid(run_id, 'run_id')
-        MarquezClient._is_instance_of(action, 'action', RunCommands, 'RunCommands')
 
         return self._post(
             self._url('/jobs/runs/{0}/{1}', run_id, action), payload={}
@@ -382,7 +381,7 @@ class MarquezClient(object):
     @staticmethod
     def _is_none(variable_value, variable_name):
         if not variable_value:
-            raise ValueError('{0} must not be None', variable_name)
+            raise ValueError(f"{variable_name} must not be None")
 
     @staticmethod
     def _check_name_length(variable_value, variable_name):
@@ -392,12 +391,10 @@ class MarquezClient(object):
         # ['dataset_name', 'field_name', 'job_name', 'tag_name'] <= 255
         if variable_name in ['namespace_name', 'owner_name', 'source_name']:
             if len(variable_value) > 64:
-                raise ValueError('{0} length is {1}, must be <= 64',
-                                 variable_name, len(variable_value))
+                raise ValueError(f"{variable_name} length is {len(variable_value)}, must be <= 64")
         else:
             if len(variable_value) > 255:
-                raise ValueError('{0} length is {1}, must be <= 255',
-                                 variable_name, len(variable_value))
+                raise ValueError(f"{variable_name} length is {len(variable_value)}, must be <= 255")
 
     @staticmethod
     def _is_valid_uuid(variable_value, variable_name):
@@ -406,12 +403,12 @@ class MarquezClient(object):
         try:
             uuid.UUID(str(variable_value))
         except:
-            raise ValueError('{0} must be a valid UUID', variable_name)
+            raise ValueError(f"{variable_name} must be a valid UUID")
 
     @staticmethod
-    def _is_instance_of(variable_value, variable_name, variable_enum_type, variable_enum_type_name):
+    def _is_instance_of(variable_value, variable_enum_type):
         if not isinstance(variable_value, variable_enum_type):
-            raise ValueError('{0} must be an instance of {1}', variable_name, variable_enum_type_name)
+            raise ValueError(f"{variable_value} must be an instance of {variable_enum_type}")
 
     @staticmethod
     def _is_valid_connection_url(connection_url):

@@ -42,13 +42,6 @@ class RunState(Enum):
     ABORTED = 'ABORTED'
 
 
-class RunCommands(Enum):
-    START = 'start'
-    COMPLETE = 'complete'
-    FAIL = 'fail'
-    ABORT = 'abort'
-
-
 class DatasetFieldType(Enum):
     NUMBER = 1
     DECIMAL = 2
