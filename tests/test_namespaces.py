@@ -89,6 +89,7 @@ def test_list_namespaces(marquez_client, namespace):
     all_namespaces = marquez_client.list_namespaces()
     assert namespace in all_namespaces['namespaces']
 
+
 @vcr.use_cassette(
     'tests/fixtures/vcr/test_namespaces/test_namespaces_not_set.yaml')
 def test_namespace_not_set(marquez_client):

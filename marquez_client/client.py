@@ -32,7 +32,8 @@ _HEADERS = {'User-Agent': _USER_AGENT}
 
 # Marquez Client
 class MarquezClient(object):
-    def __init__(self, enable_ssl=False, host=None, port=None, timeout_ms=None):
+    def __init__(self, enable_ssl=False, host=None, port=None,
+                 timeout_ms=None):
         enable_ssl = enable_ssl or os.environ.get('ENABLE_SSL', ENABLE_SSL)
         host = host or os.environ.get('MARQUEZ_HOST', DEFAULT_HOST)
         port = port or os.environ.get('MARQUEZ_PORT', DEFAULT_PORT)
@@ -83,7 +84,8 @@ class MarquezClient(object):
         )
 
     # Source API
-    def create_source(self, source_name, source_type, connection_url, description=None):
+    def create_source(self, source_name, source_type, connection_url,
+                      description=None):
         MarquezClient._check_name_length(source_name, 'source_name')
         MarquezClient._is_instance_of(source_type, SourceType)
 
@@ -189,7 +191,8 @@ class MarquezClient(object):
                       namespace_name, dataset_name, tag_name)
         )
 
-    def tag_dataset_field(self, namespace_name, dataset_name, field_name, tag_name):
+    def tag_dataset_field(self, namespace_name, dataset_name, field_name,
+                          tag_name):
         MarquezClient._check_name_length(namespace_name, 'namespace_name')
         MarquezClient._check_name_length(dataset_name, 'dataset_name')
         MarquezClient._check_name_length(field_name, 'field_name')
@@ -201,7 +204,8 @@ class MarquezClient(object):
         )
 
     # Job API
-    def create_job(self, namespace_name, job_name, job_type, location=None, input_dataset=None,
+    def create_job(self, namespace_name, job_name, job_type, location=None,
+                   input_dataset=None,
                    output_dataset=None, description=None, context=None):
         MarquezClient._check_name_length(namespace_name, 'namespace_name')
         MarquezClient._check_name_length(job_name, 'job_name')
@@ -246,7 +250,8 @@ class MarquezClient(object):
             }
         )
 
-    def create_job_run(self, namespace_name, job_name, nominal_start_time=None,
+    def create_job_run(self, namespace_name, job_name,
+                       nominal_start_time=None,
                        nominal_end_time=None, run_args=None,
                        mark_as_running=False):
         MarquezClient._check_name_length(namespace_name, 'namespace_name')
@@ -296,16 +301,16 @@ class MarquezClient(object):
         return self._get(self._url('/jobs/runs/{0}', run_id))
 
     def mark_job_run_as_started(self, run_id):
-        return self._mark_job_run_as(run_id, 'start')
+        return self.__mark_job_run_as(run_id, 'start')
 
     def mark_job_run_as_completed(self, run_id):
-        return self._mark_job_run_as(run_id, 'complete')
+        return self.__mark_job_run_as(run_id, 'complete')
 
     def mark_job_run_as_failed(self, run_id):
-        return self._mark_job_run_as(run_id, 'fail')
+        return self.__mark_job_run_as(run_id, 'fail')
 
     def mark_job_run_as_aborted(self, run_id):
-        return self._mark_job_run_as(run_id, 'abort')
+        return self.__mark_job_run_as(run_id, 'abort')
 
     def list_tags(self, limit=None, offset=None):
         return self._get(
@@ -391,10 +396,12 @@ class MarquezClient(object):
         # ['dataset_name', 'field_name', 'job_name', 'tag_name'] <= 255
         if variable_name in ['namespace_name', 'owner_name', 'source_name']:
             if len(variable_value) > 64:
-                raise ValueError(f"{variable_name} length is {len(variable_value)}, must be <= 64")
+                raise ValueError(f"{variable_name} length is"
+                                 f" {len(variable_value)}, must be <= 64")
         else:
             if len(variable_value) > 255:
-                raise ValueError(f"{variable_name} length is {len(variable_value)}, must be <= 255")
+                raise ValueError(f"{variable_name} length is"
+                                 f" {len(variable_value)}, must be <= 255")
 
     @staticmethod
     def _is_valid_uuid(variable_value, variable_name):
@@ -402,15 +409,15 @@ class MarquezClient(object):
 
         try:
             uuid.UUID(str(variable_value))
-        except:
+        except ValueError:
             raise ValueError(f"{variable_name} must be a valid UUID")
 
     @staticmethod
     def _is_instance_of(variable_value, variable_enum_type):
         if not isinstance(variable_value, variable_enum_type):
-            raise ValueError(f"{variable_value} must be an instance of {variable_enum_type}")
+            raise ValueError(f"{variable_value} must be an instance"
+                             f" of {variable_enum_type}")
 
     @staticmethod
     def _is_valid_connection_url(connection_url):
         MarquezClient._is_none(connection_url, 'connection_url')
-

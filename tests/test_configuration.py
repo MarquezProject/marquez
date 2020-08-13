@@ -34,14 +34,14 @@ def test_host_from_env(clear_env):
     os.environ['MARQUEZ_HOST'] = 'marquez.dev'
 
     client = MarquezClient()
-    assert client._api_base == f'http://marquez.dev:8080/api/v1'
+    assert client._api_base == 'http://marquez.dev:8080/api/v1'
 
 
 def test_host_from_constructor(clear_env):
     os.environ['MARQUEZ_HOST'] = 'marquez.dev'
 
     client = MarquezClient(host='marquez.staging')
-    assert client._api_base == f'http://marquez.staging:8080/api/v1'
+    assert client._api_base == 'http://marquez.staging:8080/api/v1'
 
 
 def test_port_default(clear_env):
