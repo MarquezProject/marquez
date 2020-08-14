@@ -34,21 +34,22 @@ or Gradle:
 ```groovy
 implementation 'io.github.marquezproject:marquez-java:0.4.1'
 ```
+
 ## Usage
 
 ```java
 MarquezClient client = MarquezClient().builder()
     .baseUrl("http://localhost:5000/api/v1")
     .build()
-     
+
 // Metadata
 NamespaceMeta meta = NamespaceMeta().builder()
-    .ownerName("example-owner")
-    .description("example description")
+    .ownerName("me")
+    .description("My first namespace!")
     .build()
 
 // Create namespace 
-Namespace namespace = client.createNamespace("example-namespace", meta);
+Namespace namespace = client.createNamespace("my-namespace", meta);
 ```
 
 ## Contributing
