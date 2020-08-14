@@ -203,7 +203,7 @@ public class MarquezClientTest {
   private static final Instant ENDED_AT = START_AT.plusMillis(1000L);
   private static final long DURATION = START_AT.until(ENDED_AT, MILLIS);
   private static final Map<String, String> RUN_ARGS = newRunArgs();
-  private static final Run RUN =
+  private static final Run NEW =
       new Run(
           newRunId(),
           CREATED_AT,
@@ -419,7 +419,7 @@ public class MarquezClientTest {
             .fields(FIELDS)
             .tags(TAGS)
             .description(dataset.getDescription().get())
-            .runId(RUN.getId())
+            .runId(NEW.getId())
             .build();
 
     final Instant beforeModified = Instant.now();
@@ -493,7 +493,7 @@ public class MarquezClientTest {
             .tags(TAGS)
             .description(dataset.getDescription().get())
             .schemaLocation(dataset.getSchemaLocation().get())
-            .runId(RUN.getId())
+            .runId(NEW.getId())
             .build();
 
     final Instant beforeModified = Instant.now();
@@ -559,25 +559,25 @@ public class MarquezClientTest {
             .args(RUN_ARGS)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    final String runAsJson = JsonGenerator.newJsonFor(NEW);
     when(http.post(url, metaAsJson)).thenReturn(runAsJson);
 
     final Run run = client.createRun(NAMESPACE_NAME, JOB_NAME, meta);
-    assertThat(run).isEqualTo(RUN);
+    assertThat(run).isEqualTo(NEW);
   }
 
   @Test
   public void testGetRun() throws Exception {
     final String pathTemplate = "/jobs/runs/%s";
-    final String path = buildPathFor(pathTemplate, RUN.getId());
+    final String path = buildPathFor(pathTemplate, NEW.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, RUN.getId())).thenReturn(url);
+    when(http.url(pathTemplate, NEW.getId())).thenReturn(url);
 
-    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    final String runAsJson = JsonGenerator.newJsonFor(NEW);
     when(http.get(url)).thenReturn(runAsJson);
 
-    final Run run = client.getRun(RUN.getId());
-    assertThat(run).isEqualTo(RUN);
+    final Run run = client.getRun(NEW.getId());
+    assertThat(run).isEqualTo(NEW);
   }
 
   @Test
