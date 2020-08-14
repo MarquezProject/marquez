@@ -68,7 +68,7 @@ public class MarquezClient {
     this(Utils.toUrl(baseUrlString));
   }
 
-  public MarquezClient(@NonNull final URL baseUrl) {
+  public MarquezClient(final URL baseUrl) {
     this(MarquezHttp.create(baseUrl, MarquezClient.Version.get()));
   }
 
