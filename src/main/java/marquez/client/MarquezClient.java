@@ -55,46 +55,32 @@ public class MarquezClient {
   @VisibleForTesting
   static final URL DEFAULT_BASE_URL = Utils.toUrl("http://localhost:8080/api/v1");
 
-  @VisibleForTesting static final String DEFAULT_NAMESPACE_NAME = "default";
-
   @VisibleForTesting static final int DEFAULT_LIMIT = 100;
   @VisibleForTesting static final int DEFAULT_OFFSET = 0;
 
   @VisibleForTesting final MarquezHttp http;
-  @VisibleForTesting final String namespaceName;
 
   public MarquezClient() {
-    this(DEFAULT_BASE_URL, DEFAULT_NAMESPACE_NAME);
+    this(DEFAULT_BASE_URL);
   }
 
-  public MarquezClient(final URL baseUrl) {
-    this(baseUrl, DEFAULT_NAMESPACE_NAME);
+  public MarquezClient(final String baseUrlString) {
+    this(Utils.toUrl(baseUrlString));
   }
 
-  public MarquezClient(final String namespaceName) {
-    this(DEFAULT_BASE_URL, namespaceName);
+  public MarquezClient(@NonNull final URL baseUrl) {
+    this(MarquezHttp.create(baseUrl, MarquezClient.Version.get()));
   }
 
-  public MarquezClient(final String baseUrlString, final String namespaceName) {
-    this(Utils.toUrl(baseUrlString), namespaceName);
-  }
-
-  public MarquezClient(@NonNull final URL baseUrl, final String namespaceName) {
-    this(MarquezHttp.create(baseUrl, MarquezClient.Version.get()), namespaceName);
-  }
-
-  MarquezClient(@NonNull final MarquezHttp http, @NonNull final String namespaceName) {
+  MarquezClient(@NonNull final MarquezHttp http) {
     this.http = http;
-    this.namespaceName = namespaceName;
   }
 
-  public Namespace createNamespace(@NonNull String namespaceName, @NonNull NamespaceMeta meta) {
-    final String bodyAsJson = http.put(http.url("/namespaces/%s", namespaceName), meta.toJson());
+  public Namespace createNamespace(
+      @NonNull String namespaceName, @NonNull NamespaceMeta namespaceMeta) {
+    final String bodyAsJson =
+        http.put(http.url("/namespaces/%s", namespaceName), namespaceMeta.toJson());
     return Namespace.fromJson(bodyAsJson);
-  }
-
-  public Namespace getNamespace() {
-    return getNamespace(namespaceName);
   }
 
   public Namespace getNamespace(@NonNull String namespaceName) {
@@ -111,22 +97,14 @@ public class MarquezClient {
     return Namespaces.fromJson(bodyAsJson).getValue();
   }
 
-  public Source createSource(@NonNull String sourceName, @NonNull SourceMeta meta) {
-    final String bodyAsJson = http.put(http.url("/sources/%s", sourceName), meta.toJson());
+  public Source createSource(@NonNull String sourceName, @NonNull SourceMeta sourceMeta) {
+    final String bodyAsJson = http.put(http.url("/sources/%s", sourceName), sourceMeta.toJson());
     return Source.fromJson(bodyAsJson);
   }
 
   public Source getSource(@NonNull String sourceName) {
     final String bodyAsJson = http.get(http.url("/sources/%s", sourceName));
     return Source.fromJson(bodyAsJson);
-  }
-
-  public List<Source> listSources() {
-    return listSources(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
-  }
-
-  public List<Source> listSources(int limit, int offset) {
-    return listSources(namespaceName, limit, offset);
   }
 
   public List<Source> listSources(String namespaceName) {
@@ -138,33 +116,21 @@ public class MarquezClient {
     return Sources.fromJson(bodyAsJson).getValue();
   }
 
-  public Dataset createDataset(String datasetName, DatasetMeta meta) {
-    return createDataset(namespaceName, datasetName, meta);
-  }
-
   public Dataset createDataset(
-      @NonNull String namespaceName, @NonNull String datasetName, @NonNull DatasetMeta meta) {
+      @NonNull String namespaceName,
+      @NonNull String datasetName,
+      @NonNull DatasetMeta datasetMeta) {
     final String bodyAsJson =
-        http.put(http.url("/namespaces/%s/datasets/%s", namespaceName, datasetName), meta.toJson());
+        http.put(
+            http.url("/namespaces/%s/datasets/%s", namespaceName, datasetName),
+            datasetMeta.toJson());
     return Dataset.fromJson(bodyAsJson);
-  }
-
-  public Dataset getDataset(String datasetName) {
-    return getDataset(namespaceName, datasetName);
   }
 
   public Dataset getDataset(@NonNull String namespaceName, @NonNull String datasetName) {
     final String bodyAsJson =
         http.get(http.url("/namespaces/%s/datasets/%s", namespaceName, datasetName));
     return Dataset.fromJson(bodyAsJson);
-  }
-
-  public List<Dataset> listDatasets() {
-    return listDatasets(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
-  }
-
-  public List<Dataset> listDatasets(int limit, int offset) {
-    return listDatasets(namespaceName, limit, offset);
   }
 
   public List<Dataset> listDatasets(String namespaceName) {
@@ -178,10 +144,6 @@ public class MarquezClient {
     return Datasets.fromJson(bodyAsJson).getValue();
   }
 
-  public Dataset tagDatasetWith(@NonNull String datasetName, @NonNull String tagName) {
-    return tagDatasetWith(namespaceName, datasetName, tagName);
-  }
-
   public Dataset tagDatasetWith(
       @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
     final String bodyAsJson =
@@ -190,12 +152,7 @@ public class MarquezClient {
     return Dataset.fromJson(bodyAsJson);
   }
 
-  public Dataset tagDatasetFieldWith(
-      @NonNull String datasetName, @NonNull String fieldName, @NonNull String tagName) {
-    return tagDatasetFieldWith(namespaceName, datasetName, fieldName, tagName);
-  }
-
-  public Dataset tagDatasetFieldWith(
+  public Dataset tagFieldWith(
       @NonNull String namespaceName,
       @NonNull String datasetName,
       @NonNull String fieldName,
@@ -208,32 +165,16 @@ public class MarquezClient {
     return Dataset.fromJson(bodyAsJson);
   }
 
-  public Job createJob(String jobName, JobMeta meta) {
-    return createJob(namespaceName, jobName, meta);
-  }
-
   public Job createJob(
-      @NonNull String namespaceName, @NonNull String jobName, @NonNull JobMeta meta) {
+      @NonNull String namespaceName, @NonNull String jobName, @NonNull JobMeta jobMeta) {
     final String bodyAsJson =
-        http.put(http.url("/namespaces/%s/jobs/%s", namespaceName, jobName), meta.toJson());
+        http.put(http.url("/namespaces/%s/jobs/%s", namespaceName, jobName), jobMeta.toJson());
     return Job.fromJson(bodyAsJson);
-  }
-
-  public Job getJob(String jobName) {
-    return getJob(namespaceName, jobName);
   }
 
   public Job getJob(@NonNull String namespaceName, @NonNull String jobName) {
     final String bodyAsJson = http.get(http.url("/namespaces/%s/jobs/%s", namespaceName, jobName));
     return Job.fromJson(bodyAsJson);
-  }
-
-  public List<Job> listJobs() {
-    return listJobs(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
-  }
-
-  public List<Job> listJobs(int limit, int offset) {
-    return listJobs(namespaceName, limit, offset);
   }
 
   public List<Job> listJobs(String namespaceName) {
@@ -246,25 +187,22 @@ public class MarquezClient {
     return Jobs.fromJson(bodyAsJson).getValue();
   }
 
-  public Run createRun(String jobName, RunMeta meta) {
-    return createRun(namespaceName, jobName, meta, false);
+  public Run createRun(String namespaceName, String jobName, RunMeta runMeta) {
+    return createRun(namespaceName, jobName, runMeta, false);
   }
 
-  public Run createRun(String namespaceName, String jobName, RunMeta meta) {
-    return createRun(namespaceName, jobName, meta, false);
+  public Run createRunAndStart(String namespaceName, String jobName, RunMeta runMeta) {
+    return createRun(namespaceName, jobName, runMeta, true);
   }
 
-  public Run createRun(String jobName, RunMeta meta, boolean markRunAsRunning) {
-    return createRun(namespaceName, jobName, meta, markRunAsRunning);
-  }
-
-  public Run createRun(
+  private Run createRun(
       @NonNull String namespaceName,
       @NonNull String jobName,
-      @NonNull RunMeta meta,
+      @NonNull RunMeta runMeta,
       boolean markRunAsRunning) {
     final String bodyAsJson =
-        http.post(http.url("/namespaces/%s/jobs/%s/runs", namespaceName, jobName), meta.toJson());
+        http.post(
+            http.url("/namespaces/%s/jobs/%s/runs", namespaceName, jobName), runMeta.toJson());
     final Run run = Run.fromJson(bodyAsJson);
     return (markRunAsRunning) ? markRunAsRunning(run.getId()) : run;
   }
@@ -272,14 +210,6 @@ public class MarquezClient {
   public Run getRun(@NonNull String runId) {
     final String bodyAsJson = http.get(http.url("/jobs/runs/%s", runId));
     return Run.fromJson(bodyAsJson);
-  }
-
-  public List<Run> listRuns(String jobName) {
-    return listRuns(namespaceName, jobName, DEFAULT_LIMIT, DEFAULT_OFFSET);
-  }
-
-  public List<Run> listRuns(String jobName, int limit, int offset) {
-    return listRuns(namespaceName, jobName, limit, offset);
   }
 
   public List<Run> listRuns(String namespaceName, String jobName) {
@@ -312,7 +242,7 @@ public class MarquezClient {
         return markRunAsFailed(runId, at);
       default:
         throw new IllegalArgumentException(
-            String.format("Unexpected run state type: %s", runState.name()));
+            String.format("Unexpected run state: %s", runState.name()));
     }
   }
 
@@ -380,11 +310,10 @@ public class MarquezClient {
 
     private Builder() {
       this.baseUrl = DEFAULT_BASE_URL;
-      this.namespaceName = System.getProperty(NAMESPACE_NAME_ENV_VAR, DEFAULT_NAMESPACE_NAME);
     }
 
-    public Builder baseUrl(@NonNull String baseUrl) {
-      return baseUrl(Utils.toUrl(baseUrl));
+    public Builder baseUrl(@NonNull String baseUrlString) {
+      return baseUrl(Utils.toUrl(baseUrlString));
     }
 
     public Builder baseUrl(@NonNull URL baseUrl) {
@@ -392,14 +321,8 @@ public class MarquezClient {
       return this;
     }
 
-    public Builder namespace(@NonNull String namespaceName) {
-      this.namespaceName = namespaceName;
-      return this;
-    }
-
     public MarquezClient build() {
-      return new MarquezClient(
-          MarquezHttp.create(baseUrl, MarquezClient.Version.get()), namespaceName);
+      return new MarquezClient(MarquezHttp.create(baseUrl, MarquezClient.Version.get()));
     }
   }
 

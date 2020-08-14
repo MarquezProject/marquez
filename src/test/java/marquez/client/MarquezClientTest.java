@@ -15,9 +15,7 @@
 package marquez.client;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
-import static marquez.client.MarquezClient.Builder.NAMESPACE_NAME_ENV_VAR;
 import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
-import static marquez.client.MarquezClient.DEFAULT_NAMESPACE_NAME;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newContext;
 import static marquez.client.models.ModelGenerator.newDatasetIdWith;
@@ -33,7 +31,6 @@ import static marquez.client.models.ModelGenerator.newOutputs;
 import static marquez.client.models.ModelGenerator.newOwnerName;
 import static marquez.client.models.ModelGenerator.newRunArgs;
 import static marquez.client.models.ModelGenerator.newRunId;
-import static marquez.client.models.ModelGenerator.newRunState;
 import static marquez.client.models.ModelGenerator.newSchemaLocation;
 import static marquez.client.models.ModelGenerator.newSourceName;
 import static marquez.client.models.ModelGenerator.newSourceType;
@@ -200,22 +197,68 @@ public class MarquezClientTest {
           null);
 
   // RUN
-  private static final String RUN_ID = newRunId();
   private static final Instant NOMINAL_START_TIME = newTimestamp();
   private static final Instant NOMINAL_END_TIME = newTimestamp();
-  private static final RunState RUN_STATE = newRunState();
   private static final Instant START_AT = newTimestamp();
   private static final Instant ENDED_AT = START_AT.plusMillis(1000L);
   private static final long DURATION = START_AT.until(ENDED_AT, MILLIS);
   private static final Map<String, String> RUN_ARGS = newRunArgs();
   private static final Run RUN =
       new Run(
-          RUN_ID,
+          newRunId(),
           CREATED_AT,
           UPDATED_AT,
           NOMINAL_START_TIME,
           NOMINAL_END_TIME,
-          RUN_STATE,
+          RunState.NEW,
+          START_AT,
+          ENDED_AT,
+          DURATION,
+          RUN_ARGS);
+  private static final Run RUNNING =
+      new Run(
+          newRunId(),
+          CREATED_AT,
+          UPDATED_AT,
+          NOMINAL_START_TIME,
+          NOMINAL_END_TIME,
+          RunState.RUNNING,
+          START_AT,
+          ENDED_AT,
+          DURATION,
+          RUN_ARGS);
+  private static final Run COMPLETED =
+      new Run(
+          newRunId(),
+          CREATED_AT,
+          UPDATED_AT,
+          NOMINAL_START_TIME,
+          NOMINAL_END_TIME,
+          RunState.COMPLETED,
+          START_AT,
+          ENDED_AT,
+          DURATION,
+          RUN_ARGS);
+  private static final Run ABORTED =
+      new Run(
+          newRunId(),
+          CREATED_AT,
+          UPDATED_AT,
+          NOMINAL_START_TIME,
+          NOMINAL_END_TIME,
+          RunState.ABORTED,
+          START_AT,
+          ENDED_AT,
+          DURATION,
+          RUN_ARGS);
+  private static final Run FAILED =
+      new Run(
+          newRunId(),
+          CREATED_AT,
+          UPDATED_AT,
+          NOMINAL_START_TIME,
+          NOMINAL_END_TIME,
+          RunState.FAILED,
           START_AT,
           ENDED_AT,
           DURATION,
@@ -228,25 +271,13 @@ public class MarquezClientTest {
 
   @Before
   public void setUp() {
-    client = new MarquezClient(http, DEFAULT_NAMESPACE_NAME);
+    client = new MarquezClient(http);
   }
 
   @Test
   public void testClientBuilder_default() {
     final MarquezClient client = MarquezClient.builder().build();
     assertThat(client.http.baseUrl).isEqualTo(DEFAULT_BASE_URL);
-    assertThat(client.namespaceName).isEqualTo(DEFAULT_NAMESPACE_NAME);
-  }
-
-  @Test
-  public void testClientBuilder_envVar() {
-    final String namespaceName = newNamespaceName();
-    System.setProperty(NAMESPACE_NAME_ENV_VAR, namespaceName);
-
-    final MarquezClient client = MarquezClient.builder().namespace(namespaceName).build();
-    assertThat(client.namespaceName).isEqualTo(namespaceName);
-
-    System.clearProperty(NAMESPACE_NAME_ENV_VAR);
   }
 
   @Test
@@ -332,9 +363,9 @@ public class MarquezClientTest {
   @Test
   public void testCreateDbTable() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
 
     final DbTableMeta meta =
         DbTableMeta.builder()
@@ -349,7 +380,7 @@ public class MarquezClientTest {
     final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
     when(http.put(url, metaAsJson)).thenReturn(dbTableAsJson);
 
-    final Dataset dataset = client.createDataset(DB_TABLE_NAME, meta);
+    final Dataset dataset = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, meta);
     assertThat(dataset).isInstanceOf(DbTable.class);
     assertThat((DbTable) dataset).isEqualTo(DB_TABLE);
   }
@@ -357,14 +388,14 @@ public class MarquezClientTest {
   @Test
   public void testGetDbTable() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
 
     final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
     when(http.get(url)).thenReturn(dbTableAsJson);
 
-    final Dataset dataset = client.getDataset(DB_TABLE_NAME);
+    final Dataset dataset = client.getDataset(NAMESPACE_NAME, DB_TABLE_NAME);
     assertThat(dataset).isInstanceOf(DbTable.class);
     assertThat((DbTable) dataset).isEqualTo(DB_TABLE);
   }
@@ -372,14 +403,14 @@ public class MarquezClientTest {
   @Test
   public void testModifiedDbTable() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
 
     final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
     when(http.get(url)).thenReturn(dbTableAsJson);
 
-    final DbTable dataset = (DbTable) client.getDataset(DB_TABLE_NAME);
+    final DbTable dataset = (DbTable) client.getDataset(NAMESPACE_NAME, DB_TABLE_NAME);
 
     final DbTableMeta modifiedMeta =
         DbTableMeta.builder()
@@ -388,7 +419,7 @@ public class MarquezClientTest {
             .fields(FIELDS)
             .tags(TAGS)
             .description(dataset.getDescription().get())
-            .runId(RUN_ID)
+            .runId(RUN.getId())
             .build();
 
     final Instant beforeModified = Instant.now();
@@ -396,7 +427,8 @@ public class MarquezClientTest {
     final String modifiedDbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE_MODIFIED);
     when(http.put(url, modifiedMetaAsJson)).thenReturn(modifiedDbTableAsJson);
 
-    final Dataset modifiedDataset = client.createDataset(DB_TABLE_NAME, modifiedMeta);
+    final Dataset modifiedDataset =
+        client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, modifiedMeta);
     assertThat(modifiedDataset).isInstanceOf(DbTable.class);
     assertThat((DbTable) modifiedDataset).isEqualTo(DB_TABLE_MODIFIED);
     assertThat(modifiedDataset.getLastModifiedAt().get().isAfter(beforeModified));
@@ -405,9 +437,9 @@ public class MarquezClientTest {
   @Test
   public void testCreateStream() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
 
     final StreamMeta meta =
         StreamMeta.builder()
@@ -422,7 +454,7 @@ public class MarquezClientTest {
     final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
     when(http.put(url, metaAsJson)).thenReturn(streamAsJson);
 
-    final Dataset dataset = client.createDataset(STREAM_NAME, meta);
+    final Dataset dataset = client.createDataset(NAMESPACE_NAME, STREAM_NAME, meta);
     assertThat(dataset).isInstanceOf(Stream.class);
     assertThat(dataset).isEqualTo(STREAM);
   }
@@ -430,28 +462,28 @@ public class MarquezClientTest {
   @Test
   public void testGetStream() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
 
     final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
     when(http.get(url)).thenReturn(streamAsJson);
 
-    final Dataset dataset = client.getDataset(STREAM_NAME);
+    final Dataset dataset = client.getDataset(NAMESPACE_NAME, STREAM_NAME);
     assertThat(dataset).isEqualTo(STREAM);
   }
 
   @Test
   public void testModifiedStream() throws Exception {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
 
     final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
     when(http.get(url)).thenReturn(streamAsJson);
 
-    final Stream dataset = (Stream) client.getDataset(STREAM_NAME);
+    final Stream dataset = (Stream) client.getDataset(NAMESPACE_NAME, STREAM_NAME);
 
     final StreamMeta modifiedMeta =
         StreamMeta.builder()
@@ -461,7 +493,7 @@ public class MarquezClientTest {
             .tags(TAGS)
             .description(dataset.getDescription().get())
             .schemaLocation(dataset.getSchemaLocation().get())
-            .runId(RUN_ID)
+            .runId(RUN.getId())
             .build();
 
     final Instant beforeModified = Instant.now();
@@ -469,7 +501,7 @@ public class MarquezClientTest {
     final String modifiedStreamAsJson = JsonGenerator.newJsonFor(STREAM_MODIFIED);
     when(http.put(url, modifiedMetaAsJson)).thenReturn(modifiedStreamAsJson);
 
-    final Dataset modifiedDataset = client.createDataset(STREAM_NAME, modifiedMeta);
+    final Dataset modifiedDataset = client.createDataset(NAMESPACE_NAME, STREAM_NAME, modifiedMeta);
     assertThat(modifiedDataset).isInstanceOf(Stream.class);
     assertThat((Stream) modifiedDataset).isEqualTo(STREAM_MODIFIED);
     assertThat(modifiedDataset.getLastModifiedAt().get().isAfter(beforeModified));
@@ -478,9 +510,9 @@ public class MarquezClientTest {
   @Test
   public void testCreateJob() throws Exception {
     final String pathTemplate = "/namespaces/%s/jobs/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
 
     final JobMeta meta =
         JobMeta.builder()
@@ -495,30 +527,30 @@ public class MarquezClientTest {
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
     when(http.put(url, metaAsJson)).thenReturn(jobAsJson);
 
-    final Job job = client.createJob(JOB_NAME, meta);
+    final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, meta);
     assertThat(job).isEqualTo(JOB);
   }
 
   @Test
   public void testGetJob() throws Exception {
     final String pathTemplate = "/namespaces/%s/jobs/%s";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
 
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
     when(http.get(url)).thenReturn(jobAsJson);
 
-    final Job job = client.getJob(JOB_NAME);
+    final Job job = client.getJob(NAMESPACE_NAME, JOB_NAME);
     assertThat(job).isEqualTo(JOB);
   }
 
   @Test
   public void testCreateRun() throws Exception {
     final String pathTemplate = "/namespaces/%s/jobs/%s/runs";
-    final String path = buildPathFor(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME);
+    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, DEFAULT_NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    when(http.url(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
 
     final RunMeta meta =
         RunMeta.builder()
@@ -530,36 +562,36 @@ public class MarquezClientTest {
     final String runAsJson = JsonGenerator.newJsonFor(RUN);
     when(http.post(url, metaAsJson)).thenReturn(runAsJson);
 
-    final Run run = client.createRun(JOB_NAME, meta);
+    final Run run = client.createRun(NAMESPACE_NAME, JOB_NAME, meta);
     assertThat(run).isEqualTo(RUN);
   }
 
   @Test
   public void testGetRun() throws Exception {
     final String pathTemplate = "/jobs/runs/%s";
-    final String path = buildPathFor(pathTemplate, RUN_ID);
+    final String path = buildPathFor(pathTemplate, RUN.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, RUN_ID)).thenReturn(url);
+    when(http.url(pathTemplate, RUN.getId())).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(RUN);
     when(http.get(url)).thenReturn(runAsJson);
 
-    final Run run = client.getRun(RUN_ID);
+    final Run run = client.getRun(RUN.getId());
     assertThat(run).isEqualTo(RUN);
   }
 
   @Test
   public void testMarkRunAsRunning() throws Exception {
     final String pathTemplate = "/jobs/runs/%s/start";
-    final String path = buildPathFor(pathTemplate, RUN_ID);
+    final String path = buildPathFor(pathTemplate, RUNNING.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, ImmutableMap.of(), RUN_ID)).thenReturn(url);
+    when(http.url(pathTemplate, ImmutableMap.of(), RUNNING.getId())).thenReturn(url);
 
-    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    final String runAsJson = JsonGenerator.newJsonFor(RUNNING);
     when(http.post(url)).thenReturn(runAsJson);
 
-    final Run run = client.markRunAsRunning(RUN_ID);
-    assertThat(run).isEqualTo(RUN);
+    final Run run = client.markRunAsRunning(RUNNING.getId());
+    assertThat(run).isEqualTo(RUNNING);
 
     verify(http, times(1)).post(url);
   }
@@ -567,15 +599,15 @@ public class MarquezClientTest {
   @Test
   public void testMarkRunAsCompleted() throws Exception {
     final String pathTemplate = "/jobs/runs/%s/complete";
-    final String path = buildPathFor(pathTemplate, RUN_ID);
+    final String path = buildPathFor(pathTemplate, COMPLETED.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, ImmutableMap.of(), RUN_ID)).thenReturn(url);
+    when(http.url(pathTemplate, ImmutableMap.of(), COMPLETED.getId())).thenReturn(url);
 
-    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    final String runAsJson = JsonGenerator.newJsonFor(COMPLETED);
     when(http.post(url)).thenReturn(runAsJson);
 
-    final Run run = client.markRunAsCompleted(RUN_ID);
-    assertThat(run).isEqualTo(RUN);
+    final Run run = client.markRunAsCompleted(COMPLETED.getId());
+    assertThat(run).isEqualTo(COMPLETED);
 
     verify(http, times(1)).post(url);
   }
@@ -583,15 +615,15 @@ public class MarquezClientTest {
   @Test
   public void testMarkRunAsAborted() throws Exception {
     final String pathTemplate = "/jobs/runs/%s/abort";
-    final String path = buildPathFor(pathTemplate, RUN_ID);
+    final String path = buildPathFor(pathTemplate, ABORTED.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, ImmutableMap.of(), RUN_ID)).thenReturn(url);
+    when(http.url(pathTemplate, ImmutableMap.of(), ABORTED.getId())).thenReturn(url);
 
-    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    final String runAsJson = JsonGenerator.newJsonFor(ABORTED);
     when(http.post(url)).thenReturn(runAsJson);
 
-    final Run run = client.markRunAsAborted(RUN_ID);
-    assertThat(run).isEqualTo(RUN);
+    final Run run = client.markRunAsAborted(ABORTED.getId());
+    assertThat(run).isEqualTo(ABORTED);
 
     verify(http, times(1)).post(url);
   }
@@ -599,15 +631,15 @@ public class MarquezClientTest {
   @Test
   public void testMarkRunAsFailed() throws Exception {
     final String pathTemplate = "/jobs/runs/%s/fail";
-    final String path = buildPathFor(pathTemplate, RUN_ID);
+    final String path = buildPathFor(pathTemplate, FAILED.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, ImmutableMap.of(), RUN_ID)).thenReturn(url);
+    when(http.url(pathTemplate, ImmutableMap.of(), FAILED.getId())).thenReturn(url);
 
-    final String runAsJson = JsonGenerator.newJsonFor(RUN);
+    final String runAsJson = JsonGenerator.newJsonFor(FAILED);
     when(http.post(url)).thenReturn(runAsJson);
 
-    final Run run = client.markRunAsFailed(RUN_ID);
-    assertThat(run).isEqualTo(RUN);
+    final Run run = client.markRunAsFailed(FAILED.getId());
+    assertThat(run).isEqualTo(FAILED);
 
     verify(http, times(1)).post(url);
   }
