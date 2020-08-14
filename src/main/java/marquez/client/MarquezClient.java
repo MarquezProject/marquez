@@ -303,10 +303,7 @@ public class MarquezClient {
   }
 
   public static final class Builder {
-    @VisibleForTesting static final String NAMESPACE_NAME_ENV_VAR = "MARQUEZ_NAMESPACE";
-
     @VisibleForTesting URL baseUrl;
-    private String namespaceName;
 
     private Builder() {
       this.baseUrl = DEFAULT_BASE_URL;
