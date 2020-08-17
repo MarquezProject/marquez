@@ -21,13 +21,13 @@ This library is under active development at [WeWork](https://www.wework.com).
 ## Installation
 
 ```bash
-$ pip install marquez-airflow
+$ pip3 install marquez-airflow
 ```
 
 To install from source run:
 
 ```bash
-$ python setup.py install
+$ python3 setup.py install
 ```
  
  ## Usage
