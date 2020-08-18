@@ -24,16 +24,14 @@ This library is under active development at [Datakin](https://twitter.com/Dataki
 $ pip3 install marquez-airflow
 ```
 
-To install from source run:
+To install from source, run:
 
 ```bash
 $ python3 setup.py install
 ```
- 
- ## Usage
- 
-To use this library, the line `from airflow import DAG` needs to be replaced by `from marquez_airflow import DAG`, see example below:
- 
+
+## Usage
+
 ```python
 from datetime import datetime
 from marquez_airflow import DAG
