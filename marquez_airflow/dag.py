@@ -35,8 +35,8 @@ class DAG(airflow.models.DAG):
         super().__init__(*args, **kwargs)
         self._marquez_dataset_cache = {}
         self._marquez_source_cache = {}
-        self.marquez_namespace = os.environ.get('MARQUEZ_NAMESPACE') or \
-            DAG.DEFAULT_NAMESPACE
+        self.marquez_namespace = os.getenv('MARQUEZ_NAMESPACE',
+                                           DAG.DEFAULT_NAMESPACE)
         self._job_id_mapping = JobIdMapping()
 
     def create_dagrun(self, *args, **kwargs):
