@@ -7,11 +7,11 @@
 [![version](https://img.shields.io/pypi/v/marquez-airflow.svg)](https://pypi.python.org/pypi/marquez-airflow)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez-airflow/master/LICENSE)
 
-A library that integrates Airflow DAGs with [Marquez](https://github.com/MarquezProject/marquez) for automatic metadata collection.
+A library that integrates [Airflow `DAGs`]() with [Marquez](https://github.com/MarquezProject/marquez) for automatic metadata collection.
 
 ## Status
 
-This library is under active development at [WeWork](https://www.wework.com).
+This library is under active development at [Datakin](https://twitter.com/DatakinHQ). 
 
 ## Requirements
 
