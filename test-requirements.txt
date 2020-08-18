@@ -1,4 +1,4 @@
-apache-airflow==1.10.6
+apache-airflow==1.10.11
 marquez-python==0.5.6
 codecov
 pytest

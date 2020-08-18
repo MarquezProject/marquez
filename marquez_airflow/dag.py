@@ -83,7 +83,7 @@ class DAG(airflow.models.DAG):
                               marquez_namespace=self.marquez_namespace,
                               duration_ms=(self._now_ms() - t))
 
-            log.info(f'Successfully recorded metadata',
+            log.info('Successfully recorded metadata',
                      airflow_dag_id=self.dag_id,
                      marquez_namespace=self.marquez_namespace,
                      duration_ms=(self._now_ms() - create_dag_start_ms))
@@ -143,7 +143,7 @@ class DAG(airflow.models.DAG):
             else:
                 task_location = get_location(task.dag.fileloc)
         except Exception:
-            log.warn(f'Unable to fetch the location')
+            log.warn('Unable to fetch the location')
 
         steps_metadata = []
         if extractor:
@@ -260,7 +260,7 @@ class DAG(airflow.models.DAG):
             JobIdMapping.make_key(job_name, run_id), session)
 
         if marquez_job_run_ids:
-            log.info(f'Found job runs.',
+            log.info('Found job runs.',
                      airflow_dag_id=self.dag_id,
                      airflow_job_id=job_name,
                      airflow_run_id=run_id,
