@@ -30,6 +30,6 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "marquez-python==0.5.6",
-        "sqlparse==0.2.3"
+        "sqlparse==0.3.1"
     ],
 )
