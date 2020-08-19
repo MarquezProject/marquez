@@ -21,18 +21,8 @@ jobs:
     steps:
       - checkout
       - run: pip install --user  -r test-requirements.txt
-      - run: python -m pytest ./tests --cov=marquez_client --cov-report xml --ignore=tests/integration ./tests
+      - run: python -m pytest ./tests --cov=marquez_client --cov-report xml ./tests
       - run: python -m codecov
-
-  integration:
-    machine: true
-    environment:
-      - COMPOSE_FILE: 'tests/integration/docker-compose.yml'
-    steps:
-      - checkout
-      - run:
-          name: Test
-          command: tests/integration/run.sh
 
   release:
     <<: *defaults
