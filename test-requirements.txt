@@ -8,3 +8,7 @@ urllib3
 vcrpy
 pytest-cov
 codecov
+pyrfc3339
+mock
+pytz
+uuid
