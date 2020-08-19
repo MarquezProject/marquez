@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.1...HEAD)
+
+## [0.11.1](https://github.com/MarquezProject/marquez/compare/0.11.0...0.11.1) - 2020-08-19
 
 ### Added
 
