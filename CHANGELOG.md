@@ -4,6 +4,10 @@
 
 ### Added
 
+* Use shorten name for namespaces in version IDs
+* Add namespace to Dataset and Job models
+* Add ability to deserialize `int` type to columns [@phixMe](https://github.com/phixMe)
+* Add `SqlLogger` for SQL profiling
 * Add `DatasetVersionId.asDatasetId()` and `JobVersionId.asJobId()`
 * Add `DatasetService.getBy(DatasetVersionId): Dataset`
 * Add `JobService.getBy(JobVersionId): Job`
@@ -16,6 +20,10 @@
 ### Changed
 
 * `config.yml` -> `marquez.yml`
+
+### Fixed
+
+* Fix dataset version column mappings
 
 ## [0.11.0](https://github.com/MarquezProject/marquez/compare/0.10.4...0.11.0) - 2020-05-27
 
