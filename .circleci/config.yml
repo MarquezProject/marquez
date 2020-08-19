@@ -35,7 +35,8 @@ jobs:
           name:
           environment:
             AIRFLOW__CORE__DAGS_FOLDER: './tests/test_dags'
-          command: python -m pytest --log-cli-level=INFO --ignore=tests/integration --cov=marquez --cov-report xml ./tests
+          command: python -m pytest --ignore=tests/integration --cov=marquez_airflow tests/
+      - run: bash <(curl -s https://codecov.io/bash)
 
   integration:
     machine: true
