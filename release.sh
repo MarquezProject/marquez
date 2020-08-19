@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,15 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Usage: $ ./release.py <type>
 
 set -e -x
 
-# Usage: $ ./prepare_for_release.py <type>
-# type - [major | minor | patch]. Default is patch.
-
 branch=$(git rev-parse --abbrev-ref HEAD)
-if [[ "${branch}" != "master" ]]; then
-  echo "You may only tag a commit on the 'master' branch"
+
+if [[ "${branch}" != "main" ]]; then
+  echo "You may only tag a commit on the 'main' branch"
   exit 1;
 fi
 
@@ -44,5 +44,5 @@ bumpversion --current-version ${version} \
   --commit --tag \
   --tag-name {new_version} \
   ${type} ./setup.py
-git push --tags origin master
-echo "Done pushing to master"
+git push --tags origin main
+echo "Done pushing to main"
