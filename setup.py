@@ -29,7 +29,7 @@ setuptools.setup(
     url="https://github.com/MarquezProject/marquez-airflow",
     packages=setuptools.find_packages(),
     install_requires=[
-        "marquez-python==0.5.6",
+        "marquez-python==0.6.0",
         "sqlparse==0.3.1"
     ],
 )

@@ -204,14 +204,15 @@ class DAG(airflow.models.DAG):
                           airflow_run_id=dag_run_id,
                           marquez_namespace=self.marquez_namespace)
 
-            marquez_client.create_job(step.name,
-                                      'BATCH',  # job type
+            marquez_client.create_job(job_name=step.name,
+                                      job_type='BATCH',  # job type
                                       location=(step.location or
                                                 task_location),
                                       input_dataset=input_datasets,
                                       output_dataset=output_datasets,
                                       context=step.context,
-                                      description=self.description)
+                                      description=self.description,
+                                      namespace_name=self.marquez_namespace)
             log.info(f'Successfully recorded job: {step.name}',
                      airflow_dag_id=self.dag_id,
                      marquez_namespace=self.marquez_namespace)
@@ -287,8 +288,7 @@ class DAG(airflow.models.DAG):
 
     def get_marquez_client(self):
         if not self._marquez_client:
-            self._marquez_client = MarquezClient(
-                namespace_name=self.marquez_namespace)
+            self._marquez_client = MarquezClient()
         return self._marquez_client
 
     @staticmethod

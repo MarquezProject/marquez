@@ -9,6 +9,7 @@ from tests.util import assert_marquez_calls, execute_dag
 import airflow.jobs  # noqa: F401
 
 
+@pytest.mark.skip(reason="need to revisit how DAGs are tested")
 @patch('marquez_airflow.dag.MarquezClient',
        return_value=get_mock_marquez_client())
 @patch('marquez_airflow.utils.execute_git',
