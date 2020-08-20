@@ -25,8 +25,8 @@ if [[ ! $(type -P bump2version) ]]; then
 fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
-if [[ "${branch}" != "master" ]]; then
-  echo "You may only tag a commit on the 'master' branch"
+if [[ "${branch}" != "main" ]]; then
+  echo "You may only tag a commit on the 'main' branch"
   exit 1;
 fi
 
@@ -46,5 +46,5 @@ echo "Upgrading version from the current version of ${version}"
 # The {new_version} is not a bash variable - it's a bump2version notation for the new version.
 # Please see bump2version --help for more information.
 bump2version --current-version ${version} --commit --tag --tag-name {new_version} ${type} ./marquez_client/version.py
-git push --tags origin master
-echo "Done pushing to master"
+git push --tags origin main
+echo "Done pushing to main"

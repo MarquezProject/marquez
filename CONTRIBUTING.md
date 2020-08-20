@@ -17,7 +17,7 @@ We feel that a welcoming community is important and we ask that you follow the [
 5. Write a test for your change
 6. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez-python/compare)
 7. Add the ["review"](https://github.com/MarquezProject/marquez-python/labels/review) label to your pull request
-8. Work with project maintainers to get your change reviewed and merged into the `master` branch
+8. Work with project maintainers to get your change reviewed and merged into the `main` branch
 9. Delete your branch
 
 To ensure your pull request is accepted, follow these guidelines:
