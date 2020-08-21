@@ -1,8 +1,8 @@
 *.egg-info
 .coverage
+.idea/
 __pycache__
 bin/
 build/
 dist/
 lib/
-
