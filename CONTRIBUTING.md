@@ -1,6 +1,19 @@
 # How to Contribute
 
-We're excited you're interested in contributing to Marquez! We'd love your help, and there are plenty of ways to contribute:
+We're excited you're interested in contributing to Marquez! We'd love your help.
+We welcome all levels of expertise from novice to experts.
+
+If you are `very new` to the open source contribution:
+`Fork` this repo
+`Star` this repo and your own fork
+In `Issues` tab, read some that interests you
+You can talk to us directly on `gitter.im` (instructions to join on the project page `README.md`)
+You can Follow us on `twitter`, https://twitter.com/MarquezProject
+
+Further, check the `Resources` section at the bottom of this page.
+
+
+There are plenty of ways to contribute:
 
 * Fix or [report](https://github.com/MarquezProject/marquez-python/issues/new) a bug
 * Fix or improve documentation
