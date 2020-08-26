@@ -27,7 +27,7 @@ import marquez.common.models.RunId;
 @EqualsAndHashCode
 @ToString
 public final class RunMeta {
-  @Nullable private final RunId runId;
+  @Nullable private final RunId id;
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
   @Getter private final ImmutableMap<String, String> args;
@@ -41,11 +41,11 @@ public final class RunMeta {
 
   @JsonCreator
   public RunMeta(
-      @Nullable final RunId runId,
+      @Nullable final RunId id,
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
       @Nullable final ImmutableMap<String, String> args) {
-    this.runId = runId;
+    this.id = id;
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;
     this.args = (args == null) ? ImmutableMap.of() : args;
@@ -59,7 +59,7 @@ public final class RunMeta {
     return Optional.ofNullable(nominalEndTime);
   }
 
-  public Optional<RunId> getRunId() {
-    return Optional.ofNullable(runId);
+  public Optional<RunId> getId() {
+    return Optional.ofNullable(id);
   }
 }

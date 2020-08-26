@@ -295,7 +295,7 @@ public class JobResourceTest {
   static Run toRun(final RunMeta runMeta) {
     final Instant now = newTimestamp();
     return new Run(
-        runMeta.getRunId().orElseGet(ModelGenerator::newRunId),
+        runMeta.getId().orElseGet(ModelGenerator::newRunId),
         now,
         now,
         runMeta.getNominalStartTime().orElse(null),
