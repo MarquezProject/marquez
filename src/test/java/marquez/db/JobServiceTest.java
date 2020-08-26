@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import marquez.DataAccessTests;
 import marquez.IntegrationTests;
 import marquez.JdbiRuleInit;
@@ -38,6 +39,7 @@ import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.TagRow;
@@ -162,19 +164,23 @@ public class JobServiceTest {
     assertThat(job.getId().getNamespace()).isEqualTo(NAMESPACE_NAME);
     assertThat(job.getId().getName()).isEqualTo(jobName);
     assertThat(job.getId()).isEqualTo(new JobId(NAMESPACE_NAME, jobName));
+
     Run run = jobService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
     assertThat(run.getId()).isNotNull();
     assertThat(run.getStartedAt().isPresent()).isFalse();
+
     jobService.markRunAs(run.getId(), RUNNING);
     Optional<Run> startedRun = jobService.getRun(run.getId());
     assertThat(startedRun.isPresent()).isTrue();
     assertThat(startedRun.get().getStartedAt()).isNotNull();
     assertThat(startedRun.get().getEndedAt().isPresent()).isFalse();
+
     jobService.markRunAs(run.getId(), COMPLETED);
     Optional<Run> endedRun = jobService.getRun(run.getId());
     assertThat(endedRun.isPresent()).isTrue();
     assertThat(endedRun.get().getStartedAt()).isEqualTo(startedRun.get().getStartedAt());
     assertThat(endedRun.get().getEndedAt()).isNotNull();
+
     List<Run> allRuns = jobService.getAllRunsFor(NAMESPACE_NAME, jobName, 10, 0);
     assertThat(allRuns.size()).isEqualTo(1);
     assertThat(allRuns.get(0).getEndedAt()).isEqualTo(endedRun.get().getEndedAt());
@@ -198,5 +204,29 @@ public class JobServiceTest {
     RunTransition completedRun = runTransitions.get(2);
     assertThat(completedRun.getRunId()).isEqualTo(run.getId());
     assertThat(completedRun.getNewState()).isEqualTo(COMPLETED);
+  }
+
+  @Test
+  public void testRunWithId() throws MarquezServiceException, MalformedURLException {
+    JobName jobName = JobName.of("MY_JOB2");
+    Job job =
+        jobService.createOrUpdate(
+            NAMESPACE_NAME,
+            jobName,
+            new JobMeta(
+                JobType.BATCH,
+                ImmutableSet.of(),
+                ImmutableSet.of(),
+                Utils.toUrl("https://github.com/repo/test/commit/foo"),
+                ImmutableMap.of(),
+                "description"));
+
+    RunId run2Id = RunId.of(UUID.randomUUID());
+    Run run2 =
+        jobService.createRun(NAMESPACE_NAME, job.getName(), new RunMeta(run2Id, null, null, null));
+    assertThat(run2.getId()).isEqualTo(run2Id);
+    Optional<Run> run2Again = jobService.getRun(run2Id);
+    assertThat(run2Again.isPresent()).isTrue();
+    assertThat(run2Again.get().getId()).isEqualTo(run2Id);
   }
 }

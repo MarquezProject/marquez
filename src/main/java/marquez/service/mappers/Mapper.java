@@ -393,7 +393,7 @@ public final class Mapper {
       @NonNull final RunMeta runMeta) {
     final Instant now = newTimestamp();
     return new RunRow(
-        newRowUuid(),
+        runMeta.getId().map((runId) -> runId.getValue()).orElseGet(Mapper::newRowUuid),
         now,
         now,
         jobVersionUuid,

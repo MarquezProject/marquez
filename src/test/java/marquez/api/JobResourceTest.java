@@ -35,6 +35,7 @@ import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
+import marquez.common.models.ModelGenerator;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.service.JobService;
@@ -141,6 +142,31 @@ public class JobResourceTest {
     final UriInfo uriInfo = mock(UriInfo.class);
 
     final RunMeta runMeta = newRunMeta();
+    final Run run = toRun(runMeta);
+    final URI runLocation =
+        URI.create(
+            String.format(
+                "http://localhost:5000/api/v1/namespaces/%s/jobs/%s/runs/%s",
+                NAMESPACE_NAME.getValue(), JOB_NAME.getValue(), run.getId()));
+
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(jobService.exists(NAMESPACE_NAME, JOB_NAME)).thenReturn(true);
+    when(jobService.createRun(NAMESPACE_NAME, JOB_NAME, runMeta)).thenReturn(run);
+
+    doReturn(runLocation).when(jobResource).locationFor(uriInfo, run);
+
+    final Response response = jobResource.createRun(NAMESPACE_NAME, JOB_NAME, runMeta, uriInfo);
+    assertThat(response.getStatus()).isEqualTo(201);
+    assertThat(response.getLocation()).isEqualTo(runLocation);
+    assertThat((Run) response.getEntity()).isEqualTo(run);
+  }
+
+  @Test
+  public void testCreateRunWithId() throws MarquezServiceException {
+    final UriInfo uriInfo = mock(UriInfo.class);
+
+    RunId newRunId = newRunId();
+    final RunMeta runMeta = newRunMeta(newRunId);
     final Run run = toRun(runMeta);
     final URI runLocation =
         URI.create(
@@ -269,7 +295,7 @@ public class JobResourceTest {
   static Run toRun(final RunMeta runMeta) {
     final Instant now = newTimestamp();
     return new Run(
-        newRunId(),
+        runMeta.getId().orElseGet(ModelGenerator::newRunId),
         now,
         now,
         runMeta.getNominalStartTime().orElse(null),
