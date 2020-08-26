@@ -1028,6 +1028,10 @@ components:
     newRun:
       type: object
       properties:
+        runId:
+          description: An optional client-provided UUID for this run (this could be a Random or name based UUID). If not provided a random UUID will be generated for the run
+          type: string
+          format: uuid
         nominalStartTime:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
           type: string
