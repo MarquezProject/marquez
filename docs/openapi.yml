@@ -1028,7 +1028,7 @@ components:
     newRun:
       type: object
       properties:
-        runId:
+        id:
           description: An optional client-provided UUID for this run (this could be a Random or name based UUID). If not provided a random UUID will be generated for the run
           type: string
           format: uuid
