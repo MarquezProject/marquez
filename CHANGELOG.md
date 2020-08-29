@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.1...HEAD)
 
+### Added
+
+* Add support for external ID on run creation [@julienledem](https://github.com/julienledem)
+
 ## [0.11.1](https://github.com/MarquezProject/marquez/compare/0.11.0...0.11.1) - 2020-08-19
 
 ### Added
