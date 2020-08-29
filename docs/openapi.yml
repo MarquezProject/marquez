@@ -321,6 +321,7 @@ paths:
   /jobs/runs/{id}/start:
     parameters:
       - $ref: '#/components/parameters/runId'
+      - $ref: '#/components/parameters/at'
     post:
       summary: Start a run
       description: Marks the run as `RUNNING`.
@@ -337,6 +338,7 @@ paths:
   /jobs/runs/{id}/complete:
     parameters:
       - $ref: '#/components/parameters/runId'
+      - $ref: '#/components/parameters/at'
     post:
       summary: Complete a run
       description: Marks the run as `COMPLETED`.
@@ -353,6 +355,7 @@ paths:
   /jobs/runs/{id}/fail:
     parameters:
       - $ref: '#/components/parameters/runId'
+      - $ref: '#/components/parameters/at'
     post:
       summary: Fail a run
       description: Marks the run as `FAILED`.
@@ -369,6 +372,7 @@ paths:
   /jobs/runs/{id}/abort:
     parameters:
       - $ref: '#/components/parameters/runId'
+      - $ref: '#/components/parameters/at'
     post:
       summary: Abort a run
       description: Marks the run as `ABORTED`.
@@ -401,6 +405,15 @@ paths:
 
 components:
   parameters:
+    at:
+      name: at
+      in: query
+      description: The time the event happened at
+      required: false
+      schema:
+        type: string
+        format: date-time
+
     namespace:
       name: namespace
       in: path
