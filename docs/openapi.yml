@@ -408,7 +408,7 @@ components:
     at:
       name: at
       in: query
-      description: The time the event happened at
+      description: An ISO-8601 timestamp representing the time when the run transitioned.
       required: false
       schema:
         type: string
