@@ -7,6 +7,8 @@ services:
       - "5001:5001"
     volumes:
       - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
+    links:
+      - "db:postgres"
     depends_on:
       - db
     entrypoint: ["./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
