@@ -10,13 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-class MarquezError(Exception):
-    pass
+class Backend:
+    def put(self, path, headers, json):
+        pass
 
-
-class APIError(MarquezError):
-    pass
-
-
-class InvalidRequestError(MarquezError):
-    pass
+    def post(self, path, headers, json=None):
+        pass

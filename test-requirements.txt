@@ -12,3 +12,8 @@ pyrfc3339
 mock
 pytz
 uuid
+python-json-logger
+uuid
+pyrfc3339
+pytz
+mock
