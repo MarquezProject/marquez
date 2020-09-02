@@ -12,6 +12,6 @@
 
 DEFAULT_TIMEOUT_MS = 10000
 DEFAULT_NAMESPACE_NAME = 'default'
-DEFAULT_MARQUEZ_BACKEND = 'file'
+DEFAULT_MARQUEZ_BACKEND = 'http'
 DEFAULT_MARQUEZ_URL = 'http://localhost:8080'
 DEFAULT_MARQUEZ_FILE = '/tmp/marquez/client.requests.log'

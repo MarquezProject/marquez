@@ -10,6 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import logging
 import logging.config
 import random
@@ -37,7 +38,7 @@ class TestAirflowDAG(unittest.TestCase):
             logging.config.dictConfig(yamlConfig)
             log.info("loaded logConfig.yaml")
 
-        # os.environ['MARQUEZ_BACKEND'] = 'file'
+        os.environ['MARQUEZ_BACKEND'] = 'file'
 
         self.client = Clients.new_write_only_client()
         log.info("created marquez_client.")
