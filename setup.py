@@ -58,7 +58,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         "requests",
-        "six"
+        "six",
+        "pyrfc3339"
     ],
     include_package_data=True,
     long_description="""\
