@@ -65,8 +65,10 @@ class DAG(airflow.models.DAG):
             marquez_client = self.get_marquez_client()
 
             # Create the Namespace
+            # TODO: Use 'anonymous' owner for now, but we may want to use
+            # the 'owner' attribute defined via default_args for a DAG
             marquez_client.create_namespace(self.marquez_namespace,
-                                            "default_owner")
+                                            "anonymous")
 
             # Register each task in the DAG
             for task_id, task in self.task_dict.items():
