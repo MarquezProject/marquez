@@ -13,8 +13,10 @@
 import json
 import os
 import time
+from uuid import uuid4
 
-from marquez_client import MarquezClient
+from marquez_client.clients import Clients
+from marquez_client.models import JobType
 
 import airflow.models
 from marquez_airflow import log
@@ -174,7 +176,12 @@ class DAG(airflow.models.DAG):
         # If no extractor found or failed to extract metadata,
         # report the task metadata
         if not steps_metadata:
-            steps_metadata = [StepMetadata(task_name)]
+            steps_metadata = [StepMetadata(
+                name=task_name,
+                context={
+                    'airflow.operator': task.__class__.__name__,
+                    'airflow.task_info': task.__dict__
+                })]
 
         # store all the JobRuns associated with a task
         marquez_jobrun_ids = []
@@ -205,7 +212,7 @@ class DAG(airflow.models.DAG):
                           marquez_namespace=self.marquez_namespace)
 
             marquez_client.create_job(job_name=step.name,
-                                      job_type='BATCH',  # job type
+                                      job_type=JobType.BATCH,  # job type
                                       location=(step.location or
                                                 task_location),
                                       input_dataset=input_datasets,
@@ -217,15 +224,20 @@ class DAG(airflow.models.DAG):
                      airflow_dag_id=self.dag_id,
                      marquez_namespace=self.marquez_namespace)
 
-            marquez_jobrun_id = marquez_client.create_job_run(
-                step.name,
+            # TODO: Look into generating a uuid based on the DAG run_id
+            external_run_id = str(uuid4())
+
+            marquez_client.create_job_run(
+                namespace_name=self.marquez_namespace,
+                job_name=step.name,
+                run_id=external_run_id,
                 run_args=run_args,
                 nominal_start_time=start_time,
-                nominal_end_time=end_time).get('runId')
+                nominal_end_time=end_time)
 
-            if marquez_jobrun_id:
-                marquez_jobrun_ids.append(marquez_jobrun_id)
-                marquez_client.mark_job_run_as_started(marquez_jobrun_id)
+            if external_run_id:
+                marquez_jobrun_ids.append(external_run_id)
+                marquez_client.mark_job_run_as_started(external_run_id)
             else:
                 log.error(f'Failed to get run id: {step.name}',
                           airflow_dag_id=self.dag_id,
@@ -234,7 +246,7 @@ class DAG(airflow.models.DAG):
             log.info(f'Successfully recorded job run: {step.name}',
                      airflow_dag_id=self.dag_id,
                      airflow_dag_execution_time=start_time,
-                     marquez_run_id=marquez_jobrun_id,
+                     marquez_run_id=external_run_id,
                      marquez_namespace=self.marquez_namespace,
                      duration_ms=(self._now_ms() - report_job_start_ms))
 
@@ -288,7 +300,7 @@ class DAG(airflow.models.DAG):
 
     def get_marquez_client(self):
         if not self._marquez_client:
-            self._marquez_client = MarquezClient()
+            self._marquez_client = Clients.new_write_only_client()
         return self._marquez_client
 
     @staticmethod
