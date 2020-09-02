@@ -44,7 +44,7 @@ class MarquezWriteOnlyClient(object):
             payload['description'] = description
 
         return self._backend.put(
-            self.path('/namespaces/{0}', namespace_name),
+            self._path('/namespaces/{0}', namespace_name),
             headers=_HEADERS,
             json=payload
         )
@@ -66,7 +66,7 @@ class MarquezWriteOnlyClient(object):
             payload['description'] = description
 
         return self._backend.put(
-            self.path('/sources/{0}', source_name),
+            self._path('/sources/{0}', source_name),
             headers=_HEADERS,
             json=payload)
 
@@ -106,8 +106,8 @@ class MarquezWriteOnlyClient(object):
             payload['schemaLocation'] = schema_location
 
         return self._backend.put(
-            self.path('/namespaces/{0}/datasets/{1}', namespace_name,
-                      dataset_name),
+            self._path('/namespaces/{0}/datasets/{1}', namespace_name,
+                       dataset_name),
             headers=_HEADERS,
             json=payload
         )
@@ -136,7 +136,7 @@ class MarquezWriteOnlyClient(object):
             payload['description'] = description
 
         return self._backend.put(
-            self.path('/namespaces/{0}/jobs/{1}', namespace_name, job_name),
+            self._path('/namespaces/{0}/jobs/{1}', namespace_name, job_name),
             headers=_HEADERS,
             json=payload
         )
@@ -162,8 +162,8 @@ class MarquezWriteOnlyClient(object):
             payload['runArgs'] = run_args
 
         response = self._backend.post(
-            self.path('/namespaces/{0}/jobs/{1}/runs',
-                      namespace_name, job_name),
+            self._path('/namespaces/{0}/jobs/{1}/runs',
+                       namespace_name, job_name),
             headers=_HEADERS,
             json=payload)
 
@@ -189,14 +189,14 @@ class MarquezWriteOnlyClient(object):
         Utils.is_valid_uuid(run_id, 'run_id')
 
         return self._backend.post(
-            self.path('/jobs/runs/{0}/{1}?at={2}', run_id, action,
-                      action_at if action_at else Utils.utc_now()),
+            self._path('/jobs/runs/{0}/{1}?at={2}', run_id, action,
+                       action_at if action_at else Utils.utc_now()),
             headers=_HEADERS,
             json={}
         )
 
     # Common
     @staticmethod
-    def path(self, path, *args):
+    def _path(path_template, *args):
         encoded_args = [quote(arg.encode('utf-8'), safe='') for arg in args]
-        return f'{_API_PATH}{path.format(*encoded_args)}'
+        return f'{_API_PATH}{path_template.format(*encoded_args)}'
