@@ -20,7 +20,13 @@ log = logging.getLogger(__name__)
 
 class FileBackend(Backend):
     def __init__(self, file):
-        self._file = open(file, 'a')
+        self._file = open(self._mkdir_if_not_exists(file), 'a')
+
+    @staticmethod
+    def _mkdir_if_not_exists(file):
+        path, _ = os.path.split(file)
+        os.makedirs(path, exist_ok=True)
+        return file
 
     def put(self, path, headers, json):
         log.debug("_put()")
