@@ -21,9 +21,6 @@ import static marquez.common.models.ModelGenerator.newDescription;
 import static marquez.common.models.ModelGenerator.newJobName;
 import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
-import static marquez.common.models.RunState.COMPLETED;
-import static marquez.common.models.RunState.NEW;
-import static marquez.common.models.RunState.RUNNING;
 import static marquez.db.models.ModelGenerator.newJobContextRowWith;
 import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
 import static marquez.db.models.ModelGenerator.newRowUuid;
@@ -35,7 +32,6 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Collection;
@@ -67,11 +63,8 @@ import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
-import marquez.service.models.Run;
-import marquez.service.models.RunMeta;
 import marquez.service.models.Version;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -281,67 +274,5 @@ public class JobServiceTest {
 
     verify(jobDao, times(1)).findAll(NAMESPACE_NAME.getValue(), 4, 0);
     verify(jobVersionDao, times(1)).findBy(JOB_VERSION_ROW.getUuid());
-  }
-
-  @Test
-  @Ignore
-  // TODO: Add use of mocking
-  public void testRun() throws MarquezServiceException, MalformedURLException {
-    JobName jobName = JobName.of("MY_JOB");
-    Job job =
-        jobService.createOrUpdate(
-            NAMESPACE_NAME,
-            jobName,
-            new JobMeta(
-                BATCH,
-                ImmutableSet.of(),
-                ImmutableSet.of(),
-                Utils.toUrl("https://github.com/repo/test/commit/foo"),
-                ImmutableMap.of(),
-                "description"));
-    Instant startedAt = Instant.now();
-    assertThat(job.getName()).isEqualTo(jobName);
-    assertThat(job.getId().getNamespace()).isEqualTo(NAMESPACE_NAME);
-    assertThat(job.getId().getName()).isEqualTo(jobName);
-    assertThat(job.getId()).isEqualTo(new JobId(NAMESPACE_NAME, jobName));
-    Run run = jobService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
-    assertThat(run.getId()).isNotNull();
-    assertThat(run.getStartedAt().isPresent()).isFalse();
-    jobService.markRunAs(run.getId(), RUNNING, startedAt);
-    Optional<Run> startedRun = jobService.getRun(run.getId());
-    assertThat(startedRun.isPresent()).isTrue();
-    assertThat(startedRun.get().getStartedAt().isPresent()).isTrue();
-    assertThat(startedRun.get().getStartedAt().get()).isEqualTo(startedAt);
-    assertThat(startedRun.get().getEndedAt().isPresent()).isFalse();
-    Instant endedAt = Instant.now();
-    jobService.markRunAs(run.getId(), COMPLETED, endedAt);
-    Optional<Run> endedRun = jobService.getRun(run.getId());
-    assertThat(endedRun.isPresent()).isTrue();
-    assertThat(endedRun.get().getStartedAt()).isEqualTo(startedRun.get().getStartedAt());
-    assertThat(endedRun.get().getEndedAt().isPresent()).isTrue();
-    assertThat(endedRun.get().getEndedAt().get()).isEqualTo(endedAt);
-    List<Run> allRuns = jobService.getAllRunsFor(NAMESPACE_NAME, jobName, 10, 0);
-    assertThat(allRuns.size()).isEqualTo(1);
-    assertThat(allRuns.get(0).getEndedAt()).isEqualTo(endedRun.get().getEndedAt());
-
-    assertThat(jobInputUpdates.size()).isEqualTo(1);
-    JobInputUpdate jobInputUpdate = jobInputUpdates.get(0);
-    assertThat(jobInputUpdate.getRunId()).isEqualTo(run.getId());
-    assertThat(jobInputUpdate.getJobVersionId().getName()).isEqualTo(jobName);
-
-    assertThat(jobOutputUpdates.size()).isEqualTo(1);
-    JobOutputUpdate jobOutputUpdate = jobOutputUpdates.get(0);
-    assertThat(jobOutputUpdate.getRunId()).isEqualTo(run.getId());
-
-    assertThat(runTransitions.size()).isEqualTo(3);
-    RunTransition newRun = runTransitions.get(0);
-    assertThat(newRun.getRunId()).isEqualTo(run.getId());
-    assertThat(newRun.getNewState()).isEqualTo(NEW);
-    RunTransition runningRun = runTransitions.get(1);
-    assertThat(runningRun.getRunId()).isEqualTo(run.getId());
-    assertThat(runningRun.getNewState()).isEqualTo(RUNNING);
-    RunTransition completedRun = runTransitions.get(2);
-    assertThat(completedRun.getRunId()).isEqualTo(run.getId());
-    assertThat(completedRun.getNewState()).isEqualTo(COMPLETED);
   }
 }

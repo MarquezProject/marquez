@@ -35,7 +35,7 @@ repositories {
 }
 
 ext {
-  dropwizardVersion = '2.0.9'
+  dropwizardVersion = '2.0.12'
   jdbi3Version = '3.13.0'
   lombokVersion = '1.18.12'
   prometheusVersion = '0.9.0'
@@ -103,6 +103,12 @@ task sourceJar(type: Jar) {
 task javadocJar(type: Jar, dependsOn: javadoc) {
   classifier 'javadoc'
   from javadoc.destinationDir
+}
+
+release {
+  git {
+    requireBranch = 'main'
+  }
 }
 
 publishing {

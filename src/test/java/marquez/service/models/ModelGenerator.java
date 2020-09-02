@@ -144,9 +144,13 @@ public final class ModelGenerator extends Generator {
   }
 
   public static RunMeta newRunMeta() {
+    return newRunMeta(null);
+  }
+
+  public static RunMeta newRunMeta(RunId runId) {
     final Instant nominalStartTime = newTimestamp();
     final Instant nominalEndTime = nominalStartTime.plus(1, HOURS);
-    return new RunMeta(nominalStartTime, nominalEndTime, newRunArgs());
+    return new RunMeta(runId, nominalStartTime, nominalEndTime, newRunArgs());
   }
 
   public static Run newRun() {
