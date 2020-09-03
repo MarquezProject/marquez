@@ -182,7 +182,7 @@ class DAG(airflow.models.DAG):
                 name=task_name,
                 context={
                     'airflow.operator': task.__class__.__name__,
-                    'airflow.task_info': task.__dict__
+                    'airflow.task_info': str(task.__dict__)
                 })]
 
         # store all the JobRuns associated with a task
