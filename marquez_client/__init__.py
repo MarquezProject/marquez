@@ -12,3 +12,4 @@
 
 from marquez_client.client import MarquezClient
 from marquez_client.client_wo import MarquezWriteOnlyClient
+from marquez_client.clients import Clients

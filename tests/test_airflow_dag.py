@@ -19,7 +19,7 @@ import uuid
 
 import yaml
 
-from marquez_client.clients import Clients
+from marquez_client import Clients
 from marquez_client.models import (SourceType, DatasetType, JobType)
 
 from marquez_client.utils import Utils

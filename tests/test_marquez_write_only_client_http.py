@@ -13,7 +13,7 @@ import datetime
 import unittest
 
 from marquez_client.models import DatasetType, SourceType, JobType, RunState
-from marquez_client.clients import Clients
+from marquez_client import Clients
 
 import uuid
 import logging
