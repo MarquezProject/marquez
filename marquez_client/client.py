@@ -256,7 +256,7 @@ class MarquezClient(object):
             payload['nominalEndTime'] = nominal_end_time
 
         if run_args:
-            payload['runArgs'] = run_args
+            payload['args'] = run_args
 
         response = self._post(
             self._url('/namespaces/{0}/jobs/{1}/runs',

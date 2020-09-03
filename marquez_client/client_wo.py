@@ -159,7 +159,7 @@ class MarquezWriteOnlyClient(object):
             payload['nominalEndTime'] = nominal_end_time
 
         if run_args:
-            payload['runArgs'] = run_args
+            payload['args'] = run_args
 
         response = self._backend.post(
             self._path('/namespaces/{0}/jobs/{1}/runs',

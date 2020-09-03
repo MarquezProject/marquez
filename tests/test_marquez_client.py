@@ -288,7 +288,7 @@ class TestMarquezClient(unittest.TestCase):
             'startedAt': f'{action_at}',
             'endedAt': None,
             'durationMs': None,
-            'run_args': {
+            'args': {
                 "email": "me@mycorp.com",
                 "emailOnFailure": "true",
                 "emailOnRetry": "true",
@@ -307,7 +307,7 @@ class TestMarquezClient(unittest.TestCase):
         )
 
         assert response['id'] is not None
-        assert str(response['run_args']) == str(run_args)
+        assert str(response['args']) == str(run_args)
         assert str(response['startedAt']) == action_at
 
     @mock.patch("marquez_client.client.MarquezClient._post")
