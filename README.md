@@ -29,6 +29,32 @@ To install from source, run:
 ```bash
 $ python3 setup.py install
 ```
+## Settings
+
+### Pointing to your Marquez service
+`marquez-airflow` needs to know where to talk to the Marquez server API.  You can set these using environment variables to be read by your Airflow service.
+
+You will also need to set the namespace if you are using something other than the `default` namespace.
+```
+MARQUEZ_URL=http://my_hosted_marquez.example.com:5000
+MARQUEZ_NAMESPACE=my_special_ns
+```
+
+*NOTE: In the latest version of `marquez-python`, the constructor requires a `url` parameter for the host and port.  Presumably, the logic to read the env vars will move into this library*
+
+### Extractors : Sending the correct data from your DAGs
+If you do nothing, Marquez will receive the `Job` and the `Run` from your DAGs, but sources and datasets will not be sent.
+
+`marquez-airflow` allows you to do more than that by building "Extractors".  Extractors are in the process of changing right now, but they basically take a task and extract:
+1. Name : The name of the task
+1. Location : Location of the code for the task
+1. Inputs : List of input datasets
+1. Outputs : List of output datasets
+1. Context : The Airflow context for the task
+
+It's important to understand the inputs and outputs are lists and relate directly to the `Dataset` object in Marquez.  Datasets also include a source which relates directly to the `Source` object in Marquez.
+
+*A PostgresExtractor is currently in progress.  When that's merged, it will represent a good example of how to write custom extractors*
 
 ## Usage
 
