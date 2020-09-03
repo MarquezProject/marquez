@@ -10,6 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import os
 
@@ -40,7 +41,7 @@ class FileBackend(Backend):
 
         log.info(put_details)
 
-        self._file.write(f'{put_details}{os.linesep}')
+        self._sync_file(put_details)
 
     def post(self, path, headers, json=None):
         log.debug("_post()")
@@ -54,7 +55,13 @@ class FileBackend(Backend):
 
         log.info(post_details)
 
-        self._file.write(f'{post_details}{os.linesep}')
+        self._sync_file(post_details)
+
+    def _sync_file(self, json_data):
+        self._file.write(json.dumps(json_data))
+        self._file.write(os.linesep)
+        self._file.flush()
+        os.fsync(self._file.fileno())
 
     def __del__(self):
         self._file.close()
