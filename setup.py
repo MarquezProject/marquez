@@ -16,7 +16,7 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 NAME = "marquez-airflow"
-VERSION = "0.2.1"
+VERSION = "0.2.2"
 
 setuptools.setup(
     name=NAME,
