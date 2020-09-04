@@ -1,6 +1,6 @@
 apache-airflow==1.10.11
 codecov==2.1.8
-marquez-python==0.7.3
+marquez-python==0.7.4
 pytest==6.0.1
 pytest-cov==2.10.1
 requests==2.24.0
