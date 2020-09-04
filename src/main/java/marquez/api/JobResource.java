@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import java.net.URI;
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -40,6 +41,7 @@ import lombok.NonNull;
 import lombok.Value;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
+import marquez.api.exceptions.RunAlreadyExistsException;
 import marquez.api.exceptions.RunNotFoundException;
 import marquez.common.Utils;
 import marquez.common.models.JobName;
@@ -131,6 +133,7 @@ public class JobResource {
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, jobName);
+    throwIfExists(namespaceName, jobName, runMeta.getId().orElse(null));
 
     final Run run = jobService.createRun(namespaceName, jobName, runMeta);
     final URI runLocation = locationFor(uriInfo, run);
@@ -244,6 +247,16 @@ public class JobResource {
       throws MarquezServiceException {
     if (!jobService.exists(namespaceName, jobName)) {
       throw new JobNotFoundException(jobName);
+    }
+  }
+
+  void throwIfExists(
+      @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @Nullable RunId runId)
+      throws MarquezServiceException {
+    if (runId != null) {
+      if (jobService.runExists(runId)) {
+        throw new RunAlreadyExistsException(namespaceName, jobName, runId);
+      }
     }
   }
 
