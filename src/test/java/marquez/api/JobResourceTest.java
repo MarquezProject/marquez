@@ -110,7 +110,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testGet_namespaceNotFound() throws MarquezServiceException {
+  public void testGet_throwOnNamespaceNotFound() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
 
     assertThatExceptionOfType(NamespaceNotFoundException.class)
@@ -190,7 +190,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testCreateRun_idAlreadyExists() throws MarquezServiceException {
+  public void testCreateRun_throwOnIdAlreadyExists() throws MarquezServiceException {
     final UriInfo uriInfo = mock(UriInfo.class);
     final RunId runIdExists = newRunId();
     final RunMeta runMetaWithIdExists = newRunMeta(runIdExists);
@@ -206,7 +206,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testCreateRun_namespaceNotFound() throws MarquezServiceException {
+  public void testCreateRun_throwOnNamespaceNotFound() throws MarquezServiceException {
     final UriInfo uriInfo = mock(UriInfo.class);
     final RunMeta runMeta = newRunMeta();
 
@@ -218,7 +218,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testCreateRun_jobNotFound() throws MarquezServiceException {
+  public void testCreateRun_throwOnJobNotFound() throws MarquezServiceException {
     final UriInfo uriInfo = mock(UriInfo.class);
     final RunMeta runMeta = newRunMeta();
 
@@ -273,7 +273,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testMarkRunAs_idNotFound() throws MarquezServiceException {
+  public void testMarkRunAs_throwOnIdNotFound() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(false);
 
     assertThatExceptionOfType(RunNotFoundException.class)
