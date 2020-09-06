@@ -218,6 +218,19 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testCreateRun_jobNotFound() throws MarquezServiceException {
+    final UriInfo uriInfo = mock(UriInfo.class);
+    final RunMeta runMeta = newRunMeta();
+
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(jobService.exists(NAMESPACE_NAME, JOB_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(JobNotFoundException.class)
+        .isThrownBy(() -> jobResource.createRun(NAMESPACE_NAME, JOB_NAME, runMeta, uriInfo))
+        .withMessageContaining(String.format("'%s' not found", JOB_NAME.getValue()));
+  }
+
+  @Test
   public void testGetRun() throws MarquezServiceException {
     final Run run = newRunWith(RUN_ID);
 
