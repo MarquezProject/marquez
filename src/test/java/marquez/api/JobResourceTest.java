@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import marquez.UnitTests;
 import marquez.api.exceptions.JobNotFoundException;
+import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunAlreadyExistsException;
 import marquez.api.exceptions.RunNotFoundException;
 import marquez.common.models.JobId;
@@ -109,6 +110,15 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testGet_namespaceNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(NamespaceNotFoundException.class)
+        .isThrownBy(() -> jobResource.get(NAMESPACE_NAME, JOB_NAME))
+        .withMessageContaining(String.format("'%s' not found", NAMESPACE_NAME.getValue()));
+  }
+
+  @Test
   public void testGet_notFound() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.get(NAMESPACE_NAME, JOB_NAME)).thenReturn(Optional.empty());
@@ -144,11 +154,7 @@ public class JobResourceTest {
 
     final RunMeta runMeta = newRunMeta();
     final Run run = toRun(runMeta);
-    final URI runLocation =
-        URI.create(
-            String.format(
-                "http://localhost:5000/api/v1/namespaces/%s/jobs/%s/runs/%s",
-                NAMESPACE_NAME.getValue(), JOB_NAME.getValue(), run.getId()));
+    final URI runLocation = toRunLocation(NAMESPACE_NAME, JOB_NAME, run);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.exists(NAMESPACE_NAME, JOB_NAME)).thenReturn(true);
@@ -169,11 +175,7 @@ public class JobResourceTest {
     final RunId newRunId = newRunId();
     final RunMeta runMeta = newRunMeta(newRunId);
     final Run run = toRun(runMeta);
-    final URI runLocation =
-        URI.create(
-            String.format(
-                "http://localhost:5000/api/v1/namespaces/%s/jobs/%s/runs/%s",
-                NAMESPACE_NAME.getValue(), JOB_NAME.getValue(), run.getId().getValue()));
+    final URI runLocation = toRunLocation(NAMESPACE_NAME, JOB_NAME, run);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.exists(NAMESPACE_NAME, JOB_NAME)).thenReturn(true);
@@ -201,6 +203,18 @@ public class JobResourceTest {
         .isThrownBy(
             () -> jobResource.createRun(NAMESPACE_NAME, JOB_NAME, runMetaWithIdExists, uriInfo))
         .withMessageContaining(String.format("'%s' already exists", runIdExists.getValue()));
+  }
+
+  @Test
+  public void testCreateRun_namespaceNotFound() throws MarquezServiceException {
+    final UriInfo uriInfo = mock(UriInfo.class);
+    final RunMeta runMeta = newRunMeta();
+
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(NamespaceNotFoundException.class)
+        .isThrownBy(() -> jobResource.createRun(NAMESPACE_NAME, JOB_NAME, runMeta, uriInfo))
+        .withMessageContaining(String.format("'%s' not found", NAMESPACE_NAME.getValue()));
   }
 
   @Test
@@ -246,13 +260,22 @@ public class JobResourceTest {
   }
 
   @Test
+  public void testMarkRunAs_idNotFound() throws MarquezServiceException {
+    when(jobService.runExists(RUN_ID)).thenReturn(false);
+
+    assertThatExceptionOfType(RunNotFoundException.class)
+        .isThrownBy(() -> jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT))
+        .withMessageContaining(String.format("'%s' not found", RUN_ID.getValue()));
+  }
+
+  @Test
   public void testMarkRunAsRunning() throws MarquezServiceException {
     when(jobService.runExists(RUN_ID)).thenReturn(true);
 
     final Run running = newRunWith(RUN_ID, RUNNING, TRANSITIONED_AT);
     doReturn(Response.ok(running).build()).when(jobResource).getRun(RUN_ID);
 
-    final Response response = jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT);
+    final Response response = jobResource.markRunAsRunning(RUN_ID, TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(running);
   }
@@ -264,7 +287,7 @@ public class JobResourceTest {
     final Run completed = newRunWith(RUN_ID, COMPLETED, TRANSITIONED_AT);
     doReturn(Response.ok(completed).build()).when(jobResource).getRun(RUN_ID);
 
-    final Response response = jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT);
+    final Response response = jobResource.markRunAsCompleted(RUN_ID, TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(completed);
   }
@@ -276,7 +299,7 @@ public class JobResourceTest {
     final Run failed = newRunWith(RUN_ID, FAILED, TRANSITIONED_AT);
     doReturn(Response.ok(failed).build()).when(jobResource).getRun(RUN_ID);
 
-    final Response response = jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT);
+    final Response response = jobResource.markRunAsFailed(RUN_ID, TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(failed);
   }
@@ -288,7 +311,7 @@ public class JobResourceTest {
     final Run aborted = newRunWith(RUN_ID, ABORTED, TRANSITIONED_AT);
     doReturn(Response.ok(aborted).build()).when(jobResource).getRun(RUN_ID);
 
-    final Response response = jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT);
+    final Response response = jobResource.markRunAsAborted(RUN_ID, TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(aborted);
   }
@@ -322,5 +345,13 @@ public class JobResourceTest {
         null,
         null,
         runMeta.getArgs());
+  }
+
+  static URI toRunLocation(
+      final NamespaceName namespaceName, final JobName jobName, final Run run) {
+    return URI.create(
+        String.format(
+            "http://localhost:5000/api/v1/namespaces/%s/jobs/%s/runs/%s",
+            namespaceName.getValue(), jobName.getValue(), run.getId().getValue()));
   }
 }
