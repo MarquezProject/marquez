@@ -190,7 +190,7 @@ public class JobResourceTest {
   }
 
   @Test
-  public void testCreateRunWithIdAlreadyExists() throws MarquezServiceException {
+  public void testCreateRun_idAlreadyExists() throws MarquezServiceException {
     final UriInfo uriInfo = mock(UriInfo.class);
     final RunId runIdExists = newRunId();
     final RunMeta runMetaWithIdExists = newRunMeta(runIdExists);
