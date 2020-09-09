@@ -9,9 +9,28 @@
 
 A library that integrates [Airflow `DAGs`]() with [Marquez](https://github.com/MarquezProject/marquez) for automatic metadata collection.
 
+## Features
+
+**Metadata**
+
+* Task lifecycle
+* Task parameters
+* Task runs linked to **versioned** code
+* Task inputs / outputs
+
+**Lineage**
+
+* Track inter-DAG dependencies
+
+**Built-in**
+
+* SQL parser
+* Link to code builder (ex: **GitHub**)
+* Metadata extractors
+
 ## Status
 
-This library is under active development at [Datakin](https://twitter.com/DatakinHQ). 
+This library is under active development with a rapidly evolving API and we'd love your help!
 
 ## Requirements
 
@@ -24,11 +43,14 @@ This library is under active development at [Datakin](https://twitter.com/Dataki
 $ pip3 install marquez-airflow
 ```
 
+> **Note:** You can also add `marquez-airflow` to your `requirements.txt` for Airflow.
+
 To install from source, run:
 
 ```bash
 $ python3 setup.py install
 ```
+
 ## Settings
 
 ### Pointing to your Marquez service
@@ -57,6 +79,22 @@ It's important to understand the inputs and outputs are lists and relate directl
 *A PostgresExtractor is currently in progress.  When that's merged, it will represent a good example of how to write custom extractors*
 
 ## Usage
+
+To begin collecting Airflow DAG metadata with Marquez, use:
+
+```diff
+- from airflow import DAG
++ from marquez_airflow import DAG
+```
+
+When enabled, the library will:
+
+1. On DAG **start**, collect metadata for each task using an `Extractor` (the library defines a _default_ extractor to use otherwise)
+2. Collect task input / output metadata (`source`, `schema`, etc)
+3. Collect task run-level metadata (execution time, state, parameters, etc)
+4. On DAG **complete**, also mark the task as _complete_ in Marquez  
+
+## Example
 
 ```python
 from datetime import datetime
