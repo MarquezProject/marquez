@@ -266,25 +266,26 @@ public class MarquezClientTest {
 
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
 
+  @Mock private MarquezUrl marquezUrl;
   @Mock private MarquezHttp http;
   private MarquezClient client;
 
   @Before
   public void setUp() {
-    client = new MarquezClient(http);
+    client = new MarquezClient(marquezUrl, http);
   }
 
   @Test
   public void testClientBuilder_default() {
     final MarquezClient client = MarquezClient.builder().build();
-    assertThat(client.http.baseUrl).isEqualTo(DEFAULT_BASE_URL);
+    assertThat(client.url.baseUrl).isEqualTo(DEFAULT_BASE_URL);
   }
 
   @Test
   public void testClientBuilder_overrideUrl() throws Exception {
     final URL url = new URL("http://test.com:8080/api/v1");
     final MarquezClient client = MarquezClient.builder().baseUrl(url).build();
-    assertThat(client.http.baseUrl).isEqualTo(url);
+    assertThat(client.url.baseUrl).isEqualTo(url);
   }
 
   @Test
@@ -299,7 +300,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
 
     final NamespaceMeta meta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
@@ -316,7 +317,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
 
     final String namespaceAsJson = JsonGenerator.newJsonFor(NAMESPACE);
     when(http.get(url)).thenReturn(namespaceAsJson);
@@ -330,7 +331,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/sources/%s";
     final String path = buildPathFor(pathTemplate, SOURCE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, SOURCE_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, SOURCE_NAME)).thenReturn(url);
 
     final SourceMeta meta =
         SourceMeta.builder()
@@ -351,7 +352,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/sources/%s";
     final String path = buildPathFor(pathTemplate, SOURCE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, SOURCE_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, SOURCE_NAME)).thenReturn(url);
 
     final String sourceAsJson = JsonGenerator.newJsonFor(SOURCE);
     when(http.get(url)).thenReturn(sourceAsJson);
@@ -365,7 +366,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
 
     final DbTableMeta meta =
         DbTableMeta.builder()
@@ -390,7 +391,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
 
     final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
     when(http.get(url)).thenReturn(dbTableAsJson);
@@ -405,7 +406,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
 
     final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
     when(http.get(url)).thenReturn(dbTableAsJson);
@@ -431,7 +432,7 @@ public class MarquezClientTest {
         client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, modifiedMeta);
     assertThat(modifiedDataset).isInstanceOf(DbTable.class);
     assertThat((DbTable) modifiedDataset).isEqualTo(DB_TABLE_MODIFIED);
-    assertThat(modifiedDataset.getLastModifiedAt().get().isAfter(beforeModified));
+    assertThat(modifiedDataset.getLastModifiedAt().get().isAfter(beforeModified)).isFalse();
   }
 
   @Test
@@ -439,7 +440,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
 
     final StreamMeta meta =
         StreamMeta.builder()
@@ -464,7 +465,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
 
     final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
     when(http.get(url)).thenReturn(streamAsJson);
@@ -478,7 +479,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s/datasets/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
 
     final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
     when(http.get(url)).thenReturn(streamAsJson);
@@ -504,7 +505,7 @@ public class MarquezClientTest {
     final Dataset modifiedDataset = client.createDataset(NAMESPACE_NAME, STREAM_NAME, modifiedMeta);
     assertThat(modifiedDataset).isInstanceOf(Stream.class);
     assertThat((Stream) modifiedDataset).isEqualTo(STREAM_MODIFIED);
-    assertThat(modifiedDataset.getLastModifiedAt().get().isAfter(beforeModified));
+    assertThat(modifiedDataset.getLastModifiedAt().get().isAfter(beforeModified)).isFalse();
   }
 
   @Test
@@ -512,7 +513,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s/jobs/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
 
     final JobMeta meta =
         JobMeta.builder()
@@ -536,7 +537,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s/jobs/%s";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
 
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
     when(http.get(url)).thenReturn(jobAsJson);
@@ -550,7 +551,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/namespaces/%s/jobs/%s/runs";
     final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
 
     final RunMeta meta =
         RunMeta.builder()
@@ -571,7 +572,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/jobs/runs/%s";
     final String path = buildPathFor(pathTemplate, NEW.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, NEW.getId())).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, NEW.getId())).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(NEW);
     when(http.get(url)).thenReturn(runAsJson);
@@ -585,7 +586,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/jobs/runs/%s/start";
     final String path = buildPathFor(pathTemplate, RUNNING.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, ImmutableMap.of(), RUNNING.getId())).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, ImmutableMap.of(), RUNNING.getId())).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(RUNNING);
     when(http.post(url)).thenReturn(runAsJson);
@@ -601,7 +602,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/jobs/runs/%s/complete";
     final String path = buildPathFor(pathTemplate, COMPLETED.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, ImmutableMap.of(), COMPLETED.getId())).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, ImmutableMap.of(), COMPLETED.getId())).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(COMPLETED);
     when(http.post(url)).thenReturn(runAsJson);
@@ -617,7 +618,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/jobs/runs/%s/abort";
     final String path = buildPathFor(pathTemplate, ABORTED.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, ImmutableMap.of(), ABORTED.getId())).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, ImmutableMap.of(), ABORTED.getId())).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(ABORTED);
     when(http.post(url)).thenReturn(runAsJson);
@@ -633,7 +634,7 @@ public class MarquezClientTest {
     final String pathTemplate = "/jobs/runs/%s/fail";
     final String path = buildPathFor(pathTemplate, FAILED.getId());
     final URL url = buildUrlFor(path);
-    when(http.url(pathTemplate, ImmutableMap.of(), FAILED.getId())).thenReturn(url);
+    when(this.marquezUrl.from(pathTemplate, ImmutableMap.of(), FAILED.getId())).thenReturn(url);
 
     final String runAsJson = JsonGenerator.newJsonFor(FAILED);
     when(http.post(url)).thenReturn(runAsJson);

@@ -27,14 +27,17 @@ import marquez.client.Utils;
 @EqualsAndHashCode
 @ToString
 public class RunMeta {
+  @Getter @Nullable private final String id;
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
   @Getter private final Map<String, String> args;
 
   public RunMeta(
+      @Nullable final String id,
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
       @Nullable final Map<String, String> args) {
+    this.id = id;
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;
     this.args = (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
@@ -57,12 +60,18 @@ public class RunMeta {
   }
 
   public static final class Builder {
+    @Nullable private String id;
     @Nullable private Instant nominalStartTime;
     @Nullable private Instant nominalEndTime;
     @Nullable private Map<String, String> args;
 
     private Builder() {
       this.args = ImmutableMap.of();
+    }
+
+    public Builder id(String id) {
+      this.id = id;
+      return this;
     }
 
     public Builder nominalStartTime(@Nullable Instant nominalStartTime) {
@@ -81,7 +90,7 @@ public class RunMeta {
     }
 
     public RunMeta build() {
-      return new RunMeta(nominalStartTime, nominalEndTime, args);
+      return new RunMeta(id, nominalStartTime, nominalEndTime, args);
     }
   }
 }

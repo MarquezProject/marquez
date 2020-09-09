@@ -28,7 +28,6 @@ import marquez.client.Utils;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class Run extends RunMeta {
-  @Getter private final String id;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final RunState state;
@@ -47,8 +46,7 @@ public final class Run extends RunMeta {
       @Nullable final Instant endedAt,
       @Nullable final Long durationMs,
       @Nullable final Map<String, String> args) {
-    super(nominalStartTime, nominalEndTime, args);
-    this.id = id;
+    super(id, nominalStartTime, nominalEndTime, args);
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.state = state;

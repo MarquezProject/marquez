@@ -18,9 +18,9 @@ plugins {
   id 'java-library'
   id 'maven-publish'
   id 'signing'
-  id "com.github.spotbugs" version "3.0.0"
+  id 'com.github.spotbugs' version '4.5.0'
   id 'com.adarshr.test-logger' version '1.7.0'
-  id 'com.diffplug.gradle.spotless' version '3.23.1'
+  id 'com.diffplug.spotless' version '5.1.0'
   id 'com.github.jk1.dependency-license-report' version '1.9'
   id 'net.researchgate.release' version '2.8.0'
 }
@@ -196,10 +196,20 @@ spotbugsMain {
   }
 }
 
+spotbugsTest {
+  ignoreFailures = true
+  effort = 'max'
+  reportLevel = 'low'
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+}
+
 def coverageDir = "${reportsDir}/coverage";
 
 jacoco {
-  toolVersion = '0.8.2'
+  toolVersion = '0.8.5'
   reportsDir = file(coverageDir)
 }
 

@@ -21,13 +21,9 @@ import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Value;
@@ -37,25 +33,22 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 @Slf4j
 class MarquezHttp {
-  @VisibleForTesting final URL baseUrl;
   private final HttpClient http;
 
-  MarquezHttp(final URL baseUrl, final HttpClient http) {
-    this.baseUrl = baseUrl;
+  MarquezHttp(final HttpClient http) {
     this.http = http;
   }
 
-  static final MarquezHttp create(final URL baseUrl, final MarquezClient.Version version) {
+  static final MarquezHttp create(final MarquezClient.Version version) {
     final UserAgent userAgent = UserAgent.of(version);
     final HttpClient http = HttpClientBuilder.create().setUserAgent(userAgent.getValue()).build();
-    return new MarquezHttp(baseUrl, http);
+    return new MarquezHttp(http);
   }
 
   String post(URL url) {
@@ -126,24 +119,6 @@ class MarquezHttp {
     final int code = response.getStatusLine().getStatusCode();
     if (code >= 400 && code < 600) { // non-2xx
       throw new MarquezHttpException(HttpError.of(response));
-    }
-  }
-
-  URL url(String pathTemplate, @Nullable String... pathArgs) {
-    return url(String.format(pathTemplate, (Object[]) pathArgs), ImmutableMap.of());
-  }
-
-  URL url(String pathTemplate, Map<String, Object> queryParams, @Nullable String... pathArgs) {
-    return url(String.format(pathTemplate, (Object[]) pathArgs), queryParams);
-  }
-
-  URL url(String path, Map<String, Object> queryParams) {
-    try {
-      final URIBuilder builder = new URIBuilder(baseUrl.toURI()).setPath(baseUrl.getPath() + path);
-      queryParams.forEach((name, value) -> builder.addParameter(name, String.valueOf(value)));
-      return builder.build().toURL();
-    } catch (URISyntaxException | MalformedURLException e) {
-      throw new MarquezHttpException();
     }
   }
 

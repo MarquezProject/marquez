@@ -52,7 +52,7 @@ public final class JsonGenerator {
   public static String newJsonFor(final SourceMeta meta) {
     return MAPPER
         .createObjectNode()
-        .put("type", meta.getType().toString())
+        .put("type", meta.getType())
         .put("connectionUrl", meta.getConnectionUrl().toString())
         .put("description", meta.getDescription().orElse(null))
         .toString();
@@ -61,7 +61,7 @@ public final class JsonGenerator {
   public static String newJsonFor(final Source source) {
     return MAPPER
         .createObjectNode()
-        .put("type", source.getType().toString())
+        .put("type", source.getType())
         .put("name", source.getName())
         .put("createdAt", ISO_INSTANT.format(source.getCreatedAt()))
         .put("updatedAt", ISO_INSTANT.format(source.getUpdatedAt()))
