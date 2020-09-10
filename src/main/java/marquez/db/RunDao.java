@@ -123,7 +123,7 @@ public interface RunDao extends SqlObject {
   @SqlQuery(
       SELECT_RUN
           + "WHERE r.job_version_uuid = :jobVersionUuid "
-          + "ORDER BY r.created_at "
+          + "ORDER BY r.created_at DESC "
           + "LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(ExtendedRunRowMapper.class)
   List<ExtendedRunRow> findAll(UUID jobVersionUuid, int limit, int offset);

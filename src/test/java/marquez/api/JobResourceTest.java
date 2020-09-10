@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import marquez.UnitTests;
 import marquez.api.exceptions.JobNotFoundException;
+import marquez.api.exceptions.RunAlreadyExistsException;
 import marquez.api.exceptions.RunNotFoundException;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
@@ -165,14 +166,14 @@ public class JobResourceTest {
   public void testCreateRunWithId() throws MarquezServiceException {
     final UriInfo uriInfo = mock(UriInfo.class);
 
-    RunId newRunId = newRunId();
+    final RunId newRunId = newRunId();
     final RunMeta runMeta = newRunMeta(newRunId);
     final Run run = toRun(runMeta);
     final URI runLocation =
         URI.create(
             String.format(
                 "http://localhost:5000/api/v1/namespaces/%s/jobs/%s/runs/%s",
-                NAMESPACE_NAME.getValue(), JOB_NAME.getValue(), run.getId()));
+                NAMESPACE_NAME.getValue(), JOB_NAME.getValue(), run.getId().getValue()));
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.exists(NAMESPACE_NAME, JOB_NAME)).thenReturn(true);
@@ -184,6 +185,22 @@ public class JobResourceTest {
     assertThat(response.getStatus()).isEqualTo(201);
     assertThat(response.getLocation()).isEqualTo(runLocation);
     assertThat((Run) response.getEntity()).isEqualTo(run);
+  }
+
+  @Test
+  public void testCreateRunWithIdAlreadyExists() throws MarquezServiceException {
+    final UriInfo uriInfo = mock(UriInfo.class);
+    final RunId runIdExists = newRunId();
+    final RunMeta runMetaWithIdExists = newRunMeta(runIdExists);
+
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(jobService.exists(NAMESPACE_NAME, JOB_NAME)).thenReturn(true);
+    when(jobService.runExists(runIdExists)).thenReturn(true);
+
+    assertThatExceptionOfType(RunAlreadyExistsException.class)
+        .isThrownBy(
+            () -> jobResource.createRun(NAMESPACE_NAME, JOB_NAME, runMetaWithIdExists, uriInfo))
+        .withMessageContaining(String.format("'%s' already exists", runIdExists.getValue()));
   }
 
   @Test
