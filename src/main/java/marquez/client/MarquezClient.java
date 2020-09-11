@@ -14,22 +14,22 @@
 
 package marquez.client;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static marquez.client.models.RunState.ABORTED;
+import static marquez.client.models.RunState.COMPLETED;
+import static marquez.client.models.RunState.FAILED;
+import static marquez.client.models.RunState.RUNNING;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -52,9 +52,8 @@ import marquez.client.models.Tag;
 
 @Slf4j
 public class MarquezClient {
-  @VisibleForTesting static final String BASE_PATH = "/api/v1";
 
-  static final URL DEFAULT_BASE_URL = Utils.toUrl("http://localhost:8080" + BASE_PATH);
+  static final URL DEFAULT_BASE_URL = Utils.toUrl("http://localhost:8080");
 
   @VisibleForTesting static final int DEFAULT_LIMIT = 100;
   @VisibleForTesting static final int DEFAULT_OFFSET = 0;
@@ -81,13 +80,12 @@ public class MarquezClient {
 
   public Namespace createNamespace(
       @NonNull String namespaceName, @NonNull NamespaceMeta namespaceMeta) {
-    final String bodyAsJson =
-        http.put(url.from("/namespaces/%s", namespaceName), namespaceMeta.toJson());
+    final String bodyAsJson = http.put(url.toNamespaceUrl(namespaceName), namespaceMeta.toJson());
     return Namespace.fromJson(bodyAsJson);
   }
 
   public Namespace getNamespace(@NonNull String namespaceName) {
-    final String bodyAsJson = http.get(url.from("/namespaces/%s", namespaceName));
+    final String bodyAsJson = http.get(url.toNamespaceUrl(namespaceName));
     return Namespace.fromJson(bodyAsJson);
   }
 
@@ -96,26 +94,26 @@ public class MarquezClient {
   }
 
   public List<Namespace> listNamespaces(int limit, int offset) {
-    final String bodyAsJson = http.get(url.from("/namespaces", newQueryParamsWith(limit, offset)));
+    final String bodyAsJson = http.get(url.toListNamespacesUrl(limit, offset));
     return Namespaces.fromJson(bodyAsJson).getValue();
   }
 
   public Source createSource(@NonNull String sourceName, @NonNull SourceMeta sourceMeta) {
-    final String bodyAsJson = http.put(url.from("/sources/%s", sourceName), sourceMeta.toJson());
+    final String bodyAsJson = http.put(url.toSourceUrl(sourceName), sourceMeta.toJson());
     return Source.fromJson(bodyAsJson);
   }
 
   public Source getSource(@NonNull String sourceName) {
-    final String bodyAsJson = http.get(url.from("/sources/%s", sourceName));
+    final String bodyAsJson = http.get(url.toSourceUrl(sourceName));
     return Source.fromJson(bodyAsJson);
   }
 
-  public List<Source> listSources(String namespaceName) {
-    return listSources(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
+  public List<Source> listSources() {
+    return listSources(DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<Source> listSources(@NonNull String namespaceName, int limit, int offset) {
-    final String bodyAsJson = http.get(url.from("/sources", newQueryParamsWith(limit, offset)));
+  public List<Source> listSources(int limit, int offset) {
+    final String bodyAsJson = http.get(url.toListSourcesUrl(limit, offset));
     return Sources.fromJson(bodyAsJson).getValue();
   }
 
@@ -124,15 +122,12 @@ public class MarquezClient {
       @NonNull String datasetName,
       @NonNull DatasetMeta datasetMeta) {
     final String bodyAsJson =
-        http.put(
-            url.from("/namespaces/%s/datasets/%s", namespaceName, datasetName),
-            datasetMeta.toJson());
+        http.put(url.toDatasetUrl(namespaceName, datasetName), datasetMeta.toJson());
     return Dataset.fromJson(bodyAsJson);
   }
 
   public Dataset getDataset(@NonNull String namespaceName, @NonNull String datasetName) {
-    final String bodyAsJson =
-        http.get(url.from("/namespaces/%s/datasets/%s", namespaceName, datasetName));
+    final String bodyAsJson = http.get(url.toDatasetUrl(namespaceName, datasetName));
     return Dataset.fromJson(bodyAsJson);
   }
 
@@ -141,17 +136,13 @@ public class MarquezClient {
   }
 
   public List<Dataset> listDatasets(@NonNull String namespaceName, int limit, int offset) {
-    final String bodyAsJson =
-        http.get(
-            url.from("/namespaces/%s/datasets", newQueryParamsWith(limit, offset), namespaceName));
+    final String bodyAsJson = http.get(url.toListDatasetsUrl(namespaceName, limit, offset));
     return Datasets.fromJson(bodyAsJson).getValue();
   }
 
   public Dataset tagDatasetWith(
       @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
-    final String bodyAsJson =
-        http.post(
-            url.from("/namespaces/%s/datasets/%s/tags/%s", namespaceName, datasetName, tagName));
+    final String bodyAsJson = http.post(url.toDatasetTagUrl(namespaceName, datasetName, tagName));
     return Dataset.fromJson(bodyAsJson);
   }
 
@@ -161,22 +152,18 @@ public class MarquezClient {
       @NonNull String fieldName,
       @NonNull String tagName) {
     final String bodyAsJson =
-        http.post(
-            url.from(
-                "/namespaces/%s/datasets/%s/fields/%s/tags/%s",
-                namespaceName, datasetName, fieldName, tagName));
+        http.post(url.toFieldTagURL(namespaceName, datasetName, fieldName, tagName));
     return Dataset.fromJson(bodyAsJson);
   }
 
   public Job createJob(
       @NonNull String namespaceName, @NonNull String jobName, @NonNull JobMeta jobMeta) {
-    final String bodyAsJson =
-        http.put(url.from("/namespaces/%s/jobs/%s", namespaceName, jobName), jobMeta.toJson());
+    final String bodyAsJson = http.put(url.toJobUrl(namespaceName, jobName), jobMeta.toJson());
     return Job.fromJson(bodyAsJson);
   }
 
   public Job getJob(@NonNull String namespaceName, @NonNull String jobName) {
-    final String bodyAsJson = http.get(url.from("/namespaces/%s/jobs/%s", namespaceName, jobName));
+    final String bodyAsJson = http.get(url.toJobUrl(namespaceName, jobName));
     return Job.fromJson(bodyAsJson);
   }
 
@@ -185,8 +172,7 @@ public class MarquezClient {
   }
 
   public List<Job> listJobs(@NonNull String namespaceName, int limit, int offset) {
-    final String bodyAsJson =
-        http.get(url.from("/namespaces/%s/jobs", newQueryParamsWith(limit, offset), namespaceName));
+    final String bodyAsJson = http.get(url.toListJobsUrl(namespaceName, limit, offset));
     return Jobs.fromJson(bodyAsJson).getValue();
   }
 
@@ -200,8 +186,7 @@ public class MarquezClient {
       @NonNull RunMeta runMeta,
       boolean markRunAsRunning) {
     final String bodyAsJson =
-        http.post(
-            url.from("/namespaces/%s/jobs/%s/runs", namespaceName, jobName), runMeta.toJson());
+        http.post(url.toCreateRunUrl(namespaceName, jobName), runMeta.toJson());
     final Run run = Run.fromJson(bodyAsJson);
     return (markRunAsRunning) ? markRunAsRunning(run.getId()) : run;
   }
@@ -211,7 +196,7 @@ public class MarquezClient {
   }
 
   public Run getRun(@NonNull String runId) {
-    final String bodyAsJson = http.get(url.from("/jobs/runs/%s", runId));
+    final String bodyAsJson = http.get(url.toRunUrl(runId));
     return Run.fromJson(bodyAsJson);
   }
 
@@ -221,11 +206,7 @@ public class MarquezClient {
 
   public List<Run> listRuns(
       @NonNull String namespaceName, @NonNull String jobName, int limit, int offset) {
-    final String bodyAsJson =
-        http.get(
-            url.from(
-                "/namespaces/%s/jobs/%s/runs",
-                newQueryParamsWith(limit, offset), namespaceName, jobName));
+    final String bodyAsJson = http.get(url.toListRunsUrl(namespaceName, jobName, limit, offset));
     return Runs.fromJson(bodyAsJson).getValue();
   }
 
@@ -234,19 +215,8 @@ public class MarquezClient {
   }
 
   public Run markRunAs(String runId, @NonNull RunState runState, @Nullable Instant at) {
-    switch (runState) {
-      case RUNNING:
-        return markRunAsRunning(runId, at);
-      case COMPLETED:
-        return markRunAsCompleted(runId, at);
-      case ABORTED:
-        return markRunAsAborted(runId, at);
-      case FAILED:
-        return markRunAsFailed(runId, at);
-      default:
-        throw new IllegalArgumentException(
-            String.format("Unexpected run state: %s", runState.name()));
-    }
+    final String bodyAsJson = http.post(url.toRunTransitionUrl(runId, runState, at));
+    return Run.fromJson(bodyAsJson);
   }
 
   public Run markRunAsRunning(String runId) {
@@ -254,7 +224,7 @@ public class MarquezClient {
   }
 
   public Run markRunAsRunning(String runId, @Nullable Instant at) {
-    return markRunWith("/jobs/runs/%s/start", runId, at);
+    return markRunAs(runId, RUNNING, at);
   }
 
   public Run markRunAsCompleted(String runId) {
@@ -262,7 +232,7 @@ public class MarquezClient {
   }
 
   public Run markRunAsCompleted(String runId, @Nullable Instant at) {
-    return markRunWith("/jobs/runs/%s/complete", runId, at);
+    return markRunAs(runId, COMPLETED, at);
   }
 
   public Run markRunAsAborted(String runId) {
@@ -270,7 +240,7 @@ public class MarquezClient {
   }
 
   public Run markRunAsAborted(String runId, @Nullable Instant at) {
-    return markRunWith("/jobs/runs/%s/abort", runId, at);
+    return markRunAs(runId, ABORTED, at);
   }
 
   public Run markRunAsFailed(String runId) {
@@ -278,12 +248,7 @@ public class MarquezClient {
   }
 
   public Run markRunAsFailed(String runId, @Nullable Instant at) {
-    return markRunWith("/jobs/runs/%s/fail", runId, at);
-  }
-
-  private Run markRunWith(String pathTemplate, @NonNull String runId, @Nullable Instant at) {
-    final String bodyAsJson = http.post(url.from(pathTemplate, newQueryParamsWith(at), runId));
-    return Run.fromJson(bodyAsJson);
+    return markRunAs(runId, FAILED, at);
   }
 
   public Set<Tag> listTags() {
@@ -291,18 +256,8 @@ public class MarquezClient {
   }
 
   public Set<Tag> listTags(int limit, int offset) {
-    final String bodyAsJson = http.get(url.from("/tags", newQueryParamsWith(limit, offset)));
+    final String bodyAsJson = http.get(url.toListTagsUrl(limit, offset));
     return Tags.fromJson(bodyAsJson).getValue();
-  }
-
-  private Map<String, Object> newQueryParamsWith(@Nullable Instant at) {
-    return (at == null) ? ImmutableMap.of() : ImmutableMap.of("at", ISO_INSTANT.format(at));
-  }
-
-  private Map<String, Object> newQueryParamsWith(int limit, int offset) {
-    checkArgument(limit >= 0, "limit must be >= 0");
-    checkArgument(offset >= 0, "offset must be >= 0");
-    return ImmutableMap.of("limit", limit, "offset", offset);
   }
 
   public static final class Builder {

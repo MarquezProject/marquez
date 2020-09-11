@@ -16,6 +16,7 @@ package marquez.client;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
+import static marquez.client.MarquezPathV1.BASE_PATH;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newContext;
 import static marquez.client.models.ModelGenerator.newDatasetIdWith;
@@ -43,13 +44,21 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import marquez.client.MarquezClient.Datasets;
+import marquez.client.MarquezClient.Jobs;
+import marquez.client.MarquezClient.Namespaces;
+import marquez.client.MarquezClient.Runs;
+import marquez.client.MarquezClient.Sources;
+import marquez.client.MarquezClient.Tags;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DbTable;
@@ -69,6 +78,7 @@ import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
+import marquez.client.models.Tag;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -266,7 +276,7 @@ public class MarquezClientTest {
 
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
 
-  @Mock private MarquezUrl marquezUrl;
+  private MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;
   private MarquezClient client;
 
@@ -297,10 +307,7 @@ public class MarquezClientTest {
 
   @Test
   public void testCreateNamespace() throws Exception {
-    final String pathTemplate = "/namespaces/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s", NAMESPACE_NAME);
 
     final NamespaceMeta meta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
@@ -314,24 +321,23 @@ public class MarquezClientTest {
 
   @Test
   public void testGetNamespace() throws Exception {
-    final String pathTemplate = "/namespaces/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME)).thenReturn(url);
-
     final String namespaceAsJson = JsonGenerator.newJsonFor(NAMESPACE);
-    when(http.get(url)).thenReturn(namespaceAsJson);
-
+    when(http.get(buildUrlFor("/namespaces/%s", NAMESPACE_NAME))).thenReturn(namespaceAsJson);
     final Namespace namespace = client.getNamespace(NAMESPACE_NAME);
     assertThat(namespace).isEqualTo(NAMESPACE);
   }
 
   @Test
+  public void testListNamespaces() throws Exception {
+    when(http.get(buildUrlFor("/namespaces?limit=10&offset=0")))
+        .thenReturn(Utils.toJson(new Namespaces(ImmutableList.of(NAMESPACE))));
+    final List<Namespace> namespaces = client.listNamespaces(10, 0);
+    assertThat(namespaces).containsExactly(NAMESPACE);
+  }
+
+  @Test
   public void testCreateSource() throws Exception {
-    final String pathTemplate = "/sources/%s";
-    final String path = buildPathFor(pathTemplate, SOURCE_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, SOURCE_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/sources/%s", SOURCE_NAME);
 
     final SourceMeta meta =
         SourceMeta.builder()
@@ -349,10 +355,7 @@ public class MarquezClientTest {
 
   @Test
   public void testGetSource() throws Exception {
-    final String pathTemplate = "/sources/%s";
-    final String path = buildPathFor(pathTemplate, SOURCE_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, SOURCE_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/sources/%s", SOURCE_NAME);
 
     final String sourceAsJson = JsonGenerator.newJsonFor(SOURCE);
     when(http.get(url)).thenReturn(sourceAsJson);
@@ -362,11 +365,16 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testListSources() throws Exception {
+    when(http.get(buildUrlFor("/sources?limit=10&offset=0")))
+        .thenReturn(Utils.toJson(new Sources(ImmutableList.of(SOURCE))));
+    final List<Source> sources = client.listSources(10, 0);
+    assertThat(sources).asList().containsExactly(SOURCE);
+  }
+
+  @Test
   public void testCreateDbTable() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, DB_TABLE_NAME);
 
     final DbTableMeta meta =
         DbTableMeta.builder()
@@ -388,10 +396,7 @@ public class MarquezClientTest {
 
   @Test
   public void testGetDbTable() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, DB_TABLE_NAME);
 
     final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
     when(http.get(url)).thenReturn(dbTableAsJson);
@@ -403,10 +408,7 @@ public class MarquezClientTest {
 
   @Test
   public void testModifiedDbTable() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, DB_TABLE_NAME);
 
     final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
     when(http.get(url)).thenReturn(dbTableAsJson);
@@ -437,10 +439,7 @@ public class MarquezClientTest {
 
   @Test
   public void testCreateStream() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, STREAM_NAME);
 
     final StreamMeta meta =
         StreamMeta.builder()
@@ -462,10 +461,7 @@ public class MarquezClientTest {
 
   @Test
   public void testGetStream() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, STREAM_NAME);
 
     final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
     when(http.get(url)).thenReturn(streamAsJson);
@@ -476,10 +472,7 @@ public class MarquezClientTest {
 
   @Test
   public void testModifiedStream() throws Exception {
-    final String pathTemplate = "/namespaces/%s/datasets/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, STREAM_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, STREAM_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, STREAM_NAME);
 
     final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
     when(http.get(url)).thenReturn(streamAsJson);
@@ -509,11 +502,16 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testListDatasets() throws Exception {
+    when(http.get(buildUrlFor("/namespaces/%s/datasets?limit=10&offset=0", NAMESPACE_NAME)))
+        .thenReturn(Utils.toJson(new Datasets(ImmutableList.of(STREAM, DB_TABLE))));
+    final List<Dataset> datasets = client.listDatasets(NAMESPACE_NAME, 10, 0);
+    assertThat(datasets).asList().containsExactly(STREAM, DB_TABLE);
+  }
+
+  @Test
   public void testCreateJob() throws Exception {
-    final String pathTemplate = "/namespaces/%s/jobs/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s/jobs/%s", NAMESPACE_NAME, JOB_NAME);
 
     final JobMeta meta =
         JobMeta.builder()
@@ -534,10 +532,7 @@ public class MarquezClientTest {
 
   @Test
   public void testGetJob() throws Exception {
-    final String pathTemplate = "/namespaces/%s/jobs/%s";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s/jobs/%s", NAMESPACE_NAME, JOB_NAME);
 
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
     when(http.get(url)).thenReturn(jobAsJson);
@@ -547,11 +542,16 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testListJobs() throws Exception {
+    when(http.get(buildUrlFor("/namespaces/%s/jobs?limit=10&offset=0", NAMESPACE_NAME)))
+        .thenReturn(Utils.toJson(new Jobs(ImmutableList.of(JOB))));
+    final List<Job> jobs = client.listJobs(NAMESPACE_NAME, 10, 0);
+    assertThat(jobs).asList().containsExactly(JOB);
+  }
+
+  @Test
   public void testCreateRun() throws Exception {
-    final String pathTemplate = "/namespaces/%s/jobs/%s/runs";
-    final String path = buildPathFor(pathTemplate, NAMESPACE_NAME, JOB_NAME);
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NAMESPACE_NAME, JOB_NAME)).thenReturn(url);
+    final URL url = buildUrlFor("/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME, JOB_NAME);
 
     final RunMeta meta =
         RunMeta.builder()
@@ -569,10 +569,7 @@ public class MarquezClientTest {
 
   @Test
   public void testGetRun() throws Exception {
-    final String pathTemplate = "/jobs/runs/%s";
-    final String path = buildPathFor(pathTemplate, NEW.getId());
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, NEW.getId())).thenReturn(url);
+    final URL url = buildUrlFor("/jobs/runs/%s", NEW.getId());
 
     final String runAsJson = JsonGenerator.newJsonFor(NEW);
     when(http.get(url)).thenReturn(runAsJson);
@@ -582,11 +579,17 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testListRuns() throws Exception {
+    when(http.get(
+            buildUrlFor("/namespaces/%s/jobs/%s/runs?limit=10&offset=0", NAMESPACE_NAME, JOB_NAME)))
+        .thenReturn(Utils.toJson(new Runs(ImmutableList.of(NEW))));
+    final List<Run> runs = client.listRuns(NAMESPACE_NAME, JOB_NAME, 10, 0);
+    assertThat(runs).asList().containsExactly(NEW);
+  }
+
+  @Test
   public void testMarkRunAsRunning() throws Exception {
-    final String pathTemplate = "/jobs/runs/%s/start";
-    final String path = buildPathFor(pathTemplate, RUNNING.getId());
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, ImmutableMap.of(), RUNNING.getId())).thenReturn(url);
+    final URL url = buildUrlFor("/jobs/runs/%s/start", RUNNING.getId());
 
     final String runAsJson = JsonGenerator.newJsonFor(RUNNING);
     when(http.post(url)).thenReturn(runAsJson);
@@ -599,10 +602,7 @@ public class MarquezClientTest {
 
   @Test
   public void testMarkRunAsCompleted() throws Exception {
-    final String pathTemplate = "/jobs/runs/%s/complete";
-    final String path = buildPathFor(pathTemplate, COMPLETED.getId());
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, ImmutableMap.of(), COMPLETED.getId())).thenReturn(url);
+    final URL url = buildUrlFor("/jobs/runs/%s/complete", COMPLETED.getId());
 
     final String runAsJson = JsonGenerator.newJsonFor(COMPLETED);
     when(http.post(url)).thenReturn(runAsJson);
@@ -615,10 +615,7 @@ public class MarquezClientTest {
 
   @Test
   public void testMarkRunAsAborted() throws Exception {
-    final String pathTemplate = "/jobs/runs/%s/abort";
-    final String path = buildPathFor(pathTemplate, ABORTED.getId());
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, ImmutableMap.of(), ABORTED.getId())).thenReturn(url);
+    final URL url = buildUrlFor("/jobs/runs/%s/abort", ABORTED.getId());
 
     final String runAsJson = JsonGenerator.newJsonFor(ABORTED);
     when(http.post(url)).thenReturn(runAsJson);
@@ -631,10 +628,7 @@ public class MarquezClientTest {
 
   @Test
   public void testMarkRunAsFailed() throws Exception {
-    final String pathTemplate = "/jobs/runs/%s/fail";
-    final String path = buildPathFor(pathTemplate, FAILED.getId());
-    final URL url = buildUrlFor(path);
-    when(this.marquezUrl.from(pathTemplate, ImmutableMap.of(), FAILED.getId())).thenReturn(url);
+    final URL url = buildUrlFor("/jobs/runs/%s/fail", FAILED.getId());
 
     final String runAsJson = JsonGenerator.newJsonFor(FAILED);
     when(http.post(url)).thenReturn(runAsJson);
@@ -645,11 +639,44 @@ public class MarquezClientTest {
     verify(http, times(1)).post(url);
   }
 
-  private String buildPathFor(String pathTemplate, String... pathArgs) {
-    return String.format(pathTemplate, (Object[]) pathArgs);
+  @Test
+  public void testTagDataset() throws Exception {
+    final URL url =
+        buildUrlFor(
+            "/namespaces/%s/datasets/%s/tags/%s", NAMESPACE_NAME, DB_TABLE_NAME, "tag_name");
+
+    final String runAsJson = JsonGenerator.newJsonFor(DB_TABLE);
+    when(http.post(url)).thenReturn(runAsJson);
+
+    final Dataset dataset = client.tagDatasetWith(NAMESPACE_NAME, DB_TABLE_NAME, "tag_name");
+    assertThat(dataset).isEqualTo(DB_TABLE);
   }
 
-  private URL buildUrlFor(String path) throws Exception {
-    return new URL(DEFAULT_BASE_URL + path);
+  @Test
+  public void testTagField() throws Exception {
+    final URL url =
+        buildUrlFor(
+            "/namespaces/%s/datasets/%s/fields/%s/tags/%s",
+            NAMESPACE_NAME, DB_TABLE_NAME, "field", "tag_name");
+
+    final String runAsJson = JsonGenerator.newJsonFor(DB_TABLE);
+    when(http.post(url)).thenReturn(runAsJson);
+
+    final Dataset dataset = client.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, "field", "tag_name");
+    assertThat(dataset).isEqualTo(DB_TABLE);
+  }
+
+  @Test
+  public void testListTags() throws Exception {
+    ImmutableSet<Tag> expectedTags =
+        ImmutableSet.of(new Tag("tag1", "a tag"), new Tag("tag2", "another tag"));
+    when(http.get(buildUrlFor("/tags?limit=10&offset=0")))
+        .thenReturn(Utils.toJson(new Tags(expectedTags)));
+    final List<Tag> tags = new ArrayList<>(client.listTags(10, 0));
+    assertThat(tags).asList().containsExactlyInAnyOrderElementsOf(expectedTags);
+  }
+
+  private URL buildUrlFor(String pathTemplate, String... pathArgs) throws Exception {
+    return new URL(DEFAULT_BASE_URL + BASE_PATH + String.format(pathTemplate, (Object[]) pathArgs));
   }
 }

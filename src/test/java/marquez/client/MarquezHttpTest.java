@@ -14,6 +14,8 @@
 
 package marquez.client;
 
+import static marquez.client.MarquezPathV1.BASE_PATH;
+import static marquez.client.MarquezPathV1.path;
 import static marquez.client.models.ModelGenerator.newDescription;
 import static marquez.client.models.ModelGenerator.newJobName;
 import static marquez.client.models.ModelGenerator.newNamespace;
@@ -54,7 +56,7 @@ import org.mockito.junit.MockitoRule;
 
 @Category(UnitTests.class)
 public class MarquezHttpTest {
-  private static final String BASE_URL_STRING = "http://localhost:8080/api/v1";
+  private static final String BASE_URL_STRING = "http://localhost:8080";
   private static final URL BASE_URL = Utils.toUrl(BASE_URL_STRING);
 
   private static final int HTTP_200 = 200;
@@ -84,8 +86,8 @@ public class MarquezHttpTest {
     final String pathArg = "default";
     final String path = String.format(pathTemplate, pathArg);
 
-    URL expected = new URL(BASE_URL_STRING + path);
-    URL actual = marquezUrl.from(path, pathArg);
+    URL expected = new URL(BASE_URL_STRING + BASE_PATH + path);
+    URL actual = marquezUrl.from(path(path, pathArg));
     assertThat(actual).isEqualTo(expected);
   }
 
@@ -100,7 +102,7 @@ public class MarquezHttpTest {
 
     when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
 
-    final URL url = marquezUrl.from("/jobs/runs/%s/start", newRunId());
+    final URL url = marquezUrl.from(path("/jobs/runs/%s/start", newRunId()));
     final String actual = marquezHttp.post(url);
     assertThat(actual).isEqualTo(json);
   }
@@ -115,7 +117,7 @@ public class MarquezHttpTest {
 
     when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
 
-    final URL url = marquezUrl.from("/jobs/runs/%s/start", newRunId());
+    final URL url = marquezUrl.from(path("/jobs/runs/%s/start", newRunId()));
     assertThatExceptionOfType(MarquezHttpException.class).isThrownBy(() -> marquezHttp.post(url));
   }
 
@@ -131,7 +133,8 @@ public class MarquezHttpTest {
 
     when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
 
-    final URL url = marquezUrl.from("/namespace/%s/jobs/%s/runs", newNamespaceName(), newJobName());
+    final URL url =
+        marquezUrl.from(path("/namespace/%s/jobs/%s/runs", newNamespaceName(), newJobName()));
     final String actual = marquezHttp.post(url, meta.toJson());
     assertThat(actual).isEqualTo(json);
   }
@@ -146,7 +149,7 @@ public class MarquezHttpTest {
 
     when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
 
-    final URL url = marquezUrl.from("/jobs/runs/%s/start", newRunId());
+    final URL url = marquezUrl.from(path("/jobs/runs/%s/start", newRunId()));
     assertThatExceptionOfType(MarquezHttpException.class).isThrownBy(() -> marquezHttp.post(url));
   }
 
@@ -167,7 +170,7 @@ public class MarquezHttpTest {
 
     when(httpClient.execute(any(HttpPut.class))).thenReturn(httpResponse);
 
-    final URL url = marquezUrl.from("/namespace/%s", namespaceName);
+    final URL url = marquezUrl.from(path("/namespace/%s", namespaceName));
     final NamespaceMeta meta =
         NamespaceMeta.builder().ownerName(ownerName).description(description).build();
     final String actual = marquezHttp.put(url, meta.toJson());
@@ -185,7 +188,7 @@ public class MarquezHttpTest {
     when(httpClient.execute(any(HttpPut.class))).thenReturn(httpResponse);
 
     final NamespaceMeta meta = newNamespaceMeta();
-    final URL url = marquezUrl.from("/namespace/%s", newNamespaceName());
+    final URL url = marquezUrl.from(path("/namespace/%s", newNamespaceName()));
     assertThatExceptionOfType(MarquezHttpException.class)
         .isThrownBy(() -> marquezHttp.put(url, meta.toJson()));
   }
@@ -202,7 +205,7 @@ public class MarquezHttpTest {
 
     when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
 
-    final URL url = marquezUrl.from("/namespace/%s", namespace.getName());
+    final URL url = marquezUrl.from(path("/namespace/%s", namespace.getName()));
     final String actual = marquezHttp.get(url);
     assertThat(actual).isEqualTo(json);
   }
@@ -217,7 +220,7 @@ public class MarquezHttpTest {
 
     when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
 
-    final URL url = marquezUrl.from("/namespace/%s", newNamespaceName());
+    final URL url = marquezUrl.from(path("/namespace/%s", newNamespaceName()));
     assertThatExceptionOfType(MarquezHttpException.class).isThrownBy(() -> marquezHttp.get(url));
   }
 }
