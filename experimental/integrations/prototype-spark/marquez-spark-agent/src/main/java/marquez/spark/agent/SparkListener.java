@@ -1,10 +1,16 @@
 package marquez.spark.agent;
 
+import static marquez.client.models.JobType.BATCH;
+
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -26,6 +33,7 @@ import org.apache.spark.rdd.NewHadoopRDD;
 import org.apache.spark.rdd.PairRDDFunctions;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.scheduler.ActiveJob;
+import org.apache.spark.scheduler.JobFailed;
 import org.apache.spark.scheduler.ResultStage;
 import org.apache.spark.scheduler.SparkListenerInterface;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
@@ -34,6 +42,14 @@ import org.apache.spark.scheduler.Stage;
 import org.apache.spark.scheduler.StageInfo;
 import org.apache.spark.storage.RDDInfo;
 
+import marquez.client.Backends;
+import marquez.client.Clients;
+import marquez.client.MarquezWriteOnlyClient;
+import marquez.client.models.DatasetId;
+import marquez.client.models.DatasetMeta;
+import marquez.client.models.DbTableMeta;
+import marquez.client.models.JobMeta;
+import marquez.client.models.RunMeta;
 import scala.collection.JavaConversions;
 
 
@@ -41,7 +57,21 @@ public class SparkListener {
 
   private static Map<Integer, ActiveJob> activeJobs = Collections.synchronizedMap(new HashMap<>());
 
-  private static Map<RDD, Configuration> outputs = Collections.synchronizedMap(new HashMap<>());
+  private static Map<RDD<?>, Configuration> outputs = Collections.synchronizedMap(new HashMap<>());
+
+  private static Map<Integer, UUID> jobIdToRunId = Collections.synchronizedMap(new HashMap<>());
+
+  private static MarquezWriteOnlyClient marquezClient;
+
+  private static String jobNamespace;
+  private static String jobName;
+
+  public static void init(String agentArgument) {
+    System.out.println("Init SparkListener: " + agentArgument);
+    marquezClient = Clients.newWriteOnlyClient(Backends.newFileBackend(new File("/tmp/marquez.request.log")));
+    jobNamespace = "jobs";
+    jobName = "Spark";
+  }
 
   public static void registerActiveJob(ActiveJob activeJob) {
     System.out.println("Registered Active job:" + activeJob.jobId());
@@ -61,10 +91,159 @@ public class SparkListener {
         }
       }
     }
-
   }
 
-  private static Path getOutputPath(RDD rdd) {
+  private static void jobStarted(SparkListenerJobStart jobStart) {
+    ActiveJob activeJob = activeJobs.get(jobStart.jobId());
+    RDD<?> finalRDD = activeJob.finalStage().rdd();
+    Set<RDD<?>> rdds = flattenRDDs(finalRDD);
+    List<String> inputs = findInputs(rdds);
+    List<String> outputs = findOutputs(rdds);
+    System.out.println("++++++++++++ Job " + jobStart.jobId() + " started at: " + jobStart.time() + " Inputs: " + inputs + " Outputs: " + outputs);
+    Set<DatasetId> inputIds = new HashSet<DatasetId>();
+    for (String input : inputs) {
+      String protocol;
+      try {
+        URL inputUrl = new URL(input);
+        protocol=inputUrl.getProtocol();
+      } catch (MalformedURLException e) {
+        protocol = "unknown";
+      }
+      String namespace = protocol;
+      String name = input;
+      DatasetMeta meta = DbTableMeta.builder().sourceName(protocol).physicalName(name).build();
+      marquezClient.createDataset(namespace, name, meta);
+      inputIds.add(new DatasetId(namespace, name));
+    }
+    Set<DatasetId> outputIds = new HashSet<DatasetId>();
+    for (String output : outputs) {
+      String protocol;
+      try {
+        URL inputUrl = new URL(output);
+        protocol=inputUrl.getProtocol();
+      } catch (MalformedURLException e) {
+        protocol = "unknown";
+      }
+      String namespace = protocol;
+      String name = output;
+      DatasetMeta meta = DbTableMeta.builder().sourceName(protocol).physicalName(name).build();
+//      marquezClient.createDataset(namespace, name, meta);
+      outputIds.add(new DatasetId(namespace, name));
+    }
+    marquezClient.createJob(jobNamespace, jobName, JobMeta.builder().inputs(inputIds).outputs(outputIds).type(BATCH).build());
+    UUID runId = UUID.randomUUID();
+    jobIdToRunId.put(jobStart.jobId(), runId);
+    marquezClient.createRun(jobNamespace, jobName, new RunMeta(runId.toString(), null, null, null));
+    marquezClient.markRunAsRunning(runId.toString(), Instant.ofEpochMilli(jobStart.time()));
+  }
+
+  private static void jobEnded(SparkListenerJobEnd jobEnd) {
+    ActiveJob activeJob = activeJobs.get(jobEnd.jobId());
+    RDD<?> finalRDD = activeJob.finalStage().rdd();
+    Set<RDD<?>> rdds = flattenRDDs(finalRDD);
+    List<String> outputs = findOutputs(rdds);
+    UUID runId = jobIdToRunId.get(jobEnd.jobId());
+    for (String output : outputs) {
+      String protocol;
+      try {
+        URL inputUrl = new URL(output);
+        protocol=inputUrl.getProtocol();
+      } catch (MalformedURLException e) {
+        protocol = "unknown";
+      }
+      String namespace = protocol;
+      String name = output;
+      DatasetMeta meta = DbTableMeta.builder().sourceName(protocol).physicalName(name).runId(runId.toString()).build();
+      marquezClient.createDataset(namespace, name, meta);
+    }
+    Instant at = Instant.ofEpochMilli(jobEnd.time());
+
+    if (jobEnd.jobResult() instanceof JobFailed){
+      Exception e = ((JobFailed)jobEnd.jobResult()).exception();
+      e.printStackTrace(System.out);
+      marquezClient.markRunAsFailed(runId.toString(), at);
+    } else if (jobEnd.jobResult().getClass().getSimpleName().startsWith("JobSucceeded")){
+      System.out.println(jobEnd.jobResult().getClass().getName() );
+      marquezClient.markRunAsCompleted(runId.toString(), at);
+    } else {
+      System.out.println("Unknown status: " + jobEnd.jobResult());
+    }
+    System.out.println("++++++++++++ Job " + jobEnd.jobId() + " ended with status " + jobEnd.jobResult() + " at: " + jobEnd.time());
+  }
+
+  private static List<String> findOutputs(Set<RDD<?>> rdds) {
+    List<String> result = new ArrayList<>();
+    for (RDD<?> rdd: rdds) {
+      Path outputPath = getOutputPath(rdd);
+      if (outputPath != null) {
+        result.add(outputPath.toUri().toString());
+      }
+    }
+    return result;
+  }
+
+
+  private static Set<RDD<?>> flattenRDDs(RDD<?> rdd) {
+    Set<RDD<?>> rdds = new HashSet<>();
+    rdds.add(rdd);
+    Collection<Dependency<?>> deps = JavaConversions.asJavaCollection(rdd.dependencies());
+    for (Dependency<?> dep : deps) {
+      rdds.addAll(flattenRDDs(dep.rdd()));
+    }
+    return rdds;
+  }
+
+  private static List<String> findInputs(Set<RDD<?>> rdds) {
+    List<String> result = new ArrayList<>();
+    for (RDD<?> rdd: rdds) {
+      Path[] inputPaths = getInputPaths(rdd);
+      if (inputPaths != null) {
+        for (Path path : inputPaths) {
+          result.add(path.toUri().toString());
+        }
+      }
+    }
+    return result;
+  }
+
+  private static Path[] getInputPaths(RDD<?> rdd) {
+    Path[] inputPaths = null;
+    if (rdd instanceof HadoopRDD) {
+      inputPaths = org.apache.hadoop.mapred.FileInputFormat.getInputPaths(((HadoopRDD<?,?>)rdd).getJobConf());
+    } else if (rdd instanceof NewHadoopRDD) {
+      try {
+        inputPaths = org.apache.hadoop.mapreduce.lib.input.FileInputFormat.getInputPaths(new Job(((NewHadoopRDD<?,?>)rdd).getConf()));
+      } catch (IOException e) {
+        e.printStackTrace(System.out);
+      }
+    }
+    return inputPaths;
+  }
+
+  private static void printRDDs(String prefix, RDD<?> rdd) {
+
+    Path outputPath = getOutputPath(rdd);
+    Path[] inputPath = getInputPaths(rdd);
+    System.out.println(prefix + rdd + (outputPath == null ? "" : " output: " + outputPath) + (inputPath == null ? "" : " input: " + Arrays.toString(inputPath)));
+    Collection<Dependency<?>> deps = JavaConversions.asJavaCollection(rdd.dependencies());
+    for (Dependency<?> dep : deps) {
+      printRDDs(prefix + " \\ ", dep.rdd());
+    }
+  }
+
+  private static void printStages(String prefix, Stage stage) {
+    if (stage instanceof ResultStage) {
+      ResultStage resultStage = (ResultStage)stage;
+      System.out.println(prefix +"(stageId:" + stage.id() + ") Result:" + resultStage.func());
+    }
+    printRDDs(prefix +"(stageId:" + stage.id() + ")-("+stage.getClass().getSimpleName()+")- RDD: ",  stage.rdd());
+    Collection<Stage> parents = JavaConversions.asJavaCollection(stage.parents());
+    for (Stage parent : parents) {
+      printStages(prefix + " \\ ", parent);
+    }
+  }
+
+  private static Path getOutputPath(RDD<?> rdd) {
     Configuration conf = outputs.get(rdd);
     if (conf == null) {
       return null;
@@ -136,91 +315,16 @@ public class SparkListener {
         return null;
       }
 
-      private void jobStarted(SparkListenerJobStart jobStart) {
-        ActiveJob activeJob = activeJobs.get(jobStart.jobId());
-        RDD<?> finalRDD = activeJob.finalStage().rdd();
-        Set<RDD<?>> rdds = flattenRDDs(finalRDD);
-        List<String> inputs = findInputs(rdds);
-        List<String> outputs = findOutputs(rdds);
-        System.out.println("++++++++++++ Job " + jobStart.jobId() + " started at: " + jobStart.time() + " Inputs: " + inputs + " Outputs: " + outputs);
-      }
-
-      private void jobEnded(SparkListenerJobEnd jobEnd) {
-        System.out.println("++++++++++++ Job " + jobEnd.jobId() + " ended with status " + jobEnd.jobResult() + " at: " + jobEnd.time());
-      }
-
-      private List<String> findOutputs(Set<RDD<?>> rdds) {
-        List<String> result = new ArrayList<>();
-        for (RDD<?> rdd: rdds) {
-          Path outputPath = getOutputPath(rdd);
-          if (outputPath != null) {
-            result.add(outputPath.toUri().toString());
-          }
-        }
-        return result;
-      }
-
-
-      private Set<RDD<?>> flattenRDDs(RDD<?> rdd) {
-        Set<RDD<?>> rdds = new HashSet<>();
-        rdds.add(rdd);
-        Collection<Dependency<?>> deps = JavaConversions.asJavaCollection(rdd.dependencies());
-        for (Dependency<?> dep : deps) {
-          rdds.addAll(flattenRDDs(dep.rdd()));
-        }
-        return rdds;
-      }
-
-      private List<String> findInputs(Set<RDD<?>> rdds) {
-        List<String> result = new ArrayList<>();
-        for (RDD<?> rdd: rdds) {
-          Path[] inputPaths = getInputPaths(rdd);
-          if (inputPaths != null) {
-            for (Path path : inputPaths) {
-              result.add(path.toUri().toString());
-            }
-          }
-        }
-        return result;
-      }
-
-      private Path[] getInputPaths(RDD<?> rdd) {
-        Path[] inputPaths = null;
-        if (rdd instanceof HadoopRDD) {
-          inputPaths = org.apache.hadoop.mapred.FileInputFormat.getInputPaths(((HadoopRDD<?,?>)rdd).getJobConf());
-        } else if (rdd instanceof NewHadoopRDD) {
-          try {
-            inputPaths = org.apache.hadoop.mapreduce.lib.input.FileInputFormat.getInputPaths(new Job(((NewHadoopRDD<?,?>)rdd).getConf()));
-          } catch (IOException e) {
-            e.printStackTrace(System.out);
-          }
-        }
-        return inputPaths;
-      }
-
-      private void printRDDs(String prefix, RDD<?> rdd) {
-
-        Path outputPath = getOutputPath(rdd);
-        Path[] inputPath = getInputPaths(rdd);
-        System.out.println(prefix + rdd + (outputPath == null ? "" : " output: " + outputPath) + (inputPath == null ? "" : " input: " + Arrays.toString(inputPath)));
-        Collection<Dependency<?>> deps = JavaConversions.asJavaCollection(rdd.dependencies());
-        for (Dependency<?> dep : deps) {
-          printRDDs(prefix + " \\ ", dep.rdd());
-        }
-      }
-
-      private void printStages(String prefix, Stage stage) {
-        if (stage instanceof ResultStage) {
-          ResultStage resultStage = (ResultStage)stage;
-          System.out.println(prefix +"(stageId:" + stage.id() + ") Result:" + resultStage.func());
-        }
-        printRDDs(prefix +"(stageId:" + stage.id() + ")-("+stage.getClass().getSimpleName()+")- RDD: ",  stage.rdd());
-        Collection<Stage> parents = JavaConversions.asJavaCollection(stage.parents());
-        for (Stage parent : parents) {
-          printStages(prefix + " \\ ", parent);
-        }
-      }
     });
     context.addSparkListener(listener);
+  }
+
+  public static void close() {
+    try {
+      marquezClient.close();
+      marquezClient = null;
+    } catch (IOException e) {
+      e.printStackTrace(System.out);
+    }
   }
 }

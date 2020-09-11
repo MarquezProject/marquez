@@ -16,11 +16,25 @@ public class MarquezAgent {
 
   public static void premain(String agentArgument, Instrumentation instrumentation) throws Exception {
     System.out.println("MarquezAgent.premain");
+    SparkListener.init(agentArgument);
     instrument(agentArgument, instrumentation);
+    addShutDownHook();
   }
 
   public static void main(String agentArgument, Instrumentation instrumentation) throws Exception {
     System.out.println("MarquezAgent.main");
+    SparkListener.init(agentArgument);
     instrument(agentArgument, instrumentation);
+    addShutDownHook();
+  }
+
+
+  private static void addShutDownHook() {
+    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
+      @Override
+      public void run() {
+        SparkListener.close();
+      }
+    }));
   }
 }
