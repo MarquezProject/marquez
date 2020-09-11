@@ -1,7 +1,7 @@
 # Marquez Java Client
 
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez-java/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez-java/tree/master) 
-[![codecov](https://codecov.io/gh/MarquezProject/marquez-java/branch/master/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez-java/branch/master)
+[![codecov](https://codecov.io/gh/MarquezProject/marquez-java/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez-java/branch/master)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marquez-project/community)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez-java/master/LICENSE)
