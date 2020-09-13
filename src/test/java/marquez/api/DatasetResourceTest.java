@@ -7,6 +7,7 @@ import static marquez.common.models.ModelGenerator.newRunId;
 import static marquez.common.models.ModelGenerator.newTagName;
 import static marquez.service.models.ModelGenerator.newDbTable;
 import static marquez.service.models.ModelGenerator.newDbTableMeta;
+import static marquez.service.models.ModelGenerator.newDbTableMetaWith;
 import static marquez.service.models.ModelGenerator.newDbTableWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -22,6 +23,7 @@ import marquez.UnitTests;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.FieldNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
+import marquez.api.exceptions.RunNotFoundException;
 import marquez.api.exceptions.TagNotFoundException;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -82,6 +84,21 @@ public class DatasetResourceTest {
     final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta))
+        .thenReturn(dbTable);
+
+    final Response response =
+        datasetResource.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta);
+    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat((Dataset) response.getEntity()).isEqualTo(dbTable);
+  }
+
+  @Test
+  public void testCreateOrUpdateWithRun() throws MarquezServiceException {
+    final DbTableMeta dbTableMeta = newDbTableMetaWith(RUN_ID);
+    final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
+
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.runExists(RUN_ID)).thenReturn(true);
     when(datasetService.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta))
         .thenReturn(dbTable);
@@ -90,6 +107,21 @@ public class DatasetResourceTest {
         datasetResource.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Dataset) response.getEntity()).isEqualTo(dbTable);
+  }
+
+  @Test
+  public void testCreateOrUpdate_throwOnRunNotFound() throws MarquezServiceException {
+    final RunId runIdDoesNotExist = newRunId();
+    final DbTableMeta dbTableMeta = newDbTableMetaWith(runIdDoesNotExist);
+    final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
+
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(jobService.runExists(runIdDoesNotExist)).thenReturn(false);
+
+    assertThatExceptionOfType(RunNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta))
+        .withMessageContaining(String.format("'%s' not found", runIdDoesNotExist.getValue()));
   }
 
   @Test

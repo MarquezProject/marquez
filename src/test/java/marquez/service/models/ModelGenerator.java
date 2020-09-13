@@ -41,6 +41,7 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import marquez.Generator;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
@@ -100,8 +101,12 @@ public final class ModelGenerator extends Generator {
   }
 
   public static DbTableMeta newDbTableMeta() {
+    return newDbTableMetaWith(null);
+  }
+
+  public static DbTableMeta newDbTableMetaWith(@Nullable final RunId runId) {
     return new DbTableMeta(
-        newDatasetName(), newSourceName(), newFields(4), newTagNames(2), newDescription(), null);
+        newDatasetName(), newSourceName(), newFields(4), newTagNames(2), newDescription(), runId);
   }
 
   public static JobMeta newJobMeta() {
