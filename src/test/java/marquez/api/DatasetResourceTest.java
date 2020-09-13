@@ -10,7 +10,6 @@ import static marquez.service.models.ModelGenerator.newDbTableMeta;
 import static marquez.service.models.ModelGenerator.newDbTableWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -142,7 +141,7 @@ public class DatasetResourceTest {
     when(tagService.exists(TAG_NAME)).thenReturn(true);
 
     final DbTable dbTable = tagWith(TAG_NAME, newDbTableWith(DB_TABLE_ID));
-    doReturn(Response.ok(dbTable).build()).when(datasetResource).get(NAMESPACE_NAME, DB_TABLE_NAME);
+    when(datasetService.tagWith(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME)).thenReturn(dbTable);
 
     final Response response = datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME);
     assertThat(response.getStatus()).isEqualTo(200);
@@ -175,12 +174,15 @@ public class DatasetResourceTest {
   public void testTag_field() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
+    when(datasetService.fieldExists(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME)).thenReturn(true);
     when(tagService.exists(TAG_NAME)).thenReturn(true);
 
-    final DbTable dbTable = tagAllWith(TAG_NAME, newDbTableWith(DB_TABLE_ID));
-    doReturn(Response.ok(dbTable).build()).when(datasetResource).get(NAMESPACE_NAME, DB_TABLE_NAME);
+    final DbTable dbTable = tagAllFieldsWith(TAG_NAME, newDbTableWith(DB_TABLE_ID));
+    when(datasetService.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .thenReturn(dbTable);
 
-    final Response response = datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME);
+    final Response response =
+        datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME);
     assertThat(response.getStatus()).isEqualTo(200);
 
     final Dataset dataset = (Dataset) response.getEntity();
@@ -255,7 +257,7 @@ public class DatasetResourceTest {
         dbTable.getDescription().orElse(null));
   }
 
-  static DbTable tagAllWith(final TagName tagName, final DbTable dbTable) {
+  static DbTable tagAllFieldsWith(final TagName tagName, final DbTable dbTable) {
     final ImmutableList.Builder<Field> fields = ImmutableList.builder();
     for (final Field field : dbTable.getFields()) {
       final ImmutableSet<TagName> tags =

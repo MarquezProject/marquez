@@ -141,8 +141,8 @@ public class DatasetResource {
     throwIfNotExists(namespaceName, datasetName);
     throwIfNotExists(tagName);
 
-    datasetService.tagWith(namespaceName, datasetName, tagName);
-    return get(namespaceName, datasetName);
+    final Dataset dataset = datasetService.tagWith(namespaceName, datasetName, tagName);
+    return Response.ok(dataset).build();
   }
 
   @Timed
@@ -163,8 +163,9 @@ public class DatasetResource {
     throwIfNotExists(namespaceName, datasetName, fieldName);
     throwIfNotExists(tagName);
 
-    datasetService.tagFieldWith(namespaceName, datasetName, fieldName, tagName);
-    return get(namespaceName, datasetName);
+    final Dataset dataset =
+        datasetService.tagFieldWith(namespaceName, datasetName, fieldName, tagName);
+    return Response.ok(dataset).build();
   }
 
   @Value
