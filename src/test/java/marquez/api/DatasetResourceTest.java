@@ -22,6 +22,7 @@ import marquez.UnitTests;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.FieldNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
+import marquez.api.exceptions.TagNotFoundException;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
@@ -171,6 +172,17 @@ public class DatasetResourceTest {
   }
 
   @Test
+  public void testTag_throwOnTagNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
+    when(tagService.exists(TAG_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(TagNotFoundException.class)
+        .isThrownBy(() -> datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", TAG_NAME.getValue()));
+  }
+
+  @Test
   public void testTag_field() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
@@ -224,6 +236,19 @@ public class DatasetResourceTest {
         .isThrownBy(
             () -> datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
         .withMessageContaining(String.format("'%s' not found", DB_FIELD_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_field_throwOnTagNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
+    when(datasetService.fieldExists(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME)).thenReturn(true);
+    when(tagService.exists(TAG_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(TagNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", TAG_NAME.getValue()));
   }
 
   static DbTable toDbTable(final DatasetId dbTableId, final DbTableMeta dbTableMeta) {
