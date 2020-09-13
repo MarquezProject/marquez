@@ -2,6 +2,7 @@ package marquez.api;
 
 import static marquez.api.DatasetResource.Datasets;
 import static marquez.common.models.ModelGenerator.newDatasetId;
+import static marquez.common.models.ModelGenerator.newFieldName;
 import static marquez.common.models.ModelGenerator.newRunId;
 import static marquez.common.models.ModelGenerator.newTagName;
 import static marquez.service.models.ModelGenerator.newDbTable;
@@ -20,9 +21,12 @@ import java.util.Optional;
 import javax.ws.rs.core.Response;
 import marquez.UnitTests;
 import marquez.api.exceptions.DatasetNotFoundException;
+import marquez.api.exceptions.FieldNotFoundException;
+import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
+import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
@@ -47,6 +51,7 @@ public class DatasetResourceTest {
   private static final DatasetId DB_TABLE_ID = newDatasetId();
   private static final NamespaceName NAMESPACE_NAME = DB_TABLE_ID.getNamespace();
   private static final DatasetName DB_TABLE_NAME = DB_TABLE_ID.getName();
+  private static final FieldName DB_FIELD_NAME = newFieldName();
 
   private static final DbTable DB_TABLE_0 = newDbTable();
   private static final DbTable DB_TABLE_1 = newDbTable();
@@ -131,7 +136,7 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testTag_dataset() throws MarquezServiceException {
+  public void testTag() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
     when(tagService.exists(TAG_NAME)).thenReturn(true);
@@ -148,7 +153,26 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testTag_datasetField() throws MarquezServiceException {
+  public void testTag_throwOnNamespaceNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(NamespaceNotFoundException.class)
+        .isThrownBy(() -> datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", NAMESPACE_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_throwOnDatasetNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(DatasetNotFoundException.class)
+        .isThrownBy(() -> datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", DB_TABLE_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_field() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
     when(tagService.exists(TAG_NAME)).thenReturn(true);
@@ -164,6 +188,40 @@ public class DatasetResourceTest {
     for (final Field field : dataset.getFields()) {
       assertThat(field.getTags()).contains(TAG_NAME);
     }
+  }
+
+  @Test
+  public void testTag_field_throwOnNamespaceNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(NamespaceNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", NAMESPACE_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_field_throwOnDatasetNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(DatasetNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", DB_TABLE_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_field_throwOnFieldNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
+    when(datasetService.fieldExists(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME))
+        .thenReturn(false);
+
+    assertThatExceptionOfType(FieldNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", DB_FIELD_NAME.getValue()));
   }
 
   static DbTable toDbTable(final DatasetId dbTableId, final DbTableMeta dbTableMeta) {
