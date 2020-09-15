@@ -21,8 +21,8 @@ jobs:
     steps:
       - checkout
       - run: pip install --user  -r test-requirements.txt
-      - run: python -m pytest ./tests --cov=marquez_client --cov-report xml ./tests
-      - run: python -m codecov
+      - run: python -m pytest --cov=marquez_python tests/
+      - run: bash <(curl -s https://codecov.io/bash)
 
   release:
     <<: *defaults
