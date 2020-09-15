@@ -2,14 +2,15 @@ package marquez.api;
 
 import static marquez.api.DatasetResource.Datasets;
 import static marquez.common.models.ModelGenerator.newDatasetId;
+import static marquez.common.models.ModelGenerator.newFieldName;
 import static marquez.common.models.ModelGenerator.newRunId;
 import static marquez.common.models.ModelGenerator.newTagName;
 import static marquez.service.models.ModelGenerator.newDbTable;
 import static marquez.service.models.ModelGenerator.newDbTableMeta;
+import static marquez.service.models.ModelGenerator.newDbTableMetaWith;
 import static marquez.service.models.ModelGenerator.newDbTableWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -20,9 +21,14 @@ import java.util.Optional;
 import javax.ws.rs.core.Response;
 import marquez.UnitTests;
 import marquez.api.exceptions.DatasetNotFoundException;
+import marquez.api.exceptions.FieldNotFoundException;
+import marquez.api.exceptions.NamespaceNotFoundException;
+import marquez.api.exceptions.RunNotFoundException;
+import marquez.api.exceptions.TagNotFoundException;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
+import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
@@ -47,6 +53,7 @@ public class DatasetResourceTest {
   private static final DatasetId DB_TABLE_ID = newDatasetId();
   private static final NamespaceName NAMESPACE_NAME = DB_TABLE_ID.getNamespace();
   private static final DatasetName DB_TABLE_NAME = DB_TABLE_ID.getName();
+  private static final FieldName DB_FIELD_NAME = newFieldName();
 
   private static final DbTable DB_TABLE_0 = newDbTable();
   private static final DbTable DB_TABLE_1 = newDbTable();
@@ -77,6 +84,21 @@ public class DatasetResourceTest {
     final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta))
+        .thenReturn(dbTable);
+
+    final Response response =
+        datasetResource.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta);
+    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat((Dataset) response.getEntity()).isEqualTo(dbTable);
+  }
+
+  @Test
+  public void testCreateOrUpdateWithRun() throws MarquezServiceException {
+    final DbTableMeta dbTableMeta = newDbTableMetaWith(RUN_ID);
+    final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
+
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.runExists(RUN_ID)).thenReturn(true);
     when(datasetService.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta))
         .thenReturn(dbTable);
@@ -85,6 +107,21 @@ public class DatasetResourceTest {
         datasetResource.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Dataset) response.getEntity()).isEqualTo(dbTable);
+  }
+
+  @Test
+  public void testCreateOrUpdateWithRun_throwOnRunNotFound() throws MarquezServiceException {
+    final RunId runIdDoesNotExist = newRunId();
+    final DbTableMeta dbTableMeta = newDbTableMetaWith(runIdDoesNotExist);
+    final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
+
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(jobService.runExists(runIdDoesNotExist)).thenReturn(false);
+
+    assertThatExceptionOfType(RunNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta))
+        .withMessageContaining(String.format("'%s' not found", runIdDoesNotExist.getValue()));
   }
 
   @Test
@@ -131,13 +168,13 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testTag_dataset() throws MarquezServiceException {
+  public void testTag() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
     when(tagService.exists(TAG_NAME)).thenReturn(true);
 
     final DbTable dbTable = tagWith(TAG_NAME, newDbTableWith(DB_TABLE_ID));
-    doReturn(Response.ok(dbTable).build()).when(datasetResource).get(NAMESPACE_NAME, DB_TABLE_NAME);
+    when(datasetService.tagWith(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME)).thenReturn(dbTable);
 
     final Response response = datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME);
     assertThat(response.getStatus()).isEqualTo(200);
@@ -148,15 +185,48 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testTag_datasetField() throws MarquezServiceException {
+  public void testTag_throwOnNamespaceNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(NamespaceNotFoundException.class)
+        .isThrownBy(() -> datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", NAMESPACE_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_throwOnDatasetNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(DatasetNotFoundException.class)
+        .isThrownBy(() -> datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", DB_TABLE_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_throwOnTagNotFound() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
+    when(tagService.exists(TAG_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(TagNotFoundException.class)
+        .isThrownBy(() -> datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", TAG_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_field() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
+    when(datasetService.fieldExists(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME)).thenReturn(true);
     when(tagService.exists(TAG_NAME)).thenReturn(true);
 
-    final DbTable dbTable = tagAllWith(TAG_NAME, newDbTableWith(DB_TABLE_ID));
-    doReturn(Response.ok(dbTable).build()).when(datasetResource).get(NAMESPACE_NAME, DB_TABLE_NAME);
+    final DbTable dbTable = tagAllFieldsWith(TAG_NAME, newDbTableWith(DB_TABLE_ID));
+    when(datasetService.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .thenReturn(dbTable);
 
-    final Response response = datasetResource.tag(NAMESPACE_NAME, DB_TABLE_NAME, TAG_NAME);
+    final Response response =
+        datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME);
     assertThat(response.getStatus()).isEqualTo(200);
 
     final Dataset dataset = (Dataset) response.getEntity();
@@ -164,6 +234,53 @@ public class DatasetResourceTest {
     for (final Field field : dataset.getFields()) {
       assertThat(field.getTags()).contains(TAG_NAME);
     }
+  }
+
+  @Test
+  public void testTag_field_throwOnNamespaceNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(NamespaceNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", NAMESPACE_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_field_throwOnDatasetNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(DatasetNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", DB_TABLE_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_field_throwOnFieldNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
+    when(datasetService.fieldExists(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME))
+        .thenReturn(false);
+
+    assertThatExceptionOfType(FieldNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", DB_FIELD_NAME.getValue()));
+  }
+
+  @Test
+  public void testTag_field_throwOnTagNotFound() throws MarquezServiceException {
+    when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
+    when(datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME)).thenReturn(true);
+    when(datasetService.fieldExists(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME)).thenReturn(true);
+    when(tagService.exists(TAG_NAME)).thenReturn(false);
+
+    assertThatExceptionOfType(TagNotFoundException.class)
+        .isThrownBy(
+            () -> datasetResource.tagField(NAMESPACE_NAME, DB_TABLE_NAME, DB_FIELD_NAME, TAG_NAME))
+        .withMessageContaining(String.format("'%s' not found", TAG_NAME.getValue()));
   }
 
   static DbTable toDbTable(final DatasetId dbTableId, final DbTableMeta dbTableMeta) {
@@ -197,7 +314,7 @@ public class DatasetResourceTest {
         dbTable.getDescription().orElse(null));
   }
 
-  static DbTable tagAllWith(final TagName tagName, final DbTable dbTable) {
+  static DbTable tagAllFieldsWith(final TagName tagName, final DbTable dbTable) {
     final ImmutableList.Builder<Field> fields = ImmutableList.builder();
     for (final Field field : dbTable.getFields()) {
       final ImmutableSet<TagName> tags =

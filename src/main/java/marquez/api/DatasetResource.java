@@ -141,8 +141,8 @@ public class DatasetResource {
     throwIfNotExists(namespaceName, datasetName);
     throwIfNotExists(tagName);
 
-    datasetService.tagWith(namespaceName, datasetName, tagName);
-    return get(namespaceName, datasetName);
+    final Dataset dataset = datasetService.tagWith(namespaceName, datasetName, tagName);
+    return Response.ok(dataset).build();
   }
 
   @Timed
@@ -152,7 +152,7 @@ public class DatasetResource {
   @Path("/{dataset}/fields/{field}/tags/{tag}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
-  public Response tag(
+  public Response tagField(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName,
       @PathParam("field") FieldName fieldName,
@@ -163,8 +163,9 @@ public class DatasetResource {
     throwIfNotExists(namespaceName, datasetName, fieldName);
     throwIfNotExists(tagName);
 
-    datasetService.tagWith(namespaceName, datasetName, fieldName, tagName);
-    return get(namespaceName, datasetName);
+    final Dataset dataset =
+        datasetService.tagFieldWith(namespaceName, datasetName, fieldName, tagName);
+    return Response.ok(dataset).build();
   }
 
   @Value
@@ -192,7 +193,7 @@ public class DatasetResource {
       @NonNull DatasetName datasetName,
       @NonNull FieldName fieldName)
       throws MarquezServiceException {
-    if (!datasetService.exists(namespaceName, datasetName, fieldName)) {
+    if (!datasetService.fieldExists(namespaceName, datasetName, fieldName)) {
       throw new FieldNotFoundException(datasetName, fieldName);
     }
   }

@@ -16,6 +16,10 @@
 package marquez.api;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static marquez.common.models.RunState.ABORTED;
+import static marquez.common.models.RunState.COMPLETED;
+import static marquez.common.models.RunState.FAILED;
+import static marquez.common.models.RunState.RUNNING;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -178,7 +182,7 @@ public class JobResource {
   @Produces(APPLICATION_JSON)
   public Response markRunAsRunning(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
       throws MarquezServiceException {
-    return markRunAs(runId, RunState.RUNNING, atAsIso);
+    return markRunAs(runId, RUNNING, atAsIso);
   }
 
   @Timed
@@ -189,7 +193,7 @@ public class JobResource {
   @Produces(APPLICATION_JSON)
   public Response markRunAsCompleted(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
       throws MarquezServiceException {
-    return markRunAs(runId, RunState.COMPLETED, atAsIso);
+    return markRunAs(runId, COMPLETED, atAsIso);
   }
 
   @Timed
@@ -200,7 +204,7 @@ public class JobResource {
   @Produces(APPLICATION_JSON)
   public Response markRunAsFailed(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
       throws MarquezServiceException {
-    return markRunAs(runId, RunState.FAILED, atAsIso);
+    return markRunAs(runId, FAILED, atAsIso);
   }
 
   @Timed
@@ -211,7 +215,7 @@ public class JobResource {
   @Produces(APPLICATION_JSON)
   public Response markRunAsAborted(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
       throws MarquezServiceException {
-    return markRunAs(runId, RunState.ABORTED, atAsIso);
+    return markRunAs(runId, ABORTED, atAsIso);
   }
 
   Response markRunAs(

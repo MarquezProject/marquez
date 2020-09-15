@@ -218,7 +218,7 @@ public class DatasetService {
     }
   }
 
-  public boolean exists(
+  public boolean fieldExists(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
       @NonNull FieldName fieldName)
@@ -325,7 +325,7 @@ public class DatasetService {
     }
   }
 
-  public Dataset tagWith(
+  public Dataset tagFieldWith(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
       @NonNull FieldName fieldName,

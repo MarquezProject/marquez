@@ -211,7 +211,7 @@ public class DatasetServiceTest {
             NAMESPACE_NAME.getValue(), DB_TABLE_NAME.getValue(), fieldName.getValue()))
         .thenReturn(true);
 
-    final boolean exists = datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME, fieldName);
+    final boolean exists = datasetService.fieldExists(NAMESPACE_NAME, DB_TABLE_NAME, fieldName);
     assertThat(exists).isTrue();
 
     verify(datasetFieldDao, times(1))
@@ -225,7 +225,7 @@ public class DatasetServiceTest {
             NAMESPACE_NAME.getValue(), DB_TABLE_NAME.getValue(), fieldName.getValue()))
         .thenReturn(false);
 
-    final boolean exists = datasetService.exists(NAMESPACE_NAME, DB_TABLE_NAME, fieldName);
+    final boolean exists = datasetService.fieldExists(NAMESPACE_NAME, DB_TABLE_NAME, fieldName);
     assertThat(exists).isFalse();
 
     verify(datasetFieldDao, times(1))

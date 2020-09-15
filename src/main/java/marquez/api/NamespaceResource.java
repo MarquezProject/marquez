@@ -56,9 +56,9 @@ public class NamespaceResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
-      @PathParam("namespace") NamespaceName namespaceName, @Valid NamespaceMeta meta)
+      @PathParam("namespace") NamespaceName name, @Valid NamespaceMeta meta)
       throws MarquezServiceException {
-    final Namespace namespace = service.createOrUpdate(namespaceName, meta);
+    final Namespace namespace = service.createOrUpdate(name, meta);
     return Response.ok(namespace).build();
   }
 
@@ -68,10 +68,9 @@ public class NamespaceResource {
   @GET
   @Path("/namespaces/{namespace}")
   @Produces(APPLICATION_JSON)
-  public Response get(@PathParam("namespace") NamespaceName namespaceName)
-      throws MarquezServiceException {
+  public Response get(@PathParam("namespace") NamespaceName name) throws MarquezServiceException {
     final Namespace namespace =
-        service.get(namespaceName).orElseThrow(() -> new NamespaceNotFoundException(namespaceName));
+        service.get(name).orElseThrow(() -> new NamespaceNotFoundException(name));
     return Response.ok(namespace).build();
   }
 
