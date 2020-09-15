@@ -310,9 +310,9 @@ class DAG(airflow.models.DAG):
         return int(round(time.time() * 1000))
 
     def register_datasets(self, datasets):
-        dataset_names = []
+        dataset_keys = []
         if not datasets:
-            return dataset_names
+            return dataset_keys
         client = self.get_marquez_client()
         for dataset in datasets:
             if isinstance(dataset, Dataset):
@@ -327,13 +327,13 @@ class DAG(airflow.models.DAG):
                             dataset.name,  # physical_name the same for now
                             source_name,
                             namespace_name=self.marquez_namespace)
-                        dataset_name = dataset.get('name')
-                        if dataset_name:
-                            self._marquez_dataset_cache[_key] = dataset_name
-                            dataset_names.append(dataset_name)
+                        dataset_key = dataset.get('id')
+                        if dataset_key:
+                            self._marquez_dataset_cache[_key] = dataset_key
+                            dataset_keys.append(dataset_key)
                 else:
-                    dataset_names.append(self._marquez_dataset_cache[_key])
-        return dataset_names
+                    dataset_keys.append(self._marquez_dataset_cache[_key])
+        return dataset_keys
 
     def register_source(self, source):
         if isinstance(source, Source):
