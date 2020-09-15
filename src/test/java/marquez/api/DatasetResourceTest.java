@@ -110,7 +110,7 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testCreateOrUpdate_throwOnRunNotFound() throws MarquezServiceException {
+  public void testCreateOrUpdateWithRun_throwOnRunNotFound() throws MarquezServiceException {
     final RunId runIdDoesNotExist = newRunId();
     final DbTableMeta dbTableMeta = newDbTableMetaWith(runIdDoesNotExist);
     final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
