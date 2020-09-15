@@ -178,10 +178,11 @@ class DAG(airflow.models.DAG):
         # If no extractor found or failed to extract metadata,
         # report the task metadata
         if not steps_metadata:
+            operator = f"{task.__class__.__module__}.{task.__class__.__name__}"
             steps_metadata = [StepMetadata(
                 name=task_name,
                 context={
-                    'airflow.operator': task.__class__.__name__,
+                    'airflow.operator': operator,
                     'airflow.task_info': str(task.__dict__)
                 })]
 
