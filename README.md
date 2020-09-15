@@ -51,28 +51,45 @@ To install from source, run:
 $ python3 setup.py install
 ```
 
-## Settings
+## Configuration
+
+The library depends on a _backend_. A `Backend` is configurable and lets the library know where to write dataset and job metadata.
+
+### Backends
+
+* `http`: Write metadata to Marquez
+* `file`: Write metadata to a file (as `json`) under `/tmp/marquez`
+
+By default, the `http` backend will be used (see next section). To override the default backend and write metadata to a file, use `MARQUEZ_BACKEND`:
+
+```
+MARQUEZ_BACKEND=file
+```
+
+> **Note:** Metadata will be written to `/tmp/marquez/client.requests.log`, but can be overridden with `MARQUEZ_FILE`.
 
 ### Pointing to your Marquez service
+
 `marquez-airflow` needs to know where to talk to the Marquez server API.  You can set these using environment variables to be read by your Airflow service.
 
 You will also need to set the namespace if you are using something other than the `default` namespace.
+
 ```
+MARQUEZ_BACKEND=http
 MARQUEZ_URL=http://my_hosted_marquez.example.com:5000
 MARQUEZ_NAMESPACE=my_special_ns
 ```
-
-*NOTE: In the latest version of `marquez-python`, the constructor requires a `url` parameter for the host and port.  Presumably, the logic to read the env vars will move into this library*
 
 ### Extractors : Sending the correct data from your DAGs
 If you do nothing, Marquez will receive the `Job` and the `Run` from your DAGs, but sources and datasets will not be sent.
 
 `marquez-airflow` allows you to do more than that by building "Extractors".  Extractors are in the process of changing right now, but they basically take a task and extract:
+
 1. Name : The name of the task
-1. Location : Location of the code for the task
-1. Inputs : List of input datasets
-1. Outputs : List of output datasets
-1. Context : The Airflow context for the task
+2. Location : Location of the code for the task
+3. Inputs : List of input datasets
+4. Outputs : List of output datasets
+5. Context : The Airflow context for the task
 
 It's important to understand the inputs and outputs are lists and relate directly to the `Dataset` object in Marquez.  Datasets also include a source which relates directly to the `Source` object in Marquez.
 
@@ -93,6 +110,12 @@ When enabled, the library will:
 2. Collect task input / output metadata (`source`, `schema`, etc)
 3. Collect task run-level metadata (execution time, state, parameters, etc)
 4. On DAG **complete**, also mark the task as _complete_ in Marquez  
+
+To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG`, `INFO`, or `ERROR`:
+
+```
+$ export MARQUEZ_LOG_LEVEL='INFO'
+```
 
 ## Example
 
