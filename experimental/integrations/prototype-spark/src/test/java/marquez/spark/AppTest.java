@@ -3,63 +3,89 @@
  */
 package marquez.spark;
 
+import static org.apache.spark.sql.SaveMode.Overwrite;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.SparkSession;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class AppTest {
 
-  static class Dump implements Runnable {
-    private InputStream from;
-    private OutputStream to;
+  private static JavaSparkContext sparkContext;
 
-    public Dump(InputStream from, OutputStream to) {
-      this.from = from;
-      this.to = to;
-
-    }
-
-    public void run() {
-      try {
-        from.transferTo(to);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-  }
-
-  @Test
-  public void testInspectPlan() throws IOException {
+  @BeforeClass
+  public static void initContext() {
     SparkConf conf = new SparkConf()
         .setAppName("my-app")
         .setMaster("local[2]");
-    try (JavaSparkContext sc = new JavaSparkContext(conf);) {
-
-      PrintWriter w = new PrintWriter(new FileWriter("/tmp/test.csv"));
-      w.println("1,2,3");
-      w.println("4,5,6");
-      w.close();
-      File out = new File("/tmp/out.csv");
-      if (out.exists() && out.isDirectory()) {
-        for (File f : out.listFiles()) {
-          f.delete();
-        }
-        out.delete();
-      }
-
-      JavaRDD<String> rdd = sc
-          .textFile("file:///tmp/test.csv")
-          .distinct();
-      rdd.saveAsTextFile("file:///tmp/out.csv");
-    }
+    sparkContext = new JavaSparkContext(conf);
   }
+
+  @AfterClass
+  public static void closeContext() {
+    sparkContext.close();
+  }
+
+  @Before
+  public void init() throws IOException {
+    PrintWriter w = new PrintWriter(new FileWriter("/tmp/test.csv"));
+    w.println("1,2,3");
+    w.println("4,5,6");
+    w.close();
+
+    File out = new File("/tmp/out.csv");
+    if (out.exists() && out.isDirectory()) {
+      for (File f : out.listFiles()) {
+        f.delete();
+      }
+      out.delete();
+    }
+
+  }
+
+  /**
+   * Old school RDD apis
+   * @throws IOException
+   */
+  @Test
+  public void testInspectRDDPlan() throws IOException {
+
+    JavaRDD<String> rdd = sparkContext
+        .textFile("file:///tmp/test.csv")
+        .distinct();
+    rdd.saveAsTextFile("file:///tmp/out.csv");
+  }
+
+  /**
+   * Newer Dataset apis coming with SparkSQL
+   * @throws IOException
+   */
+  @Test
+  public void testInspectDatasetPlan() throws IOException {
+
+    SparkSession session = SparkSession.builder().appName("my-app2").master("local[3]").getOrCreate();
+    SQLContext sc = session.sqlContext();
+
+
+    Dataset<Row> ds = sc.read().option("header", "false").csv("file:///tmp/test.csv")
+        .distinct();
+
+    ds.write().mode(Overwrite).csv("file:///tmp/out.csv");
+
+  }
+
 
 }

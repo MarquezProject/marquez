@@ -2,7 +2,6 @@ package marquez.spark.agent;
 
 import static marquez.client.models.JobType.BATCH;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -40,6 +39,21 @@ import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.Stage;
 import org.apache.spark.scheduler.StageInfo;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
+import org.apache.spark.sql.execution.QueryExecution;
+import org.apache.spark.sql.execution.SQLExecution;
+import org.apache.spark.sql.execution.SparkPlan;
+import org.apache.spark.sql.execution.SparkPlanInfo;
+import org.apache.spark.sql.execution.datasources.FileIndex;
+import org.apache.spark.sql.execution.datasources.FilePartition;
+import org.apache.spark.sql.execution.datasources.FileScanRDD;
+import org.apache.spark.sql.execution.datasources.HadoopFsRelation;
+import org.apache.spark.sql.execution.datasources.InsertIntoHadoopFsRelationCommand;
+import org.apache.spark.sql.execution.datasources.LogicalRelation;
+import org.apache.spark.sql.execution.datasources.PartitionedFile;
+import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionStart;
+import org.apache.spark.sql.sources.BaseRelation;
 import org.apache.spark.storage.RDDInfo;
 
 import marquez.client.Backends;
@@ -65,20 +79,42 @@ public class SparkListener {
 
   private static String jobNamespace;
   private static String jobName;
+  private static String runId;
+
+  private static String get(String[] elements, String name, int index) {
+    boolean check = elements.length > index + 1 && name.equals(elements[index]);
+    if (check) {
+      return elements[index + 1];
+    } else {
+      System.out.println("missing " + name + " in " + Arrays.toString(elements) + " at " + index);
+      return "default";
+    }
+  }
 
   public static void init(String agentArgument) {
-    System.out.println("Init SparkListener: " + agentArgument);
-    marquezClient = Clients.newWriteOnlyClient(Backends.newFileBackend(new File("/tmp/marquez.request.log")));
-    jobNamespace = "jobs";
-    jobName = "Spark";
+    System.out.println("*** Init SparkListener: " + agentArgument);
+    String[] elements = agentArgument.split("\\/");
+    String version = get(elements, "api", 1);
+    if (version.equals("v1")) {
+      System.out.println("marquez api v1");
+    }
+    jobNamespace = get(elements, "namespaces", 3);
+    jobName = get(elements, "jobs", 5);
+    runId = get(elements, "runs", 7);
+    System.out.println(String.format("/api/%s/namespaces/%s/jobs/%s/runs/%s", version, jobNamespace, jobName, runId));
+    marquezClient = Clients.newWriteOnlyClient(Backends.newLoggingBackend());
   }
 
   public static void registerActiveJob(ActiveJob activeJob) {
-    System.out.println("Registered Active job:" + activeJob.jobId());
+    System.out.println("*** Registered Active job:" + activeJob.jobId());
+    System.out.println("***   - call site:  " + activeJob.callSite().shortForm());
+    System.out.println("***   - rdd: " + activeJob.finalStage().rdd());
+    new Exception("*** ActiveJob").printStackTrace(System.out);
     activeJobs.put(activeJob.jobId(), activeJob);
   }
 
   public static void registerOutput(PairRDDFunctions<?, ?> pairRDDFunctions, Configuration conf) {
+    System.out.println("*** Registered output:" + pairRDDFunctions + " " + conf);
     Field[] declaredFields = pairRDDFunctions.getClass().getDeclaredFields();
     for (Field field : declaredFields) {
       if (field.getName().endsWith("self") && RDD.class.isAssignableFrom(field.getType())) {
@@ -90,6 +126,59 @@ public class SparkListener {
           e.printStackTrace(System.out);
         }
       }
+    }
+  }
+
+  public static void registerOutput(SparkSession session, String name, LogicalPlan command) {
+    System.out.println("*** Registered output: (" + session + ", " + name +", " + command + ")");
+    print("*** -> command: ", command);
+    if (name.equals("save")) {
+      InsertIntoHadoopFsRelationCommand c = ((InsertIntoHadoopFsRelationCommand)command);
+      System.out.println("*** -> Path: " + c.outputPath());
+    }
+  }
+
+  private static void print(String prefix, LogicalPlan plan) {
+    String extra = "";
+    if (plan instanceof LogicalRelation) {
+      LogicalRelation lr = (LogicalRelation) plan;
+      BaseRelation lrr = lr.relation();
+      extra = "||| " + lrr + " " + lr.output() + " " + lr.catalogTable() + " " + lr.isStreaming();
+      if (lrr instanceof HadoopFsRelation) {
+        FileIndex location = ((HadoopFsRelation)lrr).location();
+        extra += "|||" + Arrays.toString(location.inputFiles());
+      }
+    }
+    System.out.println(prefix + plan.getClass().getSimpleName() + ":" + extra + " plan: " + plan);
+    Collection<LogicalPlan> children = JavaConversions.asJavaCollection(plan.children());
+    for (LogicalPlan child : children) {
+      print(prefix + "  ", child);
+    }
+  }
+
+  public static void registerOutput(QueryExecution qe) {
+    System.out.println("*** Registered output QE: (" + qe + ")");
+    print("*** -> physical: ", qe.executedPlan());
+  }
+
+  private static void print(String prefix, SparkPlan executedPlan) {
+    System.out.println(prefix + executedPlan.treeString(true, true));
+  }
+
+  private static void sparkSQLExecStart(
+      SparkListenerSQLExecutionStart sparkListenerSQLExecutionStart) {
+    SparkPlanInfo sparkPlanInfo = sparkListenerSQLExecutionStart.sparkPlanInfo();
+    QueryExecution qe = SQLExecution.getQueryExecution(sparkListenerSQLExecutionStart.executionId());
+    print("%*** -> logical: ", qe.logical());
+    print("%*** -> physical: ", qe.executedPlan());
+    print("sparkPlanInfo Exec:"+ sparkListenerSQLExecutionStart.executionId()+ "  ", sparkPlanInfo);
+  }
+
+  private static void print(String prefix, SparkPlanInfo i) {
+    System.out.println(prefix + i.nodeName()+ "(" + i.simpleString()+ " metadata: " + i.metadata() + " metrics: "+ i.metrics() + ")" );
+    Collection<SparkPlanInfo> children = JavaConversions.asJavaCollection(i.children());
+    for (SparkPlanInfo child : children) {
+      print(prefix + "  ", child);
     }
   }
 
@@ -158,7 +247,7 @@ public class SparkListener {
     }
     Instant at = Instant.ofEpochMilli(jobEnd.time());
 
-    if (jobEnd.jobResult() instanceof JobFailed){
+    if (jobEnd.jobResult() instanceof JobFailed) {
       Exception e = ((JobFailed)jobEnd.jobResult()).exception();
       e.printStackTrace(System.out);
       marquezClient.markRunAsFailed(runId.toString(), at);
@@ -216,6 +305,16 @@ public class SparkListener {
       } catch (IOException e) {
         e.printStackTrace(System.out);
       }
+    } else if (rdd instanceof FileScanRDD) {
+      Collection<FilePartition> filePartitions = JavaConversions.asJavaCollection(((FileScanRDD)rdd).filePartitions());
+      List<Path> paths = new ArrayList<Path>();
+      for (FilePartition filePartition : filePartitions) {
+        PartitionedFile[] files = filePartition.files();
+        for (PartitionedFile file : files) {
+          paths.add(new Path(file.filePath()));
+        }
+      }
+      inputPaths = paths.toArray(new Path[paths.size()]);
     }
     return inputPaths;
   }
@@ -262,6 +361,7 @@ public class SparkListener {
   }
 
   public static void instrument(SparkContext context) {
+    System.out.println("*** instrument:" + context);
     Class<?>[] interfaces = {SparkListenerInterface.class};
     SparkListenerInterface listener = (SparkListenerInterface)Proxy.newProxyInstance(SparkListener.class.getClassLoader(), interfaces, new InvocationHandler(){
 
@@ -269,6 +369,15 @@ public class SparkListener {
 
       @Override
       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if (method.getName().equals("onExecutorMetricsUpdate")
+            || method.getName().equals("onBlockUpdated")
+            || method.getName().equals("onTaskStart")
+            || method.getName().equals("onTaskEnd")
+            || method.getName().equals("onStageSubmitted")
+            || method.getName().equals("onStageCompleted")
+            ) {
+          return null;
+        }
         int call = counter ++;
         String prefix = "MQZ - " + call;
         String eventType = "";
@@ -308,6 +417,8 @@ public class SparkListener {
             ActiveJob activeJob = activeJobs.get(jobId);
             System.out.println(jp + activeJob + jobEnd);
             jobEnded(jobEnd);
+          } else if (method.getName().equals("onOtherEvent") && args[0] instanceof SparkListenerSQLExecutionStart) {
+            sparkSQLExecStart((SparkListenerSQLExecutionStart)args[0]);
           }
         }
 

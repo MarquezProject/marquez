@@ -3,6 +3,7 @@ package marquez.spark.agent;
 import java.lang.instrument.Instrumentation;
 
 import marquez.spark.agent.transformers.ActiveJobTransformer;
+import marquez.spark.agent.transformers.DataFrameWriterTransformer;
 import marquez.spark.agent.transformers.PairRDDFunctionsTransformer;
 import marquez.spark.agent.transformers.SparkContextTransformer;
 
@@ -12,6 +13,7 @@ public class MarquezAgent {
     instrumentation.addTransformer(new ActiveJobTransformer());
     instrumentation.addTransformer(new SparkContextTransformer());
     instrumentation.addTransformer(new PairRDDFunctionsTransformer());
+    instrumentation.addTransformer(new DataFrameWriterTransformer());
   }
 
   public static void premain(String agentArgument, Instrumentation instrumentation) throws Exception {

@@ -36,6 +36,7 @@ dependencies {
     
     // https://mvnrepository.com/artifact/org.apache.spark/spark-core
     compileOnly 'org.apache.spark:spark-core_2.12:2.4.6'
+    compileOnly 'org.apache.spark:spark-sql_2.12:2.4.6'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.13'
