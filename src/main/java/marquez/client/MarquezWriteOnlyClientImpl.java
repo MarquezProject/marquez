@@ -10,6 +10,7 @@ import static marquez.client.MarquezPathV1.runTransitionPath;
 import static marquez.client.MarquezPathV1.sourcePath;
 
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.Instant;
 import java.util.Map;
@@ -79,5 +80,10 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
     Map<String, Object> queryParams =
         at == null ? null : ImmutableMap.of("at", ISO_INSTANT.format(at));
     backend.post(path(runTransitionPath(runId, runState), queryParams));
+  }
+
+  @Override
+  public void close() throws IOException {
+    backend.close();
   }
 }

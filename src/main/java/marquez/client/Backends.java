@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Backends {
 
+  @VisibleForTesting static final String DEFAULT_URL = "http://localhost:8080";
+
   /**
    * Will write to a file.
    *
@@ -26,7 +28,7 @@ public class Backends {
   /**
    * Will issue http requests.
    *
-   * @param baseURL the base url for http requests
+   * @param baseUrl the base url for http requests
    * @return the corresponding backend implementation
    */
   public static Backend newHttpBackend(URL baseUrl) {
@@ -34,9 +36,18 @@ public class Backends {
   }
 
   /**
+   * Will log requests.
+   *
+   * @return the corresponding backend implementation
+   */
+  public static Backend newLoggingBackend() {
+    return new LoggingBackend();
+  }
+
+  /**
    * Initializes the backend base on environment variable configuration.
    *
-   * <p>
+   * <p>configuration:
    *
    * <ul>
    *   <li>MARQUEZ_BACKEND=FILE|HTTP
@@ -52,12 +63,12 @@ public class Backends {
 
   @VisibleForTesting
   static Backend newBackendFromEnv(Map<String, String> env) {
-    String backendName = env.get("MARQUEZ_BACKEND");
+    String backendName = env.getOrDefault("MARQUEZ_BACKEND", "http");
     switch (backendName.toUpperCase(US)) {
       case "FILE":
         return newFileBackend(new File(env.get("MARQUEZ_FILE")));
       case "HTTP":
-        String configuredBaseUrl = env.get("MARQUEZ_URL");
+        String configuredBaseUrl = env.getOrDefault("MARQUEZ_URL", DEFAULT_URL);
         try {
           return newHttpBackend(new URL(configuredBaseUrl));
         } catch (MalformedURLException e) {
@@ -68,6 +79,8 @@ public class Backends {
                   + " Defaulting to doing nothing.");
           return new NullBackend();
         }
+      case "LOG":
+        return newLoggingBackend();
       default:
         log.error(
             "Could not initialize Marquez backend for "

@@ -30,6 +30,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -46,6 +48,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,6 +71,7 @@ public class MarquezHttpTest {
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
 
   @Mock private HttpClient httpClient;
+  @Mock private CloseableHttpClient closeableHttpClient;
   @Mock private HttpResponse httpResponse;
   @Mock private HttpEntity httpEntity;
 
@@ -222,5 +226,15 @@ public class MarquezHttpTest {
 
     final URL url = marquezUrl.from(path("/namespace/%s", newNamespaceName()));
     assertThatExceptionOfType(MarquezHttpException.class).isThrownBy(() -> marquezHttp.get(url));
+  }
+
+  @Test
+  public void testClose() throws Exception {
+    // the sclient is not closeable
+    marquezHttp.close();
+    // the client is closeable
+    MarquezHttp closeableMarquezHttp = new MarquezHttp(closeableHttpClient);
+    closeableMarquezHttp.close();
+    verify(closeableHttpClient, times(1)).close();
   }
 }

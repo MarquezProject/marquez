@@ -1,12 +1,13 @@
 package marquez.client;
 
+import java.io.Closeable;
 import javax.annotation.Nullable;
 
 /**
  * The backend contract for sending Marquez instrumentation. Information operations can be sent
  * synchronously or asynchronously over various protocols
  */
-public interface Backend {
+public interface Backend extends Closeable {
 
   void put(String path, String json);
 

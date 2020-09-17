@@ -5,6 +5,7 @@ import static marquez.client.models.RunState.COMPLETED;
 import static marquez.client.models.RunState.FAILED;
 import static marquez.client.models.RunState.RUNNING;
 
+import java.io.Closeable;
 import java.time.Instant;
 import javax.annotation.Nullable;
 import marquez.client.models.DatasetMeta;
@@ -18,7 +19,7 @@ import marquez.client.models.SourceMeta;
  * The contract of a write only client to instrument jobs actions. Can be taken synchronously or
  * asynchronously
  */
-public interface MarquezWriteOnlyClient {
+public interface MarquezWriteOnlyClient extends Closeable {
 
   public void createNamespace(String namespaceName, NamespaceMeta namespaceMeta);
 

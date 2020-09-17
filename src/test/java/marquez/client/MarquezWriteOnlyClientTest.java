@@ -5,6 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -123,5 +124,11 @@ public class MarquezWriteOnlyClientTest {
     String runId = UUID.randomUUID().toString();
     Instant at = Instant.now();
     client.markRunAs(runId, RunState.NEW, at);
+  }
+
+  @Test
+  public void testClose() throws IOException {
+    client.close();
+    verify(backend, times(1)).close();
   }
 }

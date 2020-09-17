@@ -32,6 +32,11 @@ repositories {
   mavenCentral()
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 ext {
   lombokVersion = '1.18.8'
   slf4jVersion = '1.7.26'

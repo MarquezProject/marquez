@@ -1,8 +1,12 @@
 package marquez.client;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.http.protocol.HTTP.USER_AGENT;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,21 +14,29 @@ import java.io.Writer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import marquez.client.MarquezClient.Version;
+import marquez.client.MarquezHttp.UserAgent;
 
 /** A backend that writes events to a file in json. */
 @Slf4j
 class FileBackend implements Backend {
 
+  private static final TypeReference<JsonNode> JSONNODE = new TypeReference<JsonNode>() {};
+
   private final File file;
   private Writer writer = null;
+  private final Map<String, String> headers;
 
-  public FileBackend(File file) {
+  FileBackend(File file) {
     this(file, initWriter(file));
   }
 
+  @VisibleForTesting
   FileBackend(File file, Writer writer) {
     this.file = file;
     this.writer = writer;
+    Version version = MarquezClient.Version.get();
+    this.headers = ImmutableMap.of(USER_AGENT, UserAgent.of(version).getValue());
   }
 
   @VisibleForTesting
@@ -58,10 +70,11 @@ class FileBackend implements Backend {
 
   private void write(String method, String path, String json) {
     if (writer != null) {
-      Map<String, String> call = new LinkedHashMap<String, String>(3);
+      Map<String, Object> call = new LinkedHashMap<>(3);
       call.put("method", method);
+      call.put("headers", headers);
       call.put("path", path);
-      call.put("payload", json);
+      call.put("payload", Utils.fromJson(json, JSONNODE));
       String line = Utils.toJson(call) + "\n";
       try {
         writer.append(line).flush();
@@ -76,5 +89,10 @@ class FileBackend implements Backend {
         writer = null;
       }
     }
+  }
+
+  @Override
+  public void close() throws IOException {
+    writer.close();
   }
 }

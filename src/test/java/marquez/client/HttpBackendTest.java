@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.junit.After;
@@ -47,5 +48,11 @@ public class HttpBackendTest {
     when(marquezHttp.post(url, "json")).thenReturn("ignored");
     httpBackend.post("/path", "json");
     verify(marquezHttp, times(1)).post(url, "json");
+  }
+
+  @Test
+  public void testClose() throws IOException {
+    httpBackend.close();
+    verify(marquezHttp, times(1)).close();
   }
 }

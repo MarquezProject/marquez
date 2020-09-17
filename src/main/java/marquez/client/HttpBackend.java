@@ -1,6 +1,7 @@
 package marquez.client;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -13,7 +14,7 @@ class HttpBackend implements Backend {
   private final URL baseUrl;
   private final MarquezHttp http;
 
-  public HttpBackend(URL baseUrl) {
+  HttpBackend(URL baseUrl) {
     this(baseUrl, MarquezHttp.create(MarquezClient.Version.get()));
   }
 
@@ -21,6 +22,10 @@ class HttpBackend implements Backend {
   HttpBackend(URL baseUrl, MarquezHttp http) {
     this.baseUrl = baseUrl;
     this.http = http;
+  }
+
+  public URL getBaseUrl() {
+    return baseUrl;
   }
 
   private URL url(String path) {
@@ -39,5 +44,10 @@ class HttpBackend implements Backend {
   @Override
   public void post(String path, String json) {
     http.post(url(path), json);
+  }
+
+  @Override
+  public void close() throws IOException {
+    http.close();
   }
 }
