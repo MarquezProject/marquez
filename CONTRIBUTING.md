@@ -8,6 +8,32 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](https://github.com/MarquezProject/marquez-airflow/blob/main/CODE_OF_CONDUCT.md) in all interactions with the community.
 
+# Development
+We recommend installing the following tools to run the tests:
+
+Install pyenv: `brew install pyenv pyenv-virtualenv`
+Add it to your profile: `~/.zshrc` or `~/.bashrc` depending on your shell
+```
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+  eval "$(pyenv virtualenv-init -)"
+fi
+```
+create a marquez-airflow virtual env:
+```
+pyenv virtualenv marquez-airflow
+pyenv activate marquez-airflow
+```
+(depending on the version of python you're running, you may need to alias pip to pip3)
+
+Install the test dependencies:
+```
+pip3 install -r test-requirements.txt
+```
+
+now you can run the tests:
+`pytest --ignore=tests/integration`
+
 # Submitting a [pull request](https://help.github.com/articles/about-pull-requests)
 
 1. [Fork](https://github.com/MarquezProject/marquez-airflow/fork) and clone the repository
