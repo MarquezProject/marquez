@@ -57,6 +57,7 @@ public class SparkSQLExecutionContext implements ExecutionContext {
   }
 
   public void start(SparkListenerSQLExecutionStart startEvent) {
+    logger.info("Spark sql execution started " + startEvent);
     SparkPlanInfo sparkPlanInfo = startEvent.sparkPlanInfo();
     QueryExecution queryExecution = SQLExecution.getQueryExecution(executionId);
     this.inputs = findInputs(queryExecution.logical());
@@ -134,7 +135,7 @@ public class SparkSQLExecutionContext implements ExecutionContext {
   }
 
   public void end(SparkListenerSQLExecutionEnd endEvent) {
-    System.out.println("jobEnded " + endEvent);
+    logger.info("Spark sql execution ended " + endEvent);
     if (success == null) {
       extraInfo.append("unknown end status\n");
     } else if (success) {
@@ -168,7 +169,7 @@ public class SparkSQLExecutionContext implements ExecutionContext {
 
   @Override
   public void end(SparkListenerJobEnd jobEnd) {
-    logger.info("job ended: " + jobEnd);
+    logger.info("Ending job as part of spark-sql:" + jobEnd.jobId());
     extraInfo.append("end: ").append(jobEnd).append("\n");
     if (jobEnd.jobResult() instanceof JobFailed) {
       success = false;
