@@ -1,54 +1,115 @@
 package marquez.spark.agent;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.spark.Dependency;
 import org.apache.spark.SparkContext;
-import org.apache.spark.rdd.HadoopRDD;
-import org.apache.spark.rdd.NewHadoopRDD;
 import org.apache.spark.rdd.PairRDDFunctions;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.scheduler.ActiveJob;
-import org.apache.spark.scheduler.ResultStage;
 import org.apache.spark.scheduler.SparkListenerInterface;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
-import org.apache.spark.scheduler.Stage;
-import org.apache.spark.scheduler.StageInfo;
-import org.apache.spark.storage.RDDInfo;
+import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionEnd;
+import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionStart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import scala.collection.JavaConversions;
+import marquez.client.Backend;
+import marquez.spark.agent.lifecycle.ExecutionContext;
+import marquez.spark.agent.lifecycle.RddExecutionContext;
+import marquez.spark.agent.lifecycle.SparkSQLExecutionContext;
+import marquez.spark.agent.transformers.ActiveJobTransformer;
+import marquez.spark.agent.transformers.PairRDDFunctionsTransformer;
 
 
 public class SparkListener {
+  private static final Logger logger = LoggerFactory.getLogger(SparkListener.class);
 
-  private static Map<Integer, ActiveJob> activeJobs = Collections.synchronizedMap(new HashMap<>());
+  private static final Map<Long, SparkSQLExecutionContext> sparkSqlExecutionRegistry = Collections.synchronizedMap(new HashMap<>());
 
-  private static Map<RDD, Configuration> outputs = Collections.synchronizedMap(new HashMap<>());
-
-  public static void registerActiveJob(ActiveJob activeJob) {
-    System.out.println("Registered Active job:" + activeJob.jobId());
-    activeJobs.put(activeJob.jobId(), activeJob);
+  public static SparkSQLExecutionContext getSparkSQLExecutionContext(long executionId) {
+    SparkSQLExecutionContext sparkSQLExecutionContext = sparkSqlExecutionRegistry.get(executionId);
+    if (sparkSQLExecutionContext == null) {
+      sparkSQLExecutionContext = new SparkSQLExecutionContext(executionId, marquezContext);
+      sparkSqlExecutionRegistry.put(executionId, sparkSQLExecutionContext);
+    }
+    return sparkSQLExecutionContext;
   }
 
+  private static final Map<Integer, ExecutionContext> rddExecutionRegistry = Collections.synchronizedMap(new HashMap<>());
+
+  public static ExecutionContext getExecutionContext(int jobId) {
+    ExecutionContext rddExecutionContext = rddExecutionRegistry.get(jobId);
+    if (rddExecutionContext == null) {
+      rddExecutionContext = new RddExecutionContext(jobId, marquezContext);
+      rddExecutionRegistry.put(jobId, rddExecutionContext);
+    }
+    return rddExecutionContext;
+  }
+
+  public static ExecutionContext getExecutionContext(int jobId, long executionId) {
+    ExecutionContext executionContext = getSparkSQLExecutionContext(executionId);
+    rddExecutionRegistry.put(jobId, executionContext);
+    return executionContext;
+  }
+
+  private static Map<RDD<?>, Configuration> outputs = Collections.synchronizedMap(new HashMap<>());
+
+  public static Configuration removeConfigForRDD(RDD<?> rdd) {
+    return outputs.remove(rdd);
+  }
+
+  private static MarquezContext marquezContext;
+
+  /**
+   * called by the agent on init with the provided argument
+   * @param agentArgument
+   */
+  public static void init(String agentArgument, Backend backend) {
+    logger.info("init: " + agentArgument);
+    marquezContext = new MarquezContext(agentArgument, backend);
+    clear();
+  }
+
+  private static void clear() {
+    sparkSqlExecutionRegistry.clear();
+    rddExecutionRegistry.clear();
+    outputs.clear();
+  }
+
+  /**
+   * Called through the agent to register every new job and get access to the RDDs
+   * @see ActiveJobTransformer
+   * @param activeJob
+   */
+  public static void registerActiveJob(ActiveJob activeJob) {
+    logger.info("registerActiveJob: " + activeJob);
+    String executionIdProp = activeJob.properties().getProperty("spark.sql.execution.id");
+    ExecutionContext context;
+    if (executionIdProp != null) {
+      long executionId = Long.parseLong(executionIdProp);
+      context = getExecutionContext(activeJob.jobId(), executionId);
+    } else {
+      context = getExecutionContext(activeJob.jobId());
+    }
+    context.setActiveJob(activeJob);
+  }
+
+  /**
+   * called through the agent when writing with the RDD API as the RDDs do not contain the output information
+   * @see PairRDDFunctionsTransformer
+   * @param pairRDDFunctions the wrapping RDD containing the rdd to save
+   * @param conf the write config
+   */
   public static void registerOutput(PairRDDFunctions<?, ?> pairRDDFunctions, Configuration conf) {
+    logger.info("registerOutput: " + pairRDDFunctions + " " + conf);
     Field[] declaredFields = pairRDDFunctions.getClass().getDeclaredFields();
     for (Field field : declaredFields) {
       if (field.getName().endsWith("self") && RDD.class.isAssignableFrom(field.getType())) {
@@ -61,28 +122,55 @@ public class SparkListener {
         }
       }
     }
-
   }
 
-  private static Path getOutputPath(RDD rdd) {
-    Configuration conf = outputs.get(rdd);
-    if (conf == null) {
-      return null;
-    }
-    // "new" mapred api
-    Path path = org.apache.hadoop.mapred.FileOutputFormat.getOutputPath(new JobConf(conf));
-    if (path == null) {
-      try {
-        // old fashioned mapreduce api
-        path =  org.apache.hadoop.mapreduce.lib.output.FileOutputFormat.getOutputPath(new Job(conf));
-      } catch (IOException exception) {
-        exception.printStackTrace(System.out);
-      }
-    }
-    return path;
+  /**
+   * called by the SparkListener when a spark-sql (Dataset api) execution starts
+   * @param startEvent
+   */
+  private static void sparkSQLExecStart(SparkListenerSQLExecutionStart startEvent) {
+    logger.info("sparkSQLExecStart: " + startEvent);
+    SparkSQLExecutionContext context = getSparkSQLExecutionContext(startEvent.executionId());
+    context.start(startEvent);
   }
 
+  /**
+   * called by the SparkListener when a spark-sql (Dataset api) execution ends
+   * @param endEvent
+   */
+  private static void sparkSQLExecEnd(SparkListenerSQLExecutionEnd endEvent) {
+    logger.info("sparkSQLExecEnd: " + endEvent);
+    SparkSQLExecutionContext context = sparkSqlExecutionRegistry.remove(endEvent.executionId());
+    context.end(endEvent);
+  }
+
+  /**
+   * called by the SparkListener when a job starts
+   * @param jobStart
+   */
+  private static void jobStarted(SparkListenerJobStart jobStart) {
+    logger.info("jobStarted: " + jobStart);
+    ExecutionContext context = getExecutionContext(jobStart.jobId());
+    context.start(jobStart);
+  }
+
+  /**
+   * called by the SparkListener when a job ends
+   * @param jobStart
+   */
+  private static void jobEnded(SparkListenerJobEnd jobEnd) {
+    logger.info("jobEnded: " + jobEnd);
+    ExecutionContext context = rddExecutionRegistry.remove(jobEnd.jobId());
+    context.end(jobEnd);
+  }
+
+  /**
+   * called through the agent when creating the Spark context
+   * We register a new SparkListener
+   * @param context the spark context
+   */
   public static void instrument(SparkContext context) {
+    logger.info("instrument: " + context);
     Class<?>[] interfaces = {SparkListenerInterface.class};
     SparkListenerInterface listener = (SparkListenerInterface)Proxy.newProxyInstance(SparkListener.class.getClassLoader(), interfaces, new InvocationHandler(){
 
@@ -90,137 +178,49 @@ public class SparkListener {
 
       @Override
       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if (method.getName().equals("onExecutorMetricsUpdate")
+            || method.getName().equals("onBlockUpdated")
+            || method.getName().equals("onTaskStart")
+            || method.getName().equals("onTaskEnd")
+            || method.getName().equals("onStageSubmitted")
+            || method.getName().equals("onStageCompleted")
+            ) {
+          return null;
+        }
         int call = counter ++;
         String prefix = "MQZ - " + call;
-        String eventType = "";
         if (args.length == 1 & args[0]!=null) {
-          eventType = "(" + args[0].getClass().getSimpleName() + ")";
-        }
-        System.out.println(  prefix + "-(START)----- MARQUEZ -: " + method.getName() + eventType);
-        System.out.println(  prefix + "-(method)----" + method);
-        for (Object arg : args) {
-          System.out.println(prefix + "-(arg)-------  " + arg);
-        }
-//        new Exception("MQZ - " + call + "-(Called from)-").printStackTrace(System.out);
-        if (args.length == 1 & args[0]!=null) {
-          if (method.getName().equals("onJobStart") && args[0] instanceof SparkListenerJobStart) {
-            SparkListenerJobStart jobStart = (SparkListenerJobStart)args[0];
-
-            jobStarted(jobStart);
-            int jobId = jobStart.jobId();
-            String jp = prefix + "-(job:"+jobId+")-";
-            ActiveJob activeJob = activeJobs.get(jobId);
-            System.out.println(jp + activeJob + jobStart.properties().toString());
-            Stage finalStage = activeJob.finalStage();
-            printStages(jp + "-(stage)-", finalStage);
-            List<StageInfo> stageInfos = JavaConversions.seqAsJavaList(jobStart.stageInfos());
-            for (StageInfo stageInfo : stageInfos) {
-              String sp = jp + "-(stageInfo)-(stageId:"+stageInfo.stageId()+")----" + stageInfo.name();
-              System.out.println(sp + "-parents:" + stageInfo.parentIds());
-              List<RDDInfo> rddInfos = JavaConversions.seqAsJavaList(stageInfo.rddInfos());
-              for (RDDInfo rddInfo : rddInfos) {
-                System.out.println( sp + "\\-(rddInfo)-" + rddInfo);
-              }
-            }
-          } else if (method.getName().equals("onJobEnd") && args[0] instanceof SparkListenerJobEnd) {
-            SparkListenerJobEnd jobEnd = (SparkListenerJobEnd)args[0];
-            int jobId = jobEnd.jobId();
-            String jp = prefix + "-(job:"+jobId+")-";
-            ActiveJob activeJob = activeJobs.get(jobId);
-            System.out.println(jp + activeJob + jobEnd);
-            jobEnded(jobEnd);
+          Object arg = args[0];
+          String eventType = "(" + arg.getClass().getSimpleName() + ")";
+          logger.info(  prefix + " -: " + method.getName() + eventType);
+          if (method.getName().equals("onJobStart") && arg instanceof SparkListenerJobStart) {
+            jobStarted((SparkListenerJobStart)args[0]);
+          } else if (method.getName().equals("onJobEnd") && arg instanceof SparkListenerJobEnd) {
+            jobEnded((SparkListenerJobEnd)arg);
+          } else if (method.getName().equals("onOtherEvent") && arg instanceof SparkListenerSQLExecutionStart) {
+            sparkSQLExecStart((SparkListenerSQLExecutionStart)arg);
+          } else if (method.getName().equals("onOtherEvent") && arg instanceof SparkListenerSQLExecutionEnd) {
+            sparkSQLExecEnd((SparkListenerSQLExecutionEnd)arg);
+          } else {
+            logger.info(  prefix + " UNEXPECTED -(event)----" + arg);
+          }
+        } else {
+          logger.info(  prefix + " UNEXPECTED -(method)----" + method);
+          for (Object arg : args) {
+            logger.info(prefix + " UNEXPECTED -(arg)-------  " + arg);
           }
         }
-
-        System.out.println( prefix + "-(END)------- MARQUEZ -: " + method.getName() + eventType);
         return null;
-      }
-
-      private void jobStarted(SparkListenerJobStart jobStart) {
-        ActiveJob activeJob = activeJobs.get(jobStart.jobId());
-        RDD<?> finalRDD = activeJob.finalStage().rdd();
-        Set<RDD<?>> rdds = flattenRDDs(finalRDD);
-        List<String> inputs = findInputs(rdds);
-        List<String> outputs = findOutputs(rdds);
-        System.out.println("++++++++++++ Job " + jobStart.jobId() + " started at: " + jobStart.time() + " Inputs: " + inputs + " Outputs: " + outputs);
-      }
-
-      private void jobEnded(SparkListenerJobEnd jobEnd) {
-        System.out.println("++++++++++++ Job " + jobEnd.jobId() + " ended with status " + jobEnd.jobResult() + " at: " + jobEnd.time());
-      }
-
-      private List<String> findOutputs(Set<RDD<?>> rdds) {
-        List<String> result = new ArrayList<>();
-        for (RDD<?> rdd: rdds) {
-          Path outputPath = getOutputPath(rdd);
-          if (outputPath != null) {
-            result.add(outputPath.toUri().toString());
-          }
-        }
-        return result;
-      }
-
-
-      private Set<RDD<?>> flattenRDDs(RDD<?> rdd) {
-        Set<RDD<?>> rdds = new HashSet<>();
-        rdds.add(rdd);
-        Collection<Dependency<?>> deps = JavaConversions.asJavaCollection(rdd.dependencies());
-        for (Dependency<?> dep : deps) {
-          rdds.addAll(flattenRDDs(dep.rdd()));
-        }
-        return rdds;
-      }
-
-      private List<String> findInputs(Set<RDD<?>> rdds) {
-        List<String> result = new ArrayList<>();
-        for (RDD<?> rdd: rdds) {
-          Path[] inputPaths = getInputPaths(rdd);
-          if (inputPaths != null) {
-            for (Path path : inputPaths) {
-              result.add(path.toUri().toString());
-            }
-          }
-        }
-        return result;
-      }
-
-      private Path[] getInputPaths(RDD<?> rdd) {
-        Path[] inputPaths = null;
-        if (rdd instanceof HadoopRDD) {
-          inputPaths = org.apache.hadoop.mapred.FileInputFormat.getInputPaths(((HadoopRDD<?,?>)rdd).getJobConf());
-        } else if (rdd instanceof NewHadoopRDD) {
-          try {
-            inputPaths = org.apache.hadoop.mapreduce.lib.input.FileInputFormat.getInputPaths(new Job(((NewHadoopRDD<?,?>)rdd).getConf()));
-          } catch (IOException e) {
-            e.printStackTrace(System.out);
-          }
-        }
-        return inputPaths;
-      }
-
-      private void printRDDs(String prefix, RDD<?> rdd) {
-
-        Path outputPath = getOutputPath(rdd);
-        Path[] inputPath = getInputPaths(rdd);
-        System.out.println(prefix + rdd + (outputPath == null ? "" : " output: " + outputPath) + (inputPath == null ? "" : " input: " + Arrays.toString(inputPath)));
-        Collection<Dependency<?>> deps = JavaConversions.asJavaCollection(rdd.dependencies());
-        for (Dependency<?> dep : deps) {
-          printRDDs(prefix + " \\ ", dep.rdd());
-        }
-      }
-
-      private void printStages(String prefix, Stage stage) {
-        if (stage instanceof ResultStage) {
-          ResultStage resultStage = (ResultStage)stage;
-          System.out.println(prefix +"(stageId:" + stage.id() + ") Result:" + resultStage.func());
-        }
-        printRDDs(prefix +"(stageId:" + stage.id() + ")-("+stage.getClass().getSimpleName()+")- RDD: ",  stage.rdd());
-        Collection<Stage> parents = JavaConversions.asJavaCollection(stage.parents());
-        for (Stage parent : parents) {
-          printStages(prefix + " \\ ", parent);
-        }
       }
     });
     context.addSparkListener(listener);
+  }
+
+  /**
+   * To close the underlying resources.
+   */
+  public static void close() {
+    clear();
+    marquezContext.close();
   }
 }

@@ -13,8 +13,8 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 
@@ -22,6 +22,7 @@ repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+    mavenLocal()
 }
 
 dependencies {
@@ -31,9 +32,11 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     //implementation 'com.google.guava:guava:29.0-jre'
     implementation 'org.javassist:javassist:3.20.0-GA'
+    implementation 'io.github.marquezproject:marquez-java:0.4.3-SNAPSHOT'
     
     // https://mvnrepository.com/artifact/org.apache.spark/spark-core
     compileOnly 'org.apache.spark:spark-core_2.12:2.4.6'
+    compileOnly 'org.apache.spark:spark-sql_2.12:2.4.6'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.13'
@@ -42,6 +45,7 @@ dependencies {
 shadowJar {
    // avoid conflict with any client version of that lib 
    relocate 'javassist', 'marquez.javassist'
+   relocate 'com.fasterxml.jackson', 'marquez.com.fasterxml.jackson'
 }
 
 jar {

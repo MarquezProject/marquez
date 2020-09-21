@@ -28,10 +28,12 @@ repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+    mavenLocal()
 }
 
 dependencies {
     implementation 'org.apache.spark:spark-core_2.12:2.4.6'
+    implementation 'org.apache.spark:spark-sql_2.12:2.4.6'
 
     compileOnly project(path: ':marquez-spark-agent', configuration: 'shadow')
 
@@ -40,14 +42,14 @@ dependencies {
 }
 test {
   testLogging.showStandardStreams = true
-  jvmArgs '-javaagent:marquez-spark-agent/build/libs/marquez-spark-agent-all.jar'
+  jvmArgs '-javaagent:marquez-spark-agent/build/libs/marquez-spark-agent-all.jar=/api/v1/namespaces/ns_name/jobs/job_name/runs/ea445b5c-22eb-457a-8007-01c7c52b6e54'
 }
 
 application {
     // Define the main class for the application.
     mainClassName = 'marquez.spark.fixture.Main'
     applicationDefaultJvmArgs = [
-        '-javaagent:marquez-spark-agent/build/libs/marquez-spark-agent-all.jar',
+        '-javaagent:marquez-spark-agent/build/libs/marquez-spark-agent-all.jar=/api/v1/namespaces/ns_name/jobs/job_name/runs/ea445b5c-22eb-457a-8007-01c7c52b6e54',
     ]
 }
 

@@ -8,3 +8,11 @@
  */
 
 rootProject.name = 'marquez-spark-agent'
+
+// adding marquez-java client
+// See: https://docs.gradle.org/current/userguide/composite_builds.html#included_build_declaring_substitutions
+includeBuild('../../../../../marquez-java') {
+    dependencySubstitution {
+        substitute module('io.github.marquezproject:marquez-java') with project(':')
+    }
+}
