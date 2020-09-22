@@ -14,6 +14,8 @@ import os
 import subprocess
 
 import airflow
+from airflow.utils.db import provide_session
+from airflow.models import Connection
 
 
 class JobIdMapping:
@@ -64,7 +66,6 @@ def url_to_https(url):
 
 
 def get_location(file_path):
-
     # move to the file directory
     abs_path = os.path.abspath(file_path)
     file_name = os.path.basename(file_path)
@@ -90,3 +91,24 @@ def execute_git(cwd, params):
     p.wait(timeout=0.5)
     out, err = p.communicate()
     return out.decode('utf8').strip()
+
+
+def get_connection_uri(conn_id):
+    """
+    Return the connection URI for the given ID. We first attempt to lookup
+    the connection URI via AIRFLOW_CONN_<conn_id>, else fallback on querying
+    the Airflow's connection table.
+    """
+    conn_uri = os.environ.get('AIRFLOW_CONN_' + conn_id.upper())
+    return conn_uri or _get_connection(conn_id).get_uri()
+
+
+@provide_session
+def _get_connection(conn_id, session=None):
+    # TODO: We may want to throw an exception if the connection
+    # does not exist (ex: AirflowConnectionException). The connection
+    # URI is required when collecting metadata for a data source.
+    return (session
+            .query(Connection)
+            .filter(Connection.conn_id == conn_id)
+            .first())
