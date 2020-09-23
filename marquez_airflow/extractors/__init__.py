@@ -119,7 +119,7 @@ class BaseExtractor:
     def validate(self):
         # TODO: maybe we should also enforce the module
         assert(self.operator_class is not None and
-               self.operator.__class__.__name__ == self.operator_class)
+               self.operator.__class__ == self.operator_class)
 
     def extract(self) -> [StepMetadata]:
         raise NotImplementedError

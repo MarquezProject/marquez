@@ -79,7 +79,7 @@ class DAG(airflow.models.DAG):
                         execution_date,
                         run_args,
                         task,
-                        extractors.get(task.__class__.__name__))
+                        extractors.get(task.__class__))
                 except Exception as e:
                     log.error(f'Failed to record task: {e}',
                               airflow_dag_id=self.dag_id,
@@ -190,11 +190,14 @@ class DAG(airflow.models.DAG):
         marquez_jobrun_ids = []
 
         for step in steps_metadata:
-            input_datasets = []
-            output_datasets = []
-
+            inputs = []
             try:
-                input_datasets = self.register_datasets(step.inputs)
+                self.register_datasets(step.inputs)
+                inputs = list(
+                    map(lambda input: {
+                        'namespace': self.marquez_namespace,
+                        'name': input.name
+                    }, step.inputs))
             except Exception as e:
                 log.error(f'Failed to register inputs: {e}',
                           inputs=str(step.inputs),
@@ -203,8 +206,15 @@ class DAG(airflow.models.DAG):
                           step=step.name,
                           airflow_run_id=dag_run_id,
                           marquez_namespace=self.marquez_namespace)
+
+            outputs = []
             try:
-                output_datasets = self.register_datasets(step.outputs)
+                self.register_datasets(step.outputs)
+                outputs = list(
+                    map(lambda output: {
+                        'namespace': self.marquez_namespace,
+                        'name': output.name
+                    }, step.outputs))
             except Exception as e:
                 log.error(f'Failed to register outputs: {e}',
                           outputs=str(step.outputs),
@@ -218,8 +228,8 @@ class DAG(airflow.models.DAG):
                                       job_type=JobType.BATCH,  # job type
                                       location=(step.location or
                                                 task_location),
-                                      input_dataset=input_datasets,
-                                      output_dataset=output_datasets,
+                                      input_dataset=inputs,
+                                      output_dataset=outputs,
                                       context=step.context,
                                       description=self.description,
                                       namespace_name=self.marquez_namespace)
@@ -311,43 +321,32 @@ class DAG(airflow.models.DAG):
         return int(round(time.time() * 1000))
 
     def register_datasets(self, datasets):
-        dataset_keys = []
-        if not datasets:
-            return dataset_keys
         client = self.get_marquez_client()
         for dataset in datasets:
             if isinstance(dataset, Dataset):
-                _key = str(dataset)
+                _key = f"{self.marquez_namespace}.{dataset.name}"
                 if _key not in self._marquez_dataset_cache:
-                    source_name = self.register_source(
-                        dataset.source)
-                    if source_name:
-                        dataset = client.create_dataset(
-                            dataset.name,
-                            dataset.type,
-                            dataset.name,  # physical_name the same for now
-                            source_name,
-                            namespace_name=self.marquez_namespace)
-                        dataset_key = dataset.get('id')
-                        if dataset_key:
-                            self._marquez_dataset_cache[_key] = dataset_key
-                            dataset_keys.append(dataset_key)
-                else:
-                    dataset_keys.append(self._marquez_dataset_cache[_key])
-        return dataset_keys
+                    self.register_source(dataset.source)
+                    client.create_dataset(
+                        dataset_name=dataset.name,
+                        dataset_type=dataset.type,
+                        physical_name=dataset.name,
+                        source_name=dataset.source.name,
+                        namespace_name=self.marquez_namespace)
+                    # NOTE:
+                    self._marquez_dataset_cache[_key] = True
 
     def register_source(self, source):
         if isinstance(source, Source):
-            _key = str(source)
-            if _key in self._marquez_source_cache:
-                return self._marquez_source_cache[_key]
-            client = self.get_marquez_client()
-            ds = client.create_source(source.name,
-                                      source.type,
-                                      source.connection_url)
-            source_name = ds.get('name')
-            self._marquez_source_cache[_key] = source_name
-            return source_name
+            _key = source.name
+            if _key not in self._marquez_source_cache:
+                client = self.get_marquez_client()
+                client.create_source(
+                    source.name,
+                    source.type,
+                    source.connection_url)
+                # NOTE:
+                self._marquez_source_cache[_key] = True
 
     @staticmethod
     def _to_iso_8601(dt):
