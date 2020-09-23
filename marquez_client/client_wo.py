@@ -72,7 +72,7 @@ class MarquezWriteOnlyClient(object):
 
     # Datasets API
     def create_dataset(self, namespace_name, dataset_name, dataset_type,
-                       physical_name, source_name, run_id,
+                       physical_name, source_name, run_id=None,
                        description=None, schema_location=None,
                        fields=None, tags=None):
         Utils.check_name_length(namespace_name, 'namespace_name')
@@ -82,7 +82,6 @@ class MarquezWriteOnlyClient(object):
         if dataset_type == DatasetType.STREAM:
             Utils.is_none(schema_location, 'schema_location')
 
-        Utils.is_none(run_id, 'run_id')
         Utils.check_name_length(physical_name, 'physical_name')
         Utils.check_name_length(source_name, 'source_name')
 
@@ -90,11 +89,13 @@ class MarquezWriteOnlyClient(object):
             'type': dataset_type.value,
             'physicalName': physical_name,
             'sourceName': source_name,
-            'runId': run_id,
         }
 
         if description:
             payload['description'] = description
+
+        if run_id:
+            payload['runId'] = run_id
 
         if fields:
             payload['fields'] = fields
