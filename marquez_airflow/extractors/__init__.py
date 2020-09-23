@@ -43,8 +43,13 @@ class Source:
         self.type = type
         self.connection_url = connection_url
 
+    def __eq__(self, other):
+        return self.name == other.name and \
+               self.type == other.type and \
+               self.connection_url == other.connection_url
+
     def __repr__(self):
-        return "{}+{}".format(self.name, self.connection_url)
+        return f"Source({self.name!r}, {self.type!r}, {self.connection_url!r})"
 
 
 class Dataset:
@@ -59,8 +64,20 @@ class Dataset:
         self.type = type
         self.description = description
 
+    def __eq__(self, other):
+        return self.source == other.source and \
+               self.name == other.name and \
+               self.type == other.type and \
+               self.description == other.description
+
     def __repr__(self):
-        return "{}/{}".format(self.source, self.name)
+        return f"""
+            Dataset(\
+              {self.source!r}, \
+              {self.name!r}, \
+              {self.type!r}, \
+              {self.description!r})
+        """
 
 
 class StepMetadata:
