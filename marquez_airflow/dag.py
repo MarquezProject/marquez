@@ -14,16 +14,18 @@ import json
 import os
 import time
 from uuid import uuid4
+from pendulum import Pendulum
+
+import airflow.models
+from airflow.operators.postgres_operator import PostgresOperator
+
+from marquez_airflow import log
+from marquez_airflow.utils import JobIdMapping, get_location
+from marquez_airflow.extractors import (Dataset, Source, StepMetadata)
+from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 
 from marquez_client.clients import Clients
 from marquez_client.models import JobType
-
-import airflow.models
-from marquez_airflow import log
-from marquez_airflow.extractors import (Dataset, Source, StepMetadata,
-                                        get_extractors)
-from marquez_airflow.utils import JobIdMapping, get_location
-from pendulum import Pendulum
 
 _NOMINAL_TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -40,6 +42,13 @@ class DAG(airflow.models.DAG):
         self.marquez_namespace = os.getenv('MARQUEZ_NAMESPACE',
                                            DAG.DEFAULT_NAMESPACE)
         self._job_id_mapping = JobIdMapping()
+        # TODO: Manually define operator->extractor mappings for now,
+        # but we'll want to encapsulate this logic in an 'Extractors' class
+        # with more convenient methods (ex: 'Extractors.extractor_for_task()')
+        self._extractors = {
+            PostgresOperator: PostgresExtractor
+            # Append new extractors here
+        }
 
     def create_dagrun(self, *args, **kwargs):
 
@@ -51,14 +60,6 @@ class DAG(airflow.models.DAG):
         run_args = {
             'external_trigger': kwargs.get('external_trigger', False)
         }
-
-        extractors = {}
-        try:
-            extractors = get_extractors()
-        except Exception as e:
-            log.warn(f'Failed retrieve extractors: {e}',
-                     airflow_dag_id=self.dag_id,
-                     marquez_namespace=self.marquez_namespace)
 
         # Marquez metadata collection
         try:
@@ -79,7 +80,7 @@ class DAG(airflow.models.DAG):
                         execution_date,
                         run_args,
                         task,
-                        extractors.get(task.__class__))
+                        self._extractors.get(task.__class__))
                 except Exception as e:
                     log.error(f'Failed to record task: {e}',
                               airflow_dag_id=self.dag_id,

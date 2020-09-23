@@ -10,27 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import inspect
-import pkgutil
-import sys
-
 from airflow.models import BaseOperator
-
-
-def get_extractors():
-    extractors = {}
-    for mi in pkgutil.walk_packages(path=__path__,
-                                    onerror=lambda x: None,
-                                    prefix=__name__+'.'):
-        try:
-            pkgutil.get_loader(mi.name).load_module()
-            for name, cls in inspect.getmembers(sys.modules[mi.name],
-                                                inspect.isclass):
-                if issubclass(cls, BaseExtractor) and cls != BaseExtractor:
-                    extractors[cls.get_operator_class()] = cls
-        except Exception:
-            pass
-    return extractors
 
 
 class Source:

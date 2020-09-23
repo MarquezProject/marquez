@@ -11,14 +11,13 @@
 # limitations under the License.
 
 import os
-import pytest
 
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.utils.dates import days_ago
 
 from marquez_airflow import DAG
-from marquez_airflow.extractors import get_extractors
 from marquez_airflow.extractors import (Source, Dataset)
+from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 
 from marquez_client.models import (SourceType, DatasetType)
 
@@ -43,12 +42,7 @@ DAG = dag = DAG(
 )
 
 
-@pytest.fixture
-def extractors():
-    return get_extractors()
-
-
-def test_extract(extractors):
+def test_extract():
     expected_inputs = [
         Dataset(
             type=DatasetType.DB_TABLE,
@@ -70,16 +64,11 @@ def test_extract(extractors):
         dag=DAG
     )
 
-    extractor = extractors.get(_extractor_key(task))
     # NOTE: When extracting operator metadata, only a single StepMetadata
     # object is returned. We'll want to cleanup the Extractor interface to
     # not return an array.
-    step_metadata = extractor(task).extract()[0]
+    step_metadata = PostgresExtractor(task).extract()[0]
 
     assert step_metadata.name == 'food_delivery_7_days.select'
     assert step_metadata.inputs == expected_inputs
     assert step_metadata.outputs == []
-
-
-def _extractor_key(task):
-    return task.__class__
