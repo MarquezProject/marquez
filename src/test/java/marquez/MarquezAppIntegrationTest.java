@@ -64,7 +64,7 @@ public class MarquezAppIntegrationTest {
   private static final String CONFIG_FILE = "config.test.yml";
   private static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
 
-  private static final PostgresContainer POSTGRES = PostgresContainer.create();
+  private static final PostgresContainer POSTGRES = PostgresContainer.create("marquez");
 
   static {
     POSTGRES.start();
