@@ -17,7 +17,6 @@ package marquez;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public final class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
