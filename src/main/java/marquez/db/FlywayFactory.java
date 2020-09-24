@@ -42,6 +42,7 @@ public final class FlywayFactory {
   private static final boolean DEFAULT_VALIDATE_ON_MIGRATE = false;
   private static final boolean DEFAULT_CLEAN_ON_VALIDATION_ERROR = false;
   private static final boolean DEFAULT_CLEAN_DISABLED = false;
+  private static final boolean DEFAULT_OUT_OF_ORDER = false;
   private static final String DEFAULT_LOCATION = "marquez/db/migration";
   private static final List<String> DEFAULT_LOCATIONS = ImmutableList.of(DEFAULT_LOCATION);
   private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
@@ -67,6 +68,7 @@ public final class FlywayFactory {
   @Getter @Setter private boolean validateOnMigrate = DEFAULT_VALIDATE_ON_MIGRATE;
   @Getter @Setter private boolean cleanOnValidationError = DEFAULT_CLEAN_ON_VALIDATION_ERROR;
   @Getter @Setter private boolean cleanDisabled = DEFAULT_CLEAN_DISABLED;
+  @Getter @Setter private boolean outOfOrder = DEFAULT_OUT_OF_ORDER;
   @Getter @Setter private List<String> locations = DEFAULT_LOCATIONS;
   @Getter @Setter private String encoding = DEFAULT_ENCODING;
   @Getter @Setter private String table = DEFAULT_TABLE;
@@ -109,6 +111,7 @@ public final class FlywayFactory {
         .validateOnMigrate(validateOnMigrate)
         .cleanOnValidationError(cleanOnValidationError)
         .cleanDisabled(cleanDisabled)
+        .outOfOrder(outOfOrder)
         .locations(locations.stream().toArray(String[]::new))
         .encoding(encoding)
         .table(table)
