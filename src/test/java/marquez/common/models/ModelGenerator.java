@@ -55,7 +55,9 @@ public final class ModelGenerator extends Generator {
     switch (type) {
       case BIGQUERY:
         // FIXME: when not using the jdbc driver ?
-        connectionUrlString = "jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=MyBigQueryProject;OAuthType=1;" + newId();
+        connectionUrlString =
+            "jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=MyBigQueryProject;OAuthType=1;"
+                + newId();
       case PULSAR:
         connectionUrlString = "pulsar://localhost:6650" + newId();
       case ORACLE:
