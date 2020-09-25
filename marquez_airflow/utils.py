@@ -16,6 +16,9 @@ import subprocess
 import airflow
 from airflow.utils.db import provide_session
 from airflow.models import Connection
+from marquez_client.models import DatasetType
+
+from marquez_airflow.extractors import Dataset
 
 
 class JobIdMapping:
@@ -112,3 +115,15 @@ def _get_connection(conn_id, session=None):
             .query(Connection)
             .filter(Connection.conn_id == conn_id)
             .first())
+
+
+def to_dataset(source, table) -> Dataset:
+    return Dataset(
+        type=DatasetType.DB_TABLE,
+        name=table,
+        source=source
+    )
+
+
+def get_job_name(task):
+    return f'{task.dag_id}.{task.task_id}'

@@ -30,6 +30,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "marquez-python==0.7.5",
-        "sqlparse==0.3.1"
+        "sqlparse==0.3.1",
+        "google-cloud-bigquery>=1.28.0"
     ],
 )

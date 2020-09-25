@@ -14,12 +14,15 @@ import json
 import os
 import time
 from uuid import uuid4
+
+from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from pendulum import Pendulum
 
 import airflow.models
 from airflow.operators.postgres_operator import PostgresOperator
 
 from marquez_airflow import log
+from marquez_airflow.extractors.bigquery_extractor import BigQueryExtractor
 from marquez_airflow.utils import JobIdMapping, get_location
 from marquez_airflow.extractors import (Dataset, Source, StepMetadata)
 from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
@@ -46,7 +49,8 @@ class DAG(airflow.models.DAG):
         # but we'll want to encapsulate this logic in an 'Extractors' class
         # with more convenient methods (ex: 'Extractors.extractor_for_task()')
         self._extractors = {
-            PostgresOperator: PostgresExtractor
+            PostgresOperator: PostgresExtractor,
+            BigQueryOperator: BigQueryExtractor
             # Append new extractors here
         }
 
@@ -106,6 +110,21 @@ class DAG(airflow.models.DAG):
             dagrun = args[0]
             task_instances = dagrun.get_task_instances()
             for ti in task_instances:
+                extractor = self._extractors.get(ti.operator.__class__)
+                steps_meta = extractor(ti.operator).extract_on_complete()
+                log.info(steps_meta)
+
+                # TODO: update to marquez
+                for step in steps_meta:
+                    self.get_marquez_client().create_job(
+                        job_name=step.name, job_type=JobType.BATCH,
+                        location=(step.location or self._get_location(ti)),
+                        input_dataset=step.inputs,
+                        output_dataset=step.outputs,
+                        context=step.context,
+                        description=self.description,
+                        namespace_name=self.marquez_namespace)
+
                 try:
                     job_name = f'{ti.dag_id}.{ti.task_id}'
                     self.report_jobrun_change(
@@ -355,3 +374,13 @@ class DAG(airflow.models.DAG):
             return dt.format(_NOMINAL_TIME_FORMAT)
         else:
             return dt.strftime(_NOMINAL_TIME_FORMAT)
+
+    @staticmethod
+    def _get_location(task):
+        try:
+            if hasattr(task, 'file_path') and task.file_path:
+                return get_location(task.file_path)
+            else:
+                return get_location(task.dag.fileloc)
+        except Exception:
+            log.warn('Unable to fetch the location')
