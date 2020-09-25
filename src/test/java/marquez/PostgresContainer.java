@@ -15,13 +15,15 @@
 package marquez;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-public class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
+public final class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
   private static final String POSTGRES_9_6 = "postgres:9.6";
   private static final int JDBC = 5;
 
-  private static PostgresContainer container;
+  private static final Map<String, PostgresContainer> containers = new HashMap<>();
 
   private String host;
   private int port;
@@ -30,9 +32,11 @@ public class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
     super(POSTGRES_9_6);
   }
 
-  public static PostgresContainer create() {
+  public static PostgresContainer create(String name) {
+    PostgresContainer container = containers.get(name);
     if (container == null) {
       container = new PostgresContainer();
+      containers.put(name, container);
     }
     return container;
   }
@@ -49,7 +53,7 @@ public class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
   public void start() {
     super.start();
 
-    final URI jdbcUri = URI.create(container.getJdbcUrl().substring(JDBC));
+    final URI jdbcUri = URI.create(this.getJdbcUrl().substring(JDBC));
     host = jdbcUri.getHost();
     port = jdbcUri.getPort();
   }

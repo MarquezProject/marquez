@@ -7,7 +7,7 @@ import org.jdbi.v3.testing.Migration;
 
 public class JdbiRuleInit {
 
-  private static final PostgresContainer POSTGRES = PostgresContainer.create();
+  private static final PostgresContainer POSTGRES = PostgresContainer.create("marquez");
 
   static {
     POSTGRES.start();
