@@ -15,6 +15,9 @@
 package marquez.common.models;
 
 public enum SourceType {
+  BIGQUERY,
+  PULSAR,
+  ORACLE,
   MYSQL,
   POSTGRESQL,
   REDSHIFT,
