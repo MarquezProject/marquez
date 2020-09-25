@@ -53,6 +53,13 @@ public final class ModelGenerator extends Generator {
   public static URI newConnectionUrlFor(SourceType type) {
     String connectionUrlString;
     switch (type) {
+      case BIGQUERY:
+        // FIXME: when not using the jdbc driver ?
+        connectionUrlString = "jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=MyBigQueryProject;OAuthType=1;" + newId();
+      case PULSAR:
+        connectionUrlString = "pulsar://localhost:6650" + newId();
+      case ORACLE:
+        connectionUrlString = "jdbc:oracle:thin:@localhost:1521:xe" + newId();
       case MYSQL:
         connectionUrlString = "jdbc:mysql://localhost:3306/test" + newId();
         break;
