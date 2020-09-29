@@ -10,6 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import subprocess
 
@@ -19,6 +20,8 @@ from airflow.models import Connection
 from marquez_client.models import DatasetType
 
 from marquez_airflow.extractors import Dataset
+
+log = logging.getLogger(__name__)
 
 
 class JobIdMapping:
@@ -103,6 +106,7 @@ def get_connection_uri(conn_id):
     the Airflow's connection table.
     """
     conn_uri = os.environ.get('AIRFLOW_CONN_' + conn_id.upper())
+    log.debug(conn_uri)
     return conn_uri or _get_connection(conn_id).get_uri()
 
 

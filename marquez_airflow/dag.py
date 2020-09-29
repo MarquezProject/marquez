@@ -10,6 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import json
 import os
 import time
@@ -21,7 +22,6 @@ from pendulum import Pendulum
 import airflow.models
 from airflow.operators.postgres_operator import PostgresOperator
 
-from marquez_airflow import log
 from marquez_airflow.extractors.bigquery_extractor import BigQueryExtractor
 from marquez_airflow.utils import JobIdMapping, get_location
 from marquez_airflow.extractors import (Dataset, Source, StepMetadata)
@@ -32,6 +32,8 @@ from marquez_client.models import JobType
 
 _NOMINAL_TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
+log = logging.getLogger(__name__)
+
 
 class DAG(airflow.models.DAG):
     DEFAULT_NAMESPACE = 'default'
@@ -40,6 +42,7 @@ class DAG(airflow.models.DAG):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        log.debug("dag.init()")
         self._marquez_dataset_cache = {}
         self._marquez_source_cache = {}
         self.marquez_namespace = os.getenv('MARQUEZ_NAMESPACE',
@@ -106,6 +109,7 @@ class DAG(airflow.models.DAG):
         return dagrun
 
     def handle_callback(self, *args, **kwargs):
+        log.debug("handle_callback()")
         try:
             dagrun = args[0]
             task_instances = dagrun.get_task_instances()

@@ -20,6 +20,8 @@ import requests
 from marquez_client import MarquezClient
 from urllib3.util.retry import Retry
 
+log = logging.getLogger(__name__)
+
 
 def test_data_in_marquez(wait_for_marquez, init_airflow_db):
     dag_id = "test_dag"
@@ -41,6 +43,7 @@ def test_data_in_marquez(wait_for_marquez, init_airflow_db):
 
 def trigger_dag(dag_id, execution_date):
     process = airflow_cli(['backfill', dag_id, '-s', execution_date])
+    log.debug("dag triggered.")
     return not process.returncode
 
 

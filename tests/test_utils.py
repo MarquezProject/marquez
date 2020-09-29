@@ -10,11 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 from unittest import mock
 
 from airflow.models import Connection
 from marquez_airflow.utils import get_connection_uri
+
+log = logging.getLogger(__name__)
 
 CONN_ID = 'test_db'
 CONN_URI = 'postgres://localhost:5432/testdb'
@@ -22,6 +25,7 @@ CONN_URI = 'postgres://localhost:5432/testdb'
 
 @mock.patch("marquez_airflow.utils._get_connection")
 def test_get_connection_uri(mock_get_connection):
+    log.debug("test_get_connection_url()")
     mock_get_connection.return_value = Connection(
         conn_id=CONN_ID,
         uri=CONN_URI

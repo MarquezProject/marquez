@@ -10,7 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
+
+log = logging.getLogger(__name__)
 
 
 def test_parse_simple_select():
@@ -21,6 +25,7 @@ def test_parse_simple_select():
         '''
     )
 
+    log.debug("sqlparser.parse() successful.")
     assert sql_meta.in_tables == ['table0']
     assert sql_meta.out_tables == []
 

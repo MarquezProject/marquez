@@ -9,6 +9,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import logging
 import json
 
 from google.cloud import bigquery
@@ -18,8 +20,6 @@ from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 
 from marquez_airflow.extractors import BaseExtractor, StepMetadata, Source
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
-
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class BigQueryExtractor(BaseExtractor):
 
     def extract(self) -> [StepMetadata]:
         sql_meta = SqlParser.parse(self.operator.sql)
-        log.info("sql parse successful.")
+        log.info("bigquery sql parse successful.")
 
         conn_id = self.operator.bigquery_conn_id
         source = Source(
@@ -65,7 +65,7 @@ class BigQueryExtractor(BaseExtractor):
         job = client.get_job(job_id=job_name)
 
         job_details = json.dumps(job._properties)
-        log.info(job_details)
+        log.debug(job_details)
 
         steps_meta[0].context = {
             'sql': self.operator.sql,

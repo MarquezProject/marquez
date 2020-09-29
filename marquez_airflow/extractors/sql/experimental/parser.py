@@ -10,12 +10,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 import sqlparse
 from sqlparse.sql import T
 from sqlparse.sql import TokenList
 
 from marquez_airflow.extractors.sql.experimental import SqlMeta
-from marquez_airflow import log
+
+log = logging.getLogger(__name__)
 
 
 def _is_in_table(token):

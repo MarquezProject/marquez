@@ -10,9 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import json
 import unittest
-import logging
 
 import mock
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
@@ -20,15 +20,15 @@ from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from marquez_airflow.extractors.bigquery_extractor import BigQueryExtractor
 from marquez_airflow.utils import get_job_name
 
+log = logging.getLogger(__name__)
+
 
 class TestBigQueryExtractor(unittest.TestCase):
     def setUp(self):
-        logging.basicConfig(format='%(levelname)s:%(message)s',
-                            level=logging.DEBUG)
-        logging.debug("TestBigQueryExtractor.setup(): ")
+        log.debug("TestBigQueryExtractor.setup(): ")
 
     def test_extract(self):
-        logging.info("test_extractor")
+        log.info("test_extractor")
 
         task = BigQueryOperator(
             bql=None,
@@ -69,7 +69,7 @@ class TestBigQueryExtractor(unittest.TestCase):
     @mock.patch("google.cloud.bigquery.Client")
     @mock.patch("json.dumps")
     def test_extract_on_complete(self, mock_json, mock_client):
-        logging.info("test_extract_on_complete")
+        log.info("test_extract_on_complete")
 
         task = BigQueryOperator(
             bql=None,

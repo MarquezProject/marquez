@@ -10,6 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 
 from airflow.operators.postgres_operator import PostgresOperator
@@ -20,6 +21,8 @@ from marquez_airflow.extractors import (Source, Dataset)
 from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 
 from marquez_client.models import (SourceType, DatasetType)
+
+log = logging.getLogger(__name__)
 
 CONN_ID = 'food_delivery_db'
 CONN_URI = 'postgres://localhost:5432/food_delivery'
@@ -56,6 +59,7 @@ def test_extract():
 
     # Set the environment variable for the connection
     os.environ[f"AIRFLOW_CONN_{CONN_ID.upper()}"] = CONN_URI
+    log.debug(CONN_URI)
 
     task = PostgresOperator(
         task_id='select',

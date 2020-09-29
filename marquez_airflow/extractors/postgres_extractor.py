@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from airflow.operators.postgres_operator import PostgresOperator
 
 from marquez_airflow.utils import get_connection_uri
@@ -18,6 +20,8 @@ from marquez_airflow.extractors import (Source, Dataset, StepMetadata)
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
 
 from marquez_client.models import (SourceType, DatasetType)
+
+log = logging.getLogger(__name__)
 
 
 class PostgresExtractor(BaseExtractor):
@@ -29,6 +33,7 @@ class PostgresExtractor(BaseExtractor):
     def extract(self) -> [StepMetadata]:
         # (1) Parse sql statement to obtain input / output tables.
         sql_meta = SqlParser.parse(self.operator.sql)
+        log.info("postgres sql parse successful.")
 
         # (2) Default all inputs / outputs to current connection.
         # NOTE: We'll want to look into adding support for the `database`

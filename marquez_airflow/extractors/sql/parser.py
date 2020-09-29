@@ -10,12 +10,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import re
 from enum import Enum
 
 import sqlparse
 from sqlparse.sql import TokenList
 from sqlparse.tokens import Literal, Name, Punctuation
+
+log = logging.getLogger(__name__)
+
 
 TABLE_REGEX = re.compile(
     r'(((LEFT\s+|RIGHT\s+|FULL\s+)?(INNER\s+|OUTER\s+|STRAIGHT\s+)?'

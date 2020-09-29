@@ -10,7 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from airflow.models import BaseOperator
+
+log = logging.getLogger(__name__)
 
 
 class Source:
@@ -90,6 +94,7 @@ class BaseExtractor:
     operator_class = None
 
     def __init__(self, operator):
+        log.debug("BaseExtractor.init")
         self.operator = operator
 
     @classmethod
