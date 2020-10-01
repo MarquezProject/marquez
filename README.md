@@ -39,7 +39,7 @@ implementation 'io.github.marquezproject:marquez-java:0.4.2'
 
 ```java
 MarquezClient client = MarquezClient().builder()
-    .baseUrl("http://localhost:5000/api/v1")
+    .baseUrl("http://localhost:5000")
     .build()
 
 // Metadata
