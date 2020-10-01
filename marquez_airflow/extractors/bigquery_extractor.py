@@ -56,20 +56,22 @@ class BigQueryExtractor(BaseExtractor):
             }
         )]
 
-    def extract_on_complete(self) -> [StepMetadata]:
+    def extract_on_complete(self, task_instance) -> [StepMetadata]:
         steps_meta = self.extract()
 
         client = bigquery.Client()
 
-        job_name = get_job_name(task=self.operator)
-        job = client.get_job(job_id=job_name)
+        bigquery_job_id = task_instance.job_id
+        job = client.get_job(job_id=bigquery_job_id)
 
         job_details = json.dumps(job._properties)
         log.debug(job_details)
 
         steps_meta[0].context = {
             'sql': self.operator.sql,
-            'job_details': job_details
+            'bigquery.job_details': job_details
         }
+
+        client.close()
 
         return steps_meta

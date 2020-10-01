@@ -115,10 +115,10 @@ class DAG(airflow.models.DAG):
             task_instances = dagrun.get_task_instances()
             for ti in task_instances:
                 extractor = self._extractors.get(ti.operator.__class__)
-                steps_meta = extractor(ti.operator).extract_on_complete()
+                steps_meta = extractor(ti.operator).extract_on_complete(ti)
                 log.info(steps_meta)
 
-                # TODO: update to marquez
+                # FIXME: replace with update api
                 for step in steps_meta:
                     self.get_marquez_client().create_job(
                         job_name=step.name, job_type=JobType.BATCH,

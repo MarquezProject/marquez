@@ -12,6 +12,7 @@
 
 import logging
 import json
+import random
 import unittest
 
 import mock
@@ -66,9 +67,10 @@ class TestBigQueryExtractor(unittest.TestCase):
 
         assert 'customers' == dataset.name
 
+    @mock.patch("airflow.models.TaskInstance")
     @mock.patch("google.cloud.bigquery.Client")
     @mock.patch("json.dumps")
-    def test_extract_on_complete(self, mock_json, mock_client):
+    def test_extract_on_complete(self, mock_json, mock_client, mock_ti):
         log.info("test_extract_on_complete")
 
         task = BigQueryOperator(
@@ -102,8 +104,10 @@ class TestBigQueryExtractor(unittest.TestCase):
         )
 
         job_name = get_job_name(task=task)
-        BigQueryExtractor(task).extract_on_complete()
+        BigQueryExtractor(task).extract_on_complete(mock_ti)
 
+        mock_ti.return_value = TestBigQueryExtractor.get_ti(self)
+        log.info(mock_ti.return_value.job_id)
         mock_client.get_job(job_name).return_value = {}
         mock_json.return_value = \
             TestBigQueryExtractor.get_job_details(self)
@@ -115,6 +119,19 @@ class TestBigQueryExtractor(unittest.TestCase):
     def get_job_details(self):
         with open('tests/extractors/job_details.json') as json_file:
             return json.load(json_file)
+
+    @staticmethod
+    def get_ti(self):
+        # TODO: TaskInstance represents a row in table task_instance
+        # Update this logic
+        # return TaskInstance
+        class TaskInstance:
+            job_id = None
+
+            def __init__(self, job_id):
+                self.job_id = job_id
+
+        return TaskInstance(job_id=random.randrange(10000))
 
 
 if __name__ == '__main__':
