@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "author": "dataviz@wework.com",
   "private": true,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
