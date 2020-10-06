@@ -19,7 +19,7 @@ from marquez_airflow.extractors import BaseExtractor
 from marquez_airflow.extractors import (Source, Dataset, StepMetadata)
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
 
-from marquez_client.models import (SourceType, DatasetType)
+from marquez_client.models import DatasetType
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ class PostgresExtractor(BaseExtractor):
         # property that is used to override the one defined in the connection.
         conn_id = self.operator.postgres_conn_id
         source = Source(
-            type=SourceType.POSTGRESQL,
+            type='POSTGRESQL',
             name=conn_id,
             connection_url=get_connection_uri(conn_id))
 

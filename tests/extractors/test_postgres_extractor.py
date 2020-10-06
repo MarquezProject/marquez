@@ -20,7 +20,7 @@ from marquez_airflow import DAG
 from marquez_airflow.extractors import (Source, Dataset)
 from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 
-from marquez_client.models import (SourceType, DatasetType)
+from marquez_client.models import DatasetType
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ def test_extract():
             type=DatasetType.DB_TABLE,
             name=DB_TABLE_NAME,
             source=Source(
-                type=SourceType.POSTGRESQL,
+                type='POSTGRESQL',
                 name=CONN_ID,
                 connection_url=CONN_URI
             )

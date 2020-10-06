@@ -21,6 +21,11 @@ from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from marquez_airflow.extractors import BaseExtractor, StepMetadata, Source
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
 
+# BIGQUERY DAGs doesn't use this.
+# Required to pass marquez server validation.
+_BIGQUERY_CONN_URL = \
+    'jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443'
+
 log = logging.getLogger(__name__)
 
 
@@ -34,12 +39,12 @@ class BigQueryExtractor(BaseExtractor):
         sql_meta = SqlParser.parse(self.operator.sql)
         log.info("bigquery sql parse successful.")
 
+        # default value: 'bigquery_default'
         conn_id = self.operator.bigquery_conn_id
         source = Source(
-            # type=SourceType.BIGQUERY,
             type="BIGQUERY",
             name=conn_id,
-            connection_url=conn_id)
+            connection_url=_BIGQUERY_CONN_URL)
         inputs = [
             to_dataset(source, table) for table in sql_meta.in_tables
         ]
