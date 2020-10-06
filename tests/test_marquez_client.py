@@ -19,7 +19,7 @@ import mock
 import yaml
 
 import marquez_client
-from marquez_client.models import DatasetType, SourceType, JobType, RunState
+from marquez_client.models import (DatasetType, JobType, RunState)
 from marquez_client.utils import Utils
 
 _NAMESPACE = "my-namespace"
@@ -175,7 +175,7 @@ class TestMarquezClient(unittest.TestCase):
     @mock.patch("marquez_client.client.MarquezClient._put")
     def test_create_datasource(self, mock_put):
         source_name = "flight_schedules_db"
-        source_type = SourceType.POSTGRESQL
+        source_type = 'POSTGRESQL'
         source_url = "jdbc:postgresql://localhost:5432/test?" \
                      "user=fred&password=secret&ssl=true"
         description = "PostgreSQL - flight schedules database"
@@ -198,7 +198,7 @@ class TestMarquezClient(unittest.TestCase):
 
         assert response['name'] == source_name
         assert response['connectionUrl'] == source_url
-        assert response['type'] == source_type.value
+        assert response['type'] == source_type
 
     @mock.patch("marquez_client.client.MarquezClient._put")
     def test_create_job(self, mock_put):

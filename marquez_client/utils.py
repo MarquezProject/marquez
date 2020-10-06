@@ -17,7 +17,7 @@ import time
 
 from datetime import datetime
 from pyrfc3339 import generate
-from marquez_client.models import DatasetFieldType, DatasetType
+from marquez_client.models import (DatasetFieldType, DatasetType)
 
 log = logging.getLogger(__name__)
 

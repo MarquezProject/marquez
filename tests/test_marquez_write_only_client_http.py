@@ -9,19 +9,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import datetime
-import unittest
 
-from marquez_client.models import DatasetType, SourceType, JobType, RunState
-from marquez_client import Clients
-
-import uuid
 import logging
 import logging.config
-import yaml
-import mock
 import os
+import unittest
+import uuid
 
+import mock
+import yaml
+
+from marquez_client import Clients
+from marquez_client.models import (DatasetType, JobType)
 from marquez_client.utils import Utils
 
 _NAMESPACE = "my-namespace"
@@ -88,7 +87,7 @@ class TestMarquezWriteOnlyClientHttp(unittest.TestCase):
     @mock.patch("marquez_client.http_backend.HttpBackend.put")
     def test_create_datasource(self, mock_put):
         source_name = "flight_schedules_db"
-        source_type = SourceType.POSTGRESQL
+        source_type = 'POSTGRESQL'
         source_url = "jdbc:postgresql://localhost:5432/test?" \
                      "user=fred&password=secret&ssl=true"
         description = "PostgreSQL - flight schedules database"

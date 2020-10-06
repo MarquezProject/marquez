@@ -16,7 +16,7 @@ import logging
 from six.moves.urllib.parse import quote
 
 from marquez_client.version import VERSION
-from .models import DatasetType, SourceType, JobType
+from .models import (DatasetType, JobType)
 from .utils import Utils
 
 _API_PATH = '/api/v1'
@@ -53,12 +53,11 @@ class MarquezWriteOnlyClient(object):
     def create_source(self, source_name, source_type, connection_url,
                       description=None):
         Utils.check_name_length(source_name, 'source_name')
-        Utils.is_instance_of(source_type, SourceType)
 
         Utils.is_valid_connection_url(connection_url)
 
         payload = {
-            'type': source_type.value,
+            'type': source_type,
             'connectionUrl': connection_url
         }
 

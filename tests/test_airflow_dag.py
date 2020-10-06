@@ -20,7 +20,7 @@ import uuid
 import yaml
 
 from marquez_client import Clients
-from marquez_client.models import (SourceType, DatasetType, JobType)
+from marquez_client.models import (DatasetType, JobType)
 
 from marquez_client.utils import Utils
 
@@ -58,7 +58,7 @@ class TestAirflowDAG(unittest.TestCase):
             self.client.create_namespace(NAMESPACE, OWNER)
             self.client.create_source(
                 SOURCE,
-                SourceType.POSTGRESQL,
+                'POSTGRESQL',
                 "jdbc:postgresql://localhost:5432/test?user=fred&ssl=true")
             self.client.create_dataset(
                 NAMESPACE, DATASET, DatasetType.DB_TABLE,
