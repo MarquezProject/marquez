@@ -108,3 +108,15 @@ class BaseExtractor:
 
     def extract(self) -> [StepMetadata]:
         raise NotImplementedError
+
+    def extract_on_complete(self) -> [StepMetadata]:
+        # TODO: This method allows for the partial updating of task
+        # metadata on completion. Marquez currently doesn't support
+        # partial updates within the context of a DAG run, but this feature
+        # will soon be supported:
+        # https://github.com/MarquezProject/marquez/issues/816
+        #
+        # Also, we'll want to revisit the metadata extraction flow,
+        # but for now, return an empty set as the default behavior
+        # as not all extractors need to handle partial metadata updates.
+        return []

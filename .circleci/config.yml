@@ -29,6 +29,9 @@ jobs:
             SLUGIFY_USES_TEXT_UNIDECODE: 'yes'
           command: pip install --user -r test-requirements.txt
       - run:
+          name: Setup Airflow DB
+          command: airflow initdb
+      - run:
           name: Install marquez-airflow package
           command: pip install --user -e .
       - run:

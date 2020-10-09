@@ -27,10 +27,13 @@ from marquez_airflow.utils import JobIdMapping, get_location
 from marquez_airflow.extractors import (Dataset, Source, StepMetadata)
 from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 
-from marquez_client.clients import Clients
+from marquez_client import Clients
 from marquez_client.models import JobType
 
 _NOMINAL_TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+
+_DAG_DEFAULT_NAMESPACE = 'default'
+_DAG_DEFAULT_OWNER = 'anonymous'
 
 
 class DAG(airflow.models.DAG, LoggingMixin):
@@ -40,11 +43,10 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.log.debug("dag.init()")
         self._marquez_dataset_cache = {}
         self._marquez_source_cache = {}
         self.marquez_namespace = os.getenv('MARQUEZ_NAMESPACE',
-                                           DAG.DEFAULT_NAMESPACE)
+                                           _DAG_DEFAULT_NAMESPACE)
         self._job_id_mapping = JobIdMapping()
         # TODO: Manually define operator->extractor mappings for now,
         # but we'll want to encapsulate this logic in an 'Extractors' class
@@ -54,10 +56,11 @@ class DAG(airflow.models.DAG, LoggingMixin):
             BigQueryOperator: BigQueryExtractor
             # Append new extractors here
         }
-        self.log.info("dag.init() successful.")
+        self.log.debug(
+            f"DAG successfully created with extractors: {self._extractors}"
+        )
 
     def create_dagrun(self, *args, **kwargs):
-
         # run Airflow's create_dagrun() first
         dagrun = super(DAG, self).create_dagrun(*args, **kwargs)
 
@@ -69,13 +72,13 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
         # Marquez metadata collection
         try:
-            marquez_client = self.get_marquez_client()
-
-            # Create the Namespace
             # TODO: Use 'anonymous' owner for now, but we may want to use
             # the 'owner' attribute defined via default_args for a DAG
-            marquez_client.create_namespace(self.marquez_namespace,
-                                            "anonymous")
+            self.log.debug(
+                f"Creating namespace '{self.marquez_namespace}' with "
+                f"owner '{_DAG_DEFAULT_OWNER}'...")
+            self.get_or_create_marquez_client()\
+                .create_namespace(self.marquez_namespace, _DAG_DEFAULT_OWNER)
 
             # Register each task in the DAG
             for task_id, task in self.task_dict.items():
@@ -111,25 +114,32 @@ class DAG(airflow.models.DAG, LoggingMixin):
         return dagrun
 
     def handle_callback(self, *args, **kwargs):
-        self.log.debug("handle_callback()")
         try:
             dagrun = args[0]
             task_instances = dagrun.get_task_instances()
             for ti in task_instances:
                 extractor = self._extractors.get(ti.operator.__class__)
-                steps_meta = extractor(ti.operator).extract_on_complete(ti)
-                self.log.info(f'steps_meta: {steps_meta}')
+                if extractor:
+                    self.log.debug(
+                        f"Using extractor '{extractor}' to apply partial "
+                        f"metadata updates for operator '{ti.operator}' "
+                        f"in DAG '{self.dag_id}'."
+                    )
 
-                # FIXME: replace with update api
-                for step in steps_meta:
-                    self.get_marquez_client().create_job(
-                        job_name=step.name, job_type=JobType.BATCH,
-                        location=(step.location or self._get_location(ti)),
-                        input_dataset=step.inputs,
-                        output_dataset=step.outputs,
-                        context=step.context,
-                        description=self.description,
-                        namespace_name=self.marquez_namespace)
+                    steps_meta = extractor(ti.operator).extract_on_complete(ti)
+                    self.log.debug(f'steps_meta: {steps_meta}')
+
+                    # FIXME: replace with update api
+                    for step in steps_meta:
+                        self.get_marquez_client().create_job(
+                            job_name=step.name,
+                            job_type=JobType.BATCH,
+                            location=(step.location or self._get_location(ti)),
+                            input_dataset=step.inputs,
+                            output_dataset=step.outputs,
+                            context=step.context,
+                            description=self.description,
+                            namespace_name=self.marquez_namespace)
 
                 try:
                     self.report_jobrun_change(
@@ -155,7 +165,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     run_args=None):
         self.log.info("report_task()")
         report_job_start_ms = self._now_ms()
-        marquez_client = self.get_marquez_client()
+        marquez_client = self.get_or_create_marquez_client()
         if execution_date:
             start_time = self._to_iso_8601(execution_date)
             end_time = self.compute_endtime(execution_date)
@@ -294,7 +304,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
             if external_run_id:
                 marquez_jobrun_ids.append(external_run_id)
-                marquez_client.mark_job_run_as_started(external_run_id)
+                marquez_client.mark_job_run_as_started(run_id=external_run_id)
             else:
                 self.log.error(
                     f'Failed to get run id: {step.name} '
@@ -354,12 +364,12 @@ class DAG(airflow.models.DAG, LoggingMixin):
                                 task,
                                 self._extractors.get(task.__class__),
                                 marquez_job_run_id=marquez_job_run_id)
-                    self.get_marquez_client().mark_job_run_as_completed(
-                        marquez_job_run_id)
+                    self.get_or_create_marquez_client(). \
+                        mark_job_run_as_completed(run_id=marquez_job_run_id)
             else:
                 for marquez_job_run_id in ids:
-                    self.get_marquez_client().mark_job_run_as_failed(
-                        marquez_job_run_id)
+                    self.get_or_create_marquez_client().mark_job_run_as_failed(
+                        run_id=marquez_job_run_id)
 
         state = 'COMPLETED' if kwargs.get('success') else 'FAILED'
         self.log.info(
@@ -370,7 +380,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
             f'marquez_run_id={marquez_job_run_ids} '
             f'marquez_namespace={self.marquez_namespace}')
 
-    def get_marquez_client(self):
+    def get_or_create_marquez_client(self):
         if not self._marquez_client:
             self._marquez_client = Clients.new_write_only_client()
         return self._marquez_client
@@ -380,7 +390,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
         return int(round(time.time() * 1000))
 
     def register_datasets(self, datasets, marquez_job_run_id=None):
-        client = self.get_marquez_client()
+        client = self.get_or_create_marquez_client()
         for dataset in datasets:
             if isinstance(dataset, Dataset):
                 _key = f'{self.marquez_namespace}.{dataset.name}'
@@ -400,7 +410,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
         if isinstance(source, Source):
             _key = source.name
             if _key not in self._marquez_source_cache:
-                client = self.get_marquez_client()
+                client = self.get_or_create_marquez_client()
                 client.create_source(
                     source.name,
                     source.type,
