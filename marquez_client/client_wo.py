@@ -46,7 +46,7 @@ class MarquezWriteOnlyClient(object):
         return self._backend.put(
             self._path('/namespaces/{0}', namespace_name),
             headers=_HEADERS,
-            json=payload
+            json_payload=payload
         )
 
     # Source API
@@ -67,7 +67,7 @@ class MarquezWriteOnlyClient(object):
         return self._backend.put(
             self._path('/sources/{0}', source_name),
             headers=_HEADERS,
-            json=payload)
+            json_payload=payload)
 
     # Datasets API
     def create_dataset(self, namespace_name, dataset_name, dataset_type,
@@ -109,7 +109,7 @@ class MarquezWriteOnlyClient(object):
             self._path('/namespaces/{0}/datasets/{1}', namespace_name,
                        dataset_name),
             headers=_HEADERS,
-            json=payload
+            json_payload=payload
         )
 
     # Job API
@@ -138,7 +138,7 @@ class MarquezWriteOnlyClient(object):
         return self._backend.put(
             self._path('/namespaces/{0}/jobs/{1}', namespace_name, job_name),
             headers=_HEADERS,
-            json=payload
+            json_payload=payload
         )
 
     def create_job_run(self, namespace_name, job_name, run_id,
@@ -165,7 +165,7 @@ class MarquezWriteOnlyClient(object):
             self._path('/namespaces/{0}/jobs/{1}/runs',
                        namespace_name, job_name),
             headers=_HEADERS,
-            json=payload)
+            json_payload=payload)
 
         if mark_as_running:
             response = self.mark_job_run_as_started(
@@ -192,7 +192,7 @@ class MarquezWriteOnlyClient(object):
             self._path('/jobs/runs/{0}/{1}?at={2}', run_id, action,
                        action_at if action_at else Utils.utc_now()),
             headers=_HEADERS,
-            json={}
+            json_payload={}
         )
 
     # Common

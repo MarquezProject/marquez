@@ -10,13 +10,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import uuid
+from datetime import datetime
+
 import pytz
 import time
-
-from datetime import datetime
 from pyrfc3339 import generate
+
 from marquez_client.models import (DatasetFieldType, DatasetType)
 
 log = logging.getLogger(__name__)
@@ -92,3 +94,8 @@ class Utils(object):
     def utc_now():
         return str(generate(datetime.utcnow().replace(tzinfo=pytz.utc),
                             microseconds=True))
+
+    @staticmethod
+    def get_json(file):
+        with open(file) as json_file:
+            return json.load(json_file)

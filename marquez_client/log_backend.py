@@ -12,22 +12,15 @@
 
 import json
 import logging
-import os
 
 from marquez_client.backend import Backend
 
 log = logging.getLogger(__name__)
 
 
-class FileBackend(Backend):
-    def __init__(self, file):
-        self._file = open(self._mkdir_if_not_exists(file), 'a')
-
-    @staticmethod
-    def _mkdir_if_not_exists(file):
-        path, _ = os.path.split(file)
-        os.makedirs(path, exist_ok=True)
-        return file
+class LogBackend(Backend):
+    def __init__(self):
+        log.debug("LogBackend.init")
 
     def put(self, path, headers, json_payload):
         log.debug("_put()")
@@ -39,10 +32,8 @@ class FileBackend(Backend):
         put_details['headers'] = headers
         put_details['payload'] = json_payload
 
-        put_json = json.dumps(put_details)
-        log.info(put_json)
-
-        self._sync_file(put_json)
+        log_details = json.dumps(put_details)
+        log.info(log_details)
 
     def post(self, path, headers, json_payload=None):
         log.debug("_post()")
@@ -55,16 +46,5 @@ class FileBackend(Backend):
         if json_payload:
             post_details['payload'] = json_payload
 
-        post_json = json.dumps(post_details)
-        log.info(post_json)
-
-        self._sync_file(post_json)
-
-    def _sync_file(self, json_data):
-        self._file.write(json_data)
-        self._file.write(os.linesep)
-        self._file.flush()
-        os.fsync(self._file.fileno())
-
-    def __del__(self):
-        self._file.close()
+        log_details = json.dumps(post_details)
+        log.info(log_details)

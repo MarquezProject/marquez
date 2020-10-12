@@ -12,14 +12,15 @@
 
 import logging
 import os
-import marquez_client
 
-from marquez_client.file_backend import FileBackend
-from marquez_client.http_backend import HttpBackend
+import marquez_client
 from marquez_client.constants import (DEFAULT_MARQUEZ_BACKEND,
                                       DEFAULT_MARQUEZ_URL,
                                       DEFAULT_MARQUEZ_FILE,
                                       DEFAULT_TIMEOUT_MS)
+from marquez_client.file_backend import FileBackend
+from marquez_client.http_backend import HttpBackend
+from marquez_client.log_backend import LogBackend
 from marquez_client.utils import Utils
 
 log = logging.getLogger(__name__)
@@ -52,3 +53,5 @@ class Clients(object):
         elif backend_env == 'file':
             file = os.environ.get('MARQUEZ_FILE', DEFAULT_MARQUEZ_FILE)
             return FileBackend(file)
+        elif backend_env == 'log':
+            return LogBackend()
