@@ -29,7 +29,7 @@ class FileBackend(Backend):
         os.makedirs(path, exist_ok=True)
         return file
 
-    def put(self, path, headers, json_payload):
+    def put(self, path, headers, payload):
         log.debug("_put()")
 
         put_details = {}
@@ -37,14 +37,14 @@ class FileBackend(Backend):
         put_details['method'] = 'PUT'
         put_details['path'] = path
         put_details['headers'] = headers
-        put_details['payload'] = json_payload
+        put_details['payload'] = payload
 
         put_json = json.dumps(put_details)
         log.info(put_json)
 
         self._sync_file(put_json)
 
-    def post(self, path, headers, json_payload=None):
+    def post(self, path, headers, payload=None):
         log.debug("_post()")
 
         post_details = {}
@@ -52,8 +52,8 @@ class FileBackend(Backend):
         post_details['method'] = 'POST'
         post_details['path'] = path
         post_details['headers'] = headers
-        if json_payload:
-            post_details['payload'] = json_payload
+        if payload:
+            post_details['payload'] = payload
 
         post_json = json.dumps(post_details)
         log.info(post_json)

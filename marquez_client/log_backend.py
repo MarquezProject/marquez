@@ -22,7 +22,7 @@ class LogBackend(Backend):
     def __init__(self):
         log.debug("LogBackend.init")
 
-    def put(self, path, headers, json_payload):
+    def put(self, path, headers, payload):
         log.debug("_put()")
 
         put_details = {}
@@ -30,12 +30,12 @@ class LogBackend(Backend):
         put_details['method'] = 'PUT'
         put_details['path'] = path
         put_details['headers'] = headers
-        put_details['payload'] = json_payload
+        put_details['payload'] = payload
 
         log_details = json.dumps(put_details)
         log.info(log_details)
 
-    def post(self, path, headers, json_payload=None):
+    def post(self, path, headers, payload=None):
         log.debug("_post()")
 
         post_details = {}
@@ -43,8 +43,8 @@ class LogBackend(Backend):
         post_details['method'] = 'POST'
         post_details['path'] = path
         post_details['headers'] = headers
-        if json_payload:
-            post_details['payload'] = json_payload
+        if payload:
+            post_details['payload'] = payload
 
         log_details = json.dumps(post_details)
         log.info(log_details)

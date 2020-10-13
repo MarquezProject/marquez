@@ -25,20 +25,20 @@ class HttpBackend(Backend):
         self._timeout = timeout
         self._url = url
 
-    def put(self, path, headers, json):
+    def put(self, path, headers, payload):
         log.debug("_put()")
 
         response = requests.put(
-            url=f'{self._url}{path}', headers=headers, json=json,
+            url=f'{self._url}{path}', headers=headers, json=payload,
             timeout=self._timeout)
 
         return self._response(response, as_json=True)
 
-    def post(self, path, headers, json=None):
+    def post(self, path, headers, payload=None):
         log.debug("_post()")
 
         response = requests.post(
-            url=f'{self._url}{path}', headers=headers, json=json,
+            url=f'{self._url}{path}', headers=headers, json=payload,
             timeout=self._timeout)
 
         return self._response(response, as_json=True)
