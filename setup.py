@@ -48,7 +48,6 @@ setup(
     packages=find_packages(),
     install_requires=[
         "marquez-python==0.7.6",
-        "sqlparse==0.3.1",
-        "packaging==20.4"
+        "sqlparse==0.3.1"
     ],
 )
