@@ -10,18 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import logging
 import logging.config
+import os
 import random
 import unittest
 import uuid
 
-import yaml
-
 from marquez_client import Clients
 from marquez_client.models import (DatasetType, JobType)
-
 from marquez_client.utils import Utils
 
 _NAMESPACE = 'default'
@@ -33,14 +29,8 @@ class TestAirflowDAG(unittest.TestCase):
     def setUp(self):
         log.debug("TestAirflowDAG.setup(): ")
 
-        with open('tests/logConfig.yaml', 'rt') as file:
-            yamlConfig = yaml.safe_load(file.read())
-            logging.config.dictConfig(yamlConfig)
-            log.info("loaded logConfig.yaml")
-
         os.environ['MARQUEZ_BACKEND'] = 'file'
-
-        self.client = Clients.new_write_only_client()
+        self.client_wo_file = Clients.new_write_only_client()
         log.info("created marquez_client.")
 
     def test_create_dag(self):
@@ -55,24 +45,26 @@ class TestAirflowDAG(unittest.TestCase):
             run_id = str(uuid.uuid4())
             JOB = f'my-job-{i%10}'
 
-            self.client.create_namespace(NAMESPACE, OWNER)
-            self.client.create_source(
+            self.client_wo_file.create_namespace(NAMESPACE, OWNER)
+            self.client_wo_file.create_source(
                 SOURCE,
                 'POSTGRESQL',
                 "jdbc:postgresql://localhost:5432/test?user=fred&ssl=true")
-            self.client.create_dataset(
+            self.client_wo_file.create_dataset(
                 NAMESPACE, DATASET, DatasetType.DB_TABLE,
                 PHYSICAL, SOURCE, run_id)
-            self.client.create_job(NAMESPACE, JOB, JobType.BATCH)
-            self.client.create_job_run(NAMESPACE, JOB, run_id,
-                                       mark_as_running=True)
+            self.client_wo_file.create_job(NAMESPACE, JOB, JobType.BATCH)
+            self.client_wo_file.create_job_run(NAMESPACE, JOB, run_id,
+                                               mark_as_running=True)
 
             udiff = (i % 10 - random.randrange(10))
 
             if udiff >= -1 or udiff <= 1:
-                self.client.mark_job_run_as_failed(run_id, Utils.utc_now())
+                self.client_wo_file.mark_job_run_as_failed(
+                    run_id, Utils.utc_now())
             else:
-                self.client.mark_job_run_as_completed(run_id, Utils.utc_now())
+                self.client_wo_file.mark_job_run_as_completed(
+                    run_id, Utils.utc_now())
 
 
 if __name__ == '__main__':

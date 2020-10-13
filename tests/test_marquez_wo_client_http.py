@@ -10,14 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import logging.config
 import os
 import unittest
 import uuid
 
 import mock
-import yaml
 
 from marquez_client import Clients
 from marquez_client.models import (DatasetType, JobType)
@@ -30,11 +28,6 @@ log = logging.getLogger(__name__)
 class TestMarquezWriteOnlyClientHttp(unittest.TestCase):
     def setUp(self):
         log.debug("MarquezWriteOnlyClient.setup(): ")
-
-        with open('tests/logConfig.yaml', 'rt') as file:
-            yamlConfig = yaml.safe_load(file.read())
-            logging.config.dictConfig(yamlConfig)
-            log.info("loaded logConfig.yaml")
 
         os.environ['MARQUEZ_BACKEND'] = 'http'
         self.client_wo_http = Clients.new_write_only_client()

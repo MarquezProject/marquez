@@ -10,13 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import logging.config
 import unittest
 import uuid
 
 import mock
-import yaml
 
 import marquez_client
 from marquez_client.models import (DatasetType, JobType, RunState)
@@ -29,11 +27,6 @@ log = logging.getLogger(__name__)
 class TestMarquezClient(unittest.TestCase):
     def setUp(self):
         log.debug("TestMarquezClient.setup(): ")
-
-        with open('tests/logConfig.yaml', 'rt') as file:
-            yamlConfig = yaml.safe_load(file.read())
-            logging.config.dictConfig(yamlConfig)
-            log.info("loaded logConfig.yaml")
 
         self.client = \
             marquez_client.client.MarquezClient("http://localhost:5000")
