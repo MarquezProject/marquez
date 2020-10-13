@@ -23,7 +23,11 @@ import airflow.models
 from airflow.operators.postgres_operator import PostgresOperator
 
 from marquez_airflow.extractors.bigquery_extractor import BigQueryExtractor
-from marquez_airflow.utils import JobIdMapping, get_location
+from marquez_airflow.utils import (
+    JobIdMapping,
+    get_location,
+    add_airflow_info_to
+)
 from marquez_airflow.extractors import (Dataset, Source, StepMetadata)
 from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 
@@ -126,7 +130,9 @@ class DAG(airflow.models.DAG, LoggingMixin):
                         f"in DAG '{self.dag_id}'."
                     )
 
-                    steps_meta = extractor(ti.operator).extract_on_complete(ti)
+                    steps_meta = add_airflow_info_to(
+                        extractor(ti.operator).extract_on_complete(ti)
+                    )
                     self.log.debug(f'steps_meta: {steps_meta}')
 
                     # FIXME: replace with update api
@@ -196,7 +202,9 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     f'task_id={task.task_id} '
                     f'airflow_run_id={dag_run_id} '
                     f'marquez_namespace={self.marquez_namespace}')
-                steps_metadata = extractor(task).extract()
+                steps_metadata = add_airflow_info_to(
+                    extractor(task).extract()
+                )
             except Exception as e:
                 self.log.error(
                     f'Failed to extract metadata {e} '
@@ -221,12 +229,14 @@ class DAG(airflow.models.DAG, LoggingMixin):
             operator = \
                 f'{task.__class__.__module__}.{task.__class__.__name__}'
             self.log.info(f'operator: {operator}')
-            steps_metadata = [StepMetadata(
-                name=task_name,
-                context={
-                    'airflow.operator': operator,
-                    'airflow.task_info': str(task.__dict__)
-                })]
+            steps_metadata = add_airflow_info_to([
+                StepMetadata(
+                    name=task_name,
+                    context={
+                        'airflow.operator': operator,
+                        'airflow.task_info': str(task.__dict__)
+                    })
+            ])
 
         # store all the JobRuns associated with a task
         marquez_jobrun_ids = []

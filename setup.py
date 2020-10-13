@@ -10,26 +10,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import setuptools
+import codecs
+import os
+
+from setuptools import find_packages, setup
+
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith('VERSION'):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
 
 with open("README.md", "r") as f:
     long_description = f.read()
 
 NAME = "marquez-airflow"
-VERSION = "0.3.4"
 
-setuptools.setup(
+setup(
     name=NAME,
-    version=VERSION,
+    version=get_version('marquez_airflow/version.py'),
     author="Marquez Team",
     author_email="",
     description="Marquez integration with Airflow",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/MarquezProject/marquez-airflow",
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     install_requires=[
         "marquez-python==0.7.6",
-        "sqlparse==0.3.1"
+        "sqlparse==0.3.1",
+        "packaging==20.4"
     ],
 )

@@ -12,7 +12,11 @@
 
 import logging
 
+from abc import ABC, abstractmethod
+
 from airflow.models import BaseOperator
+
+from marquez_client.models import DatasetType
 
 log = logging.getLogger(__name__)
 
@@ -48,6 +52,14 @@ class Dataset:
         self.type = type
         self.description = description
 
+    @staticmethod
+    def from_table(source, table):
+        return Dataset(
+            type=DatasetType.DB_TABLE,
+            name=table,
+            source=source
+        )
+
     def __eq__(self, other):
         return self.source == other.source and \
                self.name == other.name and \
@@ -65,6 +77,8 @@ class Dataset:
 
 
 class StepMetadata:
+    # TODO: Define a common way across extractors to build the
+    # job name for an operator
     name = None
     location = None
     inputs = []
@@ -89,7 +103,7 @@ class StepMetadata:
             ','.join([str(o) for o in self.outputs]))
 
 
-class BaseExtractor:
+class BaseExtractor(ABC):
     operator: BaseOperator = None
     operator_class = None
 
@@ -103,13 +117,15 @@ class BaseExtractor:
 
     def validate(self):
         # TODO: maybe we should also enforce the module
-        assert(self.operator_class is not None and
-               self.operator.__class__ == self.operator_class)
+        assert (self.operator_class is not None and
+                self.operator.__class__ == self.operator_class)
 
+    # TODO: Only return a single StepMetadata object.
+    @abstractmethod
     def extract(self) -> [StepMetadata]:
-        raise NotImplementedError
+        pass
 
-    def extract_on_complete(self) -> [StepMetadata]:
+    def extract_on_complete(self, task_instance) -> [StepMetadata]:
         # TODO: This method allows for the partial updating of task
         # metadata on completion. Marquez currently doesn't support
         # partial updates within the context of a DAG run, but this feature

@@ -15,11 +15,13 @@ import logging
 from airflow.operators.postgres_operator import PostgresOperator
 
 from marquez_airflow.utils import get_connection_uri
-from marquez_airflow.extractors import BaseExtractor
-from marquez_airflow.extractors import (Source, Dataset, StepMetadata)
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
-
-from marquez_client.models import DatasetType
+from marquez_airflow.extractors import (
+    BaseExtractor,
+    StepMetadata,
+    Source,
+    Dataset
+)
 
 log = logging.getLogger(__name__)
 
@@ -48,16 +50,13 @@ class PostgresExtractor(BaseExtractor):
         # as the current connection. NOTE: We may want to move _to_dataset()
         # to class BaseExtractor or a utils class.
         inputs = [
-            self._to_dataset(source, table) for table in sql_meta.in_tables
+            Dataset.from_table(source, table) for table in sql_meta.in_tables
         ]
         outputs = [
-            self._to_dataset(source, table) for table in sql_meta.out_tables
+            Dataset.from_table(source, table) for table in sql_meta.out_tables
         ]
 
-        # TODO: Only return a single StepMetadata object.
         return [StepMetadata(
-            # TODO: Define a common way across extractors to build the
-            # job name for an operator
             name=f"{self.operator.dag_id}.{self.operator.task_id}",
             inputs=inputs,
             outputs=outputs,
@@ -65,11 +64,3 @@ class PostgresExtractor(BaseExtractor):
                 'sql': self.operator.sql
             }
         )]
-
-    @staticmethod
-    def _to_dataset(source, table) -> Dataset:
-        return Dataset(
-            type=DatasetType.DB_TABLE,
-            name=table,
-            source=source
-        )

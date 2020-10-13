@@ -17,9 +17,9 @@ import subprocess
 import airflow
 from airflow.utils.db import provide_session
 from airflow.models import Connection
-from marquez_client.models import DatasetType
+from airflow.version import version as airflow_version
 
-from marquez_airflow.extractors import Dataset
+from marquez_airflow.version import VERSION
 
 log = logging.getLogger(__name__)
 
@@ -121,13 +121,14 @@ def _get_connection(conn_id, session=None):
             .first())
 
 
-def to_dataset(source, table) -> Dataset:
-    return Dataset(
-        type=DatasetType.DB_TABLE,
-        name=table,
-        source=source
-    )
-
-
 def get_job_name(task):
     return f'{task.dag_id}.{task.task_id}'
+
+
+def add_airflow_info_to(step_metadata):
+    step_metadata = step_metadata[0]
+
+    step_metadata.context['airflow.version'] = airflow_version
+    step_metadata.context['marquez_airflow.version'] = VERSION
+
+    return [step_metadata]

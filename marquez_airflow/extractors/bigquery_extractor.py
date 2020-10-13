@@ -15,11 +15,16 @@ import json
 
 from google.cloud import bigquery
 
-from marquez_airflow.utils import to_dataset, get_job_name
+from marquez_airflow.utils import get_job_name
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 
-from marquez_airflow.extractors import BaseExtractor, StepMetadata, Source
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
+from marquez_airflow.extractors import (
+    BaseExtractor,
+    StepMetadata,
+    Source,
+    Dataset
+)
 
 # BIGQUERY DAGs doesn't use this.
 # Required to pass marquez server validation.
@@ -46,10 +51,10 @@ class BigQueryExtractor(BaseExtractor):
             name=conn_id,
             connection_url=_BIGQUERY_CONN_URL)
         inputs = [
-            to_dataset(source, table) for table in sql_meta.in_tables
+            Dataset.from_table(source, table) for table in sql_meta.in_tables
         ]
         outputs = [
-            to_dataset(source, table) for table in sql_meta.out_tables
+            Dataset.from_table(source, table) for table in sql_meta.out_tables
         ]
 
         return [StepMetadata(

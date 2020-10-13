@@ -27,6 +27,7 @@ log = logging.getLogger(__name__)
 CONN_ID = 'food_delivery_db'
 CONN_URI = 'postgres://localhost:5432/food_delivery'
 DB_TABLE_NAME = 'discounts'
+SQL = f"SELECT * FROM {DB_TABLE_NAME};"
 
 DEFAULT_ARGS = {
     'owner': 'datascience',
@@ -57,6 +58,10 @@ def test_extract():
             )
         )]
 
+    expected_context = {
+        'sql': SQL,
+    }
+
     # Set the environment variable for the connection
     os.environ[f"AIRFLOW_CONN_{CONN_ID.upper()}"] = CONN_URI
     log.debug(CONN_URI)
@@ -64,7 +69,7 @@ def test_extract():
     task = PostgresOperator(
         task_id='select',
         postgres_conn_id=CONN_ID,
-        sql=f"SELECT * FROM {DB_TABLE_NAME};",
+        sql=SQL,
         dag=DAG
     )
 
@@ -76,3 +81,4 @@ def test_extract():
     assert step_metadata.name == 'food_delivery_7_days.select'
     assert step_metadata.inputs == expected_inputs
     assert step_metadata.outputs == []
+    assert step_metadata.context == expected_context
