@@ -41,7 +41,7 @@ bump2version \
   --commit \
   --tag \
   --tag-name {new_version} \
-  "${type}" ./marquez_python/version.py
+  "${type}" ./marquez_airflow/version.py
 
 # Push tag
 git push --tags origin main
