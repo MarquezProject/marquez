@@ -14,35 +14,36 @@
 #
 # Usage: $ ./release.py <type>
 
-set -e -x
+set -e
 
-branch=$(git rev-parse --abbrev-ref HEAD)
+# Verify bump2version is installed
+if [[ ! $(type -P bump2version) ]]; then
+ echo "bump2version not installed! Please see https://github.com/c4urself/bump2version#installation"
+ exit 1
+fi
 
+branch=$(git symbolic-ref --short HEAD)
 if [[ "${branch}" != "main" ]]; then
-  echo "You may only tag a commit on the 'main' branch"
+  echo "Error: You may only release on 'main'!"
   exit 1;
 fi
 
 type=${1}
-if [ -z "${type}" ]
-then
-  echo "defaulting to 'patch'"
+if [[ -z "${type}" ]]; then
+  # Default to 'patch'
   type="patch"
-else
-  echo "update type is: ${type}"
 fi
 
-version=$(python ./setup.py --version)  
-echo "Upgrading version from the current version of ${version}"
-
-
-# The {new_version} is not a bash variable - it's a bumpversion notation for the new version.
-# Please see bumpversion --help for more information.
-bumpversion --current-version ${version} \
-  --search "VERSION = \"{current_version}\"" \
-  --replace "VERSION = \"{new_version}\"" \
-  --commit --tag \
+# Bump version
+VERSION=$(python ./setup.py --version)
+bump2version \
+  --current-version "${VERSION}" \
+  --commit \
+  --tag \
   --tag-name {new_version} \
-  ${type} ./setup.py
+  "${type}" ./marquez_python/version.py
+
+# Push tag
 git push --tags origin main
-echo "Done pushing to main"
+
+echo "DONE!"
