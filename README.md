@@ -59,6 +59,7 @@ The library depends on a _backend_. A `Backend` is configurable and lets the lib
 
 * `http`: Write metadata to Marquez
 * `file`: Write metadata to a file (as `json`) under `/tmp/marquez`
+* `log`: just logs the metadata
 
 By default, the `http` backend will be used (see next section). To override the default backend and write metadata to a file, use `MARQUEZ_BACKEND`:
 
