@@ -19,7 +19,7 @@ from airflow.utils.db import provide_session
 from airflow.models import Connection
 from airflow.version import version as airflow_version
 
-from marquez_airflow.version import VERSION
+from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
 
 log = logging.getLogger(__name__)
 
@@ -125,10 +125,18 @@ def get_job_name(task):
     return f'{task.dag_id}.{task.task_id}'
 
 
-def add_airflow_info_to(step_metadata):
-    step_metadata = step_metadata[0]
+def add_airflow_info_to(task, steps_metadata):
+    for step_metadata in steps_metadata:
+        # Add operator info
+        operator = \
+            f'{task.__class__.__module__}.{task.__class__.__name__}'
 
-    step_metadata.context['airflow.version'] = airflow_version
-    step_metadata.context['marquez_airflow.version'] = VERSION
+        step_metadata.context['airflow.operator'] = operator
+        step_metadata.context['airflow.task_info'] = str(task.__dict__)
 
-    return [step_metadata]
+        # Add version info
+        step_metadata.context['airflow.version'] = airflow_version
+        step_metadata.context['marquez_airflow.version'] = \
+            MARQUEZ_AIRFLOW_VERSION
+
+    return steps_metadata

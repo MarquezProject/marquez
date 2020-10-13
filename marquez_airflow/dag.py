@@ -131,6 +131,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     )
 
                     steps_meta = add_airflow_info_to(
+                        ti.operator,
                         extractor(ti.operator).extract_on_complete(ti)
                     )
                     self.log.debug(f'steps_meta: {steps_meta}')
@@ -203,6 +204,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     f'airflow_run_id={dag_run_id} '
                     f'marquez_namespace={self.marquez_namespace}')
                 steps_metadata = add_airflow_info_to(
+                    task,
                     extractor(task).extract()
                 )
             except Exception as e:
@@ -226,17 +228,10 @@ class DAG(airflow.models.DAG, LoggingMixin):
         # If no extractor found or failed to extract metadata,
         # report the task metadata
         if not steps_metadata:
-            operator = \
-                f'{task.__class__.__module__}.{task.__class__.__name__}'
-            self.log.info(f'operator: {operator}')
-            steps_metadata = add_airflow_info_to([
-                StepMetadata(
-                    name=task_name,
-                    context={
-                        'airflow.operator': operator,
-                        'airflow.task_info': str(task.__dict__)
-                    })
-            ])
+            steps_metadata = add_airflow_info_to(
+                task,
+                [StepMetadata(name=task_name)]
+            )
 
         # store all the JobRuns associated with a task
         marquez_jobrun_ids = []
