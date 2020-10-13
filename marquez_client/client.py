@@ -237,7 +237,7 @@ class MarquezClient(object):
             }
         )
 
-    def create_job_run(self, namespace_name, job_name, run_id,
+    def create_job_run(self, namespace_name, job_name, run_id=None,
                        nominal_start_time=None,
                        nominal_end_time=None, run_args=None,
                        mark_as_running=False):
@@ -246,7 +246,8 @@ class MarquezClient(object):
 
         payload = {}
 
-        payload['id'] = run_id
+        if run_id:
+            payload['id'] = run_id
 
         if nominal_start_time:
             payload['nominalStartTime'] = nominal_start_time
