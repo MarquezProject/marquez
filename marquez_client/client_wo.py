@@ -115,7 +115,8 @@ class MarquezWriteOnlyClient(object):
     # Job API
     def create_job(self, namespace_name, job_name, job_type,
                    location=None, input_dataset=None,
-                   output_dataset=None, description=None, context=None):
+                   output_dataset=None, description=None, context=None,
+                   run_id=None):
         Utils.check_name_length(namespace_name, 'namespace_name')
         Utils.check_name_length(job_name, 'job_name')
         Utils.is_instance_of(job_type, JobType)
@@ -125,6 +126,9 @@ class MarquezWriteOnlyClient(object):
             'outputs': output_dataset or [],
             'type': job_type.name
         }
+
+        if run_id:
+            payload['runId'] = run_id
 
         if context:
             payload['context'] = context
