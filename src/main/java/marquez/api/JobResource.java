@@ -84,6 +84,7 @@ public class JobResource {
       @Valid JobMeta jobMeta)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
+    throwIfNotExists(jobMeta.getRunId().orElse(null));
 
     final Job job = jobService.createOrUpdate(namespaceName, jobName, jobMeta);
     return Response.ok(job).build();
@@ -264,9 +265,11 @@ public class JobResource {
     }
   }
 
-  void throwIfNotExists(@NonNull RunId runId) throws MarquezServiceException {
-    if (!jobService.runExists(runId)) {
-      throw new RunNotFoundException(runId);
+  void throwIfNotExists(@Nullable RunId runId) throws MarquezServiceException {
+    if (runId != null) {
+      if (!jobService.runExists(runId)) {
+        throw new RunNotFoundException(runId);
+      }
     }
   }
 
