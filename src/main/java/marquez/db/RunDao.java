@@ -51,7 +51,9 @@ public interface RunDao extends SqlObject {
                 + "job_version_uuid, "
                 + "run_args_uuid, "
                 + "nominal_start_time, "
-                + "nominal_end_time"
+                + "nominal_end_time, "
+                + "current_run_state,"
+                + "start_run_state_uuid"
                 + ") VALUES ("
                 + ":uuid, "
                 + ":createdAt, "
@@ -59,7 +61,10 @@ public interface RunDao extends SqlObject {
                 + ":jobVersionUuid, "
                 + ":runArgsUuid, "
                 + ":nominalStartTime, "
-                + ":nominalEndTime)")
+                + ":nominalEndTime, "
+                + ":currentRunState, "
+                + ":startRunStateUuid"
+                + ")")
         .bindBean(row)
         .execute();
     // Input versions

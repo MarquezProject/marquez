@@ -183,9 +183,11 @@ public class JobService {
             namespaceName.getValue(),
             jobMeta);
       }
-      final Version version = jobMeta.version(namespaceName, jobName);
-      if (!jobVersionDao.exists(version.getValue())) {
-        log.info("Creating version '{}' for job '{}'...", version.getValue(), jobName.getValue());
+
+      final Version jobVersion = jobMeta.version(namespaceName, jobName);
+      if (!jobVersionDao.exists(jobVersion.getValue())) {
+        log.info(
+            "Creating version '{}' for job '{}'...", jobVersion.getValue(), jobName.getValue());
         final String checksum = Utils.checksumFor(jobMeta.getContext());
         if (!jobContextDao.exists(checksum)) {
           final JobContextRow newContextRow =
@@ -196,20 +198,33 @@ public class JobService {
         final JobContextRow contextRow = jobContextDao.findBy(checksum).get();
         final List<UUID> inputUuids = findUuids(jobMeta.getInputs());
         final List<UUID> outputUuids = findUuids(jobMeta.getOutputs());
-        final JobVersionRow newVersionRow =
+        final JobVersionRow newJobVersionRow =
             Mapper.toJobVersionRow(
                 jobRow.getUuid(),
                 contextRow.getUuid(),
                 inputUuids,
                 outputUuids,
                 jobMeta.getLocation().orElse(null),
-                version);
-        jobVersionDao.insert(newVersionRow);
+                jobVersion);
+        jobVersionDao.insert(newJobVersionRow);
         versions
             .labels(namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue())
             .inc();
-        log.info("Successfully created version '{}' for job '{}'.", version, jobName.getValue());
+        log.info("Successfully created version '{}' for job '{}'.", jobVersion, jobName.getValue());
+
+        //
+        jobMeta
+            .getRunId()
+            .ifPresent(
+                runId -> {
+                  final ExtendedRunRow oldRunRow = runDao.findBy(runId.getValue()).get();
+                  log.info(oldRunRow.toString());
+                  final RunRow newRunRow = Mapper.toRunRow(oldRunRow, newJobVersionRow.getUuid());
+                  log.info(newRunRow.toString());
+                  runDao.insert(newRunRow);
+                });
       }
+
       return get(namespaceName, jobName).get();
     } catch (UnableToExecuteStatementException e) {
       log.error(

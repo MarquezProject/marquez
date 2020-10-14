@@ -387,13 +387,32 @@ public final class Mapper {
   }
 
   public static RunRow toRunRow(
+      @NonNull final ExtendedRunRow oldRunRow, @NonNull final UUID newJobVersionUuid) {
+    final Instant now = newTimestamp();
+    return new RunRow(
+        newRowUuid(),
+        now,
+        now,
+        newJobVersionUuid,
+        oldRunRow.getRunArgsUuid(),
+        oldRunRow.getInputVersionUuids(),
+        oldRunRow.getNominalStartTime().orElse(null),
+        oldRunRow.getNominalEndTime().orElse(null),
+        oldRunRow.getCurrentRunState().orElse(null),
+        oldRunRow.getStartedAt().orElse(null),
+        oldRunRow.getStartRunStateUuid().orElse(null),
+        null,
+        null);
+  }
+
+  public static RunRow toRunRow(
       @NonNull final UUID jobVersionUuid,
       @NonNull final UUID runArgsUuid,
       @NonNull final List<UUID> inputVersionUuids,
       @NonNull final RunMeta runMeta) {
     final Instant now = newTimestamp();
     return new RunRow(
-        runMeta.getId().map((runId) -> runId.getValue()).orElseGet(Mapper::newRowUuid),
+        runMeta.getId().map(runId -> runId.getValue()).orElseGet(Mapper::newRowUuid),
         now,
         now,
         jobVersionUuid,
@@ -401,6 +420,8 @@ public final class Mapper {
         inputVersionUuids,
         runMeta.getNominalStartTime().orElse(null),
         runMeta.getNominalEndTime().orElse(null),
+        null,
+        null,
         null,
         null,
         null);
