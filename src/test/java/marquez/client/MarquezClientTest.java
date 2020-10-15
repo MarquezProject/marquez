@@ -294,7 +294,7 @@ public class MarquezClientTest {
               UPDATED_AT,
               NOMINAL_START_TIME,
               NOMINAL_END_TIME,
-              RunState.NEW,
+              RunState.RUNNING,
               START_AT,
               ENDED_AT,
               DURATION,
