@@ -535,15 +535,15 @@ public class MarquezClientTest {
     final URL url = buildUrlFor("/namespaces/%s/jobs/%s", NAMESPACE_NAME, JOB_NAME);
 
     final JobMeta meta =
-            JobMeta.builder()
-                    .type(JOB_TYPE)
-                    .inputs(INPUTS)
-                    .outputs(OUTPUTS)
-                    .location(LOCATION)
-                    .description(JOB_DESCRIPTION)
-                    .context(JOB_CONTEXT)
-                    .runId(newRunId())
-                    .build();
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(INPUTS)
+            .outputs(OUTPUTS)
+            .location(LOCATION)
+            .description(JOB_DESCRIPTION)
+            .context(JOB_CONTEXT)
+            .runId(newRunId())
+            .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
     when(http.put(url, metaAsJson)).thenReturn(jobAsJson);
