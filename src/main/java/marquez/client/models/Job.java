@@ -50,7 +50,7 @@ public final class Job extends JobMeta {
       final Map<String, String> context,
       final String description,
       @Nullable final Run latestRun) {
-    super(type, inputs, outputs, location, context, description);
+    super(type, inputs, outputs, location, context, description, null);
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;

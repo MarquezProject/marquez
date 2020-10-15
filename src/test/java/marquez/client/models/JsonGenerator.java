@@ -190,6 +190,7 @@ public final class JsonGenerator {
     obj.put("location", meta.getLocation().map(URL::toString).orElse(null));
     obj.set("context", context);
     obj.put("description", meta.getDescription().orElse(null));
+    obj.put("runId", meta.getRunId().orElse(null));
 
     return obj.toString();
   }

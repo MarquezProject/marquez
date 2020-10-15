@@ -36,6 +36,7 @@ public class JobMeta {
   @Nullable private final URL location;
   @Getter private final Map<String, String> context;
   @Nullable String description;
+  @Nullable String runId;
 
   public JobMeta(
       @NonNull final JobType type,
@@ -43,13 +44,15 @@ public class JobMeta {
       @NonNull final Set<DatasetId> outputs,
       @Nullable final URL location,
       @Nullable final Map<String, String> context,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable String runId) {
     this.type = type;
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
     this.context = (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
     this.description = description;
+    this.runId = runId;
   }
 
   public Optional<URL> getLocation() {
@@ -58,6 +61,10 @@ public class JobMeta {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<String> getRunId() {
+    return Optional.ofNullable(runId);
   }
 
   public String toJson() {
@@ -75,6 +82,7 @@ public class JobMeta {
     @Nullable private URL location;
     @Nullable private String description;
     @Nullable Map<String, String> context;
+    @Nullable String runId;
 
     private Builder() {
       this.inputs = ImmutableSet.of();
@@ -137,8 +145,13 @@ public class JobMeta {
       return this;
     }
 
+    public Builder runId(@Nullable String runId) {
+      this.runId = runId;
+      return this;
+    }
+
     public JobMeta build() {
-      return new JobMeta(type, inputs, outputs, location, context, description);
+      return new JobMeta(type, inputs, outputs, location, context, description, runId);
     }
   }
 }
