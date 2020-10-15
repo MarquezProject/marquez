@@ -274,6 +274,32 @@ public class MarquezClientTest {
           DURATION,
           RUN_ARGS);
 
+  private static final String RUN_ID = newRunId();
+  private static final Job JOB_WITH_LATEST_RUN =
+      new Job(
+          JOB_ID,
+          JOB_TYPE,
+          JOB_NAME,
+          CREATED_AT,
+          UPDATED_AT,
+          NAMESPACE_NAME,
+          INPUTS,
+          OUTPUTS,
+          LOCATION,
+          JOB_CONTEXT,
+          JOB_DESCRIPTION,
+          new Run(
+              RUN_ID,
+              CREATED_AT,
+              UPDATED_AT,
+              NOMINAL_START_TIME,
+              NOMINAL_END_TIME,
+              RunState.NEW,
+              START_AT,
+              ENDED_AT,
+              DURATION,
+              RUN_ARGS));
+
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
 
   private MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
@@ -542,14 +568,14 @@ public class MarquezClientTest {
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
             .context(JOB_CONTEXT)
-            .runId(newRunId())
+            .runId(RUN_ID)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String jobAsJson = JsonGenerator.newJsonFor(JOB);
+    final String jobAsJson = JsonGenerator.newJsonFor(JOB_WITH_LATEST_RUN);
     when(http.put(url, metaAsJson)).thenReturn(jobAsJson);
 
     final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, meta);
-    assertThat(job).isEqualTo(JOB);
+    assertThat(job).isEqualTo(JOB_WITH_LATEST_RUN);
 
     verify(http, times(1)).put(url, metaAsJson);
   }
