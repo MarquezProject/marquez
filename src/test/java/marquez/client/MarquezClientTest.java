@@ -534,7 +534,7 @@ public class MarquezClientTest {
   public void testCreateJobWithRunId() throws Exception {
     final URL url = buildUrlFor("/namespaces/%s/jobs/%s", NAMESPACE_NAME, JOB_NAME);
 
-    final JobMeta meta =
+    final JobMeta metaWithRunId =
         JobMeta.builder()
             .type(JOB_TYPE)
             .inputs(INPUTS)
@@ -544,11 +544,11 @@ public class MarquezClientTest {
             .context(JOB_CONTEXT)
             .runId(newRunId())
             .build();
-    final String metaAsJson = JsonGenerator.newJsonFor(meta);
+    final String metaAsJson = JsonGenerator.newJsonFor(metaWithRunId);
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
     when(http.put(url, metaAsJson)).thenReturn(jobAsJson);
 
-    final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, meta);
+    final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, metaWithRunId);
     assertThat(job).isEqualTo(JOB);
   }
 
