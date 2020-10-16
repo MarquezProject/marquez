@@ -210,9 +210,12 @@ public class JobService {
         versions
             .labels(namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue())
             .inc();
-        log.info("Successfully created version '{}' for job '{}'.", jobVersion, jobName.getValue());
+        log.info(
+            "Successfully created version '{}' for job '{}'.",
+            jobVersion.getValue(),
+            jobName.getValue());
 
-        // When a run ID is provided along with the job meta,
+        // When a run ID is present, associate the new job version with the existing job run.
         jobMeta
             .getRunId()
             .ifPresent(
@@ -221,9 +224,12 @@ public class JobService {
                   final Instant updatedAt = Instant.now();
                   runDao.updateJobVersionUuid(
                       runRow.getUuid(), updatedAt, newJobVersionRow.getUuid());
+                  log.info(
+                      "Successfully associated run '{}' with version '{}'.",
+                      runId.getValue(),
+                      jobVersion.getValue());
                 });
       }
-
       return get(namespaceName, jobName).get();
     } catch (UnableToExecuteStatementException e) {
       log.error(
