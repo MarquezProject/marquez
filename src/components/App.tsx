@@ -1,34 +1,34 @@
-import React, { ReactElement, useState } from 'react'
-import { Helmet } from 'react-helmet'
 import { CssBaseline } from '@material-ui/core'
+import { Helmet } from 'react-helmet'
 import AppBar from './AppBar'
+import React, { ReactElement, useState } from 'react'
 const globalStyles = require('../global_styles.css')
 const { neptune, telescopeBlack } = globalStyles
-import { Route, Switch } from 'react-router-dom'
+import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { Grid } from '@material-ui/core'
+import {
+  Theme as ITheme,
+  WithStyles as IWithStyles,
+  createStyles,
+  withStyles
+} from '@material-ui/core/styles'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
-import logger from 'redux-logger'
-import createSagaMiddleware from 'redux-saga'
+import { Route, Switch } from 'react-router-dom'
+import { applyMiddleware, createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { createBrowserHistory } from 'history'
-import { routerMiddleware, ConnectedRouter } from 'connected-react-router'
-import {
-  withStyles,
-  createStyles,
-  WithStyles as IWithStyles,
-  Theme as ITheme
-} from '@material-ui/core/styles'
+import createSagaMiddleware from 'redux-saga'
+import logger from 'redux-logger'
 
-import createRootReducer from '../reducers'
-import rootSaga from '../sagas'
 import CustomSearchBar from './CustomSearchBar'
 import DatasetDetailPage from './DatasetDetailPage'
+import Home from './Home'
 import JobDetailPage from './JobDetailPage'
 import NetworkGraph from './NetworkGraph'
 import Toast from './Toast'
-import Home from './Home'
+import createRootReducer from '../reducers'
+import rootSaga from '../sagas'
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {

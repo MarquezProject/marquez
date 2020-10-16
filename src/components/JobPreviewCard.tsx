@@ -1,15 +1,15 @@
-import React, { ReactElement } from 'react'
 import {
-  withStyles,
-  createStyles,
+  Theme as ITheme,
   WithStyles as IWithStyles,
-  Theme as ITheme
+  createStyles,
+  withStyles
 } from '@material-ui/core/styles'
 import { Link } from 'react-router-dom'
+import React, { ReactElement } from 'react'
 
 const globalStyles = require('../global_styles.css')
 const { vibrantGreen } = globalStyles
-import { Typography, Box, Tooltip } from '@material-ui/core'
+import { Box, Tooltip, Typography } from '@material-ui/core'
 import { formatUpdatedAt } from '../helpers'
 
 import { Job } from '../types/api'

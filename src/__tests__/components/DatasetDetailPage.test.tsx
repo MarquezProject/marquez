@@ -1,10 +1,9 @@
-import { mount } from 'enzyme'
 import * as React from 'react'
+import { mount } from 'enzyme'
 import Typography from '@material-ui/core/Typography'
-import Box from '@material-ui/core/Box'
 
-import DatasetDetailPage from '../../components/DatasetDetailPage'
 import { formatUpdatedAt } from '../../helpers'
+import DatasetDetailPage from '../../components/DatasetDetailPage'
 
 const datasets = require('../../../docker/db/data/datasets.json')
 const dataset = datasets[0]
@@ -55,7 +54,7 @@ describe('DatasetDetailPage Component', () => {
     it('should render', () => {
       expect(wrapper.exists()).toBe(true)
     })
-    it(`does not render 'no dataset'`, () => {
+    it('does not render \'no dataset\'', () => {
       expect(
         wrapper.findWhere(n =>
           n

@@ -1,5 +1,5 @@
-import { shallow } from 'enzyme'
 import * as React from 'react'
+import { shallow } from 'enzyme'
 import Filters from '../../components/filters/Filters'
 import Select from '@material-ui/core/Select'
 const namespaces = require('../../../docker/db/data/namespaces.json')

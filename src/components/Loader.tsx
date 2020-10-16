@@ -1,7 +1,7 @@
 import * as React from 'react'
-import CircularProgress from '@material-ui/core/CircularProgress'
+import { WithStyles as IWithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { styled } from '@material-ui/core/styles'
-import { withStyles, createStyles, WithStyles as IWithStyles } from '@material-ui/core/styles'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 interface IProps {}
 

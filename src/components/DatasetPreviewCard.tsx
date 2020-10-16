@@ -4,13 +4,13 @@ import {
   Link
 } from 'react-router-dom'
 
+import { Box, Typography } from '@material-ui/core'
 import {
-  withStyles,
-  createStyles,
+  Theme as ITheme,
   WithStyles as IWithStyles,
-  Theme as ITheme
+  createStyles,
+  withStyles
 } from '@material-ui/core/styles'
-import { Typography, Box } from '@material-ui/core'
 import { formatUpdatedAt } from '../helpers'
 
 import { Dataset } from '../types/api'

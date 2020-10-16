@@ -1,12 +1,12 @@
-import { connect } from 'react-redux'
 import * as Redux from 'redux'
-import { bindActionCreators } from 'redux'
-import Filters from './Filters'
 import { IState } from '../../reducers'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import Filters from './Filters'
 
-import { findMatchingEntities, filterDatasets, filterJobs } from '../../actionCreators'
+import { Dataset, Namespace } from '../../types/api'
+import { filterDatasets, filterJobs, findMatchingEntities } from '../../actionCreators'
 import React, { FunctionComponent } from 'react'
-import { Namespace, Dataset } from '../../types/api'
 
 export interface IProps {
   namespaces: Namespace[]

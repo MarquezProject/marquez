@@ -1,11 +1,11 @@
-import { mount } from 'enzyme'
 import * as React from 'react'
-import Typography from '@material-ui/core/Typography'
+import { mount } from 'enzyme'
 import Box from '@material-ui/core/Box'
 import Tooltip from '@material-ui/core/Tooltip'
+import Typography from '@material-ui/core/Typography'
 
-import JobDetailPage from '../../components/JobDetailPage'
 import { formatUpdatedAt } from '../../helpers'
+import JobDetailPage from '../../components/JobDetailPage'
 
 const jobs = require('../../../docker/db/data/jobs.json')
 
@@ -210,7 +210,7 @@ test.skip('JobDetailPage Component', () => {
       expect(wrapper.exists()).toBe(true)
     })
 
-    it(`does not render 'no job'`, () => {
+    it('does not render \'no job\'', () => {
       expect(
         wrapper.findWhere(n =>
           n

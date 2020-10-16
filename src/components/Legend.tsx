@@ -1,11 +1,11 @@
-import React, { ReactElement } from 'react'
+import { Box, Typography } from '@material-ui/core'
 import {
-  withStyles,
-  createStyles,
+  Theme as ITheme,
   WithStyles as IWithStyles,
-  Theme as ITheme
+  createStyles,
+  withStyles
 } from '@material-ui/core/styles'
-import { Typography, Box } from '@material-ui/core'
+import React, { ReactElement } from 'react'
 const globalStyles = require('../global_styles.css')
 const { datasetNodeWhite } = globalStyles
 

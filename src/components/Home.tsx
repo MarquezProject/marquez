@@ -1,19 +1,19 @@
-import React, { FunctionComponent, useState } from 'react'
 import * as RRD from 'react-router-dom'
 import { Box, Typography } from '@material-ui/core'
+import React, { FunctionComponent, useState } from 'react'
 
 import Pagination from 'material-ui-flat-pagination'
 import _chunk from 'lodash/chunk'
 
 import {
-  withStyles,
-  createStyles,
+  Theme as ITheme,
   WithStyles as IWithStyles,
-  Theme as ITheme
+  createStyles,
+  withStyles
 } from '@material-ui/core/styles'
 
-import FiltersWrapper from './filters/FiltersWrapper'
 import DatasetPreviewCard from './DatasetPreviewCard'
+import FiltersWrapper from './filters/FiltersWrapper'
 import JobPreviewCard from './JobPreviewCard'
 
 import { IDatasetsState } from '../reducers/datasets'

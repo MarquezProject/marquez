@@ -1,14 +1,14 @@
-import React, { ReactElement } from 'react'
 import { AppBar, Toolbar, Typography } from '@material-ui/core'
 import {
   Link
 } from 'react-router-dom'
+import React, { ReactElement } from 'react'
 
 import {
-  withStyles,
-  createStyles,
+  Theme as ITheme,
   WithStyles as IWithStyles,
-  Theme as ITheme
+  createStyles,
+  withStyles
 } from '@material-ui/core/styles'
 
 import Menu from './Menu'

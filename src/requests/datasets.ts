@@ -1,5 +1,5 @@
+import { Datasets, Namespace } from '../types/api'
 import { genericFetchWrapper } from '.'
-import { Namespace, Datasets } from '../types/api'
 
 export const fetchDatasets = async (namespace: Namespace) => {
   const { name } = namespace

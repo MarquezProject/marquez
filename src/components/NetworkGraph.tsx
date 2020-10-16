@@ -1,38 +1,38 @@
 import * as React from 'react'
 import * as d3 from 'd3'
 
-import {
-  withStyles,
-  createStyles,
-  WithStyles as IWithStyles,
-  Theme
-} from '@material-ui/core/styles'
-import {RouteComponentProps, withRouter} from 'react-router-dom'
 import {History} from 'history'
+import {RouteComponentProps, withRouter} from 'react-router-dom'
+import {
+  Theme,
+  WithStyles,
+  createStyles,
+  withStyles
+} from '@material-ui/core/styles'
 
 import Legend from './Legend'
 
 import {IDataset, IJob} from '../types/'
 
-import _find from 'lodash/find'
 import _filter from 'lodash/filter'
+import _find from 'lodash/find'
 import _flatten from 'lodash/flatten'
 import _map from 'lodash/map'
 import _sortBy from 'lodash/sortBy'
 
-import {select, event} from 'd3-selection'
+import {D3ZoomEvent} from 'd3'
+import {drag} from 'd3-drag'
+import {event, select} from 'd3-selection'
 import {hierarchy, tree} from 'd3-hierarchy'
 import {linkHorizontal} from 'd3-shape'
-import {drag} from 'd3-drag'
 import {zoom} from 'd3-zoom'
-import {D3ZoomEvent} from 'd3'
 
-import Loader from './Loader'
-import {Run} from '../types/api'
-import {IState} from '../reducers'
 import * as Redux from 'redux'
+import {IState} from '../reducers'
+import {Run} from '../types/api'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
+import Loader from './Loader'
 
 const globalStyles = require('../global_styles.css')
 const {jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning} = globalStyles
@@ -89,7 +89,7 @@ interface IProps {
   isLoading: boolean
 }
 
-type IAllProps = IWithStyles<typeof styles> & IProps & RouteComponentProps
+type IAllProps = WithStyles<typeof styles> & IProps & RouteComponentProps
 
 export class NetworkGraph extends React.Component<IAllProps> {
 

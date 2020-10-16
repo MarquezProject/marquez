@@ -1,17 +1,16 @@
-import React, { FunctionComponent, useState } from 'react'
-import SearchBar from 'material-ui-search-bar'
-import { findMatchingEntities } from '../actionCreators'
-import {
-  withStyles,
-  createStyles,
-  WithStyles as IWithStyles,
-  Theme as ITheme
-} from '@material-ui/core/styles'
-
-import { useHistory } from 'react-router-dom'
 import * as Redux from 'redux'
+import {
+  Theme as ITheme,
+  WithStyles as IWithStyles,
+  createStyles,
+  withStyles
+} from '@material-ui/core/styles'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
+import { findMatchingEntities } from '../actionCreators'
+import { useHistory } from 'react-router-dom'
+import React, { FunctionComponent, useState } from 'react'
+import SearchBar from 'material-ui-search-bar'
 
 interface IProps {
   findMatchingEntities: typeof findMatchingEntities

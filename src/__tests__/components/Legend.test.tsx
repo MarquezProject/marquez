@@ -1,5 +1,5 @@
-import { mount } from 'enzyme'
 import * as React from 'react'
+import { mount } from 'enzyme'
 
 import Legend from '../../components/Legend'
 
@@ -9,10 +9,10 @@ describe('Legend Component Tests', () => {
     expect(wrapper.exists()).toBe(true)
   })
   const componentText = wrapper.render().text()
-  it("Should render 'datasets' key", () => {
+  it('Should render \'datasets\' key', () => {
     expect(componentText).toContain('datasets')
   })
-  it("Should render 'jobs' key", () => {
+  it('Should render \'jobs\' key', () => {
     expect(componentText).toContain('jobs')
   })
 })

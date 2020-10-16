@@ -1,27 +1,27 @@
-import React, { FunctionComponent, useState, useEffect } from 'react'
-import {
-  withStyles,
-  createStyles,
-  WithStyles as IWithStyles,
-  Theme as ITheme
-} from '@material-ui/core/styles'
 import * as Redux from 'redux'
-import { Typography, Box, Fab, Tooltip } from '@material-ui/core'
-import CloseIcon from '@material-ui/icons/Close'
-import OpenWithSharpIcon from '@material-ui/icons/OpenWithSharp'
-import Modal from '@material-ui/core/Modal'
-import HowToRegIcon from '@material-ui/icons/HowToReg'
-import { useParams, useHistory } from 'react-router-dom'
-import _find from 'lodash/find'
-import { fetchJobRuns } from '../actionCreators'
+import { Box, Fab, Tooltip, Typography } from '@material-ui/core'
 import {IState} from '../reducers'
+import {
+  Theme as ITheme,
+  WithStyles as IWithStyles,
+  createStyles,
+  withStyles
+} from '@material-ui/core/styles'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
+import { fetchJobRuns } from '../actionCreators'
+import { useHistory, useParams } from 'react-router-dom'
+import CloseIcon from '@material-ui/icons/Close'
+import HowToRegIcon from '@material-ui/icons/HowToReg'
+import Modal from '@material-ui/core/Modal'
+import OpenWithSharpIcon from '@material-ui/icons/OpenWithSharp'
+import React, { FunctionComponent, useEffect, useState } from 'react'
+import _find from 'lodash/find'
 
 const globalStyles = require('../global_styles.css')
 const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
-import { formatUpdatedAt } from '../helpers'
 import { IJob } from '../types'
+import { formatUpdatedAt } from '../helpers'
 
 const colorMap = {
   NEW: jobRunNew,

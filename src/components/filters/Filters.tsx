@@ -1,13 +1,13 @@
-import React, { ReactElement, useState, ChangeEvent } from 'react'
-import MUISelect from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
-import Box from '@material-ui/core/Box'
-import FormControl from '@material-ui/core/FormControl'
-import uniq from 'lodash/uniq'
-import { withStyles } from '@material-ui/core/styles'
-import { capitalize } from '../../helpers'
 import { IProps } from './FiltersWrapper'
 import { Namespace } from '../../types/api'
+import { capitalize } from '../../helpers'
+import { withStyles } from '@material-ui/core/styles'
+import Box from '@material-ui/core/Box'
+import FormControl from '@material-ui/core/FormControl'
+import MUISelect from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import React, { ChangeEvent, ReactElement, useState } from 'react'
+import uniq from 'lodash/uniq'
 
 const StyledFormControl = withStyles({
   root: {

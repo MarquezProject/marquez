@@ -1,5 +1,5 @@
-import { genericFetchWrapper } from '.'
 import { Namespaces } from '../types/api'
+import { genericFetchWrapper } from '.'
 
 export const fetchNamespaces = async () => {
   const url = `${__API_URL__}/namespaces`

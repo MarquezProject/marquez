@@ -1,9 +1,9 @@
-import { mount } from 'enzyme'
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { mount } from 'enzyme'
 
-import JobPreviewCard from '../../components/JobPreviewCard'
 import { formatUpdatedAt } from '../../helpers'
+import JobPreviewCard from '../../components/JobPreviewCard'
 
 const jobs = require('../../../docker/db/data/jobs.json')
 

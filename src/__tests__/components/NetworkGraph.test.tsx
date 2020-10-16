@@ -1,9 +1,3 @@
-import { mount } from 'enzyme'
-import * as React from 'react'
-import { NetworkGraph } from '../../components/NetworkGraph'
-const jobs = require('../../../docker/db/data/jobs.json')
-const datasets = require('../../../docker/db/data/datasets.json')
-
 describe('NetworkGraph Component', () => {
   // TODO: There's an issue with rendering this component in jest
 

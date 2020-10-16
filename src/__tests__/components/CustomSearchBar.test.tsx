@@ -1,6 +1,5 @@
-import { shallow } from 'enzyme'
 import * as React from 'react'
-import Typography from '@material-ui/core/Typography'
+import { shallow } from 'enzyme'
 
 import CustomSearchBar from '../../components/CustomSearchBar'
 

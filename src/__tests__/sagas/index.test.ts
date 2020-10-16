@@ -1,13 +1,13 @@
-import { expectSaga, testSaga } from 'redux-saga-test-plan'
-import * as matchers from 'redux-saga-test-plan/matchers'
-import * as actions from '../../actionCreators'
 import * as actionTypes from '../../constants/ActionTypes'
+import * as actions from '../../actionCreators'
 import * as api from '../../requests'
+import * as matchers from 'redux-saga-test-plan/matchers'
+import { expectSaga, testSaga } from 'redux-saga-test-plan'
 import { fetchNamespacesDatasetsAndJobs } from '../../sagas/'
 
 import { INamespaceAPI } from '../../types/api'
 
-describe("Main (That's so Fetch) Saga", () => {
+describe('Main (That\'s so Fetch) Saga', () => {
   const mockNamespaces: INamespaceAPI[] = [
     { name: 'Mock Namespace 1', description: '', createdAt: '', owner: 'CDA' },
     { name: 'Mock Namespace 2', description: '', createdAt: '', owner: 'CDA' }

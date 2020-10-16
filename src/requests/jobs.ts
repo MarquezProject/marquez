@@ -1,5 +1,5 @@
+import { Job, Jobs, Namespace, Run } from '../types/api'
 import { genericFetchWrapper } from '.'
-import { Job, Namespace, Jobs, Run } from '../types/api'
 
 export const fetchJobs = async (namespace: Namespace) => {
   const { name } = namespace

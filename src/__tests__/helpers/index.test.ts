@@ -19,13 +19,13 @@ describe('createNetworkData helper test', () => {
   it('should return as many nodes as there are jobs + datasets', () => {
     expect(networkData.nodes).toHaveLength(datasets.length + jobs.length)
   })
-  it(`should return as many links as there are jobs' inputs & outputs`, () => {
+  it('should return as many links as there are jobs\' inputs & outputs', () => {
     const linkCount = jobs.reduce((links, job) => {
       return (links += job.inputs.length + job.outputs.length)
     }, 0)
     expect(networkData.links).toHaveLength(linkCount)
   })
-  it(`each link should have a 'connectsToMatchingNode'`, () => {
+  it('each link should have a \'connectsToMatchingNode\'', () => {
     networkData.links.every(l => {
       expect(l).toHaveProperty('connectsToMatchingNode')
     })

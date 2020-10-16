@@ -1,8 +1,7 @@
-import { shallow } from 'enzyme'
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import { shallow } from 'enzyme'
+import Button from '@material-ui/core/Button'
 import Dialog from '../../components/Dialog'
-import Button from '@material-ui/core/Button';
 
 describe('Dialog Component', () => {
 

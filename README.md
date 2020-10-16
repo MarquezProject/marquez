@@ -98,23 +98,12 @@ This project is written in typescript. See [tsconfig.json](tsconfig.json) for ou
 
 Our types are defined in the `src/types` folder
 
-#### Linting
+#### Linting & Prettifying
 
-This project uses [ESLint with TypeScript support](https://github.com/typescript-eslint/typescript-eslint).
-
-If you have not already done so, you should [setup eslint with your editor of choice](https://eslint.org/docs/user-guide/integrations)
-
-You can add / edit the linting rules within the [eslintrc.js](eslintrc.js) file.
-
-### Prettifying
-
-We are using [Prettier](https://prettier.io/docs/en/install.html) to ensure uniform code style / formatting. Specifically, we are [using ESLint to run Prettier](https://prettier.io/docs/en/integrating-with-linters.html).
-
-1. Please set up [Prettier integration](https://prettier.io/docs/en/editors.html) with your editor of choice. (Also, be sure to disable any other prettifier, like HookyQR's Beautify tool, for this workspace.)
-
-2. Ensure that your editor formats on save.
-
-3. See [.prettierrc.js](.prettierrc.js) for our Prettier settings. See information on configuration settings [here](https://prettier.io/docs/en/configuration.html)
+Fix all style issues in project
+```
+   $ npm run eslint-fix 
+```
 
 ### Seeding data
 

@@ -1,9 +1,9 @@
-import { mount } from 'enzyme'
 import * as React from 'react'
-import Typography from '@material-ui/core/Typography'
-import DatasetPreviewCard from '../../components/DatasetPreviewCard'
-import { formatUpdatedAt } from '../../helpers'
 import { MemoryRouter } from 'react-router-dom'
+import { formatUpdatedAt } from '../../helpers'
+import { mount } from 'enzyme'
+import DatasetPreviewCard from '../../components/DatasetPreviewCard'
+import Typography from '@material-ui/core/Typography'
 
 const datasets = require('../../../docker/db/data/datasets.json')
 const dataset = datasets[0]

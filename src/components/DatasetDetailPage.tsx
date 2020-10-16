@@ -1,11 +1,11 @@
-import React, { FunctionComponent } from 'react'
+import { Box, Paper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@material-ui/core'
 import {
-  withStyles,
-  createStyles,
+  Theme as ITheme,
   WithStyles as IWithStyles,
-  Theme as ITheme
+  createStyles,
+  withStyles
 } from '@material-ui/core/styles'
-import { Typography, Box, Tooltip, Table, TableCell, TableHead, TableRow, TableBody, Paper } from '@material-ui/core'
+import React, { FunctionComponent } from 'react'
 
 import InfoIcon from '@material-ui/icons/Info'
 
@@ -14,9 +14,9 @@ import { formatUpdatedAt } from '../helpers'
 import { useParams } from 'react-router-dom'
 import _find from 'lodash/find'
 
+import * as Redux from 'redux'
 import { Dataset } from '../types/api'
 import {IState} from '../reducers'
-import * as Redux from 'redux'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 

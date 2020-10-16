@@ -1,7 +1,7 @@
-import jobsReducer, { initialState } from '../../reducers/jobs'
-import _sample from 'lodash/sample'
-import _find from 'lodash/find'
 import * as actionTypes from '../../constants/ActionTypes'
+import _find from 'lodash/find'
+import _sample from 'lodash/sample'
+import jobsReducer, { initialState } from '../../reducers/jobs'
 
 const jobs = require('../../../docker/db/data/jobs.json')
 

@@ -1,16 +1,15 @@
-import { all, call, put, take } from 'redux-saga/effects'
-import * as RS from 'redux-saga'
-import _orderBy from 'lodash/orderBy'
-import { Namespace, Namespaces  } from '../types/api'
-import { fetchNamespaces, fetchDatasets, fetchJobs, fetchLatestJobRuns } from '../requests'
-import {
-  fetchDatasetsSuccess,
-  fetchJobsSuccess,
-  fetchNamespacesSuccess,
-  fetchJobRunsSuccess,
-  applicationError
-} from '../actionCreators'
 import { FETCH_JOB_RUNS } from '../constants/ActionTypes'
+import { Namespace, Namespaces  } from '../types/api'
+import { all, call, put, take } from 'redux-saga/effects'
+import {
+  applicationError,
+  fetchDatasetsSuccess,
+  fetchJobRunsSuccess,
+  fetchJobsSuccess,
+  fetchNamespacesSuccess
+} from '../actionCreators'
+import { fetchDatasets, fetchJobs, fetchLatestJobRuns, fetchNamespaces } from '../requests'
+import _orderBy from 'lodash/orderBy'
 
 export function* fetchNamespacesDatasetsAndJobs() {
   try {

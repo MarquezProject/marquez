@@ -1,6 +1,6 @@
-import { IDataset, IJob, INetworkData, INodeNetwork, INetworkLink } from '../types/'
-import _find from 'lodash/find'
+import { IDataset, IJob, INetworkData, INetworkLink, INodeNetwork } from '../types/'
 import { isoParse, timeFormat } from 'd3-time-format'
+import _find from 'lodash/find'
 
 export const createNetworkData = (datasets: IDataset[], jobs: IJob[]): INetworkData => {
   const datasetNodes: INodeNetwork[] = datasets.map(d => ({

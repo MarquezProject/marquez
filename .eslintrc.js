@@ -9,7 +9,7 @@ module.exports = {
     project: './tsconfig.json',
     sourceType: 'module'
   },
-  plugins: ['@typescript-eslint', 'react', 'prettier'],
+  plugins: ['@typescript-eslint', 'react', 'prettier', "sort-imports-es6-autofix"],
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
@@ -17,7 +17,11 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier'
   ],
-  // ideally we keep these in alphabetical order
+  settings: {
+    "react": {
+      version: "detect"
+    }
+  },
   rules: {
     'react/prop-types': 'off',
     '@typescript-eslint/camelcase': 'off',
@@ -48,6 +52,11 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     quotes: 'off',
     '@typescript-eslint/quotes': ['error', 'single'],
-    '@typescript-eslint/semi': ['error', 'never']
+    '@typescript-eslint/semi': ['error', 'never'],
+    "sort-imports-es6-autofix/sort-imports-es6": [2, {
+      "ignoreCase": false,
+      "ignoreMemberSort": false,
+      "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
+    }]
   }
 }

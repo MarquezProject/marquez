@@ -6,6 +6,7 @@
 .env.test.local
 .pnp.js
 .vscode
+.idea
 /.pnp
 /build
 /coverage
