@@ -21,7 +21,6 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
-import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -84,7 +83,7 @@ public class DatasetResource {
       @Valid DatasetMeta datasetMeta)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
-    throwIfNotExists(datasetMeta.getRunId().orElse(null));
+    datasetMeta.getRunId().ifPresent(this::throwIfNotExists);
 
     final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, datasetMeta);
     return Response.ok(dataset).build();
@@ -204,11 +203,9 @@ public class DatasetResource {
     }
   }
 
-  void throwIfNotExists(@Nullable RunId runId) throws MarquezServiceException {
-    if (runId != null) {
-      if (!jobService.runExists(runId)) {
-        throw new RunNotFoundException(runId);
-      }
+  void throwIfNotExists(@NonNull RunId runId) throws MarquezServiceException {
+    if (!jobService.runExists(runId)) {
+      throw new RunNotFoundException(runId);
     }
   }
 }
