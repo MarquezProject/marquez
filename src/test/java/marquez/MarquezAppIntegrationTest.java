@@ -433,18 +433,18 @@ public class MarquezAppIntegrationTest {
             .description(JOB_DESCRIPTION)
             .runId(runStarted.getId())
             .build();
-    final Job jobWithLatestRun = client.createJob(NAMESPACE_NAME, JOB_NAME, jobMetaWithRunId);
-    assertThat(jobWithLatestRun.getId()).isEqualTo(JOB_ID);
-    assertThat(jobWithLatestRun.getType()).isEqualTo(JOB_TYPE);
-    assertThat(jobWithLatestRun.getName()).isEqualTo(JOB_NAME);
-    assertThat(jobWithLatestRun.getCreatedAt()).isAfter(EPOCH);
-    assertThat(jobWithLatestRun.getUpdatedAt()).isAfter(EPOCH);
-    assertThat(jobWithLatestRun.getInputs()).isEqualTo(inputs);
-    assertThat(jobWithLatestRun.getOutputs()).isEqualTo(outputs);
-    assertThat(jobWithLatestRun.getLocation()).isEqualTo(Optional.of(JOB_LOCATION));
-    assertThat(jobWithLatestRun.getContext()).isEqualTo(modifiedJobContext);
-    assertThat(jobWithLatestRun.getDescription()).isEqualTo(Optional.of(JOB_DESCRIPTION));
-    assertThat(jobWithLatestRun.getLatestRun().get().getId()).isEqualTo(runStarted.getId());
+    final Job jobWithNewVersion = client.createJob(NAMESPACE_NAME, JOB_NAME, jobMetaWithRunId);
+    assertThat(jobWithNewVersion.getId()).isEqualTo(JOB_ID);
+    assertThat(jobWithNewVersion.getType()).isEqualTo(JOB_TYPE);
+    assertThat(jobWithNewVersion.getName()).isEqualTo(JOB_NAME);
+    assertThat(jobWithNewVersion.getCreatedAt()).isAfter(EPOCH);
+    assertThat(jobWithNewVersion.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(jobWithNewVersion.getInputs()).isEqualTo(inputs);
+    assertThat(jobWithNewVersion.getOutputs()).isEqualTo(outputs);
+    assertThat(jobWithNewVersion.getLocation()).isEqualTo(Optional.of(JOB_LOCATION));
+    assertThat(jobWithNewVersion.getContext()).isEqualTo(modifiedJobContext);
+    assertThat(jobWithNewVersion.getDescription()).isEqualTo(Optional.of(JOB_DESCRIPTION));
+    assertThat(jobWithNewVersion.getLatestRun().get().getId()).isEqualTo(runStarted.getId());
 
     // (9) Complete a run
     final Instant endedAt = newTimestamp();
