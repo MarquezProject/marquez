@@ -85,7 +85,8 @@ public class JobServiceTest {
 
   // BATCH JOB META
   private static final JobMeta JOB_META =
-      new JobMeta(BATCH, ImmutableSet.of(), ImmutableSet.of(), LOCATION, CONTEXT, DESCRIPTION);
+      new JobMeta(
+          BATCH, ImmutableSet.of(), ImmutableSet.of(), LOCATION, CONTEXT, DESCRIPTION, null);
 
   // BATCH JOB
   private static final JobName JOB_NAME = newJobName();

@@ -19,6 +19,7 @@ import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidArrayOrThrow;
+import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
@@ -44,7 +45,9 @@ public final class ExtendedRunRowMapper implements RowMapper<ExtendedRunRow> {
         timestampOrNull(results, Columns.NOMINAL_END_TIME),
         stringOrNull(results, Columns.CURRENT_RUN_STATE),
         timestampOrNull(results, Columns.STARTED_AT),
+        uuidOrNull(results, Columns.START_RUN_STATE_UUID),
         timestampOrNull(results, Columns.ENDED_AT),
+        uuidOrNull(results, Columns.END_RUN_STATE_UUID),
         stringOrThrow(results, Columns.ARGS));
   }
 }

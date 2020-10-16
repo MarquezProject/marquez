@@ -70,6 +70,21 @@ public interface RunDao extends SqlObject {
     createJobVersionDao().updateLatestRun(row.getJobVersionUuid(), updateAt, row.getUuid());
   }
 
+  @Transaction
+  default void updateJobVersionUuid(UUID rowUuid, Instant updatedAt, UUID jobVersionUuid) {
+    getHandle()
+        .createUpdate(
+            "UPDATE runs "
+                + "SET updated_at = :updatedAt, "
+                + "    job_version_uuid = :jobVersionUuid "
+                + "WHERE uuid = :rowUuid")
+        .bind("updatedAt", updatedAt)
+        .bind("jobVersionUuid", jobVersionUuid)
+        .bind("rowUuid", rowUuid)
+        .execute();
+    createJobVersionDao().updateLatestRun(jobVersionUuid, updatedAt, rowUuid);
+  }
+
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM runs WHERE uuid = :rowUuid)")
   boolean exists(UUID rowUuid);
 

@@ -120,7 +120,8 @@ public final class ModelGenerator extends Generator {
         newOutputs(numOfOutputs),
         newLocation(),
         newContext(),
-        newDescription());
+        newDescription(),
+        null);
   }
 
   public static Job newJob() {

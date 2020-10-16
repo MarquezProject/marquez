@@ -35,6 +35,7 @@ import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 
 @EqualsAndHashCode
 @ToString
@@ -45,6 +46,7 @@ public final class JobMeta {
   @Nullable private final URL location;
   @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
+  @Nullable private final RunId runId;
 
   public JobMeta(
       @NonNull final JobType type,
@@ -52,13 +54,15 @@ public final class JobMeta {
       @NonNull final ImmutableSet<DatasetId> outputs,
       @Nullable final URL location,
       @Nullable final ImmutableMap<String, String> context,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable final RunId runId) {
     this.type = type;
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
     this.context = (context == null) ? ImmutableMap.of() : context;
     this.description = description;
+    this.runId = runId;
   }
 
   public Optional<URL> getLocation() {
@@ -67,6 +71,10 @@ public final class JobMeta {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<RunId> getRunId() {
+    return Optional.ofNullable(runId);
   }
 
   public Version version(@NonNull NamespaceName namespaceName, @NonNull JobName jobName) {

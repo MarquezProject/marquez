@@ -34,6 +34,11 @@ repositories {
   mavenCentral()
 }
 
+java {
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+}
+
 ext {
   dropwizardVersion = '2.0.12'
   jdbi3Version = '3.13.0'
@@ -59,7 +64,7 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
   testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
-  testCompile 'io.github.marquezproject:marquez-java:0.4.1'
+  testCompile 'io.github.marquezproject:marquez-java:0.4.3-rc.1'
   testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:3.11.1'

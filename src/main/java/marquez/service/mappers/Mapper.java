@@ -393,7 +393,7 @@ public final class Mapper {
       @NonNull final RunMeta runMeta) {
     final Instant now = newTimestamp();
     return new RunRow(
-        runMeta.getId().map((runId) -> runId.getValue()).orElseGet(Mapper::newRowUuid),
+        runMeta.getId().map(runId -> runId.getValue()).orElseGet(Mapper::newRowUuid),
         now,
         now,
         jobVersionUuid,
@@ -401,6 +401,8 @@ public final class Mapper {
         inputVersionUuids,
         runMeta.getNominalStartTime().orElse(null),
         runMeta.getNominalEndTime().orElse(null),
+        null,
+        null,
         null,
         null,
         null);

@@ -183,9 +183,11 @@ public class JobService {
             namespaceName.getValue(),
             jobMeta);
       }
-      final Version version = jobMeta.version(namespaceName, jobName);
-      if (!jobVersionDao.exists(version.getValue())) {
-        log.info("Creating version '{}' for job '{}'...", version.getValue(), jobName.getValue());
+
+      final Version jobVersion = jobMeta.version(namespaceName, jobName);
+      if (!jobVersionDao.exists(jobVersion.getValue())) {
+        log.info(
+            "Creating version '{}' for job '{}'...", jobVersion.getValue(), jobName.getValue());
         final String checksum = Utils.checksumFor(jobMeta.getContext());
         if (!jobContextDao.exists(checksum)) {
           final JobContextRow newContextRow =
@@ -196,19 +198,37 @@ public class JobService {
         final JobContextRow contextRow = jobContextDao.findBy(checksum).get();
         final List<UUID> inputUuids = findUuids(jobMeta.getInputs());
         final List<UUID> outputUuids = findUuids(jobMeta.getOutputs());
-        final JobVersionRow newVersionRow =
+        final JobVersionRow newJobVersionRow =
             Mapper.toJobVersionRow(
                 jobRow.getUuid(),
                 contextRow.getUuid(),
                 inputUuids,
                 outputUuids,
                 jobMeta.getLocation().orElse(null),
-                version);
-        jobVersionDao.insert(newVersionRow);
+                jobVersion);
+        jobVersionDao.insert(newJobVersionRow);
         versions
             .labels(namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue())
             .inc();
-        log.info("Successfully created version '{}' for job '{}'.", version, jobName.getValue());
+        log.info(
+            "Successfully created version '{}' for job '{}'.",
+            jobVersion.getValue(),
+            jobName.getValue());
+
+        // When a run ID is present, associate the new job version with the existing job run.
+        jobMeta
+            .getRunId()
+            .ifPresent(
+                runId -> {
+                  final ExtendedRunRow runRow = runDao.findBy(runId.getValue()).get();
+                  final Instant updatedAt = Instant.now();
+                  runDao.updateJobVersionUuid(
+                      runRow.getUuid(), updatedAt, newJobVersionRow.getUuid());
+                  log.info(
+                      "Successfully associated run '{}' with version '{}'.",
+                      runId.getValue(),
+                      jobVersion.getValue());
+                });
       }
       return get(namespaceName, jobName).get();
     } catch (UnableToExecuteStatementException e) {

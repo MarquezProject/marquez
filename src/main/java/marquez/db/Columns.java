@@ -31,6 +31,8 @@ public final class Columns {
   public static final String TYPE = "type";
   public static final String CREATED_AT = "created_at";
   public static final String UPDATED_AT = "updated_at";
+  public static final String STARTED_AT = "started_at";
+  public static final String ENDED_AT = "ended_at";
   public static final String NAME = "name";
   public static final String VERSION = "version";
   public static final String DESCRIPTION = "description";
@@ -49,8 +51,6 @@ public final class Columns {
   public static final String CURRENT_OWNER_NAME = "current_owner_name";
 
   /* NAMESPACE OWNERSHIP ROW COLUMNS */
-  public static final String STARTED_AT = "started_at";
-  public static final String ENDED_AT = "ended_at";
   public static final String OWNER_UUID = "owner_uuid";
 
   /* SOURCE ROW COLUMNS */
@@ -92,6 +92,8 @@ public final class Columns {
   public static final String NOMINAL_START_TIME = "nominal_start_time";
   public static final String NOMINAL_END_TIME = "nominal_end_time";
   public static final String CURRENT_RUN_STATE = "current_run_state";
+  public static final String START_RUN_STATE_UUID = "start_run_state_uuid";
+  public static final String END_RUN_STATE_UUID = "end_run_state_uuid";
 
   /* RUN ARGS ROW COLUMNS */
   public static final String ARGS = "args";

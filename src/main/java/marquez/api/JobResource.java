@@ -84,6 +84,7 @@ public class JobResource {
       @Valid JobMeta jobMeta)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
+    jobMeta.getRunId().ifPresent(this::throwIfNotExists);
 
     final Job job = jobService.createOrUpdate(namespaceName, jobName, jobMeta);
     return Response.ok(job).build();
