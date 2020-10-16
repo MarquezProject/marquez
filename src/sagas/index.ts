@@ -3,7 +3,6 @@ import * as RS from 'redux-saga'
 import _orderBy from 'lodash/orderBy'
 import { Namespace, Namespaces  } from '../types/api'
 import { fetchNamespaces, fetchDatasets, fetchJobs, fetchLatestJobRuns } from '../requests'
-import { createRollbarMessage } from '../helpers'
 import {
   fetchDatasetsSuccess,
   fetchJobsSuccess,
@@ -28,7 +27,6 @@ export function* fetchNamespacesDatasetsAndJobs() {
     yield put(fetchJobsSuccess(jobs))
     yield put(fetchNamespacesSuccess(namespaces))
   } catch (e) {
-    createRollbarMessage('fetchNamespacesDatasetsAndJobs', e)
     yield put(applicationError('Something went wrong while fetching initial data.'))
   }
 }
@@ -41,7 +39,6 @@ export function* fetchJobRunsSaga() {
       const runsOrderedByStartTime = _orderBy(runs, ['nominalStartTime'], ['asc'])
       yield put(fetchJobRunsSuccess(payload.jobName, runsOrderedByStartTime))
     } catch (e) {
-      createRollbarMessage('fetchJobRuns', e)
       yield put(applicationError('Something went wrong while fetching job runs'))
     }
   }

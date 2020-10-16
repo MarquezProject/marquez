@@ -121,14 +121,6 @@ We are using [Prettier](https://prettier.io/docs/en/install.html) to ensure unif
 Mock data can be found in the `docker/db/data` folder.
 Feel free to edit the mock data if you like. (Grant worked really hard on making it pretty.)
 
-#### Logging
-
-We are using [Rollbar](https://rollbar.com/WeWork/Marquez-UI/) for front-end logging.
-
-If you are also using Rollbar, be sure to add your Rollbar config as the first `<script/>` in `<head></head>` of `index.prod.html`. (See [Rollbar docs](https://docs.rollbar.com/docs/browser-js) for more info)
-
-If you are NOT using Rollbar, be sure to change the global `__ROLLBAR__` variable in `webpack.prod.js` to `JSON.stringify(false)` (this will disable any functionality in the `createRollbarMessage` function in `src/helpers`)
-
 #### Customization
 
 We encourage you to make Marquez your own! Feel free to change styles, add new components, etc.

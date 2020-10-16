@@ -2,18 +2,6 @@ import { IDataset, IJob, INetworkData, INodeNetwork, INetworkLink } from '../typ
 import _find from 'lodash/find'
 import { isoParse, timeFormat } from 'd3-time-format'
 
-export const createRollbarMessage = (
-  functionName: string,
-  e: string,
-  severity: 'critical' | 'error' | 'warning' | 'info' | 'debug' = 'error'
-) => {
-  if (__NODE_ENV__ === 'production') {
-    if (__ROLLBAR__) {
-      Rollbar[severity](`Error in ${functionName}: ${e}`)
-    }
-  }
-}
-
 export const createNetworkData = (datasets: IDataset[], jobs: IJob[]): INetworkData => {
   const datasetNodes: INodeNetwork[] = datasets.map(d => ({
     id: d.name,
