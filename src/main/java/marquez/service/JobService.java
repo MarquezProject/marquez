@@ -212,16 +212,15 @@ public class JobService {
             .inc();
         log.info("Successfully created version '{}' for job '{}'.", jobVersion, jobName.getValue());
 
-        //
+        // When a run ID is provided along with the job meta,
         jobMeta
             .getRunId()
             .ifPresent(
                 runId -> {
-                  final ExtendedRunRow oldRunRow = runDao.findBy(runId.getValue()).get();
-                  log.info(oldRunRow.toString());
-                  final RunRow newRunRow = Mapper.toRunRow(oldRunRow, newJobVersionRow.getUuid());
-                  log.info(newRunRow.toString());
-                  runDao.insert(newRunRow);
+                  final ExtendedRunRow runRow = runDao.findBy(runId.getValue()).get();
+                  final Instant updatedAt = Instant.now();
+                  runDao.updateJobVersionUuid(
+                      runRow.getUuid(), updatedAt, newJobVersionRow.getUuid());
                 });
       }
 

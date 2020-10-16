@@ -60,6 +60,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+// TODO: Move test to test/java/marquez/service pkg
 @Category({DataAccessTests.class, IntegrationTests.class})
 public class JobServiceTest {
 
@@ -159,7 +160,8 @@ public class JobServiceTest {
                 ImmutableSet.of(),
                 Utils.toUrl("https://github.com/repo/test/commit/foo"),
                 ImmutableMap.of(),
-                "description"));
+                "description",
+                null));
     assertThat(job.getName()).isEqualTo(jobName);
     assertThat(job.getId().getNamespace()).isEqualTo(NAMESPACE_NAME);
     assertThat(job.getId().getName()).isEqualTo(jobName);
@@ -219,7 +221,8 @@ public class JobServiceTest {
                 ImmutableSet.of(),
                 Utils.toUrl("https://github.com/repo/test/commit/foo"),
                 ImmutableMap.of(),
-                "description"));
+                "description",
+                null));
 
     RunId run2Id = RunId.of(UUID.randomUUID());
     Run run2 =

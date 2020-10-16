@@ -128,7 +128,7 @@ public class MarquezAppIntegrationTest {
   private static final ImmutableMap<String, String> JOB_CONTEXT = newContext();
   private static final String JOB_DESCRIPTION = newDescription();
 
-  private final URL baseUrl = Utils.toUrl("http://localhost:" + APP.getLocalPort() + "/api/v1");
+  private final URL baseUrl = Utils.toUrl("http://localhost:" + APP.getLocalPort());
   private final MarquezClient client = MarquezClient.builder().baseUrl(baseUrl).build();
 
   @Test
@@ -416,7 +416,37 @@ public class MarquezAppIntegrationTest {
     assertThat(runStarted.getDurationMs()).isEmpty();
     assertThat(runStarted.getArgs()).isEmpty();
 
-    // (8) Complete a run
+    // (8) Modify context in job metadata to create new job version; the version
+    //     will be linked to the provided run ID
+    final ImmutableMap<String, String> modifiedJobContext =
+        new ImmutableMap.Builder<String, String>()
+            .putAll(JOB_CONTEXT)
+            .put("key0", "value0")
+            .build();
+    final JobMeta jobMetaWithRunId =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(inputs)
+            .outputs(outputs)
+            .location(JOB_LOCATION)
+            .context(modifiedJobContext)
+            .description(JOB_DESCRIPTION)
+            .runId(runStarted.getId())
+            .build();
+    final Job jobWithLatestRun = client.createJob(NAMESPACE_NAME, JOB_NAME, jobMetaWithRunId);
+    assertThat(jobWithLatestRun.getId()).isEqualTo(JOB_ID);
+    assertThat(jobWithLatestRun.getType()).isEqualTo(JOB_TYPE);
+    assertThat(jobWithLatestRun.getName()).isEqualTo(JOB_NAME);
+    assertThat(jobWithLatestRun.getCreatedAt()).isAfter(EPOCH);
+    assertThat(jobWithLatestRun.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(jobWithLatestRun.getInputs()).isEqualTo(inputs);
+    assertThat(jobWithLatestRun.getOutputs()).isEqualTo(outputs);
+    assertThat(jobWithLatestRun.getLocation()).isEqualTo(Optional.of(JOB_LOCATION));
+    assertThat(jobWithLatestRun.getContext()).isEqualTo(modifiedJobContext);
+    assertThat(jobWithLatestRun.getDescription()).isEqualTo(Optional.of(JOB_DESCRIPTION));
+    assertThat(jobWithLatestRun.getLatestRun().get().getId()).isEqualTo(runStarted.getId());
+
+    // (9) Complete a run
     final Instant endedAt = newTimestamp();
     final Run runCompleted = client.markRunAsCompleted(run.getId(), endedAt);
     assertThat(runCompleted.getId()).isEqualTo(run.getId());

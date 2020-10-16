@@ -896,6 +896,9 @@ components:
         description:
           description: The description of the job.
           type: string
+        runId:
+          description: An _optional_ run ID used to associate a job version to an existing job run.
+          type: string
       required:
         - type
         - inputs
@@ -1042,7 +1045,7 @@ components:
       type: object
       properties:
         id:
-          description: An optional client-provided UUID for this run (this could be a Random or name based UUID). If not provided a random UUID will be generated for the run
+          description: An _optional_ client-provided UUID for this run (this could be a Random or name based UUID). If not provided a random UUID will be generated for the run
           type: string
           format: uuid
         nominalStartTime:

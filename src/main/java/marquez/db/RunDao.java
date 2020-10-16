@@ -51,9 +51,7 @@ public interface RunDao extends SqlObject {
                 + "job_version_uuid, "
                 + "run_args_uuid, "
                 + "nominal_start_time, "
-                + "nominal_end_time, "
-                + "current_run_state,"
-                + "start_run_state_uuid"
+                + "nominal_end_time"
                 + ") VALUES ("
                 + ":uuid, "
                 + ":createdAt, "
@@ -61,10 +59,7 @@ public interface RunDao extends SqlObject {
                 + ":jobVersionUuid, "
                 + ":runArgsUuid, "
                 + ":nominalStartTime, "
-                + ":nominalEndTime, "
-                + ":currentRunState, "
-                + ":startRunStateUuid"
-                + ")")
+                + ":nominalEndTime)")
         .bindBean(row)
         .execute();
     // Input versions
@@ -73,6 +68,21 @@ public interface RunDao extends SqlObject {
     // Latest run
     final Instant updateAt = row.getCreatedAt();
     createJobVersionDao().updateLatestRun(row.getJobVersionUuid(), updateAt, row.getUuid());
+  }
+
+  @Transaction
+  default void updateJobVersionUuid(UUID rowUuid, Instant updatedAt, UUID jobVersionUuid) {
+    getHandle()
+        .createUpdate(
+            "UPDATE runs "
+                + "SET updated_at = :updatedAt, "
+                + "    job_version_uuid = :jobVersionUuid "
+                + "WHERE uuid = :rowUuid")
+        .bind("updatedAt", updatedAt)
+        .bind("jobVersionUuid", jobVersionUuid)
+        .bind("rowUuid", rowUuid)
+        .execute();
+    createJobVersionDao().updateLatestRun(jobVersionUuid, updatedAt, rowUuid);
   }
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM runs WHERE uuid = :rowUuid)")
