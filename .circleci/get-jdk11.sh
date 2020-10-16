@@ -16,6 +16,6 @@
 
 set -e
 
-sudo apt-get update && apt-get install -y default-jdk
+sudo apt-get install -y default-jdk
 
 echo "DONE!"
