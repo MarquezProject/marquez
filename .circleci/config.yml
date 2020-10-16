@@ -2,7 +2,9 @@ version: 2.1
 
 defaults: &defaults
   working_directory: ~/marquez
-  machine: true
+  machine:
+    # includes Ubuntu 16.04, docker 18.09.3, docker-compose 1.23.1
+    image: ubuntu-1604:201903-01
 
 jobs:
   build:
