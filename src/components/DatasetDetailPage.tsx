@@ -15,6 +15,10 @@ import { useParams } from 'react-router-dom'
 import _find from 'lodash/find'
 
 import { Dataset } from '../types/api'
+import {IState} from '../reducers'
+import * as Redux from 'redux'
+import {bindActionCreators} from 'redux'
+import {connect} from 'react-redux'
 
 const styles = ({ shadows }: ITheme) => {
   return createStyles({
@@ -146,4 +150,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   }
 }
 
-export default withStyles(styles)(DatasetDetailPage)
+const mapStateToProps = (state: IState) => ({
+  datasets: state.datasets
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) => bindActionCreators({}, dispatch)
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(DatasetDetailPage))

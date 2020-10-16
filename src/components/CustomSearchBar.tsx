@@ -9,6 +9,9 @@ import {
 } from '@material-ui/core/styles'
 
 import { useHistory } from 'react-router-dom'
+import * as Redux from 'redux'
+import {bindActionCreators} from 'redux'
+import {connect} from 'react-redux'
 
 interface IProps {
   findMatchingEntities: typeof findMatchingEntities
@@ -61,4 +64,10 @@ const CustomSearchBar: FunctionComponent<IAllProps> = props => {
   )
 }
 
-export default withStyles(styles)(CustomSearchBar)
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators({ findMatchingEntities: findMatchingEntities }, dispatch)
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(withStyles(styles)(CustomSearchBar))

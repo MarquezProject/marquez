@@ -5,9 +5,9 @@ import Box from '@material-ui/core/Box'
 import FormControl from '@material-ui/core/FormControl'
 import uniq from 'lodash/uniq'
 import { withStyles } from '@material-ui/core/styles'
-import { capitalize } from '../helpers'
-import { IProps } from '../containers/FilterContainer'
-import { Namespace } from '../types/api'
+import { capitalize } from '../../helpers'
+import { IProps } from './FiltersWrapper'
+import { Namespace } from '../../types/api'
 
 const StyledFormControl = withStyles({
   root: {

@@ -1,4 +1,8 @@
 import * as React from 'react'
+import {IState} from '../reducers'
+import * as Redux from 'redux'
+import {bindActionCreators} from 'redux'
+import {connect} from 'react-redux'
 const styles = require('./Toast.css')
 
 interface IProps {
@@ -17,4 +21,16 @@ const Toast = (props: IProps) =>
     </div>
   ) : null
 
-export default Toast
+const mapStateToProps = (state: IState) => ({
+  error: state.display.error,
+  success: state.display.success
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) => ({
+  actions: bindActionCreators({}, dispatch)
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Toast)

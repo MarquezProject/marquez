@@ -12,12 +12,14 @@ import {
   Theme as ITheme
 } from '@material-ui/core/styles'
 
-import FilterContainer from '../containers/FilterContainer'
+import FiltersWrapper from './filters/FiltersWrapper'
 import DatasetPreviewCard from './DatasetPreviewCard'
 import JobPreviewCard from './JobPreviewCard'
 
 import { IDatasetsState } from '../reducers/datasets'
 import { IJobsState } from '../reducers/jobs'
+import {IState} from '../reducers'
+import {connect} from 'react-redux'
 
 const styles = (_theme: ITheme) => {
   return createStyles({
@@ -87,7 +89,7 @@ const Home:  FunctionComponent<IAllProps> = props => {
   return (
     <div className={classes.lowerHalf}>
       <div className={classes.filter}>
-        <FilterContainer showJobs={setShowJobs} />
+        <FiltersWrapper showJobs={setShowJobs} />
       </div>
       <div className={classes.row}>
         <Box className={classes.column}>
@@ -150,4 +152,18 @@ const Home:  FunctionComponent<IAllProps> = props => {
   )
 }
 
-export default withStyles(styles)(Home)
+const mapStateToProps = (state: IState) => ({
+  datasets: state.datasets,
+  jobs: state.jobs
+})
+
+interface IInjectedProps {
+  showJobs: boolean
+  setShowJobs: (bool: boolean) => void
+}
+
+type IStateProps = ReturnType<typeof mapStateToProps>
+
+export default connect<IStateProps, IInjectedProps>(
+  mapStateToProps
+)(withStyles(styles)(Home))

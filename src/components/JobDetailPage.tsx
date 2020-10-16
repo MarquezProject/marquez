@@ -5,6 +5,7 @@ import {
   WithStyles as IWithStyles,
   Theme as ITheme
 } from '@material-ui/core/styles'
+import * as Redux from 'redux'
 import { Typography, Box, Fab, Tooltip } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
 import OpenWithSharpIcon from '@material-ui/icons/OpenWithSharp'
@@ -12,11 +13,14 @@ import Modal from '@material-ui/core/Modal'
 import HowToRegIcon from '@material-ui/icons/HowToReg'
 import { useParams, useHistory } from 'react-router-dom'
 import _find from 'lodash/find'
+import { fetchJobRuns } from '../actionCreators'
+import {IState} from '../reducers'
+import {bindActionCreators} from 'redux'
+import {connect} from 'react-redux'
 
 const globalStyles = require('../global_styles.css')
 const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
 import { formatUpdatedAt } from '../helpers'
-
 import { IJob } from '../types'
 
 const colorMap = {
@@ -340,4 +344,15 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
   )
 }
 
-export default withStyles(styles)(JobDetailPage)
+const mapStateToProps = (state: IState) => ({
+  jobs: state.jobs
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) => bindActionCreators({
+  fetchJobRuns: fetchJobRuns
+}, dispatch)
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(JobDetailPage))

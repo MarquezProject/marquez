@@ -29,6 +29,10 @@ import {D3ZoomEvent} from 'd3'
 
 import Loader from './Loader'
 import {Run} from '../types/api'
+import {IState} from '../reducers'
+import * as Redux from 'redux'
+import {bindActionCreators} from 'redux'
+import {connect} from 'react-redux'
 
 const globalStyles = require('../global_styles.css')
 const {jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning} = globalStyles
@@ -129,7 +133,7 @@ export class NetworkGraph extends React.Component<IAllProps> {
         parents = _filter(newProps.jobs, j => j.outputs.includes(node.name))
       } else {
         const job = _find(newProps.jobs, j => j.name == node.name)
-        // TODO: Bug? Let's confirm input / output comparision on job name is correct; should be by dataset name?
+        // TODO: Bug? Let's confirm input / output comparison on job name is correct; should be by dataset name?
         parents = job ? _filter(newProps.datasets, j => job.inputs.some(input => input.name === j.name) && !job.outputs.some(output => output.name === j.name)) : []
       }
       return parents
@@ -347,4 +351,18 @@ export class NetworkGraph extends React.Component<IAllProps> {
   }
 }
 
-export default withStyles(styles)(withRouter(NetworkGraph))
+const mapStateToProps = (state: IState) => ({
+  datasets: state.datasets,
+  jobs: state.jobs,
+  isLoading: state.display.isLoading,
+  router: state.router
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) => ({
+  actions: bindActionCreators({}, dispatch)
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(withRouter(NetworkGraph)))

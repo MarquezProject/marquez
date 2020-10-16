@@ -1,20 +1,12 @@
 import { connect } from 'react-redux'
 import * as Redux from 'redux'
 import { bindActionCreators } from 'redux'
-import Filters from '../components/Filters'
-import { IState } from '../reducers'
+import Filters from './Filters'
+import { IState } from '../../reducers'
 
-import { findMatchingEntities, filterDatasets, filterJobs } from '../actionCreators'
+import { findMatchingEntities, filterDatasets, filterJobs } from '../../actionCreators'
 import React, { FunctionComponent } from 'react'
-import { Namespace, Dataset } from '../types/api'
-
-const mapStateToProps = (state: IState) => ({
-  datasets: state.datasets,
-  namespaces: state.namespaces
-})
-
-const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
-  bindActionCreators({ findMatchingEntities, filterDatasets, filterJobs }, dispatch)
+import { Namespace, Dataset } from '../../types/api'
 
 export interface IProps {
   namespaces: Namespace[]
@@ -38,6 +30,14 @@ export const FiltersWrapper: FunctionComponent<IProps> = props => {
     />
   ) : null
 }
+
+const mapStateToProps = (state: IState) => ({
+  datasets: state.datasets,
+  namespaces: state.namespaces
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators({ findMatchingEntities, filterDatasets, filterJobs }, dispatch)
 
 export default connect(
   mapStateToProps,

@@ -23,12 +23,12 @@ import {
 
 import createRootReducer from '../reducers'
 import rootSaga from '../sagas'
-import HomeContainer from '../containers/HomeContainer'
-import CustomSearchBarContainer from '../containers/CustomSearchBarContainer'
-import Toast from '../containers/ToastContainer'
-import NetworkGraphContainer from '../containers/NetworkGraphContainer'
-import DatasetDetailContainer from '../containers/DatasetDetailContainer'
-import JobDetailContainer from '../containers/JobDetailContainer'
+import CustomSearchBar from './CustomSearchBar'
+import DatasetDetailPage from './DatasetDetailPage'
+import JobDetailPage from './JobDetailPage'
+import NetworkGraph from './NetworkGraph'
+import Toast from './Toast'
+import Home from './Home'
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
@@ -77,7 +77,7 @@ const styles = (_theme: ITheme) => {
   })
 }
 
-interface IProps extends IWithStyles<typeof styles> {}
+type IProps = IWithStyles<typeof styles>
 
 const TITLE = 'Marquez | Data Kit'
 
@@ -93,21 +93,21 @@ const App = ({ classes }: IProps): ReactElement => {
           <CssBaseline />
           <Grid direction='column' alignItems='stretch' classes={classes} justify='space-between'>
             <AppBar />
-            <NetworkGraphContainer />
-            <CustomSearchBarContainer
+            <NetworkGraph />
+            <CustomSearchBar
               setShowJobs={setShowJobs}
               showJobs={showJobs}
-            ></CustomSearchBarContainer>
+            />
             <Switch>
               <Route
                 path='/'
                 exact
                 render={props => (
-                  <HomeContainer {...props} showJobs={showJobs} setShowJobs={setShowJobs} />
+                  <Home {...props} showJobs={showJobs} setShowJobs={setShowJobs} />
                   )}
               />
-              <Route path='/datasets/:datasetName' exact component={DatasetDetailContainer} />
-              <Route path='/jobs/:jobName' exact component={JobDetailContainer} />
+              <Route path='/datasets/:datasetName' exact component={DatasetDetailPage} />
+              <Route path='/jobs/:jobName' exact component={JobDetailPage} />
             </Switch>
             <Toast />
           </Grid>
