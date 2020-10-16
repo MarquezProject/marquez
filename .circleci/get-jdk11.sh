@@ -14,9 +14,8 @@
 #
 # Usage: $ ./get-jdk11.sh
 
-set -xe
+set -e
 
-sudo apt-get update
-sudo apt-get install openjdk-11-jdk
+sudo apt-get update && sudo apt-get install openjdk-11-jdk
 
 echo "DONE!"
