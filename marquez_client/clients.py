@@ -10,48 +10,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 
-import marquez_client
-from marquez_client.constants import (DEFAULT_MARQUEZ_BACKEND,
-                                      DEFAULT_MARQUEZ_URL,
-                                      DEFAULT_MARQUEZ_FILE,
-                                      DEFAULT_TIMEOUT_MS)
-from marquez_client.file_backend import FileBackend
+from marquez_client import MarquezClient, MarquezWriteOnlyClient
 from marquez_client.http_backend import HttpBackend
+from marquez_client.file_backend import FileBackend
 from marquez_client.log_backend import LogBackend
 from marquez_client.utils import Utils
-
-log = logging.getLogger(__name__)
+from marquez_client.constants import (
+    DEFAULT_MARQUEZ_BACKEND,
+    DEFAULT_MARQUEZ_URL,
+    DEFAULT_MARQUEZ_FILE,
+    DEFAULT_TIMEOUT_MS
+)
 
 
 # Marquez Clients
 class Clients(object):
-    def __init__(self):
-        log.debug("Clients.init")
-
     @staticmethod
     def new_client():
-        url = os.environ.get('MARQUEZ_URL', DEFAULT_MARQUEZ_URL)
-        return marquez_client.MarquezClient(url)
+        return MarquezClient(
+            url=os.environ.get('MARQUEZ_URL', DEFAULT_MARQUEZ_URL),
+            api_key=os.environ.get('MARQUEZ_API_KEY')
+        )
 
     @staticmethod
     def new_write_only_client():
-        return marquez_client.MarquezWriteOnlyClient(Clients.from_env())
+        return MarquezWriteOnlyClient(
+            backend=Clients._backend_from_env(),
+        )
 
     @staticmethod
-    def from_env():
-        backend_env = \
+    def _backend_from_env():
+        backend = \
             os.environ.get('MARQUEZ_BACKEND', DEFAULT_MARQUEZ_BACKEND).upper()
 
-        if backend_env == 'HTTP':
+        if backend == 'HTTP':
             url = os.environ.get('MARQUEZ_URL', DEFAULT_MARQUEZ_URL)
+            api_key = os.environ.get('MARQUEZ_API_KEY')
             timeout = Utils.to_seconds(
                 os.environ.get('MARQUEZ_TIMEOUT_MS', DEFAULT_TIMEOUT_MS))
-            return HttpBackend(url, timeout)
-        elif backend_env == 'FILE':
+            return HttpBackend(url, timeout, api_key)
+        elif backend == 'FILE':
             file = os.environ.get('MARQUEZ_FILE', DEFAULT_MARQUEZ_FILE)
             return FileBackend(file)
-        elif backend_env == 'LOG':
+        elif backend == 'LOG':
             return LogBackend()

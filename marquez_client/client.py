@@ -17,12 +17,11 @@ import requests
 from six.moves.urllib.parse import quote
 
 from marquez_client import errors
-from marquez_client.constants import (DEFAULT_TIMEOUT_MS)
+from marquez_client.constants import (DEFAULT_TIMEOUT_MS, API_PATH_V1)
 from marquez_client.models import (DatasetType, JobType)
 from marquez_client.utils import Utils
 from marquez_client.version import VERSION
 
-_API_PATH = '/api/v1'
 _USER_AGENT = f'marquez-python/{VERSION}'
 _HEADERS = {'User-Agent': _USER_AGENT}
 
@@ -30,15 +29,15 @@ log = logging.getLogger(__name__)
 
 
 # Marquez Client
-class MarquezClient(object):
-    def __init__(self, url, timeout_ms=None):
+class MarquezClient:
+    def __init__(self, url, timeout_ms=None, api_key: str = None):
         self._timeout = Utils.to_seconds(timeout_ms or os.environ.get(
             'MARQUEZ_TIMEOUT_MS', DEFAULT_TIMEOUT_MS)
         )
+        self._api_base = f"{url}{API_PATH_V1}"
 
-        self._api_base = f'{url}{_API_PATH}'
-
-        log.debug(self._api_base)
+        if api_key:
+            Utils.add_auth_to(_HEADERS, api_key)
 
     # Namespace API
     def create_namespace(self, namespace_name, owner_name, description=None):

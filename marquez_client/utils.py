@@ -99,3 +99,7 @@ class Utils(object):
     def get_json(file):
         with open(file) as json_file:
             return json.load(json_file)
+
+    @staticmethod
+    def add_auth_to(headers, api_key):
+        headers['Authorization'] = f"Bearer: {api_key}"

@@ -10,36 +10,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-
 import requests
 
 from marquez_client import errors
 from marquez_client.backend import Backend
-
-log = logging.getLogger(__name__)
+from marquez_client.utils import Utils
+from marquez_client.constants import API_PATH_V1
 
 
 class HttpBackend(Backend):
-    def __init__(self, url, timeout):
+    def __init__(self, url, timeout, api_key: str = None):
         self._timeout = timeout
-        self._url = url
+        self._api_base = f"{url}{API_PATH_V1}"
+        self._api_key = api_key
 
     def put(self, path, headers, payload):
-        log.debug("_put()")
+        if self._api_key:
+            Utils.add_auth_to(headers, self._api_key)
 
         response = requests.put(
-            url=f'{self._url}{path}', headers=headers, json=payload,
-            timeout=self._timeout)
+            url=f"{self._api_base}{path}",
+            headers=headers,
+            json=payload,
+            timeout=self._timeout
+        )
 
         return self._response(response, as_json=True)
 
     def post(self, path, headers, payload=None):
-        log.debug("_post()")
+        if self._api_key:
+            Utils.add_auth_to(headers, self._api_key)
 
         response = requests.post(
-            url=f'{self._url}{path}', headers=headers, json=payload,
-            timeout=self._timeout)
+            url=f"{self._api_base}{path}",
+            headers=headers,
+            json=payload,
+            timeout=self._timeout
+        )
 
         return self._response(response, as_json=True)
 
