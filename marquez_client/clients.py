@@ -43,15 +43,15 @@ class Clients(object):
     @staticmethod
     def from_env():
         backend_env = \
-            os.environ.get('MARQUEZ_BACKEND', DEFAULT_MARQUEZ_BACKEND)
+            os.environ.get('MARQUEZ_BACKEND', DEFAULT_MARQUEZ_BACKEND).upper()
 
-        if backend_env == 'http':
+        if backend_env == 'HTTP':
             url = os.environ.get('MARQUEZ_URL', DEFAULT_MARQUEZ_URL)
             timeout = Utils.to_seconds(
                 os.environ.get('MARQUEZ_TIMEOUT_MS', DEFAULT_TIMEOUT_MS))
             return HttpBackend(url, timeout)
-        elif backend_env == 'file':
+        elif backend_env == 'FILE':
             file = os.environ.get('MARQUEZ_FILE', DEFAULT_MARQUEZ_FILE)
             return FileBackend(file)
-        elif backend_env == 'log':
+        elif backend_env == 'LOG':
             return LogBackend()
