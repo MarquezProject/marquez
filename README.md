@@ -57,17 +57,26 @@ The library depends on a _backend_. A `Backend` is configurable and lets the lib
 
 ### Backends
 
-* `http`: Write metadata to Marquez
-* `file`: Write metadata to a file (as `json`) under `/tmp/marquez`
-* `log`: just logs the metadata
+* `HTTP`: Write metadata to Marquez
+* `FILE`: Write metadata to a file (as `json`) under `/tmp/marquez`
+* `LOG`: Simply just logs the metadata to the console
 
-By default, the `http` backend will be used (see next section). To override the default backend and write metadata to a file, use `MARQUEZ_BACKEND`:
+By default, the `HTTP` backend will be used (see next section). To override the default backend and write metadata to a file, use `MARQUEZ_BACKEND`:
 
 ```
-MARQUEZ_BACKEND=file
+MARQUEZ_BACKEND=FILE
 ```
 
 > **Note:** Metadata will be written to `/tmp/marquez/client.requests.log`, but can be overridden with `MARQUEZ_FILE`.
+
+### `HTTP` Backend Authentication
+
+The `HTTP` backend supports using API keys to authenticate requests via `Bearer` auth. To include a key when making an API request, use `MARQUEZ_API_KEY`:
+
+```
+MARQUEZ_BACKEND=HTTP
+MARQUEZ_API_KEY=[API_KEY]
+```
 
 ### Pointing to your Marquez service
 
@@ -76,12 +85,13 @@ MARQUEZ_BACKEND=file
 You will also need to set the namespace if you are using something other than the `default` namespace.
 
 ```
-MARQUEZ_BACKEND=http
+MARQUEZ_BACKEND=HTTP
 MARQUEZ_URL=http://my_hosted_marquez.example.com:5000
 MARQUEZ_NAMESPACE=my_special_ns
 ```
 
 ### Extractors : Sending the correct data from your DAGs
+
 If you do nothing, Marquez will receive the `Job` and the `Run` from your DAGs, but sources and datasets will not be sent.
 
 `marquez-airflow` allows you to do more than that by building "Extractors".  Extractors are in the process of changing right now, but they basically take a task and extract:
@@ -115,7 +125,7 @@ When enabled, the library will:
 To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG`, `INFO`, or `ERROR`:
 
 ```
-$ export MARQUEZ_LOG_LEVEL='INFO'
+$ export MARQUEZ_LOG_LEVEL=INFO
 ```
 
 ## Example
