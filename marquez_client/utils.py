@@ -102,4 +102,4 @@ class Utils(object):
 
     @staticmethod
     def add_auth_to(headers, api_key):
-        headers['Authorization'] = f"Bearer: {api_key}"
+        headers['Authorization'] = f"Bearer {api_key}"
