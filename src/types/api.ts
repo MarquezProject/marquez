@@ -18,7 +18,6 @@ export interface Runs {
   runs: Run[]
 }
 
-
 export interface Namespaces {
   namespaces: Namespace[]
 }
@@ -67,7 +66,6 @@ export interface Field {
 export interface Jobs {
   jobs: Job[]
 }
-
 
 export interface Job {
   id: JobId

@@ -13,13 +13,3 @@
 @value jobRunAborted: #7D7D7D;
 @value jobRunRunning: #FECC00;
 
-body {
-  font-family: 'Karla-Regular', sans-serif;
-  margin: 0px;
-  background-color: offWhite;
-}
-
-/* Example of global class */
-:global .link {
-  color: neptune;
-}

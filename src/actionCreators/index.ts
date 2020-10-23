@@ -1,6 +1,6 @@
 import * as actionTypes from '../constants/ActionTypes'
 
-import { Dataset, Job, Namespace,Run } from '../types/api'
+import { Dataset, Job, Namespace, Run } from '../types/api'
 import { IFilterByKey } from '../types'
 
 export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
@@ -9,7 +9,6 @@ export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
     datasets
   }
 })
-
 
 export const filterDatasets = (filterByKey: IFilterByKey, filterByValue?: string) => ({
   type: actionTypes.FILTER_DATASETS,

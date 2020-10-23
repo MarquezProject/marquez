@@ -14,7 +14,7 @@ const webpackDev = {
     },
     proxy: {
       '/api': {
-        target: `http://${process.env.MARQUEZ_HOST}:${process.env.MARQUEZ_PORT}/`,
+        target: `http://localhost:5000/`,
         secure: false,
         logLevel: 'debug',
         headers: {

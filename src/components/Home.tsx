@@ -1,31 +1,25 @@
 import * as RRD from 'react-router-dom'
-import { Box, Typography } from '@material-ui/core'
-import React, { FunctionComponent, useState } from 'react'
-
-import Pagination from 'material-ui-flat-pagination'
-import _chunk from 'lodash/chunk'
-
+import { Box } from '@material-ui/core'
+import { IDatasetsState } from '../reducers/datasets'
+import { IJobsState } from '../reducers/jobs'
+import { IState } from '../reducers'
 import {
   Theme as ITheme,
   WithStyles as IWithStyles,
   createStyles,
   withStyles
 } from '@material-ui/core/styles'
-
+import { Pagination } from '@material-ui/lab'
+import { connect } from 'react-redux'
 import DatasetPreviewCard from './DatasetPreviewCard'
 import FiltersWrapper from './filters/FiltersWrapper'
 import JobPreviewCard from './JobPreviewCard'
+import MqText from './core/text/MqText'
+import React, { FunctionComponent, useState } from 'react'
+import _chunk from 'lodash/chunk'
 
-import { IDatasetsState } from '../reducers/datasets'
-import { IJobsState } from '../reducers/jobs'
-import {IState} from '../reducers'
-import {connect} from 'react-redux'
-
-const styles = (_theme: ITheme) => {
+const styles = (theme: ITheme) => {
   return createStyles({
-    header: {
-      padding: '0% 0% 0% 1%'
-    },
     column: {
       flex: 1
     },
@@ -33,29 +27,17 @@ const styles = (_theme: ITheme) => {
       display: 'flex',
       flexDirection: 'row'
     },
-    filter: {
-      marginLeft: '-4%'
-    },
     lowerHalf: {
       display: 'flex',
       flexDirection: 'column',
-      padding: '50vh 5% 1%',
-      position: 'absolute',
-      top: 0,
+      padding: `${theme.spacing(2)}px ${theme.spacing(3)}px`,
       zIndex: 1,
       width: '100%'
     },
-    noDatasets: {
-      color: '#9e9e9e',
-      position: 'fixed',
-      bottom: '20vh',
-      left: '21%'
-    },
-    noJobs: {
-      color: '#9e9e9e',
-      position: 'fixed',
-      bottom: '20vh',
-      right: '21%'
+    none: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
     }
   })
 }
@@ -69,7 +51,7 @@ interface IProps {
 
 type IAllProps = RRD.RouteComponentProps & IWithStyles<typeof styles> & IProps
 
-const Home:  FunctionComponent<IAllProps> = props => {
+const Home: FunctionComponent<IAllProps> = props => {
   const [datasetPageIndex, setDatasetPageIndex] = useState(0)
   const [jobPageIndex, setJobPageIndex] = useState(0)
 
@@ -88,19 +70,18 @@ const Home:  FunctionComponent<IAllProps> = props => {
 
   return (
     <div className={classes.lowerHalf}>
-      <div className={classes.filter}>
-        <FiltersWrapper showJobs={setShowJobs} />
-      </div>
       <div className={classes.row}>
         <Box className={classes.column}>
           {matchingDatasets.length > 0 ? (
-            <Typography className={classes.header} color='secondary' variant='h3'>
-              {!showJobs ? 'Popular Datasets' : 'Matching Datasets'}
-            </Typography>
+            <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+              <MqText heading>{!showJobs ? 'Popular Datasets' : 'Matching Datasets'}</MqText>
+              <FiltersWrapper showJobs={setShowJobs} />
+            </Box>
           ) : (
-            <Typography className={classes.noDatasets}>no datasets found!</Typography>
+            <Box textAlign={'center'}>
+              <MqText subdued>no datasets found!</MqText>
+            </Box>
           )}
-          {console.log(displayDatasets)}
           {displayDatasets.map(d => (
             <DatasetPreviewCard
               key={d.name}
@@ -110,23 +91,27 @@ const Home:  FunctionComponent<IAllProps> = props => {
               tags={d.tags}
             />
           ))}
-          {matchingDatasets.length > 0 ? (
-          <Pagination
-            limit={limit}
-            offset={datasetPageIndex * limit}
-            total={matchingDatasets.length}
-            onClick={(e, offset, page) => setDatasetPageIndex(page - 1)}
-          />
-          ) : null}
+          {matchingDatasets.length > 0 && (
+            <Pagination
+              color={'standard'}
+              shape={'rounded'}
+              onChange={(event, page) => {
+                setDatasetPageIndex(page - 1)
+              }}
+              count={Math.ceil(matchingDatasets.length / limit)}
+            />
+          )}
         </Box>
-        {showJobs ? (
-          <Box className={classes.column}>
+        {showJobs && (
+          <Box className={classes.column} ml={2}>
             {matchingJobs.length > 0 ? (
-              <Typography className={classes.header} color='secondary' variant='h3'>
-                Matching Jobs
-              </Typography>
+              <Box mb={2} height={32}>
+                <MqText heading>Matching Jobs</MqText>
+              </Box>
             ) : (
-              <Typography className={classes.noJobs}>no jobs found!</Typography>
+              <Box textAlign={'center'}>
+                <MqText subdued>no jobs found!</MqText>
+              </Box>
             )}
             {displayJobs.map(d => (
               <JobPreviewCard
@@ -137,16 +122,18 @@ const Home:  FunctionComponent<IAllProps> = props => {
                 latestRun={d.latestRun}
               />
             ))}
-            {matchingJobs.length > 0 ? (
+            {matchingJobs.length > 0 && (
               <Pagination
-                limit={limit}
-                offset={jobPageIndex * limit}
-                total={matchingJobs.length}
-                onClick={(e, offset, page) => setJobPageIndex(page - 1)}
+                color={'standard'}
+                shape={'rounded'}
+                onChange={(event, page) => {
+                  setJobPageIndex(page - 1)
+                }}
+                count={Math.ceil(matchingJobs.length / limit)}
               />
-            ) : null}
+            )}
           </Box>
-        ) : null}
+        )}
       </div>
     </div>
   )
@@ -164,6 +151,4 @@ interface IInjectedProps {
 
 type IStateProps = ReturnType<typeof mapStateToProps>
 
-export default connect<IStateProps, IInjectedProps>(
-  mapStateToProps
-)(withStyles(styles)(Home))
+export default connect<IStateProps, IInjectedProps>(mapStateToProps)(withStyles(styles)(Home))

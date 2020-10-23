@@ -1,5 +1,5 @@
 import { FETCH_JOB_RUNS } from '../constants/ActionTypes'
-import { Namespace, Namespaces  } from '../types/api'
+import { Namespace, Namespaces } from '../types/api'
 import { all, call, put, take } from 'redux-saga/effects'
 import {
   applicationError,

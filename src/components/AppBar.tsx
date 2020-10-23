@@ -1,7 +1,5 @@
 import { AppBar, Toolbar, Typography } from '@material-ui/core'
-import {
-  Link
-} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import React, { ReactElement } from 'react'
 
 import {
@@ -43,10 +41,10 @@ const MyAppBar = (props: IProps): ReactElement => {
   return (
     <AppBar position='fixed' className={classes.appBar}>
       <Toolbar>
-        <Link className={link} to="/">
+        <Link className={link} to='/'>
           <img src={require('../img/marquez-logo.png')} height={60} alt='Marquez Logo' />
         </Link>
-        <Link className={link} to="/">
+        <Link className={link} to='/'>
           <Typography className={classes.icon} variant='h4' color='inherit' noWrap>
             MARQUEZ
           </Typography>

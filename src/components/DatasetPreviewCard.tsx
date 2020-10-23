@@ -1,40 +1,27 @@
 import React, { ReactElement } from 'react'
 
-import {
-  Link
-} from 'react-router-dom'
-
-import { Box, Typography } from '@material-ui/core'
-import {
-  Theme as ITheme,
-  WithStyles as IWithStyles,
-  createStyles,
-  withStyles
-} from '@material-ui/core/styles'
-import { formatUpdatedAt } from '../helpers'
-
+import { Box, Theme } from '@material-ui/core'
 import { Dataset } from '../types/api'
-const _  = require('lodash')
+import { WithStyles as IWithStyles, createStyles, fade, withStyles } from '@material-ui/core/styles'
+import { Link } from 'react-router-dom'
+import { formatUpdatedAt } from '../helpers'
+import MqText from './core/text/MqText'
 
-const styles = ({ palette }: ITheme) => {
+const styles = (theme: Theme) => {
   return createStyles({
-    rightCol: {
-      textAlign: 'right'
-    },
-    lastUpdated: {
-      color: palette.grey[600]
-    },
     link: {
-      textDecoration: 'none'
+      textDecoration: 'none',
+      border: `1px solid ${theme.palette.secondary.main}`,
+      display: 'block',
+      marginBottom: theme.spacing(2),
+      borderRadius: theme.shape.borderRadius,
+      transition: theme.transitions.create(['background-color']),
+      '&:hover': {
+        backgroundColor: fade(theme.palette.common.white, 0.1)
+      }
     }
   })
 }
-
-const StyledTypography = withStyles({
-  root: {
-    maxWidth: '90%'
-  }
-})(Typography)
 
 type IProps = IWithStyles<typeof styles> &
   Pick<Dataset, 'name' | 'description' | 'updatedAt' | 'tags'>
@@ -45,23 +32,19 @@ class DatasetPreviewCard extends React.Component<IProps, IState> {
     const { classes, name, description, updatedAt } = this.props
     const { link } = classes
     return (
-      <Link className={link} to={{pathname: `/datasets/${name}`}}>
-        <Box p={2} m={1} bgcolor='white' boxShadow={3} display='flex' justifyContent='space-between'>
-          <div>
-            <Typography color='secondary' variant='h3'>
+      <Link className={link} to={{ pathname: `/datasets/${name}` }}>
+        <Box p={2}>
+          <Box display='flex' justifyContent='space-between' alignItems={'center'} mb={1}>
+            <MqText subheading font={'mono'}>
               {name}
-            </Typography>
-            <StyledTypography color='primary'>{description}</StyledTypography>
-          </div>
-          <Box
-            className={classes.rightCol}
-            display='flex'
-            flexDirection='column'
-            alignItems='flex-end'
-            justifyContent='space-between'
-          >
-            <Typography className={classes.lastUpdated}>{formatUpdatedAt(updatedAt)}</Typography>
+            </MqText>
+            <Box mt={1}>
+              <MqText subdued>{formatUpdatedAt(updatedAt)}</MqText>
+            </Box>
           </Box>
+          <MqText subdued>
+            {description || 'There is no description available for this dataset'}
+          </MqText>
         </Box>
       </Link>
     )

@@ -1,18 +1,13 @@
 import * as React from 'react'
 import * as d3 from 'd3'
 
-import {History} from 'history'
-import {RouteComponentProps, withRouter} from 'react-router-dom'
-import {
-  Theme,
-  WithStyles,
-  createStyles,
-  withStyles
-} from '@material-ui/core/styles'
+import { History } from 'history'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 
 import Legend from './Legend'
 
-import {IDataset, IJob} from '../types/'
+import { IDataset, IJob } from '../types/'
 
 import _filter from 'lodash/filter'
 import _find from 'lodash/find'
@@ -20,22 +15,24 @@ import _flatten from 'lodash/flatten'
 import _map from 'lodash/map'
 import _sortBy from 'lodash/sortBy'
 
-import {D3ZoomEvent} from 'd3'
-import {drag} from 'd3-drag'
-import {event, select} from 'd3-selection'
-import {hierarchy, tree} from 'd3-hierarchy'
-import {linkHorizontal} from 'd3-shape'
-import {zoom} from 'd3-zoom'
+import { D3ZoomEvent } from 'd3'
+import { drag } from 'd3-drag'
+import { event, select } from 'd3-selection'
+import { hierarchy, tree } from 'd3-hierarchy'
+import { linkHorizontal } from 'd3-shape'
+import { zoom } from 'd3-zoom'
 
 import * as Redux from 'redux'
-import {IState} from '../reducers'
-import {Run} from '../types/api'
-import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux'
+import { HEADER_HEIGHT } from '../helpers/theme'
+import { IState } from '../reducers'
+import { Run } from '../types/api'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import Box from '@material-ui/core/Box/Box'
 import Loader from './Loader'
 
 const globalStyles = require('../global_styles.css')
-const {jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning} = globalStyles
+const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
 
 const colorMap = {
   NEW: jobRunNew,
@@ -45,21 +42,21 @@ const colorMap = {
   RUNNING: jobRunRunning
 }
 
-const styles = ({palette}: Theme) => {
+const styles = ({ palette, spacing }: Theme) => {
   return createStyles({
     networkBackground: {
-      background: palette.common.black,
       width: '100%',
-      height: '50vh',
-      position: 'fixed',
+      height: `calc(50vh - ${HEADER_HEIGHT}px)`,
       display: 'flex',
       alignItems: 'center',
       zIndex: 2,
-      cursor: 'grab'
+      cursor: 'grab',
+      marginTop: HEADER_HEIGHT,
+      borderBottom: `1px solid ${palette.secondary.main}`
     },
     networkGraph: {
       width: 'inherit',
-      height: 'inherit',
+      height: 'inherit'
     },
     tooltip: {
       position: 'absolute',
@@ -75,9 +72,9 @@ const styles = ({palette}: Theme) => {
       cursor: 'pointer'
     },
     legend: {
-      position: 'fixed',
-      bottom: '59vh',
-      right: '6%',
+      position: 'absolute',
+      bottom: `${spacing(1)}px`,
+      right: `${spacing(3)}px`,
       zIndex: 3
     }
   })
@@ -92,10 +89,8 @@ interface IProps {
 type IAllProps = WithStyles<typeof styles> & IProps & RouteComponentProps
 
 export class NetworkGraph extends React.Component<IAllProps> {
-
-
   shouldComponentUpdate(newProps: IAllProps) {
-    let dragOffset = {x: 0, y: 0}
+    let dragOffset = { x: 0, y: 0 }
     const allNodes = [...newProps.datasets, ...newProps.jobs]
     const matchingNodes = _filter(allNodes, node => node.matches)
     const searchExists = matchingNodes.length != allNodes.length
@@ -122,7 +117,14 @@ export class NetworkGraph extends React.Component<IAllProps> {
         children = _filter(newProps.jobs, j => j.inputs.includes(node.name))
       } else {
         const job = _find(newProps.jobs, j => j.name == node.name)
-        children = job ? _filter(newProps.datasets, d => job.outputs.some(output => output.name === d.name) && !job.inputs.some(input => input.name === d.name)) : []
+        children = job
+          ? _filter(
+              newProps.datasets,
+              d =>
+                job.outputs.some(output => output.name === d.name) &&
+                !job.inputs.some(input => input.name === d.name)
+            )
+          : []
       }
       return children
     }
@@ -134,7 +136,14 @@ export class NetworkGraph extends React.Component<IAllProps> {
       } else {
         const job = _find(newProps.jobs, j => j.name == node.name)
         // TODO: Bug? Let's confirm input / output comparison on job name is correct; should be by dataset name?
-        parents = job ? _filter(newProps.datasets, j => job.inputs.some(input => input.name === j.name) && !job.outputs.some(output => output.name === j.name)) : []
+        parents = job
+          ? _filter(
+              newProps.datasets,
+              j =>
+                job.inputs.some(input => input.name === j.name) &&
+                !job.outputs.some(output => output.name === j.name)
+            )
+          : []
       }
       return parents
     }
@@ -186,19 +195,20 @@ export class NetworkGraph extends React.Component<IAllProps> {
     }
 
     function graph(cluster: any, reverse: boolean, history: History) {
-
       cluster = tree().nodeSize([20, 70])(cluster)
 
-      const zoomLayer = svg.append('g')
+      const zoomLayer = svg
+        .append('g')
         .attr('id', 'zoomLayer')
         .attr('width', 'inherit')
         .attr('height', 'inherit')
 
-      const g = zoomLayer.append('g')
+      const g = zoomLayer
+        .append('g')
         .attr('id', 'lineage')
         .attr('font-family', 'sans-serif')
         .attr('font-size', 10)
-        .attr('transform', `translate(${width/2}, ${height/2})`)
+        .attr('transform', `translate(${width / 2}, ${height / 2})`)
 
       const n = g.node()
       if (n) {
@@ -214,13 +224,21 @@ export class NetworkGraph extends React.Component<IAllProps> {
         .selectAll('path')
         .data(cluster.links())
         .join('path')
-        .attr('d', linkHorizontal().x((d: any) => reverse ? -d.y : d.y).y((d: any) => d.x))
-        .attr('stroke', (d: any) => d.target.data.matches && d.source.data.matches ? linkHighlight : defaultHighlight)
+        .attr(
+          'd',
+          linkHorizontal()
+            .x((d: any) => (reverse ? -d.y : d.y))
+            .y((d: any) => d.x)
+        )
+        .attr('stroke', (d: any) =>
+          d.target.data.matches && d.source.data.matches ? linkHighlight : defaultHighlight
+        )
 
       const datasets = _filter(cluster.descendants(), d => isDataset(d))
       const jobs = _filter(cluster.descendants(), d => !isDataset(d))
 
-      const datasetNode = g.append('g')
+      const datasetNode = g
+        .append('g')
         .attr('stroke-linejoin', 'round')
         .selectAll('g')
         .data(datasets)
@@ -239,9 +257,9 @@ export class NetworkGraph extends React.Component<IAllProps> {
       datasetNode
         .append('a')
         .append('rect')
-        .attr('fill', d => d.data.matches ? circleHighlight : defaultHighlight)
-        .attr('x', -square/2)
-        .attr('y', -square/2)
+        .attr('fill', d => (d.data.matches ? circleHighlight : defaultHighlight))
+        .attr('x', -square / 2)
+        .attr('y', -square / 2)
         .attr('width', square)
         .attr('height', square)
         .attr('cursor', 'pointer')
@@ -252,15 +270,16 @@ export class NetworkGraph extends React.Component<IAllProps> {
       jobNode
         .append('a')
         .append('circle')
-        .attr('fill', d => d.data.matches ? findJobColor(d) : defaultHighlight)
+        .attr('fill', d => (d.data.matches ? findJobColor(d) : defaultHighlight))
         .attr('r', radius)
         .on('click', (node: { data: IJob }) => {
           history.push(`/jobs/${node.data.name}`)
         })
 
       // Add text to nodes
-      datasetNode.append('text')
-        .text(d => d.data.matches ? d.data.name : null)
+      datasetNode
+        .append('text')
+        .text(d => (d.data.matches ? d.data.name : null))
         .attr('dy', 10)
         .attr('font-size', 8)
         .attr('font-family', 'sans-serif')
@@ -269,8 +288,9 @@ export class NetworkGraph extends React.Component<IAllProps> {
         .attr('fill', labelHighlight)
 
       // Add text to nodes
-      jobNode.append('text')
-        .text(d => d.data.matches ? d.data.name : null)
+      jobNode
+        .append('text')
+        .text(d => (d.data.matches ? d.data.name : null))
         .attr('dy', 10)
         .attr('font-size', 8)
         .attr('font-family', 'sans-serif')
@@ -293,20 +313,33 @@ export class NetworkGraph extends React.Component<IAllProps> {
 
     function redraw() {
       const zoomEvent: D3ZoomEvent<any, any> = event
-      svg.selectAll('#zoomLayer').attr('transform', 'translate(' + zoomEvent.transform.x + ',' + zoomEvent.transform.y + ')' + ' scale(' + zoomEvent.transform.k + ')')
+      svg
+        .selectAll('#zoomLayer')
+        .attr(
+          'transform',
+          'translate(' +
+            zoomEvent.transform.x +
+            ',' +
+            zoomEvent.transform.y +
+            ')' +
+            ' scale(' +
+            zoomEvent.transform.k +
+            ')'
+        )
     }
 
-    svg.call(
-      drag()
-        .on('start', dragstarted)
-        .on('drag', dragged)
-    ).call(
-      zoom().on('zoom', redraw)
-    )
+    svg
+      .call(
+        drag()
+          .on('start', dragstarted)
+          .on('drag', dragged)
+      )
+      .call(zoom().on('zoom', redraw))
 
     // run calculations for network graph
     let lineages = getLineages()
-    lineages = nodeId && !searchExists ? [_find(lineages, lineage => lineage.name == nodeId)] : lineages
+    lineages =
+      nodeId && !searchExists ? [_find(lineages, lineage => lineage.name == nodeId)] : lineages
     let clusters = _map(lineages, lineage => hierarchy(lineage))
     clusters = _sortBy(clusters, l => l.descendants().length)
     const largestCluster = clusters[clusters.length - 1]
@@ -331,22 +364,23 @@ export class NetworkGraph extends React.Component<IAllProps> {
     const { classes, isLoading } = this.props
 
     return (
-      <div id='network-graph-container' className={classes.networkBackground}>
-        <div id='tooltip' className={classes.tooltip} />
-        <Legend customClassName={classes.legend} />
-        {isLoading ? (
-          <Loader />
-        ) : (
-          <svg id='network-graph' className={classes.networkGraph}>
-            <g
-              ref={node => {
-                this.graph = node as SVGElement
-              }}
-            >
-            </g>
-          </svg>
-        )}
-      </div>
+      <Box position={'relative'}>
+        <div id='network-graph-container' className={classes.networkBackground}>
+          <div id='tooltip' className={classes.tooltip} />
+          <Legend customClassName={classes.legend} />
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <svg id='network-graph' className={classes.networkGraph}>
+              <g
+                ref={node => {
+                  this.graph = node as SVGElement
+                }}
+              ></g>
+            </svg>
+          )}
+        </div>
+      </Box>
     )
   }
 }

@@ -11,8 +11,8 @@ import uniq from 'lodash/uniq'
 
 const StyledFormControl = withStyles({
   root: {
-    margin: '0rem 2rem 0rem 0rem',
-    minWidth: '10rem'
+    minWidth: '10rem',
+    margin: 0
   }
 })(FormControl)
 
@@ -85,7 +85,7 @@ const Filters = (props: IProps): ReactElement => {
   }
 
   return (
-    <Box ml='5%' py={2}>
+    <Box>
       <StyledFormControl margin='normal'>
         <MUISelect value={currentFilter} renderValue={capitalize} onChange={onPrimaryFilterChange}>
           {Object.keys(filterByOptions).map(o => (
@@ -99,7 +99,7 @@ const Filters = (props: IProps): ReactElement => {
         </MUISelect>
       </StyledFormControl>
       {subFilterVisible && (
-        <StyledFormControl margin='normal'>
+        <StyledFormControl>
           <MUISelect
             value={currentFilterValue}
             renderValue={filterDictionary[currentFilter].accessor}

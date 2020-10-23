@@ -9,13 +9,13 @@ module.exports = {
     project: './tsconfig.json',
     sourceType: 'module'
   },
-  plugins: ['@typescript-eslint', 'react', 'prettier', "sort-imports-es6-autofix"],
+  plugins: ['@typescript-eslint', 'react', "sort-imports-es6-autofix"],
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'prettier'
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
   ],
   settings: {
     "react": {

@@ -1,28 +1,19 @@
-import { CssBaseline } from '@material-ui/core'
-import { Helmet } from 'react-helmet'
-import AppBar from './AppBar'
-import React, { ReactElement, useState } from 'react'
-const globalStyles = require('../global_styles.css')
-const { neptune, telescopeBlack } = globalStyles
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
-import { Grid } from '@material-ui/core'
-import {
-  Theme as ITheme,
-  WithStyles as IWithStyles,
-  createStyles,
-  withStyles
-} from '@material-ui/core/styles'
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import { Container, CssBaseline } from '@material-ui/core'
+import { Helmet } from 'react-helmet'
+import { Theme as ITheme, createStyles, withStyles } from '@material-ui/core/styles'
+import { MuiThemeProvider } from '@material-ui/core/styles'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import { applyMiddleware, createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { createBrowserHistory } from 'history'
+import React, { ReactElement, useState } from 'react'
 import createSagaMiddleware from 'redux-saga'
-import logger from 'redux-logger'
 
-import CustomSearchBar from './CustomSearchBar'
+import { theme } from '../helpers/theme'
 import DatasetDetailPage from './DatasetDetailPage'
+import Header from './header/Header'
 import Home from './Home'
 import JobDetailPage from './JobDetailPage'
 import NetworkGraph from './NetworkGraph'
@@ -38,35 +29,12 @@ const sagaMiddleware = createSagaMiddleware({
 const history = createBrowserHistory()
 const historyMiddleware = routerMiddleware(history)
 
-const middleware = __DEVELOPMENT__
-  ? [sagaMiddleware, historyMiddleware, logger]
-  : [sagaMiddleware, historyMiddleware]
-
 const store = createStore(
   createRootReducer(history),
-  composeWithDevTools(applyMiddleware(...middleware))
+  composeWithDevTools(applyMiddleware(sagaMiddleware, historyMiddleware))
 )
 
 sagaMiddleware.run(rootSaga)
-// see the defaults here for MUI Theme -- https://material-ui.com/customization/default-theme/?expend-path=$.typography
-const theme = createMuiTheme({
-  typography: {
-    h3: {
-      fontSize: '1rem',
-      fontWeight: 700,
-      lineHeight: 2
-    },
-    fontSize: 14
-  },
-  palette: {
-    primary: {
-      main: telescopeBlack
-    },
-    secondary: {
-      main: neptune
-    }
-  }
-})
 
 const styles = (_theme: ITheme) => {
   return createStyles({
@@ -77,11 +45,9 @@ const styles = (_theme: ITheme) => {
   })
 }
 
-type IProps = IWithStyles<typeof styles>
-
 const TITLE = 'Marquez | Data Kit'
 
-const App = ({ classes }: IProps): ReactElement => {
+const App = (): ReactElement => {
   const [showJobs, setShowJobs] = useState(false)
   return (
     <Provider store={store}>
@@ -91,26 +57,22 @@ const App = ({ classes }: IProps): ReactElement => {
             <title>{TITLE}</title>
           </Helmet>
           <CssBaseline />
-          <Grid direction='column' alignItems='stretch' classes={classes} justify='space-between'>
-            <AppBar />
-            <NetworkGraph />
-            <CustomSearchBar
-              setShowJobs={setShowJobs}
-              showJobs={showJobs}
-            />
+          <Container maxWidth={'lg'} disableGutters={true}>
+            <Header setShowJobs={setShowJobs} showJobs={showJobs} />
+          </Container>
+          <NetworkGraph />
+          <Container maxWidth={'lg'} disableGutters={true}>
             <Switch>
               <Route
                 path='/'
                 exact
-                render={props => (
-                  <Home {...props} showJobs={showJobs} setShowJobs={setShowJobs} />
-                  )}
+                render={props => <Home {...props} showJobs={showJobs} setShowJobs={setShowJobs} />}
               />
               <Route path='/datasets/:datasetName' exact component={DatasetDetailPage} />
               <Route path='/jobs/:jobName' exact component={JobDetailPage} />
             </Switch>
-            <Toast />
-          </Grid>
+          </Container>
+          <Toast />
         </MuiThemeProvider>
       </ConnectedRouter>
     </Provider>

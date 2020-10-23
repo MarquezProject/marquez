@@ -11,17 +11,19 @@
     "pretest": "eslint src/**/*[x]",
     "test": "jest",
     "test-watch": "jest --watch",
-    "eslint-fix": "eslint . --ext .ts,.tsx --fix"
+    "eslint-fix": "eslint . --ext .ts,.tsx --ignore-pattern \"src/__tests__/*\" --fix"
   },
   "engines": {
     "node": "10.16.3"
   },
   "dependencies": {
-    "@material-ui/core": "^4.6.1",
-    "@material-ui/icons": "^4.4.3",
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.56",
     "@types/d3": "^5.7.2",
     "@types/react-router-dom": "^5.1.2",
     "autoprefixer": "^9.5.1",
+    "classnames": "^2.2.6",
     "connected-react-router": "^6.4.0",
     "css-loader": "^2.1.0",
     "d3-color": "^1.4.0",
@@ -34,8 +36,6 @@
     "http-proxy-middleware": "^0.20.0",
     "jest": "23.6.0",
     "lodash": "^4.17.19",
-    "material-ui-flat-pagination": "^4.0.0",
-    "material-ui-search-bar": "^1.0.0-beta.14",
     "postcss-loader": "^3.0.0",
     "postcss-modules-values": "^2.0.0",
     "react": "^16.8.0",
@@ -51,6 +51,7 @@
   },
   "devDependencies": {
     "@material-ui/styles": "^4.0.0-rc.0",
+    "@types/classnames": "^2.2.10",
     "@types/d3-color": "^1.2.2",
     "@types/enzyme": "^3.1.16",
     "@types/enzyme-adapter-react-16": "^1.0.3",

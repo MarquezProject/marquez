@@ -1,4 +1,13 @@
-import { Box, Paper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@material-ui/core'
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip
+} from '@material-ui/core'
 import {
   Theme as ITheme,
   WithStyles as IWithStyles,
@@ -16,26 +25,18 @@ import _find from 'lodash/find'
 
 import * as Redux from 'redux'
 import { Dataset } from '../types/api'
-import {IState} from '../reducers'
-import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux'
+import { IState } from '../reducers'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import MqText from './core/text/MqText'
 
-const styles = ({ shadows }: ITheme) => {
+const styles = ({ spacing }: ITheme) => {
   return createStyles({
     root: {
-      marginTop: '52vh',
-      height: '48vh',
-      padding: '0 6% 1%',
+      padding: `0 ${spacing(2)}px`
     },
     noData: {
       padding: '125px 0 0 0'
-    },
-    noSchema: {
-      boxShadow: shadows[1],
-      padding: '1rem'
-    },
-    noSchemaTitle: {
-      fontSize: '14px'
     },
     infoIcon: {
       paddingLeft: '3px',
@@ -60,7 +61,7 @@ const styles = ({ shadows }: ITheme) => {
     },
     updated: {
       marginTop: '10px'
-    },
+    }
   })
 }
 
@@ -68,83 +69,70 @@ type IProps = IWithStyles<typeof styles> & { datasets: Dataset[] }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { datasets, classes } = props
-  const {
-    root, paper, updated, noData, noSchema, noSchemaTitle, infoIcon, tableCell, tableRow
-  } = classes
+  const { root, paper, infoIcon, tableCell, tableRow } = classes
   const { datasetName } = useParams()
   const dataset = _find(datasets, d => d.name === datasetName)
   if (!dataset) {
     return (
-      <Box
-        mt={10}
-        display='flex'
-        justifyContent="center"
-        className={root}
-      >
-        <Typography align='center' className={noData}>
-          No dataset by the name of <strong>&quot;{datasetName}&quot;</strong> found
-        </Typography>
+      <Box display='flex' justifyContent='center' className={root} mt={2}>
+        <MqText subdued>
+          No dataset by the name of <MqText bold inline>{`"${datasetName}"`}</MqText> found
+        </MqText>
       </Box>
     )
   } else {
-    const {
-      name,
-      description,
-      updatedAt,
-      fields
-    } = dataset
+    const { name, description, updatedAt, fields } = dataset
 
     return (
-      <Box mt={10} className={root}>
+      <Box mt={2} className={root}>
         <Box display='flex' justifyContent='space-between'>
           <div>
-            <Typography color='secondary' align='left'>
-              <strong>{name}</strong>
-            </Typography>
-            <Typography color='primary' align='left'>
-              {description}
-            </Typography>
+            <MqText heading font={'mono'}>
+              {name}
+            </MqText>
+            <MqText subdued>{description}</MqText>
           </div>
         </Box>
         {fields && fields.length > 0 ? (
           <Paper className={paper}>
-            <Table size="small">
+            <Table size='small'>
               <TableHead>
                 <TableRow className={tableRow}>
-                  {
-                    fields.map((field) => {
-                      return (
-                      <TableCell className={tableCell} key={field.name} align="center"><strong>{field.name}</strong>
-                        <Tooltip title={field.type} placement="top">
+                  {fields.map(field => {
+                    return (
+                      <TableCell className={tableCell} key={field.name} align='center'>
+                        <strong>{field.name}</strong>
+                        <Tooltip title={field.type} placement='top'>
                           <div className={infoIcon}>
                             <InfoIcon color='disabled' fontSize='small' />
                           </div>
                         </Tooltip>
                       </TableCell>
-                      )
-                    })
-                  }
+                    )
+                  })}
                 </TableRow>
               </TableHead>
               <TableBody>
                 <TableRow className={tableRow}>
-                  {fields.map((field) => {
-                    return <TableCell className={tableCell} key={field.name} align="left">{field.description || 'no description'}</TableCell>
+                  {fields.map(field => {
+                    return (
+                      <TableCell className={tableCell} key={field.name} align='left'>
+                        {field.description || 'no description'}
+                      </TableCell>
+                    )
                   })}
                 </TableRow>
               </TableBody>
             </Table>
           </Paper>
         ) : (
-          <div className={noSchema}>
-            <Typography className={noSchemaTitle}>
-              schema not present
-            </Typography>
+          <div>
+            <MqText subdued>schema not present</MqText>
           </div>
         )}
-        <Typography className={updated} color='primary' align='right'>
-          last updated: {formatUpdatedAt(updatedAt)}
-        </Typography>
+        <Box display={'flex'} justifyContent={'flex-end'} mt={1}>
+          <MqText subdued>last updated: {formatUpdatedAt(updatedAt)}</MqText>
+        </Box>
       </Box>
     )
   }
