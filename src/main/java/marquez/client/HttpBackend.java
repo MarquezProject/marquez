@@ -4,22 +4,28 @@ import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import lombok.NonNull;
 
 /**
  * A backend who issues HTTP requests by appending the path to the provided baseUrl and
  * posting/putting the payload.
  */
 class HttpBackend implements Backend {
-
   private final URL baseUrl;
-  private final MarquezHttp http;
+  @VisibleForTesting final MarquezHttp http;
 
-  HttpBackend(URL baseUrl) {
+  @VisibleForTesting
+  HttpBackend(final URL baseUrl) {
     this(baseUrl, MarquezHttp.create(MarquezClient.Version.get()));
   }
 
   @VisibleForTesting
-  HttpBackend(URL baseUrl, MarquezHttp http) {
+  HttpBackend(final URL baseUrl, @NonNull final String apiKey) {
+    this(baseUrl, MarquezHttp.create(MarquezClient.Version.get(), apiKey));
+  }
+
+  @VisibleForTesting
+  HttpBackend(@NonNull final URL baseUrl, @NonNull final MarquezHttp http) {
     this.baseUrl = baseUrl;
     this.http = http;
   }

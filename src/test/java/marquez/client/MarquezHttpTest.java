@@ -28,6 +28,7 @@ import static marquez.client.models.ModelGenerator.newTimestamp;
 import static org.apache.http.Consts.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -68,6 +69,9 @@ public class MarquezHttpTest {
       "{\"code\":500, \"message\": \"internal server error\"}";
   private static final byte[] HTTP_ERROR_AS_BYTES = HTTP_ERROR_AS_JSON.getBytes(UTF_8);
 
+  // Http Auth
+  private static final String API_KEY = "PuRx8GT3huSXlheDIRUK1YUatGpLVEuL";
+
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
 
   @Mock private HttpClient httpClient;
@@ -81,7 +85,14 @@ public class MarquezHttpTest {
   @Before
   public void setUp() {
     marquezUrl = new MarquezUrl(BASE_URL);
-    marquezHttp = new MarquezHttp(httpClient);
+    marquezHttp = new MarquezHttp(httpClient, null);
+  }
+
+  @Test
+  public void testNewMarquezHttp_throwsOnNull() {
+    assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null));
+    assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null, API_KEY));
+    assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null, null));
   }
 
   @Test
@@ -233,7 +244,7 @@ public class MarquezHttpTest {
     // the sclient is not closeable
     marquezHttp.close();
     // the client is closeable
-    MarquezHttp closeableMarquezHttp = new MarquezHttp(closeableHttpClient);
+    MarquezHttp closeableMarquezHttp = new MarquezHttp(closeableHttpClient, null);
     closeableMarquezHttp.close();
     verify(closeableHttpClient, times(1)).close();
   }

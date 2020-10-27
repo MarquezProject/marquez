@@ -62,17 +62,26 @@ public class MarquezClient {
   @VisibleForTesting final MarquezHttp http;
 
   public MarquezClient() {
-    this(DEFAULT_BASE_URL);
+    this(DEFAULT_BASE_URL, null);
   }
 
   public MarquezClient(final String baseUrlString) {
-    this(Utils.toUrl(baseUrlString));
+    this(baseUrlString, null);
+  }
+
+  public MarquezClient(final String baseUrlString, @Nullable final String apiKey) {
+    this(Utils.toUrl(baseUrlString), apiKey);
   }
 
   public MarquezClient(final URL baseUrl) {
-    this(MarquezUrl.create(baseUrl), MarquezHttp.create(MarquezClient.Version.get()));
+    this(baseUrl, null);
   }
 
+  public MarquezClient(final URL baseUrl, @Nullable final String apiKey) {
+    this(MarquezUrl.create(baseUrl), MarquezHttp.create(MarquezClient.Version.get(), apiKey));
+  }
+
+  @VisibleForTesting
   MarquezClient(@NonNull final MarquezUrl url, @NonNull final MarquezHttp http) {
     this.url = url;
     this.http = http;
@@ -262,6 +271,7 @@ public class MarquezClient {
 
   public static final class Builder {
     @VisibleForTesting URL baseUrl;
+    @VisibleForTesting @Nullable String apiKey;
 
     private Builder() {
       this.baseUrl = DEFAULT_BASE_URL;
@@ -276,9 +286,14 @@ public class MarquezClient {
       return this;
     }
 
+    public Builder apiKey(@Nullable String apiKey) {
+      this.apiKey = apiKey;
+      return this;
+    }
+
     public MarquezClient build() {
       return new MarquezClient(
-          MarquezUrl.create(baseUrl), MarquezHttp.create(MarquezClient.Version.get()));
+          MarquezUrl.create(baseUrl), MarquezHttp.create(MarquezClient.Version.get(), apiKey));
     }
   }
 

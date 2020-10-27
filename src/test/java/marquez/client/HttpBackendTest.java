@@ -1,6 +1,7 @@
 package marquez.client;
 
 import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -32,6 +33,16 @@ public class HttpBackendTest {
   @After
   public void tearDown() {
     verifyNoMoreInteractions(marquezHttp);
+  }
+
+  @Test
+  public void testNewHttpBackend_throwsOnNull() {
+    assertThatNullPointerException().isThrownBy(() -> new HttpBackend(null));
+    assertThatNullPointerException()
+        .isThrownBy(() -> new HttpBackend(DEFAULT_BASE_URL, (String) null));
+    assertThatNullPointerException()
+        .isThrownBy(() -> new HttpBackend(DEFAULT_BASE_URL, (MarquezHttp) null));
+    assertThatNullPointerException().isThrownBy(() -> new HttpBackend(null, marquezHttp));
   }
 
   @Test

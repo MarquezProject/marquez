@@ -14,6 +14,8 @@
 
 package marquez.client;
 
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,6 +27,7 @@ import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import lombok.NonNull;
+import org.apache.http.client.methods.HttpRequestBase;
 
 public final class Utils {
   private Utils() {}
@@ -62,5 +65,10 @@ public final class Utils {
       error.initCause(e);
       throw error;
     }
+  }
+
+  public static void addAuthTo(
+      @NonNull final HttpRequestBase request, @NonNull final String apiKey) {
+    request.addHeader(AUTHORIZATION, "Bearer " + apiKey);
   }
 }

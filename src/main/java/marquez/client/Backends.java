@@ -7,13 +7,15 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /** To initialize the Marquez backend protocol. */
 @Slf4j
 public class Backends {
+  private Backends() {}
 
-  @VisibleForTesting static final String DEFAULT_URL = "http://localhost:8080";
+  @VisibleForTesting static final URL DEFAULT_BASE_URL = Utils.toUrl("http://localhost:8080");
 
   /**
    * Will write to a file.
@@ -21,7 +23,7 @@ public class Backends {
    * @param file the file to write to
    * @return the corresponding backend implementation
    */
-  public static Backend newFileBackend(File file) {
+  public static Backend newFileBackend(@NonNull final File file) {
     return new FileBackend(file);
   }
 
@@ -31,8 +33,19 @@ public class Backends {
    * @param baseUrl the base url for http requests
    * @return the corresponding backend implementation
    */
-  public static Backend newHttpBackend(URL baseUrl) {
+  public static Backend newHttpBackend(@NonNull final URL baseUrl) {
     return new HttpBackend(baseUrl);
+  }
+
+  /**
+   * Will issue http requests.
+   *
+   * @param baseUrl the base url for http requests
+   * @param apiKey the API key to authenticate http requests
+   * @return the corresponding backend implementation
+   */
+  public static Backend newHttpBackend(@NonNull final URL baseUrl, @NonNull final String apiKey) {
+    return new HttpBackend(baseUrl, apiKey);
   }
 
   /**
@@ -63,14 +76,17 @@ public class Backends {
 
   @VisibleForTesting
   static Backend newBackendFromEnv(Map<String, String> env) {
-    String backendName = env.getOrDefault("MARQUEZ_BACKEND", "http");
+    final String backendName = env.getOrDefault("MARQUEZ_BACKEND", "http");
     switch (backendName.toUpperCase(US)) {
       case "FILE":
         return newFileBackend(new File(env.get("MARQUEZ_FILE")));
       case "HTTP":
-        String configuredBaseUrl = env.getOrDefault("MARQUEZ_URL", DEFAULT_URL);
+        final String configuredBaseUrl = env.get("MARQUEZ_URL");
+        final String apiKey = env.get("MARQUEZ_API_KEY");
         try {
-          return newHttpBackend(new URL(configuredBaseUrl));
+          final URL baseUrl =
+              (configuredBaseUrl == null) ? DEFAULT_BASE_URL : new URL(configuredBaseUrl);
+          return (apiKey == null) ? newHttpBackend(baseUrl) : newHttpBackend(baseUrl, apiKey);
         } catch (MalformedURLException e) {
           log.error(
               "Could not initialize Marquez http backend because of an invalid base url "

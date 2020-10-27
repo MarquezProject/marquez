@@ -21,12 +21,14 @@ import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.annotations.VisibleForTesting;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import javax.annotation.Nullable;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
@@ -34,6 +36,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -42,16 +45,23 @@ import org.apache.http.util.EntityUtils;
 @Slf4j
 class MarquezHttp implements Closeable {
   private final HttpClient http;
+  @VisibleForTesting @Nullable final String apiKey;
 
-  MarquezHttp(final HttpClient http) {
+  MarquezHttp(@NonNull final HttpClient http, @Nullable final String apiKey) {
     this.http = http;
+    this.apiKey = apiKey;
   }
 
-  static final MarquezHttp create(final MarquezClient.Version version) {
+  static MarquezHttp create(final MarquezClient.Version version) {
+    return create(version, null);
+  }
+
+  static MarquezHttp create(
+      @NonNull final MarquezClient.Version version, @Nullable final String apiKey) {
     final UserAgent userAgent = UserAgent.of(version);
     final CloseableHttpClient http =
         HttpClientBuilder.create().setUserAgent(userAgent.getValue()).build();
-    return new MarquezHttp(http);
+    return new MarquezHttp(http, apiKey);
   }
 
   String post(URL url) {
@@ -68,6 +78,8 @@ class MarquezHttp implements Closeable {
         request.addHeader(CONTENT_TYPE, APPLICATION_JSON.toString());
         request.setEntity(new StringEntity(json, APPLICATION_JSON));
       }
+
+      addAuthToReqIfKeyPresent(request);
 
       final HttpResponse response = http.execute(request);
       throwOnHttpError(response);
@@ -89,6 +101,8 @@ class MarquezHttp implements Closeable {
       request.addHeader(CONTENT_TYPE, APPLICATION_JSON.toString());
       request.setEntity(new StringEntity(json, APPLICATION_JSON));
 
+      addAuthToReqIfKeyPresent(request);
+
       final HttpResponse response = http.execute(request);
       throwOnHttpError(response);
 
@@ -106,6 +120,8 @@ class MarquezHttp implements Closeable {
       final HttpGet request = new HttpGet();
       request.setURI(url.toURI());
       request.addHeader(ACCEPT, APPLICATION_JSON.toString());
+
+      addAuthToReqIfKeyPresent(request);
 
       final HttpResponse response = http.execute(request);
       throwOnHttpError(response);
@@ -129,6 +145,12 @@ class MarquezHttp implements Closeable {
   public void close() throws IOException {
     if (http instanceof Closeable) {
       ((Closeable) http).close();
+    }
+  }
+
+  private void addAuthToReqIfKeyPresent(final HttpRequestBase request) {
+    if (apiKey != null) {
+      Utils.addAuthTo(request, apiKey);
     }
   }
 

@@ -319,7 +319,7 @@ public class MarquezClientTest {
 
   @Test
   public void testClientBuilder_overrideUrl() throws Exception {
-    final URL url = new URL("http://test.com:8080/api/v1");
+    final URL url = new URL("http://test.com:8080");
     final MarquezClient client = MarquezClient.builder().baseUrl(url).build();
     assertThat(client.url.baseUrl).isEqualTo(url);
   }
