@@ -11,127 +11,156 @@
 # limitations under the License.
 
 import logging
-import json
 import random
 import unittest
+from datetime import datetime
 
 import mock
+import pytz
+from airflow.utils import timezone
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
+from airflow.models import TaskInstance, DAG
+from airflow.utils.state import State
 
 from marquez_airflow.extractors.bigquery_extractor import BigQueryExtractor
-from marquez_airflow.utils import get_job_name
 
 log = logging.getLogger(__name__)
+
+
+class TestBigQueryExtractorE2E(unittest.TestCase):
+    def setUp(self):
+        log.debug("TestBigQueryExtractorE2E.setup(): ")
+
+    @mock.patch('airflow.contrib.operators.bigquery_operator.BigQueryHook')
+    @mock.patch('google.cloud.bigquery.Client')
+    def test_extract(self, mock_client, mock_hook):
+        log.info("test_extractor")
+
+        bq_job_id = "foo.bq.job_id"
+
+        mock_hook.return_value \
+            .get_conn.return_value \
+            .cursor.return_value \
+            .run_query.return_value = bq_job_id
+
+        mock_client.return_value \
+            .get_job.return_value \
+            ._properties = {"foo": "bar"}
+
+        mock_client.return_value.close.return_value
+
+        mock.seal(mock_hook)
+        mock.seal(mock_client)
+
+        dag = DAG(dag_id='TestBigQueryExtractorE2E')
+        task = BigQueryOperator(
+            sql='select first_name, last_name from customers;',
+            task_id="task_id",
+            project_id="project_id",
+            dag_id="dag_id",
+            dag=dag,
+            start_date=timezone.datetime(2016, 2, 1, 0, 0, 0)
+        )
+
+        task_instance = TaskInstance(
+            task=task,
+            execution_date=datetime.utcnow().replace(tzinfo=pytz.utc))
+
+        bq_extractor = BigQueryExtractor(task)
+
+        steps_meta = bq_extractor.extract()
+
+        assert steps_meta[0].inputs is not None
+        dataset = steps_meta[0].inputs[0]
+        assert 'customers' == dataset.name
+
+        assert steps_meta[0].name == "TestBigQueryExtractorE2E.task_id"
+        assert steps_meta[0].outputs == []
+        assert steps_meta[0].context is not None
+        assert steps_meta[0].context["sql"] == task.sql
+
+        task_instance.run()
+
+        steps_meta = bq_extractor.extract_on_complete(task_instance)
+        assert steps_meta[0].context['bigquery.job_properties'] \
+            == '{"foo": "bar"}'
+        mock_client.return_value \
+            .get_job.assert_called_once_with(job_id=bq_job_id)
+
+        mock_client.return_value.close.assert_called()
 
 
 class TestBigQueryExtractor(unittest.TestCase):
     def setUp(self):
         log.debug("TestBigQueryExtractor.setup(): ")
+        self.task = TestBigQueryExtractor._get_bigquery_task()
+        self.ti = TestBigQueryExtractor._get_ti(task=self.task)
+        self.bq_extractor = BigQueryExtractor(operator=self.task)
 
     def test_extract(self):
         log.info("test_extractor")
 
-        task = BigQueryOperator(
-            bql=None,
-            sql='select first_name, last_name from customers;',
-            destination_dataset_table=None,
-            write_disposition='WRITE_EMPTY',
-            allow_large_results=False,
-            flatten_results=None,
-            bigquery_conn_id='bigquery_default',
-            delegate_to=None,
-            udf_config=None,
-            use_legacy_sql=True,
-            maximum_billing_tier=None,
-            maximum_bytes_billed=None,
-            create_disposition='CREATE_IF_NEEDED',
-            schema_update_options=(),
-            query_params=None,
-            labels=None,
-            priority='INTERACTIVE',
-            time_partitioning=None,
-            api_resource_configs=None,
-            cluster_fields=None,
-            location=None,
-            encryption_configuration=None,
-            task_id="task_id",
-            project_id="project_id",
-            dag_id="dag_id",
-        )
+        steps_meta = BigQueryExtractor(self.task).extract()
 
-        # self.task_dict = dict()  # type: Dict[str, BaseOperator]
-        # task = ("task_id", BigQueryOperator())
-
-        steps_meta = BigQueryExtractor(task).extract()
         dataset = steps_meta[0].inputs[0]
-
         assert 'customers' == dataset.name
 
-    @mock.patch("airflow.models.TaskInstance")
-    @mock.patch("google.cloud.bigquery.Client")
-    @mock.patch("json.dumps")
-    def test_extract_on_complete(self, mock_json, mock_client, mock_ti):
-        log.info("test_extract_on_complete")
+        assert steps_meta[0].name == "TestBigQueryExtractorE2E.task_id"
+        assert steps_meta[0].location is None
+        assert steps_meta[0].inputs is not None
+        assert steps_meta[0].outputs == []
+        assert steps_meta[0].context is not None
+        assert steps_meta[0].context["sql"] == self.task.sql
 
+    @mock.patch("airflow.models.TaskInstance.xcom_pull")
+    def test_get_bigquery_job_id(self, mock_xcom_pull):
+        self.bq_extractor._get_bigquery_job_id(self.ti)
+
+        mock_xcom_pull.assert_called_once_with(
+            task_ids=self.ti.task_id, key='job_id')
+
+    def test_add_job_properties(self):
+        async_job = TestBigQueryExtractor._get_async_job({"foo": "bar"})
+        job_properties = self.bq_extractor._get_job_properties_str(async_job)
+        assert job_properties == '{"foo": "bar"}'
+        steps_meta = self.bq_extractor._add_job_properties(job_properties)
+        assert steps_meta[0].context["bigquery.job_properties"] \
+            == '{"foo": "bar"}'
+
+    @staticmethod
+    def _get_ti(task):
+        task_instance = TaskInstance(
+            task=task,
+            execution_date=datetime.utcnow().replace(tzinfo=pytz.utc),
+            state=State.RUNNING)
+        task_instance.job_id = random.randrange(10000)
+
+        return task_instance
+
+    @staticmethod
+    def _get_async_job(properties):
+        # BigQuery Job
+        class AsyncJob:
+            _properties = None
+
+            def __init__(self, _properties):
+                self._properties = _properties
+
+        return AsyncJob(_properties=properties)
+
+    @staticmethod
+    def _get_bigquery_task():
+        dag = DAG(dag_id='TestBigQueryExtractorE2E')
         task = BigQueryOperator(
-            bql=None,
-            sql='SELECT name '
-                'FROM bigquery-public-data.usa_names.usa_1910_2013 '
-                'WHERE state = "TX" LIMIT 100',
-            destination_dataset_table=None,
-            write_disposition='WRITE_EMPTY',
-            allow_large_results=False,
-            flatten_results=None,
-            bigquery_conn_id='bigquery_default',
-            delegate_to=None,
-            udf_config=None,
-            use_legacy_sql=True,
-            maximum_billing_tier=None,
-            maximum_bytes_billed=None,
-            create_disposition='CREATE_IF_NEEDED',
-            schema_update_options=(),
-            query_params=None,
-            labels=None,
-            priority='INTERACTIVE',
-            time_partitioning=None,
-            api_resource_configs=None,
-            cluster_fields=None,
-            location=None,
-            encryption_configuration=None,
+            sql='select first_name, last_name from customers;',
             task_id="task_id",
             project_id="project_id",
             dag_id="dag_id",
+            dag=dag,
+            start_date=timezone.datetime(2016, 2, 1, 0, 0, 0)
         )
 
-        job_name = get_job_name(task=task)
-        BigQueryExtractor(task).extract_on_complete(mock_ti)
-
-        mock_ti.return_value = TestBigQueryExtractor.get_ti(self)
-        log.info(mock_ti.return_value.job_id)
-        mock_client.get_job(job_name).return_value = {}
-        mock_json.return_value = \
-            TestBigQueryExtractor.get_job_details(self)
-
-        assert mock_json.return_value.get("statistics").get(
-            "totalBytesProcessed") == "65935918"
-
-    @staticmethod
-    def get_job_details(self):
-        with open('tests/extractors/job_details.json') as json_file:
-            return json.load(json_file)
-
-    @staticmethod
-    def get_ti(self):
-        # TODO: TaskInstance represents a row in table task_instance
-        # Update this logic
-        # return TaskInstance
-        class TaskInstance:
-            job_id = None
-
-            def __init__(self, job_id):
-                self.job_id = job_id
-
-        return TaskInstance(job_id=random.randrange(10000))
+        return task
 
 
 if __name__ == '__main__':

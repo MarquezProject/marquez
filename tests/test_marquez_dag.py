@@ -22,8 +22,9 @@ from airflow.utils.state import State
 
 from marquez_client.models import JobType
 
+from marquez_airflow.extractors import BaseExtractor, StepMetadata
 from marquez_airflow import DAG
-from marquez_airflow.utils import get_location
+from marquez_airflow.utils import get_location, get_job_name
 
 NO_INPUTS = []
 NO_OUTPUTS = []
@@ -65,6 +66,29 @@ def clear_db_airflow_dags(session=None):
     session.query(TaskInstance).delete()
 
 
+class DummyExtractor(BaseExtractor):
+    operator_class = DummyOperator
+
+    def __init__(self, operator):
+        super().__init__(operator)
+
+    def extract(self) -> [StepMetadata]:
+        return [StepMetadata(
+            name=get_job_name(task=self.operator),
+            context={
+                "extract": "extract"
+            }
+        )]
+
+    def extract_on_complete(self, task_instance) -> [StepMetadata]:
+        return [StepMetadata(
+            name=get_job_name(task=self.operator),
+            context={
+                "extract_on_complete": "extract_on_complete"
+            }
+        )]
+
+
 @mock.patch('marquez_airflow.DAG.get_or_create_marquez_client')
 @provide_session
 def test_marquez_dag(mock_get_or_create_marquez_client,
@@ -86,6 +110,8 @@ def test_marquez_dag(mock_get_or_create_marquez_client,
         dag=DAG
     )
     failed_task_location = get_location(task_will_complete.dag.fileloc)
+
+    DAG._extractors[task_will_complete.__class__] = DummyExtractor
 
     # (4) Create DAG run and mark as running
     dagrun = DAG.create_dagrun(

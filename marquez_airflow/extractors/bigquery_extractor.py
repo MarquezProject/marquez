@@ -10,20 +10,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import json
+import logging
 
+from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from google.cloud import bigquery
 
-from marquez_airflow.utils import get_job_name
-from airflow.contrib.operators.bigquery_operator import BigQueryOperator
-
-from marquez_airflow.extractors.sql.experimental.parser import SqlParser
 from marquez_airflow.extractors import (
     BaseExtractor,
     StepMetadata,
     Source,
     Dataset
+)
+from marquez_airflow.extractors.sql.experimental.parser import SqlParser
+from marquez_airflow.utils import (
+    get_job_name
 )
 
 # BIGQUERY DAGs doesn't use this.
@@ -42,7 +43,7 @@ class BigQueryExtractor(BaseExtractor):
 
     def extract(self) -> [StepMetadata]:
         sql_meta = SqlParser.parse(self.operator.sql)
-        log.info("bigquery sql parse successful.")
+        log.debug(f"bigquery sql parsed and obtained meta: {sql_meta}")
 
         # default value: 'bigquery_default'
         conn_id = self.operator.bigquery_conn_id
@@ -66,22 +67,48 @@ class BigQueryExtractor(BaseExtractor):
             }
         )]
 
+    # convenience method
     def extract_on_complete(self, task_instance) -> [StepMetadata]:
+        log.debug(f"extract_on_complete({task_instance})")
+
+        bigquery_job_id = self._get_bigquery_job_id(task_instance)
+
+        try:
+            client = bigquery.Client()
+            try:
+                job = client.get_job(job_id=bigquery_job_id)
+                job_properties_str = self._get_job_properties_str(job)
+            finally:
+                client.close()
+            steps_meta = self._add_job_properties(job_properties_str)
+        except Exception as e:
+            log.error(f"Cannot retrieve job details from BigQuery.Client. {e}",
+                      exc_info=True)
+
+        return steps_meta
+
+    def _add_job_properties(self, job_properties) -> [StepMetadata]:
+        log.debug("extract_on_complete(job_details)")
         steps_meta = self.extract()
-
-        client = bigquery.Client()
-
-        bigquery_job_id = task_instance.job_id
-        job = client.get_job(job_id=bigquery_job_id)
-
-        job_details = json.dumps(job._properties)
-        log.debug(job_details)
 
         steps_meta[0].context = {
             'sql': self.operator.sql,
-            'bigquery.job_details': job_details
+            'bigquery.job_properties': job_properties
         }
 
-        client.close()
-
         return steps_meta
+
+    def _get_job_properties_str(self, job):
+        job_properties = json.dumps(job._properties)
+
+        log.debug(f"job: {job_properties}")
+
+        return job_properties
+
+    def _get_bigquery_job_id(self, task_instance):
+        bigquery_job_id = task_instance.xcom_pull(
+            task_ids=task_instance.task_id, key='job_id')
+
+        log.info(f"bigquery_job_id: {bigquery_job_id}")
+
+        return bigquery_job_id

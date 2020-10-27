@@ -10,34 +10,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import json
 import os
-import time
 from uuid import uuid4
 
+import airflow.models
+import time
 from airflow import LoggingMixin
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
+from airflow.operators.postgres_operator import PostgresOperator
+from marquez_client import Clients
+from marquez_client.models import JobType
 from pendulum import Pendulum
 
-import airflow.models
-from airflow.operators.postgres_operator import PostgresOperator
-
+from marquez_airflow.extractors import (Dataset, Source, StepMetadata)
 from marquez_airflow.extractors.bigquery_extractor import BigQueryExtractor
+from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 from marquez_airflow.utils import (
     JobIdMapping,
     get_location,
     add_airflow_info_to
 )
-from marquez_airflow.extractors import (Dataset, Source, StepMetadata)
-from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
-
-from marquez_client import Clients
-from marquez_client.models import JobType
 
 _NOMINAL_TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 _DAG_DEFAULT_NAMESPACE = 'default'
 _DAG_DEFAULT_OWNER = 'anonymous'
+
+log = logging.getLogger(__name__)
 
 
 class DAG(airflow.models.DAG, LoggingMixin):
@@ -81,9 +82,10 @@ class DAG(airflow.models.DAG, LoggingMixin):
             self.log.debug(
                 f"Creating namespace '{self.marquez_namespace}' with "
                 f"owner '{_DAG_DEFAULT_OWNER}'...")
-            self.get_or_create_marquez_client()\
+            self.get_or_create_marquez_client() \
                 .create_namespace(self.marquez_namespace, _DAG_DEFAULT_OWNER)
 
+            self.log.debug(f"self.task_dict: {self.task_dict}")
             # Register each task in the DAG
             for task_id, task in self.task_dict.items():
                 t = self._now_ms()
@@ -100,7 +102,8 @@ class DAG(airflow.models.DAG, LoggingMixin):
                         f'airflow_dag_id={self.dag_id} '
                         f'task_id={task_id} '
                         f'marquez_namespace={self.marquez_namespace} '
-                        f'duration_ms={(self._now_ms() - t)}')
+                        f'duration_ms={(self._now_ms() - t)}',
+                        exc_info=True)
 
             self.log.info(
                 f'Successfully recorded metadata: '
@@ -113,40 +116,76 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 f'Failed to record metadata: {e} '
                 f'airflow_dag_id={self.dag_id} '
                 f'marquez_namespace={self.marquez_namespace} '
-                f'duration_ms={(self._now_ms() - create_dag_start_ms)}')
+                f'duration_ms={(self._now_ms() - create_dag_start_ms)}',
+                exc_info=True)
 
         return dagrun
 
     def handle_callback(self, *args, **kwargs):
+        self.log.debug(f"handle_callback({args}, {kwargs})")
+
         try:
             dagrun = args[0]
+            self.log.debug(f"dagrun : {dagrun}")
             task_instances = dagrun.get_task_instances()
+            self.log.info(f"{task_instances}")
             for ti in task_instances:
-                extractor = self._extractors.get(ti.operator.__class__)
+                task = dagrun.get_dag().get_task(ti.task_id)
+                self.log.info(f"ti: {ti} of task: {task}")
+
+                extractor = self._extractors.get(task.__class__)
+                self.log.info(f'extractor: {extractor}')
+
+                ti_location = self._get_location(task)
+
                 if extractor:
                     self.log.debug(
                         f"Using extractor '{extractor}' to apply partial "
-                        f"metadata updates for operator '{ti.operator}' "
+                        f"metadata updates for operator '{task.__class__}' "
                         f"in DAG '{self.dag_id}'."
                     )
 
                     steps_meta = add_airflow_info_to(
-                        ti.operator,
-                        extractor(ti.operator).extract_on_complete(ti)
-                    )
+                        task,
+                        extractor(task).extract_on_complete(ti))
                     self.log.debug(f'steps_meta: {steps_meta}')
 
-                    # FIXME: replace with update api
                     for step in steps_meta:
-                        self.get_marquez_client().create_job(
+                        self.log.info(f'step: {step}')
+
+                        marquez_run_id = self._get_marquez_run_id(
+                            ti, dagrun, kwargs)
+                        self.log.info(f'marquez_run_id: {marquez_run_id}')
+
+                        self.register_datasets(step.inputs, marquez_run_id)
+                        inputs = list(
+                            map(lambda input_data: {
+                                'namespace': self.marquez_namespace,
+                                'name': input_data.name
+                            }, step.inputs))
+                        self.log.info(f'inputs: {inputs}')
+
+                        self.register_datasets(step.outputs, marquez_run_id)
+                        outputs = list(
+                            map(lambda output_data: {
+                                'namespace': self.marquez_namespace,
+                                'name': output_data.name
+                            }, step.outputs))
+                        self.log.info(f'outputs: {outputs}')
+
+                        self.get_or_create_marquez_client().create_job(
+                            namespace_name=self.marquez_namespace,
                             job_name=step.name,
                             job_type=JobType.BATCH,
-                            location=(step.location or self._get_location(ti)),
-                            input_dataset=step.inputs,
-                            output_dataset=step.outputs,
-                            context=step.context,
+                            location=step.location or ti_location,
+                            input_dataset=inputs,
+                            output_dataset=outputs,
                             description=self.description,
-                            namespace_name=self.marquez_namespace)
+                            context=step.context,
+                            run_id=marquez_run_id)
+
+                        self.log.info(f"client.create_job(run_id="
+                                      f"{marquez_run_id}) successful.")
 
                 try:
                     self.report_jobrun_change(
@@ -154,12 +193,14 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 except Exception as e:
                     self.log.error(
                         f'Failed to record task run state change: {e} '
-                        f'dag_id={self.dag_id}')
+                        f'dag_id={self.dag_id}',
+                        exc_info=True)
 
         except Exception as e:
             self.log.error(
                 f'Failed to record dagrun state change: {e} '
-                f'dag_id={self.dag_id}')
+                f'dag_id={self.dag_id}',
+                exc_info=True)
 
         return super().handle_callback(*args, **kwargs)
 
@@ -191,7 +232,8 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 task_location = get_location(task.dag.fileloc)
         except Exception as e:
             self.log.warning(
-                f'Unable to fetch the location: {e}')
+                f'Unable to fetch the location: {e}',
+                exc_info=True)
 
         steps_metadata = []
         if extractor:
@@ -213,7 +255,8 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     f'airflow_dag_id={self.dag_id} '
                     f'task_id={task.task_id} '
                     f'airflow_run_id={dag_run_id} '
-                    f'marquez_namespace={self.marquez_namespace}')
+                    f'marquez_namespace={self.marquez_namespace}',
+                    exc_info=True)
         else:
             self.log.warning(
                 f'Unable to find an extractor. '
@@ -255,7 +298,8 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     f'task_id={task.task_id} '
                     f'step={step.name} '
                     f'airflow_run_id={dag_run_id} '
-                    f'marquez_namespace={self.marquez_namespace}')
+                    f'marquez_namespace={self.marquez_namespace}',
+                    exc_info=True)
 
             outputs = []
             try:
@@ -274,7 +318,8 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     f'task_id={task.task_id} '
                     f'step={step.name} '
                     f'airflow_run_id={dag_run_id} '
-                    f'marquez_namespace={self.marquez_namespace}')
+                    f'marquez_namespace={self.marquez_namespace}',
+                    exc_info=True)
 
             marquez_client.create_job(job_name=step.name,
                                       job_type=JobType.BATCH,  # job type
@@ -337,7 +382,8 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 f'task_id={task.task_id} '
                 f'airflow_run_id={dag_run_id} '
                 f'marquez_run_id={marquez_jobrun_ids} '
-                f'marquez_namespace={self.marquez_namespace}')
+                f'marquez_namespace={self.marquez_namespace}',
+                exc_info=True)
 
     def compute_endtime(self, execution_date):
         return self.following_schedule(execution_date)
@@ -438,4 +484,17 @@ class DAG(airflow.models.DAG, LoggingMixin):
             else:
                 return get_location(task.dag.fileloc)
         except Exception as e:
-            DAG.log.warning(f'Unable to fetch the location. {e}')
+            log.warning(f'Unable to fetch the location. {e}', exc_info=True)
+
+    def _get_marquez_run_id(self, ti, dagrun, kwargs):
+        self.log.debug(f"_get_marquez_run_id({ti}, {dagrun}, {kwargs})")
+        job_name = f'{ti.dag_id}.{ti.task_id}'
+        session = kwargs.get('session')
+        job_run_ids_str = self._job_id_mapping.get(
+            JobIdMapping.make_key(job_name, dagrun.run_id), session)
+        self.log.info(f"job_run_ids: {job_run_ids_str}")
+        if job_run_ids_str:
+            job_run_ids_array = json.loads(job_run_ids_str)
+            return job_run_ids_array[0]
+        else:
+            return None

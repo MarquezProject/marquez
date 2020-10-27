@@ -8,7 +8,7 @@ marquez-python==0.7.10
 pytest==6.0.1
 pytest-cov==2.10.1
 requests==2.24.0
-psycopg2==2.8.6
+psycopg2-binary==2.8.6
 mock>=4.0.2
 httplib2>=0.18.1
 google-cloud-bigquery>=1.28.0
@@ -17,3 +17,4 @@ google-api-core>=1.22.2
 google-api-python-client>=1.12.2
 pandas-gbq>=0.13.2
 google-cloud-storage>=1.31.2
+sqlparse==0.3.1

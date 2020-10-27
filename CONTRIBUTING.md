@@ -31,8 +31,23 @@ Install the test dependencies:
 pip3 install -r test-requirements.txt
 ```
 
+Init the airflow local db:
+```
+airflow initdb
+```
+
 now you can run the tests:
-`pytest --ignore=tests/integration`
+`python -m pytest  --ignore=tests/integration tests/`
+
+To run the linter locally:
+install flake8
+```
+pip install flake8
+```
+and run it:
+```
+python -m flake8
+```
 
 # Submitting a [pull request](https://help.github.com/articles/about-pull-requests)
 

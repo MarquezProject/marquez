@@ -49,5 +49,5 @@ setup(
     install_requires=[
         "marquez-python==0.7.10",
         "sqlparse==0.3.1"
-    ],
+    ]
 )

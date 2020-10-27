@@ -15,8 +15,8 @@ import os
 import subprocess
 
 import airflow
-from airflow.utils.db import provide_session
 from airflow.models import Connection
+from airflow.utils.db import provide_session
 from airflow.version import version as airflow_version
 
 from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
@@ -39,6 +39,10 @@ class JobIdMapping:
 
     @staticmethod
     def pop(key, session):
+        return JobIdMapping.get(key=key, session=session, delete=True)
+
+    @staticmethod
+    def get(key, session, delete=False):
         if session:
             q = session.query(airflow.models.Variable).filter(
                 airflow.models.Variable.key == key)
@@ -46,7 +50,8 @@ class JobIdMapping:
                 return
             else:
                 val = q.first().val
-                q.delete(synchronize_session=False)
+                if delete:
+                    q.delete(synchronize_session=False)
                 return val
 
     @staticmethod
@@ -126,6 +131,8 @@ def get_job_name(task):
 
 
 def add_airflow_info_to(task, steps_metadata):
+    log.info(f"add_airflow_info_to({task}, {steps_metadata})")
+
     for step_metadata in steps_metadata:
         # Add operator info
         operator = \
