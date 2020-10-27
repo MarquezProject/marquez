@@ -342,7 +342,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 return
 
             # TODO: Look into generating a uuid based on the DAG run_id
-            external_run_id = str(uuid4())
+            external_run_id = self.new_run_id()
 
             marquez_client.create_job_run(
                 namespace_name=self.marquez_namespace,
@@ -435,6 +435,9 @@ class DAG(airflow.models.DAG, LoggingMixin):
         if not self._marquez_client:
             self._marquez_client = Clients.new_write_only_client()
         return self._marquez_client
+
+    def new_run_id(self):
+        return str(uuid4())
 
     @staticmethod
     def _now_ms():
