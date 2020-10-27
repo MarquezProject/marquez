@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez-java/compare/0.4.3...HEAD)
 
-## [0.4.3](https://github.com/MarquezProject/marquez-java/compare/0.4.2...0.4.3) 2020-10-27
+## [0.4.3](https://github.com/MarquezProject/marquez-java/compare/0.4.2...0.4.3) - 2020-10-27
 
 ### Added
 
@@ -15,13 +15,13 @@
 
 * Factor out path building logic [@julienledem](https://github.com/julienledem)
 
-## [0.4.2](https://github.com/MarquezProject/marquez-java/compare/0.4.1...0.4.2) 2020-08-14
+## [0.4.2](https://github.com/MarquezProject/marquez-java/compare/0.4.1...0.4.2) - 2020-08-14
 
 ### Changed
 
 * Require namespace on all method calls
 
-## [0.4.1](https://github.com/MarquezProject/marquez-java/compare/0.4.0...0.4.1) 2020-07-24
+## [0.4.1](https://github.com/MarquezProject/marquez-java/compare/0.4.0...0.4.1) - 2020-07-24
 
 ### Added
 
@@ -32,7 +32,7 @@
 * `MarquezClient.marRunAs()`
 * `MarquezClient.createRun()` with namespace override
 
-## [0.4.0](https://github.com/MarquezProject/marquez-java/compare/0.3.0...0.4.0) 2020-05-24
+## [0.4.0](https://github.com/MarquezProject/marquez-java/compare/0.3.0...0.4.0) - 2020-05-24
 
 ### Added
 
@@ -40,13 +40,13 @@
 * `DatasetID` and `JobID`
 * `Job.latestRun`
 
-## [0.3.0](https://github.com/MarquezProject/marquez-java/compare/0.2.0...0.3.0) 2020-01-02
+## [0.3.0](https://github.com/MarquezProject/marquez-java/compare/0.2.0...0.3.0) - 2020-01-02
 
 ### Added
 
 * `Dataset.lastModified` [@soumyasmruti](https://github.com/soumyasmruti)
 
-## [0.2.0](https://github.com/MarquezProject/marquez-java/compare/0.1.0...0.2.0) 2019-11-12
+## [0.2.0](https://github.com/MarquezProject/marquez-java/compare/0.1.0...0.2.0) - 2019-11-12
 
 ### Added
 
