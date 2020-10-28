@@ -144,36 +144,36 @@ class TestMarquezWriteOnlyClientHttp(unittest.TestCase):
         )
 
     @mock.patch("marquez_client.http_backend.HttpBackend.post")
-    def test_mark_job_run_as_start(self, mock_post):
+    def test_mark_job_run_as_started(self, mock_post):
         run_id = str(uuid.uuid4())
-        action_at = Utils.utc_now()
+        started_at = Utils.utc_now()
 
         self.client_wo_http.mark_job_run_as_started(
-            run_id=run_id, action_at=action_at)
+            run_id=run_id, at=started_at)
 
     @mock.patch("marquez_client.http_backend.HttpBackend.post")
     def test_mark_job_run_as_completed(self, mock_post):
         run_id = str(uuid.uuid4())
-        action_at = Utils.utc_now()
+        completed_at = Utils.utc_now()
 
         self.client_wo_http.mark_job_run_as_completed(
-            run_id=run_id, action_at=action_at)
+            run_id=run_id, at=completed_at)
 
     @mock.patch("marquez_client.http_backend.HttpBackend.post")
     def test_mark_job_run_as_failed(self, mock_post):
         run_id = str(uuid.uuid4())
-        action_at = Utils.utc_now()
+        failed_at = Utils.utc_now()
 
         self.client_wo_http.mark_job_run_as_failed(
-            run_id=run_id, action_at=action_at)
+            run_id=run_id, at=failed_at)
 
     @mock.patch("marquez_client.http_backend.HttpBackend.post")
     def test_mark_job_run_as_aborted(self, mock_post):
         run_id = str(uuid.uuid4())
-        action_at = Utils.utc_now()
+        aborted_at = Utils.utc_now()
 
         self.client_wo_http.mark_job_run_as_aborted(
-            run_id=run_id, action_at=action_at)
+            run_id=run_id, at=aborted_at)
 
 
 if __name__ == '__main__':

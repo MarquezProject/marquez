@@ -78,7 +78,7 @@ class MarquezClient:
         Utils.is_valid_connection_url(connection_url)
 
         payload = {
-            'type': source_type,
+            'type': source_type.upper(),
             'connectionUrl': connection_url
         }
 
@@ -131,7 +131,7 @@ class MarquezClient:
             payload['runId'] = run_id
 
         if fields:
-            payload['fields'] = fields
+            payload['fields'] = Utils.mk_fields_from(fields)
 
         if tags:
             payload['tags'] = tags

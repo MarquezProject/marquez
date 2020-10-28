@@ -12,8 +12,8 @@
 
 
 class Backend:
-    def put(self, path, headers, json):
+    def put(self, path, headers, payload):
         pass
 
-    def post(self, path, headers, json=None):
+    def post(self, path, headers, payload=None):
         pass

@@ -11,7 +11,6 @@
 # limitations under the License.
 
 import json
-import logging
 import uuid
 from datetime import datetime
 
@@ -19,29 +18,26 @@ import pytz
 import time
 from pyrfc3339 import generate
 
-from marquez_client.models import (DatasetFieldType, DatasetType)
 
-log = logging.getLogger(__name__)
-
-
-class Utils(object):
-    def make_field(name, data_type, description=None):
-        if isinstance(data_type, str):
-            if not DatasetFieldType.__members__.__contains__(data_type):
-                raise ValueError(f'Invalid field type: {data_type}')
-        elif isinstance(data_type, DatasetFieldType):
-            data_type = data_type.name
-        else:
-            raise ValueError('data_type must be a str or a DatasetFieldType')
-
-        DatasetType.__members__.get(data_type)
-        field = {
-            'name': name,
-            'type': data_type
-        }
-        if description:
-            field['description'] = description
-        return field
+class Utils:
+    @staticmethod
+    def mk_fields_from(fields):
+        new_fields = []
+        for field in fields:
+            if 'name' not in field:
+                raise ValueError('field name must not be None')
+            if 'type' not in field:
+                raise ValueError('field type must not be None')
+            new_field = {
+                'name': field['name'],
+                'type': field['type'].upper(),
+            }
+            if 'tags' in field:
+                new_field['tags'] = field['tags']
+            if 'description' in field:
+                new_field['description'] = field['description']
+            new_fields.append(new_field)
+        return new_fields
 
     @staticmethod
     def to_seconds(timeout_ms):

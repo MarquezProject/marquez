@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 
 
 # Marquez Write Only Client
-class MarquezWriteOnlyClient(object):
+class MarquezWriteOnlyClient:
     def __init__(self, backend):
         self._backend = backend
 
@@ -44,7 +44,7 @@ class MarquezWriteOnlyClient(object):
             payload['description'] = description
 
         self._backend.put(
-            self._path('/namespaces/{0}', namespace_name),
+            path=self._path('/namespaces/{0}', namespace_name),
             headers=_HEADERS,
             payload=payload
         )
@@ -57,7 +57,7 @@ class MarquezWriteOnlyClient(object):
         Utils.is_valid_connection_url(connection_url)
 
         payload = {
-            'type': source_type,
+            'type': source_type.upper(),
             'connectionUrl': connection_url
         }
 
@@ -65,7 +65,7 @@ class MarquezWriteOnlyClient(object):
             payload['description'] = description
 
         self._backend.put(
-            self._path('/sources/{0}', source_name),
+            path=self._path('/sources/{0}', source_name),
             headers=_HEADERS,
             payload=payload)
 
@@ -97,7 +97,7 @@ class MarquezWriteOnlyClient(object):
             payload['runId'] = run_id
 
         if fields:
-            payload['fields'] = fields
+            payload['fields'] = Utils.mk_fields_from(fields)
 
         if tags:
             payload['tags'] = tags
@@ -106,8 +106,8 @@ class MarquezWriteOnlyClient(object):
             payload['schemaLocation'] = schema_location
 
         self._backend.put(
-            self._path('/namespaces/{0}/datasets/{1}', namespace_name,
-                       dataset_name),
+            path=self._path('/namespaces/{0}/datasets/{1}', namespace_name,
+                            dataset_name),
             headers=_HEADERS,
             payload=payload
         )
@@ -140,7 +140,9 @@ class MarquezWriteOnlyClient(object):
             payload['description'] = description
 
         self._backend.put(
-            self._path('/namespaces/{0}/jobs/{1}', namespace_name, job_name),
+            path=self._path(
+                '/namespaces/{0}/jobs/{1}', namespace_name, job_name
+            ),
             headers=_HEADERS,
             payload=payload
         )
@@ -165,42 +167,38 @@ class MarquezWriteOnlyClient(object):
         if run_args:
             payload['args'] = run_args
 
-        response = self._backend.post(
-            self._path('/namespaces/{0}/jobs/{1}/runs',
-                       namespace_name, job_name),
+        self._backend.post(
+            path=self._path('/namespaces/{0}/jobs/{1}/runs',
+                            namespace_name, job_name),
             headers=_HEADERS,
             payload=payload)
 
         if mark_as_running:
-            response = self.mark_job_run_as_started(
+            self.mark_job_run_as_started(
                 run_id, str(datetime.datetime.utcnow()))
 
-        response
+    def mark_job_run_as_started(self, run_id, at=None):
+        self.__mark_job_run_as(run_id, 'start', at)
 
-    def mark_job_run_as_started(self, run_id, action_at=None):
-        self.__mark_job_run_as(run_id, 'start', action_at)
+    def mark_job_run_as_completed(self, run_id, at=None):
+        self.__mark_job_run_as(run_id, 'complete', at)
 
-    def mark_job_run_as_completed(self, run_id, action_at=None):
-        self.__mark_job_run_as(run_id, 'complete', action_at)
+    def mark_job_run_as_failed(self, run_id, at=None):
+        self.__mark_job_run_as(run_id, 'fail', at)
 
-    def mark_job_run_as_failed(self, run_id, action_at=None):
-        self.__mark_job_run_as(run_id, 'fail', action_at)
+    def mark_job_run_as_aborted(self, run_id, at=None):
+        self.__mark_job_run_as(run_id, 'abort', at)
 
-    def mark_job_run_as_aborted(self, run_id, action_at=None):
-        self.__mark_job_run_as(run_id, 'abort', action_at)
-
-    def __mark_job_run_as(self, run_id, action, action_at=None):
+    def __mark_job_run_as(self, run_id, transition, at=None):
         Utils.is_valid_uuid(run_id, 'run_id')
-
         self._backend.post(
-            self._path('/jobs/runs/{0}/{1}?at={2}', run_id, action,
-                       action_at if action_at else Utils.utc_now()),
-            headers=_HEADERS,
-            payload={}
+            path=self._path('/jobs/runs/{0}/{1}?at={2}', run_id, transition,
+                            at if at else Utils.utc_now()),
+            headers=_HEADERS
         )
 
     # Common
     @staticmethod
     def _path(path_template, *args):
         encoded_args = [quote(arg.encode('utf-8'), safe='') for arg in args]
-        return f'{_API_PATH}{path_template.format(*encoded_args)}'
+        return f'{path_template.format(*encoded_args)}'

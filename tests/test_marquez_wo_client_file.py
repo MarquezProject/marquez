@@ -138,33 +138,33 @@ class TestMarquezWriteOnlyClientFile(unittest.TestCase):
             mark_as_running=True
         )
 
-    def test_mark_job_run_as_start(self):
+    def test_mark_job_run_as_started(self):
         run_id = str(uuid.uuid4())
-        action_at = Utils.utc_now()
+        started_at = Utils.utc_now()
 
         self.client_wo_file.mark_job_run_as_started(
-            run_id=run_id, action_at=action_at)
+            run_id=run_id, at=started_at)
 
     def test_mark_job_run_as_completed(self):
         run_id = str(uuid.uuid4())
-        action_at = Utils.utc_now()
+        completed_at = Utils.utc_now()
 
         self.client_wo_file.mark_job_run_as_completed(
-            run_id=run_id, action_at=action_at)
+            run_id=run_id, at=completed_at)
 
     def test_mark_job_run_as_failed(self):
         run_id = str(uuid.uuid4())
-        action_at = Utils.utc_now()
+        failed_at = Utils.utc_now()
 
         self.client_wo_file.mark_job_run_as_failed(
-            run_id=run_id, action_at=action_at)
+            run_id=run_id, at=failed_at)
 
     def test_mark_job_run_as_aborted(self):
         run_id = str(uuid.uuid4())
-        action_at = Utils.utc_now()
+        aborted_at = Utils.utc_now()
 
         self.client_wo_file.mark_job_run_as_aborted(
-            run_id=run_id, action_at=action_at)
+            run_id=run_id, at=aborted_at)
 
 
 if __name__ == '__main__':
