@@ -450,14 +450,27 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 _key = f'{self.marquez_namespace}.{dataset.name}'
                 if _key not in self._marquez_dataset_cache:
                     self.register_source(dataset.source)
+                    # NOTE: The client expects a dict when capturing
+                    # fields for a dataset. Below we translate a field
+                    # object into a dict for compatibility. Work is currently
+                    # in progress to make this step unnecessary (see:
+                    # https://github.com/MarquezProject/marquez-python/pull/89)
+                    fields = []
+                    for field in dataset.fields:
+                        fields.append({
+                            'name': field.name,
+                            'type': field.type,
+                            'tags': field.tags,
+                            'description': field.description
+                        })
                     client.create_dataset(
                         dataset_name=dataset.name,
                         dataset_type=dataset.type,
                         physical_name=dataset.name,
                         source_name=dataset.source.name,
                         namespace_name=self.marquez_namespace,
+                        fields=fields,
                         run_id=marquez_job_run_id)
-                    # NOTE:
                     self._marquez_dataset_cache[_key] = True
 
     def register_source(self, source):
@@ -469,7 +482,6 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     source.name,
                     source.type,
                     source.connection_url)
-                # NOTE:
                 self._marquez_source_cache[_key] = True
 
     @staticmethod

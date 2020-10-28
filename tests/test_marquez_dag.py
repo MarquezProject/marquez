@@ -226,10 +226,10 @@ class TestFixtureDummyExtractor(BaseExtractor):
 
     def extract(self) -> [StepMetadata]:
         inputs = [
-            Dataset.from_table(self.source, "extract_input1")
+            Dataset.from_table_only(self.source, "extract_input1")
         ]
         outputs = [
-            Dataset.from_table(self.source, "extract_output1")
+            Dataset.from_table_only(self.source, "extract_output1")
         ]
         return [StepMetadata(
             name=get_job_name(task=self.operator),
@@ -242,10 +242,10 @@ class TestFixtureDummyExtractor(BaseExtractor):
 
     def extract_on_complete(self, task_instance) -> [StepMetadata]:
         inputs = [
-            Dataset.from_table(self.source, "extract_on_complete_input1")
+            Dataset.from_table_only(self.source, "extract_on_complete_input1")
         ]
         outputs = [
-            Dataset.from_table(self.source, "extract_on_complete_output1")
+            Dataset.from_table_only(self.source, "extract_on_complete_output1")
         ]
         return [StepMetadata(
             name=get_job_name(task=self.operator),
@@ -315,6 +315,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
             physical_name='extract_input1',
             source_name='dummy_source_name',
             namespace_name=DAG_NAMESPACE,
+            fields=[],
             run_id=None
         ),
         mock.call(
@@ -323,6 +324,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
             physical_name='extract_output1',
             source_name='dummy_source_name',
             namespace_name=DAG_NAMESPACE,
+            fields=[],
             run_id=None
         )
     ])
@@ -418,6 +420,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
             physical_name='extract_on_complete_input1',
             source_name='dummy_source_name',
             namespace_name=DAG_NAMESPACE,
+            fields=[],
             run_id=run_id
         ),
         mock.call(
@@ -426,6 +429,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
             physical_name='extract_on_complete_output1',
             source_name='dummy_source_name',
             namespace_name=DAG_NAMESPACE,
+            fields=[],
             run_id=run_id
         )
     ])

@@ -52,10 +52,14 @@ class BigQueryExtractor(BaseExtractor):
             name=conn_id,
             connection_url=_BIGQUERY_CONN_URL)
         inputs = [
-            Dataset.from_table(source, table) for table in sql_meta.in_tables
+            Dataset.from_table_only(
+                source, table
+            ) for table in sql_meta.in_tables
         ]
         outputs = [
-            Dataset.from_table(source, table) for table in sql_meta.out_tables
+            Dataset.from_table_only(
+                source, table
+            ) for table in sql_meta.out_tables
         ]
 
         return [StepMetadata(
