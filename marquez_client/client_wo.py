@@ -43,7 +43,7 @@ class MarquezWriteOnlyClient(object):
         if description:
             payload['description'] = description
 
-        return self._backend.put(
+        self._backend.put(
             self._path('/namespaces/{0}', namespace_name),
             headers=_HEADERS,
             payload=payload
@@ -64,7 +64,7 @@ class MarquezWriteOnlyClient(object):
         if description:
             payload['description'] = description
 
-        return self._backend.put(
+        self._backend.put(
             self._path('/sources/{0}', source_name),
             headers=_HEADERS,
             payload=payload)
@@ -105,7 +105,7 @@ class MarquezWriteOnlyClient(object):
         if schema_location:
             payload['schemaLocation'] = schema_location
 
-        return self._backend.put(
+        self._backend.put(
             self._path('/namespaces/{0}/datasets/{1}', namespace_name,
                        dataset_name),
             headers=_HEADERS,
@@ -139,7 +139,7 @@ class MarquezWriteOnlyClient(object):
         if description:
             payload['description'] = description
 
-        return self._backend.put(
+        self._backend.put(
             self._path('/namespaces/{0}/jobs/{1}', namespace_name, job_name),
             headers=_HEADERS,
             payload=payload
@@ -175,24 +175,24 @@ class MarquezWriteOnlyClient(object):
             response = self.mark_job_run_as_started(
                 run_id, str(datetime.datetime.utcnow()))
 
-        return response
+        response
 
     def mark_job_run_as_started(self, run_id, action_at=None):
-        return self.__mark_job_run_as(run_id, 'start', action_at)
+        self.__mark_job_run_as(run_id, 'start', action_at)
 
     def mark_job_run_as_completed(self, run_id, action_at=None):
-        return self.__mark_job_run_as(run_id, 'complete', action_at)
+        self.__mark_job_run_as(run_id, 'complete', action_at)
 
     def mark_job_run_as_failed(self, run_id, action_at=None):
-        return self.__mark_job_run_as(run_id, 'fail', action_at)
+        self.__mark_job_run_as(run_id, 'fail', action_at)
 
     def mark_job_run_as_aborted(self, run_id, action_at=None):
-        return self.__mark_job_run_as(run_id, 'abort', action_at)
+        self.__mark_job_run_as(run_id, 'abort', action_at)
 
     def __mark_job_run_as(self, run_id, action, action_at=None):
         Utils.is_valid_uuid(run_id, 'run_id')
 
-        return self._backend.post(
+        self._backend.post(
             self._path('/jobs/runs/{0}/{1}?at={2}', run_id, action,
                        action_at if action_at else Utils.utc_now()),
             headers=_HEADERS,
