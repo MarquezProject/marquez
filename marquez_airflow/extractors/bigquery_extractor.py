@@ -54,12 +54,12 @@ class BigQueryExtractor(BaseExtractor):
         log.debug(f"bigquery sql parsed and obtained meta: {sql_meta}")
 
         inputs = [
-            Dataset.from_table_only(
+            Dataset.from_table(
                 source, table
             ) for table in sql_meta.in_tables
         ]
         outputs = [
-            Dataset.from_table_only(
+            Dataset.from_table(
                 source, table
             ) for table in sql_meta.out_tables
         ]
@@ -100,7 +100,7 @@ class BigQueryExtractor(BaseExtractor):
                     self._bq_table_name(bq_t) for bq_t in bq_input_tables
                 ]
                 inputs = [
-                    Dataset.from_table_only(source, table)
+                    Dataset.from_table(source, table)
                     for table in input_table_names
                 ]
                 bq_output_table = job_properties.get('configuration')\
@@ -108,7 +108,7 @@ class BigQueryExtractor(BaseExtractor):
                     .get('destinationTable')
                 output_table_name = self._bq_table_name(bq_output_table)
                 outputs = [
-                    Dataset.from_table_only(source, output_table_name)
+                    Dataset.from_table(source, output_table_name)
                 ]
                 return [StepMetadata(
                     name=get_job_name(task=self.operator),

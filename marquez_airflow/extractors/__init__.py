@@ -77,8 +77,8 @@ class Dataset:
         self.description = description
 
     @staticmethod
-    def from_table_only(source: Source, table_name: str,
-                        schema_name: str = None):
+    def from_table(source: Source, table_name: str,
+                   schema_name: str = None):
         return Dataset(
             type=DatasetType.DB_TABLE,
             name=Dataset._to_name(

@@ -60,7 +60,7 @@ class PostgresExtractor(BaseExtractor):
         # input tables to format the dataset name as:
         # {schema_name}.{table_name}
         inputs = [
-            Dataset.from_table_only(
+            Dataset.from_table(
                 source=source,
                 table_name=in_table_schema.table_name,
                 schema_name=in_table_schema.schema_name
