@@ -41,16 +41,18 @@ class BigQueryExtractor(BaseExtractor):
     def __init__(self, operator):
         super().__init__(operator)
 
-    def extract(self) -> [StepMetadata]:
-        sql_meta = SqlParser.parse(self.operator.sql)
-        log.debug(f"bigquery sql parsed and obtained meta: {sql_meta}")
-
-        # default value: 'bigquery_default'
+    def _source(self) -> Source:
         conn_id = self.operator.bigquery_conn_id
-        source = Source(
+        return Source(
             type="BIGQUERY",
             name=conn_id,
             connection_url=_BIGQUERY_CONN_URL)
+
+    def extract(self) -> [StepMetadata]:
+        source = self._source()
+        sql_meta = SqlParser.parse(self.operator.sql)
+        log.debug(f"bigquery sql parsed and obtained meta: {sql_meta}")
+
         inputs = [
             Dataset.from_table_only(
                 source, table
@@ -71,43 +73,59 @@ class BigQueryExtractor(BaseExtractor):
             }
         )]
 
+    def _bq_table_name(self, bq_table):
+        project = bq_table.get('projectId')
+        dataset = bq_table.get('datasetId')
+        table = bq_table.get('tableId')
+        return f"{project}.{dataset}.{table}"
+
     # convenience method
     def extract_on_complete(self, task_instance) -> [StepMetadata]:
         log.debug(f"extract_on_complete({task_instance})")
 
+        source = self._source()
         bigquery_job_id = self._get_bigquery_job_id(task_instance)
 
         try:
             client = bigquery.Client()
             try:
                 job = client.get_job(job_id=bigquery_job_id)
-                job_properties_str = self._get_job_properties_str(job)
+                job_properties = job._properties
+                job_properties_str = json.dumps(job_properties)
+                bq_input_tables = job_properties.get('statistics')\
+                    .get('query')\
+                    .get('referencedTables')
+
+                input_table_names = [
+                    self._bq_table_name(bq_t) for bq_t in bq_input_tables
+                ]
+                inputs = [
+                    Dataset.from_table(source, table)
+                    for table in input_table_names
+                ]
+                bq_output_table = job_properties.get('configuration')\
+                    .get('query')\
+                    .get('destinationTable')
+                output_table_name = self._bq_table_name(bq_output_table)
+                outputs = [
+                    Dataset.from_table(source, output_table_name)
+                ]
+                return [StepMetadata(
+                    name=get_job_name(task=self.operator),
+                    inputs=inputs,
+                    outputs=outputs,
+                    context={
+                        'sql': self.operator.sql,
+                        'bigquery.job_properties': job_properties_str
+                    }
+                )]
             finally:
                 client.close()
-            steps_meta = self._add_job_properties(job_properties_str)
+
         except Exception as e:
             log.error(f"Cannot retrieve job details from BigQuery.Client. {e}",
                       exc_info=True)
-
-        return steps_meta
-
-    def _add_job_properties(self, job_properties) -> [StepMetadata]:
-        log.debug("extract_on_complete(job_details)")
-        steps_meta = self.extract()
-
-        steps_meta[0].context = {
-            'sql': self.operator.sql,
-            'bigquery.job_properties': job_properties
-        }
-
-        return steps_meta
-
-    def _get_job_properties_str(self, job):
-        job_properties = json.dumps(job._properties)
-
-        log.debug(f"job: {job_properties}")
-
-        return job_properties
+        return []
 
     def _get_bigquery_job_id(self, task_instance):
         bigquery_job_id = task_instance.xcom_pull(

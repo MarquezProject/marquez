@@ -10,6 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import random
 import unittest
@@ -36,6 +37,13 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
     def test_extract(self, mock_client, mock_hook):
         log.info("test_extractor")
 
+        job_details_file = open(
+            file="tests/extractors/job_details.json",
+            mode="r"
+        )
+        job_details = json.loads(job_details_file.read())
+        job_details_file.close()
+
         bq_job_id = "foo.bq.job_id"
 
         mock_hook.return_value \
@@ -45,7 +53,7 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
 
         mock_client.return_value \
             .get_job.return_value \
-            ._properties = {"foo": "bar"}
+            ._properties = job_details
 
         mock_client.return_value.close.return_value
 
@@ -83,9 +91,20 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
 
         steps_meta = bq_extractor.extract_on_complete(task_instance)
         assert steps_meta[0].context['bigquery.job_properties'] \
-            == '{"foo": "bar"}'
+            == json.dumps(job_details)
         mock_client.return_value \
             .get_job.assert_called_once_with(job_id=bq_job_id)
+
+        assert steps_meta[0].inputs is not None
+        assert len(steps_meta[0].inputs) == 1
+        assert steps_meta[0].inputs[0].name == \
+            "bigquery-public-data.usa_names.usa_1910_2013"
+        assert steps_meta[0].outputs is not None
+        assert len(steps_meta[0].outputs) == 1
+        assert steps_meta[0].outputs[0].name == \
+            "bq-airflow-marquez" + \
+            "._caa03048f8548c01c38d7ce7ed96d73410a3b7be" + \
+            ".anon8adc631eed203758a0ce6505c735e5ceb49d6de7"
 
         mock_client.return_value.close.assert_called()
 
@@ -118,14 +137,6 @@ class TestBigQueryExtractor(unittest.TestCase):
 
         mock_xcom_pull.assert_called_once_with(
             task_ids=self.ti.task_id, key='job_id')
-
-    def test_add_job_properties(self):
-        async_job = TestBigQueryExtractor._get_async_job({"foo": "bar"})
-        job_properties = self.bq_extractor._get_job_properties_str(async_job)
-        assert job_properties == '{"foo": "bar"}'
-        steps_meta = self.bq_extractor._add_job_properties(job_properties)
-        assert steps_meta[0].context["bigquery.job_properties"] \
-            == '{"foo": "bar"}'
 
     @staticmethod
     def _get_ti(task):
