@@ -12,6 +12,7 @@
 
 import pytest
 import mock
+import logging
 
 from airflow.models import (TaskInstance, DagRun)
 from airflow.operators.dummy_operator import DummyOperator
@@ -30,6 +31,8 @@ from marquez_airflow.extractors import (
 from marquez_airflow.utils import get_location, get_job_name
 
 from uuid import UUID
+
+log = logging.getLogger(__name__)
 
 NO_INPUTS = []
 NO_OUTPUTS = []
@@ -122,7 +125,7 @@ def test_marquez_dag(mock_get_or_create_marquez_client, mock_uuid,
                                                                  DAG_OWNER)
 
     # Assert source and dataset meta calls
-    mock_marquez_client.create_datasource.assert_not_called()
+    mock_marquez_client.create_source.assert_not_called()
     mock_marquez_client.create_dataset.assert_not_called()
 
     # Assert job meta calls
@@ -306,8 +309,11 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
                                                                  DAG_OWNER)
 
     # Datasets are updated
-    # TODO: why is create_datasource not called?
-    mock_marquez_client.create_datasource.assert_not_called()
+    mock_marquez_client.create_source.assert_called_once_with(
+        'dummy_source_name',
+        'DummySource',
+        'http://dummy/source/url'
+    )
     mock_marquez_client.create_dataset.assert_has_calls([
         mock.call(
             dataset_name='extract_input1',
@@ -328,7 +334,6 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
             run_id=None
         )
     ])
-    mock_marquez_client.create_dataset.reset_mock()
 
     # job is updated
     mock_marquez_client.create_job.assert_called_once_with(
@@ -343,7 +348,6 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
     )
     assert mock_marquez_client.create_job.mock_calls[0].\
         kwargs['context'].get('extract') == 'extract'
-    mock_marquez_client.create_job.reset_mock()
 
     # run is created
     mock_marquez_client.create_job_run.assert_called_once_with(
@@ -359,6 +363,21 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
     mock_marquez_client.mark_job_run_as_started.assert_called_once_with(
         run_id=run_id
     )
+
+    log.info("Marquez client calls when starting:")
+    for call in mock_marquez_client.mock_calls:
+        log.info(call)
+
+    assert [name for name, args, kwargs in mock_marquez_client.mock_calls] == [
+       'create_namespace',
+       'create_source',
+       'create_dataset',
+       'create_dataset',
+       'create_job',
+       'create_job_run',
+       'mark_job_run_as_started'
+    ]
+    mock_marquez_client.reset_mock()
 
     # --- Pretend complete the task
     task_will_complete.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
@@ -433,3 +452,15 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
             run_id=run_id
         )
     ])
+
+    log.info("Marquez client calls when completing:")
+    for call in mock_marquez_client.mock_calls:
+        log.info(call)
+
+    assert [name for name, args, kwargs in mock_marquez_client.mock_calls] == [
+       'create_dataset',  # we would expect only the output to be updated
+       'create_dataset',
+       'create_job',
+       'create_job',  # we would expect only one call to update the job
+       'mark_job_run_as_completed'
+    ]

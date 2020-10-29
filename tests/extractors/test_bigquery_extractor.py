@@ -102,9 +102,7 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
         assert steps_meta[0].outputs is not None
         assert len(steps_meta[0].outputs) == 1
         assert steps_meta[0].outputs[0].name == \
-            "bq-airflow-marquez" + \
-            "._caa03048f8548c01c38d7ce7ed96d73410a3b7be" + \
-            ".anon8adc631eed203758a0ce6505c735e5ceb49d6de7"
+            "bq-airflow-marquez.new_dataset.output_table"
 
         mock_client.return_value.close.assert_called()
 
