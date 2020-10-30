@@ -27,7 +27,7 @@ jobs:
           name: Install test dependencies
           environment:
             SLUGIFY_USES_TEXT_UNIDECODE: 'yes'
-          command: pip install --user -r test-requirements.txt
+          command: pip install --user -r test-requirements.txt --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-1.10.12/constraints-3.7.txt"
       - run:
           name: Setup Airflow DB
           command: airflow initdb
