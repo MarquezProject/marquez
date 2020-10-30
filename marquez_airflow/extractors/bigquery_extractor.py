@@ -12,6 +12,7 @@
 
 import json
 import logging
+import traceback
 
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from google.cloud import bigquery
@@ -49,27 +50,15 @@ class BigQueryExtractor(BaseExtractor):
             connection_url=_BIGQUERY_CONN_URL)
 
     def extract(self) -> [StepMetadata]:
-        source = self._source()
         sql_meta = SqlParser.parse(self.operator.sql)
         log.debug(f"bigquery sql parsed and obtained meta: {sql_meta}")
 
-        inputs = [
-            Dataset.from_table(
-                source, table
-            ) for table in sql_meta.in_tables
-        ]
-        outputs = [
-            Dataset.from_table(
-                source, table
-            ) for table in sql_meta.out_tables
-        ]
-
         return [StepMetadata(
             name=get_job_name(task=self.operator),
-            inputs=inputs,
-            outputs=outputs,
             context={
-                'sql': self.operator.sql
+                'sql': self.operator.sql,
+                'bigquery.sql.parsed.inputs': json.dumps(sql_meta.in_tables),
+                'bigquery.sql.parsed.outputs': json.dumps(sql_meta.out_tables)
             }
         )]
 
@@ -86,12 +75,19 @@ class BigQueryExtractor(BaseExtractor):
         source = self._source()
         bigquery_job_id = self._get_bigquery_job_id(task_instance)
 
+        inputs = None
+        outputs = None
+        context = {
+            'sql': self.operator.sql,
+            'bigquery.job_id': bigquery_job_id
+        }
         try:
             client = bigquery.Client()
             try:
                 job = client.get_job(job_id=bigquery_job_id)
                 job_properties = job._properties
                 job_properties_str = json.dumps(job_properties)
+                context['bigquery.job_properties'] = job_properties_str
                 bq_input_tables = job_properties.get('statistics')\
                     .get('query')\
                     .get('referencedTables')
@@ -110,22 +106,19 @@ class BigQueryExtractor(BaseExtractor):
                 outputs = [
                     Dataset.from_table(source, output_table_name)
                 ]
-                return [StepMetadata(
-                    name=get_job_name(task=self.operator),
-                    inputs=inputs,
-                    outputs=outputs,
-                    context={
-                        'sql': self.operator.sql,
-                        'bigquery.job_properties': job_properties_str
-                    }
-                )]
             finally:
                 client.close()
-
         except Exception as e:
             log.error(f"Cannot retrieve job details from BigQuery.Client. {e}",
                       exc_info=True)
-        return []
+            context['bigquery.extractor.error'] = \
+                f"{e}: {traceback.format_exc()}"
+        return [StepMetadata(
+                    name=get_job_name(task=self.operator),
+                    inputs=inputs,
+                    outputs=outputs,
+                    context=context
+                )]
 
     def _get_bigquery_job_id(self, task_instance):
         bigquery_job_id = task_instance.xcom_pull(

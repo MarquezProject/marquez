@@ -78,14 +78,14 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
 
         steps_meta = bq_extractor.extract()
 
-        assert steps_meta[0].inputs is not None
-        dataset = steps_meta[0].inputs[0]
-        assert 'customers' == dataset.name
-
         assert steps_meta[0].name == "TestBigQueryExtractorE2E.task_id"
+        assert steps_meta[0].inputs == []
         assert steps_meta[0].outputs == []
         assert steps_meta[0].context is not None
-        assert steps_meta[0].context["sql"] == task.sql
+        assert steps_meta[0].context['sql'] == task.sql
+        assert steps_meta[0].context['bigquery.sql.parsed.inputs'] \
+            == '["customers"]'
+        assert steps_meta[0].context['bigquery.sql.parsed.outputs'] == '[]'
 
         task_instance.run()
 
@@ -98,11 +98,76 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
         assert steps_meta[0].inputs is not None
         assert len(steps_meta[0].inputs) == 1
         assert steps_meta[0].inputs[0].name == \
-            "bigquery-public-data.usa_names.usa_1910_2013"
+            'bigquery-public-data.usa_names.usa_1910_2013'
         assert steps_meta[0].outputs is not None
         assert len(steps_meta[0].outputs) == 1
         assert steps_meta[0].outputs[0].name == \
-            "bq-airflow-marquez.new_dataset.output_table"
+            'bq-airflow-marquez.new_dataset.output_table'
+        assert steps_meta[0].context['sql'] == task.sql
+        assert steps_meta[0].context['bigquery.job_id'] == bq_job_id
+
+        mock_client.return_value.close.assert_called()
+
+    @mock.patch('airflow.contrib.operators.bigquery_operator.BigQueryHook')
+    @mock.patch('google.cloud.bigquery.Client')
+    def test_extract_error(self, mock_client, mock_hook):
+        log.info("test_extractor_error")
+
+        bq_job_id = "foo.bq.job_id"
+
+        mock_hook.return_value \
+            .get_conn.return_value \
+            .cursor.return_value \
+            .run_query.return_value = bq_job_id
+
+        mock_client.return_value \
+            .get_job.side_effects = [Exception("bq error")]
+
+        mock_client.return_value.close.return_value
+
+        mock.seal(mock_hook)
+        mock.seal(mock_client)
+
+        dag = DAG(dag_id='TestBigQueryExtractorE2E')
+        task = BigQueryOperator(
+            sql='select first_name, last_name from customers;',
+            task_id="task_id",
+            project_id="project_id",
+            dag_id="dag_id",
+            dag=dag,
+            start_date=timezone.datetime(2016, 2, 1, 0, 0, 0)
+        )
+
+        task_instance = TaskInstance(
+            task=task,
+            execution_date=datetime.utcnow().replace(tzinfo=pytz.utc))
+
+        bq_extractor = BigQueryExtractor(task)
+
+        steps_meta = bq_extractor.extract()
+
+        assert steps_meta[0].name == "TestBigQueryExtractorE2E.task_id"
+        assert steps_meta[0].inputs == []
+        assert steps_meta[0].outputs == []
+        assert steps_meta[0].context is not None
+        assert steps_meta[0].context["sql"] == task.sql
+        assert steps_meta[0].context["bigquery.sql.parsed.inputs"] \
+            == '["customers"]'
+        assert steps_meta[0].context["bigquery.sql.parsed.outputs"] == '[]'
+
+        task_instance.run()
+
+        steps_meta = bq_extractor.extract_on_complete(task_instance)
+        assert steps_meta[0].context['bigquery.extractor.error'] is not None
+        mock_client.return_value \
+            .get_job.assert_called_once_with(job_id=bq_job_id)
+
+        assert steps_meta[0].inputs is not None
+        assert len(steps_meta[0].inputs) == 0
+        assert steps_meta[0].outputs is not None
+        assert len(steps_meta[0].outputs) == 0
+
+        assert steps_meta[0].context['sql'] == task.sql
 
         mock_client.return_value.close.assert_called()
 
@@ -119,15 +184,15 @@ class TestBigQueryExtractor(unittest.TestCase):
 
         steps_meta = BigQueryExtractor(self.task).extract()
 
-        dataset = steps_meta[0].inputs[0]
-        assert 'customers' == dataset.name
-
         assert steps_meta[0].name == "TestBigQueryExtractorE2E.task_id"
         assert steps_meta[0].location is None
-        assert steps_meta[0].inputs is not None
+        assert steps_meta[0].inputs == []
         assert steps_meta[0].outputs == []
         assert steps_meta[0].context is not None
         assert steps_meta[0].context["sql"] == self.task.sql
+        assert steps_meta[0].context["bigquery.sql.parsed.inputs"] \
+            == '["customers"]'
+        assert steps_meta[0].context["bigquery.sql.parsed.outputs"] == '[]'
 
     @mock.patch("airflow.models.TaskInstance.xcom_pull")
     def test_get_bigquery_job_id(self, mock_xcom_pull):
