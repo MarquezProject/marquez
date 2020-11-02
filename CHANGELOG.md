@@ -1,10 +1,18 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.1...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.2...HEAD)
 
 ### Added
 
 * Add support for external ID on run creation [@julienledem](https://github.com/julienledem)
+
+## [0.11.2](https://github.com/MarquezProject/marquez/compare/0.11.1...0.11.2) - 2020-08-21
+
+### Changed
+
+* Always migrate db schema on app start in development config
+* Update default db username / password
+* Use [`marquez.dev.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.dev.yml) in on docker compose `up` 
 
 ## [0.11.1](https://github.com/MarquezProject/marquez/compare/0.11.0...0.11.1) - 2020-08-19
 
