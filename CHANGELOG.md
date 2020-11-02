@@ -1,10 +1,20 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.2...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.3...HEAD)
+
+## [0.11.3](https://github.com/MarquezProject/marquez/compare/0.11.2...0.11.3)
 
 ### Added
 
 * Add support for external ID on run creation [@julienledem](https://github.com/julienledem)
+* Throw `RunAlreadyExistsException` on run ID already exists
+* Add BigQuery, Pulsar, and Oracle source types [@sreev](https://github.com/sreev)
+* Add run ID support in job meta; the optional run ID will be used to link a newly created job version to an existing job run, while supporting updating the run state and avoiding having to create another run
+
+### Fixed
+
+* Use `postgres` instead of `db` in [`marquez.dev.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.dev.yml)
+* Allow multiple postgres containers [@phixMe](https://github.com/phixMe)
 
 ## [0.11.2](https://github.com/MarquezProject/marquez/compare/0.11.1...0.11.2) - 2020-08-21
 
