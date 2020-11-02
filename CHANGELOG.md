@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.3...HEAD)
 
-## [0.11.3](https://github.com/MarquezProject/marquez/compare/0.11.2...0.11.3)
+## [0.11.3](https://github.com/MarquezProject/marquez/compare/0.11.2...0.11.3) - 2020-11-02
 
 ### Added
 
@@ -14,7 +14,7 @@
 ### Fixed
 
 * Use `postgres` instead of `db` in [`marquez.dev.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.dev.yml)
-* Allow multiple postgres containers [@phixMe](https://github.com/phixMe)
+* Allow multiple postgres containers in test suite [@phixMe](https://github.com/phixMe)
 
 ## [0.11.2](https://github.com/MarquezProject/marquez/compare/0.11.1...0.11.2) - 2020-08-21
 
