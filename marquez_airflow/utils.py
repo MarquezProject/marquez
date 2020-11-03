@@ -13,6 +13,7 @@
 import logging
 import os
 import subprocess
+import json
 
 import airflow
 from airflow.models import Connection
@@ -34,15 +35,18 @@ class JobIdMapping:
         return cls._instance
 
     @staticmethod
-    def set(key, val):
-        airflow.models.Variable.set(key, val)
+    def set(job_name, run_id, val):
+        airflow.models.Variable.set(
+            JobIdMapping.make_key(job_name, run_id),
+            json.dumps(val))
 
     @staticmethod
-    def pop(key, session):
-        return JobIdMapping.get(key=key, session=session, delete=True)
+    def pop(job_name, run_id, session):
+        return JobIdMapping.get(job_name, run_id, session, delete=True)
 
     @staticmethod
-    def get(key, session, delete=False):
+    def get(job_name, run_id, session, delete=False):
+        key = JobIdMapping.make_key(job_name, run_id)
         if session:
             q = session.query(airflow.models.Variable).filter(
                 airflow.models.Variable.key == key)
@@ -52,7 +56,9 @@ class JobIdMapping:
                 val = q.first().val
                 if delete:
                     q.delete(synchronize_session=False)
-                return val
+                if val:
+                    return json.loads(val)
+                return None
 
     @staticmethod
     def make_key(job_name, run_id):
