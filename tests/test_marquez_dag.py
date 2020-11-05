@@ -429,9 +429,6 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
 
     # When a task run completes, the task outputs are also updated in order
     # to link a job version (=task version) to a dataset version.
-
-    # TODO: see what the correct contract is
-    # in the current state, both inputs and outputs are updated here
     mock_marquez_client.create_dataset.assert_has_calls([
         mock.call(
             dataset_name='extract_on_complete_input1',
@@ -440,7 +437,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
             source_name='dummy_source_name',
             namespace_name=DAG_NAMESPACE,
             fields=[],
-            run_id=run_id
+            run_id=None
         ),
         mock.call(
             dataset_name='extract_on_complete_output1',

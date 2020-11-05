@@ -154,7 +154,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                             ti, dagrun, kwargs)
                         self.log.info(f'marquez_run_id: {marquez_run_id}')
 
-                        self.register_datasets(step.inputs, marquez_run_id)
+                        self.register_datasets(step.inputs)
                         self.register_datasets(step.outputs, marquez_run_id)
                         inputs = self._to_dataset_ids(step.inputs)
                         outputs = self._to_dataset_ids(step.outputs)
