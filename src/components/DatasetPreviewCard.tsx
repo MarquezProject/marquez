@@ -24,15 +24,20 @@ const styles = (theme: Theme) => {
 }
 
 type IProps = IWithStyles<typeof styles> &
-  Pick<Dataset, 'name' | 'description' | 'updatedAt' | 'tags'>
-interface IState {}
+  Pick<Dataset, 'name' | 'description' | 'updatedAt' | 'tags'> & {
+    setSelectedNode: (payload: string) => void
+  }
 
-class DatasetPreviewCard extends React.Component<IProps, IState> {
+class DatasetPreviewCard extends React.Component<IProps> {
   render(): ReactElement {
-    const { classes, name, description, updatedAt } = this.props
+    const { classes, name, description, updatedAt, setSelectedNode } = this.props
     const { link } = classes
     return (
-      <Link className={link} to={{ pathname: `/datasets/${name}` }}>
+      <Link
+        className={link}
+        to={{ pathname: `/datasets/${name}` }}
+        onClick={() => setSelectedNode(name)}
+      >
         <Box p={2}>
           <Box display='flex' justifyContent='space-between' alignItems={'center'} mb={1}>
             <MqText subheading font={'mono'}>

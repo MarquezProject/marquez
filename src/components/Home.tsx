@@ -1,4 +1,5 @@
 import * as RRD from 'react-router-dom'
+import * as Redux from 'redux'
 import { Box } from '@material-ui/core'
 import { IDatasetsState } from '../reducers/datasets'
 import { IJobsState } from '../reducers/jobs'
@@ -10,7 +11,9 @@ import {
   withStyles
 } from '@material-ui/core/styles'
 import { Pagination } from '@material-ui/lab'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { setSelectedNode } from '../actionCreators'
 import DatasetPreviewCard from './DatasetPreviewCard'
 import FiltersWrapper from './filters/FiltersWrapper'
 import JobPreviewCard from './JobPreviewCard'
@@ -47,8 +50,8 @@ interface IProps {
   jobs: IJobsState
   showJobs: boolean
   setShowJobs: (bool: boolean) => void
+  setSelectedNode: (payload: string) => void
 }
-
 type IAllProps = RRD.RouteComponentProps & IWithStyles<typeof styles> & IProps
 
 const Home: FunctionComponent<IAllProps> = props => {
@@ -57,7 +60,7 @@ const Home: FunctionComponent<IAllProps> = props => {
 
   const limit = 5
 
-  const { datasets, jobs, classes, showJobs, setShowJobs } = props
+  const { datasets, jobs, classes, showJobs, setShowJobs, setSelectedNode } = props
 
   const matchingDatasets = datasets.filter(d => d.matches)
   const matchingJobs = jobs.filter(j => j.matches)
@@ -89,6 +92,7 @@ const Home: FunctionComponent<IAllProps> = props => {
               description={d.description}
               updatedAt={d.createdAt}
               tags={d.tags}
+              setSelectedNode={setSelectedNode}
             />
           ))}
           {matchingDatasets.length > 0 && (
@@ -120,6 +124,7 @@ const Home: FunctionComponent<IAllProps> = props => {
                 description={d.description}
                 updatedAt={d.createdAt}
                 latestRun={d.latestRun}
+                setSelectedNode={setSelectedNode}
               />
             ))}
             {matchingJobs.length > 0 && (
@@ -144,11 +149,15 @@ const mapStateToProps = (state: IState) => ({
   jobs: state.jobs
 })
 
-interface IInjectedProps {
-  showJobs: boolean
-  setShowJobs: (bool: boolean) => void
-}
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators(
+    {
+      setSelectedNode: setSelectedNode
+    },
+    dispatch
+  )
 
-type IStateProps = ReturnType<typeof mapStateToProps>
-
-export default connect<IStateProps, IInjectedProps>(mapStateToProps)(withStyles(styles)(Home))
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(Home))

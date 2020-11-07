@@ -127,23 +127,27 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     >
       <Box>
         <Box mb={1}>
-          <Tooltip title={latestRun ? latestRun.state : ''} placement='top'>
-            {latestRun && (
-              <div
-                className={`${_status}`}
-                style={{ backgroundColor: colorMap[latestRun.state] }}
-              />
-            )}
-          </Tooltip>
+          {latestRun && (
+            <Tooltip title={latestRun.state} placement='top'>
+              {latestRun && (
+                <div
+                  className={`${_status}`}
+                  style={{ backgroundColor: colorMap[latestRun.state] }}
+                />
+              )}
+            </Tooltip>
+          )}
         </Box>
         <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
           <MqText font={'mono'} heading>
             {namespace} / {name}
           </MqText>
-          <Box>
-            <Button variant='outlined' color='primary' target={'_blank'} href={location}>
-              Location
-            </Button>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box mr={1}>
+              <Button variant='outlined' color='primary' target={'_blank'} href={location}>
+                Location
+              </Button>
+            </Box>
             <IconButton onClick={() => history.push('/')}>
               <CloseIcon />
             </IconButton>

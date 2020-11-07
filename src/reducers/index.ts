@@ -5,6 +5,7 @@ import { connectRouter } from 'connected-react-router'
 import datasets, { IDatasetsState } from './datasets'
 import display, { IDisplayState } from './display'
 import jobs, { IJobsState } from './jobs'
+import lineage, { ILineageState } from './lineage'
 import namespaces, { INamespacesState } from './namespaces'
 
 export interface IState {
@@ -13,6 +14,7 @@ export interface IState {
   namespaces: INamespacesState
   display: IDisplayState
   router: any
+  lineage: ILineageState
 }
 
 export default (history: History): Reducer =>
@@ -21,7 +23,8 @@ export default (history: History): Reducer =>
     datasets,
     jobs,
     namespaces,
-    display
+    display,
+    lineage
   })
 
 // temp fix for: https://github.com/Microsoft/TypeScript/issues/7294#issuecomment-465794460

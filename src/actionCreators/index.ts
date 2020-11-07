@@ -76,3 +76,13 @@ export const dialogToggle = (field: string) => ({
     field
   }
 })
+
+export const setSelectedNode = (node: string) => ({
+  type: actionTypes.SET_SELECTED_NODE,
+  payload: node
+})
+
+export const setBottomBarHeight = (height: number) => ({
+  type: actionTypes.SET_BOTTOM_BAR_HEIGHT,
+  payload: height
+})

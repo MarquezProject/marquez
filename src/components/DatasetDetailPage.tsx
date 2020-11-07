@@ -1,3 +1,6 @@
+import React, { FunctionComponent } from 'react'
+
+import * as Redux from 'redux'
 import {
   Box,
   Paper,
@@ -8,27 +11,23 @@ import {
   TableRow,
   Tooltip
 } from '@material-ui/core'
+import { Dataset } from '../types/api'
+import { IState } from '../reducers'
 import {
   Theme as ITheme,
   WithStyles as IWithStyles,
   createStyles,
   withStyles
 } from '@material-ui/core/styles'
-import React, { FunctionComponent } from 'react'
-
-import InfoIcon from '@material-ui/icons/Info'
-
-import { formatUpdatedAt } from '../helpers'
-
-import { useParams } from 'react-router-dom'
-import _find from 'lodash/find'
-
-import * as Redux from 'redux'
-import { Dataset } from '../types/api'
-import { IState } from '../reducers'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { formatUpdatedAt } from '../helpers'
+import { useHistory, useParams } from 'react-router-dom'
+import CloseIcon from '@material-ui/icons/Close'
+import IconButton from '@material-ui/core/IconButton'
+import InfoIcon from '@material-ui/icons/Info'
 import MqText from './core/text/MqText'
+import _find from 'lodash/find'
 
 const styles = ({ spacing }: ITheme) => {
   return createStyles({
@@ -71,6 +70,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { datasets, classes } = props
   const { root, paper, infoIcon, tableCell, tableRow } = classes
   const { datasetName } = useParams()
+  const history = useHistory()
   const dataset = _find(datasets, d => d.name === datasetName)
   if (!dataset) {
     return (
@@ -85,13 +85,16 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
 
     return (
       <Box mt={2} className={root}>
-        <Box display='flex' justifyContent='space-between'>
-          <div>
+        <Box>
+          <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
             <MqText heading font={'mono'}>
               {name}
             </MqText>
-            <MqText subdued>{description}</MqText>
-          </div>
+            <IconButton onClick={() => history.push('/')}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <MqText subdued>{description}</MqText>
         </Box>
         {fields && fields.length > 0 ? (
           <Paper className={paper}>
