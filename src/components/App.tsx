@@ -31,7 +31,7 @@ const store = createStore(
 
 sagaMiddleware.run(rootSaga)
 
-const TITLE = 'Marquez | Data Kit'
+const TITLE = 'Marquez'
 
 const App = (): ReactElement => {
   const [showJobs, setShowJobs] = useState(false)
