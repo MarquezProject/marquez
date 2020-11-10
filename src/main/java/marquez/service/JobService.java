@@ -279,7 +279,7 @@ public class JobService {
                 new DatasetVersionId(
                     namespaceName, DatasetName.of(inputDataset.getName()), row.getUuid())));
       } else {
-        log.warn(
+        log.error(
             "Input dataset version could not be found during run input update. Input Dataset ID: {}",
             inputDataset.getUuid());
       }
