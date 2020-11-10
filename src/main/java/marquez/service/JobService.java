@@ -26,15 +26,18 @@ import com.google.common.collect.ImmutableSet;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.exceptions.RunNotFoundException;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -54,6 +57,7 @@ import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.ExtendedRunRow;
@@ -196,8 +200,12 @@ public class JobService {
         }
         final JobRow jobRow = jobDao.find(namespaceName.getValue(), jobName.getValue()).get();
         final JobContextRow contextRow = jobContextDao.findBy(checksum).get();
-        final List<UUID> inputUuids = findUuids(jobMeta.getInputs());
-        final List<UUID> outputUuids = findUuids(jobMeta.getOutputs());
+        final List<DatasetRow> inputRows = findDatasetRows(jobMeta.getInputs());
+        final List<UUID> inputUuids =
+            inputRows.stream().map(DatasetRow::getUuid).collect(Collectors.toList());
+        final List<DatasetRow> outputRows = findDatasetRows(jobMeta.getOutputs());
+        final List<UUID> outputUuids =
+            outputRows.stream().map(DatasetRow::getUuid).collect(Collectors.toList());
         final JobVersionRow newJobVersionRow =
             Mapper.toJobVersionRow(
                 jobRow.getUuid(),
@@ -210,6 +218,14 @@ public class JobService {
         versions
             .labels(namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue())
             .inc();
+
+        jobMeta
+            .getRunId()
+            .ifPresent(
+                runId ->
+                    updateRunInputDatasets(
+                        runId.getValue(), inputRows, namespaceName, jobName, newJobVersionRow));
+
         log.info(
             "Successfully created version '{}' for job '{}'.",
             jobVersion.getValue(),
@@ -242,13 +258,56 @@ public class JobService {
     }
   }
 
+  private void updateRunInputDatasets(
+      UUID runUuid,
+      List<DatasetRow> inputRows,
+      NamespaceName namespaceName,
+      JobName jobName,
+      JobVersionRow jobVersion) {
+    if (inputRows.isEmpty()) {
+      return;
+    }
+    List<RunInput> runInputs = new ArrayList<>();
+    for (DatasetRow inputDataset : inputRows) {
+      Optional<DatasetVersionRow> version =
+          datasetVersionDao.findLatestDatasetByUuid(inputDataset.getUuid());
+      if (version.isPresent()) {
+        DatasetVersionRow row = version.get();
+        runDao.updateInputVersions(runUuid, version.get().getUuid());
+        runInputs.add(
+            new RunInput(
+                new DatasetVersionId(
+                    namespaceName, DatasetName.of(inputDataset.getName()), row.getUuid())));
+      } else {
+        log.warn(
+            "Input dataset version could not be found during run input update. Input Dataset ID: {}",
+            inputDataset.getUuid());
+      }
+    }
+    Optional<ExtendedRunRow> runRow = runDao.findBy(runUuid);
+    if (runRow.isEmpty()) {
+      throw new RunNotFoundException(RunId.of(runUuid));
+    }
+    ExtendedRunRow run = runRow.get();
+    notify(
+        new JobInputUpdate(
+            RunId.of(runUuid),
+            new RunMeta(
+                RunId.of(runUuid),
+                run.getNominalStartTime().orElse(null),
+                run.getNominalEndTime().orElse(null),
+                Mapper.toRunArgs(run.getArgs())),
+            new JobVersionId(namespaceName, jobName, jobVersion.getUuid()),
+            runInputs));
+  }
+
   /**
    * find the uuids for the datsets based on their namespace/name
    *
    * @param datasetIds the namespace/name ids of the datasets
    * @return their uuids
    */
-  private List<UUID> findUuids(ImmutableSet<DatasetId> datasetIds) {
+  private List<DatasetRow> findDatasetRows(ImmutableSet<DatasetId> datasetIds) {
     // group per namespace since that's how we can query the db
     Map<@NonNull NamespaceName, List<DatasetId>> byNamespace =
         datasetIds.stream().collect(groupingBy(DatasetId::getNamespace));
@@ -270,7 +329,7 @@ public class JobService {
                         "Some datasets not found in namespace %s \nExpected: %s\nActual: %s",
                         namespace, names, actual));
               }
-              return results.stream().map(DatasetRow::getUuid);
+              return results.stream();
             })
         .collect(toImmutableList());
   }

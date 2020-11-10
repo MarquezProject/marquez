@@ -90,7 +90,7 @@ public interface RunDao extends SqlObject {
 
   @SqlUpdate(
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
-          + "VALUES (:runUuid, :datasetVersionUuid)")
+          + "VALUES (:runUuid, :datasetVersionUuid) ON CONFLICT DO NOTHING")
   void updateInputVersions(UUID runUuid, UUID datasetVersionUuid);
 
   @SqlUpdate(

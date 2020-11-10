@@ -74,11 +74,11 @@ public interface DatasetVersionDao {
   void updateFields(UUID datasetVersionUuid, UUID datasetFieldUuid);
 
   String SELECT =
-      "SELECT *, "
+      "SELECT dv.*, "
           + "ARRAY(SELECT dataset_field_uuid "
           + "      FROM dataset_versions_field_mapping "
-          + "      WHERE dataset_version_uuid = uuid) AS field_uuids "
-          + "FROM dataset_versions ";
+          + "      WHERE dataset_version_uuid = dv.uuid) AS field_uuids "
+          + "FROM dataset_versions dv ";
 
   String EXTENDED_SELECT =
       "SELECT dv.*, d.name as dataset_name, n.name as namespace_name, "
@@ -91,6 +91,12 @@ public interface DatasetVersionDao {
 
   @SqlQuery(SELECT + "WHERE uuid = :uuid")
   Optional<DatasetVersionRow> findBy(UUID uuid);
+
+  @SqlQuery(
+      SELECT
+          + "INNER JOIN datasets AS d ON d.uuid = dv.dataset_uuid AND d.current_version_uuid = dv.uuid "
+          + "WHERE dv.dataset_uuid = :datasetUuid")
+  Optional<DatasetVersionRow> findLatestDatasetByUuid(UUID datasetUuid);
 
   default Optional<DatasetVersionRow> find(String typeString, @Nullable UUID uuid) {
     if (uuid == null) {

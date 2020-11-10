@@ -462,6 +462,97 @@ public class MarquezAppIntegrationTest {
   }
 
   @Test
+  public void testApp_testLazyInputDataset() {
+    String jobName = newJobName().getValue();
+
+    // Create namespace for job
+    final NamespaceMeta namespaceMeta =
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
+
+    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+
+    // Create source for input / output db tables
+    final SourceMeta sourceMeta =
+        SourceMeta.builder()
+            .type(STREAM_SOURCE_TYPE)
+            .connectionUrl(STREAM_CONNECTION_URL)
+            .description(STREAM_SOURCE_DESCRIPTION)
+            .build();
+
+    client.createSource(STREAM_SOURCE_NAME, sourceMeta);
+
+    // Create job
+    final JobMeta jobMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+
+    final Job job = client.createJob(NAMESPACE_NAME, jobName, jobMeta);
+
+    // Create a run
+    final RunMeta runMeta = RunMeta.builder().build();
+    final Run run = client.createRun(NAMESPACE_NAME, jobName, runMeta);
+    assertThat(run.getId()).isNotNull();
+    assertThat(run.getCreatedAt()).isAfter(EPOCH);
+    assertThat(run.getUpdatedAt()).isAfter(EPOCH);
+    assertThat(run.getNominalStartTime()).isEmpty();
+    assertThat(run.getNominalEndTime()).isEmpty();
+    assertThat(run.getState()).isEqualTo(RunState.NEW);
+    assertThat(run.getStartedAt()).isEmpty();
+    assertThat(run.getEndedAt()).isEmpty();
+    assertThat(run.getDurationMs()).isEmpty();
+    assertThat(run.getArgs()).isEmpty();
+
+    // Create datasets
+    final ImmutableSet<DatasetId> inputs = newDatasetIdsWith(NAMESPACE_NAME, 2);
+    for (final DatasetId input : inputs) {
+      final DbTableMeta dbTableMeta =
+          DbTableMeta.builder()
+              .physicalName(input.getName())
+              .sourceName(STREAM_SOURCE_NAME)
+              .description(newDescription())
+              .build();
+
+      client.createDataset(input.getNamespace(), input.getName(), dbTableMeta);
+    }
+
+    final ImmutableSet<DatasetId> outputs = newDatasetIdsWith(NAMESPACE_NAME, 2);
+    for (final DatasetId output : outputs) {
+      final DbTableMeta dbTableMeta =
+          DbTableMeta.builder()
+              .physicalName(output.getName())
+              .sourceName(STREAM_SOURCE_NAME)
+              .runId(run.getId()) // with run ID in output dataset
+              .description(newDescription())
+              .build();
+
+      client.createDataset(output.getNamespace(), output.getName(), dbTableMeta);
+    }
+
+    // Update job
+    final JobMeta jobUpdateMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(inputs)
+            .outputs(outputs)
+            .runId(runMeta.getId())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+    client.createJob(NAMESPACE_NAME, jobName, jobUpdateMeta);
+
+    // Assure datasets are associated
+    Job finalJob = client.getJob(NAMESPACE_NAME, jobName);
+    assertThat(finalJob.getInputs()).hasSize(2);
+  }
+
+  @Test
   public void testApp_listTags() {
     final Set<Tag> tags = client.listTags();
     assertThat(tags).containsExactlyInAnyOrder(PII, SENSITIVE);

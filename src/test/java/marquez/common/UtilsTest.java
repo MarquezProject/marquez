@@ -55,7 +55,7 @@ public class UtilsTest {
 
   @Test
   public void testFromJson_throwsOnNull() {
-    assertThatNullPointerException().isThrownBy(() -> Utils.fromJson(JSON, null));
+    assertThatNullPointerException().isThrownBy(() -> Utils.fromJson(JSON, (TypeReference) null));
     assertThatNullPointerException().isThrownBy(() -> Utils.fromJson(null, TYPE));
   }
 
