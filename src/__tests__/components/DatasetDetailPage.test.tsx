@@ -18,7 +18,7 @@ jest.mock('react-router-dom', () => ({
 
 import { useParams } from 'react-router-dom'
 
-describe('DatasetDetailPage Component', () => {
+test.skip('DatasetDetailPage Component', () => {
 
   describe('when there is no match for the datasetName in url params', () => {
     useParams.mockImplementation(() => ({

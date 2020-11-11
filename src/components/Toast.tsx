@@ -6,11 +6,11 @@ import { connect } from 'react-redux'
 const styles = require('./Toast.css')
 
 interface IProps {
-  error: string
-  success: string
+  error?: string
+  success?: string
 }
 
-const Toast = (props: IProps) =>
+export const Toast = (props: IProps) =>
   props.error || props.success ? (
     <div
       className={`${styles.container} ${

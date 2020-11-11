@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
-import Toast from '../../components/Toast'
+import {Toast} from '../../components/Toast'
 
 describe('MainContainer Component', () => {
   it('does not render when there is no error', () => {

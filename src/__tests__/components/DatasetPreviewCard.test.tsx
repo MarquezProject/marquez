@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { formatUpdatedAt } from '../../helpers'
 import { mount } from 'enzyme'
 import DatasetPreviewCard from '../../components/DatasetPreviewCard'
-import Typography from '@material-ui/core/Typography'
+import MqText from '../../components/core/text/MqText'
 
 const datasets = require('../../../docker/db/data/datasets.json')
 const dataset = datasets[0]
@@ -22,18 +22,14 @@ describe('DatasetPreviewCard Component', () => {
     expect(componentText).toContain(dataset.name)
   })
   it('should render the description', () => {
-    expect(componentText).toContain(dataset.description)
+    expect(componentText).toContain("There is no description available for this dataset")
   })
   it('should render the time', () => {
     expect(
       wrapper
-        .find(Typography)
-        .last()
+        .find(MqText)
+        .at(1)
         .text()
     ).toContain(formatUpdatedAt(dataset.updatedAt))
-  })
-  // wrapping in Router produces a new key each time, which makes the snapshots not match
-  test.skip('renders a snapshot that matches previous', () => {
-    expect(wrapper).toMatchSnapshot()
   })
 })
