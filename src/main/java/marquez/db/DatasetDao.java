@@ -35,30 +35,32 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 public interface DatasetDao extends SqlObject {
   @Transaction
   default void insert(DatasetRow row) {
-    getHandle()
-        .createUpdate(
-            "INSERT INTO datasets ("
-                + "uuid, "
-                + "type, "
-                + "created_at, "
-                + "updated_at, "
-                + "namespace_uuid, "
-                + "source_uuid, "
-                + "name, "
-                + "physical_name, "
-                + "description"
-                + ") VALUES ("
-                + ":uuid, "
-                + ":type, "
-                + ":createdAt, "
-                + ":updatedAt, "
-                + ":namespaceUuid, "
-                + ":sourceUuid, "
-                + ":name, "
-                + ":physicalName, "
-                + ":description)")
-        .bindBean(row)
-        .execute();
+    withHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    "INSERT INTO datasets ("
+                        + "uuid, "
+                        + "type, "
+                        + "created_at, "
+                        + "updated_at, "
+                        + "namespace_uuid, "
+                        + "source_uuid, "
+                        + "name, "
+                        + "physical_name, "
+                        + "description"
+                        + ") VALUES ("
+                        + ":uuid, "
+                        + ":type, "
+                        + ":createdAt, "
+                        + ":updatedAt, "
+                        + ":namespaceUuid, "
+                        + ":sourceUuid, "
+                        + ":name, "
+                        + ":physicalName, "
+                        + ":description)")
+                .bindBean(row)
+                .execute());
     // Tags
     final Instant taggedAt = row.getCreatedAt();
     row.getTagUuids().forEach(tagUuid -> updateTags(row.getUuid(), tagUuid, taggedAt));

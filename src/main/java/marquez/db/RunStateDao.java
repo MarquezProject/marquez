@@ -41,12 +41,14 @@ public interface RunStateDao extends SqlObject {
       boolean starting,
       boolean done,
       boolean complete) {
-    getHandle()
-        .createUpdate(
-            "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
-                + "VALUES (:uuid, :transitionedAt, :runUuid, :state)")
-        .bindBean(row)
-        .execute();
+    withHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
+                        + "VALUES (:uuid, :transitionedAt, :runUuid, :state)")
+                .bindBean(row)
+                .execute());
     // State transition
     final Instant updateAt = row.getTransitionedAt();
     createRunDao().updateRunState(row.getRunUuid(), updateAt, row.getState());
