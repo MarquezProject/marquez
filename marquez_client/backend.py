@@ -13,7 +13,9 @@
 
 class Backend:
     def put(self, path, headers, payload):
-        pass
+        raise NotImplementedError(
+            'put function not implemented in the subclass')
 
     def post(self, path, headers, payload=None):
-        pass
+        raise NotImplementedError(
+            'post function not implemented in the subclass')
