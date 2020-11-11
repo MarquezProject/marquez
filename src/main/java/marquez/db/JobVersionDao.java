@@ -41,28 +41,30 @@ public interface JobVersionDao extends SqlObject {
 
   @Transaction
   default void insert(@NonNull JobVersionRow row) {
-    getHandle()
-        .createUpdate(
-            "INSERT INTO job_versions ("
-                + "uuid, "
-                + "created_at, "
-                + "updated_at, "
-                + "job_uuid, "
-                + "version, "
-                + "location, "
-                + "latest_run_uuid, "
-                + "job_context_uuid"
-                + ") VALUES ("
-                + ":uuid, "
-                + ":createdAt, "
-                + ":updateAt, "
-                + ":jobUuid, "
-                + ":version, "
-                + ":location, "
-                + ":latestRunUuid, "
-                + ":jobContextUuid)")
-        .bindBean(row)
-        .execute();
+    withHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    "INSERT INTO job_versions ("
+                        + "uuid, "
+                        + "created_at, "
+                        + "updated_at, "
+                        + "job_uuid, "
+                        + "version, "
+                        + "location, "
+                        + "latest_run_uuid, "
+                        + "job_context_uuid"
+                        + ") VALUES ("
+                        + ":uuid, "
+                        + ":createdAt, "
+                        + ":updateAt, "
+                        + ":jobUuid, "
+                        + ":version, "
+                        + ":location, "
+                        + ":latestRunUuid, "
+                        + ":jobContextUuid)")
+                .bindBean(row)
+                .execute());
     // I/O
     row.getInputUuids().forEach(inputUuid -> updateInputs(row.getUuid(), inputUuid));
     row.getOutputUuids().forEach(outputUuid -> updateOutputs(row.getUuid(), outputUuid));
