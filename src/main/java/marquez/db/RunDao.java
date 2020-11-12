@@ -42,26 +42,28 @@ public interface RunDao extends SqlObject {
 
   @Transaction
   default void insert(RunRow row) {
-    getHandle()
-        .createUpdate(
-            "INSERT INTO runs ("
-                + "uuid, "
-                + "created_at, "
-                + "updated_at, "
-                + "job_version_uuid, "
-                + "run_args_uuid, "
-                + "nominal_start_time, "
-                + "nominal_end_time"
-                + ") VALUES ("
-                + ":uuid, "
-                + ":createdAt, "
-                + ":updatedAt, "
-                + ":jobVersionUuid, "
-                + ":runArgsUuid, "
-                + ":nominalStartTime, "
-                + ":nominalEndTime)")
-        .bindBean(row)
-        .execute();
+    withHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    "INSERT INTO runs ("
+                        + "uuid, "
+                        + "created_at, "
+                        + "updated_at, "
+                        + "job_version_uuid, "
+                        + "run_args_uuid, "
+                        + "nominal_start_time, "
+                        + "nominal_end_time"
+                        + ") VALUES ("
+                        + ":uuid, "
+                        + ":createdAt, "
+                        + ":updatedAt, "
+                        + ":jobVersionUuid, "
+                        + ":runArgsUuid, "
+                        + ":nominalStartTime, "
+                        + ":nominalEndTime)")
+                .bindBean(row)
+                .execute());
     // Input versions
     row.getInputVersionUuids()
         .forEach(inputVersionUuid -> updateInputVersions(row.getUuid(), inputVersionUuid));
@@ -72,16 +74,18 @@ public interface RunDao extends SqlObject {
 
   @Transaction
   default void updateJobVersionUuid(UUID rowUuid, Instant updatedAt, UUID jobVersionUuid) {
-    getHandle()
-        .createUpdate(
-            "UPDATE runs "
-                + "SET updated_at = :updatedAt, "
-                + "    job_version_uuid = :jobVersionUuid "
-                + "WHERE uuid = :rowUuid")
-        .bind("updatedAt", updatedAt)
-        .bind("jobVersionUuid", jobVersionUuid)
-        .bind("rowUuid", rowUuid)
-        .execute();
+    withHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    "UPDATE runs "
+                        + "SET updated_at = :updatedAt, "
+                        + "    job_version_uuid = :jobVersionUuid "
+                        + "WHERE uuid = :rowUuid")
+                .bind("updatedAt", updatedAt)
+                .bind("jobVersionUuid", jobVersionUuid)
+                .bind("rowUuid", rowUuid)
+                .execute());
     createJobVersionDao().updateLatestRun(jobVersionUuid, updatedAt, rowUuid);
   }
 

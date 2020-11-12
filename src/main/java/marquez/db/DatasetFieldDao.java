@@ -38,26 +38,28 @@ public interface DatasetFieldDao extends SqlObject {
 
   @Transaction
   default void insert(DatasetFieldRow row) {
-    getHandle()
-        .createUpdate(
-            "INSERT INTO dataset_fields ("
-                + "uuid, "
-                + "type, "
-                + "created_at, "
-                + "updated_at, "
-                + "dataset_uuid, "
-                + "name, "
-                + "description"
-                + ") VALUES ("
-                + ":uuid, "
-                + ":type, "
-                + ":createdAt, "
-                + ":updatedAt, "
-                + ":datasetUuid, "
-                + ":name, "
-                + ":description)")
-        .bindBean(row)
-        .execute();
+    withHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    "INSERT INTO dataset_fields ("
+                        + "uuid, "
+                        + "type, "
+                        + "created_at, "
+                        + "updated_at, "
+                        + "dataset_uuid, "
+                        + "name, "
+                        + "description"
+                        + ") VALUES ("
+                        + ":uuid, "
+                        + ":type, "
+                        + ":createdAt, "
+                        + ":updatedAt, "
+                        + ":datasetUuid, "
+                        + ":name, "
+                        + ":description)")
+                .bindBean(row)
+                .execute());
     // Tags
     final Instant taggedAt = row.getCreatedAt();
     row.getTagUuids().forEach(tagUuid -> updateTags(row.getUuid(), tagUuid, taggedAt));
