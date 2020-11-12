@@ -1,0 +1,170 @@
+[
+  {
+    "type": "BATCH",
+    "name": "etl_menus",
+    "inputs": [],
+    "outputs": [{"namespace": "food_delivery", "name": "public.menus"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/etl_menus.py",
+    "namespace": "food_delivery",
+    "description": "Loads newly added restaurant menus daily.",
+    "context": {
+      "sql": "INSERT INTO menus (id, name, restaurant_id, description)\n  SELECT id, name, restaurant_id, description\n    FROM tmp_menus;"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "etl_categories",
+    "inputs": [],
+    "outputs": [{"namespace": "food_delivery", "name": "public.categories"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/etl_categories.py",
+    "namespace": "food_delivery",
+    "description": "Loads newly added menus categories daily.",
+    "context": {
+      "sql": "INSERT INTO categories (id, name, menu_id, description)\n  SELECT id, name, menu_id, description\n    FROM tmp_categories;"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "etl_menu_items",
+    "inputs": [],
+    "outputs": [{"namespace": "food_delivery", "name": "public.menu_items"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/etl_menu_items.py",
+    "namespace": "food_delivery",
+    "description": "Loads newly added restaurant menu items daily.",
+    "context": {
+      "sql": "INSERT INTO menu_items (id, name, price, category_id, description)\n  SELECT id, name, price, category_id, description\n    FROM tmp_menu_items;"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "etl_orders",
+    "inputs": [],
+    "outputs": [{"namespace": "food_delivery", "name": "public.orders"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/etl_orders.py",
+    "namespace": "food_delivery",
+    "description": "Loads newly placed orders daily.",
+    "context": {
+      "sql": "INSERT INTO orders (id, placed_on, menu_item_id, quantity, discount_id, comment)\n  SELECT id, placed_on, menu_item_id, quantity, discount_id, comment\n    FROM tmp_orders;"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "etl_orders_7_days",
+    "inputs": [
+      {"namespace": "food_delivery", "name": "public.menus"},
+      {"namespace": "food_delivery", "name": "public.orders"}
+    ],
+    "outputs": [{"namespace": "food_delivery", "name": "public.orders_7_days"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/etl_orders_7_days.py",
+    "namespace": "food_delivery",
+    "description": "Loads newly placed orders weekly.",
+    "context": {
+      "sql": "INSERT INTO orders_7_days (order_id, placed_on, discount_id, menu_id, restaurant_id, menu_item_id, category_id)\n  SELECT o.id AS order_id, o.placed_on, o.discount_id, m.id AS menu_id, m.restaurant_id, mi.id AS menu_item_id, c.id AS category_id\n    FROM orders AS o\n   INNER JOIN menu_items AS mi\n      ON menu_items.id = o.menu_item_id\n   INNER JOIN categories AS c\n      ON c.id = mi.category_id\n   INNER JOIN menu AS m\n      ON m.id = c.menu_id\n   WHERE o.placed_on >= NOW() - interval '7 days'"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "etl_customers",
+    "inputs": [],
+    "outputs": [{"namespace": "food_delivery", "name": "public.customers"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/etl_customers.py",
+    "namespace": "food_delivery",
+    "description": "Loads newly registered customers daily.",
+    "context": {
+      "sql": "INSERT INTO customers (id, created_at, updated_at, name, email, phone, city_id)\n  SELECT id, created_at, updated_at, name, email, phone, city_id\n    FROM tmp_customers;"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "etl_order_status",
+    "inputs": [],
+    "outputs": [{"namespace": "food_delivery", "name": "public.order_status"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/etl_order_status.py",
+    "namespace": "food_delivery",
+    "description": "Loads order statues updates daily.",
+    "context": {
+      "sql": "INSERT INTO order_status (id, transitioned_at, status, order_id, customer_id, restaurant_id, driver_id)\n  SELECT id, transitioned_at, status, order_id, customer_id, restaurant_id, driver_id\n    FROM tmp_order_status;"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "etl_drivers",
+    "inputs": [],
+    "outputs": [{"namespace": "food_delivery", "name": "public.drivers"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/etl_drivers.py",
+    "namespace": "food_delivery",
+    "description": "Loads newly registered drivers daily.",
+    "context": {
+      "sql": "INSERT INTO drivers (id, created_at, updated_at, name, email, phone, car_make, car_model, car_year, car_color, car_license_plate)\n  SELECT id, created_at, updated_at, name, email, phone, car_make, car_model, car_year, car_color, car_license_plate\n    FROM tmp_drivers;"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "etl_restaurants",
+    "inputs": [],
+    "outputs": [{"namespace": "food_delivery", "name": "public.restaurants"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/etl_restaurants.py",
+    "namespace": "food_delivery",
+    "description": "Loads newly registered restaurants daily.",
+    "context": {
+      "sql": "INSERT INTO restaurants (id, created_at, updated_at, name, email, address, phone, city_id, business_hours_id, description)\n  SELECT id, created_at, updated_at, name, email, address, phone, city_id, business_hours_id, description\n    FROM tmp_restaurants;"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "etl_delivery_7_days",
+    "inputs": [
+      {"namespace": "food_delivery", "name": "public.orders_7_days"},
+      {"namespace": "food_delivery", "name": "public.customers"},
+      {"namespace": "food_delivery", "name": "public.order_status"},
+      {"namespace": "food_delivery", "name": "public.drivers"},
+      {"namespace": "food_delivery", "name": "public.restaurants"}
+    ],
+    "outputs": [{"namespace": "food_delivery", "name": "public.delivery_7_days"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/4d0b5d374261fdaf60a1fc588dd8f0d124b0e87f/examples/airflow/dags/etl_delivery_7_days.py",
+    "namespace": "food_delivery",
+    "description": "Loads new deliveries for the week.",
+    "context": {
+      "sql": "INSERT INTO delivery (order_id, order_placed_on, order_dispatched_on, order_delivered_on, customer_email,\n      customer_address, discount_id, menu_id, restaurant_id, restaurant_address, menu_item_id, category_id, driver_id)\n  SELECT o.order_id, o.placed_on AS order_placed_on,\n    (SELECT transitioned_at FROM order_status WHERE order_id == o.order_id AND status = 'DISPATCHED') AS order_dispatched_on,\n    (SELECT transitioned_at FROM order_status WHERE order_id == o.order_id AND status = 'DELIVERED') AS order_delivered_on,\n    c.email AS customer_email, c.address AS customer_address, o.discount_id, o.menu_id, o.restaurant_id,\n      r.address, o.menu_item_id, o.category_id, d.id AS driver_id\n    FROM orders_7_days AS o\n   INNER JOIN order_status AS os\n      ON os.order_id = o.order_id\n   INNER JOIN customers AS c\n      ON c.id = os.customer_id\n   INNER JOIN restaurants AS r\n      ON r.id = os.restaurant_id\n   INNER JOIN drivers AS d\n      ON d.id = os.driver_id\n   WHERE os.transitioned_at >= NOW() - interval '7 days'"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "delivery_times_7_days",
+    "inputs": [{"namespace": "food_delivery", "name": "public.delivery_7_days"}],
+    "outputs": [
+      {"namespace": "food_delivery", "name": "public.top_delivery_times"},
+      {"namespace": "food_delivery", "name": "public.discounts"}
+    ],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/delivery_times_7_days.py",
+    "namespace": "food_delivery",
+    "description": "Determine weekly top delivery times by restaurant.",
+    "context": {
+      "sql": "INSERT INTO top_delivery_times (order_id, order_placed_on, order_dispatched_on, order_delivered_on, order_delivery_time,\n    customer_email, restaurant_id, driver_id)\n  SELECT order_id, order_placed_on, order_delivered_on, DATEDIFF(minute, order_placed_on, order_delivered_on) AS order_delivery_time,\n    customer_email, restaurant_id, driver_id\n    FROM delivery_7_days\n    GROUP BY restaurant_id\n    ORDER BY order_delivery_time DESC\n    LIMIT 1"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "orders_popular_day_of_week",
+    "inputs": [{"namespace": "food_delivery", "name": "public.top_delivery_times"}],
+    "outputs": [{"namespace": "food_delivery", "name": "public.popular_orders_day_of_week"}],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/orders_popular_day_of_week.py",
+    "namespace": "food_delivery",
+    "description": "Determines the popular day of week orders are placed.",
+    "context": {
+      "sql": "INSERT INTO popular_orders_day_of_week (order_day_of_week, order_placed_on, orders_placed)\n  SELECT order_day_of_week, order_placed_on, COUNT(*)\n    FROM top_delivery_times;"
+    }
+  },
+  {
+    "type": "BATCH",
+    "name": "email_discounts",
+    "inputs": [{"namespace": "food_delivery", "name": "public.discounts"}],
+    "outputs": [],
+    "location": "https://github.com/DatakinHQ/datakin/blob/2294bc15eb49071f38425dc927e48655530a2f2e/examples/airflow/dags/email_discounts.py",
+    "namespace": "food_delivery",
+    "description": "Email discounts to customers that have expereinced order delays.",
+    "context": {
+      "sql": "SELECT * FROM discounts;"
+    }
+  }
+]

@@ -1,0 +1,24 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Karla', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+@font-face {
+  font-family: 'Source Code Pro';
+  src: local('Source Code Pro'), url(fonts/SourceCodePro-Regular.ttf) format('truetype'), local('Source Code Pro'), url(fonts/SourceCodePro-Bold.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Karla';
+  src: local('Karla'), url(fonts/Karla/Karla-Regular.ttf) format('truetype'), local('Karla'), url(fonts/Karla/Karla-Bold.ttf) format('truetype');
+}

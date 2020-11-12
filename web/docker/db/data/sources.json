@@ -1,0 +1,7 @@
+[
+  {
+    "type": "MYSQL",
+    "name": "analytics_db",
+    "connectionUrl": "jdbc:mysql://localhost:3306/deliveries"
+  }
+]

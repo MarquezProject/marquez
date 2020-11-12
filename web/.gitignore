@@ -1,0 +1,17 @@
+*.swp
+.DS_Store
+.env.development.local
+.env.local
+.env.production.local
+.env.test.local
+.pnp.js
+.vscode
+.idea
+/.pnp
+/build
+/coverage
+/dist
+/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
