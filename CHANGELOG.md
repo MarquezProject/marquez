@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.3...HEAD)
 
+### Fixed
+
+* Replace `jdbi.getHandle()` with `jdbi.withHandle()` to free DB connections from pool [@henneberger](https://github.com/henneberger)
+
 ## [0.11.3](https://github.com/MarquezProject/marquez/compare/0.11.2...0.11.3) - 2020-11-02
 
 ### Added
