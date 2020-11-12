@@ -23,11 +23,16 @@ import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
 import static marquez.db.models.ModelGenerator.newSourceRow;
 import static marquez.db.models.ModelGenerator.newTagRows;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,30 +40,46 @@ import marquez.DataAccessTests;
 import marquez.IntegrationTests;
 import marquez.JdbiRuleInit;
 import marquez.common.Utils;
+import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetVersionId;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.common.models.SourceName;
+import marquez.common.models.SourceType;
+import marquez.db.models.ExtendedDatasetVersionRow;
+import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.TagRow;
+import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.RunTransitionListener;
 import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
+import marquez.service.RunTransitionListener.RunInput;
 import marquez.service.RunTransitionListener.RunTransition;
+import marquez.service.SourceService;
 import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.models.Dataset;
+import marquez.service.models.DbTableMeta;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
+import marquez.service.models.Source;
+import marquez.service.models.SourceMeta;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.testing.JdbiRule;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 // TODO: Move test to test/java/marquez/service pkg
 @Category({DataAccessTests.class, IntegrationTests.class})
@@ -72,12 +93,15 @@ public class JobServiceTest {
   private static SourceDao sourceDao;
   private static DatasetDao datasetDao;
   private static DatasetVersionDao datasetVersionDao;
+  private static DatasetFieldDao datasetFieldDao;
   private static TagDao tagDao;
 
   private static NamespaceRow namespaceRow;
   private static SourceRow sourceRow;
   private static List<TagRow> tagRows;
   private static JobService jobService;
+  private static DatasetService datasetService;
+  private static SourceService sourceService;
 
   private static RunStateDao runStateDao;
   private static JobVersionDao versionDao;
@@ -86,9 +110,7 @@ public class JobServiceTest {
   private static RunArgsDao runArgsDao;
   private static RunDao runDao;
 
-  private static List<JobInputUpdate> jobInputUpdates = new ArrayList<>();
-  private static List<JobOutputUpdate> jobOutputUpdates = new ArrayList<>();
-  private static List<RunTransition> runTransitions = new ArrayList<>();
+  private static RunTransitionListener listener;
 
   @BeforeClass
   public static void setUpOnce() {
@@ -98,6 +120,7 @@ public class JobServiceTest {
     datasetDao = jdbi.onDemand(DatasetDao.class);
     tagDao = jdbi.onDemand(TagDao.class);
     datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
+    datasetFieldDao = jdbi.onDemand(DatasetFieldDao.class);
     runStateDao = jdbi.onDemand(RunStateDao.class);
     versionDao = jdbi.onDemand(JobVersionDao.class);
     jobDao = jdbi.onDemand(JobDao.class);
@@ -113,25 +136,11 @@ public class JobServiceTest {
 
     tagRows = newTagRows(2);
     tagRows.forEach(tagRow -> tagDao.insert(tagRow));
+  }
 
-    RunTransitionListener listener =
-        new RunTransitionListener() {
-
-          @Override
-          public void notify(JobInputUpdate jobInputUpdate) {
-            jobInputUpdates.add(jobInputUpdate);
-          }
-
-          @Override
-          public void notify(JobOutputUpdate jobOutputUpdate) {
-            jobOutputUpdates.add(jobOutputUpdate);
-          }
-
-          @Override
-          public void notify(RunTransition transition) {
-            runTransitions.add(transition);
-          }
-        };
+  @Before
+  public void setup() {
+    listener = mock(RunTransitionListener.class);
 
     jobService =
         new JobService(
@@ -145,10 +154,101 @@ public class JobServiceTest {
             runArgsDao,
             runStateDao,
             asList(listener));
+
+    datasetService =
+        new DatasetService(
+            namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao, tagDao);
+
+    sourceService = new SourceService(sourceDao);
+  }
+
+  @Test
+  /* Tests the condition when an input dataset is added after the run starts (e.g. Bigquery workflow) */
+  public void testLazyInputDataset() {
+    ArgumentCaptor<JobInputUpdate> jobInputUpdateArg =
+        ArgumentCaptor.forClass(JobInputUpdate.class);
+    doNothing().when(listener).notify(jobInputUpdateArg.capture());
+
+    JobName jobName = JobName.of("BIG_QUERY");
+    Job job =
+        jobService.createOrUpdate(
+            NAMESPACE_NAME,
+            jobName,
+            new JobMeta(
+                JobType.BATCH,
+                ImmutableSet.of(),
+                ImmutableSet.of(),
+                Utils.toUrl("https://github.com/repo/test/commit/foo"),
+                ImmutableMap.of(),
+                "description",
+                null));
+    assertThat(job.getId()).isNotNull();
+
+    Run run = jobService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
+    assertThat(run.getId()).isNotNull();
+
+    SourceName sn = SourceName.of("bq_source");
+    Source s =
+        sourceService.createOrUpdate(
+            sn, new SourceMeta(SourceType.BIGQUERY, URI.create("http://example.com"), null));
+    assertThat(s.getName()).isNotNull();
+    DatasetName in_dsn = DatasetName.of("INPUT_DATASET");
+    Dataset in_ds =
+        datasetService.createOrUpdate(
+            NAMESPACE_NAME, in_dsn, new DbTableMeta(in_dsn, sn, null, null, null, null));
+
+    DatasetName out_dsn = DatasetName.of("OUTPUT_DATASET");
+    Dataset out_ds =
+        datasetService.createOrUpdate(
+            NAMESPACE_NAME, out_dsn, new DbTableMeta(out_dsn, sn, null, null, null, run.getId()));
+
+    Job update =
+        jobService.createOrUpdate(
+            NAMESPACE_NAME,
+            jobName,
+            new JobMeta(
+                JobType.BATCH,
+                ImmutableSet.of(in_ds.getId()),
+                ImmutableSet.of(out_ds.getId()),
+                Utils.toUrl("https://github.com/repo/test/commit/foo"),
+                ImmutableMap.of(),
+                "description",
+                run.getId()));
+    assertThat(update.getInputs()).hasSize(1);
+    assertThat(update.getOutputs()).hasSize(1);
+
+    Optional<ExtendedRunRow> updatedRun = runDao.findBy(run.getId().getValue());
+    assertThat(updatedRun.isPresent()).isEqualTo(true);
+    assertThat(updatedRun.get().getInputVersionUuids()).hasSize(1);
+
+    List<ExtendedDatasetVersionRow> out_ds_versions =
+        datasetVersionDao.findByRunId(run.getId().getValue());
+    assertThat(out_ds_versions).hasSize(1);
+
+    Optional<ExtendedRunRow> run_row = runDao.findBy(run.getId().getValue());
+    assertThat(run_row.isPresent()).isEqualTo(true);
+    assertThat(run_row.get().getInputVersionUuids()).hasSize(1);
+
+    verify(listener, Mockito.times(2)).notify((JobInputUpdate) any());
+    assertThat(jobInputUpdateArg.getAllValues().get(1).getInputs())
+        .isEqualTo(
+            ImmutableList.of(
+                new RunInput(
+                    new DatasetVersionId(
+                        NAMESPACE_NAME, in_dsn, run_row.get().getInputVersionUuids().get(0)))));
   }
 
   @Test
   public void testRun() throws MarquezServiceException, MalformedURLException {
+    ArgumentCaptor<RunTransition> runTransitionArg = ArgumentCaptor.forClass(RunTransition.class);
+    doNothing().when(listener).notify(runTransitionArg.capture());
+    ArgumentCaptor<JobInputUpdate> jobInputUpdateArg =
+        ArgumentCaptor.forClass(JobInputUpdate.class);
+    doNothing().when(listener).notify(jobInputUpdateArg.capture());
+    ArgumentCaptor<JobOutputUpdate> jobOutputUpdateArg =
+        ArgumentCaptor.forClass(JobOutputUpdate.class);
+    doNothing().when(listener).notify(jobOutputUpdateArg.capture());
+
     JobName jobName = JobName.of("MY_JOB");
     Job job =
         jobService.createOrUpdate(
@@ -187,15 +287,18 @@ public class JobServiceTest {
     assertThat(allRuns.size()).isEqualTo(1);
     assertThat(allRuns.get(0).getEndedAt()).isEqualTo(endedRun.get().getEndedAt());
 
+    List<JobInputUpdate> jobInputUpdates = jobInputUpdateArg.getAllValues();
     assertThat(jobInputUpdates.size()).isEqualTo(1);
     JobInputUpdate jobInputUpdate = jobInputUpdates.get(0);
     assertThat(jobInputUpdate.getRunId()).isEqualTo(run.getId());
     assertThat(jobInputUpdate.getJobVersionId().getName()).isEqualTo(jobName);
 
+    List<JobOutputUpdate> jobOutputUpdates = jobOutputUpdateArg.getAllValues();
     assertThat(jobOutputUpdates.size()).isEqualTo(1);
     JobOutputUpdate jobOutputUpdate = jobOutputUpdates.get(0);
     assertThat(jobOutputUpdate.getRunId()).isEqualTo(run.getId());
 
+    List<RunTransition> runTransitions = runTransitionArg.getAllValues();
     assertThat(runTransitions.size()).isEqualTo(3);
     RunTransition newRun = runTransitions.get(0);
     assertThat(newRun.getRunId()).isEqualTo(run.getId());

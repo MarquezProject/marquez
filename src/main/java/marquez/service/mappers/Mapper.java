@@ -431,4 +431,15 @@ public final class Mapper {
   private static Instant newTimestamp() {
     return Instant.now();
   }
+
+  public static ImmutableMap<String, String> toRunArgs(String args) {
+    if (args == null) {
+      return null;
+    }
+    return Utils.fromJson(
+        args,
+        Utils.getMapper()
+            .getTypeFactory()
+            .constructMapType(ImmutableMap.class, String.class, String.class));
+  }
 }
