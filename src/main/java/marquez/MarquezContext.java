@@ -11,6 +11,7 @@ import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
 import marquez.api.SourceResource;
 import marquez.api.TagResource;
+import marquez.api.exceptions.JdbiExceptionExceptionMapper;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
@@ -68,6 +69,7 @@ public final class MarquezContext {
   @Getter private final TagResource tagResource;
 
   @Getter private final ImmutableList<Object> resources;
+  @Getter private final JdbiExceptionExceptionMapper jdbiException;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
@@ -111,6 +113,7 @@ public final class MarquezContext {
     this.tagService = new TagService(tagDao);
     this.tagService.init(tags);
     this.serviceExceptionMapper = new MarquezServiceExceptionMapper();
+    this.jdbiException = new JdbiExceptionExceptionMapper();
 
     this.namespaceResource = new NamespaceResource(namespaceService);
     this.sourceResource = new SourceResource(sourceService);
@@ -126,7 +129,8 @@ public final class MarquezContext {
             datasetResource,
             jobResource,
             tagResource,
-            serviceExceptionMapper);
+            serviceExceptionMapper,
+            jdbiException);
   }
 
   public void registerListener(@NonNull RunTransitionListener listener) {

@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -102,7 +103,9 @@ public class JobResource {
     throwIfNotExists(namespaceName);
 
     final Job job =
-        jobService.get(namespaceName, jobName).orElseThrow(() -> new JobNotFoundException(jobName));
+        jobService
+            .getJob(namespaceName, jobName)
+            .orElseThrow(() -> new JobNotFoundException(jobName));
     return Response.ok(job).build();
   }
 
@@ -114,8 +117,8 @@ public class JobResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
-      @QueryParam("limit") @DefaultValue("100") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset)
+      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
+      @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
 

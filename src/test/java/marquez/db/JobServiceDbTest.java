@@ -83,7 +83,7 @@ import org.mockito.Mockito;
 
 // TODO: Move test to test/java/marquez/service pkg
 @Category({DataAccessTests.class, IntegrationTests.class})
-public class JobServiceTest {
+public class JobServiceDbTest {
 
   @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
 
