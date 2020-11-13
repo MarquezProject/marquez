@@ -6,27 +6,11 @@
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/master/LICENSE)
 [![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez-web)
 
-Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata.
-
 This web UI is used to view metadata collected and cataloged by [Marquez](https://github.com/MarquezProject/marquez).
 
 <p align="center">
   <img src="./docs/demo.gif">
 </p>
-
-### Status
-
-This project is in the early stages of development.
-
-### Quickstart
-
-The easiest way to get up and running is with Docker. From the base of the Marquez UI repository run:
-
-```
-$ ./docker/up.sh
-```
-
-> **Note:** Use the `--build` flag to build images from source.
 
 Open http://localhost:3000
 
@@ -50,18 +34,6 @@ To develop on this project, you need to have Node version 10.16.3 installed. In 
 
 ### Running with [Docker](./Dockerfile)
 
-1. Build image:
-
-   ```
-   $ docker build -t marquez-web .
-   ```
-
-2. Run image:
-
-   ```
-   $ docker run -p 3000:3000 -d marquez-web
-   ```
-
 You can open http://localhost:3000 to begin exploring the web UI.
 
 ### Testing
@@ -77,10 +49,6 @@ You can open http://localhost:3000 to begin exploring the web UI.
    ```
    $ npm run test
    ```
-
-### Deployment
-
-(to-do)
 
 ### Testing Setup
 
