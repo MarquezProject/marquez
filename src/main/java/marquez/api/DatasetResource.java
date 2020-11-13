@@ -45,8 +45,8 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
 import marquez.service.DatasetService;
-import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.RunService;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
@@ -56,18 +56,18 @@ import marquez.service.models.DatasetMeta;
 public class DatasetResource {
   private final NamespaceService namespaceService;
   private final DatasetService datasetService;
-  private final JobService jobService;
   private final TagService tagService;
+  private final RunService runService;
 
   public DatasetResource(
       @NonNull final NamespaceService namespaceService,
       @NonNull final DatasetService datasetService,
-      @NonNull final JobService jobService,
-      @NonNull final TagService tagService) {
+      @NonNull final TagService tagService,
+      @NonNull final RunService runService) {
     this.namespaceService = namespaceService;
     this.datasetService = datasetService;
-    this.jobService = jobService;
     this.tagService = tagService;
+    this.runService = runService;
   }
 
   @Timed
@@ -204,7 +204,7 @@ public class DatasetResource {
   }
 
   void throwIfNotExists(@NonNull RunId runId) throws MarquezServiceException {
-    if (!jobService.runExists(runId)) {
+    if (!runService.runExists(runId)) {
       throw new RunNotFoundException(runId);
     }
   }

@@ -34,7 +34,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.net.URL;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -151,12 +150,12 @@ public class JobServiceTest {
   @Mock private RunDao runDao;
   @Mock private RunArgsDao runArgsDao;
   @Mock private RunStateDao runStateDao;
-  @Mock private Collection<RunTransitionListener> runTransitionListeners;
   private JobService jobService;
 
   private static List<JobInputUpdate> jobInputUpdates = Lists.newArrayList();
   private static List<JobOutputUpdate> jobOutputUpdates = Lists.newArrayList();
   private static List<RunTransition> runTransitions = Lists.newArrayList();
+  private RunService runService;
 
   @Before
   public void setUp() {
@@ -179,18 +178,18 @@ public class JobServiceTest {
           }
         };
 
-    jobService =
-        new JobService(
-            namespaceDao,
-            datasetDao,
-            datasetVersionDao,
-            jobDao,
+    runService =
+        new RunService(
             jobVersionDao,
-            jobContextDao,
-            runDao,
+            datasetDao,
             runArgsDao,
+            runDao,
+            datasetVersionDao,
             runStateDao,
             Lists.newArrayList(listener));
+    jobService =
+        new JobService(
+            namespaceDao, datasetDao, jobDao, jobVersionDao, jobContextDao, runDao, runService);
   }
 
   @Test

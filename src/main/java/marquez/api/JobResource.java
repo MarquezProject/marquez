@@ -55,6 +55,7 @@ import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.RunService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
@@ -65,11 +66,15 @@ import marquez.service.models.RunMeta;
 public class JobResource {
   private final NamespaceService namespaceService;
   private final JobService jobService;
+  private final RunService runService;
 
   public JobResource(
-      @NonNull final NamespaceService namespaceService, @NonNull final JobService jobService) {
+      @NonNull final NamespaceService namespaceService,
+      @NonNull final JobService jobService,
+      @NonNull final RunService runService) {
     this.namespaceService = namespaceService;
     this.jobService = jobService;
+    this.runService = runService;
   }
 
   @Timed
@@ -143,7 +148,7 @@ public class JobResource {
     throwIfNotExists(namespaceName, jobName);
     throwIfExists(namespaceName, jobName, runMeta.getId().orElse(null));
 
-    final Run run = jobService.createRun(namespaceName, jobName, runMeta);
+    final Run run = runService.createRun(namespaceName, jobName, runMeta);
     final URI runLocation = locationFor(uriInfo, run);
     return Response.created(runLocation).entity(run).build();
   }
@@ -155,7 +160,7 @@ public class JobResource {
   @Path("/jobs/runs/{id}")
   @Produces(APPLICATION_JSON)
   public Response getRun(@PathParam("id") RunId runId) throws MarquezServiceException {
-    final Run run = jobService.getRun(runId).orElseThrow(() -> new RunNotFoundException(runId));
+    final Run run = runService.getRun(runId).orElseThrow(() -> new RunNotFoundException(runId));
     return Response.ok(run).build();
   }
 
@@ -174,7 +179,7 @@ public class JobResource {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, jobName);
 
-    final ImmutableList<Run> runs = jobService.getAllRunsFor(namespaceName, jobName, limit, offset);
+    final ImmutableList<Run> runs = runService.getAllRunsFor(namespaceName, jobName, limit, offset);
     return Response.ok(new Runs(runs)).build();
   }
 
@@ -227,7 +232,7 @@ public class JobResource {
       throws MarquezServiceException {
     throwIfNotExists(runId);
 
-    jobService.markRunAs(runId, runState, Utils.toInstant(atAsIso));
+    runService.markRunAs(runId, runState, Utils.toInstant(atAsIso));
     return getRun(runId);
   }
 
@@ -262,14 +267,14 @@ public class JobResource {
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @Nullable RunId runId)
       throws MarquezServiceException {
     if (runId != null) {
-      if (jobService.runExists(runId)) {
+      if (runService.runExists(runId)) {
         throw new RunAlreadyExistsException(namespaceName, jobName, runId);
       }
     }
   }
 
   void throwIfNotExists(@NonNull RunId runId) throws MarquezServiceException {
-    if (!jobService.runExists(runId)) {
+    if (!runService.runExists(runId)) {
       throw new RunNotFoundException(runId);
     }
   }
