@@ -16,10 +16,6 @@
 package marquez.api;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static marquez.common.models.RunState.ABORTED;
-import static marquez.common.models.RunState.COMPLETED;
-import static marquez.common.models.RunState.FAILED;
-import static marquez.common.models.RunState.RUNNING;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -48,11 +44,9 @@ import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunAlreadyExistsException;
 import marquez.api.exceptions.RunNotFoundException;
-import marquez.common.Utils;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
-import marquez.common.models.RunState;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.RunService;
@@ -157,17 +151,6 @@ public class JobResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("/jobs/runs/{id}")
-  @Produces(APPLICATION_JSON)
-  public Response getRun(@PathParam("id") RunId runId) throws MarquezServiceException {
-    final Run run = runService.getRun(runId).orElseThrow(() -> new RunNotFoundException(runId));
-    return Response.ok(run).build();
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @GET
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
   @Produces(APPLICATION_JSON)
   public Response listRuns(
@@ -183,57 +166,10 @@ public class JobResource {
     return Response.ok(new Runs(runs)).build();
   }
 
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @POST
-  @Path("/jobs/runs/{id}/start")
-  @Produces(APPLICATION_JSON)
-  public Response markRunAsRunning(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
-    return markRunAs(runId, RUNNING, atAsIso);
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @POST
-  @Path("/jobs/runs/{id}/complete")
-  @Produces(APPLICATION_JSON)
-  public Response markRunAsCompleted(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
-    return markRunAs(runId, COMPLETED, atAsIso);
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @POST
-  @Path("/jobs/runs/{id}/fail")
-  @Produces(APPLICATION_JSON)
-  public Response markRunAsFailed(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
-    return markRunAs(runId, FAILED, atAsIso);
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @POST
-  @Path("/jobs/runs/{id}/abort")
-  @Produces(APPLICATION_JSON)
-  public Response markRunAsAborted(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
-    return markRunAs(runId, ABORTED, atAsIso);
-  }
-
-  Response markRunAs(
-      @NonNull RunId runId, @NonNull RunState runState, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
+  @Path("/jobs/runs/{id}")
+  public RunResource runResourceRoot(@PathParam("id") RunId runId) {
     throwIfNotExists(runId);
-
-    runService.markRunAs(runId, runState, Utils.toInstant(atAsIso));
-    return getRun(runId);
+    return new RunResource(runId, runService);
   }
 
   @Value
@@ -283,7 +219,7 @@ public class JobResource {
     return uriInfo
         .getBaseUriBuilder()
         .path(JobResource.class)
-        .path(JobResource.class, "getRun")
+        .path(RunResource.class, "getRun")
         .build(run.getId().getValue());
   }
 }

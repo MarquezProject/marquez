@@ -80,10 +80,13 @@ public class JobResourceTest {
   @Mock private JobService jobService;
   @Mock private RunService runService;
   private JobResource jobResource;
+  private RunResource runResource;
 
   @Before
   public void setUp() {
     jobResource = spy(new JobResource(namespaceService, jobService, runService));
+    runResource = mock(RunResource.class);
+    when(runService.runExists(RUN_ID)).thenReturn(true);
   }
 
   @Test
@@ -238,7 +241,7 @@ public class JobResourceTest {
 
     when(runService.getRun(RUN_ID)).thenReturn(Optional.of(run));
 
-    final Response response = jobResource.getRun(RUN_ID);
+    final Response response = jobResource.runResourceRoot(RUN_ID).getRun();
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(run);
   }
@@ -248,7 +251,7 @@ public class JobResourceTest {
     when(runService.getRun(RUN_ID)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(RunNotFoundException.class)
-        .isThrownBy(() -> jobResource.getRun(RUN_ID))
+        .isThrownBy(() -> jobResource.runResourceRoot(RUN_ID).getRun())
         .withMessageContaining(String.format("'%s' not found", RUN_ID.getValue()));
   }
 
@@ -279,7 +282,7 @@ public class JobResourceTest {
     when(runService.runExists(RUN_ID)).thenReturn(false);
 
     assertThatExceptionOfType(RunNotFoundException.class)
-        .isThrownBy(() -> jobResource.markRunAs(RUN_ID, RUNNING, TRANSITIONED_AT))
+        .isThrownBy(() -> jobResource.runResourceRoot(RUN_ID).markRunAs(RUNNING, TRANSITIONED_AT))
         .withMessageContaining(String.format("'%s' not found", RUN_ID.getValue()));
   }
 
@@ -288,9 +291,12 @@ public class JobResourceTest {
     when(runService.runExists(RUN_ID)).thenReturn(true);
 
     final Run running = newRunWith(RUN_ID, RUNNING, TRANSITIONED_AT);
-    doReturn(Response.ok(running).build()).when(jobResource).getRun(RUN_ID);
 
-    final Response response = jobResource.markRunAsRunning(RUN_ID, TRANSITIONED_AT);
+    when(runService.getRun(RUN_ID)).thenReturn(Optional.of(running));
+
+    doReturn(Response.ok(running).build()).when(runResource).getRun();
+
+    final Response response = jobResource.runResourceRoot(RUN_ID).markRunAsRunning(TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(running);
   }
@@ -300,9 +306,10 @@ public class JobResourceTest {
     when(runService.runExists(RUN_ID)).thenReturn(true);
 
     final Run completed = newRunWith(RUN_ID, COMPLETED, TRANSITIONED_AT);
-    doReturn(Response.ok(completed).build()).when(jobResource).getRun(RUN_ID);
-
-    final Response response = jobResource.markRunAsCompleted(RUN_ID, TRANSITIONED_AT);
+    doReturn(Response.ok(completed).build()).when(runResource).getRun();
+    when(runService.getRun(RUN_ID)).thenReturn(Optional.of(completed));
+    final Response response =
+        jobResource.runResourceRoot(RUN_ID).markRunAsCompleted(TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(completed);
   }
@@ -312,9 +319,10 @@ public class JobResourceTest {
     when(runService.runExists(RUN_ID)).thenReturn(true);
 
     final Run failed = newRunWith(RUN_ID, FAILED, TRANSITIONED_AT);
-    doReturn(Response.ok(failed).build()).when(jobResource).getRun(RUN_ID);
+    doReturn(Response.ok(failed).build()).when(runResource).getRun();
+    when(runService.getRun(RUN_ID)).thenReturn(Optional.of(failed));
 
-    final Response response = jobResource.markRunAsFailed(RUN_ID, TRANSITIONED_AT);
+    final Response response = jobResource.runResourceRoot(RUN_ID).markRunAsFailed(TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(failed);
   }
@@ -324,9 +332,10 @@ public class JobResourceTest {
     when(runService.runExists(RUN_ID)).thenReturn(true);
 
     final Run aborted = newRunWith(RUN_ID, ABORTED, TRANSITIONED_AT);
-    doReturn(Response.ok(aborted).build()).when(jobResource).getRun(RUN_ID);
+    doReturn(Response.ok(aborted).build()).when(runResource).getRun();
+    when(runService.getRun(RUN_ID)).thenReturn(Optional.of(aborted));
 
-    final Response response = jobResource.markRunAsAborted(RUN_ID, TRANSITIONED_AT);
+    final Response response = jobResource.runResourceRoot(RUN_ID).markRunAsAborted(TRANSITIONED_AT);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat((Run) response.getEntity()).isEqualTo(aborted);
   }
