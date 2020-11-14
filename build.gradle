@@ -41,7 +41,7 @@ java {
 
 ext {
   dropwizardVersion = '2.0.12'
-  jdbi3Version = '3.13.0'
+  jdbi3Version = '3.17.0'
   lombokVersion = '1.18.12'
   prometheusVersion = '0.9.0'
   isReleaseVersion = !version.endsWith('SNAPSHOT')
