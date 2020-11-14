@@ -9,7 +9,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marquez-project/community)
+[![Slack](https://img.shields.io/badge/slack-chat-green.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-izlcs3ar-V_mHjWkAUBBGEHuezX~ZgQ)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
 [![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez)
@@ -101,7 +101,7 @@ Then browse to the admin interface: http://localhost:8081
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: https://gitter.im/marquez-project/community
+* Chat: marquezproject.slack.com
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing
