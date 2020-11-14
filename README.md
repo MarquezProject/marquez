@@ -101,7 +101,7 @@ Then browse to the admin interface: http://localhost:8081
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: marquezproject.slack.com
+* Chat: https://marquezproject.slack.com
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing
