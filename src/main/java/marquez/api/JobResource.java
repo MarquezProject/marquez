@@ -16,10 +16,6 @@
 package marquez.api;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static marquez.common.models.RunState.ABORTED;
-import static marquez.common.models.RunState.COMPLETED;
-import static marquez.common.models.RunState.FAILED;
-import static marquez.common.models.RunState.RUNNING;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -29,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -47,13 +44,12 @@ import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunAlreadyExistsException;
 import marquez.api.exceptions.RunNotFoundException;
-import marquez.common.Utils;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
-import marquez.common.models.RunState;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.RunService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
@@ -64,11 +60,15 @@ import marquez.service.models.RunMeta;
 public class JobResource {
   private final NamespaceService namespaceService;
   private final JobService jobService;
+  private final RunService runService;
 
   public JobResource(
-      @NonNull final NamespaceService namespaceService, @NonNull final JobService jobService) {
+      @NonNull final NamespaceService namespaceService,
+      @NonNull final JobService jobService,
+      @NonNull final RunService runService) {
     this.namespaceService = namespaceService;
     this.jobService = jobService;
+    this.runService = runService;
   }
 
   @Timed
@@ -102,7 +102,9 @@ public class JobResource {
     throwIfNotExists(namespaceName);
 
     final Job job =
-        jobService.get(namespaceName, jobName).orElseThrow(() -> new JobNotFoundException(jobName));
+        jobService
+            .getJob(namespaceName, jobName)
+            .orElseThrow(() -> new JobNotFoundException(jobName));
     return Response.ok(job).build();
   }
 
@@ -114,8 +116,8 @@ public class JobResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
-      @QueryParam("limit") @DefaultValue("100") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset)
+      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
+      @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset)
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
 
@@ -140,20 +142,9 @@ public class JobResource {
     throwIfNotExists(namespaceName, jobName);
     throwIfExists(namespaceName, jobName, runMeta.getId().orElse(null));
 
-    final Run run = jobService.createRun(namespaceName, jobName, runMeta);
+    final Run run = runService.createRun(namespaceName, jobName, runMeta);
     final URI runLocation = locationFor(uriInfo, run);
     return Response.created(runLocation).entity(run).build();
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @GET
-  @Path("/jobs/runs/{id}")
-  @Produces(APPLICATION_JSON)
-  public Response getRun(@PathParam("id") RunId runId) throws MarquezServiceException {
-    final Run run = jobService.getRun(runId).orElseThrow(() -> new RunNotFoundException(runId));
-    return Response.ok(run).build();
   }
 
   @Timed
@@ -171,61 +162,14 @@ public class JobResource {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, jobName);
 
-    final ImmutableList<Run> runs = jobService.getAllRunsFor(namespaceName, jobName, limit, offset);
+    final ImmutableList<Run> runs = runService.getAllRunsFor(namespaceName, jobName, limit, offset);
     return Response.ok(new Runs(runs)).build();
   }
 
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @POST
-  @Path("/jobs/runs/{id}/start")
-  @Produces(APPLICATION_JSON)
-  public Response markRunAsRunning(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
-    return markRunAs(runId, RUNNING, atAsIso);
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @POST
-  @Path("/jobs/runs/{id}/complete")
-  @Produces(APPLICATION_JSON)
-  public Response markRunAsCompleted(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
-    return markRunAs(runId, COMPLETED, atAsIso);
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @POST
-  @Path("/jobs/runs/{id}/fail")
-  @Produces(APPLICATION_JSON)
-  public Response markRunAsFailed(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
-    return markRunAs(runId, FAILED, atAsIso);
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @POST
-  @Path("/jobs/runs/{id}/abort")
-  @Produces(APPLICATION_JSON)
-  public Response markRunAsAborted(@PathParam("id") RunId runId, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
-    return markRunAs(runId, ABORTED, atAsIso);
-  }
-
-  Response markRunAs(
-      @NonNull RunId runId, @NonNull RunState runState, @QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
+  @Path("/jobs/runs/{id}")
+  public RunResource runResourceRoot(@PathParam("id") RunId runId) {
     throwIfNotExists(runId);
-
-    jobService.markRunAs(runId, runState, Utils.toInstant(atAsIso));
-    return getRun(runId);
+    return new RunResource(runId, runService);
   }
 
   @Value
@@ -259,14 +203,14 @@ public class JobResource {
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @Nullable RunId runId)
       throws MarquezServiceException {
     if (runId != null) {
-      if (jobService.runExists(runId)) {
+      if (runService.runExists(runId)) {
         throw new RunAlreadyExistsException(namespaceName, jobName, runId);
       }
     }
   }
 
   void throwIfNotExists(@NonNull RunId runId) throws MarquezServiceException {
-    if (!jobService.runExists(runId)) {
+    if (!runService.runExists(runId)) {
       throw new RunNotFoundException(runId);
     }
   }
@@ -275,7 +219,7 @@ public class JobResource {
     return uriInfo
         .getBaseUriBuilder()
         .path(JobResource.class)
-        .path(JobResource.class, "getRun")
+        .path(RunResource.class, "getRun")
         .build(run.getId().getValue());
   }
 }

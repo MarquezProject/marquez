@@ -14,7 +14,6 @@
 
 package marquez.db;
 
-import static java.util.Arrays.asList;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.RunState.COMPLETED;
 import static marquez.common.models.RunState.NEW;
@@ -31,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
@@ -56,6 +56,7 @@ import marquez.db.models.SourceRow;
 import marquez.db.models.TagRow;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
+import marquez.service.RunService;
 import marquez.service.RunTransitionListener;
 import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
@@ -83,7 +84,7 @@ import org.mockito.Mockito;
 
 // TODO: Move test to test/java/marquez/service pkg
 @Category({DataAccessTests.class, IntegrationTests.class})
-public class JobServiceTest {
+public class JobServiceDbTest {
 
   @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
 
@@ -111,6 +112,7 @@ public class JobServiceTest {
   private static RunDao runDao;
 
   private static RunTransitionListener listener;
+  private RunService runService;
 
   @BeforeClass
   public static void setUpOnce() {
@@ -142,18 +144,19 @@ public class JobServiceTest {
   public void setup() {
     listener = mock(RunTransitionListener.class);
 
+    runService =
+        new RunService(
+            versionDao,
+            datasetDao,
+            runArgsDao,
+            runDao,
+            datasetVersionDao,
+            runStateDao,
+            Lists.newArrayList(listener));
+
     jobService =
         new JobService(
-            namespaceDao,
-            datasetDao,
-            datasetVersionDao,
-            jobDao,
-            versionDao,
-            contextDao,
-            runDao,
-            runArgsDao,
-            runStateDao,
-            asList(listener));
+            namespaceDao, datasetDao, jobDao, versionDao, contextDao, runDao, runService);
 
     datasetService =
         new DatasetService(
@@ -184,7 +187,7 @@ public class JobServiceTest {
                 null));
     assertThat(job.getId()).isNotNull();
 
-    Run run = jobService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
+    Run run = runService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
     assertThat(run.getId()).isNotNull();
 
     SourceName sn = SourceName.of("bq_source");
@@ -267,23 +270,23 @@ public class JobServiceTest {
     assertThat(job.getId().getName()).isEqualTo(jobName);
     assertThat(job.getId()).isEqualTo(new JobId(NAMESPACE_NAME, jobName));
 
-    Run run = jobService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
+    Run run = runService.createRun(NAMESPACE_NAME, jobName, new RunMeta(null, null, null));
     assertThat(run.getId()).isNotNull();
     assertThat(run.getStartedAt().isPresent()).isFalse();
 
-    jobService.markRunAs(run.getId(), RUNNING);
-    Optional<Run> startedRun = jobService.getRun(run.getId());
+    runService.markRunAs(run.getId(), RUNNING);
+    Optional<Run> startedRun = runService.getRun(run.getId());
     assertThat(startedRun.isPresent()).isTrue();
     assertThat(startedRun.get().getStartedAt()).isNotNull();
     assertThat(startedRun.get().getEndedAt().isPresent()).isFalse();
 
-    jobService.markRunAs(run.getId(), COMPLETED);
-    Optional<Run> endedRun = jobService.getRun(run.getId());
+    runService.markRunAs(run.getId(), COMPLETED);
+    Optional<Run> endedRun = runService.getRun(run.getId());
     assertThat(endedRun.isPresent()).isTrue();
     assertThat(endedRun.get().getStartedAt()).isEqualTo(startedRun.get().getStartedAt());
     assertThat(endedRun.get().getEndedAt()).isNotNull();
 
-    List<Run> allRuns = jobService.getAllRunsFor(NAMESPACE_NAME, jobName, 10, 0);
+    List<Run> allRuns = runService.getAllRunsFor(NAMESPACE_NAME, jobName, 10, 0);
     assertThat(allRuns.size()).isEqualTo(1);
     assertThat(allRuns.get(0).getEndedAt()).isEqualTo(endedRun.get().getEndedAt());
 
@@ -329,9 +332,9 @@ public class JobServiceTest {
 
     RunId run2Id = RunId.of(UUID.randomUUID());
     Run run2 =
-        jobService.createRun(NAMESPACE_NAME, job.getName(), new RunMeta(run2Id, null, null, null));
+        runService.createRun(NAMESPACE_NAME, job.getName(), new RunMeta(run2Id, null, null, null));
     assertThat(run2.getId()).isEqualTo(run2Id);
-    Optional<Run> run2Again = jobService.getRun(run2Id);
+    Optional<Run> run2Again = runService.getRun(run2Id);
     assertThat(run2Again.isPresent()).isTrue();
     assertThat(run2Again.get().getId()).isEqualTo(run2Id);
   }

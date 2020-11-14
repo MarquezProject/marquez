@@ -34,7 +34,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.net.URL;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -151,12 +150,12 @@ public class JobServiceTest {
   @Mock private RunDao runDao;
   @Mock private RunArgsDao runArgsDao;
   @Mock private RunStateDao runStateDao;
-  @Mock private Collection<RunTransitionListener> runTransitionListeners;
   private JobService jobService;
 
   private static List<JobInputUpdate> jobInputUpdates = Lists.newArrayList();
   private static List<JobOutputUpdate> jobOutputUpdates = Lists.newArrayList();
   private static List<RunTransition> runTransitions = Lists.newArrayList();
+  private RunService runService;
 
   @Before
   public void setUp() {
@@ -179,39 +178,37 @@ public class JobServiceTest {
           }
         };
 
-    jobService =
-        new JobService(
-            namespaceDao,
-            datasetDao,
-            datasetVersionDao,
-            jobDao,
+    runService =
+        new RunService(
             jobVersionDao,
-            jobContextDao,
-            runDao,
+            datasetDao,
             runArgsDao,
+            runDao,
+            datasetVersionDao,
             runStateDao,
             Lists.newArrayList(listener));
+    jobService =
+        new JobService(
+            namespaceDao, datasetDao, jobDao, jobVersionDao, jobContextDao, runDao, runService);
   }
 
   @Test
   public void testCreateOrUpdate() throws MarquezServiceException {
-    when(jobDao.exists(NAMESPACE_NAME.getValue(), JOB_NAME.getValue())).thenReturn(false);
     when(namespaceDao.findBy(NAMESPACE_NAME.getValue())).thenReturn(Optional.of(NAMESPACE_ROW));
-    when(jobVersionDao.exists(VERSION.getValue())).thenReturn(false);
     when(jobVersionDao.findBy(JOB_VERSION_ROW.getUuid())).thenReturn(Optional.of(JOB_VERSION_ROW));
 
     final String checksum = Utils.checksumFor(JOB_META.getContext());
     when(jobContextDao.exists(checksum)).thenReturn(false);
     when(jobContextDao.findBy(checksum)).thenReturn(Optional.of(JOB_CONTEXT_ROW));
     when(jobDao.find(NAMESPACE_NAME.getValue(), JOB_NAME.getValue()))
+        .thenReturn(Optional.empty())
         .thenReturn(Optional.of(JOB_ROW));
 
     final Job job = jobService.createOrUpdate(NAMESPACE_NAME, JOB_NAME, JOB_META);
     assertThat(job).isEqualTo(JOB);
 
     verify(namespaceDao, times(1)).findBy(NAMESPACE_NAME.getValue());
-    verify(jobDao, times(1)).exists(NAMESPACE_NAME.getValue(), JOB_NAME.getValue());
-    verify(jobDao, times(2)).find(NAMESPACE_NAME.getValue(), JOB_NAME.getValue());
+    verify(jobDao, times(3)).find(NAMESPACE_NAME.getValue(), JOB_NAME.getValue());
     verify(jobVersionDao, times(1)).exists(VERSION.getValue());
     verify(jobVersionDao, times(1)).findBy(JOB_VERSION_ROW.getUuid());
     verify(jobContextDao, times(1)).exists(checksum);
@@ -245,7 +242,7 @@ public class JobServiceTest {
         .thenReturn(Optional.of(JOB_ROW));
     when(jobVersionDao.findBy(JOB_VERSION_ROW.getUuid())).thenReturn(Optional.of(JOB_VERSION_ROW));
 
-    final Optional<Job> job = jobService.get(NAMESPACE_NAME, JOB_NAME);
+    final Optional<Job> job = jobService.getJob(NAMESPACE_NAME, JOB_NAME);
     assertThat(job).contains(JOB);
 
     verify(jobDao, times(1)).find(NAMESPACE_NAME.getValue(), JOB_NAME.getValue());
@@ -258,7 +255,7 @@ public class JobServiceTest {
         .thenReturn(Optional.of(JOB_ROW));
     when(jobVersionDao.findBy(JOB_VERSION_ROW.getUuid())).thenReturn(Optional.of(JOB_VERSION_ROW));
 
-    final Optional<Job> job = jobService.getBy(JOB_VERSION_ID);
+    final Optional<Job> job = jobService.getByJobVersion(JOB_VERSION_ID);
     assertThat(job).contains(JOB);
 
     verify(jobDao, times(1)).find(NAMESPACE_NAME.getValue(), JOB_NAME.getValue());

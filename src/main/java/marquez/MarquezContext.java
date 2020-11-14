@@ -11,6 +11,7 @@ import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
 import marquez.api.SourceResource;
 import marquez.api.TagResource;
+import marquez.api.exceptions.JdbiExceptionExceptionMapper;
 import marquez.api.exceptions.MarquezServiceExceptionMapper;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
@@ -29,6 +30,7 @@ import marquez.db.TagDao;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.RunService;
 import marquez.service.RunTransitionListener;
 import marquez.service.SourceService;
 import marquez.service.TagService;
@@ -68,6 +70,8 @@ public final class MarquezContext {
   @Getter private final TagResource tagResource;
 
   @Getter private final ImmutableList<Object> resources;
+  @Getter private final JdbiExceptionExceptionMapper jdbiException;
+  @Getter private final RunService runService;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
@@ -96,27 +100,29 @@ public final class MarquezContext {
     this.datasetService =
         new DatasetService(
             namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao, tagDao);
+    this.runService =
+        new RunService(
+            jobVersionDao,
+            datasetDao,
+            runArgsDao,
+            runDao,
+            datasetVersionDao,
+            runStateDao,
+            Lists.newArrayList(runTransitionListeners));
+
     this.jobService =
         new JobService(
-            namespaceDao,
-            datasetDao,
-            datasetVersionDao,
-            jobDao,
-            jobVersionDao,
-            jobContextDao,
-            runDao,
-            runArgsDao,
-            runStateDao,
-            runTransitionListeners);
+            namespaceDao, datasetDao, jobDao, jobVersionDao, jobContextDao, runDao, runService);
     this.tagService = new TagService(tagDao);
     this.tagService.init(tags);
     this.serviceExceptionMapper = new MarquezServiceExceptionMapper();
+    this.jdbiException = new JdbiExceptionExceptionMapper();
 
     this.namespaceResource = new NamespaceResource(namespaceService);
     this.sourceResource = new SourceResource(sourceService);
     this.datasetResource =
-        new DatasetResource(namespaceService, datasetService, jobService, tagService);
-    this.jobResource = new JobResource(namespaceService, jobService);
+        new DatasetResource(namespaceService, datasetService, tagService, runService);
+    this.jobResource = new JobResource(namespaceService, jobService, runService);
     this.tagResource = new TagResource(tagService);
 
     this.resources =
@@ -126,7 +132,8 @@ public final class MarquezContext {
             datasetResource,
             jobResource,
             tagResource,
-            serviceExceptionMapper);
+            serviceExceptionMapper,
+            jdbiException);
   }
 
   public void registerListener(@NonNull RunTransitionListener listener) {
