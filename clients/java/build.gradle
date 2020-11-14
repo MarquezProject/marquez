@@ -1,0 +1,227 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+  id 'checkstyle'
+  id 'jacoco'
+  id 'java-library'
+  id 'maven-publish'
+  id 'signing'
+  id 'com.github.spotbugs' version '4.5.0'
+  id 'com.adarshr.test-logger' version '1.7.0'
+  id 'com.diffplug.spotless' version '5.1.0'
+  id 'com.github.jk1.dependency-license-report' version '1.9'
+  id 'net.researchgate.release' version '2.8.0'
+}
+
+import org.apache.tools.ant.filters.*
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+ext {
+  lombokVersion = '1.18.8'
+  slf4jVersion = '1.7.26'
+  isReleaseVersion = !version.endsWith("SNAPSHOT")
+}
+
+dependencies {
+  implementation 'org.slf4j:slf4j-api:1.7.26'
+  implementation 'io.dropwizard:dropwizard-jackson:1.3.14'
+  implementation 'org.apache.httpcomponents:httpclient:4.5.9'
+  implementation 'org.apache.maven:maven-archiver:3.5.0'
+  compileOnly "org.projectlombok:lombok:${lombokVersion}"
+  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+  testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
+  testImplementation 'junit:junit:4.12'
+  testImplementation 'org.assertj:assertj-core:3.12.2'
+  testImplementation 'org.mockito:mockito-core:2.27.0'
+}
+
+compileJava {
+  options.incremental = true
+  options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+  options.incremental = true
+  options.compilerArgs << '-parameters'
+}
+
+task testUnit(type: Test) {
+  useJUnit {
+    includeCategories 'marquez.client.UnitTests'
+  }
+}
+
+task sourceJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier 'javadoc'
+    from javadoc.destinationDir
+}
+
+release {
+  git {
+    requireBranch = 'main'
+  }
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      groupId = 'io.github.marquezproject'
+      artifactId = 'marquez-java'
+
+      from components.java
+
+      artifact sourceJar
+      artifact javadocJar
+
+      pom {
+        name = 'marquez-java'
+        description = 'Java client for Marquez'
+        url = 'https://github.com/MarquezProject/marquez-java'
+        licenses {
+          license {
+            name = 'The Apache License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+        developers {
+          developer {
+            id = 'marquezproject'
+            name = 'Marquez Project'
+          }
+        }
+        scm {
+          connection = 'scm:git:git://github.com/MarquezProject/marquez-java.git'
+          developerConnection = 'scm:git:ssh://github.com:MarquezProject/marquez-java.git'
+          url = 'https://github.com/MarquezProject/marquez-java'
+        }
+      }
+    }
+  }
+
+  processResources {
+    filter ReplaceTokens, tokens: [
+      "version": project.property("version")
+    ]
+  }
+
+  repositories {
+    maven {
+      url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+      credentials {
+        username = System.getenv('SONATYPE_NEXUS_USERNAME')
+        password = System.getenv('SONATYPE_NEXUS_PASSWORD')
+      }
+    }
+  }
+}
+
+signing {
+  required { isReleaseVersion }
+  sign publishing.publications.mavenJava
+}
+
+jar {
+  manifest {
+    attributes(
+      'Created-By': "Gradle ${gradle.gradleVersion}",
+      'Built-By': System.getProperty('user.name'),
+      'Build-Jdk': System.getProperty('java.version'),
+      'Implementation-Title': project.name,
+      'Implementation-Version': project.version
+    )
+  }
+}
+
+spotless {
+  java {
+    googleJavaFormat()
+    removeUnusedImports()
+  }
+}
+
+def reportsDir = "${buildDir}/reports";
+
+def checkstyleDir = "${reportsDir}/checkstyle";
+
+checkstyle {
+  toolVersion = '8.12'
+  configFile = rootProject.file('checkstyle.xml')
+}
+
+task checkstyle(type: Checkstyle) {
+  reports {
+    xml.enabled = true
+    html.enabled = true
+    html.destination = file(checkstyleDir)
+  }
+}
+
+checkstyleMain {
+  source = 'src/main/java'
+}
+
+checkstyleTest {
+  source = 'src/test/java'
+}
+
+spotbugsMain {
+  ignoreFailures = false
+  effort = 'max'
+  reportLevel = 'low'
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+}
+
+spotbugsTest {
+  ignoreFailures = true
+  effort = 'max'
+  reportLevel = 'low'
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+}
+
+def coverageDir = "${reportsDir}/coverage";
+
+jacoco {
+  toolVersion = '0.8.5'
+  reportsDir = file(coverageDir)
+}
+
+jacocoTestReport {
+  reports {
+    xml.enabled = true
+    html.enabled = true
+    html.destination = file(coverageDir)
+  }
+}

@@ -1,0 +1,25 @@
+version: 2.1
+
+jobs:
+  build:
+    working_directory: ~/marquez-java
+    docker:
+      - image: circleci/openjdk:11-jdk
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-jvm-{{ .Branch }}-{{ .Revision }}
+            - v1-jvm-{{ .Branch }}
+      - run: ./gradlew --no-daemon --stacktrace build
+      - run: ./gradlew --no-daemon jacocoTestReport
+      - run: bash <(curl -s https://codecov.io/bash)
+      - save_cache:
+          key: v1-jvm-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.gradle
+
+workflows:
+  marquez_java:
+    jobs:
+      - build
