@@ -248,8 +248,7 @@ public class JobService {
     return jobDao.find(namespaceName.getValue(), jobName.getValue()).map(this::toJob);
   }
 
-  public Optional<Job> getBy(@NonNull JobVersionId jobVersionId)
-      throws MarquezServiceException {
+  public Optional<Job> getBy(@NonNull JobVersionId jobVersionId) throws MarquezServiceException {
     return jobDao
         .find(jobVersionId.getNamespace().getValue(), jobVersionId.getName().getValue())
         .map(jobRow -> toJob(jobRow, jobVersionId.getVersionUuid()));

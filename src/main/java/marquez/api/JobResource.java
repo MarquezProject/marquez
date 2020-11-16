@@ -102,9 +102,7 @@ public class JobResource {
     throwIfNotExists(namespaceName);
 
     final Job job =
-        jobService
-            .get(namespaceName, jobName)
-            .orElseThrow(() -> new JobNotFoundException(jobName));
+        jobService.get(namespaceName, jobName).orElseThrow(() -> new JobNotFoundException(jobName));
     return Response.ok(job).build();
   }
 
