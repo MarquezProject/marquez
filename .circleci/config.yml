@@ -33,7 +33,7 @@ jobs:
   test-web:
     docker:
       - image: circleci/node:11.9.0
-    working_directory: ~/marquez/web
+    working_directory: ~/marquez_web/web
     environment:
       TZ: 'America/New_York'
     steps:
