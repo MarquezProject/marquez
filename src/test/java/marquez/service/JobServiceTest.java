@@ -242,7 +242,7 @@ public class JobServiceTest {
         .thenReturn(Optional.of(JOB_ROW));
     when(jobVersionDao.findBy(JOB_VERSION_ROW.getUuid())).thenReturn(Optional.of(JOB_VERSION_ROW));
 
-    final Optional<Job> job = jobService.getJob(NAMESPACE_NAME, JOB_NAME);
+    final Optional<Job> job = jobService.get(NAMESPACE_NAME, JOB_NAME);
     assertThat(job).contains(JOB);
 
     verify(jobDao, times(1)).find(NAMESPACE_NAME.getValue(), JOB_NAME.getValue());
@@ -255,7 +255,7 @@ public class JobServiceTest {
         .thenReturn(Optional.of(JOB_ROW));
     when(jobVersionDao.findBy(JOB_VERSION_ROW.getUuid())).thenReturn(Optional.of(JOB_VERSION_ROW));
 
-    final Optional<Job> job = jobService.getByJobVersion(JOB_VERSION_ID);
+    final Optional<Job> job = jobService.getBy(JOB_VERSION_ID);
     assertThat(job).contains(JOB);
 
     verify(jobDao, times(1)).find(NAMESPACE_NAME.getValue(), JOB_NAME.getValue());

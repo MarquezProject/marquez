@@ -103,7 +103,7 @@ public class JobResource {
 
     final Job job =
         jobService
-            .getJob(namespaceName, jobName)
+            .get(namespaceName, jobName)
             .orElseThrow(() -> new JobNotFoundException(jobName));
     return Response.ok(job).build();
   }

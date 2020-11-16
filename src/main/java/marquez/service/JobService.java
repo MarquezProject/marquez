@@ -92,7 +92,7 @@ public class JobService {
     if (!jobVersionDao.exists(jobVersion.getValue())) {
       createJobVersion(job.getUuid(), jobVersion, namespaceName, jobName, jobMeta);
       // Get a new job as versions have been attached
-      return getJob(namespaceName, jobName).get();
+      return get(namespaceName, jobName).get();
     }
     return toJob(job);
   }
@@ -243,12 +243,12 @@ public class JobService {
     return jobDao.exists(namespaceName.getValue(), jobName.getValue());
   }
 
-  public Optional<Job> getJob(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)
+  public Optional<Job> get(@NonNull NamespaceName namespaceName, @NonNull JobName jobName)
       throws MarquezServiceException {
     return jobDao.find(namespaceName.getValue(), jobName.getValue()).map(this::toJob);
   }
 
-  public Optional<Job> getByJobVersion(@NonNull JobVersionId jobVersionId)
+  public Optional<Job> getBy(@NonNull JobVersionId jobVersionId)
       throws MarquezServiceException {
     return jobDao
         .find(jobVersionId.getNamespace().getValue(), jobVersionId.getName().getValue())
