@@ -4,6 +4,12 @@ defaults: &defaults
   working_directory: ~/marquez
   machine: true
 
+# Define reusable config (see: https://yaml.org/spec/1.2/spec.html#id2765878)
+checkout_project_root: &checkout_project_root
+  # Override checkout path to project root (see: https://circleci.com/docs/2.0/configuration-reference/#checkout)
+  checkout:
+    path: ~/marquez
+
 jobs:
   build:
     <<: *defaults
@@ -31,13 +37,13 @@ jobs:
             - ~/.gradle
 
   test-web:
+    working_directory: ~/marquez/web
     docker:
       - image: circleci/node:11.9.0
-    working_directory: ~/web
     environment:
       TZ: 'America/New_York'
     steps:
-      - checkout
+      - *checkout_project_root
       - restore_cache:
           keys:
             - v1-deps-{{ .Branch }}-{{ .Revision }}
