@@ -375,7 +375,7 @@ public final class Mapper {
         row.getUpdatedAt(),
         row.getNominalStartTime().orElse(null),
         row.getNominalEndTime().orElse(null),
-        RunState.valueOf(row.getCurrentRunState().get()),
+        RunState.valueOf(row.getCurrentRunState().orElse(RunState.NEW.name())),
         row.getStartedAt().orElse(null),
         row.getEndedAt().orElse(null),
         durationMs.orElse(null),
