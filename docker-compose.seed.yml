@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  seed_marquez_db:
+    build: ./web/docker/db
+    environment:
+      - MARQUEZ_HOST=app
+      - MARQUEZ_PORT=5000
+      - MARQUEZ_ADMIN_PORT=5001
+    volumes:
+      - ./docker/wait-for-it.sh:/usr/local/bin/wait-for-it.sh
+    depends_on:
+      - app
+    entrypoint: [ "./wait-for-it.sh", "app:5000", "--", "./entrypoint.sh" ]
