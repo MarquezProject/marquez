@@ -35,6 +35,7 @@ import marquez.common.models.TagName;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.RunService;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
@@ -70,12 +71,13 @@ public class DatasetResourceTest {
   @Mock private DatasetService datasetService;
   @Mock private JobService jobService;
   @Mock private TagService tagService;
+  @Mock private RunService runService;
   private DatasetResource datasetResource;
 
   @Before
   public void setUp() {
     datasetResource =
-        spy(new DatasetResource(namespaceService, datasetService, jobService, tagService));
+        spy(new DatasetResource(namespaceService, datasetService, tagService, runService));
   }
 
   @Test
@@ -99,7 +101,7 @@ public class DatasetResourceTest {
     final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(jobService.runExists(RUN_ID)).thenReturn(true);
+    when(runService.runExists(RUN_ID)).thenReturn(true);
     when(datasetService.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta))
         .thenReturn(dbTable);
 
@@ -116,7 +118,7 @@ public class DatasetResourceTest {
     final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(jobService.runExists(runIdDoesNotExist)).thenReturn(false);
+    when(runService.runExists(runIdDoesNotExist)).thenReturn(false);
 
     assertThatExceptionOfType(RunNotFoundException.class)
         .isThrownBy(

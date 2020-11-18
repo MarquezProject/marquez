@@ -91,7 +91,7 @@ public final class JobMeta {
     return Version.of(UUID.nameUUIDFromBytes(bytes));
   }
 
-  private static java.util.stream.Stream<String> idToStream(DatasetId datasetId) {
+  private static Stream<String> idToStream(DatasetId datasetId) {
     return Stream.of(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
   }
 }
