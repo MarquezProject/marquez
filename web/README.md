@@ -1,19 +1,5 @@
 # Marquez Web UI
 
-[![CircleCI](https://circleci.com/gh/MarquezProject/marquez-web/tree/master.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez-web/tree/master)
-[![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marquez-project/community)
-[![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/master/LICENSE)
-[![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez-web)
-
-This web UI is used to view metadata collected and cataloged by [Marquez](https://github.com/MarquezProject/marquez).
-
-<p align="center">
-  <img src="./docs/demo.gif">
-</p>
-
-Open http://localhost:3000
-
 ### Requirements
 
 To develop on this project, you need to have Node version 10.16.3 installed. In order to easily switch between node versions, we recommend using node version manager like [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md)
@@ -31,10 +17,6 @@ To develop on this project, you need to have Node version 10.16.3 installed. In 
    ```
    $ npm run dev
    ```
-
-### Running with [Docker](./Dockerfile)
-
-You can open http://localhost:3000 to begin exploring the web UI.
 
 ### Testing
 

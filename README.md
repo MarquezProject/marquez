@@ -15,19 +15,24 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez)
 [![Known Vulnerabilities](https://snyk.io/test/github/MarquezProject/marquez/badge.svg)](https://snyk.io/test/github/MarquezProject/marquez)
 
+<p align="center">
+  <img src="./web/docs/demo.gif">
+</p>
+
 ## Status
 
 Marquez is an [LF AI Foundation](https://lfai.foundation) incubation project and under active development at [Datakin](https://twitter.com/DatakinHQ) (in collaboration with many other organizations).
 
 ## Quickstart
 
-The Marquez [API](https://marquezproject.github.io/marquez/openapi.html) provides a simple way to collect metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
+Marquez provides a simple way to collect metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
-$ docker-compose up
+$ ./docker/up.sh
 ```
+Use the `--build` flag to build images from source, and/or `--seed` to load with seed data.
 
-Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
+You can open http://localhost:3000 to begin exploring the web UI.
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
@@ -92,7 +97,6 @@ Then browse to the admin interface: http://localhost:8081
 
 ## Related Projects
 
-* [`marquez-web`](https://github.com/MarquezProject/marquez-web): Web UI used to view metadata collected and cataloged by Marquez.
 * [`marquez-airflow`](https://github.com/MarquezProject/marquez-airflow): Airflow support for Marquez.
 * [`marquez-java`](https://github.com/MarquezProject/marquez-java): Java client for Marquez.
 * [`marquez-python`](https://github.com/MarquezProject/marquez-python): Python client for Marquez.
