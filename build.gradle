@@ -57,7 +57,7 @@ dependencies {
   compile "io.prometheus:simpleclient_servlet:${prometheusVersion}"
   compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
   compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
-  compile 'com.google.guava:guava:28.0-jre'
+  compile 'com.google.guava:guava:30.0-jre'
   compile 'org.flywaydb:flyway-core:6.3.0'
   compile 'org.postgresql:postgresql:42.2.5'
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
