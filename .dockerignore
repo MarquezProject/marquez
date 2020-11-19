@@ -3,3 +3,4 @@
 Dockerfile
 build
 docs
+web/node_modules

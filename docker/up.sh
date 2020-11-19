@@ -23,7 +23,26 @@ cd "${project_root}"
 compose_files="-f docker-compose.yml"
 args="-V --force-recreate"
 
-if [ "${1}" = "--build" ]; then
+while [ $# -gt 0 ]; do
+  case $1 in
+    '--build'|-b)
+       BUILD='true'
+       break
+       ;;
+    '--seed'|-s)
+       SEED='true'
+       ;;
+    *) exit 1
+       ;;
+  esac
+  shift
+done
+
+if [[ "${SEED}" = "true" ]]; then
+  compose_files+=" -f docker-compose.seed.yml"
+fi
+
+if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   args+=" --build"
 fi

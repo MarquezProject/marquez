@@ -9,11 +9,15 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marquez-project/community)
+[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-izlcs3ar-V_mHjWkAUBBGEHuezX~ZgQ)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
 [![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez)
 [![Known Vulnerabilities](https://snyk.io/test/github/MarquezProject/marquez/badge.svg)](https://snyk.io/test/github/MarquezProject/marquez)
+
+<p align="center">
+  <img src="./web/docs/demo.gif">
+</p>
 
 ## Status
 
@@ -21,13 +25,14 @@ Marquez is an [LF AI Foundation](https://lfai.foundation) incubation project and
 
 ## Quickstart
 
-The Marquez [API](https://marquezproject.github.io/marquez/openapi.html) provides a simple way to collect metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
+Marquez provides a simple way to collect metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
-$ docker-compose up
+$ ./docker/up.sh
 ```
+Use the `--build` flag to build images from source, and/or `--seed` to load with seed data.
 
-Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
+You can open http://localhost:3000 to begin exploring the web UI.
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
@@ -92,7 +97,6 @@ Then browse to the admin interface: http://localhost:8081
 
 ## Related Projects
 
-* [`marquez-web`](https://github.com/MarquezProject/marquez-web): Web UI used to view metadata collected and cataloged by Marquez.
 * [`marquez-airflow`](https://github.com/MarquezProject/marquez-airflow): Airflow support for Marquez.
 * [`marquez-java`](https://github.com/MarquezProject/marquez-java): Java client for Marquez.
 * [`marquez-python`](https://github.com/MarquezProject/marquez-python): Python client for Marquez.
@@ -101,7 +105,7 @@ Then browse to the admin interface: http://localhost:8081
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: https://gitter.im/marquez-project/community
+* Chat: https://marquezproject.slack.com
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing
