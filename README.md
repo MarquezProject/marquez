@@ -1,8 +1,12 @@
 <p align="center">
-  <img src="https://github.com/MarquezProject/marquez/blob/main/docs/assets/images/marquez-logo.png" width="500px" />
+  <img src="./docs/assets/images/marquez-logo.png" width="500px" />
 </p>
 
 Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the provenance of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more. Marquez was released and open sourced by [WeWork](https://www.wework.com).
+
+<p align="center">
+  <img src="./web/docs/demo.gif">
+</p>
 
 ## Badges
 
@@ -15,13 +19,9 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez)
 [![Known Vulnerabilities](https://snyk.io/test/github/MarquezProject/marquez/badge.svg)](https://snyk.io/test/github/MarquezProject/marquez)
 
-<p align="center">
-  <img src="./web/docs/demo.gif">
-</p>
-
 ## Status
 
-Marquez is an [LF AI Foundation](https://lfai.foundation) incubation project and under active development at [Datakin](https://twitter.com/DatakinHQ) (in collaboration with many other organizations).
+Marquez is an [LF AI Foundation](https://lfai.foundation) incubation project under active development and we'd love your help!
 
 ## Quickstart
 
@@ -32,15 +32,21 @@ $ ./docker/up.sh
 ```
 Use the `--build` flag to build images from source, and/or `--seed` to load with seed data.
 
-You can open http://localhost:3000 to begin exploring the web UI.
+> Note: The HTTP API listens on port `5000` for all calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on localhost browse to http://localhost:5001.
 
-> **Note:** By default, the HTTP API does not require any form of authentication or authorization.
+You can open http://localhost:3000 to begin exploring the web UI.
 
 ## Documentation
 
 We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/main/docs).
 
 > **Note:** To begin collecting metadata with Marquez, follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide. Below you will find the steps to get up and running from source.
+
+## Modules
+
+Marquez uses a _multi_-project structure and contains the following modules:
+
+* [`web`](https://github.com/MarquezProject/marquez/tree/main/web): Web UI used to view metadata
 
 ## Requirements
 
@@ -56,6 +62,7 @@ To build the entire project run:
 ```
 $ ./gradlew shadowJar
 ```
+
 The executable can be found under `build/libs/`
 
 ## Configuration
