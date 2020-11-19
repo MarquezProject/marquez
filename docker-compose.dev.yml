@@ -2,3 +2,8 @@ version: "3.7"
 services:
   app:
     build: .
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile

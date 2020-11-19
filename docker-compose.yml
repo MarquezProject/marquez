@@ -14,9 +14,7 @@ services:
     entrypoint: ["./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
 
   web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
+    image: marquezproject/marquez-web:latest
     environment:
       - MARQUEZ_HOST=app
       - MARQUEZ_PORT=5000

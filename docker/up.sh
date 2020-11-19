@@ -12,9 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./up.sh [--build]
+# Usage: $ ./up.sh [--build] [--seed]
 
 set -e
+
+usage() {
+  echo "usage: ./$(basename -- ${0}) [--build] [--seed]"
+  exit 1
+}
 
 # Change working directory to project root
 project_root=$(git rev-parse --show-toplevel)
@@ -27,24 +32,28 @@ while [ $# -gt 0 ]; do
   case $1 in
     '--build'|-b)
        BUILD='true'
-       break
        ;;
     '--seed'|-s)
        SEED='true'
        ;;
-    *) exit 1
+    '--help'|-h)
+       usage
+       exit 0
+       ;;
+    *) usage
+       exit 1
        ;;
   esac
   shift
 done
-
-if [[ "${SEED}" = "true" ]]; then
-  compose_files+=" -f docker-compose.seed.yml"
-fi
 
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   args+=" --build"
 fi
 
-docker-compose down && docker-compose $compose_files up $args
+if [[ "${SEED}" = "true" ]]; then
+  compose_files+=" -f docker-compose.seed.yml"
+fi
+
+docker-compose $compose_files up $args
