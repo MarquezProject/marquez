@@ -107,7 +107,7 @@ public class JobResourceTest {
     final Job job = newJobWith(JOB_ID);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(jobService.getJob(NAMESPACE_NAME, JOB_NAME)).thenReturn(Optional.of(job));
+    when(jobService.get(NAMESPACE_NAME, JOB_NAME)).thenReturn(Optional.of(job));
 
     final Response response = jobResource.get(NAMESPACE_NAME, JOB_NAME);
     assertThat(response.getStatus()).isEqualTo(200);
@@ -126,7 +126,7 @@ public class JobResourceTest {
   @Test
   public void testGet_notFound() throws MarquezServiceException {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
-    when(jobService.getJob(NAMESPACE_NAME, JOB_NAME)).thenReturn(Optional.empty());
+    when(jobService.get(NAMESPACE_NAME, JOB_NAME)).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(JobNotFoundException.class)
         .isThrownBy(() -> jobResource.get(NAMESPACE_NAME, JOB_NAME))

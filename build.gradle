@@ -24,8 +24,8 @@ plugins {
   id 'signing'
   id 'com.adarshr.test-logger' version '2.1.0'
   id 'com.diffplug.spotless' version '5.8.1'
-  id 'com.github.jk1.dependency-license-report' version '1.14'
-  id 'com.github.johnrengelman.shadow' version '6.0.0'
+  id 'com.github.jk1.dependency-license-report' version '1.16'
+  id 'com.github.johnrengelman.shadow' version '6.1.0'
   id 'net.researchgate.release' version '2.8.1'
 }
 
@@ -40,8 +40,8 @@ java {
 }
 
 ext {
-  dropwizardVersion = '2.0.12'
-  jdbi3Version = '3.13.0'
+  dropwizardVersion = '2.0.15'
+  jdbi3Version = '3.17.0'
   lombokVersion = '1.18.12'
   prometheusVersion = '0.9.0'
   isReleaseVersion = !version.endsWith('SNAPSHOT')
@@ -57,14 +57,14 @@ dependencies {
   compile "io.prometheus:simpleclient_servlet:${prometheusVersion}"
   compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
   compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
-  compile 'com.google.guava:guava:28.0-jre'
+  compile 'com.google.guava:guava:30.0-jre'
   compile 'org.flywaydb:flyway-core:6.3.0'
   compile 'org.postgresql:postgresql:42.2.5'
   compileOnly "org.projectlombok:lombok:${lombokVersion}"
   annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
   testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
-  testCompile 'io.github.marquezproject:marquez-java:0.4.3-rc.1'
+  testCompile 'io.github.marquezproject:marquez-java:0.4.3'
   testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:3.11.1'

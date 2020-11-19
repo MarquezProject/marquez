@@ -13,6 +13,20 @@ services:
       - db
     entrypoint: ["./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
 
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    environment:
+      - MARQUEZ_HOST=app
+      - MARQUEZ_PORT=5000
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - app
+
   db:
     image: postgres:12.1
     ports:
