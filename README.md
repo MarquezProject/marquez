@@ -25,7 +25,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Status
 
-Marquez is an [LF AI & Data](https://lfaidata.foundation/projects/marquez) incubation project under active development and we'd love your help!
+Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/marquez) incubation project under active development and we'd love your help!
 
 ## Quickstart
 
