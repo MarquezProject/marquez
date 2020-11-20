@@ -107,7 +107,10 @@ class BigQueryExtractor(BaseExtractor):
                     Dataset.from_table(source, output_table_name)
                 ]
             finally:
-                client.close()
+                # Ensure client has close() defined, otherwise ignore.
+                # NOTE: close() was introduced in python-bigquery v1.23.0
+                if hasattr(client, "close"):
+                    client.close()
         except Exception as e:
             log.error(f"Cannot retrieve job details from BigQuery.Client. {e}",
                       exc_info=True)
