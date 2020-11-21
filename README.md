@@ -25,7 +25,7 @@ Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/mar
   <img src="./web/docs/demo.gif">
 </p>
 
-Marquez provides a simple way to collect dataset and job metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
+The Marquez [API](https://marquezproject.github.io/marquez/openapi.html) provides a simple way to collect dataset and job metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
 $ ./docker/up.sh
@@ -35,7 +35,7 @@ $ ./docker/up.sh
 
 The HTTP API listens on port `5000` for all calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on localhost browse to http://localhost:5001.
 
-> Note: By default, the HTTP API does not require any form of authentication or authorization.
+> **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
 You can open http://localhost:3000 to begin exploring the web UI.
 
