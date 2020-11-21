@@ -35,7 +35,7 @@ This library is under active development with a rapidly evolving API and we'd lo
 ## Requirements
 
  - [Python 3.5.0](https://www.python.org/downloads)+
- - [Airflow 1.10.3](https://pypi.org/project/apache-airflow)+
+ - [Airflow 1.10.4](https://pypi.org/project/apache-airflow)+
 
 ## Installation
 
