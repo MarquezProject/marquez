@@ -4,14 +4,6 @@
 
 Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the provenance of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more. Marquez was released and open sourced by [WeWork](https://www.wework.com).
 
-* [Quickstart](#quickstart)
-* [Documentation](#documentation)
-* [Getting Involved](#getting-involved)
-
-<p align="center">
-  <img src="./web/docs/demo.gif">
-</p>
-
 ## Badges
 
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
@@ -29,14 +21,21 @@ Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/mar
 
 ## Quickstart
 
-Marquez provides a simple way to collect metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
+<p align="center">
+  <img src="./web/docs/demo.gif">
+</p>
+
+Marquez provides a simple way to collect dataset and job metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
 $ ./docker/up.sh
 ```
-Use the `--build` flag to build images from source, and/or `--seed` to load with seed data.
 
-> Note: The HTTP API listens on port `5000` for all calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on localhost browse to http://localhost:5001.
+> **Tip:** Use the `--build` flag to build images from source, and/or `--seed` to load with seed data.
+
+The HTTP API listens on port `5000` for all calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on localhost browse to http://localhost:5001.
+
+> Note: By default, the HTTP API does not require any form of authentication or authorization.
 
 You can open http://localhost:3000 to begin exploring the web UI.
 
