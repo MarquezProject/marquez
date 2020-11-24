@@ -64,7 +64,7 @@ jobs:
           keys:
             - v1-client-java-{{ .Branch }}-{{ .Revision }}
             - v1-client-java-{{ .Branch }}
-      - run: ./.circleci/get-jdk11.sh
+      - run: ../../.circleci/get-jdk11.sh
       - run: ./gradlew --no-daemon --stacktrace build
       - run: ./gradlew --no-daemon jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
