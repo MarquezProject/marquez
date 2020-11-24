@@ -59,7 +59,7 @@ jobs:
     working_directory: ~/marquez/clients/java
     machine: true
     steps:
-      - checkout
+      - *checkout_project_root
       - restore_cache:
           keys:
             - v1-client-java-{{ .Branch }}-{{ .Revision }}
