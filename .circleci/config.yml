@@ -1,26 +1,26 @@
 version: 2.1
 
-defaults: &defaults
+# Define reusable config (see: https://yaml.org/spec/1.2/spec.html#id2765878)
+machine: &machine
   working_directory: ~/marquez
   machine: true
 
-# Define reusable config (see: https://yaml.org/spec/1.2/spec.html#id2765878)
 checkout_project_root: &checkout_project_root
   # Override checkout path to project root (see: https://circleci.com/docs/2.0/configuration-reference/#checkout)
   checkout:
     path: ~/marquez
 
 jobs:
-  build:
-    <<: *defaults
+  build-core:
+    <<: *machine
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
     steps:
       - checkout
       - restore_cache:
           keys:
-            - v1-jvm-{{ .Branch }}-{{ .Revision }}
-            - v1-jvm-{{ .Branch }}
+            - v1-core-{{ .Branch }}-{{ .Revision }}
+            - v1-core-{{ .Branch }}
       - run: ./.circleci/get-jdk11.sh
       - run: echo "checks.disable=true" > ~/.testcontainers.properties
       - run: ./gradlew --no-daemon --stacktrace build
@@ -32,11 +32,11 @@ jobs:
           path: build/reports/tests/test
           destination: test-report
       - save_cache:
-          key: v1-jvm-{{ .Branch }}-{{ .Revision }}
+          key: v1-core-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.gradle
 
-  test-web:
+  build-web:
     working_directory: ~/marquez/web
     docker:
       - image: circleci/node:11.9.0
@@ -46,17 +46,40 @@ jobs:
       - *checkout_project_root
       - restore_cache:
           keys:
-            - v1-deps-{{ .Branch }}-{{ .Revision }}
-            - v1-deps-{{ .Branch }}
+            - v1-web-{{ .Branch }}-{{ .Revision }}
+            - v1-web-{{ .Branch }}
       - run: npm install
       - run: npm run test
       - save_cache:
           paths:
             - node_modules
-          key: v1-deps-{{ .Branch }}-{{ .Revision }}
+          key: v1-web-{{ .Branch }}-{{ .Revision }}
+
+  build-client-java:
+    working_directory: ~/marquez/clients/java
+    machine: true
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-client-java-{{ .Branch }}-{{ .Revision }}
+            - v1-client-java-{{ .Branch }}
+      - run: ./.circleci/get-jdk11.sh
+      - run: ./gradlew --no-daemon --stacktrace build
+      - run: ./gradlew --no-daemon jacocoTestReport
+      - run: bash <(curl -s https://codecov.io/bash)
+      - store_test_results:
+          path: build/test-results/test
+      - store_artifacts:
+          path: build/reports/tests/test
+          destination: test-report
+      - save_cache:
+          key: v1-client-java-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.gradle
 
   release:
-    <<: *defaults
+    <<: *machine
     steps:
       - checkout
       - run: ./.circleci/get-jdk11.sh
@@ -66,13 +89,12 @@ jobs:
 workflows:
   marquez:
     jobs:
-      - build
+      - build-core
+      - build-web
+      - build-client-java
       - release:
           filters:
             tags:
               only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
             branches:
               ignore: /.*/
-  marquez_web:
-    jobs:
-      - test-web
