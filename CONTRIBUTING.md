@@ -131,13 +131,13 @@ $ git commit -s -m "This is my commit message"
 To bundle:
 
 ```bash
-$ redoc-cli bundle docs/openapi.yml -o docs/openapi.html  --title "Marquez API Reference"
+$ redoc-cli bundle spec/openapi.yml -o docs/openapi.html  --title "Marquez API Reference"
 ```
 
 To serve:  
 
 ```bash
-$ redoc-cli serve docs/openapi.yml
+$ redoc-cli serve spec/openapi.yml
 ```
 
 Then browse to: http://localhost:8080
