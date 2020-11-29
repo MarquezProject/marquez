@@ -9,7 +9,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Tooltip
+  Tooltip,
+  Chip
 } from '@material-ui/core'
 import { Dataset } from '../types/api'
 import { IState } from '../reducers'
@@ -33,6 +34,18 @@ const styles = ({ spacing }: ITheme) => {
   return createStyles({
     root: {
       padding: `0 ${spacing(2)}px`
+    },
+    tagList: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      listStyle: 'none',
+      margin: 0,
+      padding: 0
+    },
+    tag: {
+      "&:not(:last-of-type)": {
+        marginRight: spacing(1)
+      }
     },
     noData: {
       padding: '125px 0 0 0'
@@ -81,11 +94,22 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
       </Box>
     )
   } else {
-    const { name, description, updatedAt, fields } = dataset
-
+    const { name, description, updatedAt, fields, tags } = dataset
     return (
       <Box mt={2} className={root}>
         <Box>
+          {tags.length > 0 &&
+          <ul className={classes.tagList}>
+            {tags.map(tag =>
+              <li key={tag} className={classes.tag}>
+                <Chip
+                  size="small"
+                  label={'thing'}
+                />
+              </li>
+            )}
+          </ul>
+          }
           <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
             <MqText heading font={'mono'}>
               {name}
