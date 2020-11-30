@@ -197,8 +197,12 @@ def test_marquez_dag(mock_get_or_create_marquez_client, mock_uuid,
     # dataset call is not invoked.
     mock_marquez_client.create_dataset.assert_not_called()
 
+    # session = settings.Session()
     # (6) Start task that will be marked as failed
-    task_will_fail.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+    ti1 = TaskInstance(task=task_will_fail, execution_date=DEFAULT_DATE)
+    ti1.state = State.FAILED
+    session.add(ti1)
+    session.commit()
 
     dag.handle_callback(dagrun, success=False, session=session)
     mock_marquez_client.mark_job_run_as_failed.assert_called_once_with(
@@ -402,21 +406,6 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
             description=DAG_DESCRIPTION,
             namespace_name=DAG_NAMESPACE,
             run_id=run_id
-        ),
-        # TODO: consolidate the two calls, this second call is spurious
-        mock.call(
-            job_name=f"{dag_id}.{TASK_ID_COMPLETED}",
-            job_type=JobType.BATCH,
-            location=completed_task_location,
-            input_dataset=[
-                {'namespace': 'default', 'name': 'extract_input1'}
-            ],
-            output_dataset=[
-                {'namespace': 'default', 'name': 'extract_output1'}
-            ],
-            context=mock.ANY,
-            description=DAG_DESCRIPTION,
-            namespace_name=DAG_NAMESPACE,
         )
     ])
 
@@ -458,6 +447,5 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
        'create_dataset',  # we would expect only the output to be updated
        'create_dataset',
        'create_job',
-       'create_job',  # we would expect only one call to update the job
        'mark_job_run_as_completed'
     ]

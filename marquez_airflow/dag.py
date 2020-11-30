@@ -19,6 +19,7 @@ import time
 from airflow import LoggingMixin
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from airflow.operators.postgres_operator import PostgresOperator
+from airflow.utils.state import State
 from marquez_client import Clients
 from marquez_client.models import JobType
 from pendulum import Pendulum
@@ -125,6 +126,17 @@ class DAG(airflow.models.DAG, LoggingMixin):
             f'marquez_namespace={self.marquez_namespace} ' \
             f'duration_ms={(self._now_ms() - start_time)}'
 
+    def _handle_task_state(self, marquez_job_run_ids, ti):
+        for marquez_job_run_id in marquez_job_run_ids:
+            if ti.state in {State.SUCCESS, State.SKIPPED}:
+                self.log.info(f"Setting success: {ti.task_id}")
+                self.get_or_create_marquez_client(). \
+                    mark_job_run_as_completed(run_id=marquez_job_run_id)
+            else:
+                self.log.info(f"Setting failed: {ti.task_id}")
+                self.get_or_create_marquez_client().mark_job_run_as_failed(
+                    run_id=marquez_job_run_id)
+
     def handle_callback(self, *args, **kwargs):
         self.log.debug(f"handle_callback({args}, {kwargs})")
 
@@ -133,16 +145,22 @@ class DAG(airflow.models.DAG, LoggingMixin):
             self.log.debug(f"handle_callback() dagrun : {dagrun}")
             task_instances = dagrun.get_task_instances()
             self.log.info(f"{task_instances}")
+
             for ti in task_instances:
-                task = dagrun.get_dag().get_task(ti.task_id)
-                self.log.info(f"ti: {ti} of task: {task}")
+                ti.task = self.get_task(ti.task_id)
+                task = ti.task
 
                 extractor = self._get_extractor(task)
-
-                ti_location = self._get_location(task)
+                self.log.info(f"{ti}")
+                job_name = self._marquez_job_name_from_ti(ti)
+                session = kwargs.get('session')
+                marquez_job_run_ids = self._job_id_mapping.pop(
+                    job_name, dagrun.run_id, session)
+                if marquez_job_run_ids is None:
+                    self.log.error(f'No runs assocated with task {ti}')
+                    continue
 
                 if extractor:
-
                     steps_meta = add_airflow_info_to(
                         task,
                         extractor(task).extract_on_complete(ti))
@@ -150,41 +168,41 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     for step in steps_meta:
                         self.log.info(f'step: {step}')
 
-                        marquez_run_id = self._get_marquez_run_id(
-                            ti, dagrun, kwargs)
-                        self.log.info(f'marquez_run_id: {marquez_run_id}')
+                        for marquez_run_id in marquez_job_run_ids:
+                            self.log.info(f'marquez_run_id: {marquez_run_id}')
 
-                        self.register_datasets(step.inputs)
-                        self.register_datasets(step.outputs, marquez_run_id)
-                        inputs = self._to_dataset_ids(step.inputs)
-                        outputs = self._to_dataset_ids(step.outputs)
-                        self.log.info(
-                            f'inputs: {inputs} '
-                            f'outputs: {outputs} '
-                        )
-                        self.get_or_create_marquez_client().create_job(
-                            namespace_name=self.marquez_namespace,
-                            job_name=step.name,
-                            job_type=JobType.BATCH,
-                            location=step.location or ti_location,
-                            input_dataset=inputs,
-                            output_dataset=outputs,
-                            description=self.description,
-                            context=step.context,
-                            run_id=marquez_run_id)
+                            inputs = None
+                            if step.inputs is not None:
+                                self.register_datasets(step.inputs)
+                                inputs = self._to_dataset_ids(step.inputs)
+                                self.log.info(
+                                    f'inputs: {inputs} '
+                                )
+                            outputs = None
+                            if step.outputs is not None:
+                                self.register_datasets(step.outputs,
+                                                       marquez_run_id)
+                                outputs = self._to_dataset_ids(step.outputs)
+                                self.log.info(
+                                    f'outputs: {outputs} '
+                                )
 
-                        self.log.info(f"client.create_job(run_id="
-                                      f"{marquez_run_id}) successful.")
+                            ti_location = self._get_location(task)
+                            self.get_or_create_marquez_client().create_job(
+                                namespace_name=self.marquez_namespace,
+                                job_name=step.name,
+                                job_type=JobType.BATCH,
+                                location=step.location or ti_location,
+                                input_dataset=inputs,
+                                output_dataset=outputs,
+                                description=self.description,
+                                context=step.context,
+                                run_id=marquez_run_id)
 
-                try:
-                    self.report_jobrun_change(
-                        ti, dagrun.run_id, **kwargs)
-                except Exception as e:
-                    self.log.error(
-                        f'Failed to record task run state change: {e} '
-                        f'dag_id={self.dag_id}',
-                        exc_info=True)
-
+                            self.log.info(f"client.create_job(run_id="
+                                          f"{marquez_run_id}) successful.")
+                self._handle_task_state(marquez_job_run_ids, ti)
+            return
         except Exception as e:
             self.log.error(
                 f'Failed to record dagrun state change: {e} '
@@ -313,13 +331,9 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 nominal_start_time=start_time,
                 nominal_end_time=end_time)
 
-            if external_run_id:
-                marquez_jobrun_ids.append(external_run_id)
-                marquez_client.mark_job_run_as_started(run_id=external_run_id)
-            else:
-                self.log.error(
-                    f'Failed to get run id: {step.name} {task_info}'
-                    )
+            marquez_jobrun_ids.append(external_run_id)
+            marquez_client.mark_job_run_as_started(run_id=external_run_id)
+
             self.log.info(
                 f'Successfully recorded job run: {step.name} {task_info}'
                 f'airflow_dag_execution_time={start_time} '
@@ -339,48 +353,6 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
     def compute_endtime(self, execution_date):
         return self.following_schedule(execution_date)
-
-    def report_jobrun_change(self, ti, run_id, **kwargs):
-        job_name = self._marquez_job_name_from_ti(ti)
-        session = kwargs.get('session')
-        marquez_job_run_ids = self._job_id_mapping.pop(
-            job_name, run_id, session)
-
-        task_info = \
-            f'airflow_dag_id={self.dag_id} ' \
-            f'task_id={ti.task_id} ' \
-            f'airflow_run_id={run_id} ' \
-            f'marquez_run_id={marquez_job_run_ids} ' \
-            f'marquez_namespace={self.marquez_namespace}' \
-            f'marquez_job_name={job_name} '
-
-        if marquez_job_run_ids:
-            self.log.info(
-                f'Found job runs: {task_info}'
-                f'marquez_run_ids={marquez_job_run_ids} ')
-
-            state = 'UNKNOWN'
-            if kwargs.get('success'):
-                state = 'COMPLETED'
-                for marquez_job_run_id in marquez_job_run_ids:
-                    for task_id, task in self.task_dict.items():
-                        if task_id == ti.task_id:
-                            self.log.info(f'task_id: {task_id}')
-                            self.report_task(
-                                run_id,
-                                None,
-                                task,
-                                self._get_extractor(task),
-                                marquez_job_run_id=marquez_job_run_id)
-                    self.get_or_create_marquez_client(). \
-                        mark_job_run_as_completed(run_id=marquez_job_run_id)
-            else:
-                state = 'FAILED'
-                for marquez_job_run_id in marquez_job_run_ids:
-                    self.get_or_create_marquez_client().mark_job_run_as_failed(
-                        run_id=marquez_job_run_id)
-
-        self.log.info(f'Marked job run(s) as {state}. {task_info}')
 
     def get_or_create_marquez_client(self):
         if not self._marquez_client:
@@ -461,15 +433,3 @@ class DAG(airflow.models.DAG, LoggingMixin):
     @staticmethod
     def _marquez_job_name(dag_id, task_id):
         return f'{dag_id}.{task_id}'
-
-    def _get_marquez_run_id(self, ti, dagrun, kwargs):
-        self.log.debug(f"_get_marquez_run_id({ti}, {dagrun}, {kwargs})")
-        job_name = self._marquez_job_name_from_ti(ti)
-        session = kwargs.get('session')
-        job_run_ids = self._job_id_mapping.get(
-            job_name, dagrun.run_id, session)
-        self.log.info(f"job_run_ids: {job_run_ids}")
-        if job_run_ids:
-            return job_run_ids[0]
-        else:
-            return None
