@@ -44,6 +44,13 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
         job_details = json.loads(job_details_file.read())
         job_details_file.close()
 
+        table_details_file = open(
+            file="tests/extractors/table_details.json",
+            mode="r"
+        )
+        table_details = json.loads(table_details_file.read())
+        job_details_file.close()
+
         bq_job_id = "foo.bq.job_id"
 
         mock_hook.return_value \
@@ -54,6 +61,10 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
         mock_client.return_value \
             .get_job.return_value \
             ._properties = job_details
+
+        mock_client.return_value \
+            .get_table.return_value \
+            ._properties = table_details
 
         mock_client.return_value.close.return_value
 
@@ -99,6 +110,9 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
         assert len(steps_meta[0].inputs) == 1
         assert steps_meta[0].inputs[0].name == \
             'bigquery-public-data.usa_names.usa_1910_2013'
+
+        assert steps_meta[0].inputs[0].fields is not None
+        assert len(steps_meta[0].inputs[0].fields) == 5
         assert steps_meta[0].outputs is not None
         assert len(steps_meta[0].outputs) == 1
         assert steps_meta[0].outputs[0].name == \

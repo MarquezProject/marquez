@@ -23,6 +23,7 @@ from marquez_airflow.extractors import (
     Source,
     Dataset
 )
+from marquez_airflow.models import DbTableSchema, DbColumn
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
 from marquez_airflow.utils import (
     get_job_name
@@ -95,12 +96,24 @@ class BigQueryExtractor(BaseExtractor):
                 input_table_names = [
                     self._bq_table_name(bq_t) for bq_t in bq_input_tables
                 ]
-                inputs = [
-                    Dataset.from_table(source, table)
-                    for table in input_table_names
-                ]
-                bq_output_table = job_properties.get('configuration')\
-                    .get('query')\
+                try:
+                    inputs = [
+                        Dataset.from_table_schema(
+                            source=source,
+                            table_schema=table_schema
+                        )
+                        for table_schema in self._get_table_schemas(
+                            input_table_names, client
+                        )
+                    ]
+                except Exception as e:
+                    log.warn(f'Could not extract schema from bigquery. {e}')
+                    inputs = [
+                        Dataset.from_table(source, table)
+                        for table in input_table_names
+                    ]
+                bq_output_table = job_properties.get('configuration') \
+                    .get('query') \
                     .get('destinationTable')
                 output_table_name = self._bq_table_name(bq_output_table)
                 outputs = [
@@ -122,6 +135,39 @@ class BigQueryExtractor(BaseExtractor):
                     outputs=outputs,
                     context=context
                 )]
+
+    def _get_table_schemas(self, tables: [str], client: bigquery.Client) \
+            -> [DbTableSchema]:
+        # Avoid querying postgres by returning an empty array
+        # if no tables have been provided.
+        if not tables:
+            return []
+
+        return [self._get_table(table, client) for table in tables]
+
+    def _get_table(self, table: str, client: bigquery.Client) -> DbTableSchema:
+        bq_table = client.get_table(table)
+        if not bq_table._properties:
+            return
+        table = bq_table._properties
+
+        if not table.get('schema') or not table.get('schema').get('fields'):
+            return
+
+        fields = table.get('schema').get('fields')
+        columns = [DbColumn(
+            name=fields[i].get('name'),
+            type=fields[i].get('type'),
+            description=fields[i].get('description'),
+            ordinal_position=i
+        ) for i in range(len(fields))]
+
+        return DbTableSchema(
+            schema_name=table.get('tableReference').get('projectId') + '.' +
+            table.get('tableReference').get('datasetId'),
+            table_name=table.get('tableReference').get('tableId'),
+            columns=columns
+        )
 
     def _get_bigquery_job_id(self, task_instance):
         bigquery_job_id = task_instance.xcom_pull(
