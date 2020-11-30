@@ -65,7 +65,11 @@ class JobIdMapping:
         return "marquez_id_mapping-{}-{}".format(job_name, run_id)
 
 
-def url_to_https(url):
+def url_to_https(url) -> str:
+    # Ensure URL exists
+    if not url:
+        return None
+
     base_url = None
     if url.startswith('git@'):
         part = url.split('git@')[1:2]
@@ -75,14 +79,18 @@ def url_to_https(url):
         base_url = url
 
     if not base_url:
-        raise ValueError(f'Unable to extract location from: {url}')
+        raise ValueError(f"Unable to extract location from: {url}")
 
     if base_url.endswith('.git'):
         base_url = base_url[:-4]
     return base_url
 
 
-def get_location(file_path):
+def get_location(file_path) -> str:
+    # Ensure file path exists
+    if not file_path:
+        return None
+
     # move to the file directory
     abs_path = os.path.abspath(file_path)
     file_name = os.path.basename(file_path)
@@ -99,6 +107,9 @@ def get_location(file_path):
 
     # build the URL
     base_url = url_to_https(repo_url)
+    if not base_url:
+        return None
+
     return f'{base_url}/blob/{commit_id}/{repo_relative_path}{file_name}'
 
 
