@@ -90,9 +90,17 @@ public class JobService {
 
     final Version jobVersion = jobMeta.version(namespaceName, jobName);
     if (!jobVersionDao.exists(jobVersion.getValue())) {
-      createJobVersion(job.getUuid(), jobVersion, namespaceName, jobName, jobMeta);
+      UUID jobVersionUuid =
+          createJobVersion(job.getUuid(), jobVersion, namespaceName, jobName, jobMeta).getUuid();
+      updateRunFromJobMeta(jobMeta, jobVersionUuid, namespaceName, jobName);
       // Get a new job as versions have been attached
       return get(namespaceName, jobName).get();
+    } else if (jobMeta.getRunId().isPresent()) {
+      Optional<ExtendedJobVersionRow> jobVersionUuid =
+          jobVersionDao.findVersion(jobVersion.getValue());
+      ExtendedJobVersionRow jobVersionRow =
+          jobVersionUuid.orElseThrow(MarquezServiceException::new);
+      updateRunFromJobMeta(jobMeta, jobVersionRow.getUuid(), namespaceName, jobName);
     }
     return toJob(job);
   }
@@ -105,7 +113,7 @@ public class JobService {
     return jobRow.get();
   }
 
-  private void createJobVersion(
+  private JobVersionRow createJobVersion(
       UUID jobId,
       Version jobVersion,
       NamespaceName namespaceName,
@@ -126,20 +134,6 @@ public class JobService {
             jobMeta.getLocation().orElse(null),
             jobVersion);
 
-    jobMeta
-        .getRunId()
-        .ifPresent(
-            runId -> {
-              // associate new input datasets with job version
-              runService.updateRunInputDatasets(
-                  runId.getValue(), inputRows, namespaceName, jobName, newJobVersionRow);
-
-              // associate the new job version with the existing job run
-              final Instant updatedAt = Instant.now();
-              runService.updateJobVersionUuid(
-                  runId.getValue(), updatedAt, newJobVersionRow.getUuid());
-            });
-
     JobMetrics.emitVersionMetric(
         namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue());
 
@@ -147,6 +141,28 @@ public class JobService {
         "Successfully created version '{}' for job '{}'.",
         jobVersion.getValue(),
         jobName.getValue());
+    return newJobVersionRow;
+  }
+
+  private void updateRunFromJobMeta(
+      JobMeta jobMeta,
+      UUID jobVersionUuid,
+      @NonNull NamespaceName namespaceName,
+      @NonNull JobName jobName) {
+    jobMeta
+        .getRunId()
+        .ifPresent(
+            runId -> {
+              final List<DatasetRow> inputRows = findDatasetRows(jobMeta.getInputs());
+
+              // associate new input datasets with job version
+              runService.updateRunInputDatasets(
+                  runId.getValue(), inputRows, namespaceName, jobName, jobVersionUuid);
+
+              // associate the new job version with the existing job run
+              final Instant updatedAt = Instant.now();
+              runService.updateJobVersionUuid(runId.getValue(), updatedAt, jobVersionUuid);
+            });
   }
 
   private JobContextRow getOrCreateJobContextRow(ImmutableMap<String, String> context) {

@@ -162,15 +162,11 @@ public class RunService {
       throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
-    final Optional<ExtendedJobVersionRow> versionRow =
-        jobVersionDao.findLatest(namespaceName.getValue(), jobName.getValue());
-    if (versionRow.isPresent()) {
-      final List<ExtendedRunRow> runRows =
-          runDao.findAll(versionRow.get().getUuid(), limit, offset);
-      final List<Run> runs = Mapper.toRuns(runRows);
-      return ImmutableList.copyOf(runs);
-    }
-    return ImmutableList.of();
+
+    final List<ExtendedRunRow> runRows =
+        runDao.findAll(namespaceName.getValue(), jobName.getValue(), limit, offset);
+    final List<Run> runs = Mapper.toRuns(runRows);
+    return ImmutableList.copyOf(runs);
   }
 
   public void markRunAs(@NonNull RunId runId, @NonNull RunState newRunState) {
@@ -237,7 +233,7 @@ public class RunService {
       List<DatasetRow> inputRows,
       NamespaceName namespaceName,
       JobName jobName,
-      JobVersionRow jobVersion) {
+      UUID jobVersionUuid) {
     if (inputRows.isEmpty()) {
       return;
     }
@@ -271,7 +267,7 @@ public class RunService {
                 run.getNominalStartTime().orElse(null),
                 run.getNominalEndTime().orElse(null),
                 Mapper.toRunArgs(run.getArgs())),
-            new JobVersionId(namespaceName, jobName, jobVersion.getUuid()),
+            new JobVersionId(namespaceName, jobName, jobVersionUuid),
             runInputs));
   }
 
