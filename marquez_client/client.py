@@ -10,15 +10,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import os
-
 import requests
+
 from six.moves.urllib.parse import quote
 
 from marquez_client import errors
-from marquez_client.constants import (DEFAULT_TIMEOUT_MS, API_PATH_V1)
-from marquez_client.models import (DatasetType, JobType)
+from marquez_client.constants import (
+    DEFAULT_TIMEOUT_MS,
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    API_PATH_V1
+)
+from marquez_client.models import (
+    DatasetId,
+    DatasetType,
+    JobType
+)
 from marquez_client.utils import Utils
 from marquez_client.version import VERSION
 
@@ -28,7 +38,6 @@ _HEADERS = {'User-Agent': _USER_AGENT}
 log = logging.getLogger(__name__)
 
 
-# Marquez Client
 class MarquezClient:
     def __init__(self, url, timeout_ms=None, api_key: str = None):
         self._timeout = Utils.to_seconds(timeout_ms or os.environ.get(
@@ -39,7 +48,6 @@ class MarquezClient:
         if api_key:
             Utils.add_auth_to(_HEADERS, api_key)
 
-    # Namespace API
     def create_namespace(self, namespace_name, owner_name, description=None):
         Utils.check_name_length(namespace_name, 'namespace_name')
         Utils.check_name_length(owner_name, 'owner_name')
@@ -65,12 +73,11 @@ class MarquezClient:
         return self._get(
             self._url('/namespaces'),
             params={
-                'limit': limit,
-                'offset': offset
+                'limit': limit or DEFAULT_LIMIT,
+                'offset': offset or DEFAULT_OFFSET
             }
         )
 
-    # Source API
     def create_source(self, source_name, source_type, connection_url,
                       description=None):
         Utils.check_name_length(source_name, 'source_name')
@@ -97,14 +104,13 @@ class MarquezClient:
         return self._get(
             self._url('/sources'),
             params={
-                'limit': limit,
-                'offset': offset
+                'limit': limit or DEFAULT_LIMIT,
+                'offset': offset or DEFAULT_OFFSET
             }
         )
 
-    # Datasets API
     def create_dataset(self, namespace_name, dataset_name, dataset_type,
-                       physical_name, source_name,
+                       dataset_physical_name, source_name,
                        description=None, run_id=None,
                        schema_location=None,
                        fields=None, tags=None):
@@ -113,14 +119,14 @@ class MarquezClient:
         Utils.is_instance_of(dataset_type, DatasetType)
 
         if dataset_type == DatasetType.STREAM:
-            MarquezClient._is_none(schema_location, 'schema_location')
+            Utils.is_none(schema_location, 'schema_location')
 
-        Utils.check_name_length(physical_name, 'physical_name')
+        Utils.check_name_length(dataset_physical_name, 'dataset_physical_name')
         Utils.check_name_length(source_name, 'source_name')
 
         payload = {
             'type': dataset_type.value,
-            'physicalName': physical_name,
+            'physicalName': dataset_physical_name,
             'sourceName': source_name,
         }
 
@@ -160,8 +166,8 @@ class MarquezClient:
         return self._get(
             self._url('/namespaces/{0}/datasets', namespace_name),
             params={
-                'limit': limit,
-                'offset': offset
+                'limit': limit or DEFAULT_LIMIT,
+                'offset': offset or DEFAULT_OFFSET
             }
         )
 
@@ -177,30 +183,34 @@ class MarquezClient:
                       namespace_name, dataset_name, tag_name)
         )
 
-    def tag_dataset_field(self, namespace_name, dataset_name, field_name,
-                          tag_name):
+    def tag_dataset_field(self, namespace_name, dataset_name,
+                          dataset_field_name, tag_name):
         Utils.check_name_length(namespace_name, 'namespace_name')
         Utils.check_name_length(dataset_name, 'dataset_name')
-        Utils.check_name_length(field_name, 'field_name')
+        Utils.check_name_length(dataset_field_name, 'dataset_field_name')
         Utils.check_name_length(tag_name, 'tag_name')
 
         return self._post(
             self._url('/namespaces/{0}/datasets/{1}/fields/{2}/tags/{3}',
-                      namespace_name, dataset_name, field_name, tag_name)
+                      namespace_name, dataset_name, dataset_field_name,
+                      tag_name)
         )
 
-    # Job API
     def create_job(self, namespace_name, job_name, job_type, location=None,
-                   input_dataset=None, output_dataset=None, description=None,
-                   context=None, run_id=None):
+                   inputs: [DatasetId] = None, outputs: [DatasetId] = None,
+                   description=None, context=None, run_id=None):
         Utils.check_name_length(namespace_name, 'namespace_name')
         Utils.check_name_length(job_name, 'job_name')
         Utils.is_instance_of(job_type, JobType)
 
         payload = {
-            'inputs': input_dataset or [],
-            'outputs': output_dataset or [],
-            'type': job_type.name
+            'type': job_type.value,
+            'inputs': [
+                input.__dict__ for input in inputs
+            ] if inputs else [],
+            'outputs': [
+                output.__dict__ for output in outputs
+            ] if outputs else []
         }
 
         if run_id:
@@ -234,8 +244,8 @@ class MarquezClient:
         return self._get(
             self._url('/namespaces/{0}/jobs', namespace_name),
             params={
-                'limit': limit,
-                'offset': offset
+                'limit': limit or DEFAULT_LIMIT,
+                'offset': offset or DEFAULT_OFFSET
             }
         )
 
@@ -281,27 +291,26 @@ class MarquezClient:
                 namespace_name,
                 job_name),
             params={
-                'limit': limit,
-                'offset': offset
+                'limit': limit or DEFAULT_LIMIT,
+                'offset': offset or DEFAULT_OFFSET
             }
         )
 
     def get_job_run(self, run_id):
-        self._is_valid_uuid(run_id, 'run_id')
-
+        Utils.is_valid_uuid(run_id, 'run_id')
         return self._get(self._url('/jobs/runs/{0}', run_id))
 
-    def mark_job_run_as_started(self, run_id, action_at=None):
-        return self.__mark_job_run_as(run_id, 'start', action_at)
+    def mark_job_run_as_started(self, run_id, at=None):
+        return self.__mark_job_run_as(run_id, 'start', at)
 
-    def mark_job_run_as_completed(self, run_id, action_at=None):
-        return self.__mark_job_run_as(run_id, 'complete', action_at)
+    def mark_job_run_as_completed(self, run_id, at=None):
+        return self.__mark_job_run_as(run_id, 'complete', at)
 
-    def mark_job_run_as_failed(self, run_id, action_at=None):
-        return self.__mark_job_run_as(run_id, 'fail', action_at)
+    def mark_job_run_as_failed(self, run_id, at=None):
+        return self.__mark_job_run_as(run_id, 'fail', at)
 
-    def mark_job_run_as_aborted(self, run_id, action_at=None):
-        return self.__mark_job_run_as(run_id, 'abort', action_at)
+    def mark_job_run_as_aborted(self, run_id, at=None):
+        return self.__mark_job_run_as(run_id, 'abort', at)
 
     def list_tags(self, limit=None, offset=None):
         return self._get(
@@ -312,33 +321,28 @@ class MarquezClient:
             }
         )
 
-    def __mark_job_run_as(self, run_id, action, action_at=None):
+    def __mark_job_run_as(self, run_id, action, at=None):
         Utils.is_valid_uuid(run_id, 'run_id')
 
         return self._post(
             self._url('/jobs/runs/{0}/{1}?at={2}', run_id, action,
-                      action_at if action_at else Utils.utc_now()), payload={}
+                      at if at else Utils.utc_now())
         )
 
-    # Common
     def _url(self, path, *args):
         encoded_args = [quote(arg.encode('utf-8'), safe='') for arg in args]
         return f'{self._api_base}{path.format(*encoded_args)}'
 
-    def _post(self, url, payload, as_json=True):
+    def _post(self, url, payload=None, as_json=True):
         now_ms = Utils.now_ms()
 
         response = requests.post(
-            url=url, headers=_HEADERS, json=payload, timeout=self._timeout)
-
-        post_details = {}
-        post_details['url'] = url
-        post_details['http_method'] = 'POST'
-        post_details['http_headers'] = _HEADERS
-        post_details['payload'] = payload
-        post_details['duration_ms'] = (self._now_ms() - now_ms)
-
-        log.info(post_details)
+            url=url, headers=_HEADERS, json=payload, timeout=self._timeout
+        )
+        log.info(
+            f"{url} method=POST payload={json.dumps(payload)} "
+            f"duration_ms={Utils.now_ms() - now_ms}"
+        )
 
         return self._response(response, as_json)
 
@@ -346,16 +350,12 @@ class MarquezClient:
         now_ms = Utils.now_ms()
 
         response = requests.put(
-            url=url, headers=_HEADERS, json=payload, timeout=self._timeout)
-
-        put_details = {}
-        put_details['url'] = url
-        put_details['http_method'] = 'POST'
-        put_details['http_headers'] = _HEADERS
-        put_details['payload'] = payload
-        put_details['duration_ms'] = (self._now_ms() - now_ms)
-
-        log.info(put_details)
+            url=url, headers=_HEADERS, json=payload, timeout=self._timeout
+        )
+        log.info(
+            f"{url} method=PUT payload={json.dumps(payload)} "
+            f"duration_ms={Utils.now_ms() - now_ms}"
+        )
 
         return self._response(response, as_json)
 
@@ -363,16 +363,11 @@ class MarquezClient:
         now_ms = Utils.now_ms()
 
         response = requests.get(
-            url, params=params, headers=_HEADERS, timeout=self._timeout)
-
-        get_details = {}
-        get_details['url'] = url
-        get_details['http_method'] = 'POST'
-        get_details['http_headers'] = _HEADERS
-        get_details['payload'] = params
-        get_details['duration_ms'] = (self._now_ms() - now_ms)
-
-        log.info(get_details)
+            url=url, params=params, headers=_HEADERS, timeout=self._timeout
+        )
+        log.info(
+            f"{url} method=GET duration_ms={Utils.now_ms() - now_ms}"
+        )
 
         return self._response(response, as_json)
 

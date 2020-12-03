@@ -15,5 +15,7 @@ DEFAULT_NAMESPACE_NAME = 'default'
 DEFAULT_MARQUEZ_BACKEND = 'http'
 DEFAULT_MARQUEZ_URL = 'http://localhost:8080'
 DEFAULT_MARQUEZ_FILE = '/tmp/marquez/client.requests.log'
+DEFAULT_LIMIT = 100
+DEFAULT_OFFSET = 0
 
 API_PATH_V1 = '/api/v1'
