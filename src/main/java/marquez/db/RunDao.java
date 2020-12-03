@@ -141,11 +141,14 @@ public interface RunDao extends SqlObject {
 
   @SqlQuery(
       SELECT_RUN
-          + "WHERE r.job_version_uuid = :jobVersionUuid "
+          + "INNER JOIN job_versions AS jv ON r.job_version_uuid = jv.uuid "
+          + "INNER JOIN jobs AS j ON jv.job_uuid = j.uuid "
+          + "INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid "
+          + "WHERE n.name = :namespace and j.name = :jobName "
           + "ORDER BY r.created_at DESC "
           + "LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(ExtendedRunRowMapper.class)
-  List<ExtendedRunRow> findAll(UUID jobVersionUuid, int limit, int offset);
+  List<ExtendedRunRow> findAll(String namespace, String jobName, int limit, int offset);
 
   @SqlQuery("SELECT COUNT(*) FROM runs")
   int count();
