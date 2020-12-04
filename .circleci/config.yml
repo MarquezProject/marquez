@@ -2,7 +2,7 @@ version: 2
 
 defaults: &defaults
   docker:
-    - image: circleci/python:3.6
+    - image: circleci/python:3.8.5
   working_directory: ~/marquez_airflow
 
 

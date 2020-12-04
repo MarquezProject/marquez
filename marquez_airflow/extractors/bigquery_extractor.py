@@ -51,17 +51,7 @@ class BigQueryExtractor(BaseExtractor):
             connection_url=_BIGQUERY_CONN_URL)
 
     def extract(self) -> [StepMetadata]:
-        sql_meta = SqlParser.parse(self.operator.sql)
-        log.debug(f"bigquery sql parsed and obtained meta: {sql_meta}")
-
-        return [StepMetadata(
-            name=get_job_name(task=self.operator),
-            context={
-                'sql': self.operator.sql,
-                'bigquery.sql.parsed.inputs': json.dumps(sql_meta.in_tables),
-                'bigquery.sql.parsed.outputs': json.dumps(sql_meta.out_tables)
-            }
-        )]
+        return []
 
     def _bq_table_name(self, bq_table):
         project = bq_table.get('projectId')
@@ -69,56 +59,39 @@ class BigQueryExtractor(BaseExtractor):
         table = bq_table.get('tableId')
         return f"{project}.{dataset}.{table}"
 
-    # convenience method
     def extract_on_complete(self, task_instance) -> [StepMetadata]:
         log.debug(f"extract_on_complete({task_instance})")
-
+        context = self.parse_sql_context()
         source = self._source()
-        bigquery_job_id = self._get_bigquery_job_id(task_instance)
+
+        try:
+            bigquery_job_id = self._get_xcom_bigquery_job_id(task_instance)
+            context['bigquery.job_id'] = bigquery_job_id
+            if bigquery_job_id is None:
+                raise Exception("Xcom could not resolve BigQuery job id")
+        except Exception as e:
+            log.error(f"Cannot retrieve job details from BigQuery.Client. {e}",
+                      exc_info=True)
+            context['bigquery.extractor.client_error'] = \
+                f"{e}: {traceback.format_exc()}"
+            return [StepMetadata(
+                name=get_job_name(task=self.operator),
+                context=context,
+                inputs=None,
+                outputs=None
+            )]
 
         inputs = None
         outputs = None
-        context = {
-            'sql': self.operator.sql,
-            'bigquery.job_id': bigquery_job_id
-        }
         try:
             client = bigquery.Client()
             try:
                 job = client.get_job(job_id=bigquery_job_id)
-                job_properties = job._properties
-                job_properties_str = json.dumps(job_properties)
+                job_properties_str = json.dumps(job._properties)
                 context['bigquery.job_properties'] = job_properties_str
-                bq_input_tables = job_properties.get('statistics')\
-                    .get('query')\
-                    .get('referencedTables')
 
-                input_table_names = [
-                    self._bq_table_name(bq_t) for bq_t in bq_input_tables
-                ]
-                try:
-                    inputs = [
-                        Dataset.from_table_schema(
-                            source=source,
-                            table_schema=table_schema
-                        )
-                        for table_schema in self._get_table_schemas(
-                            input_table_names, client
-                        )
-                    ]
-                except Exception as e:
-                    log.warn(f'Could not extract schema from bigquery. {e}')
-                    inputs = [
-                        Dataset.from_table(source, table)
-                        for table in input_table_names
-                    ]
-                bq_output_table = job_properties.get('configuration') \
-                    .get('query') \
-                    .get('destinationTable')
-                output_table_name = self._bq_table_name(bq_output_table)
-                outputs = [
-                    Dataset.from_table(source, output_table_name)
-                ]
+                inputs = self._get_input_from_bq(client, job, context, source)
+                outputs = self._get_output_from_bq(job, source)
             finally:
                 # Ensure client has close() defined, otherwise ignore.
                 # NOTE: close() was introduced in python-bigquery v1.23.0
@@ -129,12 +102,49 @@ class BigQueryExtractor(BaseExtractor):
                       exc_info=True)
             context['bigquery.extractor.error'] = \
                 f"{e}: {traceback.format_exc()}"
+
         return [StepMetadata(
-                    name=get_job_name(task=self.operator),
-                    inputs=inputs,
-                    outputs=outputs,
-                    context=context
-                )]
+            name=get_job_name(task=self.operator),
+            inputs=inputs,
+            outputs=outputs,
+            context=context
+        )]
+
+    def _get_input_from_bq(self, client, job, context, source):
+        bq_input_tables = job._properties.get('statistics')\
+            .get('query')\
+            .get('referencedTables')
+
+        input_table_names = [
+            self._bq_table_name(bq_t) for bq_t in bq_input_tables
+        ]
+        try:
+            return [
+                Dataset.from_table_schema(
+                    source=source,
+                    table_schema=table_schema
+                )
+                for table_schema in self._get_table_schemas(
+                    input_table_names, client
+                )
+            ]
+        except Exception as e:
+            log.warn(f'Could not extract schema from bigquery. {e}')
+            context['bigquery.extractor.bq_schema_error'] = \
+                f'{e}: {traceback.format_exc()}'
+            return [
+                Dataset.from_table(source, table)
+                for table in input_table_names
+            ]
+
+    def _get_output_from_bq(self, job, source):
+        bq_output_table = job._properties.get('configuration') \
+            .get('query') \
+            .get('destinationTable')
+        output_table_name = self._bq_table_name(bq_output_table)
+        return [
+            Dataset.from_table(source, output_table_name)
+        ]
 
     def _get_table_schemas(self, tables: [str], client: bigquery.Client) \
             -> [DbTableSchema]:
@@ -169,10 +179,28 @@ class BigQueryExtractor(BaseExtractor):
             columns=columns
         )
 
-    def _get_bigquery_job_id(self, task_instance):
+    def _get_xcom_bigquery_job_id(self, task_instance):
         bigquery_job_id = task_instance.xcom_pull(
             task_ids=task_instance.task_id, key='job_id')
 
         log.info(f"bigquery_job_id: {bigquery_job_id}")
 
         return bigquery_job_id
+
+    def parse_sql_context(self):
+        context = {
+            'sql': self.operator.sql,
+        }
+        try:
+            sql_meta = SqlParser.parse(self.operator.sql)
+            log.debug(f"bigquery sql parsed and obtained meta: {sql_meta}")
+            context['bigquery.sql.parsed.inputs'] = json.dumps(
+                sql_meta.in_tables)
+            context['bigquery.sql.parsed.outputs'] = json.dumps(
+                sql_meta.out_tables)
+        except Exception as e:
+            log.error(f"Cannot parse sql query. {e}",
+                      exc_info=True)
+            context['bigquery.extractor.sql_parser_error'] = \
+                f'{e}: {traceback.format_exc()}'
+        return context
