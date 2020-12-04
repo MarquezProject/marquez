@@ -1,0 +1,24 @@
+{
+  "method": "PUT",
+  "path": "/api/v1/namespaces/my-namespace/jobs/my-job",
+  "headers": {
+    "User-Agent": "marquez-python/0.7.6"
+  },
+  "payload": {
+    "inputs": [
+      {
+        "namespace": "my-namespace",
+        "name": "public.mytable"
+      }
+    ],
+    "outputs": {
+      "namespace": "my-namespace",
+      "name": "public.mytable"
+    },
+    "type": "BATCH",
+    "context": {
+      "sql": "SELECT * FROM public.mytable;"
+    },
+    "location": "https://github.com/my-jobs/blob/07f3d2dfc8186cadae9146719e70294a4c7a8ee8"
+  }
+}
