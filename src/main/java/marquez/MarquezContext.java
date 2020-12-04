@@ -3,6 +3,7 @@ package marquez;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
@@ -108,7 +109,7 @@ public final class MarquezContext {
             runDao,
             datasetVersionDao,
             runStateDao,
-            Lists.newArrayList(runTransitionListeners));
+            runTransitionListeners);
 
     this.jobService =
         new JobService(
@@ -151,7 +152,7 @@ public final class MarquezContext {
 
     Builder() {
       this.tags = ImmutableSet.of();
-      this.runTransitionListeners = Lists.newArrayList();
+      this.runTransitionListeners = new ArrayList<>();
     }
 
     public Builder jdbi(@NonNull Jdbi jdbi) {
@@ -170,7 +171,7 @@ public final class MarquezContext {
 
     public Builder runTransitionListeners(
         @NonNull List<RunTransitionListener> runTransitionListeners) {
-      this.runTransitionListeners = runTransitionListeners;
+      this.runTransitionListeners.addAll(runTransitionListeners);
       return this;
     }
 
