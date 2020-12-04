@@ -110,7 +110,6 @@ Then browse to the admin interface: http://localhost:8081
 ## Related Projects
 
 * [`marquez-airflow`](https://github.com/MarquezProject/marquez-airflow): Airflow support for Marquez.
-* [`marquez-python`](https://github.com/MarquezProject/marquez-python): Python client for Marquez.
 
 ## Getting Involved
 
