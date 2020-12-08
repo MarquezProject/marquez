@@ -181,4 +181,4 @@ class BaseExtractor(ABC, LoggingMixin):
         # Also, we'll want to revisit the metadata extraction flow,
         # but for now, return an empty set as the default behavior
         # as not all extractors need to handle partial metadata updates.
-        return []
+        return self.extract()

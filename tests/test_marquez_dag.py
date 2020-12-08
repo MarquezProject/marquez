@@ -83,7 +83,7 @@ def test_new_run_id(clear_db_airflow_dags, session=None):
 
 # tests a simple workflow with default extraction mechanism
 @mock.patch('marquez_airflow.DAG.new_run_id')
-@mock.patch('marquez_airflow.DAG.get_or_create_marquez_client')
+@mock.patch('marquez_airflow.marquez.Marquez.get_or_create_marquez_client')
 @provide_session
 def test_marquez_dag(mock_get_or_create_marquez_client, mock_uuid,
                      clear_db_airflow_dags, session=None):
@@ -139,7 +139,8 @@ def test_marquez_dag(mock_get_or_create_marquez_client, mock_uuid,
             output_dataset=None,
             context=mock.ANY,
             description=DAG_DESCRIPTION,
-            namespace_name=DAG_NAMESPACE
+            namespace_name=DAG_NAMESPACE,
+            run_id=None
         ),
         mock.call(
             job_name=f"{DAG_ID}.{TASK_ID_FAILED}",
@@ -149,7 +150,8 @@ def test_marquez_dag(mock_get_or_create_marquez_client, mock_uuid,
             output_dataset=None,
             context=mock.ANY,
             description=DAG_DESCRIPTION,
-            namespace_name=DAG_NAMESPACE
+            namespace_name=DAG_NAMESPACE,
+            run_id=None
         )
     ]
     log.info(
@@ -251,20 +253,7 @@ class TestFixtureDummyExtractor(BaseExtractor):
         )]
 
     def extract_on_complete(self, task_instance) -> [StepMetadata]:
-        inputs = [
-            Dataset.from_table(self.source, "extract_on_complete_input1")
-        ]
-        outputs = [
-            Dataset.from_table(self.source, "extract_on_complete_output1")
-        ]
-        return [StepMetadata(
-            name=get_job_name(task=self.operator),
-            inputs=inputs,
-            outputs=outputs,
-            context={
-                "extract_on_complete": "extract_on_complete"
-            }
-        )]
+        return []
 
 
 class TestFixtureDummyExtractorOnComplete(BaseExtractor):
@@ -314,7 +303,7 @@ class TestFixtureDummyExtractorOnComplete(BaseExtractor):
 
 # test the lifecycle including with extractors
 @mock.patch('marquez_airflow.DAG.new_run_id')
-@mock.patch('marquez_airflow.DAG.get_or_create_marquez_client')
+@mock.patch('marquez_airflow.marquez.Marquez.get_or_create_marquez_client')
 @provide_session
 def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
                                     mock_uuid,
@@ -361,7 +350,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
                                                                  DAG_OWNER)
 
     # Datasets are updated
-    mock_marquez_client.create_source.assert_called_once_with(
+    mock_marquez_client.create_source.assert_called_with(
         'dummy_source_name',
         'DummySource',
         'http://dummy/source/url'
@@ -396,7 +385,8 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
         output_dataset=[{'namespace': 'default', 'name': 'extract_output1'}],
         context=mock.ANY,
         description=DAG_DESCRIPTION,
-        namespace_name=DAG_NAMESPACE
+        namespace_name=DAG_NAMESPACE,
+        run_id=None
     )
     assert mock_marquez_client.create_job.mock_calls[0].\
         kwargs['context'].get('extract') == 'extract'
@@ -419,6 +409,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
         'create_namespace',
         'create_source',
         'create_dataset',
+        'create_source',
         'create_dataset',
         'create_job',
         'create_job_run'
@@ -445,10 +436,10 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
             job_type=JobType.BATCH,
             location=completed_task_location,
             input_dataset=[
-                {'namespace': 'default', 'name': 'extract_on_complete_input1'}
+                {'namespace': 'default', 'name': 'extract_input1'}
             ],
             output_dataset=[
-                {'namespace': 'default', 'name': 'extract_on_complete_output1'}
+                {'namespace': 'default', 'name': 'extract_output1'}
             ],
             context=mock.ANY,
             description=DAG_DESCRIPTION,
@@ -457,7 +448,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
     ])
 
     assert mock_marquez_client.create_job.mock_calls[0].\
-        kwargs['context'].get('extract_on_complete') == 'extract_on_complete'
+        kwargs['context'].get('extract') == 'extract'
 
     mock_marquez_client.mark_job_run_as_completed.assert_called_once_with(
         run_id=run_id
@@ -467,18 +458,18 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
     # to link a job version (=task version) to a dataset version.
     mock_marquez_client.create_dataset.assert_has_calls([
         mock.call(
-            dataset_name='extract_on_complete_input1',
+            dataset_name='extract_input1',
             dataset_type=DatasetType.DB_TABLE,
-            physical_name='extract_on_complete_input1',
+            physical_name='extract_input1',
             source_name='dummy_source_name',
             namespace_name=DAG_NAMESPACE,
             fields=[],
             run_id=None
         ),
         mock.call(
-            dataset_name='extract_on_complete_output1',
+            dataset_name='extract_output1',
             dataset_type=DatasetType.DB_TABLE,
-            physical_name='extract_on_complete_output1',
+            physical_name='extract_output1',
             source_name='dummy_source_name',
             namespace_name=DAG_NAMESPACE,
             fields=[],
@@ -490,16 +481,19 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
     for call in mock_marquez_client.mock_calls:
         log.info(call)
     assert [name for name, args, kwargs in mock_marquez_client.mock_calls] == [
-        'mark_job_run_as_started',
+        'create_namespace',
+        'create_source',
         'create_dataset',
+        'create_source',
         'create_dataset',
         'create_job',
+        'mark_job_run_as_started',
         'mark_job_run_as_completed'
     ]
 
 
 @mock.patch('marquez_airflow.DAG.new_run_id')
-@mock.patch('marquez_airflow.DAG.get_or_create_marquez_client')
+@mock.patch('marquez_airflow.marquez.Marquez.get_or_create_marquez_client')
 @provide_session
 def test_marquez_dag_with_extract_on_complete(
         mock_get_or_create_marquez_client,
@@ -558,7 +552,7 @@ def test_marquez_dag_with_extract_on_complete(
     dag.handle_callback(dagrun, success=True, session=session)
 
     # Datasets are updated
-    mock_marquez_client.create_source.assert_called_once_with(
+    mock_marquez_client.create_source.assert_called_with(
         'dummy_source_name',
         'DummySource',
         'http://dummy/source/url'
@@ -617,7 +611,8 @@ def test_marquez_dag_with_extract_on_complete(
                              'name': 'extract_on_complete_output1'}],
             context=mock.ANY,
             description=DAG_DESCRIPTION,
-            namespace_name=DAG_NAMESPACE
+            namespace_name=DAG_NAMESPACE,
+            run_id=None
         ),
         mock.call(
             job_name=f"{dag_id}.{TASK_ID_COMPLETED}",
@@ -707,14 +702,18 @@ def test_marquez_dag_with_extract_on_complete(
     for call in mock_marquez_client.mock_calls:
         log.info(call)
     assert [name for name, args, kwargs in mock_marquez_client.mock_calls] == [
+        'create_namespace',
         'create_source',
         'create_dataset',
+        'create_source',
         'create_dataset',
         'create_job',
         'create_job_run',
-        'mark_job_run_as_started',
+        'create_source',
         'create_dataset',
+        'create_source',
         'create_dataset',
         'create_job',
+        'mark_job_run_as_started',
         'mark_job_run_as_completed'
     ]

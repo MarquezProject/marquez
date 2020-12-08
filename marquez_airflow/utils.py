@@ -19,10 +19,12 @@ import airflow
 from airflow.models import Connection
 from airflow.utils.db import provide_session
 from airflow.version import version as airflow_version
+from pendulum import Pendulum
 
 from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
 
 log = logging.getLogger(__name__)
+_NOMINAL_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 class JobIdMapping:
@@ -164,3 +166,41 @@ def add_airflow_info_to(task, steps_metadata):
             MARQUEZ_AIRFLOW_VERSION
 
     return steps_metadata
+
+
+class DagUtils:
+
+    def get_execution_date(**kwargs):
+        return kwargs.get('execution_date')
+
+    def get_run_args(**kwargs):
+        return {
+            'external_trigger': kwargs.get('external_trigger', False)
+        }
+
+    @staticmethod
+    def get_start_time(execution_date=None):
+        if execution_date:
+            return DagUtils.to_iso_8601(execution_date)
+        else:
+            return None
+
+    @staticmethod
+    def get_end_time(execution_date, default):
+        if execution_date:
+            end_time = default
+        else:
+            end_time = None
+
+        if end_time:
+            end_time = DagUtils.to_iso_8601(end_time)
+        return end_time
+
+    @staticmethod
+    def to_iso_8601(dt):
+        if not dt:
+            return None
+        if isinstance(dt, Pendulum):
+            return dt.format(_NOMINAL_TIME_FORMAT)
+        else:
+            return dt.strftime(_NOMINAL_TIME_FORMAT)
