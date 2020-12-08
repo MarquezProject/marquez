@@ -37,19 +37,12 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
     def test_extract(self, mock_client, mock_hook):
         log.info("test_extractor")
 
-        job_details_file = open(
-            file="tests/extractors/job_details.json",
-            mode="r"
-        )
-        job_details = json.loads(job_details_file.read())
-        job_details_file.close()
-
-        table_details_file = open(
-            file="tests/extractors/table_details.json",
-            mode="r"
-        )
-        table_details = json.loads(table_details_file.read())
-        job_details_file.close()
+        job_details = self.read_file_json(
+            "tests/extractors/job_details.json")
+        table_details = self.read_dataset_json(
+            "tests/extractors/table_details.json")
+        out_details = self.read_dataset_json(
+            "tests/extractors/out_table_details.json")
 
         bq_job_id = "foo.bq.job_id"
 
@@ -63,8 +56,7 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
             ._properties = job_details
 
         mock_client.return_value \
-            .get_table.return_value \
-            ._properties = table_details
+            .get_table.side_effect = [table_details, out_details]
 
         mock_client.return_value.close.return_value
 
@@ -106,12 +98,31 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
         assert len(steps_meta[0].inputs[0].fields) == 5
         assert steps_meta[0].outputs is not None
         assert len(steps_meta[0].outputs) == 1
+        assert steps_meta[0].outputs[0].fields is not None
+        assert len(steps_meta[0].outputs[0].fields) == 2
         assert steps_meta[0].outputs[0].name == \
             'bq-airflow-marquez.new_dataset.output_table'
         assert steps_meta[0].context['sql'] == task.sql
         assert steps_meta[0].context['bigquery.job_id'] == bq_job_id
 
         mock_client.return_value.close.assert_called()
+
+    def read_dataset_json(self, file):
+        client_mock = self.Client_mock()
+        client_mock._properties = self.read_file_json(file)
+        return client_mock
+
+    class Client_mock:
+        _properties = None
+
+    def read_file_json(self, file):
+        f = open(
+            file=file,
+            mode="r"
+        )
+        details = json.loads(f.read())
+        f.close()
+        return details
 
     @mock.patch('airflow.contrib.operators.bigquery_operator.BigQueryHook')
     @mock.patch('google.cloud.bigquery.Client')

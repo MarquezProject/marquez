@@ -150,7 +150,7 @@ def get_job_name(task):
 
 
 def add_airflow_info_to(task, steps_metadata):
-    log.info(f"add_airflow_info_to({task}, {steps_metadata})")
+    log.debug(f"add_airflow_info_to({task}, {steps_metadata})")
 
     for step_metadata in steps_metadata:
         # Add operator info

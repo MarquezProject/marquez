@@ -90,8 +90,8 @@ class BigQueryExtractor(BaseExtractor):
                 job_properties_str = json.dumps(job._properties)
                 context['bigquery.job_properties'] = job_properties_str
 
-                inputs = self._get_input_from_bq(client, job, context, source)
-                outputs = self._get_output_from_bq(job, source)
+                inputs = self._get_input_from_bq(job, context, source, client)
+                outputs = self._get_output_from_bq(job, source, client)
             finally:
                 # Ensure client has close() defined, otherwise ignore.
                 # NOTE: close() was introduced in python-bigquery v1.23.0
@@ -110,7 +110,7 @@ class BigQueryExtractor(BaseExtractor):
             context=context
         )]
 
-    def _get_input_from_bq(self, client, job, context, source):
+    def _get_input_from_bq(self, job, context, source, client):
         bq_input_tables = job._properties.get('statistics')\
             .get('query')\
             .get('referencedTables')
@@ -137,14 +137,29 @@ class BigQueryExtractor(BaseExtractor):
                 for table in input_table_names
             ]
 
-    def _get_output_from_bq(self, job, source):
+    def _get_output_from_bq(self, job, source, client):
         bq_output_table = job._properties.get('configuration') \
             .get('query') \
             .get('destinationTable')
         output_table_name = self._bq_table_name(bq_output_table)
-        return [
-            Dataset.from_table(source, output_table_name)
-        ]
+        table_schema = self._get_table_safely(output_table_name, client)
+        if table_schema:
+            return [Dataset.from_table_schema(
+                source=source,
+                table_schema=table_schema
+            )]
+        else:
+            log.warn("Could not resolve output table from bq")
+            return [
+                Dataset.from_table(source, output_table_name)
+            ]
+
+    def _get_table_safely(self, output_table_name, client):
+        try:
+            return self._get_table(output_table_name, client)
+        except Exception as e:
+            log.warn(f'Could not extract output schema from bigquery. {e}')
+        return None
 
     def _get_table_schemas(self, tables: [str], client: bigquery.Client) \
             -> [DbTableSchema]:
