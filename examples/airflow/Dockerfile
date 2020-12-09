@@ -1,6 +1,17 @@
-FROM puckel/docker-airflow:1.10.6
+FROM bitnami/airflow-scheduler:1.10.12 AS scheduler
+USER root
+RUN apt-get update && \
+    apt-get install -y git
+USER 1001
 
-LABEL maintainer "WeWork<data-platform@wework.com>"
+FROM bitnami/airflow-worker:1.10.12 AS worker
+USER root
+RUN apt-get update && \
+    apt-get install -y git
+USER 1001
 
-RUN pip install --upgrade pip \
-  && pip install -U --user marquez-airflow
+FROM bitnami/airflow:1.10.12 AS airflow
+USER root
+RUN apt-get update && \
+    apt-get install -y git
+USER 1001
