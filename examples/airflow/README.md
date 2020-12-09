@@ -1,4 +1,4 @@
-# Debugging [Airflow](https://airflow.apache.org) DAGs with [Datakin](http://datak.in)
+# Debugging [Airflow](https://airflow.apache.org) DAGs with [Marquez](https://marquezproject.github.io/marquez)
 
 In this example, you'll be introduced to the core concepts of Airflow: _DAGs_, _operators_, and _tasks_. You’ll write your very first DAG and learn how workflows are defined and executed in Airflow using pre-defined datasets and sources.
 

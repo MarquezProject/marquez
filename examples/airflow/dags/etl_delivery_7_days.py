@@ -9,7 +9,7 @@ default_args = {
     'start_date': days_ago(1),
     'email_on_failure': False,
     'email_on_retry': False,
-    'email': ['datascience@datakin.com']
+    'email': ['datascience@example.com']
 }
 
 dag = DAG(
