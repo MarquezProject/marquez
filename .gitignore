@@ -6,3 +6,5 @@ bin/
 build/
 dist/
 lib/
+tests/integration/requirements.txt
+tests/integration/integration-requirements.txt

@@ -3,8 +3,9 @@ version: 2
 defaults: &defaults
   docker:
     - image: circleci/python:3.8.5
-  working_directory: ~/marquez_airflow
-
+  working_directory: ~/marquez-airflow
+  environment:
+    SLUGIFY_USES_TEXT_UNIDECODE: 'yes'
 
 jobs:
   build:
@@ -13,11 +14,9 @@ jobs:
       - checkout
       - run:
           name: Install airflow from package
-          environment:
-            SLUGIFY_USES_TEXT_UNIDECODE: 'yes'
           command: pip install --user -e .
       - run: pip install --user flake8
-      - run: python -m flake8
+      - run: python -m flake8 --exclude integration
 
   test:
     <<: *defaults
@@ -25,8 +24,6 @@ jobs:
       - checkout
       - run:
           name: Install test dependencies
-          environment:
-            SLUGIFY_USES_TEXT_UNIDECODE: 'yes'
           command: pip install --user -r test-requirements.txt --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-1.10.12/constraints-3.7.txt"
       - run:
           name: Setup Airflow DB
@@ -42,14 +39,13 @@ jobs:
       - run: bash <(curl -s https://codecov.io/bash)
 
   integration:
+    working_directory: ~/marquez-airflow/tests/integration
     machine: true
-    environment:
-      - COMPOSE_FILE: 'tests/integration/docker-compose.yml'
     steps:
-      - checkout
-      - run:
-          name: Test
-          command: tests/integration/run.sh
+      - checkout:
+          path: ~/marquez-airflow
+      - run: ./../../.circleci/get-docker-compose.sh
+      - run: ./docker/up.sh
 
   release:
     <<: *defaults

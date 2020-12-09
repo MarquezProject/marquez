@@ -1,5 +1,6 @@
-#!/bin/bash
 
+#!/bin/bash
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,14 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Usage: $ ./get-docker-compose.sh
 
-# Usage: $ ./init-marquez-db.sh
+set -e
 
-set -eu
+curl -L https://github.com/docker/compose/releases/download/1.25.3/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+chmod +x ~/docker-compose
+sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
-psql -v ON_ERROR_STOP=1 --username "${POSTGRES_USER}" > /dev/null <<-EOSQL
-  CREATE USER ${MARQUEZ_USER};
-  ALTER USER ${MARQUEZ_USER} WITH PASSWORD '${MARQUEZ_PASSWORD}';
-  CREATE DATABASE ${MARQUEZ_DB};
-  GRANT ALL PRIVILEGES ON DATABASE ${MARQUEZ_DB} TO ${MARQUEZ_USER};
-EOSQL
+echo "DONE!"

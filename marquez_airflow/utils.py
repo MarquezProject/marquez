@@ -18,7 +18,7 @@ import json
 import airflow
 from airflow.models import Connection
 from airflow.utils.db import provide_session
-from airflow.version import version as airflow_version
+from airflow.version import version as AIRFLOW_VERSION
 from pendulum import Pendulum
 
 from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
@@ -161,7 +161,7 @@ def add_airflow_info_to(task, steps_metadata):
         step_metadata.context['airflow.task_info'] = str(task.__dict__)
 
         # Add version info
-        step_metadata.context['airflow.version'] = airflow_version
+        step_metadata.context['airflow.version'] = AIRFLOW_VERSION
         step_metadata.context['marquez_airflow.version'] = \
             MARQUEZ_AIRFLOW_VERSION
 
