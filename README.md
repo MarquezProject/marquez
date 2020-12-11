@@ -54,7 +54,6 @@ Marquez uses a _multi_-project structure and contains the following modules:
 * [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
 * [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations) - integrations with other systems
 * [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart) - helm chart
-* [`examples`](https://github.com/MarquezProject/marquez/tree/main/examples) - example usage of Marquez
 
 ## Requirements
 
