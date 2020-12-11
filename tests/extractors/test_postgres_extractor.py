@@ -18,7 +18,11 @@ from airflow.operators.postgres_operator import PostgresOperator
 from airflow.utils.dates import days_ago
 
 from marquez_airflow import DAG
-from marquez_airflow.models import DbTableSchema, DbColumn
+from marquez_airflow.models import (
+    DbTableName,
+    DbTableSchema,
+    DbColumn
+)
 from marquez_airflow.extractors import Source, Dataset
 from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 
@@ -28,7 +32,7 @@ CONN_ID = 'food_delivery_db'
 CONN_URI = 'postgres://localhost:5432/food_delivery'
 
 DB_SCHEMA_NAME = 'public'
-DB_TABLE_NAME = 'discounts'
+DB_TABLE_NAME = DbTableName('discounts')
 DB_TABLE_COLUMNS = [
     DbColumn(
         name='id',
@@ -63,7 +67,7 @@ DB_TABLE_SCHEMA = DbTableSchema(
 )
 NO_DB_TABLE_SCHEMA = []
 
-SQL = f"SELECT * FROM {DB_TABLE_NAME};"
+SQL = f"SELECT * FROM {DB_TABLE_NAME.name};"
 
 DAG_ID = 'email_discounts'
 DAG_OWNER = 'datascience'
@@ -103,7 +107,7 @@ def test_extract(mock_get_table_schemas):
     expected_inputs = [
         Dataset(
             type=DatasetType.DB_TABLE,
-            name=f"{DB_SCHEMA_NAME}.{DB_TABLE_NAME}",
+            name=f"{DB_SCHEMA_NAME}.{DB_TABLE_NAME.name}",
             source=Source(
                 type='POSTGRESQL',
                 name=CONN_ID,
@@ -138,11 +142,11 @@ def test_get_table_schemas(mock_conn):
 
     # (2) Mock calls to postgres
     rows = [
-        (DB_SCHEMA_NAME, DB_TABLE_NAME, 'id', 1, 'int4'),
-        (DB_SCHEMA_NAME, DB_TABLE_NAME, 'amount_off', 2, 'int4'),
-        (DB_SCHEMA_NAME, DB_TABLE_NAME, 'customer_email', 3, 'varchar'),
-        (DB_SCHEMA_NAME, DB_TABLE_NAME, 'starts_on', 4, 'timestamp'),
-        (DB_SCHEMA_NAME, DB_TABLE_NAME, 'ends_on', 5, 'timestamp')
+        (DB_SCHEMA_NAME, DB_TABLE_NAME.name, 'id', 1, 'int4'),
+        (DB_SCHEMA_NAME, DB_TABLE_NAME.name, 'amount_off', 2, 'int4'),
+        (DB_SCHEMA_NAME, DB_TABLE_NAME.name, 'customer_email', 3, 'varchar'),
+        (DB_SCHEMA_NAME, DB_TABLE_NAME.name, 'starts_on', 4, 'timestamp'),
+        (DB_SCHEMA_NAME, DB_TABLE_NAME.name, 'ends_on', 5, 'timestamp')
     ]
 
     mock_conn.return_value \
@@ -155,6 +159,6 @@ def test_get_table_schemas(mock_conn):
 
     # (4) Extract table schemas for task
     extractor = PostgresExtractor(TASK)
-    table_schemas = extractor._get_table_schemas(tables=[DB_TABLE_NAME])
+    table_schemas = extractor._get_table_schemas(table_names=[DB_TABLE_NAME])
 
     assert table_schemas == [DB_TABLE_SCHEMA]

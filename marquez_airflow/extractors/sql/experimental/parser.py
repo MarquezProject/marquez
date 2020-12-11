@@ -15,7 +15,9 @@ import logging
 import sqlparse
 from sqlparse.sql import T
 from sqlparse.sql import TokenList
+from sqlparse.tokens import Punctuation
 
+from marquez_airflow.models import DbTableName
 from marquez_airflow.extractors.sql.experimental import SqlMeta
 
 log = logging.getLogger(__name__)
@@ -45,8 +47,18 @@ def _match_on(token, keywords):
 
 def _get_table(tokens, idx):
     idx, token = tokens.token_next(idx=idx)
-    table = next(token.flatten()).value
-    return idx, table
+    token_list = token.flatten()
+    table_name = next(token_list).value
+    try:
+        # Determine if the table contains the schema
+        # separated by a dot (format: 'schema.table')
+        dot = next(token_list)
+        if dot.match(Punctuation, '.'):
+            table_name += dot.value
+            table_name += next(token_list).value
+    except StopIteration:
+        pass
+    return idx, DbTableName(table_name)
 
 
 class SqlParser:
@@ -57,14 +69,14 @@ class SqlParser:
     @staticmethod
     def parse(sql):
         if sql is None:
-            raise ValueError("A sql statement must be provided")
+            raise ValueError("A sql statement must be provided.")
 
         # Tokenize the SQL statement
         statements = sqlparse.parse(sql)
 
         # We assume only one statement in SQL
         tokens = TokenList(statements[0].tokens)
-        log.debug(f"Tokenized {sql}: {tokens}")
+        log.debug(f"Successfully tokenized sql statement: {tokens}")
 
         in_tables = []
         out_tables = []

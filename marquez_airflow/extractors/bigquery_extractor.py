@@ -23,7 +23,11 @@ from marquez_airflow.extractors import (
     Source,
     Dataset
 )
-from marquez_airflow.models import DbTableSchema, DbColumn
+from marquez_airflow.models import (
+    DbTableName,
+    DbTableSchema,
+    DbColumn
+)
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
 from marquez_airflow.utils import (
     get_job_name
@@ -158,7 +162,7 @@ class BigQueryExtractor(BaseExtractor):
         try:
             return self._get_table(output_table_name, client)
         except Exception as e:
-            log.warn(f'Could not extract output schema from bigquery. {e}')
+            log.warning(f'Could not extract output schema from bigquery. {e}')
         return None
 
     def _get_table_schemas(self, tables: [str], client: bigquery.Client) \
@@ -186,11 +190,11 @@ class BigQueryExtractor(BaseExtractor):
             description=fields[i].get('description'),
             ordinal_position=i
         ) for i in range(len(fields))]
-
+        self.log.info(DbTableName(table.get('tableReference').get('tableId')))
         return DbTableSchema(
             schema_name=table.get('tableReference').get('projectId') + '.' +
             table.get('tableReference').get('datasetId'),
-            table_name=table.get('tableReference').get('tableId'),
+            table_name=DbTableName(table.get('tableReference').get('tableId')),
             columns=columns
         )
 
@@ -210,12 +214,15 @@ class BigQueryExtractor(BaseExtractor):
             sql_meta = SqlParser.parse(self.operator.sql)
             log.debug(f"bigquery sql parsed and obtained meta: {sql_meta}")
             context['bigquery.sql.parsed.inputs'] = json.dumps(
-                sql_meta.in_tables)
+                [in_table.name for in_table in sql_meta.in_tables]
+            )
             context['bigquery.sql.parsed.outputs'] = json.dumps(
-                sql_meta.out_tables)
+                [out_table.name for out_table in sql_meta.out_tables]
+            )
         except Exception as e:
             log.error(f"Cannot parse sql query. {e}",
                       exc_info=True)
             context['bigquery.extractor.sql_parser_error'] = \
                 f'{e}: {traceback.format_exc()}'
+        self.log.info(context)
         return context

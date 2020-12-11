@@ -12,6 +12,7 @@
 
 import logging
 
+from marquez_airflow.models import DbTableName
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
 
 log = logging.getLogger(__name__)
@@ -26,7 +27,31 @@ def test_parse_simple_select():
     )
 
     log.debug("sqlparser.parse() successful.")
-    assert sql_meta.in_tables == ['table0']
+    assert sql_meta.in_tables == [DbTableName('table0')]
+    assert sql_meta.out_tables == []
+
+
+def test_parse_simple_select_with_table_schema_prefix():
+    sql_meta = SqlParser.parse(
+        '''
+        SELECT *
+          FROM schema0.table0;
+        '''
+    )
+
+    assert sql_meta.in_tables == [DbTableName('schema0.table0')]
+    assert sql_meta.out_tables == []
+
+
+def test_parse_simple_select_with_table_schema_prefix_and_extra_whitespace():
+    sql_meta = SqlParser.parse(
+        '''
+        SELECT *
+          FROM    schema0.table0   ;
+        '''
+    )
+
+    assert sql_meta.in_tables == [DbTableName('schema0.table0')]
     assert sql_meta.out_tables == []
 
 
@@ -39,8 +64,8 @@ def test_parse_simple_select_into():
         '''
     )
 
-    assert sql_meta.in_tables == ['table1']
-    assert sql_meta.out_tables == ['table0']
+    assert sql_meta.in_tables == [DbTableName('table1')]
+    assert sql_meta.out_tables == [DbTableName('table0')]
 
 
 def test_parse_simple_join():
@@ -53,7 +78,7 @@ def test_parse_simple_join():
         '''
     )
 
-    assert sql_meta.in_tables == ['table0', 'table1']
+    assert sql_meta.in_tables == [DbTableName('table0'), DbTableName('table1')]
     assert sql_meta.out_tables == []
 
 
@@ -67,7 +92,7 @@ def test_parse_simple_inner_join():
         '''
     )
 
-    assert sql_meta.in_tables == ['table0', 'table1']
+    assert sql_meta.in_tables == [DbTableName('table0'), DbTableName('table1')]
     assert sql_meta.out_tables == []
 
 
@@ -81,7 +106,7 @@ def test_parse_simple_left_join():
         '''
     )
 
-    assert sql_meta.in_tables == ['table0', 'table1']
+    assert sql_meta.in_tables == [DbTableName('table0'), DbTableName('table1')]
     assert sql_meta.out_tables == []
 
 
@@ -95,7 +120,7 @@ def test_parse_simple_left_outer_join():
         '''
     )
 
-    assert sql_meta.in_tables == ['table0', 'table1']
+    assert sql_meta.in_tables == [DbTableName('table0'), DbTableName('table1')]
     assert sql_meta.out_tables == []
 
 
@@ -109,7 +134,7 @@ def test_parse_simple_right_join():
         '''
     )
 
-    assert sql_meta.in_tables == ['table0', 'table1']
+    assert sql_meta.in_tables == [DbTableName('table0'), DbTableName('table1')]
     assert sql_meta.out_tables == []
 
 
@@ -123,7 +148,7 @@ def test_parse_simple_right_outer_join():
         '''
     )
 
-    assert sql_meta.in_tables == ['table0', 'table1']
+    assert sql_meta.in_tables == [DbTableName('table0'), DbTableName('table1')]
     assert sql_meta.out_tables == []
 
 
@@ -136,7 +161,7 @@ def test_parse_simple_insert_into():
     )
 
     assert sql_meta.in_tables == []
-    assert sql_meta.out_tables == ['table0']
+    assert sql_meta.out_tables == [DbTableName('table0')]
 
 
 def test_parse_simple_insert_into_select():
@@ -148,5 +173,5 @@ def test_parse_simple_insert_into_select():
         '''
     )
 
-    assert sql_meta.in_tables == ['table0']
-    assert sql_meta.out_tables == ['table1']
+    assert sql_meta.in_tables == [DbTableName('table0')]
+    assert sql_meta.out_tables == [DbTableName('table1')]

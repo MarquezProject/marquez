@@ -16,7 +16,11 @@ from typing import Optional
 from airflow.hooks.postgres_hook import PostgresHook
 from airflow.operators.postgres_operator import PostgresOperator
 
-from marquez_airflow.models import DbTableSchema, DbColumn
+from marquez_airflow.models import (
+    DbTableName,
+    DbTableSchema,
+    DbColumn
+)
 from marquez_airflow.utils import get_connection_uri
 from marquez_airflow.extractors.sql.experimental import SqlMeta
 from marquez_airflow.extractors.sql.experimental.parser import SqlParser
@@ -62,7 +66,7 @@ class PostgresExtractor(BaseExtractor):
         inputs = [
             Dataset.from_table(
                 source=source,
-                table_name=in_table_schema.table_name,
+                table_name=in_table_schema.table_name.name,
                 schema_name=in_table_schema.schema_name
             ) for in_table_schema in self._get_table_schemas(
                 sql_meta.in_tables
@@ -86,10 +90,12 @@ class PostgresExtractor(BaseExtractor):
             }
         )]
 
-    def _get_table_schemas(self, tables: [str]) -> [DbTableSchema]:
+    def _get_table_schemas(
+            self, table_names: [DbTableName]
+    ) -> [DbTableSchema]:
         # Avoid querying postgres by returning an empty array
-        # if no tables have been provided.
-        if not tables:
+        # if no table names have been provided.
+        if not table_names:
             return []
 
         # Keeps tack of the schema by table.
@@ -101,7 +107,9 @@ class PostgresExtractor(BaseExtractor):
         )
         with closing(hook.get_conn()) as conn:
             with closing(conn.cursor()) as cursor:
-                table_names = ",".join(map(lambda table: f"'{table}'", tables))
+                table_names_as_list = ",".join(map(
+                    lambda name: f"'{name}'", table_names
+                ))
                 cursor.execute(
                     f"""
                     SELECT table_schema,
@@ -110,12 +118,12 @@ class PostgresExtractor(BaseExtractor):
                            ordinal_position,
                            udt_name
                       FROM information_schema.columns
-                     WHERE table_name IN ({table_names});
+                     WHERE table_name IN ({table_names_as_list});
                     """
                 )
                 for row in cursor.fetchall():
                     table_schema_name: str = row[_TABLE_SCHEMA]
-                    table_name: str = row[_TABLE_NAME]
+                    table_name: DbTableName = DbTableName(row[_TABLE_NAME])
                     table_column: DbColumn = DbColumn(
                         name=row[_COLUMN_NAME],
                         type=row[_UDT_NAME],

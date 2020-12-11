@@ -127,8 +127,6 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
     @mock.patch('airflow.contrib.operators.bigquery_operator.BigQueryHook')
     @mock.patch('google.cloud.bigquery.Client')
     def test_extract_error(self, mock_client, mock_hook):
-        log.info("test_extractor_error")
-
         bq_job_id = "foo.bq.job_id"
 
         mock_hook.return_value \

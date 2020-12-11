@@ -28,7 +28,11 @@ from marquez_airflow import DAG
 from marquez_airflow.extractors import (
     BaseExtractor, StepMetadata, Source, Dataset
 )
-from marquez_airflow.models import DbTableSchema, DbColumn
+from marquez_airflow.models import (
+    DbTableName,
+    DbTableSchema,
+    DbColumn
+)
 from marquez_airflow.utils import get_location, get_job_name
 
 from uuid import UUID
@@ -273,7 +277,7 @@ class TestFixtureDummyExtractorOnComplete(BaseExtractor):
         inputs = [
             Dataset.from_table_schema(self.source, DbTableSchema(
                 schema_name='schema',
-                table_name='extract_on_complete_input1',
+                table_name=DbTableName('extract_on_complete_input1'),
                 columns=[DbColumn(
                     name='field1',
                     type='text',

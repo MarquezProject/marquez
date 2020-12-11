@@ -10,8 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from marquez_airflow.models import DbTableName
+
 
 class SqlMeta:
-    def __init__(self, in_tables, out_tables):
+    # TODO: Only a single output table may exist, we'll want to rename
+    # SqlMeta.out_tables -> SqlMeta.out_table
+    def __init__(self, in_tables: [DbTableName], out_tables: [DbTableName]):
         self.in_tables = in_tables
         self.out_tables = out_tables

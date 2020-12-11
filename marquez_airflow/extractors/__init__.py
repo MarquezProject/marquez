@@ -94,7 +94,7 @@ class Dataset:
             type=DatasetType.DB_TABLE,
             name=Dataset._to_name(
                 schema_name=table_schema.schema_name,
-                table_name=table_schema.table_name
+                table_name=table_schema.table_name.name
             ),
             source=source,
             fields=[
