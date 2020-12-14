@@ -1,6 +1,7 @@
 from datetime import datetime
 from marquez_airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
+from airflow.operators.sensors import ExternalTaskSensor
 from airflow.utils.dates import days_ago
 
 default_args = {
@@ -18,6 +19,14 @@ dag = DAG(
     catchup=False,
     default_args=default_args,
     description='Loads newly registered restaurants daily.'
+)
+
+# Wait for new_food_deliveries DAG to complete
+ExternalTaskSensor(
+    task_id='wait_for_new_food_deliveries',
+    external_dag_id='new_food_deliveries',
+    check_existence=True,
+    timeout=120
 )
 
 t1 = PostgresOperator(
