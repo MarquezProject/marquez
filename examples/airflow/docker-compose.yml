@@ -1,82 +1,106 @@
-version: '3'
-
+version: "3.7"
 services:
-
-  airflow-db:
-    image: 'postgres:9.6'
-    ports:
-      - '5432:5432'
-    environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
-    volumes:
-      - airflow-data:/var/lib/postgresql
-    
   airflow:
-    build: .
+    image: bitnami/airflow:1.10.12
     ports:
       - "8080:8080"
     environment:
-      - LOAD_EX=n
-      - EXECUTOR=Local
-      - POSTGRES_HOST=airflow-db
-      - AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT=False
+      - AIRFLOW_USERNAME=airflow
+      - AIRFLOW_PASSWORD=airflow
+      - AIRFLOW_EMAIL=airflow@example.com
+      - AIRFLOW_FERNET_KEY=Z2uDm0ZL60fXNkEXG8LW99Ki2zf8wkmIltaTz1iQPDU=
+      - AIRFLOW_DATABASE_HOST=postgres
+      - AIRFLOW_DATABASE_NAME=airflow
+      - AIRFLOW_DATABASE_USERNAME=airflow
+      - AIRFLOW_DATABASE_PASSWORD=airflow
+      - AIRFLOW_EXECUTOR=CeleryExecutor
+      - AIRFLOW_LOAD_EXAMPLES=no
+      - AIRFLOW_CONN_FOOD_DELIVERY_DB=postgres://food_delivery:food_delivery@postgres:5432/food_delivery
+      - MARQUEZ_NAMESPACE=food_delivery
     volumes:
-      - ./dags:/usr/local/airflow/dags
-      - ./docker/wait-for-it.sh:/usr/local/bin/wait-for-it.sh
+      - ./dags:/opt/bitnami/airflow/dags
+      - ./requirements.txt:/bitnami/python/requirements.txt
+
+  airflow_scheduler:
+    image: bitnami/airflow-scheduler:1.10.12
+    environment:
+      - AIRFLOW_FERNET_KEY=Z2uDm0ZL60fXNkEXG8LW99Ki2zf8wkmIltaTz1iQPDU=
+      - AIRFLOW_DATABASE_HOST=postgres
+      - AIRFLOW_DATABASE_NAME=airflow
+      - AIRFLOW_DATABASE_USERNAME=airflow
+      - AIRFLOW_DATABASE_PASSWORD=airflow
+      - AIRFLOW_EXECUTOR=CeleryExecutor
+      - AIRFLOW_LOAD_EXAMPLES=no
+      - AIRFLOW_CONN_FOOD_DELIVERY_DB=postgres://food_delivery:food_delivery@postgres:5432/food_delivery
+      - MARQUEZ_BACKEND=http
+      - MARQUEZ_URL=http://marquez:5000
+      - MARQUEZ_NAMESPACE=food_delivery
+    volumes:
+      - ./dags:/opt/bitnami/airflow/dags
+      - ./requirements.txt:/bitnami/python/requirements.txt
+
+  airflow_worker:
+    image: bitnami/airflow-worker:1.10.12
+    environment:
+      - AIRFLOW_FERNET_KEY=Z2uDm0ZL60fXNkEXG8LW99Ki2zf8wkmIltaTz1iQPDU=
+      - AIRFLOW_DATABASE_HOST=postgres
+      - AIRFLOW_DATABASE_NAME=airflow
+      - AIRFLOW_DATABASE_USERNAME=airflow
+      - AIRFLOW_DATABASE_PASSWORD=airflow
+      - AIRFLOW_EXECUTOR=CeleryExecutor
+      - AIRFLOW_LOAD_EXAMPLES=no
+      - AIRFLOW_CONN_FOOD_DELIVERY_DB=postgres://food_delivery:food_delivery@postgres:5432/food_delivery
+      - MARQUEZ_NAMESPACE=food_delivery
+    volumes:
+      - ./dags:/opt/bitnami/airflow/dags
+      - ./requirements.txt:/bitnami/python/requirements.txt
+
+  marquez:
+    image: marquezproject/marquez:latest
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    volumes:
+      - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
     depends_on:
-      - airflow-db
-    command: ["wait-for-it.sh", "airflow-db:5432", "--", "/entrypoint.sh", "webserver"]
+      - postgres
+    entrypoint: ["./wait-for-it.sh", "postgres:5432", "--", "./entrypoint.sh"]
+    # Enables SQL statement logging (see: https://www.postgresql.org/docs/12/runtime-config-logging.html#GUC-LOG-STATEMENT)
+    # command: ["postgres", "-c", "log_statement=all"]
 
-  marquez-db:
-    image: 'postgres:9.6'
-    ports:
-      - '25432:5432'
+  marquez_web:
+    image: marquezproject/marquez-web:latest
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - MARQUEZ_DB=marquez
-      - MARQUEZ_USER=buendia
-      - MARQUEZ_PASSWORD=macondo
-    volumes:
-      - marquez-data:/var/lib/postgresql
-      - ./docker/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
-
-  marquez-api:
-    image: 'marquezproject/marquez:latest'
-    ports:
-      - '5000:5000'
-      - '5001:5001'
-    environment:
+      - MARQUEZ_HOST=marquez
       - MARQUEZ_PORT=5000
-      - MARQUEZ_ADMIN_PORT=5001
-      - MARQUEZ_CONFIG=/usr/src/app/config.yml
-      - POSTGRES_HOST=marquez-db
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=marquez
-      - POSTGRES_USER=buendia
-      - POSTGRES_PASSWORD=macondo
-    volumes:
-      - ./marquez-config.yml:/usr/src/app/config.yml
-    depends_on:
-      - marquez-db
-
-  marquez-web:
-    image: 'marquezproject/marquez-web:latest'
     ports:
       - "3000:3000"
-    environment:
-      - MARQUEZ_HOST=marquez-api
-      - MARQUEZ_PORT=5000
-    volumes:
-      - ./docker/wait-for-it.sh:/usr/local/bin/wait-for-it.sh
+    stdin_open: true
+    tty: true
     depends_on:
-      - marquez-api
-    command: ["wait-for-it.sh", "marquez-api:5000", "--", "/usr/src/app/entrypoint.sh"]
+      - marquez
 
-volumes:
-  airflow-data:
-    external: false
-  marquez-data:
-    external: false
+  postgres:
+    image: bitnami/postgresql:9.6.18
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - AIRFLOW_USER=airflow
+      - AIRFLOW_PASSWORD=airflow
+      - AIRFLOW_DB=airflow
+      - MARQUEZ_USER=marquez
+      - MARQUEZ_PASSWORD=marquez
+      - MARQUEZ_DB=marquez
+      - FOOD_DELIVERY_USER=food_delivery
+      - FOOD_DELIVERY_PASSWORD=food_delivery
+      - FOOD_DELIVERY_DB=food_delivery
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./docker/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+
+  redis:
+    image: bitnami/redis:6.0.6
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
