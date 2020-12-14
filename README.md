@@ -52,6 +52,8 @@ Marquez uses a _multi_-project structure and contains the following modules:
 
 * [`web`](https://github.com/MarquezProject/marquez/tree/main/web): web UI used to view metadata
 * [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
+* [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations): integrations with other systems
+* [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart): helm chart
 
 ## Requirements
 
@@ -106,10 +108,6 @@ $ ./gradlew runShadow
 ```
 
 Then browse to the admin interface: http://localhost:8081
-
-## Related Projects
-
-* [`marquez-airflow`](https://github.com/MarquezProject/marquez-airflow): Airflow support for Marquez.
 
 ## Getting Involved
 
