@@ -22,7 +22,7 @@ dag = DAG(
 
 # Wait for new_food_deliveries DAG to complete
 t1 = ExternalTaskSensor(
-    task_id='etl_orders_wait_for_new_food_deliveries',
+    task_id='wait_for_new_food_deliveries',
     external_dag_id='new_food_deliveries',
     mode='reschedule',
     dag=dag
@@ -30,7 +30,7 @@ t1 = ExternalTaskSensor(
 
 # Wait for etl_menu_items DAG to complete
 t2 = ExternalTaskSensor(
-    task_id='etl_orders_wait_for_etl_menu_items',
+    task_id='wait_for_etl_menu_items',
     external_dag_id='etl_menu_items',
     mode='reschedule',
     dag=dag
@@ -62,4 +62,6 @@ t4 = PostgresOperator(
     dag=dag
 )
 
-t1 >> t2 >> t3 >> t4
+t1 >> t3
+t2 >> t3
+t3 >> t4

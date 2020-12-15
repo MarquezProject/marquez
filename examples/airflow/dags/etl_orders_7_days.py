@@ -22,7 +22,7 @@ dag = DAG(
 
 # Wait for new_food_deliveries DAG to complete
 t1 = ExternalTaskSensor(
-    task_id='etl_orders_7_days_wait_for_new_food_deliveries',
+    task_id='wait_for_new_food_deliveries',
     external_dag_id='new_food_deliveries',
     mode='reschedule',
     dag=dag
@@ -30,7 +30,7 @@ t1 = ExternalTaskSensor(
 
 # Wait for etl_orders DAG to complete
 t2 = ExternalTaskSensor(
-    task_id='etl_orders_7_days_wait_for_etl_orders',
+    task_id='wait_for_etl_orders',
     external_dag_id='etl_orders',
     mode='reschedule',
     dag=dag
@@ -38,7 +38,7 @@ t2 = ExternalTaskSensor(
 
 # Wait for etl_menus DAG to complete
 t3 = ExternalTaskSensor(
-    task_id='etl_orders_7_days_wait_for_etl_menus',
+    task_id='wait_for_etl_menus',
     external_dag_id='etl_menus',
     mode='reschedule',
     dag=dag
@@ -46,7 +46,7 @@ t3 = ExternalTaskSensor(
 
 # Wait for etl_menu_items DAG to complete
 t4 = ExternalTaskSensor(
-    task_id='etl_orders_7_days_wait_for_etl_menu_items',
+    task_id='wait_for_etl_menu_items',
     external_dag_id='etl_menu_items',
     mode='reschedule',
     dag=dag
@@ -54,7 +54,7 @@ t4 = ExternalTaskSensor(
 
 # Wait for etl_categories DAG to complete
 t5 = ExternalTaskSensor(
-    task_id='etl_orders_7_days_wait_for_etl_categories',
+    task_id='wait_for_etl_categories',
     external_dag_id='etl_categories',
     mode='reschedule',
     dag=dag
@@ -62,7 +62,7 @@ t5 = ExternalTaskSensor(
 
 # Wait for etl_restaurants DAG to complete
 t6 = ExternalTaskSensor(
-    task_id='etl_orders_7_days_wait_for_etl_restaurants',
+    task_id='wait_for_etl_restaurants',
     external_dag_id='etl_restaurants',
     mode='reschedule',
     dag=dag
@@ -109,4 +109,10 @@ t9 = PostgresOperator(
     dag=dag
 )
 
-t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7 >> t8 >> t9
+t1 >> t7
+t2 >> t7
+t3 >> t7
+t4 >> t7
+t5 >> t7
+t6 >> t7
+t7 >> t8 >> t9

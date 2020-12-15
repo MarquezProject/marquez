@@ -22,7 +22,7 @@ dag = DAG(
 
 # Wait for new_food_deliveries DAG to complete
 t1 = ExternalTaskSensor(
-    task_id='etl_restaurants_wait_for_new_food_deliveries',
+    task_id='wait_for_new_food_deliveries',
     external_dag_id='new_food_deliveries',
     mode='reschedule',
     dag=dag
