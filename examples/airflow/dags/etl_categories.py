@@ -61,4 +61,6 @@ t4 = PostgresOperator(
     dag=dag
 )
 
-t1 >> t2 >> t3 >> t4
+t1 >> t3
+t2 >> t3
+t3 >> t4
