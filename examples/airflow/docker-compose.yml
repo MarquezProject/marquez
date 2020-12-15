@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   airflow:
-    image: bitnami/airflow:1.10.12
+    image: bitnami/airflow:1.10.13
     ports:
       - "8080:8080"
     environment:
@@ -15,6 +15,7 @@ services:
       - AIRFLOW_DATABASE_PASSWORD=airflow
       - AIRFLOW_EXECUTOR=CeleryExecutor
       - AIRFLOW_LOAD_EXAMPLES=no
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=false
       - AIRFLOW_CONN_FOOD_DELIVERY_DB=postgres://food_delivery:food_delivery@postgres:5432/food_delivery
       - MARQUEZ_NAMESPACE=food_delivery
     volumes:
@@ -22,7 +23,7 @@ services:
       - ./requirements.txt:/bitnami/python/requirements.txt
 
   airflow_scheduler:
-    image: bitnami/airflow-scheduler:1.10.12
+    image: bitnami/airflow-scheduler:1.10.13
     environment:
       - AIRFLOW_FERNET_KEY=Z2uDm0ZL60fXNkEXG8LW99Ki2zf8wkmIltaTz1iQPDU=
       - AIRFLOW_DATABASE_HOST=postgres
@@ -40,7 +41,7 @@ services:
       - ./requirements.txt:/bitnami/python/requirements.txt
 
   airflow_worker:
-    image: bitnami/airflow-worker:1.10.12
+    image: bitnami/airflow-worker:1.10.13
     environment:
       - AIRFLOW_FERNET_KEY=Z2uDm0ZL60fXNkEXG8LW99Ki2zf8wkmIltaTz1iQPDU=
       - AIRFLOW_DATABASE_HOST=postgres

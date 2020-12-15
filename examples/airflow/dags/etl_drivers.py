@@ -1,6 +1,6 @@
-from datetime import datetime
 from marquez_airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
+from airflow.operators.sensors import ExternalTaskSensor
 from airflow.utils.dates import days_ago
 
 default_args = {
@@ -20,7 +20,15 @@ dag = DAG(
     description='Loads newly registered drivers daily.'
 )
 
-t1 = PostgresOperator(
+# Wait for new_food_deliveries DAG to complete
+t1 = ExternalTaskSensor(
+    task_id='wait_for_new_food_deliveries',
+    external_dag_id='new_food_deliveries',
+    mode='reschedule',
+    dag=dag
+)
+
+t2 = PostgresOperator(
     task_id='if_not_exists',
     postgres_conn_id='food_delivery_db',
     sql='''
@@ -40,7 +48,7 @@ t1 = PostgresOperator(
     dag=dag
 )
 
-t2 = PostgresOperator(
+t3 = PostgresOperator(
     task_id='insert',
     postgres_conn_id='food_delivery_db',
     sql='''
@@ -51,4 +59,4 @@ t2 = PostgresOperator(
     dag=dag
 )
 
-t1 >> t2
+t1 >> t2 >> t3

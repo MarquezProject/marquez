@@ -10,9 +10,9 @@ The easiest way to get up and running is with Docker. To start Airflow, run:
 $ ./docker/up.sh
 ```
 
-Use the `--build` flag to build images from source, or `--pull` to pull a tagged image.
+> **Tip:** Use the `--pull` to pull a tagged image.
 
-Airflow listens on port `8080`. To view the Airflow UI and verify it's running, open http://localhost:8080
+Airflow listens on port `8080`. To view the Airflow UI and verify it's running, open http://localhost:8080. Then, browse to http://localhost:3000 to begin exploring DAG metadata via the Marquez UI.
 
 # Airflow
 
