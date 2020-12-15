@@ -120,5 +120,3 @@ t1 = PostgresOperator(
     ''',
     dag=dag
 )
-
-t1 

@@ -1,6 +1,7 @@
 from datetime import datetime
 from marquez_airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
+from airflow.operators.sensors import ExternalTaskSensor
 from airflow.utils.dates import days_ago
 
 default_args = {
@@ -20,7 +21,47 @@ dag = DAG(
     description='Loads new deliveries for the week.'
 )
 
-t1 = PostgresOperator(
+# Wait for etl_orders_7_days DAG to complete
+t1 = ExternalTaskSensor(
+    task_id='wait_for_etl_orders_7_days',
+    external_dag_id='etl_orders_7_days',
+    mode='reschedule',
+    dag=dag
+)
+
+# Wait for etl_restaurants DAG to complete
+t2 = ExternalTaskSensor(
+    task_id='wait_for_etl_restaurants',
+    external_dag_id='etl_restaurants',
+    mode='reschedule',
+    dag=dag
+)
+
+# Wait for etl_order_status DAG to complete
+t3 = ExternalTaskSensor(
+    task_id='wait_for_etl_order_status',
+    external_dag_id='etl_order_status',
+    mode='reschedule',
+    dag=dag
+)
+
+# Wait for etl_drivers DAG to complete
+t4 = ExternalTaskSensor(
+    task_id='wait_for_etl_drivers',
+    external_dag_id='etl_drivers',
+    mode='reschedule',
+    dag=dag
+)
+
+# Wait for etl_customers DAG to complete
+t5 = ExternalTaskSensor(
+    task_id='wait_for_etl_customers',
+    external_dag_id='etl_customers',
+    mode='reschedule',
+    dag=dag
+)
+
+t6 = PostgresOperator(
     task_id='if_not_exists',
     postgres_conn_id='food_delivery_db',
     sql='''
@@ -42,14 +83,14 @@ t1 = PostgresOperator(
     dag=dag
 )
 
-t2 = PostgresOperator(
+t7 = PostgresOperator(
     task_id='tuncate',
     postgres_conn_id='food_delivery_db',
     sql='TRUNCATE TABLE delivery_7_days;',
     dag=dag
 )
 
-t3 = PostgresOperator(
+t8 = PostgresOperator(
     task_id='insert',
     postgres_conn_id='food_delivery_db',
     sql='''
@@ -72,4 +113,9 @@ t3 = PostgresOperator(
     dag=dag
 )
 
-t1 >> t2 >> t3
+t1 >> t6
+t2 >> t6
+t3 >> t6
+t4 >> t6
+t5 >> t6
+t6 >> t7 >> t8
