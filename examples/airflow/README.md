@@ -12,7 +12,7 @@ $ ./docker/up.sh
 
 > **Tip:** Use the `--pull` to pull a tagged image.
 
-Airflow listens on port `8080`. To view the Airflow UI and verify it's running, open http://localhost:8080. Then, browse to http://localhost:3000 to begin exploring metadata via the Marquez UI.
+Airflow listens on port `8080`. To view the Airflow UI and verify it's running, open http://localhost:8080. Then, browse to http://localhost:3000 to begin exploring DAG metadata via the Marquez UI.
 
 # Airflow
 
