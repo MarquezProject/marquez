@@ -1,6 +1,6 @@
-from datetime import datetime
 from marquez_airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
+from airflow.operators.sensors import ExternalTaskSensor
 from airflow.utils.dates import days_ago
 
 default_args = {
@@ -20,7 +20,55 @@ dag = DAG(
     description='Loads newly placed orders weekly.'
 )
 
-t1 = PostgresOperator(
+# Wait for new_food_deliveries DAG to complete
+t1 = ExternalTaskSensor(
+    task_id='etl_orders_7_days_wait_for_new_food_deliveries',
+    external_dag_id='new_food_deliveries',
+    mode='reschedule',
+    dag=dag
+)
+
+# Wait for etl_orders DAG to complete
+t2 = ExternalTaskSensor(
+    task_id='etl_orders_7_days_wait_for_etl_orders',
+    external_dag_id='etl_orders',
+    mode='reschedule',
+    dag=dag
+)
+
+# Wait for etl_menus DAG to complete
+t3 = ExternalTaskSensor(
+    task_id='etl_orders_7_days_wait_for_etl_menus',
+    external_dag_id='etl_menus',
+    mode='reschedule',
+    dag=dag
+)
+
+# Wait for etl_menu_items DAG to complete
+t4 = ExternalTaskSensor(
+    task_id='etl_orders_7_days_wait_for_etl_menu_items',
+    external_dag_id='etl_menu_items',
+    mode='reschedule',
+    dag=dag
+)
+
+# Wait for etl_categories DAG to complete
+t5 = ExternalTaskSensor(
+    task_id='etl_orders_7_days_wait_for_etl_categories',
+    external_dag_id='etl_categories',
+    mode='reschedule',
+    dag=dag
+)
+
+# Wait for etl_restaurants DAG to complete
+t6 = ExternalTaskSensor(
+    task_id='etl_orders_7_days_wait_for_etl_restaurants',
+    external_dag_id='etl_restaurants',
+    mode='reschedule',
+    dag=dag
+)
+
+t7 = PostgresOperator(
     task_id='if_not_exists',
     postgres_conn_id='food_delivery_db',
     sql='''
@@ -36,14 +84,14 @@ t1 = PostgresOperator(
     dag=dag
 )
 
-t2 = PostgresOperator(
+t8 = PostgresOperator(
     task_id='tuncate',
     postgres_conn_id='food_delivery_db',
     sql='TRUNCATE TABLE orders_7_days;',
     dag=dag
 )
 
-t3 = PostgresOperator(
+t9 = PostgresOperator(
     task_id='insert',
     postgres_conn_id='food_delivery_db',
     sql='''
@@ -61,4 +109,4 @@ t3 = PostgresOperator(
     dag=dag
 )
 
-t1 >> t2 >> t3
+t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7 >> t8 >> t9
