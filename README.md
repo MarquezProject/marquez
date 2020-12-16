@@ -109,6 +109,10 @@ $ ./gradlew runShadow
 
 Then browse to the admin interface: http://localhost:8081
 
+## Related Projects
+
+* [`OpenLineage`](https://github.com/OpenLineage/OpenLineage): open standard for metadata and lineage collection
+
 ## Getting Involved
 
 * Website: https://marquezproject.ai
