@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import java.time.Instant;
 import java.util.Optional;
 import marquez.db.mappers.RunArgsRowMapper;
 import marquez.db.models.RunArgsRow;
@@ -37,4 +38,15 @@ public interface RunArgsDao {
 
   @SqlQuery("SELECT COUNT(*) FROM run_args")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO run_args ( "
+          + "created_at, args, checksum "
+          + ") VALUES ( "
+          + ":now, :args, :checksum "
+          + ") ON CONFLICT(checksum) DO "
+          + "UPDATE SET "
+          + "args = :args "
+          + "RETURNING *")
+  RunArgsRow upsert(Instant now, String args, String checksum);
 }

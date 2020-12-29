@@ -20,11 +20,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Value;
 import marquez.db.mappers.DatasetFieldRowMapper;
 import marquez.db.models.DatasetFieldRow;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
@@ -118,4 +122,39 @@ public interface DatasetFieldDao extends SqlObject {
 
   @SqlQuery("SELECT COUNT(*) FROM dataset_fields")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO dataset_fields ("
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "dataset_uuid, "
+          + "name, "
+          + "description"
+          + ") VALUES ("
+          + ":type, "
+          + ":now, "
+          + ":now, "
+          + ":datasetUuid, "
+          + ":name, "
+          + ":description) "
+          + "ON CONFLICT(dataset_uuid, name, type) "
+          + "DO UPDATE SET "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "description = EXCLUDED.description "
+          + "RETURNING *")
+  DatasetFieldRow upsert(
+      Instant now, String name, String type, String description, UUID datasetUuid);
+
+  @SqlBatch(
+      "INSERT INTO dataset_versions_field_mapping (dataset_version_uuid, dataset_field_uuid) "
+          + "VALUES (:datasetVersionUuid, :datasetFieldUuid) ON CONFLICT DO NOTHING")
+  void updateFieldMapping(@BindBean List<DatasetFieldMapping> datasetFieldMappings);
+
+  @Value
+  @AllArgsConstructor
+  public static class DatasetFieldMapping {
+    UUID datasetVersionUuid;
+    UUID datasetFieldUuid;
+  }
 }

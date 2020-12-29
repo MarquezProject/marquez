@@ -79,4 +79,21 @@ public interface NamespaceDao {
 
   @SqlQuery("SELECT COUNT(*) FROM namespaces")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO namespaces ( "
+          + "created_at, "
+          + "updated_at, "
+          + "name, "
+          + "current_owner_name "
+          + ") VALUES ("
+          + ":now, "
+          + ":now, "
+          + ":name, "
+          + ":currentOwnerName "
+          + ") ON CONFLICT(name) DO "
+          + "UPDATE SET "
+          + "updated_at = EXCLUDED.updated_at "
+          + "RETURNING *")
+  NamespaceRow upsert(Instant now, String name, String currentOwnerName);
 }
