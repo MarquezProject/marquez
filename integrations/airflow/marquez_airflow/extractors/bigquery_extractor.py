@@ -115,16 +115,29 @@ class BigQueryExtractor(BaseExtractor):
             context=context
         )]
 
+    def get_parsed_table_inputs(self,data):
+        data1 = re.sub(r'[?|`]',r'',data)
+        datas = re.split('[.]',str(data1))
+        table_dict = {"projectId":datas[0],"datasetId":datas[1],"tableId":datas[2]}
+        return table_dict
+
     def _get_input_from_bq(self, job, context, source, client):
-        if not job._properties.get('statistics')\
+        
+        if job._properties.get('statistics').get('query').get('referencedTables') is not None:
+            bq_input_tables = job._properties.get('statistics')\
+            .get('query')\
+            .get('referencedTables')
+
+        elif context['bigquery.sql.parsed.inputs'] is not None:
+            sql_meta = SqlParser.parse(self.operator.sql)
+            bq_input_tables = [self.get_parsed_table_inputs(inputs) for inputs in sql_meta.in_tables]
+
+        elif not job._properties.get('statistics')\
               or not job._properties.get('statistics').get('query')\
               or not job._properties.get('statistics').get('query')\
                   .get('referencedTables'):
-            return None
 
-        bq_input_tables = job._properties.get('statistics')\
-            .get('query')\
-            .get('referencedTables')
+            return None
 
         input_table_names = [
             self._bq_table_name(bq_t) for bq_t in bq_input_tables
