@@ -15,10 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import marquez.service.models.LineageEvent;
-import marquez.service.models.LineageEvent.Dataset;
-import marquez.service.models.LineageEvent.Job;
-import marquez.service.models.LineageEvent.SchemaField;
 import marquez.common.Utils;
 import marquez.common.models.DatasetType;
 import marquez.common.models.JobType;
@@ -37,6 +33,10 @@ import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
 import marquez.db.models.RunStateRow;
 import marquez.db.models.SourceRow;
+import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.Dataset;
+import marquez.service.models.LineageEvent.Job;
+import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -116,19 +116,27 @@ public interface OpenLineageDao extends SqlObject {
 
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
-    NamespaceRow namespace = namespaceDao.upsert(now, event.getJob().getNamespace(), DEFAULT_NAMESPACE_OWNER);
+    NamespaceRow namespace =
+        namespaceDao.upsert(now, event.getJob().getNamespace(), DEFAULT_NAMESPACE_OWNER);
 
     String description = null;
-    if (event.getJob().getFacets() != null && event.getJob().getFacets().getDocumentation() != null) {
+    if (event.getJob().getFacets() != null
+        && event.getJob().getFacets().getDocumentation() != null) {
       description = event.getJob().getFacets().getDocumentation().getDescription();
     }
     JobRow job =
-        jobDao.upsert(getJobType(event.getJob()), now, namespace.getUuid(), event.getJob().getName(), description);
+        jobDao.upsert(
+            getJobType(event.getJob()),
+            now,
+            namespace.getUuid(),
+            event.getJob().getName(),
+            description);
     Map<String, String> context = buildJobContext(event);
     JobContextRow jobContext =
         jobContextDao.upsert(now, Utils.toJson(context), Utils.checksumFor(context));
     String location = null;
-    if (event.getJob().getFacets() != null && event.getJob().getFacets().getSourceCodeLocation() != null) {
+    if (event.getJob().getFacets() != null
+        && event.getJob().getFacets().getSourceCodeLocation() != null) {
       location = event.getJob().getFacets().getSourceCodeLocation().getUrl();
     }
 
@@ -263,7 +271,10 @@ public interface OpenLineageDao extends SqlObject {
     if (ds.getFacets() != null && ds.getFacets().getDataSource() != null) {
       source =
           sourceDao.upsert(
-              getSourceType(ds), now, ds.getFacets().getDataSource().getName(), ds.getFacets().getDataSource().getUri());
+              getSourceType(ds),
+              now,
+              ds.getFacets().getDataSource().getName(),
+              ds.getFacets().getDataSource().getUri());
     } else {
       source = sourceDao.upsert(getSourceType(ds), now, DEFAULT_SOURCE_NAME, "");
     }
@@ -275,7 +286,12 @@ public interface OpenLineageDao extends SqlObject {
 
     DatasetRow dataset =
         datasetDao.upsert(
-            getDatasetType(ds), now, namespace.getUuid(), source.getUuid(), ds.getName(), dsDescription);
+            getDatasetType(ds),
+            now,
+            namespace.getUuid(),
+            source.getUuid(),
+            ds.getName(),
+            dsDescription);
 
     List<SchemaField> fields = null;
     if (ds.getFacets() != null && ds.getFacets().getSchema() != null) {
@@ -357,7 +373,11 @@ public interface OpenLineageDao extends SqlObject {
   default UUID buildJobVersion(LineageEvent event, Map<String, String> context) {
     final byte[] bytes =
         VERSION_JOINER
-            .join(event.getJob().getNamespace(), event.getJob().getName(), event.getProducer(), KV_JOINER.join(context))
+            .join(
+                event.getJob().getNamespace(),
+                event.getJob().getName(),
+                event.getProducer(),
+                KV_JOINER.join(context))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }
@@ -367,10 +387,14 @@ public interface OpenLineageDao extends SqlObject {
     if (event.getJob().getFacets() != null) {
       if (event.getJob().getFacets().getSourceCodeLocation() != null) {
         if (event.getJob().getFacets().getSourceCodeLocation().getType() != null) {
-          args.put("job.facets.sourceCodeLocation.type", event.getJob().getFacets().getSourceCodeLocation().getType());
+          args.put(
+              "job.facets.sourceCodeLocation.type",
+              event.getJob().getFacets().getSourceCodeLocation().getType());
         }
         if (event.getJob().getFacets().getSourceCodeLocation().getUrl() != null) {
-          args.put("job.facets.sourceCodeLocation.url", event.getJob().getFacets().getSourceCodeLocation().getUrl());
+          args.put(
+              "job.facets.sourceCodeLocation.url",
+              event.getJob().getFacets().getSourceCodeLocation().getUrl());
         }
       }
       if (event.getJob().getFacets().getSql() != null) {
@@ -401,7 +425,10 @@ public interface OpenLineageDao extends SqlObject {
                 fields == null
                     ? ImmutableList.of()
                     : fields.stream()
-                        .map(field -> versionField(field.getName(), field.getType(), field.getDescription()))
+                        .map(
+                            field ->
+                                versionField(
+                                    field.getName(), field.getType(), field.getDescription()))
                         .collect(joining(VERSION_DELIM)),
                 runId)
             .getBytes(UTF_8);

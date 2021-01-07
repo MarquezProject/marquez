@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.ZoneId;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
-import marquez.service.models.LineageEvent;
 import marquez.common.Utils;
 import marquez.db.OpenLineageDao;
+import marquez.service.models.LineageEvent;
 
 @Slf4j
 public class OpenLineageService {

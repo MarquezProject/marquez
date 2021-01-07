@@ -47,7 +47,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   @Parameter public String input;
 
   @Test
-  public void testApp_openLineage() throws IOException {
+  public void testOpenLineage() throws IOException {
     URL resource = Resources.getResource(input);
     String lineageArr = Resources.toString(resource, Charset.defaultCharset());
     HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
@@ -74,10 +74,28 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void test_serialization() throws IOException {
-    URL in = Resources.getResource(input);
+  public void testSerialization() throws IOException {
+    testSerialization(Utils.newObjectMapper());
+  }
 
-    ObjectMapper mapper = Utils.newObjectMapper();
+  // Test object mapper with listed jackson requirements
+  @Test
+  public void testRequiredObjectMapper() throws IOException {
+    testSerialization(getMapper());
+  }
+
+  public ObjectMapper getMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.setSerializationInclusion(Include.NON_NULL);
+    mapper.registerModule(new JavaTimeModule());
+    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+
+    return mapper;
+  }
+
+  public void testSerialization(ObjectMapper mapper) throws IOException {
+    URL in = Resources.getResource(input);
 
     LineageEvent lineageEvent = mapper.readValue(in, LineageEvent.class);
     String out = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lineageEvent);

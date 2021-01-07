@@ -20,7 +20,8 @@ import lombok.ToString;
 
 /**
  * Requires jackson serialization features: mapper.registerModule(new JavaTimeModule());
- * mapper.setSerializationInclusion(Include.NON_NULL); mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+ * mapper.setSerializationInclusion(Include.NON_NULL);
+ * mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
  * mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
  */
 @Builder
@@ -34,16 +35,12 @@ import lombok.ToString;
 public class LineageEvent {
 
   private String eventType;
-  @NotNull
-  private ZonedDateTime eventTime;
-  @NotNull
-  private LineageEvent.Run run;
-  @NotNull
-  private LineageEvent.Job job;
+  @NotNull private ZonedDateTime eventTime;
+  @NotNull private LineageEvent.Run run;
+  @NotNull private LineageEvent.Job job;
   private List<Dataset> inputs;
   private List<Dataset> outputs;
-  @NotNull
-  private String producer;
+  @NotNull private String producer;
 
   @AllArgsConstructor
   @NoArgsConstructor
@@ -55,8 +52,7 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Run {
 
-    @NotNull
-    private String runId;
+    @NotNull private String runId;
     private RunFacet facets;
   }
 
@@ -73,8 +69,7 @@ public class LineageEvent {
     private NominalTimeRunFacet nominalTime;
     private ParentRunFacet parent;
 
-    @Builder.Default
-    private Map<String, Object> additional = new LinkedHashMap<>();
+    @Builder.Default private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
     public void setFacet(String key, Object value) {
@@ -98,13 +93,12 @@ public class LineageEvent {
   @Getter
   @Setter
   private abstract static class BaseFacet {
-    @NotNull
-    private URI _producer;
-    @NotNull
-    private URI _schemaURL;
+    @NotNull private URI _producer;
+    @NotNull private URI _schemaURL;
 
-    public BaseFacet(@NotNull URI _producer,
-        @NotNull URI _schemaURL) {
+    protected BaseFacet() {}
+
+    public BaseFacet(@NotNull URI _producer, @NotNull URI _schemaURL) {
       this._producer = _producer;
       this._schemaURL = _schemaURL;
     }
@@ -114,23 +108,26 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
+  @NoArgsConstructor
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class NominalTimeRunFacet extends BaseFacet {
 
-    @NotNull
-    private ZonedDateTime nominalStartTime;
+    @NotNull private ZonedDateTime nominalStartTime;
     private ZonedDateTime nominalEndTime;
 
     @Builder
-    public NominalTimeRunFacet(@NotNull URI _producer,
+    public NominalTimeRunFacet(
+        @NotNull URI _producer,
         @NotNull URI _schemaURL,
-        @NotNull ZonedDateTime nominalStartTime, ZonedDateTime nominalEndTime) {
+        @NotNull ZonedDateTime nominalStartTime,
+        ZonedDateTime nominalEndTime) {
       super(_producer, _schemaURL);
       this.nominalStartTime = nominalStartTime;
       this.nominalEndTime = nominalEndTime;
     }
   }
 
+  @NoArgsConstructor
   @Getter
   @Setter
   @Valid
@@ -138,13 +135,12 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class ParentRunFacet extends BaseFacet {
 
-    @NotNull
-    private RunLink run;
-    @NotNull
-    private JobLink job;
+    @NotNull private RunLink run;
+    @NotNull private JobLink job;
 
     @Builder
-    public ParentRunFacet(@NotNull URI _producer,
+    public ParentRunFacet(
+        @NotNull URI _producer,
         @NotNull URI _schemaURL,
         @NotNull RunLink run,
         @NotNull JobLink job) {
@@ -164,8 +160,7 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class RunLink {
 
-    @NotNull
-    private String runId;
+    @NotNull private String runId;
   }
 
   @Builder
@@ -178,10 +173,8 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class JobLink {
 
-    @NotNull
-    private String namespace;
-    @NotNull
-    private String name;
+    @NotNull private String namespace;
+    @NotNull private String name;
   }
 
   @Builder
@@ -194,13 +187,10 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Job {
 
-    @NotNull
-    private String namespace;
-    @NotNull
-    private String name;
+    @NotNull private String namespace;
+    @NotNull private String name;
     private JobFacet facets;
   }
-
 
   @Builder
   @AllArgsConstructor
@@ -215,8 +205,7 @@ public class LineageEvent {
     private DocumentationJobFacet documentation;
     private SourceCodeLocationJobFacet sourceCodeLocation;
     private SQLJobFacet sql;
-    @Builder.Default
-    private Map<String, Object> additional = new LinkedHashMap<>();
+    @Builder.Default private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
     public void setFacet(String key, Object value) {
@@ -241,6 +230,7 @@ public class LineageEvent {
     }
   }
 
+  @NoArgsConstructor
   @Getter
   @Setter
   @Valid
@@ -248,17 +238,17 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DocumentationJobFacet extends BaseFacet {
 
-    @NotNull
-    private String description;
+    @NotNull private String description;
 
     @Builder
-    public DocumentationJobFacet(@NotNull URI _producer,
-        @NotNull URI _schemaURL, @NotNull String description) {
+    public DocumentationJobFacet(
+        @NotNull URI _producer, @NotNull URI _schemaURL, @NotNull String description) {
       super(_producer, _schemaURL);
       this.description = description;
     }
   }
 
+  @NoArgsConstructor
   @Getter
   @Setter
   @Valid
@@ -270,14 +260,15 @@ public class LineageEvent {
     private String url;
 
     @Builder
-    public SourceCodeLocationJobFacet(@NotNull URI _producer,
-        @NotNull URI _schemaURL, String type, String url) {
+    public SourceCodeLocationJobFacet(
+        @NotNull URI _producer, @NotNull URI _schemaURL, String type, String url) {
       super(_producer, _schemaURL);
       this.type = type;
       this.url = url;
     }
   }
 
+  @NoArgsConstructor
   @Getter
   @Setter
   @Valid
@@ -285,12 +276,10 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class SQLJobFacet extends BaseFacet {
 
-    @NotNull
-    private String query;
+    @NotNull private String query;
 
     @Builder
-    public SQLJobFacet(@NotNull URI _producer,
-        @NotNull URI _schemaURL, @NotNull String query) {
+    public SQLJobFacet(@NotNull URI _producer, @NotNull URI _schemaURL, @NotNull String query) {
       super(_producer, _schemaURL);
       this.query = query;
     }
@@ -307,10 +296,8 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Dataset {
 
-    @NotNull
-    private String namespace;
-    @NotNull
-    private String name;
+    @NotNull private String namespace;
+    @NotNull private String name;
     private DatasetFacet facets;
   }
 
@@ -328,8 +315,7 @@ public class LineageEvent {
     private SchemaDatasetFacet schema;
     private DatasourceDatasetFacet dataSource;
     private String description;
-    @Builder.Default
-    private Map<String, Object> additional = new LinkedHashMap<>();
+    @Builder.Default private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
     public void setFacet(String key, Object value) {
@@ -358,6 +344,7 @@ public class LineageEvent {
     }
   }
 
+  @NoArgsConstructor
   @Getter
   @Setter
   @Valid
@@ -365,17 +352,17 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DocumentationDatasetFacet extends BaseFacet {
 
-    @NotNull
-    private String description;
+    @NotNull private String description;
 
     @Builder
-    public DocumentationDatasetFacet(@NotNull URI _producer,
-        @NotNull URI _schemaURL, @NotNull String description) {
+    public DocumentationDatasetFacet(
+        @NotNull URI _producer, @NotNull URI _schemaURL, @NotNull String description) {
       super(_producer, _schemaURL);
       this.description = description;
     }
   }
 
+  @NoArgsConstructor
   @Getter
   @Setter
   @Valid
@@ -386,8 +373,8 @@ public class LineageEvent {
     private List<SchemaField> fields;
 
     @Builder
-    public SchemaDatasetFacet(@NotNull URI _producer,
-        @NotNull URI _schemaURL, List<SchemaField> fields) {
+    public SchemaDatasetFacet(
+        @NotNull URI _producer, @NotNull URI _schemaURL, List<SchemaField> fields) {
       super(_producer, _schemaURL);
       this.fields = fields;
     }
@@ -403,13 +390,12 @@ public class LineageEvent {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class SchemaField {
 
-    @NotNull
-    private String name;
-    @NotNull
-    private String type;
+    @NotNull private String name;
+    @NotNull private String type;
     private String description;
   }
 
+  @NoArgsConstructor
   @Getter
   @Setter
   @Valid
@@ -421,8 +407,8 @@ public class LineageEvent {
     private String uri;
 
     @Builder
-    public DatasourceDatasetFacet(@NotNull URI _producer,
-        @NotNull URI _schemaURL, String name, String uri) {
+    public DatasourceDatasetFacet(
+        @NotNull URI _producer, @NotNull URI _schemaURL, String name, String uri) {
       super(_producer, _schemaURL);
       this.name = name;
       this.uri = uri;
