@@ -1,15 +1,10 @@
 package marquez;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import marquez.api.DatasetResource;
@@ -49,44 +44,44 @@ import org.jdbi.v3.core.Jdbi;
 
 @Getter
 public final class MarquezContext {
-  private final NamespaceDao namespaceDao;
-  private final OwnerDao ownerDao;
-  private final NamespaceOwnershipDao namespaceOwnershipDao;
-  private final SourceDao sourceDao;
-  private final DatasetDao datasetDao;
-  private final DatasetFieldDao datasetFieldDao;
-  private final DatasetVersionDao datasetVersionDao;
-  private final JobDao jobDao;
-  private final JobVersionDao jobVersionDao;
-  private final JobContextDao jobContextDao;
-  private final RunDao runDao;
-  private final RunArgsDao runArgsDao;
-  private final RunStateDao runStateDao;
-  private final TagDao tagDao;
+  @Getter private final NamespaceDao namespaceDao;
+  @Getter private final OwnerDao ownerDao;
+  @Getter private final NamespaceOwnershipDao namespaceOwnershipDao;
+  @Getter private final SourceDao sourceDao;
+  @Getter private final DatasetDao datasetDao;
+  @Getter private final DatasetFieldDao datasetFieldDao;
+  @Getter private final DatasetVersionDao datasetVersionDao;
+  @Getter private final JobDao jobDao;
+  @Getter private final JobVersionDao jobVersionDao;
+  @Getter private final JobContextDao jobContextDao;
+  @Getter private final RunDao runDao;
+  @Getter private final RunArgsDao runArgsDao;
+  @Getter private final RunStateDao runStateDao;
+  @Getter private final TagDao tagDao;
+  @Getter private final OpenLineageDao openLineageDao;
 
-  private final List<RunTransitionListener> runTransitionListeners;
+  @Getter private final List<RunTransitionListener> runTransitionListeners;
 
-  private final NamespaceService namespaceService;
-  private final SourceService sourceService;
-  private final DatasetService datasetService;
-  private final JobService jobService;
-  private final TagService tagService;
-  private final MarquezServiceExceptionMapper serviceExceptionMapper;
+  @Getter private final NamespaceService namespaceService;
+  @Getter private final SourceService sourceService;
+  @Getter private final DatasetService datasetService;
+  @Getter private final JobService jobService;
+  @Getter private final TagService tagService;
+  @Getter private final RunService runService;
+  @Getter private final OpenLineageService openLineageService;
 
-  private final NamespaceResource namespaceResource;
-  private final SourceResource sourceResource;
-  private final DatasetResource datasetResource;
-  private final JobResource jobResource;
-  private final TagResource tagResource;
+  @Getter private final MarquezServiceExceptionMapper serviceExceptionMapper;
 
-  private final ImmutableList<Object> resources;
-  private final JdbiExceptionExceptionMapper jdbiException;
-  private final RunService runService;
-  private final OpenLineageResource openLineageResource;
-  private final OpenLineageService openLineageService;
-  private final OpenLineageDao openLineageDao;
+  @Getter private final NamespaceResource namespaceResource;
+  @Getter private final SourceResource sourceResource;
+  @Getter private final DatasetResource datasetResource;
+  @Getter private final JobResource jobResource;
+  @Getter private final TagResource tagResource;
+  @Getter private final OpenLineageResource openLineageResource;
 
-  @Builder
+  @Getter private final ImmutableList<Object> resources;
+  @Getter private final JdbiExceptionExceptionMapper jdbiException;
+
   private MarquezContext(
       @NonNull final Jdbi jdbi,
       @NonNull final ImmutableSet<Tag> tags,
@@ -133,7 +128,7 @@ public final class MarquezContext {
             namespaceDao, datasetDao, jobDao, jobVersionDao, jobContextDao, runDao, runService);
     this.tagService = new TagService(tagDao);
     this.tagService.init(tags);
-    this.openLineageService = new OpenLineageService(openLineageDao, getLineageObjectMapper());
+    this.openLineageService = new OpenLineageService(openLineageDao);
     this.serviceExceptionMapper = new MarquezServiceExceptionMapper();
     this.jdbiException = new JdbiExceptionExceptionMapper();
 
@@ -157,13 +152,43 @@ public final class MarquezContext {
             openLineageResource);
   }
 
-  public ObjectMapper getLineageObjectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.setSerializationInclusion(Include.NON_NULL);
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+  public static Builder builder() {
+    return new Builder();
+  }
 
-    return mapper;
+  public static class Builder {
+
+    private Jdbi jdbi;
+    private ImmutableSet<Tag> tags;
+    private List<RunTransitionListener> runTransitionListeners;
+
+    Builder() {
+      this.tags = ImmutableSet.of();
+      this.runTransitionListeners = new ArrayList<>();
+    }
+
+    public Builder jdbi(@NonNull Jdbi jdbi) {
+      this.jdbi = jdbi;
+      return this;
+    }
+
+    public Builder tags(@NonNull ImmutableSet<Tag> tags) {
+      this.tags = tags;
+      return this;
+    }
+
+    public Builder runTransitionListener(@NonNull RunTransitionListener runTransitionListener) {
+      return runTransitionListeners(Lists.newArrayList(runTransitionListener));
+    }
+
+    public Builder runTransitionListeners(
+        @NonNull List<RunTransitionListener> runTransitionListeners) {
+      this.runTransitionListeners.addAll(runTransitionListeners);
+      return this;
+    }
+
+    public MarquezContext build() throws MarquezServiceException {
+      return new MarquezContext(jdbi, tags, runTransitionListeners);
+    }
   }
 }

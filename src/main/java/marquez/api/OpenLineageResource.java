@@ -32,7 +32,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.model.LineageEvent;
+import marquez.service.models.LineageEvent;
 import marquez.service.OpenLineageService;
 
 @Slf4j

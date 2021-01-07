@@ -53,7 +53,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTests.class)
-public class MarquezAppIntegrationTest extends AbstractIntegrationTest {
+public class MarquezAppIntegrationTest extends BaseIntegrationTest {
   // TAGS
   private static final Tag PII = new Tag("PII", "Personally identifiable information");
   private static final Tag SENSITIVE = new Tag("SENSITIVE", "Contains sensitive information");

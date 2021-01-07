@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import marquez.api.model.LineageEvent;
+import marquez.service.models.LineageEvent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

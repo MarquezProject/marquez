@@ -15,10 +15,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import marquez.api.model.LineageEvent;
-import marquez.api.model.LineageEvent.LineageDataset;
-import marquez.api.model.LineageEvent.LineageJob;
-import marquez.api.model.LineageEvent.SchemaField;
+import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.Dataset;
+import marquez.service.models.LineageEvent.Job;
+import marquez.service.models.LineageEvent.SchemaField;
 import marquez.common.Utils;
 import marquez.common.models.DatasetType;
 import marquez.common.models.JobType;
@@ -81,29 +81,23 @@ public interface OpenLineageDao extends SqlObject {
   SourceDao createSourceDao();
 
   @SqlUpdate(
-      "INSERT INTO lineage_event ("
+      "INSERT INTO lineage_events ("
           + "event_type, "
           + "event_time, "
           + "run_id, "
           + "job_name, "
           + "job_namespace, "
-          + "inputs, "
-          + "outputs, "
+          + "event, "
           + "producer) "
-          + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
-          + "ON CONFLICT ON CONSTRAINT lineage_event_pk DO "
-          + "UPDATE SET "
-          + "inputs = excluded.inputs,"
-          + "outputs = excluded.outputs,"
-          + "producer = excluded.producer")
+          + "VALUES (?, ?, ?, ?, ?, ?, ?) "
+          + "ON CONFLICT ON CONSTRAINT lineage_event_pk DO NOTHING")
   void createLineageEvent(
       String eventType,
       Instant eventTime,
       String runId,
       String jobName,
       String jobNamespace,
-      PGobject inputs,
-      PGobject outputs,
+      PGobject event,
       String producer);
 
   @Transaction
@@ -120,22 +114,22 @@ public interface OpenLineageDao extends SqlObject {
     RunArgsDao runArgsDao = createRunArgsDao();
     RunStateDao runStateDao = createRunStateDao();
 
-    Instant now = event.eventTime.withZoneSameInstant(ZoneId.of("UTC")).toInstant();
+    Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
-    NamespaceRow namespace = namespaceDao.upsert(now, event.job.namespace, DEFAULT_NAMESPACE_OWNER);
+    NamespaceRow namespace = namespaceDao.upsert(now, event.getJob().getNamespace(), DEFAULT_NAMESPACE_OWNER);
 
     String description = null;
-    if (event.job.facets != null && event.job.facets.documentation != null) {
-      description = event.job.facets.documentation.description;
+    if (event.getJob().getFacets() != null && event.getJob().getFacets().getDocumentation() != null) {
+      description = event.getJob().getFacets().getDocumentation().getDescription();
     }
     JobRow job =
-        jobDao.upsert(getJobType(event.job), now, namespace.getUuid(), event.job.name, description);
+        jobDao.upsert(getJobType(event.getJob()), now, namespace.getUuid(), event.getJob().getName(), description);
     Map<String, String> context = buildJobContext(event);
     JobContextRow jobContext =
         jobContextDao.upsert(now, Utils.toJson(context), Utils.checksumFor(context));
     String location = null;
-    if (event.job.facets != null && event.job.facets.sourceCodeLocation != null) {
-      location = event.job.facets.sourceCodeLocation.url;
+    if (event.getJob().getFacets() != null && event.getJob().getFacets().getSourceCodeLocation() != null) {
+      location = event.getJob().getFacets().getSourceCodeLocation().getUrl();
     }
 
     JobVersionRow jobVersion =
@@ -148,30 +142,30 @@ public interface OpenLineageDao extends SqlObject {
 
     Instant nominalStartTime = null;
     Instant nominalEndTime = null;
-    if (event.run.facets != null && event.run.facets.nominalTime != null) {
+    if (event.getRun().getFacets() != null && event.getRun().getFacets().getNominalTime() != null) {
       nominalStartTime =
           event
-              .run
-              .facets
-              .nominalTime
-              .nominalStartTime
+              .getRun()
+              .getFacets()
+              .getNominalTime()
+              .getNominalStartTime()
               .withZoneSameInstant(ZoneId.of("UTC"))
               .toInstant();
       nominalEndTime =
           event
-              .run
-              .facets
-              .nominalTime
-              .nominalEndTime
+              .getRun()
+              .getFacets()
+              .getNominalTime()
+              .getNominalEndTime()
               .withZoneSameInstant(ZoneId.of("UTC"))
               .toInstant();
     }
 
-    UUID runUuid = runToUuid(event.run.runId);
+    UUID runUuid = runToUuid(event.getRun().getRunId());
 
     RunRow run;
-    if (event.eventType != null) {
-      RunState runStateType = getRunState(event.eventType);
+    if (event.getEventType() != null) {
+      RunState runStateType = getRunState(event.getEventType());
       run =
           runDao.upsert(
               runUuid,
@@ -194,8 +188,8 @@ public interface OpenLineageDao extends SqlObject {
 
     jobVersionDao.updateLatestRun(jobVersion.getUuid(), now, run.getUuid());
 
-    if (event.eventType != null) {
-      RunState runStateType = getRunState(event.eventType);
+    if (event.getEventType() != null) {
+      RunState runStateType = getRunState(event.getEventType());
 
       RunStateRow runState = runStateDao.upsert(now, run.getUuid(), runStateType);
       if (runStateType.isDone()) {
@@ -206,8 +200,8 @@ public interface OpenLineageDao extends SqlObject {
       }
     }
 
-    if (event.inputs != null) {
-      for (LineageDataset ds : event.inputs) {
+    if (event.getInputs() != null) {
+      for (Dataset ds : event.getInputs()) {
         upsertLineageDataset(
             ds,
             jobVersion,
@@ -225,8 +219,8 @@ public interface OpenLineageDao extends SqlObject {
       }
     }
 
-    if (event.outputs != null) {
-      for (LineageDataset ds : event.outputs) {
+    if (event.getOutputs() != null) {
+      for (Dataset ds : event.getOutputs()) {
         upsertLineageDataset(
             ds,
             jobVersion,
@@ -245,12 +239,12 @@ public interface OpenLineageDao extends SqlObject {
     }
   }
 
-  default JobType getJobType(LineageJob job) {
+  default JobType getJobType(Job job) {
     return JobType.BATCH;
   }
 
   default void upsertLineageDataset(
-      LineageDataset ds,
+      Dataset ds,
       JobVersionRow jobVersion,
       NamespaceRow namespace,
       Instant now,
@@ -263,29 +257,29 @@ public interface OpenLineageDao extends SqlObject {
       DatasetFieldDao datasetFieldDao,
       RunDao runDao,
       JobVersionDao jobVersionDao) {
-    NamespaceRow dsNamespace = namespaceDao.upsert(now, ds.namespace, DEFAULT_NAMESPACE_OWNER);
+    NamespaceRow dsNamespace = namespaceDao.upsert(now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
 
     SourceRow source;
-    if (ds.facets != null && ds.facets.dataSource != null) {
+    if (ds.getFacets() != null && ds.getFacets().getDataSource() != null) {
       source =
           sourceDao.upsert(
-              getSourceType(ds), now, ds.facets.dataSource.name, ds.facets.dataSource.uri);
+              getSourceType(ds), now, ds.getFacets().getDataSource().getName(), ds.getFacets().getDataSource().getUri());
     } else {
       source = sourceDao.upsert(getSourceType(ds), now, DEFAULT_SOURCE_NAME, "");
     }
 
     String dsDescription = null;
-    if (ds.facets != null && ds.facets.documentation != null) {
-      dsDescription = ds.facets.documentation.description;
+    if (ds.getFacets() != null && ds.getFacets().getDocumentation() != null) {
+      dsDescription = ds.getFacets().getDocumentation().getDescription();
     }
 
     DatasetRow dataset =
         datasetDao.upsert(
-            getDatasetType(ds), now, namespace.getUuid(), source.getUuid(), ds.name, dsDescription);
+            getDatasetType(ds), now, namespace.getUuid(), source.getUuid(), ds.getName(), dsDescription);
 
     List<SchemaField> fields = null;
-    if (ds.facets != null && ds.facets.schema != null) {
-      fields = ds.facets.schema.fields;
+    if (ds.getFacets() != null && ds.getFacets().getSchema() != null) {
+      fields = ds.getFacets().getSchema().getFields();
     }
 
     DatasetVersionRow dsVersion =
@@ -300,7 +294,7 @@ public interface OpenLineageDao extends SqlObject {
       for (SchemaField field : fields) {
         DatasetFieldRow datasetFieldRow =
             datasetFieldDao.upsert(
-                now, field.name, field.type, field.description, dataset.getUuid());
+                now, field.getName(), field.getType(), field.getDescription(), dataset.getUuid());
         datasetFieldMappings.add(
             new DatasetFieldMapping(dsVersion.getUuid(), datasetFieldRow.getUuid()));
       }
@@ -315,11 +309,11 @@ public interface OpenLineageDao extends SqlObject {
         jobVersion.getUuid(), dataset.getUuid(), isInput ? IoType.INPUT : IoType.OUTPUT);
   }
 
-  default SourceType getSourceType(LineageDataset ds) {
+  default SourceType getSourceType(Dataset ds) {
     return SourceType.POSTGRESQL;
   }
 
-  default DatasetType getDatasetType(LineageDataset ds) {
+  default DatasetType getDatasetType(Dataset ds) {
     return DatasetType.DB_TABLE;
   }
 
@@ -340,21 +334,21 @@ public interface OpenLineageDao extends SqlObject {
 
   default Map<String, String> createRunArgs(LineageEvent event) {
     Map<String, String> args = new LinkedHashMap<>();
-    if (event.run.facets != null) {
-      if (event.run.facets.nominalTime != null) {
+    if (event.getRun().getFacets() != null) {
+      if (event.getRun().getFacets().getNominalTime() != null) {
         args.put(
-            "run.facets.nominalTime.nominalStartTime",
-            event.run.facets.nominalTime.nominalStartTime.toString());
-        if (event.run.facets.nominalTime.nominalEndTime != null) {
+            "nominal_start_time",
+            event.getRun().getFacets().getNominalTime().getNominalStartTime().toString());
+        if (event.getRun().getFacets().getNominalTime().getNominalEndTime() != null) {
           args.put(
-              "run.facets.nominalTime.nominalEndTime",
-              event.run.facets.nominalTime.nominalEndTime.toString());
+              "nominal_end_time",
+              event.getRun().getFacets().getNominalTime().getNominalEndTime().toString());
         }
       }
-      if (event.run.facets.parent != null) {
-        args.put("run.facets.parent.run.runId", event.run.facets.parent.run.runId);
-        args.put("run.facets.parent.job.name", event.run.facets.parent.job.name);
-        args.put("run.facets.parent.job.namespace", event.run.facets.parent.job.namespace);
+      if (event.getRun().getFacets().getParent() != null) {
+        args.put("run_id", event.getRun().getFacets().getParent().getRun().getRunId());
+        args.put("name", event.getRun().getFacets().getParent().getJob().getName());
+        args.put("namespace", event.getRun().getFacets().getParent().getJob().getNamespace());
       }
     }
     return args;
@@ -363,24 +357,24 @@ public interface OpenLineageDao extends SqlObject {
   default UUID buildJobVersion(LineageEvent event, Map<String, String> context) {
     final byte[] bytes =
         VERSION_JOINER
-            .join(event.job.namespace, event.job.name, event.producer, KV_JOINER.join(context))
+            .join(event.getJob().getNamespace(), event.getJob().getName(), event.getProducer(), KV_JOINER.join(context))
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }
 
   default Map<String, String> buildJobContext(LineageEvent event) {
     Map<String, String> args = new LinkedHashMap<>();
-    if (event.job.facets != null) {
-      if (event.job.facets.sourceCodeLocation != null) {
-        if (event.job.facets.sourceCodeLocation.type != null) {
-          args.put("job.facets.sourceCodeLocation.type", event.job.facets.sourceCodeLocation.type);
+    if (event.getJob().getFacets() != null) {
+      if (event.getJob().getFacets().getSourceCodeLocation() != null) {
+        if (event.getJob().getFacets().getSourceCodeLocation().getType() != null) {
+          args.put("job.facets.sourceCodeLocation.type", event.getJob().getFacets().getSourceCodeLocation().getType());
         }
-        if (event.job.facets.sourceCodeLocation.url != null) {
-          args.put("job.facets.sourceCodeLocation.url", event.job.facets.sourceCodeLocation.url);
+        if (event.getJob().getFacets().getSourceCodeLocation().getUrl() != null) {
+          args.put("job.facets.sourceCodeLocation.url", event.getJob().getFacets().getSourceCodeLocation().getUrl());
         }
       }
-      if (event.job.facets.sql != null) {
-        args.put("job.facets.sql.query", event.job.facets.sql.query);
+      if (event.getJob().getFacets().getSql() != null) {
+        args.put("sql", event.getJob().getFacets().getSql().getQuery());
       }
     }
 
@@ -407,7 +401,7 @@ public interface OpenLineageDao extends SqlObject {
                 fields == null
                     ? ImmutableList.of()
                     : fields.stream()
-                        .map(field -> versionField(field.name, field.type, field.description))
+                        .map(field -> versionField(field.getName(), field.getType(), field.getDescription()))
                         .collect(joining(VERSION_DELIM)),
                 runId)
             .getBytes(UTF_8);
@@ -418,14 +412,14 @@ public interface OpenLineageDao extends SqlObject {
     return VERSION_JOINER.join(fieldName, type, description);
   }
 
-  default PGobject createJsonArray(List<LineageDataset> dataset, ObjectMapper mapper) {
+  default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {
     try {
       PGobject jsonObject = new PGobject();
       jsonObject.setType("json");
-      jsonObject.setValue(mapper.writeValueAsString(dataset));
+      jsonObject.setValue(mapper.writeValueAsString(event));
       return jsonObject;
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Could write lineage event to db", e);
     }
   }
 }

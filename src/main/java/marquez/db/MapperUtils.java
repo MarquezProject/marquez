@@ -1,6 +1,5 @@
 package marquez.db;
 
-import com.google.common.collect.ImmutableSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -19,7 +18,7 @@ public class MapperUtils {
       return columns;
     } catch (SQLException e) {
       log.error("Unable to get column names", e);
+      throw new RuntimeException(e);
     }
-    return ImmutableSet.of();
   }
 }

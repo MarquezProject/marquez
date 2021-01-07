@@ -168,7 +168,6 @@ public interface DatasetDao extends SqlObject {
           + ":name, "
           + ":description) "
           + "ON CONFLICT (namespace_uuid, name) "
-          // todo: what is the unique identifier here?
           + "DO UPDATE SET "
           + "type = EXCLUDED.type, "
           + "updated_at = EXCLUDED.updated_at, "

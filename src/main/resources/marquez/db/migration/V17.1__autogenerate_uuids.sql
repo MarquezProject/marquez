@@ -1,16 +1,3 @@
-CREATE TABLE lineage_event (
-  event_time timestamp with time zone,
-  event_type text,
-  run_id text,
-  job_name text,
-  job_namespace text,
-  inputs jsonb,
-  outputs jsonb,
-  producer text,
-  CONSTRAINT lineage_event_pk
-    PRIMARY KEY(event_time, event_type, run_id, job_name, job_namespace)
-);
-
 create extension if not exists "uuid-ossp";
 alter table sources alter column uuid set default uuid_generate_v4();
 alter table namespaces alter column uuid set default uuid_generate_v4();

@@ -22,7 +22,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import marquez.api.model.LineageEvent;
+import marquez.common.Utils;
+import marquez.service.models.LineageEvent;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -32,7 +33,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 @Category(IntegrationTests.class)
-public class OpenLineageIntegrationTest extends AbstractIntegrationTest {
+public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   public static String EVENT_REQUIRED = "open_lineage/event_required_only.json";
   public static String EVENT_SIMPLE = "open_lineage/event_simple.json";
   public static String EVENT_FULL = "open_lineage/event_full.json";
@@ -76,21 +77,11 @@ public class OpenLineageIntegrationTest extends AbstractIntegrationTest {
   public void test_serialization() throws IOException {
     URL in = Resources.getResource(input);
 
-    ObjectMapper mapper = getMapper();
+    ObjectMapper mapper = Utils.newObjectMapper();
 
     LineageEvent lineageEvent = mapper.readValue(in, LineageEvent.class);
     String out = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lineageEvent);
 
     assertEquals(mapper.readTree(in), mapper.readTree(out));
-  }
-
-  public ObjectMapper getMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.setSerializationInclusion(Include.NON_NULL);
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-
-    return mapper;
   }
 }
