@@ -92,6 +92,12 @@ public interface DatasetVersionDao {
   @SqlQuery(SELECT + "WHERE uuid = :uuid")
   Optional<DatasetVersionRow> findBy(UUID uuid);
 
+  @SqlQuery(SELECT + "WHERE uuid = :uuid")
+  Optional<DatasetVersionRow> findAllBy(UUID uuid);
+
+  @SqlQuery(EXTENDED_SELECT + "WHERE uuid = :uuid")
+  Optional<ExtendedDatasetVersionRow> findByVersion(UUID uuid);
+
   @SqlQuery(
       SELECT
           + "INNER JOIN datasets AS d ON d.uuid = dv.dataset_uuid AND d.current_version_uuid = dv.uuid "
@@ -112,6 +118,8 @@ public interface DatasetVersionDao {
     }
   }
 
+  // default Optional<DatasetVersionRow> findByVersion(UUID versionUuid) {}
+
   @SqlQuery("SELECT COUNT(*) FROM dataset_versions")
   int count();
 
@@ -123,4 +131,11 @@ public interface DatasetVersionDao {
   @SqlQuery(EXTENDED_SELECT + " WHERE run_uuid = :runId")
   @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
   List<ExtendedDatasetVersionRow> findByRunId(@NonNull UUID runId);
+
+  @SqlQuery(
+      EXTENDED_SELECT
+          + "WHERE n.name = :namespaceName AND d.name = :datasetName "
+          + "ORDER BY created_at DESC "
+          + "LIMIT :limit OFFSET :offset")
+  List<DatasetVersionRow> findAll(String namespaceName, String datasetName, int limit, int offset);
 }

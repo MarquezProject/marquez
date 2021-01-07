@@ -37,6 +37,7 @@ import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.Version;
 import marquez.db.DatasetDao;
 import marquez.db.JobContextDao;
 import marquez.db.JobDao;
@@ -54,7 +55,6 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
-import marquez.service.models.Version;
 
 @Slf4j
 public class JobService {

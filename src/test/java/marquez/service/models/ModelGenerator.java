@@ -52,6 +52,7 @@ import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.common.models.Version;
 
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}

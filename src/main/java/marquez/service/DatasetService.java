@@ -37,6 +37,7 @@ import marquez.common.models.Field;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.TagName;
+import marquez.common.models.Version;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
@@ -54,7 +55,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
-import marquez.service.models.Version;
+import marquez.service.models.DatasetVersion;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -77,22 +78,22 @@ public class DatasetService {
   private final NamespaceDao namespaceDao;
   private final SourceDao sourceDao;
   private final DatasetDao datasetDao;
-  private final DatasetFieldDao fieldDao;
-  private final DatasetVersionDao versionDao;
+  private final DatasetFieldDao datasetFieldDao;
+  private final DatasetVersionDao datasetVersionDao;
   private final TagDao tagDao;
 
   public DatasetService(
       @NonNull final NamespaceDao namespaceDao,
       @NonNull final SourceDao sourceDao,
       @NonNull final DatasetDao datasetDao,
-      @NonNull final DatasetFieldDao fieldDao,
-      @NonNull final DatasetVersionDao versionDao,
+      @NonNull final DatasetFieldDao datasetFieldDao,
+      @NonNull final DatasetVersionDao datasetVersionDao,
       @NonNull final TagDao tagDao) {
     this.namespaceDao = namespaceDao;
     this.sourceDao = sourceDao;
     this.datasetDao = datasetDao;
-    this.fieldDao = fieldDao;
-    this.versionDao = versionDao;
+    this.datasetFieldDao = datasetFieldDao;
+    this.datasetVersionDao = datasetVersionDao;
     this.tagDao = tagDao;
   }
 
@@ -132,14 +133,14 @@ public class DatasetService {
         datasets.labels(namespaceName.getValue(), datasetMeta.getType().toString()).inc();
       }
       final Version version = datasetMeta.version(namespaceName, datasetName);
-      if (!versionDao.exists(version.getValue())) {
+      if (!datasetVersionDao.exists(version.getValue())) {
         log.info(
             "Creating version '{}' for dataset '{}'...",
             version.getValue(),
             datasetName.getValue());
         final ExtendedDatasetRow datasetRow =
             datasetDao.find(namespaceName.getValue(), datasetName.getValue()).get();
-        final List<DatasetFieldRow> fieldRows = fieldDao.findAll(datasetRow.getUuid());
+        final List<DatasetFieldRow> fieldRows = datasetFieldDao.findAll(datasetRow.getUuid());
         final List<DatasetFieldRow> newFieldRows =
             datasetMeta.getFields().stream()
                 .map(field -> toDatasetFieldRow(datasetRow.getUuid(), field))
@@ -172,7 +173,7 @@ public class DatasetService {
             fieldRowsForVersion.stream().map(DatasetFieldRow::getUuid).collect(toImmutableList());
         final DatasetVersionRow newVersionRow =
             Mapper.toDatasetVersionRow(datasetRow.getUuid(), version, fieldUuids, datasetMeta);
-        versionDao.insertWith(newVersionRow, newFieldRowsForVersion);
+        datasetVersionDao.insertWith(newVersionRow, newFieldRowsForVersion);
         log.info(
             "Successfully created version '{}' for dataset '{}'.",
             version.getValue(),
@@ -224,7 +225,7 @@ public class DatasetService {
       @NonNull FieldName fieldName)
       throws MarquezServiceException {
     try {
-      return fieldDao.exists(
+      return datasetFieldDao.exists(
           namespaceName.getValue(), datasetName.getValue(), fieldName.getValue());
     } catch (UnableToExecuteStatementException e) {
       log.error("Failed to check dataset '{}'.", datasetName.getValue(), e);
@@ -255,6 +256,26 @@ public class DatasetService {
     }
   }
 
+  public Optional<DatasetVersion> getVersion(@NonNull Version version) {
+    return datasetVersionDao.findBy(version.getValue()).map(this::toDatasetVersion);
+  }
+
+  public ImmutableList<DatasetVersion> getVersionsFor(
+      @NonNull NamespaceName namespaceName,
+      @NonNull DatasetName datasetName,
+      int limit,
+      int offset) {
+    checkArgument(limit >= 0, "limit must be >= 0");
+    checkArgument(offset >= 0, "offset must be >= 0");
+    final ImmutableList.Builder<DatasetVersion> datasetVersions = ImmutableList.builder();
+    final List<DatasetVersionRow> datasetVersionRows =
+        datasetVersionDao.findAll(namespaceName.getValue(), datasetName.getValue(), limit, offset);
+    for (final DatasetVersionRow datasetVersionRow : datasetVersionRows) {
+      datasetVersions.add(toDatasetVersion(datasetVersionRow));
+    }
+    return datasetVersions.build();
+  }
+
   public ImmutableList<Dataset> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
       throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
@@ -282,7 +303,7 @@ public class DatasetService {
             .map(TagName::of)
             .collect(toImmutableSet());
     final DatasetVersionRow versionRow =
-        versionDao
+        datasetVersionDao
             .find(
                 datasetRow.getType(),
                 (datasetVersionUuid == null)
@@ -290,10 +311,25 @@ public class DatasetService {
                     : datasetVersionUuid)
             .get();
     final ImmutableList<Field> fields =
-        fieldDao.findAllIn(toArray(versionRow.getFieldUuids(), UUID.class)).stream()
+        datasetFieldDao.findAllIn(toArray(versionRow.getFieldUuids(), UUID.class)).stream()
             .map(this::toField)
             .collect(toImmutableList());
     return Mapper.toDataset(datasetRow, tags, versionRow, fields);
+  }
+
+  private DatasetVersion toDatasetVersion(@NonNull DatasetVersionRow datasetVersionRow) {
+    final ExtendedDatasetRow datasetRow =
+        datasetDao.findBy(datasetVersionRow.getDatasetUuid()).get();
+    final ImmutableSet<TagName> tags =
+        tagDao.findAllIn(toArray(datasetRow.getTagUuids(), UUID.class)).stream()
+            .map(TagRow::getName)
+            .map(TagName::of)
+            .collect(toImmutableSet());
+    final ImmutableList<Field> fields =
+        datasetFieldDao.findAllIn(toArray(datasetVersionRow.getFieldUuids(), UUID.class)).stream()
+            .map(this::toField)
+            .collect(toImmutableList());
+    return Mapper.toDatasetVersion(datasetRow, tags, datasetVersionRow, fields);
   }
 
   /** Creates a {@link Field} instance from the given {@link DatasetFieldRow}. */
@@ -335,11 +371,11 @@ public class DatasetService {
       final ExtendedDatasetRow datasetRow =
           datasetDao.find(namespaceName.getValue(), datasetName.getValue()).get();
       final DatasetFieldRow fieldRow =
-          fieldDao.find(datasetRow.getUuid(), fieldName.getValue()).get();
+          datasetFieldDao.find(datasetRow.getUuid(), fieldName.getValue()).get();
       final TagRow tagRow =
           tagDao.findBy(tagName.getValue().toUpperCase(Locale.getDefault())).get();
       final Instant taggedAt = Instant.now();
-      fieldDao.updateTags(fieldRow.getUuid(), tagRow.getUuid(), taggedAt);
+      datasetFieldDao.updateTags(fieldRow.getUuid(), tagRow.getUuid(), taggedAt);
       log.info(
           "Successfully tagged field '{}' for dataset '{}' with '{}'.",
           fieldName,
