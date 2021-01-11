@@ -58,7 +58,6 @@ public final class Utils {
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-    mapper.registerModule(new JavaTimeModule());
 
     return mapper;
   }
