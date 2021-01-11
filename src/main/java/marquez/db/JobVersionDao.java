@@ -137,4 +137,34 @@ public interface JobVersionDao extends SqlObject {
 
   @SqlQuery("SELECT COUNT(*) FROM job_versions")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO job_versions ("
+          + "created_at, "
+          + "updated_at, "
+          + "job_uuid, "
+          + "job_context_uuid, "
+          + "location,"
+          + "version"
+          + ") VALUES ("
+          + ":now, "
+          + ":now, "
+          + ":jobUuid, "
+          + ":jobContextUuid, "
+          + ":location, "
+          + ":version) "
+          + "ON CONFLICT(version) DO "
+          + "UPDATE SET "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "job_uuid = EXCLUDED.job_uuid, "
+          + "job_context_uuid = EXCLUDED.job_context_uuid "
+          + "RETURNING *")
+  ExtendedJobVersionRow upsert(
+      Instant now, UUID jobUuid, UUID jobContextUuid, String location, UUID version);
+
+  @SqlUpdate(
+      "INSERT INTO job_versions_io_mapping ("
+          + "job_version_uuid, dataset_uuid, io_type) "
+          + "VALUES (:jobVersionUuid, :datasetUuid, :ioType) ON CONFLICT DO NOTHING")
+  void upsertDatasetIoMapping(UUID jobVersionUuid, UUID datasetUuid, IoType ioType);
 }

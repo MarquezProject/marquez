@@ -10,6 +10,7 @@ import lombok.NonNull;
 import marquez.api.DatasetResource;
 import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
+import marquez.api.OpenLineageResource;
 import marquez.api.SourceResource;
 import marquez.api.TagResource;
 import marquez.api.exceptions.JdbiExceptionExceptionMapper;
@@ -22,6 +23,7 @@ import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
 import marquez.db.NamespaceOwnershipDao;
+import marquez.db.OpenLineageDao;
 import marquez.db.OwnerDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
@@ -31,6 +33,7 @@ import marquez.db.TagDao;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
+import marquez.service.OpenLineageService;
 import marquez.service.RunService;
 import marquez.service.RunTransitionListener;
 import marquez.service.SourceService;
@@ -39,6 +42,7 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Tag;
 import org.jdbi.v3.core.Jdbi;
 
+@Getter
 public final class MarquezContext {
   @Getter private final NamespaceDao namespaceDao;
   @Getter private final OwnerDao ownerDao;
@@ -54,14 +58,18 @@ public final class MarquezContext {
   @Getter private final RunArgsDao runArgsDao;
   @Getter private final RunStateDao runStateDao;
   @Getter private final TagDao tagDao;
+  @Getter private final OpenLineageDao openLineageDao;
 
-  private final List<RunTransitionListener> runTransitionListeners;
+  @Getter private final List<RunTransitionListener> runTransitionListeners;
 
   @Getter private final NamespaceService namespaceService;
   @Getter private final SourceService sourceService;
   @Getter private final DatasetService datasetService;
   @Getter private final JobService jobService;
   @Getter private final TagService tagService;
+  @Getter private final RunService runService;
+  @Getter private final OpenLineageService openLineageService;
+
   @Getter private final MarquezServiceExceptionMapper serviceExceptionMapper;
 
   @Getter private final NamespaceResource namespaceResource;
@@ -69,16 +77,20 @@ public final class MarquezContext {
   @Getter private final DatasetResource datasetResource;
   @Getter private final JobResource jobResource;
   @Getter private final TagResource tagResource;
+  @Getter private final OpenLineageResource openLineageResource;
 
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
-  @Getter private final RunService runService;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
       @NonNull final ImmutableSet<Tag> tags,
-      @NonNull final List<RunTransitionListener> runTransitionListeners)
+      List<RunTransitionListener> runTransitionListeners)
       throws MarquezServiceException {
+    if (runTransitionListeners == null) {
+      runTransitionListeners = new ArrayList<>();
+    }
+
     this.namespaceDao = jdbi.onDemand(NamespaceDao.class);
     this.ownerDao = jdbi.onDemand(OwnerDao.class);
     this.namespaceOwnershipDao = jdbi.onDemand(NamespaceOwnershipDao.class);
@@ -93,7 +105,7 @@ public final class MarquezContext {
     this.runArgsDao = jdbi.onDemand(RunArgsDao.class);
     this.runStateDao = jdbi.onDemand(RunStateDao.class);
     this.tagDao = jdbi.onDemand(TagDao.class);
-
+    this.openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     this.runTransitionListeners = runTransitionListeners;
 
     this.namespaceService = new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
@@ -116,6 +128,7 @@ public final class MarquezContext {
             namespaceDao, datasetDao, jobDao, jobVersionDao, jobContextDao, runDao, runService);
     this.tagService = new TagService(tagDao);
     this.tagService.init(tags);
+    this.openLineageService = new OpenLineageService(openLineageDao);
     this.serviceExceptionMapper = new MarquezServiceExceptionMapper();
     this.jdbiException = new JdbiExceptionExceptionMapper();
 
@@ -125,6 +138,7 @@ public final class MarquezContext {
         new DatasetResource(namespaceService, datasetService, tagService, runService);
     this.jobResource = new JobResource(namespaceService, jobService, runService);
     this.tagResource = new TagResource(tagService);
+    this.openLineageResource = new OpenLineageResource(openLineageService);
 
     this.resources =
         ImmutableList.of(
@@ -134,11 +148,8 @@ public final class MarquezContext {
             jobResource,
             tagResource,
             serviceExceptionMapper,
-            jdbiException);
-  }
-
-  public void registerListener(@NonNull RunTransitionListener listener) {
-    runTransitionListeners.add(listener);
+            jdbiException,
+            openLineageResource);
   }
 
   public static Builder builder() {
@@ -146,6 +157,7 @@ public final class MarquezContext {
   }
 
   public static class Builder {
+
     private Jdbi jdbi;
     private ImmutableSet<Tag> tags;
     private List<RunTransitionListener> runTransitionListeners;

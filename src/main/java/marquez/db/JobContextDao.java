@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,4 +46,15 @@ public interface JobContextDao {
 
   @SqlQuery("SELECT COUNT(*) FROM job_contexts")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO job_contexts "
+          + "(created_at, context, checksum) "
+          + "VALUES "
+          + "(:now, :context, :checksum) "
+          + "ON CONFLICT (checksum) DO "
+          + "UPDATE SET "
+          + "context = EXCLUDED.context "
+          + "RETURNING *")
+  JobContextRow upsert(Instant now, String context, String checksum);
 }

@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.RunState;
 import marquez.db.mappers.RunStateRowMapper;
 import marquez.db.models.RunStateRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
@@ -76,4 +77,9 @@ public interface RunStateDao extends SqlObject {
 
   @SqlQuery("SELECT COUNT(*) FROM run_states")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO run_states (transitioned_at, run_uuid, state)"
+          + "VALUES (:now, :runUuid, :runStateType) RETURNING *")
+  RunStateRow upsert(Instant now, UUID runUuid, RunState runStateType);
 }

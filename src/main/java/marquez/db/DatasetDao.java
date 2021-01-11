@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.DatasetType;
 import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.mappers.ExtendedDatasetRowMapper;
 import marquez.db.models.DatasetRow;
@@ -32,6 +33,8 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
+@RegisterRowMapper(ExtendedDatasetRowMapper.class)
+@RegisterRowMapper(DatasetRowMapper.class)
 public interface DatasetDao extends SqlObject {
   @Transaction
   default void insert(DatasetRow row) {
@@ -119,15 +122,12 @@ public interface DatasetDao extends SqlObject {
           + "  ON (s.uuid = d.source_uuid) ";
 
   @SqlQuery(EXTENDED_SELECT + " WHERE d.uuid = :rowUuid")
-  @RegisterRowMapper(ExtendedDatasetRowMapper.class)
   Optional<ExtendedDatasetRow> findBy(UUID rowUuid);
 
   @SqlQuery(EXTENDED_SELECT + "WHERE d.name = :datasetName AND n.name = :namespaceName")
-  @RegisterRowMapper(ExtendedDatasetRowMapper.class)
   Optional<ExtendedDatasetRow> find(String namespaceName, String datasetName);
 
   @SqlQuery(EXTENDED_SELECT + " WHERE d.uuid IN (<rowUuids>)")
-  @RegisterRowMapper(ExtendedDatasetRowMapper.class)
   List<ExtendedDatasetRow> findAllIn(@BindList(onEmpty = NULL_STRING) Collection<UUID> rowUuids);
 
   @SqlQuery(
@@ -135,7 +135,6 @@ public interface DatasetDao extends SqlObject {
           + " INNER JOIN namespaces AS n "
           + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
           + "WHERE d.name IN (<datasetNames>)")
-  @RegisterRowMapper(DatasetRowMapper.class)
   List<DatasetRow> findAllIn(
       String namespaceName, @BindList(onEmpty = NULL_STRING) Collection<String> datasetNames);
 
@@ -144,9 +143,43 @@ public interface DatasetDao extends SqlObject {
           + "WHERE n.name = :namespaceName "
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
-  @RegisterRowMapper(ExtendedDatasetRowMapper.class)
   List<ExtendedDatasetRow> findAll(String namespaceName, int limit, int offset);
 
   @SqlQuery("SELECT COUNT(*) FROM datasets")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO datasets ("
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "namespace_uuid, "
+          + "source_uuid, "
+          + "name, "
+          + "physical_name, "
+          + "description "
+          + ") VALUES ( "
+          + ":type, "
+          + ":now, "
+          + ":now, "
+          + ":namespaceUuid, "
+          + ":sourceUuid, "
+          + ":name, "
+          + ":name, "
+          + ":description) "
+          + "ON CONFLICT (namespace_uuid, name) "
+          + "DO UPDATE SET "
+          + "type = EXCLUDED.type, "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "source_uuid = EXCLUDED.source_uuid, "
+          + "physical_name = EXCLUDED.physical_name, "
+          + "description = EXCLUDED.description "
+          + "RETURNING *")
+  DatasetRow upsert(
+      DatasetType type,
+      Instant now,
+      UUID namespaceUuid,
+      UUID sourceUuid,
+      String name,
+      String description);
 }

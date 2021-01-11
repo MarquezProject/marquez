@@ -22,8 +22,10 @@ import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 import lombok.NonNull;
 import marquez.db.Columns;
+import marquez.db.MapperUtils;
 import marquez.db.models.JobRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -32,13 +34,16 @@ public final class JobRowMapper implements RowMapper<JobRow> {
   @Override
   public JobRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
+    Set<String> columnNames = MapperUtils.getColumnNames(results.getMetaData());
     return new JobRow(
         uuidOrThrow(results, Columns.ROW_UUID),
         stringOrThrow(results, Columns.TYPE),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         uuidOrThrow(results, Columns.NAMESPACE_UUID),
-        stringOrThrow(results, Columns.NAMESPACE_NAME),
+        columnNames.contains(Columns.NAMESPACE_NAME)
+            ? stringOrThrow(results, Columns.NAMESPACE_NAME)
+            : "",
         stringOrThrow(results, Columns.NAME),
         stringOrNull(results, Columns.DESCRIPTION),
         uuidOrNull(results, Columns.CURRENT_VERSION_UUID));

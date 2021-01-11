@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.JobType;
 import marquez.db.mappers.JobRowMapper;
 import marquez.db.models.JobRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -88,4 +89,27 @@ public interface JobDao {
 
   @SqlQuery("SELECT COUNT(*) FROM jobs")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO jobs ("
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "namespace_uuid, "
+          + "name, "
+          + "description "
+          + ") VALUES ( "
+          + ":type, "
+          + ":now, "
+          + ":now, "
+          + ":namespaceUuid, "
+          + ":name, "
+          + ":description "
+          + ") ON CONFLICT (name, namespace_uuid) DO "
+          + "UPDATE SET "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "type = EXCLUDED.type, "
+          + "description = EXCLUDED.description "
+          + "RETURNING *")
+  JobRow upsert(JobType type, Instant now, UUID namespaceUuid, String name, String description);
 }

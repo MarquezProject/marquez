@@ -22,10 +22,13 @@ import static marquez.db.Columns.uuidArrayOrThrow;
 import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
+import com.google.common.collect.ImmutableList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 import lombok.NonNull;
 import marquez.db.Columns;
+import marquez.db.MapperUtils;
 import marquez.db.models.ExtendedRunRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -34,20 +37,26 @@ public final class ExtendedRunRowMapper implements RowMapper<ExtendedRunRow> {
   @Override
   public ExtendedRunRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
+    Set<String> columnNames = MapperUtils.getColumnNames(results.getMetaData());
+
     return new ExtendedRunRow(
         uuidOrThrow(results, Columns.ROW_UUID),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         uuidOrThrow(results, Columns.JOB_VERSION_UUID),
         uuidOrThrow(results, Columns.RUN_ARGS_UUID),
-        uuidArrayOrThrow(results, Columns.INPUT_VERSION_UUIDS),
+        columnNames.contains(Columns.INPUT_VERSION_UUIDS)
+            ? uuidArrayOrThrow(results, Columns.INPUT_VERSION_UUIDS)
+            : ImmutableList.of(),
         timestampOrNull(results, Columns.NOMINAL_START_TIME),
         timestampOrNull(results, Columns.NOMINAL_END_TIME),
         stringOrNull(results, Columns.CURRENT_RUN_STATE),
-        timestampOrNull(results, Columns.STARTED_AT),
+        columnNames.contains(Columns.STARTED_AT)
+            ? timestampOrNull(results, Columns.STARTED_AT)
+            : null,
         uuidOrNull(results, Columns.START_RUN_STATE_UUID),
-        timestampOrNull(results, Columns.ENDED_AT),
+        columnNames.contains(Columns.ENDED_AT) ? timestampOrNull(results, Columns.ENDED_AT) : null,
         uuidOrNull(results, Columns.END_RUN_STATE_UUID),
-        stringOrThrow(results, Columns.ARGS));
+        columnNames.contains(Columns.ARGS) ? stringOrThrow(results, Columns.ARGS) : "");
   }
 }

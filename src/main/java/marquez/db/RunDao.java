@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.models.RunState;
 import marquez.db.mappers.ExtendedRunRowMapper;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.RunRow;
@@ -31,6 +32,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
+@RegisterRowMapper(ExtendedRunRowMapper.class)
 public interface RunDao extends SqlObject {
   @CreateSqlObject
   JobVersionDao createJobVersionDao();
@@ -136,7 +138,6 @@ public interface RunDao extends SqlObject {
           + "  ON (rs_e.uuid = r.end_run_state_uuid) ";
 
   @SqlQuery(SELECT_RUN + " WHERE r.uuid = :rowUuid")
-  @RegisterRowMapper(ExtendedRunRowMapper.class)
   Optional<ExtendedRunRow> findBy(UUID rowUuid);
 
   @SqlQuery(
@@ -147,9 +148,79 @@ public interface RunDao extends SqlObject {
           + "WHERE n.name = :namespace and j.name = :jobName "
           + "ORDER BY r.created_at DESC "
           + "LIMIT :limit OFFSET :offset")
-  @RegisterRowMapper(ExtendedRunRowMapper.class)
   List<ExtendedRunRow> findAll(String namespace, String jobName, int limit, int offset);
 
   @SqlQuery("SELECT COUNT(*) FROM runs")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO runs ( "
+          + "uuid, "
+          + "created_at, "
+          + "updated_at, "
+          + "job_version_uuid, "
+          + "run_args_uuid, "
+          + "nominal_start_time, "
+          + "nominal_end_time,"
+          + "current_run_state "
+          + ") VALUES ( "
+          + ":runUuid, "
+          + ":now, "
+          + ":now, "
+          + ":jobVersionUuid, "
+          + ":runArgsUuid, "
+          + ":nominalStartTime, "
+          + ":nominalEndTime, "
+          + ":runStateType "
+          + ") ON CONFLICT(uuid) DO "
+          + "UPDATE SET "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "current_run_state = EXCLUDED.current_run_state, "
+          + "nominal_start_time = EXCLUDED.nominal_start_time, "
+          + "nominal_end_time = EXCLUDED.nominal_end_time "
+          + "RETURNING *")
+  ExtendedRunRow upsert(
+      UUID runUuid,
+      Instant now,
+      UUID jobVersionUuid,
+      UUID runArgsUuid,
+      Instant nominalStartTime,
+      Instant nominalEndTime,
+      RunState runStateType);
+
+  @SqlQuery(
+      "INSERT INTO runs ( "
+          + "uuid, "
+          + "created_at, "
+          + "updated_at, "
+          + "job_version_uuid, "
+          + "run_args_uuid, "
+          + "nominal_start_time, "
+          + "nominal_end_time"
+          + ") VALUES ( "
+          + ":runUuid, "
+          + ":now, "
+          + ":now, "
+          + ":jobVersionUuid, "
+          + ":runArgsUuid, "
+          + ":nominalStartTime, "
+          + ":nominalEndTime "
+          + ") ON CONFLICT(uuid) DO "
+          + "UPDATE SET "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "current_run_state = EXCLUDED.current_run_state, "
+          + "nominal_start_time = EXCLUDED.nominal_start_time "
+          + "RETURNING *")
+  ExtendedRunRow upsert(
+      UUID runUuid,
+      Instant now,
+      UUID jobVersionUuid,
+      UUID runArgsUuid,
+      Instant nominalStartTime,
+      Instant nominalEndTime);
+
+  @SqlUpdate(
+      "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
+          + "VALUES (:runUuid, :datasetVersionUuid) ON CONFLICT DO NOTHING")
+  void updateInputMapping(UUID runUuid, UUID datasetVersionUuid);
 }

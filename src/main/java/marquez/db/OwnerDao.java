@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.db.mappers.OwnerRowMapper;
@@ -62,4 +63,14 @@ public interface OwnerDao {
 
   @SqlQuery("SELECT COUNT(*) FROM owners")
   int count();
+
+  @SqlQuery(
+      "INSERT INTO owners (created_at, name) "
+          + "VALUES ( "
+          + ":now, :name "
+          + ") ON CONFLICT(name) DO "
+          + "UPDATE SET "
+          + "created_at = EXCLUDED.created_at "
+          + "RETURNING *")
+  OwnerRow upsert(Instant now, String name);
 }

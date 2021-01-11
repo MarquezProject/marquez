@@ -51,6 +51,7 @@ dependencies {
   compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
   compile "io.dropwizard:dropwizard-jdbi3:${dropwizardVersion}"
   compile "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}"
+  compile "io.dropwizard:dropwizard-http2:${dropwizardVersion}"
   compile "io.prometheus:simpleclient:${prometheusVersion}"
   compile "io.prometheus:simpleclient_dropwizard:${prometheusVersion}"
   compile "io.prometheus:simpleclient_hotspot:${prometheusVersion}"

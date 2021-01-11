@@ -24,17 +24,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import marquez.client.MarquezClient;
-import marquez.client.Utils;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
@@ -54,33 +49,11 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.SourceType;
-import org.jdbi.v3.testing.JdbiRule;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTests.class)
-public class MarquezAppIntegrationTest {
-  private static final String CONFIG_FILE = "config.test.yml";
-  private static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
-
-  private static final PostgresContainer POSTGRES = PostgresContainer.create("marquez");
-
-  static {
-    POSTGRES.start();
-  }
-
-  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
-
-  @ClassRule
-  public static final DropwizardAppRule<MarquezConfig> APP =
-      new DropwizardAppRule<>(
-          MarquezApp.class,
-          CONFIG_FILE_PATH,
-          ConfigOverride.config("db.url", POSTGRES.getJdbcUrl()),
-          ConfigOverride.config("db.user", POSTGRES.getUsername()),
-          ConfigOverride.config("db.password", POSTGRES.getPassword()));
-
+public class MarquezAppIntegrationTest extends BaseIntegrationTest {
   // TAGS
   private static final Tag PII = new Tag("PII", "Personally identifiable information");
   private static final Tag SENSITIVE = new Tag("SENSITIVE", "Contains sensitive information");
@@ -127,9 +100,6 @@ public class MarquezAppIntegrationTest {
   private static final URL JOB_LOCATION = newLocation();
   private static final ImmutableMap<String, String> JOB_CONTEXT = newContext();
   private static final String JOB_DESCRIPTION = newDescription();
-
-  private final URL baseUrl = Utils.toUrl("http://localhost:" + APP.getLocalPort());
-  private final MarquezClient client = MarquezClient.builder().baseUrl(baseUrl).build();
 
   @Test
   public void testApp_createNamespace() {
