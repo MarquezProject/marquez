@@ -150,6 +150,7 @@ public interface DatasetDao extends SqlObject {
 
   @SqlQuery(
       "INSERT INTO datasets ("
+          + "uuid, "
           + "type, "
           + "created_at, "
           + "updated_at, "
@@ -159,6 +160,7 @@ public interface DatasetDao extends SqlObject {
           + "physical_name, "
           + "description "
           + ") VALUES ( "
+          + ":uuid, "
           + ":type, "
           + ":now, "
           + ":now, "
@@ -176,6 +178,7 @@ public interface DatasetDao extends SqlObject {
           + "description = EXCLUDED.description "
           + "RETURNING *")
   DatasetRow upsert(
+      UUID uuid,
       DatasetType type,
       Instant now,
       UUID namespaceUuid,

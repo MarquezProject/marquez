@@ -92,6 +92,7 @@ public interface JobDao {
 
   @SqlQuery(
       "INSERT INTO jobs ("
+          + "uuid, "
           + "type, "
           + "created_at, "
           + "updated_at, "
@@ -99,6 +100,7 @@ public interface JobDao {
           + "name, "
           + "description "
           + ") VALUES ( "
+          + ":uuid, "
           + ":type, "
           + ":now, "
           + ":now, "
@@ -111,5 +113,6 @@ public interface JobDao {
           + "type = EXCLUDED.type, "
           + "description = EXCLUDED.description "
           + "RETURNING *")
-  JobRow upsert(JobType type, Instant now, UUID namespaceUuid, String name, String description);
+  JobRow upsert(
+      UUID uuid, JobType type, Instant now, UUID namespaceUuid, String name, String description);
 }

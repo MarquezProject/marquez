@@ -126,12 +126,12 @@ public interface DatasetVersionDao {
 
   @SqlQuery(
       "INSERT INTO dataset_versions "
-          + "(created_at, dataset_uuid, version, run_uuid) "
+          + "(uuid, created_at, dataset_uuid, version, run_uuid) "
           + "VALUES "
-          + "(:now, :datasetUuid, :version, :runUuid) "
+          + "(:uuid, :now, :datasetUuid, :version, :runUuid) "
           + "ON CONFLICT(version) "
           + "DO UPDATE SET "
           + "run_uuid = EXCLUDED.run_uuid "
           + "RETURNING *")
-  DatasetVersionRow upsert(Instant now, UUID datasetUuid, UUID version, UUID runUuid);
+  DatasetVersionRow upsert(UUID uuid, Instant now, UUID datasetUuid, UUID version, UUID runUuid);
 }
