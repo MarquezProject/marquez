@@ -8,7 +8,7 @@ RUN ./gradlew --version
 
 FROM base AS build
 WORKDIR /usr/src/app
-COPY src ./src
+COPY api/src ./api/src
 COPY build.gradle build.gradle
 RUN ./gradlew --no-daemon shadowJar
 
