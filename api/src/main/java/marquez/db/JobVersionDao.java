@@ -140,6 +140,7 @@ public interface JobVersionDao extends SqlObject {
 
   @SqlQuery(
       "INSERT INTO job_versions ("
+          + "uuid, "
           + "created_at, "
           + "updated_at, "
           + "job_uuid, "
@@ -147,6 +148,7 @@ public interface JobVersionDao extends SqlObject {
           + "location,"
           + "version"
           + ") VALUES ("
+          + ":uuid, "
           + ":now, "
           + ":now, "
           + ":jobUuid, "
@@ -160,7 +162,7 @@ public interface JobVersionDao extends SqlObject {
           + "job_context_uuid = EXCLUDED.job_context_uuid "
           + "RETURNING *")
   ExtendedJobVersionRow upsert(
-      Instant now, UUID jobUuid, UUID jobContextUuid, String location, UUID version);
+      UUID uuid, Instant now, UUID jobUuid, UUID jobContextUuid, String location, UUID version);
 
   @SqlUpdate(
       "INSERT INTO job_versions_io_mapping ("

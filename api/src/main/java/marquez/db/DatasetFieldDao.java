@@ -125,6 +125,7 @@ public interface DatasetFieldDao extends SqlObject {
 
   @SqlQuery(
       "INSERT INTO dataset_fields ("
+          + "uuid, "
           + "type, "
           + "created_at, "
           + "updated_at, "
@@ -132,6 +133,7 @@ public interface DatasetFieldDao extends SqlObject {
           + "name, "
           + "description"
           + ") VALUES ("
+          + ":uuid, "
           + ":type, "
           + ":now, "
           + ":now, "
@@ -144,7 +146,7 @@ public interface DatasetFieldDao extends SqlObject {
           + "description = EXCLUDED.description "
           + "RETURNING *")
   DatasetFieldRow upsert(
-      Instant now, String name, String type, String description, UUID datasetUuid);
+      UUID uuid, Instant now, String name, String type, String description, UUID datasetUuid);
 
   @SqlBatch(
       "INSERT INTO dataset_versions_field_mapping (dataset_version_uuid, dataset_field_uuid) "
