@@ -70,15 +70,11 @@ public class OpenLineageClient {
   }
 
   public <T> T post(URI uri, Object obj, Class<T> clazz) throws MarquezHttpException {
-    return executeSync(
-        BasicHttpRequests.post(uri),
-        obj,
-        new TypeReference<T>() {
-          @Override
-          public Type getType() {
-            return clazz;
-          }
-        });
+    return post(uri, obj, getTypeReference(clazz));
+  }
+
+  public <T> T post(URI uri, Object obj, TypeReference<T> ref) throws MarquezHttpException {
+    return executeSync(BasicHttpRequests.post(uri), obj, ref);
   }
 
   public <T> T executeSync(HttpRequest request, Object obj, TypeReference<T> ref)
@@ -100,15 +96,12 @@ public class OpenLineageClient {
   }
 
   public <T> CompletableFuture<ResponseMessage<T>> postAsync(URI uri, Object obj, Class<T> clazz) {
-    return executeAsync(
-        BasicHttpRequests.post(uri),
-        obj,
-        new TypeReference<T>() {
-          @Override
-          public Type getType() {
-            return clazz;
-          }
-        });
+    return postAsync(uri, obj, getTypeReference(clazz));
+  }
+
+  public <T> CompletableFuture<ResponseMessage<T>> postAsync(
+      URI uri, Object obj, TypeReference<T> ref) {
+    return executeAsync(BasicHttpRequests.post(uri), obj, ref);
   }
 
   protected <T> CompletableFuture<ResponseMessage<T>> executeAsync(
@@ -170,6 +163,15 @@ public class OpenLineageClient {
 
   protected static String getUserAgent() {
     return "openlineage-java" + "/1.0";
+  }
+
+  private <T> TypeReference<T> getTypeReference(Class<T> clazz) {
+    return new TypeReference<T>() {
+      @Override
+      public Type getType() {
+        return clazz;
+      }
+    };
   }
 
   public void close() {
