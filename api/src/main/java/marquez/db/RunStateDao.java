@@ -79,7 +79,7 @@ public interface RunStateDao extends SqlObject {
   int count();
 
   @SqlQuery(
-      "INSERT INTO run_states (transitioned_at, run_uuid, state)"
-          + "VALUES (:now, :runUuid, :runStateType) RETURNING *")
-  RunStateRow upsert(Instant now, UUID runUuid, RunState runStateType);
+      "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
+          + "VALUES (:uuid, :now, :runUuid, :runStateType) RETURNING *")
+  RunStateRow upsert(UUID uuid, Instant now, UUID runUuid, RunState runStateType);
 }

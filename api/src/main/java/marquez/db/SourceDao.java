@@ -64,12 +64,14 @@ public interface SourceDao {
 
   @SqlQuery(
       "INSERT INTO sources ("
+          + "uuid, "
           + "type, "
           + "created_at, "
           + "updated_at, "
           + "name, "
           + "connection_url "
           + ") VALUES ("
+          + ":uuid, "
           + ":type, "
           + ":now, "
           + ":now, "
@@ -81,5 +83,5 @@ public interface SourceDao {
           + "name = EXCLUDED.name, "
           + "connection_url = EXCLUDED.connection_url "
           + "RETURNING *")
-  SourceRow upsert(SourceType type, Instant now, String name, String connectionUrl);
+  SourceRow upsert(UUID uuid, SourceType type, Instant now, String name, String connectionUrl);
 }
