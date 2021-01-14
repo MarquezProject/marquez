@@ -26,10 +26,7 @@
           "items": {
             "anyOf": [
               {
-                "$ref": "#/definitions/BaseLogicalPlan"
-              },
-              {
-                "$ref": "#/definitions/LogicalRelation"
+                "$ref": "#/definitions/LogicalPlanRunFacet"
               },
               {
                 "$ref": "#/definitions/InsertIntoHadoopFsRelationCommand"
