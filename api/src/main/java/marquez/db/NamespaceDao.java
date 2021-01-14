@@ -82,11 +82,13 @@ public interface NamespaceDao {
 
   @SqlQuery(
       "INSERT INTO namespaces ( "
+          + "uuid, "
           + "created_at, "
           + "updated_at, "
           + "name, "
           + "current_owner_name "
           + ") VALUES ("
+          + ":uuid, "
           + ":now, "
           + ":now, "
           + ":name, "
@@ -95,5 +97,5 @@ public interface NamespaceDao {
           + "UPDATE SET "
           + "updated_at = EXCLUDED.updated_at "
           + "RETURNING *")
-  NamespaceRow upsert(Instant now, String name, String currentOwnerName);
+  NamespaceRow upsert(UUID uuid, Instant now, String name, String currentOwnerName);
 }

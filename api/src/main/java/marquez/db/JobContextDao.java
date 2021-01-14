@@ -49,12 +49,12 @@ public interface JobContextDao {
 
   @SqlQuery(
       "INSERT INTO job_contexts "
-          + "(created_at, context, checksum) "
+          + "(uuid, created_at, context, checksum) "
           + "VALUES "
-          + "(:now, :context, :checksum) "
+          + "(:uuid, :now, :context, :checksum) "
           + "ON CONFLICT (checksum) DO "
           + "UPDATE SET "
           + "context = EXCLUDED.context "
           + "RETURNING *")
-  JobContextRow upsert(Instant now, String context, String checksum);
+  JobContextRow upsert(UUID uuid, Instant now, String context, String checksum);
 }

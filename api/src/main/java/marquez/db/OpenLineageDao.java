@@ -117,7 +117,8 @@ public interface OpenLineageDao extends SqlObject {
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
     NamespaceRow namespace =
-        namespaceDao.upsert(now, event.getJob().getNamespace(), DEFAULT_NAMESPACE_OWNER);
+        namespaceDao.upsert(
+            UUID.randomUUID(), now, event.getJob().getNamespace(), DEFAULT_NAMESPACE_OWNER);
 
     String description = null;
     if (event.getJob().getFacets() != null
@@ -126,6 +127,7 @@ public interface OpenLineageDao extends SqlObject {
     }
     JobRow job =
         jobDao.upsert(
+            UUID.randomUUID(),
             getJobType(event.getJob()),
             now,
             namespace.getUuid(),
@@ -133,7 +135,8 @@ public interface OpenLineageDao extends SqlObject {
             description);
     Map<String, String> context = buildJobContext(event);
     JobContextRow jobContext =
-        jobContextDao.upsert(now, Utils.toJson(context), Utils.checksumFor(context));
+        jobContextDao.upsert(
+            UUID.randomUUID(), now, Utils.toJson(context), Utils.checksumFor(context));
     String location = null;
     if (event.getJob().getFacets() != null
         && event.getJob().getFacets().getSourceCodeLocation() != null) {
@@ -142,11 +145,17 @@ public interface OpenLineageDao extends SqlObject {
 
     JobVersionRow jobVersion =
         jobVersionDao.upsert(
-            now, job.getUuid(), jobContext.getUuid(), location, buildJobVersion(event, context));
+            UUID.randomUUID(),
+            now,
+            job.getUuid(),
+            jobContext.getUuid(),
+            location,
+            buildJobVersion(event, context));
 
     Map<String, String> runArgsMap = createRunArgs(event);
     RunArgsRow runArgs =
-        runArgsDao.upsert(now, Utils.toJson(runArgsMap), Utils.checksumFor(runArgsMap));
+        runArgsDao.upsert(
+            UUID.randomUUID(), now, Utils.toJson(runArgsMap), Utils.checksumFor(runArgsMap));
 
     Instant nominalStartTime = null;
     Instant nominalEndTime = null;
@@ -199,7 +208,8 @@ public interface OpenLineageDao extends SqlObject {
     if (event.getEventType() != null) {
       RunState runStateType = getRunState(event.getEventType());
 
-      RunStateRow runState = runStateDao.upsert(now, run.getUuid(), runStateType);
+      RunStateRow runState =
+          runStateDao.upsert(UUID.randomUUID(), now, run.getUuid(), runStateType);
       if (runStateType.isDone()) {
         runDao.updateEndState(run.getUuid(), now, runState.getUuid());
       } else if (runStateType.isStarting()) {
@@ -265,18 +275,20 @@ public interface OpenLineageDao extends SqlObject {
       DatasetFieldDao datasetFieldDao,
       RunDao runDao,
       JobVersionDao jobVersionDao) {
-    NamespaceRow dsNamespace = namespaceDao.upsert(now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
+    NamespaceRow dsNamespace =
+        namespaceDao.upsert(UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
 
     SourceRow source;
     if (ds.getFacets() != null && ds.getFacets().getDataSource() != null) {
       source =
           sourceDao.upsert(
+              UUID.randomUUID(),
               getSourceType(ds),
               now,
               ds.getFacets().getDataSource().getName(),
               ds.getFacets().getDataSource().getUri());
     } else {
-      source = sourceDao.upsert(getSourceType(ds), now, DEFAULT_SOURCE_NAME, "");
+      source = sourceDao.upsert(UUID.randomUUID(), getSourceType(ds), now, DEFAULT_SOURCE_NAME, "");
     }
 
     String dsDescription = null;
@@ -286,6 +298,7 @@ public interface OpenLineageDao extends SqlObject {
 
     DatasetRow dataset =
         datasetDao.upsert(
+            UUID.randomUUID(),
             getDatasetType(ds),
             now,
             namespace.getUuid(),
@@ -300,6 +313,7 @@ public interface OpenLineageDao extends SqlObject {
 
     DatasetVersionRow dsVersion =
         datasetVersionDao.upsert(
+            UUID.randomUUID(),
             now,
             dataset.getUuid(),
             version(dsNamespace.getName(), source.getName(), dataset.getName(), fields, runUuid),
@@ -310,7 +324,12 @@ public interface OpenLineageDao extends SqlObject {
       for (SchemaField field : fields) {
         DatasetFieldRow datasetFieldRow =
             datasetFieldDao.upsert(
-                now, field.getName(), field.getType(), field.getDescription(), dataset.getUuid());
+                UUID.randomUUID(),
+                now,
+                field.getName(),
+                field.getType(),
+                field.getDescription(),
+                dataset.getUuid());
         datasetFieldMappings.add(
             new DatasetFieldMapping(dsVersion.getUuid(), datasetFieldRow.getUuid()));
       }
