@@ -56,8 +56,6 @@ public class RddExecutionContext implements ExecutionContext {
 
   @Override
   public void start(SparkListenerJobStart jobStart) {
-    asJavaCollection(jobStart.stageInfos());
-
     LineageEvent event =
         LineageEvent.builder()
             .inputs(buildInputs(inputs))

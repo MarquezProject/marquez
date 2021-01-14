@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.EqualsAndHashCode.Exclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -91,7 +93,7 @@ public class LineageEvent {
 
   @Getter
   @Setter
-  private abstract static class BaseFacet {
+  public abstract static class BaseFacet {
 
     @NonNull private URI _producer;
     @NonNull private URI _schemaURL;
@@ -284,11 +286,12 @@ public class LineageEvent {
   @ToString
   @NonNull
   @JsonIgnoreProperties(ignoreUnknown = true)
+  @EqualsAndHashCode
   public static class Dataset {
 
     @NonNull private String namespace;
     @NonNull private String name;
-    private DatasetFacet facets;
+    @Exclude private DatasetFacet facets;
   }
 
   @Builder

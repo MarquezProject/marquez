@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "definitions": {
+    "Run": {
+      "properties": {
+        "facets": {
+          "properties": {
+            "logicalPlan": {
+              "$ref": "#/definitions/LogicalPlanRunFacet"
+            }
+          }
+        }
+      }
+    },
+    "LogicalPlanRunFacet": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "An explanation about the purpose of this instance."
+        },
+        "name": {
+          "type": "string"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/BaseLogicalPlan"
+              },
+              {
+                "$ref": "#/definitions/LogicalRelation"
+              },
+              {
+                "$ref": "#/definitions/InsertIntoHadoopFsRelationCommand"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "InsertIntoHadoopFsRelationCommand": {
+      "properties":{
+        "outputPath": {
+          "type": "string"
+        }
+      }
+    },
+    "LogicalRelation": {
+      "properties":{
+        "relation": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/HadoopFsRelation"
+            },
+            {
+              "$ref": "#/definitions/JDBCRelation"
+            }
+          ]
+        }
+      }
+    },
+    "HadoopFsRelation": {
+      "properties":{
+        "relation": {
+          "location": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "JDBCRelation": {
+      "properties":{
+        "relation": {
+          "jdbcOptions": {
+            "type": "object"
+          }
+        }
+      }
+    }
+
+  }
+}
