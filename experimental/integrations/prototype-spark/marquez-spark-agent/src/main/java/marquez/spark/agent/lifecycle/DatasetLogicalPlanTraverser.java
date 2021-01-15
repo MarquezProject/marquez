@@ -24,24 +24,24 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
 public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
-  private Set<Dataset> outputDataset;
-  private Set<Dataset> inputDataset;
+  private Set<Dataset> outputDatasets;
+  private Set<Dataset> inputDatasets;
   private String jobNamespace;
 
   public TraverserResult build(LogicalPlan plan, String jobNamespace) {
     synchronized (this) {
-      outputDataset = new HashSet<>();
-      inputDataset = new HashSet<>();
+      outputDatasets = new HashSet<>();
+      inputDatasets = new HashSet<>();
       this.jobNamespace = jobNamespace;
       super.visit(plan);
-      return new TraverserResult(new ArrayList<>(outputDataset), new ArrayList<>(inputDataset));
+      return new TraverserResult(new ArrayList<>(outputDatasets), new ArrayList<>(inputDatasets));
     }
   }
 
   @Override
   protected Object visit(
       CreateDataSourceTableAsSelectCommand createDataSourceTableAsSelectCommand) {
-    outputDataset.add(
+    outputDatasets.add(
         Dataset.builder()
             .namespace(jobNamespace)
             .name(createDataSourceTableAsSelectCommand.table().qualifiedName())
@@ -54,7 +54,7 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   }
 
   protected Object visit(InsertIntoHadoopFsRelationCommand insertIntoHadoopFsRelationCommand) {
-    outputDataset.add(
+    outputDatasets.add(
         Dataset.builder()
             .namespace(jobNamespace)
             .name(insertIntoHadoopFsRelationCommand.outputPath().toUri().toString())
@@ -84,7 +84,7 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   }
 
   protected Object visit(HadoopFsRelation relation) {
-    inputDataset.addAll(visit(relation.location()));
+    inputDatasets.addAll(visit(relation.location()));
     return null;
   }
 
