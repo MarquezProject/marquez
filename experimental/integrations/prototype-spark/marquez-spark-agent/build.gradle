@@ -49,6 +49,9 @@ dependencies {
 
 shadowJar {
     // avoid conflict with any client version of that lib
+    relocate 'com.github.ok2c.hc5', 'marquez.com.github.ok2c.hc5'
+    relocate 'org.apache.httpcomponents.client5', 'marquez.org.apache.httpcomponents.client5'
+    relocate 'javassist', 'marquez.javassist'
     relocate 'javassist', 'marquez.javassist'
     relocate 'com.fasterxml.jackson', 'marquez.com.fasterxml.jackson'
     zip64 true
