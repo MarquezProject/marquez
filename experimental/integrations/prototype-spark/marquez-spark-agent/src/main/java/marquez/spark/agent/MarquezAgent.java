@@ -1,45 +1,44 @@
 package marquez.spark.agent;
 
 import java.lang.instrument.Instrumentation;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import marquez.client.Backends;
+import java.net.URISyntaxException;
+import lombok.extern.slf4j.Slf4j;
 import marquez.spark.agent.transformers.ActiveJobTransformer;
 import marquez.spark.agent.transformers.PairRDDFunctionsTransformer;
 import marquez.spark.agent.transformers.SparkContextTransformer;
 
+@Slf4j
 public class MarquezAgent {
-  private static final Logger logger = LoggerFactory.getLogger(MarquezAgent.class);
-
-  public static void instrument(String agentArgument, Instrumentation instrumentation) throws Exception {
-    instrumentation.addTransformer(new ActiveJobTransformer());
-    instrumentation.addTransformer(new SparkContextTransformer());
-    instrumentation.addTransformer(new PairRDDFunctionsTransformer());
+  /** Entry point for -javaagent, pre application start */
+  @SuppressWarnings("unused")
+  public static void premain(String agentArgs, Instrumentation inst) {
+    try {
+      premain(agentArgs, inst, new MarquezContext(agentArgs));
+    } catch (URISyntaxException e) {
+      log.error("Could not find marquez client url", e);
+    }
   }
 
-  public static void premain(String agentArgument, Instrumentation instrumentation) throws Exception {
-    logger.info("MarquezAgent.premain " + agentArgument);
-    SparkListener.init(agentArgument, Backends.newLoggingBackend());
-    instrument(agentArgument, instrumentation);
+  public static void premain(String agentArgs, Instrumentation inst, MarquezContext context) {
+    log.info("MarquezAgent.premain " + agentArgs);
+    SparkListener.init(agentArgs, context);
+    instrument(inst);
     addShutDownHook();
   }
 
-  public static void main(String agentArgument, Instrumentation instrumentation) throws Exception {
-    logger.info("MarquezAgent.main " + agentArgument);
-    SparkListener.init(agentArgument, Backends.newLoggingBackend());
-    instrument(agentArgument, instrumentation);
-    addShutDownHook();
+  /** Entry point when attaching after application start */
+  @SuppressWarnings("unused")
+  public static void agentmain(String agentArgs, Instrumentation inst) {
+    premain(agentArgs, inst);
   }
 
+  public static void instrument(Instrumentation inst) {
+    inst.addTransformer(new ActiveJobTransformer());
+    inst.addTransformer(new SparkContextTransformer());
+    inst.addTransformer(new PairRDDFunctionsTransformer());
+  }
 
   private static void addShutDownHook() {
-    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
-      @Override
-      public void run() {
-        SparkListener.close();
-      }
-    }));
+    Runtime.getRuntime().addShutdownHook(new Thread(SparkListener::close));
   }
 }

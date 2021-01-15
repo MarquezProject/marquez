@@ -6,9 +6,9 @@ import org.apache.spark.scheduler.SparkListenerJobStart;
 
 public interface ExecutionContext {
 
-  void setActiveJob(ActiveJob activeJob);
+  abstract void setActiveJob(ActiveJob activeJob);
 
-  void start(SparkListenerJobStart jobStart);
+  abstract void start(SparkListenerJobStart jobStart);
 
-  void end(SparkListenerJobEnd jobEnd);
+  abstract void end(SparkListenerJobEnd jobEnd);
 }
