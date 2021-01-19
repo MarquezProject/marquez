@@ -656,6 +656,8 @@ components:
         runId:
           description: The ID associated with the run modifying the table.
           type: string
+        facets:
+          $ref: '#/components/schemas/datasetFacets'
       required:
         - type
         - physicalName
@@ -672,6 +674,12 @@ components:
           {'name': 'd', 'type': 'INTEGER'}
         ]
         description: "My first dataset!"
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     STREAM:
       type: object
@@ -719,6 +727,8 @@ components:
         runId:
           description: The ID associated with the run modifying the stream.
           type: string
+        facets:
+          $ref: '#/components/schemas/datasetFacets'
       required:
         - type
         - physicalName
@@ -731,6 +741,12 @@ components:
         schemaLocation: 'http://registry.example.com/schemas/ids/1'
         fields: []
         description: "My first stream dataset!"
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     dataset:
       type: object
@@ -796,6 +812,8 @@ components:
         description:
           description:  The description of the dataset.
           type: string
+        facets:
+          $ref: '#/components/schemas/datasetFacets'
       example:
         id:
           namespace: my-namespace
@@ -816,6 +834,12 @@ components:
         tags: []
         lastModifiedAt: null
         description: "My first dataset!"
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     datasets:
       type: object
@@ -899,6 +923,8 @@ components:
         runId:
           description: An _optional_ run ID used to associate a job version to an existing job run.
           type: string
+        facets:
+          $ref: '#/components/schemas/jobFacets'
       required:
         - type
         - inputs
@@ -910,6 +936,12 @@ components:
         location: https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     job:
       type: object
@@ -972,8 +1004,9 @@ components:
           type: string
           format: URL
         context:
-          description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
+          description: Deprecated- Use facet. A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
           type: object
+          deprecated: true
         description:
           description: The description of the job.
           type: string
@@ -1017,6 +1050,10 @@ components:
             args:
               description: The arguments of the run.
               type: object
+            facets:
+              $ref: '#/components/schemas/runFacets'
+        facets:
+          $ref: '#/components/schemas/jobFacets'
       example:
         id:
           namespace: my-namespace
@@ -1032,6 +1069,12 @@ components:
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
         latestRun: null
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     jobs:
       type: object
@@ -1059,8 +1102,16 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        facets:
+          $ref: '#/components/schemas/runFacets'
       example:
         args: {'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     runAsNew:
       type: object
@@ -1103,6 +1154,8 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        facets:
+          $ref: '#/components/schemas/runFacets'
       example:
         id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         createdAt: 2019-05-09T19:49:24.201361Z
@@ -1114,6 +1167,12 @@ components:
         endedAt: null
         durationMs: null
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     runAsRunning:
       type: object
@@ -1156,6 +1215,8 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        facets:
+          $ref: '#/components/schemas/runFacets'
       example:
         id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         createdAt: 2019-05-09T19:49:24.201361Z
@@ -1167,6 +1228,12 @@ components:
         endedAt: null
         durationMs: null
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     runAsCompleted:
       type: object
@@ -1209,6 +1276,8 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        facets:
+          $ref: '#/components/schemas/runFacets'
       example:
         id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         createdAt: 2019-05-09T19:49:24.201361Z
@@ -1220,7 +1289,12 @@ components:
         endedAt: 2019-05-09T20:05:46.815920Z
         durationMs: 4250894125
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     runAsFailed:
       type: object
@@ -1263,6 +1337,8 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        facets:
+          $ref: '#/components/schemas/runFacets'
       example:
         id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         createdAt: 2019-05-09T19:49:24.201361Z
@@ -1274,7 +1350,12 @@ components:
         endedAt: 2019-05-09T20:05:46.815920Z
         durationMs: 4250894125
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
 
     runAsAborted:
       type: object
@@ -1317,6 +1398,8 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        facets:
+          $ref: '#/components/schemas/runFacets'
       example:
         id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         createdAt: 2019-05-09T19:49:24.201361Z
@@ -1328,7 +1411,12 @@ components:
         endedAt: 2019-05-09T20:05:46.815920Z
         durationMs: 4250894125
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
     runs:
       type: object
       properties:
@@ -1337,3 +1425,45 @@ components:
           items:
             $ref: '#/components/schemas/runAsCompleted'
 
+    datasetFacets:
+      description: The dataset facets.
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/customFacet'
+
+    jobFacets:
+      description: The job facets.
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/customFacet'
+
+    runFacets:
+      description: The run facets.
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/customFacet'
+
+    customFacet:
+      description: a Custom Facet is defined is a separate spec. field must not start with _
+      allOf:
+        - $ref: '#/components/schemas/baseFacet'
+        - type: object
+          additionalProperties: true
+
+    baseFacet:
+      description: all fields of the base facet are prefixed with _ to avoid name conflicts in facets
+      type: object
+      properties:
+        _producer:
+          description: URI identifying the producer of this metadata. For example this could be a git url with a given tag or sha
+          type: string
+          format: uri
+          example: https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client
+        _schemaURL:
+          description: The URL to the corresponding version of the schema definition following a $ref URL Reference (see https://swagger.io/docs/specification/using-ref/)
+          type: string
+          format: uri
+          example: https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet
+      required:
+        - _producer
+        - _schemaURL
