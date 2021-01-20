@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import marquez.spark.agent.client.LineageEvent.Dataset;
 import marquez.spark.agent.client.LineageEvent.DatasetFacet;
 import marquez.spark.agent.client.LineageEvent.SchemaDatasetFacet;
@@ -62,11 +61,11 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
     return null;
   }
 
-  @SneakyThrows
   protected SchemaDatasetFacet visit(StructType structType) {
     return SchemaDatasetFacet.builder()
-        ._producer(new URI(""))
-        ._schemaURL(new URI(""))
+        ._producer(URI.create("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"))
+        ._schemaURL(
+            URI.create("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/schemaDatasetFacet"))
         .fields(visit(structType.fields()))
         .build();
   }

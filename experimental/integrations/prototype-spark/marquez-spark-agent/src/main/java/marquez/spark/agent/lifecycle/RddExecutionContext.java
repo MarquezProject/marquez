@@ -3,14 +3,15 @@ package marquez.spark.agent.lifecycle;
 import static marquez.spark.agent.lifecycle.Rdds.flattenRDDs;
 import static scala.collection.JavaConversions.asJavaCollection;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +19,8 @@ import marquez.spark.agent.MarquezContext;
 import marquez.spark.agent.SparkListener;
 import marquez.spark.agent.client.LineageEvent;
 import marquez.spark.agent.client.LineageEvent.Dataset;
-import marquez.spark.agent.client.LineageEvent.Run;
 import marquez.spark.agent.client.LineageEvent.RunFacet;
+import marquez.spark.agent.facets.ErrorFacet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
@@ -64,7 +65,7 @@ public class RddExecutionContext implements ExecutionContext {
             .job(buildJob())
             .eventTime(toZonedTime(jobStart.time()))
             .eventType("START")
-            .producer("org.apache.spark")
+            .producer("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client")
             .build();
 
     marquezContext.emit(event);
@@ -76,27 +77,36 @@ public class RddExecutionContext implements ExecutionContext {
         LineageEvent.builder()
             .inputs(buildInputs(inputs))
             .outputs(buildOutputs(outputs))
-            .run(buildRun(buildRunFacets(jobEnd.jobResult())))
+            .run(buildRun(buildRunFacets(buildJobErrorFacet(jobEnd.jobResult()))))
             .job(buildJob())
             .eventTime(toZonedTime(jobEnd.time()))
             .eventType(getEventType(jobEnd.jobResult()))
-            .producer("org.apache.spark")
+            .producer("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client")
             .build();
 
     marquezContext.emit(event);
   }
 
-  public static ZonedDateTime toZonedTime(long time) {
+  public ZonedDateTime toZonedTime(long time) {
     Instant i = Instant.ofEpochMilli(time);
     return ZonedDateTime.ofInstant(i, ZoneOffset.UTC);
   }
 
-  private RunFacet buildRunFacets(JobResult jobResult) {
-    if (jobResult instanceof JobFailed) {
-      Exception e = ((JobFailed) jobResult).exception();
-      return RunFacet.builder()
-          .additional(ImmutableMap.of("spark.exception", e.getMessage()))
-          .build();
+  private LineageEvent.Run buildRun(RunFacet facets) {
+    return LineageEvent.Run.builder().runId(marquezContext.getParentRunId()).facets(facets).build();
+  }
+
+  protected RunFacet buildRunFacets(ErrorFacet jobError) {
+    Map<String, Object> additionalFacets = new HashMap<>();
+    if (jobError != null) {
+      additionalFacets.put("spark.exception", jobError);
+    }
+    return RunFacet.builder().additional(additionalFacets).build();
+  }
+
+  private ErrorFacet buildJobErrorFacet(JobResult jobResult) {
+    if (jobResult instanceof JobFailed && ((JobFailed) jobResult).exception() != null) {
+      return ErrorFacet.builder().exception(((JobFailed) jobResult).exception()).build();
     }
     return null;
   }
@@ -106,10 +116,6 @@ public class RddExecutionContext implements ExecutionContext {
         .namespace(marquezContext.getJobNamespace())
         .name(marquezContext.getJobName())
         .build();
-  }
-
-  private LineageEvent.Run buildRun(RunFacet facets) {
-    return Run.builder().runId(marquezContext.getParentRunId()).facets(facets).build();
   }
 
   private List<Dataset> buildOutputs(List<String> outputs) {
