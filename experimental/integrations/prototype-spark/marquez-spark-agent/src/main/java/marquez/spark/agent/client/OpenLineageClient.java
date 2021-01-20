@@ -14,6 +14,7 @@ import com.ok2c.hc5.json.http.JsonResponseConsumers;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -36,16 +37,16 @@ import org.apache.hc.core5.util.Timeout;
 @Slf4j
 public class OpenLineageClient {
   private final CloseableHttpAsyncClient http;
-  private final String apiKey;
+  private final Optional<String> apiKey;
   @Getter protected static final ObjectMapper objectMapper = createMapper();
 
-  public OpenLineageClient(CloseableHttpAsyncClient http, String apiKey) {
+  public OpenLineageClient(CloseableHttpAsyncClient http, Optional<String> apiKey) {
     this.http = http;
     this.http.start();
     this.apiKey = apiKey;
   }
 
-  public static OpenLineageClient create(final String apiKey) {
+  public static OpenLineageClient create(final Optional<String> apiKey) {
     final CloseableHttpAsyncClient http =
         HttpAsyncClients.customHttp2()
             .setTlsStrategy(
@@ -156,8 +157,8 @@ public class OpenLineageClient {
   }
 
   private void addAuthToReqIfKeyPresent(final HttpRequest request) {
-    if (apiKey != null) {
-      request.addHeader(AUTHORIZATION, "Bearer " + apiKey);
+    if (apiKey.isPresent()) {
+      request.addHeader(AUTHORIZATION, "Bearer " + apiKey.get());
     }
   }
 
