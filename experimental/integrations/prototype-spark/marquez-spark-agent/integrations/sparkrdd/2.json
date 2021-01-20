@@ -11,7 +11,7 @@
   },
   "inputs" : [ {
     "namespace" : "ns_name",
-    "name" : "file:/Users/henneberger/datakin/test/marquez/experimental/integrations/prototype-spark/marquez-spark-agent/build/resources/test/data.txt"
+    "name" : "data.txt"
   } ],
   "outputs" : [ ],
   "producer" : "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"

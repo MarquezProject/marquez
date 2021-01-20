@@ -56,7 +56,7 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
     outputDatasets.add(
         Dataset.builder()
             .namespace(jobNamespace)
-            .name(insertIntoHadoopFsRelationCommand.outputPath().toUri().toString())
+            .name(visitPathUri(insertIntoHadoopFsRelationCommand.outputPath().toUri()))
             .build());
     return null;
   }
@@ -100,10 +100,11 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   }
 
   protected Dataset visit(Path path) {
-    return Dataset.builder()
-        .namespace(jobNamespace)
-        .name(path.toUri().toASCIIString().replaceAll(":", "_"))
-        .build();
+    return Dataset.builder().namespace(jobNamespace).name(visitPathUri(path.toUri())).build();
+  }
+
+  protected String visitPathUri(URI uri) {
+    return uri.toASCIIString().replaceAll(":", "_");
   }
 
   @Getter

@@ -16,6 +16,10 @@ public class ContextFactory {
   }
 
   public SparkSQLExecutionContext createSparkSQLExecutionContext(long executionId) {
-    return new SparkSQLExecutionContext(executionId, marquezContext);
+    return new SparkSQLExecutionContext(
+        executionId,
+        marquezContext,
+        new LogicalPlanFacetTraverser(),
+        new DatasetLogicalPlanTraverser());
   }
 }

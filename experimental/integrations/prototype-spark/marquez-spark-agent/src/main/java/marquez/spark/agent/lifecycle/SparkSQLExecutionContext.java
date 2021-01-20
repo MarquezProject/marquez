@@ -31,10 +31,18 @@ public class SparkSQLExecutionContext implements ExecutionContext {
   private final long executionId;
 
   private MarquezContext marquezContext;
+  private final LogicalPlanFacetTraverser logicalPlanFacetTraverser;
+  private final DatasetLogicalPlanTraverser datasetLogicalPlanTraverser;
 
-  public SparkSQLExecutionContext(long executionId, MarquezContext marquezContext) {
+  public SparkSQLExecutionContext(
+      long executionId,
+      MarquezContext marquezContext,
+      LogicalPlanFacetTraverser logicalPlanFacetTraverser,
+      DatasetLogicalPlanTraverser datasetLogicalPlanTraverser) {
     this.executionId = executionId;
     this.marquezContext = marquezContext;
+    this.logicalPlanFacetTraverser = logicalPlanFacetTraverser;
+    this.datasetLogicalPlanTraverser = datasetLogicalPlanTraverser;
   }
 
   public void start(SparkListenerSQLExecutionStart startEvent) {}
@@ -52,13 +60,13 @@ public class SparkSQLExecutionContext implements ExecutionContext {
       log.info("No execution info {}", queryExecution);
       return;
     }
-    DatasetLogicalPlanTraverser.TraverserResult r =
-        new DatasetLogicalPlanTraverser()
-            .build(queryExecution.logical(), marquezContext.getJobNamespace());
+    DatasetLogicalPlanTraverser.TraverserResult result =
+        datasetLogicalPlanTraverser.build(
+            queryExecution.logical(), marquezContext.getJobNamespace());
     LineageEvent event =
         LineageEvent.builder()
-            .inputs(r.getInputDataset())
-            .outputs(r.getOutputDataset())
+            .inputs(result.getInputDataset())
+            .outputs(result.getOutputDataset())
             .run(
                 buildRun(
                     buildRunFacets(
@@ -96,8 +104,8 @@ public class SparkSQLExecutionContext implements ExecutionContext {
       return;
     }
     DatasetLogicalPlanTraverser.TraverserResult r =
-        new DatasetLogicalPlanTraverser()
-            .build(queryExecution.logical(), marquezContext.getJobNamespace());
+        datasetLogicalPlanTraverser.build(
+            queryExecution.logical(), marquezContext.getJobNamespace());
     LineageEvent event =
         LineageEvent.builder()
             .inputs(r.getInputDataset())
@@ -117,7 +125,7 @@ public class SparkSQLExecutionContext implements ExecutionContext {
     marquezContext.emit(event);
   }
 
-  public ZonedDateTime toZonedTime(long time) {
+  protected ZonedDateTime toZonedTime(long time) {
     Instant i = Instant.ofEpochMilli(time);
     return ZonedDateTime.ofInstant(i, ZoneOffset.UTC);
   }
@@ -129,7 +137,7 @@ public class SparkSQLExecutionContext implements ExecutionContext {
     return "FAIL";
   }
 
-  private LineageEvent.Run buildRun(RunFacet facets) {
+  protected LineageEvent.Run buildRun(RunFacet facets) {
     return LineageEvent.Run.builder().runId(marquezContext.getParentRunId()).facets(facets).build();
   }
 
@@ -145,19 +153,19 @@ public class SparkSQLExecutionContext implements ExecutionContext {
     return RunFacet.builder().parent(parentRunFacet).additional(additionalFacets).build();
   }
 
-  private LogicalPlanFacet buildLogicalPlanFacet(LogicalPlan plan) {
-    Map<String, Object> planMap = new LogicalPlanFacetTraverser().visit(plan);
+  protected LogicalPlanFacet buildLogicalPlanFacet(LogicalPlan plan) {
+    Map<String, Object> planMap = logicalPlanFacetTraverser.visit(plan);
     return LogicalPlanFacet.builder().plan(planMap).build();
   }
 
-  private ErrorFacet buildJobErrorFacet(JobResult jobResult) {
+  protected ErrorFacet buildJobErrorFacet(JobResult jobResult) {
     if (jobResult instanceof JobFailed && ((JobFailed) jobResult).exception() != null) {
       return ErrorFacet.builder().exception(((JobFailed) jobResult).exception()).build();
     }
     return null;
   }
 
-  private LineageEvent.Job buildJob() {
+  protected LineageEvent.Job buildJob() {
     return LineageEvent.Job.builder()
         .namespace(marquezContext.getJobNamespace())
         .name(marquezContext.getJobName())

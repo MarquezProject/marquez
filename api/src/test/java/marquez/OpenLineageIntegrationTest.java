@@ -10,14 +10,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.util.Resources;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpClient.Version;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
@@ -49,19 +43,10 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testOpenLineage() throws IOException {
     URL resource = Resources.getResource(input);
-    String lineageArr = Resources.toString(resource, Charset.defaultCharset());
-    HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
-
-    HttpRequest request =
-        HttpRequest.newBuilder()
-            .uri(URI.create(baseUrl + "/api/v1/lineage"))
-            .header("Content-Type", "application/json")
-            .POST(BodyPublishers.ofString(lineageArr))
-            .build();
+    String body = Resources.toString(resource, Charset.defaultCharset());
 
     CompletableFuture<Integer> resp =
-        client
-            .sendAsync(request, BodyHandlers.ofString())
+        this.sendLineage(body)
             .thenApply(HttpResponse::statusCode)
             .whenComplete(
                 (val, error) -> {
