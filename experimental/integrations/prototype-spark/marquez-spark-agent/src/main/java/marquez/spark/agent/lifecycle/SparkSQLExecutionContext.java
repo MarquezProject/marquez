@@ -4,7 +4,6 @@ import static marquez.spark.agent.lifecycle.RddExecutionContext.toZonedTime;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import marquez.spark.agent.MarquezContext;
 import marquez.spark.agent.client.LineageEvent;
@@ -28,12 +27,10 @@ public class SparkSQLExecutionContext implements ExecutionContext {
   private final long executionId;
 
   private MarquezContext marquezContext;
-  private UUID taskRunId;
 
   public SparkSQLExecutionContext(long executionId, MarquezContext marquezContext) {
     this.executionId = executionId;
     this.marquezContext = marquezContext;
-    this.taskRunId = UUID.randomUUID();
   }
 
   public void start(SparkListenerSQLExecutionStart startEvent) {}
