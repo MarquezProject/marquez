@@ -13,7 +13,7 @@ public class MarquezAgent {
   @SuppressWarnings("unused")
   public static void premain(String agentArgs, Instrumentation inst) {
     try {
-      premain(agentArgs, inst, new MarquezContext(agentArgs));
+      premain(agentArgs, inst, new MarquezContext(ArgumentParser.parse(agentArgs)));
     } catch (URISyntaxException e) {
       log.error("Could not find marquez client url", e);
     }
