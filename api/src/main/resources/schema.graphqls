@@ -1,0 +1,129 @@
+scalar UUID
+scalar DateTime
+scalar Json
+
+type Query {
+  datasets: [Dataset]
+  namespace(name: String): Namespace
+}
+
+type Tag {
+  name: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  description: String
+
+  fields: [DatasetField]
+  datasets: [Dataset]
+}
+type Source {
+  type: String
+  name: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  connectionUrl: String
+  description: String
+  datasets: [Dataset]
+}
+type RunStateRecord {
+  transitionedAt: DateTime
+  state: String
+  run: Run
+}
+type RunArgs {
+  createdAt: DateTime
+  args: Json
+  checksum: String
+  run: [Run]
+}
+type Run {
+  createdAt: DateTime
+  updatedAt: DateTime
+  nominalStartTime: DateTime
+  nominalEndTime: DateTime
+
+  jobVersion: JobVersion
+  runArgs: RunArgs
+  currentState: String
+  startState: RunStateRecord
+  endState: RunStateRecord
+  states: [RunStateRecord]
+  inputs: [DatasetVersion]
+  outputs: [DatasetVersion]
+}
+type Owner {
+  createdAt: DateTime
+  name: String
+  namespaces: [Namespace]
+}
+type Namespace {
+  name: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  description: String
+  owner: [Owner]
+  currentOwner: Owner
+  jobs: [Job]
+  datasets: [Dataset]
+}
+type JobVersion {
+  createdAt: DateTime
+  updatedAt: DateTime
+  location: String
+  version: UUID
+  jobContext: JobContext
+  latestRun: Run
+  job: Job
+  inputs: [Dataset]
+  outputs: [Dataset]
+}
+type JobContext {
+  createdAt: DateTime
+  context: String
+  checksum: String
+  jobVersion: [JobVersion]
+}
+type Job {
+  type: String
+  name: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  description: String
+  versions: [JobVersion]
+  namespace: Namespace
+  currentVersion: JobVersion
+}
+type DatasetVersion {
+  createdAt: DateTime
+  dataset: Dataset
+  version: UUID
+  fields: [DatasetField]
+  run: Run
+}
+type DatasetField {
+  type: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String
+  description: String
+  dataset: Dataset
+  versions: [DatasetVersion]
+  tags: [Tag]
+}
+type Dataset {
+  type: String
+  name: String
+  physicalName: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  lastModifiedAt: DateTime
+  description: String
+  source: Source
+  fields: [DatasetField]
+  jobVersionAsInput: [JobVersion]
+  jobVersionAsOutput: [JobVersion]
+  namespace: Namespace
+  tags: [Tag]
+  currentVersion: DatasetVersion
+  versions: [DatasetVersion]
+}

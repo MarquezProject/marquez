@@ -40,6 +40,9 @@ The HTTP API listens on port `5000` for all calls and port `5001` for the admin 
 
 You can open http://localhost:3000 to begin exploring the web UI.
 
+The graphql playground endpoint can be found at http://localhost:5000/api/v1/graphql-playground with 
+the graphql location being at http://localhost:5000/api/v1/graphql
+
 ## Documentation
 
 We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/main/docs).
