@@ -7,7 +7,10 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import marquez.spark.agent.MarquezContext;
 import marquez.spark.agent.client.LineageEvent;
+import marquez.spark.agent.client.LineageEvent.JobLink;
+import marquez.spark.agent.client.LineageEvent.ParentRunFacet;
 import marquez.spark.agent.client.LineageEvent.RunFacet;
+import marquez.spark.agent.client.LineageEvent.RunLink;
 import org.apache.spark.scheduler.ActiveJob;
 import org.apache.spark.scheduler.JobFailed;
 import org.apache.spark.scheduler.JobResult;
@@ -52,7 +55,10 @@ public class SparkSQLExecutionContext implements ExecutionContext {
         LineageEvent.builder()
             .inputs(r.getInputDataset())
             .outputs(r.getOutputDataset())
-            .run(buildRun(buildRunFacets(buildLogicalPlanFacet(queryExecution.logical()), null)))
+            .run(
+                buildRun(
+                    buildRunFacets(
+                        buildLogicalPlanFacet(queryExecution.logical()), null, buildParentFacet())))
             .job(buildJob())
             .eventTime(toZonedTime(jobStart.time()))
             .eventType("START")
@@ -60,6 +66,17 @@ public class SparkSQLExecutionContext implements ExecutionContext {
             .build();
 
     marquezContext.emit(event);
+  }
+
+  private ParentRunFacet buildParentFacet() {
+    return ParentRunFacet.builder()
+        .job(
+            JobLink.builder()
+                .name(marquezContext.getJobName())
+                .namespace(marquezContext.getJobNamespace())
+                .build())
+        .run(RunLink.builder().runId(marquezContext.getParentRunId()).build())
+        .build();
   }
 
   @Override
@@ -81,7 +98,8 @@ public class SparkSQLExecutionContext implements ExecutionContext {
                 buildRun(
                     buildRunFacets(
                         buildLogicalPlanFacet(queryExecution.logical()),
-                        buildJobErrorFacet(jobEnd.jobResult()))))
+                        buildJobErrorFacet(jobEnd.jobResult()),
+                        buildParentFacet())))
             .job(buildJob())
             .eventTime(toZonedTime(jobEnd.time()))
             .eventType(getEventType(jobEnd.jobResult()))
@@ -102,7 +120,8 @@ public class SparkSQLExecutionContext implements ExecutionContext {
     return LineageEvent.Run.builder().runId(marquezContext.getParentRunId()).facets(facets).build();
   }
 
-  protected RunFacet buildRunFacets(Object logicalPlanFacet, Object jobError) {
+  protected RunFacet buildRunFacets(
+      Object logicalPlanFacet, Object jobError, ParentRunFacet parentRunFacet) {
     Map<String, Object> additionalFacets = new HashMap<>();
     if (logicalPlanFacet != null) {
       additionalFacets.put("logicalPlan", logicalPlanFacet);
@@ -110,7 +129,7 @@ public class SparkSQLExecutionContext implements ExecutionContext {
     if (jobError != null) {
       additionalFacets.put("spark.exception", jobError);
     }
-    return RunFacet.builder().additional(additionalFacets).build();
+    return RunFacet.builder().parent(parentRunFacet).additional(additionalFacets).build();
   }
 
   private Map<String, Object> buildLogicalPlanFacet(LogicalPlan plan) {
