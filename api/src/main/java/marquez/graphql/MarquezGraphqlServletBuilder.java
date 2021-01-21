@@ -3,6 +3,7 @@ package marquez.graphql;
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.smoketurner.dropwizard.graphql.CachingPreparsedDocumentProvider;
@@ -29,6 +30,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import java.net.URL;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.UUID;
 import lombok.SneakyThrows;
 import marquez.MarquezConfig;
@@ -159,22 +161,26 @@ public class MarquezGraphqlServletBuilder {
             .build())
         .scalar(GraphQLScalarType.newScalar()
             .name("Json")
-            .coercing(new Coercing<Object, Object>() {
+            .coercing(new Coercing<String, Map>() {
+              ObjectMapper mapper = new ObjectMapper();
 
               @Override
-              public Object serialize(Object dataFetcherResult)
+              @SneakyThrows
+              public Map serialize(Object dataFetcherResult)
                   throws CoercingSerializeException {
-                return dataFetcherResult.toString();
+                return (Map)dataFetcherResult;
               }
 
               @Override
-              public Object parseValue(Object input) throws CoercingParseValueException {
-                return UUID.fromString(input.toString());
+              @SneakyThrows
+              public String parseValue(Object input) throws CoercingParseValueException {
+                return mapper.writeValueAsString(input);
               }
 
               @Override
-              public Object parseLiteral(Object input) throws CoercingParseLiteralException {
-                return UUID.fromString(input.toString());
+              @SneakyThrows
+              public String parseLiteral(Object input) throws CoercingParseLiteralException {
+                return mapper.writeValueAsString(input);
               }
             })
             .build())
