@@ -618,7 +618,7 @@ components:
       properties:
         type:
           description: The type of the dataset.
-          type: enum
+          type: string
           enum: [DB_TABLE]
         physicalName:
           description: The **physical** name of the table.
@@ -636,20 +636,23 @@ components:
                 description: The name of the field.
                 type: string
               type:
-                description: The type of the field.
-                type: enum
+                $ref: '#/components/schemas/fieldType'
               tags:
                 description: List of tags.
                 type: array
+                items:
+                  $ref: '#/components/schemas/tag'
               description:
                 description: The description of the field.
-                type: string 
+                type: string
             required:
               - name
               - type
         tags:
           description: List of tags.
           type: array
+          items:
+            $ref: '#/components/schemas/tag'
         description:
           description:  The description of the table.
           type: string
@@ -686,7 +689,7 @@ components:
       properties:
         type:
           description: The type of the dataset.
-          type: enum
+          type: string
           enum: [STREAM]
         physicalName:
           description: The **physical** name of the stream.
@@ -708,19 +711,23 @@ components:
                 type: string
               type:
                 description: The type of the field.
-                type: enum
+                type: string
               tags:
                 description: List of tags.
                 type: array
+                items:
+                  $ref: '#/components/schemas/tag'
               description:
                 description: The description of the field.
-                type: string 
+                type: string
             required:
               - name
               - type
         tags:
           description: List of tags.
           type: array
+          items:
+            $ref: '#/components/schemas/tag'
         description:
           description: The description of the stream.
           type: string
@@ -794,17 +801,20 @@ components:
                 description: The name of the field.
                 type: string
               type:
-                description: The type of the field.
-                type: enum
+                $ref: '#/components/schemas/fieldType'
               tags:
                 description: List of tags.
                 type: array
+                items:
+                  $ref: '#/components/schemas/tag'
               description:
                 description: The description of the field.
-                type: string 
+                type: string
         tags:
           description: List of tags.
           type: array
+          items:
+            $ref: '#/components/schemas/tag'
         lastModifiedAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a successful run.
           type: string
@@ -1467,3 +1477,7 @@ components:
       required:
         - _producer
         - _schemaURL
+    fieldType:
+      description: The type of the field.
+      type: string
+      enum: [ARRAY, BIGINT, BINARY, BOOL, BOOLEAN, BPCHAR, CHAR, CHARACTER, DATE, DATETIME, DECIMAL, DOUBLE, FLOAT, FLOAT4, FLOAT8, GEOMETRY, INT, INT2, INT4, INT8, INTEGER, NCHAR, NUMBER, NUMERIC, NVARCHAR, OBJECT, REAL, SMALLINT, STRING, TEXT, TIME, TIMESTAMP, TIMESTAMPTZ, TIMESTAMP_LTZ, TIMESTAMP_NTZ, TIMESTAMP_TZ, VARBINARY, VARCHAR, VARIANT, VARYING]
