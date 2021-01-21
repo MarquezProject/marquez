@@ -154,7 +154,6 @@ public final class MarquezContext {
             jdbiException,
             openLineageResource);
 
-
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
     this.graphqlServlet = servlet.getServlet(jdbi);
   }

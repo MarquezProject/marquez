@@ -1,7 +1,6 @@
 package marquez.graphql;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import marquez.db.JobVersionDao.IoType;
 import marquez.graphql.mapper.ObjectMapMapper;
@@ -30,10 +29,12 @@ public interface Daos {
   @SqlQuery("SELECT * FROM dataset_fields where dataset_uuid = :datasetUuid")
   List<RowMap<String, Object>> getDatasetField(UUID datasetUuid);
 
-  @SqlQuery("SELECT f.* FROM dataset_fields f inner join dataset_fields_tag_mapping m on m.dataset_field_uuid = f.uuid where m.tag_uuid = :tagUuid")
+  @SqlQuery(
+      "SELECT f.* FROM dataset_fields f inner join dataset_fields_tag_mapping m on m.dataset_field_uuid = f.uuid where m.tag_uuid = :tagUuid")
   List<RowMap<String, Object>> getDatasetFieldsByTagUuid(UUID tagUuid);
 
-  @SqlQuery("SELECT d.* FROM datasets d inner join datasets_tag_mapping m on m.dataset_uuid = d.uuid where tag_uuid = :uuid")
+  @SqlQuery(
+      "SELECT d.* FROM datasets d inner join datasets_tag_mapping m on m.dataset_uuid = d.uuid where tag_uuid = :uuid")
   List<RowMap<String, Object>> getDatasetsByTagUuid(UUID tagUuid);
 
   @SqlQuery("SELECT d.* from datasets d where source_uuid = :sourceUuid")
@@ -48,7 +49,8 @@ public interface Daos {
   @SqlQuery("SELECT * FROM dataset_versions where uuid = :uuid")
   List<RowMap<String, Object>> getCurrentDatasetVersion(UUID uuid);
 
-  @SqlQuery("SELECT dv.* from dataset_versions dv inner join runs_input_mapping m on m.dataset_version_uuid = dv.uuid where m.run_uuid = :runUuid")
+  @SqlQuery(
+      "SELECT dv.* from dataset_versions dv inner join runs_input_mapping m on m.dataset_version_uuid = dv.uuid where m.run_uuid = :runUuid")
   List<RowMap<String, Object>> getInputsByRun(UUID runUuid);
 
   @SqlQuery("SELECT dv.* from dataset_versions dv where dv.run_uuid = :runUuid")
@@ -57,10 +59,12 @@ public interface Daos {
   @SqlQuery("SELECT * from run_args where uuid = :uuid")
   RowMap<String, Object> getRunArgs(UUID uuid);
 
-  @SqlQuery("SELECT n.* from namespaces n inner join on namespace_ownerships no on no.namespace_uuid = n.uuid where owner_uuid = :ownerUuid")
+  @SqlQuery(
+      "SELECT n.* from namespaces n inner join on namespace_ownerships no on no.namespace_uuid = n.uuid where owner_uuid = :ownerUuid")
   List<RowMap<String, Object>> getNamespacesByOwner(UUID ownerUuid);
 
-  @SqlQuery("SELECT * from owners o inner join namespace_ownerships no on o.uuid = no.owner_uuid where namespace_uuid = :namespaceUuid")
+  @SqlQuery(
+      "SELECT * from owners o inner join namespace_ownerships no on o.uuid = no.owner_uuid where namespace_uuid = :namespaceUuid")
   List<RowMap<String, Object>> getOwnersByNamespace(UUID namespaceUuid);
 
   @SqlQuery("SELECT * from owners where name = :ownerName")
@@ -72,14 +76,16 @@ public interface Daos {
   @SqlQuery("SELECT * from datasets where namespace_uuid = :namespaceUuid")
   List<RowMap<String, Object>> getDatasetsByNamespace(UUID namespaceUuid);
 
-  @SqlQuery("SELECT d.* from datasets d inner join job_versions_io_mapping m on m.dataset_uuid = d.uuid where m.job_version_uuid = :jobVersionUuid and io_type = :ioType")
+  @SqlQuery(
+      "SELECT d.* from datasets d inner join job_versions_io_mapping m on m.dataset_uuid = d.uuid where m.job_version_uuid = :jobVersionUuid and io_type = :ioType")
   List<RowMap<String, Object>> getIOMappingByJobVersion(UUID jobVersionUuid, IoType ioType);
 
-  @SqlQuery("SELECT jv.* "
-      + " FROM job_versions_io_mapping m "
-      + " inner join job_versions jv "
-      + " on m.dataset_uuid = jv.uuid"
-      + " where m.dataset_uuid = :datasetUuid AND m.io_type = :ioType")
+  @SqlQuery(
+      "SELECT jv.* "
+          + " FROM job_versions_io_mapping m "
+          + " inner join job_versions jv "
+          + " on m.dataset_uuid = jv.uuid"
+          + " where m.dataset_uuid = :datasetUuid AND m.io_type = :ioType")
   List<RowMap<String, Object>> getJobVersionsByIoMapping(UUID datasetUuid, IoType ioType);
 
   @SqlQuery("SELECT * from job_versions where job_context_uuid = :jobContextUuid")
@@ -94,7 +100,8 @@ public interface Daos {
   @SqlQuery("SELECT * from dataset_fields where dataset_uuid = :datasetVersionUuid")
   List<RowMap<String, Object>> getFields(UUID datasetVersionUuid);
 
-  @SqlQuery("SELECT dv.* from dataset_versions dv inner join dataset_versions_field_mapping m on dv.uuid = m.dataset_version_uuid where dataset_field_uuid = :datasetFieldUuid")
+  @SqlQuery(
+      "SELECT dv.* from dataset_versions dv inner join dataset_versions_field_mapping m on dv.uuid = m.dataset_version_uuid where dataset_field_uuid = :datasetFieldUuid")
   List<RowMap<String, Object>> getVersionsByDatasetField(UUID datasetFieldUuid);
 
   @SqlQuery("SELECT * FROM dataset_versions where dataset_uuid = :datasetUuid")
@@ -115,12 +122,14 @@ public interface Daos {
   @SqlQuery("SELECT * from run_states where uuid = :uuid")
   RowMap<String, Object> getRunStateByUuid(UUID uuid);
 
-  @SqlQuery("SELECT t.* FROM datasets_tag_mapping m "
-      + " inner join tags t "
-      + " on m.tag_uuid = t.uuid"
-      + " where dataset_uuid = :datasetUuid")
+  @SqlQuery(
+      "SELECT t.* FROM datasets_tag_mapping m "
+          + " inner join tags t "
+          + " on m.tag_uuid = t.uuid"
+          + " where dataset_uuid = :datasetUuid")
   List<RowMap<String, Object>> getTagsByDatasetTag(UUID datasetUuid);
 
-  @SqlQuery("SELECT t.* from tags t inner join dataset_fields_tag_mapping m on t.uuid = m.tag_uuid where dataaset_field_uuid = :datasetFieldUuid")
+  @SqlQuery(
+      "SELECT t.* from tags t inner join dataset_fields_tag_mapping m on t.uuid = m.tag_uuid where dataaset_field_uuid = :datasetFieldUuid")
   List<RowMap<String, Object>> getTagsByDatasetField(UUID datasetFieldUuid);
 }

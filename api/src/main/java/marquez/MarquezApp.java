@@ -74,7 +74,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    bootstrap.addBundle(new AssetsBundle("/assets", "/api/v1/graphql-playground", "index.htm", "graphql-playground"));
+    bootstrap.addBundle(
+        new AssetsBundle(
+            "/assets", "/api/v1/graphql-playground", "index.htm", "graphql-playground"));
   }
 
   @Override
@@ -112,7 +114,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
         MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
 
     if (config.getGraphql().isEnabled()) {
-      env.servlets().addServlet("api/v1/graphql", context.getGraphqlServlet())
+      env.servlets()
+          .addServlet("api/v1/graphql", context.getGraphqlServlet())
           .addMapping("/api/v1/graphql", "/api/v1/schema.json");
     }
 

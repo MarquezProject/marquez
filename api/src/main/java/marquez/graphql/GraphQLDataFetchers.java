@@ -18,7 +18,6 @@ public class GraphQLDataFetchers {
 
   public DataFetcher getDatasets() {
     return dataFetchingEnvironment -> {
-
       return dao.getDatasets();
     };
   }
@@ -27,7 +26,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getSource((UUID)map.get("sourceUuid"));
+      return dao.getSource((UUID) map.get("sourceUuid"));
     };
   }
 
@@ -35,7 +34,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getNamespace((UUID)map.get("namespaceUuid"));
+      return dao.getNamespace((UUID) map.get("namespaceUuid"));
     };
   }
 
@@ -43,7 +42,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getCurrentDatasetVersion((UUID)map.get("currentVersionUuid"));
+      return dao.getCurrentDatasetVersion((UUID) map.get("currentVersionUuid"));
     };
   }
 
@@ -51,7 +50,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getDatasetField((UUID)map.get("uuid"));
+      return dao.getDatasetField((UUID) map.get("uuid"));
     };
   }
 
@@ -59,7 +58,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getJobVersionsByIoMapping((UUID)map.get("uuid"), IoType.INPUT);
+      return dao.getJobVersionsByIoMapping((UUID) map.get("uuid"), IoType.INPUT);
     };
   }
 
@@ -67,7 +66,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getJobVersionsByIoMapping((UUID)map.get("uuid"), IoType.OUTPUT);
+      return dao.getJobVersionsByIoMapping((UUID) map.get("uuid"), IoType.OUTPUT);
     };
   }
 
@@ -75,7 +74,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getTagsByDatasetTag((UUID)map.get("uuid"));
+      return dao.getTagsByDatasetTag((UUID) map.get("uuid"));
     };
   }
 
@@ -83,7 +82,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getDatasetVersionsByDataset((UUID)map.get("uuid"));
+      return dao.getDatasetVersionsByDataset((UUID) map.get("uuid"));
     };
   }
 
@@ -91,7 +90,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getDatasetFieldsByTagUuid((UUID)map.get("uuid"));
+      return dao.getDatasetFieldsByTagUuid((UUID) map.get("uuid"));
     };
   }
 
@@ -99,7 +98,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getDatasetsByTagUuid((UUID)map.get("uuid"));
+      return dao.getDatasetsByTagUuid((UUID) map.get("uuid"));
     };
   }
 
@@ -107,7 +106,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getDatasetsBySource((UUID)map.get("uuid"));
+      return dao.getDatasetsBySource((UUID) map.get("uuid"));
     };
   }
 
@@ -115,7 +114,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getRun((UUID)map.get("runUuid"));
+      return dao.getRun((UUID) map.get("runUuid"));
     };
   }
 
@@ -123,7 +122,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getRunsByRunArgs((UUID)map.get("uuid"));
+      return dao.getRunsByRunArgs((UUID) map.get("uuid"));
     };
   }
 
@@ -131,7 +130,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getJobVersion((UUID)map.get("jobVersionUuid"));
+      return dao.getJobVersion((UUID) map.get("jobVersionUuid"));
     };
   }
 
@@ -139,7 +138,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getRunStateByRun((UUID)map.get("uuid"));
+      return dao.getRunStateByRun((UUID) map.get("uuid"));
     };
   }
 
@@ -147,7 +146,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getRunStateByUuid((UUID)map.get("startStateUuid"));
+      return dao.getRunStateByUuid((UUID) map.get("startStateUuid"));
     };
   }
 
@@ -155,7 +154,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getRunStateByUuid((UUID)map.get("endStateUuid"));
+      return dao.getRunStateByUuid((UUID) map.get("endStateUuid"));
     };
   }
 
@@ -163,7 +162,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getInputsByRun((UUID)map.get("uuid"));
+      return dao.getInputsByRun((UUID) map.get("uuid"));
     };
   }
 
@@ -171,7 +170,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getOutputsByRun((UUID)map.get("uuid"));
+      return dao.getOutputsByRun((UUID) map.get("uuid"));
     };
   }
 
@@ -179,7 +178,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getRunArgs((UUID)map.get("runArgsUuid"));
+      return dao.getRunArgs((UUID) map.get("runArgsUuid"));
     };
   }
 
@@ -187,7 +186,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getNamespacesByOwner((UUID)map.get("uuid"));
+      return dao.getNamespacesByOwner((UUID) map.get("uuid"));
     };
   }
 
@@ -195,7 +194,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getOwnersByNamespace((UUID)map.get("uuid"));
+      return dao.getOwnersByNamespace((UUID) map.get("uuid"));
     };
   }
 
@@ -203,7 +202,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getCurrentOwnerByNamespace((String)map.get("currentOwnerName"));
+      return dao.getCurrentOwnerByNamespace((String) map.get("currentOwnerName"));
     };
   }
 
@@ -211,14 +210,14 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getJobContext((UUID)map.get("jobContextUuid"));
+      return dao.getJobContext((UUID) map.get("jobContextUuid"));
     };
   }
 
   public DataFetcher getLatestRunByJobVersion() {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
-      UUID latestRunUuid = (UUID)map.get("latestRunUuid");
+      UUID latestRunUuid = (UUID) map.get("latestRunUuid");
       if (latestRunUuid == null) {
         return null;
       }
@@ -230,7 +229,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getJob((UUID)map.get("jobUuid"));
+      return dao.getJob((UUID) map.get("jobUuid"));
     };
   }
 
@@ -238,7 +237,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getIOMappingByJobVersion((UUID)map.get("uuid"), IoType.INPUT);
+      return dao.getIOMappingByJobVersion((UUID) map.get("uuid"), IoType.INPUT);
     };
   }
 
@@ -246,7 +245,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getIOMappingByJobVersion((UUID)map.get("uuid"), IoType.OUTPUT);
+      return dao.getIOMappingByJobVersion((UUID) map.get("uuid"), IoType.OUTPUT);
     };
   }
 
@@ -254,7 +253,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getJobVersionByJobContext((UUID)map.get("uuid"));
+      return dao.getJobVersionByJobContext((UUID) map.get("uuid"));
     };
   }
 
@@ -262,7 +261,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getJobVersionByJob((UUID)map.get("uuid"));
+      return dao.getJobVersionByJob((UUID) map.get("uuid"));
     };
   }
 
@@ -270,7 +269,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getNamespace((UUID)map.get("namespaceUuid"));
+      return dao.getNamespace((UUID) map.get("namespaceUuid"));
     };
   }
 
@@ -278,7 +277,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getJobVersion((UUID)map.get("currentVersionUuid"));
+      return dao.getJobVersion((UUID) map.get("currentVersionUuid"));
     };
   }
 
@@ -286,7 +285,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getFields((UUID)map.get("uuid"));
+      return dao.getFields((UUID) map.get("uuid"));
     };
   }
 
@@ -294,7 +293,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getRun((UUID)map.get("uuid"));
+      return dao.getRun((UUID) map.get("uuid"));
     };
   }
 
@@ -302,7 +301,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getDataset((UUID)map.get("uuid"));
+      return dao.getDataset((UUID) map.get("uuid"));
     };
   }
 
@@ -310,7 +309,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getVersionsByDatasetField((UUID)map.get("uuid"));
+      return dao.getVersionsByDatasetField((UUID) map.get("uuid"));
     };
   }
 
@@ -318,7 +317,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getTagsByDatasetField((UUID)map.get("uuid"));
+      return dao.getTagsByDatasetField((UUID) map.get("uuid"));
     };
   }
 
@@ -326,7 +325,7 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getDataset((UUID)map.get("datasetUuid"));
+      return dao.getDataset((UUID) map.get("datasetUuid"));
     };
   }
 
@@ -343,7 +342,7 @@ public class GraphQLDataFetchers {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
       if (map.isEmpty()) return null;
 
-      return dao.getJobsByNamespace((UUID)map.get("uuid"));
+      return dao.getJobsByNamespace((UUID) map.get("uuid"));
     };
   }
 
@@ -354,7 +353,7 @@ public class GraphQLDataFetchers {
         return null;
       }
 
-      return dao.getDatasetsByNamespace((UUID)map.get("uuid"));
+      return dao.getDatasetsByNamespace((UUID) map.get("uuid"));
     };
   }
 
@@ -362,8 +361,8 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return Utils.fromJson((String)map.get("args"),
-          new TypeReference<ImmutableMap<String, String>>() {});
+      return Utils.fromJson(
+          (String) map.get("args"), new TypeReference<ImmutableMap<String, String>>() {});
     };
   }
 }
