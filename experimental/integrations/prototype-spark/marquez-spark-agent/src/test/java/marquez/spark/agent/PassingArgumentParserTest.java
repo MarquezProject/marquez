@@ -19,7 +19,7 @@ public class PassingArgumentParserTest {
     List<Object[]> pass = new ArrayList<>();
     pass.add(
         new Object[] {
-          "http://localhost:5000/api/v1/namespaces/ns_name/jobs/job_name/runs/ea445b5c-22eb-457a-8007-01c7c52b6e54?token=abc",
+          "http://localhost:5000/api/v1/namespaces/ns_name/jobs/job_name/runs/ea445b5c-22eb-457a-8007-01c7c52b6e54?api_key=abc",
           "http://localhost:5000",
           "v1",
           "ns_name",
@@ -59,7 +59,7 @@ public class PassingArgumentParserTest {
   public String runId;
 
   @Parameter(value = 6)
-  public Optional<String> token;
+  public Optional<String> apiKey;
 
   @Test
   public void testArgument() {
@@ -69,6 +69,6 @@ public class PassingArgumentParserTest {
     assertEquals(namespace, parser.getNamespace());
     assertEquals(jobName, parser.getJobName());
     assertEquals(runId, parser.getRunId());
-    assertEquals(token, parser.getToken());
+    assertEquals(apiKey, parser.getApiKey());
   }
 }

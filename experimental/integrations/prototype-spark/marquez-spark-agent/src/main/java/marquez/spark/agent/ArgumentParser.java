@@ -20,7 +20,7 @@ public class ArgumentParser {
   private final String namespace;
   private final String jobName;
   private final String runId;
-  private final Optional<String> token;
+  private final Optional<String> apiKey;
 
   public static ArgumentParser parse(String agentArgs) {
     URI uri = URI.create(agentArgs);
@@ -34,18 +34,19 @@ public class ArgumentParser {
     String runId = get(elements, "runs", 7);
 
     List<NameValuePair> nameValuePairList = URLEncodedUtils.parse(uri, StandardCharsets.UTF_8);
-    String token = getToken(nameValuePairList);
+    String apiKey = getApiKey(nameValuePairList);
 
     log.info(
         String.format("/api/%s/namespaces/%s/jobs/%s/runs/%s", version, namespace, jobName, runId));
 
-    return new ArgumentParser(host, version, namespace, jobName, runId, Optional.ofNullable(token));
+    return new ArgumentParser(
+        host, version, namespace, jobName, runId, Optional.ofNullable(apiKey));
   }
 
-  private static String getToken(List<NameValuePair> nameValuePairList) {
-    String token;
-    if ((token = getNamedParameter(nameValuePairList, "token")) != null) {
-      return token;
+  private static String getApiKey(List<NameValuePair> nameValuePairList) {
+    String apiKey;
+    if ((apiKey = getNamedParameter(nameValuePairList, "api_key")) != null) {
+      return apiKey;
     }
     return null;
   }

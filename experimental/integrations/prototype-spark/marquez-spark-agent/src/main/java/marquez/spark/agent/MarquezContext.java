@@ -18,7 +18,7 @@ public class MarquezContext {
 
   public MarquezContext(ArgumentParser argument) throws URISyntaxException {
     log.info("Init MarquezContext: " + argument);
-    this.client = OpenLineageClient.create(argument.getToken());
+    this.client = OpenLineageClient.create(argument.getApiKey());
     this.lineageURI =
         new URI(String.format("%s/api/%s/lineage", argument.getHost(), argument.getVersion()));
     this.jobNamespace = argument.getNamespace();
