@@ -36,10 +36,7 @@ public class LibraryTest {
   public static void setUp() throws Exception {
     marquezContext = mock(MarquezContext.class);
     ByteBuddyAgent.install();
-    MarquezAgent.premain(
-        "/api/v1/namespaces/ns_name/jobs/job_name/runs/ea445b5c-22eb-457a-8007-01c7c52b6e54",
-        ByteBuddyAgent.getInstrumentation(),
-        marquezContext);
+    MarquezAgent.premain("", ByteBuddyAgent.getInstrumentation(), marquezContext);
   }
 
   @Test
