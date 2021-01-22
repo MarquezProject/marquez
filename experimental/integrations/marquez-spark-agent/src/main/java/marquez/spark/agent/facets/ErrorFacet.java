@@ -14,7 +14,7 @@ public class ErrorFacet extends BaseFacet {
         URI.create("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"),
         URI.create(
             "https://github.com/MarquezProject/marquez/blob/main/experimental/integrations/"
-                + "prototype-spark/marquez-spark-agent/facets/spark-2.4/v1/error-facet"));
+                + "marquez-spark-agent/facets/spark-2.4/v1/error-facet"));
     this.exception = exception;
   }
 
