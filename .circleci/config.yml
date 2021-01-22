@@ -99,7 +99,6 @@ jobs:
           keys:
             - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
             - v1-integration-spark-{{ .Branch }}
-      - run: ../../.circleci/get-jdk11.sh
       - run: ./gradlew --no-daemon --stacktrace build
       - run: ./gradlew --no-daemon jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
