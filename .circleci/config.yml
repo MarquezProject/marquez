@@ -11,7 +11,7 @@ checkout_project_root: &checkout_project_root
     path: ~/marquez
 
 jobs:
-  build-core:
+  build-api:
     <<: *machine
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
@@ -19,8 +19,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-core-{{ .Branch }}-{{ .Revision }}
-            - v1-core-{{ .Branch }}
+            - v1-api-{{ .Branch }}-{{ .Revision }}
+            - v1-api-{{ .Branch }}
       - run: ./.circleci/get-jdk11.sh
       - run: echo "checks.disable=true" > ~/.testcontainers.properties
       - run: ./gradlew --no-daemon --stacktrace build
@@ -32,7 +32,7 @@ jobs:
           path: build/reports/tests/test
           destination: test-report
       - save_cache:
-          key: v1-core-{{ .Branch }}-{{ .Revision }}
+          key: v1-api-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.gradle
 
@@ -78,6 +78,19 @@ jobs:
           paths:
             - ~/.gradle
 
+  # build-client-python:
+  #  working_directory: ~/marquez/clients/python
+  #  docker:
+  #    - image: circleci/python:3.6
+
+  # integration-spark:
+  # run tests
+  # run integration tests
+
+  # integration-airflow:
+  # run tests
+  # run integration tests
+
   release:
     <<: *machine
     steps:
@@ -89,9 +102,12 @@ jobs:
 workflows:
   marquez:
     jobs:
-      - build-core
+      - build-api
       - build-web
       - build-client-java
+      #- build-client-python
+      #- integration-spark
+      #- integration-airflow
       - release:
           filters:
             tags:
