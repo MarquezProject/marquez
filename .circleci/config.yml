@@ -93,7 +93,7 @@ jobs:
   build-integration-spark:
     working_directory: ~/marquez/experimental/integrations/marquez-spark-agent
     docker:
-      - image: circleci/8-jdk
+      - image: circleci/openjdk:8-jdk
     steps:
       - *checkout_project_root
       - restore_cache:
