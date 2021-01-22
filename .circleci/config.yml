@@ -90,27 +90,21 @@ jobs:
       - run: python -m pytest --cov=marquez_python tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
-#  build-integration-spark:
-#    working_directory: ~/marquez/experimental/integrations/prototype-spark
-#    machine: true
-#    steps:
-#      - *checkout_project_root
-#      - restore_cache:
-#          keys:
-#            - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
-#            - v1-integration-spark-{{ .Branch }}
-#      - run: ./gradlew --no-daemon --stacktrace build
-#      - run: ./gradlew --no-daemon jacocoTestReport
-#      - run: bash <(curl -s https://codecov.io/bash)
-#      - store_test_results:
-#          path: build/test-results/test
-#      - store_artifacts:
-#          path: build/reports/tests/test
-#          destination: test-report
-#      - save_cache:
-#          key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
-#          paths:
-#            - ~/.gradle
+  build-integration-spark:
+    working_directory: ~/marquez/experimental/integrations/marquez-spark-agent
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - *checkout_project_root
+      - restore_cache:
+          keys:
+            - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
+            - v1-integration-spark-{{ .Branch }}
+      - run: ./gradlew --no-daemon --stacktrace build
+      - save_cache:
+          key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.gradle
 
   build-integration-airflow:
     working_directory: ~/marquez/integrations/airflow
@@ -148,7 +142,7 @@ workflows:
       - build-web
       - build-client-java
       - build-client-python
-      # - build-integration-spark
+      - build-integration-spark
       - build-integration-airflow
       - test-integration-airflow:
           requires:
