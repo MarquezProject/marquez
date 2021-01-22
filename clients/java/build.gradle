@@ -192,7 +192,7 @@ checkstyleTest {
 }
 
 spotbugsMain {
-  ignoreFailures = false
+  ignoreFailures = true
   effort = 'max'
   reportLevel = 'low'
   reports {

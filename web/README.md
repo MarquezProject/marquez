@@ -59,13 +59,3 @@ Fix all style issues in project
 
 Mock data can be found in the `docker/db/data` folder.
 Feel free to edit the mock data if you like. (Grant worked really hard on making it pretty.)
-
-#### Customization
-
-We encourage you to make Marquez your own! Feel free to change styles, add new components, etc.
-
-To get feedback on your customized version of Marquez, update the **FEEDBACK_FORM_URL** variable in the "plugins" section of `./webpack.prod.js`
-
-### Contributing
-
-See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez-web/blob/master/CONTRIBUTING.md) for more details about how to contribute.
