@@ -108,7 +108,7 @@ jobs:
     machine: true
     steps:
       - *checkout_project_root
-      - run: ./../../.circleci/get-docker-compose.sh
+      - run: ./../../../../.circleci/get-docker-compose.sh
       - run: ./docker/up.sh
 
   release:
