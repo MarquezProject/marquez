@@ -1,8 +1,8 @@
-package marquez.spark;
+package marquez.spark.agent.lifecycle;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -10,7 +10,11 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.io.Resources;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import marquez.spark.agent.MarquezAgent;
@@ -36,11 +40,14 @@ public class LibraryTest {
   public static void setUp() throws Exception {
     marquezContext = mock(MarquezContext.class);
     ByteBuddyAgent.install();
-    MarquezAgent.premain("", ByteBuddyAgent.getInstrumentation(), marquezContext);
+    MarquezAgent.premain(
+        "/api/v1/namespaces/ns_name/jobs/job_name/runs/ea445b5c-22eb-457a-8007-01c7c52b6e54",
+        ByteBuddyAgent.getInstrumentation(),
+        new StaticExecutionContextFactory(marquezContext));
   }
 
   @Test
-  public void testSparkSql() throws JsonProcessingException {
+  public void testSparkSql() throws IOException {
     reset(marquezContext);
     when(marquezContext.getJobNamespace()).thenReturn("ns_name");
     when(marquezContext.getJobName()).thenReturn("job_name");
@@ -66,12 +73,28 @@ public class LibraryTest {
     ArgumentCaptor<LineageEvent> lineageEvent = ArgumentCaptor.forClass(LineageEvent.class);
     Mockito.verify(marquezContext, times(4)).emit(lineageEvent.capture());
     List<LineageEvent> events = lineageEvent.getAllValues();
+
+    updateSnapshots("sparksql", events);
+
     assertEquals(4, events.size());
-    verifyEvents(events);
+
+    for (int i = 0; i < events.size(); i++) {
+      LineageEvent event = events.get(i);
+      String snapshot =
+          new String(
+              Files.readAllBytes(
+                  Paths.get(String.format("integrations/%s/%d.json", "sparksql", i + 1))));
+      assertEquals(
+          snapshot,
+          OpenLineageClient.getObjectMapper()
+              .writerWithDefaultPrettyPrinter()
+              .writeValueAsString(event));
+    }
+    verifySerialization(events);
   }
 
   @Test
-  public void testRdd() throws JsonProcessingException {
+  public void testRdd() throws IOException {
     reset(marquezContext);
     when(marquezContext.getJobNamespace()).thenReturn("ns_name");
     when(marquezContext.getJobName()).thenReturn("job_name");
@@ -94,34 +117,49 @@ public class LibraryTest {
     Mockito.verify(marquezContext, times(2)).emit(lineageEvent.capture());
     List<LineageEvent> events = lineageEvent.getAllValues();
     assertEquals(2, events.size());
-    verifyEvents(events);
+
+    updateSnapshots("sparkrdd", events);
+
+    for (int i = 0; i < events.size(); i++) {
+      LineageEvent event = events.get(i);
+      String snapshot =
+          new String(
+              Files.readAllBytes(
+                  Paths.get(String.format("integrations/%s/%d.json", "sparkrdd", i + 1))));
+      assertEquals(
+          snapshot,
+          OpenLineageClient.getObjectMapper()
+              .writerWithDefaultPrettyPrinter()
+              .writeValueAsString(event));
+    }
+
+    verifySerialization(events);
   }
 
-  private void verifyEvents(List<LineageEvent> events) throws JsonProcessingException {
+  private void verifySerialization(List<LineageEvent> events) throws JsonProcessingException {
     for (LineageEvent event : events) {
-      assertNotNull(event.getEventTime());
-      assertNotNull(event.getEventType());
-      assertNotNull(event.getJob());
-      assertNotNull(event.getJob().getName());
-      assertNotNull(event.getJob().getNamespace());
-      assertEquals("job_name", event.getJob().getName());
-      assertEquals("ns_name", event.getJob().getNamespace());
-      assertNotNull(event.getRun());
-      assertNotNull(event.getRun().getRunId());
-      assertEquals("ea445b5c-22eb-457a-8007-01c7c52b6e54", event.getRun().getRunId());
-      assertNotNull(event.getProducer());
-
-      assertNotNull(event.getInputs());
-      assertEquals(1, event.getInputs().size());
-      assertNotNull(event.getInputs().get(0).getName());
-      assertTrue(event.getInputs().get(0).getName().endsWith("data.txt"));
-      assertEquals("ns_name", event.getInputs().get(0).getNamespace());
-
-      assertNotNull(event.getOutputs());
-      assertEquals(0, event.getOutputs().size());
-
       assertNotNull(
           "Event can serialize", OpenLineageClient.getObjectMapper().writeValueAsString(event));
+    }
+  }
+
+  private void updateSnapshots(String prefix, List<LineageEvent> events) {
+    if (System.getenv().containsKey("UPDATE_SNAPSHOT")) {
+      for (int i = 0; i < events.size(); i++) {
+        LineageEvent event = events.get(i);
+        try {
+          String url = String.format("integrations/%s/%d.json", prefix, i + 1);
+          FileWriter myWriter = new FileWriter(url);
+          myWriter.write(
+              OpenLineageClient.getObjectMapper()
+                  .writerWithDefaultPrettyPrinter()
+                  .writeValueAsString(event));
+          myWriter.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail();
+        }
+      }
     }
   }
 }
