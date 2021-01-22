@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 @patch('marquez_airflow.utils.execute_git',
        side_effect=execute_git_mock)
 def test_dag_location(git_mock):
-    assert ('https://github.com/MarquezProject/marquez-airflow/blob/'
+    assert ('https://github.com/MarquezProject/marquez/blob/'
             'abcd1234/tests/test_dags/test_dag.py' ==
             get_location("tests/test_dags/test_dag.py"))
 
