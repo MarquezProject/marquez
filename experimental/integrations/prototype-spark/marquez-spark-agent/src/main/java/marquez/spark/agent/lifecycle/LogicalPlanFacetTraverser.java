@@ -2,6 +2,7 @@ package marquez.spark.agent.lifecycle;
 
 import static scala.collection.JavaConversions.asJavaCollection;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -211,8 +212,12 @@ public class LogicalPlanFacetTraverser extends LogicalPlanTraverser {
   protected Object visit(Path path) {
     Map map = new LinkedHashMap<>();
     map.put("name", path.getName());
-    map.put("uri", path.toUri().toASCIIString());
+    map.put("uri", visitPathUri(path.toUri()));
     return map;
+  }
+
+  protected Object visitPathUri(URI uri) {
+    return uri.toASCIIString();
   }
 
   protected List visitChildren(Collection<LogicalPlan> children) {

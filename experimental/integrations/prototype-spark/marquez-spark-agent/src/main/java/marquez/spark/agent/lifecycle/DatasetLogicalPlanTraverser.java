@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import marquez.spark.agent.client.LineageEvent.Dataset;
 import marquez.spark.agent.client.LineageEvent.DatasetFacet;
 import marquez.spark.agent.client.LineageEvent.SchemaDatasetFacet;
@@ -57,16 +56,16 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
     outputDatasets.add(
         Dataset.builder()
             .namespace(jobNamespace)
-            .name(insertIntoHadoopFsRelationCommand.outputPath().toUri().toString())
+            .name(visitPathUri(insertIntoHadoopFsRelationCommand.outputPath().toUri()))
             .build());
     return null;
   }
 
-  @SneakyThrows
   protected SchemaDatasetFacet visit(StructType structType) {
     return SchemaDatasetFacet.builder()
-        ._producer(new URI(""))
-        ._schemaURL(new URI(""))
+        ._producer(URI.create("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"))
+        ._schemaURL(
+            URI.create("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/schemaDatasetFacet"))
         .fields(visit(structType.fields()))
         .build();
   }
@@ -101,10 +100,11 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   }
 
   protected Dataset visit(Path path) {
-    return Dataset.builder()
-        .namespace(jobNamespace)
-        .name(path.toUri().toASCIIString().replaceAll(":", "_"))
-        .build();
+    return Dataset.builder().namespace(jobNamespace).name(visitPathUri(path.toUri())).build();
+  }
+
+  protected String visitPathUri(URI uri) {
+    return uri.toASCIIString().replaceAll(":", "_");
   }
 
   @Getter

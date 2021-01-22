@@ -3,6 +3,7 @@ package marquez.spark.agent;
 import java.lang.instrument.Instrumentation;
 import java.net.URISyntaxException;
 import lombok.extern.slf4j.Slf4j;
+import marquez.spark.agent.lifecycle.ContextFactory;
 import marquez.spark.agent.transformers.ActiveJobTransformer;
 import marquez.spark.agent.transformers.PairRDDFunctionsTransformer;
 import marquez.spark.agent.transformers.SparkContextTransformer;
@@ -13,15 +14,17 @@ public class MarquezAgent {
   @SuppressWarnings("unused")
   public static void premain(String agentArgs, Instrumentation inst) {
     try {
-      premain(agentArgs, inst, new MarquezContext(ArgumentParser.parse(agentArgs)));
+      premain(
+          agentArgs, inst, new ContextFactory(new MarquezContext(ArgumentParser.parse(agentArgs))));
     } catch (URISyntaxException e) {
       log.error("Could not find marquez client url", e);
     }
   }
 
-  public static void premain(String agentArgs, Instrumentation inst, MarquezContext context) {
+  public static void premain(
+      String agentArgs, Instrumentation inst, ContextFactory contextFactory) {
     log.info("MarquezAgent.premain " + agentArgs);
-    SparkListener.init(agentArgs, context);
+    SparkListener.init(agentArgs, contextFactory);
     instrument(inst);
     addShutDownHook();
   }

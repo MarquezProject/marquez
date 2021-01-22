@@ -1,16 +1,17 @@
 package marquez.spark.agent.lifecycle;
 
-import static marquez.spark.agent.lifecycle.Rdds.flattenRDDs;
 import static scala.collection.JavaConversions.asJavaCollection;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
+import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +19,8 @@ import marquez.spark.agent.MarquezContext;
 import marquez.spark.agent.SparkListener;
 import marquez.spark.agent.client.LineageEvent;
 import marquez.spark.agent.client.LineageEvent.Dataset;
-import marquez.spark.agent.client.LineageEvent.Run;
 import marquez.spark.agent.client.LineageEvent.RunFacet;
+import marquez.spark.agent.facets.ErrorFacet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
@@ -49,7 +50,7 @@ public class RddExecutionContext implements ExecutionContext {
   @Override
   public void setActiveJob(ActiveJob activeJob) {
     RDD<?> finalRDD = activeJob.finalStage().rdd();
-    Set<RDD<?>> rdds = flattenRDDs(finalRDD);
+    Set<RDD<?>> rdds = Rdds.flattenRDDs(finalRDD);
     this.inputs = findInputs(rdds);
     this.outputs = findOutputs(rdds);
   }
@@ -64,7 +65,7 @@ public class RddExecutionContext implements ExecutionContext {
             .job(buildJob())
             .eventTime(toZonedTime(jobStart.time()))
             .eventType("START")
-            .producer("org.apache.spark")
+            .producer("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client")
             .build();
 
     marquezContext.emit(event);
@@ -76,43 +77,48 @@ public class RddExecutionContext implements ExecutionContext {
         LineageEvent.builder()
             .inputs(buildInputs(inputs))
             .outputs(buildOutputs(outputs))
-            .run(buildRun(buildRunFacets(jobEnd.jobResult())))
+            .run(buildRun(buildRunFacets(buildJobErrorFacet(jobEnd.jobResult()))))
             .job(buildJob())
             .eventTime(toZonedTime(jobEnd.time()))
             .eventType(getEventType(jobEnd.jobResult()))
-            .producer("org.apache.spark")
+            .producer("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client")
             .build();
 
     marquezContext.emit(event);
   }
 
-  public static ZonedDateTime toZonedTime(long time) {
+  protected ZonedDateTime toZonedTime(long time) {
     Instant i = Instant.ofEpochMilli(time);
     return ZonedDateTime.ofInstant(i, ZoneOffset.UTC);
   }
 
-  private RunFacet buildRunFacets(JobResult jobResult) {
-    if (jobResult instanceof JobFailed) {
-      Exception e = ((JobFailed) jobResult).exception();
-      return RunFacet.builder()
-          .additional(ImmutableMap.of("spark.exception", e.getMessage()))
-          .build();
+  protected LineageEvent.Run buildRun(RunFacet facets) {
+    return LineageEvent.Run.builder().runId(marquezContext.getParentRunId()).facets(facets).build();
+  }
+
+  protected RunFacet buildRunFacets(ErrorFacet jobError) {
+    Map<String, Object> additionalFacets = new HashMap<>();
+    if (jobError != null) {
+      additionalFacets.put("spark.exception", jobError);
+    }
+    return RunFacet.builder().additional(additionalFacets).build();
+  }
+
+  protected ErrorFacet buildJobErrorFacet(JobResult jobResult) {
+    if (jobResult instanceof JobFailed && ((JobFailed) jobResult).exception() != null) {
+      return ErrorFacet.builder().exception(((JobFailed) jobResult).exception()).build();
     }
     return null;
   }
 
-  private LineageEvent.Job buildJob() {
+  protected LineageEvent.Job buildJob() {
     return LineageEvent.Job.builder()
         .namespace(marquezContext.getJobNamespace())
         .name(marquezContext.getJobName())
         .build();
   }
 
-  private LineageEvent.Run buildRun(RunFacet facets) {
-    return Run.builder().runId(marquezContext.getParentRunId()).facets(facets).build();
-  }
-
-  private List<Dataset> buildOutputs(List<String> outputs) {
+  protected List<Dataset> buildOutputs(List<String> outputs) {
     return outputs.stream()
         .map(
             name ->
@@ -120,7 +126,7 @@ public class RddExecutionContext implements ExecutionContext {
         .collect(Collectors.toList());
   }
 
-  private List<Dataset> buildInputs(List<String> inputs) {
+  protected List<Dataset> buildInputs(List<String> inputs) {
     return inputs.stream()
         .map(
             name ->
@@ -128,31 +134,31 @@ public class RddExecutionContext implements ExecutionContext {
         .collect(Collectors.toList());
   }
 
-  private static List<String> findOutputs(Set<RDD<?>> rdds) {
+  protected List<String> findOutputs(Set<RDD<?>> rdds) {
     List<String> result = new ArrayList<>();
     for (RDD<?> rdd : rdds) {
       Path outputPath = getOutputPath(rdd);
       if (outputPath != null) {
-        result.add(outputPath.toUri().toString());
+        result.add(formatRddName(outputPath.toUri()));
       }
     }
     return result;
   }
 
-  private static List<String> findInputs(Set<RDD<?>> rdds) {
+  protected List<String> findInputs(Set<RDD<?>> rdds) {
     List<String> result = new ArrayList<>();
     for (RDD<?> rdd : rdds) {
       Path[] inputPaths = getInputPaths(rdd);
       if (inputPaths != null) {
         for (Path path : inputPaths) {
-          result.add(path.toUri().toString());
+          result.add(formatRddName(path.toUri()));
         }
       }
     }
     return result;
   }
 
-  private static Path[] getInputPaths(RDD<?> rdd) {
+  protected Path[] getInputPaths(RDD<?> rdd) {
     Path[] inputPaths = null;
     if (rdd instanceof HadoopRDD) {
       inputPaths =
@@ -164,13 +170,17 @@ public class RddExecutionContext implements ExecutionContext {
             org.apache.hadoop.mapreduce.lib.input.FileInputFormat.getInputPaths(
                 new Job(((NewHadoopRDD<?, ?>) rdd).getConf()));
       } catch (IOException e) {
-        e.printStackTrace(System.out);
+        log.error("Marquez spark agent could not get input paths", e);
       }
     }
     return inputPaths;
   }
 
-  private void printRDDs(String prefix, RDD<?> rdd) {
+  protected String formatRddName(URI pathUri) {
+    return pathUri.toString();
+  }
+
+  protected void printRDDs(String prefix, RDD<?> rdd) {
     Collection<Dependency<?>> deps = asJavaCollection(rdd.dependencies());
     for (Dependency<?> dep : deps) {
       printRDDs(prefix + "  ", dep.rdd());
@@ -190,7 +200,7 @@ public class RddExecutionContext implements ExecutionContext {
     }
   }
 
-  private static Path getOutputPath(RDD<?> rdd) {
+  protected static Path getOutputPath(RDD<?> rdd) {
     Configuration conf = SparkListener.getConfigForRDD(rdd);
     if (conf == null) {
       return null;

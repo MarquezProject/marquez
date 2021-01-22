@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import lombok.extern.slf4j.Slf4j;
+import marquez.spark.agent.lifecycle.ContextFactory;
 import marquez.spark.agent.lifecycle.ExecutionContext;
-import marquez.spark.agent.lifecycle.RddExecutionContext;
 import marquez.spark.agent.lifecycle.SparkSQLExecutionContext;
 import marquez.spark.agent.transformers.ActiveJobTransformer;
 import marquez.spark.agent.transformers.PairRDDFunctionsTransformer;
@@ -30,11 +30,11 @@ public class SparkListener {
   private static final Map<Integer, ExecutionContext> rddExecutionRegistry =
       Collections.synchronizedMap(new HashMap<>());
   private static WeakHashMap<RDD<?>, Configuration> outputs = new WeakHashMap<>();
-  private static MarquezContext marquezContext;
+  private static ContextFactory contextFactory;
 
   /** called by the agent on init with the provided argument */
-  public static void init(String agentArgument, MarquezContext context) {
-    marquezContext = context;
+  public static void init(String agentArgument, ContextFactory contextFactory) {
+    SparkListener.contextFactory = contextFactory;
     clear();
   }
 
@@ -129,35 +129,51 @@ public class SparkListener {
   /** called by the SparkListener when a spark-sql (Dataset api) execution starts */
   private static void sparkSQLExecStart(SparkListenerSQLExecutionStart startEvent) {
     SparkSQLExecutionContext context = getSparkSQLExecutionContext(startEvent.executionId());
-    context.start(startEvent);
+    try {
+      context.start(startEvent);
+    } catch (Exception e) {
+      log.error("Marquez spark agent could not listen to spark sql job start", e);
+    }
   }
 
   /** called by the SparkListener when a spark-sql (Dataset api) execution ends */
   private static void sparkSQLExecEnd(SparkListenerSQLExecutionEnd endEvent) {
     SparkSQLExecutionContext context = sparkSqlExecutionRegistry.remove(endEvent.executionId());
-    context.end(endEvent);
+    try {
+      context.end(endEvent);
+    } catch (Exception e) {
+      log.error("Marquez spark agent could not listen to spark sql job end", e);
+    }
   }
 
   /** called by the SparkListener when a job starts */
   private static void jobStarted(SparkListenerJobStart jobStart) {
     ExecutionContext context = getExecutionContext(jobStart.jobId());
-    context.start(jobStart);
+    try {
+      context.start(jobStart);
+    } catch (Exception e) {
+      log.error("Marquez spark agent could not listen to job start", e);
+    }
   }
 
   /** called by the SparkListener when a job ends */
   private static void jobEnded(SparkListenerJobEnd jobEnd) {
     ExecutionContext context = rddExecutionRegistry.remove(jobEnd.jobId());
-    context.end(jobEnd);
+    try {
+      context.end(jobEnd);
+    } catch (Exception e) {
+      log.error("Marquez spark agent could not listen to job end", e);
+    }
   }
 
   public static SparkSQLExecutionContext getSparkSQLExecutionContext(long executionId) {
     return sparkSqlExecutionRegistry.computeIfAbsent(
-        executionId, (e) -> new SparkSQLExecutionContext(executionId, marquezContext));
+        executionId, (e) -> contextFactory.createSparkSQLExecutionContext(executionId));
   }
 
   public static ExecutionContext getExecutionContext(int jobId) {
     return rddExecutionRegistry.computeIfAbsent(
-        jobId, (e) -> new RddExecutionContext(jobId, marquezContext));
+        jobId, (e) -> contextFactory.createRddExecutionContext(jobId));
   }
 
   public static ExecutionContext getExecutionContext(int jobId, long executionId) {
@@ -179,6 +195,6 @@ public class SparkListener {
   /** To close the underlying resources. */
   public static void close() {
     clear();
-    marquezContext.close();
+    SparkListener.contextFactory.close();
   }
 }
