@@ -270,6 +270,7 @@ public class LineageEvent {
 
     private String type;
     private String url;
+
     @Builder
     public SourceCodeLocationJobFacet(
         @NotNull URI _producer, @NotNull URI _schemaURL, String type, String url) {
@@ -416,6 +417,7 @@ public class LineageEvent {
 
     private String name;
     private String uri;
+
     @Builder
     public DatasourceDatasetFacet(
         @NotNull URI _producer, @NotNull URI _schemaURL, String name, String uri) {
