@@ -1,9 +1,9 @@
 *.egg-info
 *.iml
-*.jar
 *.swp
 ./**/*.class
 ./out/*
+.DS_Store
 .classpath
 .editorconfig
 .gradle/
