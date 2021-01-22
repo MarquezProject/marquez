@@ -21,7 +21,7 @@ public abstract class BaseIntegrationTest {
   protected static final String CONFIG_FILE = "config.test.yml";
   protected static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
   protected static final PostgresContainer POSTGRES = createMarquezPostgres();
-  HttpClient http2 = HttpClient.newBuilder().version(Version.HTTP_2).build();
+  protected final HttpClient http2 = HttpClient.newBuilder().version(Version.HTTP_2).build();
 
   static {
     POSTGRES.start();
