@@ -5,7 +5,7 @@
       "properties": {
         "facets": {
           "properties": {
-            "logicalPlan": {
+            "spark.logicalPlan": {
               "$ref": "#/definitions/LogicalPlanRunFacet"
             }
           }
@@ -13,10 +13,10 @@
       }
     },
     "LogicalPlanRunFacet": {
+      "type": "object",
       "properties": {
         "type": {
-          "type": "string",
-          "description": "An explanation about the purpose of this instance."
+          "type": "string"
         },
         "name": {
           "type": "string"
@@ -34,16 +34,20 @@
             ]
           }
         }
-      }
+      },
+      "additionalProperties": true
     },
     "InsertIntoHadoopFsRelationCommand": {
+      "type": "object",
       "properties":{
         "outputPath": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": true
     },
     "LogicalRelation": {
+      "type": "object",
       "properties":{
         "relation": {
           "anyOf": [
@@ -55,25 +59,36 @@
             }
           ]
         }
-      }
+      },
+      "additionalProperties": true
     },
     "HadoopFsRelation": {
+      "type": "object",
       "properties":{
         "relation": {
-          "location": {
-            "type": "string"
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string"
+            }
           }
         }
-      }
+      },
+      "additionalProperties": true
     },
     "JDBCRelation": {
+      "type": "object",
       "properties":{
         "relation": {
-          "jdbcOptions": {
-            "type": "object"
+          "type": "object",
+          "properties": {
+            "jdbcOptions": {
+              "type": "object"
+            }
           }
         }
-      }
+      },
+      "additionalProperties": true
     }
 
   }
