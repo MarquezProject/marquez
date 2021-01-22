@@ -9,8 +9,9 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
-[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-izlcs3ar-V_mHjWkAUBBGEHuezX~ZgQ)
+[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-kcdjmhmq-FGjwM2K_A~1B2Tw0oV6ssA)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
 [![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez)
 [![Known Vulnerabilities](https://snyk.io/test/github/MarquezProject/marquez/badge.svg)](https://snyk.io/test/github/MarquezProject/marquez)
@@ -51,6 +52,8 @@ Marquez uses a _multi_-project structure and contains the following modules:
 
 * [`web`](https://github.com/MarquezProject/marquez/tree/main/web): web UI used to view metadata
 * [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
+* [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations): integrations with other systems
+* [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart): helm chart
 
 ## Requirements
 
@@ -108,14 +111,13 @@ Then browse to the admin interface: http://localhost:8081
 
 ## Related Projects
 
-* [`marquez-airflow`](https://github.com/MarquezProject/marquez-airflow): Airflow support for Marquez.
-* [`marquez-python`](https://github.com/MarquezProject/marquez-python): Python client for Marquez.
+* [`OpenLineage`](https://github.com/OpenLineage/OpenLineage): open standard for metadata and lineage collection
 
 ## Getting Involved
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: https://marquezproject.slack.com
+* Chat: [https://marquezproject.slack.com](https://join.slack.com/t/marquezproject/shared_invite/zt-kcdjmhmq-FGjwM2K_A~1B2Tw0oV6ssA)
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing

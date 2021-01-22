@@ -1,44 +1,41 @@
 package marquez.spark.agent.transformers;
 
+import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
+import lombok.extern.slf4j.Slf4j;
 import marquez.spark.agent.SparkListener;
 
+@Slf4j
 public class PairRDDFunctionsTransformer implements ClassFileTransformer {
-  private static final Logger logger = LoggerFactory.getLogger(PairRDDFunctionsTransformer.class);
-  private static final String TBI = "org.apache.spark.rdd.PairRDDFunctions";
-  protected final ClassPool pool = ClassPool.getDefault();
+  private static final String className = "org.apache.spark.rdd.PairRDDFunctions";
+  private final String internalForm = className.replaceAll("\\.", "/");
 
-  public static final String CODE = String.format("{ %s.registerOutput(this, conf); }", SparkListener.class.getName());
-
+  public static final String CODE =
+      String.format("{ %s.registerOutput(this, conf); }", SparkListener.class.getName());
 
   @Override
-  public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-    if (!className.replace('/', '.').equals(TBI)) {
+  public byte[] transform(
+      ClassLoader loader,
+      String className,
+      Class<?> classBeingRedefined,
+      ProtectionDomain protectionDomain,
+      byte[] classfileBuffer)
+      throws IllegalClassFormatException {
+    if (!className.equals(this.internalForm)) {
       return classfileBuffer;
     }
-    logger.info("PairRDDFunctionsTransformer.transform(" +className+")");
+    log.info("PairRDDFunctionsTransformer.transform(" + className + ")");
     try {
-      this.pool.insertClassPath(new ByteArrayClassPath(TBI, classfileBuffer));
-      CtClass ctClass = this.pool.get(TBI);
-      if (ctClass.isFrozen()) {
-        logger.error(className + " is frozen. Not doing anything");
-        return classfileBuffer;
-      }
+      CtClass ctClass = ClassPool.getDefault().makeClass(new ByteArrayInputStream(classfileBuffer));
       ctClass.getDeclaredMethod("saveAsNewAPIHadoopDataset").insertBefore(CODE);
       ctClass.getDeclaredMethod("saveAsHadoopDataset").insertBefore(CODE);
       return ctClass.toBytecode();
     } catch (Throwable throwable) {
-      System.err.println("BLETCH!!!");
-      throwable.printStackTrace();
+      log.error("Failed to instrument " + className + ". Not doing anything", throwable);
       return classfileBuffer;
     }
   }

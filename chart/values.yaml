@@ -1,0 +1,42 @@
+marquez:
+  replicaCount: 1
+  image:
+    repository: marquezproject/marquez
+    tag: 0.10.0
+    pullPolicy: IfNotPresent
+  db:
+    host: localhost
+    port: 5432
+    name: marquez
+    user: buendia
+    password: macondo
+  migrateOnStartup: true
+
+web:
+  replicaCount: 1
+  image:
+    repository: marquezproject/marquez-web
+    tag: 0.5.3
+    pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  paths: []
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

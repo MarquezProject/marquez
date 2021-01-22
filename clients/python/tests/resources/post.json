@@ -1,0 +1,16 @@
+{
+  "method": "POST",
+  "path": "/api/v1/namespaces/my-namespace/jobs/my-job/runs",
+  "headers": {
+    "User-Agent": "marquez-python/0.7.6"
+  },
+  "payload": {
+    "id": "8c78b02b-86b8-40c7-91bf-e5dd7899ed3b",
+    "args": {
+      "email": "me@mycorp.com",
+      "emailOnFailure": "true",
+      "emailOnRetry": "true",
+      "retries": "1"
+    }
+  }
+}

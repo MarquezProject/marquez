@@ -1,43 +1,38 @@
 package marquez.spark.agent.transformers;
 
+import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javassist.ByteArrayClassPath;
-import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
+import lombok.extern.slf4j.Slf4j;
 import marquez.spark.agent.SparkListener;
 
+@Slf4j
 public class ActiveJobTransformer implements ClassFileTransformer {
-  private static final Logger logger = LoggerFactory.getLogger(ActiveJobTransformer.class);
+  private static final String className = "org.apache.spark.scheduler.ActiveJob";
+  private final String internalForm = className.replaceAll("\\.", "/");
 
-  private static final String TBI = "org.apache.spark.scheduler.ActiveJob";
-  protected final ClassPool pool = ClassPool.getDefault();
-
-  public static final String CODE = String.format("{ %s.registerActiveJob(this); }", SparkListener.class.getName());
-
+  public static final String CODE =
+      String.format("{ %s.registerActiveJob(this); }", SparkListener.class.getName());
 
   @Override
-  public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-    if (!className.replace('/', '.').equals(TBI)) {
+  public byte[] transform(
+      ClassLoader loader,
+      String className,
+      Class<?> classBeingRedefined,
+      ProtectionDomain protectionDomain,
+      byte[] classfileBuffer)
+      throws IllegalClassFormatException {
+    if (!className.equals(this.internalForm)) {
       return classfileBuffer;
     }
-    logger.info("ActiveJobTransformer.transform(" +className+")");
+    log.info("ActiveJobTransformer.transform(" + className + ")");
     try {
-      this.pool.insertClassPath(new ByteArrayClassPath(TBI, classfileBuffer));
-      CtClass ctClass = this.pool.get(TBI);
-      if (ctClass.isFrozen()) {
-        logger.error(className + " is frozen. Not doing anything");
-        return classfileBuffer;
-      }
-      // TODO: figure out why this is needed
-      this.pool.insertClassPath(new ClassClassPath(org.apache.spark.scheduler.Stage.class));
+      CtClass ctClass = ClassPool.getDefault().makeClass(new ByteArrayInputStream(classfileBuffer));
+
       CtConstructor[] constructors = ctClass.getConstructors();
       for (CtConstructor constructor : constructors) {
         if (constructor.callsSuper()) {
@@ -46,7 +41,7 @@ public class ActiveJobTransformer implements ClassFileTransformer {
       }
       return ctClass.toBytecode();
     } catch (Throwable throwable) {
-      logger.error("Failed to instrument " + className + ". Not doing anything", throwable);
+      log.error("Failed to instrument " + className + ". Not doing anything", throwable);
       return classfileBuffer;
     }
   }

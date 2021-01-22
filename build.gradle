@@ -39,6 +39,13 @@ java {
   targetCompatibility = JavaVersion.VERSION_11
 }
 
+sourceSets {
+  main.java.srcDirs = ["${projectDir}/api/src/main/java"]
+  main.resources.srcDirs = ["${projectDir}/api/src/main/resources"]
+  test.java.srcDirs = ["${projectDir}/api/src/test/java"]
+  test.resources.srcDirs = ["${projectDir}/api/src/test/resources"]
+}
+
 ext {
   dropwizardVersion = '2.0.15'
   jdbi3Version = '3.17.0'
@@ -51,6 +58,7 @@ dependencies {
   compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
   compile "io.dropwizard:dropwizard-jdbi3:${dropwizardVersion}"
   compile "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}"
+  compile "io.dropwizard:dropwizard-http2:${dropwizardVersion}"
   compile "io.prometheus:simpleclient:${prometheusVersion}"
   compile "io.prometheus:simpleclient_dropwizard:${prometheusVersion}"
   compile "io.prometheus:simpleclient_hotspot:${prometheusVersion}"
