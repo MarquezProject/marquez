@@ -78,10 +78,15 @@ jobs:
           paths:
             - ~/.gradle
 
-  # build-client-python:
-  #  working_directory: ~/marquez/clients/python
-  #  docker:
-  #    - image: circleci/python:3.6
+  build-client-python:
+    working_directory: ~/marquez/clients/python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - *checkout_project_root
+      - run: pip install --user  -r test-requirements.txt
+      - run: python -m pytest --cov=marquez_python tests/
+      - run: bash <(curl -s https://codecov.io/bash)
 
   # integration-spark:
   # run tests
@@ -105,7 +110,7 @@ workflows:
       - build-api
       - build-web
       - build-client-java
-      #- build-client-python
+      - build-client-python
       #- integration-spark
       #- integration-airflow
       - release:
