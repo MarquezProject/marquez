@@ -102,7 +102,7 @@ public class SourceService {
 
   static Source toSource(@NonNull final SourceRow row) {
     return new Source(
-        SourceType.valueOf(row.getType()),
+        SourceType.of(row.getType()),
         SourceName.of(row.getName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),

@@ -344,8 +344,8 @@ public interface OpenLineageDao extends SqlObject {
         jobVersion.getUuid(), dataset.getUuid(), isInput ? IoType.INPUT : IoType.OUTPUT);
   }
 
-  default SourceType getSourceType(Dataset ds) {
-    return SourceType.POSTGRESQL;
+  default String getSourceType(Dataset ds) {
+    return SourceType.of("POSTGRESQL").getValue();
   }
 
   default DatasetType getDatasetType(Dataset ds) {
