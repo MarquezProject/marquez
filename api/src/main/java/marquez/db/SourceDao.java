@@ -18,7 +18,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.models.SourceType;
 import marquez.db.mappers.SourceRowMapper;
 import marquez.db.models.SourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
