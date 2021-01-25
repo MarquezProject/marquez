@@ -1,6 +1,9 @@
+*.egg-info
 *.iml
-*.jar
 *.swp
+./**/*.class
+./out/*
+.DS_Store
 .classpath
 .editorconfig
 .gradle/
@@ -8,11 +11,13 @@
 .project
 .settings
 .vscode/
-./out/*
-out/*
-./**/*.class
+__pycache__
 bin/
 build/
+dist/
+integrations/airflow/tests/integration/integration-requirements.txt
+integrations/airflow/tests/integration/requirements.txt
+out/*
 
 # Marquez configuration
 marquez.yml

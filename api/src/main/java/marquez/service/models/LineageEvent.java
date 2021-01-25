@@ -2,6 +2,7 @@ package marquez.service.models;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
@@ -69,7 +70,7 @@ public class LineageEvent {
     private NominalTimeRunFacet nominalTime;
     private ParentRunFacet parent;
 
-    @Builder.Default private Map<String, Object> additional = new LinkedHashMap<>();
+    @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
     public void setFacet(String key, Object value) {
@@ -95,12 +96,23 @@ public class LineageEvent {
   private abstract static class BaseFacet {
     @NotNull private URI _producer;
     @NotNull private URI _schemaURL;
+    @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
     protected BaseFacet() {}
 
     public BaseFacet(@NotNull URI _producer, @NotNull URI _schemaURL) {
       this._producer = _producer;
       this._schemaURL = _schemaURL;
+    }
+
+    @JsonAnySetter
+    public void setFacet(String key, Object value) {
+      additional.put(key, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalFacets() {
+      return additional;
     }
   }
 
@@ -205,7 +217,7 @@ public class LineageEvent {
     private DocumentationJobFacet documentation;
     private SourceCodeLocationJobFacet sourceCodeLocation;
     private SQLJobFacet sql;
-    @Builder.Default private Map<String, Object> additional = new LinkedHashMap<>();
+    @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
     public void setFacet(String key, Object value) {
@@ -315,7 +327,7 @@ public class LineageEvent {
     private SchemaDatasetFacet schema;
     private DatasourceDatasetFacet dataSource;
     private String description;
-    @Builder.Default private Map<String, Object> additional = new LinkedHashMap<>();
+    @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
     public void setFacet(String key, Object value) {
