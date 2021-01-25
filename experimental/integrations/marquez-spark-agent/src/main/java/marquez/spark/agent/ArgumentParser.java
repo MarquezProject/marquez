@@ -46,7 +46,7 @@ public class ArgumentParser {
   private static String getApiKey(List<NameValuePair> nameValuePairList) {
     String apiKey;
     if ((apiKey = getNamedParameter(nameValuePairList, "api_key")) != null) {
-      return apiKey;
+      return apiKey.isEmpty() ? null : apiKey;
     }
     return null;
   }
