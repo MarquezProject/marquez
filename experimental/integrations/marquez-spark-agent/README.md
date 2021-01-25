@@ -15,12 +15,13 @@ from uuid import uuid4
 
 jar = 'marquez-spark-LATEST.jar'
 files = [f"gs://bq-airflow-spark/{jar}"]
-marquez_path = 'https://marquez.example.org:5000'
+marquez_path = 'http://localhost:5000'
 run_id = uuid4()
 job_name = 'submit_job'
+api_key = ''
 properties = {
   'spark.driver.extraJavaOptions':
-  f"-javaagent:{jar}={marquez_path}/api/v1/namespaces/foo/job/{job_name}/runs/{run_id}"
+  f"-javaagent:{jar}={marquez_path}/api/v1/namespaces/foo/job/{job_name}/runs/{run_id}?api_key={api_key}"
 }
 
 t1 = DataProcPySparkOperator(
@@ -47,9 +48,10 @@ marquez_path = 'http://localhost:5000'
 run_id = uuid4()
 jar_path = 'marquez-spark-LATEST.jar'
 job_name = 'submit_job'
+api_key = ''
 properties = {
 'spark.driver.extraJavaOptions':
-f"-javaagent:{jar_path}={marquez_path}/api/v1/namespaces/foo/job/{job_name}/runs/{run_id}"
+f"-javaagent:{jar_path}={marquez_path}/api/v1/namespaces/foo/job/{job_name}/runs/{run_id}?api_key={api_key}"
 }
 
 t1 = SparkSubmitOperator(
@@ -65,10 +67,10 @@ t1 = SparkSubmitOperator(
 
 ## Arguments
 The java agent accepts an argument in the form of a uri. It includes the location of Marquez, the 
-namespace name, the job name, and a unique run id. This run id will be emitted as a parent run 
+namespace name, the job name, and a unique run id. The run id will be emitted as a parent run 
 facet.
 ```
-{marquez_home}/api/v1/namespaces/{namespace}/job/{job_name}/runs/{run_uuid}"
+{marquez_home}/api/v1/namespaces/{namespace}/job/{job_name}/runs/{run_uuid}?api_key={api_key}"
 
 ```
 For example:
@@ -77,6 +79,11 @@ https://marquez.example.com:5000/api/v1/namespaces/foo/job/spark.submit_job/runs
 ```
 
 # Build
+
+## Java 8
+Testing requires a Java 8 JVM to test the scala spark components. 
+
+`export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 
 ## Testing
 To run the tests, run:
