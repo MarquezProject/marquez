@@ -147,6 +147,9 @@ workflows:
       - test-integration-airflow:
           requires:
             - build-integration-airflow
+          filters:
+            branches:
+              only: main
       - release:
           filters:
             tags:
