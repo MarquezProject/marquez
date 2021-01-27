@@ -65,7 +65,7 @@ publishing {
             pom {
                 name = 'marquez-java'
                 description = 'Java client for Marquez'
-                url = 'https://github.com/MarquezProject/marquez-java'
+                url = 'https://github.com/MarquezProject/marquez'
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
@@ -79,9 +79,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/MarquezProject/marquez-java.git'
-                    developerConnection = 'scm:git:ssh://github.com:MarquezProject/marquez-java.git'
-                    url = 'https://github.com/MarquezProject/marquez-java'
+                    connection = 'scm:git:git://github.com/MarquezProject/marquez.git'
+                    developerConnection = 'scm:git:ssh://github.com:MarquezProject/marquez.git'
+                    url = 'https://github.com/MarquezProject/marquez'
                 }
             }
         }

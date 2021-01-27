@@ -16,4 +16,6 @@ rootProject.name = 'marquez'
 
 include 'api'
 include 'clients:java'
-// include 'integrations:spark'
+
+//...
+include 'experimental:integrations:marquez-spark-agent'
