@@ -76,7 +76,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     bootstrap.addBundle(
         new AssetsBundle(
-            "/assets", "/api/v1/graphql-playground", "index.htm", "graphql-playground"));
+            "/assets", "/graphql-playground", "graphql-playground/index.htm", "graphql-playground"));
   }
 
   @Override

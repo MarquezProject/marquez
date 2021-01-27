@@ -2,21 +2,22 @@ package marquez.graphql;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import com.smoketurner.dropwizard.graphql.CachingPreparsedDocumentProvider;
-import com.smoketurner.dropwizard.graphql.GraphQLFactory;
-import graphql.execution.preparsed.PreparsedDocumentProvider;
+import graphql.TypeResolutionEnvironment;
 import graphql.kickstart.execution.GraphQLQueryInvoker;
+import graphql.kickstart.servlet.GraphQLConfiguration;
 import graphql.kickstart.servlet.GraphQLHttpServlet;
 import graphql.schema.Coercing;
 import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
+import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.PropertyDataFetcher;
+import graphql.schema.TypeResolver;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
@@ -31,32 +32,22 @@ import org.jdbi.v3.core.Jdbi;
 public class MarquezGraphqlServletBuilder {
 
   public GraphQLHttpServlet getServlet(final Jdbi jdbi) {
-    final GraphQLFactory factory = getGraphQLFactory(jdbi);
-
-    final PreparsedDocumentProvider provider =
-        new CachingPreparsedDocumentProvider(factory.getQueryCache(), new MetricRegistry());
-
-    final GraphQLSchema schema = factory.build();
+    final GraphQLSchema schema = getGraphQLSchema(jdbi);
 
     final GraphQLQueryInvoker queryInvoker =
         GraphQLQueryInvoker.newBuilder()
-            .withPreparsedDocumentProvider(provider)
-            .withInstrumentation(factory.getInstrumentations())
             .build();
 
-    final graphql.kickstart.servlet.GraphQLConfiguration config =
-        graphql.kickstart.servlet.GraphQLConfiguration.with(schema).with(queryInvoker).build();
+    final GraphQLConfiguration config =
+       GraphQLConfiguration.with(schema).with(queryInvoker).build();
 
     return GraphQLHttpServlet.with(config);
   }
 
   @SneakyThrows
-  public GraphQLFactory getGraphQLFactory(Jdbi jdbi) {
-    GraphQLDataFetchers dataFetchers = new GraphQLDataFetchers(jdbi);
+  public GraphQLSchema getGraphQLSchema(Jdbi jdbi) {
+    GraphqlDataFetchers dataFetchers = new GraphqlDataFetchers(jdbi);
 
-    final GraphQLFactory factory = new GraphQLFactory();
-    // the RuntimeWiring must be configured prior to the run()
-    // methods being called so the schema is connected properly.
     URL url = Resources.getResource("schema.graphqls");
     String sdl = Resources.toString(url, Charsets.UTF_8);
     RuntimeWiring wiring =
@@ -64,7 +55,9 @@ public class MarquezGraphqlServletBuilder {
             .type(
                 newTypeWiring("Query")
                     .dataFetcher("datasets", dataFetchers.getDatasets())
-                    .dataFetcher("namespace", dataFetchers.getNamespaceByName()))
+                    .dataFetcher("namespace", dataFetchers.getNamespaceByName())
+                    .dataFetcher("searchDatasets", dataFetchers.searchDatasets())
+                    .dataFetcher("searchJobs", dataFetchers.searchJobs()))
             .type(
                 newTypeWiring("Dataset")
                     .dataFetcher("source", dataFetchers.getSourcesByDataset())
@@ -84,10 +77,6 @@ public class MarquezGraphqlServletBuilder {
             .type(
                 newTypeWiring("RunStateRecord")
                     .dataFetcher("run", dataFetchers.getRunByRunStateRecord()))
-            .type(
-                newTypeWiring("RunArgs")
-                    .dataFetcher("run", dataFetchers.getRunsByRunArgs())
-                    .dataFetcher("args", dataFetchers.convertRunArgs()))
             .type(
                 newTypeWiring("Run")
                     .dataFetcher("jobVersion", dataFetchers.getJobVersionByRun())
@@ -113,9 +102,6 @@ public class MarquezGraphqlServletBuilder {
                     .dataFetcher("job", dataFetchers.getJobByJobVersion())
                     .dataFetcher("inputs", dataFetchers.getInputsByJobVersion())
                     .dataFetcher("outputs", dataFetchers.getOutputsByJobVersion()))
-            .type(
-                newTypeWiring("JobContext")
-                    .dataFetcher("jobVersion", dataFetchers.getJobVersionsByJobContext()))
             .type(
                 newTypeWiring("Job")
                     .dataFetcher("versions", dataFetchers.getVersionsByJob())
@@ -210,17 +196,10 @@ public class MarquezGraphqlServletBuilder {
                         })
                     .build())
             .build();
-    GraphQLSchema graphQLSchema = buildSchema(sdl, wiring);
-    factory.setGraphQLSchema(graphQLSchema);
 
-    factory.setRuntimeWiring(wiring);
-    return factory;
-  }
+    TypeDefinitionRegistry typeDefinitionRegistry = new SchemaParser().parse(sdl);
 
-  private GraphQLSchema buildSchema(String sdl, RuntimeWiring wiring) {
-    TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
-    RuntimeWiring runtimeWiring = wiring;
     SchemaGenerator schemaGenerator = new SchemaGenerator();
-    return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
+    return schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, wiring);
   }
 }

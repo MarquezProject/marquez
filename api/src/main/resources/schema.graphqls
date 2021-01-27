@@ -4,7 +4,33 @@ scalar Json
 
 type Query {
   datasets: [Dataset]
-  namespace(name: String): Namespace
+  namespace(name: String!): Namespace
+  searchJobs(name: String!): JobSearchPage
+  searchDatasets(name: String!): DatasetSearchPage
+}
+
+
+type DatasetSearchPage {
+  data: [Dataset]
+}
+
+type JobSearchPage {
+  data: [Job]
+}
+#
+#type SimilarDatasetPage {
+#  data: [Dataset]
+#  pageInfo: PageInfo
+#}
+#
+#type SimilarJobPage {
+#  data: [Job]
+#  pageInfo: PageInfo
+#}
+
+type PageInfo {
+  hasNext: Boolean
+  pageState: String
 }
 
 type Tag {
@@ -30,12 +56,6 @@ type RunStateRecord {
   state: String
   run: Run
 }
-type RunArgs {
-  createdAt: DateTime
-  args: Json
-  checksum: String
-  run: [Run]
-}
 type Run {
   createdAt: DateTime
   updatedAt: DateTime
@@ -43,7 +63,7 @@ type Run {
   nominalEndTime: DateTime
 
   jobVersion: JobVersion
-  runArgs: RunArgs
+  runArgs: Json
   currentState: String
   startState: RunStateRecord
   endState: RunStateRecord
@@ -61,7 +81,7 @@ type Namespace {
   createdAt: DateTime
   updatedAt: DateTime
   description: String
-  owner: [Owner]
+  owners: [Owner]
   currentOwner: Owner
   jobs: [Job]
   datasets: [Dataset]
@@ -71,17 +91,11 @@ type JobVersion {
   updatedAt: DateTime
   location: String
   version: UUID
-  jobContext: JobContext
+  jobContext: Json
   latestRun: Run
   job: Job
   inputs: [Dataset]
   outputs: [Dataset]
-}
-type JobContext {
-  createdAt: DateTime
-  context: String
-  checksum: String
-  jobVersion: [JobVersion]
 }
 type Job {
   type: String

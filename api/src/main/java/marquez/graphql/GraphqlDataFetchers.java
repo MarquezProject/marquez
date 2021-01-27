@@ -3,17 +3,23 @@ package marquez.graphql;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import graphql.schema.DataFetcher;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import marquez.common.Utils;
 import marquez.db.JobVersionDao.IoType;
 import org.jdbi.v3.core.Jdbi;
 
-public class GraphQLDataFetchers {
-  private Daos dao;
+public class GraphqlDataFetchers {
+  private GraphqlDaos dao;
 
-  public GraphQLDataFetchers(Jdbi jdbi) {
-    this.dao = jdbi.onDemand(Daos.class);
+  public GraphqlDataFetchers(Jdbi jdbi) {
+    this.dao = jdbi.onDemand(GraphqlDaos.class);
   }
 
   public DataFetcher getDatasets() {
@@ -177,8 +183,13 @@ public class GraphQLDataFetchers {
   public DataFetcher getRunArgsByRun() {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
+      Map<String, Object> runArgs = dao.getRunArgs((UUID) map.get("runArgsUuid"));
+      if (runArgs == null) {
+        return null;
+      }
 
-      return dao.getRunArgs((UUID) map.get("runArgsUuid"));
+      return Utils.fromJson(
+          (String) map.get("args"), new TypeReference<ImmutableMap<String, String>>() {});
     };
   }
 
@@ -210,7 +221,13 @@ public class GraphQLDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getJobContext((UUID) map.get("jobContextUuid"));
+      Map jobContext = dao.getJobContext((UUID) map.get("jobContextUuid"));
+      if (jobContext == null) {
+        return null;
+      }
+      return Utils.fromJson(
+          (String) jobContext.get("context"), new TypeReference<ImmutableMap<String, String>>() {});
+
     };
   }
 
@@ -246,14 +263,6 @@ public class GraphQLDataFetchers {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
       return dao.getIOMappingByJobVersion((UUID) map.get("uuid"), IoType.OUTPUT);
-    };
-  }
-
-  public DataFetcher getJobVersionsByJobContext() {
-    return dataFetchingEnvironment -> {
-      Map<String, Object> map = dataFetchingEnvironment.getSource();
-
-      return dao.getJobVersionByJobContext((UUID) map.get("uuid"));
     };
   }
 
@@ -357,12 +366,56 @@ public class GraphQLDataFetchers {
     };
   }
 
-  public DataFetcher convertRunArgs() {
+  public DataFetcher searchJobs() {
     return dataFetchingEnvironment -> {
-      Map<String, Object> map = dataFetchingEnvironment.getSource();
+      String name = dataFetchingEnvironment.getArgument("name");
+      if (name.isEmpty()) {
+        return ImmutableMap.of("data", dao.getJobs());
+      }
 
-      return Utils.fromJson(
-          (String) map.get("args"), new TypeReference<ImmutableMap<String, String>>() {});
+      return ImmutableMap.of("data", dao.searchJobs(toQueryString(name), name));
     };
+  }
+
+  private List<String> toExactMatches(String name) {
+    return Arrays.asList(name.split("\\s"));
+  }
+
+  public DataFetcher searchDatasets() {
+    return dataFetchingEnvironment -> {
+      String name = dataFetchingEnvironment.getArgument("name");
+      if (name.isEmpty()) {
+        return ImmutableMap.of("data", dao.getDatasets());
+      }
+
+      return ImmutableMap.of("data", dao.searchDatasets(toQueryString(name), name));
+    };
+  }
+
+  private String toQueryString(String name) {
+    StringJoiner tsQueryLiteral = new StringJoiner(" & ");
+    for (String term : toQueryTerms(name)) {
+      //Prefix matching: https://www.postgresql.org/docs/9.0/textsearch-controls.html
+      tsQueryLiteral.add(String.format("%s:*", term));
+    }
+//
+//    StringJoiner exact = new StringJoiner(" | ");
+//    exact.add(String.format("(%s)", tsQueryLiteral));
+//    for (String exactMatch : name.split("\\s")) {
+//      exact.add(exactMatch);
+//    }
+
+    return tsQueryLiteral.toString();
+  }
+
+  private List<String> toQueryTerms(String name) {
+    List<String> terms = new ArrayList<>();
+    Pattern p = Pattern.compile("((?:\\w|\\d)+)");
+    Matcher m = p.matcher(name);
+    while (m.find()) {
+      terms.add(m.group(1));
+    }
+
+    return terms;
   }
 }
