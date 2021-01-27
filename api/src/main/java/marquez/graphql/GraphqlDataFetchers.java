@@ -227,7 +227,6 @@ public class GraphqlDataFetchers {
       }
       return Utils.fromJson(
           (String) jobContext.get("context"), new TypeReference<ImmutableMap<String, String>>() {});
-
     };
   }
 
@@ -395,15 +394,9 @@ public class GraphqlDataFetchers {
   private String toQueryString(String name) {
     StringJoiner tsQueryLiteral = new StringJoiner(" & ");
     for (String term : toQueryTerms(name)) {
-      //Prefix matching: https://www.postgresql.org/docs/9.0/textsearch-controls.html
+      // Prefix matching: https://www.postgresql.org/docs/9.0/textsearch-controls.html
       tsQueryLiteral.add(String.format("%s:*", term));
     }
-//
-//    StringJoiner exact = new StringJoiner(" | ");
-//    exact.add(String.format("(%s)", tsQueryLiteral));
-//    for (String exactMatch : name.split("\\s")) {
-//      exact.add(exactMatch);
-//    }
 
     return tsQueryLiteral.toString();
   }

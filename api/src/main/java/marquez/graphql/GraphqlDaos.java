@@ -7,7 +7,6 @@ import marquez.graphql.mapper.ObjectMapMapper;
 import marquez.graphql.mapper.RowMap;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @RegisterRowMapper(ObjectMapMapper.class)
@@ -138,61 +137,63 @@ public interface GraphqlDaos extends SqlObject {
       "SELECT t.* from tags t inner join dataset_fields_tag_mapping m on t.uuid = m.tag_uuid where dataaset_field_uuid = :datasetFieldUuid")
   List<RowMap<String, Object>> getTagsByDatasetField(UUID datasetFieldUuid);
 
-  @SqlQuery("select distinct name, max(rank) as rank from  "
-      + "( "
-      //Exact match
-      + "( "
-      + "SELECT name, 1 AS rank  "
-      + "FROM jobs "
-      + "WHERE name = :term "
-      + ")"
-      + "UNION "
-      //Ranked match
-      + "( "
-      + "SELECT name, ts_rank_cd(to_tsvector('simple', regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')), query.q) AS rank  "
-      + "FROM jobs, (select :query::tsquery q ) query  "
-      + "WHERE query.q @@ regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')::tsvector  "
-      + "ORDER BY rank DESC  "
-      + "LIMIT 50 "
-      + ") "
-      + "UNION "
-      //String contains
-      + "( "
-      + "SELECT name, 0 AS rank  "
-      + "FROM jobs "
-      + "WHERE name ilike '%' || :term || '%' "
-      + "ORDER BY rank DESC "
-      + "LIMIT 50 "
-      + ")"
-      + ") q group by name order by rank DESC LIMIT 50")
+  @SqlQuery(
+      "select distinct name, max(rank) as rank from  "
+          + "( "
+          // Exact match
+          + "( "
+          + "SELECT name, 1 AS rank  "
+          + "FROM jobs "
+          + "WHERE name = :term "
+          + ")"
+          + "UNION "
+          // Ranked match
+          + "( "
+          + "SELECT name, ts_rank_cd(to_tsvector('simple', regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')), query.q) AS rank  "
+          + "FROM jobs, (select :query::tsquery q ) query  "
+          + "WHERE query.q @@ regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')::tsvector  "
+          + "ORDER BY rank DESC  "
+          + "LIMIT 50 "
+          + ") "
+          + "UNION "
+          // String contains
+          + "( "
+          + "SELECT name, 0 AS rank  "
+          + "FROM jobs "
+          + "WHERE name ilike '%' || :term || '%' "
+          + "ORDER BY rank DESC "
+          + "LIMIT 50 "
+          + ")"
+          + ") q group by name order by rank DESC LIMIT 50")
   List<RowMap<String, Object>> searchJobs(String query, String term);
 
-  @SqlQuery("select distinct name, max(rank) as rank from  "
-      + "( "
-      //Exact match
-      + "( "
-      + "SELECT name, 1 AS rank  "
-      + "FROM datasets "
-      + "WHERE name = :term "
-      + ")"
-      + "UNION "
-      //Ranked match
-      + "( "
-      + "SELECT name, ts_rank_cd(to_tsvector('simple', regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')), query.q) AS rank  "
-      + "FROM datasets, (select :query::tsquery q ) query  "
-      + "WHERE query.q @@ regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')::tsvector  "
-      + "ORDER BY rank DESC  "
-      + "LIMIT 50 "
-      + ") "
-      + "UNION "
-      //String contains
-      + "( "
-      + "SELECT name, 0 AS rank  "
-      + "FROM datasets "
-      + "WHERE name ilike '%' || :term || '%' "
-      + "ORDER BY rank DESC "
-      + "LIMIT 50 "
-      + ")" 
-      + ") q group by name order by rank DESC LIMIT 50")
+  @SqlQuery(
+      "select distinct name, max(rank) as rank from  "
+          + "( "
+          // Exact match
+          + "( "
+          + "SELECT name, 1 AS rank  "
+          + "FROM datasets "
+          + "WHERE name = :term "
+          + ")"
+          + "UNION "
+          // Ranked match
+          + "( "
+          + "SELECT name, ts_rank_cd(to_tsvector('simple', regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')), query.q) AS rank  "
+          + "FROM datasets, (select :query::tsquery q ) query  "
+          + "WHERE query.q @@ regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')::tsvector  "
+          + "ORDER BY rank DESC  "
+          + "LIMIT 50 "
+          + ") "
+          + "UNION "
+          // String contains
+          + "( "
+          + "SELECT name, 0 AS rank  "
+          + "FROM datasets "
+          + "WHERE name ilike '%' || :term || '%' "
+          + "ORDER BY rank DESC "
+          + "LIMIT 50 "
+          + ")"
+          + ") q group by name order by rank DESC LIMIT 50")
   List<RowMap<String, Object>> searchDatasets(String query, String term);
 }

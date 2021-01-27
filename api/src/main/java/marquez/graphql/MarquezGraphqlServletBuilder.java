@@ -5,7 +5,6 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import graphql.TypeResolutionEnvironment;
 import graphql.kickstart.execution.GraphQLQueryInvoker;
 import graphql.kickstart.servlet.GraphQLConfiguration;
 import graphql.kickstart.servlet.GraphQLHttpServlet;
@@ -13,11 +12,8 @@ import graphql.schema.Coercing;
 import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
-import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
-import graphql.schema.PropertyDataFetcher;
-import graphql.schema.TypeResolver;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
@@ -34,12 +30,10 @@ public class MarquezGraphqlServletBuilder {
   public GraphQLHttpServlet getServlet(final Jdbi jdbi) {
     final GraphQLSchema schema = getGraphQLSchema(jdbi);
 
-    final GraphQLQueryInvoker queryInvoker =
-        GraphQLQueryInvoker.newBuilder()
-            .build();
+    final GraphQLQueryInvoker queryInvoker = GraphQLQueryInvoker.newBuilder().build();
 
     final GraphQLConfiguration config =
-       GraphQLConfiguration.with(schema).with(queryInvoker).build();
+        GraphQLConfiguration.with(schema).with(queryInvoker).build();
 
     return GraphQLHttpServlet.with(config);
   }
