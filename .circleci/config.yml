@@ -99,7 +99,7 @@ jobs:
           keys:
             - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
             - v1-integration-spark-{{ .Branch }}
-      - run: ./gradlew --no-daemon --stacktrace build
+      - run: ./gradlew --no-daemon --stacktrace :experimental:integrations:marquez-spark-agent:build
       - save_cache:
           key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
           paths:
