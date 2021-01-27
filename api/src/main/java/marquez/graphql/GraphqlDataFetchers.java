@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import graphql.schema.DataFetcher;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -13,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import marquez.common.Utils;
 import marquez.db.JobVersionDao.IoType;
+import marquez.graphql.mapper.RowMap;
 import org.jdbi.v3.core.Jdbi;
 
 public class GraphqlDataFetchers {
@@ -25,6 +25,15 @@ public class GraphqlDataFetchers {
   public DataFetcher getDatasets() {
     return dataFetchingEnvironment -> {
       return dao.getDatasets();
+    };
+  }
+
+  public DataFetcher getDatasetByNamespaceAndName() {
+    return dataFetchingEnvironment -> {
+      String name = dataFetchingEnvironment.getArgument("name");
+      String namespace = dataFetchingEnvironment.getArgument("namespace");
+
+      return dao.getDatasetByNamespaceAndName(namespace, name);
     };
   }
 
@@ -168,7 +177,7 @@ public class GraphqlDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getInputsByRun((UUID) map.get("uuid"));
+      return dao.getDatasetVersionInputsByRun((UUID) map.get("uuid"));
     };
   }
 
@@ -176,7 +185,7 @@ public class GraphqlDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getOutputsByRun((UUID) map.get("uuid"));
+      return dao.getDatasetVersionByRun((UUID) map.get("uuid"));
     };
   }
 
@@ -301,7 +310,7 @@ public class GraphqlDataFetchers {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
-      return dao.getRun((UUID) map.get("uuid"));
+      return dao.getRun((UUID) map.get("runUuid"));
     };
   }
 
@@ -365,29 +374,40 @@ public class GraphqlDataFetchers {
     };
   }
 
+  public DataFetcher getJobs() {
+    return dataFetchingEnvironment -> {
+      return dao.getJobs();
+    };
+  }
+
+  public DataFetcher getJobsByNamespaceAndName() {
+    return dataFetchingEnvironment -> {
+      String name = dataFetchingEnvironment.getArgument("name");
+      String namespace = dataFetchingEnvironment.getArgument("namespace");
+
+      return dao.getJobByNamespaceAndName(namespace, name);
+    };
+  }
+
   public DataFetcher searchJobs() {
     return dataFetchingEnvironment -> {
       String name = dataFetchingEnvironment.getArgument("name");
       if (name.isEmpty()) {
-        return ImmutableMap.of("data", dao.getJobs());
+        return dao.getJobs();
       }
 
-      return ImmutableMap.of("data", dao.searchJobs(toQueryString(name), name));
+      return dao.searchJobs(toQueryString(name), name);
     };
-  }
-
-  private List<String> toExactMatches(String name) {
-    return Arrays.asList(name.split("\\s"));
   }
 
   public DataFetcher searchDatasets() {
     return dataFetchingEnvironment -> {
       String name = dataFetchingEnvironment.getArgument("name");
       if (name.isEmpty()) {
-        return ImmutableMap.of("data", dao.getDatasets());
+        return dao.getDatasets();
       }
 
-      return ImmutableMap.of("data", dao.searchDatasets(toQueryString(name), name));
+      return dao.searchDatasets(toQueryString(name), name);
     };
   }
 
@@ -410,5 +430,64 @@ public class GraphqlDataFetchers {
     }
 
     return terms;
+  }
+
+  public DataFetcher getDatasetLineageInput() {
+    return dataFetchingEnvironment -> {
+      Map<String, Object> jobVersion = dataFetchingEnvironment.getSource();
+      UUID latestRun = (UUID)jobVersion.get("latestRunUuid");
+      return dao.getDatasetVersionInputsByRun(latestRun);
+    };
+  }
+
+  public DataFetcher getDatasetLineageOutput() {
+    return dataFetchingEnvironment -> {
+      Map<String, Object> jobVersion = dataFetchingEnvironment.getSource();
+      UUID latestRun = (UUID)jobVersion.get("latestRunUuid");
+
+      return dao.getDatasetVersionByRun(latestRun);
+    };
+  }
+
+  public DataFetcher getJobLineageInput() {
+    return dataFetchingEnvironment -> {
+      Map<String, Object> datasetVersion = dataFetchingEnvironment.getSource();
+      UUID datasetVersionUuid = (UUID)datasetVersion.get("uuid");
+
+      return dao.getDistinctJobVersionsByDatasetVersion(datasetVersionUuid);
+    };
+  }
+
+  public DataFetcher getJobLineageOutput() {
+    return dataFetchingEnvironment -> {
+//      MarquezGraphqlContext context = dataFetchingEnvironment.getContext();
+      Map<String, Object> datasetVersion = dataFetchingEnvironment.getSource();
+      UUID datasetVersionUuid = (UUID)datasetVersion.get("uuid");
+
+      return dao.getDistinctJobVersionsByDatasetVersionOutput(datasetVersionUuid);
+    };
+  }
+
+  public DataFetcher datasetLineage() {
+    return dataFetchingEnvironment -> {
+      MarquezGraphqlContext context = dataFetchingEnvironment.getContext();
+      return null;
+    };
+  }
+
+  public DataFetcher jobLineage() {
+    return dataFetchingEnvironment -> {
+      String name = dataFetchingEnvironment.getArgument("name");
+      String namespace = dataFetchingEnvironment.getArgument("namespace");
+
+      Map<String, Object> job = dao.getJobByNamespaceAndName(namespace, name);
+      if (job == null) return null;
+      UUID currentVersion = (UUID)job.get("currentVersionUuid");
+
+      Map<String, Object> jobVersion = dao.getJobVersion(currentVersion);
+      if (jobVersion == null) return null;
+
+        return ImmutableMap.of("data", jobVersion);
+    };
   }
 }

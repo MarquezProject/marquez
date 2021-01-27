@@ -21,6 +21,14 @@ public interface GraphqlDaos extends SqlObject {
   @SqlQuery("SELECT * FROM datasets")
   List<RowMap<String, Object>> getDatasets();
 
+  @SqlQuery("SELECT datasets.* FROM datasets inner join namespaces on datasets.namespace_uuid = namespaces.uuid "
+      + "where namespaces.name = :namespaceName and datasets.name = :name")
+  RowMap<String, Object> getDatasetByNamespaceAndName(String namespaceName, String name);
+
+  @SqlQuery("SELECT jobs.* FROM jobs inner join namespaces on jobs.namespace_uuid = namespaces.uuid "
+      + "where namespaces.name = :namespaceName and jobs.name = :name")
+  RowMap<String, Object> getJobByNamespaceAndName(String namespaceName, String name);
+
   @SqlQuery("SELECT * FROM jobs")
   List<RowMap<String, Object>> getJobs();
 
@@ -51,14 +59,26 @@ public interface GraphqlDaos extends SqlObject {
   List<RowMap<String, Object>> getRunsByRunArgs(UUID runArgsUuid);
 
   @SqlQuery("SELECT * FROM dataset_versions where uuid = :uuid")
-  List<RowMap<String, Object>> getCurrentDatasetVersion(UUID uuid);
+  RowMap<String, Object> getCurrentDatasetVersion(UUID uuid);
 
   @SqlQuery(
       "SELECT dv.* from dataset_versions dv inner join runs_input_mapping m on m.dataset_version_uuid = dv.uuid where m.run_uuid = :runUuid")
-  List<RowMap<String, Object>> getInputsByRun(UUID runUuid);
+  List<RowMap<String, Object>> getDatasetVersionInputsByRun(UUID runUuid);
+
+  @SqlQuery(
+      "SELECT r.* from runs r inner join runs_input_mapping m on m.run_uuid = r.uuid where m.dataset_version_uuid = :datasetVersionUuid")
+  List<RowMap<String, Object>> getRunsByDatasetVersion(UUID datasetVersionUuid);
+
+  @SqlQuery(
+      "SELECT distinct jv.* from runs r inner join runs_input_mapping m on m.run_uuid = r.uuid inner join job_versions jv on jv.uuid = r.job_version_uuid where m.dataset_version_uuid = :datasetVersionUuid")
+  List<RowMap<String, Object>> getDistinctJobVersionsByDatasetVersion(UUID datasetVersionUuid);
+
+  @SqlQuery(
+      "SELECT distinct jv.* from dataset_versions dv inner join runs r on r.uuid = dv.run_uuid inner join job_versions jv on jv.uuid = r.job_version_uuid where dv.uuid = :datasetVersionUuid")
+  List<RowMap<String, Object>> getDistinctJobVersionsByDatasetVersionOutput(UUID datasetVersionUuid);
 
   @SqlQuery("SELECT dv.* from dataset_versions dv where dv.run_uuid = :runUuid")
-  List<RowMap<String, Object>> getOutputsByRun(UUID runUuid);
+  List<RowMap<String, Object>> getDatasetVersionByRun(UUID runUuid);
 
   @SqlQuery("SELECT * from run_args where uuid = :uuid")
   RowMap<String, Object> getRunArgs(UUID uuid);
@@ -91,9 +111,6 @@ public interface GraphqlDaos extends SqlObject {
           + " on m.dataset_uuid = jv.uuid"
           + " where m.dataset_uuid = :datasetUuid AND m.io_type = :ioType")
   List<RowMap<String, Object>> getJobVersionsByIoMapping(UUID datasetUuid, IoType ioType);
-
-  @SqlQuery("SELECT * from job_versions where job_context_uuid = :jobContextUuid")
-  List<RowMap<String, Object>> getJobVersionByJobContext(UUID jobContextUuid);
 
   @SqlQuery("SELECT * from job_versions where job_uuid = :jobUuid")
   List<RowMap<String, Object>> getJobVersionByJob(UUID jobUuid);
@@ -138,62 +155,68 @@ public interface GraphqlDaos extends SqlObject {
   List<RowMap<String, Object>> getTagsByDatasetField(UUID datasetFieldUuid);
 
   @SqlQuery(
-      "select distinct name, max(rank) as rank from  "
-          + "( "
-          // Exact match
-          + "( "
-          + "SELECT name, 1 AS rank  "
-          + "FROM jobs "
+      "select *, r from ( "
+          + "select distinct uuid, max(rank) as r from   "
+          + "(  "
+          //Exact match
+          + "(  "
+          + "SELECT uuid, 1 AS rank   "
+          + "FROM jobs  "
           + "WHERE name = :term "
-          + ")"
-          + "UNION "
-          // Ranked match
-          + "( "
-          + "SELECT name, ts_rank_cd(to_tsvector('simple', regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')), query.q) AS rank  "
-          + "FROM jobs, (select :query::tsquery q ) query  "
-          + "WHERE query.q @@ regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')::tsvector  "
-          + "ORDER BY rank DESC  "
-          + "LIMIT 50 "
           + ") "
-          + "UNION "
-          // String contains
-          + "( "
-          + "SELECT name, 0 AS rank  "
-          + "FROM jobs "
-          + "WHERE name ilike '%' || :term || '%' "
-          + "ORDER BY rank DESC "
-          + "LIMIT 50 "
-          + ")"
-          + ") q group by name order by rank DESC LIMIT 50")
+          + "UNION  "
+          //rank match
+          + "(  "
+          + "SELECT uuid, ts_rank_cd(to_tsvector('simple', regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')), query.q) AS rank   "
+          + "FROM jobs, (select :query::tsquery q ) query   "
+          + "WHERE query.q @@ regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')::tsvector   "
+          + "ORDER BY rank DESC   "
+          + "LIMIT 50  "
+          + ")  "
+          + "UNION  "
+          //similar match
+          + "(  "
+          + "SELECT uuid, 0 AS rank   "
+          + "FROM jobs  "
+          + "WHERE name ilike '%in%'  "
+          + "ORDER BY rank DESC  "
+          + "LIMIT 50  "
+          + ") "
+          + ") q group by uuid order by r DESC LIMIT 50) pq "
+          + "inner join jobs on pq.uuid = jobs.uuid "
+          + "order by r DESC")
   List<RowMap<String, Object>> searchJobs(String query, String term);
 
   @SqlQuery(
-      "select distinct name, max(rank) as rank from  "
-          + "( "
-          // Exact match
-          + "( "
-          + "SELECT name, 1 AS rank  "
-          + "FROM datasets "
+      "select *, r from ( "
+          + "select distinct uuid, max(rank) as r from   "
+          + "(  "
+          //Exact match
+          + "(  "
+          + "SELECT uuid, 1 AS rank   "
+          + "FROM datasets  "
           + "WHERE name = :term "
-          + ")"
-          + "UNION "
-          // Ranked match
-          + "( "
-          + "SELECT name, ts_rank_cd(to_tsvector('simple', regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')), query.q) AS rank  "
-          + "FROM datasets, (select :query::tsquery q ) query  "
-          + "WHERE query.q @@ regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')::tsvector  "
-          + "ORDER BY rank DESC  "
-          + "LIMIT 50 "
           + ") "
-          + "UNION "
-          // String contains
-          + "( "
-          + "SELECT name, 0 AS rank  "
-          + "FROM datasets "
-          + "WHERE name ilike '%' || :term || '%' "
-          + "ORDER BY rank DESC "
-          + "LIMIT 50 "
-          + ")"
-          + ") q group by name order by rank DESC LIMIT 50")
+          + "UNION  "
+          //rank match
+          + "(  "
+          + "SELECT uuid, ts_rank_cd(to_tsvector('simple', regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')), query.q) AS rank   "
+          + "FROM datasets, (select :query::tsquery q ) query   "
+          + "WHERE query.q @@ regexp_replace(name, '\\.|\\\\|:|/|-|_', ' ', 'g')::tsvector   "
+          + "ORDER BY rank DESC   "
+          + "LIMIT 50  "
+          + ")  "
+          + "UNION  "
+          //similar match
+          + "(  "
+          + "SELECT uuid, 0 AS rank   "
+          + "FROM datasets  "
+          + "WHERE name ilike '%in%'  "
+          + "ORDER BY rank DESC  "
+          + "LIMIT 50  "
+          + ") "
+          + ") q group by uuid order by r DESC LIMIT 50) pq "
+          + "inner join datasets on pq.uuid = datasets.uuid "
+          + "order by r DESC")
   List<RowMap<String, Object>> searchDatasets(String query, String term);
 }

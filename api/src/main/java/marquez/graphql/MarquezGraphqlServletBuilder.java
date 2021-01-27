@@ -5,15 +5,20 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import graphql.TypeResolutionEnvironment;
 import graphql.kickstart.execution.GraphQLQueryInvoker;
+import graphql.kickstart.execution.config.ExecutionStrategyProvider;
 import graphql.kickstart.servlet.GraphQLConfiguration;
 import graphql.kickstart.servlet.GraphQLHttpServlet;
+import graphql.kickstart.servlet.input.GraphQLInvocationInputFactory;
 import graphql.schema.Coercing;
 import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
+import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.TypeResolver;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
@@ -30,10 +35,13 @@ public class MarquezGraphqlServletBuilder {
   public GraphQLHttpServlet getServlet(final Jdbi jdbi) {
     final GraphQLSchema schema = getGraphQLSchema(jdbi);
 
-    final GraphQLQueryInvoker queryInvoker = GraphQLQueryInvoker.newBuilder().build();
+    final GraphQLQueryInvoker queryInvoker = GraphQLQueryInvoker.newBuilder()
+        .build();
 
     final GraphQLConfiguration config =
-        GraphQLConfiguration.with(schema).with(queryInvoker).build();
+        GraphQLConfiguration.with(schema).with(queryInvoker)
+            .with(new CustomGraphQLContextBuilder())
+            .build();
 
     return GraphQLHttpServlet.with(config);
   }
@@ -49,9 +57,34 @@ public class MarquezGraphqlServletBuilder {
             .type(
                 newTypeWiring("Query")
                     .dataFetcher("datasets", dataFetchers.getDatasets())
+                    .dataFetcher("dataset", dataFetchers.getDatasetByNamespaceAndName())
                     .dataFetcher("namespace", dataFetchers.getNamespaceByName())
+                    .dataFetcher("jobs", dataFetchers.getJobs())
+                    .dataFetcher("job", dataFetchers.getJobsByNamespaceAndName())
                     .dataFetcher("searchDatasets", dataFetchers.searchDatasets())
-                    .dataFetcher("searchJobs", dataFetchers.searchJobs()))
+                    .dataFetcher("searchJobs", dataFetchers.searchJobs())
+                    .dataFetcher("datasetLineage", dataFetchers.datasetLineage())
+                    .dataFetcher("jobLineage", dataFetchers.jobLineage()))
+            .type(
+                newTypeWiring("DatasetLineage")
+                .typeResolver(new TypeResolver() {
+                  @Override
+                  public GraphQLObjectType getType(
+                      TypeResolutionEnvironment env) {
+                    return env.getSchema().getObjectType("DatasetVersionLineage");
+                  }
+                })
+            )
+            .type(
+                newTypeWiring("JobLineage")
+                .typeResolver(new TypeResolver() {
+                  @Override
+                  public GraphQLObjectType getType(
+                      TypeResolutionEnvironment env) {
+                    return env.getSchema().getObjectType("JobVersionLineage");
+                  }
+                })
+            )
             .type(
                 newTypeWiring("Dataset")
                     .dataFetcher("source", dataFetchers.getSourcesByDataset())
@@ -97,6 +130,15 @@ public class MarquezGraphqlServletBuilder {
                     .dataFetcher("inputs", dataFetchers.getInputsByJobVersion())
                     .dataFetcher("outputs", dataFetchers.getOutputsByJobVersion()))
             .type(
+                newTypeWiring("JobVersionLineage")
+                    .dataFetcher("jobContext", dataFetchers.getJobContextByJobVersion())
+                    .dataFetcher("latestRun", dataFetchers.getLatestRunByJobVersion())
+                    .dataFetcher("job", dataFetchers.getJobByJobVersion())
+                    .dataFetcher("inputs", dataFetchers.getInputsByJobVersion())
+                    .dataFetcher("outputs", dataFetchers.getOutputsByJobVersion())
+                    .dataFetcher("inputLineage", dataFetchers.getDatasetLineageInput())
+                    .dataFetcher("outputLineage", dataFetchers.getDatasetLineageOutput()))
+            .type(
                 newTypeWiring("Job")
                     .dataFetcher("versions", dataFetchers.getVersionsByJob())
                     .dataFetcher("namespace", dataFetchers.getNamespaceByJob())
@@ -106,6 +148,13 @@ public class MarquezGraphqlServletBuilder {
                     .dataFetcher("fields", dataFetchers.getFieldsByDatasetVersion())
                     .dataFetcher("run", dataFetchers.getRunByDatasetVersion())
                     .dataFetcher("dataset", dataFetchers.getDatasetByDatasetVersion()))
+            .type(
+                newTypeWiring("DatasetVersionLineage")
+                    .dataFetcher("fields", dataFetchers.getFieldsByDatasetVersion())
+                    .dataFetcher("run", dataFetchers.getRunByDatasetVersion())
+                    .dataFetcher("dataset", dataFetchers.getDatasetByDatasetVersion())
+                    .dataFetcher("usedIn", dataFetchers.getJobLineageInput())
+                    .dataFetcher("producedBy", dataFetchers.getJobLineageOutput()))
             .type(
                 newTypeWiring("DatasetField")
                     .dataFetcher("dataset", dataFetchers.getDatasetByDatasetField())
