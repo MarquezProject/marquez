@@ -12,18 +12,20 @@
  * limitations under the License.
  */
 
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import org.apache.tools.ant.filters.*
+
 plugins {
+    id 'application'
     id 'checkstyle'
     id 'jacoco'
-    id 'java-library'
+    id 'java'
     id 'maven-publish'
     id 'signing'
     id 'com.adarshr.test-logger' version '2.1.1'
-    id 'com.github.spotbugs' version '4.5.0'
-    id 'net.researchgate.release' version '2.8.0'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'net.researchgate.release' version '2.8.1'
 }
-
-import org.apache.tools.ant.filters.*
 
 repositories {
     mavenLocal()
@@ -36,23 +38,36 @@ java {
 }
 
 ext {
-    lombokVersion = '1.18.8'
-    slf4jVersion = '1.7.26'
-    isReleaseVersion = !version.endsWith("SNAPSHOT")
+    dropwizardVersion = '2.0.15'
+    jdbi3Version = '3.17.0'
+    lombokVersion = '1.18.12'
+    prometheusVersion = '0.9.0'
+    isReleaseVersion = !version.endsWith('SNAPSHOT')
 }
 
 dependencies {
-    implementation 'org.slf4j:slf4j-api:1.7.26'
-    implementation 'io.dropwizard:dropwizard-jackson:1.3.14'
-    implementation 'org.apache.httpcomponents:httpclient:4.5.9'
-    implementation 'org.apache.maven:maven-archiver:3.5.0'
+    compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
+    compile "io.dropwizard:dropwizard-jdbi3:${dropwizardVersion}"
+    compile "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}"
+    compile "io.dropwizard:dropwizard-http2:${dropwizardVersion}"
+    compile "io.prometheus:simpleclient:${prometheusVersion}"
+    compile "io.prometheus:simpleclient_dropwizard:${prometheusVersion}"
+    compile "io.prometheus:simpleclient_hotspot:${prometheusVersion}"
+    compile "io.prometheus:simpleclient_servlet:${prometheusVersion}"
+    compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
+    compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
+    compile 'com.google.guava:guava:30.0-jre'
+    compile 'org.flywaydb:flyway-core:6.3.0'
+    compile 'org.postgresql:postgresql:42.2.5'
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-    testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.assertj:assertj-core:3.12.2'
-    testImplementation 'org.mockito:mockito-core:2.27.0'
+    testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
+    testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:3.11.1'
+    testCompile 'org.mockito:mockito-core:3.3.3'
+    testCompile 'org.testcontainers:postgresql:1.13.0'
 }
 
 compileJava {
@@ -67,7 +82,19 @@ compileTestJava {
 
 task testUnit(type: Test) {
     useJUnit {
-        includeCategories 'marquez.client.UnitTests'
+        includeCategories 'marquez.UnitTests'
+    }
+}
+
+task testIntegration(type: Test) {
+    useJUnit {
+        includeCategories 'marquez.IntegrationTests'
+    }
+}
+
+task testDataAccess(type: Test) {
+    useJUnit {
+        includeCategories 'marquez.DataAccessTests'
     }
 }
 
@@ -91,7 +118,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId = 'io.github.marquezproject'
-            artifactId = 'marquez-java'
+            artifactId = 'marquez'
 
             from components.java
 
@@ -99,9 +126,9 @@ publishing {
             artifact javadocJar
 
             pom {
-                name = 'marquez-java'
-                description = 'Java client for Marquez'
-                url = 'https://github.com/MarquezProject/marquez-java'
+                name = 'marquez'
+                description = 'Collect, aggregate, and visualize a data ecosystem\'s metadata'
+                url = 'https://github.com/MarquezProject/marquez'
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
@@ -115,9 +142,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/MarquezProject/marquez-java.git'
-                    developerConnection = 'scm:git:ssh://github.com:MarquezProject/marquez-java.git'
-                    url = 'https://github.com/MarquezProject/marquez-java'
+                    connection = 'scm:git:git://github.com/MarquezProject/marquez.git'
+                    developerConnection = 'scm:git:ssh://github.com:MarquezProject/marquez.git'
+                    url = 'https://github.com/MarquezProject/marquez'
                 }
             }
         }
@@ -145,16 +172,26 @@ signing {
     sign publishing.publications.mavenJava
 }
 
-jar {
+mainClassName = 'marquez.MarquezApp'
+
+shadowJar {
+    baseName = project.name
+    classifier = ''
+    version = project.version
+    transform(ServiceFileTransformer)
     manifest {
         attributes(
                 'Created-By': "Gradle ${gradle.gradleVersion}",
                 'Built-By': System.getProperty('user.name'),
                 'Build-Jdk': System.getProperty('java.version'),
                 'Implementation-Title': project.name,
-                'Implementation-Version': project.version
-        )
+                'Implementation-Version': project.version,
+                'Main-Class': mainClassName)
     }
+}
+
+runShadow {
+    args = ['server', 'marquez.yml']
 }
 
 def reportsDir = "${buildDir}/reports";
@@ -180,26 +217,6 @@ checkstyleMain {
 
 checkstyleTest {
     source = 'src/test/java'
-}
-
-spotbugsMain {
-    ignoreFailures = false
-    effort = 'max'
-    reportLevel = 'low'
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
-
-spotbugsTest {
-    ignoreFailures = true
-    effort = 'max'
-    reportLevel = 'low'
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
 }
 
 def coverageDir = "${reportsDir}/coverage";

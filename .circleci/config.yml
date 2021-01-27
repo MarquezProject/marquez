@@ -23,8 +23,8 @@ jobs:
             - v1-api-{{ .Branch }}
       - run: ./.circleci/get-jdk11.sh
       - run: echo "checks.disable=true" > ~/.testcontainers.properties
-      - run: ./gradlew --no-daemon --stacktrace build
-      - run: ./gradlew --no-daemon jacocoTestReport
+      - run: ./gradlew --no-daemon --stacktrace api:build
+      - run: ./gradlew --no-daemon api:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
           path: build/test-results/test
@@ -65,8 +65,8 @@ jobs:
             - v1-client-java-{{ .Branch }}-{{ .Revision }}
             - v1-client-java-{{ .Branch }}
       - run: ../../.circleci/get-jdk11.sh
-      - run: ./gradlew --no-daemon --stacktrace build
-      - run: ./gradlew --no-daemon jacocoTestReport
+      - run: ./gradlew --no-daemon --stacktrace clients:java:build
+      - run: ./gradlew --no-daemon clients:java:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
           path: build/test-results/test

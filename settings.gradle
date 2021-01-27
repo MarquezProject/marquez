@@ -13,3 +13,6 @@
  */
 
 rootProject.name = 'marquez'
+
+include 'api'
+include 'clients:java'
