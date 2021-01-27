@@ -12,17 +12,127 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.github.jk1.dependency-license-report' version '1.16'
+buildscript {
+    repositories {
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    dependencies {
+        classpath 'com.adarshr:gradle-test-logger-plugin:2.1.1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+        classpath 'gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.6.0'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.8.1'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
 }
 
 subprojects {
-    project(':api') {
-        apply plugin: 'application'
-        apply plugin: 'java'
+    apply plugin: 'checkstyle'
+    apply plugin: 'jacoco'
+    apply plugin: 'java'
+    apply plugin: 'com.adarshr.test-logger'
+    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'com.github.spotbugs'
+    apply plugin: "com.diffplug.spotless"
 
-        dependencies {
-            testCompile project(':clients:java')
+    ext {
+        lombokVersion = '1.18.8'
+        slf4jVersion = '1.7.26'
+        isReleaseVersion = !version.endsWith("SNAPSHOT")
+    }
+
+    compileJava {
+        options.incremental = true
+        options.compilerArgs << '-parameters'
+        options.encoding = "UTF-8"
+    }
+
+    compileTestJava {
+        options.incremental = true
+        options.compilerArgs << '-parameters'
+        options.encoding = "UTF-8"
+    }
+
+    task sourceJar(type: Jar) {
+        classifier 'sources'
+        from sourceSets.main.allJava
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    spotless {
+        java {
+            googleJavaFormat()
+            removeUnusedImports()
+        }
+    }
+
+    def reportsDir = "${buildDir}/reports";
+    def checkstyleDir = "${reportsDir}/checkstyle";
+
+    checkstyle {
+        toolVersion = '8.12'
+        configFile = rootProject.file('checkstyle.xml')
+    }
+
+    task checkstyle(type: Checkstyle) {
+        reports {
+            xml.enabled = true
+            html.enabled = true
+            html.destination = file(checkstyleDir)
+        }
+    }
+
+    checkstyleMain {
+        source = 'src/main/java'
+    }
+
+    checkstyleTest {
+        source = 'src/test/java'
+    }
+
+    spotbugsMain {
+        ignoreFailures = false
+        effort = 'max'
+        reportLevel = 'low'
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+
+    spotbugsTest {
+        ignoreFailures = true
+        effort = 'max'
+        reportLevel = 'low'
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+
+    def coverageDir = "${reportsDir}/coverage";
+
+    jacoco {
+        toolVersion = '0.8.5'
+        reportsDir = file(coverageDir)
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled = true
+            html.enabled = true
+            html.destination = file(coverageDir)
         }
     }
 }

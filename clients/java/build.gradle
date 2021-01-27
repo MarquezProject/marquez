@@ -12,37 +12,21 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'checkstyle'
-    id 'jacoco'
-    id 'java-library'
-    id 'maven-publish'
-    id 'signing'
-    id 'com.adarshr.test-logger' version '2.1.1'
-    id 'com.github.spotbugs' version '4.5.0'
-    id 'net.researchgate.release' version '2.8.0'
-}
-
 import org.apache.tools.ant.filters.*
 
-repositories {
-    mavenLocal()
-    mavenCentral()
+plugins {
+    id 'maven-publish'
+    id 'signing'
+    id 'net.researchgate.release' version '2.8.1'
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-ext {
-    lombokVersion = '1.18.8'
-    slf4jVersion = '1.7.26'
-    isReleaseVersion = !version.endsWith("SNAPSHOT")
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 dependencies {
-    implementation 'org.slf4j:slf4j-api:1.7.26'
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation 'io.dropwizard:dropwizard-jackson:1.3.14'
     implementation 'org.apache.httpcomponents:httpclient:4.5.9'
     implementation 'org.apache.maven:maven-archiver:3.5.0'
@@ -55,30 +39,10 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.27.0'
 }
 
-compileJava {
-    options.incremental = true
-    options.compilerArgs << '-parameters'
-}
-
-compileTestJava {
-    options.incremental = true
-    options.compilerArgs << '-parameters'
-}
-
 task testUnit(type: Test) {
     useJUnit {
         includeCategories 'marquez.client.UnitTests'
     }
-}
-
-task sourceJar(type: Jar) {
-    classifier 'sources'
-    from sourceSets.main.allJava
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier 'javadoc'
-    from javadoc.destinationDir
 }
 
 release {
@@ -154,65 +118,5 @@ jar {
                 'Implementation-Title': project.name,
                 'Implementation-Version': project.version
         )
-    }
-}
-
-def reportsDir = "${buildDir}/reports";
-
-def checkstyleDir = "${reportsDir}/checkstyle";
-
-checkstyle {
-    toolVersion = '8.12'
-    configFile = rootProject.file('checkstyle.xml')
-}
-
-task checkstyle(type: Checkstyle) {
-    reports {
-        xml.enabled = true
-        html.enabled = true
-        html.destination = file(checkstyleDir)
-    }
-}
-
-checkstyleMain {
-    source = 'src/main/java'
-}
-
-checkstyleTest {
-    source = 'src/test/java'
-}
-
-spotbugsMain {
-    ignoreFailures = false
-    effort = 'max'
-    reportLevel = 'low'
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
-
-spotbugsTest {
-    ignoreFailures = true
-    effort = 'max'
-    reportLevel = 'low'
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
-
-def coverageDir = "${reportsDir}/coverage";
-
-jacoco {
-    toolVersion = '0.8.5'
-    reportsDir = file(coverageDir)
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled = true
-        html.enabled = true
-        html.destination = file(coverageDir)
     }
 }
