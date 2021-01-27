@@ -56,10 +56,9 @@ jobs:
           key: v1-web-{{ .Branch }}-{{ .Revision }}
 
   build-client-java:
-    working_directory: ~/marquez/clients/java
-    machine: true
+    <<: *machine
     steps:
-      - *checkout_project_root
+      - checkout
       - restore_cache:
           keys:
             - v1-client-java-{{ .Branch }}-{{ .Revision }}
