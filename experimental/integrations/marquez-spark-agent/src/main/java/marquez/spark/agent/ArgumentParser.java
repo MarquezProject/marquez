@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.URLEncodedUtils;
@@ -14,6 +15,7 @@ import org.apache.hc.core5.net.URLEncodedUtils;
 @AllArgsConstructor
 @Slf4j
 @Getter
+@ToString
 public class ArgumentParser {
   private final String host;
   private final String version;
@@ -37,7 +39,7 @@ public class ArgumentParser {
     String apiKey = getApiKey(nameValuePairList);
 
     log.info(
-        String.format("/api/%s/namespaces/%s/jobs/%s/runs/%s", version, namespace, jobName, runId));
+        String.format("%s/api/%s/namespaces/%s/jobs/%s/runs/%s", host, version, namespace, jobName, runId));
 
     return new ArgumentParser(
         host, version, namespace, jobName, runId, Optional.ofNullable(apiKey));

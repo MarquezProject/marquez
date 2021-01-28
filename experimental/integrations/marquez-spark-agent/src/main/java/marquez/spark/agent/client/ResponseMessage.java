@@ -1,9 +1,11 @@
 package marquez.spark.agent.client;
 
 import lombok.Getter;
+import lombok.ToString;
 import lombok.Value;
 
 @Value
+@ToString
 public class ResponseMessage<T> {
   @Getter protected int responseCode;
   @Getter protected T body;

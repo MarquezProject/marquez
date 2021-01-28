@@ -21,4 +21,7 @@ public final class MarquezHttpException extends Throwable {
     this.message = error.getMessage();
     this.details = error.getDetails();
   }
+  public MarquezHttpException(@NonNull final Throwable throwable) {
+    super(throwable);
+  }
 }
