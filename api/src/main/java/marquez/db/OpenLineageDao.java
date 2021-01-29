@@ -385,6 +385,8 @@ public interface OpenLineageDao extends SqlObject {
             datasetVerion,
             isInput ? null : runUuid);
 
+    datasetDao.updateVersion(dataset.getUuid(), now, dsVersion.getUuid());
+
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
     if (fields != null) {
       for (SchemaField field : fields) {

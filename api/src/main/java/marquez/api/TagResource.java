@@ -29,6 +29,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.experimental.Delegate;
 import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Tag;
