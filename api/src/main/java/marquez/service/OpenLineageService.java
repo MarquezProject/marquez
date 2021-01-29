@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
+import marquez.common.models.RunState;
 import marquez.db.OpenLineageDao;
 import marquez.service.models.LineageEvent;
 
@@ -24,10 +25,13 @@ public class OpenLineageService {
         CompletableFuture.supplyAsync(() ->
             openLineageDao.updateMarquezModel(event))
         .thenAccept((update) -> {
-          update.getJobInputUpdate()
-              .ifPresent(runService::notify);
-          update.getJobOutputUpdate()
-              .ifPresent(runService::notify);
+          if (event.getEventType() != null &&
+              openLineageDao.getRunState(event.getEventType()).equals(RunState.COMPLETED)) {
+            update.getJobInputUpdate()
+                .ifPresent(runService::notify);
+            update.getJobOutputUpdate()
+                .ifPresent(runService::notify);
+          }
         });
 
     CompletableFuture openLineage =

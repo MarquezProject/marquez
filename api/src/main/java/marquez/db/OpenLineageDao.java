@@ -282,7 +282,7 @@ public interface OpenLineageDao extends SqlObject {
 
     RunId runId = RunId.of(run.getUuid());
     JobVersionId jobVersionId = JobVersionId.builder()
-        .versionUuid(jobVersion.getVersion())
+        .versionUuid(jobVersion.getUuid())
         .namespace(NamespaceName.of(namespace.getName()))
         .name(JobName.of(job.getName()))
         .build();
@@ -368,7 +368,7 @@ public interface OpenLineageDao extends SqlObject {
             now,
             namespace.getUuid(),
             source.getUuid(),
-            ds.getName(),
+            ds.getName().replaceAll(":", "_"),
             dsDescription);
 
     List<SchemaField> fields = null;
