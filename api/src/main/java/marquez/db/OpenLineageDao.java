@@ -133,6 +133,7 @@ public interface OpenLineageDao extends SqlObject {
             namespace.getUuid(),
             event.getJob().getName(),
             description);
+
     Map<String, String> context = buildJobContext(event);
     JobContextRow jobContext =
         jobContextDao.upsert(
@@ -151,6 +152,8 @@ public interface OpenLineageDao extends SqlObject {
             jobContext.getUuid(),
             location,
             buildJobVersion(event, context));
+
+    jobDao.updateVersion(job.getUuid(), Instant.now(), jobVersion.getUuid());
 
     Map<String, String> runArgsMap = createRunArgs(event);
     RunArgsRow runArgs =
