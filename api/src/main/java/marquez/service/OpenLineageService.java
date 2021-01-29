@@ -11,15 +11,24 @@ import marquez.service.models.LineageEvent;
 @Slf4j
 public class OpenLineageService {
   private final OpenLineageDao openLineageDao;
+  private final RunService runService;
   private final ObjectMapper mapper = Utils.newObjectMapper();
 
-  public OpenLineageService(OpenLineageDao openLineageDao) {
+  public OpenLineageService(OpenLineageDao openLineageDao, RunService runService) {
     this.openLineageDao = openLineageDao;
+    this.runService = runService;
   }
 
   public CompletableFuture<Void> createLineageEvent(LineageEvent event) {
     CompletableFuture marquez =
-        CompletableFuture.runAsync(() -> openLineageDao.updateMarquezModel(event));
+        CompletableFuture.supplyAsync(() ->
+            openLineageDao.updateMarquezModel(event))
+        .thenAccept((update) -> {
+          update.getJobInputUpdate()
+              .ifPresent(runService::notify);
+          update.getJobOutputUpdate()
+              .ifPresent(runService::notify);
+        });
 
     CompletableFuture openLineage =
         CompletableFuture.runAsync(

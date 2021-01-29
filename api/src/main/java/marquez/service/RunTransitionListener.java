@@ -3,6 +3,7 @@ package marquez.service;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.models.DatasetVersionId;

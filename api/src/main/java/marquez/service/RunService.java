@@ -277,15 +277,15 @@ public class RunService {
     log.info("Successfully associated run '{}' with version '{}'.", runId, newJobVersionUuid);
   }
 
-  private void notify(JobInputUpdate update) {
+  void notify(JobInputUpdate update) {
     notify(RunTransitionListener::notify, update);
   }
 
-  private void notify(JobOutputUpdate update) {
+  void notify(JobOutputUpdate update) {
     notify(RunTransitionListener::notify, update);
   }
 
-  private void notify(RunTransition transition) {
+  void notify(RunTransition transition) {
     notify(RunTransitionListener::notify, transition);
   }
 

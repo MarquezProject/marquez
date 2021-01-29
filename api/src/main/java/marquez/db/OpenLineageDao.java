@@ -14,10 +14,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import marquez.common.Utils;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.DatasetVersionId;
+import marquez.common.models.JobName;
 import marquez.common.models.JobType;
+import marquez.common.models.JobVersionId;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
@@ -33,10 +40,16 @@ import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
 import marquez.db.models.RunStateRow;
 import marquez.db.models.SourceRow;
+import marquez.db.models.UpdateLineageResponse;
+import marquez.service.RunTransitionListener.JobInputUpdate;
+import marquez.service.RunTransitionListener.JobOutputUpdate;
+import marquez.service.RunTransitionListener.RunInput;
+import marquez.service.RunTransitionListener.RunOutput;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.Job;
 import marquez.service.models.LineageEvent.SchemaField;
+import marquez.service.models.RunMeta;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -101,7 +114,7 @@ public interface OpenLineageDao extends SqlObject {
       String producer);
 
   @Transaction
-  default void updateMarquezModel(LineageEvent event) {
+  default UpdateLineageResponse updateMarquezModel(LineageEvent event) {
     NamespaceDao namespaceDao = createNamespaceDao();
     DatasetDao datasetDao = createDatasetDao();
     SourceDao sourceDao = createSourceDao();
@@ -221,9 +234,12 @@ public interface OpenLineageDao extends SqlObject {
       }
     }
 
+    //RunInput list uses null as a sentinel value
+    List<RunInput> runInputs = null;
     if (event.getInputs() != null) {
+      runInputs = new ArrayList<>();
       for (Dataset ds : event.getInputs()) {
-        upsertLineageDataset(
+        DatasetVersionId datasetVersionId = upsertLineageDataset(
             ds,
             jobVersion,
             namespace,
@@ -237,12 +253,16 @@ public interface OpenLineageDao extends SqlObject {
             datasetFieldDao,
             runDao,
             jobVersionDao);
+        runInputs.add(new RunInput(datasetVersionId));
       }
     }
 
+    //RunInput list uses null as a sentinel value
+    List<RunOutput> runOutputs = null;
     if (event.getOutputs() != null) {
+      runOutputs = new ArrayList<>();
       for (Dataset ds : event.getOutputs()) {
-        upsertLineageDataset(
+        DatasetVersionId datasetVersionId = upsertLineageDataset(
             ds,
             jobVersion,
             namespace,
@@ -256,15 +276,57 @@ public interface OpenLineageDao extends SqlObject {
             datasetFieldDao,
             runDao,
             jobVersionDao);
+        runOutputs.add(new RunOutput(datasetVersionId));
       }
     }
+
+    RunId runId = RunId.of(run.getUuid());
+    JobVersionId jobVersionId = JobVersionId.builder()
+        .versionUuid(jobVersion.getVersion())
+        .namespace(NamespaceName.of(namespace.getName()))
+        .name(JobName.of(job.getName()))
+        .build();
+
+    Optional<JobInputUpdate> jobInputUpdate = buildJobInput(run, runArgsMap, jobVersionId, runId, runInputs);
+    Optional<JobOutputUpdate> jobOutputUpdate = buildJobOutput(runId, jobVersionId, runOutputs);
+
+    return new UpdateLineageResponse(jobInputUpdate, jobOutputUpdate);
+  }
+
+  default Optional<JobOutputUpdate> buildJobOutput(RunId runId, JobVersionId jobVersionId, List<RunOutput> runOutputs) {
+    if (runOutputs == null) {
+      return Optional.empty();
+    }
+    return Optional.of(new JobOutputUpdate(
+        runId,
+        jobVersionId,
+        runOutputs
+    ));
+  }
+
+  default Optional<JobInputUpdate> buildJobInput(RunRow run, Map<String, String> runArgsMap,
+      JobVersionId jobVersionId, RunId runId, List<RunInput> runInputs) {
+    if (runInputs == null) {
+      return Optional.empty();
+    }
+
+    return Optional.of(new JobInputUpdate(
+        runId,
+        RunMeta.builder()
+            .id(RunId.of(run.getUuid()))
+            .nominalStartTime(run.getNominalStartTime().orElse(null))
+            .nominalEndTime(run.getNominalEndTime().orElse(null))
+            .args(runArgsMap)
+            .build(),
+        jobVersionId,
+        runInputs));
   }
 
   default JobType getJobType(Job job) {
     return JobType.BATCH;
   }
 
-  default void upsertLineageDataset(
+  default DatasetVersionId upsertLineageDataset(
       Dataset ds,
       JobVersionRow jobVersion,
       NamespaceRow namespace,
@@ -314,13 +376,14 @@ public interface OpenLineageDao extends SqlObject {
       fields = ds.getFacets().getSchema().getFields();
     }
 
+    UUID datasetVerion = version(dsNamespace.getName(), source.getName(), dataset.getName(), fields, runUuid);
     DatasetVersionRow dsVersion =
         datasetVersionDao.upsert(
             UUID.randomUUID(),
             now,
             dataset.getUuid(),
-            version(dsNamespace.getName(), source.getName(), dataset.getName(), fields, runUuid),
-            isInput ? runUuid : null);
+            datasetVerion,
+            isInput ? null : runUuid);
 
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
     if (fields != null) {
@@ -345,6 +408,12 @@ public interface OpenLineageDao extends SqlObject {
 
     jobVersionDao.upsertDatasetIoMapping(
         jobVersion.getUuid(), dataset.getUuid(), isInput ? IoType.INPUT : IoType.OUTPUT);
+
+    return DatasetVersionId.builder()
+        .versionUuid(datasetVerion)
+        .namespace(NamespaceName.of(namespace.getName()))
+        .name(DatasetName.of(dataset.getName()))
+        .build();
   }
 
   default SourceType getSourceType(Dataset ds) {
@@ -428,7 +497,7 @@ public interface OpenLineageDao extends SqlObject {
   }
 
   default UUID runToUuid(String runId) {
-    return UUID.nameUUIDFromBytes(runId.getBytes());
+    return UUID.fromString(runId);
   }
 
   default UUID version(
