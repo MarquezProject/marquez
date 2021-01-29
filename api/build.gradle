@@ -146,9 +146,7 @@ signing {
 mainClassName = 'marquez.MarquezApp'
 
 shadowJar {
-    baseName = project.name
-    classifier = ''
-    version = project.version
+    classifier = null
     transform(ServiceFileTransformer)
     manifest {
         attributes(
@@ -162,5 +160,5 @@ shadowJar {
 }
 
 runShadow {
-    args = ['server', 'marquez.yml']
+    args = ['server', '../marquez.yml']
 }
