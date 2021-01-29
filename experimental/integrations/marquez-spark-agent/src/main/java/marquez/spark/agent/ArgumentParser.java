@@ -39,7 +39,8 @@ public class ArgumentParser {
     String apiKey = getApiKey(nameValuePairList);
 
     log.info(
-        String.format("%s/api/%s/namespaces/%s/jobs/%s/runs/%s", host, version, namespace, jobName, runId));
+        String.format(
+            "%s/api/%s/namespaces/%s/jobs/%s/runs/%s", host, version, namespace, jobName, runId));
 
     return new ArgumentParser(
         host, version, namespace, jobName, runId, Optional.ofNullable(apiKey));

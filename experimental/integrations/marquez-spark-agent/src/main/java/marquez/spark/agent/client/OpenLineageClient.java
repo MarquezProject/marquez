@@ -35,16 +35,16 @@ public class OpenLineageClient {
   private final Optional<String> apiKey;
   @Getter protected static final ObjectMapper objectMapper = createMapper();
 
-  public OpenLineageClient(CloseableHttpAsyncClient http, Optional<String> apiKey,
-      ExecutorService executorService) {
+  public OpenLineageClient(
+      CloseableHttpAsyncClient http, Optional<String> apiKey, ExecutorService executorService) {
     this.http = http;
     this.executorService = executorService;
     this.http.start();
     this.apiKey = apiKey;
   }
 
-  public static OpenLineageClient create(final Optional<String> apiKey,
-      ExecutorService executorService) {
+  public static OpenLineageClient create(
+      final Optional<String> apiKey, ExecutorService executorService) {
     final CloseableHttpAsyncClient http = HttpAsyncClients.createDefault();
     return new OpenLineageClient(http, apiKey, executorService);
   }
@@ -53,11 +53,13 @@ public class OpenLineageClient {
     return post(uri, obj, Void.class);
   }
 
-  public <T> ResponseMessage<T> post(URI uri, Object obj, Class<T> clazz) throws MarquezHttpException {
+  public <T> ResponseMessage<T> post(URI uri, Object obj, Class<T> clazz)
+      throws MarquezHttpException {
     return post(uri, obj, getTypeReference(clazz));
   }
 
-  public <T> ResponseMessage<T> post(URI uri, Object obj, TypeReference<T> ref) throws MarquezHttpException {
+  public <T> ResponseMessage<T> post(URI uri, Object obj, TypeReference<T> ref)
+      throws MarquezHttpException {
     return executeSync(BasicHttpRequests.post(uri), obj, ref);
   }
 
@@ -106,7 +108,8 @@ public class OpenLineageClient {
           } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
           }
-        }, executorService);
+        },
+        executorService);
   }
 
   private <T> ResponseMessage<T> createMessage(

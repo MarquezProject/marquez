@@ -1,6 +1,5 @@
 package marquez.spark.agent;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ForkJoinPool;
