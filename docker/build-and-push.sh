@@ -18,14 +18,12 @@ set -eu
 
 readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$" # X.Y.Z
 readonly ORG="marquezproject"
-readonly REPO="marquez"
-readonly NAME="${ORG}/${REPO}"
 
 # Change working directory to project root
 project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}"
 
-# Version X.Y.Z of Marquez image to build
+# Version X.Y.Z of Marquez images to build
 version="${1}"
 
 # Ensure valid version 
@@ -34,14 +32,20 @@ if [[ ! "${version}" =~ ${SEMVER_REGEX} ]]; then
   exit 1
 fi
 
-echo "Building image (tag: ${version})..."
+echo "Building images (tag: ${version})..."
 
-# Build and tag image
-docker build --no-cache --tag "${NAME}:${version}" .
-docker tag "${NAME}:${version}" "${NAME}:latest"
+# Build and tag app image
+docker build --no-cache --tag "marquez:${version}" .
+docker tag 'marquez' 'marquez:latest'
 
-# Push image to Docker Hub
-docker push "${NAME}:${version}"
-docker push "${NAME}:latest"
+# Build and tag web image
+docker build --no-cache --tag "marquez-web:${version}" .
+docker tag 'marquez-web' 'marquez-web:latest'
+
+# Push images to Docker Hub
+docker push "marquez:${version}"
+docker push 'marquez:latest'
+docker push "marquez-web:${version}"
+docker push 'marquez-web:latest'
 
 echo "DONE!"
