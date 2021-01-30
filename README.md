@@ -9,7 +9,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
-[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-kcdjmhmq-FGjwM2K_A~1B2Tw0oV6ssA)
+[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-linj7k52-NaYvdVsa7SkR5T4IMMzZFw)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
@@ -117,7 +117,7 @@ Then browse to the admin interface: http://localhost:8081
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: [https://marquezproject.slack.com](https://join.slack.com/t/marquezproject/shared_invite/zt-kcdjmhmq-FGjwM2K_A~1B2Tw0oV6ssA)
+* Chat: [https://marquezproject.slack.com](https://join.slack.com/t/marquezproject/shared_invite/zt-linj7k52-NaYvdVsa7SkR5T4IMMzZFw)
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing
