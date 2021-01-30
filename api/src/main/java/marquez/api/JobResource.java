@@ -38,7 +38,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.api.exceptions.JobNotFoundException;

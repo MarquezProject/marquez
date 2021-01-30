@@ -22,17 +22,17 @@ public class OpenLineageService {
 
   public CompletableFuture<Void> createLineageEvent(LineageEvent event) {
     CompletableFuture marquez =
-        CompletableFuture.supplyAsync(() ->
-            openLineageDao.updateMarquezModel(event))
-        .thenAccept((update) -> {
-          if (event.getEventType() != null &&
-              openLineageDao.getRunState(event.getEventType()).equals(RunState.COMPLETED)) {
-            update.getJobInputUpdate()
-                .ifPresent(runService::notify);
-            update.getJobOutputUpdate()
-                .ifPresent(runService::notify);
-          }
-        });
+        CompletableFuture.supplyAsync(() -> openLineageDao.updateMarquezModel(event))
+            .thenAccept(
+                (update) -> {
+                  if (event.getEventType() != null
+                      && openLineageDao
+                          .getRunState(event.getEventType())
+                          .equals(RunState.COMPLETED)) {
+                    update.getJobInputUpdate().ifPresent(runService::notify);
+                    update.getJobOutputUpdate().ifPresent(runService::notify);
+                  }
+                });
 
     CompletableFuture openLineage =
         CompletableFuture.runAsync(
