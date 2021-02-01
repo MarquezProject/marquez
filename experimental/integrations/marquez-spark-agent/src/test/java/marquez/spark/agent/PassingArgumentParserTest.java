@@ -37,6 +37,16 @@ public class PassingArgumentParserTest {
           "ea445b5c-22eb-457a-8007-01c7c52b6e54",
           Optional.empty()
         });
+    pass.add(
+        new Object[] {
+          "http://localhost:5000/api/v1/namespaces/ns_name/jobs/job_name/runs/ea445b5c-22eb-457a-8007-01c7c52b6e54?api_key=",
+          "http://localhost:5000",
+          "v1",
+          "ns_name",
+          "job_name",
+          "ea445b5c-22eb-457a-8007-01c7c52b6e54",
+          Optional.empty()
+        });
     return pass;
   }
 
