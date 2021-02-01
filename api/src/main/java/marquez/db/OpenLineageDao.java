@@ -229,8 +229,7 @@ public interface OpenLineageDao extends SqlObject {
       if (runStateType.isDone()) {
         runDao.updateEndState(run.getUuid(), now, runState.getUuid());
       } else if (runStateType.isStarting()) {
-        // todo: Verify if repeated running states should cause an update
-        runDao.updateStartState(run.getUuid(), now, runState.getUuid());
+        runDao.upsertStartState(run.getUuid(), now, runState.getUuid());
       }
     }
 

@@ -116,6 +116,13 @@ public interface RunDao extends SqlObject {
   @SqlUpdate(
       "UPDATE runs "
           + "SET updated_at = :updatedAt, "
+          + "    start_run_state_uuid = :startRunStateUuid "
+          + "WHERE uuid = :rowUuid AND (updated_at < :updatedAt or start_run_state_uuid is null)")
+  void upsertStartState(UUID rowUuid, Instant updatedAt, UUID startRunStateUuid);
+
+  @SqlUpdate(
+      "UPDATE runs "
+          + "SET updated_at = :updatedAt, "
           + "    end_run_state_uuid = :endRunStateUuid "
           + "WHERE uuid = :rowUuid")
   void updateEndState(UUID rowUuid, Instant updatedAt, UUID endRunStateUuid);
