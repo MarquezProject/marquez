@@ -501,12 +501,12 @@ public interface OpenLineageDao extends SqlObject {
   }
 
   default UUID runToUuid(String runId) {
-     try{
-       return UUID.fromString(runId);
-     } catch (Exception e) {
-       // Allow non-UUID runId
-       return UUID.nameUUIDFromBytes(runId.getBytes());
-     }
+    try {
+      return UUID.fromString(runId);
+    } catch (Exception e) {
+      // Allow non-UUID runId
+      return UUID.nameUUIDFromBytes(runId.getBytes());
+    }
   }
 
   default UUID version(
