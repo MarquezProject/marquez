@@ -2,11 +2,17 @@ package marquez.spark.agent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import lombok.extern.slf4j.Slf4j;
+import marquez.spark.agent.client.LineageEvent;
+import marquez.spark.agent.client.LineageEvent.Job;
+import marquez.spark.agent.client.LineageEvent.Run;
+import marquez.spark.agent.client.LineageEvent.RunFacet;
+import marquez.spark.agent.facets.ErrorFacet;
 import marquez.spark.agent.lifecycle.ContextFactory;
 import marquez.spark.agent.lifecycle.ExecutionContext;
 import marquez.spark.agent.lifecycle.SparkSQLExecutionContext;
@@ -76,12 +82,13 @@ public class SparkListener {
                     }
                   } catch (Exception e) {
                     log.error("Could not run OpenLineage SparkContext listener proxy function", e);
+                    emitError(e);
                   }
-
                   return null;
                 });
     context.addSparkListener(listener);
   }
+
   /**
    * Entry point for ActiveJobTransformer
    *
@@ -104,6 +111,7 @@ public class SparkListener {
       context.setActiveJob(activeJob);
     } catch (Exception e) {
       log.error("Could not initialize OpenLineage ActiveJob listener", e);
+      emitError(e);
     }
   }
 
@@ -135,6 +143,7 @@ public class SparkListener {
       }
     } catch (Exception e) {
       log.error("Could not initialize OpenLineage PairRDDFunctions listener", e);
+      emitError(e);
     }
   }
 
@@ -180,6 +189,42 @@ public class SparkListener {
 
   public static Configuration getConfigForRDD(RDD<?> rdd) {
     return outputs.get(rdd);
+  }
+
+  public static void emitError(Exception e) {
+    try {
+      contextFactory.marquezContext.emit(buildErrorLineageEvent(buildRunFacet(buildErrorFacet(e))));
+    } catch (Exception ex) {
+      log.error("Could not emit open lineage on error", e);
+    }
+  }
+
+  public static LineageEvent buildErrorLineageEvent(RunFacet runFacet) {
+    return LineageEvent.builder()
+        .eventTime(ZonedDateTime.now())
+        .run(
+            Run.builder()
+                .runId(contextFactory.marquezContext.getParentRunId())
+                .facets(runFacet)
+                .build())
+        .job(
+            Job.builder()
+                .name(contextFactory.marquezContext.getJobName())
+                .namespace(contextFactory.marquezContext.getJobNamespace())
+                .build())
+        .producer("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client")
+        .build();
+  }
+
+  public static RunFacet buildRunFacet(ErrorFacet errorFacet) {
+    Map<String, Object> facets = new HashMap<>();
+    facets.put("lineage.error", errorFacet);
+
+    return RunFacet.builder().additional(facets).build();
+  }
+
+  public static ErrorFacet buildErrorFacet(Exception e) {
+    return ErrorFacet.builder().exception(e).build();
   }
 
   private static void clear() {
