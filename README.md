@@ -70,7 +70,7 @@ To build the entire project run:
 $ ./gradlew :api:shadowJar
 ```
 
-The executable can be found under `build/libs/`
+The executable can be found under `api/build/libs/`
 
 ## Configuration
 
