@@ -64,7 +64,7 @@ Marquez uses a _multi_-project structure and contains the following modules:
 
 ## Building
 
-To build the entire project run:
+To build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
 
 ```
 $ ./gradlew :api:shadowJar
