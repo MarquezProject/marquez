@@ -8,6 +8,9 @@ import static marquez.common.Utils.VERSION_JOINER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -116,7 +119,7 @@ public interface OpenLineageDao extends MarquezDao {
     String location = null;
     if (event.getJob().getFacets() != null
         && event.getJob().getFacets().getSourceCodeLocation() != null) {
-      location = event.getJob().getFacets().getSourceCodeLocation().getUrl();
+      location = getUrlOrPlaceholder(event.getJob().getFacets().getSourceCodeLocation().getUrl());
     }
 
     JobVersionRow jobVersion =
@@ -247,6 +250,18 @@ public interface OpenLineageDao extends MarquezDao {
 
     bag.setOutputs(Optional.ofNullable(datasetOutputs));
     return bag;
+  }
+
+  default String getUrlOrPlaceholder(String url){
+    try {
+      return new URL(url).toURI().toASCIIString();
+    } catch (MalformedURLException | URISyntaxException e) {
+      try {
+        return new URL("http://" + url).toURI().toASCIIString();
+      } catch (Exception ex) {
+        return null;
+      }
+    }
   }
 
   default String formatNamespaceName(String namespace) {

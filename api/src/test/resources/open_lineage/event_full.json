@@ -51,7 +51,7 @@
         "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
         "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
         "type": "git",
-        "url": "http://example.com"
+        "url": "string"
       },
       "sql": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
@@ -103,7 +103,7 @@
           "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
           "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
           "name": "string",
-          "uri": "http://example.com"
+          "uri": "string"
         },
         "additionalProp1": {
           "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
@@ -148,7 +148,7 @@
           "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
           "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
           "name": "string",
-          "uri": "http://example.com"
+          "uri": "string"
         },
         "additionalProp1": {
           "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
