@@ -373,7 +373,8 @@ public interface OpenLineageDao extends SqlObject {
             now,
             namespace.getUuid(),
             source.getUuid(),
-            ds.getName().replaceAll(":", "_"),
+            formatName(ds.getName()),
+            ds.getName(),
             dsDescription);
 
     List<SchemaField> fields = null;
@@ -418,6 +419,10 @@ public interface OpenLineageDao extends SqlObject {
         .namespace(NamespaceName.of(namespace.getName()))
         .name(DatasetName.of(dataset.getName()))
         .build();
+  }
+
+  default String formatName(String name) {
+    return name.replaceAll("[:/]", "_");
   }
 
   default SourceType getSourceType(Dataset ds) {
