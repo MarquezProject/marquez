@@ -67,7 +67,7 @@ Marquez uses a _multi_-project structure and contains the following modules:
 To build the entire project run:
 
 ```
-$ ./gradlew shadowJar
+$ ./gradlew :api:shadowJar
 ```
 
 The executable can be found under `build/libs/`
@@ -104,7 +104,7 @@ By default, Marquez uses the following ports:
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/MarquezApp.java)
 
 ```bash
-$ ./gradlew runShadow
+$ ./gradlew :api:runShadow
 ```
 
 Then browse to the admin interface: http://localhost:8081
