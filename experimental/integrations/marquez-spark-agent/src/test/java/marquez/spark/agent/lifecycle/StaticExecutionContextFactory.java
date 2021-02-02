@@ -23,7 +23,7 @@ public class StaticExecutionContextFactory extends ContextFactory {
 
           @Override
           protected URI getDatasetUri(URI pathUri) {
-            return URI.create("file:///data.txt");
+            return URI.create("gs://bucket/data.txt");
           }
         };
     return rdd;
@@ -59,7 +59,7 @@ public class StaticExecutionContextFactory extends ContextFactory {
   class StaticDatasetPlanTraverser extends DatasetLogicalPlanTraverser {
     @Override
     protected URI visitPathUri(URI uri) {
-      return URI.create("file:///data.txt");
+      return URI.create("gs://bucket/data.txt");
     }
   }
 }

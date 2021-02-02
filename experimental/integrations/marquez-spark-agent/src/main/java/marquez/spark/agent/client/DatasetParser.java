@@ -9,13 +9,7 @@ public class DatasetParser {
   }
 
   private static String getName(URI uri) {
-    if (isNullOrEmpty(uri.getPath())) {
-      return uri.toASCIIString();
-    }
-    if (uri.getPath().charAt(0) == '/') {
-      return uri.getPath().substring(1);
-    }
-    return uri.getPath();
+    return uri.toASCIIString();
   }
 
   private static String getNamespace(URI uri) {
