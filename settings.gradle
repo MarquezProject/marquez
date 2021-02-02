@@ -13,3 +13,7 @@
  */
 
 rootProject.name = 'marquez'
+
+include 'api'
+include 'clients:java'
+include 'experimental:integrations:marquez-spark-agent'

@@ -23,7 +23,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class SparkAgentIntegrationTest extends BaseIntegrationTest {
   @Parameters(name = "{0}")
   public static List<Path> data() throws IOException {
-    String prefix = "experimental/integrations/marquez-spark-agent/integrations";
+    String prefix = "../experimental/integrations/marquez-spark-agent/integrations";
     List<Path> paths = Files.list(Paths.get(prefix + "/sparkrdd")).collect(Collectors.toList());
     List<Path> sql = Files.list(Paths.get(prefix + "/sparksql")).collect(Collectors.toList());
     paths.addAll(sql);
