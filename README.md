@@ -50,6 +50,7 @@ We invite everyone to help us improve and keep documentation up to date. Documen
 
 Marquez uses a _multi_-project structure and contains the following modules:
 
+* [`api`](https://github.com/MarquezProject/marquez/tree/main/api): core API used to collect metadata
 * [`web`](https://github.com/MarquezProject/marquez/tree/main/web): web UI used to view metadata
 * [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
 * [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations): integrations with other systems
