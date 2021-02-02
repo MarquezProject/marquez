@@ -16,7 +16,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import org.apache.tools.ant.filters.*
 
 plugins {
-    id 'application'
     id 'maven-publish'
     id 'signing'
     id 'net.researchgate.release' version '2.8.1'
@@ -88,7 +87,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId = 'io.github.marquezproject'
-            artifactId = 'marquez'
+            artifactId = 'marquez-api'
 
             from components.java
 
@@ -146,7 +145,7 @@ signing {
 mainClassName = 'marquez.MarquezApp'
 
 shadowJar {
-    classifier = null
+    classifier = ''
     transform(ServiceFileTransformer)
     manifest {
         attributes(
