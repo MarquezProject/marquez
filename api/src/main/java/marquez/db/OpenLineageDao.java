@@ -257,9 +257,10 @@ public interface OpenLineageDao extends MarquezDao {
       return new URL(url).toURI().toASCIIString();
     } catch (MalformedURLException | URISyntaxException e) {
       try {
+        //assume host as string
         return new URL("http://" + url).toURI().toASCIIString();
       } catch (Exception ex) {
-        return null;
+        return "";//empty string for placeholder
       }
     }
   }
@@ -296,7 +297,7 @@ public interface OpenLineageDao extends MarquezDao {
               getSourceType(ds),
               now,
               ds.getFacets().getDataSource().getName(),
-              ds.getFacets().getDataSource().getUri());
+              getUrlOrPlaceholder(ds.getFacets().getDataSource().getUri()));
     } else {
       source = sourceDao.upsert(UUID.randomUUID(), getSourceType(ds), now, DEFAULT_SOURCE_NAME, "");
     }
