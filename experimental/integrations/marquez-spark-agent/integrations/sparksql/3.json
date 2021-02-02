@@ -57,7 +57,7 @@
     "name" : "job_name"
   },
   "inputs" : [ {
-    "namespace" : "ns_name",
+    "namespace" : "file",
     "name" : "data.txt"
   } ],
   "outputs" : [ ],
