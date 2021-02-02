@@ -17,14 +17,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.common.Utils;
-import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
-import marquez.common.models.DatasetVersionId;
-import marquez.common.models.JobName;
 import marquez.common.models.JobType;
-import marquez.common.models.JobVersionId;
-import marquez.common.models.NamespaceName;
-import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
@@ -40,16 +34,12 @@ import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
 import marquez.db.models.RunStateRow;
 import marquez.db.models.SourceRow;
-import marquez.db.models.UpdateLineageResponse;
-import marquez.service.RunTransitionListener.JobInputUpdate;
-import marquez.service.RunTransitionListener.JobOutputUpdate;
-import marquez.service.RunTransitionListener.RunInput;
-import marquez.service.RunTransitionListener.RunOutput;
+import marquez.db.models.UpdateLineageRow;
+import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.Job;
 import marquez.service.models.LineageEvent.SchemaField;
-import marquez.service.models.RunMeta;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -114,7 +104,7 @@ public interface OpenLineageDao extends SqlObject {
       String producer);
 
   @Transaction
-  default UpdateLineageResponse updateMarquezModel(LineageEvent event) {
+  default UpdateLineageRow updateMarquezModel(LineageEvent event) {
     NamespaceDao namespaceDao = createNamespaceDao();
     DatasetDao datasetDao = createDatasetDao();
     SourceDao sourceDao = createSourceDao();
@@ -129,9 +119,11 @@ public interface OpenLineageDao extends SqlObject {
 
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
+    UpdateLineageRow bag = new UpdateLineageRow();
     NamespaceRow namespace =
         namespaceDao.upsert(
             UUID.randomUUID(), now, event.getJob().getNamespace(), DEFAULT_NAMESPACE_OWNER);
+    bag.setNamespace(namespace);
 
     String description = null;
     if (event.getJob().getFacets() != null
@@ -146,11 +138,13 @@ public interface OpenLineageDao extends SqlObject {
             namespace.getUuid(),
             event.getJob().getName(),
             description);
+    bag.setJob(job);
 
     Map<String, String> context = buildJobContext(event);
     JobContextRow jobContext =
         jobContextDao.upsert(
             UUID.randomUUID(), now, Utils.toJson(context), Utils.checksumFor(context));
+    bag.setJobContext(jobContext);
     String location = null;
     if (event.getJob().getFacets() != null
         && event.getJob().getFacets().getSourceCodeLocation() != null) {
@@ -165,6 +159,7 @@ public interface OpenLineageDao extends SqlObject {
             jobContext.getUuid(),
             location,
             buildJobVersion(event, context));
+    bag.setJobVersion(jobVersion);
 
     jobDao.updateVersion(job.getUuid(), Instant.now(), jobVersion.getUuid());
 
@@ -172,6 +167,7 @@ public interface OpenLineageDao extends SqlObject {
     RunArgsRow runArgs =
         runArgsDao.upsert(
             UUID.randomUUID(), now, Utils.toJson(runArgsMap), Utils.checksumFor(runArgsMap));
+    bag.setRunArgs(runArgs);
 
     Instant nominalStartTime = null;
     Instant nominalEndTime = null;
@@ -218,6 +214,7 @@ public interface OpenLineageDao extends SqlObject {
               nominalStartTime,
               nominalEndTime);
     }
+    bag.setRun(run);
 
     jobVersionDao.updateLatestRun(jobVersion.getUuid(), now, run.getUuid());
 
@@ -226,6 +223,7 @@ public interface OpenLineageDao extends SqlObject {
 
       RunStateRow runState =
           runStateDao.upsert(UUID.randomUUID(), now, run.getUuid(), runStateType);
+      bag.setRunState(runState);
       if (runStateType.isDone()) {
         runDao.updateEndState(run.getUuid(), now, runState.getUuid());
       } else if (runStateType.isStarting()) {
@@ -234,11 +232,11 @@ public interface OpenLineageDao extends SqlObject {
     }
 
     // RunInput list uses null as a sentinel value
-    List<RunInput> runInputs = null;
+    List<DatasetRecord> datasetInputs = null;
     if (event.getInputs() != null) {
-      runInputs = new ArrayList<>();
+      datasetInputs = new ArrayList<>();
       for (Dataset ds : event.getInputs()) {
-        DatasetVersionId datasetVersionId =
+        DatasetRecord record =
             upsertLineageDataset(
                 ds,
                 jobVersion,
@@ -253,16 +251,16 @@ public interface OpenLineageDao extends SqlObject {
                 datasetFieldDao,
                 runDao,
                 jobVersionDao);
-        runInputs.add(new RunInput(datasetVersionId));
+        datasetInputs.add(record);
       }
     }
-
+    bag.setInputs(Optional.ofNullable(datasetInputs));
     // RunInput list uses null as a sentinel value
-    List<RunOutput> runOutputs = null;
+    List<DatasetRecord> datasetOutputs = null;
     if (event.getOutputs() != null) {
-      runOutputs = new ArrayList<>();
+      datasetOutputs = new ArrayList<>();
       for (Dataset ds : event.getOutputs()) {
-        DatasetVersionId datasetVersionId =
+        DatasetRecord record =
             upsertLineageDataset(
                 ds,
                 jobVersion,
@@ -277,61 +275,19 @@ public interface OpenLineageDao extends SqlObject {
                 datasetFieldDao,
                 runDao,
                 jobVersionDao);
-        runOutputs.add(new RunOutput(datasetVersionId));
+        datasetOutputs.add(record);
       }
     }
 
-    RunId runId = RunId.of(run.getUuid());
-    JobVersionId jobVersionId =
-        JobVersionId.builder()
-            .versionUuid(jobVersion.getUuid())
-            .namespace(NamespaceName.of(namespace.getName()))
-            .name(JobName.of(job.getName()))
-            .build();
-
-    Optional<JobInputUpdate> jobInputUpdate =
-        buildJobInput(run, runArgsMap, jobVersionId, runId, runInputs);
-    Optional<JobOutputUpdate> jobOutputUpdate = buildJobOutput(runId, jobVersionId, runOutputs);
-
-    return new UpdateLineageResponse(jobInputUpdate, jobOutputUpdate);
-  }
-
-  default Optional<JobOutputUpdate> buildJobOutput(
-      RunId runId, JobVersionId jobVersionId, List<RunOutput> runOutputs) {
-    if (runOutputs == null) {
-      return Optional.empty();
-    }
-    return Optional.of(new JobOutputUpdate(runId, jobVersionId, runOutputs));
-  }
-
-  default Optional<JobInputUpdate> buildJobInput(
-      RunRow run,
-      Map<String, String> runArgsMap,
-      JobVersionId jobVersionId,
-      RunId runId,
-      List<RunInput> runInputs) {
-    if (runInputs == null) {
-      return Optional.empty();
-    }
-
-    return Optional.of(
-        new JobInputUpdate(
-            runId,
-            RunMeta.builder()
-                .id(RunId.of(run.getUuid()))
-                .nominalStartTime(run.getNominalStartTime().orElse(null))
-                .nominalEndTime(run.getNominalEndTime().orElse(null))
-                .args(runArgsMap)
-                .build(),
-            jobVersionId,
-            runInputs));
+    bag.setOutputs(Optional.ofNullable(datasetOutputs));
+    return bag;
   }
 
   default JobType getJobType(Job job) {
     return JobType.BATCH;
   }
 
-  default DatasetVersionId upsertLineageDataset(
+  default DatasetRecord upsertLineageDataset(
       Dataset ds,
       JobVersionRow jobVersion,
       NamespaceRow namespace,
@@ -366,7 +322,7 @@ public interface OpenLineageDao extends SqlObject {
       dsDescription = ds.getFacets().getDocumentation().getDescription();
     }
 
-    DatasetRow dataset =
+    DatasetRow datasetRow =
         datasetDao.upsert(
             UUID.randomUUID(),
             getDatasetType(ds),
@@ -382,13 +338,13 @@ public interface OpenLineageDao extends SqlObject {
       fields = ds.getFacets().getSchema().getFields();
     }
 
-    UUID datasetVerion =
-        version(dsNamespace.getName(), source.getName(), dataset.getName(), fields, runUuid);
-    DatasetVersionRow dsVersion =
+    UUID datasetVersion =
+        version(dsNamespace.getName(), source.getName(), datasetRow.getName(), fields, runUuid);
+    DatasetVersionRow datasetVersionRow =
         datasetVersionDao.upsert(
-            UUID.randomUUID(), now, dataset.getUuid(), datasetVerion, isInput ? null : runUuid);
+            UUID.randomUUID(), now, datasetRow.getUuid(), datasetVersion, isInput ? null : runUuid);
 
-    datasetDao.updateVersion(dataset.getUuid(), now, dsVersion.getUuid());
+    datasetDao.updateVersion(datasetRow.getUuid(), now, datasetVersionRow.getUuid());
 
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
     if (fields != null) {
@@ -400,25 +356,21 @@ public interface OpenLineageDao extends SqlObject {
                 field.getName(),
                 field.getType(),
                 field.getDescription(),
-                dataset.getUuid());
+                datasetRow.getUuid());
         datasetFieldMappings.add(
-            new DatasetFieldMapping(dsVersion.getUuid(), datasetFieldRow.getUuid()));
+            new DatasetFieldMapping(datasetVersionRow.getUuid(), datasetFieldRow.getUuid()));
       }
     }
     datasetFieldDao.updateFieldMapping(datasetFieldMappings);
 
     if (isInput) {
-      runDao.updateInputMapping(runUuid, dsVersion.getUuid());
+      runDao.updateInputMapping(runUuid, datasetVersionRow.getUuid());
     }
 
     jobVersionDao.upsertDatasetIoMapping(
-        jobVersion.getUuid(), dataset.getUuid(), isInput ? IoType.INPUT : IoType.OUTPUT);
+        jobVersion.getUuid(), datasetRow.getUuid(), isInput ? IoType.INPUT : IoType.OUTPUT);
 
-    return DatasetVersionId.builder()
-        .versionUuid(datasetVerion)
-        .namespace(NamespaceName.of(namespace.getName()))
-        .name(DatasetName.of(dataset.getName()))
-        .build();
+    return new DatasetRecord(datasetRow, datasetVersionRow);
   }
 
   default String formatName(String name) {

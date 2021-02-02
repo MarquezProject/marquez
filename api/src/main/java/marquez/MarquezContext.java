@@ -128,7 +128,7 @@ public final class MarquezContext {
             namespaceDao, datasetDao, jobDao, jobVersionDao, jobContextDao, runDao, runService);
     this.tagService = new TagService(tagDao);
     this.tagService.init(tags);
-    this.openLineageService = new OpenLineageService(openLineageDao, runService);
+    this.openLineageService = new OpenLineageService(openLineageDao, runService, datasetVersionDao);
     this.serviceExceptionMapper = new MarquezServiceExceptionMapper();
     this.jdbiException = new JdbiExceptionExceptionMapper();
 

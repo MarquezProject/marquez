@@ -35,6 +35,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(DatasetVersionRowMapper.class)
+@RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
 public interface DatasetVersionDao {
   @CreateSqlObject
   DatasetDao createDatasetDao();
@@ -121,7 +122,6 @@ public interface DatasetVersionDao {
    * @param runId - the run ID
    */
   @SqlQuery(EXTENDED_SELECT + " WHERE run_uuid = :runId")
-  @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
   List<ExtendedDatasetVersionRow> findByRunId(@NonNull UUID runId);
 
   @SqlQuery(
@@ -134,4 +134,9 @@ public interface DatasetVersionDao {
           + "run_uuid = EXCLUDED.run_uuid "
           + "RETURNING *")
   DatasetVersionRow upsert(UUID uuid, Instant now, UUID datasetUuid, UUID version, UUID runUuid);
+
+  @SqlQuery(
+      EXTENDED_SELECT
+          + " INNER JOIN runs_input_mapping m ON m.dataset_version_uuid = dv.uuid WHERE m.run_uuid = :runUuid")
+  List<ExtendedDatasetVersionRow> findInputsByRunId(UUID runUuid);
 }

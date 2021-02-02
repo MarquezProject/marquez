@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -30,10 +31,10 @@ public class ArgumentParser {
 
     String path = uri.getPath();
     String[] elements = path.split("/");
-    String version = get(elements, "api", 1);
-    String namespace = get(elements, "namespaces", 3);
-    String jobName = get(elements, "jobs", 5);
-    String runId = get(elements, "runs", 7);
+    String version = get(elements, "api", 1, "default");
+    String namespace = get(elements, "namespaces", 3, "default");
+    String jobName = get(elements, "jobs", 5, "default");
+    String runId = get(elements, "runs", 7, getRandomUuid().toString());
 
     List<NameValuePair> nameValuePairList = URLEncodedUtils.parse(uri, StandardCharsets.UTF_8);
     String apiKey = getApiKey(nameValuePairList);
@@ -44,6 +45,10 @@ public class ArgumentParser {
 
     return new ArgumentParser(
         host, version, namespace, jobName, runId, Optional.ofNullable(apiKey));
+  }
+
+  public static UUID getRandomUuid() {
+    return UUID.randomUUID();
   }
 
   private static String getApiKey(List<NameValuePair> nameValuePairList) {
@@ -63,13 +68,13 @@ public class ArgumentParser {
     return null;
   }
 
-  private static String get(String[] elements, String name, int index) {
+  private static String get(String[] elements, String name, int index, String defaultValue) {
     boolean check = elements.length > index + 1 && name.equals(elements[index]);
     if (check) {
       return elements[index + 1];
     } else {
       log.warn("missing " + name + " in " + Arrays.toString(elements) + " at " + index);
-      return "default";
+      return defaultValue;
     }
   }
 }
