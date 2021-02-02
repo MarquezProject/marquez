@@ -23,5 +23,6 @@ public class UpdateLineageRow {
   public static class DatasetRecord {
     DatasetRow datasetRow;
     DatasetVersionRow datasetVersionRow;
+    NamespaceRow namespaceRow;
   }
 }

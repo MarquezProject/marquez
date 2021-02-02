@@ -40,6 +40,7 @@ import marquez.common.models.TagName;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
+import marquez.db.MarquezDao;
 import marquez.db.NamespaceDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
@@ -80,6 +81,15 @@ public class DatasetService {
   private final DatasetFieldDao fieldDao;
   private final DatasetVersionDao versionDao;
   private final TagDao tagDao;
+
+  public DatasetService(@NonNull final MarquezDao marquezDao) {
+    this.namespaceDao = marquezDao.createNamespaceDao();
+    this.sourceDao = marquezDao.createSourceDao();
+    this.datasetDao = marquezDao.createDatasetDao();
+    this.fieldDao = marquezDao.createDatasetFieldDao();
+    this.versionDao = marquezDao.createDatasetVersionDao();
+    this.tagDao = marquezDao.createTagDao();
+  }
 
   public DatasetService(
       @NonNull final NamespaceDao namespaceDao,

@@ -40,48 +40,13 @@ import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.Job;
 import marquez.service.models.LineageEvent.SchemaField;
-import org.jdbi.v3.sqlobject.CreateSqlObject;
-import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
 
-public interface OpenLineageDao extends SqlObject {
+public interface OpenLineageDao extends MarquezDao {
   public String DEFAULT_SOURCE_NAME = "default";
   public String DEFAULT_NAMESPACE_OWNER = "anonymous";
-
-  @CreateSqlObject
-  DatasetDao createDatasetDao();
-
-  @CreateSqlObject
-  DatasetFieldDao createDatasetFieldDao();
-
-  @CreateSqlObject
-  DatasetVersionDao createDatasetVersionDao();
-
-  @CreateSqlObject
-  JobContextDao createJobContextDao();
-
-  @CreateSqlObject
-  JobDao createJobDao();
-
-  @CreateSqlObject
-  JobVersionDao createJobVersionDao();
-
-  @CreateSqlObject
-  NamespaceDao createNamespaceDao();
-
-  @CreateSqlObject
-  RunDao createRunDao();
-
-  @CreateSqlObject
-  RunArgsDao createRunArgsDao();
-
-  @CreateSqlObject
-  RunStateDao createRunStateDao();
-
-  @CreateSqlObject
-  SourceDao createSourceDao();
 
   @SqlUpdate(
       "INSERT INTO lineage_events ("
@@ -122,7 +87,10 @@ public interface OpenLineageDao extends SqlObject {
     UpdateLineageRow bag = new UpdateLineageRow();
     NamespaceRow namespace =
         namespaceDao.upsert(
-            UUID.randomUUID(), now, event.getJob().getNamespace(), DEFAULT_NAMESPACE_OWNER);
+            UUID.randomUUID(),
+            now,
+            formatNamespaceName(event.getJob().getNamespace()),
+            DEFAULT_NAMESPACE_OWNER);
     bag.setNamespace(namespace);
 
     String description = null;
@@ -240,7 +208,6 @@ public interface OpenLineageDao extends SqlObject {
             upsertLineageDataset(
                 ds,
                 jobVersion,
-                namespace,
                 now,
                 runUuid,
                 true,
@@ -264,7 +231,6 @@ public interface OpenLineageDao extends SqlObject {
             upsertLineageDataset(
                 ds,
                 jobVersion,
-                namespace,
                 now,
                 runUuid,
                 false,
@@ -283,6 +249,10 @@ public interface OpenLineageDao extends SqlObject {
     return bag;
   }
 
+  default String formatNamespaceName(String namespace) {
+    return namespace.replaceAll("[^a-zA-Z0-9\\-_]", "_");
+  }
+
   default JobType getJobType(Job job) {
     return JobType.BATCH;
   }
@@ -290,7 +260,6 @@ public interface OpenLineageDao extends SqlObject {
   default DatasetRecord upsertLineageDataset(
       Dataset ds,
       JobVersionRow jobVersion,
-      NamespaceRow namespace,
       Instant now,
       UUID runUuid,
       boolean isInput,
@@ -322,14 +291,21 @@ public interface OpenLineageDao extends SqlObject {
       dsDescription = ds.getFacets().getDocumentation().getDescription();
     }
 
+    NamespaceRow datasetNamespace =
+        namespaceDao.upsert(
+            UUID.randomUUID(),
+            now,
+            formatNamespaceName(ds.getNamespace()),
+            DEFAULT_NAMESPACE_OWNER);
+
     DatasetRow datasetRow =
         datasetDao.upsert(
             UUID.randomUUID(),
             getDatasetType(ds),
             now,
-            namespace.getUuid(),
+            datasetNamespace.getUuid(),
             source.getUuid(),
-            formatName(ds.getName()),
+            formatDatasetName(ds.getName()),
             ds.getName(),
             dsDescription);
 
@@ -370,10 +346,10 @@ public interface OpenLineageDao extends SqlObject {
     jobVersionDao.upsertDatasetIoMapping(
         jobVersion.getUuid(), datasetRow.getUuid(), isInput ? IoType.INPUT : IoType.OUTPUT);
 
-    return new DatasetRecord(datasetRow, datasetVersionRow);
+    return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
   }
 
-  default String formatName(String name) {
+  default String formatDatasetName(String name) {
     return name.replaceAll("[:/]", "_");
   }
 

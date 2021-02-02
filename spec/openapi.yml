@@ -17,8 +17,8 @@ paths:
     put:
       summary: Create a namespace
       description: Creates a new namespace object. A namespace enables the contextual grouping of related
-        jobs and datasets. Namespaces must contain only letters (`a-z`, `A-Z`), numbers (`0-9`), or
-        underscores (`_`). A namespace is case-insensitive with a maximum length of `1024` characters.
+        jobs and datasets. Namespaces must contain only letters (`a-z`, `A-Z`), numbers (`0-9`),
+        underscores (`_`), or dots (`.`). A namespace is case-insensitive with a maximum length of `1024` characters.
         Note jobs and datasets will be unique within a namespace, but not across namespaces.
       tags:
         - Namespaces
