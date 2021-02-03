@@ -366,7 +366,7 @@ public interface OpenLineageDao extends MarquezDao {
   }
 
   default String formatDatasetName(String name) {
-    return name.replaceAll("[:/]", "_");
+    return name;
   }
 
   default SourceType getSourceType(Dataset ds) {

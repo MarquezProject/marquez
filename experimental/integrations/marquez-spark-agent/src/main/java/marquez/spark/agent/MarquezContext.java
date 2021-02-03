@@ -1,5 +1,6 @@
 package marquez.spark.agent;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ForkJoinPool;
@@ -34,8 +35,10 @@ public class MarquezContext {
       ResponseMessage resp = client.post(lineageURI, event);
       if (!resp.completedSuccessfully()) {
         log.error("Could not emit lineage.", new MarquezHttpException(resp, resp.getError()));
+      } else {
+        log.info("Lineage completed successfully: {}", OpenLineageClient.createMapper().writeValueAsString(event));
       }
-    } catch (MarquezHttpException e) {
+    } catch (MarquezHttpException | JsonProcessingException e) {
       log.error("Could not emit lineage w/ exception", e);
     }
   }
