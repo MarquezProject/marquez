@@ -25,6 +25,21 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @RegisterRowMapper(SourceRowMapper.class)
 public interface SourceDao {
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM sources WHERE name = :name)")
+  boolean exists(String name);
+
+  @SqlQuery("SELECT * FROM sources WHERE uuid = :uuid")
+  Optional<SourceRow> findBy(UUID uuid);
+
+  @SqlQuery("SELECT * FROM sources WHERE name = :name")
+  Optional<SourceRow> findBy(String name);
+
+  @SqlQuery("SELECT * FROM sources ORDER BY name LIMIT :limit OFFSET :offset")
+  List<SourceRow> findAll(int limit, int offset);
+
+  @SqlQuery("SELECT COUNT(*) FROM sources")
+  int count();
+
   @SqlQuery(
       "INSERT INTO sources ("
           + "uuid, "
@@ -57,19 +72,4 @@ public interface SourceDao {
       String name,
       String connectionUrl,
       String description);
-
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM sources WHERE name = :name)")
-  boolean exists(String name);
-
-  @SqlQuery("SELECT * FROM sources WHERE uuid = :uuid")
-  Optional<SourceRow> findBy(UUID uuid);
-
-  @SqlQuery("SELECT * FROM sources WHERE name = :name")
-  Optional<SourceRow> findBy(String name);
-
-  @SqlQuery("SELECT * FROM sources ORDER BY name LIMIT :limit OFFSET :offset")
-  List<SourceRow> findAll(int limit, int offset);
-
-  @SqlQuery("SELECT COUNT(*) FROM sources")
-  int count();
 }

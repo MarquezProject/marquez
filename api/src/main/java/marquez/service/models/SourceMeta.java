@@ -47,12 +47,10 @@ public final class SourceMeta {
       @Nullable final SourceType type,
       @Nullable final URI connectionUrl,
       @Nullable final String description) {
-    // ...
     this.type =
         (connectionUrl == null)
             ? checkNotNull(type, "connection url must be provided when type == null")
             : Utils.sourceTypeFor(connectionUrl);
-    // ...
     this.connectionUrl = (connectionUrl == null) ? null : Utils.urlWithNoCredentials(connectionUrl);
     this.description = description;
   }

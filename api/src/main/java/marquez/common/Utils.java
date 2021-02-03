@@ -145,18 +145,18 @@ public final class Utils {
     }
   }
 
-  private static boolean isJdbcUrl(@NonNull final URI connectionUrl) {
+  static boolean isJdbcUrl(@NonNull final URI connectionUrl) {
     final String connectionUrlString = connectionUrl.toString();
     return connectionUrlString.startsWith(JDBC);
   }
 
-  private static URI toUrlWithNoJdbcPrefix(@NonNull final URI connectionUrl) {
+  static URI toUrlWithNoJdbcPrefix(@NonNull final URI connectionUrl) {
     return isJdbcUrl(connectionUrl)
         ? URI.create(dropJdbcPrefix(connectionUrl.toString()))
         : connectionUrl;
   }
 
-  private static String dropJdbcPrefix(@NonNull final String connectionUrlString) {
+  static String dropJdbcPrefix(@NonNull final String connectionUrlString) {
     return connectionUrlString.replaceFirst("^" + JDBC, "");
   }
 }

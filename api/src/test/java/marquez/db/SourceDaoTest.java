@@ -14,7 +14,10 @@
 
 package marquez.db;
 
-import static marquez.common.models.ModelGenerator.*;
+import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
+import static marquez.common.models.ModelGenerator.newDbSourceType;
+import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newSourceName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
@@ -90,7 +93,7 @@ public class SourceDaoTest {
     // Current row
     final SourceRow currentRow = dao.findBy(ROW_UUID).get();
 
-    // Modify row
+    // Modified row
     final Instant now = Instant.now();
     final SourceRow modifiedRow =
         dao.upsert(
