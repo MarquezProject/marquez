@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.spark.agent.client.LineageEvent;
 import marquez.spark.agent.client.MarquezHttpException;
 import marquez.spark.agent.client.OpenLineageClient;
+import marquez.spark.agent.client.ResponseMessage;
 
 @Slf4j
 public class MarquezContext {
@@ -29,18 +30,14 @@ public class MarquezContext {
   }
 
   public void emit(LineageEvent event) {
-    client
-        .postAsync(lineageURI, event)
-        .whenComplete(
-            (resp, ex) -> {
-              if (ex != null || resp == null) {
-                log.error("Could not emit lineage.", ex);
-                return;
-              }
-              if (!resp.completedSuccessfully()) {
-                log.error("Could not emit lineage.", new MarquezHttpException(resp.getError()));
-              }
-            });
+    try {
+      ResponseMessage resp = client.post(lineageURI, event);
+      if (!resp.completedSuccessfully()) {
+        log.error("Could not emit lineage.", new MarquezHttpException(resp, resp.getError()));
+      }
+    } catch (MarquezHttpException e) {
+      log.error("Could not emit lineage w/ exception", e);
+    }
   }
 
   public void close() {

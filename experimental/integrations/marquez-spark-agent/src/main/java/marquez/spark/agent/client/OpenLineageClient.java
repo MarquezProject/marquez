@@ -67,11 +67,19 @@ public class OpenLineageClient {
       throws MarquezHttpException {
     CompletableFuture<ResponseMessage<T>> future = executeAsync(request, obj, ref);
     try {
-      ResponseMessage<T> message = future.get();
-      if (message.completedSuccessfully()) {
-        return message;
+      ResponseMessage<T> message =
+          (ResponseMessage<T>)
+              future
+                  .exceptionally(
+                      (resp) -> {
+                        return new ResponseMessage(
+                            0, null, new HttpError(0, resp.getMessage(), resp.toString()));
+                      })
+                  .get();
+      if (message == null) {
+        return new ResponseMessage(0, null, new HttpError(0, "unknown error", "unknown error"));
       }
-      throw new MarquezHttpException(message.getError());
+      return message;
     } catch (ExecutionException | InterruptedException e) {
       throw new MarquezHttpException(e);
     }
