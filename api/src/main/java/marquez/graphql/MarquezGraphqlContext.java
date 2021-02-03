@@ -13,14 +13,15 @@ import javax.servlet.http.Part;
 import lombok.SneakyThrows;
 import org.dataloader.DataLoaderRegistry;
 
-public class MarquezGraphqlContext extends DefaultGraphQLContext implements
-    GraphQLServletContext {
+public class MarquezGraphqlContext extends DefaultGraphQLContext implements GraphQLServletContext {
 
   private final HttpServletRequest httpServletRequest;
   private final HttpServletResponse httpServletResponse;
   private final Map<Object, Object> lineageMap;
 
-  protected MarquezGraphqlContext(DataLoaderRegistry dataLoaderRegistry, Subject subject,
+  protected MarquezGraphqlContext(
+      DataLoaderRegistry dataLoaderRegistry,
+      Subject subject,
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse) {
     super(dataLoaderRegistry, subject);
@@ -62,9 +63,7 @@ public class MarquezGraphqlContext extends DefaultGraphQLContext implements
   @Override
   @SneakyThrows
   public Map<String, List<Part>> getParts() {
-    return httpServletRequest.getParts()
-        .stream()
-        .collect(Collectors.groupingBy(Part::getName));
+    return httpServletRequest.getParts().stream().collect(Collectors.groupingBy(Part::getName));
   }
 
   public static class Builder {
@@ -80,8 +79,8 @@ public class MarquezGraphqlContext extends DefaultGraphQLContext implements
     }
 
     public MarquezGraphqlContext build() {
-      return new MarquezGraphqlContext(dataLoaderRegistry, subject, httpServletRequest,
-          httpServletResponse);
+      return new MarquezGraphqlContext(
+          dataLoaderRegistry, subject, httpServletRequest, httpServletResponse);
     }
 
     public Builder with(HttpServletRequest httpServletRequest) {

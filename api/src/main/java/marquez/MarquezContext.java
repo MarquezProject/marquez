@@ -31,6 +31,7 @@ import marquez.db.RunDao;
 import marquez.db.RunStateDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
+import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
@@ -155,7 +156,7 @@ public final class MarquezContext {
             openLineageResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
-    this.graphqlServlet = servlet.getServlet(jdbi);
+    this.graphqlServlet = servlet.getServlet(new GraphqlSchemaBuilder(jdbi));
   }
 
   public static Builder builder() {

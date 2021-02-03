@@ -2,7 +2,6 @@ package marquez.graphql;
 
 import graphql.kickstart.execution.context.DefaultGraphQLContext;
 import graphql.kickstart.execution.context.GraphQLContext;
-import graphql.kickstart.servlet.context.DefaultGraphQLServletContext;
 import graphql.kickstart.servlet.context.DefaultGraphQLWebSocketContext;
 import graphql.kickstart.servlet.context.GraphQLServletContextBuilder;
 import java.util.concurrent.CompletableFuture;
@@ -15,12 +14,13 @@ import org.dataloader.DataLoaderRegistry;
 
 public class CustomGraphQLContextBuilder implements GraphQLServletContextBuilder {
 
-  public CustomGraphQLContextBuilder() {
-  }
+  public CustomGraphQLContextBuilder() {}
 
   @Override
   public GraphQLContext build(HttpServletRequest req, HttpServletResponse response) {
-    return MarquezGraphqlContext.createServletContext(buildDataLoaderRegistry(), null).with(req).with(response)
+    return MarquezGraphqlContext.createServletContext(buildDataLoaderRegistry(), null)
+        .with(req)
+        .with(response)
         .build();
   }
 
@@ -31,16 +31,22 @@ public class CustomGraphQLContextBuilder implements GraphQLServletContextBuilder
 
   @Override
   public GraphQLContext build(Session session, HandshakeRequest request) {
-    return DefaultGraphQLWebSocketContext.createWebSocketContext(buildDataLoaderRegistry(), null).with(session)
-        .with(request).build();
+    return DefaultGraphQLWebSocketContext.createWebSocketContext(buildDataLoaderRegistry(), null)
+        .with(session)
+        .with(request)
+        .build();
   }
 
   private DataLoaderRegistry buildDataLoaderRegistry() {
     DataLoaderRegistry dataLoaderRegistry = new DataLoaderRegistry();
-    dataLoaderRegistry.register("datasetLineage",
-        new DataLoader<Integer, String>(customerIds ->
-            CompletableFuture.supplyAsync(() -> {
-                return null;})));
+    dataLoaderRegistry.register(
+        "datasetLineage",
+        new DataLoader<Integer, String>(
+            customerIds ->
+                CompletableFuture.supplyAsync(
+                    () -> {
+                      return null;
+                    })));
     return dataLoaderRegistry;
   }
 }

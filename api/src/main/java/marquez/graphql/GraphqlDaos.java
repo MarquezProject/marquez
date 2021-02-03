@@ -21,12 +21,14 @@ public interface GraphqlDaos extends SqlObject {
   @SqlQuery("SELECT * FROM datasets")
   List<RowMap<String, Object>> getDatasets();
 
-  @SqlQuery("SELECT datasets.* FROM datasets inner join namespaces on datasets.namespace_uuid = namespaces.uuid "
-      + "where namespaces.name = :namespaceName and datasets.name = :name")
+  @SqlQuery(
+      "SELECT datasets.* FROM datasets inner join namespaces on datasets.namespace_uuid = namespaces.uuid "
+          + "where namespaces.name = :namespaceName and datasets.name = :name")
   RowMap<String, Object> getDatasetByNamespaceAndName(String namespaceName, String name);
 
-  @SqlQuery("SELECT jobs.* FROM jobs inner join namespaces on jobs.namespace_uuid = namespaces.uuid "
-      + "where namespaces.name = :namespaceName and jobs.name = :name")
+  @SqlQuery(
+      "SELECT jobs.* FROM jobs inner join namespaces on jobs.namespace_uuid = namespaces.uuid "
+          + "where namespaces.name = :namespaceName and jobs.name = :name")
   RowMap<String, Object> getJobByNamespaceAndName(String namespaceName, String name);
 
   @SqlQuery("SELECT * FROM jobs")
@@ -75,7 +77,8 @@ public interface GraphqlDaos extends SqlObject {
 
   @SqlQuery(
       "SELECT distinct jv.* from dataset_versions dv inner join runs r on r.uuid = dv.run_uuid inner join job_versions jv on jv.uuid = r.job_version_uuid where dv.uuid = :datasetVersionUuid")
-  List<RowMap<String, Object>> getDistinctJobVersionsByDatasetVersionOutput(UUID datasetVersionUuid);
+  List<RowMap<String, Object>> getDistinctJobVersionsByDatasetVersionOutput(
+      UUID datasetVersionUuid);
 
   @SqlQuery("SELECT dv.* from dataset_versions dv where dv.run_uuid = :runUuid")
   List<RowMap<String, Object>> getDatasetVersionByRun(UUID runUuid);
