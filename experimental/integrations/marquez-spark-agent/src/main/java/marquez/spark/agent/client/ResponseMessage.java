@@ -12,7 +12,7 @@ public class ResponseMessage<T> {
   @Getter protected HttpError error;
 
   public boolean completedSuccessfully() {
-    if (responseCode >= 400 && responseCode < 600) { // non-2xx
+    if (responseCode >= 400 && responseCode < 600 || responseCode == 0) { // non-2xx
       return false;
     }
     return true;
