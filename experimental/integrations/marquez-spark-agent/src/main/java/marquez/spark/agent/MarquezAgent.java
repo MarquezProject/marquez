@@ -23,7 +23,7 @@ public class MarquezAgent {
 
   public static void premain(
       String agentArgs, Instrumentation inst, ContextFactory contextFactory) {
-    log.info("MarquezAgent.premain " + agentArgs);
+    log.info("MarquezAgent.premain ");
     SparkListener.init(contextFactory);
     instrument(inst);
     addShutDownHook();
