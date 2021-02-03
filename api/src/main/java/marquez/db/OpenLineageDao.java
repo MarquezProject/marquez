@@ -252,15 +252,15 @@ public interface OpenLineageDao extends MarquezDao {
     return bag;
   }
 
-  default String getUrlOrPlaceholder(String url){
+  default String getUrlOrPlaceholder(String url) {
     try {
       return new URL(url).toURI().toASCIIString();
     } catch (MalformedURLException | URISyntaxException e) {
       try {
-        //assume host as string
+        // assume host as string
         return new URL("http://" + url).toURI().toASCIIString();
       } catch (Exception ex) {
-        return "";//empty string for placeholder
+        return ""; // empty string for placeholder
       }
     }
   }
