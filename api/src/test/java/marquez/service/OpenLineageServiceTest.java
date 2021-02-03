@@ -195,7 +195,7 @@ public class OpenLineageServiceTest {
     Optional<Dataset> dataset =
         datasetService.get(
             NamespaceName.of(openLineageDao.formatNamespaceName(ds.getNamespace())),
-            DatasetName.of(openLineageDao.formatDatasetName(ds.getName())));
+            DatasetName.of(ds.getName()));
     assertTrue("Dataset does not exist: " + ds, dataset.isPresent());
   }
 

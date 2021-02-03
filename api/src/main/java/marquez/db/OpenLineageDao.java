@@ -266,7 +266,7 @@ public interface OpenLineageDao extends MarquezDao {
   }
 
   default String formatNamespaceName(String namespace) {
-    return namespace.replaceAll("[^a-zA-Z0-9\\-_]", "_");
+    return namespace.replaceAll("[^a-zA-Z0-9\\-_.]", "_");
   }
 
   default JobType getJobType(Job job) {
@@ -321,7 +321,7 @@ public interface OpenLineageDao extends MarquezDao {
             now,
             datasetNamespace.getUuid(),
             source.getUuid(),
-            formatDatasetName(ds.getName()),
+            ds.getName(),
             ds.getName(),
             dsDescription);
 
@@ -363,10 +363,6 @@ public interface OpenLineageDao extends MarquezDao {
         jobVersion.getUuid(), datasetRow.getUuid(), isInput ? IoType.INPUT : IoType.OUTPUT);
 
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
-  }
-
-  default String formatDatasetName(String name) {
-    return name;
   }
 
   default SourceType getSourceType(Dataset ds) {
