@@ -36,7 +36,9 @@ public class MarquezContext {
       if (!resp.completedSuccessfully()) {
         log.error("Could not emit lineage.", new MarquezHttpException(resp, resp.getError()));
       } else {
-        log.info("Lineage completed successfully: {}", OpenLineageClient.createMapper().writeValueAsString(event));
+        log.info(
+            "Lineage completed successfully: {}",
+            OpenLineageClient.createMapper().writeValueAsString(event));
       }
     } catch (MarquezHttpException | JsonProcessingException e) {
       log.error("Could not emit lineage w/ exception", e);

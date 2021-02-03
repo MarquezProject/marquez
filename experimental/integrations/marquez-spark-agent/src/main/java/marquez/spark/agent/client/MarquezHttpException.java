@@ -15,8 +15,7 @@ public final class MarquezHttpException extends Throwable {
   @Getter private String details;
 
   /** Constructs a {@code MarquezHttpException} with the HTTP error {@code error}. */
-  public MarquezHttpException(@NonNull ResponseMessage resp,
-      final HttpError error) {
+  public MarquezHttpException(@NonNull ResponseMessage resp, final HttpError error) {
     super(error == null ? "unknown error" : error.getMessage());
     if (error != null) {
       this.code = error.getCode();
