@@ -34,7 +34,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -141,7 +140,7 @@ public class JobServiceDbTest {
         sourceRow.getType(),
         sourceRow.getCreatedAt(),
         sourceRow.getUpdatedAt(),
-            sourceRow.getName(),
+        sourceRow.getName(),
         sourceRow.getConnectionUrl().orElse(null),
         sourceRow.getDescription().orElse(null));
 
@@ -202,8 +201,7 @@ public class JobServiceDbTest {
     SourceName sn = SourceName.of("bq_source");
     SourceType type = newDbSourceType();
     Source s =
-        sourceService.createOrUpdate(
-            sn, new SourceMeta(type, newConnectionUrlFor(type), null));
+        sourceService.createOrUpdate(sn, new SourceMeta(type, newConnectionUrlFor(type), null));
     assertThat(s.getName()).isNotNull();
     DatasetName in_dsn = DatasetName.of("INPUT_DATASET");
     Dataset in_ds =

@@ -15,7 +15,16 @@
 package marquez.db.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static marquez.common.models.ModelGenerator.*;
+import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
+import static marquez.common.models.ModelGenerator.newContext;
+import static marquez.common.models.ModelGenerator.newDatasetName;
+import static marquez.common.models.ModelGenerator.newDatasetType;
+import static marquez.common.models.ModelGenerator.newDbSourceType;
+import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.common.models.ModelGenerator.newOwnerName;
+import static marquez.common.models.ModelGenerator.newSourceName;
+import static marquez.common.models.ModelGenerator.newTagName;
 
 import com.google.common.collect.ImmutableList;
 import java.time.Instant;

@@ -16,7 +16,23 @@ package marquez.service.models;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.temporal.ChronoUnit.HOURS;
-import static marquez.common.models.ModelGenerator.*;
+import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
+import static marquez.common.models.ModelGenerator.newContext;
+import static marquez.common.models.ModelGenerator.newDatasetId;
+import static marquez.common.models.ModelGenerator.newDatasetIds;
+import static marquez.common.models.ModelGenerator.newDatasetName;
+import static marquez.common.models.ModelGenerator.newDbSourceType;
+import static marquez.common.models.ModelGenerator.newDescription;
+import static marquez.common.models.ModelGenerator.newFields;
+import static marquez.common.models.ModelGenerator.newJobId;
+import static marquez.common.models.ModelGenerator.newJobType;
+import static marquez.common.models.ModelGenerator.newLocation;
+import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.common.models.ModelGenerator.newOwnerName;
+import static marquez.common.models.ModelGenerator.newRunId;
+import static marquez.common.models.ModelGenerator.newSourceName;
+import static marquez.common.models.ModelGenerator.newTagName;
+import static marquez.common.models.ModelGenerator.newTagNames;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
