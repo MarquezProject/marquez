@@ -86,12 +86,12 @@ Testing requires a Java 8 JVM to test the scala spark components.
 `export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 
 ## Testing
-To run the tests, run:
+To run the tests, from the root directory run:
 ```sh
-./gradlew test
+./gradlew :experimental:integrations:marquez-spark-agent:test
 ```
 
 ## Build spark agent jar
 ```sh
-./gradlew shadowJar
+./gradlew :experimental:integrations:marquez-spark-agent:shadowJar
 ```
