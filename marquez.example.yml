@@ -44,6 +44,10 @@ db:
 # Enables database migration on startup (default: true)
 migrateOnStartup: ${MIGRATE_ON_STARTUP:-true}
 
+# Enabled the Graphql endpoint
+graphql:
+  enabled: ${GRAPHQL_ENABLED:-true}
+
 ### LOGGING CONFIG ###
 
 # Enables logging configuration overrides (see: https://www.dropwizard.io/en/stable/manual/configuration.html#logging)
