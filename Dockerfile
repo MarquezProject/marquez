@@ -8,14 +8,16 @@ RUN ./gradlew --version
 
 FROM base AS build
 WORKDIR /usr/src/app
-COPY api/src ./api/src
 COPY build.gradle build.gradle
-RUN ./gradlew --no-daemon shadowJar
+COPY api ./api
+COPY api/build.gradle ./api/build.gradle
+COPY clients/java ./clients/java
+RUN ./gradlew --no-daemon :api:shadowJar
 
 FROM openjdk:11-jre
 RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client
 WORKDIR /usr/src/app
-COPY --from=build /usr/src/app/build/libs/marquez-*.jar /usr/src/app
+COPY --from=build /usr/src/app/api/build/libs/marquez-*.jar /usr/src/app
 COPY marquez.dev.yml marquez.dev.yml
 COPY docker/entrypoint.sh entrypoint.sh
 EXPOSE 5000 5001

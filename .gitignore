@@ -21,3 +21,6 @@ out/*
 
 # Marquez configuration
 marquez.yml
+
+# jenv
+.java-version

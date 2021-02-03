@@ -50,9 +50,10 @@ We invite everyone to help us improve and keep documentation up to date. Documen
 
 Marquez uses a _multi_-project structure and contains the following modules:
 
+* [`api`](https://github.com/MarquezProject/marquez/tree/main/api): core API used to collect metadata
 * [`web`](https://github.com/MarquezProject/marquez/tree/main/web): web UI used to view metadata
 * [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
-* [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations): integrations with other systems
+* [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations): integrations with other systems (ex: [`Airflow`](https://github.com/MarquezProject/marquez/tree/feature/ci-build-jvm-modules/examples/airflow))
 * [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart): helm chart
 
 ## Requirements
@@ -64,13 +65,13 @@ Marquez uses a _multi_-project structure and contains the following modules:
 
 ## Building
 
-To build the entire project run:
+To build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
 
 ```
-$ ./gradlew shadowJar
+$ ./gradlew :api:shadowJar
 ```
 
-The executable can be found under `build/libs/`
+The executable can be found under `api/build/libs/`
 
 ## Configuration
 
@@ -104,7 +105,7 @@ By default, Marquez uses the following ports:
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/MarquezApp.java)
 
 ```bash
-$ ./gradlew runShadow
+$ ./gradlew :api:runShadow
 ```
 
 Then browse to the admin interface: http://localhost:8081

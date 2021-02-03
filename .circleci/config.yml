@@ -23,8 +23,8 @@ jobs:
             - v1-api-{{ .Branch }}
       - run: ./.circleci/get-jdk11.sh
       - run: echo "checks.disable=true" > ~/.testcontainers.properties
-      - run: ./gradlew --no-daemon --stacktrace build
-      - run: ./gradlew --no-daemon jacocoTestReport
+      - run: ./gradlew --no-daemon --stacktrace api:build
+      - run: ./gradlew --no-daemon api:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
           path: build/test-results/test
@@ -56,17 +56,16 @@ jobs:
           key: v1-web-{{ .Branch }}-{{ .Revision }}
 
   build-client-java:
-    working_directory: ~/marquez/clients/java
-    machine: true
+    <<: *machine
     steps:
-      - *checkout_project_root
+      - checkout
       - restore_cache:
           keys:
             - v1-client-java-{{ .Branch }}-{{ .Revision }}
             - v1-client-java-{{ .Branch }}
-      - run: ../../.circleci/get-jdk11.sh
-      - run: ./gradlew --no-daemon --stacktrace build
-      - run: ./gradlew --no-daemon jacocoTestReport
+      - run: ./.circleci/get-jdk11.sh
+      - run: ./gradlew --no-daemon --stacktrace clients:java:build
+      - run: ./gradlew --no-daemon clients:java:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
           path: build/test-results/test
@@ -95,12 +94,12 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
-      - *checkout_project_root
+      - checkout
       - restore_cache:
           keys:
             - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
             - v1-integration-spark-{{ .Branch }}
-      - run: ./gradlew --no-daemon --stacktrace build
+      - run: ./gradlew --no-daemon --stacktrace :experimental:integrations:marquez-spark-agent:build
       - save_cache:
           key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
           paths:
@@ -131,7 +130,6 @@ jobs:
     <<: *machine
     steps:
       - checkout
-      - run: ./.circleci/get-jdk11.sh
       - run: ./docker/login.sh
       - run: ./docker/build-and-push.sh $CIRCLE_TAG
 
