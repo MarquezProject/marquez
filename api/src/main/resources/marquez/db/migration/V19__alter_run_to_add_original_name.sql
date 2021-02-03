@@ -1,1 +1,1 @@
-ALTER TABLE runs ADD original_name VARCHAR(255);
+ALTER TABLE runs ADD external_id VARCHAR(255);
