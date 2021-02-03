@@ -32,6 +32,7 @@ public class MarquezContext {
 
   public void emit(LineageEvent event) {
     try {
+      //Todo: move to async client
       ResponseMessage resp = client.post(lineageURI, event);
       if (!resp.completedSuccessfully()) {
         log.error("Could not emit lineage.", new MarquezHttpException(resp, resp.getError()));
