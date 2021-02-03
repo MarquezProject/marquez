@@ -170,6 +170,7 @@ public interface OpenLineageDao extends MarquezDao {
       run =
           runDao.upsert(
               runUuid,
+              event.getRun().getRunId(),
               now,
               jobVersion.getUuid(),
               runArgs.getUuid(),
@@ -180,6 +181,7 @@ public interface OpenLineageDao extends MarquezDao {
       run =
           runDao.upsert(
               runUuid,
+              event.getRun().getRunId(),
               now,
               jobVersion.getUuid(),
               runArgs.getUuid(),
