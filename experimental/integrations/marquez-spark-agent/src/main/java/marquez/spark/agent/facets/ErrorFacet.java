@@ -1,5 +1,7 @@
 package marquez.spark.agent.facets;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import lombok.Builder;
 import lombok.NonNull;
@@ -20,5 +22,12 @@ public class ErrorFacet extends BaseFacet {
 
   public String getMessage() {
     return exception.getMessage();
+  }
+
+  public String getStackTrace() {
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    exception.printStackTrace(pw);
+    return sw.toString();
   }
 }

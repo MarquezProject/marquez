@@ -22,8 +22,8 @@ public class StaticExecutionContextFactory extends ContextFactory {
           }
 
           @Override
-          protected String formatRddName(URI pathUri) {
-            return pathUri.getPath().substring(pathUri.getPath().lastIndexOf("/") + 1);
+          protected URI getDatasetUri(URI pathUri) {
+            return URI.create("gs://bucket/data.txt");
           }
         };
     return rdd;
@@ -58,8 +58,8 @@ public class StaticExecutionContextFactory extends ContextFactory {
 
   class StaticDatasetPlanTraverser extends DatasetLogicalPlanTraverser {
     @Override
-    protected String visitPathUri(URI uri) {
-      return "data.txt";
+    protected URI visitPathUri(URI uri) {
+      return URI.create("gs://bucket/data.txt");
     }
   }
 }

@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
+import marquez.spark.agent.client.DatasetParser;
+import marquez.spark.agent.client.DatasetParser.DatasetParseResult;
 import marquez.spark.agent.client.LineageEvent.Dataset;
 import marquez.spark.agent.client.LineageEvent.DatasetFacet;
 import marquez.spark.agent.client.LineageEvent.SchemaDatasetFacet;
@@ -41,24 +43,36 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   protected Object visit(
       CreateDataSourceTableAsSelectCommand createDataSourceTableAsSelectCommand) {
     outputDatasets.add(
-        Dataset.builder()
-            .namespace(jobNamespace)
-            .name(createDataSourceTableAsSelectCommand.table().qualifiedName())
-            .facets(
-                DatasetFacet.builder()
-                    .schema(visit(createDataSourceTableAsSelectCommand.table().schema()))
-                    .build())
-            .build());
+        buildDataset(
+            createDataSourceTableAsSelectCommand.table().qualifiedName(),
+            DatasetFacet.builder()
+                .schema(visit(createDataSourceTableAsSelectCommand.table().schema()))
+                .build()));
     return null;
   }
 
   protected Object visit(InsertIntoHadoopFsRelationCommand insertIntoHadoopFsRelationCommand) {
     outputDatasets.add(
-        Dataset.builder()
-            .namespace(jobNamespace)
-            .name(visitPathUri(insertIntoHadoopFsRelationCommand.outputPath().toUri()))
-            .build());
+        buildDataset(visitPathUri(insertIntoHadoopFsRelationCommand.outputPath().toUri()), null));
     return null;
+  }
+
+  protected Dataset buildDataset(String uri, DatasetFacet datasetFacet) {
+    DatasetParseResult result = DatasetParser.parse(uri);
+    return buildDataset(result, datasetFacet);
+  }
+
+  protected Dataset buildDataset(URI uri, DatasetFacet datasetFacet) {
+    DatasetParseResult result = DatasetParser.parse(uri);
+    return buildDataset(result, datasetFacet);
+  }
+
+  protected Dataset buildDataset(DatasetParseResult result, DatasetFacet datasetFacet) {
+    return Dataset.builder()
+        .name(result.getName())
+        .namespace(result.getNamespace())
+        .facets(datasetFacet)
+        .build();
   }
 
   protected SchemaDatasetFacet visit(StructType structType) {
@@ -100,11 +114,11 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   }
 
   protected Dataset visit(Path path) {
-    return Dataset.builder().namespace(jobNamespace).name(visitPathUri(path.toUri())).build();
+    return buildDataset(visitPathUri(path.toUri()), null);
   }
 
-  protected String visitPathUri(URI uri) {
-    return uri.toASCIIString().replaceAll(":", "_");
+  protected URI visitPathUri(URI uri) {
+    return uri;
   }
 
   @Getter

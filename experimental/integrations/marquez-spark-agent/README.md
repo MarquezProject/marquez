@@ -11,58 +11,28 @@ executor and the `-javaagent` parameter will load it on execution.
 
 ```python
 from uuid import uuid4
+import os
 ...
+job_name = 'job_name'
 
-jar = 'marquez-spark-LATEST.jar'
+jar = 'marquez-spark-0.11.4-rc.4.jar'
 files = [f"gs://bq-airflow-spark/{jar}"]
-marquez_path = 'http://localhost:5000'
-run_id = uuid4()
-job_name = 'submit_job'
-api_key = ''
 properties = {
   'spark.driver.extraJavaOptions':
-  f"-javaagent:{jar}={marquez_path}/api/v1/namespaces/foo/job/{job_name}/runs/{run_id}?api_key={api_key}"
+    f"-javaagent:{jar}={os.environ.get('MARQUEZ_URL')}/api/v1/namespaces/{os.getenv('MARQUEZ_NAMESPACE', 'default')}/jobs/{job_name}/runs/{uuid4()}?api_key={os.environ.get('MARQUEZ_API_KEY')}"
 }
 
 t1 = DataProcPySparkOperator(
     task_id=job_name,
     gcp_conn_id='google_cloud_default',
-    project_id='your-gcp-project-id',
-    main='gs://gcp-bucket/word-count.py',
-    job_name='WordCount',
-    dataproc_pyspark_properties=properties,
-    cluster_name='your-dataproc-cluster',
-    files=files,
+    project_id='project_id',
+    cluster_name='cluster-name',
     region='us-west1',
+    main='gs://bucket/your-prog.py',
+    job_name=job_name,
+    dataproc_pyspark_properties=properties,
+    files=files,
     dag=dag)
-```
-
-### Spark Submit
-```python
-from uuid import uuid4
-import os
-...
-
-spark_home = os.getenv('SPARK_HOME')
-marquez_path = 'http://localhost:5000'
-run_id = uuid4()
-jar_path = 'marquez-spark-LATEST.jar'
-job_name = 'submit_job'
-api_key = ''
-properties = {
-'spark.driver.extraJavaOptions':
-f"-javaagent:{jar_path}={marquez_path}/api/v1/namespaces/foo/job/{job_name}/runs/{run_id}?api_key={api_key}"
-}
-
-t1 = SparkSubmitOperator(
-    task_id=job_name,
-    conn_id='spark_local',
-    master='local',
-    conf=properties,
-    application=f"{spark_home}/work-dir/word-count.jar",
-    dag=dag
-)
-
 ```
 
 ## Arguments
@@ -86,12 +56,12 @@ Testing requires a Java 8 JVM to test the scala spark components.
 `export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 
 ## Testing
-To run the tests, run:
+To run the tests, from the root directory run:
 ```sh
-./gradlew test
+./gradlew :experimental:integrations:marquez-spark-agent:test
 ```
 
 ## Build spark agent jar
 ```sh
-./gradlew shadowJar
+./gradlew :experimental:integrations:marquez-spark-agent:shadowJar
 ```
