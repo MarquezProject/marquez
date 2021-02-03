@@ -118,8 +118,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     if (config.getGraphql().isEnabled()) {
       env.servlets()
-          .addServlet("api/v1/graphql", context.getGraphqlServlet())
-          .addMapping("/api/v1/graphql", "/api/v1/schema.json");
+          .addServlet("api/v1-beta/graphql", context.getGraphqlServlet())
+          .addMapping("/api/v1-beta/graphql", "/api/v1/schema.json");
     }
 
     log.debug("Registering resources...");

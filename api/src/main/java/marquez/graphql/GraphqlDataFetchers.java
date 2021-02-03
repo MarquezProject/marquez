@@ -3,16 +3,10 @@ package marquez.graphql;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import graphql.schema.DataFetcher;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import marquez.common.Utils;
 import marquez.db.JobVersionDao.IoType;
-import marquez.graphql.mapper.RowMap;
 import org.jdbi.v3.core.Jdbi;
 
 public class GraphqlDataFetchers {
@@ -386,108 +380,6 @@ public class GraphqlDataFetchers {
       String namespace = dataFetchingEnvironment.getArgument("namespace");
 
       return dao.getJobByNamespaceAndName(namespace, name);
-    };
-  }
-
-  public DataFetcher searchJobs() {
-    return dataFetchingEnvironment -> {
-      String name = dataFetchingEnvironment.getArgument("name");
-      if (name.isEmpty()) {
-        return dao.getJobs();
-      }
-
-      return dao.searchJobs(toQueryString(name), name);
-    };
-  }
-
-  public DataFetcher searchDatasets() {
-    return dataFetchingEnvironment -> {
-      String name = dataFetchingEnvironment.getArgument("name");
-      if (name.isEmpty()) {
-        return dao.getDatasets();
-      }
-
-      return dao.searchDatasets(toQueryString(name), name);
-    };
-  }
-
-  private String toQueryString(String name) {
-    StringJoiner tsQueryLiteral = new StringJoiner(" & ");
-    for (String term : toQueryTerms(name)) {
-      // Prefix matching: https://www.postgresql.org/docs/9.0/textsearch-controls.html
-      tsQueryLiteral.add(String.format("%s:*", term));
-    }
-
-    return tsQueryLiteral.toString();
-  }
-
-  private List<String> toQueryTerms(String name) {
-    List<String> terms = new ArrayList<>();
-    Pattern p = Pattern.compile("((?:\\w|\\d)+)");
-    Matcher m = p.matcher(name);
-    while (m.find()) {
-      terms.add(m.group(1));
-    }
-
-    return terms;
-  }
-
-  public DataFetcher getDatasetLineageInput() {
-    return dataFetchingEnvironment -> {
-      Map<String, Object> jobVersion = dataFetchingEnvironment.getSource();
-      UUID latestRun = (UUID)jobVersion.get("latestRunUuid");
-      return dao.getDatasetVersionInputsByRun(latestRun);
-    };
-  }
-
-  public DataFetcher getDatasetLineageOutput() {
-    return dataFetchingEnvironment -> {
-      Map<String, Object> jobVersion = dataFetchingEnvironment.getSource();
-      UUID latestRun = (UUID)jobVersion.get("latestRunUuid");
-
-      return dao.getDatasetVersionByRun(latestRun);
-    };
-  }
-
-  public DataFetcher getJobLineageInput() {
-    return dataFetchingEnvironment -> {
-      Map<String, Object> datasetVersion = dataFetchingEnvironment.getSource();
-      UUID datasetVersionUuid = (UUID)datasetVersion.get("uuid");
-
-      return dao.getDistinctJobVersionsByDatasetVersion(datasetVersionUuid);
-    };
-  }
-
-  public DataFetcher getJobLineageOutput() {
-    return dataFetchingEnvironment -> {
-//      MarquezGraphqlContext context = dataFetchingEnvironment.getContext();
-      Map<String, Object> datasetVersion = dataFetchingEnvironment.getSource();
-      UUID datasetVersionUuid = (UUID)datasetVersion.get("uuid");
-
-      return dao.getDistinctJobVersionsByDatasetVersionOutput(datasetVersionUuid);
-    };
-  }
-
-  public DataFetcher datasetLineage() {
-    return dataFetchingEnvironment -> {
-      MarquezGraphqlContext context = dataFetchingEnvironment.getContext();
-      return null;
-    };
-  }
-
-  public DataFetcher jobLineage() {
-    return dataFetchingEnvironment -> {
-      String name = dataFetchingEnvironment.getArgument("name");
-      String namespace = dataFetchingEnvironment.getArgument("namespace");
-
-      Map<String, Object> job = dao.getJobByNamespaceAndName(namespace, name);
-      if (job == null) return null;
-      UUID currentVersion = (UUID)job.get("currentVersionUuid");
-
-      Map<String, Object> jobVersion = dao.getJobVersion(currentVersion);
-      if (jobVersion == null) return null;
-
-        return ImmutableMap.of("data", jobVersion);
     };
   }
 }

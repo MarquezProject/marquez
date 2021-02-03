@@ -61,10 +61,7 @@ public class MarquezGraphqlServletBuilder {
                     .dataFetcher("namespace", dataFetchers.getNamespaceByName())
                     .dataFetcher("jobs", dataFetchers.getJobs())
                     .dataFetcher("job", dataFetchers.getJobsByNamespaceAndName())
-                    .dataFetcher("searchDatasets", dataFetchers.searchDatasets())
-                    .dataFetcher("searchJobs", dataFetchers.searchJobs())
-                    .dataFetcher("datasetLineage", dataFetchers.datasetLineage())
-                    .dataFetcher("jobLineage", dataFetchers.jobLineage()))
+            )
             .type(
                 newTypeWiring("DatasetLineage")
                 .typeResolver(new TypeResolver() {
@@ -130,15 +127,6 @@ public class MarquezGraphqlServletBuilder {
                     .dataFetcher("inputs", dataFetchers.getInputsByJobVersion())
                     .dataFetcher("outputs", dataFetchers.getOutputsByJobVersion()))
             .type(
-                newTypeWiring("JobVersionLineage")
-                    .dataFetcher("jobContext", dataFetchers.getJobContextByJobVersion())
-                    .dataFetcher("latestRun", dataFetchers.getLatestRunByJobVersion())
-                    .dataFetcher("job", dataFetchers.getJobByJobVersion())
-                    .dataFetcher("inputs", dataFetchers.getInputsByJobVersion())
-                    .dataFetcher("outputs", dataFetchers.getOutputsByJobVersion())
-                    .dataFetcher("inputLineage", dataFetchers.getDatasetLineageInput())
-                    .dataFetcher("outputLineage", dataFetchers.getDatasetLineageOutput()))
-            .type(
                 newTypeWiring("Job")
                     .dataFetcher("versions", dataFetchers.getVersionsByJob())
                     .dataFetcher("namespace", dataFetchers.getNamespaceByJob())
@@ -148,13 +136,6 @@ public class MarquezGraphqlServletBuilder {
                     .dataFetcher("fields", dataFetchers.getFieldsByDatasetVersion())
                     .dataFetcher("run", dataFetchers.getRunByDatasetVersion())
                     .dataFetcher("dataset", dataFetchers.getDatasetByDatasetVersion()))
-            .type(
-                newTypeWiring("DatasetVersionLineage")
-                    .dataFetcher("fields", dataFetchers.getFieldsByDatasetVersion())
-                    .dataFetcher("run", dataFetchers.getRunByDatasetVersion())
-                    .dataFetcher("dataset", dataFetchers.getDatasetByDatasetVersion())
-                    .dataFetcher("usedIn", dataFetchers.getJobLineageInput())
-                    .dataFetcher("producedBy", dataFetchers.getJobLineageOutput()))
             .type(
                 newTypeWiring("DatasetField")
                     .dataFetcher("dataset", dataFetchers.getDatasetByDatasetField())

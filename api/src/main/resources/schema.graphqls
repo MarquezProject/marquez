@@ -8,25 +8,6 @@ type Query {
   namespace(name: String!): Namespace
   jobs: [Job]
   job(namespace: String!, name: String): Job
-  searchJobs(name: String!): [Job]
-  searchDatasets(name: String!): [Dataset]
-  datasetLineage(namespace: String!, name: String!, pageState: String, depth: Int = 5): DatasetLineagePage
-  jobLineage(namespace: String!, name: String!, pageState: String, depth: Int = 5): JobLineagePage
-}
-
-type DatasetLineagePage {
-  data: DatasetVersionLineage
-  pageInfo: PageInfo
-}
-
-type JobLineagePage {
-  data: JobVersionLineage
-  pageInfo: PageInfo
-}
-
-type PageInfo {
-  hasNext: Boolean
-  pageState: String
 }
 
 type Tag {
@@ -136,42 +117,4 @@ type Dataset {
   tags: [Tag]
   currentVersion: DatasetVersion
   versions: [DatasetVersion]
-}
-
-union DatasetLineage = DatasetVersionRef | DatasetVersionLineage
-
-type DatasetVersionRef {
-  namespace: String!
-  name: String!
-}
-
-type DatasetVersionLineage {
-  createdAt: DateTime
-  dataset: Dataset
-  version: UUID
-  fields: [DatasetField]
-  run: Run
-  usedIn: [JobLineage]
-  producedBy: [JobLineage]
-}
-
-union JobLineage = JobVersionRef | JobVersionLineage
-
-type JobVersionRef {
-  namespace: String!
-  name: String!
-}
-
-type JobVersionLineage {
-  createdAt: DateTime
-  updatedAt: DateTime
-  location: String
-  version: UUID
-  jobContext: Json
-  latestRun: Run
-  job: Job
-  inputs: [Dataset]
-  outputs: [Dataset]
-  inputLineage: [DatasetLineage]
-  outputLineage: [DatasetLineage]
 }
