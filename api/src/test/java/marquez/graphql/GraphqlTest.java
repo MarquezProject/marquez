@@ -1,6 +1,7 @@
 package marquez.graphql;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -14,6 +15,7 @@ import marquez.JdbiRuleInit;
 import marquez.common.Utils;
 import marquez.db.OpenLineageDao;
 import marquez.service.OpenLineageService;
+import marquez.service.RunService;
 import marquez.service.models.LineageEvent;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.testing.JdbiRule;
@@ -37,8 +39,10 @@ public class GraphqlTest {
         Utils.newObjectMapper()
             .readValue(Resources.getResource("open_lineage/event_simple.json"), LineageEvent.class);
 
-    OpenLineageService service = new OpenLineageService(openLineageDao);
-    service.createLineageEvent(lineageEvent).get();
+    OpenLineageService service =
+        new OpenLineageService(
+            openLineageDao, mock(RunService.class), openLineageDao.createDatasetVersionDao());
+    service.createAsync(lineageEvent).get();
   }
 
   @Test
