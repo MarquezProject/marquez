@@ -17,6 +17,7 @@ package marquez;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
@@ -72,6 +73,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
 
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    bootstrap.addBundle(
+        new AssetsBundle(
+            "/assets",
+            "/graphql-playground",
+            "graphql-playground/index.htm",
+            "graphql-playground"));
   }
 
   @Override
@@ -91,6 +99,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
       }
     }
     registerResources(config, env, source);
+
     registerServlets(env);
   }
 
@@ -106,6 +115,12 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     final MarquezContext context =
         MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
+
+    if (config.getGraphql().isEnabled()) {
+      env.servlets()
+          .addServlet("api/v1-beta/graphql", context.getGraphqlServlet())
+          .addMapping("/api/v1-beta/graphql", "/api/v1/schema.json");
+    }
 
     log.debug("Registering resources...");
     for (final Object resource : context.getResources()) {
