@@ -121,11 +121,11 @@ public final class Mapper {
 
   public static Source toSource(@NonNull final SourceRow row) {
     return new Source(
-        SourceType.valueOf(row.getType()),
+        SourceType.of(row.getType()),
         SourceName.of(row.getName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
-        URI.create(row.getConnectionUrl()),
+        row.getConnectionUrl().map(URI::create).orElse(null),
         row.getDescription().orElse(null));
   }
 
@@ -142,7 +142,7 @@ public final class Mapper {
         now,
         now,
         name.getValue(),
-        meta.getConnectionUrl().toASCIIString(),
+        meta.getConnectionUrl().map(URI::toASCIIString).orElse(null),
         meta.getDescription().orElse(null));
   }
 
@@ -438,7 +438,7 @@ public final class Mapper {
     }
     return Utils.fromJson(
         args,
-        Utils.getMapper()
+        Utils.objectMapper()
             .getTypeFactory()
             .constructMapType(ImmutableMap.class, String.class, String.class));
   }

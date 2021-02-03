@@ -283,12 +283,22 @@ public interface OpenLineageDao extends SqlObject {
       source =
           sourceDao.upsert(
               UUID.randomUUID(),
-              getSourceType(ds),
+              getSourceType(ds).getValue(),
+              now,
               now,
               ds.getFacets().getDataSource().getName(),
-              ds.getFacets().getDataSource().getUri());
+              ds.getFacets().getDataSource().getUri(),
+              ds.getFacets().getDescription());
     } else {
-      source = sourceDao.upsert(UUID.randomUUID(), getSourceType(ds), now, DEFAULT_SOURCE_NAME, "");
+      source =
+          sourceDao.upsert(
+              UUID.randomUUID(),
+              getSourceType(ds).getValue(),
+              now,
+              now,
+              DEFAULT_SOURCE_NAME,
+              "",
+              "");
     }
 
     String dsDescription = null;
@@ -345,7 +355,7 @@ public interface OpenLineageDao extends SqlObject {
   }
 
   default SourceType getSourceType(Dataset ds) {
-    return SourceType.POSTGRESQL;
+    return SourceType.of("POSTGRESQL");
   }
 
   default DatasetType getDatasetType(Dataset ds) {

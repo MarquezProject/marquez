@@ -38,8 +38,12 @@ public final class ModelGenerator extends Generator {
     return OwnerName.of("test_owner" + newId());
   }
 
-  public static SourceType newSourceType() {
-    return SourceType.values()[newIdWithBound(SourceType.values().length - 1)];
+  public static SourceType newDbSourceType() {
+    return SourceType.of("POSTGRESQL");
+  }
+
+  public static SourceType newStreamSourceType() {
+    return SourceType.of("KAFKA");
   }
 
   public static SourceName newSourceName() {
@@ -47,41 +51,16 @@ public final class ModelGenerator extends Generator {
   }
 
   public static URI newConnectionUrl() {
-    return newConnectionUrlFor(SourceType.POSTGRESQL);
+    return newConnectionUrlFor(newDbSourceType());
   }
 
   public static URI newConnectionUrlFor(SourceType type) {
-    String connectionUrlString;
-    switch (type) {
-      case BIGQUERY:
-        // FIXME: when not using the jdbc driver ?
-        connectionUrlString =
-            "jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=MyBigQueryProject;OAuthType=1;"
-                + newId();
-      case PULSAR:
-        connectionUrlString = "pulsar://localhost:6650" + newId();
-      case ORACLE:
-        connectionUrlString = "jdbc:oracle:thin:@localhost:1521:xe" + newId();
-      case MYSQL:
-        connectionUrlString = "jdbc:mysql://localhost:3306/test" + newId();
-        break;
-      case POSTGRESQL:
-        connectionUrlString = "jdbc:postgresql://localhost:5432/test" + newId();
-        break;
-      case REDSHIFT:
-        connectionUrlString =
-            "jdbc:redshift://we.us-west-2.redshift.amazonaws.com:5439/test" + newId();
-        break;
-      case SNOWFLAKE:
-        connectionUrlString = "jdbc:snowflake://we.snowflakecomputing.com/?db=test" + newId();
-        break;
-      case KAFKA:
-        connectionUrlString = "localhost:9092";
-        break;
-      default:
-        throw new IllegalArgumentException();
+    if ("POSTGRESQL".equals(type.getValue())) {
+      return URI.create("jdbc:postgresql://localhost:5432/test" + newId());
+    } else if ("KAFKA".equals(type.getValue())) {
+      return URI.create("kafka://localhost:9092");
     }
-    return URI.create(connectionUrlString);
+    throw new IllegalArgumentException();
   }
 
   public static ImmutableSet<DatasetId> newDatasetIds(final int limit) {

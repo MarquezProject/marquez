@@ -32,12 +32,15 @@ import io.dropwizard.jackson.Jackson;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
+import marquez.common.models.SourceType;
 
 public final class Utils {
   private Utils() {}
@@ -52,6 +55,8 @@ public final class Utils {
 
   private static final int UUID_LENGTH = 36;
 
+  private static final String JDBC = "jdbc:";
+
   public static ObjectMapper newObjectMapper() {
     final ObjectMapper mapper = Jackson.newObjectMapper();
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -63,7 +68,7 @@ public final class Utils {
 
   public static String toJson(@NonNull final Object value) {
     try {
-      return MAPPER.writeValueAsString(value);
+      return objectMapper().writeValueAsString(value);
     } catch (JsonProcessingException e) {
       throw new UncheckedIOException(e);
     }
@@ -71,7 +76,7 @@ public final class Utils {
 
   public static <T> T fromJson(@NonNull final String json, @NonNull final TypeReference<T> type) {
     try {
-      return MAPPER.readValue(json, type);
+      return objectMapper().readValue(json, type);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
@@ -79,13 +84,13 @@ public final class Utils {
 
   public static <T> T fromJson(@NonNull final String json, @NonNull final JavaType type) {
     try {
-      return MAPPER.readValue(json, type);
+      return objectMapper().readValue(json, type);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
   }
 
-  public static ObjectMapper getMapper() {
+  public static ObjectMapper objectMapper() {
     return MAPPER;
   }
 
@@ -112,7 +117,46 @@ public final class Utils {
     return UUID.fromString(uuidString);
   }
 
-  public static Instant toInstant(@Nullable final String asIso) {
+  public static Instant toInstantOrNull(@Nullable final String asIso) {
     return (asIso == null) ? null : Instant.from(ISO_INSTANT.parse(asIso));
+  }
+
+  public static SourceType sourceTypeFor(@NonNull final URI connectionUrl) {
+    return SourceType.of(toUrlWithNoJdbcPrefix(connectionUrl).getScheme());
+  }
+
+  public static URI urlWithNoCredentials(@NonNull final URI connectionUrl) {
+    final URI urlWithNoJdbcPrefix = toUrlWithNoJdbcPrefix(connectionUrl);
+    try {
+      return new URI(
+          (isJdbcUrl(connectionUrl))
+              ? JDBC + urlWithNoJdbcPrefix.getScheme()
+              : urlWithNoJdbcPrefix.getScheme(),
+          null,
+          urlWithNoJdbcPrefix.getHost(),
+          urlWithNoJdbcPrefix.getPort(),
+          urlWithNoJdbcPrefix.getPath(),
+          urlWithNoJdbcPrefix.getQuery(),
+          urlWithNoJdbcPrefix.getFragment());
+    } catch (URISyntaxException e) {
+      final AssertionError error = new AssertionError("Malformed URI: " + connectionUrl);
+      error.initCause(e);
+      throw error;
+    }
+  }
+
+  private static boolean isJdbcUrl(@NonNull final URI connectionUrl) {
+    final String connectionUrlString = connectionUrl.toString();
+    return connectionUrlString.startsWith(JDBC);
+  }
+
+  private static URI toUrlWithNoJdbcPrefix(@NonNull final URI connectionUrl) {
+    return isJdbcUrl(connectionUrl)
+        ? URI.create(dropJdbcPrefix(connectionUrl.toString()))
+        : connectionUrl;
+  }
+
+  private static String dropJdbcPrefix(@NonNull final String connectionUrlString) {
+    return connectionUrlString.replaceFirst("^" + JDBC, "");
   }
 }

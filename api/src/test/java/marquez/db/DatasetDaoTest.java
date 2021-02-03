@@ -110,7 +110,14 @@ public class DatasetDaoTest {
     namespaceDao.insert(namespaceRow);
 
     sourceRow = newSourceRow();
-    sourceDao.insert(sourceRow);
+    sourceDao.upsert(
+        sourceRow.getUuid(),
+        sourceRow.getType(),
+        sourceRow.getCreatedAt(),
+        sourceRow.getUpdatedAt(),
+        sourceRow.getName(),
+        sourceRow.getConnectionUrl().get(),
+        sourceRow.getDescription().orElse(null));
 
     tagRows = newTagRows(2);
     tagRows.forEach(tagRow -> tagDao.insert(tagRow));

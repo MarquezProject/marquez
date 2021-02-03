@@ -91,7 +91,7 @@ public class RunResource {
   Response markRunAs(@NonNull RunState runState, @QueryParam("at") String atAsIso)
       throws MarquezServiceException {
 
-    runService.markRunAs(runId, runState, Utils.toInstant(atAsIso));
+    runService.markRunAs(runId, runState, Utils.toInstantOrNull(atAsIso));
     return getRun();
   }
 }

@@ -23,9 +23,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
+import java.net.URI;
 import java.net.URL;
+import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 import marquez.UnitTests;
+import marquez.common.models.SourceType;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -35,6 +39,8 @@ public class UtilsTest {
   private static final Object OBJECT = new Object(VALUE);
   private static final TypeReference<Object> TYPE = new TypeReference<Object>() {};
   private static final String JSON = "{\"value\":\"" + VALUE + "\"}";
+
+  private static final SourceType POSTGRESQL = SourceType.of("POSTGRESQL");
 
   @Test
   public void testToJson() {
@@ -96,6 +102,77 @@ public class UtilsTest {
     final String checksum0 = Utils.checksumFor(kvMap0);
     final String checksum1 = Utils.checksumFor(kvMap1);
     assertThat(checksum0).isNotEqualTo(checksum1);
+  }
+
+  @Test
+  public void testToUuid() {
+    final String uuidString = "156c934a-6f35-440b-ac88-7a0b6e83fe51";
+    final UUID uuid = Utils.toUuid(uuidString);
+    assertThat(uuid.toString()).isEqualTo(uuidString);
+  }
+
+  @Test
+  public void testToUuid_throwsOnBlankOrEmpty() {
+    assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> Utils.toUuid(""));
+    assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> Utils.toUuid(" "));
+  }
+
+  @Test
+  public void testToUuid_throwsOnLengthNotValid() {
+    assertThatExceptionOfType(IllegalArgumentException.class)
+        .isThrownBy(() -> Utils.toUuid("53678291-e1fa-4f1b-bb29-939b-53a855c48817"));
+    assertThatExceptionOfType(IllegalArgumentException.class)
+        .isThrownBy(() -> Utils.toUuid("53678291-e1fa-4f1b-53a855c48817"));
+  }
+
+  @Test
+  public void testToInstantOrNull() {
+    final Instant nullInstant = Utils.toInstantOrNull(null);
+    assertThat(nullInstant).isNull();
+
+    final String asIso = "2021-01-09T19:49:24.201Z";
+    final Instant instant = Utils.toInstantOrNull(asIso);
+    assertThat(instant).isEqualTo(asIso);
+  }
+
+  @Test
+  public void testSourceTypeFor() {
+    final URI connectionUrl = URI.create("postgresql://localhost:5432/test");
+    final URI connectionUrlWithJdbcPrefix = URI.create("jdbc:" + connectionUrl);
+
+    final SourceType sourceType = Utils.sourceTypeFor(connectionUrl);
+    final SourceType sourceTypeHadJdbcPrefix = Utils.sourceTypeFor(connectionUrlWithJdbcPrefix);
+
+    assertThat(sourceType).isEqualTo(POSTGRESQL);
+    assertThat(sourceTypeHadJdbcPrefix).isEqualTo(POSTGRESQL);
+  }
+
+  @Test
+  public void testSourceTypeFor_withJdbcPrefix() {
+    final URI connectionUrlWithJdbcPrefix = URI.create("jdbc:postgresql://localhost:5432/test");
+
+    final SourceType sourceType = Utils.sourceTypeFor(connectionUrlWithJdbcPrefix);
+    assertThat(sourceType).isEqualTo(POSTGRESQL);
+  }
+
+  @Test
+  public void testUrlWithNoCredentials() {
+    final URI connectionUrlWithCredentials =
+        URI.create("postgresql://test:1234@localhost:5432/test");
+
+    final URI expected = URI.create("postgresql://localhost:5432/test");
+    final URI actual = Utils.urlWithNoCredentials(connectionUrlWithCredentials);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testUrlWithNoCredentials_withJdbcPrefix() {
+    final URI connectionUrlWithCredentialsAndJdbcPrefix =
+        URI.create("jdbc:postgresql://test:1234@localhost:5432/test");
+
+    final URI expected = URI.create("jdbc:postgresql://localhost:5432/test");
+    final URI actual = Utils.urlWithNoCredentials(connectionUrlWithCredentialsAndJdbcPrefix);
+    assertThat(actual).isEqualTo(expected);
   }
 
   @JsonAutoDetect(fieldVisibility = Visibility.ANY)

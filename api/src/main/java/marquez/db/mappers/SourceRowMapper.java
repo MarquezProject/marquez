@@ -37,7 +37,7 @@ public final class SourceRowMapper implements RowMapper<SourceRow> {
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         stringOrThrow(results, Columns.NAME),
-        stringOrThrow(results, Columns.CONNECTION_URL),
+        stringOrNull(results, Columns.CONNECTION_URL),
         stringOrNull(results, Columns.DESCRIPTION));
   }
 }

@@ -14,18 +14,52 @@
 
 package marquez.service.models;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.net.URI;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
+import marquez.common.Utils;
 import marquez.common.models.SourceType;
 
-@Value
-public class SourceMeta {
-  @NonNull SourceType type;
-  @NonNull URI connectionUrl;
-  @Nullable String description;
+@EqualsAndHashCode
+@ToString
+public final class SourceMeta {
+  @Getter private final SourceType type;
+  @Nullable private final URI connectionUrl;
+  @Nullable private final String description;
+
+  public SourceMeta(@NonNull final SourceType type, @Nullable final String description) {
+    this(type, null, description);
+  }
+
+  public SourceMeta(@NonNull final URI connectionUrl, @Nullable final String description) {
+    this(null, connectionUrl, description);
+  }
+
+  @JsonCreator
+  public SourceMeta(
+      @Nullable final SourceType type,
+      @Nullable final URI connectionUrl,
+      @Nullable final String description) {
+    // ...
+    this.type =
+        (connectionUrl == null)
+            ? checkNotNull(type, "connection url must be provided when type == null")
+            : Utils.sourceTypeFor(connectionUrl);
+    // ...
+    this.connectionUrl = (connectionUrl == null) ? null : Utils.urlWithNoCredentials(connectionUrl);
+    this.description = description;
+  }
+
+  public Optional<URI> getConnectionUrl() {
+    return Optional.ofNullable(connectionUrl);
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

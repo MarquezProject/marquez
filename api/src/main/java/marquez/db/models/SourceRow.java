@@ -28,8 +28,12 @@ public class SourceRow {
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
   @NonNull String name;
-  @NonNull String connectionUrl;
+  @Nullable String connectionUrl;
   @Nullable String description;
+
+  public Optional<String> getConnectionUrl() {
+    return Optional.ofNullable(connectionUrl);
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

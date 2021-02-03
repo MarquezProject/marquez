@@ -1,0 +1,1 @@
+ALTER TABLE sources ALTER COLUMN connection_url DROP NOT NULL;

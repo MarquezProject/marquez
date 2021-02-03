@@ -16,23 +16,7 @@ package marquez.service.models;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.temporal.ChronoUnit.HOURS;
-import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
-import static marquez.common.models.ModelGenerator.newContext;
-import static marquez.common.models.ModelGenerator.newDatasetId;
-import static marquez.common.models.ModelGenerator.newDatasetIds;
-import static marquez.common.models.ModelGenerator.newDatasetName;
-import static marquez.common.models.ModelGenerator.newDescription;
-import static marquez.common.models.ModelGenerator.newFields;
-import static marquez.common.models.ModelGenerator.newJobId;
-import static marquez.common.models.ModelGenerator.newJobType;
-import static marquez.common.models.ModelGenerator.newLocation;
-import static marquez.common.models.ModelGenerator.newNamespaceName;
-import static marquez.common.models.ModelGenerator.newOwnerName;
-import static marquez.common.models.ModelGenerator.newRunId;
-import static marquez.common.models.ModelGenerator.newSourceName;
-import static marquez.common.models.ModelGenerator.newSourceType;
-import static marquez.common.models.ModelGenerator.newTagName;
-import static marquez.common.models.ModelGenerator.newTagNames;
+import static marquez.common.models.ModelGenerator.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -75,7 +59,7 @@ public final class ModelGenerator extends Generator {
 
   public static Source newSourceWith(final SourceName sourceName) {
     final Instant now = newTimestamp();
-    final SourceType sourceType = newSourceType();
+    final SourceType sourceType = newDbSourceType();
     return new Source(
         sourceType, sourceName, now, now, newConnectionUrlFor(sourceType), newDescription());
   }
@@ -173,7 +157,7 @@ public final class ModelGenerator extends Generator {
 
   public static Run newRunWith(
       final RunId runId, final RunState runState, final String transitionedAt) {
-    final Instant now = Utils.toInstant(transitionedAt);
+    final Instant now = Utils.toInstantOrNull(transitionedAt);
     final RunMeta runMeta = newRunMeta();
     return new Run(
         runId,

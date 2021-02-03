@@ -55,8 +55,7 @@ public class SourceResource {
   @Path("{source}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
-  public Response createOrUpdate(@PathParam("source") SourceName name, @Valid SourceMeta meta)
-      throws MarquezServiceException {
+  public Response createOrUpdate(@PathParam("source") SourceName name, @Valid SourceMeta meta) {
     final Source source = service.createOrUpdate(name, meta);
     return Response.ok(source).build();
   }
@@ -67,7 +66,7 @@ public class SourceResource {
   @GET
   @Path("{source}")
   @Produces(APPLICATION_JSON)
-  public Response get(@PathParam("source") SourceName name) throws MarquezServiceException {
+  public Response get(@PathParam("source") SourceName name) {
     final Source source = service.get(name).orElseThrow(() -> new SourceNotFoundException(name));
     return Response.ok(source).build();
   }

@@ -38,8 +38,12 @@ public class Source {
 
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
-  @NonNull URI connectionUrl;
+  @Nullable URI connectionUrl;
   @Nullable String description;
+
+  public Optional<URI> getConnectionUrl() {
+    return Optional.ofNullable(connectionUrl);
+  }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

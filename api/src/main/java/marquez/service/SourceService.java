@@ -17,10 +17,11 @@ package marquez.service;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
-import io.prometheus.client.Counter;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.SourceName;
@@ -28,85 +29,58 @@ import marquez.common.models.SourceType;
 import marquez.db.SourceDao;
 import marquez.db.models.SourceRow;
 import marquez.service.exceptions.MarquezServiceException;
-import marquez.service.mappers.Mapper;
 import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
-import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class SourceService {
-  private static final Counter sources =
-      Counter.build()
-          .namespace("marquez")
-          .name("source_total")
-          .help("Total number of sources.")
-          .register();
-
   private final SourceDao dao;
 
   public SourceService(@NonNull final SourceDao dao) {
     this.dao = dao;
   }
 
-  public Source createOrUpdate(@NonNull SourceName name, @NonNull SourceMeta meta)
-      throws MarquezServiceException {
-    try {
-      if (!exists(name)) {
-        log.info("Source '{}' not found, creating...", name.getValue());
-        final SourceRow newRow = Mapper.toSourceRow(name, meta);
-        dao.insert(newRow);
-        log.info("Successfully created source '{}' with meta: {}", name.getValue(), meta);
-
-        sources.inc();
-      }
-      return get(name).get();
-    } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to create or update source '{}' with meta: {}", name.getValue(), meta, e);
-      throw new MarquezServiceException();
-    }
+  public Source createOrUpdate(@NonNull SourceName name, @NonNull SourceMeta meta) {
+    final Instant now = Instant.now();
+    final SourceRow row =
+        dao.upsert(
+            UUID.randomUUID(),
+            meta.getType().getValue(),
+            now,
+            now,
+            name.getValue(),
+            meta.getConnectionUrl().map(URI::toASCIIString).orElse(null),
+            meta.getDescription().orElse(null));
+    log.info("Added source '{}' with meta: {}", name.getValue(), meta);
+    return toSource(row);
   }
 
   public boolean exists(@NonNull SourceName name) throws MarquezServiceException {
-    try {
-      return dao.exists(name.getValue());
-    } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to check for source '{}'.", name.getValue(), e);
-      throw new MarquezServiceException();
-    }
+    return dao.exists(name.getValue());
   }
 
-  public Optional<Source> get(@NonNull SourceName name) throws MarquezServiceException {
-    try {
-      return dao.findBy(name.getValue()).map(SourceService::toSource);
-    } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get source '{}'.", name.getValue(), e);
-      throw new MarquezServiceException();
-    }
+  public Optional<Source> get(@NonNull SourceName name) {
+    return dao.findBy(name.getValue()).map(SourceService::toSource);
   }
 
-  public ImmutableList<Source> getAll(int limit, int offset) throws MarquezServiceException {
+  public ImmutableList<Source> getAll(int limit, int offset) {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
-    try {
-      final ImmutableList.Builder<Source> sources = ImmutableList.builder();
-      final List<SourceRow> rows = dao.findAll(limit, offset);
-      for (final SourceRow row : rows) {
-        sources.add(toSource(row));
-      }
-      return sources.build();
-    } catch (UnableToExecuteStatementException e) {
-      log.error("Failed to get sources.", e);
-      throw new MarquezServiceException();
+    final ImmutableList.Builder<Source> sources = ImmutableList.builder();
+    final List<SourceRow> rows = dao.findAll(limit, offset);
+    for (final SourceRow row : rows) {
+      sources.add(toSource(row));
     }
+    return sources.build();
   }
 
   static Source toSource(@NonNull final SourceRow row) {
     return new Source(
-        SourceType.valueOf(row.getType()),
+        SourceType.of(row.getType()),
         SourceName.of(row.getName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
-        URI.create(row.getConnectionUrl()),
+        row.getConnectionUrl().map(URI::create).orElse(null),
         row.getDescription().orElse(null));
   }
 }

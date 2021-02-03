@@ -18,17 +18,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.models.SourceType;
 import marquez.db.mappers.SourceRowMapper;
 import marquez.db.models.SourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(SourceRowMapper.class)
 public interface SourceDao {
-  @SqlUpdate(
+  @SqlQuery(
       "INSERT INTO sources ("
           + "uuid, "
           + "type, "
@@ -36,7 +33,7 @@ public interface SourceDao {
           + "updated_at, "
           + "name, "
           + "connection_url, "
-          + "description"
+          + "description "
           + ") VALUES ("
           + ":uuid, "
           + ":type, "
@@ -44,14 +41,28 @@ public interface SourceDao {
           + ":updatedAt, "
           + ":name, "
           + ":connectionUrl, "
-          + ":description)")
-  void insert(@BindBean SourceRow row);
+          + ":description"
+          + ") ON CONFLICT(name) DO UPDATE SET "
+          + "type = EXCLUDED.type, "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "name = EXCLUDED.name, "
+          + "connection_url = EXCLUDED.connection_url, "
+          + "description = EXCLUDED.description "
+          + "RETURNING *")
+  SourceRow upsert(
+      UUID uuid,
+      String type,
+      Instant createdAt,
+      Instant updatedAt,
+      String name,
+      String connectionUrl,
+      String description);
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM sources WHERE name = :name)")
   boolean exists(String name);
 
-  @SqlQuery("SELECT * FROM sources WHERE uuid = :rowUuid")
-  Optional<SourceRow> findBy(UUID rowUuid);
+  @SqlQuery("SELECT * FROM sources WHERE uuid = :uuid")
+  Optional<SourceRow> findBy(UUID uuid);
 
   @SqlQuery("SELECT * FROM sources WHERE name = :name")
   Optional<SourceRow> findBy(String name);
@@ -61,27 +72,4 @@ public interface SourceDao {
 
   @SqlQuery("SELECT COUNT(*) FROM sources")
   int count();
-
-  @SqlQuery(
-      "INSERT INTO sources ("
-          + "uuid, "
-          + "type, "
-          + "created_at, "
-          + "updated_at, "
-          + "name, "
-          + "connection_url "
-          + ") VALUES ("
-          + ":uuid, "
-          + ":type, "
-          + ":now, "
-          + ":now, "
-          + ":name, "
-          + ":connectionUrl"
-          + ") ON CONFLICT(name) DO UPDATE SET "
-          + "type = EXCLUDED.type, "
-          + "updated_at = EXCLUDED.updated_at, "
-          + "name = EXCLUDED.name, "
-          + "connection_url = EXCLUDED.connection_url "
-          + "RETURNING *")
-  SourceRow upsert(UUID uuid, SourceType type, Instant now, String name, String connectionUrl);
 }
