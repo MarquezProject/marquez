@@ -8,9 +8,9 @@ import static marquez.common.Utils.VERSION_JOINER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import java.net.MalformedURLException;
+import io.dropwizard.util.Strings;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.UUID;
 import marquez.common.Utils;
 import marquez.common.models.DatasetType;
@@ -252,13 +253,13 @@ public interface OpenLineageDao extends MarquezDao {
     return bag;
   }
 
-  default String getUrlOrPlaceholder(String url) {
+  default String getUrlOrPlaceholder(String uri) {
     try {
-      return new URL(url).toURI().toASCIIString();
-    } catch (MalformedURLException | URISyntaxException e) {
+      return new URI(uri).toASCIIString();
+    } catch (URISyntaxException e) {
       try {
         // assume host as string
-        return new URL("http://" + url).toURI().toASCIIString();
+        return new URI("http://" + uri).toASCIIString();
       } catch (Exception ex) {
         return ""; // empty string for placeholder
       }
@@ -321,7 +322,7 @@ public interface OpenLineageDao extends MarquezDao {
             now,
             datasetNamespace.getUuid(),
             source.getUuid(),
-            ds.getName(),
+            formatDatasetName(ds.getName()),
             ds.getName(),
             dsDescription);
 
@@ -363,6 +364,47 @@ public interface OpenLineageDao extends MarquezDao {
         jobVersion.getUuid(), datasetRow.getUuid(), isInput ? IoType.INPUT : IoType.OUTPUT);
 
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
+  }
+
+  default String formatDatasetName(String name) {
+    // if url, use the host.path as output, else use name
+    // Valid URIs:
+    // a.a.a
+    //  -note, a.a.a is all in 'path' and all other fields are null
+    // gs://bucket
+    // file:///out.txt
+    // file:///
+    // file://localhost/out.txt
+
+    try {
+      // Construction name by walking the path and append if not null
+      URI uri = new URI(name);
+      StringJoiner joiner = new StringJoiner(".");
+      if (!Strings.isNullOrEmpty(uri.getScheme())) {
+        joiner.add(uri.getScheme());
+      }
+      if (!Strings.isNullOrEmpty(uri.getHost())) {
+        joiner.add(uri.getHost());
+      }
+      if (!Strings.isNullOrEmpty(uri.getPath())) {
+        joiner.add(trimLeadingSlash(uri.getPath()));
+      }
+      String newName = joiner.toString();
+
+      if (newName.isEmpty()) {
+        return name;
+      }
+      return newName;
+    } catch (URISyntaxException e) {
+      return name;
+    }
+  }
+
+  default String trimLeadingSlash(String path) {
+    if (path.startsWith("/")) {
+      return path.substring(1);
+    }
+    return path;
   }
 
   default SourceType getSourceType(Dataset ds) {
