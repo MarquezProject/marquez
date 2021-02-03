@@ -133,6 +133,13 @@ public interface DatasetVersionDao {
   List<ExtendedDatasetVersionRow> findByRunId(@NonNull UUID runId);
 
   @SqlQuery(
+          EXTENDED_SELECT
+                  + "WHERE n.name = :namespaceName AND d.name = :datasetName "
+                  + "ORDER BY created_at DESC "
+                  + "LIMIT :limit OFFSET :offset")
+  List<DatasetVersionRow> findAll(String namespaceName, String datasetName, int limit, int offset);
+
+  @SqlQuery(
       "INSERT INTO dataset_versions "
           + "(uuid, created_at, dataset_uuid, version, run_uuid) "
           + "VALUES "
