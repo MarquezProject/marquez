@@ -5,7 +5,7 @@ import marquez.spark.agent.MarquezContext;
 
 @AllArgsConstructor
 public class ContextFactory {
-  protected final MarquezContext marquezContext;
+  public final MarquezContext marquezContext;
 
   public void close() {
     marquezContext.close();

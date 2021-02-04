@@ -9,7 +9,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
 [![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
-[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-kcdjmhmq-FGjwM2K_A~1B2Tw0oV6ssA)
+[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-linj7k52-NaYvdVsa7SkR5T4IMMzZFw)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
@@ -40,6 +40,9 @@ The HTTP API listens on port `5000` for all calls and port `5001` for the admin 
 
 You can open http://localhost:3000 to begin exploring the web UI.
 
+The graphql playground endpoint can be found at http://localhost:5000/graphql-playground with 
+the graphql endpoint located at http://localhost:5000/api/v1-beta/graphql
+
 ## Documentation
 
 We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/main/docs).
@@ -50,9 +53,10 @@ We invite everyone to help us improve and keep documentation up to date. Documen
 
 Marquez uses a _multi_-project structure and contains the following modules:
 
+* [`api`](https://github.com/MarquezProject/marquez/tree/main/api): core API used to collect metadata
 * [`web`](https://github.com/MarquezProject/marquez/tree/main/web): web UI used to view metadata
 * [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
-* [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations): integrations with other systems
+* [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations): integrations with other systems (ex: [`Airflow`](https://github.com/MarquezProject/marquez/tree/feature/ci-build-jvm-modules/examples/airflow))
 * [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart): helm chart
 
 ## Requirements
@@ -64,13 +68,13 @@ Marquez uses a _multi_-project structure and contains the following modules:
 
 ## Building
 
-To build the entire project run:
+To build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
 
 ```
-$ ./gradlew shadowJar
+$ ./gradlew :api:shadowJar
 ```
 
-The executable can be found under `build/libs/`
+The executable can be found under `api/build/libs/`
 
 ## Configuration
 
@@ -104,7 +108,7 @@ By default, Marquez uses the following ports:
 ## Running the [Application](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/MarquezApp.java)
 
 ```bash
-$ ./gradlew runShadow
+$ ./gradlew :api:runShadow
 ```
 
 Then browse to the admin interface: http://localhost:8081
@@ -117,7 +121,7 @@ Then browse to the admin interface: http://localhost:8081
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: [https://marquezproject.slack.com](https://join.slack.com/t/marquezproject/shared_invite/zt-kcdjmhmq-FGjwM2K_A~1B2Tw0oV6ssA)
+* Chat: [https://marquezproject.slack.com](https://join.slack.com/t/marquezproject/shared_invite/zt-linj7k52-NaYvdVsa7SkR5T4IMMzZFw)
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing

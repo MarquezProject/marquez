@@ -167,7 +167,7 @@ public interface DatasetDao extends SqlObject {
           + ":namespaceUuid, "
           + ":sourceUuid, "
           + ":name, "
-          + ":name, "
+          + ":physicalName, "
           + ":description) "
           + "ON CONFLICT (namespace_uuid, name) "
           + "DO UPDATE SET "
@@ -184,5 +184,6 @@ public interface DatasetDao extends SqlObject {
       UUID namespaceUuid,
       UUID sourceUuid,
       String name,
+      String physicalName,
       String description);
 }

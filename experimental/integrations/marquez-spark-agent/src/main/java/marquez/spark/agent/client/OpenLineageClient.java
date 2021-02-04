@@ -17,78 +17,71 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.async.methods.BasicHttpRequests;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.cookie.StandardCookieSpec;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
-import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.Message;
-import org.apache.hc.core5.http.ssl.TLS;
-import org.apache.hc.core5.reactor.IOReactorConfig;
-import org.apache.hc.core5.ssl.SSLContexts;
-import org.apache.hc.core5.util.Timeout;
 
 @Slf4j
 public class OpenLineageClient {
   private final CloseableHttpAsyncClient http;
+  private final ExecutorService executorService;
   private final Optional<String> apiKey;
   @Getter protected static final ObjectMapper objectMapper = createMapper();
 
-  public OpenLineageClient(CloseableHttpAsyncClient http, Optional<String> apiKey) {
+  public OpenLineageClient(
+      CloseableHttpAsyncClient http, Optional<String> apiKey, ExecutorService executorService) {
     this.http = http;
+    this.executorService = executorService;
     this.http.start();
     this.apiKey = apiKey;
   }
 
-  public static OpenLineageClient create(final Optional<String> apiKey) {
-    final CloseableHttpAsyncClient http =
-        HttpAsyncClients.customHttp2()
-            .setTlsStrategy(
-                ClientTlsStrategyBuilder.create()
-                    .setSslContext(SSLContexts.createSystemDefault())
-                    .setTlsVersions(TLS.V_1_3, TLS.V_1_2)
-                    .build())
-            .setIOReactorConfig(IOReactorConfig.custom().setSoTimeout(Timeout.ofSeconds(5)).build())
-            .setDefaultRequestConfig(
-                RequestConfig.custom()
-                    .setConnectTimeout(Timeout.ofSeconds(5))
-                    .setResponseTimeout(Timeout.ofSeconds(5))
-                    .setCookieSpec(StandardCookieSpec.STRICT)
-                    .build())
-            .setUserAgent(getUserAgent())
-            .build();
-    return new OpenLineageClient(http, apiKey);
+  public static OpenLineageClient create(
+      final Optional<String> apiKey, ExecutorService executorService) {
+    final CloseableHttpAsyncClient http = HttpAsyncClients.createDefault();
+    return new OpenLineageClient(http, apiKey, executorService);
   }
 
-  public <T> void post(URI uri, Object obj) throws MarquezHttpException {
-    post(uri, obj, Void.class);
+  public <T> ResponseMessage post(URI uri, Object obj) throws MarquezHttpException {
+    return post(uri, obj, Void.class);
   }
 
-  public <T> T post(URI uri, Object obj, Class<T> clazz) throws MarquezHttpException {
+  public <T> ResponseMessage<T> post(URI uri, Object obj, Class<T> clazz)
+      throws MarquezHttpException {
     return post(uri, obj, getTypeReference(clazz));
   }
 
-  public <T> T post(URI uri, Object obj, TypeReference<T> ref) throws MarquezHttpException {
+  public <T> ResponseMessage<T> post(URI uri, Object obj, TypeReference<T> ref)
+      throws MarquezHttpException {
     return executeSync(BasicHttpRequests.post(uri), obj, ref);
   }
 
-  public <T> T executeSync(HttpRequest request, Object obj, TypeReference<T> ref)
+  public <T> ResponseMessage<T> executeSync(HttpRequest request, Object obj, TypeReference<T> ref)
       throws MarquezHttpException {
     CompletableFuture<ResponseMessage<T>> future = executeAsync(request, obj, ref);
     try {
-      ResponseMessage<T> message = future.get();
-      if (message.completedSuccessfully()) {
-        return message.getBody();
+      ResponseMessage<T> message =
+          (ResponseMessage<T>)
+              future
+                  .exceptionally(
+                      (resp) -> {
+                        return new ResponseMessage(
+                            0, null, new HttpError(0, resp.getMessage(), resp.toString()));
+                      })
+                  .get();
+      if (message == null) {
+        return new ResponseMessage(0, null, new HttpError(0, "unknown error", "unknown error"));
       }
-      throw new MarquezHttpException(message.getError());
-    } catch (ExecutionException | InterruptedException ignored) {
-      throw new MarquezHttpException();
+      return message;
+    } catch (ExecutionException | InterruptedException e) {
+      throw new MarquezHttpException(e);
     }
   }
 
@@ -123,7 +116,8 @@ public class OpenLineageClient {
           } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
           }
-        });
+        },
+        executorService);
   }
 
   private <T> ResponseMessage<T> createMessage(

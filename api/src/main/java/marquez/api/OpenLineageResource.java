@@ -54,7 +54,7 @@ public class OpenLineageResource {
       @Valid @NotNull LineageEvent event, @Suspended final AsyncResponse asyncResponse)
       throws JsonProcessingException, SQLException {
     openLineageService
-        .createLineageEvent(event)
+        .createAsync(event)
         .whenComplete(
             (result, err) -> {
               if (err != null) {

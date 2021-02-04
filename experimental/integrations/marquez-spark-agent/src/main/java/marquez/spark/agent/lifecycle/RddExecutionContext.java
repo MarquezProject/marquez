@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import marquez.spark.agent.MarquezContext;
 import marquez.spark.agent.SparkListener;
+import marquez.spark.agent.client.DatasetParser;
+import marquez.spark.agent.client.DatasetParser.DatasetParseResult;
 import marquez.spark.agent.client.LineageEvent;
 import marquez.spark.agent.client.LineageEvent.Dataset;
 import marquez.spark.agent.client.LineageEvent.RunFacet;
@@ -40,8 +42,8 @@ import org.apache.spark.scheduler.Stage;
 @Slf4j
 public class RddExecutionContext implements ExecutionContext {
   private final MarquezContext marquezContext;
-  private List<String> inputs;
-  private List<String> outputs;
+  private List<URI> inputs;
+  private List<URI> outputs;
 
   public RddExecutionContext(int jobId, MarquezContext marquezContext) {
     this.marquezContext = marquezContext;
@@ -118,40 +120,37 @@ public class RddExecutionContext implements ExecutionContext {
         .build();
   }
 
-  protected List<Dataset> buildOutputs(List<String> outputs) {
-    return outputs.stream()
-        .map(
-            name ->
-                Dataset.builder().name(name).namespace(marquezContext.getJobNamespace()).build())
-        .collect(Collectors.toList());
+  protected List<Dataset> buildOutputs(List<URI> outputs) {
+    return outputs.stream().map(this::buildDataset).collect(Collectors.toList());
   }
 
-  protected List<Dataset> buildInputs(List<String> inputs) {
-    return inputs.stream()
-        .map(
-            name ->
-                Dataset.builder().name(name).namespace(marquezContext.getJobNamespace()).build())
-        .collect(Collectors.toList());
+  protected Dataset buildDataset(URI uri) {
+    DatasetParseResult result = DatasetParser.parse(uri);
+    return Dataset.builder().name(result.getName()).namespace(result.getNamespace()).build();
   }
 
-  protected List<String> findOutputs(Set<RDD<?>> rdds) {
-    List<String> result = new ArrayList<>();
+  protected List<Dataset> buildInputs(List<URI> inputs) {
+    return inputs.stream().map(this::buildDataset).collect(Collectors.toList());
+  }
+
+  protected List<URI> findOutputs(Set<RDD<?>> rdds) {
+    List<URI> result = new ArrayList<>();
     for (RDD<?> rdd : rdds) {
       Path outputPath = getOutputPath(rdd);
       if (outputPath != null) {
-        result.add(formatRddName(outputPath.toUri()));
+        result.add(getDatasetUri(outputPath.toUri()));
       }
     }
     return result;
   }
 
-  protected List<String> findInputs(Set<RDD<?>> rdds) {
-    List<String> result = new ArrayList<>();
+  protected List<URI> findInputs(Set<RDD<?>> rdds) {
+    List<URI> result = new ArrayList<>();
     for (RDD<?> rdd : rdds) {
       Path[] inputPaths = getInputPaths(rdd);
       if (inputPaths != null) {
         for (Path path : inputPaths) {
-          result.add(formatRddName(path.toUri()));
+          result.add(getDatasetUri(path.toUri()));
         }
       }
     }
@@ -176,8 +175,9 @@ public class RddExecutionContext implements ExecutionContext {
     return inputPaths;
   }
 
-  protected String formatRddName(URI pathUri) {
-    return pathUri.toString();
+  // exposed for testing
+  protected URI getDatasetUri(URI pathUri) {
+    return pathUri;
   }
 
   protected void printRDDs(String prefix, RDD<?> rdd) {
