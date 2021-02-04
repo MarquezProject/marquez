@@ -51,16 +51,17 @@ public final class ModelGenerator extends Generator {
   }
 
   public static URI newConnectionUrl() {
-    return newConnectionUrlFor(SourceType.of("POSTGRESQL"));
+    return newConnectionUrlFor(newDbSourceType());
   }
 
   public static URI newConnectionUrlFor(SourceType type) {
-    if ("POSTGRESQL".equals(type.getValue())) {
-      return URI.create("jdbc:postgresql://localhost:5432/test" + newId());
-    } else if ("KAFKA".equals(type.getValue())) {
-      return URI.create("localhost:9092");
+    if ("POSTGRESQL".equalsIgnoreCase(type.getValue())) {
+      return URI.create("postgresql://localhost:5432/test" + newId());
+    } else if ("KAFKA".equalsIgnoreCase(type.getValue())) {
+      return URI.create("kafka://localhost:9092");
+    } else {
+      return URI.create(String.format("%s://localhost:9092", type.getValue()));
     }
-    throw new IllegalArgumentException();
   }
 
   public static ImmutableSet<DatasetId> newDatasetIds(final int limit) {

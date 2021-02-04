@@ -32,7 +32,7 @@ public final class SourceType {
   @Getter private final String value;
 
   public SourceType(@NonNull final String value) {
-    this.value = checkNotBlank(value, "value must not be blank").toUpperCase().trim();
+    this.value = checkNotBlank(value, "value must not be blank");
   }
 
   public static SourceType of(final String value) {
