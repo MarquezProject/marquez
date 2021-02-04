@@ -269,7 +269,7 @@ public interface OpenLineageDao extends MarquezDao {
   }
 
   default String formatNamespaceName(String namespace) {
-    return namespace.replaceAll("[^a-zA-Z0-9\\-_.]", "_");
+    return namespace; //accept user's input as-is
   }
 
   default JobType getJobType(Job job) {
