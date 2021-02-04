@@ -409,8 +409,8 @@ public interface OpenLineageDao extends MarquezDao {
     return path;
   }
 
-  default SourceType getSourceType(Dataset ds) {
-    return SourceType.POSTGRESQL;
+  default String getSourceType(Dataset ds) {
+    return SourceType.of("POSTGRESQL").getValue();
   }
 
   default DatasetType getDatasetType(Dataset ds) {

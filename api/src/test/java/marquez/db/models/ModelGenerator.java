@@ -19,11 +19,11 @@ import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.ModelGenerator.newContext;
 import static marquez.common.models.ModelGenerator.newDatasetName;
 import static marquez.common.models.ModelGenerator.newDatasetType;
+import static marquez.common.models.ModelGenerator.newDbSourceType;
 import static marquez.common.models.ModelGenerator.newDescription;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newOwnerName;
 import static marquez.common.models.ModelGenerator.newSourceName;
-import static marquez.common.models.ModelGenerator.newSourceType;
 import static marquez.common.models.ModelGenerator.newTagName;
 
 import com.google.common.collect.ImmutableList;
@@ -67,10 +67,10 @@ public final class ModelGenerator extends Generator {
 
   public static SourceRow newSourceRowWith(final SourceName name) {
     final Instant now = newTimestamp();
-    final SourceType type = newSourceType();
+    final SourceType type = newDbSourceType();
     return new SourceRow(
         newRowUuid(),
-        type.name(),
+        type.getValue(),
         now,
         now,
         name.getValue(),
