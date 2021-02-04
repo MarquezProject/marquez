@@ -54,23 +54,12 @@ public interface OpenLineageDao extends MarquezDao {
 
   @SqlUpdate(
       "INSERT INTO lineage_events ("
-          + "event_type, "
           + "event_time, "
-          + "run_id, "
-          + "job_name, "
-          + "job_namespace, "
-          + "event, "
-          + "producer) "
-          + "VALUES (?, ?, ?, ?, ?, ?, ?) "
-          + "ON CONFLICT ON CONSTRAINT lineage_event_pk DO NOTHING")
-  void createLineageEvent(
-      String eventType,
-      Instant eventTime,
-      String runId,
-      String jobName,
-      String jobNamespace,
-      PGobject event,
-      String producer);
+          + "uuid, "
+          + "event "
+          + ") "
+          + "VALUES (?, ?, ?)")
+  void createLineageEvent(Instant eventTime, UUID uuid, PGobject event);
 
   @Transaction
   default UpdateLineageRow updateMarquezModel(LineageEvent event) {

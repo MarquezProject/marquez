@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -63,13 +64,9 @@ public class OpenLineageService {
         CompletableFuture.runAsync(
             () ->
                 openLineageDao.createLineageEvent(
-                    event.getEventType() == null ? "" : event.getEventType(),
                     event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
-                    event.getRun().getRunId(),
-                    event.getJob().getName(),
-                    event.getJob().getNamespace(),
-                    openLineageDao.createJsonArray(event, mapper),
-                    event.getProducer()));
+                    UUID.randomUUID(),
+                    openLineageDao.createJsonArray(event, mapper)));
 
     return CompletableFuture.allOf(marquez, openLineage);
   }
