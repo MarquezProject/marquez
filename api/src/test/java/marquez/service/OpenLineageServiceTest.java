@@ -66,7 +66,7 @@ public class OpenLineageServiceTest {
 
   @Parameters(name = "{0}")
   public static List<Object[]> data() throws IOException, URISyntaxException {
-    String prefix = "../experimental/integrations/marquez-spark-agent/integrations";
+    String prefix = "../integrations/spark/integrations";
     List<URI> rdd =
         Files.list(Paths.get(prefix + "/sparkrdd")).map(Path::toUri).collect(Collectors.toList());
     List<URI> sql =

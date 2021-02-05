@@ -51,17 +51,21 @@ https://marquez.example.com:5000/api/v1/namespaces/foo/job/spark.submit_job/runs
 # Build
 
 ## Java 8
+
 Testing requires a Java 8 JVM to test the scala spark components. 
 
 `export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 
 ## Testing
+
 To run the tests, from the root directory run:
+
 ```sh
-./gradlew :experimental:integrations:marquez-spark-agent:test
+./gradlew :integrations:spark:test
 ```
 
 ## Build spark agent jar
+
 ```sh
-./gradlew :experimental:integrations:marquez-spark-agent:shadowJar
+./gradlew :integrations:spark:shadowJar
 ```

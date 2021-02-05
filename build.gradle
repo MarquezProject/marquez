@@ -52,7 +52,7 @@ subprojects {
         archivesBaseName = 'marquez-java'
     }
 
-    project(':experimental:integrations:marquez-spark-agent') {
+    project(':integrations:spark') {
         apply plugin: 'java-library'
         archivesBaseName = 'marquez-spark'
     }
