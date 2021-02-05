@@ -95,9 +95,6 @@ public interface DatasetVersionDao {
   @SqlQuery(SELECT + "WHERE uuid = :uuid")
   Optional<DatasetVersionRow> findAllBy(UUID uuid);
 
-  @SqlQuery(SELECT + "WHERE uuid = :uuid")
-  Optional<DatasetVersionRow> findByVersion(UUID uuid);
-
   @SqlQuery(
       SELECT
           + "INNER JOIN datasets AS d ON d.uuid = dv.dataset_uuid AND d.current_version_uuid = dv.uuid "

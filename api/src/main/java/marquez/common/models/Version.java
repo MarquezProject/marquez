@@ -24,6 +24,7 @@ import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import marquez.common.Utils;
 import marquez.common.models.Version.UUIDToVersion;
 import marquez.common.models.Version.VersionToUUID;
 
@@ -35,7 +36,7 @@ public class Version {
   @Getter private final UUID value;
 
   public Version(final String value) {
-    this(UUID.fromString(checkNotBlank(value)));
+    this(Utils.toUuid(checkNotBlank(value)));
   }
 
   public Version(final UUID value) {

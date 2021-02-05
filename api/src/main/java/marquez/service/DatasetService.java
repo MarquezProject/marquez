@@ -346,7 +346,6 @@ public class DatasetService {
     return Mapper.toDatasetVersion(datasetRow, tags, datasetVersionRow, fields, null, createdByRun);
   }
 
-  // NOTE:
   private DatasetVersion toDatasetVersion(@NonNull ExtendedDatasetVersionRow datasetVersionRow) {
     final ExtendedDatasetRow datasetRow =
         datasetDao.findBy(datasetVersionRow.getDatasetUuid()).get();

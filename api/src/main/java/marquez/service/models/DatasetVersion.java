@@ -41,8 +41,8 @@ import marquez.common.models.Version;
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
     property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = DbTable.class, name = "DB_TABLE"),
-  @JsonSubTypes.Type(value = Stream.class, name = "STREAM")
+  @JsonSubTypes.Type(value = DbTableVersion.class, name = "DB_TABLE"),
+  @JsonSubTypes.Type(value = StreamVersion.class, name = "STREAM")
 })
 public abstract class DatasetVersion {
   @Getter private final DatasetId id;
