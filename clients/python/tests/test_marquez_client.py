@@ -470,7 +470,9 @@ def test_list_dataset_versions(mock_get, client):
     mock_get.return_value.status_code.return_value = HTTPStatus.OK
     mock_get.return_value.json.return_value = [DB_TABLE_VERSION]
 
-    dataset_versions = client.list_dataset_versions(NAMESPACE_NAME, DB_TABLE_NAME)
+    dataset_versions = client.list_dataset_versions(
+        NAMESPACE_NAME, DB_TABLE_NAME
+    )
 
     assert dataset_versions[0]['id'] == DB_TABLE_ID
     assert dataset_versions[0]['type'] == DatasetType.DB_TABLE
