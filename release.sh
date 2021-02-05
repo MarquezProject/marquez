@@ -28,7 +28,7 @@ if [[ ! $(type -P bump2version) ]]; then
 fi
 
 branch=$(git symbolic-ref --short HEAD)
-if [[ "${branch}" == "main" ]]; then
+if [[ "${branch}" != "main" ]]; then
   echo "Error: You may only release on 'main'!"
   exit 1;
 fi
