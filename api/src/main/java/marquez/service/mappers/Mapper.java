@@ -124,7 +124,7 @@ public final class Mapper {
 
   public static Source toSource(@NonNull final SourceRow row) {
     return new Source(
-        SourceType.valueOf(row.getType()),
+        SourceType.of(row.getType()),
         SourceName.of(row.getName()),
         row.getCreatedAt(),
         row.getUpdatedAt(),
@@ -141,7 +141,7 @@ public final class Mapper {
     final Instant now = newTimestamp();
     return new SourceRow(
         newRowUuid(),
-        meta.getType().toString(),
+        meta.getType().getValue(),
         now,
         now,
         name.getValue(),

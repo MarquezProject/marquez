@@ -27,6 +27,7 @@ import marquez.common.models.RunState;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.JobVersionDao;
+import marquez.db.MarquezDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
@@ -58,6 +59,17 @@ public class RunService {
   private final DatasetVersionDao datasetVersionDao;
   private final RunStateDao runStateDao;
   private final Collection<RunTransitionListener> runTransitionListeners;
+
+  public RunService(
+      @NonNull MarquezDao marquezDao, Collection<RunTransitionListener> runTransitionListeners) {
+    this.jobVersionDao = marquezDao.createJobVersionDao();
+    this.datasetDao = marquezDao.createDatasetDao();
+    this.runArgsDao = marquezDao.createRunArgsDao();
+    this.runDao = marquezDao.createRunDao();
+    this.datasetVersionDao = marquezDao.createDatasetVersionDao();
+    this.runStateDao = marquezDao.createRunStateDao();
+    this.runTransitionListeners = runTransitionListeners;
+  }
 
   public RunService(
       JobVersionDao jobVersionDao,
@@ -277,15 +289,15 @@ public class RunService {
     log.info("Successfully associated run '{}' with version '{}'.", runId, newJobVersionUuid);
   }
 
-  private void notify(JobInputUpdate update) {
+  void notify(JobInputUpdate update) {
     notify(RunTransitionListener::notify, update);
   }
 
-  private void notify(JobOutputUpdate update) {
+  void notify(JobOutputUpdate update) {
     notify(RunTransitionListener::notify, update);
   }
 
-  private void notify(RunTransition transition) {
+  void notify(RunTransition transition) {
     notify(RunTransitionListener::notify, transition);
   }
 

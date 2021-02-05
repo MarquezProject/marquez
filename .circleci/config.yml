@@ -90,7 +90,7 @@ jobs:
       - run: bash <(curl -s https://codecov.io/bash)
 
   build-integration-spark:
-    working_directory: ~/marquez/experimental/integrations/marquez-spark-agent
+    working_directory: ~/marquez/integrations/spark
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
@@ -99,7 +99,7 @@ jobs:
           keys:
             - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
             - v1-integration-spark-{{ .Branch }}
-      - run: ./gradlew --no-daemon --stacktrace :experimental:integrations:marquez-spark-agent:build
+      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:build
       - save_cache:
           key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
           paths:

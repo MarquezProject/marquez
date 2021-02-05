@@ -33,7 +33,7 @@ public final class NamespaceName {
   private static final int MIN_SIZE = 1;
   private static final int MAX_SIZE = 1024;
   private static final Pattern PATTERN =
-      Pattern.compile(String.format("^[a-zA-Z0-9_-]{%d,%d}$", MIN_SIZE, MAX_SIZE));
+      Pattern.compile(String.format("^[a-zA-Z0-9_\\-\\.]{%d,%d}$", MIN_SIZE, MAX_SIZE));
 
   @Getter private final String value;
 
@@ -41,7 +41,7 @@ public final class NamespaceName {
     checkArgument(
         PATTERN.matcher(value).matches(),
         "namespace '%s' must contain only letters (a-z, A-Z), numbers (0-9), "
-            + "underscores (_) or dashes (-) with a maximum length of %s characters.",
+            + "underscores (_), dashes (-), or dots (.) with a maximum length of %s characters.",
         value,
         MAX_SIZE);
     this.value = value;

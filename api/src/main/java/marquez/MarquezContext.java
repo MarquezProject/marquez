@@ -3,6 +3,7 @@ package marquez;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import graphql.kickstart.servlet.GraphQLHttpServlet;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -30,6 +31,8 @@ import marquez.db.RunDao;
 import marquez.db.RunStateDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
+import marquez.graphql.GraphqlSchemaBuilder;
+import marquez.graphql.MarquezGraphqlServletBuilder;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -81,6 +84,7 @@ public final class MarquezContext {
 
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
+  @Getter private final GraphQLHttpServlet graphqlServlet;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
@@ -134,7 +138,7 @@ public final class MarquezContext {
             namespaceDao, datasetDao, jobDao, jobVersionDao, jobContextDao, runDao, runService);
     this.tagService = new TagService(tagDao);
     this.tagService.init(tags);
-    this.openLineageService = new OpenLineageService(openLineageDao);
+    this.openLineageService = new OpenLineageService(openLineageDao, runService, datasetVersionDao);
     this.serviceExceptionMapper = new MarquezServiceExceptionMapper();
     this.jdbiException = new JdbiExceptionExceptionMapper();
 
@@ -156,6 +160,9 @@ public final class MarquezContext {
             serviceExceptionMapper,
             jdbiException,
             openLineageResource);
+
+    final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
+    this.graphqlServlet = servlet.getServlet(new GraphqlSchemaBuilder(jdbi));
   }
 
   public static Builder builder() {
