@@ -521,7 +521,7 @@ components:
         example: ea9badc5-7cb2-49af-9a9f-155771d3a797
 
     version:
-      name: id
+      name: version
       in: path
       description: The ID of the dataset version.
       required: true
