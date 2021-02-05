@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -147,7 +147,7 @@ public class DatasetResource {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, datasetName);
 
-    final ImmutableList<DatasetVersion> datasetVersions =
+    final List<DatasetVersion> datasetVersions =
         datasetService.getVersionsFor(namespaceName, datasetName, limit, offset);
     return Response.ok(new DatasetVersions(datasetVersions)).build();
   }
@@ -164,7 +164,7 @@ public class DatasetResource {
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
 
-    final ImmutableList<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
+    final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
     return Response.ok(new Datasets(datasets)).build();
   }
 
@@ -215,14 +215,14 @@ public class DatasetResource {
   static class Datasets {
     @NonNull
     @JsonProperty("datasets")
-    ImmutableList<Dataset> value;
+    List<Dataset> value;
   }
 
   @Value
   static class DatasetVersions {
     @NonNull
     @JsonProperty("versions")
-    ImmutableList<DatasetVersion> value;
+    List<DatasetVersion> value;
   }
 
   void throwIfNotExists(@NonNull NamespaceName namespaceName) throws MarquezServiceException {

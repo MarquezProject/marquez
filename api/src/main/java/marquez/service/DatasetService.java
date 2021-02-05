@@ -281,7 +281,7 @@ public class DatasetService {
     return datasetVersionDao.findBy(version.getValue()).map(this::toDatasetVersion);
   }
 
-  public ImmutableList<DatasetVersion> getVersionsFor(
+  public List<DatasetVersion> getVersionsFor(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
       int limit,
@@ -297,7 +297,7 @@ public class DatasetService {
     return datasetVersions.build();
   }
 
-  public ImmutableList<Dataset> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
+  public List<Dataset> getAll(@NonNull NamespaceName namespaceName, int limit, int offset)
       throws MarquezServiceException {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
