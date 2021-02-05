@@ -49,7 +49,6 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.SourceType;
-import marquez.service.models.DatasetVersion;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 

@@ -219,6 +219,7 @@ DB_TABLE_VERSION = {
     'createdByRun': COMPLETED
 }
 
+
 @pytest.fixture
 def client():
     return MarquezClient(url='http;//localhost:5000')
@@ -431,6 +432,7 @@ def test_get_dataset(mock_get, client):
         timeout=mock.ANY
     )
 
+
 @mock.patch('requests.get')
 def test_get_dataset_version(mock_get, client):
     mock_get.return_value.status_code.return_value = HTTPStatus.OK
@@ -454,15 +456,17 @@ def test_get_dataset_version(mock_get, client):
 
     mock_get.assert_called_once_with(
         url=client._url(
-            '/namespaces/{0}/datasets/{1}/versions/{2}', NAMESPACE_NAME, DB_TABLE_NAME, VERSION
+            '/namespaces/{0}/datasets/{1}/versions/{2}',
+            NAMESPACE_NAME, DB_TABLE_NAME, VERSION
         ),
         params=mock.ANY,
         headers=mock.ANY,
         timeout=mock.ANY
     )
 
+
 @mock.patch('requests.get')
-def test_list_datasets(mock_get, client):
+def test_list_dataset_versions(mock_get, client):
     mock_get.return_value.status_code.return_value = HTTPStatus.OK
     mock_get.return_value.json.return_value = [DB_TABLE_VERSION]
 
@@ -480,7 +484,8 @@ def test_list_datasets(mock_get, client):
 
     mock_get.assert_called_once_with(
         url=client._url(
-            '/namespaces/{0}/datasets/{1}/versions', NAMESPACE_NAME, DB_TABLE_NAME
+            '/namespaces/{0}/datasets/{1}/versions',
+            NAMESPACE_NAME, DB_TABLE_NAME
         ),
         params={
             'limit': DEFAULT_LIMIT,
@@ -489,6 +494,7 @@ def test_list_datasets(mock_get, client):
         headers=mock.ANY,
         timeout=mock.ANY
     )
+
 
 @mock.patch('requests.get')
 def test_list_datasets(mock_get, client):
