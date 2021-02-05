@@ -38,6 +38,7 @@ import static marquez.client.models.ModelGenerator.newSourceType;
 import static marquez.client.models.ModelGenerator.newStreamName;
 import static marquez.client.models.ModelGenerator.newTagNames;
 import static marquez.client.models.ModelGenerator.newTimestamp;
+import static marquez.client.models.ModelGenerator.newVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.times;
@@ -53,6 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import marquez.client.MarquezClient.DatasetVersions;
 import marquez.client.MarquezClient.Datasets;
 import marquez.client.MarquezClient.Jobs;
 import marquez.client.MarquezClient.Namespaces;
@@ -61,8 +63,10 @@ import marquez.client.MarquezClient.Sources;
 import marquez.client.MarquezClient.Tags;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
+import marquez.client.models.DatasetVersion;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
+import marquez.client.models.DbTableVersion;
 import marquez.client.models.Field;
 import marquez.client.models.Job;
 import marquez.client.models.JobId;
@@ -78,6 +82,7 @@ import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
+import marquez.client.models.StreamVersion;
 import marquez.client.models.Tag;
 import org.junit.Before;
 import org.junit.Rule;
@@ -93,6 +98,7 @@ public class MarquezClientTest {
   private static final Instant CREATED_AT = newTimestamp();
   private static final Instant UPDATED_AT = CREATED_AT;
   private static final Instant LAST_MODIFIED_AT = newTimestamp();
+  private static final String VERSION = newVersion();
 
   // NAMESPACE
   private static final String NAMESPACE_NAME = newNamespaceName();
@@ -300,9 +306,37 @@ public class MarquezClientTest {
               DURATION,
               RUN_ARGS));
 
+  // DATASET VERSIONS
+  private static final Run CREATED_BY_RUN = COMPLETED;
+  private static final DbTableVersion DB_TABLE_VERSION =
+      new DbTableVersion(
+          DB_TABLE_ID,
+          DB_TABLE_NAME,
+          DB_TABLE_PHYSICAL_NAME,
+          CREATED_AT,
+          VERSION,
+          DB_TABLE_SOURCE_NAME,
+          FIELDS,
+          TAGS,
+          DB_TABLE_DESCRIPTION,
+          CREATED_BY_RUN);
+  private static final StreamVersion STREAM_VERSION =
+      new StreamVersion(
+          STREAM_ID,
+          STREAM_NAME,
+          STREAM_PHYSICAL_NAME,
+          CREATED_AT,
+          VERSION,
+          STREAM_SOURCE_NAME,
+          FIELDS,
+          TAGS,
+          STREAM_SCHEMA_LOCATION,
+          STREAM_DESCRIPTION,
+          CREATED_BY_RUN);
+
   @Rule public final MockitoRule rule = MockitoJUnit.rule();
 
-  private MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
+  private final MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;
   private MarquezClient client;
 
@@ -464,6 +498,21 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testGetDbTableVersion() throws Exception {
+    final URL url =
+        buildUrlFor(
+            "/namespaces/%s/datasets/%s/versions/%s", NAMESPACE_NAME, DB_TABLE_NAME, VERSION);
+
+    final String dbTableVersionAsJson = JsonGenerator.newJsonFor(DB_TABLE_VERSION);
+    when(http.get(url)).thenReturn(dbTableVersionAsJson);
+
+    final DatasetVersion datasetVersion =
+        client.getDatasetVersion(NAMESPACE_NAME, DB_TABLE_NAME, VERSION);
+    assertThat(datasetVersion).isInstanceOf(DbTableVersion.class);
+    assertThat((DbTableVersion) datasetVersion).isEqualTo(DB_TABLE_VERSION);
+  }
+
+  @Test
   public void testCreateStream() throws Exception {
     final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, STREAM_NAME);
 
@@ -528,11 +577,38 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testGetStreamVersion() throws Exception {
+    final URL url =
+        buildUrlFor(
+            "/namespaces/%s/datasets/%s/versions/%s", NAMESPACE_NAME, DB_TABLE_NAME, VERSION);
+
+    final String streamVersionAsJson = JsonGenerator.newJsonFor(STREAM_VERSION);
+    when(http.get(url)).thenReturn(streamVersionAsJson);
+
+    final DatasetVersion datasetVersion =
+        client.getDatasetVersion(NAMESPACE_NAME, DB_TABLE_NAME, VERSION);
+    assertThat(datasetVersion).isInstanceOf(StreamVersion.class);
+    assertThat((StreamVersion) datasetVersion).isEqualTo(STREAM_VERSION);
+  }
+
+  @Test
   public void testListDatasets() throws Exception {
     when(http.get(buildUrlFor("/namespaces/%s/datasets?limit=10&offset=0", NAMESPACE_NAME)))
-        .thenReturn(Utils.toJson(new Datasets(ImmutableList.of(STREAM, DB_TABLE))));
+        .thenReturn(Utils.toJson(new Datasets(ImmutableList.of(DB_TABLE, STREAM))));
     final List<Dataset> datasets = client.listDatasets(NAMESPACE_NAME, 10, 0);
-    assertThat(datasets).asList().containsExactly(STREAM, DB_TABLE);
+    assertThat(datasets).asList().containsExactly(DB_TABLE, STREAM);
+  }
+
+  @Test
+  public void testListDatasetVersions() throws Exception {
+    when(http.get(
+            buildUrlFor(
+                "/namespaces/%s/datasets/%s/versions?limit=10&offset=0",
+                NAMESPACE_NAME, DB_TABLE_NAME)))
+        .thenReturn(Utils.toJson(new DatasetVersions(ImmutableList.of(DB_TABLE_VERSION))));
+    final List<DatasetVersion> datasetVersions =
+        client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME, 10, 0);
+    assertThat(datasetVersions).asList().containsExactly(DB_TABLE_VERSION);
   }
 
   @Test

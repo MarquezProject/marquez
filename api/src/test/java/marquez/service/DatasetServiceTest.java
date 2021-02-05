@@ -117,13 +117,20 @@ public class DatasetServiceTest {
   @Mock private DatasetFieldDao datasetFieldDao;
   @Mock private DatasetVersionDao datasetVersionDao;
   @Mock private TagDao tagDao;
+  @Mock private RunService runService;
   private DatasetService datasetService;
 
   @Before
   public void setUp() {
     datasetService =
         new DatasetService(
-            namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao, tagDao);
+            namespaceDao,
+            sourceDao,
+            datasetDao,
+            datasetFieldDao,
+            datasetVersionDao,
+            tagDao,
+            runService);
   }
 
   @Test

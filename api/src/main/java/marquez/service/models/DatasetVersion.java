@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,7 +30,6 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
-import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
@@ -56,7 +56,7 @@ public abstract class DatasetVersion {
   @Getter private final ImmutableList<Field> fields;
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final String description;
-  @Nullable private final RunId runId;
+  @Nullable private final Run createdByRun;
 
   public DatasetVersion(
       @NonNull final DatasetId id,
@@ -69,7 +69,7 @@ public abstract class DatasetVersion {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final RunId runId) {
+      @Nullable final Run createdByRun) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -81,6 +81,14 @@ public abstract class DatasetVersion {
     this.fields = (fields == null) ? ImmutableList.of() : fields;
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.description = description;
-    this.runId = runId;
+    this.createdByRun = createdByRun;
+  }
+
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(description);
+  }
+
+  public Optional<Run> getCreatedByRun() {
+    return Optional.ofNullable(createdByRun);
   }
 }

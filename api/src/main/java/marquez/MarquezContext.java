@@ -110,9 +110,6 @@ public final class MarquezContext {
 
     this.namespaceService = new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
     this.sourceService = new SourceService(sourceDao);
-    this.datasetService =
-        new DatasetService(
-            namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao, tagDao);
     this.runService =
         new RunService(
             jobVersionDao,
@@ -122,6 +119,15 @@ public final class MarquezContext {
             datasetVersionDao,
             runStateDao,
             runTransitionListeners);
+    this.datasetService =
+        new DatasetService(
+            namespaceDao,
+            sourceDao,
+            datasetDao,
+            datasetFieldDao,
+            datasetVersionDao,
+            tagDao,
+            runService);
 
     this.jobService =
         new JobService(

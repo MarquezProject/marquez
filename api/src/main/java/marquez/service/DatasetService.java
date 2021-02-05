@@ -32,10 +32,12 @@ import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetType;
 import marquez.common.models.DatasetVersionId;
 import marquez.common.models.Field;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
 import marquez.db.DatasetDao;
@@ -48,14 +50,17 @@ import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
+import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
+import marquez.db.models.StreamVersionRow;
 import marquez.db.models.TagRow;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DatasetVersion;
+import marquez.service.models.Run;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
@@ -82,19 +87,23 @@ public class DatasetService {
   private final DatasetVersionDao datasetVersionDao;
   private final TagDao tagDao;
 
+  private final RunService runService;
+
   public DatasetService(
       @NonNull final NamespaceDao namespaceDao,
       @NonNull final SourceDao sourceDao,
       @NonNull final DatasetDao datasetDao,
       @NonNull final DatasetFieldDao datasetFieldDao,
       @NonNull final DatasetVersionDao datasetVersionDao,
-      @NonNull final TagDao tagDao) {
+      @NonNull final TagDao tagDao,
+      @NonNull final RunService runService) {
     this.namespaceDao = namespaceDao;
     this.sourceDao = sourceDao;
     this.datasetDao = datasetDao;
     this.datasetFieldDao = datasetFieldDao;
     this.datasetVersionDao = datasetVersionDao;
     this.tagDao = tagDao;
+    this.runService = runService;
   }
 
   public Dataset createOrUpdate(
@@ -268,9 +277,9 @@ public class DatasetService {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
     final ImmutableList.Builder<DatasetVersion> datasetVersions = ImmutableList.builder();
-    final List<DatasetVersionRow> datasetVersionRows =
+    final List<ExtendedDatasetVersionRow> datasetVersionRows =
         datasetVersionDao.findAll(namespaceName.getValue(), datasetName.getValue(), limit, offset);
-    for (final DatasetVersionRow datasetVersionRow : datasetVersionRows) {
+    for (final ExtendedDatasetVersionRow datasetVersionRow : datasetVersionRows) {
       datasetVersions.add(toDatasetVersion(datasetVersionRow));
     }
     return datasetVersions.build();
@@ -329,7 +338,40 @@ public class DatasetService {
         datasetFieldDao.findAllIn(toArray(datasetVersionRow.getFieldUuids(), UUID.class)).stream()
             .map(this::toField)
             .collect(toImmutableList());
-    return Mapper.toDatasetVersion(datasetRow, tags, datasetVersionRow, fields);
+    final Run createdByRun =
+        datasetVersionRow
+            .getRunUuid()
+            .map(runUuid -> runService.getRun(RunId.of(runUuid)).orElse(null))
+            .orElse(null);
+    return Mapper.toDatasetVersion(datasetRow, tags, datasetVersionRow, fields, null, createdByRun);
+  }
+
+  // NOTE:
+  private DatasetVersion toDatasetVersion(@NonNull ExtendedDatasetVersionRow datasetVersionRow) {
+    final ExtendedDatasetRow datasetRow =
+        datasetDao.findBy(datasetVersionRow.getDatasetUuid()).get();
+    final ImmutableSet<TagName> tags =
+        tagDao.findAllIn(toArray(datasetRow.getTagUuids(), UUID.class)).stream()
+            .map(TagRow::getName)
+            .map(TagName::of)
+            .collect(toImmutableSet());
+    final ImmutableList<Field> fields =
+        datasetFieldDao.findAllIn(toArray(datasetVersionRow.getFieldUuids(), UUID.class)).stream()
+            .map(this::toField)
+            .collect(toImmutableList());
+    final Run createdByRun =
+        datasetVersionRow
+            .getRunUuid()
+            .map(runUuid -> runService.getRun(RunId.of(runUuid)).orElse(null))
+            .orElse(null);
+    final String schemaLocation =
+        (DatasetType.valueOf(datasetRow.getType()) == DatasetType.STREAM)
+            ? ((StreamVersionRow)
+                    datasetVersionDao.find(datasetRow.getType(), datasetVersionRow.getUuid()).get())
+                .getSchemaLocation()
+            : null;
+    return Mapper.toDatasetVersion(
+        datasetRow, tags, datasetVersionRow, fields, schemaLocation, createdByRun);
   }
 
   /** Creates a {@link Field} instance from the given {@link DatasetFieldRow}. */

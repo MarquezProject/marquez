@@ -49,6 +49,7 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.SourceType;
+import marquez.service.models.DatasetVersion;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -191,6 +192,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
                 .count())
         .isEqualTo(1);
 
+    assertThat(client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(1);
+
     // (4) Add field to db table
     final List<Field> original = dbTable.getFields();
     final List<Field> added = ImmutableList.of(newFieldWith(PII.getName()), newField(), newField());
@@ -217,6 +220,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(modifiedDbTable.getTags()).isEqualTo(DB_TABLE_TAGS);
     assertThat(modifiedDbTable.getLastModifiedAt()).isEmpty();
     assertThat(modifiedDbTable.getDescription()).isEqualTo(Optional.of(DB_TABLE_DESCRIPTION));
+
+    assertThat(client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(2);
   }
 
   @Test
@@ -265,6 +270,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
                 .count())
         .isEqualTo(1);
 
+    assertThat(client.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME)).hasSize(1);
+
     // (4) Change schema location
     final URL modifiedSchemaLocation = newSchemaLocation();
     final StreamMeta modifiedStreamMeta =
@@ -288,6 +295,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(modifiedStream.getLastModifiedAt()).isEmpty();
     assertThat(modifiedStream.getSchemaLocation()).isEqualTo(Optional.of(modifiedSchemaLocation));
     assertThat(modifiedStream.getDescription()).isEqualTo(Optional.of(STREAM_DESCRIPTION));
+
+    assertThat(client.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME)).hasSize(2);
   }
 
   @Test

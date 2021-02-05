@@ -149,6 +149,9 @@ public class RunService {
     return runDao.exists(runId.getValue());
   }
 
+  // This method exposes the underlying DB model and should be removed.
+  // Service calls should only return models as defined by the service.
+  @Deprecated
   public ExtendedRunRow getRun(UUID runId) {
     return runDao.findBy(runId).orElseThrow(() -> new RunNotFoundException(RunId.of(runId)));
   }

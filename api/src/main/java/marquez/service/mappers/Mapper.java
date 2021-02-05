@@ -81,6 +81,7 @@ import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
 import marquez.service.models.Stream;
 import marquez.service.models.StreamMeta;
+import marquez.service.models.StreamVersion;
 import marquez.service.models.Tag;
 
 public final class Mapper {
@@ -172,6 +173,24 @@ public final class Mapper {
     }
   }
 
+  public static DatasetVersion toDatasetVersion(
+      @NonNull final ExtendedDatasetRow row,
+      @NonNull final ImmutableSet<TagName> tags,
+      @NonNull final DatasetVersionRow versionRow,
+      @NonNull final ImmutableList<Field> fields,
+      @Nullable final String schemaLocation,
+      @Nullable final Run createdByRun) {
+    final DatasetType type = DatasetType.valueOf(row.getType());
+    switch (type) {
+      case DB_TABLE:
+        return toDbTableVersion(row, tags, versionRow, fields, createdByRun);
+      case STREAM:
+        return toStreamVersion(row, tags, versionRow, fields, schemaLocation, createdByRun);
+      default:
+        throw new IllegalArgumentException();
+    }
+  }
+
   private static Dataset toDbTable(
       @NonNull final ExtendedDatasetRow row,
       @NonNull final ImmutableSet<TagName> tags,
@@ -187,6 +206,25 @@ public final class Mapper {
         tags,
         row.getLastModifiedAt().orElse(null),
         row.getDescription().orElse(null));
+  }
+
+  public static DbTableVersion toDbTableVersion(
+      @NonNull final ExtendedDatasetRow row,
+      @NonNull final ImmutableSet<TagName> tags,
+      @NonNull final DatasetVersionRow versionRow,
+      @NonNull final ImmutableList<Field> fields,
+      @Nullable final Run createdByRun) {
+    return new DbTableVersion(
+        new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName())),
+        DatasetName.of(row.getName()),
+        DatasetName.of(row.getPhysicalName()),
+        versionRow.getCreatedAt(),
+        Version.of(versionRow.getUuid()),
+        SourceName.of(row.getSourceName()),
+        fields,
+        tags,
+        row.getDescription().orElse(null),
+        createdByRun);
   }
 
   private static Dataset toStream(
@@ -206,6 +244,27 @@ public final class Mapper {
         tags,
         row.getLastModifiedAt().orElse(null),
         row.getDescription().orElse(null));
+  }
+
+  public static DatasetVersion toStreamVersion(
+      @NonNull final ExtendedDatasetRow row,
+      @NonNull final ImmutableSet<TagName> tags,
+      @NonNull final DatasetVersionRow versionRow,
+      @NonNull final ImmutableList<Field> fields,
+      @Nullable final String schemaLocation,
+      @Nullable final Run createdByRun) {
+    return new StreamVersion(
+        new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName())),
+        DatasetName.of(row.getName()),
+        DatasetName.of(row.getPhysicalName()),
+        row.getCreatedAt(),
+        Version.of(versionRow.getUuid()),
+        SourceName.of(row.getSourceName()),
+        (schemaLocation == null) ? null : Utils.toUrl(schemaLocation),
+        fields,
+        tags,
+        row.getDescription().orElse(null),
+        createdByRun);
   }
 
   public static DatasetRow toDatasetRow(
@@ -228,40 +287,6 @@ public final class Mapper {
         null,
         meta.getDescription().orElse(null),
         null);
-  }
-
-  public static DatasetVersion toDatasetVersion(
-      @NonNull final ExtendedDatasetRow row,
-      @NonNull final ImmutableSet<TagName> tags,
-      @NonNull final DatasetVersionRow versionRow,
-      @NonNull final ImmutableList<Field> fields) {
-    final DatasetType type = DatasetType.valueOf(row.getType());
-    switch (type) {
-      case DB_TABLE:
-        return toDbTableVersion(row, tags, versionRow, fields);
-      case STREAM:
-        return null;
-      default:
-        throw new IllegalArgumentException();
-    }
-  }
-
-  private static DbTableVersion toDbTableVersion(
-      @NonNull final ExtendedDatasetRow row,
-      @NonNull final ImmutableSet<TagName> tags,
-      @NonNull final DatasetVersionRow versionRow,
-      @NonNull final ImmutableList<Field> fields) {
-    return new DbTableVersion(
-        new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName())),
-        DatasetName.of(row.getName()),
-        DatasetName.of(row.getPhysicalName()),
-        versionRow.getCreatedAt(),
-        Version.of(versionRow.getUuid()),
-        SourceName.of(row.getSourceName()),
-        fields,
-        tags,
-        row.getDescription().orElse(null),
-        versionRow.getRunUuid().map(RunId::of).orElse(null));
   }
 
   private static DatasetType toDatasetType(@NonNull final DatasetMeta meta) {

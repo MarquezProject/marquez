@@ -25,7 +25,6 @@ import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
-import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
@@ -43,7 +42,7 @@ public final class DbTableVersion extends DatasetVersion {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final RunId runId) {
+      @Nullable final Run createdByRun) {
     super(
         id,
         DB_TABLE,
@@ -55,6 +54,6 @@ public final class DbTableVersion extends DatasetVersion {
         fields,
         tags,
         description,
-        runId);
+        createdByRun);
   }
 }
