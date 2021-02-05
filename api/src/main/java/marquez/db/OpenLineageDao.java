@@ -8,7 +8,6 @@ import static marquez.common.Utils.VERSION_JOINER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import io.dropwizard.util.Strings;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -18,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.UUID;
 import marquez.common.Utils;
 import marquez.common.models.DatasetType;
@@ -369,37 +367,7 @@ public interface OpenLineageDao extends MarquezDao {
   }
 
   default String formatDatasetName(String name) {
-    // if url, use the host.path as output, else use name
-    // Valid URIs:
-    // a.a.a
-    //  -note, a.a.a is all in 'path' and all other fields are null
-    // gs://bucket
-    // file:///out.txt
-    // file:///
-    // file://localhost/out.txt
-
-    try {
-      // Construction name by walking the path and append if not null
-      URI uri = new URI(name);
-      StringJoiner joiner = new StringJoiner(".");
-      if (!Strings.isNullOrEmpty(uri.getScheme())) {
-        joiner.add(uri.getScheme());
-      }
-      if (!Strings.isNullOrEmpty(uri.getHost())) {
-        joiner.add(uri.getHost());
-      }
-      if (!Strings.isNullOrEmpty(uri.getPath())) {
-        joiner.add(trimLeadingSlash(uri.getPath()));
-      }
-      String newName = joiner.toString();
-
-      if (newName.isEmpty()) {
-        return name;
-      }
-      return newName;
-    } catch (URISyntaxException e) {
-      return name;
-    }
+    return name;
   }
 
   default String trimLeadingSlash(String path) {
