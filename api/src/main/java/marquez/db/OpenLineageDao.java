@@ -8,7 +8,6 @@ import static marquez.common.Utils.VERSION_JOINER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import io.dropwizard.util.Strings;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -18,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.UUID;
 import marquez.common.Utils;
 import marquez.common.models.DatasetType;
