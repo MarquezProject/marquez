@@ -88,10 +88,10 @@ public class DatasetService {
   private final DatasetVersionDao datasetVersionDao;
   private final TagDao tagDao;
 
-
   private final RunService runService;
 
-  public DatasetService(@NonNull final MarquezDao marquezDao, @NonNull final RunService runService) {
+  public DatasetService(
+      @NonNull final MarquezDao marquezDao, @NonNull final RunService runService) {
     this.namespaceDao = marquezDao.createNamespaceDao();
     this.sourceDao = marquezDao.createSourceDao();
     this.datasetDao = marquezDao.createDatasetDao();

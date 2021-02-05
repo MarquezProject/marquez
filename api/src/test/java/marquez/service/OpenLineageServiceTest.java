@@ -45,7 +45,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 
 @RunWith(Parameterized.class)
 @Category({DataAccessTests.class, IntegrationTests.class})
