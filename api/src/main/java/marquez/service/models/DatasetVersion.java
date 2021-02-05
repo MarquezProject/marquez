@@ -14,23 +14,22 @@
 
 package marquez.service.models;
 
-import static marquez.common.Utils.VERSION_JOINER;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.time.Instant;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
-import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
@@ -42,46 +41,54 @@ import marquez.common.models.Version;
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
     property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = DbTableMeta.class, name = "DB_TABLE"),
-  @JsonSubTypes.Type(value = StreamMeta.class, name = "STREAM")
+  @JsonSubTypes.Type(value = DbTableVersion.class, name = "DB_TABLE"),
+  @JsonSubTypes.Type(value = StreamVersion.class, name = "STREAM")
 })
-public abstract class DatasetMeta {
+public abstract class DatasetVersion {
+  @Getter private final DatasetId id;
   @Getter private final DatasetType type;
+  @Getter private final DatasetName name;
   @Getter private final DatasetName physicalName;
+  @Getter private final Instant createdAt;
+  @Getter private final Version version;
+  @Getter private final NamespaceName namespace;
   @Getter private final SourceName sourceName;
   @Getter private final ImmutableList<Field> fields;
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final String description;
-  @Nullable private final RunId runId;
+  @Nullable private final Run createdByRun;
 
-  public DatasetMeta(
+  public DatasetVersion(
+      @NonNull final DatasetId id,
       @NonNull final DatasetType type,
+      @NonNull final DatasetName name,
       @NonNull final DatasetName physicalName,
+      @NonNull final Instant createdAt,
+      @NonNull final Version version,
       @NonNull final SourceName sourceName,
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final RunId runId) {
+      @Nullable final Run createdByRun) {
+    this.id = id;
     this.type = type;
+    this.name = name;
     this.physicalName = physicalName;
+    this.createdAt = createdAt;
+    this.version = version;
+    this.namespace = id.getNamespace();
     this.sourceName = sourceName;
     this.fields = (fields == null) ? ImmutableList.of() : fields;
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.description = description;
-    this.runId = runId;
+    this.createdByRun = createdByRun;
   }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
   }
 
-  public Optional<RunId> getRunId() {
-    return Optional.ofNullable(runId);
-  }
-
-  public abstract Version version(NamespaceName namespaceName, DatasetName datasetName);
-
-  protected static String joinField(final Field field) {
-    return VERSION_JOINER.join(field.getName(), field.getType(), field.getDescription());
+  public Optional<Run> getCreatedByRun() {
+    return Optional.ofNullable(createdByRun);
   }
 }

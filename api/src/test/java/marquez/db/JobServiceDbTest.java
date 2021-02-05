@@ -160,7 +160,13 @@ public class JobServiceDbTest {
 
     datasetService =
         new DatasetService(
-            namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao, tagDao);
+            namespaceDao,
+            sourceDao,
+            datasetDao,
+            datasetFieldDao,
+            datasetVersionDao,
+            tagDao,
+            runService);
 
     sourceService = new SourceService(sourceDao);
   }

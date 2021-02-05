@@ -12,34 +12,23 @@
  * limitations under the License.
  */
 
-package marquez.service.models;
+package marquez.client.models;
 
-import static java.util.UUID.fromString;
+import static marquez.client.models.ModelGenerator.newDbTableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.UUID;
-import marquez.UnitTests;
-import marquez.common.models.Version;
+import marquez.client.UnitTests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(UnitTests.class)
-public class VersionTest {
-  private static final UUID ACTUAL = fromString("225adbdd-2a5d-4b5f-89b3-06a7cd47cc87");
-  private static final UUID EXPECTED = fromString("225adbdd-2a5d-4b5f-89b3-06a7cd47cc87");
-
-  @Test(expected = NullPointerException.class)
-  public void testNull() {
-    Version.of(null);
-  }
+public class DbTableVersionTest {
+  private static final DatasetVersion DB_TABLE_VERSION = newDbTableVersion();
+  private static final String JSON = JsonGenerator.newJsonFor(DB_TABLE_VERSION);
 
   @Test
-  public void testForValue() {
-    assertThat(Version.of(ACTUAL).getValue()).isEqualByComparingTo(EXPECTED);
-  }
-
-  @Test
-  public void testForEquals() {
-    assertThat(Version.of(ACTUAL)).isEqualTo(Version.of(EXPECTED));
+  public void testFromJson() {
+    final DatasetVersion actual = DbTableVersion.fromJson(JSON);
+    assertThat(actual).isEqualTo(DB_TABLE_VERSION);
   }
 }

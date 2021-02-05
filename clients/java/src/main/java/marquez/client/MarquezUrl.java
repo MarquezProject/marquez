@@ -5,8 +5,10 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static marquez.client.MarquezPathV1.createRunPath;
 import static marquez.client.MarquezPathV1.datasetPath;
 import static marquez.client.MarquezPathV1.datasetTagPath;
+import static marquez.client.MarquezPathV1.datasetVersionPath;
 import static marquez.client.MarquezPathV1.fieldTagPath;
 import static marquez.client.MarquezPathV1.jobPath;
+import static marquez.client.MarquezPathV1.listDatasetVersionsPath;
 import static marquez.client.MarquezPathV1.listDatasetsPath;
 import static marquez.client.MarquezPathV1.listJobsPath;
 import static marquez.client.MarquezPathV1.listNamespacesPath;
@@ -115,6 +117,16 @@ class MarquezUrl {
 
   URL toListDatasetsUrl(@NonNull String namespaceName, int limit, int offset) {
     return from(listDatasetsPath(namespaceName), newQueryParamsWith(limit, offset));
+  }
+
+  URL toDatasetVersionUrl(String namespaceName, String datasetName, String version) {
+    return from(datasetVersionPath(namespaceName, datasetName, version));
+  }
+
+  URL toListDatasetVersionsUrl(
+      @NonNull String namespaceName, @NonNull String datasetName, int limit, int offset) {
+    return from(
+        listDatasetVersionsPath(namespaceName, datasetName), newQueryParamsWith(limit, offset));
   }
 
   URL toDatasetTagUrl(

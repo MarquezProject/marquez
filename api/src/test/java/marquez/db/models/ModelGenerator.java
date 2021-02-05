@@ -38,7 +38,7 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
-import marquez.service.models.Version;
+import marquez.common.models.Version;
 
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}

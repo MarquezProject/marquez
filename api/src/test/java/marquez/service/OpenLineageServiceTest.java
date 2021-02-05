@@ -190,7 +190,7 @@ public class OpenLineageServiceTest {
   }
 
   private void checkExists(LineageEvent.Dataset ds) {
-    DatasetService datasetService = new DatasetService(openLineageDao);
+    DatasetService datasetService = new DatasetService(openLineageDao, runService);
 
     Optional<Dataset> dataset =
         datasetService.get(

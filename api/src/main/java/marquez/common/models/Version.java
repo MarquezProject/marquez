@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package marquez.service.models;
+package marquez.common.models;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
@@ -24,8 +24,9 @@ import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import marquez.service.models.Version.UUIDToVersion;
-import marquez.service.models.Version.VersionToUUID;
+import marquez.common.Utils;
+import marquez.common.models.Version.UUIDToVersion;
+import marquez.common.models.Version.VersionToUUID;
 
 @EqualsAndHashCode
 @ToString
@@ -34,7 +35,11 @@ import marquez.service.models.Version.VersionToUUID;
 public class Version {
   @Getter private final UUID value;
 
-  private Version(final UUID value) {
+  public Version(final String value) {
+    this(Utils.toUuid(checkNotBlank(value)));
+  }
+
+  public Version(final UUID value) {
     checkNotNull(value, "UUID must not be null");
     checkNotBlank(value.toString(), "UUID value must not be blank");
     this.value = value;

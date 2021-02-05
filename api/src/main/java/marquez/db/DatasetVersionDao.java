@@ -93,6 +93,9 @@ public interface DatasetVersionDao {
   @SqlQuery(SELECT + "WHERE uuid = :uuid")
   Optional<DatasetVersionRow> findBy(UUID uuid);
 
+  @SqlQuery(SELECT + "WHERE uuid = :uuid")
+  Optional<DatasetVersionRow> findAllBy(UUID uuid);
+
   @SqlQuery(
       SELECT
           + "INNER JOIN datasets AS d ON d.uuid = dv.dataset_uuid AND d.current_version_uuid = dv.uuid "
@@ -123,6 +126,15 @@ public interface DatasetVersionDao {
    */
   @SqlQuery(EXTENDED_SELECT + " WHERE run_uuid = :runId")
   List<ExtendedDatasetVersionRow> findByRunId(@NonNull UUID runId);
+
+  @SqlQuery(
+      EXTENDED_SELECT
+          + "WHERE n.name = :namespaceName AND d.name = :datasetName "
+          + "ORDER BY created_at DESC "
+          + "LIMIT :limit OFFSET :offset")
+  @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
+  List<ExtendedDatasetVersionRow> findAll(
+      String namespaceName, String datasetName, int limit, int offset);
 
   @SqlQuery(
       "INSERT INTO dataset_versions "

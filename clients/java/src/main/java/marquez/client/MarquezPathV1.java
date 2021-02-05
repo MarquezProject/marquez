@@ -30,6 +30,18 @@ class MarquezPathV1 {
     return path("/sources");
   }
 
+  static String datasetVersionPath(
+      @NonNull final String namespaceName,
+      @NonNull final String datasetName,
+      @NonNull final String version) {
+    return path("/namespaces/%s/datasets/%s/versions/%s", namespaceName, datasetName, version);
+  }
+
+  static String listDatasetVersionsPath(
+      @NonNull final String namespaceName, @NonNull final String datasetName) {
+    return path("/namespaces/%s/datasets/%s/versions", namespaceName, datasetName);
+  }
+
   static String listDatasetsPath(@NonNull String namespaceName) {
     return path("/namespaces/%s/datasets", namespaceName);
   }

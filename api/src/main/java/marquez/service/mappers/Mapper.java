@@ -47,6 +47,7 @@ import marquez.common.models.RunState;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
 import marquez.common.models.TagName;
+import marquez.common.models.Version;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -66,8 +67,10 @@ import marquez.db.models.StreamVersionRow;
 import marquez.db.models.TagRow;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
+import marquez.service.models.DatasetVersion;
 import marquez.service.models.DbTable;
 import marquez.service.models.DbTableMeta;
+import marquez.service.models.DbTableVersion;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Namespace;
@@ -78,8 +81,8 @@ import marquez.service.models.Source;
 import marquez.service.models.SourceMeta;
 import marquez.service.models.Stream;
 import marquez.service.models.StreamMeta;
+import marquez.service.models.StreamVersion;
 import marquez.service.models.Tag;
-import marquez.service.models.Version;
 
 public final class Mapper {
   private Mapper() {}
@@ -170,6 +173,24 @@ public final class Mapper {
     }
   }
 
+  public static DatasetVersion toDatasetVersion(
+      @NonNull final ExtendedDatasetRow row,
+      @NonNull final ImmutableSet<TagName> tags,
+      @NonNull final DatasetVersionRow versionRow,
+      @NonNull final ImmutableList<Field> fields,
+      @Nullable final String schemaLocation,
+      @Nullable final Run createdByRun) {
+    final DatasetType type = DatasetType.valueOf(row.getType());
+    switch (type) {
+      case DB_TABLE:
+        return toDbTableVersion(row, tags, versionRow, fields, createdByRun);
+      case STREAM:
+        return toStreamVersion(row, tags, versionRow, fields, schemaLocation, createdByRun);
+      default:
+        throw new IllegalArgumentException();
+    }
+  }
+
   private static Dataset toDbTable(
       @NonNull final ExtendedDatasetRow row,
       @NonNull final ImmutableSet<TagName> tags,
@@ -185,6 +206,25 @@ public final class Mapper {
         tags,
         row.getLastModifiedAt().orElse(null),
         row.getDescription().orElse(null));
+  }
+
+  public static DbTableVersion toDbTableVersion(
+      @NonNull final ExtendedDatasetRow row,
+      @NonNull final ImmutableSet<TagName> tags,
+      @NonNull final DatasetVersionRow versionRow,
+      @NonNull final ImmutableList<Field> fields,
+      @Nullable final Run createdByRun) {
+    return new DbTableVersion(
+        new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName())),
+        DatasetName.of(row.getName()),
+        DatasetName.of(row.getPhysicalName()),
+        versionRow.getCreatedAt(),
+        Version.of(versionRow.getUuid()),
+        SourceName.of(row.getSourceName()),
+        fields,
+        tags,
+        row.getDescription().orElse(null),
+        createdByRun);
   }
 
   private static Dataset toStream(
@@ -204,6 +244,27 @@ public final class Mapper {
         tags,
         row.getLastModifiedAt().orElse(null),
         row.getDescription().orElse(null));
+  }
+
+  public static DatasetVersion toStreamVersion(
+      @NonNull final ExtendedDatasetRow row,
+      @NonNull final ImmutableSet<TagName> tags,
+      @NonNull final DatasetVersionRow versionRow,
+      @NonNull final ImmutableList<Field> fields,
+      @Nullable final String schemaLocation,
+      @Nullable final Run createdByRun) {
+    return new StreamVersion(
+        new DatasetId(NamespaceName.of(row.getNamespaceName()), DatasetName.of(row.getName())),
+        DatasetName.of(row.getName()),
+        DatasetName.of(row.getPhysicalName()),
+        row.getCreatedAt(),
+        Version.of(versionRow.getUuid()),
+        SourceName.of(row.getSourceName()),
+        (schemaLocation == null) ? null : Utils.toUrl(schemaLocation),
+        fields,
+        tags,
+        row.getDescription().orElse(null),
+        createdByRun);
   }
 
   public static DatasetRow toDatasetRow(
