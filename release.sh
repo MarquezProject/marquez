@@ -53,7 +53,7 @@ bump2version \
 # Bump marquez_airflow version
 VERSION=$(python ./integrations/airflow/setup.py --version)
 bump2version \
-  --config-file ./clients/python/setup.cfg \
+  --config-file ./integrations/airflow/setup.cfg \
   --current-version "${VERSION}" \
   --no-commit \
   --no-tag \
