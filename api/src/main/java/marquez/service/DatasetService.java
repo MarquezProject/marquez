@@ -91,13 +91,14 @@ public class DatasetService {
 
   private final RunService runService;
 
-  public DatasetService(@NonNull final MarquezDao marquezDao) {
+  public DatasetService(@NonNull final MarquezDao marquezDao, @NonNull final RunService runService) {
     this.namespaceDao = marquezDao.createNamespaceDao();
     this.sourceDao = marquezDao.createSourceDao();
     this.datasetDao = marquezDao.createDatasetDao();
-    this.fieldDao = marquezDao.createDatasetFieldDao();
-    this.versionDao = marquezDao.createDatasetVersionDao();
+    this.datasetFieldDao = marquezDao.createDatasetFieldDao();
+    this.datasetVersionDao = marquezDao.createDatasetVersionDao();
     this.tagDao = marquezDao.createTagDao();
+    this.runService = runService;
   }
 
   public DatasetService(

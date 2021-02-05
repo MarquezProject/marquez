@@ -45,6 +45,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 
 @RunWith(Parameterized.class)
 @Category({DataAccessTests.class, IntegrationTests.class})
@@ -190,7 +191,7 @@ public class OpenLineageServiceTest {
   }
 
   private void checkExists(LineageEvent.Dataset ds) {
-    DatasetService datasetService = new DatasetService(openLineageDao);
+    DatasetService datasetService = new DatasetService(openLineageDao, runService);
 
     Optional<Dataset> dataset =
         datasetService.get(
