@@ -30,6 +30,7 @@ import marquez.db.JobVersionDao;
 import marquez.db.MarquezDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
+import marquez.db.RunDao.RunData;
 import marquez.db.RunStateDao;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -175,9 +176,9 @@ public class RunService {
     checkArgument(limit >= 0, "limit must be >= 0");
     checkArgument(offset >= 0, "offset must be >= 0");
 
-    final List<ExtendedRunRow> runRows =
+    final List<RunData> runRows =
         runDao.findAll(namespaceName.getValue(), jobName.getValue(), limit, offset);
-    final List<Run> runs = Mapper.toRuns(runRows);
+    final List<Run> runs = Mapper.toMarquezRuns(runRows);
     return ImmutableList.copyOf(runs);
   }
 

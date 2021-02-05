@@ -17,12 +17,16 @@ package marquez.db;
 import static marquez.db.Columns.ENDED_AT;
 import static marquez.db.Columns.STARTED_AT;
 
+import com.github.henneberger.typekin.annotation.StructuralType;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.MarquezModel;
 import marquez.common.models.RunState;
 import marquez.db.mappers.ExtendedRunRowMapper;
+import marquez.db.mappers.RunMapper;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.RunRow;
 import org.jdbi.v3.sqlobject.CreateSqlObject;
@@ -155,7 +159,8 @@ public interface RunDao extends SqlObject {
           + "WHERE n.name = :namespace and j.name = :jobName "
           + "ORDER BY r.created_at DESC "
           + "LIMIT :limit OFFSET :offset")
-  List<ExtendedRunRow> findAll(String namespace, String jobName, int limit, int offset);
+  @RegisterRowMapper(RunMapper.class)
+  List<RunData> findAll(String namespace, String jobName, int limit, int offset);
 
   @SqlQuery("SELECT COUNT(*) FROM runs")
   int count();
@@ -236,4 +241,171 @@ public interface RunDao extends SqlObject {
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
           + "VALUES (:runUuid, :datasetVersionUuid) ON CONFLICT DO NOTHING")
   void updateInputMapping(UUID runUuid, UUID datasetVersionUuid);
+
+  @StructuralType(model = MarquezModel.Run.class, name = "RunDataType")
+  public static class RunData implements RunDataType {
+    private final UUID uuid;
+    private final Instant createdAt;
+    private final Instant updatedAt;
+    private final List<DatasetVersionIdData> inputDatasetVersion;
+    private final JobVersionIdData jobVersionId;
+    private final Optional<Instant> nominalStartTime;
+    private final Optional<Instant> nominalEndTime;
+    private final Optional<CurrentRunStateData> currentRunState;
+    private final Optional<RunStateData> startRunState;
+    private final Optional<RunStateData> endRunState;
+    private final RunArgsData runArgs;
+
+    public RunData(
+        UUID uuid,
+        Instant createdAt,
+        Instant updatedAt,
+        JobVersionIdData jobVersionId,
+        List<DatasetVersionIdData> inputDatasetVersion,
+        Optional<Instant> nominalStartTime,
+        Optional<Instant> nominalEndTime,
+        Optional<CurrentRunStateData> currentRunState,
+        Optional<RunStateData> startRunState,
+        Optional<RunStateData> endRunState,
+        RunArgsData runArgs) {
+      this.uuid = uuid;
+      this.createdAt = createdAt;
+      this.updatedAt = updatedAt;
+      this.inputDatasetVersion = inputDatasetVersion;
+      this.jobVersionId = jobVersionId;
+      this.nominalStartTime = nominalStartTime;
+      this.nominalEndTime = nominalEndTime;
+      this.currentRunState = currentRunState;
+      this.startRunState = startRunState;
+      this.endRunState = endRunState;
+      this.runArgs = runArgs;
+    }
+
+    public UUID getUuid() {
+      return uuid;
+    }
+
+    public Instant getCreatedAt() {
+      return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+      return updatedAt;
+    }
+
+    public List<DatasetVersionIdData> getInputDatasetVersion() {
+      return inputDatasetVersion;
+    }
+
+    public JobVersionIdData getJobVersion() {
+      return jobVersionId;
+    }
+
+    public Optional<Instant> getNominalStartTime() {
+      return nominalStartTime;
+    }
+
+    public Optional<Instant> getNominalEndTime() {
+      return nominalEndTime;
+    }
+
+    public Optional<CurrentRunStateData> getCurrentRunState() {
+      return currentRunState;
+    }
+
+    public Optional<RunStateData> getStartRunState() {
+      return startRunState;
+    }
+
+    public Optional<RunStateData> getEndRunState() {
+      return endRunState;
+    }
+
+    public RunArgsData getRunArgs() {
+      return runArgs;
+    }
+  }
+
+  @StructuralType(model = MarquezModel.JobVersion.class, name = "JobVersionIdDataType")
+  public static class JobVersionIdData implements JobVersionIdDataType {
+
+    private final UUID uuid;
+
+    public JobVersionIdData(UUID uuid) {
+
+      this.uuid = uuid;
+    }
+
+    public UUID getUuid() {
+      return uuid;
+    }
+  }
+
+  @StructuralType(model = MarquezModel.RunState.class, name = "RunStateDataType")
+  public static class RunStateData implements RunStateDataType {
+
+    private final UUID uuid;
+    private final Instant transitionTime;
+
+    public RunStateData(UUID uuid, Instant transitionTime) {
+      this.uuid = uuid;
+      this.transitionTime = transitionTime;
+    }
+
+    public UUID getUuid() {
+      return uuid;
+    }
+
+    public Instant getTransitionedAt() {
+      return transitionTime;
+    }
+  }
+
+  @StructuralType(model = MarquezModel.RunState.class, name = "CurrentRunStateDataType")
+  public static class CurrentRunStateData implements CurrentRunStateDataType {
+
+    private final RunState runState;
+
+    public CurrentRunStateData(RunState runState) {
+      this.runState = runState;
+    }
+
+    public marquez.common.models.RunState getState() {
+      return runState;
+    }
+  }
+
+  @StructuralType(model = MarquezModel.RunArgs.class, name = "RunArgsDataType")
+  public static class RunArgsData implements RunArgsDataType {
+
+    private final UUID uuid;
+    private final Map<String, String> args;
+
+    public RunArgsData(UUID uuid, Map<String, String> args) {
+      this.uuid = uuid;
+      this.args = args;
+    }
+
+    public UUID getUuid() {
+      return uuid;
+    }
+
+    public Map<String, String> getArgs() {
+      return args;
+    }
+  }
+
+  @StructuralType(model = MarquezModel.DatasetVersion.class, name = "DatasetVersionDataType")
+  public static class DatasetVersionIdData implements DatasetVersionDataType {
+
+    private final UUID uuid;
+
+    public DatasetVersionIdData(UUID uuid) {
+      this.uuid = uuid;
+    }
+
+    public UUID getUuid() {
+      return uuid;
+    }
+  }
 }

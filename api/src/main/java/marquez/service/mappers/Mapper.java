@@ -18,6 +18,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.temporal.ChronoUnit.MILLIS;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.github.henneberger.typekin.annotation.TypeOf;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -30,6 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
+import marquez.common.MarquezModel;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -364,6 +366,30 @@ public final class Mapper {
         null);
   }
 
+  public static Run toMarquezRun(@NonNull final ToRunFragment run) {
+    Optional<Long> durationMs =
+        run.getEndRunState()
+            .flatMap(
+                endedAt ->
+                    run.getStartRunState()
+                        .map(
+                            startedAt ->
+                                startedAt
+                                    .getTransitionedAt()
+                                    .until(endedAt.getTransitionedAt(), MILLIS)));
+    return new Run(
+        RunId.of(run.getUuid()),
+        run.getCreatedAt(),
+        run.getUpdatedAt(),
+        run.getNominalStartTime().orElse(null),
+        run.getNominalEndTime().orElse(null),
+        run.getCurrentRunState().map(CurrentRunStateFragment::getState).orElse(RunState.NEW),
+        run.getStartRunState().map(TerminalRunStateFragment::getTransitionedAt).orElse(null),
+        run.getEndRunState().map(TerminalRunStateFragment::getTransitionedAt).orElse(null),
+        durationMs.orElse(null),
+        run.getRunArgs().getArgs());
+  }
+
   public static Run toRun(@NonNull final ExtendedRunRow row) {
     Optional<Long> durationMs =
         row.getEndedAt()
@@ -384,6 +410,46 @@ public final class Mapper {
 
   public static List<Run> toRuns(@NonNull final List<ExtendedRunRow> rows) {
     return rows.stream().map(Mapper::toRun).collect(toImmutableList());
+  }
+
+  @TypeOf(model = MarquezModel.Run.class)
+  public interface ToRunFragment {
+    public UUID getUuid();
+
+    public Instant getCreatedAt();
+
+    public Instant getUpdatedAt();
+
+    public Optional<Instant> getNominalStartTime();
+
+    public Optional<Instant> getNominalEndTime();
+
+    Optional<? extends TerminalRunStateFragment> getEndRunState();
+
+    Optional<? extends TerminalRunStateFragment> getStartRunState();
+
+    Optional<? extends CurrentRunStateFragment> getCurrentRunState();
+
+    RunArgsFragment getRunArgs();
+  }
+
+  @TypeOf(model = MarquezModel.RunState.class)
+  public interface CurrentRunStateFragment {
+    public marquez.common.models.RunState getState();
+  }
+
+  @TypeOf(model = MarquezModel.RunState.class)
+  public interface TerminalRunStateFragment {
+    public Instant getTransitionedAt();
+  }
+
+  @TypeOf(model = MarquezModel.RunArgs.class)
+  public interface RunArgsFragment {
+    public Map<String, String> getArgs();
+  }
+
+  public static List<Run> toMarquezRuns(final List<? extends ToRunFragment> rows) {
+    return rows.stream().map(Mapper::toMarquezRun).collect(toImmutableList());
   }
 
   public static RunRow toRunRow(
