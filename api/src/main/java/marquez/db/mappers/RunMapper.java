@@ -57,7 +57,7 @@ public final class RunMapper implements RowMapper<RunData> {
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         toJobVersionIdData(uuidOrThrow(results, Columns.JOB_VERSION_UUID)),
-        toInputDatasetVersionIdData(results, Columns.INPUT_VERSION_UUIDS),
+        toInputDatasetVersionIdData(uuidArrayOrThrow(results, Columns.INPUT_VERSION_UUIDS)),
         Optional.ofNullable(timestampOrNull(results, Columns.NOMINAL_START_TIME)),
         Optional.ofNullable(timestampOrNull(results, Columns.NOMINAL_END_TIME)),
         toCurrentRunState(stringOrNull(results, Columns.CURRENT_RUN_STATE)),
@@ -103,10 +103,8 @@ public final class RunMapper implements RowMapper<RunData> {
     return new JobVersionIdData(uuid);
   }
 
-  private List<DatasetVersionIdData> toInputDatasetVersionIdData(
-      ResultSet results, String inputVersionUuids) throws SQLException {
-    return uuidArrayOrThrow(results, Columns.INPUT_VERSION_UUIDS).stream()
-        .map(uuid -> new DatasetVersionIdData(uuid))
-        .collect(Collectors.toList());
+  private List<DatasetVersionIdData> toInputDatasetVersionIdData(List<UUID> input)
+      throws SQLException {
+    return input.stream().map(DatasetVersionIdData::new).collect(Collectors.toList());
   }
 }
