@@ -152,23 +152,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/dataset'
 
-  /namespaces/{namespace}/datasets/{dataset}/versions:
-    parameters:
-      - $ref: '#/components/parameters/namespace'
-      - $ref: '#/components/parameters/dataset'
-    get:
-      summary: List all versions for a dataset
-      description: Returns a list of versions for a dataset.
-      tags:
-        - Datasets
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/datasetVersions'
-
   /namespaces/{namespace}/datasets/{dataset}/versions/{version}:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -189,6 +172,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/datasetVersion'
+
+  /namespaces/{namespace}/datasets/{dataset}/versions:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/dataset'
+    get:
+      summary: List all versions for a dataset
+      description: Returns a list of versions for a dataset.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datasetVersions'
 
   /namespaces/{namespace}/datasets:
     parameters:
@@ -514,6 +514,16 @@ components:
       name: id
       in: path
       description: The ID of the run.
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: ea9badc5-7cb2-49af-9a9f-155771d3a797
+
+    version:
+      name: id
+      in: path
+      description: The ID of the dataset version.
       required: true
       schema:
         type: string
@@ -870,6 +880,147 @@ components:
         datasets:
           items:
             $ref: '#/components/schemas/dataset'
+
+    datasetVersion:
+      type: object
+      properties:
+        id:
+          description: The ID of the dataset.
+          type: object
+          properties:
+            namespace:
+              type: string
+              description: The namespace of the dataset.
+            name:
+              type: string
+              description: The name of the dataset.
+        type:
+          description: The type of the dataset.
+          type: string
+        name:
+          description: The **logical** name of the dataset.
+          type: string
+        physicalName:
+          description: The **physical** name of the dataset.
+          type: string
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was created.
+          type: string
+          format: date-time
+        version:
+          description: The ID of the dataset version.
+          type: string
+        namespace:
+          type: string
+          description: The namespace of the dataset.
+        sourceName:
+          description: The name of the source associated with the dataset.
+          type: string
+        fields:
+          description: The fields of the dataset.
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                description: The name of the field.
+                type: string
+              type:
+                $ref: '#/components/schemas/fieldType'
+              tags:
+                description: List of tags.
+                type: array
+                items:
+                  $ref: '#/components/schemas/tag'
+              description:
+                description: The description of the field.
+                type: string
+        tags:
+          description: List of tags.
+          type: array
+          items:
+            $ref: '#/components/schemas/tag'
+        description:
+          description:  The description of the dataset.
+          type: string
+        createdByRun:
+          description: The run associated with the dataset version.
+          type: object
+          properties:
+            id:
+              description: The ID of the run.
+              type: string
+              format: uuid
+            createdAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+              type: string
+              format: date-time
+            updatedAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+              type: string
+              format: date-time
+            nominalStartTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+              type: string
+              format: date-time
+            nominalEndTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+              type: string
+              format: date-time
+            state:
+              description: The current state of the run.
+              type: string
+              enum: [ NEW, RUNNING, COMPLETED, FAILED, ABORTED ]
+            startedAt:
+              type: integer
+              description: The time at which the run was started. Measured in seconds since the Unix epoch.
+            endedAt:
+              type: integer
+              description: The time at which the run was ended. Measured in seconds since the Unix epoch.
+            durationMs:
+              type: integer
+              description: The total duration of the run. Measured in milliseconds.
+            args:
+              description: The arguments of the run.
+              type: object
+      example:
+        id:
+          namespace: my-namespace
+          name: my-dataset
+        type: DB_TABLE
+        name: my-dataset
+        physicalName: public.mytable
+        createdAt: 2019-05-09T19:49:24.201361Z
+        version: d224dac0-35d7-4d9b-bbbe-6fff1a8485ad
+        namespace: my-namespace
+        sourceName: my-source
+        fields: [
+          {'name': 'a', 'type': 'INTEGER', 'tags': []},
+          {'name': 'b', 'type': 'TIMESTAMP', 'tags': []},
+          {'name': 'c', 'type': 'INTEGER', 'tags': []},
+          {'name': 'd', 'type': 'INTEGER', 'tags': []}
+        ]
+        tags: []
+        description: "My first dataset!"
+        createdByRun: {
+          "id": "0e89b60a-d80d-42ae-a12b-bd79ae1fb576",
+          "createdAt": "2019-05-09T18:52:35.620763Z",
+          "updatedAt": "2019-05-09T18:53:41.461122Z",
+          "nominalStartTime": null,
+          "nominalEndTime": null,
+          "state": "COMPLETED",
+          "startedAt": "2021-02-05T18:53:33.245492Z",
+          "endedAt": "2021-02-05T18:53:41.461122Z",
+          "durationMs": 8216,
+          "args": { 'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1 }
+        }
+
+    datasetVersions:
+      type: object
+      properties:
+        datasets:
+          items:
+            $ref: '#/components/schemas/datasetVersion'
 
     tag:
       type: object
