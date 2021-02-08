@@ -17,7 +17,6 @@ import org.apache.tools.ant.filters.*
 plugins {
     id 'maven-publish'
     id 'signing'
-    id 'net.researchgate.release' version '2.8.1'
 }
 
 java {
@@ -42,12 +41,6 @@ dependencies {
 task testUnit(type: Test) {
     useJUnit {
         includeCategories 'marquez.client.UnitTests'
-    }
-}
-
-release {
-    git {
-        requireBranch = 'main'
     }
 }
 
