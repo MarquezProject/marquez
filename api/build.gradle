@@ -90,7 +90,7 @@ publishing {
             artifact javadocJar
 
             pom {
-                name = 'marquez'
+                name = 'marquez-api'
                 description = 'Collect, aggregate, and visualize a data ecosystem\'s metadata'
                 url = 'https://github.com/MarquezProject/marquez'
                 licenses {
