@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./up.sh [--build] [--seed]
+# Usage: $ ./up.sh [--build | --pull] [--seed]
 
 set -e
 
