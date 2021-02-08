@@ -35,17 +35,17 @@ fi
 echo "Building images (tag: ${version})..."
 
 # Build and tag app image
-docker build --no-cache --tag "marquez:${version}" .
-docker tag "marquez:${version}" 'marquez:latest'
+docker build --no-cache --tag "${ORG}/marquez:${version}" .
+docker tag "${ORG}/marquez:${version}" "${ORG}/marquez:latest"
 
 # Build and tag web image
-docker build --no-cache --tag "marquez-web:${version}" .
-docker tag "marquez-web:${version}" 'marquez-web:latest'
+docker build --no-cache --tag "${ORG}/marquez-web:${version}" .
+docker tag "${ORG}/marquez-web:${version}" "${ORG}/marquez-web:latest"
 
 # Push images to Docker Hub
-docker push "marquez:${version}"
-docker push 'marquez:latest'
-docker push "marquez-web:${version}"
-docker push 'marquez-web:latest'
+docker push "${ORG}/marquez:${version}"
+docker push "${ORG}/marquez:latest"
+docker push "${ORG}/marquez-web:${version}"
+docker push "${ORG}/marquez-web:latest"
 
 echo "DONE!"
