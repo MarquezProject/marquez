@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./up.sh [--build] [--seed]
+# Usage: $ ./up.sh [--build | --pull] [--seed]
 
 set -e
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) [--build] [--seed]"
+  echo "usage: ./$(basename -- ${0}) [--build | --pull] [--seed]"
   exit 1
 }
 
@@ -32,6 +32,9 @@ while [ $# -gt 0 ]; do
   case $1 in
     '--build'|-b)
        BUILD='true'
+       ;;
+    '--pull'|-p)
+       PULL='true'
        ;;
     '--seed'|-s)
        SEED='true'
@@ -50,6 +53,8 @@ done
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   args+=" --build"
+elif [[ "${PULL}" = "true" ]]; then
+  docker-compose pull
 fi
 
 if [[ "${SEED}" = "true" ]]; then
