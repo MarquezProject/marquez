@@ -36,11 +36,11 @@ echo "Building images (tag: ${version})..."
 
 # Build and tag app image
 docker build --no-cache --tag "marquez:${version}" .
-docker tag 'marquez' 'marquez:latest'
+docker tag "marquez:${version}" 'marquez:latest'
 
 # Build and tag web image
 docker build --no-cache --tag "marquez-web:${version}" .
-docker tag 'marquez-web' 'marquez-web:latest'
+docker tag "marquez-web:${version}" 'marquez-web:latest'
 
 # Push images to Docker Hub
 docker push "marquez:${version}"
