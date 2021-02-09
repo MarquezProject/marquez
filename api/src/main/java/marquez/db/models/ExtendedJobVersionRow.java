@@ -42,18 +42,22 @@ public class ExtendedJobVersionRow extends JobVersionRow {
       final UUID latestRunUuid,
       @NonNull final String context,
       @NonNull final String namespaceName,
-      @NonNull final String name) {
+      @NonNull final String name,
+      @NonNull final UUID namespaceUuid) {
     super(
         uuid,
         createdAt,
         updatedAt,
         jobUuid,
+        name,
         jobContextUuid,
         inputUuids,
         outputUuids,
         location,
         version,
-        latestRunUuid);
+        latestRunUuid,
+        namespaceUuid,
+        namespaceName);
     this.context = context;
     this.namespaceName = namespaceName;
     this.name = name;
