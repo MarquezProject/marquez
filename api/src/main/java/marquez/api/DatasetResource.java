@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.api.exceptions.DatasetNotFoundException;
+import marquez.api.exceptions.DatasetVersionNotFoundException;
 import marquez.api.exceptions.FieldNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
@@ -44,6 +45,7 @@ import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
+import marquez.common.models.Version;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
 import marquez.service.RunService;
@@ -51,6 +53,7 @@ import marquez.service.TagService;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
+import marquez.service.models.DatasetVersion;
 
 @Path("/api/v1/namespaces/{namespace}/datasets")
 public class DatasetResource {
@@ -112,6 +115,47 @@ public class DatasetResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
+  @Path("{dataset}/versions/{version}")
+  @Produces(APPLICATION_JSON)
+  public Response getVersion(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("dataset") DatasetName datasetName,
+      @PathParam("version") Version version)
+      throws MarquezServiceException {
+    throwIfNotExists(namespaceName);
+    throwIfNotExists(namespaceName, datasetName);
+
+    final DatasetVersion datasetVersion =
+        datasetService
+            .getVersion(version)
+            .orElseThrow(() -> new DatasetVersionNotFoundException(version));
+    return Response.ok(datasetVersion).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Path("{dataset}/versions")
+  @Produces(APPLICATION_JSON)
+  public Response listVersions(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("dataset") DatasetName datasetName,
+      @QueryParam("limit") @DefaultValue("100") int limit,
+      @QueryParam("offset") @DefaultValue("0") int offset)
+      throws MarquezServiceException {
+    throwIfNotExists(namespaceName);
+    throwIfNotExists(namespaceName, datasetName);
+
+    final List<DatasetVersion> datasetVersions =
+        datasetService.getVersionsFor(namespaceName, datasetName, limit, offset);
+    return Response.ok(new DatasetVersions(datasetVersions)).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
@@ -120,7 +164,7 @@ public class DatasetResource {
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
 
-    final ImmutableList<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
+    final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
     return Response.ok(new Datasets(datasets)).build();
   }
 
@@ -171,7 +215,14 @@ public class DatasetResource {
   static class Datasets {
     @NonNull
     @JsonProperty("datasets")
-    ImmutableList<Dataset> value;
+    List<Dataset> value;
+  }
+
+  @Value
+  static class DatasetVersions {
+    @NonNull
+    @JsonProperty("versions")
+    List<DatasetVersion> value;
   }
 
   void throwIfNotExists(@NonNull NamespaceName namespaceName) throws MarquezServiceException {

@@ -25,7 +25,6 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ExtendedDatasetVersionRow extends DatasetVersionRow {
-
   @Getter private @NonNull String namespaceName;
   @Getter private @NonNull String datasetName;
 

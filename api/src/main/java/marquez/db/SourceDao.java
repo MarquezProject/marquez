@@ -18,7 +18,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.models.SourceType;
 import marquez.db.mappers.SourceRowMapper;
 import marquez.db.models.SourceRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -83,5 +82,5 @@ public interface SourceDao {
           + "name = EXCLUDED.name, "
           + "connection_url = EXCLUDED.connection_url "
           + "RETURNING *")
-  SourceRow upsert(UUID uuid, SourceType type, Instant now, String name, String connectionUrl);
+  SourceRow upsert(UUID uuid, String type, Instant now, String name, String connectionUrl);
 }

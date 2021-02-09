@@ -160,7 +160,13 @@ public class JobServiceDbTest {
 
     datasetService =
         new DatasetService(
-            namespaceDao, sourceDao, datasetDao, datasetFieldDao, datasetVersionDao, tagDao);
+            namespaceDao,
+            sourceDao,
+            datasetDao,
+            datasetFieldDao,
+            datasetVersionDao,
+            tagDao,
+            runService);
 
     sourceService = new SourceService(sourceDao);
   }
@@ -193,7 +199,7 @@ public class JobServiceDbTest {
     SourceName sn = SourceName.of("bq_source");
     Source s =
         sourceService.createOrUpdate(
-            sn, new SourceMeta(SourceType.BIGQUERY, URI.create("http://example.com"), null));
+            sn, new SourceMeta(SourceType.of("BIGQUERY"), URI.create("http://example.com"), null));
     assertThat(s.getName()).isNotNull();
     DatasetName in_dsn = DatasetName.of("INPUT_DATASET");
     Dataset in_ds =

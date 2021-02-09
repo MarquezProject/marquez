@@ -7,6 +7,7 @@ import static marquez.common.models.ModelGenerator.newConnectionUrl;
 import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.ModelGenerator.newContext;
 import static marquez.common.models.ModelGenerator.newDatasetName;
+import static marquez.common.models.ModelGenerator.newDbSourceType;
 import static marquez.common.models.ModelGenerator.newDescription;
 import static marquez.common.models.ModelGenerator.newFieldName;
 import static marquez.common.models.ModelGenerator.newFieldType;
@@ -15,7 +16,6 @@ import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newOwnerName;
 import static marquez.common.models.ModelGenerator.newSourceName;
-import static marquez.common.models.ModelGenerator.newSourceType;
 import static marquez.service.models.ModelGenerator.newSchemaLocation;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,15 +64,16 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
   private static final String NAMESPACE_DESCRIPTION = newDescription();
 
   // SOURCE
-  private static final String SOURCE_TYPE = newSourceType().name();
+  private static final String SOURCE_TYPE = newDbSourceType().getValue();
   private static final String SOURCE_NAME = newSourceName().getValue();
   private static final URI CONNECTION_URL = newConnectionUrl();
   private static final String SOURCE_DESCRIPTION = newDescription();
 
   // DB TABLE DATASET
-  private static final String DB_TABLE_SOURCE_TYPE = SourceType.POSTGRESQL.name();
+  private static final String DB_TABLE_SOURCE_TYPE = SourceType.of("POSTGRESQL").getValue();
   private static final String DB_TABLE_SOURCE_NAME = newSourceName().getValue();
-  private static final URI DB_TABLE_CONNECTION_URL = newConnectionUrlFor(SourceType.POSTGRESQL);
+  private static final URI DB_TABLE_CONNECTION_URL =
+      newConnectionUrlFor(SourceType.of("POSTGRESQL"));
   private static final String DB_TABLE_SOURCE_DESCRIPTION = newDescription();
   private static final DatasetId DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
   private static final String DB_TABLE_NAME = DB_TABLE_ID.getName();
@@ -83,9 +84,9 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
   private static final Set<String> DB_TABLE_TAGS = ImmutableSet.of(PII.getName());
 
   // STREAM DATASET
-  private static final String STREAM_SOURCE_TYPE = SourceType.KAFKA.name();
+  private static final String STREAM_SOURCE_TYPE = SourceType.of("KAFKA").getValue();
   private static final String STREAM_SOURCE_NAME = newSourceName().getValue();
-  private static final URI STREAM_CONNECTION_URL = newConnectionUrlFor(SourceType.KAFKA);
+  private static final URI STREAM_CONNECTION_URL = newConnectionUrlFor(SourceType.of("KAFKA"));
   private static final String STREAM_SOURCE_DESCRIPTION = newDescription();
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
   private static final String STREAM_NAME = STREAM_ID.getName();
@@ -191,6 +192,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
                 .count())
         .isEqualTo(1);
 
+    assertThat(client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(1);
+
     // (4) Add field to db table
     final List<Field> original = dbTable.getFields();
     final List<Field> added = ImmutableList.of(newFieldWith(PII.getName()), newField(), newField());
@@ -217,6 +220,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(modifiedDbTable.getTags()).isEqualTo(DB_TABLE_TAGS);
     assertThat(modifiedDbTable.getLastModifiedAt()).isEmpty();
     assertThat(modifiedDbTable.getDescription()).isEqualTo(Optional.of(DB_TABLE_DESCRIPTION));
+
+    assertThat(client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(2);
   }
 
   @Test
@@ -265,6 +270,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
                 .count())
         .isEqualTo(1);
 
+    assertThat(client.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME)).hasSize(1);
+
     // (4) Change schema location
     final URL modifiedSchemaLocation = newSchemaLocation();
     final StreamMeta modifiedStreamMeta =
@@ -288,6 +295,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(modifiedStream.getLastModifiedAt()).isEmpty();
     assertThat(modifiedStream.getSchemaLocation()).isEqualTo(Optional.of(modifiedSchemaLocation));
     assertThat(modifiedStream.getDescription()).isEqualTo(Optional.of(STREAM_DESCRIPTION));
+
+    assertThat(client.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME)).hasSize(2);
   }
 
   @Test

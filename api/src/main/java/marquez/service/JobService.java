@@ -37,10 +37,12 @@ import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.Version;
 import marquez.db.DatasetDao;
 import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
+import marquez.db.MarquezDao;
 import marquez.db.NamespaceDao;
 import marquez.db.RunDao;
 import marquez.db.models.DatasetRow;
@@ -54,7 +56,6 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
-import marquez.service.models.Version;
 
 @Slf4j
 public class JobService {
@@ -65,6 +66,16 @@ public class JobService {
   private final JobContextDao jobContextDao;
   private final RunDao runDao;
   private final RunService runService;
+
+  public JobService(@NonNull MarquezDao marquezDao, @NonNull final RunService runService) {
+    this.namespaceDao = marquezDao.createNamespaceDao();
+    this.datasetDao = marquezDao.createDatasetDao();
+    this.jobDao = marquezDao.createJobDao();
+    this.jobVersionDao = marquezDao.createJobVersionDao();
+    this.jobContextDao = marquezDao.createJobContextDao();
+    this.runDao = marquezDao.createRunDao();
+    this.runService = runService;
+  }
 
   public JobService(
       @NonNull final NamespaceDao namespaceDao,

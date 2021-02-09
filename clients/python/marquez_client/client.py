@@ -160,6 +160,32 @@ class MarquezClient:
                       namespace_name, dataset_name)
         )
 
+    def get_dataset_version(self, namespace_name, dataset_name, version):
+        Utils.check_name_length(namespace_name, 'namespace_name')
+        Utils.check_name_length(dataset_name, 'dataset_name')
+
+        if not version:
+            raise ValueError('version must not be None')
+
+        return self._get(
+            self._url('/namespaces/{0}/datasets/{1}/versions/{2}',
+                      namespace_name, dataset_name, version)
+        )
+
+    def list_dataset_versions(self, namespace_name, dataset_name,
+                              limit=None, offset=None):
+        Utils.check_name_length(namespace_name, 'namespace_name')
+        Utils.check_name_length(dataset_name, 'dataset_name')
+
+        return self._get(
+            self._url('/namespaces/{0}/datasets/{1}/versions',
+                      namespace_name, dataset_name),
+            params={
+                'limit': limit or DEFAULT_LIMIT,
+                'offset': offset or DEFAULT_OFFSET
+            }
+        )
+
     def list_datasets(self, namespace_name, limit=None, offset=None):
         Utils.check_name_length(namespace_name, 'namespace_name')
 

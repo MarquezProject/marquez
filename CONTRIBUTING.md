@@ -31,20 +31,20 @@ To run the entire test suite:
 $ ./gradlew test
 ```
 
-You can also run individual tests using the flag `--tests`:
+You can also run individual tests for a [submodule](https://github.com/MarquezProject/marquez#modules) using the `--tests` flag:
 
 ```bash
-$ ./gradlew test --tests marquez.api.DatasetResourceTest
-$ ./gradlew test --tests marquez.service.DatasetServiceTest
-$ ./gradlew test --tests marquez.db.DatasetDaoTest
+$ ./gradlew :api:test --tests marquez.api.DatasetResourceTest
+$ ./gradlew :api:test --tests marquez.service.DatasetServiceTest
+$ ./gradlew :api:test --tests marquez.db.DatasetDaoTest
 ```
 
 Or run tests by category:  
 
 ```bash
-$ ./gradlew testUnit         # run only unit tests
-$ ./gradlew testIntegration  # run only integration tests
-$ ./gradlew testDataAccess   # run only data access tests
+$ ./gradlew :api:testUnit         # run only unit tests
+$ ./gradlew :api:testIntegration  # run only integration tests
+$ ./gradlew :api:testDataAccess   # run only data access tests
 ```
 
 We use [spotless](https://github.com/diffplug/spotless) to format our code. This ensures `.java` files are formatted to comply with [Google Java Style](https://google.github.io/styleguide/javaguide.html). Make sure your code is formatted before pushing any changes, otherwise CI will fail:
