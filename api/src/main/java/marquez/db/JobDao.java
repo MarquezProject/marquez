@@ -117,5 +117,11 @@ public interface JobDao {
           + "description = EXCLUDED.description "
           + "RETURNING *")
   JobRow upsert(
-      UUID uuid, JobType type, Instant now, UUID namespaceUuid, String namespaceName, String name, String description);
+      UUID uuid,
+      JobType type,
+      Instant now,
+      UUID namespaceUuid,
+      String namespaceName,
+      String name,
+      String description);
 }
