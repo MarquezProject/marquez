@@ -34,6 +34,8 @@ $ ./docker/up.sh
 
 > **Tip:** Use the `--build` flag to build images from source, and/or `--seed` to load with seed data.
 
+**`WEB UI`**
+
 You can open http://localhost:3000 to begin exploring the web UI. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run metadata of current and previous job runs, and much more!
 
 **`HTTP API`**
