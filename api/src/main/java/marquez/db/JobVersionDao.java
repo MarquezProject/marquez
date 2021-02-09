@@ -98,7 +98,7 @@ public interface JobVersionDao extends SqlObject {
   void updateLatestRun(UUID rowUuid, Instant updatedAt, UUID latestRunUuid);
 
   final String EXTENDED_SELECT =
-      "SELECT j.namespace_uuid, jv.*, jc.uuid AS job_context_uuid, jc.context, n.name as namespace_name, j.name, "
+      "SELECT j.namespace_uuid, jv.*, jc.uuid AS job_context_uuid, jc.context, j.namespace_name, j.name, "
           + "ARRAY(SELECT dataset_uuid "
           + "      FROM job_versions_io_mapping "
           + "      WHERE job_version_uuid = jv.uuid AND "
@@ -110,8 +110,6 @@ public interface JobVersionDao extends SqlObject {
           + "FROM job_versions AS jv "
           + "INNER JOIN jobs AS j "
           + "  ON j.uuid = jv.job_uuid "
-          + "INNER JOIN namespaces AS n "
-          + "  ON j.namespace_uuid = n.uuid "
           + "INNER JOIN job_contexts AS jc "
           + "  ON job_context_uuid = jc.uuid ";
 
@@ -120,7 +118,7 @@ public interface JobVersionDao extends SqlObject {
 
   @SqlQuery(
       EXTENDED_SELECT
-          + "WHERE n.name = :namespaceName AND j.name = :jobName AND j.current_version_uuid = jv.uuid "
+          + "WHERE j.namespace_name = :namespaceName AND j.name = :jobName AND j.current_version_uuid = jv.uuid "
           + "ORDER BY created_at DESC "
           + "LIMIT 1")
   Optional<ExtendedJobVersionRow> findLatest(String namespaceName, String jobName);
@@ -130,7 +128,7 @@ public interface JobVersionDao extends SqlObject {
 
   @SqlQuery(
       EXTENDED_SELECT
-          + "WHERE n.name = :namespaceName AND j.name = :jobName "
+          + "WHERE j.namespace_name = :namespaceName AND j.name = :jobName "
           + "ORDER BY created_at DESC "
           + "LIMIT :limit OFFSET :offset")
   List<ExtendedJobVersionRow> findAll(String namespaceName, String jobName, int limit, int offset);

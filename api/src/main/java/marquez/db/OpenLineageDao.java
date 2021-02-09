@@ -106,6 +106,7 @@ public interface OpenLineageDao extends MarquezDao {
             getJobType(event.getJob()),
             now,
             namespace.getUuid(),
+            namespace.getName(),
             event.getJob().getName(),
             description);
     bag.setJob(job);

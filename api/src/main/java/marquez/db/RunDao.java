@@ -151,8 +151,7 @@ public interface RunDao extends SqlObject {
       SELECT_RUN
           + "INNER JOIN job_versions AS jv ON r.job_version_uuid = jv.uuid "
           + "INNER JOIN jobs AS j ON jv.job_uuid = j.uuid "
-          + "INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid "
-          + "WHERE n.name = :namespace and j.name = :jobName "
+          + "WHERE j.namespace_name = :namespace and j.name = :jobName "
           + "ORDER BY r.created_at DESC "
           + "LIMIT :limit OFFSET :offset")
   List<ExtendedRunRow> findAll(String namespace, String jobName, int limit, int offset);
