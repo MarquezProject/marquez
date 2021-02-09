@@ -34,14 +34,17 @@ $ ./docker/up.sh
 
 > **Tip:** Use the `--build` flag to build images from source, and/or `--seed` to load with seed data.
 
-The HTTP API listens on port `5000` for all calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on localhost browse to http://localhost:5001.
+You can open http://localhost:3000 to begin exploring the web UI. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run metadata of current and previous job runs, and much more!
+
+**`HTTP API`**
+
+The [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on localhost browse to http://localhost:5001.
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
-You can open http://localhost:3000 to begin exploring the web UI.
+**`GRAPHQL`**
 
-The graphql playground endpoint can be found at http://localhost:5000/graphql-playground with 
-the graphql endpoint located at http://localhost:5000/api/v1-beta/graphql
+To explore metadata via graphql, browse to http://localhost:5000/graphql-playground. The graphql endpoint is currently in _beta_ and is located at http://localhost:5000/api/v1-beta/graphql.
 
 ## Documentation
 
