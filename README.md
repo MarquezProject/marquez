@@ -26,7 +26,7 @@ Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/mar
   <img src="./web/docs/demo.gif">
 </p>
 
-The Marquez [API](https://marquezproject.github.io/marquez/openapi.html) provides a simple way to collect dataset and job metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
+Marquez provides a simple way to collect and view _dataset_ and _job_ metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
 $ ./docker/up.sh
