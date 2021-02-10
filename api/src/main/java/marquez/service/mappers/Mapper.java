@@ -406,23 +406,29 @@ public final class Mapper {
 
   public static JobVersionRow toJobVersionRow(
       @NonNull final UUID jobRowUuid,
+      @NonNull final String jobName,
       @NonNull final UUID jobContextRowUuid,
       @NonNull final List<UUID> inputs,
       @NonNull final List<UUID> outputs,
       @Nullable final URL location,
-      @NonNull final Version version) {
+      @NonNull final Version version,
+      @NonNull final UUID namespaceUuid,
+      @NonNull final String namespaceName) {
     final Instant now = newTimestamp();
     return new JobVersionRow(
         newRowUuid(),
         now,
         now,
         jobRowUuid,
+        jobName,
         jobContextRowUuid,
         inputs,
         outputs,
         (location == null) ? null : location.toString(),
         version.getValue(),
-        null);
+        null,
+        namespaceUuid,
+        namespaceName);
   }
 
   public static Run toRun(@NonNull final ExtendedRunRow row) {
