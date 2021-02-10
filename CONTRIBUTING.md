@@ -69,7 +69,7 @@ To ensure your pull request is accepted, follow these guidelines:
 * Do your best to have a [well-formed commit message](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for your change
 * [Keep diffs small](https://graysonkoonce.com/stacked-pull-requests-keeping-github-diffs-small) and self-contained
 * If your change fixes a bug, please [link the issue](https://help.github.com/articles/closing-issues-using-keywords) in your pull request description
-* Any changes to the API reference requires [regenerating](#docs) the static `openapi.html` file.
+* Any changes to the API reference requires [regenerating](#api-docs) the static `openapi.html` file.
 
 > **Note:** A pull request should generally contain only one commit (use `git commit --amend` and `git push --force` or [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) existing commits into one).
 
