@@ -1,10 +1,27 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.11.3...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.12.0...HEAD)
+
+## [0.12.0](https://github.com/MarquezProject/marquez/compare/0.11.2...0.12.0) - 2021-02-08
+
+### Added
+
+* Modules: [`api`](https://github.com/MarquezProject/marquez/tree/main/api), [`web`](https://github.com/MarquezProject/marquez/tree/main/web), [`clients `](https://github.com/MarquezProject/marquez/tree/main/clients), [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart), and [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations)
+* Working airflow example
+* `runs` table indices for columns: `created_at` and `current_run_state` [@phixMe](https://github.com/phixMe)
+*  New `/lineage` endpoint for [OpenLineage](https://github.com/OpenLineage/OpenLineage) support [@henneberger](https://github.com/henneberger)
+*  New graphql endpoint [@henneberger](https://github.com/henneberger)
+*  New spark integration [@henneberger](https://github.com/henneberger)
+*  New API to list versions for a dataset 
+
+### Changed
+
+* Drop `Source.type` enum (now a _string_ type)
 
 ### Fixed
 
 * Replace `jdbi.getHandle()` with `jdbi.withHandle()` to free DB connections from pool [@henneberger](https://github.com/henneberger)
+* Fix `RunListener` when registering outside of the `MarquezContext` builder [@henneberger](https://github.com/henneberger)
 
 ## [0.11.3](https://github.com/MarquezProject/marquez/compare/0.11.2...0.11.3) - 2020-11-02
 
