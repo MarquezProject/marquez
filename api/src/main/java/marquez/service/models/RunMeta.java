@@ -17,8 +17,10 @@ package marquez.service.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -26,16 +28,17 @@ import marquez.common.models.RunId;
 
 @EqualsAndHashCode
 @ToString
+@Builder
 public final class RunMeta {
   @Nullable private final RunId id;
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
-  @Getter private final ImmutableMap<String, String> args;
+  @Getter private final Map<String, String> args;
 
   public RunMeta(
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
-      @Nullable final ImmutableMap<String, String> args) {
+      @Nullable final Map<String, String> args) {
     this(null, nominalStartTime, nominalEndTime, args);
   }
 
@@ -44,7 +47,7 @@ public final class RunMeta {
       @Nullable final RunId id,
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
-      @Nullable final ImmutableMap<String, String> args) {
+      @Nullable final Map<String, String> args) {
     this.id = id;
     this.nominalStartTime = nominalStartTime;
     this.nominalEndTime = nominalEndTime;

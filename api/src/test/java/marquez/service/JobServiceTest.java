@@ -25,6 +25,7 @@ import static marquez.db.models.ModelGenerator.newJobContextRowWith;
 import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
 import static marquez.db.models.ModelGenerator.newRowUuid;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,6 +44,7 @@ import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.Version;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.JobContextDao;
@@ -62,7 +64,6 @@ import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
-import marquez.service.models.Version;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -137,7 +138,8 @@ public class JobServiceTest {
           null,
           JOB_CONTEXT_ROW.getContext(),
           NAMESPACE_NAME.getValue(),
-          JOB_NAME.getValue());
+          JOB_NAME.getValue(),
+          NAMESPACE_ROW.getUuid());
 
   @Rule public MockitoRule rule = MockitoJUnit.rule();
 
@@ -196,7 +198,7 @@ public class JobServiceTest {
   public void testCreateOrUpdate() throws MarquezServiceException {
     when(namespaceDao.findBy(NAMESPACE_NAME.getValue())).thenReturn(Optional.of(NAMESPACE_ROW));
     when(jobVersionDao.findBy(JOB_VERSION_ROW.getUuid())).thenReturn(Optional.of(JOB_VERSION_ROW));
-
+    when(namespaceDao.upsert(any(), any(), any(), any())).thenReturn(NAMESPACE_ROW);
     final String checksum = Utils.checksumFor(JOB_META.getContext());
     when(jobContextDao.exists(checksum)).thenReturn(false);
     when(jobContextDao.findBy(checksum)).thenReturn(Optional.of(JOB_CONTEXT_ROW));

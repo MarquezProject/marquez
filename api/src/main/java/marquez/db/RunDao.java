@@ -116,6 +116,13 @@ public interface RunDao extends SqlObject {
   @SqlUpdate(
       "UPDATE runs "
           + "SET updated_at = :updatedAt, "
+          + "    start_run_state_uuid = :startRunStateUuid "
+          + "WHERE uuid = :rowUuid AND (updated_at < :updatedAt or start_run_state_uuid is null)")
+  void upsertStartState(UUID rowUuid, Instant updatedAt, UUID startRunStateUuid);
+
+  @SqlUpdate(
+      "UPDATE runs "
+          + "SET updated_at = :updatedAt, "
           + "    end_run_state_uuid = :endRunStateUuid "
           + "WHERE uuid = :rowUuid")
   void updateEndState(UUID rowUuid, Instant updatedAt, UUID endRunStateUuid);
@@ -143,9 +150,7 @@ public interface RunDao extends SqlObject {
   @SqlQuery(
       SELECT_RUN
           + "INNER JOIN job_versions AS jv ON r.job_version_uuid = jv.uuid "
-          + "INNER JOIN jobs AS j ON jv.job_uuid = j.uuid "
-          + "INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid "
-          + "WHERE n.name = :namespace and j.name = :jobName "
+          + "WHERE jv.namespace_name = :namespace and jv.job_name = :jobName "
           + "ORDER BY r.created_at DESC "
           + "LIMIT :limit OFFSET :offset")
   List<ExtendedRunRow> findAll(String namespace, String jobName, int limit, int offset);
@@ -156,6 +161,7 @@ public interface RunDao extends SqlObject {
   @SqlQuery(
       "INSERT INTO runs ( "
           + "uuid, "
+          + "external_id, "
           + "created_at, "
           + "updated_at, "
           + "job_version_uuid, "
@@ -165,6 +171,7 @@ public interface RunDao extends SqlObject {
           + "current_run_state "
           + ") VALUES ( "
           + ":runUuid, "
+          + ":externalId, "
           + ":now, "
           + ":now, "
           + ":jobVersionUuid, "
@@ -181,6 +188,7 @@ public interface RunDao extends SqlObject {
           + "RETURNING *")
   ExtendedRunRow upsert(
       UUID runUuid,
+      String externalId,
       Instant now,
       UUID jobVersionUuid,
       UUID runArgsUuid,
@@ -191,6 +199,7 @@ public interface RunDao extends SqlObject {
   @SqlQuery(
       "INSERT INTO runs ( "
           + "uuid, "
+          + "external_id, "
           + "created_at, "
           + "updated_at, "
           + "job_version_uuid, "
@@ -199,6 +208,7 @@ public interface RunDao extends SqlObject {
           + "nominal_end_time"
           + ") VALUES ( "
           + ":runUuid, "
+          + ":externalId, "
           + ":now, "
           + ":now, "
           + ":jobVersionUuid, "
@@ -213,6 +223,7 @@ public interface RunDao extends SqlObject {
           + "RETURNING *")
   ExtendedRunRow upsert(
       UUID runUuid,
+      String externalId,
       Instant now,
       UUID jobVersionUuid,
       UUID runArgsUuid,

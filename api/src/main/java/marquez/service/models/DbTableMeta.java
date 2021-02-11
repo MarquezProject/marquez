@@ -33,6 +33,7 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
+import marquez.common.models.Version;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

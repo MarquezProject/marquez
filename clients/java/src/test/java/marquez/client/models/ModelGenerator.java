@@ -95,6 +95,22 @@ public final class ModelGenerator {
         newDescription());
   }
 
+  public static DbTableVersion newDbTableVersion() {
+    final Instant now = newTimestamp();
+    final DatasetId dbTableId = newDatasetId();
+    return new DbTableVersion(
+        dbTableId,
+        dbTableId.getName(),
+        newDatasetPhysicalName(),
+        now,
+        newVersion(),
+        newSourceName(),
+        newFields(2),
+        newTagNames(2),
+        newDescription(),
+        newRun());
+  }
+
   public static StreamMeta newStreamMeta() {
     return StreamMeta.builder()
         .physicalName(newStreamName())
@@ -122,6 +138,23 @@ public final class ModelGenerator {
         null,
         newSchemaLocation(),
         newDescription());
+  }
+
+  public static StreamVersion newStreamVersion() {
+    final Instant now = newTimestamp();
+    final DatasetId streamId = newDatasetId();
+    return new StreamVersion(
+        streamId,
+        streamId.getName(),
+        newStreamName(),
+        now,
+        newVersion(),
+        newSourceName(),
+        newFields(2),
+        newTagNames(2),
+        newSchemaLocation(),
+        newDescription(),
+        newRun());
   }
 
   public static Set<DatasetId> newDatasetIds(final int limit) {
@@ -327,5 +360,9 @@ public final class ModelGenerator {
 
   public static String newTagName() {
     return "test_tag" + newId();
+  }
+
+  public static String newVersion() {
+    return UUID.randomUUID().toString();
   }
 }

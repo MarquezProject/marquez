@@ -21,6 +21,7 @@ import static marquez.common.models.ModelGenerator.newContext;
 import static marquez.common.models.ModelGenerator.newDatasetId;
 import static marquez.common.models.ModelGenerator.newDatasetIds;
 import static marquez.common.models.ModelGenerator.newDatasetName;
+import static marquez.common.models.ModelGenerator.newDbSourceType;
 import static marquez.common.models.ModelGenerator.newDescription;
 import static marquez.common.models.ModelGenerator.newFields;
 import static marquez.common.models.ModelGenerator.newJobId;
@@ -30,7 +31,6 @@ import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newOwnerName;
 import static marquez.common.models.ModelGenerator.newRunId;
 import static marquez.common.models.ModelGenerator.newSourceName;
-import static marquez.common.models.ModelGenerator.newSourceType;
 import static marquez.common.models.ModelGenerator.newTagName;
 import static marquez.common.models.ModelGenerator.newTagNames;
 
@@ -52,6 +52,7 @@ import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceName;
 import marquez.common.models.SourceType;
+import marquez.common.models.Version;
 
 public final class ModelGenerator extends Generator {
   private ModelGenerator() {}
@@ -75,7 +76,7 @@ public final class ModelGenerator extends Generator {
 
   public static Source newSourceWith(final SourceName sourceName) {
     final Instant now = newTimestamp();
-    final SourceType sourceType = newSourceType();
+    final SourceType sourceType = newDbSourceType();
     return new Source(
         sourceType, sourceName, now, now, newConnectionUrlFor(sourceType), newDescription());
   }

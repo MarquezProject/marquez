@@ -18,6 +18,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.Collectors.groupingBy;
+import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -37,10 +38,12 @@ import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.Version;
 import marquez.db.DatasetDao;
 import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
+import marquez.db.MarquezDao;
 import marquez.db.NamespaceDao;
 import marquez.db.RunDao;
 import marquez.db.models.DatasetRow;
@@ -54,7 +57,6 @@ import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
-import marquez.service.models.Version;
 
 @Slf4j
 public class JobService {
@@ -65,6 +67,16 @@ public class JobService {
   private final JobContextDao jobContextDao;
   private final RunDao runDao;
   private final RunService runService;
+
+  public JobService(@NonNull MarquezDao marquezDao, @NonNull final RunService runService) {
+    this.namespaceDao = marquezDao.createNamespaceDao();
+    this.datasetDao = marquezDao.createDatasetDao();
+    this.jobDao = marquezDao.createJobDao();
+    this.jobVersionDao = marquezDao.createJobVersionDao();
+    this.jobContextDao = marquezDao.createJobContextDao();
+    this.runDao = marquezDao.createRunDao();
+    this.runService = runService;
+  }
 
   public JobService(
       @NonNull final NamespaceDao namespaceDao,
@@ -86,12 +98,17 @@ public class JobService {
   public Job createOrUpdate(
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull JobMeta jobMeta)
       throws MarquezServiceException {
+    NamespaceRow namespace =
+        namespaceDao.upsert(
+            UUID.randomUUID(), Instant.now(), namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
     JobRow job = getOrCreateJobRow(namespaceName, jobName, jobMeta);
 
     final Version jobVersion = jobMeta.version(namespaceName, jobName);
     if (!jobVersionDao.exists(jobVersion.getValue())) {
       UUID jobVersionUuid =
-          createJobVersion(job.getUuid(), jobVersion, namespaceName, jobName, jobMeta).getUuid();
+          createJobVersion(
+                  job.getUuid(), jobVersion, namespace.getUuid(), namespaceName, jobName, jobMeta)
+              .getUuid();
       updateRunFromJobMeta(jobMeta, jobVersionUuid, namespaceName, jobName);
       // Get a new job as versions have been attached
       return get(namespaceName, jobName).get();
@@ -116,6 +133,7 @@ public class JobService {
   private JobVersionRow createJobVersion(
       UUID jobId,
       Version jobVersion,
+      UUID namespaceUuid,
       NamespaceName namespaceName,
       JobName jobName,
       JobMeta jobMeta) {
@@ -132,7 +150,10 @@ public class JobService {
             mapDatasetToUuid(inputRows),
             mapDatasetToUuid(outputRows),
             jobMeta.getLocation().orElse(null),
-            jobVersion);
+            jobVersion,
+            jobName.getValue(),
+            namespaceUuid,
+            namespaceName.getValue());
 
     JobMetrics.emitVersionMetric(
         namespaceName.getValue(), jobMeta.getType().toString(), jobName.getValue());
@@ -204,9 +225,21 @@ public class JobService {
       List<UUID> input,
       List<UUID> output,
       URL location,
-      Version jobVersion) {
+      Version jobVersion,
+      String jobName,
+      UUID namespaceUuid,
+      String namespaceName) {
     final JobVersionRow newJobVersionRow =
-        Mapper.toJobVersionRow(jobRowId, contextRowId, input, output, location, jobVersion);
+        Mapper.toJobVersionRow(
+            jobRowId,
+            jobName,
+            contextRowId,
+            input,
+            output,
+            location,
+            jobVersion,
+            namespaceUuid,
+            namespaceName);
     jobVersionDao.insert(newJobVersionRow);
 
     return newJobVersionRow;

@@ -36,6 +36,7 @@ import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.common.models.Version;
 
 @EqualsAndHashCode
 @ToString

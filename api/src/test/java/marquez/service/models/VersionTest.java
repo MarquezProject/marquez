@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 import marquez.UnitTests;
+import marquez.common.models.Version;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 

@@ -33,12 +33,15 @@ public class JobVersionRow {
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updateAt;
   @Getter @NonNull private final UUID jobUuid;
+  @Getter @NonNull private final String jobName;
   @Getter @NonNull private final UUID jobContextUuid;
   @Getter @NonNull private final List<UUID> inputUuids;
   @Getter @NonNull private final List<UUID> outputUuids;
   @Nullable private final String location;
   @Getter @NonNull private final UUID version;
   @Nullable private final UUID latestRunUuid;
+  @Getter @NonNull private final UUID namespaceUuid;
+  @Getter @NonNull private final String namespaceName;
 
   public boolean hasInputUuids() {
     return !inputUuids.isEmpty();

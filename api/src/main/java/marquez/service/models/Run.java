@@ -16,6 +16,7 @@ package marquez.service.models;
 
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -37,7 +38,7 @@ public final class Run {
   @Nullable private final Instant startedAt;
   @Nullable private final Instant endedAt;
   @Nullable private final Long durationMs;
-  @Getter private final ImmutableMap<String, String> args;
+  @Getter private final Map<String, String> args;
 
   public Run(
       @NonNull final RunId id,
@@ -49,7 +50,7 @@ public final class Run {
       @Nullable final Instant startedAt,
       @Nullable final Instant endedAt,
       @Nullable final Long durationMs,
-      @Nullable final ImmutableMap<String, String> args) {
+      @Nullable final Map<String, String> args) {
     this.id = id;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;

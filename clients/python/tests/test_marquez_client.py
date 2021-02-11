@@ -38,6 +38,7 @@ LAST_MODIFIED_AT = date.today().isoformat()
 DESCRIPTION = 'test description'
 TAG_NAME = 'test'
 TAGS = [TAG_NAME]
+VERSION = str(uuid.uuid4())
 
 # NAMESPACE
 NAMESPACE_NAME = 'test-namespace'
@@ -200,6 +201,22 @@ FAILED = {
     'endedAt': ENDED_AT,
     'durationMs': DURATION_MS,
     'args': None
+}
+
+# DATASET VERSIONS
+DB_TABLE_VERSION = {
+    'id': DB_TABLE_ID,
+    'type': DatasetType.DB_TABLE,
+    'name': DB_TABLE_NAME,
+    'physicalName': DB_TABLE_PHYSICAL_NAME,
+    'createdAt': NOW_AS_ISO,
+    'version': VERSION,
+    'namespace': NAMESPACE_NAME,
+    'sourceName': SOURCE_NAME,
+    'fields': FIELDS,
+    'tags': [],
+    'description': DESCRIPTION,
+    'createdByRun': COMPLETED
 }
 
 
@@ -411,6 +428,71 @@ def test_get_dataset(mock_get, client):
             '/namespaces/{0}/datasets/{1}', NAMESPACE_NAME, DB_TABLE_NAME
         ),
         params=mock.ANY,
+        headers=mock.ANY,
+        timeout=mock.ANY
+    )
+
+
+@mock.patch('requests.get')
+def test_get_dataset_version(mock_get, client):
+    mock_get.return_value.status_code.return_value = HTTPStatus.OK
+    mock_get.return_value.json.return_value = DB_TABLE_VERSION
+
+    dataset_version = client.get_dataset_version(
+        namespace_name=NAMESPACE_NAME,
+        dataset_name=DB_TABLE_NAME,
+        version=VERSION
+    )
+
+    assert dataset_version['id'] == DB_TABLE_ID
+    assert dataset_version['type'] == DatasetType.DB_TABLE
+    assert dataset_version['name'] == DB_TABLE_NAME
+    assert dataset_version['physicalName'] == DB_TABLE_PHYSICAL_NAME
+    assert dataset_version['version'] == VERSION
+    assert dataset_version['sourceName'] == SOURCE_NAME
+    assert dataset_version['fields'] == FIELDS
+    assert dataset_version['description'] == DESCRIPTION
+    assert dataset_version['createdByRun'] == COMPLETED
+
+    mock_get.assert_called_once_with(
+        url=client._url(
+            '/namespaces/{0}/datasets/{1}/versions/{2}',
+            NAMESPACE_NAME, DB_TABLE_NAME, VERSION
+        ),
+        params=mock.ANY,
+        headers=mock.ANY,
+        timeout=mock.ANY
+    )
+
+
+@mock.patch('requests.get')
+def test_list_dataset_versions(mock_get, client):
+    mock_get.return_value.status_code.return_value = HTTPStatus.OK
+    mock_get.return_value.json.return_value = [DB_TABLE_VERSION]
+
+    dataset_versions = client.list_dataset_versions(
+        NAMESPACE_NAME, DB_TABLE_NAME
+    )
+
+    assert dataset_versions[0]['id'] == DB_TABLE_ID
+    assert dataset_versions[0]['type'] == DatasetType.DB_TABLE
+    assert dataset_versions[0]['name'] == DB_TABLE_NAME
+    assert dataset_versions[0]['physicalName'] == DB_TABLE_PHYSICAL_NAME
+    assert dataset_versions[0]['version'] == VERSION
+    assert dataset_versions[0]['sourceName'] == SOURCE_NAME
+    assert dataset_versions[0]['fields'] == FIELDS
+    assert dataset_versions[0]['description'] == DESCRIPTION
+    assert dataset_versions[0]['createdByRun'] == COMPLETED
+
+    mock_get.assert_called_once_with(
+        url=client._url(
+            '/namespaces/{0}/datasets/{1}/versions',
+            NAMESPACE_NAME, DB_TABLE_NAME
+        ),
+        params={
+            'limit': DEFAULT_LIMIT,
+            'offset': DEFAULT_OFFSET
+        },
         headers=mock.ANY,
         timeout=mock.ANY
     )

@@ -35,6 +35,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(DatasetVersionRowMapper.class)
+@RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
 public interface DatasetVersionDao {
   @CreateSqlObject
   DatasetDao createDatasetDao();
@@ -92,6 +93,9 @@ public interface DatasetVersionDao {
   @SqlQuery(SELECT + "WHERE uuid = :uuid")
   Optional<DatasetVersionRow> findBy(UUID uuid);
 
+  @SqlQuery(SELECT + "WHERE uuid = :uuid")
+  Optional<DatasetVersionRow> findAllBy(UUID uuid);
+
   @SqlQuery(
       SELECT
           + "INNER JOIN datasets AS d ON d.uuid = dv.dataset_uuid AND d.current_version_uuid = dv.uuid "
@@ -121,8 +125,16 @@ public interface DatasetVersionDao {
    * @param runId - the run ID
    */
   @SqlQuery(EXTENDED_SELECT + " WHERE run_uuid = :runId")
-  @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
   List<ExtendedDatasetVersionRow> findByRunId(@NonNull UUID runId);
+
+  @SqlQuery(
+      EXTENDED_SELECT
+          + "WHERE n.name = :namespaceName AND d.name = :datasetName "
+          + "ORDER BY created_at DESC "
+          + "LIMIT :limit OFFSET :offset")
+  @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
+  List<ExtendedDatasetVersionRow> findAll(
+      String namespaceName, String datasetName, int limit, int offset);
 
   @SqlQuery(
       "INSERT INTO dataset_versions "
@@ -134,4 +146,9 @@ public interface DatasetVersionDao {
           + "run_uuid = EXCLUDED.run_uuid "
           + "RETURNING *")
   DatasetVersionRow upsert(UUID uuid, Instant now, UUID datasetUuid, UUID version, UUID runUuid);
+
+  @SqlQuery(
+      EXTENDED_SELECT
+          + " INNER JOIN runs_input_mapping m ON m.dataset_version_uuid = dv.uuid WHERE m.run_uuid = :runUuid")
+  List<ExtendedDatasetVersionRow> findInputsByRunId(UUID runUuid);
 }

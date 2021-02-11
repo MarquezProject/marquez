@@ -35,6 +35,7 @@ public interface JobDao {
           + "created_at, "
           + "updated_at, "
           + "namespace_uuid, "
+          + "namespace_name, "
           + "name, "
           + "description, "
           + "current_version_uuid"
@@ -44,6 +45,7 @@ public interface JobDao {
           + ":createdAt, "
           + ":updatedAt, "
           + ":namespaceUuid, "
+          + ":namespaceName, "
           + ":name, "
           + ":description, "
           + ":currentVersionUuid)")
@@ -80,9 +82,8 @@ public interface JobDao {
   Optional<JobRow> find(String namespaceName, String jobName);
 
   @SqlQuery(
-      "SELECT j.*, n.name AS namespace_name FROM jobs AS j "
-          + "INNER JOIN namespaces AS n "
-          + "  ON (n.name = :namespaceName AND j.namespace_uuid = n.uuid) "
+      "SELECT j.* FROM jobs AS j "
+          + "WHERE namespace_name = :namespaceName "
           + "ORDER BY j.name "
           + "LIMIT :limit OFFSET :offset")
   List<JobRow> findAll(String namespaceName, int limit, int offset);
@@ -97,6 +98,7 @@ public interface JobDao {
           + "created_at, "
           + "updated_at, "
           + "namespace_uuid, "
+          + "namespace_name, "
           + "name, "
           + "description "
           + ") VALUES ( "
@@ -105,6 +107,7 @@ public interface JobDao {
           + ":now, "
           + ":now, "
           + ":namespaceUuid, "
+          + ":namespaceName, "
           + ":name, "
           + ":description "
           + ") ON CONFLICT (name, namespace_uuid) DO "
@@ -114,5 +117,11 @@ public interface JobDao {
           + "description = EXCLUDED.description "
           + "RETURNING *")
   JobRow upsert(
-      UUID uuid, JobType type, Instant now, UUID namespaceUuid, String name, String description);
+      UUID uuid,
+      JobType type,
+      Instant now,
+      UUID namespaceUuid,
+      String namespaceName,
+      String name,
+      String description);
 }

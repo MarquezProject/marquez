@@ -27,6 +27,7 @@ import marquez.service.models.Tag;
 public final class MarquezConfig extends Configuration {
   private static final boolean DEFAULT_MIGRATE_ON_STARTUP = true;
   private static final ImmutableSet<Tag> DEFAULT_TAGS = ImmutableSet.of();
+  @Getter private final GraphqlConfig graphql = new GraphqlConfig();
 
   @Getter private final boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
   @Getter private final ImmutableSet<Tag> tags = DEFAULT_TAGS;
@@ -38,4 +39,8 @@ public final class MarquezConfig extends Configuration {
   @Getter
   @JsonProperty("flyway")
   private final FlywayFactory flywayFactory = new FlywayFactory();
+
+  public static class GraphqlConfig {
+    @Getter private final boolean enabled = true;
+  }
 }

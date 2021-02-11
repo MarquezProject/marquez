@@ -39,6 +39,7 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetMeta;
+import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.Namespace;
@@ -138,6 +139,25 @@ public class MarquezClient {
   public Dataset getDataset(@NonNull String namespaceName, @NonNull String datasetName) {
     final String bodyAsJson = http.get(url.toDatasetUrl(namespaceName, datasetName));
     return Dataset.fromJson(bodyAsJson);
+  }
+
+  public DatasetVersion getDatasetVersion(
+      @NonNull String namespaceName, @NonNull String datasetName, @NonNull String version) {
+    final String bodyAsJson =
+        http.get(url.toDatasetVersionUrl(namespaceName, datasetName, version));
+    return DatasetVersion.fromJson(bodyAsJson);
+  }
+
+  public List<DatasetVersion> listDatasetVersions(
+      @NonNull String namespaceName, @NonNull String datasetName) {
+    return listDatasetVersions(namespaceName, datasetName, DEFAULT_LIMIT, DEFAULT_OFFSET);
+  }
+
+  public List<DatasetVersion> listDatasetVersions(
+      @NonNull String namespaceName, @NonNull String datasetName, int limit, int offset) {
+    final String bodyAsJson =
+        http.get(url.toListDatasetVersionsUrl(namespaceName, datasetName, limit, offset));
+    return DatasetVersions.fromJson(bodyAsJson).getValue();
   }
 
   public List<Dataset> listDatasets(String namespaceName) {
@@ -368,6 +388,20 @@ public class MarquezClient {
 
     static Datasets fromJson(final String json) {
       return Utils.fromJson(json, new TypeReference<Datasets>() {});
+    }
+  }
+
+  @Value
+  static class DatasetVersions {
+    @Getter List<DatasetVersion> value;
+
+    @JsonCreator
+    DatasetVersions(@JsonProperty("versions") final List<DatasetVersion> value) {
+      this.value = ImmutableList.copyOf(value);
+    }
+
+    static DatasetVersions fromJson(final String json) {
+      return Utils.fromJson(json, new TypeReference<DatasetVersions>() {});
     }
   }
 
