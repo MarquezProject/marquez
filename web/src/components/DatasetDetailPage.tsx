@@ -102,7 +102,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             <ul className={classes.tagList}>
               {tags.map(tag => (
                 <li key={tag} className={classes.tag}>
-                  <Chip size='small' label={'thing'} />
+                  <Chip size='small' label={tag} />
                 </li>
               ))}
             </ul>
