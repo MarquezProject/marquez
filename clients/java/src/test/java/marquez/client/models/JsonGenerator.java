@@ -124,6 +124,16 @@ public final class JsonGenerator {
     throw new IllegalArgumentException();
   }
 
+  public static String newJsonFor(final DatasetVersion datasetVersion) {
+    if (datasetVersion instanceof DbTableVersion) {
+      return newJsonFor((DbTableVersion) datasetVersion);
+    } else if (datasetVersion instanceof StreamVersion) {
+      return newJsonFor((StreamVersion) datasetVersion);
+    }
+
+    throw new IllegalArgumentException();
+  }
+
   private static String newJsonFor(final DbTable dbTable) {
     final ObjectNode id =
         MAPPER
@@ -146,6 +156,31 @@ public final class JsonGenerator {
     obj.putArray("tags").addAll(tags);
     obj.put("lastModifiedAt", dbTable.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("description", dbTable.getDescription().orElse(null));
+
+    return obj.toString();
+  }
+
+  private static String newJsonFor(final DbTableVersion dbTableVersion) {
+    final ObjectNode id =
+        MAPPER
+            .createObjectNode()
+            .put("namespace", dbTableVersion.getId().getNamespace())
+            .put("name", dbTableVersion.getId().getName());
+    final ArrayNode fields = MAPPER.valueToTree(dbTableVersion.getFields());
+    final ArrayNode tags = MAPPER.valueToTree(dbTableVersion.getTags());
+
+    final ObjectNode obj = MAPPER.createObjectNode();
+    obj.set("id", id);
+    obj.put("type", DB_TABLE);
+    obj.put("name", dbTableVersion.getName());
+    obj.put("physicalName", dbTableVersion.getPhysicalName());
+    obj.put("createdAt", ISO_INSTANT.format(dbTableVersion.getCreatedAt()));
+    obj.put("version", dbTableVersion.getVersion());
+    obj.put("sourceName", dbTableVersion.getSourceName());
+    obj.putArray("fields").addAll(fields);
+    obj.putArray("tags").addAll(tags);
+    obj.put("description", dbTableVersion.getDescription().orElse(null));
+    obj.set("createdByRun", toObj(dbTableVersion.getCreatedByRun().orElse(null)));
 
     return obj.toString();
   }
@@ -173,6 +208,32 @@ public final class JsonGenerator {
     obj.put("lastModifiedAt", stream.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("schemaLocation", stream.getSchemaLocation().map(URL::toString).orElse(null));
     obj.put("description", stream.getDescription().orElse(null));
+
+    return obj.toString();
+  }
+
+  private static String newJsonFor(final StreamVersion streamVersion) {
+    final ObjectNode id =
+        MAPPER
+            .createObjectNode()
+            .put("namespace", streamVersion.getId().getNamespace())
+            .put("name", streamVersion.getId().getName());
+    final ArrayNode fields = MAPPER.valueToTree(streamVersion.getFields());
+    final ArrayNode tags = MAPPER.valueToTree(streamVersion.getTags());
+
+    final ObjectNode obj = MAPPER.createObjectNode();
+    obj.set("id", id);
+    obj.put("type", STREAM);
+    obj.put("name", streamVersion.getName());
+    obj.put("physicalName", streamVersion.getPhysicalName());
+    obj.put("createdAt", ISO_INSTANT.format(streamVersion.getCreatedAt()));
+    obj.put("version", streamVersion.getVersion());
+    obj.put("sourceName", streamVersion.getSourceName());
+    obj.putArray("fields").addAll(fields);
+    obj.putArray("tags").addAll(tags);
+    obj.put("schemaLocation", streamVersion.getSchemaLocation().map(URL::toString).orElse(null));
+    obj.put("description", streamVersion.getDescription().orElse(null));
+    obj.set("createdByRun", toObj(streamVersion.getCreatedByRun().orElse(null)));
 
     return obj.toString();
   }
