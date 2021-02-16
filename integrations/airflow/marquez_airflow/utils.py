@@ -23,7 +23,7 @@ from airflow.version import version as AIRFLOW_VERSION
 try:
     # Import from pendulum 1.x version
     from pendulum import Pendulum
-except:
+except ImportError:
     # Import for Pendulum 2.x version
     from pendulum import DateTime as Pendulum
 
