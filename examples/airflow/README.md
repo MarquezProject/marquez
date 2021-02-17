@@ -9,9 +9,9 @@ In this example, we'll walk you through how to enable an **Airflow DAG** to send
 
 > **Note:** We've added [`marquez-airflow`](https://github.com/MarquezProject/marquez/tree/main/integrations/airflow) to `requirements.txt` to automatically send DAG metadata to Marquez.
 
-## Step 1: Setup
+## Step 1: Start Airflow
 
-To setup the example, run:
+To start Airflow, run:
 
 ```bash
 $ ./docker/up.sh
@@ -25,13 +25,13 @@ $ ./docker/up.sh
 * Start Marquez
 * Start Postgres
 
-To view the Airflow UI and verify it's running, open http://localhost:8080. When the DAGs complete successfully, browse to http://localhost:3000 to begin exploring DAG metadata via the Marquez UI. You should see the following lineage graph for [`etl_orders_7_days`](https://github.com/MarquezProject/marquez/blob/main/examples/airflow/dags/etl_orders_7_days.py):
+To view the Airflow UI and verify it's running, open http://localhost:8080. When all _enabled_ DAGs complete successfully, browse to http://localhost:3000 to begin exploring DAG metadata via the Marquez UI. You should see the following lineage graph for [`etl_orders_7_days`](https://github.com/MarquezProject/marquez/blob/main/examples/airflow/dags/etl_orders_7_days.py):
 
 ![](./docs/lineage-view-0.png)
 
 ## Step 2: Collect DAG Metadata with Marquez
 
-Under [`dags/`](),
+Create a file named `etl_delivery_7_days.py` in [`dags/`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow/dags) with the following code:
 
 ```python
 from datetime import datetime
