@@ -14,8 +14,9 @@ default_args = {
 
 dag = DAG(
     'orders_popular_day_of_week',
-    schedule_interval='@hourly',
+    schedule_interval='@once',
     catchup=False,
+    is_paused_upon_creation=True,
     default_args=default_args,
     description='Determines the popular day of week orders are placed.'
 )

@@ -14,8 +14,9 @@ default_args = {
 
 dag = DAG(
     'etl_orders_7_days',
-    schedule_interval='@hourly',
+    schedule_interval='@once',
     catchup=False,
+    is_paused_upon_creation=False,
     default_args=default_args,
     description='Loads newly placed orders weekly.'
 )

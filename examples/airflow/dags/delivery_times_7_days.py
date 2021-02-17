@@ -14,8 +14,9 @@ default_args = {
 
 dag = DAG(
     'delivery_times_7_days',
-    schedule_interval='@hourly',
+    schedule_interval='@once',
     catchup=False,
+    is_paused_upon_creation=True,
     default_args=default_args,
     description='Determine weekly top delivery times by restaurant.'
 )

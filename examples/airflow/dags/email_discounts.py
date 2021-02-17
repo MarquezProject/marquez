@@ -14,8 +14,9 @@ default_args = {
 
 dag = DAG(
     'email_discounts',
-    schedule_interval='@hourly',
+    schedule_interval='@once',
     catchup=False,
+    is_paused_upon_creation=True,
     default_args=default_args,
     description='Email discounts to customers that have experienced order delays daily.'
 )

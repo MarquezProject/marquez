@@ -1,4 +1,3 @@
-from datetime import datetime
 from marquez_airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.utils.dates import days_ago
@@ -14,8 +13,9 @@ default_args = {
 
 dag = DAG(
     'new_food_deliveries',
-    schedule_interval='@hourly',
+    schedule_interval='@once',
     catchup=False,
+    is_paused_upon_creation=False,
     default_args=default_args,
     description='Add new food delivery data.'
 )
