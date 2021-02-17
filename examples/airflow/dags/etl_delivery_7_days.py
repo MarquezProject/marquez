@@ -1,39 +1,3 @@
-# [Airflow](https://airflow.apache.org) Example
-
-In this example, we'll walk you through how to enable an **Airflow DAG** to send lineage metadata to **Marquez**.
-
-**What you’ll learn:**
-
-* Collect DAG Metadata with Marquez
-* Explore inter-DAG dependencies using Marquez
-
-> **Note:** We've added [`marquez-airflow`](https://github.com/MarquezProject/marquez/tree/main/integrations/airflow) to `requirements.txt` to automatically send DAG metadata to Marquez.
-
-## Step 1: Start Airflow
-
-To start Airflow, run:
-
-```bash
-$ ./docker/up.sh
-```
-
-> **Tip:** Use the `--pull` to pull a tagged image.
-
-**The `docker/up.sh` will:**
-
-* Start Airflow and install `marquez-airflow` used to collect DAG metadata
-* Start Marquez
-* Start Postgres
-
-To view the Airflow UI and verify it's running, open http://localhost:8080. When all _enabled_ DAGs complete successfully, browse to http://localhost:3000 to begin exploring DAG metadata via the Marquez UI. You should see the following lineage graph for [`etl_orders_7_days`](https://github.com/MarquezProject/marquez/blob/main/examples/airflow/dags/etl_orders_7_days.py):
-
-![](./docs/lineage-view-0.png)
-
-## Step 2: Collect DAG Metadata with Marquez
-
-Create a file named `etl_delivery_7_days.py` in [`dags/`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow/dags) and copy in the following code:
-
-```python
 from datetime import datetime
 from marquez_airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
@@ -111,12 +75,3 @@ t3 = PostgresOperator(
 )
 
 t1 >> t2 >> t3
-```
-
-## Step 3: Explore inter-DAG Dependencies
-
-In the Airflow UI, enable `etl_delivery_7_days` and all remaining DAGs. You should see the following updated lineage graph for `etl_orders_7_days`:
-
-![](./docs/lineage-view-1.png)
-
-
