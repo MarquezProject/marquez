@@ -7,14 +7,14 @@ In this example, we'll walk you through how to enable an **Airflow DAG** to send
 * Collect DAG Metadata with Marquez
 * Explore inter-DAG dependencies using Marquez
 
-> **Note:** We've added [`marquez-airflow`](https://github.com/MarquezProject/marquez/tree/main/integrations/airflow) to `requirements.txt` to automatically send DAG metadata to Marquez.
+## Running with [Docker](https://github.com/MarquezProject/marquez/blob/main/examples/airflow/docker-compose.yml)
 
-## Step 1: Start Airflow
+> **Note:** We've added [`marquez-airflow`](https://github.com/MarquezProject/marquez/tree/main/integrations/airflow) to `requirements.txt` to automatically send DAG metadata to Marquez. We've also  pre-configured the library for you in `docker-compose.yml`.
 
 To start Airflow, run:
 
 ```bash
-$ ./docker/up.sh
+$ ./quickstart.sh
 ```
 
 > **Tip:** Use the `--pull` to pull a tagged image.
@@ -31,7 +31,7 @@ To view the Airflow UI and verify it's running, open http://localhost:8080. When
 
 ## Step 2: Collect DAG Metadata with Marquez
 
-Create a file named `etl_delivery_7_days.py` in [`dags/`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow/dags) and copy in the following code:
+Next, let's create a file named `etl_delivery_7_days.py` in [`dags/`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow/dags) and copy in the following code:
 
 ```python
 from datetime import datetime
@@ -115,8 +115,21 @@ t1 >> t2 >> t3
 
 ## Step 3: Explore inter-DAG Dependencies
 
-In the Airflow UI, enable `etl_delivery_7_days` and all remaining DAGs. You should see the following updated lineage graph for `etl_orders_7_days`:
+Now that you've created a DAG using `marquez-a`, in the Airflow UI, enable `etl_delivery_7_days` and all remaining DAGs. You should see the following updated lineage graph for `etl_orders_7_days`:
 
 ![](./docs/lineage-view-1.png)
+
+Now that you've registered your dataset, you can configure column properties for how the column should be treated in the Explore workflow:
+
+* But what effects (if any) would upstream DAGs have on downstream DAGs if dataset consumption was delayed?
+* What alerting rules should be in place to notify downstream DAGs of possible upstream processing issues or failures?
+
+## Running on [Cloud Composer](https://cloud.google.com/composer)
+
+## Running on [Cloud Composer](https://cloud.google.com/composer)
+
+## Feedback
+
+What did you think of this example? open a pull request  
 
 
