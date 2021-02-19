@@ -22,7 +22,7 @@ buildscript {
         classpath 'com.adarshr:gradle-test-logger-plugin:2.1.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
         classpath 'gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.6.0'
-        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.8.1'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.10.2'
         classpath 'net.researchgate:gradle-release:2.8.1'
     }
 }
