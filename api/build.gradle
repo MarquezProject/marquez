@@ -43,7 +43,7 @@ dependencies {
     compile "io.prometheus:simpleclient_servlet:${prometheusVersion}"
     compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
-    compile 'com.google.guava:guava:30.0-jre'
+    compile 'com.google.guava:guava:30.1-jre'
     compile 'org.flywaydb:flyway-core:6.3.0'
     compile 'org.postgresql:postgresql:42.2.5'
     compile 'com.graphql-java:graphql-java:16.2'
