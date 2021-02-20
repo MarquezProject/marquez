@@ -14,7 +14,7 @@
     "eslint-fix": "eslint . --ext .ts,.tsx --ignore-pattern \"src/__tests__/*\" --fix"
   },
   "engines": {
-    "node": "10.16.3"
+    "node": "10.23.3"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
