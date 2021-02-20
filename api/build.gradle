@@ -28,7 +28,7 @@ java {
 ext {
     dropwizardVersion = '2.0.19'
     jdbi3Version = '3.17.0'
-    prometheusVersion = '0.9.0'
+    prometheusVersion = '0.10.0'
 }
 
 dependencies {
