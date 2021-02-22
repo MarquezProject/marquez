@@ -26,7 +26,7 @@
     "@types/react-router-dom": "^5.1.2",
     "@visx/clip-path": "1.0.0",
     "@visx/gradient": "1.0.0",
-    "@visx/grid": "1.0.0",
+    "@visx/grid": "1.5.0",
     "@visx/legend": "1.0.0",
     "@visx/mock-data": "1.0.0",
     "@visx/responsive": "1.0.0",
