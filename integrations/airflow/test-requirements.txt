@@ -1,8 +1,8 @@
-apache-airflow==1.10.12
-apache-airflow[gcp]==1.10.12
-apache-airflow[gcp_api]==1.10.12
-apache-airflow[google]==1.10.12
-apache-airflow[postgres]==1.10.12
+apache-airflow==1.10.14
+apache-airflow[gcp]==1.10.14
+apache-airflow[gcp_api]==1.10.14
+apache-airflow[google]==1.10.14
+apache-airflow[postgres]==1.10.14
 codecov==2.1.8
 marquez-python==0.12.0
 pytest
