@@ -33,7 +33,7 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.assertj:assertj-core:3.19.0'
     testImplementation 'org.mockito:mockito-core:2.27.0'
 }
