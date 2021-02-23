@@ -45,7 +45,7 @@ dependencies {
     compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
     compile 'com.google.guava:guava:30.1-jre'
     compile 'org.flywaydb:flyway-core:6.3.0'
-    compile 'org.postgresql:postgresql:42.2.5'
+    compile 'org.postgresql:postgresql:42.2.19'
     compile 'com.graphql-java:graphql-java:16.2'
     compile 'com.graphql-java-kickstart:graphql-java-servlet:11.1.0'
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
