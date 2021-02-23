@@ -54,7 +54,7 @@ dependencies {
     testCompile project(':clients:java')
     testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
-    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.13.2'
     testCompile 'org.assertj:assertj-core:3.19.0'
     testCompile 'org.mockito:mockito-core:3.3.3'
     testCompile 'org.testcontainers:postgresql:1.13.0'
