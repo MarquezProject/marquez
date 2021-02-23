@@ -16,7 +16,7 @@ web:
   replicaCount: 1
   image:
     repository: marquezproject/marquez-web
-    tag: 0.5.3
+    tag: 0.12.0
     pullPolicy: IfNotPresent
 
 service:
