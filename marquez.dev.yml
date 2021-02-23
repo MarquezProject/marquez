@@ -15,7 +15,7 @@ db:
 migrateOnStartup: true
 
 graphql:
-  enabled: ${GRAPHQL_ENABLED:-true}
+  enabled: true
 
 logging:
   level: INFO
