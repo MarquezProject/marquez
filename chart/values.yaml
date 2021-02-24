@@ -12,13 +12,6 @@ marquez:
     password: macondo
   migrateOnStartup: true
 
-web:
-  replicaCount: 1
-  image:
-    repository: marquezproject/marquez-web
-    tag: 0.5.3
-    pullPolicy: IfNotPresent
-
 service:
   type: ClusterIP
   port: 80
