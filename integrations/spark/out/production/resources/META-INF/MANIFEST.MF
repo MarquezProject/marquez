@@ -1,3 +1,0 @@
-Manifest-Version: 1.0 
-Premain-Class: marquez.spark.MarquezAgent
-Agent-Class: marquez.spark.MarquezAgent
