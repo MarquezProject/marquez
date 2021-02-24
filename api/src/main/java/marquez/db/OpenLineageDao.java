@@ -2,7 +2,6 @@ package marquez.db;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static java.util.stream.Collectors.joining;
-import static marquez.common.Utils.KV_JOINER;
 import static marquez.common.Utils.VERSION_DELIM;
 import static marquez.common.Utils.VERSION_JOINER;
 
@@ -13,24 +12,28 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import marquez.common.Utils;
+import marquez.common.models.DatasetId;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.JobType;
+import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
-import marquez.db.JobVersionDao.IoType;
+import marquez.db.JobVersionDao.JobVersionBag;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
-import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
@@ -70,13 +73,20 @@ public interface OpenLineageDao extends MarquezDao {
       String producer);
 
   @Transaction
-  default UpdateLineageRow updateMarquezModel(LineageEvent event) {
+  default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
+    UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);
+    if (event.getEventType() != null && getRunState(event.getEventType()) == RunState.COMPLETED) {
+      updateMarquezOnComplete(event, updateLineageRow);
+    }
+    return updateLineageRow;
+  }
+
+  default UpdateLineageRow updateBaseMarquezModel(LineageEvent event, ObjectMapper mapper) {
     NamespaceDao namespaceDao = createNamespaceDao();
     DatasetDao datasetDao = createDatasetDao();
     SourceDao sourceDao = createSourceDao();
     JobDao jobDao = createJobDao();
     JobContextDao jobContextDao = createJobContextDao();
-    JobVersionDao jobVersionDao = createJobVersionDao();
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
     RunDao runDao = createRunDao();
@@ -99,6 +109,19 @@ public interface OpenLineageDao extends MarquezDao {
         && event.getJob().getFacets().getDocumentation() != null) {
       description = event.getJob().getFacets().getDocumentation().getDescription();
     }
+
+    Map<String, String> context = buildJobContext(event);
+    JobContextRow jobContext =
+        jobContextDao.upsert(
+            UUID.randomUUID(), now, Utils.toJson(context), Utils.checksumFor(context));
+    bag.setJobContext(jobContext);
+
+    String location = null;
+    if (event.getJob().getFacets() != null
+        && event.getJob().getFacets().getSourceCodeLocation() != null) {
+      location = getUrlOrPlaceholder(event.getJob().getFacets().getSourceCodeLocation().getUrl());
+    }
+
     JobRow job =
         jobDao.upsert(
             UUID.randomUUID(),
@@ -107,34 +130,12 @@ public interface OpenLineageDao extends MarquezDao {
             namespace.getUuid(),
             namespace.getName(),
             event.getJob().getName(),
-            description);
-    bag.setJob(job);
-
-    Map<String, String> context = buildJobContext(event);
-    JobContextRow jobContext =
-        jobContextDao.upsert(
-            UUID.randomUUID(), now, Utils.toJson(context), Utils.checksumFor(context));
-    bag.setJobContext(jobContext);
-    String location = null;
-    if (event.getJob().getFacets() != null
-        && event.getJob().getFacets().getSourceCodeLocation() != null) {
-      location = getUrlOrPlaceholder(event.getJob().getFacets().getSourceCodeLocation().getUrl());
-    }
-
-    JobVersionRow jobVersion =
-        jobVersionDao.upsert(
-            UUID.randomUUID(),
-            now,
-            job.getUuid(),
+            description,
             jobContext.getUuid(),
             location,
-            buildJobVersion(event, context),
-            job.getName(),
-            job.getNamespaceUuid(),
-            job.getNamespaceName());
-    bag.setJobVersion(jobVersion);
-
-    jobDao.updateVersion(job.getUuid(), Instant.now(), jobVersion.getUuid());
+            jobDao.toJson(toDatasetId(event.getInputs()), mapper),
+            jobDao.toJson(toDatasetId(event.getOutputs()), mapper));
+    bag.setJob(job);
 
     Map<String, String> runArgsMap = createRunArgs(event);
     RunArgsRow runArgs =
@@ -173,25 +174,29 @@ public interface OpenLineageDao extends MarquezDao {
               runUuid,
               event.getRun().getRunId(),
               now,
-              jobVersion.getUuid(),
+              null,
               runArgs.getUuid(),
               nominalStartTime,
               nominalEndTime,
-              runStateType);
+              runStateType,
+              now,
+              namespace.getName(),
+              job.getName());
     } else {
       run =
           runDao.upsert(
               runUuid,
               event.getRun().getRunId(),
               now,
-              jobVersion.getUuid(),
+              null,
               runArgs.getUuid(),
               nominalStartTime,
-              nominalEndTime);
+              nominalEndTime,
+              namespace.getUuid(),
+              namespace.getName(),
+              job.getName());
     }
     bag.setRun(run);
-
-    jobVersionDao.updateLatestRun(jobVersion.getUuid(), now, run.getUuid());
 
     if (event.getEventType() != null) {
       RunState runStateType = getRunState(event.getEventType());
@@ -202,7 +207,7 @@ public interface OpenLineageDao extends MarquezDao {
       if (runStateType.isDone()) {
         runDao.updateEndState(run.getUuid(), now, runState.getUuid());
       } else if (runStateType.isStarting()) {
-        runDao.upsertStartState(run.getUuid(), now, runState.getUuid());
+        runDao.updateStartState(run.getUuid(), now, runState.getUuid());
       }
     }
 
@@ -214,7 +219,6 @@ public interface OpenLineageDao extends MarquezDao {
         DatasetRecord record =
             upsertLineageDataset(
                 ds,
-                jobVersion,
                 now,
                 runUuid,
                 true,
@@ -223,8 +227,7 @@ public interface OpenLineageDao extends MarquezDao {
                 datasetDao,
                 datasetVersionDao,
                 datasetFieldDao,
-                runDao,
-                jobVersionDao);
+                runDao);
         datasetInputs.add(record);
       }
     }
@@ -237,7 +240,6 @@ public interface OpenLineageDao extends MarquezDao {
         DatasetRecord record =
             upsertLineageDataset(
                 ds,
-                jobVersion,
                 now,
                 runUuid,
                 false,
@@ -246,14 +248,37 @@ public interface OpenLineageDao extends MarquezDao {
                 datasetDao,
                 datasetVersionDao,
                 datasetFieldDao,
-                runDao,
-                jobVersionDao);
+                runDao);
         datasetOutputs.add(record);
       }
     }
 
     bag.setOutputs(Optional.ofNullable(datasetOutputs));
     return bag;
+  }
+
+  default Set<DatasetId> toDatasetId(List<Dataset> datasets) {
+    Set<DatasetId> set = new HashSet<>();
+    if (datasets == null) {
+      return set;
+    }
+    for (Dataset dataset : datasets) {
+      set.add(
+          new DatasetId(
+              NamespaceName.of(dataset.getNamespace()), DatasetName.of(dataset.getName())));
+    }
+    return set;
+  }
+
+  default void updateMarquezOnComplete(LineageEvent event, UpdateLineageRow updateLineageRow) {
+    JobVersionBag jobVersionBag =
+        createJobVersionDao()
+            .createJobVersionOnComplete(
+                event.getEventTime().toInstant(),
+                updateLineageRow.getRun().getUuid(),
+                updateLineageRow.getRun().getNamespaceName(),
+                updateLineageRow.getRun().getJobName());
+    updateLineageRow.setJobVersionBag(jobVersionBag);
   }
 
   default String getUrlOrPlaceholder(String uri) {
@@ -279,7 +304,6 @@ public interface OpenLineageDao extends MarquezDao {
 
   default DatasetRecord upsertLineageDataset(
       Dataset ds,
-      JobVersionRow jobVersion,
       Instant now,
       UUID runUuid,
       boolean isInput,
@@ -288,8 +312,7 @@ public interface OpenLineageDao extends MarquezDao {
       DatasetDao datasetDao,
       DatasetVersionDao datasetVersionDao,
       DatasetFieldDao datasetFieldDao,
-      RunDao runDao,
-      JobVersionDao jobVersionDao) {
+      RunDao runDao) {
     NamespaceRow dsNamespace =
         namespaceDao.upsert(UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
 
@@ -363,21 +386,11 @@ public interface OpenLineageDao extends MarquezDao {
       runDao.updateInputMapping(runUuid, datasetVersionRow.getUuid());
     }
 
-    jobVersionDao.upsertDatasetIoMapping(
-        jobVersion.getUuid(), datasetRow.getUuid(), isInput ? IoType.INPUT : IoType.OUTPUT);
-
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
   }
 
   default String formatDatasetName(String name) {
     return name;
-  }
-
-  default String trimLeadingSlash(String path) {
-    if (path.startsWith("/")) {
-      return path.substring(1);
-    }
-    return path;
   }
 
   default String getSourceType(Dataset ds) {
@@ -423,18 +436,6 @@ public interface OpenLineageDao extends MarquezDao {
       }
     }
     return args;
-  }
-
-  default UUID buildJobVersion(LineageEvent event, Map<String, String> context) {
-    final byte[] bytes =
-        VERSION_JOINER
-            .join(
-                event.getJob().getNamespace(),
-                event.getJob().getName(),
-                event.getProducer(),
-                KV_JOINER.join(context))
-            .getBytes(UTF_8);
-    return UUID.nameUUIDFromBytes(bytes);
   }
 
   default Map<String, String> buildJobContext(LineageEvent event) {

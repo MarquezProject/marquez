@@ -56,7 +56,7 @@ public final class ExtendedJobVersionRowMapper implements RowMapper<ExtendedJobV
         uuidOrNull(results, Columns.LATEST_RUN_UUID),
         columnNames.contains(Columns.CONTEXT) ? stringOrThrow(results, Columns.CONTEXT) : "",
         stringOrThrow(results, Columns.NAMESPACE_NAME),
-        columnNames.contains(Columns.NAME) ? stringOrThrow(results, Columns.NAME) : "",
+        stringOrThrow(results, Columns.JOB_NAME),
         uuidOrThrow(results, Columns.NAMESPACE_UUID));
   }
 }

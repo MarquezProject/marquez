@@ -15,65 +15,19 @@
 package marquez.db;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.common.models.RunState;
 import marquez.db.mappers.RunStateRowMapper;
 import marquez.db.models.RunStateRow;
-import org.jdbi.v3.sqlobject.CreateSqlObject;
-import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(RunStateRowMapper.class)
-public interface RunStateDao extends SqlObject {
-  @CreateSqlObject
-  DatasetDao createDatasetDao();
-
-  @CreateSqlObject
-  RunDao createRunDao();
-
-  @Transaction
-  default void insert(
-      RunStateRow row,
-      List<UUID> outputVersionUuids,
-      boolean starting,
-      boolean done,
-      boolean complete) {
-    withHandle(
-        handle ->
-            handle
-                .createUpdate(
-                    "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
-                        + "VALUES (:uuid, :transitionedAt, :runUuid, :state)")
-                .bindBean(row)
-                .execute());
-    // State transition
-    final Instant updateAt = row.getTransitionedAt();
-    createRunDao().updateRunState(row.getRunUuid(), updateAt, row.getState());
-    if (starting) {
-      createRunDao().updateStartState(row.getRunUuid(), updateAt, row.getUuid());
-    }
-    if (done) {
-      createRunDao().updateEndState(row.getRunUuid(), updateAt, row.getUuid());
-    }
-    // Modified
-    if (complete && outputVersionUuids != null && outputVersionUuids.size() > 0) {
-      createDatasetDao().updateLastModifedAt(outputVersionUuids, updateAt);
-    }
-  }
-
+public interface RunStateDao extends MarquezDao {
   @SqlQuery("SELECT * FROM run_states WHERE uuid = :rowUuid")
   Optional<RunStateRow> findBy(UUID rowUuid);
-
-  @SqlQuery(
-      "SELECT * FROM run_states "
-          + "WHERE run_uuid = :runUuid "
-          + "ORDER BY transitioned_at DESC "
-          + "LIMIT 1")
-  Optional<RunStateRow> findLatest(UUID runUuid);
 
   @SqlQuery("SELECT COUNT(*) FROM run_states")
   int count();
@@ -82,4 +36,19 @@ public interface RunStateDao extends SqlObject {
       "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
           + "VALUES (:uuid, :now, :runUuid, :runStateType) RETURNING *")
   RunStateRow upsert(UUID uuid, Instant now, UUID runUuid, RunState runStateType);
+
+  @Transaction
+  default void updateRunState(UUID runUuid, RunState runState, Instant transitionedAt) {
+    RunDao runDao = createRunDao();
+    RunStateRow runStateRow = upsert(UUID.randomUUID(), transitionedAt, runUuid, runState);
+    runDao.updateRunState(runUuid, transitionedAt, runState);
+    if (runState.isDone()) {
+      runDao.updateEndState(runUuid, transitionedAt, runStateRow.getUuid());
+    } else if (runState.isStarting()) {
+      runDao.updateStartState(runUuid, transitionedAt, runStateRow.getUuid());
+    }
+    //    if (complete && outputVersionUuids != null && outputVersionUuids.size() > 0) {
+    //      createDatasetDao().updateLastModifedAt(outputVersionUuids, updateAt);
+    //    }
+  }
 }

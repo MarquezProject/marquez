@@ -1,17 +1,19 @@
 package marquez.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import static marquez.common.models.RunState.COMPLETED;
 import static marquez.common.models.RunState.NEW;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -26,20 +28,17 @@ import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
+import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
+import marquez.db.JobVersionDao.JobVersionBag;
 import marquez.db.MarquezDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
-import marquez.db.models.DatasetRow;
-import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
-import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobVersionRow;
-import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
-import marquez.db.models.RunStateRow;
 import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.RunTransitionListener.RunInput;
@@ -58,6 +57,7 @@ public class RunService {
   private final RunDao runDao;
   private final DatasetVersionDao datasetVersionDao;
   private final RunStateDao runStateDao;
+  private final JobDao jobDao;
   private final Collection<RunTransitionListener> runTransitionListeners;
 
   public RunService(
@@ -68,6 +68,7 @@ public class RunService {
     this.runDao = marquezDao.createRunDao();
     this.datasetVersionDao = marquezDao.createDatasetVersionDao();
     this.runStateDao = marquezDao.createRunStateDao();
+    this.jobDao = marquezDao.createJobDao();
     this.runTransitionListeners = runTransitionListeners;
   }
 
@@ -78,6 +79,7 @@ public class RunService {
       RunDao runDao,
       DatasetVersionDao datasetVersionDao,
       RunStateDao runStateDao,
+      JobDao jobDao,
       Collection<RunTransitionListener> runTransitionListeners) {
     this.jobVersionDao = jobVersionDao;
     this.datasetDao = datasetDao;
@@ -85,76 +87,17 @@ public class RunService {
     this.runDao = runDao;
     this.datasetVersionDao = datasetVersionDao;
     this.runStateDao = runStateDao;
+    this.jobDao = jobDao;
     this.runTransitionListeners = runTransitionListeners;
   }
 
   public Run createRun(
-      @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta)
-      throws MarquezServiceException {
+      @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta) {
     log.info("Creating run for job '{}'...", jobName.getValue());
+    RunRow runRow = runDao.upsertFromRun(namespaceName, jobName, runMeta, NEW);
+    notify(new RunTransition(RunId.of(runRow.getUuid()), null, NEW));
 
-    final JobVersionRow versionRow =
-        jobVersionDao.findLatest(namespaceName.getValue(), jobName.getValue()).get();
-    final RunArgsRow runArgsRow = getOrCreateRunArgsRow(runMeta);
-
-    final List<RunInput> inputVersions = getRunInput(versionRow.getInputUuids());
-    final List<UUID> inputVersionUuids = mapRunInputToUuid(inputVersions);
-
-    final RunRow newRunRow =
-        createRunRow(versionRow.getUuid(), runArgsRow.getUuid(), inputVersionUuids, runMeta);
-
-    notify(
-        new JobInputUpdate(
-            RunId.of(newRunRow.getUuid()),
-            runMeta,
-            new JobVersionId(namespaceName, jobName, versionRow.getUuid()),
-            inputVersions));
-
-    markRunAs(RunId.of(newRunRow.getUuid()), NEW);
-    log.info(
-        "Successfully created run '{}' for job version '{}'.",
-        newRunRow.getUuid(),
-        newRunRow.getJobVersionUuid());
-    return getRun(RunId.of(newRunRow.getUuid())).get();
-  }
-
-  private RunRow createRunRow(
-      UUID versionRowId, UUID runArgsRowId, List<UUID> inputVersionUuids, RunMeta runMeta) {
-    final RunRow newRunRow =
-        Mapper.toRunRow(versionRowId, runArgsRowId, inputVersionUuids, runMeta);
-    runDao.insert(newRunRow);
-    return newRunRow;
-  }
-
-  private List<UUID> mapRunInputToUuid(List<RunInput> inputVersions) {
-    return inputVersions.stream()
-        .map((i) -> i.getDatasetVersionId().getVersionUuid())
-        .collect(toImmutableList());
-  }
-
-  private List<RunInput> getRunInput(List<UUID> inputUuids) {
-    return datasetDao.findAllIn(inputUuids).stream()
-        .map(
-            (row) ->
-                new RunInput(
-                    new DatasetVersionId(
-                        NamespaceName.of(row.getNamespaceName()),
-                        DatasetName.of(row.getName()),
-                        row.getCurrentVersionUuid().get())))
-        .collect(toImmutableList());
-  }
-
-  private RunArgsRow getOrCreateRunArgsRow(RunMeta runMeta) {
-    final String checksum = Utils.checksumFor(runMeta.getArgs());
-    Optional<RunArgsRow> runArgsRow = runArgsDao.findBy(checksum);
-    if (runArgsRow.isPresent()) {
-      return runArgsRow.get();
-    }
-
-    log.debug("New run args with checksum '{}' found: {}", checksum, runMeta.getArgs());
-    final RunArgsRow newRunArgsRow = Mapper.toRunArgsRow(runMeta.getArgs(), checksum);
-    runArgsDao.insert(newRunArgsRow);
-    return runArgsDao.findBy(checksum).get();
+    return getRun(RunId.of(runRow.getUuid())).get();
   }
 
   public boolean runExists(@NonNull RunId runId) throws MarquezServiceException {
@@ -181,112 +124,81 @@ public class RunService {
     return ImmutableList.copyOf(runs);
   }
 
-  public void markRunAs(@NonNull RunId runId, @NonNull RunState newRunState) {
-    markRunAs(runId, newRunState, null);
-  }
-
   public void markRunAs(
-      @NonNull RunId runId, @NonNull RunState newRunState, @Nullable Instant transitionedAt)
-      throws MarquezServiceException {
-    log.debug("Marking run with ID '{}' as '{}'...", runId, newRunState);
-    final RunStateRow newRunStateRow =
-        Mapper.toRunStateRow(runId.getValue(), newRunState, transitionedAt);
-    final RunRow runRow = runDao.findBy(runId.getValue()).get();
-    final List<UUID> outputUuids;
-    if (newRunState.isComplete()) {
-      final ExtendedJobVersionRow jobVersionRow =
-          jobVersionDao.findBy(runRow.getJobVersionUuid()).get();
-      final List<ExtendedDatasetVersionRow> outputVersions =
-          datasetVersionDao.findByRunId(runId.getValue());
-      final List<RunOutput> outputs =
-          outputVersions.stream()
-              .map(
-                  (v) ->
-                      new RunOutput(
-                          new DatasetVersionId(
-                              NamespaceName.of(v.getNamespaceName()),
-                              DatasetName.of(v.getDatasetName()),
-                              v.getUuid())))
-              .collect(toImmutableList());
-      notify(
-          new JobOutputUpdate(
-              runId,
-              new JobVersionId(
-                  NamespaceName.of(jobVersionRow.getNamespaceName()),
-                  JobName.of(jobVersionRow.getName()),
-                  jobVersionRow.getUuid()),
-              outputs));
-      if (jobVersionRow.hasOutputUuids()) {
-        outputUuids = jobVersionRow.getOutputUuids();
-        log.info(
-            "Run '{}' for job version '{}' modified datasets: {}",
-            runId,
-            jobVersionRow.getVersion(),
-            outputUuids);
-      } else {
-        outputUuids = null;
-      }
-    } else {
-      outputUuids = null;
+      @NonNull RunId runId, @NonNull RunState runState, @Nullable Instant transitionedAt) {
+    log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
+    ExtendedRunRow runRow = runDao.findBy(runId.getValue()).get();
+    runStateDao.updateRunState(runId.getValue(), runState, transitionedAt);
+
+    if (runState == COMPLETED) {
+      notifyCompleteHandler(runRow, transitionedAt);
     }
-    runStateDao.insert(
-        newRunStateRow,
-        outputUuids,
-        newRunState.isStarting(),
-        newRunState.isDone(),
-        newRunState.isComplete());
+
     final RunState oldRunState = runRow.getCurrentRunState().map(RunState::valueOf).orElse(null);
-    notify(new RunTransition(runId, oldRunState, newRunState));
-    JobMetrics.emitRunStateCounterMetric(newRunState);
+    notify(new RunTransition(runId, oldRunState, runState));
+    JobMetrics.emitRunStateCounterMetric(runState);
   }
 
-  public void updateRunInputDatasets(
-      UUID runUuid,
-      List<DatasetRow> inputRows,
-      NamespaceName namespaceName,
-      JobName jobName,
-      UUID jobVersionUuid) {
-    if (inputRows.isEmpty()) {
-      return;
-    }
-    List<RunInput> runInputs = new ArrayList<>();
-    for (DatasetRow inputDataset : inputRows) {
-      Optional<DatasetVersionRow> version =
-          datasetVersionDao.findLatestDatasetByUuid(inputDataset.getUuid());
-      if (version.isPresent()) {
-        DatasetVersionRow row = version.get();
-        runDao.updateInputVersions(runUuid, version.get().getUuid());
-        runInputs.add(
-            new RunInput(
-                new DatasetVersionId(
-                    namespaceName, DatasetName.of(inputDataset.getName()), row.getUuid())));
-      } else {
-        log.error(
-            "Input dataset version could not be found during run input update. Input Dataset ID: {}",
-            inputDataset.getUuid());
-      }
-    }
-    Optional<ExtendedRunRow> runRow = runDao.findBy(runUuid);
-    if (runRow.isEmpty()) {
-      throw new RunNotFoundException(RunId.of(runUuid));
-    }
-    ExtendedRunRow run = runRow.get();
+  public void notifyCompleteHandler(ExtendedRunRow runRow, Instant transitionedAt) {
+    JobVersionBag jobVersionBag =
+        jobVersionDao.createJobVersionOnComplete(
+            transitionedAt, runRow.getUuid(), runRow.getNamespaceName(), runRow.getJobName());
+
+    notify(
+        new JobOutputUpdate(
+            RunId.of(runRow.getUuid()),
+            toJobVersionId(jobVersionBag.getJobVersionRow()),
+            JobName.of(runRow.getJobName()),
+            NamespaceName.of(runRow.getNamespaceName()),
+            buildRunOutputs(jobVersionBag.getOutputs())));
     notify(
         new JobInputUpdate(
-            RunId.of(runUuid),
-            new RunMeta(
-                RunId.of(runUuid),
-                run.getNominalStartTime().orElse(null),
-                run.getNominalEndTime().orElse(null),
-                Mapper.toRunArgs(run.getArgs())),
-            new JobVersionId(namespaceName, jobName, jobVersionUuid),
-            runInputs));
+            RunId.of(runRow.getUuid()),
+            buildRunMeta(runRow),
+            toJobVersionId(jobVersionBag.getJobVersionRow()),
+            JobName.of(runRow.getJobName()),
+            NamespaceName.of(runRow.getNamespaceName()),
+            buildRunInputs(jobVersionBag.getInputs())));
   }
 
-  public void updateJobVersionUuid(UUID runId, Instant updatedAt, @NonNull UUID newJobVersionUuid) {
-    final ExtendedRunRow runRow = getRun(runId);
-    runDao.updateJobVersionUuid(runRow.getUuid(), updatedAt, newJobVersionUuid);
-    log.info("Successfully associated run '{}' with version '{}'.", runId, newJobVersionUuid);
+  public static RunMeta buildRunMeta(ExtendedRunRow runRow) {
+    return new RunMeta(
+        RunId.of(runRow.getUuid()),
+        runRow.getNominalStartTime().orElse(null),
+        runRow.getNominalEndTime().orElse(null),
+        Utils.fromJson(runRow.getArgs(), new TypeReference<Map<String, String>>() {}));
+  }
+
+  public static List<RunInput> buildRunInputs(List<ExtendedDatasetVersionRow> inputs) {
+    return inputs.stream()
+        .map(
+            (v) ->
+                new RunInput(
+                    new DatasetVersionId(
+                        NamespaceName.of(v.getNamespaceName()),
+                        DatasetName.of(v.getDatasetName()),
+                        v.getUuid())))
+        .collect(Collectors.toList());
+  }
+
+  public static List<RunOutput> buildRunOutputs(List<ExtendedDatasetVersionRow> outputs) {
+    return outputs.stream()
+        .map(
+            (v) ->
+                new RunOutput(
+                    new DatasetVersionId(
+                        NamespaceName.of(v.getNamespaceName()),
+                        DatasetName.of(v.getDatasetName()),
+                        v.getUuid())))
+        .collect(Collectors.toList());
+  }
+
+  private JobVersionId toJobVersionId(JobVersionRow jobVersion) {
+    return JobVersionId.builder()
+        .versionUuid(jobVersion.getUuid())
+        .namespace(NamespaceName.of(jobVersion.getNamespaceName()))
+        .name(JobName.of(jobVersion.getJobName()))
+        .build();
   }
 
   void notify(JobInputUpdate update) {

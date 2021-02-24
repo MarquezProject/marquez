@@ -28,6 +28,7 @@ import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedDatasetRow;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -38,36 +39,34 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 public interface DatasetDao extends SqlObject {
   @Transaction
   default void insert(DatasetRow row) {
-    withHandle(
-        handle ->
-            handle
-                .createUpdate(
-                    "INSERT INTO datasets ("
-                        + "uuid, "
-                        + "type, "
-                        + "created_at, "
-                        + "updated_at, "
-                        + "namespace_uuid, "
-                        + "source_uuid, "
-                        + "name, "
-                        + "physical_name, "
-                        + "description"
-                        + ") VALUES ("
-                        + ":uuid, "
-                        + ":type, "
-                        + ":createdAt, "
-                        + ":updatedAt, "
-                        + ":namespaceUuid, "
-                        + ":sourceUuid, "
-                        + ":name, "
-                        + ":physicalName, "
-                        + ":description)")
-                .bindBean(row)
-                .execute());
+    insertDatasetRow(row);
     // Tags
     final Instant taggedAt = row.getCreatedAt();
     row.getTagUuids().forEach(tagUuid -> updateTags(row.getUuid(), tagUuid, taggedAt));
   }
+
+  @SqlUpdate(
+      "INSERT INTO datasets ("
+          + "uuid, "
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "namespace_uuid, "
+          + "source_uuid, "
+          + "name, "
+          + "physical_name, "
+          + "description"
+          + ") VALUES ("
+          + ":uuid, "
+          + ":type, "
+          + ":createdAt, "
+          + ":updatedAt, "
+          + ":namespaceUuid, "
+          + ":sourceUuid, "
+          + ":name, "
+          + ":physicalName, "
+          + ":description)")
+  void insertDatasetRow(@BindBean DatasetRow row);
 
   @SqlQuery(
       "SELECT EXISTS ("

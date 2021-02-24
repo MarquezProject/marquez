@@ -25,6 +25,7 @@ import static marquez.common.models.ModelGenerator.newDbSourceType;
 import static marquez.common.models.ModelGenerator.newDescription;
 import static marquez.common.models.ModelGenerator.newFields;
 import static marquez.common.models.ModelGenerator.newJobId;
+import static marquez.common.models.ModelGenerator.newJobName;
 import static marquez.common.models.ModelGenerator.newJobType;
 import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
@@ -47,6 +48,7 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobId;
+import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
@@ -161,19 +163,24 @@ public final class ModelGenerator extends Generator {
   }
 
   public static Run newRun() {
-    return newRunWith(newRunId(), newRunState(), newIsoTimestamp());
+    return newRunWith(
+        newRunId(), newRunState(), newIsoTimestamp(), newNamespaceName(), newJobName());
   }
 
   public static Run newRunWith(final RunId runId) {
-    return newRunWith(runId, newRunState(), newIsoTimestamp());
+    return newRunWith(runId, newRunState(), newIsoTimestamp(), newNamespaceName(), newJobName());
   }
 
   public static Run newRunWith(final RunState runState) {
-    return newRunWith(newRunId(), runState, newIsoTimestamp());
+    return newRunWith(newRunId(), runState, newIsoTimestamp(), newNamespaceName(), newJobName());
   }
 
   public static Run newRunWith(
-      final RunId runId, final RunState runState, final String transitionedAt) {
+      final RunId runId,
+      final RunState runState,
+      final String transitionedAt,
+      NamespaceName namespaceName,
+      JobName jobName) {
     final Instant now = Utils.toInstant(transitionedAt);
     final RunMeta runMeta = newRunMeta();
     return new Run(
@@ -186,7 +193,9 @@ public final class ModelGenerator extends Generator {
         null,
         null,
         null,
-        newRunArgs());
+        newRunArgs(),
+        namespaceName.getValue(),
+        jobName.getValue());
   }
 
   public static RunState newRunState() {

@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
+import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
 import marquez.db.MapperUtils;
@@ -43,11 +44,11 @@ public final class ExtendedRunRowMapper implements RowMapper<ExtendedRunRow> {
         uuidOrThrow(results, Columns.ROW_UUID),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
-        uuidOrThrow(results, Columns.JOB_VERSION_UUID),
+        uuidOrNull(results, Columns.JOB_VERSION_UUID),
         uuidOrThrow(results, Columns.RUN_ARGS_UUID),
         columnNames.contains(Columns.INPUT_VERSION_UUIDS)
             ? uuidArrayOrThrow(results, Columns.INPUT_VERSION_UUIDS)
-            : ImmutableList.of(),
+            : ImmutableList.<UUID>of(),
         timestampOrNull(results, Columns.NOMINAL_START_TIME),
         timestampOrNull(results, Columns.NOMINAL_END_TIME),
         stringOrNull(results, Columns.CURRENT_RUN_STATE),
@@ -57,6 +58,8 @@ public final class ExtendedRunRowMapper implements RowMapper<ExtendedRunRow> {
         uuidOrNull(results, Columns.START_RUN_STATE_UUID),
         columnNames.contains(Columns.ENDED_AT) ? timestampOrNull(results, Columns.ENDED_AT) : null,
         uuidOrNull(results, Columns.END_RUN_STATE_UUID),
-        columnNames.contains(Columns.ARGS) ? stringOrThrow(results, Columns.ARGS) : "");
+        columnNames.contains(Columns.ARGS) ? stringOrThrow(results, Columns.ARGS) : "",
+        stringOrThrow(results, Columns.NAMESPACE_NAME),
+        stringOrThrow(results, Columns.JOB_NAME));
   }
 }
