@@ -1,0 +1,62 @@
+{{ if .Values.web.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "marquez.fullname" . }}-web
+  labels:
+    app.kubernetes.io/name: {{ include "marquez.name" . }}
+    helm.sh/chart: {{ include "marquez.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.web.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "marquez.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      component: web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "marquez.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        component: web
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}"
+          imagePullPolicy: {{ .Values.web.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+          env:
+            - name: MARQUEZ_PORT
+              value: {{ .Values.marquez.service.port | quote }}
+            - name: MARQUEZ_HOST
+              value: {{ include "marquez.fullname" . }}-api
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+   
+{{ end }}

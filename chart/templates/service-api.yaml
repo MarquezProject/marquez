@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "marquez.fullname" . }}-api
+  labels:
+    app.kubernetes.io/name: {{ include "marquez.name" . }}
+    helm.sh/chart: {{ include "marquez.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.marquez.service.type }}
+  ports:
+    - port: {{ .Values.marquez.service.port }}
+      targetPort: {{ .Values.marquez.port}}
+      protocol: TCP
+      name: http
+ 
+  selector:
+    app.kubernetes.io/name: {{ include "marquez.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    component: api

@@ -1,0 +1,40 @@
+{{- if .Values.marquez.ingress.enabled -}}
+{{- $fullName := include "marquez.fullname" . -}}
+{{- $ingressPaths := .Values.marquez.ingress.paths -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-api
+  labels:
+    app.kubernetes.io/name: {{ include "marquez.name" . }}
+    helm.sh/chart: {{ include "marquez.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- with .Values.marquez.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+{{- if .Values.marquez.ingress.tls }}
+  tls:
+  {{- range .Values.marquez.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- end }}
+  rules:
+  {{- range .Values.marquez.ingress.hosts }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+	{{- range $ingressPaths }}
+          - path: {{ . }}
+            backend:
+              serviceName: {{ $fullName }}-api
+              servicePort: http
+	{{- end }}
+  {{- end }}
+{{- end }}

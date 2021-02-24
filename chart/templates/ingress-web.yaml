@@ -1,23 +1,23 @@
-{{- if .Values.ingress.enabled -}}
+{{- if .Values.web.ingress.enabled -}}
 {{- $fullName := include "marquez.fullname" . -}}
-{{- $ingressPaths := .Values.ingress.paths -}}
+{{- $ingressPaths := .Values.web.ingress.paths -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-web
   labels:
     app.kubernetes.io/name: {{ include "marquez.name" . }}
     helm.sh/chart: {{ include "marquez.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-  {{- with .Values.ingress.annotations }}
+  {{- with .Values.web.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-{{- if .Values.ingress.tls }}
+{{- if .Values.web.ingress.tls }}
   tls:
-  {{- range .Values.ingress.tls }}
+  {{- range .Values.web.ingress.tls }}
     - hosts:
       {{- range .hosts }}
         - {{ . | quote }}
@@ -26,14 +26,14 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.ingress.hosts }}
+  {{- range .Values.web.ingress.hosts }}
     - host: {{ . | quote }}
       http:
         paths:
 	{{- range $ingressPaths }}
           - path: {{ . }}
             backend:
-              serviceName: {{ $fullName }}
+              serviceName: {{ $fullName }}-web
               servicePort: http
 	{{- end }}
   {{- end }}
