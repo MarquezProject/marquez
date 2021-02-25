@@ -105,7 +105,8 @@ public interface RunDao extends MarquezDao {
           + "current_run_state, "
           + "transitioned_at, "
           + "namespace_name, "
-          + "job_name "
+          + "job_name, "
+          + "location "
           + ") VALUES ( "
           + ":runUuid, "
           + ":externalId, "
@@ -118,14 +119,16 @@ public interface RunDao extends MarquezDao {
           + ":runStateType,"
           + ":runStateTime, "
           + ":namespaceName, "
-          + ":jobName "
+          + ":jobName, "
+          + ":location "
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
           + "updated_at = EXCLUDED.updated_at, "
           + "current_run_state = EXCLUDED.current_run_state, "
           + "transitioned_at = EXCLUDED.transitioned_at, "
           + "nominal_start_time = EXCLUDED.nominal_start_time, "
-          + "nominal_end_time = EXCLUDED.nominal_end_time "
+          + "nominal_end_time = EXCLUDED.nominal_end_time, "
+          + "location = EXCLUDED.location "
           + "RETURNING *")
   ExtendedRunRow upsert(
       UUID runUuid,
@@ -138,7 +141,8 @@ public interface RunDao extends MarquezDao {
       RunState runStateType,
       Instant runStateTime,
       String namespaceName,
-      String jobName);
+      String jobName,
+      String location);
 
   @SqlQuery(
       "INSERT INTO runs ( "
@@ -151,7 +155,8 @@ public interface RunDao extends MarquezDao {
           + "nominal_start_time, "
           + "nominal_end_time, "
           + "namespace_name, "
-          + "job_name "
+          + "job_name, "
+          + "location "
           + ") VALUES ( "
           + ":runUuid, "
           + ":externalId, "
@@ -162,12 +167,14 @@ public interface RunDao extends MarquezDao {
           + ":nominalStartTime, "
           + ":nominalEndTime, "
           + ":namespaceName, "
-          + ":jobName "
+          + ":jobName, "
+          + ":location "
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
           + "updated_at = EXCLUDED.updated_at, "
           + "nominal_start_time = EXCLUDED.nominal_start_time, "
-          + "nominal_end_time = EXCLUDED.nominal_end_time "
+          + "nominal_end_time = EXCLUDED.nominal_end_time, "
+          + "location = EXCLUDED.location "
           + "RETURNING *")
   ExtendedRunRow upsert(
       UUID runUuid,
@@ -179,7 +186,8 @@ public interface RunDao extends MarquezDao {
       Instant nominalEndTime,
       UUID namespaceUuid,
       String namespaceName,
-      String jobName);
+      String jobName,
+      String location);
 
   @SqlUpdate(
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
@@ -227,6 +235,8 @@ public interface RunDao extends MarquezDao {
                 Utils.toJson(runMeta.getArgs()),
                 Utils.checksumFor(runMeta.getArgs()));
 
+    JobRow jobRow = createJobDao().find(namespaceName.getValue(), jobName.getValue()).get();
+
     UUID uuid = runMeta.getId().map(RunId::getValue).orElse(UUID.randomUUID());
 
     RunRow runRow =
@@ -241,7 +251,8 @@ public interface RunDao extends MarquezDao {
             currentState,
             now,
             namespaceRow.getName(),
-            jobName.getValue());
+            jobName.getValue(),
+            jobRow.getLocation());
 
     createRunStateDao().updateRunState(uuid, currentState, now);
 

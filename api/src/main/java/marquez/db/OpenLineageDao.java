@@ -181,7 +181,8 @@ public interface OpenLineageDao extends MarquezDao {
               runStateType,
               now,
               namespace.getName(),
-              job.getName());
+              job.getName(),
+              location);
     } else {
       run =
           runDao.upsert(
@@ -194,7 +195,8 @@ public interface OpenLineageDao extends MarquezDao {
               nominalEndTime,
               namespace.getUuid(),
               namespace.getName(),
-              job.getName());
+              job.getName(),
+              location);
     }
     bag.setRun(run);
 
