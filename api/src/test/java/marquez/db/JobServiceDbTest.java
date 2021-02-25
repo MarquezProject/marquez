@@ -144,16 +144,7 @@ public class JobServiceDbTest {
   public void setup() {
     listener = mock(RunTransitionListener.class);
 
-    runService =
-        new RunService(
-            versionDao,
-            datasetDao,
-            runArgsDao,
-            runDao,
-            datasetVersionDao,
-            runStateDao,
-            jobDao,
-            Lists.newArrayList(listener));
+    runService = new RunService(versionDao, runDao, runStateDao, Lists.newArrayList(listener));
 
     jobService = new JobService(jobDao, runService);
 

@@ -45,17 +45,13 @@ import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
-import marquez.common.models.Version;
-import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
-import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
-import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
@@ -92,7 +88,6 @@ public class JobServiceTest {
   // BATCH JOB
   private static final JobName JOB_NAME = newJobName();
   private static final JobId JOB_ID = new JobId(NAMESPACE_NAME, JOB_NAME);
-  private static final Version VERSION = JOB_META.version(NAMESPACE_NAME, JOB_NAME);
   private static final JobVersionId JOB_VERSION_ID =
       new JobVersionId(NAMESPACE_NAME, JOB_NAME, JOB_VERSION_ROW_UUID);
   private static final Job JOB =
@@ -128,33 +123,15 @@ public class JobServiceTest {
 
   // JOB VERSION ROW
   private static final JobContextRow JOB_CONTEXT_ROW = newJobContextRowWith(CONTEXT);
-  private static final ExtendedJobVersionRow JOB_VERSION_ROW =
-      new ExtendedJobVersionRow(
-          JOB_VERSION_ROW_UUID,
-          NOW,
-          NOW,
-          JOB_ROW.getUuid(),
-          JOB_CONTEXT_ROW.getUuid(),
-          Lists.newArrayList(),
-          Lists.newArrayList(),
-          LOCATION.toString(),
-          VERSION.getValue(),
-          null,
-          JOB_CONTEXT_ROW.getContext(),
-          NAMESPACE_NAME.getValue(),
-          JOB_NAME.getValue(),
-          NAMESPACE_ROW.getUuid());
 
   @Rule public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock private NamespaceDao namespaceDao;
-  @Mock private DatasetDao datasetDao;
   @Mock private DatasetVersionDao datasetVersionDao;
   @Mock private JobDao jobDao;
   @Mock private JobVersionDao jobVersionDao;
   @Mock private JobContextDao jobContextDao;
   @Mock private RunDao runDao;
-  @Mock private RunArgsDao runArgsDao;
   @Mock private RunStateDao runStateDao;
   private JobService jobService;
 
@@ -184,16 +161,7 @@ public class JobServiceTest {
           }
         };
 
-    runService =
-        new RunService(
-            jobVersionDao,
-            datasetDao,
-            runArgsDao,
-            runDao,
-            datasetVersionDao,
-            runStateDao,
-            jobDao,
-            Lists.newArrayList(listener));
+    runService = new RunService(jobVersionDao, runDao, runStateDao, Lists.newArrayList(listener));
     jobService = new JobService(jobDao, jobContextDao, runDao, datasetVersionDao, runService);
   }
 
@@ -251,24 +219,20 @@ public class JobServiceTest {
   public void testGetBy() throws MarquezServiceException {
     when(jobDao.find(NAMESPACE_NAME.getValue(), JOB_NAME.getValue()))
         .thenReturn(Optional.of(JOB_ROW));
-    // when(jobVersionDao.findBy(JOB_VERSION_ROW.getUuid())).thenReturn(Optional.of(JOB_VERSION_ROW));
     when(jobContextDao.findBy(any(UUID.class))).thenReturn(Optional.of(JOB_CONTEXT_ROW));
     final Optional<Job> job = jobService.getBy(JOB_VERSION_ID);
     assertThat(job).contains(JOB);
 
     verify(jobDao, times(1)).find(NAMESPACE_NAME.getValue(), JOB_NAME.getValue());
-    //    verify(jobVersionDao, times(1)).findBy(JOB_VERSION_ROW.getUuid());
   }
 
   @Test
   public void testGetAll() throws MarquezServiceException {
     when(jobDao.findAll(NAMESPACE_NAME.getValue(), 4, 0)).thenReturn(JOB_ROWS);
-    // when(jobVersionDao.findBy(JOB_VERSION_ROW.getUuid())).thenReturn(Optional.of(JOB_VERSION_ROW));
     when(jobContextDao.findBy(any(UUID.class))).thenReturn(Optional.of(JOB_CONTEXT_ROW));
     final List<Job> jobs = jobService.getAll(NAMESPACE_NAME, 4, 0);
     assertThat(jobs).isNotNull().hasSize(1);
 
     verify(jobDao, times(1)).findAll(NAMESPACE_NAME.getValue(), 4, 0);
-    //    verify(jobVersionDao, times(1)).findBy(JOB_VERSION_ROW.getUuid());
   }
 }

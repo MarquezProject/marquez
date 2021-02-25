@@ -26,13 +26,9 @@ import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
-import marquez.db.DatasetDao;
-import marquez.db.DatasetVersionDao;
-import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
 import marquez.db.JobVersionDao.JobVersionBag;
 import marquez.db.MarquezDao;
-import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
@@ -52,42 +48,26 @@ import marquez.service.models.RunMeta;
 @Slf4j
 public class RunService {
   private final JobVersionDao jobVersionDao;
-  private final DatasetDao datasetDao;
-  private final RunArgsDao runArgsDao;
   private final RunDao runDao;
-  private final DatasetVersionDao datasetVersionDao;
   private final RunStateDao runStateDao;
-  private final JobDao jobDao;
   private final Collection<RunTransitionListener> runTransitionListeners;
 
   public RunService(
       @NonNull MarquezDao marquezDao, Collection<RunTransitionListener> runTransitionListeners) {
     this.jobVersionDao = marquezDao.createJobVersionDao();
-    this.datasetDao = marquezDao.createDatasetDao();
-    this.runArgsDao = marquezDao.createRunArgsDao();
     this.runDao = marquezDao.createRunDao();
-    this.datasetVersionDao = marquezDao.createDatasetVersionDao();
     this.runStateDao = marquezDao.createRunStateDao();
-    this.jobDao = marquezDao.createJobDao();
     this.runTransitionListeners = runTransitionListeners;
   }
 
   public RunService(
       JobVersionDao jobVersionDao,
-      DatasetDao datasetDao,
-      RunArgsDao runArgsDao,
       RunDao runDao,
-      DatasetVersionDao datasetVersionDao,
       RunStateDao runStateDao,
-      JobDao jobDao,
       Collection<RunTransitionListener> runTransitionListeners) {
     this.jobVersionDao = jobVersionDao;
-    this.datasetDao = datasetDao;
-    this.runArgsDao = runArgsDao;
     this.runDao = runDao;
-    this.datasetVersionDao = datasetVersionDao;
     this.runStateDao = runStateDao;
-    this.jobDao = jobDao;
     this.runTransitionListeners = runTransitionListeners;
   }
 
@@ -131,7 +111,11 @@ public class RunService {
     runStateDao.updateRunState(runId.getValue(), runState, transitionedAt);
 
     if (runState == COMPLETED) {
-      notifyCompleteHandler(runRow, transitionedAt);
+      JobVersionBag jobVersionBag =
+          jobVersionDao.createJobVersionOnComplete(
+              transitionedAt, runRow.getUuid(), runRow.getNamespaceName(), runRow.getJobName());
+
+      notifyCompleteHandler(jobVersionBag, runRow);
     }
 
     final RunState oldRunState = runRow.getCurrentRunState().map(RunState::valueOf).orElse(null);
@@ -139,11 +123,7 @@ public class RunService {
     JobMetrics.emitRunStateCounterMetric(runState);
   }
 
-  public void notifyCompleteHandler(ExtendedRunRow runRow, Instant transitionedAt) {
-    JobVersionBag jobVersionBag =
-        jobVersionDao.createJobVersionOnComplete(
-            transitionedAt, runRow.getUuid(), runRow.getNamespaceName(), runRow.getJobName());
-
+  public void notifyCompleteHandler(JobVersionBag jobVersionBag, ExtendedRunRow runRow) {
     notify(
         new JobOutputUpdate(
             RunId.of(runRow.getUuid()),
