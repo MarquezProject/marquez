@@ -3,5 +3,6 @@
     "config:base",
     "docker:disable",
     ":gitSignOff"
-  ]
+  ],
+  "lockFileMaintenance": { "enabled": true }
 }

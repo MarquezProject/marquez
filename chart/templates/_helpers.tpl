@@ -30,3 +30,17 @@ Create chart name and version as used by the chart label.
 {{- define "marquez.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{/*
+Return the proper Marquez image name
+*/}}
+{{- define "marquez.image" -}}
+{{- include "common.images.image" (dict "imageRoot" .Values.marquez.image "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+Return the proper Marquez web image name
+*/}}
+{{- define "web.image" -}}
+{{- include "common.images.image" (dict "imageRoot" .Values.web.image "global" .Values.global) -}}
+{{- end -}}

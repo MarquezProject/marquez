@@ -1,27 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "marquez.fullname" . }}
-  labels:
-    app.kubernetes.io/name: {{ include "marquez.name" . }}
-    helm.sh/chart: {{ include "marquez.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  name: {{ include "common.names.fullname" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- end }}
+    app.kubernetes.io/component: marquez
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
+  {{- end }}
 spec:
-  replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels:
-      app.kubernetes.io/name: {{ include "marquez.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: marquez
+  replicas: {{ default 1 .Values.marquez.replicaCount }}
   template:
     metadata:
-      labels:
-        app.kubernetes.io/name: {{ include "marquez.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: marquez
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.marquez.image.repository }}:{{ .Values.marquez.image.tag }}"
+          image: {{ include "marquez.image" . }}
           imagePullPolicy: {{ .Values.marquez.image.pullPolicy }}
           volumeMounts:
             - name: marquez-volume
@@ -29,10 +30,10 @@ spec:
               subPath: config.yml
           ports:
             - name: http
-              containerPort: 5000 
+              containerPort: {{ .Values.marquez.port }}
               protocol: TCP
             - name: http-admin
-              containerPort: 5001
+              containerPort: {{ .Values.marquez.adminPort }}
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -61,22 +62,19 @@ spec:
               value: {{ .Values.marquez.db.password }}
             - name: MIGRATE_ON_STARTUP
               value: {{ .Values.marquez.migrateOnStartup | quote }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.marquez.resources }}
+          resources: {{- toYaml .Values.marquez.resources | nindent 12 }}
+          {{- end }}
       volumes:
         - name: marquez-volume
           configMap:
-            name: marquez-config
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
+            name: {{ include "marquez.fullname" . }}-config
+      {{- if .Values.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.affinity "context" $) | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-   
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
+      {{- end }}
