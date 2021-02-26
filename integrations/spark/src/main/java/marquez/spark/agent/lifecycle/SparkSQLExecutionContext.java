@@ -1,5 +1,6 @@
 package marquez.spark.agent.lifecycle;
 
+import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -13,6 +14,7 @@ import marquez.spark.agent.client.LineageEvent.JobLink;
 import marquez.spark.agent.client.LineageEvent.ParentRunFacet;
 import marquez.spark.agent.client.LineageEvent.RunFacet;
 import marquez.spark.agent.client.LineageEvent.RunLink;
+import marquez.spark.agent.facets.DatasetMetricFacet;
 import marquez.spark.agent.facets.ErrorFacet;
 import marquez.spark.agent.facets.LogicalPlanFacet;
 import org.apache.spark.scheduler.ActiveJob;
@@ -21,10 +23,13 @@ import org.apache.spark.scheduler.JobResult;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
+import org.apache.spark.sql.catalyst.plans.logical.Statistics;
 import org.apache.spark.sql.execution.QueryExecution;
 import org.apache.spark.sql.execution.SQLExecution;
 import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionEnd;
 import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionStart;
+import scala.math.BigInt;
+import scala.runtime.AbstractFunction0;
 
 @Slf4j
 public class SparkSQLExecutionContext implements ExecutionContext {
@@ -70,7 +75,10 @@ public class SparkSQLExecutionContext implements ExecutionContext {
             .run(
                 buildRun(
                     buildRunFacets(
-                        buildLogicalPlanFacet(queryExecution.logical()), null, buildParentFacet())))
+                        buildLogicalPlanFacet(queryExecution.logical()),
+                        null,
+                        buildParentFacet(),
+                        null)))
             .job(buildJob())
             .eventTime(toZonedTime(jobStart.time()))
             .eventType("START")
@@ -95,6 +103,27 @@ public class SparkSQLExecutionContext implements ExecutionContext {
         .build();
   }
 
+  private DatasetMetricFacet buildMetricFacet(Statistics statistics) {
+    if (statistics != null) {
+      BigInt count =
+          statistics
+              .rowCount()
+              .getOrElse(
+                  new AbstractFunction0<BigInt>() {
+                    @Override
+                    public BigInt apply() {
+                      return BigInt.apply(0);
+                    }
+                  });
+      return DatasetMetricFacet.builder()
+          .metricValues(ImmutableMap.of("rows", DatasetMetricFacet.Metric.count(count.longValue())))
+          .build();
+
+    } else {
+      return null;
+    }
+  }
+
   @Override
   public void end(SparkListenerJobEnd jobEnd) {
     log.info("Ending job as part of spark-sql:" + jobEnd.jobId());
@@ -117,7 +146,8 @@ public class SparkSQLExecutionContext implements ExecutionContext {
                     buildRunFacets(
                         buildLogicalPlanFacet(queryExecution.logical()),
                         buildJobErrorFacet(jobEnd.jobResult()),
-                        buildParentFacet())))
+                        buildParentFacet(),
+                        buildMetricFacet(r.getStatistics()))))
             .job(buildJob())
             .eventTime(toZonedTime(jobEnd.time()))
             .eventType(getEventType(jobEnd.jobResult()))
@@ -144,13 +174,19 @@ public class SparkSQLExecutionContext implements ExecutionContext {
   }
 
   protected RunFacet buildRunFacets(
-      LogicalPlanFacet logicalPlanFacet, ErrorFacet jobError, ParentRunFacet parentRunFacet) {
+      LogicalPlanFacet logicalPlanFacet,
+      ErrorFacet jobError,
+      ParentRunFacet parentRunFacet,
+      DatasetMetricFacet metricFacet) {
     Map<String, Object> additionalFacets = new HashMap<>();
     if (logicalPlanFacet != null) {
       additionalFacets.put("spark.logicalPlan", logicalPlanFacet);
     }
     if (jobError != null) {
       additionalFacets.put("spark.exception", jobError);
+    }
+    if (metricFacet != null) {
+      additionalFacets.put("dataset.metrics", metricFacet);
     }
     return RunFacet.builder().parent(parentRunFacet).additional(additionalFacets).build();
   }

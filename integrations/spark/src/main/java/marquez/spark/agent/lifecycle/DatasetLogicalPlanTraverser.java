@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
+import lombok.Value;
 import marquez.spark.agent.client.DatasetParser;
 import marquez.spark.agent.client.DatasetParser.DatasetParseResult;
 import marquez.spark.agent.client.LineageEvent.Dataset;
@@ -17,6 +17,7 @@ import marquez.spark.agent.client.LineageEvent.SchemaDatasetFacet;
 import marquez.spark.agent.client.LineageEvent.SchemaField;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
+import org.apache.spark.sql.catalyst.plans.logical.Statistics;
 import org.apache.spark.sql.execution.command.CreateDataSourceTableAsSelectCommand;
 import org.apache.spark.sql.execution.datasources.FileIndex;
 import org.apache.spark.sql.execution.datasources.HadoopFsRelation;
@@ -27,6 +28,7 @@ import org.apache.spark.sql.types.StructType;
 public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   private Set<Dataset> outputDatasets;
   private Set<Dataset> inputDatasets;
+  private Statistics statistics;
   private String jobNamespace;
 
   public TraverserResult build(LogicalPlan plan, String jobNamespace) {
@@ -35,7 +37,8 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
       inputDatasets = new HashSet<>();
       this.jobNamespace = jobNamespace;
       super.visit(plan);
-      return new TraverserResult(new ArrayList<>(outputDatasets), new ArrayList<>(inputDatasets));
+      return new TraverserResult(
+          new ArrayList<>(outputDatasets), new ArrayList<>(inputDatasets), statistics);
     }
   }
 
@@ -121,15 +124,17 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
     return uri;
   }
 
-  @Getter
-  public class TraverserResult {
+  @Override
+  protected Object visitStatistics(Statistics stats) {
+    this.statistics = stats;
+    return null;
+  }
 
-    private final List<Dataset> outputDataset;
-    private final List<Dataset> inputDataset;
+  @Value
+  public static class TraverserResult {
 
-    public TraverserResult(List<Dataset> outputDataset, List<Dataset> inputDataset) {
-      this.outputDataset = outputDataset;
-      this.inputDataset = inputDataset;
-    }
+    List<Dataset> outputDataset;
+    List<Dataset> inputDataset;
+    Statistics statistics;
   }
 }
