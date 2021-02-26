@@ -52,7 +52,7 @@ public interface RunStateDao extends SqlObject {
                 .execute());
     // State transition
     final Instant updateAt = row.getTransitionedAt();
-    createRunDao().updateRunState(row.getRunUuid(), updateAt, row.getState());
+    createRunDao().updateRunState(row.getRunUuid(), Instant.now(), row.getState());
     if (starting) {
       createRunDao().updateStartState(row.getRunUuid(), updateAt, row.getUuid());
     }
