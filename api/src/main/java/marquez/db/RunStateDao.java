@@ -52,7 +52,6 @@ public interface RunStateDao extends SqlObject {
                 .execute());
     // State transition
     final Instant updateAt = row.getTransitionedAt();
-    createRunDao().updateRunState(row.getRunUuid(), Instant.now(), row.getState());
     if (starting) {
       createRunDao().updateStartState(row.getRunUuid(), updateAt, row.getUuid());
     }
@@ -63,6 +62,8 @@ public interface RunStateDao extends SqlObject {
     if (complete && outputVersionUuids != null && outputVersionUuids.size() > 0) {
       createDatasetDao().updateLastModifedAt(outputVersionUuids, updateAt);
     }
+    // Update current run with new state
+    createRunDao().updateCurrentRunState(row.getRunUuid(), Instant.now(), row.getState());
   }
 
   @SqlQuery("SELECT * FROM run_states WHERE uuid = :rowUuid")

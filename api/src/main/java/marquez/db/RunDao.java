@@ -104,7 +104,7 @@ public interface RunDao extends SqlObject {
           + "SET updated_at = :updatedAt, "
           + "    current_run_state = :currentRunState "
           + "WHERE uuid = :rowUuid")
-  void updateRunState(UUID rowUuid, Instant updatedAt, String currentRunState);
+  void updateCurrentRunState(UUID rowUuid, Instant updatedAt, String currentRunState);
 
   @SqlUpdate(
       "UPDATE runs "
