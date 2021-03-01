@@ -60,8 +60,8 @@ subprojects {
     }
 
     ext {
-        lombokVersion = '1.18.16'
-        slf4jVersion = '1.7.26'
+        lombokVersion = '1.18.18'
+        slf4jVersion = '1.7.30'
         isReleaseVersion = !version.endsWith("SNAPSHOT")
     }
 

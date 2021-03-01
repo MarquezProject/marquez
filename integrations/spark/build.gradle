@@ -29,18 +29,18 @@ dependencies {
     compileOnly 'org.apache.spark:spark-core_2.11:2.4.7'
     compileOnly 'org.apache.spark:spark-sql_2.11:2.4.7'
     implementation 'com.github.ok2c.hc5:hc5-async-json:0.2.1'
-    compileOnly 'org.projectlombok:lombok:1.18.16'
+    compileOnly 'org.projectlombok:lombok:1.18.18'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.0.3'
 
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.0'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.0'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.1'
     testImplementation 'net.bytebuddy:byte-buddy-agent:1.10.21'
     testImplementation 'net.bytebuddy:byte-buddy-dep:1.10.21'
     testImplementation 'org.apache.spark:spark-core_2.11:2.4.7'
     testImplementation 'org.apache.spark:spark-sql_2.11:2.4.7'
-    testImplementation 'org.mockito:mockito-core:3.6.28'
-    testImplementation 'junit:junit:4.13'
+    testImplementation 'org.mockito:mockito-core:3.8.0'
+    testImplementation 'junit:junit:4.13.2'
 
     annotationProcessor "org.projectlombok:lombok:1.18.16"
 }
