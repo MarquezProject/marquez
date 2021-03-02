@@ -15,64 +15,108 @@
 package marquez.db;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.Field;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
+import marquez.common.models.TagName;
+import marquez.common.models.Version;
+import marquez.db.DatasetFieldDao.DatasetFieldMapping;
+import marquez.db.DatasetFieldDao.DatasetFieldTag;
 import marquez.db.mappers.DatasetVersionRowMapper;
 import marquez.db.mappers.ExtendedDatasetVersionRowMapper;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
-import marquez.db.models.StreamVersionRow;
-import org.jdbi.v3.sqlobject.CreateSqlObject;
+import marquez.db.models.TagRow;
+import marquez.service.DatasetService;
+import marquez.service.models.DatasetMeta;
+import marquez.service.models.StreamMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(DatasetVersionRowMapper.class)
 @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
-public interface DatasetVersionDao {
-  @CreateSqlObject
-  DatasetDao createDatasetDao();
-
-  @CreateSqlObject
-  DatasetFieldDao createDatasetFieldDao();
-
-  @CreateSqlObject
-  StreamVersionDao createStreamVersionDao();
+public interface DatasetVersionDao extends MarquezDao {
 
   @Transaction
-  default void insertWith(DatasetVersionRow row, List<DatasetFieldRow> fieldRows) {
-    // Fields
-    createDatasetFieldDao().insertAll(fieldRows);
-    insert(row);
-    // Version
-    if (row instanceof StreamVersionRow) {
-      createStreamVersionDao().insert((StreamVersionRow) row);
+  default void upsertDatasetVersion(
+      UUID datasetUuid,
+      Instant now,
+      String namespaceName,
+      String datasetName,
+      DatasetMeta datasetMeta) {
+    TagDao tagDao = createTagDao();
+    DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
+
+    final Version version =
+        datasetMeta.version(NamespaceName.of(namespaceName), DatasetName.of(datasetName));
+    UUID newDatasetVersionUuid = UUID.randomUUID();
+    DatasetVersionRow datasetVersionRow =
+        upsert(
+            newDatasetVersionUuid,
+            now,
+            datasetUuid,
+            version.getValue(),
+            datasetMeta.getRunId().map(RunId::getValue).orElse(null));
+    updateDatasetVersionMetric(
+        namespaceName,
+        datasetMeta.getType().toString(),
+        datasetName,
+        newDatasetVersionUuid,
+        datasetVersionRow.getUuid());
+
+    if (datasetMeta instanceof StreamMeta) {
+      createStreamVersionDao()
+          .insert(
+              datasetVersionRow.getUuid(),
+              ((StreamMeta) datasetMeta).getSchemaLocation().toString());
     }
-    row.getFieldUuids().forEach(fieldUuid -> updateFields(row.getUuid(), fieldUuid));
-    // Current
-    final Instant updatedAt = row.getCreatedAt();
-    createDatasetDao().updateVersion(row.getDatasetUuid(), updatedAt, row.getUuid());
+
+    List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
+    List<DatasetFieldTag> datasetFieldTag = new ArrayList<>();
+
+    for (Field field : datasetMeta.getFields()) {
+      DatasetFieldRow datasetFieldRow =
+          datasetFieldDao.upsert(
+              UUID.randomUUID(),
+              now,
+              field.getName().getValue(),
+              field.getType().name(),
+              field.getDescription().orElse(null),
+              datasetUuid);
+      for (TagName tagName : field.getTags()) {
+        TagRow tag = tagDao.upsert(UUID.randomUUID(), now, tagName.getValue());
+        datasetFieldTag.add(new DatasetFieldTag(datasetFieldRow.getUuid(), tag.getUuid(), now));
+      }
+      datasetFieldMappings.add(
+          new DatasetFieldMapping(datasetVersionRow.getUuid(), datasetFieldRow.getUuid()));
+    }
+
+    datasetFieldDao.updateFieldMapping(datasetFieldMappings);
+    datasetFieldDao.updateTags(datasetFieldTag);
+
+    createDatasetDao().updateVersion(datasetUuid, now, datasetVersionRow.getUuid());
   }
 
-  @SqlUpdate(
-      "INSERT INTO dataset_versions (uuid, created_at, dataset_uuid, version, run_uuid) "
-          + "VALUES (:uuid, :createdAt, :datasetUuid, :version, :runUuid)")
-  void insert(@BindBean DatasetVersionRow row);
-
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM dataset_versions WHERE version = :version)")
-  boolean exists(UUID version);
-
-  @SqlUpdate(
-      "INSERT INTO dataset_versions_field_mapping (dataset_version_uuid, dataset_field_uuid) "
-          + "VALUES (:datasetVersionUuid, :datasetFieldUuid)")
-  void updateFields(UUID datasetVersionUuid, UUID datasetFieldUuid);
+  default void updateDatasetVersionMetric(
+      String namespaceName,
+      String type,
+      String datasetName,
+      UUID newDatasetVersionUuid,
+      UUID datasetVersionUuid) {
+    if (newDatasetVersionUuid != datasetVersionUuid) {
+      DatasetService.versions.labels(namespaceName, type, datasetName).inc();
+    }
+  }
 
   String SELECT =
       "SELECT dv.*, "
@@ -106,9 +150,6 @@ public interface DatasetVersionDao {
         return findBy(uuid);
     }
   }
-
-  @SqlQuery("SELECT COUNT(*) FROM dataset_versions")
-  int count();
 
   /**
    * returns all Dataset Versions created by this run id

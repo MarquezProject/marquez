@@ -14,29 +14,38 @@
 
 package marquez.db;
 
+import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.Value;
 import marquez.common.models.DatasetType;
+import marquez.common.models.TagName;
 import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.mappers.ExtendedDatasetRowMapper;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedDatasetRow;
-import org.jdbi.v3.sqlobject.SqlObject;
+import marquez.db.models.NamespaceRow;
+import marquez.db.models.SourceRow;
+import marquez.db.models.TagRow;
+import marquez.service.DatasetService;
+import marquez.service.models.DatasetMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(ExtendedDatasetRowMapper.class)
 @RegisterRowMapper(DatasetRowMapper.class)
-public interface DatasetDao extends SqlObject {
+public interface DatasetDao extends MarquezDao {
   @Transaction
   default void insert(DatasetRow row) {
     insertDatasetRow(row);
@@ -81,6 +90,12 @@ public interface DatasetDao extends SqlObject {
           + "VALUES (:rowUuid, :tagUuid, :taggedAt) "
           + "ON CONFLICT DO NOTHING")
   void updateTags(UUID rowUuid, UUID tagUuid, Instant taggedAt);
+
+  @SqlBatch(
+      "INSERT INTO datasets_tag_mapping (dataset_uuid, tag_uuid, tagged_at) "
+          + "VALUES (:rowUuid, :tagUuid, :taggedAt) "
+          + "ON CONFLICT DO NOTHING")
+  void updateTagMapping(@BindBean List<DatasetTagMapping> datasetTagMappings);
 
   @SqlUpdate(
       "UPDATE datasets "
@@ -185,4 +200,54 @@ public interface DatasetDao extends SqlObject {
       String name,
       String physicalName,
       String description);
+
+  @Transaction
+  default void upsertDatasetMeta(
+      String namespaceName, String datasetName, DatasetMeta datasetMeta) {
+    Instant now = Instant.now();
+    NamespaceRow namespaceRow =
+        createNamespaceDao().upsert(UUID.randomUUID(), now, namespaceName, DEFAULT_NAMESPACE_OWNER);
+    SourceRow sourceRow =
+        createSourceDao()
+            .upsertOrDefault(
+                UUID.randomUUID(), "POSTGRES", now, datasetMeta.getSourceName().getValue(), "");
+    UUID newDatasetUuid = UUID.randomUUID();
+    DatasetRow datasetRow =
+        upsert(
+            newDatasetUuid,
+            datasetMeta.getType(),
+            now,
+            namespaceRow.getUuid(),
+            sourceRow.getUuid(),
+            datasetName,
+            datasetMeta.getPhysicalName().getValue(),
+            datasetMeta.getDescription().orElse(null));
+    updateDatasetMetric(
+        namespaceName, datasetMeta.getType().toString(), newDatasetUuid, datasetRow.getUuid());
+
+    TagDao tagDao = createTagDao();
+    List<DatasetTagMapping> datasetTagMappings = new ArrayList<>();
+    for (TagName tagName : datasetMeta.getTags()) {
+      TagRow tag = tagDao.upsert(UUID.randomUUID(), now, tagName.getValue());
+      datasetTagMappings.add(new DatasetTagMapping(datasetRow.getUuid(), tag.getUuid(), now));
+    }
+    updateTagMapping(datasetTagMappings);
+
+    createDatasetVersionDao()
+        .upsertDatasetVersion(datasetRow.getUuid(), now, namespaceName, datasetName, datasetMeta);
+  }
+
+  default void updateDatasetMetric(
+      String namespaceName, String type, UUID newDatasetUuid, UUID datasetUuid) {
+    if (newDatasetUuid != datasetUuid) {
+      DatasetService.datasets.labels(namespaceName, type).inc();
+    }
+  }
+
+  @Value
+  class DatasetTagMapping {
+    UUID rowUuid;
+    UUID tagUuid;
+    Instant taggedAt;
+  }
 }

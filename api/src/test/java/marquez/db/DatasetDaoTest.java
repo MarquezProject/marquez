@@ -22,17 +22,13 @@ import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.db.models.ModelGenerator.newDatasetRow;
 import static marquez.db.models.ModelGenerator.newDatasetRowWith;
 import static marquez.db.models.ModelGenerator.newDatasetRowsWith;
-import static marquez.db.models.ModelGenerator.newDatasetVersionRowWith;
 import static marquez.db.models.ModelGenerator.newNamespaceRowWith;
-import static marquez.db.models.ModelGenerator.newRowUuid;
 import static marquez.db.models.ModelGenerator.newSourceRow;
 import static marquez.db.models.ModelGenerator.newTagRow;
 import static marquez.db.models.ModelGenerator.newTagRows;
 import static marquez.db.models.ModelGenerator.toTagUuids;
-import static marquez.service.models.ModelGenerator.newVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.util.List;
@@ -45,9 +41,7 @@ import marquez.JdbiRuleInit;
 import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.db.models.DatasetRow;
-import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
-import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.TagRow;
@@ -260,21 +254,5 @@ public class DatasetDaoTest {
 
     final List<ExtendedDatasetRow> rows = datasetDao.findAll(NAMESPACE_NAME.getValue(), 4, 0);
     assertThat(rows).isNotNull().hasSize(4);
-  }
-
-  @Test
-  public void testDatasetVersions() {
-    final DatasetRow ds =
-        newDatasetRowWith(namespaceRow.getUuid(), sourceRow.getUuid(), toTagUuids(tagRows));
-    datasetDao.insert(ds);
-
-    DatasetVersionRow dsv =
-        newDatasetVersionRowWith(ds.getUuid(), newVersion(), ImmutableList.of(), newRowUuid());
-
-    datasetVersionDao.insert(dsv);
-
-    final List<ExtendedDatasetVersionRow> rows =
-        datasetVersionDao.findByRunId(dsv.getRunUuid().get());
-    assertThat(rows).isNotNull().hasSize(1);
   }
 }
