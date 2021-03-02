@@ -154,8 +154,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     Set<String> datasetTag = ImmutableSet.of("ANY_DATASET");
     Set<String> fieldTag = ImmutableSet.of("ANY");
     List<Field> fields =
-        ImmutableList.of(
-            Field.builder().name("a").type("INTEGER").tags(fieldTag).build());
+        ImmutableList.of(Field.builder().name("a").type("INTEGER").tags(fieldTag).build());
     final DbTableMeta dbTableMeta =
         DbTableMeta.builder()
             .physicalName(datasetName)
