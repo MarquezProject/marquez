@@ -108,6 +108,12 @@ public abstract class LogicalPlanTraverser {
     return null;
   }
 
+  protected Object visit(InsertIntoDataSourceDirCommand insertIntoDataSourceCommand) {
+    visit(insertIntoDataSourceCommand.query());
+    visitStatistics(insertIntoDataSourceCommand.stats());
+    return null;
+  }
+
   protected Object visit(LogicalRelation logicalRelation) {
     visitRelation(logicalRelation.relation());
     return null;

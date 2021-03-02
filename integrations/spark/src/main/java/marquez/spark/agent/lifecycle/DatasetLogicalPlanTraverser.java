@@ -2,6 +2,7 @@ package marquez.spark.agent.lifecycle;
 
 import static scala.collection.JavaConversions.asJavaCollection;
 
+import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,15 +16,21 @@ import marquez.spark.agent.client.LineageEvent.Dataset;
 import marquez.spark.agent.client.LineageEvent.DatasetFacet;
 import marquez.spark.agent.client.LineageEvent.SchemaDatasetFacet;
 import marquez.spark.agent.client.LineageEvent.SchemaField;
+import marquez.spark.agent.facets.OutputStatisticsFacet;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.apache.spark.sql.catalyst.plans.logical.Statistics;
 import org.apache.spark.sql.execution.command.CreateDataSourceTableAsSelectCommand;
+import org.apache.spark.sql.execution.command.InsertIntoDataSourceDirCommand;
 import org.apache.spark.sql.execution.datasources.FileIndex;
 import org.apache.spark.sql.execution.datasources.HadoopFsRelation;
 import org.apache.spark.sql.execution.datasources.InsertIntoHadoopFsRelationCommand;
+import org.apache.spark.sql.execution.metric.SQLMetric;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import scala.collection.immutable.Map;
+import scala.runtime.AbstractFunction0;
+import scala.runtime.AbstractFunction1;
 
 public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   private Set<Dataset> outputDatasets;
@@ -45,18 +52,84 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   @Override
   protected Object visit(
       CreateDataSourceTableAsSelectCommand createDataSourceTableAsSelectCommand) {
-    outputDatasets.add(
+    OutputStatisticsFacet outputStats =
+        getOutputStats(createDataSourceTableAsSelectCommand.metrics());
+    apply(
         buildDataset(
             createDataSourceTableAsSelectCommand.table().qualifiedName(),
             DatasetFacet.builder()
                 .schema(visit(createDataSourceTableAsSelectCommand.table().schema()))
+                .additional(ImmutableMap.of("stats", outputStats))
                 .build()));
     return null;
   }
 
+  @Override
+  protected Object visit(InsertIntoDataSourceDirCommand insertIntoDataSourceCommand) {
+    OutputStatisticsFacet outputStats = getOutputStats(insertIntoDataSourceCommand.metrics());
+    DatasetFacet datasetFacet =
+        DatasetFacet.builder()
+            .schema(visit(insertIntoDataSourceCommand.schema()))
+            .additional(ImmutableMap.of("stats", outputStats))
+            .build();
+    DatasetLogicalPlanTraverser traverser = this;
+    insertIntoDataSourceCommand
+        .storage()
+        .locationUri()
+        .map(
+            new AbstractFunction1<URI, Dataset>() {
+              @Override
+              public Dataset apply(URI uri) {
+                return buildDataset(visitPathUri(uri), datasetFacet);
+              }
+            })
+        .foreach(
+            new AbstractFunction1<Dataset, Void>() {
+              @Override
+              public Void apply(Dataset v1) {
+                traverser.apply(v1);
+                return null;
+              }
+            });
+    return super.visit(insertIntoDataSourceCommand);
+  }
+
+  private OutputStatisticsFacet getOutputStats(Map<String, SQLMetric> metrics) {
+    long rowCount =
+        metrics
+            .getOrElse(
+                "numOutputRows",
+                new AbstractFunction0<SQLMetric>() {
+                  @Override
+                  public SQLMetric apply() {
+                    return new SQLMetric("sum", 0L);
+                  }
+                })
+            .value();
+    long outputBytes =
+        metrics
+            .getOrElse(
+                "numOutputBytes",
+                new AbstractFunction0<SQLMetric>() {
+                  @Override
+                  public SQLMetric apply() {
+                    return new SQLMetric("sum", 0L);
+                  }
+                })
+            .value();
+    return new OutputStatisticsFacet(rowCount, outputBytes);
+  }
+
   protected Object visit(InsertIntoHadoopFsRelationCommand insertIntoHadoopFsRelationCommand) {
+    OutputStatisticsFacet outputStats = getOutputStats(insertIntoHadoopFsRelationCommand.metrics());
+    DatasetFacet datasetFacet =
+        DatasetFacet.builder()
+            .schema(visit(insertIntoHadoopFsRelationCommand.schema()))
+            .additional(ImmutableMap.of("stats", outputStats))
+            .build();
     outputDatasets.add(
-        buildDataset(visitPathUri(insertIntoHadoopFsRelationCommand.outputPath().toUri()), null));
+        buildDataset(
+            visitPathUri(insertIntoHadoopFsRelationCommand.outputPath().toUri()), datasetFacet));
     return null;
   }
 
@@ -128,6 +201,10 @@ public class DatasetLogicalPlanTraverser extends LogicalPlanTraverser {
   protected Object visitStatistics(Statistics stats) {
     this.statistics = stats;
     return null;
+  }
+
+  private Boolean apply(Dataset uri) {
+    return outputDatasets.add(uri);
   }
 
   @Value
