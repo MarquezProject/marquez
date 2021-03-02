@@ -147,6 +147,29 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  public void testDatasetCustomTag() {
+    createNamespace(NAMESPACE_NAME);
+
+    String datasetName = "public.mytable";
+    Set<String> datasetTag = ImmutableSet.of("ANY_DATASET");
+    Set<String> fieldTag = ImmutableSet.of("ANY");
+    List<Field> fields =
+        ImmutableList.of(
+            Field.builder().name("a").type("INTEGER").tags(fieldTag).build());
+    final DbTableMeta dbTableMeta =
+        DbTableMeta.builder()
+            .physicalName(datasetName)
+            .sourceName("my-source")
+            .fields(fields)
+            .tags(datasetTag)
+            .build();
+    client.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
+    Dataset dataset = client.getDataset(NAMESPACE_NAME, datasetName);
+    assertThat(dataset.getTags()).isEqualTo(datasetTag);
+    assertThat(dataset.getFields().get(0).getTags()).isEqualTo(fieldTag);
+  }
+
+  @Test
   public void testDatasetFieldChange() {
     createNamespace(NAMESPACE_NAME);
     createSource("my-source");
