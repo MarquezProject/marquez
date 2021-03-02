@@ -172,6 +172,6 @@ public interface JobDao extends MarquezDao {
       String description,
       UUID jobContextUuid,
       String location,
-      Object inputs,
-      Object outputs);
+      PGobject inputs,
+      PGobject outputs);
 }
