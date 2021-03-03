@@ -95,9 +95,8 @@ public class OpenLineageServiceTest {
         new Object[] {rdd, new ExpectedResults(1, 0, 1)},
         new Object[] {sql, new ExpectedResults(1, 0, 2)},
         new Object[] {
-            Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()), new ExpectedResults(1, 1, 1)
-        }
-        );
+          Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()), new ExpectedResults(1, 1, 1)
+        });
   }
 
   public static class ExpectedResults {
