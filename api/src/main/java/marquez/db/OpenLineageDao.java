@@ -59,8 +59,7 @@ public interface OpenLineageDao extends MarquezDao {
           + "job_namespace, "
           + "event, "
           + "producer) "
-          + "VALUES (?, ?, ?, ?, ?, ?, ?) "
-          + "ON CONFLICT ON CONSTRAINT lineage_event_pk DO NOTHING")
+          + "VALUES (?, ?, ?, ?, ?, ?, ?)")
   void createLineageEvent(
       String eventType,
       Instant eventTime,
