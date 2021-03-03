@@ -44,7 +44,7 @@
     "d3-selection": "^1.4.1",
     "dagre": "^0.8.5",
     "http-proxy-middleware": "^0.20.0",
-    "jest": "23.6.0",
+    "jest": "26.6.3",
     "lodash": "^4.17.19",
     "postcss-loader": "^3.0.0",
     "postcss-modules-values": "^2.0.0",
