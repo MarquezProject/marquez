@@ -30,7 +30,7 @@
     "@visx/legend": "1.4.0",
     "@visx/mock-data": "1.5.0",
     "@visx/responsive": "1.3.0",
-    "@visx/scale": "1.0.0",
+    "@visx/scale": "1.4.0",
     "@visx/shape": "1.0.0",
     "@visx/zoom": "^1.0.0",
     "autoprefixer": "^9.5.1",
