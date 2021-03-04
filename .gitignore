@@ -26,3 +26,6 @@ marquez.yml
 
 # jenv
 .java-version
+
+# Dependent Helm charts
+chart/charts/

@@ -1,19 +1,19 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "marquez.fullname" . -}}
-{{- $ingressPaths := .Values.ingress.paths -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
-  labels:
-    app.kubernetes.io/name: {{ include "marquez.name" . }}
-    helm.sh/chart: {{ include "marquez.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-  {{- with .Values.ingress.annotations }}
+  name: {{ include "common.names.fullname" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- end }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
+    {{- end }}
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ include "common.tplvalues.render" (dict "value" $value "context" $) | quote }}
+    {{- end }}
 spec:
 {{- if .Values.ingress.tls }}
   tls:
@@ -30,11 +30,13 @@ spec:
     - host: {{ . | quote }}
       http:
         paths:
-	{{- range $ingressPaths }}
-          - path: {{ . }}
+          - path: /api/
             backend:
-              serviceName: {{ $fullName }}
+              serviceName: {{ include "common.names.fullname" . }}
               servicePort: http
-	{{- end }}
+          - path: /
+            backend:
+              serviceName: {{ include "common.names.fullname" . }}-web
+              servicePort: http
   {{- end }}
 {{- end }}

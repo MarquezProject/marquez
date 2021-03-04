@@ -1,12 +1,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "marquez.fullname" . }}-config
-  labels:
-    app: {{ template "marquez.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+  name: {{ include "common.names.fullname" . }}-config
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- end }}
+    app.kubernetes.io/component: marquez
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
+    {{- end }}
 data:
   ### HTTP SERVER CONFIG ###
   
