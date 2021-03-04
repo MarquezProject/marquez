@@ -20,7 +20,7 @@ import java.util.Map;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public final class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
-  private static final String POSTGRES_9_6 = "postgres:9.6";
+  private static final String POSTGRES = "postgres:11.8";
   private static final int JDBC = 5;
 
   private static final Map<String, PostgresContainer> containers = new HashMap<>();
@@ -29,7 +29,7 @@ public final class PostgresContainer extends PostgreSQLContainer<PostgresContain
   private int port;
 
   private PostgresContainer() {
-    super(POSTGRES_9_6);
+    super(POSTGRES);
   }
 
   public static PostgresContainer create(String name) {
