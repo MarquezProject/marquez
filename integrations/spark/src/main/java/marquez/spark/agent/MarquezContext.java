@@ -20,6 +20,8 @@ public class MarquezContext {
   @Getter private String jobName;
   @Getter private String parentRunId;
 
+  private final ObjectMapper mapper = OpenLineageClient.createMapper();
+
   public MarquezContext(ArgumentParser argument) throws URISyntaxException {
     this.client = OpenLineageClient.create(argument.getApiKey(), ForkJoinPool.commonPool());
     this.lineageURI =
@@ -36,7 +38,6 @@ public class MarquezContext {
       // Todo: move to async client
       log.debug("Posting LineageEvent {}", event);
       ResponseMessage resp = client.post(lineageURI, event);
-      ObjectMapper mapper = OpenLineageClient.createMapper();
       if (!resp.completedSuccessfully()) {
         log.error(
             "Could not emit lineage: {}",
