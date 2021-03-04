@@ -62,6 +62,7 @@ public class OpenLineageServiceTest {
   public static String EVENT_SIMPLE = "open_lineage/event_simple.json";
   public static String EVENT_FULL = "open_lineage/event_full.json";
   public static String EVENT_UNICODE = "open_lineage/event_unicode.json";
+  public static String EVENT_LARGE = "open_lineage/event_large.json";
   private List<LineageEvent> eventList;
 
   @Parameters(name = "{0}")
@@ -92,7 +93,10 @@ public class OpenLineageServiceTest {
           new ExpectedResults(3, 2, 1)
         },
         new Object[] {rdd, new ExpectedResults(1, 0, 1)},
-        new Object[] {sql, new ExpectedResults(1, 0, 2)});
+        new Object[] {sql, new ExpectedResults(1, 0, 2)},
+        new Object[] {
+          Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()), new ExpectedResults(1, 1, 1)
+        });
   }
 
   public static class ExpectedResults {
