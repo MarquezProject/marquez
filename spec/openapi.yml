@@ -788,6 +788,7 @@ components:
         - physicalName
         - sourceName
         - fields
+        - schemaLocation
       example:
         type: STREAM
         physicalName: my-stream
