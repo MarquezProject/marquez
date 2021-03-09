@@ -1,8 +1,10 @@
 {
+  "bumpVersion": "patch",
   "extends": [
     "config:base",
     "docker:disable",
     ":gitSignOff"
   ],
-  "lockFileMaintenance": { "enabled": true }
+  "lockFileMaintenance": { "enabled": true },
+  "schedule": ["every weekend"]
 }
