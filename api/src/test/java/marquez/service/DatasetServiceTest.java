@@ -51,6 +51,7 @@ import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.NamespaceDao;
+import marquez.db.RunDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.db.models.DatasetFieldRow;
@@ -117,6 +118,7 @@ public class DatasetServiceTest {
   @Mock private DatasetFieldDao datasetFieldDao;
   @Mock private DatasetVersionDao datasetVersionDao;
   @Mock private TagDao tagDao;
+  @Mock private RunDao runDao;
   @Mock private RunService runService;
   private DatasetService datasetService;
 
@@ -130,6 +132,7 @@ public class DatasetServiceTest {
             datasetFieldDao,
             datasetVersionDao,
             tagDao,
+            runDao,
             runService);
   }
 

@@ -36,6 +36,7 @@ import marquez.common.models.DatasetType;
 import marquez.common.models.DatasetVersionId;
 import marquez.common.models.Field;
 import marquez.common.models.FieldName;
+import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
@@ -45,6 +46,7 @@ import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.MarquezDao;
 import marquez.db.NamespaceDao;
+import marquez.db.RunDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.db.models.DatasetFieldRow;
@@ -52,10 +54,12 @@ import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
+import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.StreamVersionRow;
 import marquez.db.models.TagRow;
+import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
 import marquez.service.models.Dataset;
@@ -66,7 +70,7 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class DatasetService {
-  private static final Counter datasets =
+  private static final Counter datasetCounterMetric =
       Counter.build()
           .namespace("marquez")
           .name("dataset_total")
@@ -86,6 +90,7 @@ public class DatasetService {
   private final DatasetDao datasetDao;
   private final DatasetFieldDao datasetFieldDao;
   private final DatasetVersionDao datasetVersionDao;
+  private final RunDao runDao;
   private final TagDao tagDao;
 
   private final RunService runService;
@@ -98,6 +103,7 @@ public class DatasetService {
     this.datasetFieldDao = marquezDao.createDatasetFieldDao();
     this.datasetVersionDao = marquezDao.createDatasetVersionDao();
     this.tagDao = marquezDao.createTagDao();
+    this.runDao = marquezDao.createRunDao();
     this.runService = runService;
   }
 
@@ -108,6 +114,7 @@ public class DatasetService {
       @NonNull final DatasetFieldDao datasetFieldDao,
       @NonNull final DatasetVersionDao datasetVersionDao,
       @NonNull final TagDao tagDao,
+      @NonNull RunDao runDao,
       @NonNull final RunService runService) {
     this.namespaceDao = namespaceDao;
     this.sourceDao = sourceDao;
@@ -115,6 +122,7 @@ public class DatasetService {
     this.datasetFieldDao = datasetFieldDao;
     this.datasetVersionDao = datasetVersionDao;
     this.tagDao = tagDao;
+    this.runDao = runDao;
     this.runService = runService;
   }
 
@@ -151,7 +159,9 @@ public class DatasetService {
             datasetName.getValue(),
             namespaceName.getValue(),
             datasetMeta);
-        datasets.labels(namespaceName.getValue(), datasetMeta.getType().toString()).inc();
+        datasetCounterMetric
+            .labels(namespaceName.getValue(), datasetMeta.getType().toString())
+            .inc();
       }
       final Version version = datasetMeta.version(namespaceName, datasetName);
       if (!datasetVersionDao.exists(version.getValue())) {
@@ -204,6 +214,21 @@ public class DatasetService {
                 namespaceName.getValue(), datasetMeta.getType().toString(), datasetName.getValue())
             .inc();
       }
+
+      if (datasetMeta.getRunId().isPresent()) {
+        UUID runUuid = datasetMeta.getRunId().get().getValue();
+        ExtendedRunRow runRow = runDao.findBy(runUuid).get();
+
+        List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findByRunId(runUuid);
+        runService.notify(
+            new JobOutputUpdate(
+                RunId.of(runRow.getUuid()),
+                null,
+                JobName.of(runRow.getJobName()),
+                NamespaceName.of(runRow.getNamespaceName()),
+                RunService.buildRunOutputs(outputs)));
+      }
+
       return get(namespaceName, datasetName).get();
     } catch (UnableToExecuteStatementException e) {
       log.error(

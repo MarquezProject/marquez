@@ -34,6 +34,7 @@ public final class Columns {
   public static final String STARTED_AT = "started_at";
   public static final String ENDED_AT = "ended_at";
   public static final String NAME = "name";
+  public static final String JOB_NAME = "job_name";
   public static final String VERSION = "version";
   public static final String DESCRIPTION = "description";
   public static final String NAMESPACE_UUID = "namespace_uuid";

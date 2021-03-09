@@ -39,13 +39,16 @@ import marquez.api.exceptions.DatasetVersionNotFoundException;
 import marquez.api.exceptions.FieldNotFoundException;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunNotFoundException;
+import marquez.api.exceptions.SourceNotFoundException;
 import marquez.api.exceptions.TagNotFoundException;
 import marquez.common.models.DatasetName;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
+import marquez.db.SourceDao;
 import marquez.service.DatasetService;
 import marquez.service.NamespaceService;
 import marquez.service.RunService;
@@ -61,16 +64,19 @@ public class DatasetResource {
   private final DatasetService datasetService;
   private final TagService tagService;
   private final RunService runService;
+  private final SourceDao sourceDao;
 
   public DatasetResource(
       @NonNull final NamespaceService namespaceService,
       @NonNull final DatasetService datasetService,
       @NonNull final TagService tagService,
-      @NonNull final RunService runService) {
+      @NonNull final RunService runService,
+      SourceDao sourceDao) {
     this.namespaceService = namespaceService;
     this.datasetService = datasetService;
     this.tagService = tagService;
     this.runService = runService;
+    this.sourceDao = sourceDao;
   }
 
   @Timed
@@ -87,6 +93,7 @@ public class DatasetResource {
       throws MarquezServiceException {
     throwIfNotExists(namespaceName);
     datasetMeta.getRunId().ifPresent(this::throwIfNotExists);
+    throwIfSourceNotExists(datasetMeta.getSourceName());
 
     final Dataset dataset = datasetService.createOrUpdate(namespaceName, datasetName, datasetMeta);
     return Response.ok(dataset).build();
@@ -235,6 +242,12 @@ public class DatasetResource {
       throws MarquezServiceException {
     if (!datasetService.exists(namespaceName, datasetName)) {
       throw new DatasetNotFoundException(datasetName);
+    }
+  }
+
+  void throwIfSourceNotExists(SourceName sourceName) throws MarquezServiceException {
+    if (!sourceDao.exists(sourceName.getValue())) {
+      throw new SourceNotFoundException(sourceName);
     }
   }
 

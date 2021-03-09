@@ -90,10 +90,10 @@ public class OpenLineageServiceTest {
           Arrays.asList(
               Resources.getResource("open_lineage/listener/1.json").toURI(),
               Resources.getResource("open_lineage/listener/2.json").toURI()),
-          new ExpectedResults(3, 2, 1)
+          new ExpectedResults(3, 2, 2)
         },
-        new Object[] {rdd, new ExpectedResults(1, 0, 1)},
-        new Object[] {sql, new ExpectedResults(1, 0, 2)},
+        new Object[] {rdd, new ExpectedResults(1, 0, 2)},
+        new Object[] {sql, new ExpectedResults(1, 0, 4)},
         new Object[] {
           Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()), new ExpectedResults(1, 1, 1)
         });
@@ -148,7 +148,11 @@ public class OpenLineageServiceTest {
       assertEquals(
           "Dataset input count",
           expected.inputDatasetCount,
-          runInputListener.getAllValues().get(0).getInputs().size());
+          runInputListener
+              .getAllValues()
+              .get(runInputListener.getAllValues().size() - 1)
+              .getInputs()
+              .size());
     }
   }
 

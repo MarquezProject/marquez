@@ -11,6 +11,7 @@ import static marquez.service.models.ModelGenerator.newDbTableMetaWith;
 import static marquez.service.models.ModelGenerator.newDbTableWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +33,7 @@ import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
+import marquez.db.SourceDao;
 import marquez.service.DatasetService;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
@@ -72,12 +74,15 @@ public class DatasetResourceTest {
   @Mock private JobService jobService;
   @Mock private TagService tagService;
   @Mock private RunService runService;
+  @Mock private SourceDao sourceDao;
   private DatasetResource datasetResource;
 
   @Before
   public void setUp() {
     datasetResource =
-        spy(new DatasetResource(namespaceService, datasetService, tagService, runService));
+        spy(
+            new DatasetResource(
+                namespaceService, datasetService, tagService, runService, sourceDao));
   }
 
   @Test
@@ -88,6 +93,7 @@ public class DatasetResourceTest {
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(datasetService.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta))
         .thenReturn(dbTable);
+    when(sourceDao.exists(any())).thenReturn(true);
 
     final Response response =
         datasetResource.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta);
@@ -102,6 +108,7 @@ public class DatasetResourceTest {
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(runService.runExists(RUN_ID)).thenReturn(true);
+    when(sourceDao.exists(any())).thenReturn(true);
     when(datasetService.createOrUpdate(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta))
         .thenReturn(dbTable);
 
