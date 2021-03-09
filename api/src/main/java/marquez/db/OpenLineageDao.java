@@ -328,7 +328,9 @@ public interface OpenLineageDao extends MarquezDao {
               ds.getFacets().getDataSource().getName(),
               getUrlOrPlaceholder(ds.getFacets().getDataSource().getUri()));
     } else {
-      source = sourceDao.upsert(UUID.randomUUID(), getSourceType(ds), now, DEFAULT_SOURCE_NAME, "");
+      source =
+          sourceDao.upsertOrDefault(
+              UUID.randomUUID(), getSourceType(ds), now, DEFAULT_SOURCE_NAME, "");
     }
 
     String dsDescription = null;

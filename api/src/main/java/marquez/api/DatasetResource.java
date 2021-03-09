@@ -89,8 +89,7 @@ public class DatasetResource {
   public Response createOrUpdate(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName,
-      @Valid DatasetMeta datasetMeta)
-      throws MarquezServiceException {
+      @Valid DatasetMeta datasetMeta) {
     throwIfNotExists(namespaceName);
     datasetMeta.getRunId().ifPresent(this::throwIfNotExists);
     throwIfSourceNotExists(datasetMeta.getSourceName());

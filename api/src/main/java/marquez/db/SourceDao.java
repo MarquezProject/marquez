@@ -83,4 +83,24 @@ public interface SourceDao {
           + "connection_url = EXCLUDED.connection_url "
           + "RETURNING *")
   SourceRow upsert(UUID uuid, String type, Instant now, String name, String connectionUrl);
+
+  @SqlQuery(
+      "INSERT INTO sources ("
+          + "uuid, "
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "name, "
+          + "connection_url "
+          + ") VALUES ("
+          + ":uuid, "
+          + ":defaultType, "
+          + ":now, "
+          + ":now, "
+          + ":defaultName, "
+          + ":defaultConnectionUrl"
+          + ") ON CONFLICT(name) DO UPDATE SET updated_at = EXCLUDED.updated_at "
+          + "RETURNING *")
+  SourceRow upsertOrDefault(
+      UUID uuid, String defaultType, Instant now, String defaultName, String defaultConnectionUrl);
 }

@@ -46,7 +46,6 @@ import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
 import marquez.db.models.DatasetFieldRow;
-import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
 import marquez.db.models.ExtendedRunRow;
@@ -230,28 +229,6 @@ public final class Mapper {
         tags,
         row.getDescription().orElse(null),
         createdByRun);
-  }
-
-  public static DatasetRow toDatasetRow(
-      @NonNull final UUID namespaceRowUuid,
-      @NonNull final UUID sourceRowUuid,
-      @NonNull final DatasetName name,
-      @NonNull final DatasetMeta meta,
-      @NonNull final List<UUID> tagUuids) {
-    final Instant now = newTimestamp();
-    return new DatasetRow(
-        newRowUuid(),
-        toDatasetType(meta).toString(),
-        now,
-        now,
-        namespaceRowUuid,
-        sourceRowUuid,
-        name.getValue(),
-        meta.getPhysicalName().getValue(),
-        tagUuids,
-        null,
-        meta.getDescription().orElse(null),
-        null);
   }
 
   private static DatasetType toDatasetType(@NonNull final DatasetMeta meta) {

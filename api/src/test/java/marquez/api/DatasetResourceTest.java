@@ -86,7 +86,7 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testCreateOrUpdate() throws MarquezServiceException {
+  public void testCreateOrUpdate() {
     final DbTableMeta dbTableMeta = newDbTableMeta();
     final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
 
@@ -102,7 +102,7 @@ public class DatasetResourceTest {
   }
 
   @Test
-  public void testCreateOrUpdateWithRun() throws MarquezServiceException {
+  public void testCreateOrUpdateWithRun() {
     final DbTableMeta dbTableMeta = newDbTableMetaWith(RUN_ID);
     final DbTable dbTable = toDbTable(DB_TABLE_ID, dbTableMeta);
 
