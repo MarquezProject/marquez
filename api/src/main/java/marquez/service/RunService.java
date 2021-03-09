@@ -107,6 +107,9 @@ public class RunService {
   public void markRunAs(
       @NonNull RunId runId, @NonNull RunState runState, @Nullable Instant transitionedAt) {
     log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
+    if (transitionedAt == null) {
+      transitionedAt = Instant.now();
+    }
     ExtendedRunRow runRow = runDao.findBy(runId.getValue()).get();
     runStateDao.updateRunState(runId.getValue(), runState, transitionedAt);
 
