@@ -15,10 +15,14 @@
 package marquez.db;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import marquez.common.models.RunState;
 import marquez.db.mappers.RunStateRowMapper;
+import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.RunStateRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -44,11 +48,14 @@ public interface RunStateDao extends MarquezDao {
     runDao.updateRunState(runUuid, transitionedAt, runState);
     if (runState.isDone()) {
       runDao.updateEndState(runUuid, transitionedAt, runStateRow.getUuid());
+      List<ExtendedDatasetVersionRow> outputs = createDatasetVersionDao().findByRunId(runUuid);
+      List<UUID> outputUuids =
+          outputs.stream().map(DatasetVersionRow::getDatasetUuid).collect(Collectors.toList());
+      if (!outputUuids.isEmpty()) {
+        createDatasetDao().updateLastModifedAt(outputUuids, transitionedAt);
+      }
     } else if (runState.isStarting()) {
       runDao.updateStartState(runUuid, transitionedAt, runStateRow.getUuid());
     }
-    //    if (complete && outputVersionUuids != null && outputVersionUuids.size() > 0) {
-    //      createDatasetDao().updateLastModifedAt(outputVersionUuids, updateAt);
-    //    }
   }
 }
