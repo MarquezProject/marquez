@@ -5,6 +5,7 @@
     "docker:disable",
     ":gitSignOff"
   ],
+  "baseBranches": ["update-deps"],
   "lockFileMaintenance": { "enabled": true },
   "schedule": ["every weekend"]
 }
