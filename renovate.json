@@ -4,5 +4,6 @@
     "docker:disable",
     ":gitSignOff"
   ],
-  "lockFileMaintenance": { "enabled": true }
+  "lockFileMaintenance": { "enabled": true },
+  "schedule": ["every weekend"]
 }
