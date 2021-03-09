@@ -53,8 +53,6 @@ import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedRunRow;
-import marquez.db.models.NamespaceRow;
-import marquez.db.models.SourceRow;
 import marquez.db.models.StreamVersionRow;
 import marquez.db.models.TagRow;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
