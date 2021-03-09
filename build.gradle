@@ -21,7 +21,6 @@ buildscript {
     dependencies {
         classpath 'com.adarshr:gradle-test-logger-plugin:2.1.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
-        classpath 'gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.6.0'
         classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.11.0'
         classpath 'net.researchgate:gradle-release:2.8.1'
     }
@@ -35,12 +34,10 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'java'
     apply plugin: 'com.adarshr.test-logger'
     apply plugin: 'com.github.johnrengelman.shadow'
-    apply plugin: 'com.github.spotbugs'
     apply plugin: "com.diffplug.spotless"
     apply plugin: 'net.researchgate.release'
 
@@ -123,48 +120,6 @@ subprojects {
     }
 
     def reportsDir = "${buildDir}/reports";
-    def checkstyleDir = "${reportsDir}/checkstyle";
-
-    checkstyle {
-        toolVersion = '8.12'
-        configFile = rootProject.file('checkstyle.xml')
-    }
-
-    task checkstyle(type: Checkstyle) {
-        reports {
-            xml.enabled = true
-            html.enabled = true
-            html.destination = file(checkstyleDir)
-        }
-    }
-
-    checkstyleMain {
-        source = 'src/main/java'
-    }
-
-    checkstyleTest {
-        source = 'src/test/java'
-    }
-
-    spotbugsMain {
-        ignoreFailures = true
-        effort = 'max'
-        reportLevel = 'low'
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
-
-    spotbugsTest {
-        ignoreFailures = true
-        effort = 'max'
-        reportLevel = 'low'
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
 
     def coverageDir = "${reportsDir}/coverage";
 
