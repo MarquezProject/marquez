@@ -10,6 +10,10 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
 
+# Getting your changes approved
+
+Your PR must be approved and merged by a [committer](COMMITTERS.md).
+
 # Development
 
 To run the entire test suite:
