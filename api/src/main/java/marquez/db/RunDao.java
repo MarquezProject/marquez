@@ -85,7 +85,7 @@ public interface RunDao extends MarquezDao {
   @SqlQuery(
       SELECT_RUN
           + "WHERE r.namespace_name = :namespace and r.job_name = :jobName "
-          + "ORDER BY r.created_at DESC "
+          + "ORDER BY STARTED_AT DESC NULLS LAST "
           + "LIMIT :limit OFFSET :offset")
   List<ExtendedRunRow> findAll(String namespace, String jobName, int limit, int offset);
 

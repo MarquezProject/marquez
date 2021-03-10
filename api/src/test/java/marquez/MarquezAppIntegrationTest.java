@@ -612,6 +612,41 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(tags).containsExactlyInAnyOrder(PII, SENSITIVE);
   }
 
+  @Test
+  public void testApp_listRunOrder() {
+    // Create namespace for runs
+    final NamespaceMeta namespaceMeta =
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
+
+    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+
+    // Create job
+    String jobName = newJobName().getValue();
+    final JobMeta jobMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+    final Job job = client.createJob(NAMESPACE_NAME, jobName, jobMeta);
+
+    // create some runs to test ordering mechanics
+    final RunMeta runMeta = RunMeta.builder().build();
+    final Run run0 = client.createRun(NAMESPACE_NAME, jobName, runMeta);
+    final Run run1 = client.createRunAndStart(NAMESPACE_NAME, jobName, runMeta);
+    client.markRunAsCompleted(run1.getId());
+    final Run run2 = client.createRunAndStart(NAMESPACE_NAME, jobName, runMeta);
+
+    // assert that runs are in the correct order
+    List<Run> runs = client.listRuns(NAMESPACE_NAME, jobName);
+    assertThat(runs.get(0).getId()).isEqualTo(run2.getId());
+    assertThat(runs.get(1).getId()).isEqualTo(run1.getId());
+    assertThat(runs.get(2).getId()).isEqualTo(run0.getId());
+  }
+
   private static ImmutableSet<DatasetId> newDatasetIdsWith(
       final String namespaceName, final int limit) {
     return java.util.stream.Stream.generate(() -> newDatasetIdWith(namespaceName))
