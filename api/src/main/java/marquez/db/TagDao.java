@@ -16,6 +16,7 @@ package marquez.db;
 
 import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +34,13 @@ public interface TagDao {
       "INSERT INTO tags (uuid, created_at, updated_at, name, description) "
           + "VALUES (:uuid, :createdAt, :updatedAt, :name, :description)")
   void insert(@BindBean TagRow row);
+
+  @SqlQuery(
+      "INSERT INTO tags (uuid, created_at, updated_at, name) "
+          + "VALUES (:uuid, :updatedAt, :updatedAt, :name) "
+          + "ON CONFLICT(name) DO UPDATE SET updated_at = EXCLUDED.updated_at "
+          + "RETURNING *")
+  TagRow upsert(UUID uuid, Instant updatedAt, String name);
 
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM tags WHERE name = :name)")
   boolean exists(String name);

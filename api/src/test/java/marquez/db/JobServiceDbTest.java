@@ -31,8 +31,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.net.MalformedURLException;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -144,19 +144,9 @@ public class JobServiceDbTest {
   public void setup() {
     listener = mock(RunTransitionListener.class);
 
-    runService =
-        new RunService(
-            versionDao,
-            datasetDao,
-            runArgsDao,
-            runDao,
-            datasetVersionDao,
-            runStateDao,
-            Lists.newArrayList(listener));
+    runService = new RunService(versionDao, runDao, runStateDao, Lists.newArrayList(listener));
 
-    jobService =
-        new JobService(
-            namespaceDao, datasetDao, jobDao, versionDao, contextDao, runDao, runService);
+    jobService = new JobService(jobDao, runService);
 
     datasetService =
         new DatasetService(
@@ -166,6 +156,7 @@ public class JobServiceDbTest {
             datasetFieldDao,
             datasetVersionDao,
             tagDao,
+            runDao,
             runService);
 
     sourceService = new SourceService(sourceDao);
@@ -234,6 +225,8 @@ public class JobServiceDbTest {
         datasetVersionDao.findByRunId(run.getId().getValue());
     assertThat(out_ds_versions).hasSize(1);
 
+    runService.markRunAs(run.getId(), COMPLETED, Instant.now());
+
     Optional<ExtendedRunRow> run_row = runDao.findBy(run.getId().getValue());
     assertThat(run_row.isPresent()).isEqualTo(true);
     assertThat(run_row.get().getInputVersionUuids()).hasSize(1);
@@ -248,7 +241,7 @@ public class JobServiceDbTest {
   }
 
   @Test
-  public void testRun() throws MarquezServiceException, MalformedURLException {
+  public void testRun() throws MarquezServiceException {
     ArgumentCaptor<RunTransition> runTransitionArg = ArgumentCaptor.forClass(RunTransition.class);
     doNothing().when(listener).notify(runTransitionArg.capture());
     ArgumentCaptor<JobInputUpdate> jobInputUpdateArg =
@@ -280,13 +273,13 @@ public class JobServiceDbTest {
     assertThat(run.getId()).isNotNull();
     assertThat(run.getStartedAt().isPresent()).isFalse();
 
-    runService.markRunAs(run.getId(), RUNNING);
+    runService.markRunAs(run.getId(), RUNNING, Instant.now());
     Optional<Run> startedRun = runService.getRun(run.getId());
     assertThat(startedRun.isPresent()).isTrue();
     assertThat(startedRun.get().getStartedAt()).isNotNull();
     assertThat(startedRun.get().getEndedAt().isPresent()).isFalse();
 
-    runService.markRunAs(run.getId(), COMPLETED);
+    runService.markRunAs(run.getId(), COMPLETED, Instant.now());
     Optional<Run> endedRun = runService.getRun(run.getId());
     assertThat(endedRun.isPresent()).isTrue();
     assertThat(endedRun.get().getStartedAt()).isEqualTo(startedRun.get().getStartedAt());
@@ -321,8 +314,8 @@ public class JobServiceDbTest {
   }
 
   @Test
-  public void testRunWithId() throws MarquezServiceException, MalformedURLException {
-    JobName jobName = JobName.of("MY_JOB2");
+  public void testRunWithId() throws MarquezServiceException {
+    JobName jobName = JobName.of("MY_JOB2" + UUID.randomUUID());
     Job job =
         jobService.createOrUpdate(
             NAMESPACE_NAME,

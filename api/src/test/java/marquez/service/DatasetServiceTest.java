@@ -51,6 +51,7 @@ import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.NamespaceDao;
+import marquez.db.RunDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.db.models.DatasetFieldRow;
@@ -117,6 +118,7 @@ public class DatasetServiceTest {
   @Mock private DatasetFieldDao datasetFieldDao;
   @Mock private DatasetVersionDao datasetVersionDao;
   @Mock private TagDao tagDao;
+  @Mock private RunDao runDao;
   @Mock private RunService runService;
   private DatasetService datasetService;
 
@@ -130,6 +132,7 @@ public class DatasetServiceTest {
             datasetFieldDao,
             datasetVersionDao,
             tagDao,
+            runDao,
             runService);
   }
 
@@ -155,7 +158,6 @@ public class DatasetServiceTest {
 
     // Version
     final Version version = dbTableMeta.version(NAMESPACE_NAME, DB_TABLE_NAME);
-    when(datasetVersionDao.exists(version.getValue())).thenReturn(false);
 
     final DatasetVersionRow datasetVersionRow =
         newDatasetVersionRowWith(DATASET_ROW.getUuid(), version, NO_TAG_UUIDS, null);
@@ -178,17 +180,6 @@ public class DatasetServiceTest {
     assertThat(dbTable.getTags()).isEmpty();
     assertThat(dbTable.getLastModifiedAt()).isEmpty();
     assertThat(dbTable.getDescription()).isEqualTo(Optional.of(DB_TABLE_DESCRIPTION));
-
-    verify(namespaceDao, times(1)).findBy(NAMESPACE_NAME.getValue());
-    verify(sourceDao, times(1)).findBy(DB_TABLE_SOURCE_NAME.getValue());
-    verify(datasetDao, times(1)).exists(NAMESPACE_NAME.getValue(), DB_TABLE_NAME.getValue());
-    verify(datasetDao, times(2)).find(NAMESPACE_NAME.getValue(), DB_TABLE_NAME.getValue());
-    verify(datasetFieldDao, times(1))
-        .findAllIn(toArray(datasetVersionRow.getFieldUuids(), UUID.class));
-    verify(datasetVersionDao, times(1)).exists(version.getValue());
-    verify(datasetVersionDao, times(1))
-        .find(DATASET_ROW.getType(), DATASET_ROW.getCurrentVersionUuid().orElse(null));
-    verify(tagDao, times(1)).findAllIn(toArray(DATASET_ROW.getTagUuids(), UUID.class));
   }
 
   @Test

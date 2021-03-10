@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
@@ -146,12 +147,86 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testApp_createDbTable() {
+  public void testDatasetCustomTag() {
+    createNamespace(NAMESPACE_NAME);
+
+    String datasetName = "public.mytable";
+    Set<String> datasetTag = ImmutableSet.of("ANY_DATASET");
+    Set<String> fieldTag = ImmutableSet.of("ANY");
+    List<Field> fields =
+        ImmutableList.of(Field.builder().name("a").type("INTEGER").tags(fieldTag).build());
+    final DbTableMeta dbTableMeta =
+        DbTableMeta.builder()
+            .physicalName(datasetName)
+            .sourceName("my-source")
+            .fields(fields)
+            .tags(datasetTag)
+            .build();
+    client.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
+    Dataset dataset = client.getDataset(NAMESPACE_NAME, datasetName);
+    assertThat(dataset.getTags()).isEqualTo(datasetTag);
+    assertThat(dataset.getFields().get(0).getTags()).isEqualTo(fieldTag);
+  }
+
+  @Test
+  public void testDatasetFieldChange() {
+    createNamespace(NAMESPACE_NAME);
+    createSource("my-source");
+
+    String datasetName = "public.mytable";
+    List<Field> fields =
+        ImmutableList.of(
+            Field.builder().name("a").type("INTEGER").build(),
+            Field.builder().name("b").type("TIMESTAMP").build());
+    final DbTableMeta dbTableMeta =
+        DbTableMeta.builder()
+            .physicalName(datasetName)
+            .sourceName("my-source")
+            .fields(fields)
+            .build();
+
+    client.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
+    Dataset dataset = client.getDataset(NAMESPACE_NAME, datasetName);
+    assertThat(dataset.getFields()).isEqualTo(fields);
+
+    List<Field> newFields =
+        ImmutableList.of(
+            Field.builder().name("a").type("INTEGER").build(),
+            Field.builder().name("b-fix").type("STRING").build());
+
+    final DbTableMeta newDbTableMeta =
+        DbTableMeta.builder()
+            .physicalName(datasetName)
+            .sourceName("my-source")
+            .fields(newFields)
+            .build();
+
+    client.createDataset(NAMESPACE_NAME, datasetName, newDbTableMeta);
+    Dataset updatedDataset = client.getDataset(NAMESPACE_NAME, datasetName);
+    assertThat(updatedDataset.getFields()).isEqualTo(newFields);
+  }
+
+  private void createSource(String sourceName) {
+    final SourceMeta sourceMeta =
+        SourceMeta.builder()
+            .type(DB_TABLE_SOURCE_TYPE)
+            .connectionUrl(DB_TABLE_CONNECTION_URL)
+            .description(DB_TABLE_SOURCE_DESCRIPTION)
+            .build();
+    client.createSource(sourceName, sourceMeta);
+  }
+
+  private void createNamespace(String namespaceName) {
     // (1) Create namespace for db table
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+    client.createNamespace(namespaceName, namespaceMeta);
+  }
+
+  @Test
+  public void testApp_createDbTable() {
+    createNamespace(NAMESPACE_NAME);
 
     // (2) Create source for db table
     final SourceMeta sourceMeta =

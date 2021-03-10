@@ -14,6 +14,7 @@
 
 package marquez.service.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.Map;
@@ -39,6 +40,8 @@ public final class Run {
   @Nullable private final Instant endedAt;
   @Nullable private final Long durationMs;
   @Getter private final Map<String, String> args;
+  private final String namespaceName;
+  private final String jobName;
 
   public Run(
       @NonNull final RunId id,
@@ -50,7 +53,9 @@ public final class Run {
       @Nullable final Instant startedAt,
       @Nullable final Instant endedAt,
       @Nullable final Long durationMs,
-      @Nullable final Map<String, String> args) {
+      @Nullable final Map<String, String> args,
+      @NonNull String namespaceName,
+      @NonNull String jobName) {
     this.id = id;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -61,6 +66,8 @@ public final class Run {
     this.endedAt = endedAt;
     this.durationMs = durationMs;
     this.args = (args == null) ? ImmutableMap.of() : args;
+    this.namespaceName = namespaceName;
+    this.jobName = jobName;
   }
 
   public Optional<Instant> getNominalStartTime() {
@@ -81,5 +88,15 @@ public final class Run {
 
   public Optional<Long> getDurationMs() {
     return Optional.ofNullable(durationMs);
+  }
+
+  @JsonIgnore
+  public String getNamespaceName() {
+    return namespaceName;
+  }
+
+  @JsonIgnore
+  public String getJobName() {
+    return jobName;
   }
 }

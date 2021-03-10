@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +35,7 @@ import marquez.common.models.DatasetType;
 import marquez.common.models.DatasetVersionId;
 import marquez.common.models.Field;
 import marquez.common.models.FieldName;
+import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
@@ -45,17 +45,17 @@ import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.MarquezDao;
 import marquez.db.NamespaceDao;
+import marquez.db.RunDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.db.models.DatasetFieldRow;
-import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
-import marquez.db.models.NamespaceRow;
-import marquez.db.models.SourceRow;
+import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.StreamVersionRow;
 import marquez.db.models.TagRow;
+import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.mappers.Mapper;
 import marquez.service.models.Dataset;
@@ -66,14 +66,14 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 
 @Slf4j
 public class DatasetService {
-  private static final Counter datasets =
+  public static final Counter datasets =
       Counter.build()
           .namespace("marquez")
           .name("dataset_total")
           .labelNames("namespace_name", "dataset_type")
           .help("Total number of datasets.")
           .register();
-  private static final Counter versions =
+  public static final Counter versions =
       Counter.build()
           .namespace("marquez")
           .name("dataset_versions_total")
@@ -86,6 +86,7 @@ public class DatasetService {
   private final DatasetDao datasetDao;
   private final DatasetFieldDao datasetFieldDao;
   private final DatasetVersionDao datasetVersionDao;
+  private final RunDao runDao;
   private final TagDao tagDao;
 
   private final RunService runService;
@@ -98,6 +99,7 @@ public class DatasetService {
     this.datasetFieldDao = marquezDao.createDatasetFieldDao();
     this.datasetVersionDao = marquezDao.createDatasetVersionDao();
     this.tagDao = marquezDao.createTagDao();
+    this.runDao = marquezDao.createRunDao();
     this.runService = runService;
   }
 
@@ -108,6 +110,7 @@ public class DatasetService {
       @NonNull final DatasetFieldDao datasetFieldDao,
       @NonNull final DatasetVersionDao datasetVersionDao,
       @NonNull final TagDao tagDao,
+      @NonNull RunDao runDao,
       @NonNull final RunService runService) {
     this.namespaceDao = namespaceDao;
     this.sourceDao = sourceDao;
@@ -115,119 +118,36 @@ public class DatasetService {
     this.datasetFieldDao = datasetFieldDao;
     this.datasetVersionDao = datasetVersionDao;
     this.tagDao = tagDao;
+    this.runDao = runDao;
     this.runService = runService;
   }
 
   public Dataset createOrUpdate(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
-      @NonNull DatasetMeta datasetMeta)
-      throws MarquezServiceException {
-    try {
-      if (!exists(namespaceName, datasetName)) {
-        log.info(
-            "No dataset with name '{}' for namespace '{}' found, creating...",
-            datasetName.getValue(),
-            namespaceName.getValue());
-        final NamespaceRow namespaceRow = namespaceDao.findBy(namespaceName.getValue()).get();
-        final SourceRow sourceRow = sourceDao.findBy(datasetMeta.getSourceName().getValue()).get();
-        final List<UUID> tagUuids =
-            tagDao
-                .findAllIn(
-                    toArray(
-                        datasetMeta.getTags().stream()
-                            .map(TagName::getValue)
-                            .collect(toImmutableList()),
-                        String.class))
-                .stream()
-                .map(TagRow::getUuid)
-                .collect(toImmutableList());
-        final DatasetRow newDatasetRow =
-            Mapper.toDatasetRow(
-                namespaceRow.getUuid(), sourceRow.getUuid(), datasetName, datasetMeta, tagUuids);
-        datasetDao.insert(newDatasetRow);
-        log.info(
-            "Successfully created dataset '{}' for namespace '{}' with meta: {}",
-            datasetName.getValue(),
-            namespaceName.getValue(),
-            datasetMeta);
-        datasets.labels(namespaceName.getValue(), datasetMeta.getType().toString()).inc();
-      }
-      final Version version = datasetMeta.version(namespaceName, datasetName);
-      if (!datasetVersionDao.exists(version.getValue())) {
-        log.info(
-            "Creating version '{}' for dataset '{}'...",
-            version.getValue(),
-            datasetName.getValue());
-        final ExtendedDatasetRow datasetRow =
-            datasetDao.find(namespaceName.getValue(), datasetName.getValue()).get();
-        final List<DatasetFieldRow> fieldRows = datasetFieldDao.findAll(datasetRow.getUuid());
-        final List<DatasetFieldRow> newFieldRows =
-            datasetMeta.getFields().stream()
-                .map(field -> toDatasetFieldRow(datasetRow.getUuid(), field))
-                .collect(toImmutableList());
-        final List<DatasetFieldRow> newFieldRowsForVersion =
-            newFieldRows.stream()
-                .filter(
-                    newFieldRow ->
-                        fieldRows.stream()
-                            .noneMatch(
-                                fieldRow ->
-                                    newFieldRow.getName().equals(fieldRow.getName())
-                                        && newFieldRow.getType().equals(fieldRow.getType())))
-                .collect(toImmutableList());
-        final List<DatasetFieldRow> fieldRowsForVersion =
-            Stream.concat(
-                    fieldRows.stream()
-                        .filter(
-                            fieldRow ->
-                                newFieldRows.stream()
-                                    .noneMatch(
-                                        newFieldRow ->
-                                            newFieldRow.getName().equals(fieldRow.getName())
-                                                && !newFieldRow
-                                                    .getType()
-                                                    .equals(fieldRow.getType()))),
-                    newFieldRowsForVersion.stream())
-                .collect(toImmutableList());
-        final List<UUID> fieldUuids =
-            fieldRowsForVersion.stream().map(DatasetFieldRow::getUuid).collect(toImmutableList());
-        final DatasetVersionRow newVersionRow =
-            Mapper.toDatasetVersionRow(datasetRow.getUuid(), version, fieldUuids, datasetMeta);
-        datasetVersionDao.insertWith(newVersionRow, newFieldRowsForVersion);
-        log.info(
-            "Successfully created version '{}' for dataset '{}'.",
-            version.getValue(),
-            datasetName.getValue());
-        versions
-            .labels(
-                namespaceName.getValue(), datasetMeta.getType().toString(), datasetName.getValue())
-            .inc();
-      }
-      return get(namespaceName, datasetName).get();
-    } catch (UnableToExecuteStatementException e) {
-      log.error(
-          "Failed to create or update dataset '{}' for namespace '{}' with meta: {}",
-          datasetName.getValue(),
-          namespaceName.getValue(),
-          datasetMeta,
-          e);
-      throw new MarquezServiceException();
-    }
-  }
+      @NonNull DatasetMeta datasetMeta) {
+    if (datasetMeta.getRunId().isPresent()) {
+      UUID runUuid = datasetMeta.getRunId().get().getValue();
+      ExtendedRunRow runRow = runDao.findBy(runUuid).get();
 
-  /** Creates a {@link DatasetFieldRow} instance from the given {@link Field}. */
-  private DatasetFieldRow toDatasetFieldRow(@NonNull UUID datasetUuid, @NonNull Field field) {
-    final List<UUID> tagUuids =
-        tagDao
-            .findAllIn(
-                toArray(
-                    field.getTags().stream().map(TagName::getValue).collect(toImmutableList()),
-                    String.class))
-            .stream()
-            .map(TagRow::getUuid)
-            .collect(toImmutableList());
-    return Mapper.toDatasetFieldRow(datasetUuid, field, tagUuids);
+      List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findByRunId(runUuid);
+      runService.notify(
+          new JobOutputUpdate(
+              RunId.of(runRow.getUuid()),
+              null,
+              JobName.of(runRow.getJobName()),
+              NamespaceName.of(runRow.getNamespaceName()),
+              RunService.buildRunOutputs(outputs)));
+    }
+    log.info(
+        "Creating or updating dataset '{}' for namespace '{}' with meta: {}",
+        datasetName.getValue(),
+        namespaceName.getValue(),
+        datasetMeta);
+
+    datasetDao.upsertDatasetMeta(namespaceName.getValue(), datasetName.getValue(), datasetMeta);
+
+    return get(namespaceName, datasetName).get();
   }
 
   public boolean exists(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName)

@@ -114,15 +114,7 @@ public final class MarquezContext {
 
     this.namespaceService = new NamespaceService(namespaceDao, ownerDao, namespaceOwnershipDao);
     this.sourceService = new SourceService(sourceDao);
-    this.runService =
-        new RunService(
-            jobVersionDao,
-            datasetDao,
-            runArgsDao,
-            runDao,
-            datasetVersionDao,
-            runStateDao,
-            runTransitionListeners);
+    this.runService = new RunService(jobVersionDao, runDao, runStateDao, runTransitionListeners);
     this.datasetService =
         new DatasetService(
             namespaceDao,
@@ -131,11 +123,10 @@ public final class MarquezContext {
             datasetFieldDao,
             datasetVersionDao,
             tagDao,
+            runDao,
             runService);
 
-    this.jobService =
-        new JobService(
-            namespaceDao, datasetDao, jobDao, jobVersionDao, jobContextDao, runDao, runService);
+    this.jobService = new JobService(jobDao, runService);
     this.tagService = new TagService(tagDao);
     this.tagService.init(tags);
     this.openLineageService = new OpenLineageService(openLineageDao, runService, datasetVersionDao);
@@ -145,8 +136,8 @@ public final class MarquezContext {
     this.namespaceResource = new NamespaceResource(namespaceService);
     this.sourceResource = new SourceResource(sourceService);
     this.datasetResource =
-        new DatasetResource(namespaceService, datasetService, tagService, runService);
-    this.jobResource = new JobResource(namespaceService, jobService, runService);
+        new DatasetResource(namespaceService, datasetService, tagService, runService, sourceDao);
+    this.jobResource = new JobResource(namespaceService, jobService, runService, datasetDao);
     this.tagResource = new TagResource(tagService);
     this.openLineageResource = new OpenLineageResource(openLineageService);
 

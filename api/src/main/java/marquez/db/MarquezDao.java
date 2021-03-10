@@ -39,4 +39,7 @@ public interface MarquezDao extends SqlObject {
 
   @CreateSqlObject
   TagDao createTagDao();
+
+  @CreateSqlObject
+  StreamVersionDao createStreamVersionDao();
 }

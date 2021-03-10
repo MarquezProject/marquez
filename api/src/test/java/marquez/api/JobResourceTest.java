@@ -19,6 +19,7 @@ import static marquez.service.models.ModelGenerator.newRunState;
 import static marquez.service.models.ModelGenerator.newRunWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -40,6 +41,7 @@ import marquez.common.models.JobName;
 import marquez.common.models.ModelGenerator;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.db.DatasetDao;
 import marquez.service.JobService;
 import marquez.service.NamespaceService;
 import marquez.service.RunService;
@@ -79,12 +81,13 @@ public class JobResourceTest {
   @Mock private NamespaceService namespaceService;
   @Mock private JobService jobService;
   @Mock private RunService runService;
+  @Mock private DatasetDao datasetDao;
   private JobResource jobResource;
   private RunResource runResource;
 
   @Before
   public void setUp() {
-    jobResource = spy(new JobResource(namespaceService, jobService, runService));
+    jobResource = spy(new JobResource(namespaceService, jobService, runService, datasetDao));
     runResource = mock(RunResource.class);
     when(runService.runExists(RUN_ID)).thenReturn(true);
   }
@@ -96,6 +99,7 @@ public class JobResourceTest {
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
     when(jobService.createOrUpdate(NAMESPACE_NAME, JOB_NAME, jobMeta)).thenReturn(job);
+    when(datasetDao.exists(any(), any())).thenReturn(true);
 
     final Response response = jobResource.createOrUpdate(NAMESPACE_NAME, JOB_NAME, jobMeta);
     assertThat(response.getStatus()).isEqualTo(200);
@@ -158,7 +162,7 @@ public class JobResourceTest {
     final UriInfo uriInfo = mock(UriInfo.class);
 
     final RunMeta runMeta = newRunMeta();
-    final Run run = toRun(runMeta);
+    final Run run = toRun(runMeta, NAMESPACE_NAME, JOB_NAME);
     final URI runLocation = toRunLocation(NAMESPACE_NAME, JOB_NAME, run);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
@@ -179,7 +183,7 @@ public class JobResourceTest {
 
     final RunId newRunId = newRunId();
     final RunMeta runMeta = newRunMeta(newRunId);
-    final Run run = toRun(runMeta);
+    final Run run = toRun(runMeta, NAMESPACE_NAME, JOB_NAME);
     final URI runLocation = toRunLocation(NAMESPACE_NAME, JOB_NAME, run);
 
     when(namespaceService.exists(NAMESPACE_NAME)).thenReturn(true);
@@ -290,7 +294,7 @@ public class JobResourceTest {
   public void testMarkRunAsRunning() throws MarquezServiceException {
     when(runService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run running = newRunWith(RUN_ID, RUNNING, TRANSITIONED_AT);
+    final Run running = newRunWith(RUN_ID, RUNNING, TRANSITIONED_AT, NAMESPACE_NAME, JOB_NAME);
 
     when(runService.getRun(RUN_ID)).thenReturn(Optional.of(running));
 
@@ -305,7 +309,7 @@ public class JobResourceTest {
   public void testMarkRunAsCompleted() throws MarquezServiceException {
     when(runService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run completed = newRunWith(RUN_ID, COMPLETED, TRANSITIONED_AT);
+    final Run completed = newRunWith(RUN_ID, COMPLETED, TRANSITIONED_AT, NAMESPACE_NAME, JOB_NAME);
     doReturn(Response.ok(completed).build()).when(runResource).getRun();
     when(runService.getRun(RUN_ID)).thenReturn(Optional.of(completed));
     final Response response =
@@ -318,7 +322,7 @@ public class JobResourceTest {
   public void testMarkRunAsFailed() throws MarquezServiceException {
     when(runService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run failed = newRunWith(RUN_ID, FAILED, TRANSITIONED_AT);
+    final Run failed = newRunWith(RUN_ID, FAILED, TRANSITIONED_AT, NAMESPACE_NAME, JOB_NAME);
     doReturn(Response.ok(failed).build()).when(runResource).getRun();
     when(runService.getRun(RUN_ID)).thenReturn(Optional.of(failed));
 
@@ -331,7 +335,7 @@ public class JobResourceTest {
   public void testMarkRunAsAborted() throws MarquezServiceException {
     when(runService.runExists(RUN_ID)).thenReturn(true);
 
-    final Run aborted = newRunWith(RUN_ID, ABORTED, TRANSITIONED_AT);
+    final Run aborted = newRunWith(RUN_ID, ABORTED, TRANSITIONED_AT, NAMESPACE_NAME, JOB_NAME);
     doReturn(Response.ok(aborted).build()).when(runResource).getRun();
     when(runService.getRun(RUN_ID)).thenReturn(Optional.of(aborted));
 
@@ -356,7 +360,7 @@ public class JobResourceTest {
         null);
   }
 
-  static Run toRun(final RunMeta runMeta) {
+  static Run toRun(final RunMeta runMeta, NamespaceName namespaceName, JobName jobName) {
     final Instant now = newTimestamp();
     return new Run(
         runMeta.getId().orElseGet(ModelGenerator::newRunId),
@@ -368,7 +372,9 @@ public class JobResourceTest {
         null,
         null,
         null,
-        runMeta.getArgs());
+        runMeta.getArgs(),
+        namespaceName.getValue(),
+        jobName.getValue());
   }
 
   static URI toRunLocation(
