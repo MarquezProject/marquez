@@ -6,7 +6,7 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 * Join our [slack](http://bit.ly/MarquezSlack) channel and leave us feedback or help with answering questions from the community
 * Fix or [report](https://github.com/MarquezProject/marquez/issues/new) a bug
 * Fix or improve documentation
-* For newcomers, pick up a ["good first issue"](https://github.com/MarquezProject/marquez/labels/good%20first%20issue), then send a pull request our way (see the [resources](#resources) section for helpful links to get started)
+* For newcomers, pick up a ["good first issue"](https://github.com/MarquezProject/marquez/labels/good%20first%20issue), then send a pull request our way (see the [resources](#resources) section below for helpful links to get started)
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
 
@@ -26,7 +26,7 @@ $ ./gradlew :api:test --tests marquez.service.DatasetServiceTest
 $ ./gradlew :api:test --tests marquez.db.DatasetDaoTest
 ```
 
-Or run tests by category:  
+Or run tests by category:
 
 ```bash
 $ ./gradlew :api:testUnit         # run only unit tests
@@ -41,6 +41,20 @@ $ ./gradlew spotlessApply
 ```
 
 > **Note:** To make formatting code simple, we recommend installing a [plugin](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides) for your favorite IDE. We also us [Lombok](https://projectlombok.org). Though not required, you might want to install the [plugin](https://projectlombok.org/setup/overview) as well.
+
+# `.git/hooks`
+
+We use [`pre-commit`](https://pre-commit.com/index.html) to manage git hooks:
+
+```bash
+$ brew install pre-commit
+```
+
+To setup the git hook scripts run:
+
+```
+$ pre-commit install
+```
 
 # Publish to Local Maven Repository
 
@@ -81,15 +95,15 @@ To ensure your pull request is accepted, follow these guidelines:
   feature  Add or expand a feature
   bug      Fix a bug
   ```
-  
+
   _For example_:
-  
+
   ```
   feature/my-cool-new-feature
   bug/my-bug-fix
   bug/my-other-bug-fix
   ```
-  
+
 * Choose _short_ and _descriptive_ branch names
 * Use dashes (`-`) to separate _words_ in branch names
 * Use _lowercase_ in branch names
@@ -118,7 +132,7 @@ To bundle:
 $ redoc-cli bundle spec/openapi.yml -o docs/openapi.html  --title "Marquez API Reference"
 ```
 
-To serve:  
+To serve:
 
 ```bash
 $ redoc-cli serve spec/openapi.yml
