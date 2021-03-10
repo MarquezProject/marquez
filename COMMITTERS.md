@@ -22,3 +22,8 @@ contributions, we have a strong foundation to build on.
 
 | Name             | Email                       |
 | ---------------- | ----------------------------|
+
+# Becoming a Committer
+
+A Contributor may become a Committer by a majority approval of the
+existing Committers. (per the project [charter](file:///Users/julien/Downloads/Marquez%20Project%20Technical%20Charter%20Final_Adopted%2005.21.20.pdf) )
