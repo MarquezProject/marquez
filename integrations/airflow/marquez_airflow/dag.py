@@ -54,13 +54,8 @@ _EXTRACTORS = {
 
 
 class DAG(airflow.models.DAG, LoggingMixin):
-    _job_id_mapping = None
-    _marquez = None
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self._job_id_mapping = JobIdMapping()
 
     def create_dagrun(self, *args, **kwargs):
         # run Airflow's create_dagrun() first
@@ -101,7 +96,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                         execution_date,
                         self.following_schedule(execution_date))
                 ) for step in steps]
-                self._job_id_mapping.set(
+                JobIdMapping.set(
                     self._marquez_job_name(self.dag_id, task.task_id),
                     dagrun.run_id,
                     marquez_jobrun_ids)
@@ -143,7 +138,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
     def _report_task_instance(self, ti, dagrun, run_args, session):
         task = self.get_task(ti.task_id)
-        run_ids = self._job_id_mapping.pop(
+        run_ids = JobIdMapping.pop(
             self._marquez_job_name_from_ti(ti), dagrun.run_id, session)
         steps = self._extract_metadata(dagrun, task, ti)
 
