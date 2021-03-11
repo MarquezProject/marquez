@@ -10,7 +10,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 from uuid import uuid4
 
 import airflow.models
@@ -40,8 +39,6 @@ else:
     from airflow.utils.log.logging_mixin import LoggingMixin
 
 from marquez_airflow.marquez import Marquez
-
-log = logging.getLogger(__name__)
 
 
 class DAG(airflow.models.DAG, LoggingMixin):
@@ -226,7 +223,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
     def _get_extractor(self, task):
         extractor = self._extractors.get(task.__class__)
-        log.debug(f'extractor for {task.__class__} is {extractor}')
+        self.log.debug(f'extractor for {task.__class__} is {extractor}')
         return extractor
 
     def _timed_log_message(self, start_time):
@@ -248,8 +245,6 @@ class DAG(airflow.models.DAG, LoggingMixin):
             else:
                 return get_location(task.dag.fileloc)
         except Exception:
-            log.warning(f"Failed to get location for task '{task.task_id}'.",
-                        exc_info=True)
             return None
 
     @staticmethod
