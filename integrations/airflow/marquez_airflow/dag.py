@@ -40,6 +40,9 @@ else:
 
 from marquez_airflow.marquez import Marquez
 
+
+_MARQUEZ = Marquez()
+
 # TODO: Manually define operator->extractor mappings for now,
 # but we'll want to encapsulate this logic in an 'Extractors' class
 # with more convenient methods (ex: 'Extractors.extractor_for_task()')
@@ -58,7 +61,6 @@ class DAG(airflow.models.DAG, LoggingMixin):
         super().__init__(*args, **kwargs)
 
         self._job_id_mapping = JobIdMapping()
-        self._marquez = Marquez()
 
     def create_dagrun(self, *args, **kwargs):
         # run Airflow's create_dagrun() first
@@ -66,7 +68,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
         create_dag_start_ms = self._now_ms()
         try:
-            self._marquez.create_namespace()
+            _MARQUEZ.create_namespace()
             self._register_dagrun(
                 dagrun,
                 DagUtils.get_execution_date(**kwargs),
@@ -87,10 +89,10 @@ class DAG(airflow.models.DAG, LoggingMixin):
             t = self._now_ms()
             try:
                 steps = self._extract_metadata(dagrun, task)
-                [self._marquez.create_job(
+                [_MARQUEZ.create_job(
                     step, self._get_location(task), self.description)
                     for step in steps]
-                marquez_jobrun_ids = [self._marquez.create_run(
+                marquez_jobrun_ids = [_MARQUEZ.create_run(
                     self.new_run_id(),
                     step,
                     run_args,
@@ -114,7 +116,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
         try:
             dagrun = args[0]
             self.log.debug(f"handle_callback() dagrun : {dagrun}")
-            self._marquez.create_namespace()
+            _MARQUEZ.create_namespace()
             self._report_task_instances(
                 dagrun,
                 DagUtils.get_run_args(**kwargs),
@@ -148,10 +150,10 @@ class DAG(airflow.models.DAG, LoggingMixin):
         # Note: run_ids could be missing if it was removed from airflow
         # or the job could not be registered.
         if not run_ids:
-            [self._marquez.create_job(
+            [_MARQUEZ.create_job(
                 step, self._get_location(task), self.description)
              for step in steps]
-            run_ids = [self._marquez.create_run(
+            run_ids = [_MARQUEZ.create_run(
                 self.new_run_id(),
                 step,
                 run_args,
@@ -163,21 +165,21 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
         for step in steps:
             for run_id in run_ids:
-                self._marquez.create_job(
+                _MARQUEZ.create_job(
                     step, self._get_location(task), self.description,
                     ti.state, run_id)
-                self._marquez.start_run(
+                _MARQUEZ.start_run(
                     run_id,
                     DagUtils.to_iso_8601(ti.start_date))
 
                 self.log.debug(f'Setting task state: {ti.state}'
                                f' for {ti.task_id}')
                 if ti.state in {State.SUCCESS, State.SKIPPED}:
-                    self._marquez.complete_run(
+                    _MARQUEZ.complete_run(
                         run_id,
                         DagUtils.to_iso_8601(ti.end_date))
                 else:
-                    self._marquez.fail_run(
+                    _MARQUEZ.fail_run(
                         run_id,
                         DagUtils.to_iso_8601(ti.end_date))
 
