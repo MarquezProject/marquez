@@ -2,8 +2,8 @@
   "name": "marquez-ui",
   "version": "0.1.0",
   "main": "dist/index.js",
-  "author": "dataviz@wework.com",
-  "private": true,
+  "author": "peter@datakin.com",
+  "private": false,
   "license": "Apache-2.0",
   "scripts": {
     "dev": "webpack-dev-server --open --config webpack.dev.js",
