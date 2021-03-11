@@ -1,23 +1,18 @@
 package marquez.service;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static marquez.common.models.RunState.COMPLETED;
 import static marquez.common.models.RunState.NEW;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.ImmutableList;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.exceptions.RunNotFoundException;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetVersionId;
@@ -26,10 +21,9 @@ import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
+import marquez.db.BaseDao;
 import marquez.db.JobVersionDao;
 import marquez.db.JobVersionDao.JobVersionBag;
-import marquez.db.MarquezDao;
-import marquez.db.RunDao;
 import marquez.db.RunStateDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedRunRow;
@@ -40,68 +34,30 @@ import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.RunTransitionListener.RunInput;
 import marquez.service.RunTransitionListener.RunOutput;
 import marquez.service.RunTransitionListener.RunTransition;
-import marquez.service.exceptions.MarquezServiceException;
-import marquez.service.mappers.Mapper;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 
 @Slf4j
-public class RunService {
+public class RunService extends DelegatingDaos.DelegatingRunDao {
   private final JobVersionDao jobVersionDao;
-  private final RunDao runDao;
   private final RunStateDao runStateDao;
   private final Collection<RunTransitionListener> runTransitionListeners;
 
   public RunService(
-      @NonNull MarquezDao marquezDao, Collection<RunTransitionListener> runTransitionListeners) {
-    this.jobVersionDao = marquezDao.createJobVersionDao();
-    this.runDao = marquezDao.createRunDao();
-    this.runStateDao = marquezDao.createRunStateDao();
-    this.runTransitionListeners = runTransitionListeners;
-  }
-
-  public RunService(
-      JobVersionDao jobVersionDao,
-      RunDao runDao,
-      RunStateDao runStateDao,
-      Collection<RunTransitionListener> runTransitionListeners) {
-    this.jobVersionDao = jobVersionDao;
-    this.runDao = runDao;
-    this.runStateDao = runStateDao;
+      @NonNull BaseDao baseDao, Collection<RunTransitionListener> runTransitionListeners) {
+    super(baseDao.createRunDao());
+    this.jobVersionDao = baseDao.createJobVersionDao();
+    this.runStateDao = baseDao.createRunStateDao();
     this.runTransitionListeners = runTransitionListeners;
   }
 
   public Run createRun(
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta) {
     log.info("Creating run for job '{}'...", jobName.getValue());
-    RunRow runRow = runDao.upsertFromRun(namespaceName, jobName, runMeta, NEW);
+    RunRow runRow = upsertFromRun(namespaceName, jobName, runMeta, NEW);
     notify(new RunTransition(RunId.of(runRow.getUuid()), null, NEW));
 
-    return getRun(RunId.of(runRow.getUuid())).get();
-  }
-
-  public boolean runExists(@NonNull RunId runId) throws MarquezServiceException {
-    return runDao.exists(runId.getValue());
-  }
-
-  public ExtendedRunRow getRun(UUID runId) {
-    return runDao.findBy(runId).orElseThrow(() -> new RunNotFoundException(RunId.of(runId)));
-  }
-
-  public Optional<Run> getRun(RunId runId) throws MarquezServiceException {
-    return runDao.findBy(runId.getValue()).map(Mapper::toRun);
-  }
-
-  public ImmutableList<Run> getAllRunsFor(
-      @NonNull NamespaceName namespaceName, @NonNull JobName jobName, int limit, int offset)
-      throws MarquezServiceException {
-    checkArgument(limit >= 0, "limit must be >= 0");
-    checkArgument(offset >= 0, "offset must be >= 0");
-
-    final List<ExtendedRunRow> runRows =
-        runDao.findAll(namespaceName.getValue(), jobName.getValue(), limit, offset);
-    final List<Run> runs = Mapper.toRuns(runRows);
-    return ImmutableList.copyOf(runs);
+    return findBy(runRow.getUuid()).get();
   }
 
   public void markRunAs(
@@ -110,7 +66,7 @@ public class RunService {
     if (transitionedAt == null) {
       transitionedAt = Instant.now();
     }
-    ExtendedRunRow runRow = runDao.findBy(runId.getValue()).get();
+    ExtendedRunRow runRow = findByRow(runId.getValue()).get();
     runStateDao.updateRunState(runId.getValue(), runState, transitionedAt);
 
     if (runState == COMPLETED) {

@@ -23,36 +23,34 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
+import marquez.db.mappers.JobMapper;
 import marquez.db.mappers.JobRowMapper;
 import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
+import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
+import marquez.service.models.Run;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.postgresql.util.PGobject;
 
 @RegisterRowMapper(JobRowMapper.class)
-public interface JobDao extends MarquezDao {
+@RegisterRowMapper(JobMapper.class)
+public interface JobDao extends BaseDao {
   @SqlQuery(
       "SELECT EXISTS (SELECT 1 FROM jobs AS j "
           + "WHERE j.namespace_name= :namespaceName AND "
           + " j.name = :jobName)")
   boolean exists(String namespaceName, String jobName);
 
-  /**
-   * Updates the current version of the job
-   *
-   * @param rowUuid the jobs.uuid
-   * @param updatedAt when it was updated
-   * @param currentVersionUuid job_versions.uuid for the current version
-   */
   @SqlUpdate(
       "UPDATE jobs "
           + "SET updated_at = :updatedAt, "
@@ -60,23 +58,49 @@ public interface JobDao extends MarquezDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
+  String JOB_SELECT =
+      "SELECT j.*, jc.context "
+          + "FROM jobs AS j "
+          + "left outer join job_contexts jc on jc.uuid = j.current_job_context_uuid ";
+
+  @SqlQuery(JOB_SELECT + "WHERE j.namespace_name = :namespaceName AND " + "      j.name = :jobName")
+  Optional<Job> find(String namespaceName, String jobName);
+
+  default Optional<Job> findWithRun(String namespaceName, String jobName) {
+    Optional<Job> job = find(namespaceName, jobName);
+    job.ifPresent(
+        j -> {
+          Optional<Run> run = createRunDao().findByLatestJob(namespaceName, jobName);
+          run.ifPresent(j::setLatestRun);
+        });
+    return job;
+  }
+
   @SqlQuery(
       "SELECT j.*, n.name AS namespace_name FROM jobs AS j "
           + "INNER JOIN namespaces AS n "
           + "  ON (n.name = :namespaceName AND "
           + "      j.namespace_uuid = n.uuid AND "
           + "      j.name = :jobName)")
-  Optional<JobRow> find(String namespaceName, String jobName);
+  Optional<JobRow> findByRow(String namespaceName, String jobName);
 
   @SqlQuery(
-      "SELECT j.* FROM jobs AS j "
+      JOB_SELECT
           + "WHERE namespace_name = :namespaceName "
           + "ORDER BY j.name "
           + "LIMIT :limit OFFSET :offset")
-  List<JobRow> findAll(String namespaceName, int limit, int offset);
+  List<Job> findAll(String namespaceName, int limit, int offset);
 
-  @SqlQuery("SELECT COUNT(*) FROM jobs")
-  int count();
+  default List<Job> findAllWithRun(String namespaceName, int limit, int offset) {
+    RunDao runDao = createRunDao();
+    return findAll(namespaceName, limit, offset).stream()
+        .peek(
+            j ->
+                runDao
+                    .findByLatestJob(namespaceName, j.getName().getValue())
+                    .ifPresent(j::setLatestRun))
+        .collect(Collectors.toList());
+  }
 
   default JobRow upsert(
       NamespaceName namespaceName, JobName jobName, JobMeta jobMeta, ObjectMapper mapper) {

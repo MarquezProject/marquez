@@ -14,12 +14,14 @@
 
 package marquez.service.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -56,6 +58,7 @@ public abstract class Dataset {
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
+  private final Optional<UUID> currentVersionUuid;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -68,7 +71,8 @@ public abstract class Dataset {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable final Optional<UUID> currentVersionUuid) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -81,6 +85,7 @@ public abstract class Dataset {
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
+    this.currentVersionUuid = currentVersionUuid;
   }
 
   public Optional<Instant> getLastModifiedAt() {
@@ -89,5 +94,10 @@ public abstract class Dataset {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  @JsonIgnore
+  public Optional<UUID> getCurrentVersionUuid() {
+    return currentVersionUuid;
   }
 }

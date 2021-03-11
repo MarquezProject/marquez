@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
-import marquez.db.MapperUtils;
 import marquez.db.models.ExtendedJobVersionRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;

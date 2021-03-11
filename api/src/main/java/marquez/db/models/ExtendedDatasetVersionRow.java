@@ -15,7 +15,6 @@
 package marquez.db.models;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,11 +32,10 @@ public class ExtendedDatasetVersionRow extends DatasetVersionRow {
       @NonNull Instant createdAt,
       @NonNull UUID datasetUuid,
       @NonNull UUID version,
-      @NonNull List<UUID> fieldUuids,
       UUID runUuid,
       @NonNull final String namespaceName,
       @NonNull final String datasetName) {
-    super(uuid, createdAt, datasetUuid, version, fieldUuids, runUuid);
+    super(uuid, createdAt, datasetUuid, version, runUuid);
     this.namespaceName = namespaceName;
     this.datasetName = datasetName;
   }

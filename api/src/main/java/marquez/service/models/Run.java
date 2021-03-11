@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
@@ -38,7 +39,7 @@ public final class Run {
   @Getter private final RunState state;
   @Nullable private final Instant startedAt;
   @Nullable private final Instant endedAt;
-  @Nullable private final Long durationMs;
+  @Nullable @Setter private Long durationMs;
   @Getter private final Map<String, String> args;
   private final String namespaceName;
   private final String jobName;

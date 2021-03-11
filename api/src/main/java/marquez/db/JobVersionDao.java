@@ -42,14 +42,11 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(ExtendedJobVersionRowMapper.class)
-public interface JobVersionDao extends MarquezDao {
+public interface JobVersionDao extends BaseDao {
   enum IoType {
     INPUT,
     OUTPUT;
   }
-
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM job_versions WHERE version = :version)")
-  boolean exists(UUID version);
 
   @SqlUpdate(
       "UPDATE job_versions "
@@ -109,7 +106,7 @@ public interface JobVersionDao extends MarquezDao {
     JobVersionDao jobVersionDao = createJobVersionDao();
     JobDao jobDao = createJobDao();
     JobContextDao jobContextDao = createJobContextDao();
-    JobRow jobRow = jobDao.find(namespaceName, jobName).get();
+    JobRow jobRow = jobDao.findByRow(namespaceName, jobName).get();
     Optional<JobContextRow> jobContextRow = jobContextDao.findBy(jobRow.getJobContextUuid());
     Map context =
         jobContextRow
@@ -117,7 +114,7 @@ public interface JobVersionDao extends MarquezDao {
             .orElse(new HashMap<>());
     List<ExtendedDatasetVersionRow> inputs = datasetVersionDao.findInputsByRunId(runUuid);
     List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findByRunId(runUuid);
-    NamespaceRow namespaceRow = createNamespaceDao().findBy(jobRow.getNamespaceName()).get();
+    NamespaceRow namespaceRow = createNamespaceDao().findByRow(jobRow.getNamespaceName()).get();
 
     JobVersionRow jobVersion =
         jobVersionDao.upsert(
@@ -174,7 +171,7 @@ public interface JobVersionDao extends MarquezDao {
     return UUID.nameUUIDFromBytes(bytes);
   }
 
-  public static Stream<String> idToStream(ExtendedDatasetVersionRow dataset) {
+  static Stream<String> idToStream(ExtendedDatasetVersionRow dataset) {
     return Stream.of(dataset.getNamespaceName(), dataset.getDatasetName());
   }
 

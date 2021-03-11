@@ -15,31 +15,14 @@
 package marquez.db;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 import marquez.db.mappers.RunArgsRowMapper;
 import marquez.db.models.RunArgsRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(RunArgsRowMapper.class)
 public interface RunArgsDao {
-  @SqlUpdate(
-      "INSERT INTO run_args (uuid, created_at, args, checksum) "
-          + "VALUES (:uuid, :createdAt, :args, :checksum)")
-  void insert(@BindBean RunArgsRow row);
-
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM run_args WHERE checksum = :checksum)")
-  boolean exists(String checksum);
-
-  @SqlQuery("SELECT * FROM run_args WHERE checksum = :checksum")
-  Optional<RunArgsRow> findBy(String checksum);
-
-  @SqlQuery("SELECT COUNT(*) FROM run_args")
-  int count();
-
   @SqlQuery(
       "INSERT INTO run_args ( "
           + "uuid, "

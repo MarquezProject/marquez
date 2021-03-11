@@ -14,6 +14,7 @@
 
 package marquez.common.base;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
@@ -31,7 +32,11 @@ public class MorePreconditionsTest {
   private static final String EMPTY_STRING = "";
   private static final String NON_BLANK_STRING = "test string";
   private static final String NULL_STRING = null;
-  private static final String NON_NULL_STRING = NON_BLANK_STRING;
+
+  @Test
+  public void testNotBlank() {
+    assertThat(MorePreconditions.checkNotBlank(NON_BLANK_STRING)).isEqualTo(NON_BLANK_STRING);
+  }
 
   @Test
   public void testCheckNotBlank_throwsOnNullString_noErrorMessage() {

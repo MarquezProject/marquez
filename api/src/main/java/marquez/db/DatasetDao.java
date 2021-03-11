@@ -17,23 +17,24 @@ package marquez.db;
 import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
 
+import com.google.common.collect.ImmutableList;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.Value;
 import marquez.common.models.DatasetType;
 import marquez.common.models.TagName;
+import marquez.db.mappers.DatasetMapper;
 import marquez.db.mappers.DatasetRowMapper;
-import marquez.db.mappers.ExtendedDatasetRowMapper;
 import marquez.db.models.DatasetRow;
-import marquez.db.models.ExtendedDatasetRow;
+import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.TagRow;
 import marquez.service.DatasetService;
+import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -43,40 +44,9 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
-@RegisterRowMapper(ExtendedDatasetRowMapper.class)
 @RegisterRowMapper(DatasetRowMapper.class)
-public interface DatasetDao extends MarquezDao {
-  @Transaction
-  default void insert(DatasetRow row) {
-    insertDatasetRow(row);
-    // Tags
-    final Instant taggedAt = row.getCreatedAt();
-    row.getTagUuids().forEach(tagUuid -> updateTags(row.getUuid(), tagUuid, taggedAt));
-  }
-
-  @SqlUpdate(
-      "INSERT INTO datasets ("
-          + "uuid, "
-          + "type, "
-          + "created_at, "
-          + "updated_at, "
-          + "namespace_uuid, "
-          + "source_uuid, "
-          + "name, "
-          + "physical_name, "
-          + "description"
-          + ") VALUES ("
-          + ":uuid, "
-          + ":type, "
-          + ":createdAt, "
-          + ":updatedAt, "
-          + ":namespaceUuid, "
-          + ":sourceUuid, "
-          + ":name, "
-          + ":physicalName, "
-          + ":description)")
-  void insertDatasetRow(@BindBean DatasetRow row);
-
+@RegisterRowMapper(DatasetMapper.class)
+public interface DatasetDao extends BaseDao {
   @SqlQuery(
       "SELECT EXISTS ("
           + "SELECT 1 FROM datasets AS d "
@@ -84,12 +54,6 @@ public interface DatasetDao extends MarquezDao {
           + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
           + "WHERE d.name = :datasetName)")
   boolean exists(String namespaceName, String datasetName);
-
-  @SqlUpdate(
-      "INSERT INTO datasets_tag_mapping (dataset_uuid, tag_uuid, tagged_at) "
-          + "VALUES (:rowUuid, :tagUuid, :taggedAt) "
-          + "ON CONFLICT DO NOTHING")
-  void updateTags(UUID rowUuid, UUID tagUuid, Instant taggedAt);
 
   @SqlBatch(
       "INSERT INTO datasets_tag_mapping (dataset_uuid, tag_uuid, tagged_at) "
@@ -102,16 +66,9 @@ public interface DatasetDao extends MarquezDao {
           + "SET updated_at = :lastModifiedAt, "
           + "    last_modified_at = :lastModifiedAt "
           + "WHERE uuid IN (<rowUuids>)")
-  void updateLastModifedAt(
+  void updateLastModifiedAt(
       @BindList(onEmpty = NULL_STRING) List<UUID> rowUuids, Instant lastModifiedAt);
 
-  /**
-   * Updates the current version of the dataset
-   *
-   * @param rowUuid the datasets.uuid
-   * @param updatedAt when it was updated
-   * @param currentVersionUuid dataset_versions.uuid for the current version
-   */
   @SqlUpdate(
       "UPDATE datasets "
           + "SET updated_at = :updatedAt, "
@@ -119,48 +76,47 @@ public interface DatasetDao extends MarquezDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  static final String TAG_UUIDS =
+  String TAG_UUIDS =
       "ARRAY(SELECT tag_uuid "
           + "      FROM datasets_tag_mapping "
           + "      WHERE dataset_uuid = d.uuid) AS tag_uuids ";
 
-  static final String SELECT = "SELECT d.*, " + TAG_UUIDS + "FROM datasets AS d ";
+  String SELECT = "SELECT d.*, " + TAG_UUIDS + "FROM datasets AS d ";
 
-  static final String EXTENDED_SELECT =
-      "SELECT d.*, s.name AS source_name, n.name as namespace_name, "
-          + TAG_UUIDS
-          + "FROM datasets AS d "
-          + "INNER JOIN namespaces AS n "
-          + "  ON (n.uuid = d.namespace_uuid) "
-          + "INNER JOIN sources AS s "
-          + "  ON (s.uuid = d.source_uuid) ";
+  String DATASET_SELECT =
+      "select d.*, t_json.fields, ARRAY(select t.name from tags t\n"
+          + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
+          + "    where d.uuid = m.dataset_uuid) as tags,"
+          + "    sv.schema_location\n"
+          + "from datasets d\n"
+          + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n"
+          + "left outer join (\n"
+          + "    select fm.dataset_version_uuid, jsonb_agg((select x from (select f.name, f.type, f.description, t_agg.agg as tags) as x) ) as fields\n"
+          + "    from dataset_fields f\n"
+          + "    inner join dataset_versions_field_mapping fm on fm.dataset_field_uuid = f.uuid\n"
+          + "    left outer join (select m.dataset_field_uuid, jsonb_agg((select t.name)) agg\n"
+          + "        from dataset_fields_tag_mapping m\n"
+          + "        inner join tags t on m.tag_uuid = t.uuid\n"
+          + "        group by m.dataset_field_uuid\n"
+          + "        ) t_agg on t_agg.dataset_field_uuid = f.uuid\n"
+          + "    group by fm.dataset_version_uuid) t_json on t_json.dataset_version_uuid = d.current_version_uuid\n";
 
-  @SqlQuery(EXTENDED_SELECT + " WHERE d.uuid = :rowUuid")
-  Optional<ExtendedDatasetRow> findBy(UUID rowUuid);
+  @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
+  Optional<Dataset> find(String namespaceName, String datasetName);
 
-  @SqlQuery(EXTENDED_SELECT + "WHERE d.name = :datasetName AND n.name = :namespaceName")
-  Optional<ExtendedDatasetRow> find(String namespaceName, String datasetName);
-
-  @SqlQuery(EXTENDED_SELECT + " WHERE d.uuid IN (<rowUuids>)")
-  List<ExtendedDatasetRow> findAllIn(@BindList(onEmpty = NULL_STRING) Collection<UUID> rowUuids);
-
-  @SqlQuery(
-      SELECT
-          + " INNER JOIN namespaces AS n "
-          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
-          + "WHERE d.name IN (<datasetNames>)")
-  List<DatasetRow> findAllIn(
-      String namespaceName, @BindList(onEmpty = NULL_STRING) Collection<String> datasetNames);
+  @SqlQuery(SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
+  Optional<DatasetRow> findByRow(String namespaceName, String datasetName);
 
   @SqlQuery(
-      EXTENDED_SELECT
-          + "WHERE n.name = :namespaceName "
+      "SELECT uuid FROM datasets WHERE name = :datasetName AND namespace_name = :namespaceName")
+  Optional<UUID> getUuid(String namespaceName, String datasetName);
+
+  @SqlQuery(
+      DATASET_SELECT
+          + "WHERE d.namespace_name = :namespaceName "
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
-  List<ExtendedDatasetRow> findAll(String namespaceName, int limit, int offset);
-
-  @SqlQuery("SELECT COUNT(*) FROM datasets")
-  int count();
+  List<Dataset> findAll(String namespaceName, int limit, int offset);
 
   @SqlQuery(
       "INSERT INTO datasets ("
@@ -169,7 +125,9 @@ public interface DatasetDao extends MarquezDao {
           + "created_at, "
           + "updated_at, "
           + "namespace_uuid, "
+          + "namespace_name, "
           + "source_uuid, "
+          + "source_name, "
           + "name, "
           + "physical_name, "
           + "description "
@@ -179,7 +137,9 @@ public interface DatasetDao extends MarquezDao {
           + ":now, "
           + ":now, "
           + ":namespaceUuid, "
+          + ":namespaceName, "
           + ":sourceUuid, "
+          + ":sourceName, "
           + ":name, "
           + ":physicalName, "
           + ":description) "
@@ -187,7 +147,6 @@ public interface DatasetDao extends MarquezDao {
           + "DO UPDATE SET "
           + "type = EXCLUDED.type, "
           + "updated_at = EXCLUDED.updated_at, "
-          + "source_uuid = EXCLUDED.source_uuid, "
           + "physical_name = EXCLUDED.physical_name, "
           + "description = EXCLUDED.description "
           + "RETURNING *")
@@ -196,13 +155,15 @@ public interface DatasetDao extends MarquezDao {
       DatasetType type,
       Instant now,
       UUID namespaceUuid,
+      String namespaceName,
       UUID sourceUuid,
+      String sourceName,
       String name,
       String physicalName,
       String description);
 
   @Transaction
-  default void upsertDatasetMeta(
+  default Dataset upsertDatasetMeta(
       String namespaceName, String datasetName, DatasetMeta datasetMeta) {
     Instant now = Instant.now();
     NamespaceRow namespaceRow =
@@ -210,7 +171,11 @@ public interface DatasetDao extends MarquezDao {
     SourceRow sourceRow =
         createSourceDao()
             .upsertOrDefault(
-                UUID.randomUUID(), "POSTGRES", now, datasetMeta.getSourceName().getValue(), "");
+                UUID.randomUUID(),
+                toDefaultSourceType(datasetMeta.getType()),
+                now,
+                datasetMeta.getSourceName().getValue(),
+                "");
     UUID newDatasetUuid = UUID.randomUUID();
     DatasetRow datasetRow =
         upsert(
@@ -218,7 +183,9 @@ public interface DatasetDao extends MarquezDao {
             datasetMeta.getType(),
             now,
             namespaceRow.getUuid(),
+            namespaceRow.getName(),
             sourceRow.getUuid(),
+            sourceRow.getName(),
             datasetName,
             datasetMeta.getPhysicalName().getValue(),
             datasetMeta.getDescription().orElse(null));
@@ -233,8 +200,16 @@ public interface DatasetDao extends MarquezDao {
     }
     updateTagMapping(datasetTagMappings);
 
-    createDatasetVersionDao()
-        .upsertDatasetVersion(datasetRow.getUuid(), now, namespaceName, datasetName, datasetMeta);
+    DatasetVersionRow dvRow =
+        createDatasetVersionDao()
+            .upsertDatasetVersion(
+                datasetRow.getUuid(), now, namespaceName, datasetName, datasetMeta);
+
+    return find(namespaceName, datasetName).get();
+  }
+
+  default String toDefaultSourceType(DatasetType type) {
+    return "POSTGRES";
   }
 
   default void updateDatasetMetric(
@@ -242,6 +217,15 @@ public interface DatasetDao extends MarquezDao {
     if (newDatasetUuid != datasetUuid) {
       DatasetService.datasets.labels(namespaceName, type).inc();
     }
+  }
+
+  default Dataset updateTags(String namespaceName, String datasetName, String tagName) {
+    Instant now = Instant.now();
+    DatasetRow datasetRow = findByRow(namespaceName, datasetName).get();
+    TagRow tagRow = createTagDao().upsert(UUID.randomUUID(), now, tagName);
+    updateTagMapping(
+        ImmutableList.of(new DatasetTagMapping(datasetRow.getUuid(), tagRow.getUuid(), now)));
+    return find(namespaceName, datasetName).get();
   }
 
   @Value
