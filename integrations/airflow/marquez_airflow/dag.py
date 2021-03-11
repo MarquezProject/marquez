@@ -40,6 +40,15 @@ else:
 
 from marquez_airflow.marquez import Marquez
 
+# TODO: Manually define operator->extractor mappings for now,
+# but we'll want to encapsulate this logic in an 'Extractors' class
+# with more convenient methods (ex: 'Extractors.extractor_for_task()')
+_EXTRACTORS = {
+    PostgresOperator: PostgresExtractor,
+    BigQueryOperator: BigQueryExtractor
+    # Append new extractors here
+}
+
 
 class DAG(airflow.models.DAG, LoggingMixin):
     _job_id_mapping = None
@@ -50,17 +59,6 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
         self._job_id_mapping = JobIdMapping()
         self._marquez = Marquez()
-        # TODO: Manually define operator->extractor mappings for now,
-        # but we'll want to encapsulate this logic in an 'Extractors' class
-        # with more convenient methods (ex: 'Extractors.extractor_for_task()')
-        self._extractors = {
-            PostgresOperator: PostgresExtractor,
-            BigQueryOperator: BigQueryExtractor
-            # Append new extractors here
-        }
-        self.log.debug(
-            f"DAG successfully created with extractors: {self._extractors}"
-        )
 
     def create_dagrun(self, *args, **kwargs):
         # run Airflow's create_dagrun() first
@@ -222,7 +220,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
         return extractor(task).extract()
 
     def _get_extractor(self, task):
-        extractor = self._extractors.get(task.__class__)
+        extractor = _EXTRACTORS.get(task.__class__)
         self.log.debug(f'extractor for {task.__class__} is {extractor}')
         return extractor
 
