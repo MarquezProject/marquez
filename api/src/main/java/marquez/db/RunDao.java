@@ -19,6 +19,7 @@ import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.Utils;
@@ -199,13 +200,20 @@ public interface RunDao extends BaseDao {
 
     upsertRun(runUuid, jobRow.getName(), jobRow.getNamespaceName());
 
-    if (jobMeta.getInputs() != null) {
-      for (DatasetId datasetId : jobMeta.getInputs()) {
-        Optional<Dataset> datasetRow =
-            datasetDao.find(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
-        if (datasetRow.isPresent() && datasetRow.get().getCurrentVersionUuid().isPresent()) {
-          updateInputMapping(runUuid, datasetRow.get().getCurrentVersionUuid().get());
-        }
+    updateInputDatasetMapping(jobMeta.getInputs(), runUuid);
+  }
+
+  default void updateInputDatasetMapping(Set<DatasetId> inputs, UUID runUuid) {
+    if (inputs == null) {
+      return;
+    }
+    DatasetDao datasetDao = createDatasetDao();
+
+    for (DatasetId datasetId : inputs) {
+      Optional<Dataset> dataset =
+          datasetDao.find(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+      if (dataset.isPresent() && dataset.get().getCurrentVersionUuid().isPresent()) {
+        updateInputMapping(runUuid, dataset.get().getCurrentVersionUuid().get());
       }
     }
   }
@@ -252,6 +260,8 @@ public interface RunDao extends BaseDao {
             namespaceRow.getName(),
             jobName.getValue(),
             jobRow.getLocation());
+
+    updateInputDatasetMapping(jobRow.getInputs(), uuid);
 
     createRunStateDao().updateRunState(uuid, currentState, now);
 
