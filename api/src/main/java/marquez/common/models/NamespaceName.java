@@ -33,7 +33,7 @@ public final class NamespaceName {
   private static final int MIN_SIZE = 1;
   private static final int MAX_SIZE = 1024;
   private static final Pattern PATTERN =
-      Pattern.compile(String.format("^[a-zA-Z0-9_\\-\\.]{%d,%d}$", MIN_SIZE, MAX_SIZE));
+      Pattern.compile(String.format("^[a-zA-Z:/0-9_\\-\\.]{%d,%d}$", MIN_SIZE, MAX_SIZE));
 
   @Getter private final String value;
 
