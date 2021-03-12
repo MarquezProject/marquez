@@ -61,8 +61,9 @@ public final class JobMapper implements RowMapper<Job> {
         urlOrNull(results, "current_location"),
         toContext(results, Columns.CONTEXT),
         stringOrNull(results, Columns.DESCRIPTION),
-        null // toRun(results, "run")
-        );
+        // Latest Run is resolved in the JobDao. This can be brought in via a join and
+        //  and a jsonb but custom deserializers will need to be introduced
+        null);
   }
 
   private ImmutableMap<String, String> toContext(ResultSet results, String column)

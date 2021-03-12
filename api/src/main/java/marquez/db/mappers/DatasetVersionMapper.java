@@ -82,7 +82,7 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               stringOrNull(results, Columns.DESCRIPTION),
               null);
     }
-
+    // The createdByRun can be brought in via join, similar to the JobMapper
     datasetVersion.setCreatedByRunUuid(uuidOrNull(results, "createdByRunUuid"));
     return datasetVersion;
   }
