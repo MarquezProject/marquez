@@ -15,14 +15,20 @@
 package marquez.db;
 
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PGInterval;
 
+@Slf4j
 public final class Columns {
   private Columns() {}
 
@@ -187,5 +193,31 @@ public final class Columns {
       throw new IllegalArgumentException();
     }
     return Arrays.asList((String[]) results.getArray(column).getArray());
+  }
+
+  public static URI uriOrNull(ResultSet results, String column) {
+    try {
+      String result = stringOrNull(results, column);
+      if (result == null) {
+        return null;
+      }
+      return new URI(result);
+    } catch (URISyntaxException | SQLException e) {
+      log.error("Could not read source URI", e);
+      return null;
+    }
+  }
+
+  public static URL urlOrNull(ResultSet results, String column) {
+    try {
+      String result = stringOrNull(results, column);
+      if (result == null) {
+        return null;
+      }
+      return new URL(result);
+    } catch (SQLException | MalformedURLException e) {
+      log.error("Could not read source URI", e);
+      return null;
+    }
   }
 }

@@ -144,4 +144,8 @@ public final class ModelGenerator extends Generator {
   public static String newDescription() {
     return "test_description" + newId();
   }
+
+  public static URL newSchemaLocation() {
+    return Utils.toUrl("http://localhost:8081/schemas/ids/" + newId());
+  }
 }

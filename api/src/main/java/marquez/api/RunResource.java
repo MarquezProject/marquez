@@ -21,7 +21,6 @@ import marquez.common.Utils;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.service.RunService;
-import marquez.service.exceptions.MarquezServiceException;
 import marquez.service.models.Run;
 
 public class RunResource {
@@ -40,8 +39,9 @@ public class RunResource {
   @GET
   @Path("/")
   @Produces(APPLICATION_JSON)
-  public Response getRun() throws MarquezServiceException {
-    final Run run = runService.getRun(runId).orElseThrow(() -> new RunNotFoundException(runId));
+  public Response getRun() {
+    final Run run =
+        runService.findBy(runId.getValue()).orElseThrow(() -> new RunNotFoundException(runId));
     return Response.ok(run).build();
   }
 
@@ -51,8 +51,7 @@ public class RunResource {
   @POST
   @Path("start")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsRunning(@QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
+  public Response markRunAsRunning(@QueryParam("at") String atAsIso) {
     return markRunAs(RUNNING, atAsIso);
   }
 
@@ -62,8 +61,7 @@ public class RunResource {
   @POST
   @Path("complete")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsCompleted(@QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
+  public Response markRunAsCompleted(@QueryParam("at") String atAsIso) {
     return markRunAs(COMPLETED, atAsIso);
   }
 
@@ -73,7 +71,7 @@ public class RunResource {
   @POST
   @Path("fail")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsFailed(@QueryParam("at") String atAsIso) throws MarquezServiceException {
+  public Response markRunAsFailed(@QueryParam("at") String atAsIso) {
     return markRunAs(FAILED, atAsIso);
   }
 
@@ -83,8 +81,7 @@ public class RunResource {
   @POST
   @Path("abort")
   @Produces(APPLICATION_JSON)
-  public Response markRunAsAborted(@QueryParam("at") String atAsIso)
-      throws MarquezServiceException {
+  public Response markRunAsAborted(@QueryParam("at") String atAsIso) {
     return markRunAs(ABORTED, atAsIso);
   }
 

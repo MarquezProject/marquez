@@ -19,6 +19,8 @@ import static marquez.common.models.DatasetType.DB_TABLE;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -41,7 +43,8 @@ public final class DbTable extends Dataset {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable final Optional<UUID> currentVersionUuid) {
     super(
         id,
         DB_TABLE,
@@ -53,6 +56,7 @@ public final class DbTable extends Dataset {
         fields,
         tags,
         lastModifiedAt,
-        description);
+        description,
+        currentVersionUuid);
   }
 }

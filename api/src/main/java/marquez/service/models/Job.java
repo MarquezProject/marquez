@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
@@ -44,7 +45,7 @@ public final class Job {
   @Nullable private final URL location;
   @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
-  @Nullable private final Run latestRun;
+  @Nullable @Setter private Run latestRun;
 
   public Job(
       @NonNull final JobId id,

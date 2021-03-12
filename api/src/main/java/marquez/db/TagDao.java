@@ -14,27 +14,19 @@
 
 package marquez.db;
 
-import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
-
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import marquez.db.mappers.TagMapper;
 import marquez.db.mappers.TagRowMapper;
 import marquez.db.models.TagRow;
+import marquez.service.models.Tag;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(TagRowMapper.class)
+@RegisterRowMapper(TagMapper.class)
 public interface TagDao {
-  @SqlUpdate(
-      "INSERT INTO tags (uuid, created_at, updated_at, name, description) "
-          + "VALUES (:uuid, :createdAt, :updatedAt, :name, :description)")
-  void insert(@BindBean TagRow row);
-
   @SqlQuery(
       "INSERT INTO tags (uuid, created_at, updated_at, name) "
           + "VALUES (:uuid, :updatedAt, :updatedAt, :name) "
@@ -42,24 +34,29 @@ public interface TagDao {
           + "RETURNING *")
   TagRow upsert(UUID uuid, Instant updatedAt, String name);
 
+  @SqlQuery(
+      "INSERT INTO tags (uuid, created_at, updated_at, name, description) "
+          + "VALUES (:uuid, :updatedAt, :updatedAt, :name, :description) "
+          + "ON CONFLICT(name) DO UPDATE SET updated_at = EXCLUDED.updated_at "
+          + "RETURNING *")
+  TagRow upsert(UUID uuid, Instant updatedAt, String name, String description);
+
+  default Tag upsert(Tag tag) {
+    Instant now = Instant.now();
+    if (tag.getDescription().isPresent()) {
+      upsert(UUID.randomUUID(), now, tag.getName().getValue(), tag.getDescription().get());
+    } else {
+      upsert(UUID.randomUUID(), now, tag.getName().getValue());
+    }
+    return find(tag.getName().getValue());
+  }
+
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM tags WHERE name = :name)")
   boolean exists(String name);
 
-  @SqlQuery("SELECT * FROM tags WHERE uuid = :rowUuid")
-  Optional<TagRow> findBy(UUID rowUuid);
-
   @SqlQuery("SELECT * FROM tags WHERE name = :name")
-  Optional<TagRow> findBy(String name);
-
-  @SqlQuery("SELECT * FROM tags WHERE uuid IN (<rowUuids>)")
-  List<TagRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... rowUuids);
-
-  @SqlQuery("SELECT * FROM tags WHERE name IN (<names>)")
-  List<TagRow> findAllIn(@BindList(onEmpty = NULL_STRING) String... names);
+  Tag find(String name);
 
   @SqlQuery("SELECT * FROM tags ORDER BY name LIMIT :limit OFFSET :offset")
-  List<TagRow> findAll(int limit, int offset);
-
-  @SqlQuery("SELECT COUNT(*) FROM tags")
-  int count();
+  Set<Tag> findAll(int limit, int offset);
 }

@@ -14,30 +14,12 @@
 
 package marquez.db;
 
-import java.util.Optional;
 import java.util.UUID;
-import marquez.db.mappers.StreamVersionRowMapper;
-import marquez.db.models.StreamVersionRow;
-import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-@RegisterRowMapper(StreamVersionRowMapper.class)
 public interface StreamVersionDao {
   @SqlUpdate(
       "INSERT INTO stream_versions (dataset_version_uuid, schema_location) "
           + "VALUES (:datasetVersionUuid, :schemaLocation)")
   void insert(UUID datasetVersionUuid, String schemaLocation);
-
-  @SqlQuery(
-      "SELECT dv.*, sv.*, "
-          + "ARRAY(SELECT dataset_field_uuid "
-          + "      FROM dataset_versions_field_mapping "
-          + "      WHERE dataset_version_uuid = dv.uuid) AS field_uuids "
-          + "FROM dataset_versions AS dv, stream_versions AS sv "
-          + "WHERE dv.uuid = :uuid AND sv.dataset_version_uuid = dv.uuid")
-  Optional<StreamVersionRow> findBy(UUID uuid);
-
-  @SqlQuery("SELECT COUNT(*) FROM stream_versions")
-  int count();
 }

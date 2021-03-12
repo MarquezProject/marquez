@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.db.Columns;
-import marquez.db.MapperUtils;
 import marquez.db.models.JobRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;

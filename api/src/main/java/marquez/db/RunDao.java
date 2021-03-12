@@ -28,13 +28,15 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.db.mappers.ExtendedRunRowMapper;
-import marquez.db.models.ExtendedDatasetRow;
+import marquez.db.mappers.RunMapper;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
+import marquez.service.models.Dataset;
 import marquez.service.models.JobMeta;
+import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -42,7 +44,8 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(ExtendedRunRowMapper.class)
-public interface RunDao extends MarquezDao {
+@RegisterRowMapper(RunMapper.class)
+public interface RunDao extends BaseDao {
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM runs WHERE uuid = :rowUuid)")
   boolean exists(UUID rowUuid);
 
@@ -70,27 +73,23 @@ public interface RunDao extends MarquezDao {
           + "WHERE uuid = :rowUuid")
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
-  static final String SELECT_RUN =
-      "SELECT r.*, ra.args, r.started_at, r.ended_at, "
-          + "ARRAY(SELECT dataset_version_uuid "
-          + "      FROM runs_input_mapping "
-          + "      WHERE run_uuid = r.uuid) AS input_version_uuids "
+  String SELECT_RUN =
+      "SELECT r.*, ra.args, r.started_at, r.ended_at, ra.args "
           + "FROM runs AS r "
-          + "INNER JOIN run_args AS ra"
-          + "  ON (ra.uuid = r.run_args_uuid) ";
+          + "LEFT OUTER JOIN run_args AS ra ON (ra.uuid = r.run_args_uuid) ";
 
   @SqlQuery(SELECT_RUN + " WHERE r.uuid = :rowUuid")
-  Optional<ExtendedRunRow> findBy(UUID rowUuid);
+  Optional<Run> findBy(UUID rowUuid);
+
+  @SqlQuery(SELECT_RUN + " WHERE r.uuid = :rowUuid")
+  Optional<ExtendedRunRow> findByRow(UUID rowUuid);
 
   @SqlQuery(
       SELECT_RUN
           + "WHERE r.namespace_name = :namespace and r.job_name = :jobName "
           + "ORDER BY STARTED_AT DESC NULLS LAST "
           + "LIMIT :limit OFFSET :offset")
-  List<ExtendedRunRow> findAll(String namespace, String jobName, int limit, int offset);
-
-  @SqlQuery("SELECT COUNT(*) FROM runs")
-  int count();
+  List<Run> findAll(String namespace, String jobName, int limit, int offset);
 
   @SqlQuery(
       "INSERT INTO runs ( "
@@ -202,7 +201,7 @@ public interface RunDao extends MarquezDao {
 
     if (jobMeta.getInputs() != null) {
       for (DatasetId datasetId : jobMeta.getInputs()) {
-        Optional<ExtendedDatasetRow> datasetRow =
+        Optional<Dataset> datasetRow =
             datasetDao.find(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
         if (datasetRow.isPresent() && datasetRow.get().getCurrentVersionUuid().isPresent()) {
           updateInputMapping(runUuid, datasetRow.get().getCurrentVersionUuid().get());
@@ -235,7 +234,7 @@ public interface RunDao extends MarquezDao {
                 Utils.toJson(runMeta.getArgs()),
                 Utils.checksumFor(runMeta.getArgs()));
 
-    JobRow jobRow = createJobDao().find(namespaceName.getValue(), jobName.getValue()).get();
+    JobRow jobRow = createJobDao().findByRow(namespaceName.getValue(), jobName.getValue()).get();
 
     UUID uuid = runMeta.getId().map(RunId::getValue).orElse(UUID.randomUUID());
 
@@ -259,11 +258,12 @@ public interface RunDao extends MarquezDao {
     return runRow;
   }
 
-  @SqlQuery(
-      SELECT_RUN
-          + " WHERE r.job_name = :jobName AND r.namespace_name = :namespaceName ORDER by created_at DESC LIMIT 1")
-  Optional<ExtendedRunRow> findLatestRunForJob(String jobName, String namespaceName);
-
   @SqlUpdate("UPDATE runs " + "SET job_version_uuid = :jobVersionUuid " + "WHERE uuid = :runUuid")
   void updateJobVersion(UUID runUuid, UUID jobVersionUuid);
+
+  @SqlQuery(
+      SELECT_RUN
+          + "where r.job_name = :jobName and r.namespace_name = :namespaceName "
+          + "order by updated_at desc limit 1")
+  Optional<Run> findByLatestJob(String namespaceName, String jobName);
 }

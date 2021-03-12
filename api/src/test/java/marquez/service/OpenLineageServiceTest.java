@@ -18,14 +18,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import marquez.DataAccessTests;
 import marquez.IntegrationTests;
 import marquez.JdbiRuleInit;
 import marquez.common.Utils;
-import marquez.common.models.DatasetName;
-import marquez.common.models.JobName;
-import marquez.common.models.NamespaceName;
-import marquez.common.models.RunId;
 import marquez.db.DatasetVersionDao;
 import marquez.db.OpenLineageDao;
 import marquez.service.RunTransitionListener.JobInputUpdate;
@@ -47,7 +42,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.ArgumentCaptor;
 
 @RunWith(Parameterized.class)
-@Category({DataAccessTests.class, IntegrationTests.class})
+@Category({IntegrationTests.class})
 public class OpenLineageServiceTest {
   @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
   private RunService runService;
@@ -127,7 +122,7 @@ public class OpenLineageServiceTest {
     doNothing().when(runService).notify(runInputListener.capture());
     runOutputListener = ArgumentCaptor.forClass(JobOutputUpdate.class);
     doNothing().when(runService).notify(runOutputListener.capture());
-    lineageService = new OpenLineageService(openLineageDao, runService, datasetVersionDao);
+    lineageService = new OpenLineageService(openLineageDao, runService);
 
     List<LineageEvent> eventList = new ArrayList<>();
     for (URI event : events) {
@@ -175,14 +170,13 @@ public class OpenLineageServiceTest {
     JobService jobService = new JobService(openLineageDao, runService);
     LineageEvent event = eventList.get(eventList.size() - 1);
     Optional<Job> job =
-        jobService.get(
-            NamespaceName.of(openLineageDao.formatNamespaceName(event.getJob().getNamespace())),
-            JobName.of(event.getJob().getName()));
+        jobService.findWithRun(
+            openLineageDao.formatNamespaceName(event.getJob().getNamespace()),
+            event.getJob().getName());
     assertTrue("Job does not exist: " + event.getJob().getName(), job.isPresent());
 
     RunService runService = new RunService(openLineageDao, new ArrayList());
-    Optional<Run> run =
-        runService.getRun(RunId.of(openLineageDao.runToUuid(event.getRun().getRunId())));
+    Optional<Run> run = runService.findBy(openLineageDao.runToUuid(event.getRun().getRunId()));
     assertTrue("Should have run", run.isPresent());
 
     if (event.getInputs() != null) {
@@ -201,9 +195,9 @@ public class OpenLineageServiceTest {
     DatasetService datasetService = new DatasetService(openLineageDao, runService);
 
     Optional<Dataset> dataset =
-        datasetService.get(
-            NamespaceName.of(openLineageDao.formatNamespaceName(ds.getNamespace())),
-            DatasetName.of(openLineageDao.formatDatasetName(ds.getName())));
+        datasetService.find(
+            openLineageDao.formatNamespaceName(ds.getNamespace()),
+            openLineageDao.formatDatasetName(ds.getName()));
     assertTrue("Dataset does not exist: " + ds, dataset.isPresent());
   }
 

@@ -16,7 +16,6 @@ package marquez.db;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import marquez.common.models.RunState;
@@ -29,13 +28,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(RunStateRowMapper.class)
-public interface RunStateDao extends MarquezDao {
-  @SqlQuery("SELECT * FROM run_states WHERE uuid = :rowUuid")
-  Optional<RunStateRow> findBy(UUID rowUuid);
-
-  @SqlQuery("SELECT COUNT(*) FROM run_states")
-  int count();
-
+public interface RunStateDao extends BaseDao {
   @SqlQuery(
       "INSERT INTO run_states (uuid, transitioned_at, run_uuid, state)"
           + "VALUES (:uuid, :now, :runUuid, :runStateType) RETURNING *")
@@ -52,7 +45,7 @@ public interface RunStateDao extends MarquezDao {
       List<UUID> outputUuids =
           outputs.stream().map(DatasetVersionRow::getDatasetUuid).collect(Collectors.toList());
       if (!outputUuids.isEmpty()) {
-        createDatasetDao().updateLastModifedAt(outputUuids, transitionedAt);
+        createDatasetDao().updateLastModifiedAt(outputUuids, transitionedAt);
       }
     } else if (runState.isStarting()) {
       runDao.updateStartState(runUuid, transitionedAt, runStateRow.getUuid());

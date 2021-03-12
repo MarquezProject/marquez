@@ -49,7 +49,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
 
-public interface OpenLineageDao extends MarquezDao {
+public interface OpenLineageDao extends BaseDao {
   public String DEFAULT_SOURCE_NAME = "default";
   public String DEFAULT_NAMESPACE_OWNER = "anonymous";
 
@@ -351,7 +351,9 @@ public interface OpenLineageDao extends MarquezDao {
             getDatasetType(ds),
             now,
             datasetNamespace.getUuid(),
+            datasetNamespace.getName(),
             source.getUuid(),
+            source.getName(),
             formatDatasetName(ds.getName()),
             ds.getName(),
             dsDescription);

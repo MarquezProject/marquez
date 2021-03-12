@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Joiner;
@@ -70,14 +69,6 @@ public final class Utils {
   }
 
   public static <T> T fromJson(@NonNull final String json, @NonNull final TypeReference<T> type) {
-    try {
-      return MAPPER.readValue(json, type);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
-  public static <T> T fromJson(@NonNull final String json, @NonNull final JavaType type) {
     try {
       return MAPPER.readValue(json, type);
     } catch (IOException e) {

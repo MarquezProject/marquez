@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
@@ -17,8 +18,8 @@ import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.db.BaseDao;
 import marquez.db.DatasetVersionDao;
-import marquez.db.OpenLineageDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
@@ -31,22 +32,21 @@ import marquez.service.models.LineageEvent;
 import marquez.service.models.RunMeta;
 
 @Slf4j
-public class OpenLineageService {
-  private final OpenLineageDao openLineageDao;
+public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao {
   private final RunService runService;
   private final DatasetVersionDao datasetVersionDao;
   private final ObjectMapper mapper = Utils.newObjectMapper();
 
-  public OpenLineageService(
-      OpenLineageDao openLineageDao, RunService runService, DatasetVersionDao datasetVersionDao) {
-    this.openLineageDao = openLineageDao;
+  public OpenLineageService(BaseDao baseDao, RunService runService) {
+    super(baseDao.createOpenLineageDao());
     this.runService = runService;
-    this.datasetVersionDao = datasetVersionDao;
+    this.datasetVersionDao = baseDao.createDatasetVersionDao();
   }
 
   public CompletableFuture<Void> createAsync(LineageEvent event) {
     CompletableFuture marquez =
-        CompletableFuture.supplyAsync(() -> openLineageDao.updateMarquezModel(event, mapper))
+        CompletableFuture.supplyAsync(
+                () -> updateMarquezModel(event, mapper), ForkJoinPool.commonPool())
             .thenAccept(
                 (update) -> {
                   if (event.getEventType() != null) {
@@ -58,14 +58,15 @@ public class OpenLineageService {
     CompletableFuture openLineage =
         CompletableFuture.runAsync(
             () ->
-                openLineageDao.createLineageEvent(
+                createLineageEvent(
                     event.getEventType() == null ? "" : event.getEventType(),
                     event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
                     event.getRun().getRunId(),
                     event.getJob().getName(),
                     event.getJob().getNamespace(),
-                    openLineageDao.createJsonArray(event, mapper),
-                    event.getProducer()));
+                    createJsonArray(event, mapper),
+                    event.getProducer()),
+            ForkJoinPool.commonPool());
 
     return CompletableFuture.allOf(marquez, openLineage);
   }

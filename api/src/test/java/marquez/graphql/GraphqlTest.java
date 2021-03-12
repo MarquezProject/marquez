@@ -10,7 +10,6 @@ import io.dropwizard.util.Resources;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import marquez.DataAccessTests;
 import marquez.IntegrationTests;
 import marquez.JdbiRuleInit;
 import marquez.common.Utils;
@@ -25,7 +24,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-@Category({DataAccessTests.class, IntegrationTests.class})
+@Category({IntegrationTests.class})
 public class GraphqlTest {
   @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
   private static GraphQL graphQL;
@@ -40,9 +39,7 @@ public class GraphqlTest {
         Utils.newObjectMapper()
             .readValue(Resources.getResource("open_lineage/event_simple.json"), LineageEvent.class);
 
-    OpenLineageService service =
-        new OpenLineageService(
-            openLineageDao, mock(RunService.class), openLineageDao.createDatasetVersionDao());
+    OpenLineageService service = new OpenLineageService(openLineageDao, mock(RunService.class));
     service.createAsync(lineageEvent).get();
   }
 

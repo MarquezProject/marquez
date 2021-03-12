@@ -1,22 +1,10 @@
 package marquez;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.Instant.EPOCH;
 import static marquez.Generator.newTimestamp;
-import static marquez.common.models.ModelGenerator.newConnectionUrl;
-import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
-import static marquez.common.models.ModelGenerator.newContext;
-import static marquez.common.models.ModelGenerator.newDatasetName;
-import static marquez.common.models.ModelGenerator.newDbSourceType;
 import static marquez.common.models.ModelGenerator.newDescription;
-import static marquez.common.models.ModelGenerator.newFieldName;
-import static marquez.common.models.ModelGenerator.newFieldType;
 import static marquez.common.models.ModelGenerator.newJobName;
-import static marquez.common.models.ModelGenerator.newLocation;
-import static marquez.common.models.ModelGenerator.newNamespaceName;
-import static marquez.common.models.ModelGenerator.newOwnerName;
-import static marquez.common.models.ModelGenerator.newSourceName;
-import static marquez.service.models.ModelGenerator.newSchemaLocation;
+import static marquez.common.models.ModelGenerator.newSchemaLocation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -24,7 +12,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
@@ -36,9 +23,7 @@ import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.Field;
 import marquez.client.models.Job;
-import marquez.client.models.JobId;
 import marquez.client.models.JobMeta;
-import marquez.client.models.JobType;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Run;
@@ -49,59 +34,11 @@ import marquez.client.models.SourceMeta;
 import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
-import marquez.common.models.SourceType;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTests.class)
 public class MarquezAppIntegrationTest extends BaseIntegrationTest {
-  // TAGS
-  private static final Tag PII = new Tag("PII", "Personally identifiable information");
-  private static final Tag SENSITIVE = new Tag("SENSITIVE", "Contains sensitive information");
-
-  // NAMESPACE
-  private static final String NAMESPACE_NAME = newNamespaceName().getValue();
-  private static final String OWNER_NAME = newOwnerName().getValue();
-  private static final String NAMESPACE_DESCRIPTION = newDescription();
-
-  // SOURCE
-  private static final String SOURCE_TYPE = newDbSourceType().getValue();
-  private static final String SOURCE_NAME = newSourceName().getValue();
-  private static final URI CONNECTION_URL = newConnectionUrl();
-  private static final String SOURCE_DESCRIPTION = newDescription();
-
-  // DB TABLE DATASET
-  private static final String DB_TABLE_SOURCE_TYPE = SourceType.of("POSTGRESQL").getValue();
-  private static final String DB_TABLE_SOURCE_NAME = newSourceName().getValue();
-  private static final URI DB_TABLE_CONNECTION_URL =
-      newConnectionUrlFor(SourceType.of("POSTGRESQL"));
-  private static final String DB_TABLE_SOURCE_DESCRIPTION = newDescription();
-  private static final DatasetId DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
-  private static final String DB_TABLE_NAME = DB_TABLE_ID.getName();
-  private static final String DB_TABLE_PHYSICAL_NAME = DB_TABLE_NAME;
-  private static final String DB_TABLE_DESCRIPTION = newDescription();
-  private static final ImmutableList<Field> DB_TABLE_FIELDS =
-      ImmutableList.of(newFieldWith(SENSITIVE.getName()), newField());
-  private static final Set<String> DB_TABLE_TAGS = ImmutableSet.of(PII.getName());
-
-  // STREAM DATASET
-  private static final String STREAM_SOURCE_TYPE = SourceType.of("KAFKA").getValue();
-  private static final String STREAM_SOURCE_NAME = newSourceName().getValue();
-  private static final URI STREAM_CONNECTION_URL = newConnectionUrlFor(SourceType.of("KAFKA"));
-  private static final String STREAM_SOURCE_DESCRIPTION = newDescription();
-  private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
-  private static final String STREAM_NAME = STREAM_ID.getName();
-  private static final String STREAM_PHYSICAL_NAME = STREAM_NAME;
-  private static final URL STREAM_SCHEMA_LOCATION = newSchemaLocation();
-  private static final String STREAM_DESCRIPTION = newDescription();
-
-  // JOB
-  private static final String JOB_NAME = newJobName().getValue();
-  private static final JobId JOB_ID = new JobId(NAMESPACE_NAME, JOB_NAME);
-  private static final JobType JOB_TYPE = JobType.BATCH;
-  private static final URL JOB_LOCATION = newLocation();
-  private static final ImmutableMap<String, String> JOB_CONTEXT = newContext();
-  private static final String JOB_DESCRIPTION = newDescription();
 
   @Test
   public void testApp_createNamespace() {
@@ -187,7 +124,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     client.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
     Dataset dataset = client.getDataset(NAMESPACE_NAME, datasetName);
-    assertThat(dataset.getFields()).isEqualTo(fields);
+    assertThat(dataset.getFields()).hasSameElementsAs(fields);
 
     List<Field> newFields =
         ImmutableList.of(
@@ -203,25 +140,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     client.createDataset(NAMESPACE_NAME, datasetName, newDbTableMeta);
     Dataset updatedDataset = client.getDataset(NAMESPACE_NAME, datasetName);
-    assertThat(updatedDataset.getFields()).isEqualTo(newFields);
-  }
-
-  private void createSource(String sourceName) {
-    final SourceMeta sourceMeta =
-        SourceMeta.builder()
-            .type(DB_TABLE_SOURCE_TYPE)
-            .connectionUrl(DB_TABLE_CONNECTION_URL)
-            .description(DB_TABLE_SOURCE_DESCRIPTION)
-            .build();
-    client.createSource(sourceName, sourceMeta);
-  }
-
-  private void createNamespace(String namespaceName) {
-    // (1) Create namespace for db table
-    final NamespaceMeta namespaceMeta =
-        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
-
-    client.createNamespace(namespaceName, namespaceMeta);
+    assertThat(updatedDataset.getFields()).hasSameElementsAs(newFields);
   }
 
   @Test
@@ -238,18 +157,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     client.createSource(DB_TABLE_SOURCE_NAME, sourceMeta);
 
-    // (3) Add db table to namespace and associate with source
-    final DbTableMeta dbTableMeta =
-        DbTableMeta.builder()
-            .physicalName(DB_TABLE_PHYSICAL_NAME)
-            .sourceName(DB_TABLE_SOURCE_NAME)
-            .fields(DB_TABLE_FIELDS)
-            .tags(DB_TABLE_TAGS)
-            .description(DB_TABLE_DESCRIPTION)
-            .build();
-
     final DbTable dbTable =
-        (DbTable) client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, dbTableMeta);
+        (DbTable) client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
     assertThat(dbTable.getId()).isEqualTo(DB_TABLE_ID);
     assertThat(dbTable.getName()).isEqualTo(DB_TABLE_NAME);
     assertThat(dbTable.getPhysicalName()).isEqualTo(DB_TABLE_PHYSICAL_NAME);
@@ -318,15 +227,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     client.createSource(STREAM_SOURCE_NAME, sourceMeta);
 
     // (3) Add stream to namespace and associate with source
-    final StreamMeta streamMeta =
-        StreamMeta.builder()
-            .physicalName(STREAM_PHYSICAL_NAME)
-            .sourceName(STREAM_SOURCE_NAME)
-            .schemaLocation(STREAM_SCHEMA_LOCATION)
-            .description(STREAM_DESCRIPTION)
-            .build();
 
-    final Stream stream = (Stream) client.createDataset(NAMESPACE_NAME, STREAM_NAME, streamMeta);
+    final Stream stream = (Stream) client.createDataset(NAMESPACE_NAME, STREAM_NAME, STREAM_META);
     assertThat(stream.getId()).isEqualTo(STREAM_ID);
     assertThat(stream.getName()).isEqualTo(STREAM_NAME);
     assertThat(stream.getPhysicalName()).isEqualTo(STREAM_PHYSICAL_NAME);
@@ -645,28 +547,5 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(runs.get(0).getId()).isEqualTo(run2.getId());
     assertThat(runs.get(1).getId()).isEqualTo(run1.getId());
     assertThat(runs.get(2).getId()).isEqualTo(run0.getId());
-  }
-
-  private static ImmutableSet<DatasetId> newDatasetIdsWith(
-      final String namespaceName, final int limit) {
-    return java.util.stream.Stream.generate(() -> newDatasetIdWith(namespaceName))
-        .limit(limit)
-        .collect(toImmutableSet());
-  }
-
-  private static DatasetId newDatasetIdWith(final String namespaceName) {
-    return new DatasetId(namespaceName, newDatasetName().getValue());
-  }
-
-  private static Field newField() {
-    return newFieldWith(ImmutableSet.of());
-  }
-
-  private static Field newFieldWith(final String tag) {
-    return newFieldWith(ImmutableSet.of(tag));
-  }
-
-  private static Field newFieldWith(final ImmutableSet<String> tags) {
-    return new Field(newFieldName().getValue(), newFieldType().name(), tags, newDescription());
   }
 }

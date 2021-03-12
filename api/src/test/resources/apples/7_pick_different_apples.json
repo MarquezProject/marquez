@@ -1,0 +1,24 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2020-10-15T13:00:00.000+10:00",
+  "run": {
+    "runId": "155dbf08-c4c5-43e6-bb3a-8095c4ba59b8"
+  },
+  "job": {
+    "namespace": "grandmas.kitchen",
+    "name": "gather_apples"
+  },
+  "inputs": [
+    {
+      "namespace": "backyard",
+      "name": "crab.apples"
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "grandmas.kitchen",
+      "name": "apples"
+    }
+  ],
+  "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+}

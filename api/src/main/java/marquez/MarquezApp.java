@@ -83,7 +83,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
   }
 
   @Override
-  public void run(@NonNull MarquezConfig config, @NonNull Environment env) throws MarquezException {
+  public void run(@NonNull MarquezConfig config, @NonNull Environment env) {
     final DataSourceFactory sourceFactory = config.getDataSourceFactory();
     final DataSource source = sourceFactory.build(env.metrics(), DB_SOURCE_NAME);
 

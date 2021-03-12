@@ -3,10 +3,16 @@ package marquez.graphql;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import graphql.schema.DataFetcher;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import marquez.common.Utils;
 import marquez.db.JobVersionDao.IoType;
+import marquez.graphql.mapper.LineageResultMapper.DatasetResult;
+import marquez.graphql.mapper.LineageResultMapper.JobResult;
+import marquez.graphql.mapper.LineageResultMapper.LineageResult;
 import org.jdbi.v3.core.Jdbi;
 
 public class GraphqlDataFetchers {
@@ -374,12 +380,57 @@ public class GraphqlDataFetchers {
     };
   }
 
-  public DataFetcher getJobsByNamespaceAndName() {
+  public DataFetcher getQueryJobByNamespaceAndName() {
     return dataFetchingEnvironment -> {
       String name = dataFetchingEnvironment.getArgument("name");
       String namespace = dataFetchingEnvironment.getArgument("namespace");
 
       return dao.getJobByNamespaceAndName(namespace, name);
     };
+  }
+
+  public DataFetcher getLineageJobsByNamespaceAndName() {
+    return dataFetchingEnvironment -> {
+      JobResult job = dataFetchingEnvironment.getSource();
+      if (job == null) {
+        return null;
+      }
+
+      return dao.getJobByNamespaceAndName(job.getNamespace(), job.getName());
+    };
+  }
+
+  public DataFetcher getLineageDatasetsByNamespaceAndName() {
+    return dataFetchingEnvironment -> {
+      DatasetResult ds = dataFetchingEnvironment.getSource();
+      if (ds == null) {
+        return null;
+      }
+
+      return dao.getDatasetsByNamespaceAndName(ds.getNamespace(), ds.getName());
+    };
+  }
+
+  public DataFetcher getLineage() {
+    return dataFetchingEnvironment -> {
+      String jobName = dataFetchingEnvironment.getArgument("name");
+      String namespace = dataFetchingEnvironment.getArgument("namespace");
+      Integer depth = dataFetchingEnvironment.getArgument("depth");
+
+      List<JobResult> results = dao.getLineage(jobName, namespace, depth);
+      Set<LineageResult> formattedResults = flattenToLineageRows(results);
+      return ImmutableMap.of("graph", formattedResults);
+    };
+  }
+
+  private Set<LineageResult> flattenToLineageRows(List<JobResult> rows) {
+    Set<LineageResult> lineageResults = new LinkedHashSet<>();
+    for (JobResult result : rows) {
+      lineageResults.add(result);
+      lineageResults.addAll(result.getInEdges());
+      lineageResults.addAll(result.getOutEdges());
+    }
+
+    return lineageResults;
   }
 }

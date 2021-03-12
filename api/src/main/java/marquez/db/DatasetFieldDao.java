@@ -14,8 +14,6 @@
 
 package marquez.db;
 
-import static org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling.NULL_STRING;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -23,16 +21,16 @@ import java.util.UUID;
 import lombok.Value;
 import marquez.db.mappers.DatasetFieldRowMapper;
 import marquez.db.models.DatasetFieldRow;
-import org.jdbi.v3.sqlobject.SqlObject;
+import marquez.db.models.TagRow;
+import marquez.service.models.Dataset;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(DatasetFieldRowMapper.class)
-public interface DatasetFieldDao extends SqlObject {
+public interface DatasetFieldDao extends BaseDao {
   @SqlQuery(
       "SELECT EXISTS ("
           + "SELECT 1 FROM dataset_fields AS df "
@@ -42,6 +40,17 @@ public interface DatasetFieldDao extends SqlObject {
           + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
           + "WHERE df.name = :name)")
   boolean exists(String namespaceName, String datasetName, String name);
+
+  default Dataset updateTags(
+      String namespaceName, String datasetName, String fieldName, String tagName) {
+    Instant now = Instant.now();
+    TagRow tag = createTagDao().upsert(UUID.randomUUID(), now, tagName);
+    UUID datasetUuid = createDatasetDao().getUuid(namespaceName, datasetName).get();
+    DatasetFieldRow fieldRow = createDatasetFieldDao().find(datasetUuid, fieldName).get();
+
+    updateTags(fieldRow.getUuid(), tag.getUuid(), now);
+    return createDatasetDao().find(namespaceName, datasetName).get();
+  }
 
   @SqlUpdate(
       "INSERT INTO dataset_fields_tag_mapping (dataset_field_uuid, tag_uuid, tagged_at) "
@@ -58,39 +67,9 @@ public interface DatasetFieldDao extends SqlObject {
           + "ARRAY(SELECT tag_uuid "
           + "      FROM dataset_fields_tag_mapping "
           + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
-          + "FROM dataset_fields WHERE uuid = :rowUuid")
-  Optional<DatasetFieldRow> findBy(UUID rowUuid);
-
-  @SqlQuery(
-      "SELECT *, "
-          + "ARRAY(SELECT tag_uuid "
-          + "      FROM dataset_fields_tag_mapping "
-          + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
           + "FROM dataset_fields "
           + "WHERE dataset_uuid = :datasetUuid AND name = :name")
   Optional<DatasetFieldRow> find(UUID datasetUuid, String name);
-
-  @SqlQuery(
-      "SELECT *, "
-          + "ARRAY(SELECT tag_uuid "
-          + "      FROM dataset_fields_tag_mapping "
-          + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
-          + "FROM dataset_fields WHERE uuid IN (<rowUuids>) "
-          + "ORDER BY name")
-  List<DatasetFieldRow> findAllIn(@BindList(onEmpty = NULL_STRING) UUID... rowUuids);
-
-  @SqlQuery(
-      "SELECT *, "
-          + "ARRAY(SELECT tag_uuid "
-          + "      FROM dataset_fields_tag_mapping "
-          + "      WHERE dataset_field_uuid = uuid) AS tag_uuids "
-          + "FROM dataset_fields "
-          + "WHERE dataset_uuid = :datasetUuid "
-          + "ORDER BY name")
-  List<DatasetFieldRow> findAll(UUID datasetUuid);
-
-  @SqlQuery("SELECT COUNT(*) FROM dataset_fields")
-  int count();
 
   @SqlQuery(
       "INSERT INTO dataset_fields ("

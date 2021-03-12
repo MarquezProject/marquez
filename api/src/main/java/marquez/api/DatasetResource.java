@@ -14,6 +14,7 @@
 
 package marquez.api;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
@@ -21,7 +22,9 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import java.util.Locale;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -34,49 +37,25 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.DatasetVersionNotFoundException;
-import marquez.api.exceptions.FieldNotFoundException;
-import marquez.api.exceptions.NamespaceNotFoundException;
-import marquez.api.exceptions.RunNotFoundException;
-import marquez.api.exceptions.SourceNotFoundException;
-import marquez.api.exceptions.TagNotFoundException;
 import marquez.common.models.DatasetName;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
-import marquez.common.models.RunId;
-import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
-import marquez.db.SourceDao;
-import marquez.service.DatasetService;
-import marquez.service.NamespaceService;
-import marquez.service.RunService;
-import marquez.service.TagService;
-import marquez.service.exceptions.MarquezServiceException;
+import marquez.service.ServiceFactory;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DatasetVersion;
 
+@Slf4j
 @Path("/api/v1/namespaces/{namespace}/datasets")
-public class DatasetResource {
-  private final NamespaceService namespaceService;
-  private final DatasetService datasetService;
-  private final TagService tagService;
-  private final RunService runService;
-  private final SourceDao sourceDao;
+public class DatasetResource extends BaseResource {
 
-  public DatasetResource(
-      @NonNull final NamespaceService namespaceService,
-      @NonNull final DatasetService datasetService,
-      @NonNull final TagService tagService,
-      @NonNull final RunService runService,
-      SourceDao sourceDao) {
-    this.namespaceService = namespaceService;
-    this.datasetService = datasetService;
-    this.tagService = tagService;
-    this.runService = runService;
-    this.sourceDao = sourceDao;
+  public DatasetResource(@NonNull final ServiceFactory serviceFactory) {
+    super(serviceFactory);
   }
 
   @Timed
@@ -106,13 +85,12 @@ public class DatasetResource {
   @Produces(APPLICATION_JSON)
   public Response get(
       @PathParam("namespace") NamespaceName namespaceName,
-      @PathParam("dataset") DatasetName datasetName)
-      throws MarquezServiceException {
+      @PathParam("dataset") DatasetName datasetName) {
     throwIfNotExists(namespaceName);
 
     final Dataset dataset =
         datasetService
-            .get(namespaceName, datasetName)
+            .find(namespaceName.getValue(), datasetName.getValue())
             .orElseThrow(() -> new DatasetNotFoundException(datasetName));
     return Response.ok(dataset).build();
   }
@@ -126,14 +104,13 @@ public class DatasetResource {
   public Response getVersion(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName,
-      @PathParam("version") Version version)
-      throws MarquezServiceException {
+      @PathParam("version") Version version) {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, datasetName);
 
     final DatasetVersion datasetVersion =
-        datasetService
-            .getVersion(version)
+        datasetVersionService
+            .findByWithRun(version.getValue())
             .orElseThrow(() -> new DatasetVersionNotFoundException(version));
     return Response.ok(datasetVersion).build();
   }
@@ -148,13 +125,15 @@ public class DatasetResource {
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName,
       @QueryParam("limit") @DefaultValue("100") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset)
-      throws MarquezServiceException {
+      @QueryParam("offset") @DefaultValue("0") int offset) {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, datasetName);
+    checkArgument(limit >= 0, "limit must be >= 0");
+    checkArgument(offset >= 0, "offset must be >= 0");
 
     final List<DatasetVersion> datasetVersions =
-        datasetService.getVersionsFor(namespaceName, datasetName, limit, offset);
+        datasetVersionService.findAllWithRun(
+            namespaceName.getValue(), datasetName.getValue(), limit, offset);
     return Response.ok(new DatasetVersions(datasetVersions)).build();
   }
 
@@ -165,12 +144,11 @@ public class DatasetResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
-      @QueryParam("limit") @DefaultValue("100") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset)
-      throws MarquezServiceException {
+      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
+      @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     throwIfNotExists(namespaceName);
 
-    final List<Dataset> datasets = datasetService.getAll(namespaceName, limit, offset);
+    final List<Dataset> datasets = datasetService.findAll(namespaceName.getValue(), limit, offset);
     return Response.ok(new Datasets(datasets)).build();
   }
 
@@ -184,13 +162,15 @@ public class DatasetResource {
   public Response tag(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName,
-      @PathParam("tag") TagName tagName)
-      throws MarquezServiceException {
+      @PathParam("tag") TagName tagName) {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, datasetName);
-    throwIfNotExists(tagName);
 
-    final Dataset dataset = datasetService.tagWith(namespaceName, datasetName, tagName);
+    log.info("Successfully tagged dataset '{}' with '{}'.", datasetName.getValue(), tagName);
+
+    final Dataset dataset =
+        datasetService.updateTags(
+            namespaceName.getValue(), datasetName.getValue(), tagName.getValue());
     return Response.ok(dataset).build();
   }
 
@@ -205,15 +185,21 @@ public class DatasetResource {
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName,
       @PathParam("field") FieldName fieldName,
-      @PathParam("tag") TagName tagName)
-      throws MarquezServiceException {
+      @PathParam("tag") TagName tagName) {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, datasetName);
     throwIfNotExists(namespaceName, datasetName, fieldName);
-    throwIfNotExists(tagName);
-
+    log.info(
+        "Tagging field '{}' for dataset '{}' with '{}'.",
+        fieldName,
+        datasetName.getValue(),
+        tagName);
     final Dataset dataset =
-        datasetService.tagFieldWith(namespaceName, datasetName, fieldName, tagName);
+        datasetFieldService.updateTags(
+            namespaceName.getValue(),
+            datasetName.getValue(),
+            fieldName.getValue(),
+            tagName.getValue().toUpperCase(Locale.getDefault()));
     return Response.ok(dataset).build();
   }
 
@@ -229,46 +215,5 @@ public class DatasetResource {
     @NonNull
     @JsonProperty("versions")
     List<DatasetVersion> value;
-  }
-
-  void throwIfNotExists(@NonNull NamespaceName namespaceName) throws MarquezServiceException {
-    if (!namespaceService.exists(namespaceName)) {
-      throw new NamespaceNotFoundException(namespaceName);
-    }
-  }
-
-  void throwIfNotExists(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName)
-      throws MarquezServiceException {
-    if (!datasetService.exists(namespaceName, datasetName)) {
-      throw new DatasetNotFoundException(datasetName);
-    }
-  }
-
-  void throwIfSourceNotExists(SourceName sourceName) throws MarquezServiceException {
-    if (!sourceDao.exists(sourceName.getValue())) {
-      throw new SourceNotFoundException(sourceName);
-    }
-  }
-
-  void throwIfNotExists(
-      @NonNull NamespaceName namespaceName,
-      @NonNull DatasetName datasetName,
-      @NonNull FieldName fieldName)
-      throws MarquezServiceException {
-    if (!datasetService.fieldExists(namespaceName, datasetName, fieldName)) {
-      throw new FieldNotFoundException(datasetName, fieldName);
-    }
-  }
-
-  void throwIfNotExists(@NonNull TagName tagName) throws MarquezServiceException {
-    if (!tagService.exists(tagName)) {
-      throw new TagNotFoundException(tagName);
-    }
-  }
-
-  void throwIfNotExists(@NonNull RunId runId) throws MarquezServiceException {
-    if (!runService.runExists(runId)) {
-      throw new RunNotFoundException(runId);
-    }
   }
 }

@@ -3,6 +3,8 @@ package marquez.graphql;
 import java.util.List;
 import java.util.UUID;
 import marquez.db.JobVersionDao.IoType;
+import marquez.graphql.mapper.LineageResultMapper;
+import marquez.graphql.mapper.LineageResultMapper.JobResult;
 import marquez.graphql.mapper.ObjectMapMapper;
 import marquez.graphql.mapper.RowMap;
 import org.jdbi.v3.sqlobject.SqlObject;
@@ -10,6 +12,7 @@ import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @RegisterRowMapper(ObjectMapMapper.class)
+@RegisterRowMapper(LineageResultMapper.class)
 public interface GraphqlDaos extends SqlObject {
   /*
    * Note: Use must use a non-map type for returning single entries because a type of Map is already
@@ -30,6 +33,11 @@ public interface GraphqlDaos extends SqlObject {
       "SELECT jobs.* FROM jobs inner join namespaces on jobs.namespace_uuid = namespaces.uuid "
           + "where namespaces.name = :namespaceName and jobs.name = :name")
   RowMap<String, Object> getJobByNamespaceAndName(String namespaceName, String name);
+
+  @SqlQuery(
+      "SELECT datasets.* FROM datasets "
+          + "where datasets.namespace_name = :namespaceName and datasets.name = :name")
+  RowMap<String, Object> getDatasetsByNamespaceAndName(String namespaceName, String name);
 
   @SqlQuery("SELECT * FROM jobs")
   List<RowMap<String, Object>> getJobs();
@@ -156,4 +164,89 @@ public interface GraphqlDaos extends SqlObject {
   @SqlQuery(
       "SELECT t.* from tags t inner join dataset_fields_tag_mapping m on t.uuid = m.tag_uuid where dataaset_field_uuid = :datasetFieldUuid")
   List<RowMap<String, Object>> getTagsByDatasetField(UUID datasetFieldUuid);
+
+  @SqlQuery(
+      "select distinct on (lineage.job_name, "
+          + "       lineage.namespace_name) "
+          + "       lineage.job_name as name, "
+          + "       lineage.namespace_name as namespace, "
+          + "       d_in.agg as \"inEdges\", "
+          + "       d_out.agg as \"outEdges\" "
+          + "from ( "
+          + "WITH RECURSIVE search_graph(job_name, namespace_name, depth, path, cycle) AS ( "
+          + "select j.name, j.namespace_name, 1, ARRAY[j.name], false "
+          + "from jobs j "
+          + "where name = :jobName and j.namespace_name = :namespaceName "
+          + "UNION ALL "
+          + "select l.job_name, l.namespace_name, depth+1, (path || l.job_name), l.job_name = ANY(path) "
+          + "from search_graph sg, "
+          + "( "
+          + "select jv.job_name, jv.namespace_name, j.name as jx "
+          + "from jobs j "
+          + "inner join job_versions_io_mapping io_in on io_in.job_version_uuid = j.current_version_uuid and io_in.io_type = 'INPUT' "
+          + "inner join job_versions_io_mapping io_out on io_out.dataset_uuid = io_in.dataset_uuid and io_out.io_type = 'OUTPUT' "
+          + "inner join job_versions jv on jv.uuid = io_out.job_version_uuid "
+          + "UNION ALL "
+          + "select jv.job_name, jv.namespace_name, j.name as jx "
+          + "from jobs j "
+          + "inner join job_versions_io_mapping io_out on io_out.job_version_uuid = j.current_version_uuid and io_out.io_type = 'OUTPUT' "
+          + "inner join job_versions_io_mapping io_in on io_in.dataset_uuid = io_out.dataset_uuid and io_in.io_type = 'INPUT' "
+          + "inner join job_versions jv on jv.uuid = io_in.job_version_uuid "
+          + ") l where l.jx = sg.job_name and NOT cycle) "
+          + "SELECT * FROM search_graph where NOT cycle and depth <= :depth) lineage "
+          // Construct the dataset edges:
+          + "inner join jobs j on lineage.job_name = j.name and lineage.namespace_name = j.namespace_name "
+          // input datasets
+          + "left outer join "
+          + "     (select io_out.job_version_uuid, jsonb_agg((SELECT x FROM (SELECT ds_in.name, ds_in.namespace_name as namespace,  o.out_agg as \"inEdges\", i.in_agg as \"outEdges\") AS x)) as agg "
+          + "     from job_versions_io_mapping io_out "
+          + "        inner join datasets ds_in on ds_in.uuid = io_out.dataset_uuid "
+          // output jobs for each input dataset
+          + "        left outer join ( "
+          + "         select io_of_in.dataset_uuid, jsonb_agg((select x from (select j_of_in.name, j_of_in.namespace_name as namespace) as x)) as in_agg "
+          + "         from jobs j_of_in "
+          + "         left outer join job_versions_io_mapping io_of_in on io_of_in.job_version_uuid = j_of_in.current_version_uuid "
+          + "          and io_of_in.io_type = 'INPUT' "
+          + "         group by io_of_in.dataset_uuid "
+          + "         ) i on i.dataset_uuid = io_out.dataset_uuid "
+          // input jobs for each input dataset
+          + "        left outer join ( "
+          + "         select io_of_out.dataset_uuid, jsonb_agg((select x from (select j_of_out.name, j_of_out.namespace_name as namespace) as x)) as out_agg "
+          + "         from jobs j_of_out "
+          + "                  left outer join job_versions_io_mapping io_of_out "
+          + "                      on io_of_out.job_version_uuid = j_of_out.current_version_uuid "
+          + "             and io_of_out.io_type = 'OUTPUT' "
+          + "         group by io_of_out.dataset_uuid "
+          + "        ) o on o.dataset_uuid = io_out.dataset_uuid "
+          + "         WHERE io_out.io_type = 'OUTPUT' "
+          + "      group by io_out.job_version_uuid "
+          + " "
+          + "     ) d_in on d_in.job_version_uuid = j.current_version_uuid "
+          // output datasets
+          + "left outer join "
+          + "     (select io_out.job_version_uuid, jsonb_agg((SELECT x FROM (SELECT ds_in.name, ds_in.namespace_name as namespace, o.out_agg as \"inEdges\", i.in_agg as \"outEdges\") AS x)) as agg "
+          + "     from job_versions_io_mapping io_out "
+          + "        inner join datasets ds_in on ds_in.uuid = io_out.dataset_uuid "
+          // output jobs for each output dataset
+          + "        left outer join ( "
+          + "         select io_of_in.dataset_uuid, jsonb_agg((select x from (select j_of_in.name, j_of_in.namespace_name as namespace) as x)) as in_agg "
+          + "         from jobs j_of_in "
+          + "         left outer join job_versions_io_mapping io_of_in on io_of_in.job_version_uuid = j_of_in.current_version_uuid "
+          + "          and io_of_in.io_type = 'INPUT' "
+          + "         group by io_of_in.dataset_uuid "
+          + "         ) i on i.dataset_uuid = io_out.dataset_uuid "
+          // input jobs for each output dataset
+          + "        left outer join ( "
+          + "         select io_of_out.dataset_uuid, jsonb_agg((select x from (select j_of_out.name, j_of_out.namespace_name as namespace) as x)) as out_agg "
+          + "         from jobs j_of_out "
+          + "                  left outer join job_versions_io_mapping io_of_out "
+          + "                      on io_of_out.job_version_uuid = j_of_out.current_version_uuid "
+          + "             and io_of_out.io_type = 'OUTPUT' "
+          + "         group by io_of_out.dataset_uuid "
+          + "        ) o on o.dataset_uuid = io_out.dataset_uuid "
+          + "         WHERE io_out.io_type = 'INPUT' "
+          + "      group by io_out.job_version_uuid "
+          + " "
+          + "     ) d_out on d_out.job_version_uuid = j.current_version_uuid")
+  List<JobResult> getLineage(String jobName, String namespaceName, Integer depth);
 }
