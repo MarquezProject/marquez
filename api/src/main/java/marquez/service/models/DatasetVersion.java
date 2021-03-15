@@ -14,16 +14,19 @@
 
 package marquez.service.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -56,7 +59,8 @@ public abstract class DatasetVersion {
   @Getter private final ImmutableList<Field> fields;
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final String description;
-  @Nullable private final Run createdByRun;
+  @Nullable @Setter private Run createdByRun;
+  @Nullable @Setter private UUID createdByRunUuid;
 
   public DatasetVersion(
       @NonNull final DatasetId id,
@@ -90,5 +94,10 @@ public abstract class DatasetVersion {
 
   public Optional<Run> getCreatedByRun() {
     return Optional.ofNullable(createdByRun);
+  }
+
+  @JsonIgnore
+  public UUID getCreatedByRunUuid() {
+    return createdByRunUuid;
   }
 }

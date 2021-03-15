@@ -28,8 +28,4 @@ public class DatasetVersionId {
   @NonNull NamespaceName namespace;
   @NonNull DatasetName name;
   @NonNull UUID versionUuid;
-
-  public DatasetId asDatasetId() {
-    return new DatasetId(namespace, name);
-  }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
@@ -17,9 +18,8 @@ import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
-import marquez.common.models.RunState;
+import marquez.db.BaseDao;
 import marquez.db.DatasetVersionDao;
-import marquez.db.OpenLineageDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
@@ -32,28 +32,24 @@ import marquez.service.models.LineageEvent;
 import marquez.service.models.RunMeta;
 
 @Slf4j
-public class OpenLineageService {
-  private final OpenLineageDao openLineageDao;
+public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao {
   private final RunService runService;
   private final DatasetVersionDao datasetVersionDao;
   private final ObjectMapper mapper = Utils.newObjectMapper();
 
-  public OpenLineageService(
-      OpenLineageDao openLineageDao, RunService runService, DatasetVersionDao datasetVersionDao) {
-    this.openLineageDao = openLineageDao;
+  public OpenLineageService(BaseDao baseDao, RunService runService) {
+    super(baseDao.createOpenLineageDao());
     this.runService = runService;
-    this.datasetVersionDao = datasetVersionDao;
+    this.datasetVersionDao = baseDao.createDatasetVersionDao();
   }
 
   public CompletableFuture<Void> createAsync(LineageEvent event) {
     CompletableFuture marquez =
-        CompletableFuture.supplyAsync(() -> openLineageDao.updateMarquezModel(event))
+        CompletableFuture.supplyAsync(
+                () -> updateMarquezModel(event, mapper), ForkJoinPool.commonPool())
             .thenAccept(
                 (update) -> {
-                  if (event.getEventType() != null
-                      && openLineageDao
-                          .getRunState(event.getEventType())
-                          .equals(RunState.COMPLETED)) {
+                  if (event.getEventType() != null) {
                     buildJobInputUpdate(update).ifPresent(runService::notify);
                     buildJobOutputUpdate(update).ifPresent(runService::notify);
                   }
@@ -62,40 +58,39 @@ public class OpenLineageService {
     CompletableFuture openLineage =
         CompletableFuture.runAsync(
             () ->
-                openLineageDao.createLineageEvent(
+                createLineageEvent(
                     event.getEventType() == null ? "" : event.getEventType(),
                     event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
                     event.getRun().getRunId(),
                     event.getJob().getName(),
                     event.getJob().getNamespace(),
-                    openLineageDao.createJsonArray(event, mapper),
-                    event.getProducer()));
+                    createJsonArray(event, mapper),
+                    event.getProducer()),
+            ForkJoinPool.commonPool());
 
     return CompletableFuture.allOf(marquez, openLineage);
   }
 
   private Optional<JobOutputUpdate> buildJobOutputUpdate(UpdateLineageRow record) {
     RunId runId = RunId.of(record.getRun().getUuid());
-    JobVersionId jobVersionId =
-        JobVersionId.builder()
-            .versionUuid(record.getJobVersion().getUuid())
-            .namespace(NamespaceName.of(record.getNamespace().getName()))
-            .name(JobName.of(record.getJob().getName()))
-            .build();
-
-    return buildJobOutput(runId, jobVersionId, record);
+    return buildJobOutput(runId, buildJobVersionId(record), record);
   }
 
   private Optional<JobInputUpdate> buildJobInputUpdate(UpdateLineageRow record) {
     RunId runId = RunId.of(record.getRun().getUuid());
-    JobVersionId jobVersionId =
-        JobVersionId.builder()
-            .versionUuid(record.getJobVersion().getUuid())
-            .namespace(NamespaceName.of(record.getNamespace().getName()))
-            .name(JobName.of(record.getJob().getName()))
-            .build();
+    return buildJobInput(
+        record.getRun(), record.getRunArgs(), buildJobVersionId(record), runId, record);
+  }
 
-    return buildJobInput(record.getRun(), record.getRunArgs(), jobVersionId, runId, record);
+  public JobVersionId buildJobVersionId(UpdateLineageRow record) {
+    if (record.getJobVersionBag() != null) {
+      return JobVersionId.builder()
+          .versionUuid(record.getJobVersionBag().getJobVersionRow().getUuid())
+          .namespace(NamespaceName.of(record.getNamespace().getName()))
+          .name(JobName.of(record.getJob().getName()))
+          .build();
+    }
+    return null;
   }
 
   Optional<JobOutputUpdate> buildJobOutput(
@@ -111,17 +106,17 @@ public class OpenLineageService {
 
     List<RunOutput> runOutputs =
         datasets.stream()
-            .map(
-                ds ->
-                    new RunOutput(
-                        DatasetVersionId.builder()
-                            .versionUuid(ds.getVersion())
-                            .namespace(NamespaceName.of(ds.getNamespaceName()))
-                            .name(DatasetName.of(ds.getDatasetName()))
-                            .build()))
+            .map(this::buildDatasetVersionId)
+            .map(RunOutput::new)
             .collect(Collectors.toList());
 
-    return Optional.of(new JobOutputUpdate(runId, jobVersionId, runOutputs));
+    return Optional.of(
+        new JobOutputUpdate(
+            runId,
+            jobVersionId,
+            JobName.of(record.getRun().getJobName()),
+            NamespaceName.of(record.getRun().getNamespaceName()),
+            runOutputs));
   }
 
   Optional<JobInputUpdate> buildJobInput(
@@ -147,14 +142,8 @@ public class OpenLineageService {
 
     List<RunInput> runInputs =
         datasets.stream()
-            .map(
-                ds ->
-                    new RunInput(
-                        DatasetVersionId.builder()
-                            .versionUuid(ds.getVersion())
-                            .namespace(NamespaceName.of(ds.getNamespaceName()))
-                            .name(DatasetName.of(ds.getDatasetName()))
-                            .build()))
+            .map(this::buildDatasetVersionId)
+            .map(RunInput::new)
             .collect(Collectors.toList());
 
     return Optional.of(
@@ -167,6 +156,16 @@ public class OpenLineageService {
                 .args(runArgs)
                 .build(),
             jobVersionId,
+            JobName.of(run.getJobName()),
+            NamespaceName.of(run.getNamespaceName()),
             runInputs));
+  }
+
+  private DatasetVersionId buildDatasetVersionId(ExtendedDatasetVersionRow ds) {
+    return DatasetVersionId.builder()
+        .versionUuid(ds.getVersion())
+        .namespace(NamespaceName.of(ds.getNamespaceName()))
+        .name(DatasetName.of(ds.getDatasetName()))
+        .build();
   }
 }

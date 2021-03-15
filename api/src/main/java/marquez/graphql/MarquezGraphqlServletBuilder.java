@@ -12,10 +12,7 @@ public class MarquezGraphqlServletBuilder {
     final GraphQLQueryInvoker queryInvoker = GraphQLQueryInvoker.newBuilder().build();
 
     final GraphQLConfiguration config =
-        GraphQLConfiguration.with(schema)
-            .with(queryInvoker)
-            .with(new CustomGraphQLContextBuilder())
-            .build();
+        GraphQLConfiguration.with(schema).with(queryInvoker).build();
 
     return GraphQLHttpServlet.with(config);
   }

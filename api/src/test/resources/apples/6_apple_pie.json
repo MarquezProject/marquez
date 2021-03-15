@@ -1,0 +1,24 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2020-09-03T15:00:00.000+10:00",
+  "run": {
+    "runId": "66ad484e-9bba-4eed-a5f5-3a17558e7f6b"
+  },
+  "job": {
+    "namespace": "grandmas.kitchen",
+    "name": "prepare_apple_pie"
+  },
+  "inputs": [
+    {
+      "namespace": "grandmas.kitchen",
+      "name": "apple.filling"
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "grandmas.kitchen",
+      "name": "apple.pie"
+    }
+  ],
+  "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+}

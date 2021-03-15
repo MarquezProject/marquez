@@ -28,7 +28,6 @@ import java.sql.SQLException;
 import java.util.Set;
 import lombok.NonNull;
 import marquez.db.Columns;
-import marquez.db.MapperUtils;
 import marquez.db.models.DatasetRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;

@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableMap;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import lombok.Getter;
@@ -81,18 +80,6 @@ public final class FlywayFactory {
 
   @Getter @Setter
   private String repeatableSqlMigrationPrefix = DEFAULT_REPEATABLE_SQL_MIGRATION_PREFIX;
-
-  public Optional<String> getInitSql() {
-    return Optional.ofNullable(initSql);
-  }
-
-  public Optional<String> getInstalledBy() {
-    return Optional.ofNullable(installedBy);
-  }
-
-  public Optional<String> getTablespace() {
-    return Optional.ofNullable(tablespace);
-  }
 
   public Flyway build(@NonNull DataSource source) {
     return Flyway.configure()
