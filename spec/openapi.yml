@@ -686,9 +686,7 @@ components:
                 $ref: '#/components/schemas/fieldType'
               tags:
                 description: List of tags.
-                type: array
-                items:
-                  $ref: '#/components/schemas/tag'
+                type: string
               description:
                 description: The description of the field.
                 type: string
@@ -697,9 +695,7 @@ components:
               - type
         tags:
           description: List of tags.
-          type: array
-          items:
-            $ref: '#/components/schemas/tag'
+          type: string
         description:
           description:  The description of the table.
           type: string
@@ -761,9 +757,7 @@ components:
                 type: string
               tags:
                 description: List of tags.
-                type: array
-                items:
-                  $ref: '#/components/schemas/tag'
+                type: string
               description:
                 description: The description of the field.
                 type: string
@@ -772,9 +766,7 @@ components:
               - type
         tags:
           description: List of tags.
-          type: array
-          items:
-            $ref: '#/components/schemas/tag'
+          type: string
         description:
           description: The description of the stream.
           type: string
@@ -852,17 +844,13 @@ components:
                 $ref: '#/components/schemas/fieldType'
               tags:
                 description: List of tags.
-                type: array
-                items:
-                  $ref: '#/components/schemas/tag'
+                type: string
               description:
                 description: The description of the field.
                 type: string
         tags:
           description: List of tags.
-          type: array
-          items:
-            $ref: '#/components/schemas/tag'
+          type: string
         lastModifiedAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a successful run.
           type: string
@@ -954,17 +942,13 @@ components:
                 $ref: '#/components/schemas/fieldType'
               tags:
                 description: List of tags.
-                type: array
-                items:
-                  $ref: '#/components/schemas/tag'
+                type: string
               description:
                 description: The description of the field.
                 type: string
         tags:
           description: List of tags.
-          type: array
-          items:
-            $ref: '#/components/schemas/tag'
+          type: string
         description:
           description:  The description of the dataset.
           type: string

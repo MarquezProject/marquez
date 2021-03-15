@@ -28,8 +28,4 @@ public class JobVersionId {
   @NonNull NamespaceName namespace;
   @NonNull JobName name;
   @NonNull UUID versionUuid;
-
-  public JobId asJobId() {
-    return new JobId(namespace, name);
-  }
 }

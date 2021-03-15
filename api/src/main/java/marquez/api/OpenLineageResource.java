@@ -31,17 +31,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.service.OpenLineageService;
+import marquez.service.ServiceFactory;
 import marquez.service.models.LineageEvent;
 
 @Slf4j
 @Path("/api/v1/lineage")
-public class OpenLineageResource {
-  private final OpenLineageService openLineageService;
-
-  public OpenLineageResource(OpenLineageService openLineageService) {
-    this.openLineageService = openLineageService;
+public class OpenLineageResource extends BaseResource {
+  public OpenLineageResource(@NonNull final ServiceFactory serviceFactory) {
+    super(serviceFactory);
   }
 
   @Timed

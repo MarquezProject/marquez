@@ -15,17 +15,13 @@
 package marquez.db.mappers;
 
 import static marquez.db.Columns.timestampOrThrow;
-import static marquez.db.Columns.uuidArrayOrThrow;
 import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
-import com.google.common.collect.ImmutableList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 import lombok.NonNull;
 import marquez.db.Columns;
-import marquez.db.MapperUtils;
 import marquez.db.models.DatasetVersionRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -34,16 +30,11 @@ public final class DatasetVersionRowMapper implements RowMapper<DatasetVersionRo
   @Override
   public DatasetVersionRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    Set<String> columnNames = MapperUtils.getColumnNames(results.getMetaData());
-
     return new DatasetVersionRow(
         uuidOrThrow(results, Columns.ROW_UUID),
         timestampOrThrow(results, Columns.CREATED_AT),
         uuidOrThrow(results, Columns.DATASET_UUID),
         uuidOrThrow(results, Columns.VERSION),
-        columnNames.contains(Columns.FIELD_UUIDS)
-            ? uuidArrayOrThrow(results, Columns.FIELD_UUIDS)
-            : ImmutableList.of(),
         uuidOrNull(results, Columns.RUN_UUID));
   }
 }

@@ -8,6 +8,37 @@ type Query {
   namespace(name: String!): Namespace
   jobs: [Job]
   job(namespace: String!, name: String): Job
+  lineageFromJob(namespace: String!, name: String!, depth: Int = 10): LineageRoot
+}
+
+type LineageRoot {
+  graph: [LineageResultEntry]
+}
+
+union LineageResultEntry = DatasetLineageEntry | JobLineageEntry
+
+type DatasetLineageEntry {
+  name: String!
+  namespace: String!
+  type: String!
+  data: Dataset!
+  inEdges: [EdgeEntry]
+  outEdges: [EdgeEntry]
+}
+
+type JobLineageEntry {
+  name: String!
+  namespace: String!
+  type: String!
+  data: Job!
+  inEdges: [EdgeEntry]
+  outEdges: [EdgeEntry]
+}
+
+type EdgeEntry {
+  name: String!
+  namespace: String!
+  type: String!
 }
 
 type Tag {
