@@ -82,7 +82,7 @@ $ ./gradlew :api:shadowJar
 
 The executable can be found under `api/build/libs/`
 
-The [`spark`]() integration requires Java 8 to build. The module can be built separately by setting `JAVA_HOME` to your local
+The [`spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) integration requires Java 8 to build. The module can be built separately by setting `JAVA_HOME` to your local
 JDK 8 installation and invoking `./gradlew :integrations:spark:shadowJar`.
 
 To build the entire project, set `JDK8_HOME` to your local JDK 8 installation. Then, build all modules with:
