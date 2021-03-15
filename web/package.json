@@ -1,6 +1,6 @@
 {
   "name": "marquez-ui",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "dist/index.js",
   "author": "dataviz@wework.com",
   "private": true,
@@ -27,7 +27,7 @@
     "@visx/clip-path": "1.7.0",
     "@visx/gradient": "1.6.1",
     "@visx/grid": "1.6.1",
-    "@visx/legend": "1.6.1",
+    "@visx/legend": "1.7.0",
     "@visx/mock-data": "1.6.1",
     "@visx/responsive": "1.6.1",
     "@visx/scale": "1.4.0",
