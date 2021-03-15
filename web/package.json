@@ -29,7 +29,7 @@
     "@visx/grid": "1.6.1",
     "@visx/legend": "1.6.1",
     "@visx/mock-data": "1.6.1",
-    "@visx/responsive": "1.6.1",
+    "@visx/responsive": "1.7.0",
     "@visx/scale": "1.7.0",
     "@visx/shape": "1.7.0",
     "@visx/zoom": "^1.0.0",
