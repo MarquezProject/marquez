@@ -1,6 +1,6 @@
 {
   "name": "marquez-ui",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "dist/index.js",
   "author": "dataviz@wework.com",
   "private": true,
@@ -25,7 +25,7 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@types/react-router-dom": "^5.1.2",
     "@visx/clip-path": "1.7.0",
-    "@visx/gradient": "1.6.1",
+    "@visx/gradient": "1.7.0",
     "@visx/grid": "1.6.1",
     "@visx/legend": "1.6.1",
     "@visx/mock-data": "1.6.1",
