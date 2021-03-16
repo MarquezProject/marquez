@@ -116,7 +116,7 @@ public class LibraryTest {
 
     // timezone is different in CI than local
     map.remove("timeZoneId");
-    if (map.containsKey("namespace") && map.get("namespace").equals("file://")) {
+    if (map.containsKey("namespace") && map.get("namespace").equals("file")) {
       map.put("name", "/path/to/data");
     }
     if (map.containsKey("uri") && ((String) map.get("uri")).startsWith("file:/")) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonRawValue;
 import java.net.URI;
 import lombok.Builder;
 import marquez.spark.agent.client.LineageEvent.BaseFacet;
+import marquez.spark.agent.client.OpenLineageClient;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 
 public class LogicalPlanFacet extends BaseFacet {
@@ -12,10 +13,9 @@ public class LogicalPlanFacet extends BaseFacet {
   @Builder
   public LogicalPlanFacet(LogicalPlan plan) {
     super(
-        URI.create("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"),
+        URI.create(OpenLineageClient.OPEN_LINEAGE_CLIENT_URI),
         URI.create(
-            "https://github.com/MarquezProject/marquez/blob/main/experimental/integrations/"
-                + "marquez-spark-agent/facets/spark-2.4/v1/logicalPlanFacet"));
+            OpenLineageClient.OPEN_LINEAGE_CLIENT_URI + "/facets/spark-2.4/v1/logicalPlanFacet"));
     this.plan = plan;
   }
 

@@ -1,7 +1,6 @@
 package marquez.spark.agent.lifecycle;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -13,10 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.spark.agent.MarquezContext;
 import marquez.spark.agent.client.LineageEvent;
 import marquez.spark.agent.client.LineageEvent.Dataset;
-import marquez.spark.agent.client.LineageEvent.JobLink;
 import marquez.spark.agent.client.LineageEvent.ParentRunFacet;
 import marquez.spark.agent.client.LineageEvent.RunFacet;
-import marquez.spark.agent.client.LineageEvent.RunLink;
 import marquez.spark.agent.client.OpenLineageClient;
 import marquez.spark.agent.facets.ErrorFacet;
 import marquez.spark.agent.facets.LogicalPlanFacet;
@@ -36,6 +33,7 @@ import scala.collection.JavaConversions;
 
 @Slf4j
 public class SparkSQLExecutionContext implements ExecutionContext {
+
   private final long executionId;
   private final QueryExecution queryExecution;
 
@@ -90,25 +88,17 @@ public class SparkSQLExecutionContext implements ExecutionContext {
             .job(buildJob())
             .eventTime(toZonedTime(jobStart.time()))
             .eventType("START")
-            .producer("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client")
+            .producer(OpenLineageClient.OPEN_LINEAGE_CLIENT_URI)
             .build();
 
     marquezContext.emit(event);
   }
 
   private ParentRunFacet buildParentFacet() {
-    return ParentRunFacet.builder()
-        ._producer(URI.create("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"))
-        ._schemaURL(
-            URI.create(
-                "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#ParentRunFacet"))
-        .job(
-            JobLink.builder()
-                .name(marquezContext.getJobName())
-                .namespace(marquezContext.getJobNamespace())
-                .build())
-        .run(RunLink.builder().runId(marquezContext.getParentRunId()).build())
-        .build();
+    return PlanUtils.parentRunFacet(
+        marquezContext.getParentRunId(),
+        marquezContext.getJobName(),
+        marquezContext.getJobNamespace());
   }
 
   @Override
@@ -141,7 +131,7 @@ public class SparkSQLExecutionContext implements ExecutionContext {
             .job(buildJob())
             .eventTime(toZonedTime(jobEnd.time()))
             .eventType(getEventType(jobEnd.jobResult()))
-            .producer("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client")
+            .producer(OpenLineageClient.OPEN_LINEAGE_CLIENT_URI)
             .build();
 
     marquezContext.emit(event);

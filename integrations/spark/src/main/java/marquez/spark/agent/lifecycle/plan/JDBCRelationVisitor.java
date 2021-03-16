@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import marquez.spark.agent.client.LineageEvent.Dataset;
-import marquez.spark.agent.client.LineageEvent.DatasetFacet;
-import marquez.spark.agent.client.LineageEvent.DatasourceDatasetFacet;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.apache.spark.sql.execution.datasources.LogicalRelation;
@@ -80,28 +78,8 @@ public class JDBCRelationVisitor extends AbstractPartialFunction<LogicalPlan, Li
                             }
                           });
               URI connectionUri = URI.create(relation.jdbcOptions().url());
-              String namespace =
-                  String.format("%s://%s", connectionUri.getScheme(), connectionUri.getHost());
-              String name = String.format("%s.%s", connectionUri.getPath(), tableName);
               return Collections.singletonList(
-                  Dataset.builder()
-                      .namespace(namespace)
-                      .name(name)
-                      .facets(
-                          DatasetFacet.builder()
-                              .schema(PlanUtils.schemaFacet(relation.schema()))
-                              .dataSource(
-                                  DatasourceDatasetFacet.builder()
-                                      ._producer(
-                                          URI.create(
-                                              "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"))
-                                      ._schemaURL(
-                                          URI.create(
-                                              "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#DatasourceDatasetFacet"))
-                                      .uri(namespace)
-                                      .build())
-                              .build())
-                      .build());
+                  PlanUtils.getDataset(connectionUri, relation.schema()));
             })
         .orElse(Collections.emptyList());
   }

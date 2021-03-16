@@ -1,7 +1,11 @@
 package marquez.spark.agent.lifecycle.plan;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import java.util.List;
+import java.util.stream.Collectors;
 import marquez.spark.agent.client.LineageEvent.Dataset;
+import marquez.spark.agent.facets.OutputStatisticsFacet;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.apache.spark.sql.execution.datasources.InsertIntoDataSourceCommand;
 import scala.PartialFunction;
@@ -27,7 +31,21 @@ public class InsertIntoDataSourceVisitor
 
   @Override
   public List<Dataset> apply(LogicalPlan x) {
+    OutputStatisticsFacet outputStats =
+        PlanUtils.getOutputStats(((InsertIntoDataSourceCommand) x).metrics());
     return PlanUtils.applyFirst(
-        datasetProviders, ((InsertIntoDataSourceCommand) x).logicalRelation());
+            datasetProviders, ((InsertIntoDataSourceCommand) x).logicalRelation())
+        .stream()
+        // constructed datasets don't include the output stats, so add that facet here
+        .peek(
+            ds -> {
+              Builder<String, Object> facetsMap =
+                  ImmutableMap.<String, Object>builder().put("stats", outputStats);
+              if (ds.getFacets().getAdditionalFacets() != null) {
+                facetsMap.putAll(ds.getFacets().getAdditionalFacets());
+              }
+              ds.getFacets().setAdditional(facetsMap.build());
+            })
+        .collect(Collectors.toList());
   }
 }

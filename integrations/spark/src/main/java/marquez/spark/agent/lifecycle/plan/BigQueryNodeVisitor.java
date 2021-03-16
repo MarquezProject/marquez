@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import marquez.spark.agent.client.LineageEvent.Dataset;
-import marquez.spark.agent.client.LineageEvent.DatasetFacet;
-import marquez.spark.agent.client.LineageEvent.DatasourceDatasetFacet;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.apache.spark.sql.execution.datasources.LogicalRelation;
@@ -83,24 +81,8 @@ public class BigQueryNodeVisitor extends AbstractPartialFunction<LogicalPlan, Li
                       relation.tableId().getDataset(),
                       relation.tableId().getTable());
               return Collections.singletonList(
-                  Dataset.builder()
-                      .namespace("bigquery")
-                      .name(name)
-                      .facets(
-                          DatasetFacet.builder()
-                              .dataSource(
-                                  DatasourceDatasetFacet.builder()
-                                      ._producer(
-                                          URI.create(
-                                              "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"))
-                                      ._schemaURL(
-                                          URI.create(
-                                              "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#DatasourceDatasetFacet"))
-                                      .uri(String.format("bigquery://%s", name))
-                                      .build())
-                              .schema(PlanUtils.schemaFacet(relation.schema()))
-                              .build())
-                      .build());
+                  PlanUtils.getDataset(
+                      URI.create(String.format("bigquery://%s", name)), x.schema()));
             })
         .orElse(null);
   }

@@ -1,14 +1,10 @@
 package marquez.spark.agent.lifecycle.plan;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import marquez.spark.agent.client.LineageEvent.Dataset;
-import marquez.spark.agent.client.LineageEvent.DatasetFacet;
-import marquez.spark.agent.client.LineageEvent.DatasourceDatasetFacet;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.apache.spark.sql.execution.datasources.HadoopFsRelation;
@@ -58,30 +54,7 @@ public class HadoopFsRelationVisitor extends AbstractPartialFunction<LogicalPlan
             p -> {
               // TODO- refactor this to return a single partitioned dataset based on static
               // static partitions in the relation
-              URI uri = p.toUri();
-              String namespace =
-                  String.format(
-                      "%s://%s",
-                      uri.getScheme(), Optional.ofNullable(uri.getAuthority()).orElse(""));
-              return Dataset.builder()
-                  .namespace(namespace)
-                  .name(uri.getPath())
-                  .facets(
-                      DatasetFacet.builder()
-                          .schema(PlanUtils.schemaFacet(relation.schema()))
-                          .dataSource(
-                              DatasourceDatasetFacet.builder()
-                                  ._producer(
-                                      URI.create(
-                                          "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"))
-                                  ._schemaURL(
-                                      URI.create(
-                                          "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#DatasourceDatasetFacet"))
-                                  .uri(uri.toString())
-                                  .name(namespace)
-                                  .build())
-                          .build())
-                  .build();
+              return PlanUtils.getDataset(p.toUri(), relation.schema());
             })
         .collect(Collectors.toList());
   }
