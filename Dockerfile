@@ -1,4 +1,4 @@
-FROM openjdk:11-jdk AS base
+FROM adoptopenjdk/openjdk11:alpine AS base
 WORKDIR /usr/src/app
 COPY gradle gradle
 COPY gradle.properties gradle.properties
@@ -14,8 +14,8 @@ COPY api/build.gradle ./api/build.gradle
 COPY clients/java ./clients/java
 RUN ./gradlew --no-daemon :api:shadowJar
 
-FROM openjdk:11-jre
-RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client
+FROM adoptopenjdk/openjdk11:alpine-jre
+RUN apk update && apk add --virtual postgresql-client bash coreutils
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/api/build/libs/marquez-*.jar /usr/src/app
 COPY marquez.dev.yml marquez.dev.yml

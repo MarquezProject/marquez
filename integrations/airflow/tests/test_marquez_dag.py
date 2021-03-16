@@ -24,6 +24,7 @@ from airflow.utils.state import State
 
 from marquez_client.models import JobType, DatasetType
 
+from marquez_airflow.dag import _EXTRACTORS as _DAG_EXTRACTORS
 from marquez_airflow import DAG
 from marquez_airflow.extractors import (
     BaseExtractor, StepMetadata, Source, Dataset
@@ -287,11 +288,11 @@ class TestFixtureDummyExtractorOnComplete(BaseExtractor):
                     ordinal_position=1
                 ),
                     DbColumn(
-                    name='field2',
-                    type='text',
-                    description='',
-                    ordinal_position=2
-                )]
+                        name='field2',
+                        type='text',
+                        description='',
+                        ordinal_position=2
+                    )]
             ))
         ]
         outputs = [
@@ -339,7 +340,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
     completed_task_location = get_location(task_will_complete.dag.fileloc)
 
     # Add the dummy extractor to the list for the task above
-    dag._extractors[task_will_complete.__class__] = TestFixtureDummyExtractor
+    _DAG_EXTRACTORS[task_will_complete.__class__] = TestFixtureDummyExtractor
 
     # --- pretend run the DAG
 
@@ -394,8 +395,8 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
         namespace_name=DAG_NAMESPACE,
         run_id=None
     )
-    assert mock_marquez_client.create_job.mock_calls[0].\
-        kwargs['context'].get('extract') == 'extract'
+    assert mock_marquez_client.create_job.mock_calls[0]. \
+               kwargs['context'].get('extract') == 'extract'
 
     # run is created
     mock_marquez_client.create_job_run.assert_called_once_with(
@@ -453,8 +454,8 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
         )
     ])
 
-    assert mock_marquez_client.create_job.mock_calls[0].\
-        kwargs['context'].get('extract') == 'extract'
+    assert mock_marquez_client.create_job.mock_calls[0]. \
+               kwargs['context'].get('extract') == 'extract'
 
     mock_marquez_client.mark_job_run_as_completed.assert_called_once_with(
         run_id=run_id,
@@ -531,7 +532,7 @@ def test_marquez_dag_with_extract_on_complete(
     completed_task_location = get_location(task_will_complete.dag.fileloc)
 
     # Add the dummy extractor to the list for the task above
-    dag._extractors[task_will_complete.__class__] = \
+    _DAG_EXTRACTORS[task_will_complete.__class__] = \
         TestFixtureDummyExtractorOnComplete
 
     # Create DAG run and mark as running
@@ -635,8 +636,8 @@ def test_marquez_dag_with_extract_on_complete(
             run_id='my-test-uuid'
         )
     ])
-    assert mock_marquez_client.create_job.mock_calls[0].\
-        kwargs['context'].get('extract_on_complete') == 'extract_on_complete'
+    assert mock_marquez_client.create_job.mock_calls[0]. \
+               kwargs['context'].get('extract_on_complete') == 'extract_on_complete'
 
     # run is created
     mock_marquez_client.create_job_run.assert_called_once_with(
@@ -664,7 +665,7 @@ def test_marquez_dag_with_extract_on_complete(
             location=completed_task_location,
             input_dataset=[
                 {'namespace': 'default',
-                    'name': 'schema.extract_on_complete_input1'}
+                 'name': 'schema.extract_on_complete_input1'}
             ],
             output_dataset=[
                 {'namespace': 'default', 'name': 'extract_on_complete_output1'}
@@ -675,8 +676,8 @@ def test_marquez_dag_with_extract_on_complete(
         )
     ])
 
-    assert mock_marquez_client.create_job.mock_calls[0].\
-        kwargs['context'].get('extract_on_complete') == 'extract_on_complete'
+    assert mock_marquez_client.create_job.mock_calls[0]. \
+               kwargs['context'].get('extract_on_complete') == 'extract_on_complete'
 
     mock_marquez_client.mark_job_run_as_completed.assert_called_once_with(
         run_id=run_id,
