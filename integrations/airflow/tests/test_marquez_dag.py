@@ -396,7 +396,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
         run_id=None
     )
     assert mock_marquez_client.create_job.mock_calls[0]. \
-               kwargs['context'].get('extract') == 'extract'
+        kwargs['context'].get('extract') == 'extract'
 
     # run is created
     mock_marquez_client.create_job_run.assert_called_once_with(
@@ -455,7 +455,7 @@ def test_marquez_dag_with_extractor(mock_get_or_create_marquez_client,
     ])
 
     assert mock_marquez_client.create_job.mock_calls[0]. \
-               kwargs['context'].get('extract') == 'extract'
+        kwargs['context'].get('extract') == 'extract'
 
     mock_marquez_client.mark_job_run_as_completed.assert_called_once_with(
         run_id=run_id,
@@ -637,7 +637,7 @@ def test_marquez_dag_with_extract_on_complete(
         )
     ])
     assert mock_marquez_client.create_job.mock_calls[0]. \
-               kwargs['context'].get('extract_on_complete') == 'extract_on_complete'
+        kwargs['context'].get('extract_on_complete') == 'extract_on_complete'
 
     # run is created
     mock_marquez_client.create_job_run.assert_called_once_with(
@@ -677,7 +677,7 @@ def test_marquez_dag_with_extract_on_complete(
     ])
 
     assert mock_marquez_client.create_job.mock_calls[0]. \
-               kwargs['context'].get('extract_on_complete') == 'extract_on_complete'
+        kwargs['context'].get('extract_on_complete') == 'extract_on_complete'
 
     mock_marquez_client.mark_job_run_as_completed.assert_called_once_with(
         run_id=run_id,
