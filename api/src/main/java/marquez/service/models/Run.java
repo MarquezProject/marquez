@@ -55,7 +55,7 @@ public final class Run {
       @Nullable final Instant endedAt,
       @Nullable final Long durationMs,
       @Nullable final Map<String, String> args,
-      String namespaceName, //Fields not serialized may be null for clients
+      String namespaceName, // Fields not serialized may be null for clients
       String jobName) {
     this.id = id;
     this.createdAt = createdAt;
