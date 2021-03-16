@@ -1,1 +1,1 @@
-marquez-airflow==0.3.8
+marquez-airflow==0.12.2
