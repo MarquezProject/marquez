@@ -1,6 +1,17 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.12.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.12.2...HEAD)
+
+## [0.12.2](https://github.com/MarquezProject/marquez/compare/0.12.0...0.12.2) - 2021-03-16
+
+### Changed
+
+* Use alpine image for `marquez` reducing image size by `+50%` [@KevinMellott91](https://github.com/KevinMellott91)
+* Use alpine image for `marquez-web` reducing image size by `+50%` [@KevinMellott91](https://github.com/KevinMellott91)
+
+### Fixed
+
+* Ensure `marquez.DAG` is (de)serializable
 
 ## [0.12.0](https://github.com/MarquezProject/marquez/compare/0.11.2...0.12.0) - 2021-02-08
 

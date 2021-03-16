@@ -40,7 +40,7 @@ helm delete marquez
 | `marquez.replicaCount`       | Number of desired replicas       | `1`                      |
 | `marquez.image.registry`     | Marquez image registry           | `docker.io`              |
 | `marquez.image.repository`   | Marquez image repository         | `marquezproject/marquez` |
-| `marquez.image.tag`          | Marquez image tag                | `0.12.0`                 |
+| `marquez.image.tag`          | Marquez image tag                | `0.12.2`                 |
 | `marquez.image.pullPolicy`   | Image pull policy                | `IfNotPresent`           |
 | `marquez.db.host`            | PostgreSQL host                  | `localhost`              |
 | `marquez.db.port`            | PostgreSQL port                  | `5432`                   |
@@ -62,7 +62,7 @@ helm delete marquez
 | `web.replicaCount`       | Number of desired replicas      | `1`            |
 | `web.image.registry`     | Marquez Web UI image registry   | `docker.io`    |
 | `web.image.repository`   | Marquez Web UI image repository | `marquez-web`  |
-| `web.image.tag`          | Marquez Web UI image tag        | `0.12.0`       |
+| `web.image.tag`          | Marquez Web UI image tag        | `0.12.2`       |
 | `web.image.pullPolicy`   | Image pull policy               | `IfNotPresent` |
 | `web.port`               | Marquez Web host port           | `5000`         |
 | `web.resources.limits`   | K8s resource limit overrides    | `nil`          |
