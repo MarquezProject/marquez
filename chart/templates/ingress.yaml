@@ -32,11 +32,11 @@ spec:
         paths:
           - path: /api/
             backend:
-              serviceName: {{ include "common.names.fullname" . }}
+              serviceName: {{ include "common.names.fullname" $ }}
               servicePort: http
           - path: /
             backend:
-              serviceName: {{ include "common.names.fullname" . }}-web
+              serviceName: {{ include "common.names.fullname" $ }}-web
               servicePort: http
   {{- end }}
 {{- end }}
