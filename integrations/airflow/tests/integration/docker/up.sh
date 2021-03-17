@@ -45,6 +45,7 @@ google-api-python-client>=1.12.2
 pandas-gbq>=0.13.2
 google-cloud-storage>=1.31.2
 retrying==1.3.3
+marquez-python==0.12.2
 ${MARQUEZ_AIRFLOW_LIB_WITH_REV}
 EOL
 

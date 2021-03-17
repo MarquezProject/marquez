@@ -28,7 +28,7 @@ from airflow.utils.file import mkdirs
 # in this file instead of from airflow.cfg. Currently
 # there are other log format and level configurations in
 # settings.py and cli.py. Please see AIRFLOW-1455.
-LOG_LEVEL = conf.get('core', 'LOGGING_LEVEL').upper()
+LOG_LEVEL = 'DEBUG'
 
 
 # Flask appbuilder's info level log is very verbose,
@@ -43,7 +43,7 @@ COLORED_LOG = conf.getboolean('core', 'COLORED_CONSOLE_LOG')
 
 COLORED_FORMATTER_CLASS = conf.get('core', 'COLORED_FORMATTER_CLASS')
 
-BASE_LOG_FOLDER = conf.get('core', 'BASE_LOG_FOLDER')
+BASE_LOG_FOLDER = "/opt/bitnami/logs"
 
 PROCESSOR_LOG_FOLDER = conf.get('scheduler', 'CHILD_PROCESS_LOG_DIRECTORY')
 
