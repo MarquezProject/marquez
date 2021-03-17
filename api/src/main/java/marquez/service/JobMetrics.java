@@ -33,10 +33,6 @@ public class JobMetrics {
           .help("Total number of completed job runs.")
           .register();
 
-  public static void emitVersionMetric(String namespaceName, String jobMetaType, String jobName) {
-    JobMetrics.versions.labels(namespaceName, jobMetaType, jobName).inc();
-  }
-
   public static void emitJobCreationMetric(String namespaceName, String jobMetaType) {
     JobMetrics.jobs.labels(namespaceName, jobMetaType).inc();
   }
@@ -44,8 +40,6 @@ public class JobMetrics {
   /** Determines whether to increment or decrement run counters given {@link RunState}. */
   public static void emitRunStateCounterMetric(@NonNull RunState runState) {
     switch (runState) {
-      case NEW:
-        break;
       case RUNNING:
         runsActive.inc();
         break;
@@ -56,6 +50,8 @@ public class JobMetrics {
       case ABORTED:
       case FAILED:
         runsActive.dec();
+        break;
+      default:
         break;
     }
   }

@@ -5,12 +5,15 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import graphql.TypeResolutionEnvironment;
 import graphql.schema.Coercing;
 import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
+import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.TypeResolver;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.RuntimeWiring.Builder;
 import graphql.schema.idl.SchemaGenerator;
@@ -21,6 +24,8 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 import lombok.SneakyThrows;
+import marquez.graphql.mapper.LineageResultMapper.DatasetResult;
+import marquez.graphql.mapper.LineageResultMapper.JobResult;
 import org.jdbi.v3.core.Jdbi;
 
 public class GraphqlSchemaBuilder {
@@ -53,7 +58,8 @@ public class GraphqlSchemaBuilder {
                 .dataFetcher("dataset", dataFetchers.getDatasetByNamespaceAndName())
                 .dataFetcher("namespace", dataFetchers.getNamespaceByName())
                 .dataFetcher("jobs", dataFetchers.getJobs())
-                .dataFetcher("job", dataFetchers.getJobsByNamespaceAndName()))
+                .dataFetcher("job", dataFetchers.getQueryJobByNamespaceAndName())
+                .dataFetcher("lineageFromJob", dataFetchers.getLineage()))
         .type(
             newTypeWiring("Dataset")
                 .dataFetcher("source", dataFetchers.getSourcesByDataset())
@@ -110,6 +116,28 @@ public class GraphqlSchemaBuilder {
                 .dataFetcher("dataset", dataFetchers.getDatasetByDatasetField())
                 .dataFetcher("versions", dataFetchers.getVersionsByDatasetField())
                 .dataFetcher("tags", dataFetchers.getTagsByDatasetField()))
+        .type(
+            newTypeWiring("JobLineageEntry")
+                .dataFetcher("data", dataFetchers.getLineageJobsByNamespaceAndName()))
+        .type(
+            newTypeWiring("DatasetLineageEntry")
+                .dataFetcher("data", dataFetchers.getLineageDatasetsByNamespaceAndName()))
+        .type(
+            newTypeWiring("LineageResultEntry")
+                .typeResolver(
+                    new TypeResolver() {
+                      @Override
+                      public GraphQLObjectType getType(TypeResolutionEnvironment env) {
+                        Object javaObject = env.getObject();
+                        if (javaObject instanceof JobResult) {
+                          return env.getSchema().getObjectType("JobLineageEntry");
+                        } else if (javaObject instanceof DatasetResult) {
+                          return env.getSchema().getObjectType("DatasetLineageEntry");
+                        } else {
+                          throw new RuntimeException("Lineage type not recognized");
+                        }
+                      }
+                    }))
         .scalar(
             GraphQLScalarType.newScalar()
                 .name("UUID")

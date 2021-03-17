@@ -171,7 +171,7 @@ public class ColumnsTest {
   @Test
   public void testPgIntervalOrThrow_pgInterval() throws SQLException {
     final String column = "with_interval";
-    final String expected = "0 years 0 mons 0 days 0 hours 5 mins 5.00 secs";
+    final String expected = "0 years 0 mons 0 days 0 hours 5 mins 5.0 secs";
     when(results.getObject(column)).thenReturn(expected);
     when(results.getString(column)).thenReturn(expected);
 

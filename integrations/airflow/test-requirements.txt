@@ -3,8 +3,8 @@ apache-airflow[gcp]==1.10.12
 apache-airflow[gcp_api]==1.10.12
 apache-airflow[google]==1.10.12
 apache-airflow[postgres]==1.10.12
-codecov==2.1.8
-marquez-python==0.7.12
+codecov==2.1.11
+marquez-python==0.12.2
 pytest
 pytest-cov==2.10.1
 requests==2.24.0
@@ -17,4 +17,4 @@ google-api-core
 google-api-python-client
 pandas-gbq>=0.13.2
 google-cloud-storage
-sqlparse==0.3.1
+sqlparse==0.4.1

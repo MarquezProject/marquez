@@ -6,7 +6,9 @@ import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.models.DatasetVersionId;
+import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
+import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.service.models.RunMeta;
@@ -45,7 +47,9 @@ public interface RunTransitionListener {
   class JobInputUpdate {
     @NonNull RunId runId;
     @NonNull RunMeta runMeta;
-    @NonNull JobVersionId jobVersionId;
+    JobVersionId jobVersionId;
+    @NonNull JobName jobName;
+    @NonNull NamespaceName namespaceName;
     @NonNull List<RunInput> inputs;
   }
 
@@ -60,7 +64,9 @@ public interface RunTransitionListener {
   @Value
   class JobOutputUpdate {
     @NonNull RunId runId;
-    @NonNull JobVersionId jobVersionId;
+    JobVersionId jobVersionId;
+    @NonNull JobName jobName;
+    @NonNull NamespaceName namespaceName;
     @NonNull List<RunOutput> outputs;
   }
 

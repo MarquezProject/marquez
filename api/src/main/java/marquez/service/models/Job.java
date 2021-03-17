@@ -15,14 +15,15 @@
 package marquez.service.models;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
@@ -39,12 +40,12 @@ public final class Job {
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final NamespaceName namespace;
-  @Getter private final ImmutableSet<DatasetId> inputs;
-  @Getter private final ImmutableSet<DatasetId> outputs;
+  @Getter private final Set<DatasetId> inputs;
+  @Getter private final Set<DatasetId> outputs;
   @Nullable private final URL location;
   @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
-  @Nullable private final Run latestRun;
+  @Nullable @Setter private Run latestRun;
 
   public Job(
       @NonNull final JobId id,
@@ -52,8 +53,8 @@ public final class Job {
       @NonNull final JobName name,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
-      @NonNull final ImmutableSet<DatasetId> inputs,
-      @NonNull final ImmutableSet<DatasetId> outputs,
+      @NonNull final Set<DatasetId> inputs,
+      @NonNull final Set<DatasetId> outputs,
       @Nullable final URL location,
       @Nullable final ImmutableMap<String, String> context,
       @Nullable final String description,

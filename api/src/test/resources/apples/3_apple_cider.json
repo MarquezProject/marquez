@@ -1,0 +1,28 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2020-09-29T12:00:00.000+10:00",
+  "run": {
+    "runId": "5f974ced-9cb5-49cc-b15d-230d41d31005"
+  },
+  "job": {
+    "namespace": "grandmas.kitchen",
+    "name": "prepare_apple_cider"
+  },
+  "inputs": [
+    {
+      "namespace": "grandmas.kitchen",
+      "name": "apples"
+    },
+    {
+      "namespace": "cupboard",
+      "name": "sugar"
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "grandmas.kitchen",
+      "name": "apple.cider"
+    }
+  ],
+  "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+}

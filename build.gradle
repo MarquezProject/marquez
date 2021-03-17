@@ -21,8 +21,7 @@ buildscript {
     dependencies {
         classpath 'com.adarshr:gradle-test-logger-plugin:2.1.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
-        classpath 'gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.6.0'
-        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.8.1'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.11.0'
         classpath 'net.researchgate:gradle-release:2.8.1'
     }
 }
@@ -35,14 +34,18 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'java'
     apply plugin: 'com.adarshr.test-logger'
     apply plugin: 'com.github.johnrengelman.shadow'
-    apply plugin: 'com.github.spotbugs'
     apply plugin: "com.diffplug.spotless"
     apply plugin: 'net.researchgate.release'
+
+    compileTestJava.doFirst {
+        if (project.hasProperty("jdk8.build") && System.getenv("JDK8_HOME")) {
+            println "Switching build to JDK8 installation at ${System.getenv('JDK8_HOME')}"
+        }
+    }
 
     project(':api') {
         apply plugin: 'application'
@@ -60,8 +63,8 @@ subprojects {
     }
 
     ext {
-        lombokVersion = '1.18.16'
-        slf4jVersion = '1.7.26'
+        lombokVersion = '1.18.18'
+        slf4jVersion = '1.7.30'
         isReleaseVersion = !version.endsWith("SNAPSHOT")
     }
 
@@ -69,12 +72,28 @@ subprojects {
         options.incremental = true
         options.compilerArgs << '-parameters'
         options.encoding = "UTF-8"
+        if (project.hasProperty("jdk8.build")) {
+            options.fork = true
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+        }
     }
 
     compileTestJava {
         options.incremental = true
         options.compilerArgs << '-parameters'
         options.encoding = "UTF-8"
+        if (project.hasProperty("jdk8.build")) {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+            options.fork = true
+        }
+    }
+
+    tasks.withType(Test) {
+        if (project.hasProperty("jdk8.build") && System.getenv("JDK8_HOME")) {
+            test.executable = "${System.getenv('JDK8_HOME')}/bin/java"
+        }
     }
 
     task sourceJar(type: Jar) {
@@ -94,55 +113,22 @@ subprojects {
     }
 
     spotless {
+        def disallowWildcardImports = {
+            String text = it
+            def regex = ~/import .*\.\*;/
+            def m = regex.matcher(text)
+            if (m.find()) {
+                throw new AssertionError("Wildcard imports disallowed - ${m.findAll()}")
+            }
+        }
         java {
             googleJavaFormat()
             removeUnusedImports()
+            custom 'disallowWildcardImports', disallowWildcardImports
         }
     }
 
     def reportsDir = "${buildDir}/reports";
-    def checkstyleDir = "${reportsDir}/checkstyle";
-
-    checkstyle {
-        toolVersion = '8.12'
-        configFile = rootProject.file('checkstyle.xml')
-    }
-
-    task checkstyle(type: Checkstyle) {
-        reports {
-            xml.enabled = true
-            html.enabled = true
-            html.destination = file(checkstyleDir)
-        }
-    }
-
-    checkstyleMain {
-        source = 'src/main/java'
-    }
-
-    checkstyleTest {
-        source = 'src/test/java'
-    }
-
-    spotbugsMain {
-        ignoreFailures = true
-        effort = 'max'
-        reportLevel = 'low'
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
-
-    spotbugsTest {
-        ignoreFailures = true
-        effort = 'max'
-        reportLevel = 'low'
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
 
     def coverageDir = "${reportsDir}/coverage";
 

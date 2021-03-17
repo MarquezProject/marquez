@@ -1,0 +1,32 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2020-10-15T15:00:00.000+10:00",
+  "run": {
+    "runId": "e7d71919-25b3-49cc-a0f5-63ecbee72b0f"
+  },
+  "job": {
+    "namespace": "grandmas.kitchen",
+    "name": "prepare_apple_filling"
+  },
+  "inputs": [
+    {
+      "namespace": "grandmas.kitchen",
+      "name": "apples"
+    },
+    {
+      "namespace": "grandmas.kitchen",
+      "name": "cinnamon"
+    },
+    {
+      "namespace": "cupboard",
+      "name": "sugar"
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "grandmas.kitchen",
+      "name": "apple.filling"
+    }
+  ],
+  "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+}

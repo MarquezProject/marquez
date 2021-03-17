@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.db.Columns;
-import marquez.db.MapperUtils;
 import marquez.db.models.ExtendedJobVersionRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -56,7 +55,7 @@ public final class ExtendedJobVersionRowMapper implements RowMapper<ExtendedJobV
         uuidOrNull(results, Columns.LATEST_RUN_UUID),
         columnNames.contains(Columns.CONTEXT) ? stringOrThrow(results, Columns.CONTEXT) : "",
         stringOrThrow(results, Columns.NAMESPACE_NAME),
-        columnNames.contains(Columns.NAME) ? stringOrThrow(results, Columns.NAME) : "",
+        stringOrThrow(results, Columns.JOB_NAME),
         uuidOrThrow(results, Columns.NAMESPACE_UUID));
   }
 }
