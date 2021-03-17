@@ -19,7 +19,13 @@ import airflow
 from airflow.models import Connection
 from airflow.utils.db import provide_session
 from airflow.version import version as AIRFLOW_VERSION
-from pendulum import Pendulum
+
+try:
+    # Import from pendulum 1.x version
+    from pendulum import Pendulum
+except ImportError:
+    # Import for Pendulum 2.x version
+    from pendulum import DateTime as Pendulum
 
 from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
 
@@ -28,14 +34,6 @@ _NOMINAL_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 class JobIdMapping:
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(
-                JobIdMapping, cls).__new__(cls, *args, **kwargs)
-        return cls._instance
-
     @staticmethod
     def set(job_name, run_id, val):
         airflow.models.Variable.set(

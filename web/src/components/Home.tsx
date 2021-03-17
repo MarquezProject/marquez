@@ -15,7 +15,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { setSelectedNode } from '../actionCreators'
 import DatasetPreviewCard from './DatasetPreviewCard'
-import FiltersWrapper from './filters/FiltersWrapper'
 import JobPreviewCard from './JobPreviewCard'
 import MqText from './core/text/MqText'
 import React, { FunctionComponent, useState } from 'react'
@@ -49,7 +48,6 @@ interface IProps {
   datasets: IDatasetsState
   jobs: IJobsState
   showJobs: boolean
-  setShowJobs: (bool: boolean) => void
   setSelectedNode: (payload: string) => void
 }
 type IAllProps = RRD.RouteComponentProps & IWithStyles<typeof styles> & IProps
@@ -60,7 +58,7 @@ const Home: FunctionComponent<IAllProps> = props => {
 
   const limit = 5
 
-  const { datasets, jobs, classes, showJobs, setShowJobs, setSelectedNode } = props
+  const { datasets, jobs, classes, showJobs, setSelectedNode } = props
 
   const matchingDatasets = datasets.filter(d => d.matches)
   const matchingJobs = jobs.filter(j => j.matches)
@@ -78,7 +76,6 @@ const Home: FunctionComponent<IAllProps> = props => {
           {matchingDatasets.length > 0 ? (
             <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
               <MqText heading>{!showJobs ? 'Popular Datasets' : 'Matching Datasets'}</MqText>
-              <FiltersWrapper showJobs={setShowJobs} />
             </Box>
           ) : (
             <Box textAlign={'center'}>

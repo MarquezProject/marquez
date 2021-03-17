@@ -5,19 +5,20 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Value;
+import marquez.db.JobVersionDao.JobVersionBag;
 
 @Getter
 @Setter
 public class UpdateLineageRow {
   private NamespaceRow namespace;
   private JobRow job;
-  private JobVersionRow jobVersion;
   private JobContextRow jobContext;
   private RunArgsRow runArgs;
   private RunRow run;
   private RunStateRow runState;
   private Optional<List<DatasetRecord>> inputs;
   private Optional<List<DatasetRecord>> outputs;
+  private JobVersionBag jobVersionBag;
 
   @Value
   public static class DatasetRecord {

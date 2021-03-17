@@ -38,6 +38,7 @@ NAME = "marquez-airflow"
 
 setup(
     name=NAME,
+    python_requires='>=3.6',
     version=get_version('marquez_airflow/version.py'),
     author="Marquez Team",
     author_email="",
@@ -47,7 +48,7 @@ setup(
     url="https://github.com/MarquezProject/marquez-airflow",
     packages=find_packages(),
     install_requires=[
-        "marquez-python==0.12.0",
-        "sqlparse==0.3.1"
+        "marquez-python==0.12.2",
+        "sqlparse==0.4.1"
     ]
 )

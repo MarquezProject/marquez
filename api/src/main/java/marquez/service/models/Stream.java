@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -47,7 +49,8 @@ public final class Stream extends Dataset {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
-      @Nullable final String description) {
+      @Nullable final String description,
+      Optional<UUID> currentVersionUuid) {
     super(
         id,
         STREAM,
@@ -59,7 +62,8 @@ public final class Stream extends Dataset {
         fields,
         tags,
         lastModifiedAt,
-        description);
+        description,
+        currentVersionUuid);
     this.schemaLocation = schemaLocation;
   }
 }

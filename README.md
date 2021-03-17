@@ -67,19 +67,28 @@ Marquez uses a _multi_-project structure and contains the following modules:
 ## Requirements
 
 * [Java 11](https://openjdk.java.net/install)
+* [Java 8](https://openjdk.java.net/install) (_required_ for **Spark** integration)
 * [PostgreSQL 12.1](https://www.postgresql.org/download)
 
 > **Note:** To connect to your running PostgreSQL instance, you will need the standard [`psql`](https://www.postgresql.org/docs/9.6/app-psql.html) tool.
 
 ## Building
 
-To build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
+You can build most of the project modules using Java 11. We recommend setting `JAVA_HOME` to your local JDK 11 installation and invoking `./gradlew :<module>:shadowJar` with the specific module you'd like to build. For example, to build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
 
 ```
 $ ./gradlew :api:shadowJar
 ```
 
 The executable can be found under `api/build/libs/`
+
+**The** [`spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) **integration requires Java 8 to build. The module can be built separately by setting** `JAVA_HOME` **to your local JDK 8 installation and invoking** `./gradlew :integrations:spark:shadowJar`.
+
+To build the entire project, set `JAVA_HOME` to your local JDK 11 installation and `JDK8_HOME` to your local JDK 8 installation. Then, build all modules with:
+
+```
+$ ./gradlew build
+```
 
 ## Configuration
 
@@ -101,7 +110,7 @@ With your database created, you can now copy [`marquez.example.yml`](https://git
 $ cp marquez.example.yml marquez.yml
 ```
 
-You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`. The environment variables override the equivalent option in the configuration file. 
+You will then need to set the following environment variables (we recommend adding them to your `.bashrc`): `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`. The environment variables override the equivalent option in the configuration file.
 
 By default, Marquez uses the following ports:
 

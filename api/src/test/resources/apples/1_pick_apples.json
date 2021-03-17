@@ -1,0 +1,24 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2020-08-30T09:00:00.000+10:00",
+  "run": {
+    "runId": "fc57cd10-90ce-49aa-ac91-29d222d66fdf"
+  },
+  "job": {
+    "namespace": "grandmas.kitchen",
+    "name": "gather_apples"
+  },
+  "inputs": [
+    {
+      "namespace": "laurents-orchard",
+      "name": "red.delicious"
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "grandmas.kitchen",
+      "name": "apples"
+    }
+  ],
+  "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+}
