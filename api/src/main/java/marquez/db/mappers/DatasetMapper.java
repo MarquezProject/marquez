@@ -124,7 +124,7 @@ public final class DatasetMapper implements RowMapper<Dataset> {
   public static ImmutableList<Field> toFields(ResultSet results, String column)
       throws SQLException {
     if (results.getObject(column) == null) {
-      return null;
+      return ImmutableList.of();
     }
     PGobject pgObject = (PGobject) results.getObject(column);
     try {

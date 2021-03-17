@@ -50,8 +50,10 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
             .thenAccept(
                 (update) -> {
                   if (event.getEventType() != null) {
+                    if (event.getEventType().equalsIgnoreCase("COMPLETE")) {
+                      buildJobOutputUpdate(update).ifPresent(runService::notify);
+                    }
                     buildJobInputUpdate(update).ifPresent(runService::notify);
-                    buildJobOutputUpdate(update).ifPresent(runService::notify);
                   }
                 });
 

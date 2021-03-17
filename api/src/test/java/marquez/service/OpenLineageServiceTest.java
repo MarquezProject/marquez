@@ -70,39 +70,44 @@ public class OpenLineageServiceTest {
     return Arrays.asList(
         new Object[] {
           Arrays.asList(Resources.getResource(EVENT_REQUIRED_ONLY).toURI()),
-          new ExpectedResults(0, 0, 0)
+          new ExpectedResults(0, 0, 0, 0)
         },
         new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_SIMPLE).toURI()), new ExpectedResults(2, 1, 1)
+          Arrays.asList(Resources.getResource(EVENT_SIMPLE).toURI()),
+          new ExpectedResults(2, 1, 1, 1)
         },
         new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_FULL).toURI()), new ExpectedResults(1, 1, 1)
+          Arrays.asList(Resources.getResource(EVENT_FULL).toURI()), new ExpectedResults(1, 1, 1, 1)
         },
         new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_UNICODE).toURI()), new ExpectedResults(2, 1, 1)
+          Arrays.asList(Resources.getResource(EVENT_UNICODE).toURI()),
+          new ExpectedResults(2, 1, 1, 1)
         },
         new Object[] {
           Arrays.asList(
               Resources.getResource("open_lineage/listener/1.json").toURI(),
               Resources.getResource("open_lineage/listener/2.json").toURI()),
-          new ExpectedResults(3, 2, 2)
+          new ExpectedResults(3, 2, 2, 1)
         },
-        new Object[] {rdd, new ExpectedResults(1, 0, 2)},
-        new Object[] {sql, new ExpectedResults(1, 0, 4)},
+        new Object[] {rdd, new ExpectedResults(1, 0, 2, 2)},
+        new Object[] {sql, new ExpectedResults(1, 0, 4, 4)},
         new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()), new ExpectedResults(1, 1, 1)
+          Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()), new ExpectedResults(1, 1, 1, 1)
         });
   }
 
   public static class ExpectedResults {
     public int inputDatasetCount;
     public int outputDatasetCount;
-    public int uniqueEventCount;
+    public int inputEventCount;
+    public int outputEventCount;
 
-    public ExpectedResults(int inputDatasetCount, int outputDatasetCount, int uniqueEventCount) {
+    public ExpectedResults(
+        int inputDatasetCount, int outputDatasetCount, int inputEventCount, int outputEventCount) {
       this.inputDatasetCount = inputDatasetCount;
       this.outputDatasetCount = outputDatasetCount;
-      this.uniqueEventCount = uniqueEventCount;
+      this.inputEventCount = inputEventCount;
+      this.outputEventCount = outputEventCount;
     }
   }
 
@@ -138,7 +143,7 @@ public class OpenLineageServiceTest {
     if (expected.inputDatasetCount > 0) {
       assertEquals(
           "RunInputListener events",
-          expected.uniqueEventCount,
+          expected.inputEventCount,
           runInputListener.getAllValues().size());
       assertEquals(
           "Dataset input count",
@@ -156,7 +161,7 @@ public class OpenLineageServiceTest {
     if (expected.outputDatasetCount > 0) {
       assertEquals(
           "RunOutputListener events",
-          expected.uniqueEventCount,
+          expected.outputEventCount,
           runOutputListener.getAllValues().size());
       assertEquals(
           "Dataset output count",
