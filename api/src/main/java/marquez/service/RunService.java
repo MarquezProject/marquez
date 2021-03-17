@@ -69,35 +69,34 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
     ExtendedRunRow runRow = findByRow(runId.getValue()).get();
     runStateDao.updateRunState(runId.getValue(), runState, transitionedAt);
 
-    if (runState == COMPLETED) {
+    if (runState.isDone()) {
       JobVersionBag jobVersionBag =
           jobVersionDao.createJobVersionOnComplete(
               transitionedAt, runRow.getUuid(), runRow.getNamespaceName(), runRow.getJobName());
 
-      notifyCompleteHandler(jobVersionBag, runRow);
+      if (runState == COMPLETED) {
+        notify(
+            new JobOutputUpdate(
+                RunId.of(runRow.getUuid()),
+                toJobVersionId(jobVersionBag.getJobVersionRow()),
+                JobName.of(runRow.getJobName()),
+                NamespaceName.of(runRow.getNamespaceName()),
+                buildRunOutputs(jobVersionBag.getOutputs())));
+      }
+
+      notify(
+          new JobInputUpdate(
+              RunId.of(runRow.getUuid()),
+              buildRunMeta(runRow),
+              toJobVersionId(jobVersionBag.getJobVersionRow()),
+              JobName.of(runRow.getJobName()),
+              NamespaceName.of(runRow.getNamespaceName()),
+              buildRunInputs(jobVersionBag.getInputs())));
     }
 
     final RunState oldRunState = runRow.getCurrentRunState().map(RunState::valueOf).orElse(null);
     notify(new RunTransition(runId, oldRunState, runState));
     JobMetrics.emitRunStateCounterMetric(runState);
-  }
-
-  public void notifyCompleteHandler(JobVersionBag jobVersionBag, ExtendedRunRow runRow) {
-    notify(
-        new JobOutputUpdate(
-            RunId.of(runRow.getUuid()),
-            toJobVersionId(jobVersionBag.getJobVersionRow()),
-            JobName.of(runRow.getJobName()),
-            NamespaceName.of(runRow.getNamespaceName()),
-            buildRunOutputs(jobVersionBag.getOutputs())));
-    notify(
-        new JobInputUpdate(
-            RunId.of(runRow.getUuid()),
-            buildRunMeta(runRow),
-            toJobVersionId(jobVersionBag.getJobVersionRow()),
-            JobName.of(runRow.getJobName()),
-            NamespaceName.of(runRow.getNamespaceName()),
-            buildRunInputs(jobVersionBag.getInputs())));
   }
 
   public static RunMeta buildRunMeta(ExtendedRunRow runRow) {
@@ -110,26 +109,19 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
 
   public static List<RunInput> buildRunInputs(List<ExtendedDatasetVersionRow> inputs) {
     return inputs.stream()
-        .map(
-            (v) ->
-                new RunInput(
-                    new DatasetVersionId(
-                        NamespaceName.of(v.getNamespaceName()),
-                        DatasetName.of(v.getDatasetName()),
-                        v.getUuid())))
+        .map((v) -> new RunInput(buildDatasetVersionId(v)))
         .collect(Collectors.toList());
   }
 
   public static List<RunOutput> buildRunOutputs(List<ExtendedDatasetVersionRow> outputs) {
     return outputs.stream()
-        .map(
-            (v) ->
-                new RunOutput(
-                    new DatasetVersionId(
-                        NamespaceName.of(v.getNamespaceName()),
-                        DatasetName.of(v.getDatasetName()),
-                        v.getUuid())))
+        .map((v) -> new RunOutput(buildDatasetVersionId(v)))
         .collect(Collectors.toList());
+  }
+
+  private static DatasetVersionId buildDatasetVersionId(ExtendedDatasetVersionRow v) {
+    return new DatasetVersionId(
+        NamespaceName.of(v.getNamespaceName()), DatasetName.of(v.getDatasetName()), v.getVersion());
   }
 
   private JobVersionId toJobVersionId(JobVersionRow jobVersion) {

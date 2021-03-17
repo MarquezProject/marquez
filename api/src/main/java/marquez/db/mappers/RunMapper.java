@@ -63,7 +63,9 @@ public final class RunMapper implements RowMapper<Run> {
         durationMs.orElse(null),
         toArgs(results, "args"),
         stringOrThrow(results, Columns.NAMESPACE_NAME),
-        stringOrThrow(results, Columns.JOB_NAME));
+        stringOrThrow(results, Columns.JOB_NAME),
+        stringOrNull(results, Columns.LOCATION),
+        JobMapper.toContext(results, Columns.CONTEXT));
   }
 
   private Map<String, String> toArgs(ResultSet results, String column) throws SQLException {
