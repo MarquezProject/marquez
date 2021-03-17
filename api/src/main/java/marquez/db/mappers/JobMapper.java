@@ -66,7 +66,7 @@ public final class JobMapper implements RowMapper<Job> {
         null);
   }
 
-  private ImmutableMap<String, String> toContext(ResultSet results, String column)
+  public static ImmutableMap<String, String> toContext(ResultSet results, String column)
       throws SQLException {
     if (results.getString(column) == null) {
       return null;

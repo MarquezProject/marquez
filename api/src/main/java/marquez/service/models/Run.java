@@ -43,6 +43,8 @@ public final class Run {
   @Getter private final Map<String, String> args;
   private final String namespaceName;
   private final String jobName;
+  @Getter private final String location;
+  @Getter private final Map<String, String> context;
 
   public Run(
       @NonNull final RunId id,
@@ -56,7 +58,9 @@ public final class Run {
       @Nullable final Long durationMs,
       @Nullable final Map<String, String> args,
       String namespaceName, // Fields not serialized may be null for clients
-      String jobName) {
+      String jobName,
+      String location,
+      Map<String, String> context) {
     this.id = id;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -69,6 +73,8 @@ public final class Run {
     this.args = (args == null) ? ImmutableMap.of() : args;
     this.namespaceName = namespaceName;
     this.jobName = jobName;
+    this.location = location;
+    this.context = context;
   }
 
   public Optional<Instant> getNominalStartTime() {
