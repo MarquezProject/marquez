@@ -202,18 +202,18 @@ To view DAG metadata collected by Marquez from Airflow, browse to the Marquez UI
 
 If you take a quick look at the lineage graph for `counter.inc`, you should see `public.counts` as an output dataset and `sum.total` as a downstream job!
 
-![](./docs/lineage-view.png)
+![](./docs/lineage-view-job.png)
 
 ## Step 5: Troubleshoot Failing DAG with Marquez
 
-In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of column `value` in table `counts ` being renamed to `value_1_to_10`. So, let's get to it!
+In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of an upstream schema change for tabe `counts`. So, let's get to it!
 
-Let's say team `A` owns the DAG `counter`. Team `A` decides to update the `t1` task in `counter` to rename the `values` column in the `counts` table:
+Let's say team `A` owns the DAG `counter`. Team `A` decides to update the `t1` task in `counter` to rename the `values` column in the `counts` table to `value_1_to_10` (without properly communicating the schema change!):
 
 ```diff
 t1 = PostgresOperator(
 -   task_id='if_not_exists',
-+   task_id='alter_column',
++   task_id='alter_name_of_column',
     postgres_conn_id='example_db',
 -   sql='''
 -   CREATE TABLE IF NOT EXISTS counts (
@@ -226,15 +226,15 @@ t1 = PostgresOperator(
 )
 ```
 
-You should begin to see the DAG `sum` failing as the result of the column rename:
-
-![](./docs/downstream-job-failure.png)
-
-With the DAG run metadata now showing a _failed_ run state:
+Team `B`, unaware of the schena change, owns DAG `sum` and begins to see DAG run metadata with _failed_ run states:
 
 ![](./docs/search-job-failure.png)
 
-To fix the DAG `sum`, update `t2` in `sum.py` to use the new column name:
+But, team `B` isn't sure what might have caused the recent DAG failure as no recent code changes have been made. So, team `B` decides to check the schema of the input dataset:  
+
+![](./docs/lineage-view-dataset.png)
+
+Team `A` realizes that the schema had changed! To fix the DAG `sum`, team `A` updates `t2` in `sum` to use the new column name:
 
 ```diff
 t2 = PostgresOperator(
@@ -249,11 +249,7 @@ t2 = PostgresOperator(
 )
 ```
 
-Now, you should to see the DAG `sum` running successfully as the result of code change:
-
-![](./docs/downstream-job-successful.png)
-
-With the DAG run metadata now showing a _completed_ run state:
+With the code change, the DAG `sum` begins to run successfully:
 
 ![](./docs/lineage-view-job-successful.png)
 
