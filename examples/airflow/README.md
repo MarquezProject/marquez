@@ -25,7 +25,7 @@ Before you begin, make sure you have installed:
   marquez-airflow
   ```
 
-* Next, we'll need to specify where to send DAG metadata. Create a config file named `marquez.env` with the following environment variables:
+* Next, we'll need to specify where to send DAG metadata. To do so, create a config file named `marquez.env` with the following environment variables:
 
   ```
   MARQUEZ_BACKEND=http             # Collect metadata using HTTP backend
@@ -52,7 +52,7 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-Then, add the DAGs `counter` and `sum` (defined below) to `dags/`. You'll notice that we're using **`marquez_airflow import DAG`** instead of **`airflow import DAG`** when writing our DAGs.
+Then, add the DAGs `counter` and `sum` (defined below) to `dags/`. You'll notice that we're using **`marquez_airflow import DAG`** instead of **`airflow import DAG`**. When writing our DAGs, using `marquez_airflow` will enable Marquez to observe the DAG and automatically collect task-level metadata.
 
 ### DAG `counter`:
 
