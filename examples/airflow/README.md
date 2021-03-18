@@ -206,10 +206,32 @@ If you take a quick look at the lineage graph for `counter.inc`, you should see 
 
 ## Step 5: Troubleshoot Failing DAG with Marquez
 
+Update `t1` in DAG `counter.py` with:
+
+```diff
+t1 = PostgresOperator(
+   -task_id='if_not_exists',
+   +task_id='alter',
+    postgres_conn_id='example_db',
+   -sql='''
+   -CREATE TABLE IF NOT EXISTS counts (
+   -  value INTEGER
+   -);''',
+   +sql='''
+   +ALTER TABLE counts RENAME COLUMN value TO value_1_to_10;
+   +''',
+    dag=dag
+)
+```
+
+![](./docs/downstream-job-failure.png)
+
 
 ## Running on [GCP](https://cloud.google.com/composer)
 
 ## Running on [AWS](https://cloud.google.com/composer)
+
+Unfortunately, installing libraries on 
 
 ## Feedback
 
