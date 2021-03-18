@@ -226,6 +226,26 @@ t1 = PostgresOperator(
 
 ![](./docs/downstream-job-failure.png)
 
+![](./docs/search-job-failure.png)
+
+Update `t2` in `sum.py` with:
+
+```diff
+t2 = PostgresOperator(
+    task_id='total',
+    postgres_conn_id='example_db',
+    sql='''
+    INSERT INTO sums (value)
+-       SELECT SUM(c.value) FROM counts AS c;
++       SELECT SUM(c.value_1_to_10) FROM counts AS c;
+    ''',
+    dag=dag
+)
+```
+
+![](./docs/downstream-job-successful.png)
+
+![](./docs/lineage-view-job-successful.png)
 
 ## Running on [GCP](https://cloud.google.com/composer)
 
