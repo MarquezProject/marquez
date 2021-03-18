@@ -52,7 +52,7 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-Then, add the dags `counter.py` and `sum.py` (defined below) to `dags/`. You'll notice that we're using `marquez_airflow import DAG` instead of `airflow import DAG` when defining our DAGs.
+Then, add the dags `counter.py` and `sum.py` (defined below) to `dags/`. You'll notice that we're using **`marquez_airflow import DAG`** instead of **`airflow import DAG`** when defining our DAGs.
 
 ### DAG `counter.py`:
 
@@ -161,7 +161,7 @@ t1 >> t2
 
 ```
 
-At this point, you should have the following under the `examples/airflow/` directory:
+At this point, you should have the following under your `examples/airflow/` directory:
 
 ```
 .
