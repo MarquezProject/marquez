@@ -232,7 +232,7 @@ Team `B`, unaware of the schema change, owns DAG `sum` and begins to see DAG run
 
 ![](./docs/search-job-failure.png)
 
-But, team `B` isn't sure what might have caused the recent DAG failure as no recent code changes have been made to DAG `sum`. So, team `B` decides to check the schema of the input dataset:  
+But, team `B` isn't sure what might have caused the DAG failure as no recent code changes have been made to DAG `sum`. So, team `B` decides to check the schema of the input dataset:
 
 ![](./docs/lineage-view-dataset.png)
 
