@@ -190,7 +190,7 @@ $ docker-compose up
 * Start Marquez
 * Start Postgres
 
-To view the Airflow UI and verify it's running, open http://localhost:8080. You can also browse to http://localhost:3000 to view the Marquez UI.
+To view the Airflow UI and verify it's running, open http://localhost:8080. Then, login using the username and password: `airflow` / `airflow`. You can also browse to http://localhost:3000 to view the Marquez UI.
 
 ## Step 4: View Collected Metadata
 
