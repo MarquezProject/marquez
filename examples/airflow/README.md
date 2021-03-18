@@ -70,9 +70,9 @@ To view the Airflow UI and verify it's running, open http://localhost:8080. You 
 
 ## Step 3: Write Airflow DAGs using Marquez
 
-Now that we've started Airflow and Marquez, we can add the dags `counter.py` and `sum.py` (defined below) to our `dags/` folder:
+Now that we've started Airflow and Marquez, we can add the dags `counter.py` and `sum.py` (defined below) to our `dags/` folder. You'll notice that we're are using `marquez_airflow import DAG` instead of `airflow import DAG`.
 
-### DAG `counter.py`
+### DAG `counter.py`:
 
 In the `dags/` folder, create a file named `counter.py` and copy in the following code:
 
@@ -128,7 +128,7 @@ t1 >> t2
 
 ```
 
-### DAG `sum.py`
+### DAG `sum.py`:
 
 In the `dags/` folder, create a file named `sum.py` and copy in the following code:
 
@@ -188,4 +188,4 @@ t1 >> t2
 
 ## Feedback
 
-What did you think of this example? You can reach out to us on our [slack](http://bit.ly/MarquezSlack) channel and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!  
+What did you think of this example? You can reach out to us on [slack](http://bit.ly/MarquezSlack) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!  
