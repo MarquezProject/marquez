@@ -192,7 +192,7 @@ public interface GraphqlDaos extends SqlObject {
           + "inner join job_versions_io_mapping io_out on io_out.job_version_uuid = j.current_version_uuid and io_out.io_type = 'OUTPUT' "
           + "inner join job_versions_io_mapping io_in on io_in.dataset_uuid = io_out.dataset_uuid and io_in.io_type = 'INPUT' "
           + "inner join job_versions jv on jv.uuid = io_in.job_version_uuid "
-          + ") l where l.jx = sg.job_name and NOT cycle) "
+          + ") l where l.jx = sg.job_name and l.namespace_name = sg.namespace_name and NOT cycle) "
           + "SELECT * FROM search_graph where NOT cycle and depth <= :depth) lineage "
           // Construct the dataset edges:
           + "inner join jobs j on lineage.job_name = j.name and lineage.namespace_name = j.namespace_name "

@@ -4,12 +4,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import graphql.kickstart.servlet.GraphQLHttpServlet;
+import graphql.schema.GraphQLSchema;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
 import marquez.api.DatasetResource;
 import marquez.api.JobResource;
+import marquez.api.LineageResource;
 import marquez.api.NamespaceResource;
 import marquez.api.OpenLineageResource;
 import marquez.api.SourceResource;
@@ -81,6 +83,7 @@ public final class MarquezContext {
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
+  @Getter private final LineageResource lineageResource;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
@@ -134,7 +137,8 @@ public final class MarquezContext {
     this.jobResource = new JobResource(serviceFactory);
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory);
-
+    GraphQLSchema schema = new GraphqlSchemaBuilder(jdbi).buildSchema();
+    this.lineageResource = new LineageResource(serviceFactory, schema);
     this.resources =
         ImmutableList.of(
             namespaceResource,
@@ -143,7 +147,8 @@ public final class MarquezContext {
             jobResource,
             tagResource,
             jdbiException,
-            openLineageResource);
+            openLineageResource,
+            lineageResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
     this.graphqlServlet = servlet.getServlet(new GraphqlSchemaBuilder(jdbi));

@@ -1,6 +1,7 @@
 package marquez;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static marquez.common.models.ModelGenerator.newConnectionUrl;
 import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.ModelGenerator.newContext;
@@ -15,7 +16,9 @@ import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newOwnerName;
 import static marquez.common.models.ModelGenerator.newSchemaLocation;
 import static marquez.common.models.ModelGenerator.newSourceName;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -30,8 +33,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import marquez.client.MarquezClient;
 import marquez.client.Utils;
 import marquez.client.models.DatasetId;
@@ -45,6 +53,7 @@ import marquez.client.models.SourceMeta;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.SourceType;
+import marquez.service.models.LineageEvent;
 import org.jdbi.v3.testing.JdbiRule;
 import org.junit.ClassRule;
 
@@ -58,6 +67,7 @@ public abstract class BaseIntegrationTest {
     POSTGRES.start();
   }
 
+  protected final ObjectMapper objectMapper = Utils.newObjectMapper();
   protected final URL baseUrl = Utils.toUrl("http://localhost:" + APP.getLocalPort());
   protected final MarquezClient client = MarquezClient.builder().baseUrl(baseUrl).build();
   // TAGS
@@ -131,6 +141,8 @@ public abstract class BaseIntegrationTest {
           .description(JOB_DESCRIPTION)
           .build();
 
+  protected static Function<Response, Response> expect200 = expect(200);
+
   @ClassRule
   public static final DropwizardAppRule<MarquezConfig> APP =
       new DropwizardAppRule<>(
@@ -141,6 +153,13 @@ public abstract class BaseIntegrationTest {
           ConfigOverride.config("db.password", POSTGRES.getPassword()));
 
   @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
+
+  protected static Function<Response, Response> expect(int status) {
+    return (resp) -> {
+      assertThat(resp.getStatus()).isEqualTo(status);
+      return resp;
+    };
+  }
 
   protected static PostgresContainer createMarquezPostgres() {
     return PostgresContainer.create("marquez");
@@ -155,6 +174,20 @@ public abstract class BaseIntegrationTest {
             .build();
 
     return http2.sendAsync(request, BodyHandlers.ofString());
+  }
+
+  protected HttpResponse<String> sendLineage(LineageEvent event) {
+    try {
+      HttpRequest request =
+          HttpRequest.newBuilder()
+              .uri(URI.create(baseUrl + "/api/v1/lineage"))
+              .header("Content-Type", "application/json")
+              .POST(BodyPublishers.ofString(objectMapper.writeValueAsString(event)))
+              .build();
+      return http2.sendAsync(request, BodyHandlers.ofString()).get();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   protected void createSource(String sourceName) {
@@ -196,5 +229,36 @@ public abstract class BaseIntegrationTest {
 
   protected static Field newFieldWith(final ImmutableSet<String> tags) {
     return new Field(newFieldName().getValue(), newFieldType().name(), tags, newDescription());
+  }
+
+  public Response getLineage(
+      String namespace, String name, int depth, Function<Response, Response> function) {
+    return getSync(
+        URI.create(baseUrl + "/api/v1/lineageGraph"),
+        ImmutableMap.of("namespace", namespace, "name", name, "depth", depth),
+        function);
+  }
+
+  protected <T> T getSync(URI uri, Map<String, Object> params, Function<Response, T> function) {
+    Response response = getSync(uri, params);
+    return function.apply(response);
+  }
+
+  protected Response getSync(URI uri, Map<String, Object> params) {
+    WebTarget target = APP.client().target(uri);
+    for (Map.Entry<String, Object> entry : params.entrySet()) {
+      if (entry.getValue() instanceof Optional) {
+        if (((Optional) entry.getValue()).isPresent()) {
+          target = target.queryParam(entry.getKey(), ((Optional) entry.getValue()).get());
+        }
+      } else {
+        target = target.queryParam(entry.getKey(), entry.getValue());
+      }
+    }
+    return target.request(APPLICATION_JSON).accept(APPLICATION_JSON).get();
+  }
+
+  public static class GraphqlResponse<T> {
+    public T data;
   }
 }
