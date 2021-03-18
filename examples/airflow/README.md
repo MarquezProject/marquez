@@ -265,7 +265,7 @@ _Congrats_! You successfully step through a troubleshooting scenario of a failin
 ## Next Steps
 
 * Review the Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) used to collect Airflow DAG metadata and learn how to build your own integrations
-* Take a look at our other integrations (ex: [`marquez-spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark))
+* Take a look at our [`marquez-spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) integration that can be used with Airflow
 
 ## Feedback
 
