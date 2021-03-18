@@ -75,9 +75,10 @@ public interface RunDao extends BaseDao {
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
   String SELECT_RUN =
-      "SELECT r.*, ra.args, r.started_at, r.ended_at, ra.args "
+      "SELECT r.*, ra.args, ra.args, ctx.context "
           + "FROM runs AS r "
-          + "LEFT OUTER JOIN run_args AS ra ON (ra.uuid = r.run_args_uuid) ";
+          + "LEFT OUTER JOIN run_args AS ra ON (ra.uuid = r.run_args_uuid) "
+          + "LEFT OUTER JOIN job_contexts AS ctx ON (r.job_context_uuid = ctx.uuid) ";
 
   @SqlQuery(SELECT_RUN + " WHERE r.uuid = :rowUuid")
   Optional<Run> findBy(UUID rowUuid);
@@ -106,7 +107,8 @@ public interface RunDao extends BaseDao {
           + "transitioned_at, "
           + "namespace_name, "
           + "job_name, "
-          + "location "
+          + "location, "
+          + "job_context_uuid "
           + ") VALUES ( "
           + ":runUuid, "
           + ":externalId, "
@@ -120,7 +122,8 @@ public interface RunDao extends BaseDao {
           + ":runStateTime, "
           + ":namespaceName, "
           + ":jobName, "
-          + ":location "
+          + ":location, "
+          + ":jobContextUuid "
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
           + "updated_at = EXCLUDED.updated_at, "
@@ -142,7 +145,8 @@ public interface RunDao extends BaseDao {
       Instant runStateTime,
       String namespaceName,
       String jobName,
-      String location);
+      String location,
+      UUID jobContextUuid);
 
   @SqlQuery(
       "INSERT INTO runs ( "
@@ -156,7 +160,8 @@ public interface RunDao extends BaseDao {
           + "nominal_end_time, "
           + "namespace_name, "
           + "job_name, "
-          + "location "
+          + "location, "
+          + "job_context_uuid "
           + ") VALUES ( "
           + ":runUuid, "
           + ":externalId, "
@@ -168,7 +173,8 @@ public interface RunDao extends BaseDao {
           + ":nominalEndTime, "
           + ":namespaceName, "
           + ":jobName, "
-          + ":location "
+          + ":location, "
+          + ":jobContextUuid "
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
           + "updated_at = EXCLUDED.updated_at, "
@@ -187,7 +193,8 @@ public interface RunDao extends BaseDao {
       UUID namespaceUuid,
       String namespaceName,
       String jobName,
-      String location);
+      String location,
+      UUID jobContextUuid);
 
   @SqlUpdate(
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
@@ -196,8 +203,6 @@ public interface RunDao extends BaseDao {
 
   @Transaction
   default void notifyJobChange(UUID runUuid, JobRow jobRow, JobMeta jobMeta) {
-    DatasetDao datasetDao = createDatasetDao();
-
     upsertRun(runUuid, jobRow.getName(), jobRow.getNamespaceName());
 
     updateInputDatasetMapping(jobMeta.getInputs(), runUuid);
@@ -259,7 +264,8 @@ public interface RunDao extends BaseDao {
             now,
             namespaceRow.getName(),
             jobName.getValue(),
-            jobRow.getLocation());
+            jobRow.getLocation(),
+            jobRow.getJobContextUuid());
 
     updateInputDatasetMapping(jobRow.getInputs(), uuid);
 
@@ -274,6 +280,6 @@ public interface RunDao extends BaseDao {
   @SqlQuery(
       SELECT_RUN
           + "where r.job_name = :jobName and r.namespace_name = :namespaceName "
-          + "order by updated_at desc limit 1")
+          + "order by transitioned_at desc limit 1")
   Optional<Run> findByLatestJob(String namespaceName, String jobName);
 }
