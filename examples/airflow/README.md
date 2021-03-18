@@ -52,7 +52,7 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-When writing our DAGs, we'll use [`marquez-airflow`](https://pypi.org/project/marquez-airflow) enabling Marquez to observe the DAG and automatically collect task-level metadata. Below, in steps `2.1` and `2.2`, we create the DAGs `counter` and `sum` and add them to `dags/`. You'll notice that to begin collecting DAG metadata with Marquez, we only make the following change:
+When writing our DAGs, we'll use [`marquez-airflow`](https://pypi.org/project/marquez-airflow) enabling Marquez to observe the DAG and automatically collect task-level metadata. Below, in steps `2.1` and `2.2`, we create the DAGs `counter` and `sum` and add them to `dags/`. You'll notice that to begin collecting DAG metadata, we only make the following change:
 
 ```diff
 - from airflow import DAG
@@ -260,7 +260,12 @@ With the code change, the DAG `sum` begins to run successfully:
 
 ![](./docs/lineage-view-job-successful.png)
 
-_Congrats_! You successfully step through a troubleshooting scenario of a failing DAG using metadata collected with Marquez! You can now add your own DAGs to `dags/` to build more expressive data lineage views.
+_Congrats_! You successfully step through a troubleshooting scenario of a failing DAG using metadata collected with Marquez! You can now add your own DAGs to `dags/` to build more complex data lineage graphs.
+
+## Next Steps
+
+* Review the Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) used to collect Airflow DAG metadata and learn how to build your own integrations
+* Take a look at our other integrations (ex: [`marquez-spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark))
 
 ## Feedback
 
