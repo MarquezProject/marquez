@@ -215,7 +215,7 @@ t1 = PostgresOperator(
     postgres_conn_id='example_db',
    -sql='''
    -CREATE TABLE IF NOT EXISTS counts (
-   -  value INTEGER
+      -value INTEGER
    -);''',
    +sql='''
    +ALTER TABLE counts RENAME COLUMN value TO value_1_to_10;
