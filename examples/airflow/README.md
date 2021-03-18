@@ -206,7 +206,7 @@ If you take a quick look at the lineage graph for `counter.inc`, you should see 
 
 ## Step 5: Troubleshoot Failing DAG with Marquez
 
-In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of an upstream schema change for tabe `counts`. So, let's get to it!
+In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of an upstream schema change for table `counts`. So, let's get to it!
 
 Let's say team `A` owns the DAG `counter`. Team `A` decides to update the `t1` task in `counter` to rename the `values` column in the `counts` table to `value_1_to_10` (without properly communicating the schema change!):
 
@@ -226,7 +226,7 @@ t1 = PostgresOperator(
 )
 ```
 
-Team `B`, unaware of the schena change, owns DAG `sum` and begins to see DAG run metadata with _failed_ run states:
+Team `B`, unaware of the schema change, owns DAG `sum` and begins to see DAG run metadata with _failed_ run states:
 
 ![](./docs/search-job-failure.png)
 
@@ -252,6 +252,8 @@ t2 = PostgresOperator(
 With the code change, the DAG `sum` begins to run successfully:
 
 ![](./docs/lineage-view-job-successful.png)
+
+**Congrats**! You successfully step through a troubleshooting scenario using metadata collected with Marquez! You can now add your own DAGs to `dags/` to build more expressive data lineage views.
 
 ## Feedback
 
