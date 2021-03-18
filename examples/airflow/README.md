@@ -54,7 +54,7 @@ $ mkdir dags
 
 Then, add the DAGs `counter` and `sum` (defined below) to `dags/`. You'll notice that we're using **`marquez_airflow import DAG`** instead of **`airflow import DAG`**. When writing our DAGs, using `marquez_airflow` will enable Marquez to observe the DAG and automatically collect task-level metadata.
 
-### DAG `counter`:
+### DAG `counter`
 
 Under `dags/`, create a file named `counter.py` and copy in the following code:
 
@@ -110,7 +110,7 @@ t1 >> t2
 
 ```
 
-### DAG `sum`:
+### DAG `sum`
 
 Under `dags/`, create a file named `sum.py` and copy in the following code:
 
