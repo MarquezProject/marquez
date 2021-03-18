@@ -206,9 +206,9 @@ If you take a quick look at the lineage graph for `counter.inc`, you should see 
 
 ## Step 5: Troubleshoot Failing DAG with Marquez
 
-In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of column `value` in table `counts ` being renamed to `value_1_to_10`.
+In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of column `value` in table `counts ` being renamed to `value_1_to_10`. So, let's get to it!
 
-First, update the `t1` task in `counter` to rename the `values` column in the `counts` table:
+Let's say team `A` owns the DAG `counter`. Team `A` decides to update the `t1` task in `counter` to rename the `values` column in the `counts` table:
 
 ```diff
 t1 = PostgresOperator(
