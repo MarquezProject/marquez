@@ -230,11 +230,11 @@ Team `B`, unaware of the schema change, owns DAG `sum` and begins to see DAG run
 
 ![](./docs/search-job-failure.png)
 
-But, team `B` isn't sure what might have caused the recent DAG failure as no recent code changes have been made. So, team `B` decides to check the schema of the input dataset:  
+But, team `B` isn't sure what might have caused the recent DAG failure as no recent code changes have been made to DAG `sum`. So, team `B` decides to check the schema of the input dataset:  
 
 ![](./docs/lineage-view-dataset.png)
 
-Team `A` realizes that the schema had changed! To fix the DAG `sum`, team `A` updates `t2` in `sum` to use the new column name:
+Team `B` soon realizes that the schema has changed recently for the `counts` table! To fix the DAG `sum`, team `B` updates the `t2` task that calcuates the count total to use the new column name:
 
 ```diff
 t2 = PostgresOperator(
