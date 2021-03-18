@@ -194,7 +194,7 @@ To view the Airflow UI and verify it's running, open http://localhost:8080. You 
 
 ## Step 4: View Collected Metadata
 
-![](./docs/lineage-view-0.png)
+![](./docs/lineage-view.png)
 
 ## Step 5: Troubleshoot Failing DAG with Marquez
 
