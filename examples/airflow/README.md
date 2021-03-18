@@ -52,14 +52,12 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-Then, add the DAGs `counter` and `sum` (defined in steps `2.1` and `2.2` below) to `dags/`. You'll notice that to begin collecting Airflow DAG metadata with Marquez, we use:
+When writing our DAGs, we'll use [`marquez-airflow`](https://pypi.org/project/marquez-airflow) enabling Marquez to observe the DAG and automatically collect task-level metadata. Below, in steps `2.1` and `2.2`, we create the DAGs `counter` and `sum` and add them to `dags/`. You'll notice that to begin collecting DAG metadata with Marquez, we only make the following change:
 
 ```diff
 - from airflow import DAG
 + from marquez_airflow import DAG
 ```
-
-When writing our DAGs, using [`marquez-airflow`](https://pypi.org/project/marquez-airflow) will enable Marquez to observe the DAG and automatically collect task-level metadata.
 
 ## Step 2.1: Create DAG `counter`
 
