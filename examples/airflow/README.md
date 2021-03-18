@@ -27,7 +27,7 @@ Before you begin, make sure you have installed:
 
 * Next, we'll need to specify where to send DAG metadata. To do so, create a config file named `marquez.env` with the following environment variables:
 
-  ```
+  ```bash
   MARQUEZ_BACKEND=http             # Collect metadata using HTTP backend
   MARQUEZ_URL=http://marquez:5000  # The URL of the HTTP backend
   MARQUEZ_NAMESPACE=example        # The namespace associated with the collected metadata
