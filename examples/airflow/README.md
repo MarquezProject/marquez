@@ -52,9 +52,9 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-Then, add the dags `counter.py` and `sum.py` (defined below) to `dags/`. You'll notice that we're using **`marquez_airflow import DAG`** instead of **`airflow import DAG`** when writing our DAGs.
+Then, add the DAGs `counter` and `sum` (defined below) to `dags/`. You'll notice that we're using **`marquez_airflow import DAG`** instead of **`airflow import DAG`** when writing our DAGs.
 
-### DAG `counter.py`:
+### DAG `counter`:
 
 Under `dags/`, create a file named `counter.py` and copy in the following code:
 
@@ -110,7 +110,7 @@ t1 >> t2
 
 ```
 
-### DAG `sum.py`:
+### DAG `sum`:
 
 Under `dags/`, create a file named `sum.py` and copy in the following code:
 
@@ -206,7 +206,9 @@ If you take a quick look at the lineage graph for `counter.inc`, you should see 
 
 ## Step 5: Troubleshoot Failing DAG with Marquez
 
-Update `t1` in `counter.py` with:
+In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of column `value` in table `counts ` being renamed to `value_1_to_10`.
+
+First, update the `t1` task in `counter` to rename the `values` column in the `counts` table:
 
 ```diff
 t1 = PostgresOperator(
@@ -224,11 +226,15 @@ t1 = PostgresOperator(
 )
 ```
 
+You should begin to see the DAG `sum` failing as the result of the column rename:
+
 ![](./docs/downstream-job-failure.png)
+
+With the DAG run metadata now showing a _failed_ run state:
 
 ![](./docs/search-job-failure.png)
 
-Update `t2` in `sum.py` with:
+To fix the DAG `sum`, update `t2` in `sum.py` to use the new column name:
 
 ```diff
 t2 = PostgresOperator(
@@ -243,15 +249,13 @@ t2 = PostgresOperator(
 )
 ```
 
+Now, you should to see the DAG `sum` running successfully as the result of code change:
+
 ![](./docs/downstream-job-successful.png)
 
+With the DAG run metadata now showing a _completed_ run state:
+
 ![](./docs/lineage-view-job-successful.png)
-
-## Running on [GCP](https://cloud.google.com/composer)
-
-## Running on [AWS](https://cloud.google.com/composer)
-
-Unfortunately, installing libraries on 
 
 ## Feedback
 
