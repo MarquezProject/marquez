@@ -44,37 +44,19 @@ Before you begin, make sure you have installed:
   └── requirements.txt
   ```
 
-## Step 2: Start Airflow with Marquez
+## Step 2: Write Airflow DAGs using Marquez
 
-* Create the `dags/` folder where our example DAGs will be located:
+First, let's create the `dags/` folder where our example DAGs will be located:
 
-  ```bash
-  $ mkdir dags
-  ```
+```bash
+$ mkdir dags
+```
 
-* Then, start Airflow:
-
-  ```bash
-  $ docker-compose up
-  ```
-
-  > **Tip:** Use `-d` to run in detached mode.
-
-  **The above command will:**
-
-  * Start Airflow and install `marquez-airflow` used to collect DAG metadata
-  * Start Marquez
-  * Start Postgres
-
-To view the Airflow UI and verify it's running, open http://localhost:8080. You can also browse to http://localhost:3000 to view the Marquez UI.
-
-## Step 3: Write Airflow DAGs using Marquez
-
-Now that we've started Airflow and Marquez, we can add the dags `counter.py` and `sum.py` (defined below) to our `dags/` folder. You'll notice that we're are using `marquez_airflow import DAG` instead of `airflow import DAG`.
+Then, add the dags `counter.py` and `sum.py` (defined below) to `dags/`. You'll notice that we're using `marquez_airflow import DAG` instead of `airflow import DAG` when defining our DAGs.
 
 ### DAG `counter.py`:
 
-In the `dags/` folder, create a file named `counter.py` and copy in the following code:
+Under `dags/`, create a file named `counter.py` and copy in the following code:
 
 ```python
 import random
@@ -130,7 +112,7 @@ t1 >> t2
 
 ### DAG `sum.py`:
 
-In the `dags/` folder, create a file named `sum.py` and copy in the following code:
+Under `dags/`, create a file named `sum.py` and copy in the following code:
 
 ```python
 from marquez_airflow import DAG
@@ -179,7 +161,42 @@ t1 >> t2
 
 ```
 
-## Step 4: Troubleshoot Failing DAG with Marquez
+At this point, you should have the following under the `examples/airflow/` directory:
+
+```
+.
+├── dags
+│   ├── counter.py
+│   └── sum.py
+├── docker/
+├── docs/
+├── marquez.env
+└── requirements.txt
+```
+
+## Step 3: Start Airflow with Marquez
+
+Now that we have our DAGs defined using Marquez, let’s run the example!. To start Airflow, run:
+
+```bash
+$ docker-compose up
+```
+
+> **Tip:** Use `-d` to run in detached mode.
+
+**The above command will:**
+
+* Start Airflow and install `marquez-airflow` used to collect DAG metadata
+* Start Marquez
+* Start Postgres
+
+To view the Airflow UI and verify it's running, open http://localhost:8080. You can also browse to http://localhost:3000 to view the Marquez UI.
+
+## Step 4: View Collected Metadata
+
+![](./docs/lineage-view-0.png)
+
+## Step 5: Troubleshoot Failing DAG with Marquez
 
 
 ## Running on [GCP](https://cloud.google.com/composer)
