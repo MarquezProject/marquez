@@ -52,7 +52,7 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-Then, add the dags `counter.py` and `sum.py` (defined below) to `dags/`. You'll notice that we're using **`marquez_airflow import DAG`** instead of **`airflow import DAG`** when defining our DAGs.
+Then, add the dags `counter.py` and `sum.py` (defined below) to `dags/`. You'll notice that we're using **`marquez_airflow import DAG`** instead of **`airflow import DAG`** when writing our DAGs.
 
 ### DAG `counter.py`:
 
@@ -193,6 +193,14 @@ $ docker-compose up
 To view the Airflow UI and verify it's running, open http://localhost:8080. You can also browse to http://localhost:3000 to view the Marquez UI.
 
 ## Step 4: View Collected Metadata
+
+To view DAG metadata collected by Marquez from Airflow, browse to the Marquez UI by visiting http://localhost:3000. Then, use the _search_ bar in the upper right-side of the page and search for the `counter.inc` job. To view lineage metadata for `counter.inc`, click on the job from the drop-down list:
+
+> **Note:** If the `counter.inc` job is not in the drop-down list, check to see if Airflow has successfully executed the DAG.
+
+![](./docs/search.png)
+
+If you take a quick look at the lineage graph for `counter.inc`, you should see `public.counts` as an output dataset and `sum.total` as a downstream job!
 
 ![](./docs/lineage-view.png)
 
