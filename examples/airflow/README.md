@@ -204,7 +204,7 @@ If you take a quick look at the lineage graph for `counter.inc`, you should see 
 
 ![](./docs/lineage-view-job.png)
 
-## Step 5: Troubleshoot Failing DAG with Marquez
+## Step 5: Troubleshoot a Failing DAG with Marquez
 
 In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of an upstream schema change for table `counts`. So, let's get to it!
 
@@ -255,7 +255,7 @@ With the code change, the DAG `sum` begins to run successfully:
 
 ![](./docs/lineage-view-job-successful.png)
 
-**Congrats**! You successfully step through a troubleshooting scenario using metadata collected with Marquez! You can now add your own DAGs to `dags/` to build more expressive data lineage views.
+_Congrats_! You successfully step through a troubleshooting scenario of a failing DAG using metadata collected with Marquez! You can now add your own DAGs to `dags/` to build more expressive data lineage views.
 
 ## Feedback
 
