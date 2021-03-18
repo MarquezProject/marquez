@@ -208,6 +208,8 @@ If you take a quick look at the lineage graph for `counter.inc`, you should see 
 
 In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of an upstream schema change for table `counts`. So, let's get to it!
 
+> **Tipe:** It's helpful to also apply the same code changes outlined below to your Airflow DAGs defined in **Step 2**.
+
 Let's say team `A` owns the DAG `counter`. Team `A` decides to update the `t1` task in `counter` to rename the `values` column in the `counts` table to `value_1_to_10` (without properly communicating the schema change!):
 
 ```diff
