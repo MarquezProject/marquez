@@ -21,16 +21,16 @@ import io.dropwizard.db.DataSourceFactory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import marquez.db.FlywayFactory;
+import marquez.graphql.GraphqlConfig;
 import marquez.service.models.Tag;
 
 @NoArgsConstructor
-public final class MarquezConfig extends Configuration {
-  private static final boolean DEFAULT_MIGRATE_ON_STARTUP = true;
+public class MarquezConfig extends Configuration {
+  private static final boolean DEFAULT_MIGRATE_ON_STARTUP = false;
   private static final ImmutableSet<Tag> DEFAULT_TAGS = ImmutableSet.of();
-  @Getter private final GraphqlConfig graphql = new GraphqlConfig();
 
-  @Getter private final boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
-  @Getter private final ImmutableSet<Tag> tags = DEFAULT_TAGS;
+  @Getter private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
+  @Getter private ImmutableSet<Tag> tags = DEFAULT_TAGS;
 
   @Getter
   @JsonProperty("db")
@@ -40,7 +40,7 @@ public final class MarquezConfig extends Configuration {
   @JsonProperty("flyway")
   private final FlywayFactory flywayFactory = new FlywayFactory();
 
-  public static class GraphqlConfig {
-    @Getter private final boolean enabled = true;
-  }
+  @Getter
+  @JsonProperty("graphql")
+  private final GraphqlConfig graphql = new GraphqlConfig();
 }
