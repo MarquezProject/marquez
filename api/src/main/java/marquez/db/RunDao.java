@@ -16,20 +16,24 @@ package marquez.db;
 
 import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 
+import com.google.common.collect.ImmutableList;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
+import marquez.common.models.Field;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.db.mappers.ExtendedRunRowMapper;
 import marquez.db.mappers.RunMapper;
+import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
@@ -37,6 +41,7 @@ import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
 import marquez.service.models.Dataset;
 import marquez.service.models.JobMeta;
+import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -206,6 +211,51 @@ public interface RunDao extends BaseDao {
     upsertRun(runUuid, jobRow.getName(), jobRow.getNamespaceName());
 
     updateInputDatasetMapping(jobMeta.getInputs(), runUuid);
+
+    registerRunOutputDataset(runUuid, jobMeta);
+  }
+
+  default void registerRunOutputDataset(UUID runUuid, JobMeta jobMeta) {
+    DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
+    DatasetDao datasetDao = createDatasetDao();
+    OpenLineageDao openLineageDao = createOpenLineageDao();
+
+    if (jobMeta.getOutputs() != null) {
+      for (DatasetId datasetId : jobMeta.getOutputs()) {
+        Optional<DatasetRow> dsRow =
+            datasetDao.findByRow(
+                datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+        Optional<Dataset> ds =
+            datasetDao.find(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+        ds.ifPresent(
+            d -> {
+              UUID version =
+                  openLineageDao.version(
+                      d.getNamespace().getValue(),
+                      d.getSourceName().getValue(),
+                      d.getName().getValue(),
+                      toSchemaFields(d.getFields()),
+                      runUuid);
+              datasetVersionDao.upsert(
+                  UUID.randomUUID(), Instant.now(), dsRow.get().getUuid(), version, runUuid);
+            });
+      }
+    }
+  }
+
+  default List<SchemaField> toSchemaFields(ImmutableList<Field> fields) {
+    if (fields == null) {
+      return null;
+    }
+    return fields.stream()
+        .map(
+            f ->
+                SchemaField.builder()
+                    .name(f.getName().getValue())
+                    .type(f.getType().name())
+                    .description(f.getDescription().orElse(null))
+                    .build())
+        .collect(Collectors.toList());
   }
 
   default void updateInputDatasetMapping(Set<DatasetId> inputs, UUID runUuid) {
