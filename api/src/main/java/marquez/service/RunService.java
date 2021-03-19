@@ -121,7 +121,7 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
 
   private static DatasetVersionId buildDatasetVersionId(ExtendedDatasetVersionRow v) {
     return new DatasetVersionId(
-        NamespaceName.of(v.getNamespaceName()), DatasetName.of(v.getDatasetName()), v.getVersion());
+        NamespaceName.of(v.getNamespaceName()), DatasetName.of(v.getDatasetName()), v.getUuid());
   }
 
   private JobVersionId toJobVersionId(JobVersionRow jobVersion) {
