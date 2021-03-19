@@ -78,7 +78,7 @@ public final class JobMapper implements RowMapper<Job> {
   Set<DatasetId> getDatasetFromJsonOrNull(@NonNull ResultSet results, String column)
       throws SQLException {
     if (results.getObject(column) == null) {
-      return null;
+      return new HashSet<>();
     }
     PGobject pgObject = (PGobject) results.getObject(column);
     try {
