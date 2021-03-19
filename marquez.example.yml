@@ -37,12 +37,12 @@ db:
   password: ${POSTGRES_PASSWORD}
 
 # Enables flyway configuration overrides (see: https://flywaydb.org/documentation/configfiles)
-# flyway:
-#   connectRetries: 3
-#   cleanDisabled: true
+flyway:
+  locations:
+    - marquez/db/migration
 
-# Enables database migration on startup (default: true)
-migrateOnStartup: ${MIGRATE_ON_STARTUP:-true}
+# Enables database migration on startup (default: false)
+migrateOnStartup: ${MIGRATE_ON_STARTUP:-false}
 
 # Enabled the Graphql endpoint
 graphql:

@@ -22,6 +22,8 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
+import io.dropwizard.flyway.FlywayBundle;
+import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -33,7 +35,6 @@ import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.db.DbMigration;
-import marquez.db.FlywayFactory;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -75,6 +76,19 @@ public final class MarquezApp extends Application<MarquezConfig> {
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     bootstrap.addBundle(
+        new FlywayBundle<MarquezConfig>() {
+          @Override
+          public DataSourceFactory getDataSourceFactory(MarquezConfig config) {
+            return config.getDataSourceFactory();
+          }
+
+          @Override
+          public FlywayFactory getFlywayFactory(MarquezConfig config) {
+            return config.getFlywayFactory();
+          }
+        });
+
+    bootstrap.addBundle(
         new AssetsBundle(
             "/assets",
             "/graphql-playground",
@@ -88,15 +102,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final DataSource source = sourceFactory.build(env.metrics(), DB_SOURCE_NAME);
 
     log.info("Running startup actions...");
-    if (config.isMigrateOnStartup()) {
-      final FlywayFactory flywayFactory = config.getFlywayFactory();
-      try {
-        DbMigration.migrateDbOrError(flywayFactory, source);
-      } catch (FlywayException errorOnDbMigrate) {
-        log.info("Stopping app...");
-        // Propagate throwable up the stack.
-        onFatalError(errorOnDbMigrate); // Signal app termination.
-      }
+    final FlywayFactory flywayFactory = config.getFlywayFactory();
+    try {
+      DbMigration.migrateDbOrError(flywayFactory, source, config);
+    } catch (FlywayException errorOnDbMigrate) {
+      log.info("Stopping app...");
+      // Propagate throwable up the stack.
+      onFatalError(errorOnDbMigrate); // Signal app termination.
     }
     registerResources(config, env, source);
 

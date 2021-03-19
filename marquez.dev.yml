@@ -12,6 +12,10 @@ db:
   user: marquez
   password: marquez
 
+flyway:
+  locations:
+    - marquez/db/migration
+
 migrateOnStartup: true
 
 graphql:
