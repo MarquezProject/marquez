@@ -338,7 +338,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(job.getCreatedAt()).isAfter(EPOCH);
     assertThat(job.getUpdatedAt()).isAfter(EPOCH);
     assertThat(job.getInputs()).isEqualTo(inputs);
-    assertThat(job.getOutputs()).isEqualTo(outputs);
+    assertThat(job.getOutputs()).isEmpty();
     assertThat(job.getLocation()).isEqualTo(Optional.of(JOB_LOCATION));
     assertThat(job.getContext()).isEqualTo(JOB_CONTEXT);
     assertThat(job.getDescription()).isEqualTo(Optional.of(JOB_DESCRIPTION));
@@ -415,6 +415,9 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(runCompleted.getEndedAt().get()).isEqualTo(endedAt);
     assertThat(runCompleted.getDurationMs()).isNotEmpty();
     assertThat(runCompleted.getArgs()).isEmpty();
+
+    final Job completedJob = client.getJob(NAMESPACE_NAME, JOB_NAME);
+    assertThat(completedJob.getOutputs()).isEqualTo(outputs);
   }
 
   @Test
@@ -496,7 +499,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .type(JOB_TYPE)
             .inputs(inputs)
             .outputs(outputs)
-            .runId(runMeta.getId())
+            .runId(run.getId())
             .location(JOB_LOCATION)
             .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
