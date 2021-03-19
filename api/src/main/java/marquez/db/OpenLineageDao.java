@@ -154,14 +154,16 @@ public interface OpenLineageDao extends BaseDao {
               .getNominalStartTime()
               .withZoneSameInstant(ZoneId.of("UTC"))
               .toInstant();
-      nominalEndTime =
-          event
-              .getRun()
-              .getFacets()
-              .getNominalTime()
-              .getNominalEndTime()
-              .withZoneSameInstant(ZoneId.of("UTC"))
-              .toInstant();
+      if (event.getRun().getFacets().getNominalTime().getNominalEndTime() != null) {
+        nominalEndTime =
+            event
+                .getRun()
+                .getFacets()
+                .getNominalTime()
+                .getNominalEndTime()
+                .withZoneSameInstant(ZoneId.of("UTC"))
+                .toInstant();
+      }
     }
 
     UUID runUuid = runToUuid(event.getRun().getRunId());

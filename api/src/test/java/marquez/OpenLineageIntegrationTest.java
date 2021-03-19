@@ -33,10 +33,17 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   public static String EVENT_FULL = "open_lineage/event_full.json";
   public static String EVENT_UNICODE = "open_lineage/event_unicode.json";
   public static String EVENT_LARGE = "open_lineage/event_large.json";
+  public static String NULL_NOMINAL_END_TIME = "open_lineage/null_nominal_end_time.json";
 
   @Parameters(name = "{0}")
   public static List<String> data() {
-    return Arrays.asList(EVENT_FULL, EVENT_SIMPLE, EVENT_REQUIRED, EVENT_UNICODE, EVENT_LARGE);
+    return Arrays.asList(
+        EVENT_FULL,
+        EVENT_SIMPLE,
+        EVENT_REQUIRED,
+        EVENT_UNICODE,
+        EVENT_LARGE,
+        NULL_NOMINAL_END_TIME);
   }
 
   @Parameter public String input;
