@@ -75,15 +75,16 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
+    // Enable flyway commands.
     bootstrap.addBundle(
         new FlywayBundle<MarquezConfig>() {
           @Override
-          public DataSourceFactory getDataSourceFactory(MarquezConfig config) {
+          public DataSourceFactory getDataSourceFactory(@NonNull MarquezConfig config) {
             return config.getDataSourceFactory();
           }
 
           @Override
-          public FlywayFactory getFlywayFactory(MarquezConfig config) {
+          public FlywayFactory getFlywayFactory(@NonNull MarquezConfig config) {
             return config.getFlywayFactory();
           }
         });
