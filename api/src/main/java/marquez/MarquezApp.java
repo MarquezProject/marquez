@@ -22,8 +22,6 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
-import io.dropwizard.flyway.FlywayBundle;
-import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -74,20 +72,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
 
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-    // Enable flyway commands.
-    bootstrap.addBundle(
-        new FlywayBundle<MarquezConfig>() {
-          @Override
-          public DataSourceFactory getDataSourceFactory(@NonNull MarquezConfig config) {
-            return config.getDataSourceFactory();
-          }
-
-          @Override
-          public FlywayFactory getFlywayFactory(@NonNull MarquezConfig config) {
-            return config.getFlywayFactory();
-          }
-        });
 
     bootstrap.addBundle(
         new AssetsBundle(

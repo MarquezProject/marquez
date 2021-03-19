@@ -1,13 +1,11 @@
 package marquez.db;
 
-import io.dropwizard.flyway.FlywayFactory;
 import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.MarquezConfig;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
-import org.flywaydb.core.api.output.MigrateResult;
 
 @Slf4j
 public final class DbMigration {
@@ -31,8 +29,8 @@ public final class DbMigration {
     // issues before app termination.
     try {
       log.info("Migrating database...");
-      final MigrateResult result = flyway.migrate();
-      log.info("Successfully applied '{}' migrations to database.", result.migrationsExecuted);
+      final int migrations = flyway.migrate();
+      log.info("Successfully applied '{}' migrations to database.", migrations);
     } catch (FlywayException errorOnDbMigrate) {
       log.error("Failed to apply migration to database.", errorOnDbMigrate);
       try {
@@ -55,10 +53,11 @@ public final class DbMigration {
   private static void errorOnPendingMigrations(@NonNull final Flyway flyway) {
     if (hasPendingMigrations(flyway)) {
       log.error(
-          "Failed to apply migration. You must apply the migration manually with "
-              + "'path/to/marquez-api.jar db migrate marquez.yml', or set MIGRATE_ON_STARTUP=true "
-              + "to automatically apply migrations to your database. We recommend you "
-              + "view migrations before applying them with 'path/to/marquez-api.jar db info marquez.yml'.");
+          "Failed to apply migration! You must apply the migration manually using the flyway "
+              + "command 'flyway migrate', or set MIGRATE_ON_STARTUP=true to automatically apply "
+              + "migrations to your database. We also recommend you view database changes before "
+              + "applying a new migration with 'flyway migrate -dryRunOutput=dryrun.sql'. "
+              + "You can download the flyway CLI at 'https://flywaydb.org/download'");
       throw new FlywayException("Database has pending migrations!");
     }
   }

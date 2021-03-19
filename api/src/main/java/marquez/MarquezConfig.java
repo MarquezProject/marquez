@@ -18,9 +18,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableSet;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.flyway.FlywayFactory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import marquez.db.FlywayFactory;
 import marquez.graphql.GraphqlConfig;
 import marquez.service.models.Tag;
 
