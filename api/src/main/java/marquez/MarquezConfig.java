@@ -30,7 +30,6 @@ public class MarquezConfig extends Configuration {
   private static final ImmutableSet<Tag> DEFAULT_TAGS = ImmutableSet.of();
 
   @Getter private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
-
   @Getter private ImmutableSet<Tag> tags = DEFAULT_TAGS;
 
   @Getter
