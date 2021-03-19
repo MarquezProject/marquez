@@ -133,8 +133,7 @@ public interface OpenLineageDao extends BaseDao {
             description,
             jobContext.getUuid(),
             location,
-            jobDao.toJson(toDatasetId(event.getInputs()), mapper),
-            jobDao.toJson(toDatasetId(event.getOutputs()), mapper));
+            jobDao.toJson(toDatasetId(event.getInputs()), mapper));
     bag.setJob(job);
 
     Map<String, String> runArgsMap = createRunArgs(event);
