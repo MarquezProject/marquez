@@ -57,7 +57,7 @@ public final class JobMapper implements RowMapper<Job> {
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         getDatasetFromJsonOrNull(results, "current_inputs"),
-        getDatasetFromJsonOrNull(results, "current_outputs"),
+        new HashSet<>(),
         urlOrNull(results, "current_location"),
         toContext(results, Columns.CONTEXT),
         stringOrNull(results, Columns.DESCRIPTION),
@@ -78,11 +78,16 @@ public final class JobMapper implements RowMapper<Job> {
   Set<DatasetId> getDatasetFromJsonOrNull(@NonNull ResultSet results, String column)
       throws SQLException {
     if (results.getObject(column) == null) {
-      return null;
+      return new HashSet<>();
     }
     PGobject pgObject = (PGobject) results.getObject(column);
     try {
-      return mapper.readValue(pgObject.getValue(), new TypeReference<Set<DatasetId>>() {});
+      Set<DatasetId> datasets =
+          mapper.readValue(pgObject.getValue(), new TypeReference<Set<DatasetId>>() {});
+      if (datasets == null) {
+        return new HashSet<>();
+      }
+      return datasets;
     } catch (JsonProcessingException e) {
       log.error(String.format("Could not read dataset from job row %s", column), e);
       return new HashSet<>();
