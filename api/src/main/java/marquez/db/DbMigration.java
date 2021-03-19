@@ -18,7 +18,7 @@ public final class DbMigration {
     // Only attempt a database migration if there are pending changes to be applied,
     // or on the initialization of a new database. Otherwise, error on pending changes
     // when the flag 'migrateOnStartup' is set to 'false'.
-    if (config.isMigrateOnStartup() && !hasPendingMigrations(flyway)) {
+    if (!hasPendingMigrations(flyway)) {
       log.info("No pending migrations found, skipping...");
       return;
     } else if (!config.isMigrateOnStartup() && hasMigrationsApplied(flyway)) {
