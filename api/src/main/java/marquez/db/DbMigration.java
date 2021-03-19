@@ -16,8 +16,8 @@ public final class DbMigration {
     final FlywayFactory flywayFactory = config.getFlywayFactory();
     final Flyway flyway = flywayFactory.build(source);
     // Only attempt a database migration if there are pending changes to be applied,
-    // or we're initialization of a new database. Otherwise, error on pending changes
-    // when the flag 'migrateOnStartup' is set to false.
+    // or on the initialization of a new database. Otherwise, error on pending changes
+    // when the flag 'migrateOnStartup' is set to 'false'.
     if (config.isMigrateOnStartup() && !hasPendingMigrations(flyway)) {
       log.info("No pending migrations found, skipping...");
       return;
