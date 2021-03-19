@@ -10,6 +10,8 @@ db:
   driverClass: org.postgresql.Driver
 
 flyway:
+  locations:
+    - marquez/db/migration
   connectRetries: 2
   validateMigrationNaming: true
 
