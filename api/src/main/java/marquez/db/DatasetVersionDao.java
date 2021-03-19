@@ -207,17 +207,5 @@ public interface DatasetVersionDao extends BaseDao {
           + "DO UPDATE SET "
           + "run_uuid = EXCLUDED.run_uuid "
           + "RETURNING *")
-  DatasetVersionRow setOutputDataset(
-      UUID uuid, Instant now, UUID datasetUuid, UUID version, UUID runUuid);
-
-  @SqlQuery(
-      "INSERT INTO dataset_versions "
-          + "(uuid, created_at, dataset_uuid, version, run_uuid) "
-          + "VALUES "
-          + "(:uuid, :now, :datasetUuid, :version, :runUuid) "
-          + "ON CONFLICT(version) "
-          + "DO UPDATE SET "
-          + "run_uuid = EXCLUDED.run_uuid "
-          + "RETURNING *")
   DatasetVersionRow upsert(UUID uuid, Instant now, UUID datasetUuid, UUID version, UUID runUuid);
 }
