@@ -103,15 +103,16 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final DataSource source = sourceFactory.build(env.metrics(), DB_SOURCE_NAME);
 
     log.info("Running startup actions...");
+
     try {
-      DbMigration.migrateDbOrError(source, config);
+      DbMigration.migrateDbOrError(config, source);
     } catch (FlywayException errorOnDbMigrate) {
       log.info("Stopping app...");
       // Propagate throwable up the stack.
       onFatalError(errorOnDbMigrate); // Signal app termination.
     }
-    registerResources(config, env, source);
 
+    registerResources(config, env, source);
     registerServlets(env);
   }
 

@@ -14,7 +14,7 @@ public final class DbMigration {
   private DbMigration() {}
 
   public static void migrateDbOrError(
-      @NonNull final DataSource source, @NonNull final MarquezConfig config) {
+      @NonNull final MarquezConfig config, @NonNull final DataSource source) {
     final FlywayFactory flywayFactory = config.getFlywayFactory();
     final Flyway flyway = flywayFactory.build(source);
     // Only attempt a database migration if there are pending changes to be applied,
@@ -48,11 +48,11 @@ public final class DbMigration {
     }
   }
 
-  private static boolean hasMigrationsApplied(final @NonNull Flyway flyway) {
+  private static boolean hasMigrationsApplied(@NonNull final Flyway flyway) {
     return flyway.info().applied().length > 0;
   }
 
-  private static void errorOnPendingMigrations(final @NonNull Flyway flyway) {
+  private static void errorOnPendingMigrations(@NonNull final Flyway flyway) {
     if (hasPendingMigrations(flyway)) {
       log.error(
           "Failed to apply migration. You must apply the migration manually with "
@@ -63,7 +63,7 @@ public final class DbMigration {
     }
   }
 
-  private static boolean hasPendingMigrations(final @NonNull Flyway flyway) {
+  private static boolean hasPendingMigrations(@NonNull final Flyway flyway) {
     return flyway.info().pending().length > 0;
   }
 }
