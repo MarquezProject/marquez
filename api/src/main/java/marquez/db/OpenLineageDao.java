@@ -23,6 +23,7 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.FieldType;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
@@ -380,7 +381,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                field.getType(),
+                toField(field.getType()),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -394,6 +395,18 @@ public interface OpenLineageDao extends BaseDao {
     }
 
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
+  }
+
+  default String toField(String type) {
+    if (type == null) {
+      return null;
+    }
+
+    try {
+      return FieldType.valueOf(type.toUpperCase()).name();
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   default String formatDatasetName(String name) {
