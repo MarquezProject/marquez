@@ -102,9 +102,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final DataSource source = sourceFactory.build(env.metrics(), DB_SOURCE_NAME);
 
     log.info("Running startup actions...");
-    final FlywayFactory flywayFactory = config.getFlywayFactory();
     try {
-      DbMigration.migrateDbOrError(flywayFactory, source, config);
+      DbMigration.migrateDbOrError(source, config);
     } catch (FlywayException errorOnDbMigrate) {
       log.info("Stopping app...");
       // Propagate throwable up the stack.

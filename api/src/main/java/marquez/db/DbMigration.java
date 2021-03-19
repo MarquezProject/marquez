@@ -14,9 +14,8 @@ public final class DbMigration {
   private DbMigration() {}
 
   public static void migrateDbOrError(
-      @NonNull final FlywayFactory flywayFactory,
-      final @NonNull DataSource source,
-      @NonNull MarquezConfig config) {
+      @NonNull final DataSource source, @NonNull final MarquezConfig config) {
+    final FlywayFactory flywayFactory = config.getFlywayFactory();
     final Flyway flyway = flywayFactory.build(source);
     // Only attempt a database migration if there are pending changes to be applied,
     // or we're initialization of a new database. Otherwise, error on pending changes
