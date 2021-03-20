@@ -1,6 +1,6 @@
 {
   "name": "marquez-ui",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "dist/index.js",
   "author": "peter@datakin.com",
   "private": false,
@@ -43,7 +43,7 @@
     "d3-scale": "^3.2.1",
     "d3-selection": "^1.4.1",
     "dagre": "^0.8.5",
-    "http-proxy-middleware": "^0.20.0",
+    "http-proxy-middleware": "^0.21.0",
     "jest": "26.6.3",
     "lodash": "^4.17.19",
     "postcss-loader": "^3.0.0",
