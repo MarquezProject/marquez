@@ -18,7 +18,6 @@ import json
 import airflow
 from airflow.models import Connection
 from airflow.utils.db import provide_session
-from airflow.version import version as AIRFLOW_VERSION
 
 from marquez_airflow.facets import AirflowVersionRunFacet, AirflowRunArgsRunFacet
 
@@ -28,8 +27,6 @@ try:
 except ImportError:
     # Import for Pendulum 2.x version
     from pendulum import DateTime as Pendulum, from_timestamp
-
-from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
 
 log = logging.getLogger(__name__)
 _NOMINAL_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"

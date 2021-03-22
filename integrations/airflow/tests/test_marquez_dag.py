@@ -40,7 +40,7 @@ from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
 from uuid import UUID
 
 from openlineage.facet import NominalTimeRunFacet, SourceCodeLocationJobFacet, \
-    DocumentationJobFacet, DataSourceDatasetFacet, SchemaDatasetFacet, SchemaField
+    DocumentationJobFacet, DataSourceDatasetFacet, SchemaDatasetFacet, SchemaField, ParentRunFacet
 from openlineage.run import RunEvent, RunState, Job, Run, Dataset as OpenLineageDataset
 
 log = logging.getLogger(__name__)
@@ -145,7 +145,14 @@ def test_marquez_dag(job_id_mapping, mock_get_or_create_marquez_client, mock_uui
         mock.call(RunEvent(
             eventType=RunState.START,
             eventTime=mock.ANY,
-            run=Run(run_id_completed, {"nominalTime": NominalTimeRunFacet(start_time, end_time)}),
+            run=Run(run_id_completed, {
+                "nominalTime": NominalTimeRunFacet(start_time, end_time),
+                "parentRun": ParentRunFacet.create(
+                    runId=DAG_RUN_ID,
+                    namespace=DAG_NAMESPACE,
+                    job_name=f"{DAG_ID}.{TASK_ID_COMPLETED}"
+                )
+            }),
             job=Job("default", f"{DAG_ID}.{TASK_ID_COMPLETED}", {
                 "documentation": DocumentationJobFacet(DAG_DESCRIPTION),
                 "sourceCodeLocation": SourceCodeLocationJobFacet("", completed_task_location)
@@ -157,7 +164,14 @@ def test_marquez_dag(job_id_mapping, mock_get_or_create_marquez_client, mock_uui
         mock.call(RunEvent(
             eventType=RunState.START,
             eventTime=mock.ANY,
-            run=Run(run_id_failed, {"nominalTime": NominalTimeRunFacet(start_time, end_time)}),
+            run=Run(run_id_failed, {
+                "nominalTime": NominalTimeRunFacet(start_time, end_time),
+                "parentRun": ParentRunFacet.create(
+                    runId=DAG_RUN_ID,
+                    namespace=DAG_NAMESPACE,
+                    job_name=f"{DAG_ID}.{TASK_ID_FAILED}"
+                )
+            }),
             job=Job("default", f"{DAG_ID}.{TASK_ID_FAILED}", {
                 "documentation": DocumentationJobFacet(DAG_DESCRIPTION),
                 "sourceCodeLocation": SourceCodeLocationJobFacet("", failed_task_location)
@@ -313,6 +327,7 @@ def test_marquez_dag_with_extractor(
     )
 
     run_id = "my-test-uuid"
+    dag_run_id = 'test_marquez_dag_with_extractor_run_id'
     mock_uuid.side_effect = [run_id]
     # Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
@@ -333,7 +348,7 @@ def test_marquez_dag_with_extractor(
 
     # Create DAG run and mark as running
     dagrun = dag.create_dagrun(
-        run_id='test_marquez_dag_with_extractor_run_id',
+        run_id=dag_run_id,
         execution_date=DEFAULT_DATE,
         state=State.RUNNING)
 
@@ -346,7 +361,14 @@ def test_marquez_dag_with_extractor(
         RunEvent(
             RunState.START,
             mock.ANY,
-            Run(run_id, {"nominalTime": NominalTimeRunFacet(start_time, end_time)}),
+            Run(run_id, {
+                "nominalTime": NominalTimeRunFacet(start_time, end_time),
+                "parentRun": ParentRunFacet.create(
+                    runId=dag_run_id,
+                    namespace=DAG_NAMESPACE,
+                    job_name=f"{dag_id}.{TASK_ID_COMPLETED}"
+                )
+            }),
             Job("default", f"{dag_id}.{TASK_ID_COMPLETED}", {
                 "documentation": DocumentationJobFacet(DAG_DESCRIPTION),
                 "sourceCodeLocation": SourceCodeLocationJobFacet("", completed_task_location)
@@ -424,6 +446,7 @@ def test_marquez_dag_with_extract_on_complete(
     )
 
     run_id = "my-test-uuid"
+    dag_run_id = 'test_marquez_dag_with_extractor_run_id'
     mock_uuid.side_effect = [run_id]
     # Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
@@ -443,7 +466,7 @@ def test_marquez_dag_with_extract_on_complete(
 
     # Create DAG run and mark as running
     dagrun = dag.create_dagrun(
-        run_id='test_marquez_dag_with_extractor_run_id',
+        run_id=dag_run_id,
         execution_date=DEFAULT_DATE,
         state=State.RUNNING)
 
@@ -455,7 +478,12 @@ def test_marquez_dag_with_extract_on_complete(
             eventType=RunState.START,
             eventTime=mock.ANY,
             run=Run(run_id, {
-                "nominalTime": NominalTimeRunFacet(start_time, end_time)
+                "nominalTime": NominalTimeRunFacet(start_time, end_time),
+                "parentRun": ParentRunFacet.create(
+                    runId=dag_run_id,
+                    namespace=DAG_NAMESPACE,
+                    job_name=f"{dag_id}.{TASK_ID_COMPLETED}"
+                )
             }),
             job=Job("default",  f"{dag_id}.{TASK_ID_COMPLETED}", {
                 "documentation": DocumentationJobFacet(DAG_DESCRIPTION),
@@ -576,6 +604,7 @@ def test_marquez_dag_with_extractor_returning_two_steps(
     )
 
     run_id = "my-test-uuid"
+    dag_run_id = 'test_marquez_dag_with_extractor_returning_two_steps_run_id'
     mock_uuid.side_effect = [run_id]
     # Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
@@ -596,7 +625,7 @@ def test_marquez_dag_with_extractor_returning_two_steps(
 
     # Create DAG run and mark as running
     dagrun = dag.create_dagrun(
-        run_id='test_marquez_dag_with_extractor_returning_two_steps_run_id',
+        run_id=dag_run_id,
         execution_date=DEFAULT_DATE,
         state=State.RUNNING)
 
@@ -609,7 +638,14 @@ def test_marquez_dag_with_extractor_returning_two_steps(
         RunEvent(
             RunState.START,
             mock.ANY,
-            Run(run_id, {"nominalTime": NominalTimeRunFacet(start_time, end_time)}),
+            Run(run_id, {
+                "nominalTime": NominalTimeRunFacet(start_time, end_time),
+                "parentRun": ParentRunFacet.create(
+                    runId=dag_run_id,
+                    namespace=DAG_NAMESPACE,
+                    job_name=f"{dag_id}.{TASK_ID_COMPLETED}"
+                )
+            }),
             Job("default", f"{dag_id}.{TASK_ID_COMPLETED}", {
                 "documentation": DocumentationJobFacet(DAG_DESCRIPTION),
                 "sourceCodeLocation": SourceCodeLocationJobFacet("", completed_task_location)
@@ -698,6 +734,11 @@ def test_marquez_dag_adds_custom_facets(
             eventTime=mock.ANY,
             run=Run(run_id_completed, {
                 "nominalTime": NominalTimeRunFacet(start_time, end_time),
+                "parentRun": ParentRunFacet.create(
+                    runId=DAG_RUN_ID,
+                    namespace=DAG_NAMESPACE,
+                    job_name=f"{DAG_ID}.{TASK_ID_COMPLETED}"
+                ),
                 "runArgs": AirflowRunArgsRunFacet(False),
                 "airflowVersion": AirflowVersionRunFacet(
                     operator="airflow.operators.dummy_operator.DummyOperator",
