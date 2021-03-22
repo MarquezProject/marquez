@@ -1,7 +1,7 @@
 import os
 import logging
 import uuid
-from typing import Optional
+from typing import Optional, Dict, Type
 
 from marquez_airflow.extractors import Dataset, StepMetadata
 from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
@@ -9,7 +9,7 @@ from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
 from openlineage.client import OpenLineageClient
 from openlineage.facet import DocumentationJobFacet, SourceCodeLocationJobFacet, SqlJobFacet, \
     DocumentationDatasetFacet, SchemaDatasetFacet, SchemaField, DataSourceDatasetFacet, \
-    NominalTimeRunFacet, ParentRunFacet
+    NominalTimeRunFacet, ParentRunFacet, BaseFacet
 from openlineage.run import Dataset as OpenLineageDataset, RunEvent, RunState, Run, Job
 
 _DAG_DEFAULT_OWNER = 'anonymous'
@@ -40,6 +40,7 @@ class MarquezAdapter:
             nominal_start_time: str,
             nominal_end_time: str,
             step: Optional[StepMetadata],
+            run_facets: Optional[Dict[str, Type[BaseFacet]]] = None  # Custom run facets
     ) -> str:
         sql = None
         if step:
@@ -50,7 +51,7 @@ class MarquezAdapter:
             eventType=RunState.START,
             eventTime=event_time,
             run=self._build_run(
-                run_id, parent_run_id, job_name, nominal_start_time, nominal_end_time
+                run_id, parent_run_id, job_name, nominal_start_time, nominal_end_time, run_facets
             ),
             job=self._build_job(
                 job_name, job_description, code_location, sql
@@ -124,7 +125,8 @@ class MarquezAdapter:
             parent_run_id: Optional[str] = None,
             job_name: Optional[str] = None,
             nominal_start_time: Optional[str] = None,
-            nominal_end_time: Optional[str] = None
+            nominal_end_time: Optional[str] = None,
+            custom_facets: Dict[str, Type[BaseFacet]] = None
     ) -> Run:
         facets = {}
         if nominal_start_time:
@@ -137,6 +139,9 @@ class MarquezAdapter:
                 _DAG_NAMESPACE,
                 job_name
             )})
+
+        if custom_facets:
+            facets.update(custom_facets)
 
         return Run(run_id, facets)
 

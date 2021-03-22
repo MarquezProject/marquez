@@ -25,7 +25,7 @@ from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 from marquez_airflow.utils import (
     JobIdMapping,
     get_location,
-    DagUtils
+    DagUtils, get_custom_facets
 )
 
 # Handling of import of different airflow versions
@@ -64,6 +64,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
         try:
             self._register_dagrun(
                 dagrun,
+                kwargs.get('external_trigger', False),
                 DagUtils.get_execution_date(**kwargs)
             )
         except Exception as e:
@@ -78,7 +79,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
     # tasks can be safely marked as started as well.
     # Doing it other way would require to hook up to
     # scheduler, where tasks are actually started
-    def _register_dagrun(self, dagrun, execution_date):
+    def _register_dagrun(self, dagrun, is_external_trigger: bool, execution_date: str):
         self.log.debug(f"self.task_dict: {self.task_dict}")
         # Register each task in the DAG
         for task_id, task in self.task_dict.items():
@@ -95,7 +96,8 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     self._get_location(task),
                     DagUtils.get_start_time(execution_date),
                     DagUtils.get_end_time(execution_date, self.following_schedule(execution_date)),
-                    step
+                    step,
+                    get_custom_facets(task, is_external_trigger)
                 )
 
                 JobIdMapping.set(
