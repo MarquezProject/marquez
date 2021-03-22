@@ -26,7 +26,8 @@ from marquez_airflow.extractors.postgres_extractor import PostgresExtractor
 from marquez_airflow.utils import (
     JobIdMapping,
     get_location,
-    DagUtils, get_custom_facets
+    DagUtils,
+    get_custom_facets
 )
 
 # Handling of import of different airflow versions
