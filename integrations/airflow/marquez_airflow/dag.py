@@ -53,11 +53,10 @@ _EXTRACTORS = {
 
 class DAG(airflow.models.DAG, LoggingMixin):
     def __init__(self, *args, **kwargs):
-        self.log.info("MARQUEZ DAG")
+        self.log.debug("marquez-airflow dag starting")
         super().__init__(*args, **kwargs)
 
     def create_dagrun(self, *args, **kwargs):
-        self.log.error("------------------------REGISTER_DAGRUN")
         # run Airflow's create_dagrun() first
         dagrun = super(DAG, self).create_dagrun(*args, **kwargs)
 
@@ -79,7 +78,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
     # Doing it other way would require to hook up to
     # scheduler, where tasks are actually started
     def _register_dagrun(self, dagrun, execution_date):
-        self.log.error(f"---------------------------self.task_dict: {self.task_dict}")
+        self.log.debug(f"self.task_dict: {self.task_dict}")
         # Register each task in the DAG
         for task_id, task in self.task_dict.items():
             t = self._now_ms()
@@ -139,19 +138,20 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
     def _report_task_instance(self, task_instance, dagrun, session):
         task = self.get_task(task_instance.task_id)
+
+        # Note: task_run_id could be missing if it was removed from airflow
+        # or the job could not be registered.
         task_run_id = JobIdMapping.pop(
             self._marquez_job_name_from_task_instance(task_instance), dagrun.run_id, session)
         step = self._extract_metadata(dagrun, task, task_instance)
 
-        # Note: run_ids could be missing if it was removed from airflow
-        # or the job could not be registered.
         job_name = self._marquez_job_name(self.dag_id, task.task_id)
 
         if not task_run_id:
             task_run_id = _MARQUEZ.start_task(
                 job_name,
                 self.description,
-                DagUtils.to_iso_8601(self._now_ms()),
+                DagUtils.to_iso_8601(task_instance.start_date),
                 None,  # TODO: add parent hierarchy
                 self._get_location(task),
                 DagUtils.to_iso_8601(task_instance.start_date),
