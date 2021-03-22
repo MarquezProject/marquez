@@ -452,8 +452,8 @@ def test_marquez_dag_with_extract_on_complete(
                 "sourceCodeLocation": SourceCodeLocationJobFacet("", completed_task_location)
             }),
             producer=PRODUCER,
-            inputs=[],
-            outputs=[]
+            inputs=None,
+            outputs=None
         ))
     ])
 
