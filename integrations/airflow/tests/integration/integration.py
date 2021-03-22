@@ -181,14 +181,15 @@ def check_jobs_meta():
     assert if_not_exists_job['location'] is None
 
     # TODO: waiting for backend fix
-    assert if_not_exists_job['context']['sql'] is not None
+    # assert if_not_exists_job['context']['sql'] is not None
+    # assert if_not_exists_job['description'] == DAG_DESCRIPTION
+
     # TODO: no airflow context data yet
     # assert if_not_exists_job['context']['airflow.operator'] == \
     #        'airflow.operators.postgres_operator.PostgresOperator'
     # assert if_not_exists_job['context']['airflow.task_info'] is not None
     # assert if_not_exists_job['context']['airflow.version'] == AIRFLOW_VERSION
     # assert if_not_exists_job['context']['marquez_airflow.version'] == MARQUEZ_AIRFLOW_VERSION
-    assert if_not_exists_job['description'] == DAG_DESCRIPTION
     assert if_not_exists_job['latestRun']['state'] == RunState.COMPLETED.value
 
     insert_job = client.get_job(
@@ -211,15 +212,15 @@ def check_jobs_meta():
         'name': OUT_TABLE_NAME
     }]
     assert insert_job['location'] is None
-    # TODO: waiting for backend fix
-    assert insert_job['context']['sql'] is not None
+    # TODO: waiting for backend
+    # assert insert_job['context']['sql'] is not None
+    # assert insert_job['description'] == DAG_DESCRIPTION
     # TODO: no airflow context job data yet
     # assert insert_job['context']['airflow.operator'] == \
     #        'airflow.operators.postgres_operator.PostgresOperator'
     # assert insert_job['context']['airflow.task_info'] is not None
     # assert insert_job['context']['airflow.version'] == AIRFLOW_VERSION
     # assert insert_job['context']['marquez_airflow.version'] == MARQUEZ_AIRFLOW_VERSION
-    assert insert_job['description'] == DAG_DESCRIPTION
     assert insert_job['latestRun']['state'] == RunState.COMPLETED.value
 
 
