@@ -331,7 +331,7 @@ public interface RunDao extends BaseDao {
     return runRow;
   }
 
-  @SqlUpdate("UPDATE runs " + "SET job_version_uuid = :jobVersionUuid " + "WHERE uuid = :runUuid")
+  @SqlUpdate("UPDATE runs SET job_version_uuid = :jobVersionUuid WHERE uuid = :runUuid")
   void updateJobVersion(UUID runUuid, UUID jobVersionUuid);
 
   @SqlQuery(
