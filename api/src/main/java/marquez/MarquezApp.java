@@ -89,7 +89,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     log.info("Running startup actions...");
 
     try {
-      DbMigration.migrateDbOrError(config, source);
+      DbMigration.migrateDbOrError(config.getFlywayFactory(), source, config.isMigrateOnStartup());
     } catch (FlywayException errorOnDbMigrate) {
       log.info("Stopping app...");
       // Propagate throwable up the stack.

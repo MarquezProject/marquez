@@ -33,3 +33,8 @@ create index dataset_fields_name_index
     on dataset_fields (name, dataset_uuid);
 create unique index stream_versions_dataset_version_index
     on stream_versions (dataset_version_uuid);
+
+create index runs_created_at_index
+    on runs(created_at DESC)
+    include (job_name, namespace_name, started_at, ended_at)
+    where current_run_state = 'COMPLETED';

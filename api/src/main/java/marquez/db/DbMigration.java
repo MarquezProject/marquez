@@ -3,7 +3,6 @@ package marquez.db;
 import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.MarquezConfig;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 
@@ -12,8 +11,9 @@ public final class DbMigration {
   private DbMigration() {}
 
   public static void migrateDbOrError(
-      @NonNull final MarquezConfig config, @NonNull final DataSource source) {
-    final FlywayFactory flywayFactory = config.getFlywayFactory();
+      @NonNull final FlywayFactory flywayFactory,
+      @NonNull final DataSource source,
+      boolean migrateOnStartup) {
     final Flyway flyway = flywayFactory.build(source);
     // Only attempt a database migration if there are pending changes to be applied,
     // or on the initialization of a new database. Otherwise, error on pending changes
@@ -21,7 +21,7 @@ public final class DbMigration {
     if (!hasPendingMigrations(flyway)) {
       log.info("No pending migrations found, skipping...");
       return;
-    } else if (!config.isMigrateOnStartup() && hasMigrationsApplied(flyway)) {
+    } else if (!migrateOnStartup && hasMigrationsApplied(flyway)) {
       errorOnPendingMigrations(flyway);
     }
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts
