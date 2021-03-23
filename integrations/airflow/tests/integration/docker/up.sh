@@ -22,8 +22,11 @@ cd "${project_root}"/integrations/airflow/tests/integration
 
 GIT_URL=$(git config --get remote.origin.url \
 		          | sed 's|git@github.com:|https://github.com/|')
+echo "Using git url: ${GIT_URL}"
+
 GIT_REV=$(git rev-parse HEAD)
 MARQUEZ_AIRFLOW_LIB_WITH_REV="git+${GIT_URL}@${GIT_REV}#egg=marquez_airflow&subdirectory=integrations/airflow"
+echo "Using '${MARQUEZ_AIRFLOW_LIB_WITH_REV}' to download marquez-airflow lib"
 
 # Add revision to requirements.txt
 echo "${MARQUEZ_AIRFLOW_LIB_WITH_REV}" > requirements.txt
