@@ -34,12 +34,11 @@ create index dataset_fields_name_index
 create unique index stream_versions_dataset_version_index
     on stream_versions (dataset_version_uuid);
 
-drop index runs_created_at_index;
-create index runs_created_at_index
+create index runs_created_at_completed_index
     on runs(created_at DESC)
     include (job_name, namespace_name, started_at, ended_at)
     where current_run_state = 'COMPLETED';
-create index runs_created_at_by_name_index
+create index runs_created_at_completed_by_name_index
     on runs(job_name, namespace_name, created_at DESC)
     include (started_at, ended_at)
     where current_run_state = 'COMPLETED';
