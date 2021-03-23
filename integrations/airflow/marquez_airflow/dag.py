@@ -74,7 +74,8 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
         return dagrun
 
-    # TODO: do we actually need to start tasks here or just register a hierarchy?
+    # We make the assumption that when a DAG run is created, it's
+    # tasks can be safely marked as started as well.
     # Doing it other way would require to hook up to
     # scheduler, where tasks are actually started
     def _register_dagrun(self, dagrun, execution_date):
