@@ -1,6 +1,9 @@
 alter table dataset_versions add column fields jsonb;
 
-UPDATE dataset_versions SET (fields) = (select jsonb_agg((select x from (select distinct f.name, f.type, f.description) as x)) as fields
+UPDATE dataset_versions SET (fields) = (select jsonb_agg((select x from (select distinct f.name, f.type, f.description,
+       ARRAY(select t.name from tags t
+       inner join dataset_fields_tag_mapping m on m.tag_uuid = t.uuid
+       where f.uuid = m.dataset_field_uuid) as tags) as x)) as fields
      from dataset_fields f
      inner join dataset_versions_field_mapping fm on fm.dataset_field_uuid = f.uuid
      where fm.dataset_version_uuid = dataset_versions.uuid

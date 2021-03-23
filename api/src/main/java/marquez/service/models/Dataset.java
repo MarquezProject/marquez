@@ -55,7 +55,7 @@ public abstract class Dataset {
   @Getter private final Instant updatedAt;
   @Getter private final NamespaceName namespace;
   @Getter private final SourceName sourceName;
-  @Getter @Setter private ImmutableList<Field> fields;
+  @Getter private final ImmutableList<Field> fields;
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;

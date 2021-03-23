@@ -126,20 +126,13 @@ public interface DatasetVersionDao extends BaseDao {
       return null;
     }
     try {
-      List<Field> stripped =
-          fields.stream().map(this::removeTagsFromField).collect(Collectors.toList());
-
       PGobject jsonObject = new PGobject();
       jsonObject.setType("json");
-      jsonObject.setValue(Utils.getMapper().writeValueAsString(stripped));
+      jsonObject.setValue(Utils.getMapper().writeValueAsString(fields));
       return jsonObject;
     } catch (Exception e) {
       return null;
     }
-  }
-
-  default Field removeTagsFromField(Field f) {
-    return new Field(f.getName(), f.getType(), f.getDescription());
   }
 
   default PGobject toPgObjectSchemaFields(List<SchemaField> fields) {
@@ -177,10 +170,8 @@ public interface DatasetVersionDao extends BaseDao {
 
   String SELECT = "SELECT dv.* " + "FROM dataset_versions dv ";
 
-  String EXTENDED_SELECT = "SELECT dv.* " + "FROM dataset_versions AS dv ";
-
   String DATASET_VERSION_SELECT =
-      "select d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description,  ARRAY(select t.name from tags t\n"
+      "select d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description, ARRAY(select t.name from tags t\n"
           + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
           + "    where d.uuid = m.dataset_uuid) as tags,\n"
           + "dv.created_at, dv.version, dv.fields, dv.run_uuid as \"createdByRunUuid\", sv.schema_location\n"
@@ -196,13 +187,6 @@ public interface DatasetVersionDao extends BaseDao {
 
     v.ifPresent(
         ver -> {
-          ExtendedDatasetVersionRow datasetVersionUuid =
-              createDatasetVersionDao().findByRow(version).get();
-          DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
-
-          List<Field> fields = datasetFieldDao.find(datasetVersionUuid.getUuid());
-          ver.setFields(ImmutableList.copyOf(fields));
-
           if (ver.getCreatedByRunUuid() != null) {
             Optional<Run> run = createRunDao().findBy(ver.getCreatedByRunUuid());
             run.ifPresent(ver::setCreatedByRun);
@@ -211,11 +195,8 @@ public interface DatasetVersionDao extends BaseDao {
     return v;
   }
 
-  @SqlQuery(EXTENDED_SELECT + " WHERE version = :version")
-  Optional<ExtendedDatasetVersionRow> findByRow(@NonNull UUID version);
-
   @SqlQuery(
-      EXTENDED_SELECT
+      SELECT
           + " INNER JOIN runs_input_mapping m ON m.dataset_version_uuid = dv.uuid WHERE m.run_uuid = :runUuid")
   List<ExtendedDatasetVersionRow> findInputsByRunId(UUID runUuid);
 
@@ -224,7 +205,7 @@ public interface DatasetVersionDao extends BaseDao {
    *
    * @param runId - the run ID
    */
-  @SqlQuery(EXTENDED_SELECT + " WHERE run_uuid = :runId")
+  @SqlQuery(SELECT + " WHERE run_uuid = :runId")
   List<ExtendedDatasetVersionRow> findOutputsByRunId(@NonNull UUID runId);
 
   @SqlQuery(
@@ -237,16 +218,9 @@ public interface DatasetVersionDao extends BaseDao {
   default List<DatasetVersion> findAllWithRun(
       String namespaceName, String datasetName, int limit, int offset) {
     List<DatasetVersion> v = findAll(namespaceName, datasetName, limit, offset);
-    DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
     return v.stream()
         .peek(
             ver -> {
-              ExtendedDatasetVersionRow datasetVersionUuid =
-                  createDatasetVersionDao().findByRow(ver.getVersion().getValue()).get();
-
-              List<Field> fields = datasetFieldDao.find(datasetVersionUuid.getUuid());
-              ver.setFields(ImmutableList.copyOf(fields));
-
               if (ver.getCreatedByRunUuid() != null) {
                 Optional<Run> run = createRunDao().findBy(ver.getCreatedByRunUuid());
                 run.ifPresent(ver::setCreatedByRun);

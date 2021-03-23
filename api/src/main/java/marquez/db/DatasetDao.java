@@ -91,20 +91,8 @@ public interface DatasetDao extends BaseDao {
           + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n"
           + "left outer join dataset_versions dv on dv.uuid = d.current_version_uuid\n";
 
-  default Optional<Dataset> find(String namespaceName, String datasetName) {
-    Optional<Dataset> dataset = findWithoutFieldTags(namespaceName, datasetName);
-    DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
-
-    dataset.ifPresent(
-        ds ->
-            ds.getCurrentVersionUuid()
-                .ifPresent(ver -> ds.setFields(ImmutableList.copyOf(datasetFieldDao.find(ver)))));
-
-    return dataset;
-  }
-
   @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
-  Optional<Dataset> findWithoutFieldTags(String namespaceName, String datasetName);
+  Optional<Dataset> find(String namespaceName, String datasetName);
 
   @SqlQuery(SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<DatasetRow> findByRow(String namespaceName, String datasetName);
@@ -118,19 +106,7 @@ public interface DatasetDao extends BaseDao {
           + "WHERE d.namespace_name = :namespaceName "
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
-  List<Dataset> findAllWithoutTags(String namespaceName, int limit, int offset);
-
-  default List<Dataset> findAll(String namespaceName, int limit, int offset) {
-    DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
-
-    return findAllWithoutTags(namespaceName, limit, offset).stream()
-        .peek(
-            ds ->
-                ds.getCurrentVersionUuid()
-                    .ifPresent(
-                        ver -> ds.setFields(ImmutableList.copyOf(datasetFieldDao.find(ver)))))
-        .collect(Collectors.toList());
-  }
+  List<Dataset> findAll(String namespaceName, int limit, int offset);
 
   @SqlQuery(
       "INSERT INTO datasets ("
