@@ -14,6 +14,22 @@ def test_client_fails_with_wrong_event_type():
         client.emit("event")
 
 
+def test_client_fails_to_create_with_wrong_url():
+    session = MagicMock()
+    with pytest.raises(ValueError):
+        OpenLineageClient(url="notanurl", session=session)
+    with pytest.raises(ValueError):
+        OpenLineageClient(url="http://", session=session)
+    with pytest.raises(ValueError):
+        OpenLineageClient(url="example.com", session=session)
+    with pytest.raises(ValueError):
+        OpenLineageClient(url="http:example.com", session=session)
+    with pytest.raises(ValueError):
+        OpenLineageClient(url="http:/example.com", session=session)
+    with pytest.raises(ValueError):
+        OpenLineageClient(url="196.168.0.1", session=session)
+
+
 def test_client_sends_proper_json_with_minimal_event():
     session = MagicMock()
     client = OpenLineageClient(url="http://example.com", session=session)

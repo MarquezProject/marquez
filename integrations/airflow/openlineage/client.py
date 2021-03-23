@@ -1,5 +1,5 @@
 import os
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import attr
 from requests import Session
@@ -24,7 +24,10 @@ class OpenLineageClient:
             options: OpenLineageClientOptions = OpenLineageClientOptions(),
             session: Session = None
     ):
-        self.url = url  # TODO: url validation?
+        parsed = urlparse(url)
+        if not (parsed.scheme and parsed.netloc):
+            raise ValueError(f"Need valid url for OpenLineageClient, passed {url}")
+        self.url = url
         self.options = options
         self.session = session if session else Session()
         self.session.headers['Content-Type'] = 'application/json'

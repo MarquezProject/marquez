@@ -178,7 +178,9 @@ class BaseExtractor(ABC, LoggingMixin):
 
     @abstractmethod
     def extract(self) -> Union[StepMetadata, List[StepMetadata]]:
-        # Strongly preferred to return single StepMetadata instance
+        # In future releases, we'll want to deprecate returning a list of StepMetadata
+        # and simply return a StepMetadata object. We currently return a list
+        # for backwards compatibility.
         pass
 
     def extract_on_complete(self, task_instance) -> Union[StepMetadata, List[StepMetadata]]:
