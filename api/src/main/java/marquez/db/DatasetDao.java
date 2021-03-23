@@ -74,13 +74,6 @@ public interface DatasetDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  String TAG_UUIDS =
-      "ARRAY(SELECT tag_uuid "
-          + "      FROM datasets_tag_mapping "
-          + "      WHERE dataset_uuid = d.uuid) AS tag_uuids ";
-
-  String SELECT = "SELECT d.*, " + TAG_UUIDS + "FROM datasets AS d ";
-
   String DATASET_SELECT =
       "select d.*, dv.fields, ARRAY(select t.name from tags t\n"
           + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
@@ -93,7 +86,8 @@ public interface DatasetDao extends BaseDao {
   @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<Dataset> find(String namespaceName, String datasetName);
 
-  @SqlQuery(SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
+  @SqlQuery(
+      "SELECT d.* FROM datasets AS d WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<DatasetRow> findByRow(String namespaceName, String datasetName);
 
   @SqlQuery("SELECT * FROM datasets WHERE name = :datasetName AND namespace_name = :namespaceName")
