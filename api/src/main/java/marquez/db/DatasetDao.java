@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.Value;
 import marquez.common.models.DatasetType;
 import marquez.common.models.TagName;
@@ -97,9 +96,8 @@ public interface DatasetDao extends BaseDao {
   @SqlQuery(SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<DatasetRow> findByRow(String namespaceName, String datasetName);
 
-  @SqlQuery(
-      "SELECT uuid FROM datasets WHERE name = :datasetName AND namespace_name = :namespaceName")
-  Optional<UUID> getUuid(String namespaceName, String datasetName);
+  @SqlQuery("SELECT * FROM datasets WHERE name = :datasetName AND namespace_name = :namespaceName")
+  Optional<DatasetRow> getUuid(String namespaceName, String datasetName);
 
   @SqlQuery(
       DATASET_SELECT

@@ -14,7 +14,6 @@
 
 package marquez.db;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -49,6 +48,7 @@ import marquez.service.models.Run;
 import marquez.service.models.StreamMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
 
@@ -182,6 +182,9 @@ public interface DatasetVersionDao extends BaseDao {
   @SqlQuery(DATASET_VERSION_SELECT + "WHERE dv.version = :version")
   Optional<DatasetVersion> findBy(UUID version);
 
+  @SqlQuery(DATASET_VERSION_SELECT + "WHERE dv.uuid = :uuid")
+  Optional<DatasetVersion> findByUuid(UUID uuid);
+
   default Optional<DatasetVersion> findByWithRun(UUID version) {
     Optional<DatasetVersion> v = findBy(version);
 
@@ -247,4 +250,7 @@ public interface DatasetVersionDao extends BaseDao {
       PGobject fields,
       String namespaceName,
       String datasetName);
+
+  @SqlUpdate("UPDATE dataset_versions SET fields = :fields WHERE uuid = :uuid")
+  void updateFields(UUID uuid, PGobject fields);
 }

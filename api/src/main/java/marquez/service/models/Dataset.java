@@ -26,7 +26,6 @@ import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;

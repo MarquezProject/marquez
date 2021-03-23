@@ -14,17 +14,22 @@
 
 package marquez.db;
 
+import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.Value;
 import marquez.common.models.Field;
+import marquez.common.models.TagName;
 import marquez.db.mappers.DatasetFieldMapper;
 import marquez.db.mappers.DatasetFieldRowMapper;
 import marquez.db.models.DatasetFieldRow;
+import marquez.db.models.DatasetRow;
 import marquez.db.models.TagRow;
 import marquez.service.models.Dataset;
+import marquez.service.models.DatasetVersion;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
@@ -46,8 +51,33 @@ public interface DatasetFieldDao extends BaseDao {
       String namespaceName, String datasetName, String fieldName, String tagName) {
     Instant now = Instant.now();
     TagRow tag = createTagDao().upsert(UUID.randomUUID(), now, tagName);
-    UUID datasetUuid = createDatasetDao().getUuid(namespaceName, datasetName).get();
-    UUID fieldUuid = createDatasetFieldDao().findUuid(datasetUuid, fieldName).get();
+    DatasetRow datasetRow = createDatasetDao().getUuid(namespaceName, datasetName).get();
+    UUID fieldUuid = createDatasetFieldDao().findUuid(datasetRow.getUuid(), fieldName).get();
+    datasetRow
+        .getCurrentVersionUuid()
+        .ifPresent(
+            ver -> {
+              DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
+              DatasetVersion dsVer = datasetVersionDao.findByUuid(ver).get();
+              List<Field> fields =
+                  dsVer.getFields().stream()
+                      .map(
+                          f -> {
+                            if (f.getName().getValue().equalsIgnoreCase(fieldName)) {
+                              ImmutableSet<TagName> tags =
+                                  ImmutableSet.<TagName>builder()
+                                      .addAll(f.getTags())
+                                      .add(TagName.of(tagName))
+                                      .build();
+                              return new Field(
+                                  f.getName(), f.getType(), tags, f.getDescription().orElse(null));
+                            } else {
+                              return f;
+                            }
+                          })
+                      .collect(Collectors.toList());
+              datasetVersionDao.updateFields(ver, datasetVersionDao.toPgObjectFields(fields));
+            });
 
     updateTags(fieldUuid, tag.getUuid(), now);
     return createDatasetDao().find(namespaceName, datasetName).get();
