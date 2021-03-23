@@ -112,7 +112,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
 
     List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, "table1");
     assertThat(versions).hasSizeGreaterThan(1);
-    DatasetVersion version = versions.get(1);
+    DatasetVersion version = versions.get(0); // most recent dataset version
     assertThat(version.getCreatedByRun()).isNotEqualTo(Optional.empty());
     Run createdRun = version.getCreatedByRun().get();
     assertThat(createdRun.getCreatedAt()).isEqualTo(run.getCreatedAt());

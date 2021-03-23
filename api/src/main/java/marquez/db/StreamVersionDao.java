@@ -20,6 +20,6 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 public interface StreamVersionDao {
   @SqlUpdate(
       "INSERT INTO stream_versions (dataset_version_uuid, schema_location) "
-          + "VALUES (:datasetVersionUuid, :schemaLocation)")
+          + "VALUES (:datasetVersionUuid, :schemaLocation) ON CONFLICT DO NOTHING")
   void insert(UUID datasetVersionUuid, String schemaLocation);
 }

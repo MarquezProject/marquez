@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +57,8 @@ public final class DatasetMapper implements RowMapper<Dataset> {
   @Override
   public Dataset map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
+    Set<String> columnNames = MapperUtils.getColumnNames(results.getMetaData());
+
     DatasetType type = DatasetType.valueOf(stringOrThrow(results, Columns.TYPE));
 
     if (type == DatasetType.DB_TABLE) {
@@ -69,7 +72,7 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           timestampOrThrow(results, Columns.UPDATED_AT),
           SourceName.of(stringOrThrow(results, Columns.SOURCE_NAME)),
           toFields(results, "fields"),
-          toTags(results, "tags"),
+          columnNames.contains("tags") ? toTags(results, "tags") : null,
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
           stringOrNull(results, Columns.DESCRIPTION),
           Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)));
@@ -85,7 +88,7 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           SourceName.of(stringOrThrow(results, Columns.SOURCE_NAME)),
           getUrl(results, Columns.SCHEMA_LOCATION),
           toFields(results, "fields"),
-          toTags(results, "tags"),
+          columnNames.contains("tags") ? toTags(results, "tags") : null,
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
           stringOrNull(results, Columns.DESCRIPTION),
           Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)));

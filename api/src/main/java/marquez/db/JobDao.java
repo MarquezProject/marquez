@@ -115,7 +115,7 @@ public interface JobDao extends BaseDao {
                         DatasetName.of(ds.getDatasetName())))
             .collect(Collectors.toSet()));
     j.setOutputs(
-        datasetVersionDao.findByRunId(run.getId().getValue()).stream()
+        datasetVersionDao.findOutputsByRunId(run.getId().getValue()).stream()
             .map(
                 ds ->
                     new DatasetId(

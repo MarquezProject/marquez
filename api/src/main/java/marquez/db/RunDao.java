@@ -226,7 +226,8 @@ public interface RunDao extends BaseDao {
             datasetDao.findByRow(
                 datasetId.getNamespace().getValue(), datasetId.getName().getValue());
         Optional<Dataset> ds =
-            datasetDao.find(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+            datasetDao.findWithoutFieldTags(
+                datasetId.getNamespace().getValue(), datasetId.getName().getValue());
         ds.ifPresent(
             d -> {
               UUID version =
@@ -237,7 +238,14 @@ public interface RunDao extends BaseDao {
                       toSchemaFields(d.getFields()),
                       runUuid);
               datasetVersionDao.upsert(
-                  UUID.randomUUID(), Instant.now(), dsRow.get().getUuid(), version, runUuid);
+                  UUID.randomUUID(),
+                  Instant.now(),
+                  dsRow.get().getUuid(),
+                  version,
+                  runUuid,
+                  datasetVersionDao.toPgObjectFields(d.getFields()),
+                  d.getNamespace().getValue(),
+                  d.getName().getValue());
             });
       }
     }
@@ -266,7 +274,8 @@ public interface RunDao extends BaseDao {
 
     for (DatasetId datasetId : inputs) {
       Optional<Dataset> dataset =
-          datasetDao.find(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+          datasetDao.findWithoutFieldTags(
+              datasetId.getNamespace().getValue(), datasetId.getName().getValue());
       if (dataset.isPresent() && dataset.get().getCurrentVersionUuid().isPresent()) {
         updateInputMapping(runUuid, dataset.get().getCurrentVersionUuid().get());
       }

@@ -37,7 +37,7 @@ public final class Field {
   private final FieldName name;
 
   @Getter private final FieldType type;
-  @Getter private final ImmutableSet<TagName> tags;
+  @Getter private ImmutableSet<TagName> tags;
   @Nullable private final String description;
 
   @JsonCreator
@@ -64,6 +64,12 @@ public final class Field {
     this.type = type;
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.description = description;
+  }
+
+  public Field(FieldName name, FieldType type, Optional<String> description) {
+    this.name = name;
+    this.type = type;
+    this.description = description.orElse(null);
   }
 
   public Optional<String> getDescription() {
