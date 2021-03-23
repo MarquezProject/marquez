@@ -33,7 +33,6 @@ import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.db.DbMigration;
-import marquez.db.FlywayFactory;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -88,18 +87,16 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final DataSource source = sourceFactory.build(env.metrics(), DB_SOURCE_NAME);
 
     log.info("Running startup actions...");
-    if (config.isMigrateOnStartup()) {
-      final FlywayFactory flywayFactory = config.getFlywayFactory();
-      try {
-        DbMigration.migrateDbOrError(flywayFactory, source);
-      } catch (FlywayException errorOnDbMigrate) {
-        log.info("Stopping app...");
-        // Propagate throwable up the stack.
-        onFatalError(errorOnDbMigrate); // Signal app termination.
-      }
-    }
-    registerResources(config, env, source);
 
+    try {
+      DbMigration.migrateDbOrError(config, source);
+    } catch (FlywayException errorOnDbMigrate) {
+      log.info("Stopping app...");
+      // Propagate throwable up the stack.
+      onFatalError(errorOnDbMigrate); // Signal app termination.
+    }
+
+    registerResources(config, env, source);
     registerServlets(env);
   }
 
