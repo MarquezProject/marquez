@@ -129,7 +129,7 @@ jobs:
     steps:
       - *checkout_project_root
       - run: ./../../.circleci/get-docker-compose.sh
-      - run: docker build -f Dockerfile.test -t marquez-airflow-base .
+      - run: docker build -f Dockerfile.tests -t marquez-airflow-base .
       - run: ./tests/integration/docker/up.sh
 
   release:
