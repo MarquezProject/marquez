@@ -122,6 +122,7 @@ jobs:
       - run: airflow initdb
       - run: python -m pytest --cov=marquez_python tests/
       - run: bash <(curl -s https://codecov.io/bash)
+      - run: docker build -f Dockerfile.test -t marquez-airflow-base .
 
   test-integration-airflow:
     working_directory: ~/marquez/integrations/airflow/tests/integration
