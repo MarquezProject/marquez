@@ -20,7 +20,6 @@ set -e
 project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}"/integrations/airflow/tests/integration
 
-
 if [[ "$(docker images -q marquez-airflow-base:latest 2> /dev/null)" == "" ]]; then
   echo "Please run 'docker build -f Dockerfile.tests -t marquez-airflow-base .' at base folder"
   exit 1
@@ -49,7 +48,6 @@ google-api-python-client>=1.12.2
 pandas-gbq>=0.13.2
 google-cloud-storage>=1.31.2
 retrying==1.3.3
-marquez_python==0.12.2
 ${MARQUEZ_AIRFLOW_WHL}
 EOL
 
