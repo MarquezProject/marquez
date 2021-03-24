@@ -1238,20 +1238,20 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
     }
 
     public static ImmutableList<ActiveRunMeta> successes(
-        final int levelInRunGraph, final int numOfSuccesses) {
+        final int levelInLineageGraph, final int numOfSuccesses) {
       final ImmutableList.Builder<ActiveRunMeta> activeRuns = ImmutableList.builder();
       for (int i = 0; i < numOfSuccesses; i++) {
-        activeRuns.add(ActiveRunMeta.builder().levelInRunGraph(levelInRunGraph).build());
+        activeRuns.add(ActiveRunMeta.builder().levelInRunGraph(levelInLineageGraph).build());
       }
       return activeRuns.build();
     }
 
     public static ImmutableList<ActiveRunMeta> failures(
-        final int levelInRunGraph, final int numOfFailures) {
+        final int levelInLineageGraph, final int numOfFailures) {
       final ImmutableList.Builder<ActiveRunMeta> activeRuns = ImmutableList.builder();
       for (int i = 0; i < numOfFailures; i++) {
         activeRuns.add(
-            ActiveRunMeta.builder().levelInRunGraph(levelInRunGraph).markFailed().build());
+            ActiveRunMeta.builder().levelInRunGraph(levelInLineageGraph).markFailed().build());
       }
       return activeRuns.build();
     }
@@ -1267,29 +1267,29 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
     }
 
     public static ImmutableList<ActiveRunMeta> randomize(
-        final int levelInRunGraph, final int numOfRandom) {
+        final int levelInLineageGraph, final int numOfRandom) {
       final ImmutableList.Builder<ActiveRunMeta> activeRuns = ImmutableList.builder();
       for (int i = 0; i < numOfRandom; i++) {
         if (new Random().nextBoolean()) {
-          activeRuns.add(successes(levelInRunGraph, 1).get(0));
+          activeRuns.add(successes(levelInLineageGraph, 1).get(0));
         } else {
-          activeRuns.add(failures(levelInRunGraph, 1).get(0));
+          activeRuns.add(failures(levelInLineageGraph, 1).get(0));
         }
       }
       return activeRuns.build();
     }
 
     public static ActiveRunMeta successesWith(
-        int levelInRunGraph, @Nullable SchemaChange... schemaChanges) {
-      return successesWith(levelInRunGraph, null, schemaChanges);
+        int levelInLineageGraph, @Nullable SchemaChange... schemaChanges) {
+      return successesWith(levelInLineageGraph, null, schemaChanges);
     }
 
     public static ActiveRunMeta successesWith(
-        int levelInRunGraph,
+        int levelInLineageGraph,
         @Nullable CodeChange codeChange,
         @Nullable SchemaChange... schemaChanges) {
       return ActiveRunMeta.builder()
-          .levelInRunGraph(levelInRunGraph)
+          .levelInRunGraph(levelInLineageGraph)
           .codeChange(codeChange)
           .schemaChanges(ImmutableSet.copyOf(schemaChanges))
           .build();
@@ -1300,7 +1300,7 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
     }
 
     static final class Builder {
-      private int levelInRunGraph;
+      private int levelInLineageGraph;
       private boolean markFailed;
       private boolean markRunning;
       private CodeChange codeChange;
@@ -1312,8 +1312,8 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
         this.schemaChanges = ImmutableSet.of();
       }
 
-      public Builder levelInRunGraph(int levelInRunGraph) {
-        this.levelInRunGraph = levelInRunGraph;
+      public Builder levelInRunGraph(int levelInLineageGraph) {
+        this.levelInLineageGraph = levelInLineageGraph;
         return this;
       }
 
@@ -1339,7 +1339,7 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
 
       public ActiveRunMeta build() {
         return new ActiveRunMeta(
-            levelInRunGraph, markFailed, markRunning, codeChange, schemaChanges);
+            levelInLineageGraph, markFailed, markRunning, codeChange, schemaChanges);
       }
     }
   }
