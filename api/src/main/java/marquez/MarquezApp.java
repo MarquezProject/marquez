@@ -32,6 +32,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.cli.SeedCommand;
 import marquez.db.DbMigration;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
@@ -70,6 +71,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
         new SubstitutingSourceProvider(
             bootstrap.getConfigurationSourceProvider(),
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
+
+    // Add CLI commands
+    bootstrap.addCommand(new SeedCommand());
 
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
