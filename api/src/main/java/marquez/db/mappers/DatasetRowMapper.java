@@ -18,14 +18,11 @@ import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
-import static marquez.db.Columns.uuidArrayOrThrow;
 import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
-import com.google.common.collect.ImmutableList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 import lombok.NonNull;
 import marquez.db.Columns;
 import marquez.db.models.DatasetRow;
@@ -36,8 +33,6 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
   @Override
   public DatasetRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    Set<String> columnNames = MapperUtils.getColumnNames(results.getMetaData());
-
     return new DatasetRow(
         uuidOrThrow(results, Columns.ROW_UUID),
         stringOrThrow(results, Columns.TYPE),
@@ -47,9 +42,6 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
         uuidOrThrow(results, Columns.SOURCE_UUID),
         stringOrThrow(results, Columns.NAME),
         stringOrThrow(results, Columns.PHYSICAL_NAME),
-        columnNames.contains(Columns.TAG_UUIDS)
-            ? uuidArrayOrThrow(results, Columns.TAG_UUIDS)
-            : ImmutableList.of(),
         timestampOrNull(results, Columns.LAST_MODIFIED_AT),
         stringOrNull(results, Columns.DESCRIPTION),
         uuidOrNull(results, Columns.CURRENT_VERSION_UUID));

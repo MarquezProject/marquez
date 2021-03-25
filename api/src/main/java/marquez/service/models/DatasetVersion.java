@@ -56,8 +56,8 @@ public abstract class DatasetVersion {
   @Getter private final Version version;
   @Getter private final NamespaceName namespace;
   @Getter private final SourceName sourceName;
-  @Getter private final ImmutableList<Field> fields;
-  @Getter private final ImmutableSet<TagName> tags;
+  @Getter @Setter private ImmutableList<Field> fields;
+  @Getter @Setter private ImmutableSet<TagName> tags;
   @Nullable private final String description;
   @Nullable @Setter private Run createdByRun;
   @Nullable @Setter private UUID createdByRunUuid;

@@ -82,8 +82,8 @@ public interface RunDao extends BaseDao {
   String SELECT_RUN =
       "SELECT r.*, ra.args, ra.args, ctx.context "
           + "FROM runs AS r "
-          + "LEFT OUTER JOIN run_args AS ra ON (ra.uuid = r.run_args_uuid) "
-          + "LEFT OUTER JOIN job_contexts AS ctx ON (r.job_context_uuid = ctx.uuid) ";
+          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid "
+          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid ";
 
   @SqlQuery(SELECT_RUN + " WHERE r.uuid = :rowUuid")
   Optional<Run> findBy(UUID rowUuid);
@@ -237,7 +237,14 @@ public interface RunDao extends BaseDao {
                       toSchemaFields(d.getFields()),
                       runUuid);
               datasetVersionDao.upsert(
-                  UUID.randomUUID(), Instant.now(), dsRow.get().getUuid(), version, runUuid);
+                  UUID.randomUUID(),
+                  Instant.now(),
+                  dsRow.get().getUuid(),
+                  version,
+                  runUuid,
+                  datasetVersionDao.toPgObjectFields(d.getFields()),
+                  d.getNamespace().getValue(),
+                  d.getName().getValue());
             });
       }
     }
@@ -324,7 +331,7 @@ public interface RunDao extends BaseDao {
     return runRow;
   }
 
-  @SqlUpdate("UPDATE runs " + "SET job_version_uuid = :jobVersionUuid " + "WHERE uuid = :runUuid")
+  @SqlUpdate("UPDATE runs SET job_version_uuid = :jobVersionUuid WHERE uuid = :runUuid")
   void updateJobVersion(UUID runUuid, UUID jobVersionUuid);
 
   @SqlQuery(

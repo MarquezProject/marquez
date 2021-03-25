@@ -371,7 +371,14 @@ public interface OpenLineageDao extends BaseDao {
         version(dsNamespace.getName(), source.getName(), datasetRow.getName(), fields, runUuid);
     DatasetVersionRow datasetVersionRow =
         datasetVersionDao.upsert(
-            UUID.randomUUID(), now, datasetRow.getUuid(), datasetVersion, isInput ? null : runUuid);
+            UUID.randomUUID(),
+            now,
+            datasetRow.getUuid(),
+            datasetVersion,
+            isInput ? null : runUuid,
+            datasetVersionDao.toPgObjectSchemaFields(fields),
+            dsNamespace.getName(),
+            ds.getName());
 
     datasetDao.updateVersion(datasetRow.getUuid(), now, datasetVersionRow.getUuid());
 
@@ -383,7 +390,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                toField(field.getType()),
+                toFieldType(field.getType()),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -399,7 +406,7 @@ public interface OpenLineageDao extends BaseDao {
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
   }
 
-  default String toField(String type) {
+  default String toFieldType(String type) {
     if (type == null) {
       return null;
     }
@@ -504,22 +511,18 @@ public interface OpenLineageDao extends BaseDao {
                 namespace,
                 sourceName,
                 datasetName,
-                sourceName,
                 fields == null
                     ? ImmutableList.of()
                     : fields.stream()
-                        .map(
-                            field ->
-                                versionField(
-                                    field.getName(), field.getType(), field.getDescription()))
+                        .map(field -> versionField(field.getName(), field.getType()))
                         .collect(joining(VERSION_DELIM)),
                 runId)
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }
 
-  default String versionField(String fieldName, String type, String description) {
-    return VERSION_JOINER.join(fieldName, type, description);
+  default String versionField(String fieldName, String type) {
+    return VERSION_JOINER.join(fieldName, type);
   }
 
   default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {

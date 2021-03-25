@@ -113,7 +113,7 @@ public interface JobVersionDao extends BaseDao {
             .map(e -> Utils.fromJson(e.getContext(), new TypeReference<Map<String, String>>() {}))
             .orElse(new HashMap<>());
     List<ExtendedDatasetVersionRow> inputs = datasetVersionDao.findInputsByRunId(runUuid);
-    List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findByRunId(runUuid);
+    List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findOutputsByRunId(runUuid);
     NamespaceRow namespaceRow = createNamespaceDao().findByRow(jobRow.getNamespaceName()).get();
 
     JobVersionRow jobVersion =

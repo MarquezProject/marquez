@@ -50,9 +50,7 @@ public interface DatasetDao extends BaseDao {
   @SqlQuery(
       "SELECT EXISTS ("
           + "SELECT 1 FROM datasets AS d "
-          + "INNER JOIN namespaces AS n "
-          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
-          + "WHERE d.name = :datasetName)")
+          + "WHERE d.name = :datasetName AND d.namespace_name = :namespaceName)")
   boolean exists(String namespaceName, String datasetName);
 
   @SqlBatch(
@@ -76,40 +74,24 @@ public interface DatasetDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  String TAG_UUIDS =
-      "ARRAY(SELECT tag_uuid "
-          + "      FROM datasets_tag_mapping "
-          + "      WHERE dataset_uuid = d.uuid) AS tag_uuids ";
-
-  String SELECT = "SELECT d.*, " + TAG_UUIDS + "FROM datasets AS d ";
-
   String DATASET_SELECT =
-      "select d.*, t_json.fields, ARRAY(select t.name from tags t\n"
+      "select d.*, dv.fields, ARRAY(select t.name from tags t\n"
           + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
           + "    where d.uuid = m.dataset_uuid) as tags,"
           + "    sv.schema_location\n"
           + "from datasets d\n"
           + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n"
-          + "left outer join (\n"
-          + "    select fm.dataset_version_uuid, jsonb_agg((select x from (select f.name, f.type, f.description, t_agg.agg as tags) as x) ) as fields\n"
-          + "    from dataset_fields f\n"
-          + "    inner join dataset_versions_field_mapping fm on fm.dataset_field_uuid = f.uuid\n"
-          + "    left outer join (select m.dataset_field_uuid, jsonb_agg((select t.name)) agg\n"
-          + "        from dataset_fields_tag_mapping m\n"
-          + "        inner join tags t on m.tag_uuid = t.uuid\n"
-          + "        group by m.dataset_field_uuid\n"
-          + "        ) t_agg on t_agg.dataset_field_uuid = f.uuid\n"
-          + "    group by fm.dataset_version_uuid) t_json on t_json.dataset_version_uuid = d.current_version_uuid\n";
+          + "left outer join dataset_versions dv on dv.uuid = d.current_version_uuid\n";
 
   @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<Dataset> find(String namespaceName, String datasetName);
 
-  @SqlQuery(SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
+  @SqlQuery(
+      "SELECT d.* FROM datasets AS d WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<DatasetRow> findByRow(String namespaceName, String datasetName);
 
-  @SqlQuery(
-      "SELECT uuid FROM datasets WHERE name = :datasetName AND namespace_name = :namespaceName")
-  Optional<UUID> getUuid(String namespaceName, String datasetName);
+  @SqlQuery("SELECT * FROM datasets WHERE name = :datasetName AND namespace_name = :namespaceName")
+  Optional<DatasetRow> getUuid(String namespaceName, String datasetName);
 
   @SqlQuery(
       DATASET_SELECT
