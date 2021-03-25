@@ -1,10 +1,12 @@
-package marquez;
+package marquez.common.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.UUID;
+import marquez.BaseIntegrationTest;
+import marquez.IntegrationTests;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.Run;

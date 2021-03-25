@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.Value;
+import marquez.api.models.JobVersion;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -33,6 +34,7 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.common.models.Version;
 import marquez.db.mappers.ExtendedJobVersionRowMapper;
+import marquez.db.mappers.JobVersionMapper;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.JobContextRow;
@@ -47,12 +49,25 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 /** The DAO for {@code JobVersion}. */
 @RegisterRowMapper(ExtendedJobVersionRowMapper.class)
+@RegisterRowMapper(JobVersionMapper.class)
 public interface JobVersionDao extends BaseDao {
   /** An {@code enum} used to determine the input / output dataset type for a given job version. */
   enum IoType {
     INPUT,
     OUTPUT;
   }
+
+  String BASE_SELECT_ON_JOB_VERSIONS =
+      "SELECT jv.*, jc.context FROM job_versions AS jv "
+          + "LEFT OUTER JOIN job_contexts AS jc "
+          + "  ON jc.uuid = jv.job_context_uuid ";
+
+  @SqlUpdate(
+      "UPDATE job_versions "
+          + "SET updated_at = :updatedAt, "
+          + "    latest_run_uuid = :latestRunUuid "
+          + "WHERE uuid = :rowUuid")
+  void updateLatestRun(UUID rowUuid, Instant updatedAt, UUID latestRunUuid);
 
   /**
    * Used to upsert a {@link JobVersionRow} object; on version conflict, the job version object is
@@ -191,6 +206,33 @@ public interface JobVersionDao extends BaseDao {
   /** Returns the unique ID of the latest {@link Run} for a given job version. */
   @SqlQuery("SELECT latest_run_uuid FROM job_versions WHERE uuid = :jobVersionUuid")
   Optional<UUID> findLatestRunFor(UUID jobVersionUuid);
+
+  @SqlQuery(
+      BASE_SELECT_ON_JOB_VERSIONS
+          + "WHERE namespace_name = :namespaceName AND job_name  = :jobName AND jv.uuid = :jobVersionUuid")
+  Optional<JobVersion> findJobVersion(String namespaceName, String jobName, UUID jobVersionUuid);
+
+  @SqlQuery(
+      BASE_SELECT_ON_JOB_VERSIONS
+          + "WHERE namespace_name = :namespaceName AND job_name = :jobName "
+          + "LIMIT :limit OFFSET :offset")
+  List<JobVersion> findAllJobVersions(String namespaceName, String jobName, int limit, int offset);
+
+  default JobVersionBag createJobVersionOnComplete(
+      Instant transitionedAt, UUID runUuid, String namespaceName, String jobName) {
+    DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
+    JobVersionDao jobVersionDao = createJobVersionDao();
+    JobDao jobDao = createJobDao();
+    JobContextDao jobContextDao = createJobContextDao();
+    JobRow jobRow = jobDao.findByRow(namespaceName, jobName).get();
+    Optional<JobContextRow> jobContextRow = jobContextDao.findBy(jobRow.getJobContextUuid());
+    Map context =
+        jobContextRow
+            .map(e -> Utils.fromJson(e.getContext(), new TypeReference<Map<String, String>>() {}))
+            .orElse(new HashMap<>());
+    List<ExtendedDatasetVersionRow> inputs = datasetVersionDao.findInputsByRunId(runUuid);
+    List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findByRunId(runUuid);
+    NamespaceRow namespaceRow = createNamespaceDao().findByRow(jobRow.getNamespaceName()).get();
 
   /** Returns the {@link JobVersionRow} object for a given the unique run ID . */
   @SqlQuery("SELECT * FROM job_versions WHERE latest_run_uuid = :runUuid")

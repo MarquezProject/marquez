@@ -14,7 +14,9 @@
 
 package marquez.db;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -245,5 +247,14 @@ public final class Columns {
       }
     }
     return false;
+  }
+
+  public static ImmutableMap<String, String> mapOrNull(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getString(column) == null) {
+      return null;
+    }
+    final String mapAsString = results.getString(column);
+    return Utils.fromJson(mapAsString, new TypeReference<>() {});
   }
 }

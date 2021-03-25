@@ -24,11 +24,10 @@ import marquez.service.RunService;
 import marquez.service.models.Run;
 
 public class RunResource {
-
   private final RunId runId;
   private final RunService runService;
 
-  public RunResource(RunId runId, RunService runService) {
+  public RunResource(@NonNull final RunId runId, @NonNull final RunService runService) {
     this.runId = runId;
     this.runService = runService;
   }
