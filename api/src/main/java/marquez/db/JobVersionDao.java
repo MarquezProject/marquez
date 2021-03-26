@@ -98,7 +98,26 @@ public interface JobVersionDao extends BaseDao {
       "INSERT INTO job_versions_io_mapping ("
           + "job_version_uuid, dataset_uuid, io_type) "
           + "VALUES (:jobVersionUuid, :datasetUuid, :ioType) ON CONFLICT DO NOTHING")
-  void upsertDatasetIoMapping(UUID jobVersionUuid, UUID datasetUuid, IoType ioType);
+  void upsertDatasetIoMappingBase(UUID jobVersionUuid, UUID datasetUuid, IoType ioType);
+
+  @SqlUpdate(
+      "INSERT INTO job_versions_io_mapping_input ("
+          + "job_version_uuid, dataset_uuid, job_uuid) "
+          + "VALUES (:jobVersionUuid, :datasetUuid, :jobUuid) ON CONFLICT DO NOTHING")
+  void upsertDatasetIoMappingInput(UUID jobVersionUuid, UUID datasetUuid, UUID jobUuid);
+
+  @SqlUpdate(
+      "INSERT INTO job_versions_io_mapping_output ("
+          + "job_version_uuid, dataset_uuid, job_uuid) "
+          + "VALUES (:jobVersionUuid, :datasetUuid, :jobUuid) ON CONFLICT DO NOTHING")
+  void upsertDatasetIoMappingOutput(UUID jobVersionUuid, UUID datasetUuid, UUID jobUuid);
+
+  default void upsertDatasetIoMapping(
+      UUID jobVersionUuid, UUID datasetUuid, IoType ioType, UUID jobUuid) {
+    upsertDatasetIoMappingBase(jobVersionUuid, datasetUuid, ioType);
+    upsertDatasetIoMappingInput(jobVersionUuid, datasetUuid, jobUuid);
+    upsertDatasetIoMappingOutput(jobVersionUuid, datasetUuid, jobUuid);
+  }
 
   default JobVersionBag createJobVersionOnComplete(
       Instant transitionedAt, UUID runUuid, String namespaceName, String jobName) {
@@ -140,12 +159,15 @@ public interface JobVersionDao extends BaseDao {
     jobVersionDao.updateLatestRun(jobVersion.getUuid(), transitionedAt, runUuid);
     for (ExtendedDatasetVersionRow datasetVersionRow : inputs) {
       jobVersionDao.upsertDatasetIoMapping(
-          jobVersion.getUuid(), datasetVersionRow.getDatasetUuid(), IoType.INPUT);
+          jobVersion.getUuid(), datasetVersionRow.getDatasetUuid(), IoType.INPUT, jobRow.getUuid());
     }
 
     for (ExtendedDatasetVersionRow datasetVersionRow : outputs) {
       jobVersionDao.upsertDatasetIoMapping(
-          jobVersion.getUuid(), datasetVersionRow.getDatasetUuid(), IoType.OUTPUT);
+          jobVersion.getUuid(),
+          datasetVersionRow.getDatasetUuid(),
+          IoType.OUTPUT,
+          jobRow.getUuid());
     }
 
     return new JobVersionBag(jobRow, inputs, outputs, jobVersion);
