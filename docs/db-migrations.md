@@ -10,16 +10,18 @@ $ brew install flyway
 
 |                                   | **Description**                  |
 |:----------------------------------|----------------------------------|
+| `[MARQUEZ_DB_HOST]`               | The db host                      |
+| `[MARQUEZ_DB_PORT]`               | The db port                      |
 | `[MARQUEZ_DB_USER]`               | The db user                      |
 | `[MARQUEZ_DB_PASSWORD]`           | The db password                  |
 | `[MARQUEZ_DB_PATH_TO_MIGRATIONS]` | The path to migrations (`*.sql`) |
 
-To migrate the database, we'll be using [`flyway migrate`](https://flywaydb.org/documentation/usage/commandline/migrate):
+To migrate the database, we'll be using the [`flyway migrate`](https://flywaydb.org/documentation/usage/commandline/migrate) command:
 
 ```bash
 $ flyway migrate \
     -driver=org.postgresql.Driver \
-    -url=jdbc:postgresql://localhost:5432/marquez \
+    -url=jdbc:postgresql://[MARQUEZ_DB_HOST]:[MARQUEZ_DB_PORT]/marquez \
     -user=[MARQUEZ_DB_USER] \
     -password=[MARQUEZ_DB_PASSWORD] \
     -locations=filesystem:[MARQUEZ_DB_PATH_TO_MIGRATIONS]
