@@ -63,7 +63,7 @@ logging:
     # - type: sentry
     #   threshold: ${SENTRY_THRESHOLD:-ERROR}
     #   dsn: ${SENTRY_DSN}
-    #   environment: ${SENTRY_ENV}
+    #   environment: ${SENTRY_ENVIRONMENT}
     #   stacktraceAppPackages: ['com.marquez']
 
 ### METRICS CONFIG ###
