@@ -223,7 +223,7 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
         step_meta = bq_extractor.extract_on_complete(task_instance)
 
         assert step_meta.run_facets.pop() == BigQueryErrorRunFacet(
-            client_error=mock.ANY
+            clientError=mock.ANY
         )
         mock_client.return_value.get_job.assert_called_once_with(job_id=bq_job_id)
 

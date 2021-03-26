@@ -58,9 +58,9 @@ def get_from_nullable_chain(source: Mapping[str, Any], chain: List[str]) -> Opti
 
 @attr.s
 class BigQueryErrorRunFacet(BaseFacet):
-    client_error: str = attr.ib(default=None)
-    schema_error: str = attr.ib(default=None)
-    parser_error: str = attr.ib(default=None)
+    clientError: str = attr.ib(default=None)
+    schemaError: str = attr.ib(default=None)
+    parserError: str = attr.ib(default=None)
 
     @staticmethod
     def _get_schema() -> str:
@@ -70,9 +70,9 @@ class BigQueryErrorRunFacet(BaseFacet):
 @attr.s
 class BigQueryStaticticsRunFacet(BaseFacet):
     cached: bool = attr.ib()
-    outputRows: int = attr.ib(default=0)
-    billedBytes: int = attr.ib(default=0)
-    properties: str = attr.ib(default="")
+    outputRows: int = attr.ib(default=None)
+    billedBytes: int = attr.ib(default=None)
+    properties: str = attr.ib(default=None)
 
     @staticmethod
     def _get_schema() -> str:
@@ -128,8 +128,8 @@ class BigQueryExtractor(BaseExtractor):
                 outputs=None,
                 run_facets=[
                     BigQueryErrorRunFacet(
-                        client_error=f"{e}: {traceback.format_exc()}",
-                        parser_error=context.parser_error
+                        clientError=f"{e}: {traceback.format_exc()}",
+                        parserError=context.parser_error
                     )
                 ]
             )
@@ -156,8 +156,8 @@ class BigQueryExtractor(BaseExtractor):
             log.error(f"Cannot retrieve job details from BigQuery.Client. {e}",
                       exc_info=True)
             run_facets.append(BigQueryErrorRunFacet(
-                client_error=f"{e}: {traceback.format_exc()}",
-                parser_error=context.parser_error
+                clientError=f"{e}: {traceback.format_exc()}",
+                parserError=context.parser_error
             ))
 
         return StepMetadata(
