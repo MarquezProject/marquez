@@ -1,12 +1,13 @@
 package marquez.service;
 
+import javax.ws.rs.NotFoundException;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetVersionId;
 import marquez.common.models.JobId;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.RunId;
 
-public class NodeIdNotFoundException extends RuntimeException {
+public class NodeIdNotFoundException extends NotFoundException {
   public NodeIdNotFoundException(String message) {
     super(message);
   }
