@@ -165,7 +165,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
             )
 
             if not task_run_id:
-                self.log.warn('Could not emit lineage')
+                self.log.warning('Could not emit lineage')
 
         self.log.debug(f'Setting task state: {task_instance.state}'
                        f' for {task_instance.task_id}')

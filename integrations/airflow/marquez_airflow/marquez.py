@@ -194,6 +194,9 @@ class MarquezAdapter:
                 )
             })
 
+        if dataset.custom_facets:
+            facets.update(dataset.custom_facets)
+
         return OpenLineageDataset(
             namespace=_DAG_NAMESPACE,
             name=dataset.name,
