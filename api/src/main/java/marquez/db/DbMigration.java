@@ -13,7 +13,7 @@ public final class DbMigration {
   public static void migrateDbOrError(
       @NonNull final FlywayFactory flywayFactory,
       @NonNull final DataSource source,
-      boolean migrateOnStartup) {
+      final boolean migrateOnStartup) {
     final Flyway flyway = flywayFactory.build(source);
     // Only attempt a database migration if there are pending changes to be applied,
     // or on the initialization of a new database. Otherwise, error on pending changes
