@@ -30,6 +30,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Value;
 import marquez.common.Utils;
+import marquez.common.models.RunState;
 import marquez.db.mappers.ExtendedJobVersionRowMapper;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
@@ -115,12 +116,19 @@ public interface JobVersionDao extends BaseDao {
   default void upsertDatasetIoMapping(
       UUID jobVersionUuid, UUID datasetUuid, IoType ioType, UUID jobUuid) {
     upsertDatasetIoMappingBase(jobVersionUuid, datasetUuid, ioType);
-    upsertDatasetIoMappingInput(jobVersionUuid, datasetUuid, jobUuid);
-    upsertDatasetIoMappingOutput(jobVersionUuid, datasetUuid, jobUuid);
+    if (ioType == IoType.INPUT) {
+      upsertDatasetIoMappingInput(jobVersionUuid, datasetUuid, jobUuid);
+    } else {
+      upsertDatasetIoMappingOutput(jobVersionUuid, datasetUuid, jobUuid);
+    }
   }
 
   default JobVersionBag createJobVersionOnComplete(
-      Instant transitionedAt, UUID runUuid, String namespaceName, String jobName) {
+      Instant transitionedAt,
+      UUID runUuid,
+      String namespaceName,
+      String jobName,
+      RunState runState) {
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
     JobVersionDao jobVersionDao = createJobVersionDao();
     JobDao jobDao = createJobDao();
@@ -155,7 +163,10 @@ public interface JobVersionDao extends BaseDao {
 
     createRunDao().updateJobVersion(runUuid, jobVersion.getUuid());
 
-    jobDao.updateVersion(jobRow.getUuid(), transitionedAt, jobVersion.getUuid());
+    // Only set current version if completed
+    if (runState == RunState.COMPLETED) {
+      jobDao.updateVersion(jobRow.getUuid(), transitionedAt, jobVersion.getUuid());
+    }
     jobVersionDao.updateLatestRun(jobVersion.getUuid(), transitionedAt, runUuid);
     for (ExtendedDatasetVersionRow datasetVersionRow : inputs) {
       jobVersionDao.upsertDatasetIoMapping(
