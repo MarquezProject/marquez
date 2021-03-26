@@ -49,6 +49,7 @@ import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
+import org.slf4j.LoggerFactory;
 
 public interface OpenLineageDao extends BaseDao {
   public String DEFAULT_SOURCE_NAME = "default";
@@ -414,6 +415,7 @@ public interface OpenLineageDao extends BaseDao {
     try {
       return FieldType.valueOf(type.toUpperCase()).name();
     } catch (Exception e) {
+      LoggerFactory.getLogger(getClass()).warn("Can't handle field of type {}", type.toUpperCase());
       return null;
     }
   }
