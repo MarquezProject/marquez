@@ -25,7 +25,7 @@ $ flyway migrate \
     -locations=filesystem:[MARQUEZ_DB_PATH_TO_MIGRATIONS]
 ```
 
-For example, to apply the migrations under [`marquez/db/migration`](https://github.com/MarquezProject/marquez/tree/main/api/src/main/resources/marquez/db/migration) to the `marquez` database run:
+For example, to apply the migrations defined under [`marquez/db/migration`](https://github.com/MarquezProject/marquez/tree/main/api/src/main/resources/marquez/db/migration) to the `marquez` database run:
 
 ```bash
 $ flyway migrate \
