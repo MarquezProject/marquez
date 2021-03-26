@@ -36,6 +36,7 @@ public enum FieldType {
   INT4,
   INT8,
   INTEGER,
+  LONG,
   NCHAR,
   NUMBER,
   NUMERIC,
