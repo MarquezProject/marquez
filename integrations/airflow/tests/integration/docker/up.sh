@@ -38,7 +38,7 @@ apache-airflow[gcp]==1.10.12
 apache-airflow[gcp_api]==1.10.12
 apache-airflow[google]==1.10.12
 apache-airflow[postgres]==1.10.12
-requests==2.24.0
+requests==2.25.1
 psycopg2-binary==2.8.6
 httplib2>=0.18.1
 google-cloud-bigquery>=1.28.0
