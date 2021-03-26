@@ -8,11 +8,11 @@ $ brew install flyway
 
 **You'll also need the following details about the migration:**
 
-|                                   | **Description**                              |
-|:----------------------------------|----------------------------------------------|
-| `[MARQUEZ_DB_USER]`               | The marquez db user                          |
-| `[MARQUEZ_DB_PASSWORD]`           | The marquez db password                      |
-| `[MARQUEZ_DB_PATH_TO_MIGRATIONS]` | The path to the marquez migrations (`*.sql`) |
+|                                   | **Description**                  |
+|:----------------------------------|----------------------------------|
+| `[MARQUEZ_DB_USER]`               | The db user                      |
+| `[MARQUEZ_DB_PASSWORD]`           | The db password                  |
+| `[MARQUEZ_DB_PATH_TO_MIGRATIONS]` | The path to migrations (`*.sql`) |
 
 To migrate the database, we'll be using [`flyway migrate`](https://flywaydb.org/documentation/usage/commandline/migrate):
 
