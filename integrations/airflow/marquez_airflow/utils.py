@@ -28,8 +28,6 @@ except ImportError:
     # Import for Pendulum 2.x version
     from pendulum import DateTime as Pendulum, from_timestamp
 
-from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
-
 log = logging.getLogger(__name__)
 _NOMINAL_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
