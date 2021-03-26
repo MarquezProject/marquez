@@ -59,7 +59,7 @@ logging:
       # Enables app logs formatted as JSON
       # layout:
       #   type: json
-    # Enables capturing app error logging with sentry (see: https://github.com/dhatim/dropwizard-sentry#configuration)
+    # Enables capturing app error logs with sentry (see: https://github.com/dhatim/dropwizard-sentry#configuration)
     # - type: sentry
     #   threshold: ${SENTRY_THRESHOLD:-ERROR}
     #   dsn: ${SENTRY_DSN}
