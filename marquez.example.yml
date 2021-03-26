@@ -64,7 +64,7 @@ logging:
     #   threshold: ${SENTRY_THRESHOLD:-ERROR}
     #   dsn: ${SENTRY_DSN}
     #   environment: ${SENTRY_ENVIRONMENT}
-    #   stacktraceAppPackages: ['com.marquez']
+    #   stacktraceAppPackages: ['marquez']
 
 ### METRICS CONFIG ###
 
