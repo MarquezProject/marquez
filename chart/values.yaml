@@ -16,7 +16,7 @@ marquez:
   image:
     registry: docker.io
     repository: marquezproject/marquez
-    tag: 0.12.0
+    tag: 0.12.2
     pullPolicy: IfNotPresent
   ## Postgres database settings where Marquez data will persist
   ##
