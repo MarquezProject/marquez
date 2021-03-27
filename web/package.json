@@ -33,7 +33,7 @@
     "@visx/scale": "1.7.0",
     "@visx/shape": "1.7.0",
     "@visx/zoom": "1.7.0",
-    "autoprefixer": "^9.5.1",
+    "autoprefixer": "^10.0.0",
     "classnames": "^2.2.6",
     "connected-react-router": "^6.4.0",
     "css-loader": "^5.0.0",
