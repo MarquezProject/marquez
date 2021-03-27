@@ -1,6 +1,6 @@
 {
   "name": "marquez-ui",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": "dist/index.js",
   "author": "peter@datakin.com",
   "private": false,
@@ -36,7 +36,7 @@
     "autoprefixer": "^9.5.1",
     "classnames": "^2.2.6",
     "connected-react-router": "^6.4.0",
-    "css-loader": "^2.1.0",
+    "css-loader": "^5.0.0",
     "d3": "^5.16.0",
     "d3-axis": "^1.0.12",
     "d3-format": "^1.4.4",
