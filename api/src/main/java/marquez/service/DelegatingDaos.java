@@ -8,6 +8,7 @@ import marquez.db.DatasetVersionDao;
 import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
+import marquez.db.LineageDao;
 import marquez.db.NamespaceDao;
 import marquez.db.OpenLineageDao;
 import marquez.db.RunArgsDao;
@@ -86,5 +87,10 @@ public class DelegatingDaos {
   @RequiredArgsConstructor
   public static class DelegatingTagDao implements TagDao {
     @Delegate private final TagDao delegate;
+  }
+
+  @RequiredArgsConstructor
+  public static class DelegatingLineageDao implements LineageDao {
+    @Delegate private final LineageDao delegate;
   }
 }

@@ -16,4 +16,5 @@ public class ServiceFactory {
   @NonNull TagService tagService;
   @NonNull DatasetVersionService datasetVersionService;
   @NonNull DatasetFieldService datasetFieldService;
+  @NonNull LineageService lineageService;
 }

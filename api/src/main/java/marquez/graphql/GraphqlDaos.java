@@ -25,18 +25,13 @@ public interface GraphqlDaos extends SqlObject {
   List<RowMap<String, Object>> getDatasets();
 
   @SqlQuery(
-      "SELECT datasets.* FROM datasets inner join namespaces on datasets.namespace_uuid = namespaces.uuid "
-          + "where namespaces.name = :namespaceName and datasets.name = :name")
+      "SELECT * FROM datasets where namespace_name = :namespaceName and datasets.name = :name")
   RowMap<String, Object> getDatasetByNamespaceAndName(String namespaceName, String name);
 
-  @SqlQuery(
-      "SELECT jobs.* FROM jobs inner join namespaces on jobs.namespace_uuid = namespaces.uuid "
-          + "where namespaces.name = :namespaceName and jobs.name = :name")
+  @SqlQuery("SELECT * FROM jobs where namespace_name = :namespaceName and name = :name")
   RowMap<String, Object> getJobByNamespaceAndName(String namespaceName, String name);
 
-  @SqlQuery(
-      "SELECT datasets.* FROM datasets "
-          + "where datasets.namespace_name = :namespaceName and datasets.name = :name")
+  @SqlQuery("SELECT * FROM datasets where namespace_name = :namespaceName and name = :name")
   RowMap<String, Object> getDatasetsByNamespaceAndName(String namespaceName, String name);
 
   @SqlQuery("SELECT * FROM jobs")
