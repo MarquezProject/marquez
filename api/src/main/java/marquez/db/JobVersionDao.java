@@ -102,13 +102,13 @@ public interface JobVersionDao extends BaseDao {
   void upsertDatasetIoMappingBase(UUID jobVersionUuid, UUID datasetUuid, IoType ioType);
 
   @SqlUpdate(
-      "INSERT INTO job_versions_io_mapping_input ("
+      "INSERT INTO job_versions_io_mapping_inputs ("
           + "job_version_uuid, dataset_uuid, job_uuid) "
           + "VALUES (:jobVersionUuid, :datasetUuid, :jobUuid) ON CONFLICT DO NOTHING")
   void upsertDatasetIoMappingInput(UUID jobVersionUuid, UUID datasetUuid, UUID jobUuid);
 
   @SqlUpdate(
-      "INSERT INTO job_versions_io_mapping_output ("
+      "INSERT INTO job_versions_io_mapping_outputs ("
           + "job_version_uuid, dataset_uuid, job_uuid) "
           + "VALUES (:jobVersionUuid, :datasetUuid, :jobUuid) ON CONFLICT DO NOTHING")
   void upsertDatasetIoMappingOutput(UUID jobVersionUuid, UUID datasetUuid, UUID jobUuid);
