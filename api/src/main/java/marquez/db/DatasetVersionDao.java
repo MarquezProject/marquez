@@ -14,6 +14,7 @@
 
 package marquez.db;
 
+import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.NonNull;
+import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
+import marquez.common.models.FieldName;
+import marquez.common.models.FieldType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
@@ -39,11 +43,14 @@ import marquez.db.models.TagRow;
 import marquez.service.DatasetService;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DatasetVersion;
+import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Run;
 import marquez.service.models.StreamMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+import org.postgresql.util.PGobject;
 
 @RegisterRowMapper(DatasetVersionRowMapper.class)
 @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
@@ -69,7 +76,10 @@ public interface DatasetVersionDao extends BaseDao {
             now,
             datasetUuid,
             version.getValue(),
-            datasetMeta.getRunId().map(RunId::getValue).orElse(null));
+            datasetMeta.getRunId().map(RunId::getValue).orElse(null),
+            toPgObjectFields(datasetMeta.getFields()),
+            namespaceName,
+            datasetName);
     updateDatasetVersionMetric(
         namespaceName,
         datasetMeta.getType().toString(),
@@ -111,6 +121,42 @@ public interface DatasetVersionDao extends BaseDao {
     return datasetVersionRow;
   }
 
+  default PGobject toPgObjectFields(List<Field> fields) {
+    if (fields == null) {
+      return null;
+    }
+    try {
+      PGobject jsonObject = new PGobject();
+      jsonObject.setType("json");
+      jsonObject.setValue(Utils.getMapper().writeValueAsString(fields));
+      return jsonObject;
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  default PGobject toPgObjectSchemaFields(List<SchemaField> fields) {
+    return toPgObjectFields(toFields(fields));
+  }
+
+  default List<Field> toFields(List<SchemaField> fields) {
+    if (fields == null) {
+      return null;
+    }
+    OpenLineageDao openLineageDao = createOpenLineageDao();
+    return fields.stream()
+        .map(
+            f ->
+                new Field(
+                    FieldName.of(f.getName()),
+                    openLineageDao.toFieldType(f.getType()) != null
+                        ? FieldType.valueOf(openLineageDao.toFieldType(f.getType()))
+                        : FieldType.VARCHAR,
+                    ImmutableSet.of(),
+                    f.getDescription()))
+        .collect(Collectors.toList());
+  }
+
   default void updateDatasetVersionMetric(
       String namespaceName,
       String type,
@@ -124,36 +170,24 @@ public interface DatasetVersionDao extends BaseDao {
 
   String SELECT = "SELECT dv.* " + "FROM dataset_versions dv ";
 
-  String EXTENDED_SELECT =
-      "SELECT dv.*, d.name as dataset_name, n.name as namespace_name "
-          + "FROM dataset_versions AS dv "
-          + "INNER JOIN datasets AS d ON d.uuid = dv.dataset_uuid "
-          + "INNER JOIN namespaces AS n ON n.uuid = d.namespace_uuid ";
-
   String DATASET_VERSION_SELECT =
-      "select d.*, dv.version, t_json.fields, dv.run_uuid as \"createdByRunUuid\", ARRAY(select t.name from tags t\n"
+      "select d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description, ARRAY(select t.name from tags t\n"
           + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
           + "    where d.uuid = m.dataset_uuid) as tags,\n"
-          + "    sv.schema_location\n"
+          + "dv.created_at, dv.version, dv.fields, dv.run_uuid as \"createdByRunUuid\", sv.schema_location\n"
           + "from datasets d\n"
           + "inner join dataset_versions dv on d.uuid = dv.dataset_uuid\n"
-          + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n"
-          + "left outer join (\n"
-          + "    select dvf.dataset_version_uuid, jsonb_agg((select x from (select f.name, f.type, f.description, t_agg.agg as tags) as x) ) as fields\n"
-          + "    from dataset_fields f\n"
-          + "    inner join dataset_versions_field_mapping dvf on dvf.dataset_field_uuid = f.uuid\n"
-          + "    left outer join (select m.dataset_field_uuid, jsonb_agg((select t.name)) agg\n"
-          + "        from dataset_fields_tag_mapping m\n"
-          + "        inner join tags t on m.tag_uuid = t.uuid\n"
-          + "        group by m.dataset_field_uuid\n"
-          + "        ) t_agg on t_agg.dataset_field_uuid = f.uuid\n"
-          + "    group by dvf.dataset_version_uuid) t_json on t_json.dataset_version_uuid = dv.uuid\n";
+          + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n";
 
   @SqlQuery(DATASET_VERSION_SELECT + "WHERE dv.version = :version")
   Optional<DatasetVersion> findBy(UUID version);
 
+  @SqlQuery(DATASET_VERSION_SELECT + "WHERE dv.uuid = :uuid")
+  Optional<DatasetVersion> findByUuid(UUID uuid);
+
   default Optional<DatasetVersion> findByWithRun(UUID version) {
     Optional<DatasetVersion> v = findBy(version);
+
     v.ifPresent(
         ver -> {
           if (ver.getCreatedByRunUuid() != null) {
@@ -164,23 +198,23 @@ public interface DatasetVersionDao extends BaseDao {
     return v;
   }
 
+  @SqlQuery(
+      SELECT
+          + " INNER JOIN runs_input_mapping m ON m.dataset_version_uuid = dv.uuid WHERE m.run_uuid = :runUuid")
+  List<ExtendedDatasetVersionRow> findInputsByRunId(UUID runUuid);
+
   /**
    * returns all Dataset Versions created by this run id
    *
    * @param runId - the run ID
    */
-  @SqlQuery(EXTENDED_SELECT + " WHERE run_uuid = :runId")
-  List<ExtendedDatasetVersionRow> findByRunId(@NonNull UUID runId);
-
-  @SqlQuery(
-      EXTENDED_SELECT
-          + " INNER JOIN runs_input_mapping m ON m.dataset_version_uuid = dv.uuid WHERE m.run_uuid = :runUuid")
-  List<ExtendedDatasetVersionRow> findInputsByRunId(UUID runUuid);
+  @SqlQuery(SELECT + " WHERE run_uuid = :runId")
+  List<ExtendedDatasetVersionRow> findOutputsByRunId(@NonNull UUID runId);
 
   @SqlQuery(
       DATASET_VERSION_SELECT
-          + "WHERE d.namespace_name = :namespaceName AND d.name = :datasetName "
-          + "ORDER BY created_at DESC "
+          + "WHERE dv.namespace_name = :namespaceName AND dv.dataset_name = :datasetName "
+          + "ORDER BY dv.created_at DESC "
           + "LIMIT :limit OFFSET :offset")
   List<DatasetVersion> findAll(String namespaceName, String datasetName, int limit, int offset);
 
@@ -200,12 +234,23 @@ public interface DatasetVersionDao extends BaseDao {
 
   @SqlQuery(
       "INSERT INTO dataset_versions "
-          + "(uuid, created_at, dataset_uuid, version, run_uuid) "
+          + "(uuid, created_at, dataset_uuid, version, run_uuid, fields, namespace_name, dataset_name) "
           + "VALUES "
-          + "(:uuid, :now, :datasetUuid, :version, :runUuid) "
+          + "(:uuid, :now, :datasetUuid, :version, :runUuid, :fields, :namespaceName, :datasetName) "
           + "ON CONFLICT(version) "
           + "DO UPDATE SET "
           + "run_uuid = EXCLUDED.run_uuid "
           + "RETURNING *")
-  DatasetVersionRow upsert(UUID uuid, Instant now, UUID datasetUuid, UUID version, UUID runUuid);
+  DatasetVersionRow upsert(
+      UUID uuid,
+      Instant now,
+      UUID datasetUuid,
+      UUID version,
+      UUID runUuid,
+      PGobject fields,
+      String namespaceName,
+      String datasetName);
+
+  @SqlUpdate("UPDATE dataset_versions SET fields = :fields WHERE uuid = :uuid")
+  void updateFields(UUID uuid, PGobject fields);
 }

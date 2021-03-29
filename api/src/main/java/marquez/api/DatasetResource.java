@@ -90,7 +90,7 @@ public class DatasetResource extends BaseResource {
 
     final Dataset dataset =
         datasetService
-            .find(namespaceName.getValue(), datasetName.getValue())
+            .findWithTags(namespaceName.getValue(), datasetName.getValue())
             .orElseThrow(() -> new DatasetNotFoundException(datasetName));
     return Response.ok(dataset).build();
   }
@@ -148,7 +148,8 @@ public class DatasetResource extends BaseResource {
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     throwIfNotExists(namespaceName);
 
-    final List<Dataset> datasets = datasetService.findAll(namespaceName.getValue(), limit, offset);
+    final List<Dataset> datasets =
+        datasetService.findAllWithTags(namespaceName.getValue(), limit, offset);
     return Response.ok(new Datasets(datasets)).build();
   }
 

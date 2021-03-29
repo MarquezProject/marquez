@@ -49,6 +49,7 @@ import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
+import org.slf4j.LoggerFactory;
 
 public interface OpenLineageDao extends BaseDao {
   public String DEFAULT_SOURCE_NAME = "default";
@@ -76,8 +77,9 @@ public interface OpenLineageDao extends BaseDao {
   @Transaction
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);
-    if (event.getEventType() != null && getRunState(event.getEventType()).isDone()) {
-      updateMarquezOnComplete(event, updateLineageRow);
+    RunState runState = getRunState(event.getEventType());
+    if (event.getEventType() != null && runState.isDone()) {
+      updateMarquezOnComplete(event, updateLineageRow, runState);
     }
     return updateLineageRow;
   }
@@ -276,14 +278,16 @@ public interface OpenLineageDao extends BaseDao {
     return set;
   }
 
-  default void updateMarquezOnComplete(LineageEvent event, UpdateLineageRow updateLineageRow) {
+  default void updateMarquezOnComplete(
+      LineageEvent event, UpdateLineageRow updateLineageRow, RunState runState) {
     JobVersionBag jobVersionBag =
         createJobVersionDao()
             .createJobVersionOnComplete(
                 event.getEventTime().toInstant(),
                 updateLineageRow.getRun().getUuid(),
                 updateLineageRow.getRun().getNamespaceName(),
-                updateLineageRow.getRun().getJobName());
+                updateLineageRow.getRun().getJobName(),
+                runState);
     updateLineageRow.setJobVersionBag(jobVersionBag);
   }
 
@@ -301,7 +305,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default String formatNamespaceName(String namespace) {
-    return namespace.replaceAll("[^a-zA-Z0-9\\-_.]", "_");
+    return namespace.replaceAll("[^a-z:/A-Z0-9\\-_.]", "_");
   }
 
   default JobType getJobType(Job job) {
@@ -371,7 +375,14 @@ public interface OpenLineageDao extends BaseDao {
         version(dsNamespace.getName(), source.getName(), datasetRow.getName(), fields, runUuid);
     DatasetVersionRow datasetVersionRow =
         datasetVersionDao.upsert(
-            UUID.randomUUID(), now, datasetRow.getUuid(), datasetVersion, isInput ? null : runUuid);
+            UUID.randomUUID(),
+            now,
+            datasetRow.getUuid(),
+            datasetVersion,
+            isInput ? null : runUuid,
+            datasetVersionDao.toPgObjectSchemaFields(fields),
+            dsNamespace.getName(),
+            ds.getName());
 
     datasetDao.updateVersion(datasetRow.getUuid(), now, datasetVersionRow.getUuid());
 
@@ -383,7 +394,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                toField(field.getType()),
+                toFieldType(field.getType()),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -399,7 +410,7 @@ public interface OpenLineageDao extends BaseDao {
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
   }
 
-  default String toField(String type) {
+  default String toFieldType(String type) {
     if (type == null) {
       return null;
     }
@@ -407,6 +418,7 @@ public interface OpenLineageDao extends BaseDao {
     try {
       return FieldType.valueOf(type.toUpperCase()).name();
     } catch (Exception e) {
+      LoggerFactory.getLogger(getClass()).warn("Can't handle field of type {}", type.toUpperCase());
       return null;
     }
   }
@@ -424,6 +436,9 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default RunState getRunState(String eventType) {
+    if (eventType == null) {
+      return RunState.RUNNING;
+    }
     switch (eventType.toLowerCase()) {
       case "complete":
         return RunState.COMPLETED;
@@ -504,22 +519,18 @@ public interface OpenLineageDao extends BaseDao {
                 namespace,
                 sourceName,
                 datasetName,
-                sourceName,
                 fields == null
                     ? ImmutableList.of()
                     : fields.stream()
-                        .map(
-                            field ->
-                                versionField(
-                                    field.getName(), field.getType(), field.getDescription()))
+                        .map(field -> versionField(field.getName(), field.getType()))
                         .collect(joining(VERSION_DELIM)),
                 runId)
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }
 
-  default String versionField(String fieldName, String type, String description) {
-    return VERSION_JOINER.join(fieldName, type, description);
+  default String versionField(String fieldName, String type) {
+    return VERSION_JOINER.join(fieldName, type);
   }
 
   default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {

@@ -68,7 +68,7 @@ public class DatasetService extends DelegatingDaos.DelegatingDatasetDao {
       UUID runUuid = datasetMeta.getRunId().get().getValue();
       ExtendedRunRow runRow = runDao.findByRow(runUuid).get();
 
-      List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findByRunId(runUuid);
+      List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findOutputsByRunId(runUuid);
       runService.notify(
           new JobOutputUpdate(
               RunId.of(runRow.getUuid()),
