@@ -44,6 +44,7 @@ dependencies {
     compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
     compile 'com.google.guava:guava:30.1-jre'
+    compile 'org.dhatim:dropwizard-sentry:2.0.20'
     compile 'org.flywaydb:flyway-core:6.5.7'
     compile 'org.postgresql:postgresql:42.2.19'
     compile 'com.graphql-java:graphql-java:16.2'
