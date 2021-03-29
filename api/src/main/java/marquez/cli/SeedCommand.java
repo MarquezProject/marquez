@@ -105,8 +105,8 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
     // (2) Create source
     final SourceMeta sourceMeta =
         SourceMeta.builder()
-            .type("MYSQL")
-            .connectionUrl("jdbc:mysql://localhost:3306/deliveries")
+            .type("POSTGRESQL")
+            .connectionUrl("jdbc:postgres://localhost:3306/deliveries")
             .description("Contains all food delivery orders.")
             .build();
     final Source newSource = client.createSource(SOURCE_NAME, sourceMeta);
