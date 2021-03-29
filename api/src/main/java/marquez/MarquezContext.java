@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import marquez.api.DatasetResource;
 import marquez.api.JobResource;
+import marquez.api.LineageResource;
 import marquez.api.NamespaceResource;
 import marquez.api.OpenLineageResource;
 import marquez.api.SourceResource;
@@ -62,6 +63,7 @@ public final class MarquezContext {
   @Getter private final RunStateDao runStateDao;
   @Getter private final TagDao tagDao;
   @Getter private final OpenLineageDao openLineageDao;
+  @Getter private final LineageDao lineageDao;
 
   @Getter private final List<RunTransitionListener> runTransitionListeners;
 
@@ -72,6 +74,7 @@ public final class MarquezContext {
   @Getter private final TagService tagService;
   @Getter private final RunService runService;
   @Getter private final OpenLineageService openLineageService;
+  @Getter private final LineageService lineageService;
 
   @Getter private final NamespaceResource namespaceResource;
   @Getter private final SourceResource sourceResource;
@@ -79,12 +82,11 @@ public final class MarquezContext {
   @Getter private final JobResource jobResource;
   @Getter private final TagResource tagResource;
   @Getter private final OpenLineageResource openLineageResource;
+  @Getter private final LineageResource lineageResource;
 
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
-  @Getter private final LineageDao lineageDao;
-  @Getter private final LineageService lineageService;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
@@ -141,6 +143,7 @@ public final class MarquezContext {
     this.jobResource = new JobResource(serviceFactory);
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory);
+    this.lineageResource = new LineageResource(serviceFactory);
 
     this.resources =
         ImmutableList.of(
@@ -150,7 +153,8 @@ public final class MarquezContext {
             jobResource,
             tagResource,
             jdbiException,
-            openLineageResource);
+            openLineageResource,
+            lineageResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
     this.graphqlServlet = servlet.getServlet(new GraphqlSchemaBuilder(jdbi));
