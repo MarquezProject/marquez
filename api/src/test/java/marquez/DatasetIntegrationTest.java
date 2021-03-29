@@ -208,4 +208,31 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
     client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS);
   }
+
+  @Test
+  public void testApp_upsertDescription() {
+    DbTableMeta DESCRIPTION =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(DB_TABLE_FIELDS)
+            .tags(DB_TABLE_TAGS)
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
+
+    Dataset dataset = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DESCRIPTION);
+    assertThat(dataset.getDescription()).isEqualTo(DESCRIPTION.getDescription());
+
+    DbTableMeta WO_DESCRIPTION =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(DB_TABLE_FIELDS)
+            .tags(DB_TABLE_TAGS)
+            .build();
+
+    Dataset dataset2 = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, WO_DESCRIPTION);
+    // Description stays
+    assertThat(dataset2.getDescription()).isEqualTo(DESCRIPTION.getDescription());
+  }
 }
