@@ -72,7 +72,11 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
     if (runState.isDone()) {
       JobVersionBag jobVersionBag =
           jobVersionDao.createJobVersionOnComplete(
-              transitionedAt, runRow.getUuid(), runRow.getNamespaceName(), runRow.getJobName());
+              transitionedAt,
+              runRow.getUuid(),
+              runRow.getNamespaceName(),
+              runRow.getJobName(),
+              runState);
 
       if (runState == COMPLETED) {
         notify(

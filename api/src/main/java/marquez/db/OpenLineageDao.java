@@ -77,8 +77,9 @@ public interface OpenLineageDao extends BaseDao {
   @Transaction
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);
-    if (event.getEventType() != null && getRunState(event.getEventType()).isDone()) {
-      updateMarquezOnComplete(event, updateLineageRow);
+    RunState runState = getRunState(event.getEventType());
+    if (event.getEventType() != null && runState.isDone()) {
+      updateMarquezOnComplete(event, updateLineageRow, runState);
     }
     return updateLineageRow;
   }
@@ -277,14 +278,16 @@ public interface OpenLineageDao extends BaseDao {
     return set;
   }
 
-  default void updateMarquezOnComplete(LineageEvent event, UpdateLineageRow updateLineageRow) {
+  default void updateMarquezOnComplete(
+      LineageEvent event, UpdateLineageRow updateLineageRow, RunState runState) {
     JobVersionBag jobVersionBag =
         createJobVersionDao()
             .createJobVersionOnComplete(
                 event.getEventTime().toInstant(),
                 updateLineageRow.getRun().getUuid(),
                 updateLineageRow.getRun().getNamespaceName(),
-                updateLineageRow.getRun().getJobName());
+                updateLineageRow.getRun().getJobName(),
+                runState);
     updateLineageRow.setJobVersionBag(jobVersionBag);
   }
 
@@ -433,6 +436,9 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default RunState getRunState(String eventType) {
+    if (eventType == null) {
+      return RunState.RUNNING;
+    }
     switch (eventType.toLowerCase()) {
       case "complete":
         return RunState.COMPLETED;
