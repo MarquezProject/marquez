@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.Value;
 import marquez.common.models.DatasetType;
 import marquez.common.models.TagName;
@@ -86,6 +87,22 @@ public interface DatasetDao extends BaseDao {
   @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<Dataset> find(String namespaceName, String datasetName);
 
+  default Optional<Dataset> findWithTags(String namespaceName, String datasetName) {
+    Optional<Dataset> dataset = find(namespaceName, datasetName);
+    dataset.ifPresent(this::setFields);
+    return dataset;
+  }
+
+  default void setFields(Dataset ds) {
+    DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
+
+    ds.getCurrentVersionUuid()
+        .ifPresent(
+            dsv -> {
+              ds.setFields(datasetFieldDao.find(dsv));
+            });
+  }
+
   @SqlQuery(
       "SELECT d.* FROM datasets AS d WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<DatasetRow> findByRow(String namespaceName, String datasetName);
@@ -99,6 +116,11 @@ public interface DatasetDao extends BaseDao {
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
   List<Dataset> findAll(String namespaceName, int limit, int offset);
+
+  default List<Dataset> findAllWithTags(String namespaceName, int limit, int offset) {
+    List<Dataset> datasets = findAll(namespaceName, limit, offset);
+    return datasets.stream().peek(this::setFields).collect(Collectors.toList());
+  }
 
   @SqlQuery(
       "INSERT INTO datasets ("
@@ -144,6 +166,46 @@ public interface DatasetDao extends BaseDao {
       String physicalName,
       String description);
 
+  @SqlQuery(
+      "INSERT INTO datasets ("
+          + "uuid, "
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "namespace_uuid, "
+          + "namespace_name, "
+          + "source_uuid, "
+          + "source_name, "
+          + "name, "
+          + "physical_name "
+          + ") VALUES ( "
+          + ":uuid, "
+          + ":type, "
+          + ":now, "
+          + ":now, "
+          + ":namespaceUuid, "
+          + ":namespaceName, "
+          + ":sourceUuid, "
+          + ":sourceName, "
+          + ":name, "
+          + ":physicalName) "
+          + "ON CONFLICT (namespace_uuid, name) "
+          + "DO UPDATE SET "
+          + "type = EXCLUDED.type, "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "physical_name = EXCLUDED.physical_name "
+          + "RETURNING *")
+  DatasetRow upsert(
+      UUID uuid,
+      DatasetType type,
+      Instant now,
+      UUID namespaceUuid,
+      String namespaceName,
+      UUID sourceUuid,
+      String sourceName,
+      String name,
+      String physicalName);
+
   @Transaction
   default Dataset upsertDatasetMeta(
       String namespaceName, String datasetName, DatasetMeta datasetMeta) {
@@ -159,18 +221,35 @@ public interface DatasetDao extends BaseDao {
                 datasetMeta.getSourceName().getValue(),
                 "");
     UUID newDatasetUuid = UUID.randomUUID();
-    DatasetRow datasetRow =
-        upsert(
-            newDatasetUuid,
-            datasetMeta.getType(),
-            now,
-            namespaceRow.getUuid(),
-            namespaceRow.getName(),
-            sourceRow.getUuid(),
-            sourceRow.getName(),
-            datasetName,
-            datasetMeta.getPhysicalName().getValue(),
-            datasetMeta.getDescription().orElse(null));
+    DatasetRow datasetRow;
+
+    if (datasetMeta.getDescription().isPresent()) {
+      datasetRow =
+          upsert(
+              newDatasetUuid,
+              datasetMeta.getType(),
+              now,
+              namespaceRow.getUuid(),
+              namespaceRow.getName(),
+              sourceRow.getUuid(),
+              sourceRow.getName(),
+              datasetName,
+              datasetMeta.getPhysicalName().getValue(),
+              datasetMeta.getDescription().orElse(null));
+    } else {
+      datasetRow =
+          upsert(
+              newDatasetUuid,
+              datasetMeta.getType(),
+              now,
+              namespaceRow.getUuid(),
+              namespaceRow.getName(),
+              sourceRow.getUuid(),
+              sourceRow.getName(),
+              datasetName,
+              datasetMeta.getPhysicalName().getValue());
+    }
+
     updateDatasetMetric(
         namespaceName, datasetMeta.getType().toString(), newDatasetUuid, datasetRow.getUuid());
 
@@ -187,7 +266,7 @@ public interface DatasetDao extends BaseDao {
             .upsertDatasetVersion(
                 datasetRow.getUuid(), now, namespaceName, datasetName, datasetMeta);
 
-    return find(namespaceName, datasetName).get();
+    return findWithTags(namespaceName, datasetName).get();
   }
 
   default String toDefaultSourceType(DatasetType type) {
