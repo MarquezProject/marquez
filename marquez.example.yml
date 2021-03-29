@@ -41,8 +41,8 @@ db:
 #   connectRetries: 3
 #   cleanDisabled: true
 
-# Enables database migration on startup (default: false)
-migrateOnStartup: ${MIGRATE_ON_STARTUP:-false}
+# Enables database migration on startup (default: true)
+migrateOnStartup: ${MIGRATE_ON_STARTUP:-true}
 
 # Enabled the Graphql endpoint
 graphql:

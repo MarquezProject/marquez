@@ -26,7 +26,7 @@ import marquez.service.models.Tag;
 
 @NoArgsConstructor
 public class MarquezConfig extends Configuration {
-  private static final boolean DEFAULT_MIGRATE_ON_STARTUP = false;
+  private static final boolean DEFAULT_MIGRATE_ON_STARTUP = true;
   private static final ImmutableSet<Tag> DEFAULT_TAGS = ImmutableSet.of();
 
   @Getter private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
