@@ -108,7 +108,7 @@ subprojects {
 
     release {
         git {
-            requireBranch = 'main'
+            requireBranch = 'release-automation'
         }
     }
 

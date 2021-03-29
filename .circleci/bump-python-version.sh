@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./release.sh <type>
+# Usage: $ ./bump-python-version.sh <type>
 
 set -e
 
@@ -39,11 +39,21 @@ if [[ -z "${type}" ]]; then
   type="patch"
 fi
 
+
+# get new version tag from CI
+if [[ -z "${CIRCLE_TAG}" ]]; then
+  # Default to current tag
+  NEW_VERSION=$(git describe --tags --abbrev=0)
+else
+  NEW_VERSION=${CIRCLE_TAG}
+fi
+
 # Bump marquez_client version
 VERSION=$(python ./clients/python/setup.py --version)
 bump2version \
   --config-file ./clients/python/setup.cfg \
   --current-version "${VERSION}" \
+  --new-version "${NEW_VERSION}" \
   --no-commit \
   --no-tag \
   --allow-dirty \
@@ -55,13 +65,10 @@ VERSION=$(python ./integrations/airflow/setup.py --version)
 bump2version \
   --config-file ./integrations/airflow/setup.cfg \
   --current-version "${VERSION}" \
+  --new-version "${NEW_VERSION}" \
   --no-commit \
   --no-tag \
   --allow-dirty \
   "${type}" ./integrations/airflow/marquez_airflow/version.py
-
-# JVM
-
-./gradlew release
 
 echo "DONE!"
