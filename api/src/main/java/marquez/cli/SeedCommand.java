@@ -46,8 +46,8 @@ import marquez.client.models.SourceMeta;
 
 @Slf4j
 public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
-  static final String DEFAULT_DATAKIN_HOST = "localhost";
-  static final int DEFAULT_DATAKIN_PORT = 8080;
+  static final String DEFAULT_MARQUEZ_HOST = "localhost";
+  static final int DEFAULT_MARQUEZ_PORT = 8080;
 
   public static final String NAMESPACE_NAME = "food_delivery";
   static final String SOURCE_NAME = "analytics_db";
@@ -68,14 +68,14 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
         .dest("host")
         .type(String.class)
         .required(false)
-        .setDefault(DEFAULT_DATAKIN_HOST)
+        .setDefault(DEFAULT_MARQUEZ_HOST)
         .help("the HTTP API server host");
     subparser
         .addArgument("--port")
         .dest("port")
         .type(Integer.class)
         .required(false)
-        .setDefault(DEFAULT_DATAKIN_PORT)
+        .setDefault(DEFAULT_MARQUEZ_PORT)
         .help("the HTTP API server port");
   }
 
@@ -89,10 +89,10 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
 
     final URL baseUrl = Utils.toUrl(String.format("http://%s:%d", host, port));
     final MarquezClient client = MarquezClient.builder().baseUrl(baseUrl).build();
-    seed(client, LINEAGE_GRAPH_24_HOUR_WINDOW);
+    seedApiWithMeta(client, LINEAGE_GRAPH_24_HOUR_WINDOW);
   }
 
-  public void seed(@NonNull MarquezClient client, int additionalIterations) {
+  public void seedApiWithMeta(@NonNull MarquezClient client, int additionalIterations) {
     // (1) Create namespace
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder()
