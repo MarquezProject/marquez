@@ -16,7 +16,6 @@ package marquez.db;
 
 import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 
-import com.google.common.collect.ImmutableList;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -250,7 +249,7 @@ public interface RunDao extends BaseDao {
     }
   }
 
-  default List<SchemaField> toSchemaFields(ImmutableList<Field> fields) {
+  default List<SchemaField> toSchemaFields(List<Field> fields) {
     if (fields == null) {
       return null;
     }

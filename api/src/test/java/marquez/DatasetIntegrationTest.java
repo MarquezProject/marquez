@@ -2,10 +2,12 @@ package marquez;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.DbTableMeta;
@@ -25,6 +27,45 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     createNamespace(NAMESPACE_NAME);
     createSource(DB_TABLE_SOURCE_NAME);
     createSource(STREAM_SOURCE_NAME);
+  }
+
+  @Test
+  public void testApp_testTags() {
+    DbTableMeta DB_TABLE_META =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(ImmutableList.of(newFieldWith(SENSITIVE.getName()), newField()))
+            .tags(ImmutableSet.of(PII.getName()))
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
+
+    Dataset dataset = client.createDataset(NAMESPACE_NAME, "test-dataset-tags", DB_TABLE_META);
+    assertThat(dataset.getFields().get(0).getTags())
+        .isEqualTo(ImmutableSet.of(SENSITIVE.getName()));
+    assertThat(dataset.getFields().get(1).getTags()).isEmpty();
+    assertThat(dataset.getTags()).isEqualTo(ImmutableSet.of(PII.getName()));
+
+    DbTableMeta UPDATED_META =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(
+                ImmutableList.of(
+                    newFieldWith(PII.getName()),
+                    DB_TABLE_META.getFields().get(0))) // changed fields
+            .tags(ImmutableSet.of(SENSITIVE.getName())) // added dataset tag
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
+
+    Dataset updateDataset = client.createDataset(NAMESPACE_NAME, "test-dataset-tags", UPDATED_META);
+    assertThat(updateDataset.getTags())
+        .isEqualTo(ImmutableSet.of(SENSITIVE.getName(), PII.getName()));
+    assertThat(updateDataset.getFields()).isEqualTo(UPDATED_META.getFields());
+
+    Dataset getDataset = client.getDataset(NAMESPACE_NAME, "test-dataset-tags");
+    assertThat(getDataset.getFields()).isEqualTo(UPDATED_META.getFields());
+    assertThat(getDataset.getTags()).isEqualTo(ImmutableSet.of(SENSITIVE.getName(), PII.getName()));
   }
 
   @Test
