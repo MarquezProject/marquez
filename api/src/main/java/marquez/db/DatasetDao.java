@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.Value;
 import marquez.common.models.DatasetType;
 import marquez.common.models.TagName;
@@ -86,6 +87,22 @@ public interface DatasetDao extends BaseDao {
   @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<Dataset> find(String namespaceName, String datasetName);
 
+  default Optional<Dataset> findWithTags(String namespaceName, String datasetName) {
+    Optional<Dataset> dataset = find(namespaceName, datasetName);
+    dataset.ifPresent(this::setFields);
+    return dataset;
+  }
+
+  default void setFields(Dataset ds) {
+    DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
+
+    ds.getCurrentVersionUuid()
+        .ifPresent(
+            dsv -> {
+              ds.setFields(datasetFieldDao.find(dsv));
+            });
+  }
+
   @SqlQuery(
       "SELECT d.* FROM datasets AS d WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<DatasetRow> findByRow(String namespaceName, String datasetName);
@@ -99,6 +116,11 @@ public interface DatasetDao extends BaseDao {
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
   List<Dataset> findAll(String namespaceName, int limit, int offset);
+
+  default List<Dataset> findAllWithTags(String namespaceName, int limit, int offset) {
+    List<Dataset> datasets = findAll(namespaceName, limit, offset);
+    return datasets.stream().peek(this::setFields).collect(Collectors.toList());
+  }
 
   @SqlQuery(
       "INSERT INTO datasets ("
@@ -187,7 +209,7 @@ public interface DatasetDao extends BaseDao {
             .upsertDatasetVersion(
                 datasetRow.getUuid(), now, namespaceName, datasetName, datasetMeta);
 
-    return find(namespaceName, datasetName).get();
+    return findWithTags(namespaceName, datasetName).get();
   }
 
   default String toDefaultSourceType(DatasetType type) {
