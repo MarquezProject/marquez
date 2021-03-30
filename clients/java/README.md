@@ -10,14 +10,14 @@ Maven:
 <dependency>
     <groupId>io.github.marquezproject</groupId>
     <artifactId>marquez-java</artifactId>
-    <version>0.12.2</version>
+    <version>0.13.0</version>
 </dependency>
 ```
 
 or Gradle:
 
 ```groovy
-implementation 'io.github.marquezproject:marquez-java:0.12.2'
+implementation 'io.github.marquezproject:marquez-java:0.13.0'
 ```
 
 ## Usage
@@ -33,6 +33,6 @@ NamespaceMeta meta = NamespaceMeta().builder()
     .description("My first namespace!")
     .build()
 
-// Create namespace 
+// Create namespace
 Namespace namespace = client.createNamespace("my-namespace", meta);
 ```
