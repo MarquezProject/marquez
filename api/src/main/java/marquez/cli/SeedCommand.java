@@ -2,6 +2,7 @@ package marquez.cli;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static marquez.client.models.JobType.BATCH;
+import static marquez.common.base.MorePreconditions.checkNotBlank;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -44,10 +45,26 @@ import marquez.client.models.RunMeta;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 
+/**
+ * A command to seed the HTTP API with source, dataset, and job metadata. You can override the
+ * default {@code host} and {@code port} using the command-line arguments {@code --host} and {@code
+ * --port}. This command is meant to be used to explore the features of Marquez. For example,
+ * lineage graph, dataset schemas, job run history, etc.
+ *
+ * <h3>Usage</h3>
+ *
+ * For example, to override the {@code port}:
+ *
+ * <pre>{@code
+ * java -jar marquez-api.jar seed --port 5001 marquez.yml
+ * }</pre>
+ *
+ * Note that all metadata is defined within this class and requires a running instance of Marquez.
+ */
 @Slf4j
 public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
   static final String DEFAULT_MARQUEZ_HOST = "localhost";
-  static final int DEFAULT_MARQUEZ_PORT = 8080;
+  static final int DEFAULT_MARQUEZ_PORT = 5000;
 
   public static final String NAMESPACE_NAME = "food_delivery";
   static final String SOURCE_NAME = "analytics_db";
@@ -236,8 +253,9 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
         + RUN_TIME_IN_SEC_MIN;
   }
 
-  List<Field> fieldsWithChange(List<Field> fields, ActiveRunMeta.SchemaChange change) {
-    ImmutableList.Builder<Field> fieldsWithChange = ImmutableList.builder();
+  List<Field> fieldsWithChange(
+      @NonNull List<Field> fields, @NonNull ActiveRunMeta.SchemaChange change) {
+    final ImmutableList.Builder<Field> fieldsWithChange = ImmutableList.builder();
     for (final Field field : fields) {
       fieldsWithChange.add(
           (change.getFieldName().equals(field.getName()))
@@ -1117,7 +1135,7 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
     public Optional<SchemaChange> schemaChangeFor(String datasetName) {
       checkArgument(hasSchemaChange());
       for (SchemaChange schemaChange : schemaChanges) {
-        if (schemaChange.getDatasetName().equals(datasetName)) {
+        if (schemaChange.getDatasetName().equals(checkNotBlank(datasetName))) {
           return Optional.of(schemaChange);
         }
       }
@@ -1241,7 +1259,7 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
         final int levelInLineageGraph, final int numOfSuccesses) {
       final ImmutableList.Builder<ActiveRunMeta> activeRuns = ImmutableList.builder();
       for (int i = 0; i < numOfSuccesses; i++) {
-        activeRuns.add(ActiveRunMeta.builder().levelInRunGraph(levelInLineageGraph).build());
+        activeRuns.add(ActiveRunMeta.builder().levelInLineageGraph(levelInLineageGraph).build());
       }
       return activeRuns.build();
     }
@@ -1251,17 +1269,17 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
       final ImmutableList.Builder<ActiveRunMeta> activeRuns = ImmutableList.builder();
       for (int i = 0; i < numOfFailures; i++) {
         activeRuns.add(
-            ActiveRunMeta.builder().levelInRunGraph(levelInLineageGraph).markFailed().build());
+            ActiveRunMeta.builder().levelInLineageGraph(levelInLineageGraph).markFailed().build());
       }
       return activeRuns.build();
     }
 
     public static ImmutableList<ActiveRunMeta> running(
-        final int levelInRunGraph, final int numOfRunning) {
+        final int levelInLineageGraph, final int numOfRunning) {
       final ImmutableList.Builder<ActiveRunMeta> activeRuns = ImmutableList.builder();
       for (int i = 0; i < numOfRunning; i++) {
         activeRuns.add(
-            ActiveRunMeta.builder().levelInRunGraph(levelInRunGraph).markRunning().build());
+            ActiveRunMeta.builder().levelInLineageGraph(levelInLineageGraph).markRunning().build());
       }
       return activeRuns.build();
     }
@@ -1280,16 +1298,16 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
     }
 
     public static ActiveRunMeta successesWith(
-        int levelInLineageGraph, @Nullable SchemaChange... schemaChanges) {
+        int levelInLineageGraph, @Nullable final SchemaChange... schemaChanges) {
       return successesWith(levelInLineageGraph, null, schemaChanges);
     }
 
     public static ActiveRunMeta successesWith(
-        int levelInLineageGraph,
-        @Nullable CodeChange codeChange,
-        @Nullable SchemaChange... schemaChanges) {
+        final int levelInLineageGraph,
+        @Nullable final CodeChange codeChange,
+        @Nullable final SchemaChange... schemaChanges) {
       return ActiveRunMeta.builder()
-          .levelInRunGraph(levelInLineageGraph)
+          .levelInLineageGraph(levelInLineageGraph)
           .codeChange(codeChange)
           .schemaChanges(ImmutableSet.copyOf(schemaChanges))
           .build();
@@ -1312,7 +1330,7 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
         this.schemaChanges = ImmutableSet.of();
       }
 
-      public Builder levelInRunGraph(int levelInLineageGraph) {
+      public Builder levelInLineageGraph(int levelInLineageGraph) {
         this.levelInLineageGraph = levelInLineageGraph;
         return this;
       }
