@@ -1,7 +1,6 @@
 package marquez.service;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import java.util.HashMap;
 import java.util.HashSet;
