@@ -32,6 +32,7 @@ ext {
 }
 
 dependencies {
+    compile project(':clients:java')
     compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-jdbi3:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}"
@@ -52,7 +53,6 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-    testCompile project(':clients:java')
     testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
     testCompile 'junit:junit:4.13.2'

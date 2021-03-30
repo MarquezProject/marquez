@@ -12,20 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./up.sh [--build]
+# Usage: $ ./seed.sh
 
 set -e
 
-# Change working directory to project root
-project_root=$(git rev-parse --show-toplevel)
-cd "${project_root}"
-
-compose_files="-f docker-compose.yml"
-args="-V --force-recreate"
-
-if [ "${1}" = "--build" ]; then
-  compose_files+=" -f docker-compose.dev.yml"
-  args+=" --build"
+if [[ -z "${MARQUEZ_CONFIG}" ]]; then
+  MARQUEZ_CONFIG='marquez.dev.yml'
+  echo "WARNING 'MARQUEZ_CONFIG' not set, using development configuration."
 fi
 
-docker-compose down && docker-compose $compose_files up $args
+java -jar marquez-api-*.jar seed --host "${MARQUEZ_HOST}" --port "${MARQUEZ_PORT}" "${MARQUEZ_CONFIG}"
