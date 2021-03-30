@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -92,10 +93,10 @@ public class MarquezWriteOnlyClientTest {
   }
 
   @Test
-  public void testMarkRunAs() {
+  public void testMarkRunAs() throws UnsupportedEncodingException {
     String runId = UUID.randomUUID().toString();
     Instant at = Instant.now();
-    String atParam = URLEncoder.encode(String.valueOf(at), UTF_8);
+    String atParam = URLEncoder.encode(String.valueOf(at), UTF_8.name());
     client.markRunAsRunning(runId, at);
     verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/start?at=" + atParam);
     client.markRunAsAborted(runId, at);
