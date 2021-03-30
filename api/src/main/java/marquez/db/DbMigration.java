@@ -13,16 +13,16 @@ public final class DbMigration {
   public static void migrateDbOrError(
       @NonNull final FlywayFactory flywayFactory,
       @NonNull final DataSource source,
-      boolean migrateOnStartup) {
+      final boolean migrateOnStartup) {
     final Flyway flyway = flywayFactory.build(source);
     // Only attempt a database migration if there are pending changes to be applied,
     // or on the initialization of a new database. Otherwise, error on pending changes
     // when the flag 'migrateOnStartup' is set to 'false'.
-    if (!hasPendingMigrations(flyway)) {
+    if (!hasPendingDbMigrations(flyway)) {
       log.info("No pending migrations found, skipping...");
       return;
-    } else if (!migrateOnStartup && hasMigrationsApplied(flyway)) {
-      errorOnPendingMigrations(flyway);
+    } else if (!migrateOnStartup && hasDbMigrationsApplied(flyway)) {
+      errorOnPendingDbMigrations(flyway);
     }
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts
     // requiring we handle the throwable and apply a repair on the database to fix any
@@ -46,23 +46,23 @@ public final class DbMigration {
     }
   }
 
-  private static boolean hasMigrationsApplied(@NonNull final Flyway flyway) {
+  private static boolean hasDbMigrationsApplied(@NonNull final Flyway flyway) {
     return flyway.info().applied().length > 0;
   }
 
-  private static void errorOnPendingMigrations(@NonNull final Flyway flyway) {
-    if (hasPendingMigrations(flyway)) {
+  private static void errorOnPendingDbMigrations(@NonNull final Flyway flyway) {
+    if (hasPendingDbMigrations(flyway)) {
       log.error(
           "Failed to apply migration! You must apply the migration manually using the flyway "
-              + "command 'flyway migrate', or set MIGRATE_ON_STARTUP=true to automatically apply "
+              + "command 'flyway migrate', or set 'MIGRATE_ON_STARTUP=true' to automatically apply "
               + "migrations to your database. We recommend you view database changes before "
-              + "applying a new migration with 'flyway migrate -dryRunOutput=dryrun.sql'. "
-              + "You can download the flyway CLI at 'https://flywaydb.org/download'");
+              + "applying a new migration with 'flyway info'. You can download the flyway CLI "
+              + "at 'https://flywaydb.org/download'");
       throw new FlywayException("Database has pending migrations!");
     }
   }
 
-  private static boolean hasPendingMigrations(@NonNull final Flyway flyway) {
+  private static boolean hasPendingDbMigrations(@NonNull final Flyway flyway) {
     return flyway.info().pending().length > 0;
   }
 }

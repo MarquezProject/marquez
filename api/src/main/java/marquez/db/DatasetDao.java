@@ -166,6 +166,46 @@ public interface DatasetDao extends BaseDao {
       String physicalName,
       String description);
 
+  @SqlQuery(
+      "INSERT INTO datasets ("
+          + "uuid, "
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "namespace_uuid, "
+          + "namespace_name, "
+          + "source_uuid, "
+          + "source_name, "
+          + "name, "
+          + "physical_name "
+          + ") VALUES ( "
+          + ":uuid, "
+          + ":type, "
+          + ":now, "
+          + ":now, "
+          + ":namespaceUuid, "
+          + ":namespaceName, "
+          + ":sourceUuid, "
+          + ":sourceName, "
+          + ":name, "
+          + ":physicalName) "
+          + "ON CONFLICT (namespace_uuid, name) "
+          + "DO UPDATE SET "
+          + "type = EXCLUDED.type, "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "physical_name = EXCLUDED.physical_name "
+          + "RETURNING *")
+  DatasetRow upsert(
+      UUID uuid,
+      DatasetType type,
+      Instant now,
+      UUID namespaceUuid,
+      String namespaceName,
+      UUID sourceUuid,
+      String sourceName,
+      String name,
+      String physicalName);
+
   @Transaction
   default Dataset upsertDatasetMeta(
       String namespaceName, String datasetName, DatasetMeta datasetMeta) {
@@ -181,18 +221,35 @@ public interface DatasetDao extends BaseDao {
                 datasetMeta.getSourceName().getValue(),
                 "");
     UUID newDatasetUuid = UUID.randomUUID();
-    DatasetRow datasetRow =
-        upsert(
-            newDatasetUuid,
-            datasetMeta.getType(),
-            now,
-            namespaceRow.getUuid(),
-            namespaceRow.getName(),
-            sourceRow.getUuid(),
-            sourceRow.getName(),
-            datasetName,
-            datasetMeta.getPhysicalName().getValue(),
-            datasetMeta.getDescription().orElse(null));
+    DatasetRow datasetRow;
+
+    if (datasetMeta.getDescription().isPresent()) {
+      datasetRow =
+          upsert(
+              newDatasetUuid,
+              datasetMeta.getType(),
+              now,
+              namespaceRow.getUuid(),
+              namespaceRow.getName(),
+              sourceRow.getUuid(),
+              sourceRow.getName(),
+              datasetName,
+              datasetMeta.getPhysicalName().getValue(),
+              datasetMeta.getDescription().orElse(null));
+    } else {
+      datasetRow =
+          upsert(
+              newDatasetUuid,
+              datasetMeta.getType(),
+              now,
+              namespaceRow.getUuid(),
+              namespaceRow.getName(),
+              sourceRow.getUuid(),
+              sourceRow.getName(),
+              datasetName,
+              datasetMeta.getPhysicalName().getValue());
+    }
+
     updateDatasetMetric(
         namespaceName, datasetMeta.getType().toString(), newDatasetUuid, datasetRow.getUuid());
 

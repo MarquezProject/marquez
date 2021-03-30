@@ -12,6 +12,7 @@
 .settings
 .vscode/
 __pycache__
+venv
 api/out/
 bin/
 build/
