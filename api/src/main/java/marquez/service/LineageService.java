@@ -1,7 +1,6 @@
 package marquez.service;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +37,7 @@ public class LineageService extends DelegatingLineageDao {
   public Lineage lineage(NodeId nodeId, int depth) throws ExecutionException, InterruptedException {
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
-      return new Lineage(ImmutableSortedSet.of());
+      throw new NodeIdNotFoundException("Could not find node");
     }
     UUID job = optionalUUID.get();
 
