@@ -118,7 +118,10 @@ public interface LineageDao {
   List<JobData> getJob(@BindList Collection<UUID> uuid);
 
   @SqlQuery(
-      "select j.uuid from jobs j inner join job_versions_io_mapping io on io.job_version_uuid = j.current_version_uuid inner join datasets ds on ds.uuid = io.dataset_uuid\n"
+      "select j.uuid from jobs j\n"
+          + "inner join job_versions jv on jv.job_uuid = j.uuid\n"
+          + "inner join job_versions_io_mapping io on io.job_version_uuid = jv.uuid\n"
+          + "inner join datasets ds on ds.uuid = io.dataset_uuid\n"
           + "where ds.name = :datasetName and ds.namespace_name = :namespaceName\n"
           + "limit 1")
   Optional<UUID> getJobFromInputOrOutput(String datasetName, String namespaceName);
