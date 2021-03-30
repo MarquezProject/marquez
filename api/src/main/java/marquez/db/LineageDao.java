@@ -111,7 +111,7 @@ public interface LineageDao {
   List<DatasetData> getOutputDatasetsFromJobIds(@BindList Set<UUID> jobIds);
 
   @SqlQuery(
-      "SELECT j.*, jc.context\n"
+      "select j.*, jc.context\n"
           + "from jobs j\n"
           + "left outer join job_contexts jc on jc.uuid = j.current_job_context_uuid\n"
           + "where j.uuid in (<uuid>)")
@@ -124,9 +124,12 @@ public interface LineageDao {
   Optional<UUID> getJobFromInputOrOutput(String datasetName, String namespaceName);
 
   @SqlQuery(
-      RunDao.SELECT_RUN
-          + "inner join job_versions jv on jv.latest_run_uuid = r.uuid \n"
-          + "inner join jobs j on j.current_version_uuid = jv.uuid\n"
-          + "where j.uuid in (<jobUuid>)")
+      "select distinct on(r.job_name, r.namespace_name) r.*, ra.args, ra.args, ctx.context \n"
+          + "from runs AS r\n"
+          + "inner join jobs j on j.name = r.job_name AND j.namespace_name = r.namespace_name\n"
+          + "left outer join run_args AS ra ON ra.uuid = r.run_args_uuid \n"
+          + "left outer join job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
+          + "where j.uuid in (<jobUuid>)\n"
+          + "order by job_name, namespace_name, created_at DESC")
   List<Run> getCurrentRuns(@BindList Collection<UUID> jobUuid);
 }
