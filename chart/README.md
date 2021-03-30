@@ -42,6 +42,7 @@ helm delete marquez
 | `marquez.image.repository`   | Marquez image repository         | `marquezproject/marquez` |
 | `marquez.image.tag`          | Marquez image tag                | `0.12.2`                 |
 | `marquez.image.pullPolicy`   | Image pull policy                | `IfNotPresent`           |
+| `marquez.existingSecretName` | Name of an existing secret containing db password ('marquez-db-password' key) | `nil` |
 | `marquez.db.host`            | PostgreSQL host                  | `localhost`              |
 | `marquez.db.port`            | PostgreSQL port                  | `5432`                   |
 | `marquez.db.name`            | PostgreSQL database              | `marquez`                |
