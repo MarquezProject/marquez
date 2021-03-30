@@ -1,6 +1,35 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.12.2...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.13.0...HEAD)
+
+## [0.13.0](https://github.com/MarquezProject/marquez/compare/0.12.2...0.13.0) - 2021-03-30
+
+### Added
+
+* Secret support for helm chart [@KevinMellott91](https://github.com/KevinMellott91)
+* **New** `seed` cmd to populate `marquez` database with source, dataset, and job metadata allowing users to try out features of Marquez (data lineage, view job run history, etc) :tada:
+* Docs on applying db migrations manually
+* **New** Lineage API to support data lineage queries :tada:
+* Support for logging errors via [sentry](https://sentry.io/)
+* **New** Airflow [example](https://github.com/MarquezProject/marquez/tree/main/examples/airflow) with Marquez :tada:
+
+### Changed
+
+* Update OpenLinageDao to stop converting URI structures to contain underscores instead of colons and slashes [@collado-mike](https://github.com/collado-mike)
+* Bump testcontainers dependency to `v1.15.2` [@ ShakirzyanovArsen](https://github.com/ShakirzyanovArsen)
+* Register output datasets for a run lazily [@henneberger](https://github.com/henneberger)
+* Refactor spark plan traversal to find input/output datasets from datasources [@collado-mike](https://github.com/collado-mike)
+* Web UI project settings and default marquez port [@phixMe](https://github.com/phixMe)
+* Associate dataset inputs on run start [@henneberger](https://github.com/henneberger)
+
+### Fixed
+
+* Dataset description is not overwritten on update [@henneberger](https://github.com/henneberger)
+* Latest tags are returned from dataset [@henneberger](https://github.com/henneberger)
+* Airflow integration tests on forked PRs [@mobuchowski](https://github.com/mobuchowski)
+* Empty nominal end time support [@henneberger](https://github.com/henneberger)
+* Ensure valid dataset fields for OpenLineage [@henneberger](https://github.com/henneberger)
+* Ingress context templating for helm chart [@KulykDmytro](https://github.com/KulykDmytro)
 
 ## [0.12.2](https://github.com/MarquezProject/marquez/compare/0.12.0...0.12.2) - 2021-03-16
 
@@ -23,7 +52,7 @@
 *  New `/lineage` endpoint for [OpenLineage](https://github.com/OpenLineage/OpenLineage) support [@henneberger](https://github.com/henneberger)
 *  New graphql endpoint [@henneberger](https://github.com/henneberger)
 *  New spark integration [@henneberger](https://github.com/henneberger)
-*  New API to list versions for a dataset 
+*  New API to list versions for a dataset
 
 ### Changed
 
@@ -54,7 +83,7 @@
 
 * Always migrate db schema on app start in development config
 * Update default db username / password
-* Use [`marquez.dev.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.dev.yml) in on docker compose `up` 
+* Use [`marquez.dev.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.dev.yml) in on docker compose `up`
 
 ## [0.11.1](https://github.com/MarquezProject/marquez/compare/0.11.0...0.11.1) - 2020-08-19
 
@@ -194,7 +223,7 @@
 
 ### Added
 
-* Link dataset versions with run inputs 
+* Link dataset versions with run inputs
 * Add schema required by tagging
 * More tests for class `common.Utils`
 * Add `ColumnsTest`
@@ -212,7 +241,7 @@
 ### Added
 
 * Add `Job.latestRun`
-* Add debug logging 
+* Add debug logging
 
 ### Changed
 
@@ -248,7 +277,7 @@
 
 ### Changed
 
-* Rename guid column to uuid 
+* Rename guid column to uuid
 * Use admin ping and health
 * Update `owner` to `ownerName`
 
@@ -258,7 +287,7 @@
 
 ### Fixed
 
-* Fix `marquez.jar` rename on `COPY` 
+* Fix `marquez.jar` rename on `COPY`
 
 ## [0.4.0](https://github.com/MarquezProject/marquez/compare/0.3.4...0.4.0) - 2019-06-04
 
@@ -277,19 +306,19 @@
 
 ### Changed
 
-* Set timestamps to `CURRENT_TIMESTAMP` 
+* Set timestamps to `CURRENT_TIMESTAMP`
 
 ## [0.3.2](https://github.com/MarquezProject/marquez/compare/0.3.1...0.3.2) - 2019-05-14
 
 ### Changed
 
-* Set `job_versions.updated_at` to `CURRENT_TIMESTAMP` 
+* Set `job_versions.updated_at` to `CURRENT_TIMESTAMP`
 
 ## [0.3.1](https://github.com/MarquezProject/marquez/compare/0.3.0...0.3.1) - 2019-05-14
 
 ### Added
 
-* Handle `Flyway.repair()` error 
+* Handle `Flyway.repair()` error
 
 ## [0.3.0](https://github.com/MarquezProject/marquez/compare/0.2.1...0.3.0) - 2019-05-14
 
@@ -299,7 +328,7 @@
 
 ### Changed
 
-* Return timestamp strings as ISO format 
+* Return timestamp strings as ISO format
 
 ### Removed
 
