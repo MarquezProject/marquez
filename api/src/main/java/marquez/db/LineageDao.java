@@ -124,7 +124,9 @@ public interface LineageDao {
   Optional<UUID> getJobFromInputOrOutput(String datasetName, String namespaceName);
 
   @SqlQuery(
-      "select distinct on(r.job_name, r.namespace_name) r.*, ra.args, ra.args, ctx.context \n"
+      "select distinct on(r.job_name, r.namespace_name) r.uuid, r.created_at, r.updated_at, "
+          + "r.nominal_start_time, r.nominal_end_time, r.current_run_state, r.started_at, r.ended_at, "
+          + "r.namespace_name, r.job_name, r.location, ra.args, ra.args, ctx.context \n"
           + "from runs AS r\n"
           + "inner join jobs j on j.name = r.job_name AND j.namespace_name = r.namespace_name\n"
           + "left outer join run_args AS ra ON ra.uuid = r.run_args_uuid \n"
