@@ -38,7 +38,7 @@ public class LineageService extends DelegatingLineageDao {
   public Lineage lineage(NodeId nodeId, int depth) throws ExecutionException, InterruptedException {
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
-      return new Lineage(ImmutableSortedSet.of());
+      throw new NodeIdNotFoundException("Could not find node");
     }
     UUID job = optionalUUID.get();
 
