@@ -56,14 +56,15 @@ jobs:
           key: v1-web-{{ .Branch }}-{{ .Revision }}
 
   build-client-java:
-    <<: *machine
+    working_directory: ~/marquez
+    docker:
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-client-java-{{ .Branch }}-{{ .Revision }}
             - v1-client-java-{{ .Branch }}
-      - run: ./.circleci/get-jdk11.sh
       - run: ./gradlew --no-daemon --stacktrace clients:java:build
       - run: ./gradlew --no-daemon clients:java:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
