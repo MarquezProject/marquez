@@ -29,8 +29,8 @@ public class JobData implements NodeData {
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
   @NonNull NamespaceName namespace;
-  @NonNull ImmutableSet<DatasetId> inputs;
-  @NonNull ImmutableSet<DatasetId> outputs;
+  @NonNull @Setter ImmutableSet<DatasetId> inputs;
+  @NonNull @Setter ImmutableSet<DatasetId> outputs;
   @Nullable URL location;
   @NonNull ImmutableMap<String, String> context;
   @Nullable String description;
