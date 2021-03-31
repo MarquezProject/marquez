@@ -99,7 +99,7 @@ def wait_for_dag():
     )
     row = cur.fetchone()
     dag_id = row[0]
-    dag_state= row[1]
+    dag_state = row[1]
 
     cur.close()
 
