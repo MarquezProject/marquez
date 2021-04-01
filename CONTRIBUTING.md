@@ -10,16 +10,16 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
 
-# Getting your changes approved
+# Getting Your Changes Approved
 
-Your PR must be approved and merged by a [committer](COMMITTERS.md).
+Your pull request must be approved and merged by a [committer](COMMITTERS.md).
 
 # Development
 
 To run the entire test suite:
 
 ```bash
-$ ./gradlew :api:test
+$ ./gradlew test
 ```
 
 You can also run individual tests for a [submodule](https://github.com/MarquezProject/marquez#modules) using the `--tests` flag:
@@ -65,7 +65,7 @@ $ pre-commit install
 Use [`publishToMavenLocal`](https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:tasks) to publish artifacts to your local maven repository:
 
 ```
-$ ./gradlew :api:publishToMavenLocal
+$ ./gradlew publishToMavenLocal
 ```
 
 # Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
@@ -85,7 +85,7 @@ To ensure your pull request is accepted, follow these guidelines:
 
 * All changes should be accompanied by tests
 * Do your best to have a [well-formed commit message](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for your change
-* [Keep diffs small](https://graysonkoonce.com/stacked-pull-requests-keeping-github-diffs-small) and self-contained
+* [Keep diffs small](https://kurtisnusbaum.medium.com/stacked-diffs-keeping-phabricator-diffs-small-d9964f4dcfa6) and self-contained
 * If your change fixes a bug, please [link the issue](https://help.github.com/articles/closing-issues-using-keywords) in your pull request description
 * Any changes to the API reference requires [regenerating](#api-docs) the static `openapi.html` file.
 
@@ -150,6 +150,7 @@ Then browse to: http://localhost:8080
 
 * [How to Contribute to Open Source](https://opensource.guide/how-to-contribute)
 * [Using the Fork-and-Branch Git Workflow](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow)
+* [Understanding the GitHub flow](https://guides.github.com/introduction/flow/)
 * [Keep a Changelog](https://keepachangelog.com)
 * [Code Review Developer Guide](https://google.github.io/eng-practices/review)
 * [Signing Commits](https://docs.github.com/en/github/authenticating-to-github/signing-commits)
