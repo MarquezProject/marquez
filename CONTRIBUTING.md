@@ -10,9 +10,9 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
 
-# Getting your changes approved
+# Getting Your Changes Approved
 
-Your PR must be approved and merged by a [committer](COMMITTERS.md).
+Your pull request must be approved and merged by a [committer](COMMITTERS.md).
 
 # Development
 
@@ -65,7 +65,7 @@ $ pre-commit install
 Use [`publishToMavenLocal`](https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:tasks) to publish artifacts to your local maven repository:
 
 ```
-$ ./gradlew :api:publishToMavenLocal
+$ ./gradlew publishToMavenLocal
 ```
 
 # Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
