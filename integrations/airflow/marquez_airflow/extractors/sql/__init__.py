@@ -10,4 +10,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from marquez_airflow.extractors.sql.parser import SqlParser, SqlMeta
+from marquez_airflow.extractors.sql.parser import SqlParser, SqlMeta  # noqa: F401
