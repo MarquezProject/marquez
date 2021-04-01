@@ -1,6 +1,5 @@
 import os
 import logging
-import uuid
 from typing import Optional
 
 from marquez_airflow.extractors import Dataset, StepMetadata
@@ -23,15 +22,20 @@ log = logging.getLogger(__name__)
 
 
 class MarquezAdapter:
+    """
+    Adapter for translating Airflow metadata to OpenLineage events,
+    instead of directly creating them from Airflow code.
+    """
     _client = None
 
-    def get_or_create_marquez_client(self) -> OpenLineageClient:
+    def get_or_create_openlineage_client(self) -> OpenLineageClient:
         if not self._client:
             self._client = OpenLineageClient.from_environment()
         return self._client
 
     def start_task(
             self,
+            run_id: str,
             job_name: str,
             job_description: str,
             event_time: str,
@@ -41,11 +45,23 @@ class MarquezAdapter:
             nominal_end_time: str,
             step: Optional[StepMetadata],
     ) -> str:
+        """
+        Emits openlineage event of type START
+        :param run_id: globally unique identifier of task in dag run
+        :param job_name: globally unique identifier of task in dag
+        :param job_description: user provided description of job
+        :param event_time:
+        :param parent_run_id: identifier of job spawning this task
+        :param code_location: file path or URL of DAG file
+        :param nominal_start_time: scheduled time of dag run
+        :param nominal_end_time: following schedule of dag run
+        :param step: metadata container with information extracted from operator
+        :return:
+        """
         sql = None
         if step:
             sql = step.context.get('sql', None)
 
-        run_id = self._new_run_id()
         event = RunEvent(
             eventType=RunState.START,
             eventTime=event_time,
@@ -63,7 +79,7 @@ class MarquezAdapter:
                 self.map_airflow_dataset(dataset) for dataset in step.outputs
             ] if step else None
         )
-        self.get_or_create_marquez_client().emit(event)
+        self.get_or_create_openlineage_client().emit(event)
         return event.run.runId
 
     def complete_task(
@@ -73,6 +89,13 @@ class MarquezAdapter:
         end_time: str,
         step: StepMetadata
     ):
+        """
+        Emits openlineage event of type COMPLETE
+        :param run_id: globally unique identifier of task in dag run
+        :param job_name: globally unique identifier of task between dags
+        :param end_time: time of task completion
+        :param step: metadata container with information extracted from operator
+        """
         event = RunEvent(
             eventType=RunState.COMPLETE,
             eventTime=end_time,
@@ -90,7 +113,7 @@ class MarquezAdapter:
             ],
             producer=f"marquez-airflow/{MARQUEZ_AIRFLOW_VERSION}"
         )
-        self.get_or_create_marquez_client().emit(event)
+        self.get_or_create_openlineage_client().emit(event)
 
     def fail_task(
         self,
@@ -99,6 +122,13 @@ class MarquezAdapter:
         end_time: str,
         step: StepMetadata
     ):
+        """
+        Emits openlineage event of type FAIL
+        :param run_id: globally unique identifier of task in dag run
+        :param job_name: globally unique identifier of task between dags
+        :param end_time: time of task completion
+        :param step: metadata container with information extracted from operator
+        """
         event = RunEvent(
             eventType=RunState.FAIL,
             eventTime=end_time,
@@ -116,7 +146,7 @@ class MarquezAdapter:
             ],
             producer=f"marquez-airflow/{MARQUEZ_AIRFLOW_VERSION}"
         )
-        self.get_or_create_marquez_client().emit(event)
+        self.get_or_create_openlineage_client().emit(event)
 
     @staticmethod
     def _build_run(
@@ -194,7 +224,3 @@ class MarquezAdapter:
             name=dataset.name,
             facets=facets
         )
-
-    @staticmethod
-    def _new_run_id() -> str:
-        return str(uuid.uuid4())

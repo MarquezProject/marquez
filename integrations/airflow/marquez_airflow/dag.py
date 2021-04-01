@@ -74,7 +74,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
 
         return dagrun
 
-    # We make the assumption that when a DAG run is created, it's
+    # We make the assumption that when a DAG run is created, its
     # tasks can be safely marked as started as well.
     # Doing it other way would require to hook up to
     # scheduler, where tasks are actually started
@@ -87,7 +87,10 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 step = self._extract_metadata(dagrun, task)
 
                 job_name = self._marquez_job_name(self.dag_id, task.task_id)
+                run_id = self._marquez_run_id(dagrun.run_id, task.task_id)
+
                 task_run_id = _MARQUEZ.start_task(
+                    run_id,
                     job_name,
                     self.description,
                     DagUtils.to_iso_8601(self._now_ms()),
@@ -110,7 +113,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     exc_info=True)
 
     def handle_callback(self, *args, **kwargs):
-        self.log.info(f"handle_callback({args}, {kwargs})")
+        self.log.debug(f"handle_callback({args}, {kwargs})")
         try:
             dagrun = args[0]
             self.log.debug(f"handle_callback() dagrun : {dagrun}")
@@ -147,9 +150,11 @@ class DAG(airflow.models.DAG, LoggingMixin):
         step = self._extract_metadata(dagrun, task, task_instance)
 
         job_name = self._marquez_job_name(self.dag_id, task.task_id)
+        run_id = self._marquez_run_id(dagrun.run_id, task.task_id)
 
         if not task_run_id:
             task_run_id = _MARQUEZ.start_task(
+                run_id,
                 job_name,
                 self.description,
                 DagUtils.to_iso_8601(task_instance.start_date),
@@ -201,15 +206,13 @@ class DAG(airflow.models.DAG, LoggingMixin):
                         return StepMetadata(
                             name=self._marquez_job_name(self.dag_id, task.task_id)
                         )
-                    elif len(step) == 1:
-                        return step[0]
-                    else:
+                    elif len(step) >= 1:
                         self.log.warning(
                             f'Extractor {extractor.__name__} {task_info} '
                             f'returned more then one StepMetadata instance: {step} '
                             f'will drop steps except for first!'
                         )
-                        return step[0]
+                    return step[0]
 
             except Exception as e:
                 self.log.error(
@@ -258,8 +261,12 @@ class DAG(airflow.models.DAG, LoggingMixin):
         return DAG._marquez_job_name(task_instance.dag_id, task_instance.task_id)
 
     @staticmethod
-    def _marquez_job_name(dag_id, task_id):
+    def _marquez_job_name(dag_id: str, task_id: str) -> str:
         return f'{dag_id}.{task_id}'
+
+    @staticmethod
+    def _marquez_run_id(dag_run_id: str, task_id: str) -> str:
+        return f'{dag_run_id}.{task_id}'
 
     @staticmethod
     def _now_ms():

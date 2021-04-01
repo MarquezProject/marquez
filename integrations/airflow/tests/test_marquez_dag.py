@@ -93,11 +93,10 @@ def test_new_run_id(clear_db_airflow_dags, session=None):
 
 
 # tests a simple workflow with default extraction mechanism
-@mock.patch('marquez_airflow.marquez.MarquezAdapter._new_run_id')
-@mock.patch('marquez_airflow.marquez.MarquezAdapter.get_or_create_marquez_client')
+@mock.patch('marquez_airflow.marquez.MarquezAdapter.get_or_create_openlineage_client')
 @mock.patch('marquez_airflow.dag.JobIdMapping')
 @provide_session
-def test_marquez_dag(job_id_mapping, mock_get_or_create_marquez_client, mock_uuid,
+def test_marquez_dag(job_id_mapping, mock_get_or_create_openlineage_client,
                      clear_db_airflow_dags, session=None):
 
     dag = DAG(
@@ -108,10 +107,10 @@ def test_marquez_dag(job_id_mapping, mock_get_or_create_marquez_client, mock_uui
     )
     # (1) Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
-    mock_get_or_create_marquez_client.return_value = mock_marquez_client
-    run_id_completed = "my-test_marquez_dag-uuid-completed"
-    run_id_failed = "my-test_marquez_dag-uuid-failed"
-    mock_uuid.side_effect = [run_id_completed, run_id_failed]
+    mock_get_or_create_openlineage_client.return_value = mock_marquez_client
+    run_id_completed = f"{DAG_RUN_ID}.{TASK_ID_COMPLETED}"
+    run_id_failed = f"{DAG_RUN_ID}.{TASK_ID_FAILED}"
+    # mock_uuid.side_effect = [run_id_completed, run_id_failed]
 
     # (2) Add task that will be marked as completed
     task_will_complete = DummyOperator(
@@ -286,14 +285,12 @@ class TestFixtureDummyExtractorOnComplete(BaseExtractor):
 
 
 # test the lifecycle including with extractors
-@mock.patch('marquez_airflow.marquez.MarquezAdapter._new_run_id')
-@mock.patch('marquez_airflow.marquez.MarquezAdapter.get_or_create_marquez_client')
+@mock.patch('marquez_airflow.marquez.MarquezAdapter.get_or_create_openlineage_client')
 @mock.patch('marquez_airflow.dag.JobIdMapping')
 @provide_session
 def test_marquez_dag_with_extractor(
         job_id_mapping,
-        mock_get_or_create_marquez_client,
-        mock_uuid,
+        mock_get_or_create_openlineage_client,
         clear_db_airflow_dags,
         session=None):
 
@@ -306,11 +303,12 @@ def test_marquez_dag_with_extractor(
         description=DAG_DESCRIPTION
     )
 
-    run_id = "my-test-uuid"
-    mock_uuid.side_effect = [run_id]
+    dag_run_id = 'test_marquez_dag_with_extractor_run_id'
+
+    run_id = f"{dag_run_id}.{TASK_ID_COMPLETED}"
     # Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
-    mock_get_or_create_marquez_client.return_value = mock_marquez_client
+    mock_get_or_create_openlineage_client.return_value = mock_marquez_client
 
     # Add task that will be marked as completed
     task_will_complete = TestFixtureDummyOperator(
@@ -326,7 +324,7 @@ def test_marquez_dag_with_extractor(
 
     # Create DAG run and mark as running
     dagrun = dag.create_dagrun(
-        run_id='test_marquez_dag_with_extractor_run_id',
+        run_id=dag_run_id,
         execution_date=DEFAULT_DATE,
         state=State.RUNNING)
 
@@ -394,14 +392,12 @@ def test_marquez_dag_with_extractor(
     )
 
 
-@mock.patch('marquez_airflow.marquez.MarquezAdapter._new_run_id')
-@mock.patch('marquez_airflow.marquez.MarquezAdapter.get_or_create_marquez_client')
+@mock.patch('marquez_airflow.marquez.MarquezAdapter.get_or_create_openlineage_client')
 @mock.patch('marquez_airflow.dag.JobIdMapping')
 @provide_session
 def test_marquez_dag_with_extract_on_complete(
         job_id_mapping,
-        mock_get_or_create_marquez_client,
-        mock_uuid,
+        mock_get_or_create_openlineage_client,
         clear_db_airflow_dags,
         session=None):
 
@@ -414,11 +410,11 @@ def test_marquez_dag_with_extract_on_complete(
         description=DAG_DESCRIPTION
     )
 
-    run_id = "my-test-uuid"
-    mock_uuid.side_effect = [run_id]
+    dag_run_id = 'test_marquez_dag_with_extractor_run_id'
+    run_id = f"{dag_run_id}.{TASK_ID_COMPLETED}"
     # Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
-    mock_get_or_create_marquez_client.return_value = mock_marquez_client
+    mock_get_or_create_openlineage_client.return_value = mock_marquez_client
 
     # Add task that will be marked as completed
     task_will_complete = TestFixtureDummyOperator(
@@ -433,7 +429,7 @@ def test_marquez_dag_with_extract_on_complete(
 
     # Create DAG run and mark as running
     dagrun = dag.create_dagrun(
-        run_id='test_marquez_dag_with_extractor_run_id',
+        run_id=dag_run_id,
         execution_date=DEFAULT_DATE,
         state=State.RUNNING)
 
@@ -543,14 +539,12 @@ class TestFixtureDummyExtractorWithMultipleSteps(BaseExtractor):
 
 
 # test the lifecycle including with extractors
-@mock.patch('marquez_airflow.marquez.MarquezAdapter._new_run_id')
-@mock.patch('marquez_airflow.marquez.MarquezAdapter.get_or_create_marquez_client')
+@mock.patch('marquez_airflow.marquez.MarquezAdapter.get_or_create_openlineage_client')
 @mock.patch('marquez_airflow.dag.JobIdMapping')
 @provide_session
 def test_marquez_dag_with_extractor_returning_two_steps(
         job_id_mapping,
-        mock_get_or_create_marquez_client,
-        mock_uuid,
+        mock_get_or_create_openlineage_client,
         clear_db_airflow_dags,
         session=None):
 
@@ -563,11 +557,12 @@ def test_marquez_dag_with_extractor_returning_two_steps(
         description=DAG_DESCRIPTION
     )
 
-    run_id = "my-test-uuid"
-    mock_uuid.side_effect = [run_id]
+    dag_run_id = 'test_marquez_dag_with_extractor_returning_two_steps_run_id'
+    run_id = f"{dag_run_id}.{TASK_ID_COMPLETED}"
+
     # Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
-    mock_get_or_create_marquez_client.return_value = mock_marquez_client
+    mock_get_or_create_openlineage_client.return_value = mock_marquez_client
 
     # Add task that will be marked as completed
     task_will_complete = TestFixtureDummyOperator(
@@ -583,7 +578,7 @@ def test_marquez_dag_with_extractor_returning_two_steps(
 
     # Create DAG run and mark as running
     dagrun = dag.create_dagrun(
-        run_id='test_marquez_dag_with_extractor_returning_two_steps_run_id',
+        run_id=dag_run_id,
         execution_date=DEFAULT_DATE,
         state=State.RUNNING)
 
