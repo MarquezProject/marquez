@@ -167,6 +167,8 @@ public final class NodeId {
 
   @JsonIgnore
   private String[] parts(int expectedParts, String expectedType) {
+
+    // dead simple splitting by token- matches most ids
     String[] parts = value.split(ID_DELIM + "|" + VERSION_DELIM);
     if (parts.length < expectedParts) {
       throw new UnsupportedOperationException(
@@ -176,7 +178,8 @@ public final class NodeId {
     } else if (parts.length == expectedParts) {
       return parts;
     } else {
-      Pattern p = Pattern.compile(ID_DELIM + "|" + VERSION_DELIM);
+      // try to avoid matching colons in URIs- e.g., scheme://authority and host:port patterns
+      Pattern p = Pattern.compile("(?:" + ID_DELIM + "(?!//|\\d+))|" + VERSION_DELIM);
       Matcher matcher = p.matcher(value);
       String[] returnParts = new String[expectedParts];
 
