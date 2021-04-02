@@ -31,7 +31,6 @@ dependencies {
     implementation 'com.github.ok2c.hc5:hc5-async-json:0.2.1'
     compileOnly 'org.projectlombok:lombok:1.18.18'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.0.3'
-    compileOnly 'com.google.cloud.spark:spark-bigquery-with-dependencies_2.11:0.19.1'
     testImplementation 'com.google.cloud.spark:spark-bigquery-with-dependencies_2.11:0.19.1'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
@@ -53,6 +52,8 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    forkEvery 1
+    maxParallelForks 3
     testLogging {
         events "passed", "skipped", "failed"
         showStandardStreams = true
