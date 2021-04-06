@@ -15,6 +15,8 @@ import logging
 import os
 import requests
 
+import marquez_client
+
 from six.moves.urllib.parse import quote
 
 from marquez_client import errors
@@ -30,9 +32,8 @@ from marquez_client.models import (
     JobType
 )
 from marquez_client.utils import Utils
-from marquez_client.version import VERSION
 
-_USER_AGENT = f'marquez-python/{VERSION}'
+_USER_AGENT = f'marquez-python/{marquez_client.__version__}'
 _HEADERS = {'User-Agent': _USER_AGENT}
 
 log = logging.getLogger(__name__)
