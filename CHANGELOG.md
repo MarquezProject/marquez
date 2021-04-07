@@ -1,6 +1,17 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.13.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.13.1...HEAD)
+
+## [0.13.1](https://github.com/MarquezProject/marquez/compare/0.13.0...0.13.1) - 2021-04-01
+
+### Changed
+
+* Remove unused implementation of SQL parser in `marquez-airflow` [@mobuchowski](https://github.com/mobuchowski)
+
+### Fixed
+
+* Add inputs and outputs to lineage graph [@henneberger](https://github.com/henneberger)
+* Updated `NodeId` regex to support URIs with scheme and ports [@collado-mike](https://github.com/collado-mike)
 
 ## [0.13.0](https://github.com/MarquezProject/marquez/compare/0.12.2...0.13.0) - 2021-03-30
 
