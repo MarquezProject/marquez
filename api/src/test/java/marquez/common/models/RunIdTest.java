@@ -19,13 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.util.UUID;
-import marquez.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class RunIdTest {
   private static final String UUID_STRING = "225adbdd-2a5d-4b5f-89b3-06a7cd47cc87";
   private static final UUID ACTUAL = fromString(UUID_STRING);
@@ -33,9 +33,12 @@ public class RunIdTest {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testNull() {
-    RunId.of(null);
+    Assertions.assertThrows(
+      NullPointerException.class,
+      () -> RunId.of(null)
+    );
   }
 
   @Test

@@ -10,27 +10,26 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@Category(UnitTests.class)
-@RunWith(MockitoJUnitRunner.class)
+@org.junit.jupiter.api.Tag("UnitTests")
+@ExtendWith(MockitoExtension.class)
 public class HttpBackendTest {
 
   @Mock private MarquezHttp marquezHttp;
   private HttpBackend httpBackend;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     httpBackend = new HttpBackend(DEFAULT_BASE_URL, marquezHttp);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     verifyNoMoreInteractions(marquezHttp);
   }

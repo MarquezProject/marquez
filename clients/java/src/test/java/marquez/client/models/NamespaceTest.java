@@ -14,14 +14,12 @@
 
 package marquez.client.models;
 
+import org.junit.jupiter.api.Test;
+
 import static marquez.client.models.ModelGenerator.newNamespace;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import marquez.client.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class NamespaceTest {
   private static final Namespace NAMESPACE = newNamespace();
   private static final String JSON = JsonGenerator.newJsonFor(NAMESPACE);

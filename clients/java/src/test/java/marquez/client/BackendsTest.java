@@ -4,8 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
-import org.junit.Test;
 
 public class BackendsTest {
   private static final String API_KEY = "PuRx8GT3huSXlheDIRUK1YUatGpLVEuL";

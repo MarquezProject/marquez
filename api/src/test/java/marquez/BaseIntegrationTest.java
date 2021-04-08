@@ -32,6 +32,9 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+
+import io.dropwizard.testing.junit5.DropwizardAppExtension;
+import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import marquez.client.MarquezClient;
 import marquez.client.Utils;
 import marquez.client.models.DatasetId;
@@ -45,9 +48,10 @@ import marquez.client.models.SourceMeta;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.SourceType;
-import org.jdbi.v3.testing.JdbiRule;
-import org.junit.ClassRule;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+
+@ExtendWith(DropwizardExtensionsSupport.class)
 public abstract class BaseIntegrationTest {
   protected static final String CONFIG_FILE = "config.test.yml";
   protected static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
@@ -131,16 +135,14 @@ public abstract class BaseIntegrationTest {
           .description(JOB_DESCRIPTION)
           .build();
 
-  @ClassRule
-  public static final DropwizardAppRule<MarquezConfig> APP =
-      new DropwizardAppRule<>(
-          MarquezApp.class,
-          CONFIG_FILE_PATH,
-          ConfigOverride.config("db.url", POSTGRES.getJdbcUrl()),
-          ConfigOverride.config("db.user", POSTGRES.getUsername()),
-          ConfigOverride.config("db.password", POSTGRES.getPassword()));
+  public static final DropwizardAppExtension<MarquezConfig> APP =
+    new DropwizardAppExtension<>(
+      MarquezApp.class,
+      CONFIG_FILE_PATH,
+      ConfigOverride.config("db.url", POSTGRES.getJdbcUrl()),
+      ConfigOverride.config("db.user", POSTGRES.getUsername()),
+      ConfigOverride.config("db.password", POSTGRES.getPassword()));
 
-  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
 
   protected static PostgresContainer createMarquezPostgres() {
     return PostgresContainer.create("marquez");

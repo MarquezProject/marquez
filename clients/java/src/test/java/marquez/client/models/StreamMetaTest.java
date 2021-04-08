@@ -14,14 +14,12 @@
 
 package marquez.client.models;
 
+import org.junit.jupiter.api.Test;
+
 import static marquez.client.models.ModelGenerator.newStreamMeta;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import marquez.client.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class StreamMetaTest {
   private static final DatasetMeta META = newStreamMeta();
   private static final String JSON = JsonGenerator.newJsonFor(META);

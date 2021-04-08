@@ -11,17 +11,13 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-@Category(IntegrationTests.class)
+@org.junit.jupiter.api.Tag("IntegrationTests")
 public class SparkAgentIntegrationTest extends BaseIntegrationTest {
-  @Parameters(name = "{0}")
+
   public static List<Path> data() throws IOException {
     String prefix = "../integrations/spark/integrations";
     List<Path> paths = Files.list(Paths.get(prefix + "/sparkrdd")).collect(Collectors.toList());
@@ -30,10 +26,10 @@ public class SparkAgentIntegrationTest extends BaseIntegrationTest {
     return paths;
   }
 
-  @Parameter public Path input;
 
-  @Test
-  public void testOpenLineage() throws IOException {
+  @ParameterizedTest
+  @MethodSource("data")
+  public void testOpenLineage(Path input) throws IOException {
     String body = new String(Files.readAllBytes(input));
 
     CompletableFuture<Integer> resp =
@@ -42,10 +38,10 @@ public class SparkAgentIntegrationTest extends BaseIntegrationTest {
             .whenComplete(
                 (val, error) -> {
                   if (error != null) {
-                    fail("Could not complete request");
+                    Assertions.fail("Could not complete request");
                   }
                 });
 
-    assertEquals((Integer) 201, resp.join());
+    Assertions.assertEquals((Integer) 201, resp.join());
   }
 }

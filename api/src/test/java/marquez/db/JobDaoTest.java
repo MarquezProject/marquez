@@ -7,21 +7,19 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import marquez.JdbiRuleInit;
+import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.testing.JdbiRule;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class JobDaoTest {
-  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
 
   private static JobDao jobDao;
 
-  @BeforeClass
-  public static void setUpOnce() {
-    final Jdbi jdbi = dbRule.getJdbi();
+  @BeforeAll
+  public static void setUpOnce(Jdbi jdbi) {
     jobDao = jdbi.onDemand(JobDao.class);
   }
 
