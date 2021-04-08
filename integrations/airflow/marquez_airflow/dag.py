@@ -117,7 +117,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     exc_info=True)
 
     def handle_callback(self, *args, **kwargs):
-        self.log.info(f"handle_callback({args}, {kwargs})")
+        self.log.debug(f"handle_callback({args}, {kwargs})")
         try:
             dagrun = args[0]
             self.log.debug(f"handle_callback() dagrun : {dagrun}")
