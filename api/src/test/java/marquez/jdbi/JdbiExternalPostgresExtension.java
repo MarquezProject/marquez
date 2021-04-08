@@ -21,7 +21,6 @@ import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.spi.JdbiPlugin;
-import org.jdbi.v3.testing.JdbiRule;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -60,11 +59,7 @@ public abstract class JdbiExternalPostgresExtension
 
   protected abstract DataSource createDataSource();
 
-  /**
-   * Discover and install plugins from the classpath.
-   *
-   * @see JdbiRule#withPlugin(JdbiPlugin) we recommend installing plugins explicitly instead
-   */
+  /** Discover and install plugins from the classpath. */
   public JdbiExternalPostgresExtension withPlugins() {
     installPlugins = true;
     return this;
