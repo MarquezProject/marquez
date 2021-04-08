@@ -333,8 +333,6 @@ public class MarquezClientTest {
           STREAM_DESCRIPTION,
           CREATED_BY_RUN);
 
-  //  @Rule public final MockitoRule rule = MockitoJUnit.rule();
-
   private final MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;
   private MarquezClient client;
