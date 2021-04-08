@@ -52,4 +52,5 @@ marquez-python
 ${MARQUEZ_AIRFLOW_WHL}
 EOL
 
+docker-compose down
 docker-compose up --build --exit-code-from integration
