@@ -41,55 +41,54 @@ public class JobIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_createDuplicateRun() {
     Assertions.assertThrows(
-      Exception.class,
-      () -> {
-        client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
-        String runId = UUID.randomUUID().toString();
-        client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
-        client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
-      });
+        Exception.class,
+        () -> {
+          client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+          String runId = UUID.randomUUID().toString();
+          client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+          client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+        });
   }
 
   @Test
   public void testApp_notExistsJobForRun() {
     Assertions.assertThrows(
-      Exception.class,
-      () -> {
-        client.createRun(NAMESPACE_NAME, "NotExists", RunMeta.builder().build());
-      });
+        Exception.class,
+        () -> {
+          client.createRun(NAMESPACE_NAME, "NotExists", RunMeta.builder().build());
+        });
   }
 
   @Test
   public void testApp_createNonMatchingJobWithRun() {
     String runId = UUID.randomUUID().toString();
     final JobMeta JOB_META =
-      JobMeta.builder()
-        .type(JOB_TYPE)
-        .inputs(ImmutableSet.of())
-        .outputs(ImmutableSet.of())
-        .location(JOB_LOCATION)
-        .context(JOB_CONTEXT)
-        .description(JOB_DESCRIPTION)
-        .build();
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
     client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
     client.createJob(NAMESPACE_NAME, "DIFFERENT_JOB", JOB_META);
 
     client.createRun(NAMESPACE_NAME, "DIFFERENT_JOB", RunMeta.builder().id(runId).build());
 
     final JobMeta JOB_META_WITH_RUN =
-      JobMeta.builder()
-        .type(JOB_TYPE)
-        .inputs(ImmutableSet.of())
-        .outputs(ImmutableSet.of())
-        .location(JOB_LOCATION)
-        .context(JOB_CONTEXT)
-        .description(JOB_DESCRIPTION)
-        .runId(runId)
-        .build();
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .runId(runId)
+            .build();
     // associate wrong run
     Assertions.assertThrows(
-      Exception.class,
-      () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META_WITH_RUN));
+        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META_WITH_RUN));
   }
 
   @Test
@@ -105,9 +104,7 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .runId(UUID.randomUUID().toString())
             .build();
     Assertions.assertThrows(
-      Exception.class,
-      () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
-
+        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
   }
 
   @Test
@@ -122,15 +119,12 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .description(JOB_DESCRIPTION)
             .build();
     Assertions.assertThrows(
-      Exception.class,
-      () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
+        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
   }
 
   @Test
   public void testApp_notExistsJob() {
-    Assertions.assertThrows(
-      Exception.class,
-      () -> client.getJob(NAMESPACE_NAME, "not-existing"));
+    Assertions.assertThrows(Exception.class, () -> client.getJob(NAMESPACE_NAME, "not-existing"));
   }
 
   @Test

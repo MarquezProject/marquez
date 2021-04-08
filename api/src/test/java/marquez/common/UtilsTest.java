@@ -23,10 +23,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
-import org.junit.jupiter.api.Test;
-
 import java.net.URL;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("UnitTests")
 public class UtilsTest {

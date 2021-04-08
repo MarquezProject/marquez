@@ -16,9 +16,7 @@ package marquez.jdbi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-
 import javax.sql.DataSource;
-
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -31,10 +29,9 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-/**
- * JUnit Extension to manage a Jdbi instance pointed to external Postgres instance.
- */
-public abstract class JdbiExternalPostgresExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
+/** JUnit Extension to manage a Jdbi instance pointed to external Postgres instance. */
+public abstract class JdbiExternalPostgresExtension
+    implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
 
   protected final List<JdbiPlugin> plugins = new ArrayList<>();
   private final ReentrantLock lock = new ReentrantLock();
@@ -44,7 +41,7 @@ public abstract class JdbiExternalPostgresExtension implements BeforeAllCallback
   private Flyway flyway;
   private Handle handle;
   protected Migration migration;
-  
+
   public JdbiExternalPostgresExtension() {}
 
   private DataSource getDataSource() {
@@ -62,7 +59,7 @@ public abstract class JdbiExternalPostgresExtension implements BeforeAllCallback
   }
 
   protected abstract DataSource createDataSource();
-  
+
   /**
    * Discover and install plugins from the classpath.
    *
@@ -73,46 +70,37 @@ public abstract class JdbiExternalPostgresExtension implements BeforeAllCallback
     return this;
   }
 
-  /**
-   * Install a plugin into JdbiRule.
-   */
+  /** Install a plugin into JdbiRule. */
   public JdbiExternalPostgresExtension withPlugin(final JdbiPlugin plugin) {
     plugins.add(plugin);
     return this;
   }
 
-  /**
-   * Run database migration.
-   */
+  /** Run database migration. */
   public JdbiExternalPostgresExtension withMigration(final Migration newMigration) {
     this.migration = newMigration;
     return this;
   }
 
-
-  /**
-   * Get Jdbi, in case you want to open additional handles to the same data source.
-   */
+  /** Get Jdbi, in case you want to open additional handles to the same data source. */
   public Jdbi getJdbi() {
     return jdbi;
   }
 
-  /**
-   * Get the single Handle instance opened for the duration of this test case.
-   */
+  /** Get the single Handle instance opened for the duration of this test case. */
   public Handle getHandle() {
     return handle;
   }
 
-
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {
     if (migration != null) {
-      flyway = Flyway.configure()
-        .dataSource(getDataSource())
-        .locations(migration.paths.toArray(new String[0]))
-        .schemas(migration.schemas.toArray(new String[0]))
-        .load();
+      flyway =
+          Flyway.configure()
+              .dataSource(getDataSource())
+              .locations(migration.paths.toArray(new String[0]))
+              .schemas(migration.schemas.toArray(new String[0]))
+              .load();
       flyway.migrate();
     }
 
@@ -135,12 +123,16 @@ public abstract class JdbiExternalPostgresExtension implements BeforeAllCallback
   }
 
   @Override
-  public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+  public boolean supportsParameter(
+      ParameterContext parameterContext, ExtensionContext extensionContext)
+      throws ParameterResolutionException {
     return parameterContext.getParameter().getType() == Jdbi.class;
   }
 
   @Override
-  public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+  public Object resolveParameter(
+      ParameterContext parameterContext, ExtensionContext extensionContext)
+      throws ParameterResolutionException {
     return jdbi;
   }
 }

@@ -14,11 +14,11 @@
 
 package marquez.client.models;
 
-import org.junit.jupiter.api.Test;
-
 import static marquez.client.models.ModelGenerator.newJobWith;
 import static marquez.client.models.ModelGenerator.newRun;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("UnitTests")
 public class JobTest {

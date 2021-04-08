@@ -1,11 +1,10 @@
 package marquez.jdbi;
 
+import javax.sql.DataSource;
 import marquez.PostgresContainer;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.postgresql.ds.PGSimpleDataSource;
-
-import javax.sql.DataSource;
 
 public class MarquezJdbiExternalPostgresExtension extends JdbiExternalPostgresExtension {
 
@@ -43,5 +42,4 @@ public class MarquezJdbiExternalPostgresExtension extends JdbiExternalPostgresEx
     datasource.setApplicationName("Marquez Unit Tests");
     return datasource;
   }
-
 }

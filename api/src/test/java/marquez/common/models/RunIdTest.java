@@ -19,11 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.UUID;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("UnitTests")
 public class RunIdTest {
@@ -35,10 +34,7 @@ public class RunIdTest {
 
   @Test
   public void testNull() {
-    Assertions.assertThrows(
-      NullPointerException.class,
-      () -> RunId.of(null)
-    );
+    Assertions.assertThrows(NullPointerException.class, () -> RunId.of(null));
   }
 
   @Test

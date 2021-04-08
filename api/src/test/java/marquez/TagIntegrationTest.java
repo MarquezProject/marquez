@@ -32,10 +32,10 @@ public class TagIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_testFieldNotExists() {
     Assertions.assertThrows(
-      Exception.class,
-      () -> {
-        client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
-        client.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, "not-exists", "TESTTAG");
-      });
+        Exception.class,
+        () -> {
+          client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+          client.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, "not-exists", "TESTTAG");
+        });
   }
 }

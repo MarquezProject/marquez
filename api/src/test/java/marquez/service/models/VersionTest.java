@@ -29,10 +29,7 @@ public class VersionTest {
 
   @Test
   public void testNull() {
-    Assertions.assertThrows(
-      NullPointerException.class,
-      () -> Version.of(null)
-    );
+    Assertions.assertThrows(NullPointerException.class, () -> Version.of(null));
   }
 
   @Test

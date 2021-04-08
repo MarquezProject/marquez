@@ -1,8 +1,5 @@
 package marquez;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
@@ -25,7 +22,6 @@ public class SparkAgentIntegrationTest extends BaseIntegrationTest {
     paths.addAll(sql);
     return paths;
   }
-
 
   @ParameterizedTest
   @MethodSource("data")

@@ -1,7 +1,5 @@
 package marquez.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
@@ -18,11 +16,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.common.Utils;
 import marquez.db.DatasetVersionDao;
 import marquez.db.OpenLineageDao;
+import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.models.Dataset;
@@ -60,32 +57,35 @@ public class OpenLineageServiceTest {
     List<URI> sql =
         Files.list(Paths.get(prefix + "/sparksql")).map(Path::toUri).collect(Collectors.toList());
     return Stream.of(
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_REQUIRED_ONLY).toURI()),
-          new ExpectedResults(0, 0, 0, 0)
-        },
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_SIMPLE).toURI()),
-          new ExpectedResults(2, 1, 1, 1)
-        },
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_FULL).toURI()), new ExpectedResults(1, 1, 1, 1)
-        },
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_UNICODE).toURI()),
-          new ExpectedResults(2, 1, 1, 1)
-        },
-        new Object[] {
-          Arrays.asList(
-              Resources.getResource("open_lineage/listener/1.json").toURI(),
-              Resources.getResource("open_lineage/listener/2.json").toURI()),
-          new ExpectedResults(3, 2, 2, 1)
-        },
-        new Object[] {rdd, new ExpectedResults(1, 0, 2, 2)},
-        new Object[] {sql, new ExpectedResults(1, 0, 4, 4)},
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()), new ExpectedResults(1, 1, 1, 1)
-        }).collect(Collectors.toList());
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_REQUIRED_ONLY).toURI()),
+              new ExpectedResults(0, 0, 0, 0)
+            },
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_SIMPLE).toURI()),
+              new ExpectedResults(2, 1, 1, 1)
+            },
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_FULL).toURI()),
+              new ExpectedResults(1, 1, 1, 1)
+            },
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_UNICODE).toURI()),
+              new ExpectedResults(2, 1, 1, 1)
+            },
+            new Object[] {
+              Arrays.asList(
+                  Resources.getResource("open_lineage/listener/1.json").toURI(),
+                  Resources.getResource("open_lineage/listener/2.json").toURI()),
+              new ExpectedResults(3, 2, 2, 1)
+            },
+            new Object[] {rdd, new ExpectedResults(1, 0, 2, 2)},
+            new Object[] {sql, new ExpectedResults(1, 0, 4, 4)},
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()),
+              new ExpectedResults(1, 1, 1, 1)
+            })
+        .collect(Collectors.toList());
   }
 
   public static class ExpectedResults {
@@ -128,23 +128,25 @@ public class OpenLineageServiceTest {
     }
     return events;
   }
-  
+
   @ParameterizedTest
   @MethodSource("getData")
   public void testRunListenerInput(List<URI> uris, ExpectedResults expectedResults) {
     initEvents(uris);
-    
+
     if (expectedResults.inputDatasetCount > 0) {
       Assertions.assertEquals(
-        expectedResults.inputEventCount,
-          runInputListener.getAllValues().size(), "RunInputListener events");
+          expectedResults.inputEventCount,
+          runInputListener.getAllValues().size(),
+          "RunInputListener events");
       Assertions.assertEquals(
-        expectedResults.inputDatasetCount,
+          expectedResults.inputDatasetCount,
           runInputListener
               .getAllValues()
               .get(runInputListener.getAllValues().size() - 1)
               .getInputs()
-              .size(), "Dataset input count");
+              .size(),
+          "Dataset input count");
     }
   }
 
@@ -155,11 +157,13 @@ public class OpenLineageServiceTest {
 
     if (expectedResults.outputDatasetCount > 0) {
       Assertions.assertEquals(
-        expectedResults.outputEventCount,
-          runOutputListener.getAllValues().size(), "RunOutputListener events");
+          expectedResults.outputEventCount,
+          runOutputListener.getAllValues().size(),
+          "RunOutputListener events");
       Assertions.assertEquals(
-        expectedResults.outputDatasetCount,
-          runOutputListener.getAllValues().get(0).getOutputs().size(), "Dataset output count");
+          expectedResults.outputDatasetCount,
+          runOutputListener.getAllValues().get(0).getOutputs().size(),
+          "Dataset output count");
     }
   }
 

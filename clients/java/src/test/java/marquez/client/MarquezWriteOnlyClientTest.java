@@ -123,13 +123,12 @@ public class MarquezWriteOnlyClientTest {
   @Test
   public void testMarkRunAsNew() {
     Assertions.assertThrows(
-      IllegalArgumentException.class,
-      () -> {
-        String runId = UUID.randomUUID().toString();
-        Instant at = Instant.now();
-        client.markRunAs(runId, RunState.NEW, at);
-      }
-    );
+        IllegalArgumentException.class,
+        () -> {
+          String runId = UUID.randomUUID().toString();
+          Instant at = Instant.now();
+          client.markRunAs(runId, RunState.NEW, at);
+        });
   }
 
   @Test

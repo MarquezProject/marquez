@@ -14,11 +14,11 @@
 
 package marquez.common.base;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+
+import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("UnitTests")
 public class MorePreconditionsTest {

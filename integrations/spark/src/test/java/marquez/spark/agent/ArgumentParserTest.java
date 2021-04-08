@@ -1,16 +1,15 @@
 package marquez.spark.agent;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class ArgumentParserTest {
   public static Collection<Object[]> data() {
@@ -64,8 +63,15 @@ public class ArgumentParserTest {
 
   @ParameterizedTest
   @MethodSource("data")
-  public void testArgument(String input, String host, String version, String namespace,
-                           String jobName, String runId, boolean randomUuid, Optional<String> apiKey) {
+  public void testArgument(
+      String input,
+      String host,
+      String version,
+      String namespace,
+      String jobName,
+      String runId,
+      boolean randomUuid,
+      Optional<String> apiKey) {
     ArgumentParser parser = ArgumentParser.parse(input);
     assertEquals(host, parser.getHost());
     assertEquals(version, parser.getVersion());

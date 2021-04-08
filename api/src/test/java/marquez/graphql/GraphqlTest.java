@@ -8,10 +8,9 @@ import io.dropwizard.util.Resources;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.common.Utils;
 import marquez.db.OpenLineageDao;
+import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.OpenLineageService;
 import marquez.service.RunService;
 import marquez.service.models.LineageEvent;

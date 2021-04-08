@@ -14,10 +14,10 @@
 
 package marquez.client.models;
 
-import org.junit.jupiter.api.Test;
-
 import static marquez.client.models.ModelGenerator.newDbTableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("UnitTests")
 public class DbTableVersionTest {

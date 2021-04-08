@@ -169,25 +169,21 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_notExistsDatasetName() {
     Assertions.assertThrows(
-      Exception.class,
-      () -> client.getDataset(NAMESPACE_NAME, "not-existing")
-    );
+        Exception.class, () -> client.getDataset(NAMESPACE_NAME, "not-existing"));
   }
 
   @Test
   public void testApp_notExistsDatasetVersionName() {
     Assertions.assertThrows(
-      Exception.class,
-      () -> client.getDatasetVersion(NAMESPACE_NAME, "not-existing", UUID.randomUUID().toString())
-    );
+        Exception.class,
+        () ->
+            client.getDatasetVersion(NAMESPACE_NAME, "not-existing", UUID.randomUUID().toString()));
   }
 
   @Test
   public void testApp_notExistsNamespace() {
     Assertions.assertThrows(
-      Exception.class,
-      () -> client.getDataset("non-existing", "not-existing")
-    );
+        Exception.class, () -> client.getDataset("non-existing", "not-existing"));
   }
 
   @Test
@@ -202,9 +198,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .runId(UUID.randomUUID().toString())
             .build();
     Assertions.assertThrows(
-      Exception.class,
-      () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS)
-    );
+        Exception.class, () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
   }
 
   @Test
@@ -219,9 +213,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .runId(UUID.randomUUID().toString())
             .build();
     Assertions.assertThrows(
-      Exception.class,
-      () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS)
-    );
+        Exception.class, () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
   }
 
   @Test
