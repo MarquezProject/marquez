@@ -25,10 +25,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URL;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpGet;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class UtilsTest {
   private static final String VALUE = "test";
   private static final Object OBJECT = new Object(VALUE);

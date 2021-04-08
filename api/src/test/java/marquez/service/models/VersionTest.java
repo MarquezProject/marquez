@@ -18,19 +18,18 @@ import static java.util.UUID.fromString;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
-import marquez.UnitTests;
 import marquez.common.models.Version;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class VersionTest {
   private static final UUID ACTUAL = fromString("225adbdd-2a5d-4b5f-89b3-06a7cd47cc87");
   private static final UUID EXPECTED = fromString("225adbdd-2a5d-4b5f-89b3-06a7cd47cc87");
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testNull() {
-    Version.of(null);
+    Assertions.assertThrows(NullPointerException.class, () -> Version.of(null));
   }
 
   @Test

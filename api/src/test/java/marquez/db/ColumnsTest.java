@@ -27,18 +27,15 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import marquez.UnitTests;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.postgresql.util.PGInterval;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
+@ExtendWith(MockitoExtension.class)
 public class ColumnsTest {
-  @Rule public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock private ResultSet results;
   @Mock private Array array;
@@ -119,7 +116,7 @@ public class ColumnsTest {
   @Test
   public void testTimestampOrThrow_throw() throws SQLException {
     final String column = "with_null_timestamp";
-    when(results.getObject(Columns.CREATED_AT)).thenReturn(null);
+    when(results.getObject(column)).thenReturn(null);
 
     assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> Columns.timestampOrThrow(results, column));

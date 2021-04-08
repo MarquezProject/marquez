@@ -10,28 +10,24 @@ import io.dropwizard.util.Resources;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import marquez.IntegrationTests;
-import marquez.JdbiRuleInit;
 import marquez.common.Utils;
 import marquez.db.OpenLineageDao;
+import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.OpenLineageService;
 import marquez.service.RunService;
 import marquez.service.models.LineageEvent;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.testing.JdbiRule;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@Category({IntegrationTests.class})
+@org.junit.jupiter.api.Tag("IntegrationTests")
+@ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class LineageTest {
-  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
   private static GraphQL graphQL;
 
-  @BeforeClass
-  public static void setup() throws IOException, ExecutionException, InterruptedException {
-    Jdbi jdbi = dbRule.getJdbi();
+  @BeforeAll
+  public static void setup(Jdbi jdbi) throws IOException, ExecutionException, InterruptedException {
     GraphqlSchemaBuilder schemaBuilder = new GraphqlSchemaBuilder(jdbi);
     graphQL = GraphQL.newGraphQL(schemaBuilder.buildSchema()).build();
     OpenLineageDao openLineageDao = jdbi.onDemand(OpenLineageDao.class);
