@@ -42,7 +42,7 @@ $ python3 setup.py install
 
 ## Configuration
 
-The library depends on a _backend_. A `Backend` is configurable and lets the library know where to write dataset and job metadata.
+The library depends on a _backend_. A `Backend` is configurable and lets the library know where to write dataset, job, and run metadata.
 
 ### Backends
 
@@ -50,13 +50,13 @@ The library depends on a _backend_. A `Backend` is configurable and lets the lib
 * `FILE`: Write metadata to a file (as `json`) under `/tmp/marquez`
 * `LOG`: Simply just logs the metadata to the console
 
-By default, the `HTTP` backend will be used (see next section). To override the default backend and write metadata to a file, use `MARQUEZ_BACKEND`:
+By default, the `HTTP` backend will be used (see next sections on configuration). To override the default backend and write metadata to a file, use `MARQUEZ_BACKEND`:
 
 ```
 MARQUEZ_BACKEND=FILE
 ```
 
-> **Note:** Metadata will be written to `/tmp/marquez/client.requests.log`, but can be overridden with `MARQUEZ_FILE`.
+> **Note:** Metadata will be written to `/tmp/marquez/client.requests.log`, but the location can be overridden with `MARQUEZ_FILE`.
 
 ### `HTTP` Backend Authentication
 
@@ -64,7 +64,7 @@ The `HTTP` backend supports using API keys to authenticate requests via `Bearer`
 
 ```
 MARQUEZ_BACKEND=HTTP
-MARQUEZ_API_KEY=[API_KEY]
+MARQUEZ_API_KEY=[YOUR_API_KEY]
 ```
 
 ### `HTTP` Backend Environment Variables
@@ -123,7 +123,13 @@ To install all dependencies for _local_ development:
 $ pip3 install -e .[dev]
 ```
 
-To run the entire test suite:
+To run the entire test suite, you'll first want to initialize the Airflow database:
+
+```bash
+$ airflow initdb
+```
+
+Then, run the test suite with:
 
 ```bash
 $ pytest
