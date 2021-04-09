@@ -168,6 +168,8 @@ jobs:
   release-java:
     working_directory: ~/marquez
     machine: true
+    environment:
+      JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
     steps:
       - checkout
       - run: ./.circleci/get-jdk11.sh
