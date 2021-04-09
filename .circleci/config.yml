@@ -36,7 +36,7 @@ jobs:
           paths:
             - ~/.gradle
 
-  build-web:
+  test-web:
     working_directory: ~/marquez/web
     docker:
       - image: circleci/node:12.21.0
@@ -78,7 +78,7 @@ jobs:
           paths:
             - ~/.gradle
 
-  build-client-python:
+  test-client-python:
     working_directory: ~/marquez/clients/python
     docker:
       - image: circleci/python:3.6
@@ -89,6 +89,18 @@ jobs:
       - run: pip install --user  -r test-requirements.txt
       - run: python -m pytest --cov=marquez_python tests/
       - run: bash <(curl -s https://codecov.io/bash)
+
+  build-client-python:
+    working_directory: ~/marquez/clients/python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - *checkout_project_root
+      - run: python setup.py bdist_wheel
+      - persist_to_workspace:
+          root: python/dist/
+          paths:
+            - ./*
 
   build-integration-spark:
     working_directory: ~/marquez/integrations/spark
@@ -111,7 +123,7 @@ jobs:
           paths:
             - ~/.gradle
 
-  build-integration-airflow:
+  test-integration-airflow:
     working_directory: ~/marquez/integrations/airflow
     docker:
       - image: circleci/python:3.6
@@ -124,7 +136,19 @@ jobs:
       - run: python -m pytest --cov=marquez_python tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
-  test-integration-airflow:
+  build-integration-airflow:
+    working_directory: ~/marquez/integrations/airflow
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - *checkout_project_root
+      - run: python setup.py bdist_wheel
+      - persist_to_workspace:
+          root: python/dist/
+          paths:
+            - ./*
+
+  test-integration-test-airflow:
     working_directory: ~/marquez/integrations/airflow/
     machine: true
     steps:
@@ -133,28 +157,90 @@ jobs:
       - run: docker build -f Dockerfile.tests -t marquez-airflow-base .
       - run: ./tests/integration/docker/up.sh
 
-  release:
+  release-java:
     <<: *machine
     steps:
       - checkout
+      - run: ./.circleci/get-jdk11.sh
+      - run: ./gradlew --no-daemon -x test :api:release -Prelease.useAutomaticVersion=true
+      - run: ./gradlew --no-daemon -x test :clients:java:release -Prelease.useAutomaticVersion=true
+      - run: ./gradlew --no-daemon -x test :integrations:spark:release -Prelease.useAutomaticVersion=true
+      - run: ./gradlew publish
+
+
+  release-docker:
+    <<: *machine
+    steps:
+      - checkout
+      - run: ./.circleci/get-jdk11.sh
+      - run: ./.circleci/replace-gradle-version.sh $CIRCLE_TAG gradle.properties api/gradle.properties
       - run: ./docker/login.sh
       - run: ./docker/build-and-push.sh $CIRCLE_TAG
+
+  release-python:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: ls -la /tmp/workspace
+      - run: pip install wheel twine
+      - run: python -m twine upload --non-interactive --repository pypi /tmp/workspace/python/*
 
 workflows:
   marquez:
     jobs:
       - build-api
-      - build-web
+      - test-web
       - build-client-java
-      - build-client-python
       - build-integration-spark
-      - build-integration-airflow
-      - test-integration-airflow:
+      - test-client-python
+      - build-client-python:
           requires:
-            - build-integration-airflow
-      - release:
+            - test-client-python
           filters:
             tags:
               only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
             branches:
               ignore: /.*/
+      - test-integration-airflow
+      - build-integration-airflow:
+          filters:
+            tags:
+              only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
+            branches:
+              ignore: /.*/
+          requires:
+            - test-integration-airflow
+      - test-integration-test-airflow:
+          requires:
+            - test-integration-airflow
+      - release-java:
+          filters:
+            tags:
+              only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
+            branches:
+              ignore: /.*/
+          requires:
+            - build-api
+            - build-client-java
+            - build-integration-spark
+      - release-python:
+          filters:
+            tags:
+              only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
+            branches:
+              ignore: /.*/
+          requires:
+            - build-client-python
+            - build-integration-airflow
+      - release-docker:
+          filters:
+            tags:
+              only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
+            branches:
+              ignore: /.*/
+          requires:
+            - test-web
+            - build-api
