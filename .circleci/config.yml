@@ -1,18 +1,23 @@
 version: 2.1
 
 # Define reusable config (see: https://yaml.org/spec/1.2/spec.html#id2765878)
-machine: &machine
-  working_directory: ~/marquez
-  machine: true
-
 checkout_project_root: &checkout_project_root
   # Override checkout path to project root (see: https://circleci.com/docs/2.0/configuration-reference/#checkout)
   checkout:
     path: ~/marquez
 
+# Only trigger CI job on release (=X.Y.Z)
+only-on-release: &only-on-release
+  filters:
+    tags:
+      only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
+    branches:
+      ignore: /.*/
+
 jobs:
   build-api:
-    <<: *machine
+    working_directory: ~/marquez
+    machine: true
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
     steps:
@@ -27,9 +32,9 @@ jobs:
       - run: ./gradlew --no-daemon api:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
-          path: build/test-results/test
+          path: api/build/test-results/test
       - store_artifacts:
-          path: build/reports/tests/test
+          path: api/build/reports/tests/test
           destination: test-report
       - save_cache:
           key: v1-api-{{ .Branch }}-{{ .Revision }}
@@ -69,9 +74,9 @@ jobs:
       - run: ./gradlew --no-daemon clients:java:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
-          path: build/test-results/test
+          path: client/java/build/test-results/test
       - store_artifacts:
-          path: build/reports/tests/test
+          path: client/java/build/reports/tests/test
           destination: test-report
       - save_cache:
           key: v1-client-java-{{ .Branch }}-{{ .Revision }}
@@ -117,6 +122,9 @@ jobs:
           command: cat integrations/spark/build/test-results/test/TEST-*.xml
       - store_test_results:
           path: integrations/spark/build/test-results/test
+      - store_artifacts:
+          path: integrations/spark/build/reports/tests/test
+          destination: test-report
       - save_cache:
           key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
           paths:
@@ -148,7 +156,7 @@ jobs:
             - ./*
 
   integration-test-airflow:
-    working_directory: ~/marquez/integrations/airflow/
+    working_directory: ~/marquez/integrations/airflow
     machine: true
     steps:
       - *checkout_project_root
@@ -157,7 +165,8 @@ jobs:
       - run: ./tests/integration/docker/up.sh
 
   release-java:
-    <<: *machine
+    working_directory: ~/marquez
+    machine: true
     steps:
       - checkout
       - run: ./.circleci/get-jdk11.sh
@@ -168,7 +177,8 @@ jobs:
 
 
   release-docker:
-    <<: *machine
+    working_directory: ~/marquez
+    machine: true
     steps:
       - checkout
       - run: ./.circleci/get-jdk11.sh
@@ -177,13 +187,13 @@ jobs:
       - run: ./docker/build-and-push.sh $CIRCLE_TAG
 
   release-python:
+    working_directory: ~/marquez
     docker:
       - image: circleci/python:3.6
     steps:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
-      - run: ls -la /tmp/workspace
       - run: pip install wheel twine
       - run: python -m twine upload --non-interactive --repository pypi /tmp/workspace/python/*
 
@@ -196,40 +206,16 @@ workflows:
       - build-integration-spark
       - test-client-python
       - build-client-python:
-          requires:
-            - test-client-python
-          filters:
-            tags:
-              only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
-            branches:
-              ignore: /.*/
+          <<: *only-on-release
       - test-integration-airflow
+      - integration-test-airflow:
+          requires:
+            - test-integration-airflow
       - build-integration-airflow:
-          filters:
-            tags:
-              only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
-            branches:
-              ignore: /.*/
-          requires:
-            - test-integration-airflow
-      - test-integration-airflow:
-          requires:
-            - test-integration-airflow
+          <<: *only-on-release
       - release-java:
-          filters:
-            tags:
-              only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
-            branches:
-              ignore: /.*/
+          <<: *only-on-release
       - release-python:
-          filters:
-            tags:
-              only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
-            branches:
-              ignore: /.*/
+          <<: *only-on-release
       - release-docker:
-          filters:
-            tags:
-              only: /^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$/
-            branches:
-              ignore: /.*/
+          <<: *only-on-release
