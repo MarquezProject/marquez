@@ -32,9 +32,9 @@ jobs:
       - run: ./gradlew --no-daemon api:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
-          path: api/build/test-results/test
+          path: build/test-results/test
       - store_artifacts:
-          path: api/build/reports/tests/test
+          path: build/reports/tests/test
           destination: test-report
       - save_cache:
           key: v1-api-{{ .Branch }}-{{ .Revision }}
@@ -74,9 +74,9 @@ jobs:
       - run: ./gradlew --no-daemon clients:java:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
-          path: client/java/build/test-results/test
+          path: build/test-results/test
       - store_artifacts:
-          path: client/java/build/reports/tests/test
+          path: build/reports/tests/test
           destination: test-report
       - save_cache:
           key: v1-client-java-{{ .Branch }}-{{ .Revision }}
@@ -121,9 +121,9 @@ jobs:
           when: on_fail
           command: cat integrations/spark/build/test-results/test/TEST-*.xml
       - store_test_results:
-          path: integrations/spark/build/test-results/test
+          path: build/test-results/test
       - store_artifacts:
-          path: integrations/spark/build/reports/tests/test
+          path: build/reports/tests/test
           destination: test-report
       - save_cache:
           key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
