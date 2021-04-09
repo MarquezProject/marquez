@@ -168,12 +168,11 @@ jobs:
   release-java:
     working_directory: ~/marquez
     machine: true
+    environment:
+      JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
     steps:
       - checkout
       - run: ./.circleci/get-jdk11.sh
-      - run: ./gradlew --no-daemon -x test :api:release -Prelease.useAutomaticVersion=true
-      - run: ./gradlew --no-daemon -x test :clients:java:release -Prelease.useAutomaticVersion=true
-      - run: ./gradlew --no-daemon -x test :integrations:spark:release -Prelease.useAutomaticVersion=true
       - run: ./gradlew publish
 
 
@@ -182,8 +181,6 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: ./.circleci/get-jdk11.sh
-      - run: ./.circleci/replace-gradle-version.sh $CIRCLE_TAG gradle.properties api/gradle.properties
       - run: ./docker/login.sh
       - run: ./docker/build-and-push.sh $CIRCLE_TAG
 

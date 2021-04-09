@@ -22,7 +22,6 @@ buildscript {
         classpath 'com.adarshr:gradle-test-logger-plugin:2.1.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
         classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.11.0'
-        classpath 'net.researchgate:gradle-release:2.8.1'
     }
 }
 
@@ -39,7 +38,6 @@ subprojects {
     apply plugin: 'com.adarshr.test-logger'
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: "com.diffplug.spotless"
-    apply plugin: 'net.researchgate.release'
 
     compileTestJava.doFirst {
         if (project.hasProperty("jdk8.build") && System.getenv("JDK8_HOME")) {
@@ -65,7 +63,6 @@ subprojects {
     ext {
         lombokVersion = '1.18.18'
         slf4jVersion = '1.7.30'
-        isReleaseVersion = !version.endsWith("SNAPSHOT")
     }
 
     compileJava {
@@ -104,12 +101,6 @@ subprojects {
     task javadocJar(type: Jar, dependsOn: javadoc) {
         classifier 'javadoc'
         from javadoc.destinationDir
-    }
-
-    release {
-        git {
-            requireBranch = 'release-automation'
-        }
     }
 
     spotless {
