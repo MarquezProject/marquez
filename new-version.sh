@@ -77,7 +77,7 @@ sed -i "" "s/version=.*/version=${RELEASE_VERSION}/g" gradle.properties
 git commit -am "Prepare for release ${RELEASE_VERSION}"
 
 # (4) Prepare release tag
-git fetch --all --tags > /dev/null 2>&1
+git fetch --all --tags
 git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
 # (5) Prepare next development version
