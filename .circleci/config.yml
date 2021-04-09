@@ -32,7 +32,7 @@ jobs:
       - run: ./gradlew --no-daemon api:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
-          path: build/test-results/test
+          path: api/build/test-results/test
       - store_artifacts:
           path: build/reports/tests/test
           destination: test-report
@@ -74,7 +74,7 @@ jobs:
       - run: ./gradlew --no-daemon clients:java:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
-          path: build/test-results/test
+          path: clients/java/build/test-results/test
       - store_artifacts:
           path: build/reports/tests/test
           destination: test-report
@@ -120,8 +120,9 @@ jobs:
       - run:
           when: on_fail
           command: cat integrations/spark/build/test-results/test/TEST-*.xml
+      - run: ./gradlew --no-daemon :integrations:spark:jacocoTestReport
       - store_test_results:
-          path: build/test-results/test
+          path: integrations/spark/build/test-results/test
       - store_artifacts:
           path: build/reports/tests/test
           destination: test-report
