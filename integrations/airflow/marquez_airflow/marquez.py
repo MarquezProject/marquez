@@ -1,6 +1,5 @@
 import os
 import logging
-import uuid
 from typing import Optional, Dict, Type
 
 from marquez_airflow.extractors import Dataset, StepMetadata
