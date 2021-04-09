@@ -36,7 +36,7 @@ jobs:
           paths:
             - ~/.gradle
 
-  build-web:
+  test-web:
     working_directory: ~/marquez/web
     docker:
       - image: circleci/node:12.21.0
@@ -96,11 +96,9 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - *checkout_project_root
-      - run: pip install wheel bump2version
-      - run: bash -c '(cd ../../ &&  ./.circleci/bump-python-version.sh $CIRCLE_TAG)'
       - run: python setup.py bdist_wheel
       - persist_to_workspace:
-          root: dist/
+          root: python/dist/
           paths:
             - ./*
 
@@ -144,11 +142,9 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - *checkout_project_root
-      - run: pip install wheel bump2version
-      - run: bash -c '(cd ../../ &&  ./.circleci/bump-python-version.sh $CIRCLE_TAG)'
       - run: python setup.py bdist_wheel
       - persist_to_workspace:
-          root: dist/
+          root: python/dist/
           paths:
             - ./*
 
@@ -166,9 +162,9 @@ jobs:
     steps:
       - checkout
       - run: ./.circleci/get-jdk11.sh
-      - run: ./gradlew --no-daemon -x test :api:release -Prelease.useAutomaticVersion=true -Prelease.releaseVersion=$CIRCLE_TAG
-      - run: ./gradlew --no-daemon -x test :clients:java:release -Prelease.useAutomaticVersion=true -Prelease.releaseVersion=$CIRCLE_TAG
-      - run: ./gradlew --no-daemon -x test :integrations:spark:release -Prelease.useAutomaticVersion=true -Prelease.releaseVersion=$CIRCLE_TAG
+      - run: ./gradlew --no-daemon -x test :api:release -Prelease.useAutomaticVersion=true
+      - run: ./gradlew --no-daemon -x test :clients:java:release -Prelease.useAutomaticVersion=true
+      - run: ./gradlew --no-daemon -x test :integrations:spark:release -Prelease.useAutomaticVersion=true
       - run: ./gradlew publish
 
 
@@ -190,13 +186,13 @@ jobs:
           at: /tmp/workspace
       - run: ls -la /tmp/workspace
       - run: pip install wheel twine
-      - run: python -m twine upload --non-interactive --repository pypi /tmp/workspace/*
+      - run: python -m twine upload --non-interactive --repository pypi /tmp/workspace/python/*
 
 workflows:
   marquez:
     jobs:
       - build-api
-      - build-web
+      - test-web
       - build-client-java
       - build-integration-spark
       - test-client-python
@@ -246,5 +242,5 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - build-web
+            - test-web
             - build-api

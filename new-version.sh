@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./bump-python-version.sh <type>
+# Usage: $ ./new-version.sh <VERSION>
 
 set -e
 
@@ -27,13 +27,6 @@ if [[ ! $(type -P bump2version) ]]; then
  exit 1
 fi
 
-branch=$(git symbolic-ref --short HEAD)
-if [[ "${branch}" != "main" ]]; then
-  echo "Error: You may only release on 'main'!"
-  exit 1;
-fi
-
-type=${1}
 if [[ -z "${type}" ]]; then
   # Default to 'patch'
   type="patch"
@@ -41,11 +34,14 @@ fi
 
 
 # get new version tag from CI
-if [[ -z "${CIRCLE_TAG}" ]]; then
+if [[ -n "$1" ]]; then
   # Default to current tag
-  NEW_VERSION=$(git describe --tags --abbrev=0)
-else
+  NEW_VERSION=$1
+elif [[ -n ${CIRCLE_TAG} ]]; then
   NEW_VERSION=${CIRCLE_TAG}
+else
+  echo "Version not passed to script. Use ./new-version.sh VERSION"
+  exit 1
 fi
 
 # Bump marquez_client version
@@ -70,5 +66,17 @@ bump2version \
   --no-tag \
   --allow-dirty \
   "${type}" ./integrations/airflow/marquez_airflow/version.py
+
+
+GRADLE_PROPS=(
+  gradle.properties
+  api/gradle.properties
+  integrations/spark/gradle.properties
+)
+
+for FILE in "${GRADLE_PROPS[@]}"
+do
+  sed -i 's/\(^version=.*$\)/version='"${NEW_VERSION}"'/g' "$FILE"
+done
 
 echo "DONE!"
