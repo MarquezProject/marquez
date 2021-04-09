@@ -24,9 +24,9 @@ usage() {
   exit 1
 }
 
-readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?(-SNAPSHOT)?$" # X.Y.Z
-                                                                        # X.Y.Z-rc.*
-                                                                        # X.Y.Z-SNAPSHOT
+readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}((-rc\.[0-9]+)?|(-SNAPSHOT)?)$" # X.Y.Z
+                                                                           # X.Y.Z-rc.*
+                                                                           # X.Y.Z-SNAPSHOT
 
 # Change working directory to project root
 project_root=$(git rev-parse --show-toplevel)
