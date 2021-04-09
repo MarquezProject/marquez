@@ -19,7 +19,16 @@
 
 set -e
 
-# PYTHON
+usage() {
+  echo "usage: ./$(basename -- ${0}) VERSION"
+  exit 1
+}
+
+readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}(-rc\.[0-9]+)?$" # X.Y.Z-rc.*
+
+# Change working directory to project root
+project_root=$(git rev-parse --show-toplevel)
+cd "${project_root}"
 
 # Verify bump2version is installed
 if [[ ! $(type -P bump2version) ]]; then
@@ -27,56 +36,31 @@ if [[ ! $(type -P bump2version) ]]; then
  exit 1
 fi
 
-if [[ -z "${type}" ]]; then
-  # Default to 'patch'
-  type="patch"
+branch=$(git symbolic-ref --short HEAD)
+if [[ "${branch}" != "main" ]]; then
+  echo "Error: You may only release on 'main'!"
+  exit 1;
 fi
 
+if [[ $# -eq 0 ]] ; then
+  usage
+fi
 
-# get new version tag from CI
-if [[ -n "$1" ]]; then
-  # Default to current tag
-  NEW_VERSION=$1
-elif [[ -n ${CIRCLE_TAG} ]]; then
-  NEW_VERSION=${CIRCLE_TAG}
-else
-  echo "Version not passed to script. Use ./new-version.sh VERSION"
+NEW_VERSION="${1}"
+
+# Ensure valid version
+if [[ ! "${NEW_VERSION}" =~ ${SEMVER_REGEX} ]]; then
+  echo "Error: Version '${NEW_VERSION}' must match '${SEMVER_REGEX}'"
   exit 1
 fi
 
-# Bump marquez_client version
-VERSION=$(python ./clients/python/setup.py --version)
-bump2version \
-  --config-file ./clients/python/setup.cfg \
-  --current-version "${VERSION}" \
-  --new-version "${NEW_VERSION}" \
-  --no-commit \
-  --no-tag \
-  --allow-dirty \
-  "${type}" ./clients/python/marquez_client/version.py
-
-
-# Bump marquez_airflow version
-VERSION=$(python ./integrations/airflow/setup.py --version)
-bump2version \
-  --config-file ./integrations/airflow/setup.cfg \
-  --current-version "${VERSION}" \
-  --new-version "${NEW_VERSION}" \
-  --no-commit \
-  --no-tag \
-  --allow-dirty \
-  "${type}" ./integrations/airflow/marquez_airflow/version.py
-
-
-GRADLE_PROPS=(
-  gradle.properties
-  api/gradle.properties
-  integrations/spark/gradle.properties
-)
-
-for FILE in "${GRADLE_PROPS[@]}"
-do
-  sed -i 's/\(^version=.*$\)/version='"${NEW_VERSION}"'/g' "$FILE"
+# Bump python module versions
+PYTHON_MODULES=(clients/python/ integrations/airflow/)
+for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
+ (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${NEW_VERSION}" --allow-dirty)
 done
+
+# Bump java module versions
+sed -i "" "s/version=.*/version=${NEW_VERSION}/g" gradle.properties
 
 echo "DONE!"
