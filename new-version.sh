@@ -19,12 +19,12 @@
 #   * You're on the 'main' branch
 #   * You've installed 'bump2version'
 #
-# Usage: $ ./new-version.sh <NEW_VERSION> <NEXT_VERSION>
+# Usage: $ ./new-version.sh <RELEASE_VERSION> <NEXT_VERSION>
 
 set -e
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) <NEW_VERSION> <NEXT_VERSION>"
+  echo "usage: ./$(basename -- ${0}) <RELEASE_VERSION> <NEXT_VERSION>"
   exit 1
 }
 
@@ -52,11 +52,11 @@ if [[ $# -eq 0 ]] ; then
   usage
 fi
 
-NEW_VERSION="${1}"
+RELEASE_VERSION="${1}"
 NEXT_VERSION="${2}"
 
 # Ensure valid versions
-VERSIONS=($NEW_VERSION $NEXT_VERSION)
+VERSIONS=($RELEASE_VERSION $NEXT_VERSION)
 for VERSION in "${VERSIONS[@]}"; do
   if [[ ! "${VERSION}" =~ ${SEMVER_REGEX} ]]; then
     echo "Error: Version '${VERSION}' must match '${SEMVER_REGEX}'"
@@ -67,18 +67,18 @@ done
 # (1) Bump python module versions
 PYTHON_MODULES=(clients/python/ integrations/airflow/)
 for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
-  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${NEW_VERSION}")
+  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${RELEASE_VERSION}")
 done
 
 # (2) Bump java module versions
-sed -i "" "s/version=.*/version=${NEW_VERSION}/g" gradle.properties
+sed -i "" "s/version=.*/version=${RELEASE_VERSION}/g" gradle.properties
 
 # (3) Prepare release commit
-git commit -am "Prepare for release ${NEW_VERSION}"
+git commit -am "Prepare for release ${RELEASE_VERSION}"
 
 # (4) Prepare release tag
 git fetch --all --tags > /dev/null 2>&1
-git tag -a "${NEW_VERSION}" -m "marquez ${NEW_VERSION}"
+git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
 # (5) Prepare next development version
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
@@ -87,6 +87,6 @@ sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 git commit -am "Prepare next development version"
 
 # (7) Push commits and tag
-git push origin main && git push origin "${NEW_VERSION}"
+git push origin main && git push origin "${RELEASE_VERSION}"
 
 echo "DONE!"
