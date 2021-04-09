@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# Requirements:
+#   * You're on the 'main' branch
+#   * You've installed 'bump2version'
+#
 # Usage: $ ./new-version.sh <NEW_VERSION> <NEXT_VERSION>
 
 set -e
