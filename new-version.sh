@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./release.sh <type>
+# Usage: $ ./new-version.sh <VERSION>
 
 set -e
 
@@ -27,16 +27,21 @@ if [[ ! $(type -P bump2version) ]]; then
  exit 1
 fi
 
-branch=$(git symbolic-ref --short HEAD)
-if [[ "${branch}" != "main" ]]; then
-  echo "Error: You may only release on 'main'!"
-  exit 1;
-fi
-
-type=${1}
 if [[ -z "${type}" ]]; then
   # Default to 'patch'
   type="patch"
+fi
+
+
+# get new version tag from CI
+if [[ -n "$1" ]]; then
+  # Default to current tag
+  NEW_VERSION=$1
+elif [[ -n ${CIRCLE_TAG} ]]; then
+  NEW_VERSION=${CIRCLE_TAG}
+else
+  echo "Version not passed to script. Use ./new-version.sh VERSION"
+  exit 1
 fi
 
 # Bump marquez_client version
@@ -44,6 +49,7 @@ VERSION=$(python ./clients/python/setup.py --version)
 bump2version \
   --config-file ./clients/python/setup.cfg \
   --current-version "${VERSION}" \
+  --new-version "${NEW_VERSION}" \
   --no-commit \
   --no-tag \
   --allow-dirty \
@@ -55,13 +61,22 @@ VERSION=$(python ./integrations/airflow/setup.py --version)
 bump2version \
   --config-file ./integrations/airflow/setup.cfg \
   --current-version "${VERSION}" \
+  --new-version "${NEW_VERSION}" \
   --no-commit \
   --no-tag \
   --allow-dirty \
   "${type}" ./integrations/airflow/marquez_airflow/version.py
 
-# JVM
 
-./gradlew release
+GRADLE_PROPS=(
+  gradle.properties
+  api/gradle.properties
+  integrations/spark/gradle.properties
+)
+
+for FILE in "${GRADLE_PROPS[@]}"
+do
+  sed -i 's/\(^version=.*$\)/version='"${NEW_VERSION}"'/g' "$FILE"
+done
 
 echo "DONE!"
