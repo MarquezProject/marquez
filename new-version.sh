@@ -15,12 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./new-version.sh <VERSION>
+# Usage: $ ./new-version.sh <NEW_VERSION> <NEXT_VERSION>
 
 set -e
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) NEW_VERSION NEXT_VERSION"
+  echo "usage: ./$(basename -- ${0}) <NEW_VERSION> <NEXT_VERSION>"
   exit 1
 }
 
