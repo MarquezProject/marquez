@@ -147,7 +147,7 @@ jobs:
           paths:
             - ./*
 
-  test-integration-test-airflow:
+  integration-test-airflow:
     working_directory: ~/marquez/integrations/airflow/
     machine: true
     steps:
@@ -212,7 +212,7 @@ workflows:
               ignore: /.*/
           requires:
             - test-integration-airflow
-      - test-integration-test-airflow:
+      - test-integration-airflow:
           requires:
             - test-integration-airflow
       - release-java:
