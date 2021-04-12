@@ -24,13 +24,23 @@
 set -e
 
 usage() {
-  echo "usage: ./$(basename -- "${0}") --release-version RELEASE_VERSION --next-version NEXT_VERSION"
+  echo "Usage: ./$(basename -- "${0}") --release-version RELEASE_VERSION --next-version NEXT_VERSION"
   echo ""
-  echo "a script used to release Marquez"
+  echo "A script used to release Marquez"
   echo ""
-  echo "arguments:"
-  echo "  --release-version RELEASE_VERSION       the release version (ex: X.Y.Z, X.Y.Z-rc.*)"
-  echo "  --next-version NEXT_VERSION             the next version (ex: X.Y.Z, X.Y.Z-SNAPSHOT)"
+  echo "Examples:"
+  echo "  # Bump version ('-SNAPSHOT' will automatically be appended to '0.0.2')"
+  echo "  ./new-version.sh -r 0.0.1 -n 0.0.2"
+  echo ""
+  echo "  # Bump version (with '-SNAPSHOT' already appended to '0.0.2')"
+  echo "  ./new-version.sh -r 0.0.1 -n 0.0.2-SNAPSHOT"
+  echo ""
+  echo "  # Bump release candidate"
+  echo "  $ ./new-version.sh -r 0.0.1-rc.1 -n 0.0.2-rc.2"
+  echo ""
+  echo "Arguments:"
+  echo "  -r, --release-version string       the release version (ex: X.Y.Z, X.Y.Z-rc.*)"
+  echo "  -n, --next-version string          the next version (ex: X.Y.Z, X.Y.Z-SNAPSHOT)"
   exit 1
 }
 
