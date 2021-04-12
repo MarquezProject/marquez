@@ -56,8 +56,8 @@ RELEASE_VERSION="${1}"
 NEXT_VERSION="${2}"
 
 # Append '-SNAPSHOT' to 'NEXT_VERSION' if not a release candidate, or missing
-if [[ ! "${NEXT_VERSION}" = *-rc.? &&
-      ! "${NEXT_VERSION}" = *-SNAPSHOT ]]; then
+if [[ ! "${NEXT_VERSION}" == *-rc.? &&
+      ! "${NEXT_VERSION}" == *-SNAPSHOT ]]; then
   NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
 fi
 
