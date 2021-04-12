@@ -55,6 +55,12 @@ fi
 RELEASE_VERSION="${1}"
 NEXT_VERSION="${2}"
 
+# Append '-SNAPSHOT' to 'NEXT_VERSION' if not a release candidate, or missing
+if [[ ! "${NEXT_VERSION}" = *-rc.? &&
+      ! "${NEXT_VERSION}" = *-SNAPSHOT ]]; then
+  NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
+fi
+
 # Ensure valid versions
 VERSIONS=($RELEASE_VERSION $NEXT_VERSION)
 for VERSION in "${VERSIONS[@]}"; do
@@ -76,7 +82,7 @@ sed -i "" "s/version=.*/version=${RELEASE_VERSION}/g" gradle.properties
 # (3) Prepare release commit
 git commit -am "Prepare for release ${RELEASE_VERSION}"
 
-# (4) Prepare release tag
+# (4) Pull latest tags, then prepare release tag
 git fetch --all --tags
 git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
