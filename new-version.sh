@@ -19,12 +19,18 @@
 #   * You're on the 'main' branch
 #   * You've installed 'bump2version'
 #
-# Usage: $ ./new-version.sh <RELEASE_VERSION> <NEXT_VERSION>
+# Usage: $ ./new-version.sh --release-version RELEASE_VERSION --next-version NEXT_VERSION
 
 set -e
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) <RELEASE_VERSION> <NEXT_VERSION>"
+  echo "usage: ./$(basename -- "${0}") --release-version RELEASE_VERSION --next-version NEXT_VERSION"
+  echo ""
+  echo "a script used to release Marquez"
+  echo ""
+  echo "arguments:"
+  echo "  --release-version RELEASE_VERSION       the release version (ex: X.Y.Z, X.Y.Z-rc.*)"
+  echo "  --next-version NEXT_VERSION             the next version (ex: X.Y.Z, X.Y.Z-SNAPSHOT)"
   exit 1
 }
 
@@ -44,7 +50,7 @@ fi
 
 branch=$(git symbolic-ref --short HEAD)
 if [[ "${branch}" != "main" ]]; then
-  echo "Error: You may only release on 'main'!"
+  echo "error: you may only release on 'main'!"
   exit 1;
 fi
 
@@ -52,8 +58,24 @@ if [[ $# -eq 0 ]] ; then
   usage
 fi
 
-RELEASE_VERSION="${1}"
-NEXT_VERSION="${2}"
+while [ $# -gt 0 ]; do
+  case $1 in
+    '--release-version'|-r)
+       shift
+       RELEASE_VERSION="${1}"
+       ;;
+    '--next-version'|-n)
+       shift
+       NEXT_VERSION="${1}"
+       ;;
+    '--help'|-h)
+       usage
+       ;;
+    *) exit 1
+       ;;
+  esac
+  shift
+done
 
 # Append '-SNAPSHOT' to 'NEXT_VERSION' if not a release candidate, or missing
 if [[ ! "${NEXT_VERSION}" == *-rc.? &&
