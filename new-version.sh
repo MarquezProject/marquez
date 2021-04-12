@@ -30,10 +30,10 @@ usage() {
   echo
   echo "Examples:"
   echo "  # Bump version ('-SNAPSHOT' will automatically be appended to '0.0.2')"
-  echo "  ./new-version.sh -r 0.0.1 -n 0.0.2"
+  echo "  $ ./new-version.sh -r 0.0.1 -n 0.0.2"
   echo
   echo "  # Bump version (with '-SNAPSHOT' already appended to '0.0.2')"
-  echo "  ./new-version.sh -r 0.0.1 -n 0.0.2-SNAPSHOT"
+  echo "  $ ./new-version.sh -r 0.0.1 -n 0.0.2-SNAPSHOT"
   echo
   echo "  # Bump release candidate"
   echo "  $ ./new-version.sh -r 0.0.1-rc.1 -n 0.0.2-rc.2"
