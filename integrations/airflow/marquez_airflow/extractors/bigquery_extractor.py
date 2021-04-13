@@ -40,8 +40,7 @@ from marquez_airflow.utils import (
 # Required to pass marquez server validation.
 from openlineage.facet import BaseFacet
 
-_BIGQUERY_CONN_URL = \
-    'jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443'
+_BIGQUERY_CONN_URL = 'bigquery://https://www.googleapis.com/bigquery/v2:443'
 
 log = logging.getLogger(__name__)
 
@@ -58,8 +57,12 @@ def get_from_nullable_chain(source: Mapping[str, Any], chain: List[str]) -> Opti
 
 @attr.s
 class BigQueryErrorRunFacet(BaseFacet):
+    """
+    Represents errors that can happen during execution of BigqueryExtractor
+    :param clientError: represents errors originating in bigquery client
+    :param parserError: represents errors that happened during parsing SQL provided to bigquery
+    """
     clientError: str = attr.ib(default=None)
-    schemaError: str = attr.ib(default=None)
     parserError: str = attr.ib(default=None)
 
     @staticmethod
@@ -69,6 +72,14 @@ class BigQueryErrorRunFacet(BaseFacet):
 
 @attr.s
 class BigQueryStaticticsRunFacet(BaseFacet):
+    """
+    Facet that represents relevant statistics of bigquery run.
+    :param cached: bigquery caches query results. Rest of the statistics will not be provided
+        for cached queries.
+    :param outputRows: how many rows query produced.
+    :param billedBytes: how many bytes bigquery bills for.
+    :param properties: full property tree of bigquery run.
+    """
     cached: bool = attr.ib()
     outputRows: int = attr.ib(default=None)
     billedBytes: int = attr.ib(default=None)
@@ -81,6 +92,7 @@ class BigQueryStaticticsRunFacet(BaseFacet):
 
 @attr.s
 class SqlContext:
+    """Internal SQL context for holding query parser results"""
     sql: str = attr.ib()
     inputs: Optional[str] = attr.ib(default=None)
     outputs: Optional[str] = attr.ib(default=None)
