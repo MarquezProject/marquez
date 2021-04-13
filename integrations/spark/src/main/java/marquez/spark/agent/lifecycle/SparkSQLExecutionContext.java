@@ -112,8 +112,10 @@ public class SparkSQLExecutionContext implements ExecutionContext {
       log.info("No execution info {}", queryExecution);
       return;
     }
-    log.debug("Traversing logical plan {}", queryExecution.logical().toJSON());
-    log.debug("Physical plan executed {}", queryExecution.executedPlan().toJSON());
+    if (log.isDebugEnabled()) {
+      log.debug("Traversing logical plan {}", queryExecution.logical().toJSON());
+      log.debug("Physical plan executed {}", queryExecution.executedPlan().toJSON());
+    }
     List<Dataset> outputDatasets =
         PlanUtils.applyFirst(outputDatasetSupplier, queryExecution.logical());
     List<Dataset> inputDatasets =
