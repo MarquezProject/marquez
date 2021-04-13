@@ -5,29 +5,28 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.io.IOException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
-@Category(UnitTests.class)
-@RunWith(MockitoJUnitRunner.class)
+@org.junit.jupiter.api.Tag("UnitTests")
+@ExtendWith(MockitoExtension.class)
 public class LoggingBackendTest {
 
   @Mock Logger logger;
 
   private LoggingBackend loggingBackend;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     loggingBackend = new LoggingBackend(logger);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     verifyNoMoreInteractions(logger);
   }

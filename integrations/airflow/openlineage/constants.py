@@ -9,3 +9,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+DEFAULT_TIMEOUT_MS = 10000
+DEFAULT_NAMESPACE_NAME = 'default'
+DEFAULT_MARQUEZ_BACKEND = 'http'
+DEFAULT_MARQUEZ_URL = 'http://localhost:5000'
+DEFAULT_PRODUCER = "marquez-airflow"  # TODO: mechanism for setting producer

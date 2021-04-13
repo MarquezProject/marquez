@@ -84,15 +84,14 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.StreamVersion;
 import marquez.client.models.Tag;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
+@ExtendWith(MockitoExtension.class)
 public class MarquezClientTest {
   // COMMON
   private static final Instant CREATED_AT = newTimestamp();
@@ -334,13 +333,11 @@ public class MarquezClientTest {
           STREAM_DESCRIPTION,
           CREATED_BY_RUN);
 
-  @Rule public final MockitoRule rule = MockitoJUnit.rule();
-
   private final MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;
   private MarquezClient client;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     client = new MarquezClient(marquezUrl, http);
   }

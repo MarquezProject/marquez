@@ -34,10 +34,9 @@ import marquez.client.models.SourceMeta;
 import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-@Category(IntegrationTests.class)
+@org.junit.jupiter.api.Tag("IntegrationTests")
 public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
   @Test

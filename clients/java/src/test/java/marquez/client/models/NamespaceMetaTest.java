@@ -17,11 +17,9 @@ package marquez.client.models;
 import static marquez.client.models.ModelGenerator.newNamespaceMeta;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import marquez.client.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class NamespaceMetaTest {
   private static final NamespaceMeta META = newNamespaceMeta();
   private static final String JSON = JsonGenerator.newJsonFor(META);

@@ -50,15 +50,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
+@ExtendWith(MockitoExtension.class)
 public class MarquezHttpTest {
   private static final String BASE_URL_STRING = "http://localhost:8080";
   private static final URL BASE_URL = Utils.toUrl(BASE_URL_STRING);
@@ -72,8 +71,6 @@ public class MarquezHttpTest {
   // Http Auth
   private static final String API_KEY = "PuRx8GT3huSXlheDIRUK1YUatGpLVEuL";
 
-  @Rule public final MockitoRule rule = MockitoJUnit.rule();
-
   @Mock private HttpClient httpClient;
   @Mock private CloseableHttpClient closeableHttpClient;
   @Mock private HttpResponse httpResponse;
@@ -82,7 +79,7 @@ public class MarquezHttpTest {
   private MarquezUrl marquezUrl;
   private MarquezHttp marquezHttp;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     marquezUrl = new MarquezUrl(BASE_URL);
     marquezHttp = new MarquezHttp(httpClient, null);
