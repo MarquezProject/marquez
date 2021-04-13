@@ -40,7 +40,7 @@ from marquez_airflow.utils import (
 # Required to pass marquez server validation.
 from openlineage.facet import BaseFacet
 
-_BIGQUERY_CONN_URL = 'bigquery://https://www.googleapis.com/bigquery/v2:443'
+_BIGQUERY_CONN_URL = 'bigquery:{}'
 
 log = logging.getLogger(__name__)
 
@@ -105,12 +105,12 @@ class BigQueryExtractor(BaseExtractor):
     def __init__(self, operator: BigQueryOperator):
         super().__init__(operator)
 
-    def _source(self) -> Source:
+    def _source(self, bq_table) -> Source:
         conn_id = self.operator.bigquery_conn_id
         return Source(
             type="BIGQUERY",
             name=conn_id,
-            connection_url=_BIGQUERY_CONN_URL)
+            connection_url=_BIGQUERY_CONN_URL.format(self._bq_table_name(bq_table)))
 
     def extract(self) -> StepMetadata:
         return None
@@ -124,7 +124,6 @@ class BigQueryExtractor(BaseExtractor):
     def extract_on_complete(self, task_instance) -> StepMetadata:
         log.debug(f"extract_on_complete({task_instance})")
         context = self.parse_sql_context()
-        source = self._source()
 
         try:
             bigquery_job_id = self._get_xcom_bigquery_job_id(task_instance)
@@ -157,8 +156,8 @@ class BigQueryExtractor(BaseExtractor):
 
                 run_facets.append(self._get_output_statistics(props))
 
-                inputs = self._get_input_from_bq(props, source, client)
-                outputs = self._get_output_from_bq(props, source, client)
+                inputs = self._get_input_from_bq(props, client)
+                outputs = self._get_output_from_bq(props,client)
             finally:
                 # Ensure client has close() defined, otherwise ignore.
                 # NOTE: close() was introduced in python-bigquery v1.23.0
@@ -205,7 +204,7 @@ class BigQueryExtractor(BaseExtractor):
             properties=json_props
         )
 
-    def _get_input_from_bq(self, properties, source, client):
+    def _get_input_from_bq(self, properties, client):
         bq_input_tables = get_from_nullable_chain(properties, [
             'statistics', 'query', 'referencedTables'
         ])
@@ -215,24 +214,27 @@ class BigQueryExtractor(BaseExtractor):
         input_table_names = [
             self._bq_table_name(bq_t) for bq_t in bq_input_tables
         ]
+        sources = [
+            self._source(bq_t) for bq_t in bq_input_tables
+        ]
         try:
             return [
                 Dataset.from_table_schema(
                     source=source,
                     table_schema=table_schema
                 )
-                for table_schema in self._get_table_schemas(
+                for table_schema, source in zip(self._get_table_schemas(
                     input_table_names, client
-                )
+                ), sources)
             ]
         except Exception as e:
             log.warning(f'Could not extract schema from bigquery. {e}')
             return [
                 Dataset.from_table(source, table)
-                for table in input_table_names
+                for table, source in zip(input_table_names, sources)
             ]
 
-    def _get_output_from_bq(self, properties, source, client):
+    def _get_output_from_bq(self, properties, client):
         bq_output_table = get_from_nullable_chain(properties, [
             'configuration', 'query', 'destinationTable'
         ])
@@ -240,6 +242,7 @@ class BigQueryExtractor(BaseExtractor):
             return None
 
         output_table_name = self._bq_table_name(bq_output_table)
+        source = self._source(bq_output_table)
         table_schema = self._get_table_safely(output_table_name, client)
         if table_schema:
             return [Dataset.from_table_schema(
