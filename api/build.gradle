@@ -27,9 +27,9 @@ java {
 }
 
 ext {
-    dropwizardVersion = '2.0.20'
     jdbi3Version = '3.18.0'
     prometheusVersion = '0.10.0'
+    testcontainersVersion = '1.15.2'
 }
 
 dependencies {
@@ -48,23 +48,18 @@ dependencies {
     compile 'com.google.guava:guava:30.1-jre'
     compile 'org.dhatim:dropwizard-sentry:2.0.20'
     compile 'org.flywaydb:flyway-core:6.5.7'
-    compile 'org.postgresql:postgresql:42.2.19'
+    compile "org.postgresql:postgresql:${postgresqlVersion}"
     compile 'com.graphql-java:graphql-java:16.2'
     compile 'com.graphql-java-kickstart:graphql-java-servlet:11.1.0'
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testCompile "org.jdbi:jdbi3-testing:${jdbi3Version}"
-    testCompile 'org.junit.jupiter:junit-jupiter:5.7.1'
-    testCompile 'org.junit.vintage:junit-vintage-engine:5.7.1'
-    testCompile 'org.assertj:assertj-core:3.19.0'
-    testCompile 'org.mockito:mockito-core:3.8.0'
-    testCompile 'org.mockito:mockito-junit-jupiter:3.8.0'
-    testCompile 'org.testcontainers:postgresql:1.15.2'
-    testCompile "org.testcontainers:junit-jupiter:1.15.2"
+    testCompile "org.junit.vintage:junit-vintage-engine:${junit5Version}"
+    testCompile "org.testcontainers:postgresql:${testcontainersVersion}"
+    testCompile "org.testcontainers:junit-jupiter:${testcontainersVersion}"
 
 }
+
 task testUnit(type: Test) {
     useJUnitPlatform {
         includeTags 'UnitTests'
