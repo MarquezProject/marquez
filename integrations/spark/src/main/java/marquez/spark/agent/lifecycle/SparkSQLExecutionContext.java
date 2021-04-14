@@ -74,10 +74,10 @@ public class SparkSQLExecutionContext implements ExecutionContext {
       return;
     }
     List<Dataset> outputDatasets =
-        PlanUtils.applyFirst(outputDatasetSupplier, queryExecution.logical());
+        PlanUtils.applyFirst(outputDatasetSupplier, queryExecution.optimizedPlan());
     List<Dataset> inputDatasets =
         JavaConversions.seqAsJavaList(
-                queryExecution.logical().collect(PlanUtils.merge(inputDatasetSupplier)))
+                queryExecution.optimizedPlan().collect(PlanUtils.merge(inputDatasetSupplier)))
             .stream()
             .flatMap(List::stream)
             .collect(Collectors.toList());
@@ -88,7 +88,7 @@ public class SparkSQLExecutionContext implements ExecutionContext {
             .run(
                 buildRun(
                     buildRunFacets(
-                        buildLogicalPlanFacet(queryExecution.logical()), null, buildParentFacet())))
+                        buildLogicalPlanFacet(queryExecution.optimizedPlan()), null, buildParentFacet())))
             .job(buildJob(queryExecution))
             .eventTime(toZonedTime(jobStart.time()))
             .eventType("START")
@@ -113,14 +113,14 @@ public class SparkSQLExecutionContext implements ExecutionContext {
       return;
     }
     if (log.isDebugEnabled()) {
-      log.debug("Traversing logical plan {}", queryExecution.logical().toJSON());
+      log.debug("Traversing optimized plan {}", queryExecution.optimizedPlan().toJSON());
       log.debug("Physical plan executed {}", queryExecution.executedPlan().toJSON());
     }
     List<Dataset> outputDatasets =
-        PlanUtils.applyFirst(outputDatasetSupplier, queryExecution.logical());
+        PlanUtils.applyFirst(outputDatasetSupplier, queryExecution.optimizedPlan());
     List<Dataset> inputDatasets =
         JavaConversions.seqAsJavaList(
-                queryExecution.logical().collect(PlanUtils.merge(inputDatasetSupplier)))
+                queryExecution.optimizedPlan().collect(PlanUtils.merge(inputDatasetSupplier)))
             .stream()
             .flatMap(List::stream)
             .collect(Collectors.toList());
