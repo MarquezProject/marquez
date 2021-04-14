@@ -13,7 +13,7 @@
 import json
 import logging
 import traceback
-from typing import Optional, Any, List, Mapping
+from typing import Optional, Any, List, Dict, Tuple
 
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from google.cloud import bigquery
@@ -45,7 +45,7 @@ _BIGQUERY_CONN_URL = 'bigquery:{}'
 log = logging.getLogger(__name__)
 
 
-def get_from_nullable_chain(source: Mapping[str, Any], chain: List[str]) -> Optional[Any]:
+def get_from_nullable_chain(source: Dict[str, Any], chain: List[str]) -> Optional[Any]:
     chain.reverse()
     try:
         while chain:
@@ -76,18 +76,31 @@ class BigQueryStaticticsRunFacet(BaseFacet):
     Facet that represents relevant statistics of bigquery run.
     :param cached: bigquery caches query results. Rest of the statistics will not be provided
         for cached queries.
-    :param outputRows: how many rows query produced.
     :param billedBytes: how many bytes bigquery bills for.
     :param properties: full property tree of bigquery run.
     """
     cached: bool = attr.ib()
-    outputRows: int = attr.ib(default=None)
     billedBytes: int = attr.ib(default=None)
     properties: str = attr.ib(default=None)
 
     @staticmethod
     def _get_schema() -> str:
         return GITHUB_LOCATION + "bq-statistics-run-facet.json"
+
+
+@attr.s
+class BigQueryStatisticsDatasetFacet(BaseFacet):
+    """
+    Facet that represents statistics of output dataset resulting from bigquery run.
+    :param outputRows: how many rows query produced.
+    :param size: size of output dataset in bytes.
+    """
+    rowCount: int = attr.ib()
+    size: int = attr.ib()
+
+    @staticmethod
+    def _get_schema() -> str:
+        return GITHUB_LOCATION + "bq-statistics-dataset-facet.json"
 
 
 @attr.s
@@ -112,7 +125,7 @@ class BigQueryExtractor(BaseExtractor):
             name=conn_id,
             connection_url=_BIGQUERY_CONN_URL.format(self._bq_table_name(bq_table)))
 
-    def extract(self) -> StepMetadata:
+    def extract(self) -> Optional[StepMetadata]:
         return None
 
     def _bq_table_name(self, bq_table):
@@ -121,7 +134,7 @@ class BigQueryExtractor(BaseExtractor):
         table = bq_table.get('tableId')
         return f"{project}.{dataset}.{table}"
 
-    def extract_on_complete(self, task_instance) -> StepMetadata:
+    def extract_on_complete(self, task_instance) -> Optional[StepMetadata]:
         log.debug(f"extract_on_complete({task_instance})")
         context = self.parse_sql_context()
 
@@ -137,27 +150,36 @@ class BigQueryExtractor(BaseExtractor):
                 name=get_job_name(task=self.operator),
                 inputs=None,
                 outputs=None,
-                run_facets=[
-                    BigQueryErrorRunFacet(
+                run_facets={
+                    "bigQueryError": BigQueryErrorRunFacet(
                         clientError=f"{e}: {traceback.format_exc()}",
                         parserError=context.parser_error
                     )
-                ]
+                }
             )
 
         inputs = None
-        outputs = None
-        run_facets = []
+        output = None
+        run_facets = {}
         try:
             client = bigquery.Client()
             try:
                 job = client.get_job(job_id=bigquery_job_id)
                 props = job._properties
 
-                run_facets.append(self._get_output_statistics(props))
+                run_stat_facet, dataset_stat_facet = self._get_output_statistics(props)
+
+                run_facets.update({
+                    "bigQueryStatistics": run_stat_facet
+                })
 
                 inputs = self._get_input_from_bq(props, client)
-                outputs = self._get_output_from_bq(props,client)
+                output = self._get_output_from_bq(props, client)
+                if output:
+                    output.custom_facets.update({
+                        "datasetStatistics": dataset_stat_facet
+                    })
+
             finally:
                 # Ensure client has close() defined, otherwise ignore.
                 # NOTE: close() was introduced in python-bigquery v1.23.0
@@ -166,26 +188,29 @@ class BigQueryExtractor(BaseExtractor):
         except Exception as e:
             log.error(f"Cannot retrieve job details from BigQuery.Client. {e}",
                       exc_info=True)
-            run_facets.append(BigQueryErrorRunFacet(
-                clientError=f"{e}: {traceback.format_exc()}",
-                parserError=context.parser_error
-            ))
+            run_facets.update({
+                "bigQueryError": BigQueryErrorRunFacet(
+                    clientError=f"{e}: {traceback.format_exc()}",
+                    parserError=context.parser_error
+                )
+            })
 
         return StepMetadata(
             name=get_job_name(task=self.operator),
             inputs=inputs,
-            outputs=outputs,
+            outputs=[output] if output else [],
             run_facets=run_facets
         )
 
-    def _get_output_statistics(self, properties):
+    def _get_output_statistics(self, properties) \
+            -> Tuple[BigQueryStaticticsRunFacet, Optional[BigQueryStatisticsDatasetFacet]]:
         stages = get_from_nullable_chain(properties, ['statistics', 'query', 'queryPlan'])
         json_props = json.dumps(properties)
 
         if not stages:
             # we're probably getting cached results
             if get_from_nullable_chain(properties, ['statistics', 'query', 'cacheHit']):
-                return BigQueryStaticticsRunFacet(cached=True)
+                return BigQueryStaticticsRunFacet(cached=True), None
             if get_from_nullable_chain(properties, ['status', 'state']) != "DONE":
                 raise ValueError("Trying to extract data from running bigquery job")
             raise ValueError(
@@ -194,15 +219,18 @@ class BigQueryExtractor(BaseExtractor):
 
         out_stage = stages[-1]
         out_rows = out_stage.get("recordsWritten", None)
+        out_bytes = out_stage.get("shuffleOutputBytes", None)
         billed_bytes = get_from_nullable_chain(properties, [
             'statistics', 'query', 'totalBytesBilled'
         ])
         return BigQueryStaticticsRunFacet(
             cached=False,
-            outputRows=int(out_rows) if out_rows else None,
             billedBytes=int(billed_bytes) if billed_bytes else None,
             properties=json_props
-        )
+        ), BigQueryStatisticsDatasetFacet(
+            rowCount=int(out_rows),
+            size=int(out_bytes)
+        ) if out_bytes and out_rows else None
 
     def _get_input_from_bq(self, properties, client):
         bq_input_tables = get_from_nullable_chain(properties, [
@@ -234,7 +262,7 @@ class BigQueryExtractor(BaseExtractor):
                 for table, source in zip(input_table_names, sources)
             ]
 
-    def _get_output_from_bq(self, properties, client):
+    def _get_output_from_bq(self, properties, client) -> Optional[Dataset]:
         bq_output_table = get_from_nullable_chain(properties, [
             'configuration', 'query', 'destinationTable'
         ])
@@ -245,15 +273,13 @@ class BigQueryExtractor(BaseExtractor):
         source = self._source(bq_output_table)
         table_schema = self._get_table_safely(output_table_name, client)
         if table_schema:
-            return [Dataset.from_table_schema(
+            return Dataset.from_table_schema(
                 source=source,
                 table_schema=table_schema
-            )]
+            )
         else:
             log.warning("Could not resolve output table from bq")
-            return [
-                Dataset.from_table(source, output_table_name)
-            ]
+            return Dataset.from_table(source, output_table_name)
 
     def _get_table_safely(self, output_table_name, client):
         try:

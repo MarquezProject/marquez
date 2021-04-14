@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from enum import Enum
-from typing import List, Union, Type, Optional
+from typing import List, Union, Type, Optional, Dict
 from abc import ABC, abstractmethod
 
 from airflow import LoggingMixin
@@ -77,9 +77,11 @@ class Field:
 class Dataset:
     def __init__(self, source: Source, name: str, type: DatasetType,
                  fields: List[Field] = None, description: Optional[str] = None,
-                 custom_facets: Optional[Type[BaseFacet]] = None):
+                 custom_facets: Dict[str, Type[BaseFacet]] = None):
         if fields is None:
             fields = []
+        if custom_facets is None:
+            custom_facets = {}
         self.source = source
         self.name = name
         self.type = type
@@ -143,7 +145,7 @@ class StepMetadata:
             inputs: List[Dataset] = None,
             outputs: List[Dataset] = None,
             context=None,
-            run_facets: List[BaseFacet] = None
+            run_facets: Dict[str, BaseFacet] = None
     ):
         # TODO: Define a common way across extractors to build the
         # job name for an operator
@@ -161,7 +163,7 @@ class StepMetadata:
         if not context:
             self.context = {}
         if not run_facets:
-            self.run_facets = []
+            self.run_facets = {}
 
     def __repr__(self):
         return "name: {}\t inputs: {} \t outputs: {}".format(

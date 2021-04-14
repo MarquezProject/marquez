@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "definitions": {
-    "AirflowVersionFacet": {
+    "BigQueryStatisticsRunFacet": {
       "allOf": [
         {
           "$ref": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/BaseFacet"
@@ -9,22 +9,16 @@
         {
           "type": "object",
           "properties": {
-            "operator": {
-              "type": "string",
-              "example": "airflow.operators.postgres_operator.PostgresOperator"
+            "cached": {
+              "type": "boolean"
             },
-            "taskInfo": {
+            "billedBytes": {
+              "type": "int",
+              "example": 321
+            },
+            "properties": {
               "type": "string"
-            },
-            "airflowVersion": {
-              "type": "string",
-              "example": "1.10.12"
-            },
-            "marquezAirflowVersion": {
-              "type": "string",
-              "format": "0.12.2"
             }
-
           },
           "required": [
             "cached"

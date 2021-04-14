@@ -102,7 +102,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                     DagUtils.get_start_time(execution_date),
                     DagUtils.get_end_time(execution_date, self.following_schedule(execution_date)),
                     step,
-                    get_custom_facets(task, is_external_trigger)
+                    {**step.run_facets, **get_custom_facets(task, is_external_trigger)}
                 )
 
                 JobIdMapping.set(
@@ -167,6 +167,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 DagUtils.to_iso_8601(task_instance.start_date),
                 DagUtils.to_iso_8601(task_instance.end_date),
                 step,
+                {**step.run_facets, **get_custom_facets(task, False)}
             )
 
             if not task_run_id:

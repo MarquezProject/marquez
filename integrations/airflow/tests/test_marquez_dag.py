@@ -112,7 +112,7 @@ def test_marquez_dag(job_id_mapping, mock_get_or_create_openlineage_client,
     mock_get_or_create_openlineage_client.return_value = mock_marquez_client
     run_id_completed = f"{DAG_RUN_ID}.{TASK_ID_COMPLETED}"
     run_id_failed = f"{DAG_RUN_ID}.{TASK_ID_FAILED}"
-    get_custom_facets.return_value = None
+    get_custom_facets.return_value = {}
 
     # (2) Add task that will be marked as completed
     task_will_complete = DummyOperator(
@@ -327,7 +327,7 @@ def test_marquez_dag_with_extractor(
     # Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
     mock_get_or_create_openlineage_client.return_value = mock_marquez_client
-    get_custom_facets.return_value = None
+    get_custom_facets.return_value = {}
 
     # Add task that will be marked as completed
     task_will_complete = TestFixtureDummyOperator(
@@ -443,7 +443,7 @@ def test_marquez_dag_with_extract_on_complete(
     # Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
     mock_get_or_create_openlineage_client.return_value = mock_marquez_client
-    get_custom_facets.return_value = None
+    get_custom_facets.return_value = {}
 
     # Add task that will be marked as completed
     task_will_complete = TestFixtureDummyOperator(
@@ -599,7 +599,7 @@ def test_marquez_dag_with_extractor_returning_two_steps(
     # Mock the marquez client method calls
     mock_marquez_client = mock.Mock()
     mock_get_or_create_openlineage_client.return_value = mock_marquez_client
-    get_custom_facets.return_value = None
+    get_custom_facets.return_value = {}
 
     # Add task that will be marked as completed
     task_will_complete = TestFixtureDummyOperator(

@@ -1,8 +1,7 @@
-
 {
   "$schema": "http://json-schema.org/schema#",
   "definitions": {
-    "BigQueryErrorRunFacet": {
+    "BigQueryStatisticsDatasetFacet": {
       "allOf": [
         {
           "$ref": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/BaseFacet"
@@ -10,15 +9,19 @@
         {
           "type": "object",
           "properties": {
-            "clientError": {
-              "type": "string",
-              "example": "Xcom could not resolve BigQuery job id. Job may have failed"
+            "rowCount": {
+              "type": "int",
+              "example": 20
             },
-            "parserError": {
-              "type": "string",
-              "format": "Cannot parse sql query"
+            "size": {
+              "type": "int",
+              "example": 321
             }
-          }
+          },
+          "required": [
+            "rowCount",
+            "size"
+          ]
         }
       ],
       "type": "object"

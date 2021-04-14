@@ -57,6 +57,7 @@ class MarquezAdapter:
         :param nominal_start_time: scheduled time of dag run
         :param nominal_end_time: following schedule of dag run
         :param step: metadata container with information extracted from operator
+        :param run_facets:
         :return:
         """
         sql = None

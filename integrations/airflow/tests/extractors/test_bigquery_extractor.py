@@ -26,7 +26,7 @@ from airflow.utils.state import State
 from marquez_airflow.extractors.bigquery_extractor import BigQueryExtractor, \
     BigQueryStaticticsRunFacet, \
     get_from_nullable_chain, \
-    BigQueryErrorRunFacet
+    BigQueryErrorRunFacet, BigQueryStatisticsDatasetFacet
 
 log = logging.getLogger(__name__)
 
@@ -107,13 +107,17 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
         assert step_meta.outputs[0].name == \
             'bq-airflow-marquez.new_dataset.output_table'
 
+        assert BigQueryStatisticsDatasetFacet(
+            rowCount=20,
+            size=321
+        ) == step_meta.outputs[0].custom_facets['datasetStatistics']
+
         assert len(step_meta.run_facets) == 1
         assert BigQueryStaticticsRunFacet(
             cached=False,
-            outputRows=20,
             billedBytes=111149056,
             properties=json.dumps(job_details)
-        ) in step_meta.run_facets
+        ) == step_meta.run_facets['bigQueryStatistics']
 
         mock_client.return_value.close.assert_called()
 
@@ -180,7 +184,8 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
         assert step_meta.outputs is not None
 
         assert len(step_meta.run_facets) == 1
-        assert step_meta.run_facets.pop() == BigQueryStaticticsRunFacet(cached=True)
+        assert step_meta.run_facets['bigQueryStatistics'] \
+               == BigQueryStaticticsRunFacet(cached=True)
 
     @mock.patch('airflow.contrib.operators.bigquery_operator.BigQueryHook')
     @mock.patch('google.cloud.bigquery.Client')
@@ -224,7 +229,7 @@ class TestBigQueryExtractorE2E(unittest.TestCase):
 
         step_meta = bq_extractor.extract_on_complete(task_instance)
 
-        assert step_meta.run_facets.pop() == BigQueryErrorRunFacet(
+        assert step_meta.run_facets['bigQueryError'] == BigQueryErrorRunFacet(
             clientError=mock.ANY
         )
         mock_client.return_value.get_job.assert_called_once_with(job_id=bq_job_id)
