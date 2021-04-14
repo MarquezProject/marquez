@@ -114,7 +114,7 @@ To ensure your pull request is accepted, follow these guidelines:
 
 # Dependencies
 
-We use [renovate](https://github.com/renovatebot/renovate) to manage dependencies for all of our project modules. Renovate automatically opens pull requests against our [`update-deps`](https://github.com/MarquezProject/marquez/tree/update-deps) branch in order to ensure builds pass before merging into `main`. To merge dependencies updates into `main`:
+We use [renovate](https://github.com/renovatebot/renovate) to manage dependencies for all of our project modules. Renovate automatically opens pull requests against our [`update-deps`](https://github.com/MarquezProject/marquez/tree/update-deps) branch in order to ensure builds pass before merging into `main`. To merge dependencies updates:
 
 > **Note:** Make sure you've pulled the latest upstream changes for `update-deps` and `main`.
 
