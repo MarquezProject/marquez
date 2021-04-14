@@ -10,16 +10,16 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions with the community.
 
-# Getting Your Changes Approved
+# Getting your changes approved
 
-Your pull request must be approved and merged by a [committer](COMMITTERS.md).
+Your PR must be approved and merged by a [committer](COMMITTERS.md).
 
 # Development
 
 To run the entire test suite:
 
 ```bash
-$ ./gradlew test
+$ ./gradlew :api:test
 ```
 
 You can also run individual tests for a [submodule](https://github.com/MarquezProject/marquez#modules) using the `--tests` flag:
@@ -65,7 +65,7 @@ $ pre-commit install
 Use [`publishToMavenLocal`](https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:tasks) to publish artifacts to your local maven repository:
 
 ```
-$ ./gradlew publishToMavenLocal
+$ ./gradlew :api:publishToMavenLocal
 ```
 
 # Submitting a [Pull Request](https://help.github.com/articles/about-pull-requests)
@@ -85,7 +85,7 @@ To ensure your pull request is accepted, follow these guidelines:
 
 * All changes should be accompanied by tests
 * Do your best to have a [well-formed commit message](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for your change
-* [Keep diffs small](https://kurtisnusbaum.medium.com/stacked-diffs-keeping-phabricator-diffs-small-d9964f4dcfa6) and self-contained
+* [Keep diffs small](https://graysonkoonce.com/stacked-pull-requests-keeping-github-diffs-small) and self-contained
 * If your change fixes a bug, please [link the issue](https://help.github.com/articles/closing-issues-using-keywords) in your pull request description
 * Any changes to the API reference requires [regenerating](#api-docs) the static `openapi.html` file.
 
@@ -114,17 +114,36 @@ To ensure your pull request is accepted, follow these guidelines:
 
 # Dependencies
 
-We use [renovate](https://github.com/renovatebot/renovate) to manage dependencies for all of our project modules. Renovate opens pull requests against our [`update-deps`](https://github.com/MarquezProject/marquez/tree/update-deps) branch in order to ensure build pass before merging into `main`. To merge dependencies changes from `update-deps` into `main`:
+We use [renovate](https://github.com/renovatebot/renovate) to manage dependencies for all of our project modules. Renovate automatically opens pull requests against our [`update-deps`](https://github.com/MarquezProject/marquez/tree/update-deps) branch in order to ensure builds pass before merging into `main`. To merge dependencies updates into `main`:
 
-> **Note:** Make sure you've pulled the latest `update-deps` and `main` changes.
+> **Note:** Make sure you've pulled the latest upstream changes for `update-deps` and `main`.
 
-1. Switch to the `update-deps` branch
+1. Switch to `update-deps`:
 
    ```bash
    $ git checkout update-deps
    ```
-2.
 
+2. Merge `main` into `update-deps` (make sure to address any merge conflicts, if any), then push:
+
+   ```bash
+   $ git merge main
+   $ git push origin update-deps
+   ```
+
+3. Branch off `update-deps`:
+
+
+   ```bash
+   $ git checkout -b deps/renovate
+   ```
+
+4. Then, push your branch:
+
+
+   ```bash
+   $ git push origin deps/renovate
+   ```
 
 # Sign Your Work
 
