@@ -246,4 +246,41 @@ public class SparkReadWriteIntegTest {
     }
     return testFile;
   }
+
+  @Test
+  public void testInsertIntoDataSourceDirVisitor(@TempDir Path tempDir)
+      throws IOException, InterruptedException, TimeoutException {
+    Path testFile = writeTestDataToFile(tempDir);
+    final SparkSession spark =
+        SparkSession.builder()
+            .master("local[*]")
+            .appName("Word Count")
+            .config("spark.driver.host", "127.0.0.1")
+            .config("spark.driver.bindAddress", "127.0.0.1")
+            .getOrCreate();
+    Path parquetDir = tempDir.resolve("parquet").toAbsolutePath();
+    spark.read().json("file://" + testFile.toAbsolutePath()).createOrReplaceTempView("testdata");
+    spark.sql(
+        "INSERT OVERWRITE DIRECTORY '"
+            + parquetDir
+            + "'\n"
+            + "USING parquet\n"
+            + "SELECT * FROM testdata");
+    // wait for event processing to complete
+    StaticExecutionContextFactory.waitForExecutionEnd();
+
+    ArgumentCaptor<LineageEvent> lineageEvent = ArgumentCaptor.forClass(LineageEvent.class);
+    Mockito.verify(marquezContext, times(4)).emit(lineageEvent.capture());
+    List<LineageEvent> events = lineageEvent.getAllValues();
+    Optional<LineageEvent> completionEvent =
+        events.stream()
+            .filter(e -> e.getEventType().equals("COMPLETE") && !e.getInputs().isEmpty())
+            .findFirst();
+    assertTrue(completionEvent.isPresent());
+    LineageEvent event = completionEvent.get();
+    List<LineageEvent.Dataset> inputs = event.getInputs();
+    assertEquals(1, inputs.size());
+    assertEquals("file", inputs.get(0).getNamespace());
+    assertEquals(testFile.toAbsolutePath().getParent().toString(), inputs.get(0).getName());
+  }
 }

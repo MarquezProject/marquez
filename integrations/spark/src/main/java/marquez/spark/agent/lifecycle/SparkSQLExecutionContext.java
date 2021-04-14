@@ -88,7 +88,9 @@ public class SparkSQLExecutionContext implements ExecutionContext {
             .run(
                 buildRun(
                     buildRunFacets(
-                        buildLogicalPlanFacet(queryExecution.optimizedPlan()), null, buildParentFacet())))
+                        buildLogicalPlanFacet(queryExecution.optimizedPlan()),
+                        null,
+                        buildParentFacet())))
             .job(buildJob(queryExecution))
             .eventTime(toZonedTime(jobStart.time()))
             .eventType("START")

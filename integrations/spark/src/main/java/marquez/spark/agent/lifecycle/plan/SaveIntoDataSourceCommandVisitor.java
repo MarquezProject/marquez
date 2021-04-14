@@ -30,8 +30,7 @@ public class SaveIntoDataSourceCommandVisitor
   private final List<PartialFunction<LogicalPlan, List<Dataset>>> relationVisitors;
 
   public SaveIntoDataSourceCommandVisitor(
-      SQLContext sqlContext,
-      List<PartialFunction<LogicalPlan, List<Dataset>>> relationVisitors) {
+      SQLContext sqlContext, List<PartialFunction<LogicalPlan, List<Dataset>>> relationVisitors) {
     this.sqlContext = sqlContext;
     this.relationVisitors = relationVisitors;
   }
@@ -62,8 +61,7 @@ public class SaveIntoDataSourceCommandVisitor
                 relationVisitors,
                 new LogicalRelation(
                     relation, relation.schema().toAttributes(), Option.empty(), x.isStreaming())))
-        .orElse(Collections.emptyList())
-        .stream()
+        .orElse(Collections.emptyList()).stream()
         // constructed datasets don't include the output stats, so add that facet here
         .peek(
             ds -> {
