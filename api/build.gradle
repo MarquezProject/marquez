@@ -59,7 +59,7 @@ dependencies {
     testCompile 'org.junit.jupiter:junit-jupiter:5.7.1'
     testCompile 'org.junit.vintage:junit-vintage-engine:5.7.1'
     testCompile 'org.assertj:assertj-core:3.19.0'
-    testCompile 'org.mockito:mockito-core:3.8.0'
+    testCompile 'org.mockito:mockito-core:3.9.0'
     testCompile 'org.mockito:mockito-junit-jupiter:3.8.0'
     testCompile 'org.testcontainers:postgresql:1.15.2'
     testCompile "org.testcontainers:junit-jupiter:1.15.2"
