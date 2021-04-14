@@ -112,6 +112,20 @@ To ensure your pull request is accepted, follow these guidelines:
 * Use dashes (`-`) to separate _words_ in branch names
 * Use _lowercase_ in branch names
 
+# Dependencies
+
+We use [renovate](https://github.com/renovatebot/renovate) to manage dependencies for all of our project modules. Renovate opens pull requests against our [`update-deps`](https://github.com/MarquezProject/marquez/tree/update-deps) branch in order to ensure build pass before merging into `main`. To merge dependencies changes from `update-deps` into `main`:
+
+> **Note:** Make sure you've pulled the latest `update-deps` and `main` changes.
+
+1. Switch to the `update-deps` branch
+
+   ```bash
+   $ git checkout update-deps
+   ```
+2.
+
+
 # Sign Your Work
 
 The _sign-off_ is a simple line at the end of the message for a commit. All commits needs to be signed. Your signature certifies that you wrote the patch or otherwise have the right to contribute the material (see [Developer Certificate of Origin](https://developercertificate.org)):
