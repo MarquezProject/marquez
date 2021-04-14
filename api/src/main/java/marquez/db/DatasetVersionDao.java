@@ -232,6 +232,9 @@ public interface DatasetVersionDao extends BaseDao {
         .collect(Collectors.toList());
   }
 
+  @SqlQuery(SELECT + "WHERE dv.uuid = :uuid")
+  Optional<DatasetVersionRow> findRowByUuid(UUID uuid);
+
   @SqlQuery(
       "INSERT INTO dataset_versions "
           + "(uuid, created_at, dataset_uuid, version, run_uuid, fields, namespace_name, dataset_name) "
