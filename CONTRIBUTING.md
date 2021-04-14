@@ -138,12 +138,14 @@ We use [renovate](https://github.com/renovatebot/renovate) to manage dependencie
    $ git checkout -b deps/renovate
    ```
 
-4. Then, push your branch:
+4. Push your branch:
 
 
    ```bash
    $ git push origin deps/renovate
    ```
+
+5. Then, open a pull request against `main`
 
 # Sign Your Work
 
