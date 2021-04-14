@@ -59,6 +59,12 @@ logging:
       # Enables app logs formatted as JSON
       # layout:
       #   type: json
+    # Enables capturing app error logs with sentry (see: https://github.com/dhatim/dropwizard-sentry#configuration)
+    # - type: sentry
+    #   threshold: ${SENTRY_THRESHOLD:-ERROR}
+    #   dsn: ${SENTRY_DSN}
+    #   environment: ${SENTRY_ENVIRONMENT}
+    #   stacktraceAppPackages: ['marquez']
 
 ### METRICS CONFIG ###
 

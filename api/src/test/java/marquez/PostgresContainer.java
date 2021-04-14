@@ -14,13 +14,13 @@
 
 package marquez;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 public final class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
-  private static final String POSTGRES = "postgres:11.8";
+  private static final DockerImageName POSTGRES = DockerImageName.parse("postgres:11.8");
   private static final int JDBC = 5;
 
   private static final Map<String, PostgresContainer> containers = new HashMap<>();
@@ -53,9 +53,8 @@ public final class PostgresContainer extends PostgreSQLContainer<PostgresContain
   public void start() {
     super.start();
 
-    final URI jdbcUri = URI.create(this.getJdbcUrl().substring(JDBC));
-    host = jdbcUri.getHost();
-    port = jdbcUri.getPort();
+    host = super.getHost();
+    port = super.getFirstMappedPort();
   }
 
   @Override

@@ -12,6 +12,7 @@ import marquez.spark.agent.client.LineageEvent;
 import marquez.spark.agent.client.LineageEvent.Job;
 import marquez.spark.agent.client.LineageEvent.Run;
 import marquez.spark.agent.client.LineageEvent.RunFacet;
+import marquez.spark.agent.client.OpenLineageClient;
 import marquez.spark.agent.facets.ErrorFacet;
 import marquez.spark.agent.lifecycle.ContextFactory;
 import marquez.spark.agent.lifecycle.ExecutionContext;
@@ -161,7 +162,9 @@ public class SparkListener {
   /** called by the SparkListener when a spark-sql (Dataset api) execution ends */
   private static void sparkSQLExecEnd(SparkListenerSQLExecutionEnd endEvent) {
     SparkSQLExecutionContext context = sparkSqlExecutionRegistry.remove(endEvent.executionId());
-    context.end(endEvent);
+    if (context != null) {
+      context.end(endEvent);
+    }
   }
 
   /** called by the SparkListener when a job starts */
@@ -217,7 +220,7 @@ public class SparkListener {
                 .name(contextFactory.marquezContext.getJobName())
                 .namespace(contextFactory.marquezContext.getJobNamespace())
                 .build())
-        .producer("https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client")
+        .producer(OpenLineageClient.OPEN_LINEAGE_CLIENT_URI)
         .build();
   }
 

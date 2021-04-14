@@ -1,8 +1,5 @@
 package marquez;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,31 +15,32 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import marquez.common.Utils;
 import marquez.service.models.LineageEvent;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-@Category(IntegrationTests.class)
+@org.junit.jupiter.api.Tag("IntegrationTests")
 public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   public static String EVENT_REQUIRED = "open_lineage/event_required_only.json";
   public static String EVENT_SIMPLE = "open_lineage/event_simple.json";
   public static String EVENT_FULL = "open_lineage/event_full.json";
   public static String EVENT_UNICODE = "open_lineage/event_unicode.json";
   public static String EVENT_LARGE = "open_lineage/event_large.json";
+  public static String NULL_NOMINAL_END_TIME = "open_lineage/null_nominal_end_time.json";
 
-  @Parameters(name = "{0}")
   public static List<String> data() {
-    return Arrays.asList(EVENT_FULL, EVENT_SIMPLE, EVENT_REQUIRED, EVENT_UNICODE, EVENT_LARGE);
+    return Arrays.asList(
+        EVENT_FULL,
+        EVENT_SIMPLE,
+        EVENT_REQUIRED,
+        EVENT_UNICODE,
+        EVENT_LARGE,
+        NULL_NOMINAL_END_TIME);
   }
 
-  @Parameter public String input;
-
-  @Test
-  public void testOpenLineage() throws IOException {
+  @ParameterizedTest
+  @MethodSource("data")
+  public void testOpenLineage(String input) throws IOException {
     URL resource = Resources.getResource(input);
     String body = Resources.toString(resource, Charset.defaultCharset());
 
@@ -52,22 +50,24 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .whenComplete(
                 (val, error) -> {
                   if (error != null) {
-                    fail("Could not complete request");
+                    Assertions.fail("Could not complete request");
                   }
                 });
 
-    assertEquals((Integer) 201, resp.join());
+    Assertions.assertEquals((Integer) 201, resp.join());
   }
 
-  @Test
-  public void testSerialization() throws IOException {
-    testSerialization(Utils.newObjectMapper());
+  @ParameterizedTest
+  @MethodSource("data")
+  public void testSerialization(String input) throws IOException {
+    testSerialization(Utils.newObjectMapper(), input);
   }
 
   // Test object mapper with listed jackson requirements
-  @Test
-  public void testRequiredObjectMapper() throws IOException {
-    testSerialization(getMapper());
+  @ParameterizedTest
+  @MethodSource("data")
+  public void testRequiredObjectMapper(String input) throws IOException {
+    testSerialization(getMapper(), input);
   }
 
   public ObjectMapper getMapper() {
@@ -80,12 +80,12 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     return mapper;
   }
 
-  public void testSerialization(ObjectMapper mapper) throws IOException {
+  public void testSerialization(ObjectMapper mapper, String input) throws IOException {
     URL in = Resources.getResource(input);
 
     LineageEvent lineageEvent = mapper.readValue(in, LineageEvent.class);
     String out = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lineageEvent);
 
-    assertEquals(mapper.readTree(in), mapper.readTree(out));
+    Assertions.assertEquals(mapper.readTree(in), mapper.readTree(out));
   }
 }

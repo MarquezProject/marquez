@@ -1,6 +1,5 @@
 package marquez.client;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -50,7 +49,7 @@ class FileBackend implements Backend {
       log.error("Can't write Marquez calls. " + parentFile + " can not be created.");
     } else {
       try {
-        return new FileWriter(file, UTF_8, true);
+        return new FileWriter(file, true);
       } catch (IOException e) {
         log.error("Can't write Marquez calls. " + file + " can not be written to.", e);
       }

@@ -44,7 +44,6 @@ public final class JobRowMapper implements RowMapper<JobRow> {
   @Override
   public JobRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
-    Set<String> columnNames = MapperUtils.getColumnNames(results.getMetaData());
     return new JobRow(
         uuidOrThrow(results, Columns.ROW_UUID),
         stringOrThrow(results, Columns.TYPE),
@@ -56,8 +55,7 @@ public final class JobRowMapper implements RowMapper<JobRow> {
         uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
         uuidOrNull(results, "current_job_context_uuid"),
         stringOrNull(results, "current_location"),
-        getDatasetFromJsonOrNull(results, "current_inputs"),
-        getDatasetFromJsonOrNull(results, "current_outputs"));
+        getDatasetFromJsonOrNull(results, "current_inputs"));
   }
 
   Set<DatasetId> getDatasetFromJsonOrNull(@NonNull ResultSet results, String column)

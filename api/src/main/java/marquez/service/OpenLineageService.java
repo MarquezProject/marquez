@@ -50,8 +50,10 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
             .thenAccept(
                 (update) -> {
                   if (event.getEventType() != null) {
+                    if (event.getEventType().equalsIgnoreCase("COMPLETE")) {
+                      buildJobOutputUpdate(update).ifPresent(runService::notify);
+                    }
                     buildJobInputUpdate(update).ifPresent(runService::notify);
-                    buildJobOutputUpdate(update).ifPresent(runService::notify);
                   }
                 });
 
@@ -97,7 +99,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
       RunId runId, JobVersionId jobVersionId, UpdateLineageRow record) {
     // We query for all datasets since they can come in slowly over time
     List<ExtendedDatasetVersionRow> datasets =
-        datasetVersionDao.findByRunId(record.getRun().getUuid());
+        datasetVersionDao.findOutputsByRunId(record.getRun().getUuid());
 
     // Do not trigger a JobOutput event if there are no new datasets
     if (datasets.isEmpty() && record.getOutputs().isEmpty()) {
@@ -163,7 +165,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
 
   private DatasetVersionId buildDatasetVersionId(ExtendedDatasetVersionRow ds) {
     return DatasetVersionId.builder()
-        .versionUuid(ds.getVersion())
+        .versionUuid(ds.getUuid())
         .namespace(NamespaceName.of(ds.getNamespaceName()))
         .name(DatasetName.of(ds.getDatasetName()))
         .build();

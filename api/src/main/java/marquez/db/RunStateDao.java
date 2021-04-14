@@ -41,7 +41,8 @@ public interface RunStateDao extends BaseDao {
     runDao.updateRunState(runUuid, transitionedAt, runState);
     if (runState.isDone()) {
       runDao.updateEndState(runUuid, transitionedAt, runStateRow.getUuid());
-      List<ExtendedDatasetVersionRow> outputs = createDatasetVersionDao().findByRunId(runUuid);
+      List<ExtendedDatasetVersionRow> outputs =
+          createDatasetVersionDao().findOutputsByRunId(runUuid);
       List<UUID> outputUuids =
           outputs.stream().map(DatasetVersionRow::getDatasetUuid).collect(Collectors.toList());
       if (!outputUuids.isEmpty()) {

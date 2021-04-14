@@ -11,14 +11,14 @@ import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Category(IntegrationTests.class)
+@org.junit.jupiter.api.Tag("IntegrationTests")
 public class JobIntegrationTest extends BaseIntegrationTest {
 
-  @Before
+  @BeforeEach
   public void setup() {
     createNamespace(NAMESPACE_NAME);
     createSource(DB_TABLE_SOURCE_NAME);
@@ -38,20 +38,28 @@ public class JobIntegrationTest extends BaseIntegrationTest {
     assertThat(runs).hasSizeGreaterThan(0);
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_createDuplicateRun() {
-    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
-    String runId = UUID.randomUUID().toString();
-    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
-    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+    Assertions.assertThrows(
+        Exception.class,
+        () -> {
+          client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+          String runId = UUID.randomUUID().toString();
+          client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+          client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+        });
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsJobForRun() {
-    client.createRun(NAMESPACE_NAME, "NotExists", RunMeta.builder().build());
+    Assertions.assertThrows(
+        Exception.class,
+        () -> {
+          client.createRun(NAMESPACE_NAME, "NotExists", RunMeta.builder().build());
+        });
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_createNonMatchingJobWithRun() {
     String runId = UUID.randomUUID().toString();
     final JobMeta JOB_META =
@@ -79,10 +87,11 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .runId(runId)
             .build();
     // associate wrong run
-    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META_WITH_RUN);
+    Assertions.assertThrows(
+        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META_WITH_RUN));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_createJobWithMissingRun() {
     final JobMeta JOB_META =
         JobMeta.builder()
@@ -94,10 +103,11 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .description(JOB_DESCRIPTION)
             .runId(UUID.randomUUID().toString())
             .build();
-    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    Assertions.assertThrows(
+        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_createNotExistingDataset() {
     final JobMeta JOB_META =
         JobMeta.builder()
@@ -108,12 +118,13 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
-    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    Assertions.assertThrows(
+        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsJob() {
-    client.getJob(NAMESPACE_NAME, "not-existing");
+    Assertions.assertThrows(Exception.class, () -> client.getJob(NAMESPACE_NAME, "not-existing"));
   }
 
   @Test

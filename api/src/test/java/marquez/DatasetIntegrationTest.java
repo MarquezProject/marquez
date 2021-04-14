@@ -2,10 +2,12 @@ package marquez;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.DbTableMeta;
@@ -13,18 +15,57 @@ import marquez.client.models.JobMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.StreamVersion;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Category(IntegrationTests.class)
+@org.junit.jupiter.api.Tag("IntegrationTests")
 public class DatasetIntegrationTest extends BaseIntegrationTest {
 
-  @Before
+  @BeforeEach
   public void setup() {
     createNamespace(NAMESPACE_NAME);
     createSource(DB_TABLE_SOURCE_NAME);
     createSource(STREAM_SOURCE_NAME);
+  }
+
+  @Test
+  public void testApp_testTags() {
+    DbTableMeta DB_TABLE_META =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(ImmutableList.of(newFieldWith(SENSITIVE.getName()), newField()))
+            .tags(ImmutableSet.of(PII.getName()))
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
+
+    Dataset dataset = client.createDataset(NAMESPACE_NAME, "test-dataset-tags", DB_TABLE_META);
+    assertThat(dataset.getFields().get(0).getTags())
+        .isEqualTo(ImmutableSet.of(SENSITIVE.getName()));
+    assertThat(dataset.getFields().get(1).getTags()).isEmpty();
+    assertThat(dataset.getTags()).isEqualTo(ImmutableSet.of(PII.getName()));
+
+    DbTableMeta UPDATED_META =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(
+                ImmutableList.of(
+                    newFieldWith(PII.getName()),
+                    DB_TABLE_META.getFields().get(0))) // changed fields
+            .tags(ImmutableSet.of(SENSITIVE.getName())) // added dataset tag
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
+
+    Dataset updateDataset = client.createDataset(NAMESPACE_NAME, "test-dataset-tags", UPDATED_META);
+    assertThat(updateDataset.getTags())
+        .isEqualTo(ImmutableSet.of(SENSITIVE.getName(), PII.getName()));
+    assertThat(updateDataset.getFields()).isEqualTo(UPDATED_META.getFields());
+
+    Dataset getDataset = client.getDataset(NAMESPACE_NAME, "test-dataset-tags");
+    assertThat(getDataset.getFields()).isEqualTo(UPDATED_META.getFields());
+    assertThat(getDataset.getTags()).isEqualTo(ImmutableSet.of(SENSITIVE.getName(), PII.getName()));
   }
 
   @Test
@@ -112,7 +153,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
 
     List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, "table1");
     assertThat(versions).hasSizeGreaterThan(1);
-    DatasetVersion version = versions.get(1);
+    DatasetVersion version = versions.get(0); // most recent dataset version
     assertThat(version.getCreatedByRun()).isNotEqualTo(Optional.empty());
     Run createdRun = version.getCreatedByRun().get();
     assertThat(createdRun.getCreatedAt()).isEqualTo(run.getCreatedAt());
@@ -125,22 +166,27 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     assertThat(createdRun.getNominalEndTime()).isEqualTo(run.getNominalEndTime());
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsDatasetName() {
-    client.getDataset(NAMESPACE_NAME, "not-existing");
+    Assertions.assertThrows(
+        Exception.class, () -> client.getDataset(NAMESPACE_NAME, "not-existing"));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsDatasetVersionName() {
-    client.getDatasetVersion(NAMESPACE_NAME, "not-existing", UUID.randomUUID().toString());
+    Assertions.assertThrows(
+        Exception.class,
+        () ->
+            client.getDatasetVersion(NAMESPACE_NAME, "not-existing", UUID.randomUUID().toString()));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsNamespace() {
-    client.getDataset("non-existing", "not-existing");
+    Assertions.assertThrows(
+        Exception.class, () -> client.getDataset("non-existing", "not-existing"));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsRun() {
     DbTableMeta RUN_NOT_EXISTS =
         DbTableMeta.builder()
@@ -151,10 +197,11 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .runId(UUID.randomUUID().toString())
             .build();
-    client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS);
+    Assertions.assertThrows(
+        Exception.class, () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsSource() {
     DbTableMeta RUN_NOT_EXISTS =
         DbTableMeta.builder()
@@ -165,6 +212,34 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .runId(UUID.randomUUID().toString())
             .build();
-    client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS);
+    Assertions.assertThrows(
+        Exception.class, () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
+  }
+
+  @Test
+  public void testApp_upsertDescription() {
+    DbTableMeta DESCRIPTION =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(DB_TABLE_FIELDS)
+            .tags(DB_TABLE_TAGS)
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
+
+    Dataset dataset = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DESCRIPTION);
+    assertThat(dataset.getDescription()).isEqualTo(DESCRIPTION.getDescription());
+
+    DbTableMeta WO_DESCRIPTION =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(DB_TABLE_FIELDS)
+            .tags(DB_TABLE_TAGS)
+            .build();
+
+    Dataset dataset2 = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, WO_DESCRIPTION);
+    // Description stays
+    assertThat(dataset2.getDescription()).isEqualTo(DESCRIPTION.getDescription());
   }
 }

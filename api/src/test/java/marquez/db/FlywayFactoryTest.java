@@ -22,18 +22,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
-import marquez.UnitTests;
 import org.flywaydb.core.Flyway;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
+@ExtendWith(MockitoExtension.class)
 public class FlywayFactoryTest {
-  @Rule public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock private DataSource source;
 

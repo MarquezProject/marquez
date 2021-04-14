@@ -3,14 +3,14 @@ package marquez;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import marquez.client.models.Dataset;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Category(IntegrationTests.class)
+@org.junit.jupiter.api.Tag("IntegrationTests")
 public class TagIntegrationTest extends BaseIntegrationTest {
 
-  @Before
+  @BeforeEach
   public void setup() {
     createNamespace(NAMESPACE_NAME);
     createSource(DB_TABLE_SOURCE_NAME);
@@ -29,9 +29,13 @@ public class TagIntegrationTest extends BaseIntegrationTest {
     assertThat(taggedDataset.getTags()).contains("TESTDATASETTAG");
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_testFieldNotExists() {
-    client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
-    client.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, "not-exists", "TESTTAG");
+    Assertions.assertThrows(
+        Exception.class,
+        () -> {
+          client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+          client.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, "not-exists", "TESTTAG");
+        });
   }
 }

@@ -37,8 +37,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Value;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
@@ -157,15 +159,19 @@ public class JobResource extends BaseResource {
     return new RunResource(runId, runService);
   }
 
-  @Value
-  static class Jobs {
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  public static class Jobs {
     @NonNull
     @JsonProperty("jobs")
-    List<Job> value;
+    public List<Job> value;
   }
 
-  @Value
-  static class Runs {
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  public static class Runs {
     @NonNull
     @JsonProperty("runs")
     List<Run> value;

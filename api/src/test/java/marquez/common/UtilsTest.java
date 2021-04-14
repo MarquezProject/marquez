@@ -25,11 +25,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import java.net.URL;
 import java.util.Map;
-import marquez.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class UtilsTest {
   private static final String VALUE = "test";
   private static final Object OBJECT = new Object(VALUE);

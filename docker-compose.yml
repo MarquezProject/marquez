@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  app:
+  api:
     image: marquezproject/marquez:latest
     ports:
       - "5000:5000"
@@ -16,14 +16,14 @@ services:
   web:
     image: marquezproject/marquez-web:latest
     environment:
-      - MARQUEZ_HOST=app
+      - MARQUEZ_HOST=api
       - MARQUEZ_PORT=5000
     ports:
       - "3000:3000"
     stdin_open: true
     tty: true
     depends_on:
-      - app
+      - api
 
   db:
     image: postgres:12.1

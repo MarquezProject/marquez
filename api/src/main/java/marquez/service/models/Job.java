@@ -40,8 +40,8 @@ public final class Job {
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final NamespaceName namespace;
-  @Getter private final Set<DatasetId> inputs;
-  @Getter private final Set<DatasetId> outputs;
+  @Getter @Setter private Set<DatasetId> inputs;
+  @Getter @Setter private Set<DatasetId> outputs;
   @Nullable private final URL location;
   @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
