@@ -45,7 +45,9 @@ def _match_on(token, keywords):
 
 
 def _get_tables(tokens, idx) -> Tuple[int, List[DbTableName]]:
+    # Extract table identified by preceding SQL keyword at '_is_in_table'
     def parse_ident(ident: Identifier) -> str:
+        # Extract table name from possible schema.table naming
         token_list = ident.flatten()
         table_name = next(token_list).value
         try:
@@ -62,6 +64,7 @@ def _get_tables(tokens, idx) -> Tuple[int, List[DbTableName]]:
     idx, token = tokens.token_next(idx=idx)
     tables = []
     if isinstance(token, IdentifierList):
+        # Handle "comma separated joins" as opposed to explicit JOIN keyword
         gidx = 0
         tables.append(parse_ident(token.token_first(skip_ws=True, skip_cm=True)))
         gidx, punc = token.token_next(gidx, skip_ws=True, skip_cm=True)
@@ -78,7 +81,7 @@ def _get_tables(tokens, idx) -> Tuple[int, List[DbTableName]]:
 class SqlMeta:
     # TODO: Only a single output table may exist, we'll want to rename
     # SqlMeta.out_tables -> SqlMeta.out_table
-    def __init__(self, in_tables: [DbTableName], out_tables: [DbTableName]):
+    def __init__(self, in_tables: List[DbTableName], out_tables: List[DbTableName]):
         self.in_tables = in_tables
         self.out_tables = out_tables
 
@@ -118,8 +121,6 @@ class SqlParser:
                 for intable in cte_intables:
                     if intable not in self.ctes:
                         in_tables.add(intable)
-                if cte_name:
-                    self.ctes.add(cte_name)
             elif _is_in_table(token):
                 idx, extracted_tables = _get_tables(tokens, idx)
                 for table in extracted_tables:
@@ -137,7 +138,11 @@ class SqlParser:
         return token.match(T.Keyword.CTE, values=['WITH'])
 
     def parse_cte(self, idx, tokens: TokenList):
-        _, group = tokens.token_next(idx, skip_ws=True, skip_cm=True)
+        gidx, group = tokens.token_next(idx, skip_ws=True, skip_cm=True)
+
+        # handle recursive keyword
+        if group.match(T.Keyword, values=['RECURSIVE']):
+            gidx, group = tokens.token_next(gidx, skip_ws=True, skip_cm=True)
 
         if not group.is_group:
             return [], None
@@ -145,16 +150,15 @@ class SqlParser:
         # get CTE name
         offset = 1
         cte_name = group.token_first(skip_ws=True, skip_cm=True)
-        # handle recursive keyword
-        if cte_name.match(T.Keyword, values=['RECURSIVE']):
-            offset, cte_name = group.token_next(offset, skip_ws=True, skip_cm=True)
+        self.ctes.add(cte_name.value)
 
         # AS keyword
         offset, as_keyword = group.token_next(offset, skip_ws=True, skip_cm=True)
         if not as_keyword.match(T.Keyword, values=['AS']):
-            return [], None
+            raise RuntimeError(f"CTE does not have AS keyword at index {gidx}")
 
         offset, parens = group.token_next(offset, skip_ws=True, skip_cm=True)
         if isinstance(parens, Parenthesis) or parens.is_group:
+            # Parse CTE using recursion.
             return cte_name.value, self.recurse(TokenList(parens.tokens)).in_tables
-        raise RuntimeError(f"Parens {parens} are not Parenthesis")
+        raise RuntimeError(f"Parens {parens} are not Parenthesis at index {gidx}")

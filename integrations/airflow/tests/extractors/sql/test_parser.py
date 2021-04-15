@@ -12,6 +12,7 @@
 
 import logging
 
+import pytest
 from marquez_airflow.models import DbTableName
 from marquez_airflow.extractors.sql import SqlParser
 
@@ -194,3 +195,43 @@ def test_parse_simple_cte():
     )
     assert sql_meta.in_tables == [DbTableName('transactions')]
     assert sql_meta.out_tables == [DbTableName('potential_fraud')]
+
+
+def test_parse_bugged_cte():
+    with pytest.raises(RuntimeError):
+        SqlParser.parse(
+            '''
+            WITH sum_trans (
+                SELECT user_id, COUNT(*) as cnt, SUM(amount) as balance
+                FROM transactions
+                WHERE created_date > '2020-01-01'
+                GROUP BY user_id
+            )
+            INSERT INTO potential_fraud (user_id, cnt, balance)
+            SELECT user_id, cnt, balance
+              FROM sum_trans
+              WHERE count > 1000 OR balance > 100000;
+            '''
+        )
+
+
+def test_parse_recursive_cte():
+    sql_meta = SqlParser.parse(
+        '''
+        WITH RECURSIVE subordinates AS
+            (SELECT employee_id,
+                manager_id,
+                full_name
+            FROM employees
+            WHERE employee_id = 2
+            UNION SELECT e.employee_id,
+                e.manager_id,
+                e.full_name
+            FROM employees e
+            INNER JOIN subordinates s ON s.employee_id = e.manager_id)
+        INSERT INTO sub_employees (employee_id, manager_id, full_name)
+        SELECT employee_id, manager_id, full_name FROM subordinates;
+        '''
+    )
+    assert sql_meta.in_tables == [DbTableName('employees')]
+    assert sql_meta.out_tables == [DbTableName('sub_employees')]
