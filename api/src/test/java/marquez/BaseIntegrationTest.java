@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
-import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -46,99 +45,157 @@ import marquez.client.models.SourceMeta;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.SourceType;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@ExtendWith(DropwizardExtensionsSupport.class)
+@Testcontainers
 public abstract class BaseIntegrationTest {
   protected static final String CONFIG_FILE = "config.test.yml";
   protected static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
-  protected static final PostgresContainer POSTGRES = createMarquezPostgres();
-  protected final HttpClient http2 = HttpClient.newBuilder().version(Version.HTTP_2).build();
 
-  static {
-    POSTGRES.start();
-  }
+  @Container protected static final PostgresContainer POSTGRES = createMarquezPostgres();
 
-  protected final URL baseUrl = Utils.toUrl("http://localhost:" + APP.getLocalPort());
-  protected final MarquezClient client = MarquezClient.builder().baseUrl(baseUrl).build();
   // TAGS
   protected static final Tag PII = new Tag("PII", "Personally identifiable information");
   protected static final Tag SENSITIVE = new Tag("SENSITIVE", "Contains sensitive information");
 
   // NAMESPACE
-  protected static final String NAMESPACE_NAME = newNamespaceName().getValue();
-  protected static final String OWNER_NAME = newOwnerName().getValue();
-  protected static final String NAMESPACE_DESCRIPTION = newDescription();
+  protected static String NAMESPACE_NAME;
+  protected static String OWNER_NAME;
+  protected static String NAMESPACE_DESCRIPTION;
 
   // SOURCE
-  protected static final String SOURCE_TYPE = newDbSourceType().getValue();
-  protected static final String SOURCE_NAME = newSourceName().getValue();
-  protected static final URI CONNECTION_URL = newConnectionUrl();
-  protected static final String SOURCE_DESCRIPTION = newDescription();
+  protected static String SOURCE_TYPE;
+  protected static String SOURCE_NAME;
+  protected static URI CONNECTION_URL;
+  protected static String SOURCE_DESCRIPTION;
 
   // DB TABLE DATASET
-  protected static final String DB_TABLE_SOURCE_TYPE = SourceType.of("POSTGRESQL").getValue();
-  protected static final String DB_TABLE_SOURCE_NAME = newSourceName().getValue();
-  protected static final URI DB_TABLE_CONNECTION_URL =
-      newConnectionUrlFor(SourceType.of("POSTGRESQL"));
-  protected static final String DB_TABLE_SOURCE_DESCRIPTION = newDescription();
-  protected static final DatasetId DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
-  protected static final String DB_TABLE_NAME = DB_TABLE_ID.getName();
-  protected static final String DB_TABLE_PHYSICAL_NAME = DB_TABLE_NAME;
-  protected static final String DB_TABLE_DESCRIPTION = newDescription();
-  protected static final ImmutableList<Field> DB_TABLE_FIELDS =
-      ImmutableList.of(newFieldWith(SENSITIVE.getName()), newField());
-  protected static final Set<String> DB_TABLE_TAGS = ImmutableSet.of(PII.getName());
-  protected static final DbTableMeta DB_TABLE_META =
-      DbTableMeta.builder()
-          .physicalName(DB_TABLE_PHYSICAL_NAME)
-          .sourceName(DB_TABLE_SOURCE_NAME)
-          .fields(DB_TABLE_FIELDS)
-          .tags(DB_TABLE_TAGS)
-          .description(DB_TABLE_DESCRIPTION)
-          .build();
+  protected static String DB_TABLE_SOURCE_TYPE;
+  protected static String DB_TABLE_SOURCE_NAME;
+  protected static URI DB_TABLE_CONNECTION_URL;
+  protected static String DB_TABLE_SOURCE_DESCRIPTION;
+  protected static DatasetId DB_TABLE_ID;
+  protected static String DB_TABLE_NAME;
+  protected static String DB_TABLE_PHYSICAL_NAME;
+  protected static String DB_TABLE_DESCRIPTION;
+  protected static ImmutableList<Field> DB_TABLE_FIELDS;
+  protected static Set<String> DB_TABLE_TAGS;
+  protected static DbTableMeta DB_TABLE_META;
 
   // STREAM DATASET
-  protected static final String STREAM_SOURCE_TYPE = SourceType.of("KAFKA").getValue();
-  protected static final String STREAM_SOURCE_NAME = newSourceName().getValue();
-  protected static final URI STREAM_CONNECTION_URL = newConnectionUrlFor(SourceType.of("KAFKA"));
-  protected static final String STREAM_SOURCE_DESCRIPTION = newDescription();
-  protected static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
-  protected static final String STREAM_NAME = STREAM_ID.getName();
-  protected static final String STREAM_PHYSICAL_NAME = STREAM_NAME;
-  protected static final URL STREAM_SCHEMA_LOCATION = newSchemaLocation();
-  protected static final String STREAM_DESCRIPTION = newDescription();
-  protected static final StreamMeta STREAM_META =
-      StreamMeta.builder()
-          .physicalName(STREAM_PHYSICAL_NAME)
-          .sourceName(STREAM_SOURCE_NAME)
-          .schemaLocation(STREAM_SCHEMA_LOCATION)
-          .description(STREAM_DESCRIPTION)
-          .build();
+  protected static String STREAM_SOURCE_TYPE;
+  protected static String STREAM_SOURCE_NAME;
+  protected static URI STREAM_CONNECTION_URL;
+  protected static String STREAM_SOURCE_DESCRIPTION;
+  protected static DatasetId STREAM_ID;
+  protected static String STREAM_NAME;
+  protected static String STREAM_PHYSICAL_NAME;
+  protected static URL STREAM_SCHEMA_LOCATION;
+  protected static String STREAM_DESCRIPTION;
+  protected static StreamMeta STREAM_META;
   // JOB
-  protected static final String JOB_NAME = newJobName().getValue();
-  protected static final JobId JOB_ID = new JobId(NAMESPACE_NAME, JOB_NAME);
-  protected static final JobType JOB_TYPE = JobType.BATCH;
-  protected static final URL JOB_LOCATION = newLocation();
-  protected static final ImmutableMap<String, String> JOB_CONTEXT = newContext();
-  protected static final String JOB_DESCRIPTION = newDescription();
-  final JobMeta JOB_META =
-      JobMeta.builder()
-          .type(JOB_TYPE)
-          .inputs(ImmutableSet.of())
-          .outputs(ImmutableSet.of())
-          .location(JOB_LOCATION)
-          .context(JOB_CONTEXT)
-          .description(JOB_DESCRIPTION)
-          .build();
+  protected static String JOB_NAME;
+  protected static JobId JOB_ID;
+  protected static JobType JOB_TYPE;
+  protected static URL JOB_LOCATION;
+  protected static ImmutableMap<String, String> JOB_CONTEXT;
+  protected static String JOB_DESCRIPTION;
+  protected static JobMeta JOB_META;
 
-  public static final DropwizardAppExtension<MarquezConfig> APP =
-      new DropwizardAppExtension<>(
-          MarquezApp.class,
-          CONFIG_FILE_PATH,
-          ConfigOverride.config("db.url", POSTGRES.getJdbcUrl()),
-          ConfigOverride.config("db.user", POSTGRES.getUsername()),
-          ConfigOverride.config("db.password", POSTGRES.getPassword()));
+  public static DropwizardAppExtension<MarquezConfig> APP;
+  protected final HttpClient http2 = HttpClient.newBuilder().version(Version.HTTP_2).build();
+
+  protected URL baseUrl;
+  protected MarquezClient client;
+
+  @BeforeAll
+  protected static void setupAll() throws Exception {
+    NAMESPACE_NAME = newNamespaceName().getValue();
+    OWNER_NAME = newOwnerName().getValue();
+    NAMESPACE_DESCRIPTION = newDescription();
+
+    SOURCE_TYPE = newDbSourceType().getValue();
+    SOURCE_NAME = newSourceName().getValue();
+    CONNECTION_URL = newConnectionUrl();
+    SOURCE_DESCRIPTION = newDescription();
+
+    DB_TABLE_SOURCE_TYPE = SourceType.of("POSTGRESQL").getValue();
+    DB_TABLE_SOURCE_NAME = newSourceName().getValue();
+    DB_TABLE_CONNECTION_URL = newConnectionUrlFor(SourceType.of("POSTGRESQL"));
+    DB_TABLE_SOURCE_DESCRIPTION = newDescription();
+    DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
+    DB_TABLE_NAME = DB_TABLE_ID.getName();
+    DB_TABLE_PHYSICAL_NAME = DB_TABLE_NAME;
+    DB_TABLE_DESCRIPTION = newDescription();
+    DB_TABLE_FIELDS = ImmutableList.of(newFieldWith(SENSITIVE.getName()), newField());
+    DB_TABLE_TAGS = ImmutableSet.of(PII.getName());
+    DB_TABLE_META =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(DB_TABLE_FIELDS)
+            .tags(DB_TABLE_TAGS)
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
+
+    STREAM_SOURCE_TYPE = SourceType.of("KAFKA").getValue();
+    STREAM_SOURCE_NAME = newSourceName().getValue();
+    STREAM_CONNECTION_URL = newConnectionUrlFor(SourceType.of("KAFKA"));
+    STREAM_SOURCE_DESCRIPTION = newDescription();
+    STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
+    STREAM_NAME = STREAM_ID.getName();
+    STREAM_PHYSICAL_NAME = STREAM_NAME;
+    STREAM_SCHEMA_LOCATION = newSchemaLocation();
+    STREAM_DESCRIPTION = newDescription();
+    STREAM_META =
+        StreamMeta.builder()
+            .physicalName(STREAM_PHYSICAL_NAME)
+            .sourceName(STREAM_SOURCE_NAME)
+            .schemaLocation(STREAM_SCHEMA_LOCATION)
+            .description(STREAM_DESCRIPTION)
+            .build();
+
+    JOB_NAME = newJobName().getValue();
+    JOB_ID = new JobId(NAMESPACE_NAME, JOB_NAME);
+    JOB_TYPE = JobType.BATCH;
+    JOB_LOCATION = newLocation();
+    JOB_CONTEXT = newContext();
+    JOB_DESCRIPTION = newDescription();
+    JOB_META =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+
+    APP =
+        new DropwizardAppExtension<>(
+            MarquezApp.class,
+            CONFIG_FILE_PATH,
+            ConfigOverride.config("db.url", POSTGRES.getJdbcUrl()),
+            ConfigOverride.config("db.user", POSTGRES.getUsername()),
+            ConfigOverride.config("db.password", POSTGRES.getPassword()));
+
+    APP.before();
+  }
+
+  @BeforeEach
+  protected void setupApp() {
+    baseUrl = Utils.toUrl("http://localhost:" + APP.getLocalPort());
+    client = MarquezClient.builder().baseUrl(baseUrl).build();
+  }
+
+  @AfterAll
+  protected static void cleanUp() {
+    APP.after();
+  }
 
   protected static PostgresContainer createMarquezPostgres() {
     return PostgresContainer.create("marquez");

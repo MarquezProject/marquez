@@ -44,7 +44,9 @@ import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
+import marquez.service.models.LineageEvent.DatasetFacet;
 import marquez.service.models.LineageEvent.Job;
+import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
@@ -366,26 +368,42 @@ public interface OpenLineageDao extends BaseDao {
             ds.getName(),
             dsDescription);
 
-    List<SchemaField> fields = null;
-    if (ds.getFacets() != null && ds.getFacets().getSchema() != null) {
-      fields = ds.getFacets().getSchema().getFields();
-    }
+    List<SchemaField> fields =
+        Optional.ofNullable(ds.getFacets())
+            .map(DatasetFacet::getSchema)
+            .map(SchemaDatasetFacet::getFields)
+            .orElse(null);
 
-    UUID datasetVersion =
-        version(dsNamespace.getName(), source.getName(), datasetRow.getName(), fields, runUuid);
     DatasetVersionRow datasetVersionRow =
-        datasetVersionDao.upsert(
-            UUID.randomUUID(),
-            now,
-            datasetRow.getUuid(),
-            datasetVersion,
-            isInput ? null : runUuid,
-            datasetVersionDao.toPgObjectSchemaFields(fields),
-            dsNamespace.getName(),
-            ds.getName());
+        datasetRow
+            .getCurrentVersionUuid()
+            .filter(v -> isInput) // only fetch the current version if this is a read
+            .flatMap(datasetVersionDao::findRowByUuid)
+            // if this is a write _or_ if the dataset has no current version,
+            // create a new version
+            .orElseGet(
+                () -> {
+                  UUID versionUuid =
+                      version(
+                          dsNamespace.getName(),
+                          source.getName(),
+                          datasetRow.getName(),
+                          fields,
+                          runUuid);
+                  DatasetVersionRow row =
+                      datasetVersionDao.upsert(
+                          UUID.randomUUID(),
+                          now,
+                          datasetRow.getUuid(),
+                          versionUuid,
+                          isInput ? null : runUuid,
+                          datasetVersionDao.toPgObjectSchemaFields(fields),
+                          dsNamespace.getName(),
+                          ds.getName());
 
-    datasetDao.updateVersion(datasetRow.getUuid(), now, datasetVersionRow.getUuid());
-
+                  datasetDao.updateVersion(datasetRow.getUuid(), now, row.getUuid());
+                  return row;
+                });
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
     if (fields != null) {
       for (SchemaField field : fields) {
