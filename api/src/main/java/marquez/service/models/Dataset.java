@@ -61,6 +61,7 @@ public abstract class Dataset {
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
   private final Optional<UUID> currentVersionUuid;
+  @Nullable LineageEvent.DatasetFacets datasetFacets;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -74,7 +75,8 @@ public abstract class Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Optional<UUID> currentVersionUuid) {
+      @Nullable final Optional<UUID> currentVersionUuid,
+      @Nullable LineageEvent.DatasetFacets datasetFacets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -88,6 +90,7 @@ public abstract class Dataset {
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
     this.currentVersionUuid = currentVersionUuid;
+    this.datasetFacets = datasetFacets;
   }
 
   public Optional<Instant> getLastModifiedAt() {
