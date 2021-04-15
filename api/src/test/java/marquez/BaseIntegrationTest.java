@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
-
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -53,13 +52,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
-//@ExtendWith(DropwizardExtensionsSupport.class)
 public abstract class BaseIntegrationTest {
   protected static final String CONFIG_FILE = "config.test.yml";
   protected static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
 
-  @Container
-  protected static final PostgresContainer POSTGRES = createMarquezPostgres();
+  @Container protected static final PostgresContainer POSTGRES = createMarquezPostgres();
 
   // TAGS
   protected static final Tag PII = new Tag("PII", "Personally identifiable information");
@@ -115,7 +112,6 @@ public abstract class BaseIntegrationTest {
   protected URL baseUrl;
   protected MarquezClient client;
 
-
   @BeforeAll
   protected static void setupAll() throws Exception {
     NAMESPACE_NAME = newNamespaceName().getValue();
@@ -129,8 +125,7 @@ public abstract class BaseIntegrationTest {
 
     DB_TABLE_SOURCE_TYPE = SourceType.of("POSTGRESQL").getValue();
     DB_TABLE_SOURCE_NAME = newSourceName().getValue();
-    DB_TABLE_CONNECTION_URL =
-      newConnectionUrlFor(SourceType.of("POSTGRESQL"));
+    DB_TABLE_CONNECTION_URL = newConnectionUrlFor(SourceType.of("POSTGRESQL"));
     DB_TABLE_SOURCE_DESCRIPTION = newDescription();
     DB_TABLE_ID = newDatasetIdWith(NAMESPACE_NAME);
     DB_TABLE_NAME = DB_TABLE_ID.getName();
@@ -139,13 +134,13 @@ public abstract class BaseIntegrationTest {
     DB_TABLE_FIELDS = ImmutableList.of(newFieldWith(SENSITIVE.getName()), newField());
     DB_TABLE_TAGS = ImmutableSet.of(PII.getName());
     DB_TABLE_META =
-      DbTableMeta.builder()
-        .physicalName(DB_TABLE_PHYSICAL_NAME)
-        .sourceName(DB_TABLE_SOURCE_NAME)
-        .fields(DB_TABLE_FIELDS)
-        .tags(DB_TABLE_TAGS)
-        .description(DB_TABLE_DESCRIPTION)
-        .build();
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(DB_TABLE_FIELDS)
+            .tags(DB_TABLE_TAGS)
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
 
     STREAM_SOURCE_TYPE = SourceType.of("KAFKA").getValue();
     STREAM_SOURCE_NAME = newSourceName().getValue();
@@ -157,12 +152,12 @@ public abstract class BaseIntegrationTest {
     STREAM_SCHEMA_LOCATION = newSchemaLocation();
     STREAM_DESCRIPTION = newDescription();
     STREAM_META =
-      StreamMeta.builder()
-        .physicalName(STREAM_PHYSICAL_NAME)
-        .sourceName(STREAM_SOURCE_NAME)
-        .schemaLocation(STREAM_SCHEMA_LOCATION)
-        .description(STREAM_DESCRIPTION)
-        .build();
+        StreamMeta.builder()
+            .physicalName(STREAM_PHYSICAL_NAME)
+            .sourceName(STREAM_SOURCE_NAME)
+            .schemaLocation(STREAM_SCHEMA_LOCATION)
+            .description(STREAM_DESCRIPTION)
+            .build();
 
     JOB_NAME = newJobName().getValue();
     JOB_ID = new JobId(NAMESPACE_NAME, JOB_NAME);
@@ -171,24 +166,24 @@ public abstract class BaseIntegrationTest {
     JOB_CONTEXT = newContext();
     JOB_DESCRIPTION = newDescription();
     JOB_META =
-      JobMeta.builder()
-        .type(JOB_TYPE)
-        .inputs(ImmutableSet.of())
-        .outputs(ImmutableSet.of())
-        .location(JOB_LOCATION)
-        .context(JOB_CONTEXT)
-        .description(JOB_DESCRIPTION)
-        .build();
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
 
-    APP = new DropwizardAppExtension<>(
-      MarquezApp.class,
-      CONFIG_FILE_PATH,
-      ConfigOverride.config("db.url", POSTGRES.getJdbcUrl()),
-      ConfigOverride.config("db.user", POSTGRES.getUsername()),
-      ConfigOverride.config("db.password", POSTGRES.getPassword()));
+    APP =
+        new DropwizardAppExtension<>(
+            MarquezApp.class,
+            CONFIG_FILE_PATH,
+            ConfigOverride.config("db.url", POSTGRES.getJdbcUrl()),
+            ConfigOverride.config("db.user", POSTGRES.getUsername()),
+            ConfigOverride.config("db.password", POSTGRES.getPassword()));
 
     APP.before();
-
   }
 
   @BeforeEach
@@ -201,7 +196,7 @@ public abstract class BaseIntegrationTest {
   protected static void cleanUp() {
     APP.after();
   }
-  
+
   protected static PostgresContainer createMarquezPostgres() {
     return PostgresContainer.create("marquez");
   }
