@@ -75,6 +75,7 @@ public class JobResource extends BaseResource {
     }
     throwIfDatasetsNotExist(jobMeta.getInputs());
     throwIfDatasetsNotExist(jobMeta.getOutputs());
+
     final Job job = jobService.createOrUpdate(namespaceName, jobName, jobMeta);
     return Response.ok(job).build();
   }
