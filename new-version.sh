@@ -55,7 +55,7 @@ cd "${project_root}"
 # Verify bump2version is installed
 if [[ ! $(type -P bump2version) ]]; then
   echo "bump2version not installed! Please see https://github.com/c4urself/bump2version#installation"
-  exit 1
+  exit 1;
 fi
 
 branch=$(git symbolic-ref --short HEAD)
@@ -66,6 +66,12 @@ fi
 
 if [[ $# -eq 0 ]] ; then
   usage
+fi
+
+# check if we have either staged or unstaged changes in working tree
+if [[ -n "$(git status --porcelain)" ]] ; then
+  echo "error: you have changes in your working tree"
+  exit 1;
 fi
 
 while [ $# -gt 0 ]; do
