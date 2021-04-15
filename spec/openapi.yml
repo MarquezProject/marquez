@@ -158,9 +158,6 @@ paths:
       - $ref: '#/components/parameters/dataset'
       - $ref: '#/components/parameters/version'
     get:
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
       summary: Retrieve a version for a dataset
       description: Returns a version for a dataset.
       tags:
