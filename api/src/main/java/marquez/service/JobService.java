@@ -53,12 +53,14 @@ public class JobService extends DelegatingDaos.DelegatingJobDao {
 
     // Run updates come in through this endpoint to notify of input and output datasets.
     // Note: There is an alternative route to registering /output/ datasets in the dataset api.
+    log.info("isPresent: {}", jobMeta.getRunId().isPresent());
     if (jobMeta.getRunId().isPresent()) {
       UUID runUuid = jobMeta.getRunId().get().getValue();
       runDao.notifyJobChange(runUuid, jobRow, jobMeta);
       ExtendedRunRow runRow = runDao.findByRow(runUuid).get();
 
       List<ExtendedDatasetVersionRow> inputs = datasetVersionDao.findInputsByRunId(runUuid);
+      log.info("inputs: {}", inputs);
       runService.notify(
           new JobInputUpdate(
               RunId.of(runRow.getUuid()),
@@ -71,6 +73,8 @@ public class JobService extends DelegatingDaos.DelegatingJobDao {
 
     JobMetrics.emitJobCreationMetric(namespaceName.getValue(), jobMeta.getType().toString());
 
-    return findWithRun(jobRow.getNamespaceName(), jobRow.getName()).get();
+    var job = findWithRun(jobRow.getNamespaceName(), jobRow.getName()).get();
+    log.info("createOrUpdate: {}", job.getInputs().toString());
+    return job;
   }
 }
