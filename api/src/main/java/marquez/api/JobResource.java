@@ -41,7 +41,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
@@ -52,7 +51,6 @@ import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 
-@Slf4j
 @Path("/api/v1")
 public class JobResource extends BaseResource {
   public JobResource(@NonNull final ServiceFactory serviceFactory) {
@@ -77,9 +75,7 @@ public class JobResource extends BaseResource {
     }
     throwIfDatasetsNotExist(jobMeta.getInputs());
     throwIfDatasetsNotExist(jobMeta.getOutputs());
-    log.info(jobMeta.getInputs().toString());
     final Job job = jobService.createOrUpdate(namespaceName, jobName, jobMeta);
-    log.info(job.getInputs().toString());
     return Response.ok(job).build();
   }
 

@@ -137,7 +137,6 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
   }
 
   void notify(JobInputUpdate update) {
-    log.info("jobInputUpdate: {}", update);
     notify(RunTransitionListener::notify, update);
   }
 
@@ -150,11 +149,9 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
   }
 
   private <T> void notify(BiConsumer<RunTransitionListener, T> f, T param) {
-    log.info("runTransitionListeners: {}", runTransitionListeners.toString());
     for (RunTransitionListener runTransitionListener : runTransitionListeners) {
       try {
         f.accept(runTransitionListener, param);
-        log.info("runTransitionListener: {} accepted", runTransitionListener.toString());
       } catch (Exception e) {
         log.error("Exception from listener " + runTransitionListener, e);
       }
