@@ -77,6 +77,10 @@ task testDataAccess(type: Test) {
     }
 }
 
+test {
+    useJUnitPlatform()
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {

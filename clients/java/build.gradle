@@ -39,6 +39,10 @@ task testUnit(type: Test) {
     }
 }
 
+test {
+    useJUnitPlatform()
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
