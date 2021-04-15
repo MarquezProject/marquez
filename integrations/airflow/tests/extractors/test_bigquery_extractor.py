@@ -269,6 +269,9 @@ class TestBigQueryExtractor(unittest.TestCase):
         x = {"first": {"second": {"third": 42}}}
         assert get_from_nullable_chain(x, ['first', 'second', 'third']) == 42
 
+        x = {"first": {"second": {"third": 42, "fourth": {"empty": 56}}}}
+        assert get_from_nullable_chain(x, ['first', 'second', 'third']) == 42
+
     @staticmethod
     def _get_ti(task):
         task_instance = TaskInstance(

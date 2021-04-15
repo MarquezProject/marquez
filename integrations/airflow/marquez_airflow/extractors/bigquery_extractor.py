@@ -46,6 +46,25 @@ log = logging.getLogger(__name__)
 
 
 def get_from_nullable_chain(source: Dict[str, Any], chain: List[str]) -> Optional[Any]:
+    """
+    Get object from nested structure of dictionaries, where it's not guaranteed that
+    all keys in the nested structure exist.
+    Intended to replace chain of `dict.get()` statements.
+
+    Example usage:
+    if not job._properties.get('statistics')\
+        or not job._properties.get('statistics').get('query')\
+        or not job._properties.get('statistics').get('query')\
+            .get('referencedTables'):
+        return None
+    result = job._properties.get('statistics').get('query')\
+            .get('referencedTables')
+
+    becomes:
+    result = get_from_nullable_chain(properties, ['statistics', 'query', 'queryPlan'])
+    if not result:
+        return None
+    """
     chain.reverse()
     try:
         while chain:
