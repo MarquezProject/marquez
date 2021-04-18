@@ -59,7 +59,7 @@ subprojects {
         dropwizardVersion = '2.0.20'
         junit5Version = '5.7.1'
         lombokVersion = '1.18.18'
-        mockitoVersion = '3.8.0'
+        mockitoVersion = '3.9.0'
         slf4jVersion = '1.7.30'
         postgresqlVersion = '42.2.19'
         isReleaseVersion = !version.endsWith('SNAPSHOT')
