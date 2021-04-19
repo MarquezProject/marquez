@@ -235,3 +235,25 @@ def test_parse_recursive_cte():
     )
     assert sql_meta.in_tables == [DbTableName('employees')]
     assert sql_meta.out_tables == [DbTableName('sub_employees')]
+
+
+def test_parse_default_schema():
+    sql_meta = SqlParser.parse(
+        '''
+        SELECT col0, col1, col2
+          FROM table0
+        ''',
+        'public'
+    )
+    assert sql_meta.in_tables == [DbTableName('public.table0')]
+
+
+def test_ignores_default_schema_when_non_default_schema():
+    sql_meta = SqlParser.parse(
+        '''
+        SELECT col0, col1, col2
+          FROM transactions.table0
+        ''',
+        'public'
+    )
+    assert sql_meta.in_tables == [DbTableName('transactions.table0')]
