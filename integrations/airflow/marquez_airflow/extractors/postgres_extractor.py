@@ -42,13 +42,14 @@ _UDT_NAME = 4
 
 class PostgresExtractor(BaseExtractor):
     operator_class = PostgresOperator
+    default_schema = 'public'
 
     def __init__(self, operator):
         super().__init__(operator)
 
     def extract(self) -> StepMetadata:
         # (1) Parse sql statement to obtain input / output tables.
-        sql_meta: SqlMeta = SqlParser.parse(self.operator.sql)
+        sql_meta: SqlMeta = SqlParser.parse(self.operator.sql, self.default_schema)
 
         # (2) Default all inputs / outputs to current connection.
         # NOTE: We'll want to look into adding support for the `database`
