@@ -191,7 +191,7 @@ public interface DatasetVersionDao extends BaseDao {
     v.ifPresent(
         ver -> {
           if (ver.getCreatedByRunUuid() != null) {
-            Optional<Run> run = createRunDao().findBy(ver.getCreatedByRunUuid());
+            Optional<Run> run = createRunDao().findRunByUuid(ver.getCreatedByRunUuid());
             run.ifPresent(ver::setCreatedByRun);
           }
         });
@@ -201,7 +201,7 @@ public interface DatasetVersionDao extends BaseDao {
   @SqlQuery(
       SELECT
           + " INNER JOIN runs_input_mapping m ON m.dataset_version_uuid = dv.uuid WHERE m.run_uuid = :runUuid")
-  List<ExtendedDatasetVersionRow> findInputsByRunId(UUID runUuid);
+  List<ExtendedDatasetVersionRow> findInputDatasetVersionsFor(UUID runUuid);
 
   /**
    * returns all Dataset Versions created by this run id
@@ -209,7 +209,7 @@ public interface DatasetVersionDao extends BaseDao {
    * @param runId - the run ID
    */
   @SqlQuery(SELECT + " WHERE run_uuid = :runId")
-  List<ExtendedDatasetVersionRow> findOutputsByRunId(@NonNull UUID runId);
+  List<ExtendedDatasetVersionRow> findOutputDatasetVersionsFor(@NonNull UUID runId);
 
   @SqlQuery(
       DATASET_VERSION_SELECT
@@ -225,7 +225,7 @@ public interface DatasetVersionDao extends BaseDao {
         .peek(
             ver -> {
               if (ver.getCreatedByRunUuid() != null) {
-                Optional<Run> run = createRunDao().findBy(ver.getCreatedByRunUuid());
+                Optional<Run> run = createRunDao().findRunByUuid(ver.getCreatedByRunUuid());
                 run.ifPresent(ver::setCreatedByRun);
               }
             })

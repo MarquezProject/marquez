@@ -181,7 +181,8 @@ public class OpenLineageServiceTest {
     Assertions.assertTrue(job.isPresent(), "Job does not exist: " + event.getJob().getName());
 
     RunService runService = new RunService(openLineageDao, new ArrayList());
-    Optional<Run> run = runService.findBy(openLineageDao.runToUuid(event.getRun().getRunId()));
+    Optional<Run> run =
+        runService.findRunByUuid(openLineageDao.runToUuid(event.getRun().getRunId()));
     Assertions.assertTrue(run.isPresent(), "Should have run");
 
     if (event.getInputs() != null) {
@@ -200,7 +201,7 @@ public class OpenLineageServiceTest {
     DatasetService datasetService = new DatasetService(openLineageDao, runService);
 
     Optional<Dataset> dataset =
-        datasetService.find(
+        datasetService.findDatasetByName(
             openLineageDao.formatNamespaceName(ds.getNamespace()),
             openLineageDao.formatDatasetName(ds.getName()));
     Assertions.assertTrue(dataset.isPresent(), "Dataset does not exist: " + ds);

@@ -32,7 +32,7 @@ public class RunRow {
   @Getter @NonNull private final UUID uuid;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
-  private final UUID jobVersionUuid;
+  @Nullable private final UUID jobVersionUuid;
   @Getter @NonNull private final UUID runArgsUuid;
   @Getter @NonNull private final List<UUID> inputVersionUuids;
   @Nullable private final Instant nominalStartTime;
@@ -47,6 +47,10 @@ public class RunRow {
 
   public boolean hasInputVersionUuids() {
     return !inputVersionUuids.isEmpty();
+  }
+
+  public Optional<UUID> getJobVersionUuid() {
+    return Optional.ofNullable(jobVersionUuid);
   }
 
   public Optional<Instant> getNominalStartTime() {
