@@ -44,7 +44,11 @@ def _match_on(token, keywords):
     return token.match(T.Keyword, values=keywords)
 
 
-def _get_tables(tokens, idx, default_schema: Optional[str] = None) -> Tuple[int, List[DbTableName]]:
+def _get_tables(
+        tokens,
+        idx,
+        default_schema: Optional[str] = None
+) -> Tuple[int, List[DbTableName]]:
     # Extract table identified by preceding SQL keyword at '_is_in_table'
     def parse_ident(ident: Identifier) -> str:
         # Extract table name from possible schema.table naming
