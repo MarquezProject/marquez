@@ -18,7 +18,7 @@ import scala.runtime.AbstractPartialFunction;
 /**
  * {@link LogicalPlan} visitor that extracts the input query of certain write commands that don't
  * expose their input {@link LogicalPlan#children()}. Plans that expose their children are traversed
- * normally by calling {@link LogicalPlan#collect(PartialFunction)}, but children that arnen't
+ * normally by calling {@link LogicalPlan#collect(PartialFunction)}, but children that aren't
  * exposed get skipped in the collect call, so we need to root them out here.
  */
 public class CommandPlanVisitor extends AbstractPartialFunction<LogicalPlan, List<Dataset>> {

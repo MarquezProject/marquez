@@ -49,8 +49,6 @@ dependencies {
     testImplementation "org.postgresql:postgresql:${postgresqlVersion}"
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
     testImplementation('org.xerial:sqlite-jdbc:3.34.0')
-    testCompile 'org.projectlombok:lombok:1.18.18'
-    annotationProcessor "org.projectlombok:lombok:1.18.16"
     testAnnotationProcessor "org.projectlombok:lombok:1.18.16"
 }
 

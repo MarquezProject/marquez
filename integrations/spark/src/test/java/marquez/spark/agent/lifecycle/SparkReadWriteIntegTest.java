@@ -194,6 +194,7 @@ public class SparkReadWriteIntegTest {
 
     // FIXME- the DataFrame -> RDD conversion in the JDBCRelationProvider causes two different sets
     // of job execution events. Both end up triggering the open lineage event creation
+    // see https://github.com/MarquezProject/marquez/issues/1197
     Mockito.verify(marquezContext, times(4)).emit(lineageEvent.capture());
     List<LineageEvent> events = lineageEvent.getAllValues();
     Optional<LineageEvent> completionEvent =
