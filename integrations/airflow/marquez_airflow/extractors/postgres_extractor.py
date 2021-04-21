@@ -9,7 +9,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from contextlib import closing
 from typing import Optional
 
@@ -108,9 +107,7 @@ class PostgresExtractor(BaseExtractor):
         )
         with closing(hook.get_conn()) as conn:
             with closing(conn.cursor()) as cursor:
-                table_names_as_list = ",".join(map(
-                    lambda name: f"'{name}'", table_names
-                ))
+                table_names_as_list = ",".join([f"'{name.name}'" for name in table_names])
                 cursor.execute(
                     f"""
                     SELECT table_schema,

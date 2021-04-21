@@ -62,7 +62,7 @@ def _get_tables(
                 table_name += dot.value
                 table_name += next(token_list).value
             elif default_schema:
-                table_name += f'.{default_schema}'
+                table_name = f'{default_schema}.{table_name}'
         except StopIteration:
             if default_schema:
                 table_name = f'{default_schema}.{table_name}'
@@ -119,7 +119,7 @@ class SqlParser:
         parser = cls(default_schema)
         return parser.recurse(tokens)
 
-    def recurse(self, tokens: TokenList):
+    def recurse(self, tokens: TokenList) -> SqlMeta:
         in_tables, out_tables = set(), set()
         idx, token = tokens.token_next_by(t=T.Keyword)
         while token:
