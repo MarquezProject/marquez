@@ -151,8 +151,8 @@ def get_job_name(task):
 
 def get_custom_facets(task, is_external_trigger: bool):
     return {
-        "runArgs": AirflowRunArgsRunFacet(is_external_trigger),
-        "airflowVersion": AirflowVersionRunFacet.from_task(task)
+        "airflow_runArgs": AirflowRunArgsRunFacet(is_external_trigger),
+        "airflow_version": AirflowVersionRunFacet.from_task(task)
     }
 
 

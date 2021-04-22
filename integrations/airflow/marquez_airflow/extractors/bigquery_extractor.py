@@ -170,7 +170,7 @@ class BigQueryExtractor(BaseExtractor):
                 inputs=None,
                 outputs=None,
                 run_facets={
-                    "bigQueryError": BigQueryErrorRunFacet(
+                    "bigQuery_error": BigQueryErrorRunFacet(
                         clientError=f"{e}: {traceback.format_exc()}",
                         parserError=context.parser_error
                     )
@@ -189,14 +189,14 @@ class BigQueryExtractor(BaseExtractor):
                 run_stat_facet, dataset_stat_facet = self._get_output_statistics(props)
 
                 run_facets.update({
-                    "bigQueryStatistics": run_stat_facet
+                    "bigQuery_statistics": run_stat_facet
                 })
 
                 inputs = self._get_input_from_bq(props, client)
                 output = self._get_output_from_bq(props, client)
                 if output:
                     output.custom_facets.update({
-                        "datasetStatistics": dataset_stat_facet
+                        "stats": dataset_stat_facet
                     })
 
             finally:
@@ -208,7 +208,7 @@ class BigQueryExtractor(BaseExtractor):
             log.error(f"Cannot retrieve job details from BigQuery.Client. {e}",
                       exc_info=True)
             run_facets.update({
-                "bigQueryError": BigQueryErrorRunFacet(
+                "bigQuery_error": BigQueryErrorRunFacet(
                     clientError=f"{e}: {traceback.format_exc()}",
                     parserError=context.parser_error
                 )

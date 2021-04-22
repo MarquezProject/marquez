@@ -725,8 +725,8 @@ def test_marquez_dag_adds_custom_facets(
                     namespace=DAG_NAMESPACE,
                     job_name=f"{DAG_ID}.{TASK_ID_COMPLETED}"
                 ),
-                "runArgs": AirflowRunArgsRunFacet(False),
-                "airflowVersion": AirflowVersionRunFacet(
+                "airflow_runArgs": AirflowRunArgsRunFacet(False),
+                "airflow_version": AirflowVersionRunFacet(
                     operator="airflow.operators.dummy_operator.DummyOperator",
                     taskInfo=mock.ANY,
                     airflowVersion=AIRFLOW_VERSION,

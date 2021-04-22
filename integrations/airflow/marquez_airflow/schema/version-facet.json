@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "definitions": {
-    "AirflowVersionFacet": {
+    "AirflowVersionRunFacet": {
       "allOf": [
         {
           "$ref": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/BaseFacet"
