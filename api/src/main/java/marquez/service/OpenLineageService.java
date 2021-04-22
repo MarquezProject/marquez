@@ -2,6 +2,7 @@ package marquez.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.db.BaseDao;
+import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.RunArgsRow;
@@ -100,6 +102,11 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
     // We query for all datasets since they can come in slowly over time
     List<ExtendedDatasetVersionRow> datasets =
         datasetVersionDao.findOutputsByRunId(record.getRun().getUuid());
+    DatasetDao datasetDao = createDatasetDao();
+    datasets.forEach(
+        versionRow ->
+            datasetDao.updateVersion(
+                versionRow.getDatasetUuid(), Instant.now(), versionRow.getUuid()));
 
     // Do not trigger a JobOutput event if there are no new datasets
     if (datasets.isEmpty() && record.getOutputs().isEmpty()) {
