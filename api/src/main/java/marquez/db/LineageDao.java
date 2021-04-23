@@ -44,12 +44,17 @@ public interface LineageDao {
    * @return
    */
   @SqlQuery(
+      // dataset_ids: all the input and output datasets of the current version of the specified jobs
       "WITH dataset_ids AS (\n"
           + "    SELECT DISTINCT dataset_uuid\n"
           + "        FROM jobs j\n"
           + "        INNER JOIN job_versions_io_mapping io ON io.job_version_uuid=j.current_version_uuid\n"
           + "        WHERE j.uuid IN (<jobIds>)\n"
           + ")\n"
+          // SELECT DISTINCT j.uuid:
+          // all the jobs that have ever read from or written to those datasets.
+          // note that this includes previous versions of jobs that no longer interact with those
+          // datasets
           + "SELECT DISTINCT j.uuid\n"
           + "    FROM job_versions_io_mapping io\n"
           + "    INNER JOIN dataset_ids ON io.dataset_uuid=dataset_ids.dataset_uuid\n"
@@ -59,6 +64,9 @@ public interface LineageDao {
 
   @SqlQuery("SELECT uuid from jobs where name = :jobName and namespace_name = :namespace")
   Optional<UUID> getJobUuid(String jobName, String namespace);
+
+  // TODO- the input and output dataset methods below can be combined into a single SQL query
+  // that fetches input and output edges for the returned datasets all at once.
 
   /**
    * Return a list of datasets that are either inputs or outputs of the specified job ids and the
