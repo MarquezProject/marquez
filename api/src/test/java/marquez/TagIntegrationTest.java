@@ -19,13 +19,14 @@ public class TagIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testApp_testTags() {
-    client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+    marquezClient.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
     Dataset dataset =
-        client.tagFieldWith(
+        marquezClient.tagFieldWith(
             NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META.getFields().get(0).getName(), "TESTTAG");
     assertThat(dataset.getFields().get(0).getTags()).contains("TESTTAG");
 
-    Dataset taggedDataset = client.tagDatasetWith(NAMESPACE_NAME, DB_TABLE_NAME, "TESTDATASETTAG");
+    Dataset taggedDataset =
+        marquezClient.tagDatasetWith(NAMESPACE_NAME, DB_TABLE_NAME, "TESTDATASETTAG");
     assertThat(taggedDataset.getTags()).contains("TESTDATASETTAG");
   }
 
@@ -34,8 +35,8 @@ public class TagIntegrationTest extends BaseIntegrationTest {
     Assertions.assertThrows(
         Exception.class,
         () -> {
-          client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
-          client.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, "not-exists", "TESTTAG");
+          marquezClient.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+          marquezClient.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, "not-exists", "TESTTAG");
         });
   }
 }

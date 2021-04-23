@@ -43,7 +43,7 @@ public final class Stream extends Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final URL schemaLocation,
       @Nullable final String description,
-      @Nullable final String facets) {
+      @Nullable final Object facets) {
     super(
         id,
         STREAM,

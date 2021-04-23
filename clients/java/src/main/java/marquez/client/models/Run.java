@@ -34,6 +34,7 @@ public final class Run extends RunMeta {
   @Nullable private final Instant startedAt;
   @Nullable private final Long durationMs;
   @Nullable private final Instant endedAt;
+  @Nullable private final Object facets;
 
   public Run(
       @NonNull final String id,
@@ -45,7 +46,8 @@ public final class Run extends RunMeta {
       @Nullable final Instant startedAt,
       @Nullable final Instant endedAt,
       @Nullable final Long durationMs,
-      @Nullable final Map<String, String> args) {
+      @Nullable final Map<String, String> args,
+      @Nullable final Object facets) {
     super(id, nominalStartTime, nominalEndTime, args);
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -53,6 +55,7 @@ public final class Run extends RunMeta {
     this.startedAt = startedAt;
     this.durationMs = durationMs;
     this.endedAt = endedAt;
+    this.facets = facets;
   }
 
   public Optional<Instant> getStartedAt() {
@@ -65,6 +68,10 @@ public final class Run extends RunMeta {
 
   public Optional<Long> getDurationMs() {
     return Optional.ofNullable(durationMs);
+  }
+
+  public Optional<Object> getFacets() {
+    return Optional.ofNullable(facets);
   }
 
   public static Run fromJson(@NonNull final String json) {

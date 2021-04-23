@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
-/** Defines a facet type. */
+/** Defines the {@code facets} type. */
 @EqualsAndHashCode
 @ToString
 @JsonSerialize(converter = Facets.ToValue.class)

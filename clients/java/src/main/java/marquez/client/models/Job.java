@@ -36,6 +36,7 @@ public final class Job extends JobMeta {
   @Getter private final Instant updatedAt;
   @Getter private final String namespace;
   @Nullable private final Run latestRun;
+  @Nullable private final Object facets;
 
   public Job(
       @NonNull final JobId id,
@@ -49,7 +50,8 @@ public final class Job extends JobMeta {
       @Nullable final URL location,
       final Map<String, String> context,
       final String description,
-      @Nullable final Run latestRun) {
+      @Nullable final Run latestRun,
+      @Nullable final Object facets) {
     super(type, inputs, outputs, location, context, description, null);
     this.id = id;
     this.name = name;
@@ -57,10 +59,15 @@ public final class Job extends JobMeta {
     this.updatedAt = updatedAt;
     this.namespace = namespace;
     this.latestRun = latestRun;
+    this.facets = facets;
   }
 
   public Optional<Run> getLatestRun() {
     return Optional.ofNullable(latestRun);
+  }
+
+  public Optional<Object> getFacets() {
+    return Optional.ofNullable(facets);
   }
 
   public static Job fromJson(@NonNull final String json) {

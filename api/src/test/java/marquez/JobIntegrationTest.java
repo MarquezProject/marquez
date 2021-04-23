@@ -26,15 +26,15 @@ public class JobIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testApp_listJobs() {
-    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
-    List<Job> jobs = client.listJobs(NAMESPACE_NAME);
+    marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    List<Job> jobs = marquezClient.listJobs(NAMESPACE_NAME);
     assertThat(jobs).hasSizeGreaterThan(0);
   }
 
   @Test
   public void testApp_listRuns() {
-    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build());
-    List<Run> runs = client.listRuns(NAMESPACE_NAME, JOB_NAME);
+    marquezClient.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build());
+    List<Run> runs = marquezClient.listRuns(NAMESPACE_NAME, JOB_NAME);
     assertThat(runs).hasSizeGreaterThan(0);
   }
 
@@ -43,10 +43,10 @@ public class JobIntegrationTest extends BaseIntegrationTest {
     Assertions.assertThrows(
         Exception.class,
         () -> {
-          client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+          marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
           String runId = UUID.randomUUID().toString();
-          client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
-          client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+          marquezClient.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+          marquezClient.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
         });
   }
 
@@ -55,7 +55,7 @@ public class JobIntegrationTest extends BaseIntegrationTest {
     Assertions.assertThrows(
         Exception.class,
         () -> {
-          client.createRun(NAMESPACE_NAME, "NotExists", RunMeta.builder().build());
+          marquezClient.createRun(NAMESPACE_NAME, "NotExists", RunMeta.builder().build());
         });
   }
 
@@ -71,10 +71,10 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
-    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
-    client.createJob(NAMESPACE_NAME, "DIFFERENT_JOB", JOB_META);
+    marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    marquezClient.createJob(NAMESPACE_NAME, "DIFFERENT_JOB", JOB_META);
 
-    client.createRun(NAMESPACE_NAME, "DIFFERENT_JOB", RunMeta.builder().id(runId).build());
+    marquezClient.createRun(NAMESPACE_NAME, "DIFFERENT_JOB", RunMeta.builder().id(runId).build());
 
     final JobMeta JOB_META_WITH_RUN =
         JobMeta.builder()
@@ -88,7 +88,8 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .build();
     // associate wrong run
     Assertions.assertThrows(
-        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META_WITH_RUN));
+        Exception.class,
+        () -> marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META_WITH_RUN));
   }
 
   @Test
@@ -104,7 +105,7 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .runId(UUID.randomUUID().toString())
             .build();
     Assertions.assertThrows(
-        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
+        Exception.class, () -> marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
   }
 
   @Test
@@ -119,12 +120,13 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .description(JOB_DESCRIPTION)
             .build();
     Assertions.assertThrows(
-        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
+        Exception.class, () -> marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META));
   }
 
   @Test
   public void testApp_notExistsJob() {
-    Assertions.assertThrows(Exception.class, () -> client.getJob(NAMESPACE_NAME, "not-existing"));
+    Assertions.assertThrows(
+        Exception.class, () -> marquezClient.getJob(NAMESPACE_NAME, "not-existing"));
   }
 
   @Test
@@ -135,7 +137,7 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .connectionUrl(CONNECTION_URL)
             .description(SOURCE_DESCRIPTION)
             .build();
-    Source createdSource = client.createSource("sourceName", sourceMeta);
+    Source createdSource = marquezClient.createSource("sourceName", sourceMeta);
     assertThat(createdSource.getCreatedAt()).isNotNull();
     assertThat(createdSource.getName()).isEqualTo("sourceName");
     assertThat(createdSource.getType()).isEqualTo(sourceMeta.getType());
@@ -143,7 +145,7 @@ public class JobIntegrationTest extends BaseIntegrationTest {
     assertThat(createdSource.getDescription()).isEqualTo(sourceMeta.getDescription());
     assertThat(createdSource.getConnectionUrl()).isEqualTo(sourceMeta.getConnectionUrl());
 
-    Source source = client.getSource("sourceName");
+    Source source = marquezClient.getSource("sourceName");
     assertThat(source.getCreatedAt()).isNotNull();
     assertThat(source.getName()).isEqualTo("sourceName");
     assertThat(source.getType()).isEqualTo(sourceMeta.getType());

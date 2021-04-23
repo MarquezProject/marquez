@@ -23,18 +23,18 @@ public class RunIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testApp_markAsFailed() {
-    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
     String runId = UUID.randomUUID().toString();
-    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
-    client.markRunAs(runId, RunState.FAILED);
+    marquezClient.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+    marquezClient.markRunAs(runId, RunState.FAILED);
   }
 
   @Test
   public void testApp_markAsAborted() {
-    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
     String runId = UUID.randomUUID().toString();
-    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
-    Run run = client.markRunAs(runId, RunState.ABORTED);
+    marquezClient.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+    Run run = marquezClient.markRunAs(runId, RunState.ABORTED);
 
     assertThat(run.getId()).isEqualTo(runId);
   }
@@ -50,7 +50,7 @@ public class RunIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .build();
 
-    client.createDataset(NAMESPACE_NAME, "my-output-ds", DB_TABLE_META);
+    marquezClient.createDataset(NAMESPACE_NAME, "my-output-ds", DB_TABLE_META);
     final JobMeta JOB_META =
         JobMeta.builder()
             .type(JOB_TYPE)
@@ -60,9 +60,9 @@ public class RunIntegrationTest extends BaseIntegrationTest {
             .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
-    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
 
-    Run createdRun = client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build());
+    Run createdRun = marquezClient.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build());
 
     final DbTableMeta DB_TABLE_META_UPDATED =
         DbTableMeta.builder()
@@ -73,8 +73,8 @@ public class RunIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .runId(createdRun.getId())
             .build();
-    client.createDataset(NAMESPACE_NAME, "my-output-ds", DB_TABLE_META_UPDATED);
+    marquezClient.createDataset(NAMESPACE_NAME, "my-output-ds", DB_TABLE_META_UPDATED);
 
-    client.markRunAs(createdRun.getId(), RunState.COMPLETED);
+    marquezClient.markRunAs(createdRun.getId(), RunState.COMPLETED);
   }
 }

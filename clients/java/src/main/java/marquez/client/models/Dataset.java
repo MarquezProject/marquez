@@ -53,7 +53,7 @@ public abstract class Dataset {
   @Getter @NonNull private final Set<String> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
-  @Nullable private final String facets;
+  @Nullable private final Object facets;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -68,7 +68,7 @@ public abstract class Dataset {
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final String facets) {
+      @Nullable final Object facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -92,7 +92,7 @@ public abstract class Dataset {
     return Optional.ofNullable(description);
   }
 
-  public Optional<String> getFacets() {
+  public Optional<Object> getFacets() {
     return Optional.ofNullable(facets);
   }
 

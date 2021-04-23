@@ -110,7 +110,7 @@ public abstract class BaseIntegrationTest {
   protected final HttpClient http2 = HttpClient.newBuilder().version(Version.HTTP_2).build();
 
   protected URL baseUrl;
-  protected MarquezClient client;
+  protected MarquezClient marquezClient;
 
   @BeforeAll
   protected static void setupAll() throws Exception {
@@ -189,7 +189,7 @@ public abstract class BaseIntegrationTest {
   @BeforeEach
   protected void setupApp() {
     baseUrl = Utils.toUrl("http://localhost:" + APP.getLocalPort());
-    client = MarquezClient.builder().baseUrl(baseUrl).build();
+    marquezClient = MarquezClient.builder().baseUrl(baseUrl).build();
   }
 
   @AfterAll
@@ -219,7 +219,7 @@ public abstract class BaseIntegrationTest {
             .connectionUrl(DB_TABLE_CONNECTION_URL)
             .description(DB_TABLE_SOURCE_DESCRIPTION)
             .build();
-    client.createSource(sourceName, sourceMeta);
+    marquezClient.createSource(sourceName, sourceMeta);
   }
 
   protected void createNamespace(String namespaceName) {
@@ -227,7 +227,7 @@ public abstract class BaseIntegrationTest {
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    client.createNamespace(namespaceName, namespaceMeta);
+    marquezClient.createNamespace(namespaceName, namespaceMeta);
   }
 
   protected static ImmutableSet<DatasetId> newDatasetIdsWith(

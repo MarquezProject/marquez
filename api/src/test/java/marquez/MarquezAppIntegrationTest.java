@@ -44,7 +44,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    final Namespace namespace = client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+    final Namespace namespace = marquezClient.createNamespace(NAMESPACE_NAME, namespaceMeta);
     assertThat(namespace.getName()).isEqualTo(NAMESPACE_NAME);
     assertThat(namespace.getCreatedAt()).isAfter(EPOCH);
     assertThat(namespace.getUpdatedAt()).isAfter(EPOCH);
@@ -52,7 +52,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(namespace.getDescription()).isEqualTo(Optional.of(NAMESPACE_DESCRIPTION));
 
     assertThat(
-            client.listNamespaces().stream()
+            marquezClient.listNamespaces().stream()
                 .filter(other -> other.getName().equals(NAMESPACE_NAME))
                 .count())
         .isEqualTo(1);
@@ -67,7 +67,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(SOURCE_DESCRIPTION)
             .build();
 
-    final Source source = client.createSource(SOURCE_NAME, sourceMeta);
+    final Source source = marquezClient.createSource(SOURCE_NAME, sourceMeta);
     assertThat(source.getType()).isEqualTo(SOURCE_TYPE);
     assertThat(source.getName()).isEqualTo(SOURCE_NAME);
     assertThat(source.getCreatedAt()).isAfter(EPOCH);
@@ -76,7 +76,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(source.getDescription()).isEqualTo(Optional.of(SOURCE_DESCRIPTION));
 
     assertThat(
-            client.listSources().stream()
+            marquezClient.listSources().stream()
                 .filter(other -> other.getName().equals(SOURCE_NAME))
                 .count())
         .isEqualTo(1);
@@ -98,8 +98,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .fields(fields)
             .tags(datasetTag)
             .build();
-    client.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
-    Dataset dataset = client.getDataset(NAMESPACE_NAME, datasetName);
+    marquezClient.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
+    Dataset dataset = marquezClient.getDataset(NAMESPACE_NAME, datasetName);
     assertThat(dataset.getTags()).isEqualTo(datasetTag);
     assertThat(dataset.getFields().get(0).getTags()).isEqualTo(fieldTag);
   }
@@ -121,8 +121,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .fields(fields)
             .build();
 
-    client.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
-    Dataset dataset = client.getDataset(NAMESPACE_NAME, datasetName);
+    marquezClient.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
+    Dataset dataset = marquezClient.getDataset(NAMESPACE_NAME, datasetName);
     assertThat(dataset.getFields()).hasSameElementsAs(fields);
 
     List<Field> newFields =
@@ -137,8 +137,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .fields(newFields)
             .build();
 
-    client.createDataset(NAMESPACE_NAME, datasetName, newDbTableMeta);
-    Dataset updatedDataset = client.getDataset(NAMESPACE_NAME, datasetName);
+    marquezClient.createDataset(NAMESPACE_NAME, datasetName, newDbTableMeta);
+    Dataset updatedDataset = marquezClient.getDataset(NAMESPACE_NAME, datasetName);
     assertThat(updatedDataset.getFields()).hasSameElementsAs(newFields);
   }
 
@@ -154,10 +154,10 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_SOURCE_DESCRIPTION)
             .build();
 
-    client.createSource(DB_TABLE_SOURCE_NAME, sourceMeta);
+    marquezClient.createSource(DB_TABLE_SOURCE_NAME, sourceMeta);
 
     final DbTable dbTable =
-        (DbTable) client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+        (DbTable) marquezClient.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
     assertThat(dbTable.getId()).isEqualTo(DB_TABLE_ID);
     assertThat(dbTable.getName()).isEqualTo(DB_TABLE_NAME);
     assertThat(dbTable.getPhysicalName()).isEqualTo(DB_TABLE_PHYSICAL_NAME);
@@ -170,12 +170,12 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(dbTable.getDescription()).isEqualTo(Optional.of(DB_TABLE_DESCRIPTION));
 
     assertThat(
-            client.listDatasets(NAMESPACE_NAME).stream()
+            marquezClient.listDatasets(NAMESPACE_NAME).stream()
                 .filter(other -> other.getName().equals(DB_TABLE_NAME))
                 .count())
         .isEqualTo(1);
 
-    assertThat(client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(1);
+    assertThat(marquezClient.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(1);
 
     // (4) Add field to db table
     final List<Field> original = dbTable.getFields();
@@ -192,7 +192,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .build();
 
     final DbTable modifiedDbTable =
-        (DbTable) client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, modifiedDbTableMeta);
+        (DbTable) marquezClient.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, modifiedDbTableMeta);
     assertThat(modifiedDbTable.getId()).isEqualTo(DB_TABLE_ID);
     assertThat(modifiedDbTable.getName()).isEqualTo(DB_TABLE_NAME);
     assertThat(modifiedDbTable.getPhysicalName()).isEqualTo(DB_TABLE_PHYSICAL_NAME);
@@ -204,7 +204,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(modifiedDbTable.getLastModifiedAt()).isEmpty();
     assertThat(modifiedDbTable.getDescription()).isEqualTo(Optional.of(DB_TABLE_DESCRIPTION));
 
-    assertThat(client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(2);
+    assertThat(marquezClient.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(2);
   }
 
   @Test
@@ -213,7 +213,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+    marquezClient.createNamespace(NAMESPACE_NAME, namespaceMeta);
 
     // (2) Create source for stream
     final SourceMeta sourceMeta =
@@ -223,11 +223,12 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(STREAM_SOURCE_DESCRIPTION)
             .build();
 
-    client.createSource(STREAM_SOURCE_NAME, sourceMeta);
+    marquezClient.createSource(STREAM_SOURCE_NAME, sourceMeta);
 
     // (3) Add stream to namespace and associate with source
 
-    final Stream stream = (Stream) client.createDataset(NAMESPACE_NAME, STREAM_NAME, STREAM_META);
+    final Stream stream =
+        (Stream) marquezClient.createDataset(NAMESPACE_NAME, STREAM_NAME, STREAM_META);
     assertThat(stream.getId()).isEqualTo(STREAM_ID);
     assertThat(stream.getName()).isEqualTo(STREAM_NAME);
     assertThat(stream.getPhysicalName()).isEqualTo(STREAM_PHYSICAL_NAME);
@@ -241,12 +242,12 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(stream.getDescription()).isEqualTo(Optional.of(STREAM_DESCRIPTION));
 
     assertThat(
-            client.listDatasets(NAMESPACE_NAME).stream()
+            marquezClient.listDatasets(NAMESPACE_NAME).stream()
                 .filter(other -> other.getName().equals(STREAM_NAME))
                 .count())
         .isEqualTo(1);
 
-    assertThat(client.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME)).hasSize(1);
+    assertThat(marquezClient.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME)).hasSize(1);
 
     // (4) Change schema location
     final URL modifiedSchemaLocation = newSchemaLocation();
@@ -259,7 +260,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .build();
 
     final Stream modifiedStream =
-        (Stream) client.createDataset(NAMESPACE_NAME, STREAM_NAME, modifiedStreamMeta);
+        (Stream) marquezClient.createDataset(NAMESPACE_NAME, STREAM_NAME, modifiedStreamMeta);
     assertThat(modifiedStream.getId()).isEqualTo(STREAM_ID);
     assertThat(modifiedStream.getName()).isEqualTo(STREAM_NAME);
     assertThat(modifiedStream.getPhysicalName()).isEqualTo(STREAM_PHYSICAL_NAME);
@@ -272,7 +273,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(modifiedStream.getSchemaLocation()).isEqualTo(Optional.of(modifiedSchemaLocation));
     assertThat(modifiedStream.getDescription()).isEqualTo(Optional.of(STREAM_DESCRIPTION));
 
-    assertThat(client.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME)).hasSize(2);
+    assertThat(marquezClient.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME)).hasSize(2);
   }
 
   @Test
@@ -281,7 +282,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+    marquezClient.createNamespace(NAMESPACE_NAME, namespaceMeta);
 
     // (2) Create source for input / output db tables
     final SourceMeta sourceMeta =
@@ -291,7 +292,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(STREAM_SOURCE_DESCRIPTION)
             .build();
 
-    client.createSource(STREAM_SOURCE_NAME, sourceMeta);
+    marquezClient.createSource(STREAM_SOURCE_NAME, sourceMeta);
 
     // (3) Add input db tables to namespace and associate with source
     final ImmutableSet<DatasetId> inputs = newDatasetIdsWith(NAMESPACE_NAME, 4);
@@ -303,7 +304,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
               .description(newDescription())
               .build();
 
-      client.createDataset(input.getNamespace(), input.getName(), dbTableMeta);
+      marquezClient.createDataset(input.getNamespace(), input.getName(), dbTableMeta);
     }
 
     // (4) Add output db tables to namespace and associate with source
@@ -316,7 +317,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
               .description(newDescription())
               .build();
 
-      client.createDataset(output.getNamespace(), output.getName(), dbTableMeta);
+      marquezClient.createDataset(output.getNamespace(), output.getName(), dbTableMeta);
     }
 
     // (5) Add job to namespace
@@ -330,7 +331,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(JOB_DESCRIPTION)
             .build();
 
-    final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, jobMeta);
+    final Job job = marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, jobMeta);
     assertThat(job.getId()).isEqualTo(JOB_ID);
     assertThat(job.getType()).isEqualTo(JOB_TYPE);
     assertThat(job.getName()).isEqualTo(JOB_NAME);
@@ -345,7 +346,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     // (6) Create a run
     final RunMeta runMeta = RunMeta.builder().build();
-    final Run run = client.createRun(NAMESPACE_NAME, JOB_NAME, runMeta);
+    final Run run = marquezClient.createRun(NAMESPACE_NAME, JOB_NAME, runMeta);
     assertThat(run.getId()).isNotNull();
     assertThat(run.getCreatedAt()).isAfter(EPOCH);
     assertThat(run.getUpdatedAt()).isAfter(EPOCH);
@@ -359,7 +360,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     // (7) Start a run
     final Instant startedAt = newTimestamp();
-    final Run runStarted = client.markRunAsRunning(run.getId(), startedAt);
+    final Run runStarted = marquezClient.markRunAsRunning(run.getId(), startedAt);
     assertThat(runStarted.getId()).isEqualTo(run.getId());
     assertThat(runStarted.getCreatedAt()).isAfter(EPOCH);
     assertThat(runStarted.getUpdatedAt()).isAfter(EPOCH);
@@ -388,7 +389,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(JOB_DESCRIPTION)
             .runId(runStarted.getId())
             .build();
-    final Job jobWithNewVersion = client.createJob(NAMESPACE_NAME, JOB_NAME, jobMetaWithRunId);
+    final Job jobWithNewVersion =
+        marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, jobMetaWithRunId);
     assertThat(jobWithNewVersion.getId()).isEqualTo(JOB_ID);
     assertThat(jobWithNewVersion.getType()).isEqualTo(JOB_TYPE);
     assertThat(jobWithNewVersion.getName()).isEqualTo(JOB_NAME);
@@ -403,7 +405,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     // (9) Complete a run
     final Instant endedAt = newTimestamp();
-    final Run runCompleted = client.markRunAsCompleted(run.getId(), endedAt);
+    final Run runCompleted = marquezClient.markRunAsCompleted(run.getId(), endedAt);
     assertThat(runCompleted.getId()).isEqualTo(run.getId());
     assertThat(runCompleted.getCreatedAt()).isAfter(EPOCH);
     assertThat(runCompleted.getUpdatedAt()).isAfter(EPOCH);
@@ -415,7 +417,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(runCompleted.getDurationMs()).isNotEmpty();
     assertThat(runCompleted.getArgs()).isEmpty();
 
-    final Job completedJob = client.getJob(NAMESPACE_NAME, JOB_NAME);
+    final Job completedJob = marquezClient.getJob(NAMESPACE_NAME, JOB_NAME);
     assertThat(completedJob.getOutputs()).isEqualTo(outputs);
   }
 
@@ -427,7 +429,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+    marquezClient.createNamespace(NAMESPACE_NAME, namespaceMeta);
 
     // Create source for input / output db tables
     final SourceMeta sourceMeta =
@@ -437,7 +439,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(STREAM_SOURCE_DESCRIPTION)
             .build();
 
-    client.createSource(STREAM_SOURCE_NAME, sourceMeta);
+    marquezClient.createSource(STREAM_SOURCE_NAME, sourceMeta);
 
     // Create job
     final JobMeta jobMeta =
@@ -450,11 +452,11 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(JOB_DESCRIPTION)
             .build();
 
-    final Job job = client.createJob(NAMESPACE_NAME, jobName, jobMeta);
+    final Job job = marquezClient.createJob(NAMESPACE_NAME, jobName, jobMeta);
 
     // Create a run
     final RunMeta runMeta = RunMeta.builder().build();
-    final Run run = client.createRun(NAMESPACE_NAME, jobName, runMeta);
+    final Run run = marquezClient.createRun(NAMESPACE_NAME, jobName, runMeta);
     assertThat(run.getId()).isNotNull();
     assertThat(run.getCreatedAt()).isAfter(EPOCH);
     assertThat(run.getUpdatedAt()).isAfter(EPOCH);
@@ -476,7 +478,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
               .description(newDescription())
               .build();
 
-      client.createDataset(input.getNamespace(), input.getName(), dbTableMeta);
+      marquezClient.createDataset(input.getNamespace(), input.getName(), dbTableMeta);
     }
 
     final ImmutableSet<DatasetId> outputs = newDatasetIdsWith(NAMESPACE_NAME, 2);
@@ -489,7 +491,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
               .description(newDescription())
               .build();
 
-      client.createDataset(output.getNamespace(), output.getName(), dbTableMeta);
+      marquezClient.createDataset(output.getNamespace(), output.getName(), dbTableMeta);
     }
 
     // Update job
@@ -503,16 +505,16 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
-    client.createJob(NAMESPACE_NAME, jobName, jobUpdateMeta);
+    marquezClient.createJob(NAMESPACE_NAME, jobName, jobUpdateMeta);
 
     // Assure datasets are associated
-    Job finalJob = client.getJob(NAMESPACE_NAME, jobName);
+    Job finalJob = marquezClient.getJob(NAMESPACE_NAME, jobName);
     assertThat(finalJob.getInputs()).hasSize(2);
   }
 
   @Test
   public void testApp_listTags() {
-    final Set<Tag> tags = client.listTags();
+    final Set<Tag> tags = marquezClient.listTags();
     assertThat(tags).containsExactlyInAnyOrder(PII, SENSITIVE);
   }
 
@@ -522,7 +524,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+    marquezClient.createNamespace(NAMESPACE_NAME, namespaceMeta);
 
     // Create job
     String jobName = newJobName().getValue();
@@ -535,17 +537,17 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
-    final Job job = client.createJob(NAMESPACE_NAME, jobName, jobMeta);
+    final Job job = marquezClient.createJob(NAMESPACE_NAME, jobName, jobMeta);
 
     // create some runs to test ordering mechanics
     final RunMeta runMeta = RunMeta.builder().build();
-    final Run run0 = client.createRun(NAMESPACE_NAME, jobName, runMeta);
-    final Run run1 = client.createRunAndStart(NAMESPACE_NAME, jobName, runMeta);
-    client.markRunAsCompleted(run1.getId());
-    final Run run2 = client.createRunAndStart(NAMESPACE_NAME, jobName, runMeta);
+    final Run run0 = marquezClient.createRun(NAMESPACE_NAME, jobName, runMeta);
+    final Run run1 = marquezClient.createRunAndStart(NAMESPACE_NAME, jobName, runMeta);
+    marquezClient.markRunAsCompleted(run1.getId());
+    final Run run2 = marquezClient.createRunAndStart(NAMESPACE_NAME, jobName, runMeta);
 
     // assert that runs are in the correct order
-    List<Run> runs = client.listRuns(NAMESPACE_NAME, jobName);
+    List<Run> runs = marquezClient.listRuns(NAMESPACE_NAME, jobName);
     assertThat(runs.get(0).getId()).isEqualTo(run2.getId());
     assertThat(runs.get(1).getId()).isEqualTo(run1.getId());
     assertThat(runs.get(2).getId()).isEqualTo(run0.getId());
