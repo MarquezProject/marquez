@@ -207,7 +207,8 @@ public final class ModelGenerator {
         newLocation(),
         newContext(),
         newDescription(),
-        latestRun);
+        latestRun,
+        null);
   }
 
   public static JobId newJobId() {
@@ -232,7 +233,8 @@ public final class ModelGenerator {
 
   public static Run newRun() {
     final Instant now = newTimestamp();
-    return new Run(newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs());
+    return new Run(
+        newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs(), null);
   }
 
   public static String newOwnerName() {

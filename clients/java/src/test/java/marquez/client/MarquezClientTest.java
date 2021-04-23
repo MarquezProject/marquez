@@ -213,6 +213,7 @@ public class MarquezClientTest {
           LOCATION,
           JOB_CONTEXT,
           JOB_DESCRIPTION,
+          null,
           null);
 
   // RUN
@@ -233,7 +234,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run RUNNING =
       new Run(
           newRunId(),
@@ -245,7 +247,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run COMPLETED =
       new Run(
           newRunId(),
@@ -257,7 +260,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run ABORTED =
       new Run(
           newRunId(),
@@ -269,7 +273,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run FAILED =
       new Run(
           newRunId(),
@@ -281,7 +286,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
 
   private static final String RUN_ID = newRunId();
   private static final Job JOB_WITH_LATEST_RUN =
@@ -307,7 +313,9 @@ public class MarquezClientTest {
               START_AT,
               ENDED_AT,
               DURATION,
-              RUN_ARGS));
+              RUN_ARGS,
+              null),
+          null);
 
   // DATASET VERSIONS
   private static final Run CREATED_BY_RUN = COMPLETED;
