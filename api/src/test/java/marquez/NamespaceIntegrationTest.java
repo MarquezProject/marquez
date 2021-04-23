@@ -13,7 +13,7 @@ public class NamespaceIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_createNoDescription() {
     NamespaceMeta namespaceMeta = NamespaceMeta.builder().ownerName(OWNER_NAME).build();
-    Namespace namespace = marquezClient.createNamespace("NO_DESCRIPTION", namespaceMeta);
+    Namespace namespace = client.createNamespace("NO_DESCRIPTION", namespaceMeta);
     assertThat(namespace.getName()).isEqualTo("NO_DESCRIPTION");
     assertThat(namespace.getOwnerName()).isEqualTo(OWNER_NAME);
     assertThat(namespace.getUpdatedAt()).isNotNull();
@@ -25,7 +25,7 @@ public class NamespaceIntegrationTest extends BaseIntegrationTest {
   public void testApp_changeOwner() {
     NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName("daniel").description(NAMESPACE_DESCRIPTION).build();
-    Namespace namespace = marquezClient.createNamespace("HOME_NAMESPACE", namespaceMeta);
+    Namespace namespace = client.createNamespace("HOME_NAMESPACE", namespaceMeta);
     assertThat(namespace.getName()).isEqualTo("HOME_NAMESPACE");
     assertThat(namespace.getOwnerName()).isEqualTo("daniel");
     assertThat(namespace.getUpdatedAt()).isNotNull();
@@ -34,7 +34,7 @@ public class NamespaceIntegrationTest extends BaseIntegrationTest {
 
     NamespaceMeta newOwner =
         NamespaceMeta.builder().ownerName("willy").description(NAMESPACE_DESCRIPTION).build();
-    Namespace ownerChange = marquezClient.createNamespace("HOME_NAMESPACE", newOwner);
+    Namespace ownerChange = client.createNamespace("HOME_NAMESPACE", newOwner);
     assertThat(namespace.getName()).isEqualTo("HOME_NAMESPACE");
     assertThat(ownerChange.getOwnerName()).isEqualTo("willy");
     assertThat(ownerChange.getUpdatedAt()).isNotNull();
@@ -42,7 +42,7 @@ public class NamespaceIntegrationTest extends BaseIntegrationTest {
     assertThat(ownerChange.getDescription().get()).isEqualTo(NAMESPACE_DESCRIPTION);
 
     // change it back to assure that it can be change again
-    Namespace revertChange = marquezClient.createNamespace("HOME_NAMESPACE", namespaceMeta);
+    Namespace revertChange = client.createNamespace("HOME_NAMESPACE", namespaceMeta);
     assertThat(revertChange.getName()).isEqualTo("HOME_NAMESPACE");
     assertThat(revertChange.getOwnerName()).isEqualTo("daniel");
     assertThat(revertChange.getUpdatedAt()).isNotNull();
@@ -54,8 +54,8 @@ public class NamespaceIntegrationTest extends BaseIntegrationTest {
   public void testApp_getNamespace() {
     NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
-    marquezClient.createNamespace(NAMESPACE_NAME, namespaceMeta);
-    Namespace namespace = marquezClient.getNamespace(NAMESPACE_NAME);
+    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+    Namespace namespace = client.getNamespace(NAMESPACE_NAME);
     assertThat(namespace.getName()).isEqualTo(NAMESPACE_NAME);
     assertThat(namespace.getOwnerName()).isEqualTo(OWNER_NAME);
     assertThat(namespace.getUpdatedAt()).isNotNull();

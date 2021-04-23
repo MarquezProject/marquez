@@ -41,7 +41,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
 
     Dataset dataset =
-        marquezClient.createDataset(NAMESPACE_NAME, "test-dataset-tags", DB_TABLE_META);
+        client.createDataset(NAMESPACE_NAME, "test-dataset-tags", DB_TABLE_META);
     assertThat(dataset.getFields().get(0).getTags())
         .isEqualTo(ImmutableSet.of(SENSITIVE.getName()));
     assertThat(dataset.getFields().get(1).getTags()).isEmpty();
@@ -60,24 +60,24 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
 
     Dataset updateDataset =
-        marquezClient.createDataset(NAMESPACE_NAME, "test-dataset-tags", UPDATED_META);
+        client.createDataset(NAMESPACE_NAME, "test-dataset-tags", UPDATED_META);
     assertThat(updateDataset.getTags())
         .isEqualTo(ImmutableSet.of(SENSITIVE.getName(), PII.getName()));
     assertThat(updateDataset.getFields()).isEqualTo(UPDATED_META.getFields());
 
-    Dataset getDataset = marquezClient.getDataset(NAMESPACE_NAME, "test-dataset-tags");
+    Dataset getDataset = client.getDataset(NAMESPACE_NAME, "test-dataset-tags");
     assertThat(getDataset.getFields()).isEqualTo(UPDATED_META.getFields());
     assertThat(getDataset.getTags()).isEqualTo(ImmutableSet.of(SENSITIVE.getName(), PII.getName()));
   }
 
   @Test
   public void testApp_getTableVersion() {
-    marquezClient.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+    client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
     List<DatasetVersion> versions =
-        marquezClient.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
+        client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
     assertThat(versions).hasSizeGreaterThan(0);
     DatasetVersion datasetVersion =
-        marquezClient.getDatasetVersion(
+        client.getDatasetVersion(
             NAMESPACE_NAME, DB_TABLE_NAME, versions.get(0).getVersion());
 
     assertThat(datasetVersion.getId()).isEqualTo(new DatasetId(NAMESPACE_NAME, DB_TABLE_NAME));
@@ -95,11 +95,11 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testApp_getStreamVersion() {
-    marquezClient.createDataset(NAMESPACE_NAME, STREAM_NAME, STREAM_META);
-    List<DatasetVersion> versions = marquezClient.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME);
+    client.createDataset(NAMESPACE_NAME, STREAM_NAME, STREAM_META);
+    List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, STREAM_NAME);
     assertThat(versions).hasSizeGreaterThan(0);
     DatasetVersion datasetVersion =
-        marquezClient.getDatasetVersion(NAMESPACE_NAME, STREAM_NAME, versions.get(0).getVersion());
+        client.getDatasetVersion(NAMESPACE_NAME, STREAM_NAME, versions.get(0).getVersion());
 
     assertThat(datasetVersion).isInstanceOf(StreamVersion.class);
     assertThat(datasetVersion.getId()).isEqualTo(new DatasetId(NAMESPACE_NAME, STREAM_NAME));
@@ -127,7 +127,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .tags(DB_TABLE_TAGS)
             .description(DB_TABLE_DESCRIPTION)
             .build();
-    marquezClient.createDataset(NAMESPACE_NAME, "table1", DB_TABLE_META);
+    client.createDataset(NAMESPACE_NAME, "table1", DB_TABLE_META);
 
     final JobMeta jobMeta =
         JobMeta.builder()
@@ -139,10 +139,10 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .description(JOB_DESCRIPTION)
             .build();
 
-    marquezClient.createJob(NAMESPACE_NAME, JOB_NAME, jobMeta);
+    client.createJob(NAMESPACE_NAME, JOB_NAME, jobMeta);
 
     final RunMeta runMeta = RunMeta.builder().build();
-    final Run run = marquezClient.createRun(NAMESPACE_NAME, JOB_NAME, runMeta);
+    final Run run = client.createRun(NAMESPACE_NAME, JOB_NAME, runMeta);
 
     DbTableMeta DB_TABLE_META_WITH_RUN =
         DbTableMeta.builder()
@@ -153,9 +153,9 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .runId(run.getId())
             .build();
-    marquezClient.createDataset(NAMESPACE_NAME, "table1", DB_TABLE_META_WITH_RUN);
+    client.createDataset(NAMESPACE_NAME, "table1", DB_TABLE_META_WITH_RUN);
 
-    List<DatasetVersion> versions = marquezClient.listDatasetVersions(NAMESPACE_NAME, "table1");
+    List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, "table1");
     assertThat(versions).hasSizeGreaterThan(1);
     DatasetVersion version = versions.get(0); // most recent dataset version
     assertThat(version.getCreatedByRun()).isNotEqualTo(Optional.empty());
@@ -173,7 +173,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_notExistsDatasetName() {
     Assertions.assertThrows(
-        Exception.class, () -> marquezClient.getDataset(NAMESPACE_NAME, "not-existing"));
+        Exception.class, () -> client.getDataset(NAMESPACE_NAME, "not-existing"));
   }
 
   @Test
@@ -181,14 +181,14 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     Assertions.assertThrows(
         Exception.class,
         () ->
-            marquezClient.getDatasetVersion(
+            client.getDatasetVersion(
                 NAMESPACE_NAME, "not-existing", UUID.randomUUID().toString()));
   }
 
   @Test
   public void testApp_notExistsNamespace() {
     Assertions.assertThrows(
-        Exception.class, () -> marquezClient.getDataset("non-existing", "not-existing"));
+        Exception.class, () -> client.getDataset("non-existing", "not-existing"));
   }
 
   @Test
@@ -204,7 +204,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
     Assertions.assertThrows(
         Exception.class,
-        () -> marquezClient.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
+        () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
   }
 
   @Test
@@ -220,7 +220,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
     Assertions.assertThrows(
         Exception.class,
-        () -> marquezClient.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
+        () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
   }
 
   @Test
@@ -234,7 +234,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .build();
 
-    Dataset dataset = marquezClient.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DESCRIPTION);
+    Dataset dataset = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DESCRIPTION);
     assertThat(dataset.getDescription()).isEqualTo(DESCRIPTION.getDescription());
 
     DbTableMeta WO_DESCRIPTION =
@@ -245,7 +245,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .tags(DB_TABLE_TAGS)
             .build();
 
-    Dataset dataset2 = marquezClient.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, WO_DESCRIPTION);
+    Dataset dataset2 = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, WO_DESCRIPTION);
     // Description stays
     assertThat(dataset2.getDescription()).isEqualTo(DESCRIPTION.getDescription());
   }
