@@ -25,8 +25,7 @@ public class TagIntegrationTest extends BaseIntegrationTest {
             NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META.getFields().get(0).getName(), "TESTTAG");
     assertThat(dataset.getFields().get(0).getTags()).contains("TESTTAG");
 
-    Dataset taggedDataset =
-        client.tagDatasetWith(NAMESPACE_NAME, DB_TABLE_NAME, "TESTDATASETTAG");
+    Dataset taggedDataset = client.tagDatasetWith(NAMESPACE_NAME, DB_TABLE_NAME, "TESTDATASETTAG");
     assertThat(taggedDataset.getTags()).contains("TESTDATASETTAG");
   }
 

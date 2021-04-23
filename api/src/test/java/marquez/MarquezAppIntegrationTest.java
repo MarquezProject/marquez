@@ -227,8 +227,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     // (3) Add stream to namespace and associate with source
 
-    final Stream stream =
-        (Stream) client.createDataset(NAMESPACE_NAME, STREAM_NAME, STREAM_META);
+    final Stream stream = (Stream) client.createDataset(NAMESPACE_NAME, STREAM_NAME, STREAM_META);
     assertThat(stream.getId()).isEqualTo(STREAM_ID);
     assertThat(stream.getName()).isEqualTo(STREAM_NAME);
     assertThat(stream.getPhysicalName()).isEqualTo(STREAM_PHYSICAL_NAME);
@@ -389,8 +388,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(JOB_DESCRIPTION)
             .runId(runStarted.getId())
             .build();
-    final Job jobWithNewVersion =
-        client.createJob(NAMESPACE_NAME, JOB_NAME, jobMetaWithRunId);
+    final Job jobWithNewVersion = client.createJob(NAMESPACE_NAME, JOB_NAME, jobMetaWithRunId);
     assertThat(jobWithNewVersion.getId()).isEqualTo(JOB_ID);
     assertThat(jobWithNewVersion.getType()).isEqualTo(JOB_TYPE);
     assertThat(jobWithNewVersion.getName()).isEqualTo(JOB_NAME);

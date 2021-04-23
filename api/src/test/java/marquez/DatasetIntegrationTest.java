@@ -40,8 +40,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .build();
 
-    Dataset dataset =
-        client.createDataset(NAMESPACE_NAME, "test-dataset-tags", DB_TABLE_META);
+    Dataset dataset = client.createDataset(NAMESPACE_NAME, "test-dataset-tags", DB_TABLE_META);
     assertThat(dataset.getFields().get(0).getTags())
         .isEqualTo(ImmutableSet.of(SENSITIVE.getName()));
     assertThat(dataset.getFields().get(1).getTags()).isEmpty();
@@ -59,8 +58,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .build();
 
-    Dataset updateDataset =
-        client.createDataset(NAMESPACE_NAME, "test-dataset-tags", UPDATED_META);
+    Dataset updateDataset = client.createDataset(NAMESPACE_NAME, "test-dataset-tags", UPDATED_META);
     assertThat(updateDataset.getTags())
         .isEqualTo(ImmutableSet.of(SENSITIVE.getName(), PII.getName()));
     assertThat(updateDataset.getFields()).isEqualTo(UPDATED_META.getFields());
@@ -73,12 +71,10 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_getTableVersion() {
     client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
-    List<DatasetVersion> versions =
-        client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
+    List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
     assertThat(versions).hasSizeGreaterThan(0);
     DatasetVersion datasetVersion =
-        client.getDatasetVersion(
-            NAMESPACE_NAME, DB_TABLE_NAME, versions.get(0).getVersion());
+        client.getDatasetVersion(NAMESPACE_NAME, DB_TABLE_NAME, versions.get(0).getVersion());
 
     assertThat(datasetVersion.getId()).isEqualTo(new DatasetId(NAMESPACE_NAME, DB_TABLE_NAME));
     assertThat(datasetVersion.getName()).isEqualTo(DB_TABLE_NAME);
@@ -181,8 +177,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     Assertions.assertThrows(
         Exception.class,
         () ->
-            client.getDatasetVersion(
-                NAMESPACE_NAME, "not-existing", UUID.randomUUID().toString()));
+            client.getDatasetVersion(NAMESPACE_NAME, "not-existing", UUID.randomUUID().toString()));
   }
 
   @Test
@@ -203,8 +198,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .runId(UUID.randomUUID().toString())
             .build();
     Assertions.assertThrows(
-        Exception.class,
-        () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
+        Exception.class, () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
   }
 
   @Test
@@ -219,8 +213,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .runId(UUID.randomUUID().toString())
             .build();
     Assertions.assertThrows(
-        Exception.class,
-        () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
+        Exception.class, () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
   }
 
   @Test

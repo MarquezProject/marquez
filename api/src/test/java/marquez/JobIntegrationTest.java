@@ -88,8 +88,7 @@ public class JobIntegrationTest extends BaseIntegrationTest {
             .build();
     // associate wrong run
     Assertions.assertThrows(
-        Exception.class,
-        () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META_WITH_RUN));
+        Exception.class, () -> client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META_WITH_RUN));
   }
 
   @Test
@@ -125,8 +124,7 @@ public class JobIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testApp_notExistsJob() {
-    Assertions.assertThrows(
-        Exception.class, () -> client.getJob(NAMESPACE_NAME, "not-existing"));
+    Assertions.assertThrows(Exception.class, () -> client.getJob(NAMESPACE_NAME, "not-existing"));
   }
 
   @Test
