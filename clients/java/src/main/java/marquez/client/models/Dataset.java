@@ -53,6 +53,7 @@ public abstract class Dataset {
   @Getter @NonNull private final Set<String> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
+  @Nullable private final String facets;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -66,7 +67,8 @@ public abstract class Dataset {
       @Nullable final List<Field> fields,
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable final String facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -79,14 +81,19 @@ public abstract class Dataset {
     this.tags = (tags == null) ? ImmutableSet.of() : ImmutableSet.copyOf(tags);
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
+    this.facets = facets;
+  }
+
+  public Optional<Instant> getLastModifiedAt() {
+    return Optional.ofNullable(lastModifiedAt);
   }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
   }
 
-  public Optional<Instant> getLastModifiedAt() {
-    return Optional.ofNullable(lastModifiedAt);
+  public Optional<String> getFacets() {
+    return Optional.ofNullable(facets);
   }
 
   public static Dataset fromJson(@NonNull final String json) {

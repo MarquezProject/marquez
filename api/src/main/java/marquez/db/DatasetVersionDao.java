@@ -174,7 +174,10 @@ public interface DatasetVersionDao extends BaseDao {
       "select d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description, ARRAY(select t.name from tags t\n"
           + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
           + "    where d.uuid = m.dataset_uuid) as tags,\n"
-          + "dv.created_at, dv.version, dv.fields, dv.run_uuid as \"createdByRunUuid\", sv.schema_location\n"
+          + "dv.created_at, dv.version, dv.fields, dv.run_uuid as \"createdByRunUuid\", sv.schema_location,\n"
+          + "    (select jsonb_array_elements(event->'outputs')->'facets' from lineage_events as le\n"
+          + "    where dv.run_uuid::text = le.run_id\n"
+          + "    order by event_time desc limit 1) as facets \n"
           + "from datasets d\n"
           + "inner join dataset_versions dv on d.uuid = dv.dataset_uuid\n"
           + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n";

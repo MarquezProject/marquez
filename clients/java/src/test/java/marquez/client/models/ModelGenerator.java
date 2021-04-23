@@ -92,7 +92,8 @@ public final class ModelGenerator {
         newFields(2),
         newTagNames(2),
         null,
-        newDescription());
+        newDescription(),
+        null);
   }
 
   public static DbTableVersion newDbTableVersion() {
@@ -137,7 +138,8 @@ public final class ModelGenerator {
         newTagNames(2),
         null,
         newSchemaLocation(),
-        newDescription());
+        newDescription(),
+        null);
   }
 
   public static StreamVersion newStreamVersion() {

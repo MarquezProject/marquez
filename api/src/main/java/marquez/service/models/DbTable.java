@@ -26,6 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Facets;
 import marquez.common.models.Field;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
@@ -44,7 +45,8 @@ public final class DbTable extends Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Optional<UUID> currentVersionUuid) {
+      @Nullable final Optional<UUID> currentVersionUuid,
+      @Nullable final Facets facets) {
     super(
         id,
         DB_TABLE,
@@ -57,6 +59,7 @@ public final class DbTable extends Dataset {
         tags,
         lastModifiedAt,
         description,
-        currentVersionUuid);
+        currentVersionUuid,
+        facets);
   }
 }

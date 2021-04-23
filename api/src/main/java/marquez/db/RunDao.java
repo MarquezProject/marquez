@@ -79,7 +79,12 @@ public interface RunDao extends BaseDao {
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
   String SELECT_RUN =
-      "SELECT r.*, ra.args, ra.args, ctx.context "
+      "SELECT r.*, ra.args, ra.args, ctx.context, "
+          + "(SELECT event->'run'->'facets' "
+          + "   FROM lineage_events AS le "
+          + "  WHERE r.uuid::text = le.run_id "
+          + "  ORDER BY event_time DESC "
+          + "  LIMIT 1) AS facets "
           + "FROM runs AS r "
           + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid "
           + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid ";

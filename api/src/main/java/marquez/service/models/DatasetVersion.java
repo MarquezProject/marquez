@@ -31,6 +31,7 @@ import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.Facets;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
@@ -61,6 +62,7 @@ public abstract class DatasetVersion {
   @Nullable private final String description;
   @Nullable @Setter private Run createdByRun;
   @Nullable @Setter private UUID createdByRunUuid;
+  @Nullable private final Facets facets;
 
   public DatasetVersion(
       @NonNull final DatasetId id,
@@ -73,7 +75,8 @@ public abstract class DatasetVersion {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final Run createdByRun) {
+      @Nullable final Run createdByRun,
+      @Nullable final Facets facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -86,6 +89,7 @@ public abstract class DatasetVersion {
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.description = description;
     this.createdByRun = createdByRun;
+    this.facets = facets;
   }
 
   public Optional<String> getDescription() {
@@ -94,6 +98,10 @@ public abstract class DatasetVersion {
 
   public Optional<Run> getCreatedByRun() {
     return Optional.ofNullable(createdByRun);
+  }
+
+  public Optional<Facets> getFacets() {
+    return Optional.ofNullable(facets);
   }
 
   @JsonIgnore

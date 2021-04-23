@@ -29,6 +29,7 @@ import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Facets;
 import marquez.common.models.Field;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
@@ -50,7 +51,8 @@ public final class Stream extends Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      Optional<UUID> currentVersionUuid) {
+      @Nullable final Optional<UUID> currentVersionUuid,
+      @Nullable final Facets facets) {
     super(
         id,
         STREAM,
@@ -63,7 +65,8 @@ public final class Stream extends Dataset {
         tags,
         lastModifiedAt,
         description,
-        currentVersionUuid);
+        currentVersionUuid,
+        facets);
     this.schemaLocation = schemaLocation;
   }
 }

@@ -21,6 +21,7 @@ import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidOrThrow;
+import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.sql.ResultSet;
@@ -65,7 +66,8 @@ public final class RunMapper implements RowMapper<Run> {
         stringOrThrow(results, Columns.NAMESPACE_NAME),
         stringOrThrow(results, Columns.JOB_NAME),
         stringOrNull(results, Columns.LOCATION),
-        JobMapper.toContext(results, Columns.CONTEXT));
+        JobMapper.toContext(results, Columns.CONTEXT),
+        toFacetsOrNull(results));
   }
 
   private Map<String, String> toArgs(ResultSet results, String column) throws SQLException {

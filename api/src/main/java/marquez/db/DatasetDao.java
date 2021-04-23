@@ -79,7 +79,10 @@ public interface DatasetDao extends BaseDao {
       "select d.*, dv.fields, ARRAY(select t.name from tags t\n"
           + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
           + "    where d.uuid = m.dataset_uuid) as tags,"
-          + "    sv.schema_location\n"
+          + "    sv.schema_location,\n"
+          + "    (select jsonb_array_elements(event->'outputs')->'facets' from lineage_events as le\n"
+          + "    where dv.run_uuid::text = le.run_id\n"
+          + "    order by event_time desc limit 1) as facets \n"
           + "from datasets d\n"
           + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n"
           + "left outer join dataset_versions dv on dv.uuid = d.current_version_uuid\n";

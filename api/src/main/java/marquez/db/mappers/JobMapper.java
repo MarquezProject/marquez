@@ -18,6 +18,7 @@ import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.urlOrNull;
+import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -43,7 +44,7 @@ import org.postgresql.util.PGobject;
 
 @Slf4j
 public final class JobMapper implements RowMapper<Job> {
-  public static final ObjectMapper mapper = Utils.getMapper();
+  private static final ObjectMapper MAPPER = Utils.getMapper();
 
   @Override
   public Job map(@NonNull ResultSet results, @NonNull StatementContext context)
@@ -63,7 +64,8 @@ public final class JobMapper implements RowMapper<Job> {
         stringOrNull(results, Columns.DESCRIPTION),
         // Latest Run is resolved in the JobDao. This can be brought in via a join and
         //  and a jsonb but custom deserializers will need to be introduced
-        null);
+        null,
+        toFacetsOrNull(results));
   }
 
   public static ImmutableMap<String, String> toContext(ResultSet results, String column)
@@ -83,7 +85,7 @@ public final class JobMapper implements RowMapper<Job> {
     PGobject pgObject = (PGobject) results.getObject(column);
     try {
       Set<DatasetId> datasets =
-          mapper.readValue(pgObject.getValue(), new TypeReference<Set<DatasetId>>() {});
+          MAPPER.readValue(pgObject.getValue(), new TypeReference<Set<DatasetId>>() {});
       if (datasets == null) {
         return new HashSet<>();
       }

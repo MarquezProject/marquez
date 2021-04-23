@@ -32,6 +32,7 @@ import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.Facets;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
@@ -61,7 +62,7 @@ public abstract class Dataset {
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
   private final Optional<UUID> currentVersionUuid;
-  @Nullable LineageEvent.DatasetFacets datasetFacets;
+  @Nullable Facets facets;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -76,7 +77,7 @@ public abstract class Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
       @Nullable final Optional<UUID> currentVersionUuid,
-      @Nullable LineageEvent.DatasetFacets datasetFacets) {
+      @Nullable final Facets facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -90,7 +91,7 @@ public abstract class Dataset {
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
     this.currentVersionUuid = currentVersionUuid;
-    this.datasetFacets = datasetFacets;
+    this.facets = facets;
   }
 
   public Optional<Instant> getLastModifiedAt() {
@@ -99,6 +100,10 @@ public abstract class Dataset {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<Facets> getFacets() {
+    return Optional.ofNullable(facets);
   }
 
   @JsonIgnore

@@ -37,7 +37,8 @@ public final class DbTable extends Dataset {
       @Nullable final List<Field> fields,
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @Nullable final String facets) {
     super(
         id,
         DB_TABLE,
@@ -50,6 +51,7 @@ public final class DbTable extends Dataset {
         fields,
         tags,
         lastModifiedAt,
-        description);
+        description,
+        facets);
   }
 }
