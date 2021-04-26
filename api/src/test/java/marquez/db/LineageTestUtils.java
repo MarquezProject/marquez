@@ -62,18 +62,34 @@ public class LineageTestUtils {
     nominalTimeRunFacet.setNominalEndTime(
         nominalTimeRunFacet.getNominalStartTime().plus(1, ChronoUnit.HOURS));
 
-    return dao.updateMarquezModel(
-        new LineageEvent(
-            status,
-            Instant.now().atZone(LOCAL_ZONE),
-            new Run(
-                UUID.randomUUID().toString(),
-                new RunFacet(nominalTimeRunFacet, null, ImmutableMap.of())),
-            new Job(NAMESPACE, jobName, jobFacet),
-            inputs,
-            outputs,
-            PRODUCER_URL.toString()),
-        Utils.getMapper());
+    UpdateLineageRow updateLineageRow =
+        dao.updateMarquezModel(
+            new LineageEvent(
+                status,
+                Instant.now().atZone(LOCAL_ZONE),
+                new Run(
+                    UUID.randomUUID().toString(),
+                    new RunFacet(nominalTimeRunFacet, null, ImmutableMap.of())),
+                new Job(NAMESPACE, jobName, jobFacet),
+                inputs,
+                outputs,
+                PRODUCER_URL.toString()),
+            Utils.getMapper());
+    if (status.equals("COMPLETE")) {
+      DatasetDao datasetDao = dao.createDatasetDao();
+      updateLineageRow
+          .getOutputs()
+          .ifPresent(
+              outs -> {
+                outs.forEach(
+                    out ->
+                        datasetDao.updateVersion(
+                            out.getDatasetRow().getUuid(),
+                            Instant.now(),
+                            out.getDatasetVersionRow().getUuid()));
+              });
+    }
+    return updateLineageRow;
   }
 
   static DatasetFacet newDatasetFacet(SchemaField... fields) {

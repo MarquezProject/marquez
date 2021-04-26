@@ -401,7 +401,6 @@ public interface OpenLineageDao extends BaseDao {
                           dsNamespace.getName(),
                           ds.getName());
 
-                  datasetDao.updateVersion(datasetRow.getUuid(), now, row.getUuid());
                   return row;
                 });
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
