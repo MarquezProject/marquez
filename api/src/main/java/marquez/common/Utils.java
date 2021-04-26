@@ -142,20 +142,20 @@ public final class Utils {
                 namespaceName.getValue(),
                 jobName.getValue(),
                 jobInputIds.stream()
+                    .sorted()
                     .flatMap(
                         jobInputId ->
                             Stream.of(
                                 jobInputId.getNamespace().getValue(),
                                 jobInputId.getName().getValue()))
-                    .sorted()
                     .collect(joining(VERSION_DELIM)),
                 jobOutputIds.stream()
+                    .sorted()
                     .flatMap(
                         jobOutputId ->
                             Stream.of(
                                 jobOutputId.getNamespace().getValue(),
                                 jobOutputId.getName().getValue()))
-                    .sorted()
                     .collect(joining(VERSION_DELIM)),
                 jobLocation,
                 KV_JOINER.join(jobContext))
