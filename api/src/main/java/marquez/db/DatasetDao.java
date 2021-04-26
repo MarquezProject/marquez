@@ -254,11 +254,7 @@ public interface DatasetDao extends BaseDao {
               datasetMeta.getPhysicalName().getValue());
     }
 
-    updateDatasetMetric(
-        namespaceName.getValue(),
-        datasetMeta.getType().toString(),
-        newDatasetUuid,
-        datasetRow.getUuid());
+    updateDatasetMetric(namespaceName, datasetMeta.getType(), newDatasetUuid, datasetRow.getUuid());
 
     TagDao tagDao = createTagDao();
     List<DatasetTagMapping> datasetTagMappings = new ArrayList<>();
@@ -285,9 +281,12 @@ public interface DatasetDao extends BaseDao {
   }
 
   default void updateDatasetMetric(
-      String namespaceName, String type, UUID newDatasetUuid, UUID datasetUuid) {
-    if (newDatasetUuid != datasetUuid) {
-      DatasetService.datasets.labels(namespaceName, type).inc();
+      NamespaceName namespaceName,
+      DatasetType datasetType,
+      UUID newDatasetUuid,
+      UUID currentDatasetUuid) {
+    if (newDatasetUuid != currentDatasetUuid) {
+      DatasetService.datasets.labels(namespaceName.getValue(), datasetType.toString()).inc();
     }
   }
 
