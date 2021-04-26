@@ -14,6 +14,7 @@
 
 package marquez.common;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.common.models.ModelGenerator.newJobName;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.service.models.ModelGenerator.newJobMeta;
@@ -26,8 +27,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Map;
+import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.Version;
@@ -109,6 +113,7 @@ public class UtilsTest {
     final JobName jobName = newJobName();
     final JobMeta jobMeta = newJobMeta();
 
+    // Generate version0 and version1; versions will be equal.
     final Version version0 =
         Utils.newJobVersionFor(
             namespaceName,
@@ -129,13 +134,44 @@ public class UtilsTest {
   }
 
   @Test
+  public void testNewJobVersionFor_equalOnUnsortedInputsAndOutputs() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final JobName jobName = newJobName();
+    final JobMeta jobMeta = newJobMeta();
+
+    // Generate version0 and version1; versions will be equal.
+    final Version version0 =
+        Utils.newJobVersionFor(
+            namespaceName,
+            jobName,
+            jobMeta.getInputs(),
+            jobMeta.getOutputs(),
+            jobMeta.getContext(),
+            jobMeta.getLocation().map(URL::toString).orElse(null));
+    // Unsort the job inputs and outputs.
+    final ImmutableSet<DatasetId> unsortedInputs =
+        jobMeta.getInputs().stream().sorted(Collections.reverseOrder()).collect(toImmutableSet());
+    final ImmutableSet<DatasetId> unsortedOutputs =
+        jobMeta.getOutputs().stream().sorted(Collections.reverseOrder()).collect(toImmutableSet());
+    final Version version1 =
+        Utils.newJobVersionFor(
+            namespaceName,
+            jobName,
+            unsortedInputs,
+            unsortedOutputs,
+            jobMeta.getContext(),
+            jobMeta.getLocation().map(URL::toString).orElse(null));
+    assertThat(version0).isEqualTo(version1);
+  }
+
+  @Test
   public void testNewJobVersionFor_notEqual() {
     final NamespaceName namespaceName = newNamespaceName();
     final JobName jobName = newJobName();
     final JobMeta jobMeta0 = newJobMeta();
     final JobMeta jobMeta1 = newJobMeta();
 
-    // Generate version0 and version1
+    // Generate version0 and version1; versions will not be equal.
     final Version version0 =
         Utils.newJobVersionFor(
             namespaceName,
