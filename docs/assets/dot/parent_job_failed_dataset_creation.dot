@@ -11,18 +11,14 @@ digraph Creation {
         DatasetX1[label="Dataset X V1"];
         DatasetY1[label="Dataset Y V1"];
         JobA1 -> DatasetX1 [label="creates"];
+        DatasetX1 -> JobB1 [label="consumed by"];
         JobB1 -> DatasetY1 [label="creates"];
-        DatasetZ1[label="Dataset Z V1"];
-        JobC1[color=green,style=filled,label="Job B Run 1"];
-        DatasetX1 -> JobC1 [label="consumed by"];
-        DatasetY1 -> JobC1 [label="consumed by"];
-        JobC1 -> DatasetZ1 [label="creates"];
     }
     subgraph cluster2{
-        DatasetXX1[label="Dataset XX V1"];
-        JobD1[color=green,style=filled,label="Job D Run 1"];
-        DatasetZ1 -> JobD1 [label="consumed by"];
-        JobD1 -> DatasetXX1 [label="creates"];
+        JobC1[color=green,style=filled,label="Job C Run 1"];
+        DatasetY1 -> JobC1 [label="consumed by"];
+        DatasetZ1[label="Dataset Z V1"];
+        JobC1 -> DatasetZ1 [label="creates"];
     }
 
     subgraph clusterParent1{
@@ -34,12 +30,13 @@ digraph Creation {
         DatasetX2[label="Dataset X V2"];
         DatasetY2[label="Dataset Y V2"];
         JobA2 -> DatasetX2 [label="creates"];
+        DatasetX2 -> JobB2 [label="consumed by"];
         JobB2 -> DatasetY2 [label="creates"];
     }
     subgraph cluster3{
-        DatasetXX2[label="Dataset XX V2"];
-        JobD2[color=green,style=filled,label="Job D Run 2"];
-        DatasetZ1 -> JobD2 [label="consumed by"];
-        JobD2 -> DatasetXX2 [label="creates"];
+        DatasetZ2[label="Dataset XX V2"];
+        JobC2[color=green,style=filled,label="Job C Run 2"];
+        DatasetY1 -> JobC2 [label="consumed by"];
+        JobC2 -> DatasetZ2 [label="creates"];
     }
 }
