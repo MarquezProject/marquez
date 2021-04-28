@@ -1,9 +1,9 @@
 package marquez.db;
 
 import static marquez.Generator.newTimestamp;
-import static marquez.common.models.ModelGenerator.newJobName;
-import static marquez.common.models.ModelGenerator.newLocation;
-import static marquez.common.models.ModelGenerator.newVersion;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newLocation;
+import static marquez.common.models.CommonModelGenerator.newVersion;
 import static marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import static marquez.db.models.DbModelGenerator.newRowUuid;
 import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;

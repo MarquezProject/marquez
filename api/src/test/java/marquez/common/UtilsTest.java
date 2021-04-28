@@ -15,8 +15,8 @@
 package marquez.common;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static marquez.common.models.ModelGenerator.newJobName;
-import static marquez.common.models.ModelGenerator.newNamespaceName;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.service.models.ServiceModelGenerator.newJobMeta;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;

@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.Utils;
 
-public final class ModelGenerator extends Generator {
-  private ModelGenerator() {}
+public final class CommonModelGenerator extends Generator {
+  private CommonModelGenerator() {}
 
   public static NamespaceName newNamespaceName() {
     return NamespaceName.of("test_namespace" + newId());
@@ -84,7 +84,7 @@ public final class ModelGenerator extends Generator {
   }
 
   public static ImmutableSet<DatasetName> newDatasetNames(final int limit) {
-    return Stream.generate(ModelGenerator::newDatasetName).limit(limit).collect(toImmutableSet());
+    return Stream.generate(CommonModelGenerator::newDatasetName).limit(limit).collect(toImmutableSet());
   }
 
   public static DatasetName newDatasetName() {
@@ -108,11 +108,11 @@ public final class ModelGenerator extends Generator {
   }
 
   public static ImmutableList<Field> newFields(final int limit) {
-    return Stream.generate(ModelGenerator::newField).limit(limit).collect(toImmutableList());
+    return Stream.generate(CommonModelGenerator::newField).limit(limit).collect(toImmutableList());
   }
 
   public static ImmutableSet<TagName> newTagNames(final int limit) {
-    return Stream.generate(ModelGenerator::newTagName).limit(limit).collect(toImmutableSet());
+    return Stream.generate(CommonModelGenerator::newTagName).limit(limit).collect(toImmutableSet());
   }
 
   public static TagName newTagName() {

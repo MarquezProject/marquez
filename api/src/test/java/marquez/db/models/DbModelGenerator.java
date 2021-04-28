@@ -1,9 +1,9 @@
 package marquez.db.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static marquez.common.models.ModelGenerator.newDescription;
-import static marquez.common.models.ModelGenerator.newNamespaceName;
-import static marquez.common.models.ModelGenerator.newOwnerName;
+import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.common.models.CommonModelGenerator.newOwnerName;
 
 import java.time.Instant;
 import java.util.List;
