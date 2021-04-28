@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 import marquez.Generator;
 
 /** Generates new instances for {@code marquez.db.models} with random values used for testing. */
-public final class ModelGenerator extends Generator {
-  private ModelGenerator() {}
+public final class DbModelGenerator extends Generator {
+  private DbModelGenerator() {}
 
   /** Returns new {@link NamespaceRow} objects with a specified {@code limit}. */
   public static List<NamespaceRow> newNamespaceRows(int limit) {

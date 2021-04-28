@@ -9,7 +9,7 @@ import static marquez.common.models.ModelGenerator.newExternalId;
 import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newOwnerName;
-import static marquez.db.models.ModelGenerator.newRowUuid;
+import static marquez.db.models.DbModelGenerator.newRowUuid;
 import static marquez.service.models.ModelGenerator.newDbTableMeta;
 import static marquez.service.models.ModelGenerator.newDbTableMetaWith;
 import static marquez.service.models.ModelGenerator.newJobMetaWith;

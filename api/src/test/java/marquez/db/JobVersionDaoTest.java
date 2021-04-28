@@ -5,7 +5,7 @@ import static marquez.common.models.ModelGenerator.newJobName;
 import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newVersion;
 import static marquez.db.JobVersionDao.BagOfJobVersionInfo;
-import static marquez.db.models.ModelGenerator.newRowUuid;
+import static marquez.db.models.DbModelGenerator.newRowUuid;
 import static marquez.service.models.ModelGenerator.newJobMetaWith;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 /** The test suite for {@link JobVersionDao}. */
+@org.junit.jupiter.api.Tag("IntegrationTests")
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class JobVersionDaoTest extends BaseIntegrationTest {
   static Jdbi jdbiForTesting;
