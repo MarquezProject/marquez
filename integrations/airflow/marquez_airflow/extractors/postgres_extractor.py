@@ -126,7 +126,7 @@ class PostgresExtractor(BaseExtractor):
         with closing(hook.get_conn()) as conn:
             with closing(conn.cursor()) as cursor:
                 table_names_as_str = ",".join(map(
-                    lambda name: f"'{name}'", table_names
+                    lambda name: f"'{name.name}'", table_names
                 ))
                 cursor.execute(
                     self._information_schema_query(table_names_as_str)
