@@ -6,7 +6,7 @@ import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newVersion;
 import static marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import static marquez.db.models.DbModelGenerator.newRowUuid;
-import static marquez.service.models.ModelGenerator.newJobMetaWith;
+import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;

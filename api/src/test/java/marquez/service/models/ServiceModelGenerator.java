@@ -28,8 +28,8 @@ import marquez.common.models.NamespaceName;
 /**
  * Generates new instances for {@code marquez.service.models} with random values used for testing.
  */
-public final class ModelGenerator extends Generator {
-  private ModelGenerator() {}
+public final class ServiceModelGenerator extends Generator {
+  private ServiceModelGenerator() {}
 
   /** Returns a new {@link NamespaceMeta} object. */
   public static NamespaceMeta newNamespaceMeta() {
@@ -127,7 +127,7 @@ public final class ModelGenerator extends Generator {
 
   /** Returns new {@link Tag} objects with a specified {@code limit}. */
   public static ImmutableSet<Tag> newTags(final int limit) {
-    return java.util.stream.Stream.generate(ModelGenerator::newTag)
+    return java.util.stream.Stream.generate(ServiceModelGenerator::newTag)
         .limit(limit)
         .collect(toImmutableSet());
   }

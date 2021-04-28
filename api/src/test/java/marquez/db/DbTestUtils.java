@@ -10,10 +10,10 @@ import static marquez.common.models.ModelGenerator.newLocation;
 import static marquez.common.models.ModelGenerator.newNamespaceName;
 import static marquez.common.models.ModelGenerator.newOwnerName;
 import static marquez.db.models.DbModelGenerator.newRowUuid;
-import static marquez.service.models.ModelGenerator.newDbTableMeta;
-import static marquez.service.models.ModelGenerator.newDbTableMetaWith;
-import static marquez.service.models.ModelGenerator.newJobMetaWith;
-import static marquez.service.models.ModelGenerator.newRunMeta;
+import static marquez.service.models.ServiceModelGenerator.newDbTableMeta;
+import static marquez.service.models.ServiceModelGenerator.newDbTableMetaWith;
+import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;
+import static marquez.service.models.ServiceModelGenerator.newRunMeta;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableMap;
@@ -43,6 +43,7 @@ import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
+import marquez.service.models.ServiceModelGenerator;
 import org.jdbi.v3.core.Jdbi;
 
 /** Static utility methods for inserting and interacting with rows in the database. */
@@ -143,7 +144,7 @@ final class DbTestUtils {
   /** Adds a new {@link RunArgsRow} object to the {@code run_args} table. */
   static RunArgsRow newRunArgs(final Jdbi jdbi) {
     final RunArgsDao runArgsDao = jdbi.onDemand(RunArgsDao.class);
-    final ImmutableMap<String, String> runArgs = marquez.service.models.ModelGenerator.newRunArgs();
+    final ImmutableMap<String, String> runArgs = ServiceModelGenerator.newRunArgs();
     final String runArgsAsJson = Utils.toJson(runArgs);
     final String checksum = Utils.checksumFor(runArgs);
     return runArgsDao.upsertRunArgs(newRowUuid(), newTimestamp(), runArgsAsJson, checksum);
