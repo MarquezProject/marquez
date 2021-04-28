@@ -148,17 +148,17 @@ public class UtilsTest {
             jobMeta.getOutputs(),
             jobMeta.getContext(),
             jobMeta.getLocation().map(URL::toString).orElse(null));
-    // Unsort the job inputs and outputs.
-    final ImmutableSet<DatasetId> unsortedInputs =
+    // Unsort the job inputs and outputs for version1.
+    final ImmutableSet<DatasetId> unsortedJobInputIds =
         jobMeta.getInputs().stream().sorted(Collections.reverseOrder()).collect(toImmutableSet());
-    final ImmutableSet<DatasetId> unsortedOutputs =
+    final ImmutableSet<DatasetId> unsortedJobOutputIds =
         jobMeta.getOutputs().stream().sorted(Collections.reverseOrder()).collect(toImmutableSet());
     final Version version1 =
         Utils.newJobVersionFor(
             namespaceName,
             jobName,
-            unsortedInputs,
-            unsortedOutputs,
+            unsortedJobInputIds,
+            unsortedJobOutputIds,
             jobMeta.getContext(),
             jobMeta.getLocation().map(URL::toString).orElse(null));
     assertThat(version0).isEqualTo(version1);
