@@ -84,7 +84,9 @@ public final class CommonModelGenerator extends Generator {
   }
 
   public static ImmutableSet<DatasetName> newDatasetNames(final int limit) {
-    return Stream.generate(CommonModelGenerator::newDatasetName).limit(limit).collect(toImmutableSet());
+    return Stream.generate(CommonModelGenerator::newDatasetName)
+        .limit(limit)
+        .collect(toImmutableSet());
   }
 
   public static DatasetName newDatasetName() {

@@ -167,6 +167,11 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     // Ensure the output dataset versions have been associated with the run.
     DbTestUtils.verifyRunHasOutputs(jdbiForTesting, runRow.getUuid(), jobMeta.getOutputs().size());
 
+    // Ensure the latest run not associated with a job version.
+    final Optional<ExtendedJobVersionRow> jobVersionRow =
+        jobVersionDao.findJobVersionFor(runRow.getUuid());
+    assertThat(jobVersionRow).isNotPresent();
+
     // (6) Add a new job version on the run state transition to COMPLETED.
     final BagOfJobVersionInfo bagOfJobVersionInfo =
         jobVersionDao.upsertJobVersionOnRunTransition(

@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
@@ -191,6 +190,10 @@ public interface JobVersionDao extends BaseDao {
   @SqlQuery("SELECT latest_run_uuid FROM job_versions WHERE uuid = :jobVersionUuid")
   Optional<UUID> findLatestRunFor(UUID jobVersionUuid);
 
+  /** Returns the {@link JobVersionRow} object for a given the unique run ID . */
+  @SqlQuery("SELECT * FROM job_versions WHERE latest_run_uuid = :runUuid")
+  Optional<ExtendedJobVersionRow> findJobVersionFor(UUID runUuid);
+
   /** Returns the total row count for the {@code job_versions} table; used for testing only. */
   @VisibleForTesting
   @SqlQuery("SELECT COUNT(*) FROM job_versions")
@@ -198,10 +201,10 @@ public interface JobVersionDao extends BaseDao {
 
   /**
    * Used to upsert an immutable {@link JobVersionRow} object when a {@link Run} has transitioned. A
-   * {@link Version} is generated using {@link Utils#newJobVersionFor(String, String, List, List,
-   * Map, String)} based on the jobs inputs and inputs, source code location, and context. A version
-   * for a given job is created <i>only</i> when a {@link Run} transitions into a {@code COMPLETED},
-   * {@code ABORTED}, or {@code FAILED} state.
+   * {@link Version} is generated using {@link Utils#newJobVersionFor(NamespaceName, JobName,
+   * ImmutableSet, ImmutableSet, ImmutableMap, String)} based on the jobs inputs and inputs, source
+   * code location, and context. A version for a given job is created <i>only</i> when a {@link Run}
+   * transitions into a {@code COMPLETED}, {@code ABORTED}, or {@code FAILED} state.
    *
    * @param namespaceName The namespace for the job version.
    * @param jobName The name of the job.
