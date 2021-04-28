@@ -16,6 +16,7 @@ package marquez;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableSet;
+
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import lombok.Getter;
@@ -43,4 +44,8 @@ public class MarquezConfig extends Configuration {
   @Getter
   @JsonProperty("graphql")
   private final GraphqlConfig graphql = new GraphqlConfig();
+
+  @Getter
+  @JsonProperty("sentry")
+  private final SentryConfig sentry = new SentryConfig();
 }
