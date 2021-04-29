@@ -54,8 +54,8 @@ public interface JobVersionDao extends BaseDao {
   }
 
   /**
-   * Used to upsert an immutable {@link JobVersionRow} object; on version conflict, the job version
-   * object is returned unmodified.
+   * Used to upsert a  {@link JobVersionRow} object; on version conflict, the job version
+   * object is returned with the {@code updated_at} column set to the last modified timestamp.
    *
    * @param jobVersionUuid The unique ID of the job version.
    * @param now The last modified timestamp of the job version.
@@ -68,6 +68,7 @@ public interface JobVersionDao extends BaseDao {
    * @param namespaceName The namespace associated with the job version.
    * @return The {@link ExtendedJobVersionRow} object inserted into the {@code job_versions} table.
    */
+  // TODO: A JobVersionRow object should be immutable; replace with JobVersionDao.insertJobVersion()
   @SqlQuery(
       "INSERT INTO job_versions ("
           + "uuid, "
