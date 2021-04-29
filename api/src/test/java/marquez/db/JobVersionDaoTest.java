@@ -195,8 +195,8 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
             newTimestamp());
 
     // Ensure the job version is associated with the latest run.
-    final RunRow latestRunForJobVersion = runDao.findRunByUuidAsRow(runRow.getUuid()).get();
-    assertThat(latestRunForJobVersion.getJobVersionUuid())
+    final RunRow latestRunRowForJobVersion = runDao.findRunByUuidAsRow(runRow.getUuid()).get();
+    assertThat(latestRunRowForJobVersion.getJobVersionUuid())
         .isPresent()
         .contains(bagOfJobVersionInfo.getJobVersionRow().getUuid());
 
@@ -206,9 +206,9 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     assertThat(latestRunUuid).isPresent().contains(runRow.getUuid());
 
     // Ensure the latest version is associated with the job.
-    final JobRow jobForLatestRun =
+    final JobRow jobRowForLatestRun =
         jobDao.findJobByNameAsRow(jobRow.getNamespaceName(), jobRow.getName()).get();
-    assertThat(jobForLatestRun.getCurrentVersionUuid())
+    assertThat(jobRowForLatestRun.getCurrentVersionUuid())
         .isPresent()
         .contains(bagOfJobVersionInfo.getJobVersionRow().getUuid());
 
