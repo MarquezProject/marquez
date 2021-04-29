@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.Utils;
 
-public final class ModelGenerator extends Generator {
-  private ModelGenerator() {}
+public final class CommonModelGenerator extends Generator {
+  private CommonModelGenerator() {}
 
   public static NamespaceName newNamespaceName() {
     return NamespaceName.of("test_namespace" + newId());
@@ -65,7 +65,14 @@ public final class ModelGenerator extends Generator {
   }
 
   public static ImmutableSet<DatasetId> newDatasetIds(final int limit) {
-    return Stream.generate(ModelGenerator::newDatasetId).limit(limit).collect(toImmutableSet());
+    return newDatasetIdsWith(newNamespaceName(), limit);
+  }
+
+  public static ImmutableSet<DatasetId> newDatasetIdsWith(
+      final NamespaceName namespaceName, final int limit) {
+    return Stream.generate(() -> newDatasetIdWith(namespaceName))
+        .limit(limit)
+        .collect(toImmutableSet());
   }
 
   public static DatasetId newDatasetId() {
@@ -77,7 +84,9 @@ public final class ModelGenerator extends Generator {
   }
 
   public static ImmutableSet<DatasetName> newDatasetNames(final int limit) {
-    return Stream.generate(ModelGenerator::newDatasetName).limit(limit).collect(toImmutableSet());
+    return Stream.generate(CommonModelGenerator::newDatasetName)
+        .limit(limit)
+        .collect(toImmutableSet());
   }
 
   public static DatasetName newDatasetName() {
@@ -101,11 +110,11 @@ public final class ModelGenerator extends Generator {
   }
 
   public static ImmutableList<Field> newFields(final int limit) {
-    return Stream.generate(ModelGenerator::newField).limit(limit).collect(toImmutableList());
+    return Stream.generate(CommonModelGenerator::newField).limit(limit).collect(toImmutableList());
   }
 
   public static ImmutableSet<TagName> newTagNames(final int limit) {
-    return Stream.generate(ModelGenerator::newTagName).limit(limit).collect(toImmutableSet());
+    return Stream.generate(CommonModelGenerator::newTagName).limit(limit).collect(toImmutableSet());
   }
 
   public static TagName newTagName() {
@@ -134,11 +143,15 @@ public final class ModelGenerator extends Generator {
 
   public static ImmutableMap<String, String> newContext() {
     return ImmutableMap.of(
-        "sql", String.format("SELECT * FROM room_bookings WHERE room = '%dH';", newId()));
+        "sql", String.format("SELECT * FROM test_table WHERE test_column = '%dH';", newId()));
   }
 
   public static RunId newRunId() {
     return RunId.of(UUID.randomUUID());
+  }
+
+  public static Version newVersion() {
+    return Version.of(UUID.randomUUID());
   }
 
   public static String newDescription() {
@@ -147,5 +160,9 @@ public final class ModelGenerator extends Generator {
 
   public static URL newSchemaLocation() {
     return Utils.toUrl("http://localhost:8081/schemas/ids/" + newId());
+  }
+
+  public static String newExternalId() {
+    return "test_external_id" + newId();
   }
 }

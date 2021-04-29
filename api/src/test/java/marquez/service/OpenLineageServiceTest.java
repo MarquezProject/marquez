@@ -201,7 +201,8 @@ public class OpenLineageServiceTest {
     Assertions.assertTrue(job.isPresent(), "Job does not exist: " + event.getJob().getName());
 
     RunService runService = new RunService(openLineageDao, new ArrayList());
-    Optional<Run> run = runService.findBy(openLineageDao.runToUuid(event.getRun().getRunId()));
+    Optional<Run> run =
+        runService.findRunByUuid(openLineageDao.runToUuid(event.getRun().getRunId()));
     Assertions.assertTrue(run.isPresent(), "Should have run");
 
     if (event.getInputs() != null) {
@@ -246,7 +247,7 @@ public class OpenLineageServiceTest {
                 .outputs(Collections.singletonList(dataset))
                 .build())
         .get();
-    Optional<Dataset> datasetRow = datasetDao.find(NAMESPACE, DATASET_NAME);
+    Optional<Dataset> datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
     assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersionUuid).isNotPresent();
 
     // On complete, the currentVersionUuid is updated
@@ -261,10 +262,11 @@ public class OpenLineageServiceTest {
                 .outputs(Collections.singletonList(dataset))
                 .build())
         .get();
-    datasetRow = datasetDao.find(NAMESPACE, DATASET_NAME);
+    datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
     assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersionUuid).isPresent();
 
-    List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findOutputsByRunId(firstRunId);
+    List<ExtendedDatasetVersionRow> outputs =
+        datasetVersionDao.findOutputDatasetVersionsFor(firstRunId);
     assertThat(outputs).hasSize(1).map(DatasetVersionRow::getVersion).isNotNull();
 
     UUID dsVersion1Id = outputs.get(0).getVersion();
@@ -282,7 +284,8 @@ public class OpenLineageServiceTest {
                 .outputs(new ArrayList<>())
                 .build())
         .get();
-    List<ExtendedDatasetVersionRow> inputs = datasetVersionDao.findInputsByRunId(secondRunId);
+    List<ExtendedDatasetVersionRow> inputs =
+        datasetVersionDao.findInputDatasetVersionsFor(secondRunId);
     assertThat(inputs).hasSize(1).map(DatasetVersionRow::getVersion).contains(dsVersion1Id);
 
     // fail to write the dataset - the currentVersionUuid is not updated
@@ -299,7 +302,7 @@ public class OpenLineageServiceTest {
                 .build())
         .get();
 
-    Optional<Dataset> afterFailureDataset = datasetDao.find(NAMESPACE, DATASET_NAME);
+    Optional<Dataset> afterFailureDataset = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
     assertThat(afterFailureDataset)
         .isPresent()
         .flatMap(Dataset::getCurrentVersionUuid)
@@ -322,7 +325,7 @@ public class OpenLineageServiceTest {
         .get();
 
     // still version 1 is consumed since the second producer job run failed
-    assertThat(datasetVersionDao.findInputsByRunId(secondRunId))
+    assertThat(datasetVersionDao.findInputDatasetVersionsFor(secondRunId))
         .hasSize(1)
         .map(DatasetVersionRow::getVersion)
         .contains(dsVersion1Id);
@@ -332,7 +335,7 @@ public class OpenLineageServiceTest {
     DatasetService datasetService = new DatasetService(openLineageDao, runService);
 
     Optional<Dataset> dataset =
-        datasetService.find(
+        datasetService.findDatasetByName(
             openLineageDao.formatNamespaceName(ds.getNamespace()),
             openLineageDao.formatDatasetName(ds.getName()));
     Assertions.assertTrue(dataset.isPresent(), "Dataset does not exist: " + ds);

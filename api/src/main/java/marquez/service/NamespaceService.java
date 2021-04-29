@@ -43,11 +43,11 @@ public class NamespaceService extends DelegatingDaos.DelegatingNamespaceDao {
             OwnerName.ANONYMOUS,
             "The default global namespace for dataset, job, and run metadata "
                 + "not belonging to a user-specified namespace.");
-    upsert(NamespaceName.DEFAULT.getValue(), meta);
+    upsertNamespaceMeta(NamespaceName.DEFAULT, meta);
   }
 
   public Namespace createOrUpdate(@NonNull NamespaceName name, @NonNull NamespaceMeta meta) {
     namespaces.inc();
-    return upsert(name.getValue(), meta);
+    return upsertNamespaceMeta(name, meta);
   }
 }

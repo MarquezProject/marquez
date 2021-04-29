@@ -57,18 +57,18 @@ public interface JobDao extends BaseDao {
           + "SET updated_at = :updatedAt, "
           + "    current_version_uuid = :currentVersionUuid "
           + "WHERE uuid = :rowUuid")
-  void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
+  void updateVersionFor(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
   String JOB_SELECT =
       "SELECT j.*, jc.context "
           + "FROM jobs AS j "
           + "left outer join job_contexts jc on jc.uuid = j.current_job_context_uuid ";
 
-  @SqlQuery(JOB_SELECT + "WHERE j.namespace_name = :namespaceName AND " + "      j.name = :jobName")
-  Optional<Job> find(String namespaceName, String jobName);
+  @SqlQuery(JOB_SELECT + "WHERE j.namespace_name = :namespaceName AND j.name = :jobName")
+  Optional<Job> findJobByName(String namespaceName, String jobName);
 
   default Optional<Job> findWithRun(String namespaceName, String jobName) {
-    Optional<Job> job = find(namespaceName, jobName);
+    Optional<Job> job = findJobByName(namespaceName, jobName);
     job.ifPresent(
         j -> {
           Optional<Run> run = createRunDao().findByLatestJob(namespaceName, jobName);
@@ -83,7 +83,7 @@ public interface JobDao extends BaseDao {
           + "  ON (n.name = :namespaceName AND "
           + "      j.namespace_uuid = n.uuid AND "
           + "      j.name = :jobName)")
-  Optional<JobRow> findByRow(String namespaceName, String jobName);
+  Optional<JobRow> findJobByNameAsRow(String namespaceName, String jobName);
 
   @SqlQuery(
       JOB_SELECT
@@ -107,7 +107,7 @@ public interface JobDao extends BaseDao {
     j.setLatestRun(run);
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
     j.setInputs(
-        datasetVersionDao.findInputsByRunId(run.getId().getValue()).stream()
+        datasetVersionDao.findInputDatasetVersionsFor(run.getId().getValue()).stream()
             .map(
                 ds ->
                     new DatasetId(
@@ -115,7 +115,7 @@ public interface JobDao extends BaseDao {
                         DatasetName.of(ds.getDatasetName())))
             .collect(Collectors.toSet()));
     j.setOutputs(
-        datasetVersionDao.findOutputsByRunId(run.getId().getValue()).stream()
+        datasetVersionDao.findOutputDatasetVersionsFor(run.getId().getValue()).stream()
             .map(
                 ds ->
                     new DatasetId(
@@ -124,12 +124,12 @@ public interface JobDao extends BaseDao {
             .collect(Collectors.toSet()));
   }
 
-  default JobRow upsert(
+  default JobRow upsertJobMeta(
       NamespaceName namespaceName, JobName jobName, JobMeta jobMeta, ObjectMapper mapper) {
     Instant createdAt = Instant.now();
     NamespaceRow namespace =
         createNamespaceDao()
-            .upsert(
+            .upsertNamespaceRow(
                 UUID.randomUUID(), createdAt, namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
     JobContextRow contextRow =
         createJobContextDao()
@@ -139,7 +139,7 @@ public interface JobDao extends BaseDao {
                 Utils.toJson(jobMeta.getContext()),
                 Utils.checksumFor(jobMeta.getContext()));
 
-    return upsert(
+    return upsertJob(
         UUID.randomUUID(),
         jobMeta.getType(),
         createdAt,
@@ -204,7 +204,7 @@ public interface JobDao extends BaseDao {
           + "current_location = EXCLUDED.current_location, "
           + "current_inputs = EXCLUDED.current_inputs "
           + "RETURNING *")
-  JobRow upsert(
+  JobRow upsertJob(
       UUID uuid,
       JobType type,
       Instant now,

@@ -25,7 +25,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.Value;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.NamespaceName;
 import marquez.common.models.TagName;
 import marquez.db.mappers.DatasetMapper;
 import marquez.db.mappers.DatasetRowMapper;
@@ -85,10 +87,10 @@ public interface DatasetDao extends BaseDao {
           + "left outer join dataset_versions dv on dv.uuid = d.current_version_uuid\n";
 
   @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
-  Optional<Dataset> find(String namespaceName, String datasetName);
+  Optional<Dataset> findDatasetByName(String namespaceName, String datasetName);
 
   default Optional<Dataset> findWithTags(String namespaceName, String datasetName) {
-    Optional<Dataset> dataset = find(namespaceName, datasetName);
+    Optional<Dataset> dataset = findDatasetByName(namespaceName, datasetName);
     dataset.ifPresent(this::setFields);
     return dataset;
   }
@@ -105,7 +107,7 @@ public interface DatasetDao extends BaseDao {
 
   @SqlQuery(
       "SELECT d.* FROM datasets AS d WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
-  Optional<DatasetRow> findByRow(String namespaceName, String datasetName);
+  Optional<DatasetRow> findDatasetAsRow(String namespaceName, String datasetName);
 
   @SqlQuery("SELECT * FROM datasets WHERE name = :datasetName AND namespace_name = :namespaceName")
   Optional<DatasetRow> getUuid(String namespaceName, String datasetName);
@@ -208,10 +210,12 @@ public interface DatasetDao extends BaseDao {
 
   @Transaction
   default Dataset upsertDatasetMeta(
-      String namespaceName, String datasetName, DatasetMeta datasetMeta) {
+      NamespaceName namespaceName, DatasetName datasetName, DatasetMeta datasetMeta) {
     Instant now = Instant.now();
     NamespaceRow namespaceRow =
-        createNamespaceDao().upsert(UUID.randomUUID(), now, namespaceName, DEFAULT_NAMESPACE_OWNER);
+        createNamespaceDao()
+            .upsertNamespaceRow(
+                UUID.randomUUID(), now, namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
     SourceRow sourceRow =
         createSourceDao()
             .upsertOrDefault(
@@ -233,7 +237,7 @@ public interface DatasetDao extends BaseDao {
               namespaceRow.getName(),
               sourceRow.getUuid(),
               sourceRow.getName(),
-              datasetName,
+              datasetName.getValue(),
               datasetMeta.getPhysicalName().getValue(),
               datasetMeta.getDescription().orElse(null));
     } else {
@@ -246,12 +250,11 @@ public interface DatasetDao extends BaseDao {
               namespaceRow.getName(),
               sourceRow.getUuid(),
               sourceRow.getName(),
-              datasetName,
+              datasetName.getValue(),
               datasetMeta.getPhysicalName().getValue());
     }
 
-    updateDatasetMetric(
-        namespaceName, datasetMeta.getType().toString(), newDatasetUuid, datasetRow.getUuid());
+    updateDatasetMetric(namespaceName, datasetMeta.getType(), newDatasetUuid, datasetRow.getUuid());
 
     TagDao tagDao = createTagDao();
     List<DatasetTagMapping> datasetTagMappings = new ArrayList<>();
@@ -264,9 +267,13 @@ public interface DatasetDao extends BaseDao {
     DatasetVersionRow dvRow =
         createDatasetVersionDao()
             .upsertDatasetVersion(
-                datasetRow.getUuid(), now, namespaceName, datasetName, datasetMeta);
+                datasetRow.getUuid(),
+                now,
+                namespaceName.getValue(),
+                datasetName.getValue(),
+                datasetMeta);
 
-    return findWithTags(namespaceName, datasetName).get();
+    return findWithTags(namespaceName.getValue(), datasetName.getValue()).get();
   }
 
   default String toDefaultSourceType(DatasetType type) {
@@ -274,19 +281,22 @@ public interface DatasetDao extends BaseDao {
   }
 
   default void updateDatasetMetric(
-      String namespaceName, String type, UUID newDatasetUuid, UUID datasetUuid) {
-    if (newDatasetUuid != datasetUuid) {
-      DatasetService.datasets.labels(namespaceName, type).inc();
+      NamespaceName namespaceName,
+      DatasetType datasetType,
+      UUID newDatasetUuid,
+      UUID currentDatasetUuid) {
+    if (newDatasetUuid != currentDatasetUuid) {
+      DatasetService.datasets.labels(namespaceName.getValue(), datasetType.toString()).inc();
     }
   }
 
   default Dataset updateTags(String namespaceName, String datasetName, String tagName) {
     Instant now = Instant.now();
-    DatasetRow datasetRow = findByRow(namespaceName, datasetName).get();
+    DatasetRow datasetRow = findDatasetAsRow(namespaceName, datasetName).get();
     TagRow tagRow = createTagDao().upsert(UUID.randomUUID(), now, tagName);
     updateTagMapping(
         ImmutableList.of(new DatasetTagMapping(datasetRow.getUuid(), tagRow.getUuid(), now)));
-    return find(namespaceName, datasetName).get();
+    return findDatasetByName(namespaceName, datasetName).get();
   }
 
   @Value

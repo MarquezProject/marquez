@@ -1,20 +1,20 @@
 package marquez;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static marquez.common.models.ModelGenerator.newConnectionUrl;
-import static marquez.common.models.ModelGenerator.newConnectionUrlFor;
-import static marquez.common.models.ModelGenerator.newContext;
-import static marquez.common.models.ModelGenerator.newDatasetName;
-import static marquez.common.models.ModelGenerator.newDbSourceType;
-import static marquez.common.models.ModelGenerator.newDescription;
-import static marquez.common.models.ModelGenerator.newFieldName;
-import static marquez.common.models.ModelGenerator.newFieldType;
-import static marquez.common.models.ModelGenerator.newJobName;
-import static marquez.common.models.ModelGenerator.newLocation;
-import static marquez.common.models.ModelGenerator.newNamespaceName;
-import static marquez.common.models.ModelGenerator.newOwnerName;
-import static marquez.common.models.ModelGenerator.newSchemaLocation;
-import static marquez.common.models.ModelGenerator.newSourceName;
+import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
+import static marquez.common.models.CommonModelGenerator.newConnectionUrlFor;
+import static marquez.common.models.CommonModelGenerator.newContext;
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDbSourceType;
+import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newFieldName;
+import static marquez.common.models.CommonModelGenerator.newFieldType;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newLocation;
+import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static marquez.common.models.CommonModelGenerator.newSchemaLocation;
+import static marquez.common.models.CommonModelGenerator.newSourceName;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
