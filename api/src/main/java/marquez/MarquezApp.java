@@ -120,7 +120,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
       onFatalError(errorOnDbMigrate); // Signal app termination.
     }
 
-    if (config.getSentry() != null) {
+    if (isSentryEnabled(config)) {
       Sentry.init(options -> {
         options.setTracesSampleRate(config.getSentry().getTracesSampleRate());
         options.setEnvironment(config.getSentry().getEnvironment());
@@ -136,6 +136,10 @@ public final class MarquezApp extends Application<MarquezConfig> {
     registerResources(config, env, source);
     registerServlets(env);
 
+  }
+
+  private boolean isSentryEnabled(MarquezConfig config) {
+    return config.getSentry() != null && !config.getSentry().getDsn().equals(SentryConfig.DEFAULT_DSN);
   }
 
   private static class TracingServletFilter implements Filter {
@@ -225,7 +229,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
     SqlLogger sqlLogger = new InstrumentedSqlLogger(env.metrics());
-    if (config.getSentry() != null) {
+    if (isSentryEnabled(config)) {
       sqlLogger = new TracingSQLLogger(sqlLogger);
     }
     jdbi.setSqlLogger(sqlLogger);
