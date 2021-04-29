@@ -58,8 +58,7 @@ public interface LineageDao {
           + "SELECT DISTINCT j.uuid\n"
           + "    FROM job_versions_io_mapping io\n"
           + "    INNER JOIN dataset_ids ON io.dataset_uuid=dataset_ids.dataset_uuid\n"
-          + "    INNER JOIN job_versions jv ON jv.uuid=io.job_version_uuid\n"
-          + "    INNER JOIN jobs j ON j.uuid=jv.job_uuid")
+          + "    INNER JOIN jobs j ON j.current_version_uuid=io.job_version_uuid")
   Set<UUID> getLineage(@BindList Set<UUID> jobIds);
 
   @SqlQuery("SELECT uuid from jobs where name = :jobName and namespace_name = :namespace")

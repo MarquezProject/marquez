@@ -106,7 +106,7 @@ public class LineageDaoTest {
         LineageTestUtils.createLineageRow(
             openLineageDao,
             "readJobFailed",
-            "FAILED",
+            "FAIL",
             jobFacet,
             Arrays.asList(dataset),
             Arrays.asList());
@@ -138,6 +138,64 @@ public class LineageDaoTest {
         .map(jd -> jd.getName().getValue())
         .get()
         .isEqualTo("downstreamJob0<-outputData<-readJob0<-commonDataset");
+  }
+
+  @Test
+  public void testGetLineageExcludesJobsThatNoLongerParticipate() {
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+    List<JobLineage> jobRows =
+        writeDownstreamLineage(
+            openLineageDao,
+            new LinkedList<>(
+                Arrays.asList(
+                    new DatasetConsumerJob("readJob", 3, Optional.of("outputData")),
+                    new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
+            jobFacet,
+            dataset);
+
+    // don't expect a job which no longer participates in the graph to be included in the lineage
+    UpdateLineageRow oldJobRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "jobThatUsedToReadDataset",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(dataset),
+            Arrays.asList());
+
+    // jobThatUsedToReadDataset now reads a new dataset
+    Dataset aNewDataset =
+        new Dataset(
+            NAMESPACE,
+            "anUncommonDataset",
+            newDatasetFacet(
+                new SchemaField("firstname", "string", "the first name"),
+                new SchemaField("lastname", "string", "the last name"),
+                new SchemaField("birthdate", "date", "the date of birth")));
+    UpdateLineageRow newJobVersion =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "jobThatUsedToReadDataset",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(aNewDataset),
+            Arrays.asList());
+
+    // fetch the first "readJob" lineage.
+    JobLineage currentReadJob = jobRows.get(0);
+    Set<UUID> connectedJobs =
+        lineageDao.getLineage(new HashSet<>(Arrays.asList(currentReadJob.getId())));
+    assertThat(connectedJobs).size().isEqualTo(5);
+    assertThat(connectedJobs).doesNotContain(oldJobRow.getJob().getUuid());
+
+    // fetch the lineage of the changed job.
+    // It no longer has any links with the other jobs
+    Set<UUID> formerLineage =
+        lineageDao.getLineage(new HashSet<>(Arrays.asList(newJobVersion.getJob().getUuid())));
+    assertThat(formerLineage).size().isEqualTo(1);
+    assertThat(formerLineage).contains(newJobVersion.getJob().getUuid());
   }
 
   @Test
