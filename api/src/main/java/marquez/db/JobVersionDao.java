@@ -54,8 +54,8 @@ public interface JobVersionDao extends BaseDao {
   }
 
   /**
-   * Used to upsert a  {@link JobVersionRow} object; on version conflict, the job version
-   * object is returned with the {@code updated_at} column set to the last modified timestamp.
+   * Used to upsert a {@link JobVersionRow} object; on version conflict, the job version object is
+   * returned with the {@code updated_at} column set to the last modified timestamp.
    *
    * @param jobVersionUuid The unique ID of the job version.
    * @param now The last modified timestamp of the job version.

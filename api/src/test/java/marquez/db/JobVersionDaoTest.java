@@ -36,6 +36,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class JobVersionDaoTest extends BaseIntegrationTest {
   static Jdbi jdbiForTesting;
+  static DatasetVersionDao datasetVersionDao;
+  static JobDao jobDao;
+  static RunDao runDao;
   static JobVersionDao jobVersionDao;
 
   static NamespaceRow namespaceRow;
@@ -44,6 +47,9 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
   @BeforeAll
   public static void setUpOnce(final Jdbi jdbi) {
     jdbiForTesting = jdbi;
+    datasetVersionDao = jdbiForTesting.onDemand(DatasetVersionDao.class);
+    jobDao = jdbi.onDemand(JobDao.class);
+    runDao = jdbi.onDemand(RunDao.class);
     jobVersionDao = jdbiForTesting.onDemand(JobVersionDao.class);
 
     // Each tests requires both a namespace and job row.
@@ -146,9 +152,14 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
         DbTestUtils.newRun(jdbiForTesting, jobRow.getNamespaceName(), jobRow.getName());
 
     // Ensure the input dataset versions have been associated with the run.
-    DbTestUtils.verifyRunHasInputs(jdbiForTesting, runRow.getUuid(), jobMeta.getInputs().size());
+    final List<ExtendedDatasetVersionRow> inputDatasetVersions =
+        datasetVersionDao.findInputDatasetVersionsFor(runRow.getUuid());
+    assertThat(inputDatasetVersions).hasSize(jobMeta.getInputs().size());
+
     // Ensure a run with the state NEW has no output dataset versions.
-    DbTestUtils.verifyRunHasOutputs(jdbiForTesting, runRow.getUuid(), 0);
+    final List<ExtendedDatasetVersionRow> noOutputDatasetVersions =
+        datasetVersionDao.findOutputDatasetVersionsFor(runRow.getUuid());
+    assertThat(noOutputDatasetVersions).isEmpty();
 
     // (4) Transition the run from NEW to RUNNING.
     final Run runStarted =
@@ -165,7 +176,9 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     assertThat(runCompleted.getDurationMs()).isPresent();
 
     // Ensure the output dataset versions have been associated with the run.
-    DbTestUtils.verifyRunHasOutputs(jdbiForTesting, runRow.getUuid(), jobMeta.getOutputs().size());
+    final List<ExtendedDatasetVersionRow> outputDatasetVersions =
+        datasetVersionDao.findOutputDatasetVersionsFor(runRow.getUuid());
+    assertThat(outputDatasetVersions).hasSize(jobMeta.getOutputs().size());
 
     // Ensure the latest run not associated with a job version.
     final Optional<ExtendedJobVersionRow> jobVersionRow =
@@ -182,8 +195,10 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
             newTimestamp());
 
     // Ensure the job version is associated with the latest run.
-    DbTestUtils.verifyLatestJobVersionForRun(
-        jdbiForTesting, runRow.getUuid(), bagOfJobVersionInfo.getJobVersionRow().getUuid());
+    final RunRow latestRunForJobVersion = runDao.findRunByUuidAsRow(runRow.getUuid()).get();
+    assertThat(latestRunForJobVersion.getJobVersionUuid())
+        .isPresent()
+        .contains(bagOfJobVersionInfo.getJobVersionRow().getUuid());
 
     // Ensure the latest run is associated with the job version.
     final Optional<UUID> latestRunUuid =
@@ -191,11 +206,11 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     assertThat(latestRunUuid).isPresent().contains(runRow.getUuid());
 
     // Ensure the latest version is associated with the job.
-    DbTestUtils.verifyLatestJobVersionForJob(
-        jdbiForTesting,
-        jobRow.getNamespaceName(),
-        jobRow.getName(),
-        bagOfJobVersionInfo.getJobVersionRow().getUuid());
+    final JobRow jobForLatestRun =
+        jobDao.findJobByNameAsRow(jobRow.getNamespaceName(), jobRow.getName()).get();
+    assertThat(jobForLatestRun.getCurrentVersionUuid())
+        .isPresent()
+        .contains(bagOfJobVersionInfo.getJobVersionRow().getUuid());
 
     // Ensure the input datasets have been linked to the job version.
     final List<UUID> jobVersionInputDatasetUuids =

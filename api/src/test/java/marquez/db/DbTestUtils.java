@@ -14,11 +14,9 @@ import static marquez.service.models.ServiceModelGenerator.newDbTableMeta;
 import static marquez.service.models.ServiceModelGenerator.newDbTableMetaWith;
 import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;
 import static marquez.service.models.ServiceModelGenerator.newRunMeta;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import marquez.common.Utils;
@@ -27,7 +25,6 @@ import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.db.models.DatasetRow;
-import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobContextRow;
@@ -39,7 +36,6 @@ import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
 import marquez.service.models.Dataset;
 import marquez.service.models.DbTableMeta;
-import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
@@ -205,40 +201,5 @@ final class DbTestUtils {
     final RunDao runDao = jdbi.onDemand(RunDao.class);
     runDao.upsertOutputDatasetsFor(runUuid, runOutputIds);
     return run;
-  }
-
-  /** Verifies a {@link Run} has {@code expected} input dataset versions. */
-  static void verifyRunHasInputs(final Jdbi jdbi, final UUID runUuid, final int expected) {
-    final DatasetVersionDao datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
-    final List<ExtendedDatasetVersionRow> inputDatasetVersions =
-        datasetVersionDao.findInputDatasetVersionsFor(runUuid);
-    assertThat(inputDatasetVersions).hasSize(expected);
-  }
-
-  /** Verifies a {@link Run} has {@code expected} output dataset versions. */
-  static void verifyRunHasOutputs(final Jdbi jdbi, final UUID runUuid, final int expected) {
-    final DatasetVersionDao datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
-    final List<ExtendedDatasetVersionRow> outputDatasetVersions =
-        datasetVersionDao.findOutputDatasetVersionsFor(runUuid);
-    assertThat(outputDatasetVersions).hasSize(expected);
-  }
-
-  /** Verifies a {@link Run} has the specified latest job versions. */
-  static void verifyLatestJobVersionForRun(
-      final Jdbi jdbi, final UUID runUuid, final UUID jobVersionUuid) {
-    final RunDao runDao = jdbi.onDemand(RunDao.class);
-    final RunRow runRow = runDao.findRunByUuidAsRow(runUuid).get();
-    assertThat(runRow.getJobVersionUuid()).isPresent().contains(jobVersionUuid);
-  }
-
-  /** Verifies a {@link Job} has the specified latest job versions. */
-  static void verifyLatestJobVersionForJob(
-      final Jdbi jdbi,
-      final String namespaceName,
-      final String jobName,
-      final UUID jobVersionUuid) {
-    final JobDao jobDao = jdbi.onDemand(JobDao.class);
-    final JobRow jobRow = jobDao.findJobByNameAsRow(namespaceName, jobName).get();
-    assertThat(jobRow.getCurrentVersionUuid()).isPresent().contains(jobVersionUuid);
   }
 }
