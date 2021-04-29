@@ -101,7 +101,7 @@ public class LineageDaoTest {
             jobFacet,
             dataset);
 
-    // don't expect a failed job job in the returned lineage
+    // a failed job should be in the returned lineage
     UpdateLineageRow failedJobRow =
         LineageTestUtils.createLineageRow(
             openLineageDao,
@@ -111,26 +111,42 @@ public class LineageDaoTest {
             Arrays.asList(dataset),
             Arrays.asList());
 
+    // don't expect an incomplete job in the returned lineage
+    UpdateLineageRow incompleteJobRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "readJobIncomplete",
+            "START",
+            jobFacet,
+            Arrays.asList(dataset),
+            Arrays.asList());
+
     // fetch the first "readJob" lineage.
     Set<UUID> connectedJobs =
         lineageDao.getLineage(new HashSet<>(Arrays.asList(jobRows.get(0).getId())));
-    assertThat(connectedJobs).size().isEqualTo(22);
+    assertThat(connectedJobs).size().isEqualTo(23);
 
-    // expect the job that wrote "commonDataset", which is readJob0's input
-    assertThat(connectedJobs).contains(writeJob.getJob().getUuid());
-
-    // expect all jobs that read the same input dataset as readJob0
     Set<UUID> readJobUUIDs =
         jobRows.stream().map(LineageTestUtils.JobLineage::getId).collect(Collectors.toSet());
-    assertThat(connectedJobs).contains(readJobUUIDs.toArray(UUID[]::new));
 
-    // expect that the failed job that reads the same input dataset is not present
-    assertThat(connectedJobs).doesNotContain(failedJobRow.getJob().getUuid());
+    assertThat(connectedJobs)
+        // expect the job that wrote "commonDataset", which is readJob0's input
+        .contains(writeJob.getJob().getUuid())
+        // expect all jobs that read the same input dataset as readJob0
+        .containsAll(readJobUUIDs)
+        // expect that the failed job that reads the same input dataset is present
+        .contains(failedJobRow.getJob().getUuid())
+        // expect that the incomplete job that reads the same input dataset is not present
+        .doesNotContain(incompleteJobRow.getJob().getUuid());
 
     // also expect all jobs that read the output of readJob0 (downstreamJob0)
     Optional<JobData> downstreamJob =
         connectedJobs.stream()
-            .filter(id -> !readJobUUIDs.contains(id) && !id.equals(writeJob.getJob().getUuid()))
+            .filter(
+                id ->
+                    !readJobUUIDs.contains(id)
+                        && !id.equals(writeJob.getJob().getUuid())
+                        && !id.equals(failedJobRow.getJob().getUuid()))
             .flatMap(id -> lineageDao.getJob(Collections.singletonList(id)).stream())
             .findAny();
     assertThat(downstreamJob)
