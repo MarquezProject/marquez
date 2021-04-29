@@ -1,7 +1,6 @@
 package marquez;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Getter;
 
 public class SentryConfig {
@@ -10,7 +9,6 @@ public class SentryConfig {
   public static final double DEFAULT_TRACE_SAMPLE_RATE = 0.01d;
   public static final String DEFAULT_DSN = "";
   public static final boolean DEFAULT_DEBUG = false;
-
 
   @Getter @JsonProperty private String environment = DEFAULT_ENVIRONMENT;
   @Getter @JsonProperty private Double tracesSampleRate = DEFAULT_TRACE_SAMPLE_RATE;
