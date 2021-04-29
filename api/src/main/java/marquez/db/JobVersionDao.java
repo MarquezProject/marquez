@@ -22,6 +22,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.google.common.collect.ImmutableSortedSet;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.Utils;
@@ -297,9 +299,9 @@ public interface JobVersionDao extends BaseDao {
   }
 
   /** Returns the specified {@link ExtendedDatasetVersionRow}s as {@link DatasetId}s. */
-  default ImmutableSet<DatasetId> toDatasetIds(
+  default ImmutableSortedSet<DatasetId> toDatasetIds(
       @NonNull final List<ExtendedDatasetVersionRow> datasetVersionRows) {
-    final ImmutableSet.Builder<DatasetId> datasetIds = ImmutableSet.builder();
+    final ImmutableSortedSet.Builder<DatasetId> datasetIds = ImmutableSortedSet.naturalOrder();
     for (final ExtendedDatasetVersionRow datasetVersionRow : datasetVersionRows) {
       datasetIds.add(
           new DatasetId(
