@@ -18,12 +18,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import com.google.common.collect.ImmutableSortedSet;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.Utils;
