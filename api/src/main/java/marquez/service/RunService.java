@@ -78,6 +78,9 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
               runState,
               transitionedAt);
 
+      // TODO: We should also notify that the outputs have been updated when a run is in a done
+      // state to be consistent with existing job versioning logic. We'll want to add testing to
+      // confirm the new behavior before updating the logic.
       if (runState == COMPLETED) {
         notify(
             new JobOutputUpdate(
