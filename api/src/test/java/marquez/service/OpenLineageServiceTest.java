@@ -34,7 +34,7 @@ import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.models.Dataset;
 import marquez.service.models.Job;
 import marquez.service.models.LineageEvent;
-import marquez.service.models.LineageEvent.DatasetFacet;
+import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.DatasourceDatasetFacet;
 import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.Run;
@@ -225,7 +225,7 @@ public class OpenLineageServiceTest {
             .name(DATASET_NAME)
             .namespace(NAMESPACE)
             .facets(
-                DatasetFacet.builder()
+                DatasetFacets.builder()
                     .dataSource(
                         DatasourceDatasetFacet.builder()
                             .name("theDatasource")

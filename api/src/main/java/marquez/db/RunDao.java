@@ -94,7 +94,7 @@ public interface RunDao extends BaseDao {
           + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid ";
 
   @SqlQuery(BASE_RUN_SELECT + " WHERE r.uuid = :runUuid")
-  Optional<Run> findRunByUuid(UUID rowUuid);
+  Optional<Run> findRunByUuid(UUID runUuid);
 
   @SqlQuery(BASE_RUN_SELECT + " WHERE r.uuid = :runUuid")
   Optional<ExtendedRunRow> findRunByUuidAsRow(UUID runUuid);

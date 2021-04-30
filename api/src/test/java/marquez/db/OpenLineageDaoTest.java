@@ -7,9 +7,6 @@ import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
-import marquez.service.models.LineageEvent.DatasourceDatasetFacet;
-import marquez.service.models.LineageEvent.DocumentationDatasetFacet;
-import marquez.service.models.LineageEvent.Job;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
@@ -26,7 +23,7 @@ class OpenLineageDaoTest {
   public static final String DATASET_NAME = "theDataset";
 
   private static OpenLineageDao dao;
-  private final DatasetFacet datasetFacet =
+  private final DatasetFacets datasetFacets =
       LineageTestUtils.newDatasetFacet(
           new SchemaField("name", "STRING", "my name"), new SchemaField("age", "INT", "my age"));
 
