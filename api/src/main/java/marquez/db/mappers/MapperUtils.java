@@ -65,9 +65,9 @@ public final class MapperUtils {
                 return null;
               }
               // Merge and flatten array of facets; facets are assumed to be in ascending order. As
-              // we loop over the facet array, newer facets will be added or overridden based on
-              // when the OpenLineage event was received. Note, we may want to expand functionality
-              // to do deep merge of facet values.
+              // we loop over the facet array, newer facets will be added or override older facets
+              // values based on when the OpenLineage event was received. Note, we may want to
+              // expand functionality to do deep merge of facet values.
               for (final JsonNode facetsAsJson : facetsAsJsonArray) {
                 facetsAsJson
                     .fieldNames()
