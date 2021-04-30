@@ -158,9 +158,6 @@ paths:
       - $ref: '#/components/parameters/dataset'
       - $ref: '#/components/parameters/version'
     get:
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
       summary: Retrieve a version for a dataset
       description: Returns a version for a dataset.
       tags:
@@ -737,8 +734,6 @@ components:
         runId:
           description: The ID associated with the run modifying the table.
           type: string
-        facets:
-          $ref: '#/components/schemas/datasetFacets'
       required:
         - type
         - physicalName
@@ -755,12 +750,6 @@ components:
           {'name': 'd', 'type': 'INTEGER'}
         ]
         description: "My first dataset!"
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
 
     STREAM:
       type: object
@@ -808,8 +797,6 @@ components:
         runId:
           description: The ID associated with the run modifying the stream.
           type: string
-        facets:
-          $ref: '#/components/schemas/datasetFacets'
       required:
         - type
         - physicalName
@@ -823,12 +810,6 @@ components:
         schemaLocation: 'http://registry.example.com/schemas/ids/1'
         fields: []
         description: "My first stream dataset!"
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
 
     DATASET:
       type: object
@@ -1141,8 +1122,6 @@ components:
         runId:
           description: An _optional_ run ID used to associate a job version to an existing job run.
           type: string
-        facets:
-          $ref: '#/components/schemas/jobFacets'
       required:
         - type
         - inputs
@@ -1154,12 +1133,6 @@ components:
         location: https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
 
     JOB:
       type: object
@@ -1306,7 +1279,8 @@ components:
       type: object
       properties:
         id:
-          description: An _optional_ client-provided UUID for this run (this could be a Random or name based UUID). If not provided a random UUID will be generated for the run
+          description: An _optional_ user-provided unique ID of the run. A run ID **must** be an [UUID](https://tools.ietf.org/html/rfc4122).
+                       If an ID for the run is not provided, a random UUID will be generated for the given run.
           type: string
           format: uuid
         nominalStartTime:
@@ -1320,16 +1294,8 @@ components:
         args:
           description: The arguments of the run.
           type: object
-        facets:
-          $ref: '#/components/schemas/runFacets'
       example:
         args: {'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
 
     runAsNew:
       type: object
@@ -1644,32 +1610,33 @@ components:
             $ref: '#/components/schemas/runAsCompleted'
 
     datasetFacets:
-      description: The dataset facets.
+      description: The facets of the dataset. For a full list of standard dataset facets, see [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.md#standard-facets).
       type: object
       additionalProperties:
         $ref: '#/components/schemas/customFacet'
 
     jobFacets:
-      description: The job facets.
+      description: The facets of the job. For a full list of standard job facets, see [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.md#standard-facets).
       type: object
       additionalProperties:
         $ref: '#/components/schemas/customFacet'
 
     runFacets:
-      description: The run facets.
+      description: The facets of the run. For a full list of standard run facets, see [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.md#standard-facets).
       type: object
       additionalProperties:
         $ref: '#/components/schemas/customFacet'
 
     customFacet:
-      description: a Custom Facet is defined is a separate spec. field must not start with _
+      description: A custom facet enables the extension of _dataset_, _job_, and _run_ metadata. A custom facet **must** also have a schema,
+                   where a version of the schema is identifiable via a URL. A field within the schema **must** not start with an underscore (`_`).
       allOf:
         - $ref: '#/components/schemas/baseFacet'
         - type: object
           additionalProperties: true
 
     baseFacet:
-      description: all fields of the base facet are prefixed with _ to avoid name conflicts in facets
+      description: All base facet fields are prefixed with an underscore (`_`) to avoid field naming conflicts defined with other facets.
       type: object
       properties:
         _producer:

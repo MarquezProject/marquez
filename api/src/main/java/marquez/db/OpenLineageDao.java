@@ -44,7 +44,7 @@ import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
-import marquez.service.models.LineageEvent.DatasetFacet;
+import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.Job;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
@@ -371,7 +371,7 @@ public interface OpenLineageDao extends BaseDao {
 
     List<SchemaField> fields =
         Optional.ofNullable(ds.getFacets())
-            .map(DatasetFacet::getSchema)
+            .map(DatasetFacets::getSchema)
             .map(SchemaDatasetFacet::getFields)
             .orElse(null);
 

@@ -5,16 +5,17 @@ import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidArrayOrThrow;
-import static marquez.db.mappers.JobMapper.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
@@ -29,6 +30,7 @@ import org.postgresql.util.PGobject;
 
 @Slf4j
 public class DatasetDataMapper implements RowMapper<DatasetData> {
+  private static final ObjectMapper MAPPER = Utils.getMapper();
 
   @Override
   public DatasetData map(@NonNull ResultSet results, @NonNull StatementContext context)
@@ -58,7 +60,7 @@ public class DatasetDataMapper implements RowMapper<DatasetData> {
     }
     PGobject pgObject = (PGobject) results.getObject(column);
     try {
-      return mapper.readValue(pgObject.getValue(), new TypeReference<ImmutableList<Field>>() {});
+      return MAPPER.readValue(pgObject.getValue(), new TypeReference<ImmutableList<Field>>() {});
     } catch (JsonProcessingException e) {
       log.error(String.format("Could not read dataset from job row %s", column), e);
       return ImmutableList.of();

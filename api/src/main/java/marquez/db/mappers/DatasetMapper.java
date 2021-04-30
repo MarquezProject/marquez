@@ -20,10 +20,11 @@ import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidOrNull;
-import static marquez.db.mappers.JobMapper.mapper;
+import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.MalformedURLException;
@@ -35,6 +36,7 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
@@ -52,6 +54,8 @@ import org.postgresql.util.PGobject;
 
 @Slf4j
 public final class DatasetMapper implements RowMapper<Dataset> {
+  private static final ObjectMapper MAPPER = Utils.getMapper();
+
   @SneakyThrows
   @Override
   public Dataset map(@NonNull ResultSet results, @NonNull StatementContext context)
@@ -72,7 +76,8 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           toTags(results, "tags"),
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
           stringOrNull(results, Columns.DESCRIPTION),
-          Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)));
+          Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)),
+          toFacetsOrNull(results));
     } else {
       return new Stream(
           new DatasetId(
@@ -88,12 +93,13 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           toTags(results, "tags"),
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
           stringOrNull(results, Columns.DESCRIPTION),
-          Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)));
+          Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)),
+          toFacetsOrNull(results));
     }
   }
 
   private URL getUrl(ResultSet results, String column) throws SQLException, MalformedURLException {
-    if (!hasColumn(results, column)) {
+    if (!Columns.exists(results, column)) {
       return null;
     }
     String url = stringOrNull(results, column);
@@ -101,15 +107,6 @@ public final class DatasetMapper implements RowMapper<Dataset> {
       return null;
     }
     return new URL(url);
-  }
-
-  private boolean hasColumn(ResultSet results, String column) throws SQLException {
-    for (int i = 1; i <= results.getMetaData().getColumnCount(); i++) {
-      if (results.getMetaData().getColumnName(i).equals(column)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public static ImmutableSet<TagName> toTags(@NonNull ResultSet results, String column)
@@ -128,7 +125,7 @@ public final class DatasetMapper implements RowMapper<Dataset> {
     }
     PGobject pgObject = (PGobject) results.getObject(column);
     try {
-      return mapper.readValue(pgObject.getValue(), new TypeReference<ImmutableList<Field>>() {});
+      return MAPPER.readValue(pgObject.getValue(), new TypeReference<ImmutableList<Field>>() {});
     } catch (JsonProcessingException e) {
       log.error(String.format("Could not read dataset from job row %s", column), e);
       return ImmutableList.of();

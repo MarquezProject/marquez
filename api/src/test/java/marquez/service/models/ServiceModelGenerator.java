@@ -56,6 +56,7 @@ public final class ServiceModelGenerator extends Generator {
         newTagNames(2),
         null,
         newDescription(),
+        null,
         null);
   }
 

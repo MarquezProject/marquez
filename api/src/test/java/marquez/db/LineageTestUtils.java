@@ -18,7 +18,7 @@ import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
-import marquez.service.models.LineageEvent.DatasetFacet;
+import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.DatasourceDatasetFacet;
 import marquez.service.models.LineageEvent.DocumentationDatasetFacet;
 import marquez.service.models.LineageEvent.Job;
@@ -92,8 +92,8 @@ public class LineageTestUtils {
     return updateLineageRow;
   }
 
-  static DatasetFacet newDatasetFacet(SchemaField... fields) {
-    return DatasetFacet.builder()
+  static DatasetFacets newDatasetFacet(SchemaField... fields) {
+    return DatasetFacets.builder()
         .documentation(
             new DocumentationDatasetFacet(PRODUCER_URL, SCHEMA_URL, "the dataset documentation"))
         .schema(new SchemaDatasetFacet(PRODUCER_URL, SCHEMA_URL, Arrays.asList(fields)))

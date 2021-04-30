@@ -170,19 +170,33 @@ public interface DatasetVersionDao extends BaseDao {
 
   String SELECT = "SELECT dv.* " + "FROM dataset_versions dv ";
 
-  String DATASET_VERSION_SELECT =
-      "select d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description, ARRAY(select t.name from tags t\n"
-          + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
-          + "    where d.uuid = m.dataset_uuid) as tags,\n"
-          + "dv.created_at, dv.version, dv.fields, dv.run_uuid as \"createdByRunUuid\", sv.schema_location\n"
-          + "from datasets d\n"
-          + "inner join dataset_versions dv on d.uuid = dv.dataset_uuid\n"
-          + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n";
+  String BASE_DATASET_VERSION_SELECT =
+      "SELECT d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description, "
+          + "dv.created_at, dv.version, dv.fields, dv.run_uuid AS \"createdByRunUuid\", sv.schema_location, "
+          + "ARRAY(SELECT t.name FROM tags AS t "
+          + "       INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid "
+          + "       WHERE d.uuid = m.dataset_uuid) AS tags, "
+          + "(SELECT JSON_AGG(facets_by_event.facets) "
+          + "   FROM ("
+          + "      (SELECT JSONB_ARRAY_ELEMENTS(event->'inputs')->'facets' AS facets "
+          + "         FROM lineage_events AS le "
+          + "        WHERE le.run_id = dv.run_uuid::text "
+          + "        ORDER BY event_time ASC) "
+          + "      UNION "
+          + "      (SELECT JSONB_ARRAY_ELEMENTS(event->'outputs')->'facets' AS facets "
+          + "         FROM lineage_events AS le "
+          + "        WHERE le.run_id = dv.run_uuid::text "
+          + "        ORDER BY event_time ASC) "
+          + "   ) AS facets_by_event "
+          + ") AS facets "
+          + "FROM datasets AS d "
+          + "INNER JOIN dataset_versions dv ON d.uuid = dv.dataset_uuid "
+          + "LEFT OUTER JOIN stream_versions sv ON sv.dataset_version_uuid = d.current_version_uuid ";
 
-  @SqlQuery(DATASET_VERSION_SELECT + "WHERE dv.version = :version")
+  @SqlQuery(BASE_DATASET_VERSION_SELECT + "WHERE dv.version = :version")
   Optional<DatasetVersion> findBy(UUID version);
 
-  @SqlQuery(DATASET_VERSION_SELECT + "WHERE dv.uuid = :uuid")
+  @SqlQuery(BASE_DATASET_VERSION_SELECT + "WHERE dv.uuid = :uuid")
   Optional<DatasetVersion> findByUuid(UUID uuid);
 
   default Optional<DatasetVersion> findByWithRun(UUID version) {
@@ -212,7 +226,7 @@ public interface DatasetVersionDao extends BaseDao {
   List<ExtendedDatasetVersionRow> findOutputDatasetVersionsFor(@NonNull UUID runId);
 
   @SqlQuery(
-      DATASET_VERSION_SELECT
+      BASE_DATASET_VERSION_SELECT
           + "WHERE dv.namespace_name = :namespaceName AND dv.dataset_name = :datasetName "
           + "ORDER BY dv.created_at DESC "
           + "LIMIT :limit OFFSET :offset")

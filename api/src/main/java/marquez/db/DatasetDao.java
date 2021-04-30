@@ -77,16 +77,30 @@ public interface DatasetDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  String DATASET_SELECT =
-      "select d.*, dv.fields, ARRAY(select t.name from tags t\n"
-          + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
-          + "    where d.uuid = m.dataset_uuid) as tags,"
-          + "    sv.schema_location\n"
-          + "from datasets d\n"
-          + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n"
-          + "left outer join dataset_versions dv on dv.uuid = d.current_version_uuid\n";
+  String BASE_DATASET_SELECT =
+      "SELECT d.*, dv.fields, sv.schema_location, "
+          + "ARRAY(SELECT t.name FROM tags AS t "
+          + "       INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid "
+          + "       WHERE d.uuid = m.dataset_uuid) AS tags, "
+          + "(SELECT JSON_AGG(facets_by_event.facets) "
+          + "   FROM ("
+          + "      (SELECT JSONB_ARRAY_ELEMENTS(event->'inputs')->'facets' AS facets "
+          + "         FROM lineage_events AS le "
+          + "        WHERE le.run_id = dv.run_uuid::text "
+          + "        ORDER BY event_time ASC) "
+          + "      UNION "
+          + "      (SELECT JSONB_ARRAY_ELEMENTS(event->'outputs')->'facets' AS facets "
+          + "         FROM lineage_events AS le "
+          + "        WHERE le.run_id = dv.run_uuid::text "
+          + "        ORDER BY event_time ASC) "
+          + "   ) AS facets_by_event "
+          + ") AS facets "
+          + "FROM datasets AS d "
+          + "LEFT OUTER JOIN stream_versions AS sv ON sv.dataset_version_uuid = d.current_version_uuid "
+          + "LEFT OUTER JOIN dataset_versions AS dv ON dv.uuid = d.current_version_uuid ";
 
-  @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
+  @SqlQuery(
+      BASE_DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<Dataset> findDatasetByName(String namespaceName, String datasetName);
 
   default Optional<Dataset> findWithTags(String namespaceName, String datasetName) {
@@ -113,7 +127,7 @@ public interface DatasetDao extends BaseDao {
   Optional<DatasetRow> getUuid(String namespaceName, String datasetName);
 
   @SqlQuery(
-      DATASET_SELECT
+      BASE_DATASET_SELECT
           + "WHERE d.namespace_name = :namespaceName "
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")

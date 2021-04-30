@@ -21,6 +21,7 @@ import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 import static marquez.db.mappers.DatasetMapper.toFields;
 import static marquez.db.mappers.DatasetMapper.toTags;
+import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -65,7 +66,8 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               toFields(results, "fields"),
               columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
-              null);
+              null,
+              toFacetsOrNull(results));
     } else {
       datasetVersion =
           new StreamVersion(
@@ -81,7 +83,8 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               toFields(results, "fields"),
               columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
-              null);
+              null,
+              toFacetsOrNull(results));
     }
     // The createdByRun can be brought in via join, similar to the JobMapper
     datasetVersion.setCreatedByRunUuid(uuidOrNull(results, "createdByRunUuid"));

@@ -45,6 +45,7 @@ public final class Run {
   private final String jobName;
   @Getter private final String location;
   @Getter private final Map<String, String> context;
+  @Getter private final ImmutableMap<String, Object> facets;
 
   public Run(
       @NonNull final RunId id,
@@ -60,7 +61,8 @@ public final class Run {
       String namespaceName, // Fields not serialized may be null for clients
       String jobName,
       String location,
-      Map<String, String> context) {
+      Map<String, String> context,
+      @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -75,6 +77,7 @@ public final class Run {
     this.jobName = jobName;
     this.location = location;
     this.context = context;
+    this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
   public Optional<Instant> getNominalStartTime() {
