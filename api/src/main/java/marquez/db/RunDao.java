@@ -80,13 +80,13 @@ public interface RunDao extends BaseDao {
 
   String BASE_RUN_SELECT =
       "SELECT r.*, ra.args, ra.args, ctx.context, "
-          + "(SELECT JSON_AGG(tmp_facets) "
+          + "(SELECT JSON_AGG(facets_by_event.facets) "
           + "   FROM ("
           + "      SELECT event->'run'->'facets' AS facets "
           + "        FROM lineage_events AS le "
           + "       WHERE le.run_id = r.uuid::text "
           + "       ORDER BY event_time ASC"
-          + "   ) AS tmp_facets "
+          + "   ) AS facets_by_event "
           + ") AS facets "
           + "FROM runs AS r "
           + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid "

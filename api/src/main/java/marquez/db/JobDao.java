@@ -61,13 +61,13 @@ public interface JobDao extends BaseDao {
 
   String BASE_JOB_SELECT =
       "SELECT j.*, jc.context, "
-          + "(SELECT JSON_AGG(tmp_facets) "
+          + "(SELECT JSON_AGG(facets_by_event.facets) "
           + "   FROM ("
           + "      SELECT event->'job'->'facets' AS facets "
           + "        FROM lineage_events AS le "
           + "       WHERE le.run_id = jv.latest_run_uuid::text "
           + "       ORDER BY event_time ASC"
-          + "   ) AS tmp_facets "
+          + "   ) AS facets_by_event "
           + ") AS facets "
           + "FROM jobs AS j "
           + "LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid "

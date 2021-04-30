@@ -38,16 +38,18 @@ public final class MapperUtils {
 
   /**
    * Returns a new {@link ImmutableMap} instance of facets present in the provided
-   * {java.sql.ResultSet}.
+   * {java.sql.ResultSet}. the keys are the facet names
    */
   static ImmutableMap<String, Object> toFacetsOrNull(@NonNull final ResultSet results)
       throws SQLException {
+    // ...
     if (!Columns.exists(results, Columns.FACETS)) {
-      return null;
+      return ImmutableMap.of();
     }
     return Optional.ofNullable(stringOrNull(results, Columns.FACETS))
         .map(
             facetsAsString -> {
+              // ...
               final ObjectNode mergedFacetsAsJson = Utils.getMapper().createObjectNode();
 
               // Get the array of facets.
@@ -56,20 +58,20 @@ public final class MapperUtils {
                 facetsAsJsonArray =
                     Utils.fromJson(facetsAsString, new TypeReference<ArrayNode>() {});
               } catch (Exception e) {
-                  // Log error, then return
+                // Log error, then return
                 log.error("Failed to read facets: %s", facetsAsString, e);
                 return null;
               }
 
+              // NOTE: does not do a deep merge on facets
               // Merge array of facets.
               for (final JsonNode facetsAsJson : facetsAsJsonArray) {
-                final JsonNode currFacetsAsJson = facetsAsJson.get("facets");
-                currFacetsAsJson
+                facetsAsJson
                     .fieldNames()
                     .forEachRemaining(
                         facet -> {
-                          final JsonNode currFacetValueAsJson = currFacetsAsJson.get(facet);
-                          mergedFacetsAsJson.putPOJO(facet, currFacetValueAsJson);
+                          final JsonNode facetValueAsJson = facetsAsJson.get(facet);
+                          mergedFacetsAsJson.putPOJO(facet, facetValueAsJson);
                         });
               }
               return Utils.getMapper()
