@@ -75,19 +75,31 @@ public interface DatasetDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  String DATASET_SELECT =
-      "select d.*, dv.fields, ARRAY(select t.name from tags t\n"
-          + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
-          + "    where d.uuid = m.dataset_uuid) as tags,"
-          + "    sv.schema_location,\n"
-          + "    (select jsonb_array_elements(event->'outputs')->'facets' from lineage_events as le\n"
-          + "    where dv.run_uuid::text = le.run_id\n"
-          + "    order by event_time desc limit 1) as facets \n"
-          + "from datasets d\n"
-          + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n"
-          + "left outer join dataset_versions dv on dv.uuid = d.current_version_uuid\n";
+  /** */
+  String BASE_DATASET_SELECT =
+      "SELECT d.*, dv.fields, sv.schema_location, "
+          + "ARRAY(SELECT t.name FROM tags AS t "
+          + "       INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid "
+          + "       WHERE d.uuid = m.dataset_uuid) AS tags, "
+          + "(SELECT JSON_AGG(tmp_facets) "
+          + "   FROM ("
+          + "      (SELECT JSONB_ARRAY_ELEMENTS(event->'inputs')->'facets' AS facets "
+          + "         FROM lineage_events AS le "
+          + "        WHERE le.run_id = dv.run_uuid::text "
+          + "        ORDER BY event_time ASC) "
+          + "      UNION "
+          + "      (SELECT JSONB_ARRAY_ELEMENTS(event->'outputs')->'facets' AS facets "
+          + "         FROM lineage_events AS le "
+          + "        WHERE le.run_id = dv.run_uuid::text "
+          + "        ORDER BY event_time ASC) "
+          + "   ) AS tmp_facets "
+          + ") AS facets "
+          + "FROM datasets AS d "
+          + "LEFT OUTER JOIN stream_versions AS sv ON sv.dataset_version_uuid = d.current_version_uuid "
+          + "LEFT OUTER JOIN dataset_versions AS dv ON dv.uuid = d.current_version_uuid ";
 
-  @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
+  @SqlQuery(
+      BASE_DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
   Optional<Dataset> find(String namespaceName, String datasetName);
 
   default Optional<Dataset> findWithTags(String namespaceName, String datasetName) {
@@ -114,7 +126,7 @@ public interface DatasetDao extends BaseDao {
   Optional<DatasetRow> getUuid(String namespaceName, String datasetName);
 
   @SqlQuery(
-      DATASET_SELECT
+      BASE_DATASET_SELECT
           + "WHERE d.namespace_name = :namespaceName "
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")

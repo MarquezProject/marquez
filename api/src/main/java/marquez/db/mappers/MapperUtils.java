@@ -4,6 +4,8 @@ import static marquez.db.Columns.stringOrNull;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -45,9 +47,31 @@ public final class MapperUtils {
     return Optional.ofNullable(stringOrNull(results, Columns.FACETS))
         .map(
             facetsAsString -> {
-              final JsonNode facetsAsJson =
-                  Utils.fromJson(facetsAsString, new TypeReference<JsonNode>() {});
-              return Facets.of(facetsAsJson);
+              final ObjectNode mergedFacetsAsJson = Utils.getMapper().createObjectNode();
+
+              // ...
+              ArrayNode facetsAsJsonArray;
+              try {
+                facetsAsJsonArray =
+                    Utils.fromJson(facetsAsString, new TypeReference<ArrayNode>() {});
+              } catch (Exception e) {
+                // log error ...
+                return null;
+              }
+
+              // ...
+              for (final JsonNode facetsAsJson : facetsAsJsonArray) {
+                final JsonNode currFacetsAsJson = facetsAsJson.get("facets");
+                // ...
+                currFacetsAsJson
+                    .fieldNames()
+                    .forEachRemaining(
+                        facet -> {
+                          final JsonNode currFacetValueAsJson = currFacetsAsJson.get(facet);
+                          mergedFacetsAsJson.putPOJO(facet, currFacetValueAsJson);
+                        });
+              }
+              return Facets.of(mergedFacetsAsJson);
             })
         .orElse(null);
   }

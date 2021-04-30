@@ -59,18 +59,22 @@ public interface JobDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  String JOB_SELECT =
+  /** */
+  String BASE_JOB_SELECT =
       "SELECT j.*, jc.context, "
-          + "(SELECT event->'job'->'facets' "
-          + "   FROM lineage_events AS le "
-          + "  WHERE jv.latest_run_uuid::text = le.run_id "
-          + "  ORDER BY event_time DESC "
-          + "  LIMIT 1) AS facets "
+          + "(SELECT JSON_AGG(tmp_facets) "
+          + "   FROM ("
+          + "      SELECT event->'job'->'facets' AS facets "
+          + "        FROM lineage_events AS le "
+          + "       WHERE le.run_id = jv.latest_run_uuid::text "
+          + "       ORDER BY event_time ASC"
+          + "   ) AS tmp_facets "
+          + ") AS facets "
           + "FROM jobs AS j "
           + "LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid "
           + "LEFT OUTER JOIN job_contexts jc ON jc.uuid = j.current_job_context_uuid ";
 
-  @SqlQuery(JOB_SELECT + "WHERE j.namespace_name = :namespaceName AND j.name = :jobName")
+  @SqlQuery(BASE_JOB_SELECT + "WHERE j.namespace_name = :namespaceName AND j.name = :jobName")
   Optional<Job> find(String namespaceName, String jobName);
 
   default Optional<Job> findWithRun(String namespaceName, String jobName) {
@@ -92,7 +96,7 @@ public interface JobDao extends BaseDao {
   Optional<JobRow> findByRow(String namespaceName, String jobName);
 
   @SqlQuery(
-      JOB_SELECT
+      BASE_JOB_SELECT
           + "WHERE j.namespace_name = :namespaceName "
           + "ORDER BY j.name "
           + "LIMIT :limit OFFSET :offset")
