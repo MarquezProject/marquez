@@ -18,9 +18,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -53,7 +55,7 @@ public abstract class Dataset {
   @Getter @NonNull private final Set<String> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
-  @Nullable private final Object facets;
+  @Getter private final Map<String, Object> facets;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -68,7 +70,7 @@ public abstract class Dataset {
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Object facets) {
+      @Nullable final Map<String, Object> facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -81,7 +83,7 @@ public abstract class Dataset {
     this.tags = (tags == null) ? ImmutableSet.of() : ImmutableSet.copyOf(tags);
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
-    this.facets = facets;
+    this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
   }
 
   public Optional<Instant> getLastModifiedAt() {
@@ -92,8 +94,8 @@ public abstract class Dataset {
     return Optional.ofNullable(description);
   }
 
-  public Optional<Object> getFacets() {
-    return Optional.ofNullable(facets);
+  public boolean hasFacets() {
+    return !facets.isEmpty();
   }
 
   public static Dataset fromJson(@NonNull final String json) {

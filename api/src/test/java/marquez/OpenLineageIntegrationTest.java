@@ -80,7 +80,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
           final JsonNode inputFacetsAsJson = inputAsJson.path("facets");
 
           final Dataset inputDataset = client.getDataset(inputNamespace, inputName);
-          if (inputDataset.getFacets().isPresent()) {
+          if (inputDataset.hasFacets()) {
             assertThat(inputDataset.getNamespace()).isEqualTo(inputNamespace);
             assertThat(inputDataset.getName()).isEqualTo(inputName);
             final JsonNode facetsForInputsAsJson =
@@ -96,7 +96,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     final JsonNode jobFacetsAsJson = jobAsJson.path("facets");
 
     final Job job = client.getJob(jobNamespace, jobName);
-    if (job.getFacets().isPresent()) {
+    if (job.hasFacets()) {
       final JsonNode facetsForRunAsJson =
           Utils.getMapper().convertValue(job.getFacets(), JsonNode.class);
       assertThat(facetsForRunAsJson).isEqualTo(jobFacetsAsJson);
@@ -108,7 +108,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     final JsonNode runFacetsAsJson = runAsJson.path("facets");
 
     final Run run = client.getRun(runId);
-    if (run.getFacets().isPresent()) {
+    if (run.hasFacets()) {
       final JsonNode facetsForRunAsJson =
           Utils.getMapper().convertValue(run.getFacets(), JsonNode.class);
       assertThat(facetsForRunAsJson).isEqualTo(runFacetsAsJson);

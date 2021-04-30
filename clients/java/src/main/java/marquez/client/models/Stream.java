@@ -19,6 +19,7 @@ import static marquez.client.models.DatasetType.STREAM;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -43,7 +44,7 @@ public final class Stream extends Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final URL schemaLocation,
       @Nullable final String description,
-      @Nullable final Object facets) {
+      @Nullable final Map<String, Object> facets) {
     super(
         id,
         STREAM,
