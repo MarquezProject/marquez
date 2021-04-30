@@ -11,14 +11,15 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
 import marquez.common.models.Facets;
 import marquez.db.Columns;
 
 @Slf4j
+@UtilityClass
 public final class MapperUtils {
-  private MapperUtils() {}
 
   static Set<String> getColumnNames(ResultSetMetaData metaData) {
     try {
