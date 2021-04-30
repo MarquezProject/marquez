@@ -39,7 +39,8 @@ public final class MapperUtils {
   /**
    * Returns a new {@link ImmutableMap} instance of facets present in the provided {@link
    * java.sql.ResultSet}, or an empty {@link ImmutableMap} if none are present. Note, {@code key}s
-   * in the resulting facet map are the facet names (ex: schema, dataSource, documentation, etc).
+   * in the resulting facet map are the facet names (ex: 'schema', 'dataSource', 'documentation',
+   * etc).
    */
   static ImmutableMap<String, Object> toFacetsOrNull(@NonNull final ResultSet results)
       throws SQLException {
@@ -53,7 +54,6 @@ public final class MapperUtils {
         .map(
             facetsAsString -> {
               final ObjectNode mergedFacetsAsJson = Utils.getMapper().createObjectNode();
-
               // Get the array of facets.
               ArrayNode facetsAsJsonArray;
               try {
@@ -64,7 +64,6 @@ public final class MapperUtils {
                 log.error("Failed to read facets: %s", facetsAsString, e);
                 return null;
               }
-
               // Merge and flatten array of facets; facets are assumed to be in ascending order. As
               // we loop over the facet array, newer facets will be added or overridden based on
               // when the OpenLineage event was received. Note, we may want to expand functionality
@@ -78,6 +77,7 @@ public final class MapperUtils {
                           mergedFacetsAsJson.putPOJO(facet, facetValueAsJson);
                         });
               }
+              // Before returning, convert the Json object to a map.
               return Utils.getMapper()
                   .convertValue(
                       mergedFacetsAsJson, new TypeReference<ImmutableMap<String, Object>>() {});
