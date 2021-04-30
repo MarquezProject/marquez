@@ -27,7 +27,7 @@ $ python3 setup.py install
 ```python
 from marquez_client import MarquezClient
 
-client = MarquezClient(url='http;//localhost:5000')
+client = MarquezClient(url='http://localhost:5000')
 
 # create namespace
 client.create_namespace('my-namespace', 'me', 'My first namespace!')
