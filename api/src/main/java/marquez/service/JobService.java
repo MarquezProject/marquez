@@ -49,16 +49,17 @@ public class JobService extends DelegatingDaos.DelegatingJobDao {
 
   public Job createOrUpdate(
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull JobMeta jobMeta) {
-    JobRow jobRow = upsert(namespaceName, jobName, jobMeta, mapper);
+    JobRow jobRow = upsertJobMeta(namespaceName, jobName, jobMeta, mapper);
 
     // Run updates come in through this endpoint to notify of input and output datasets.
     // Note: There is an alternative route to registering /output/ datasets in the dataset api.
     if (jobMeta.getRunId().isPresent()) {
       UUID runUuid = jobMeta.getRunId().get().getValue();
       runDao.notifyJobChange(runUuid, jobRow, jobMeta);
-      ExtendedRunRow runRow = runDao.findByRow(runUuid).get();
+      ExtendedRunRow runRow = runDao.findRunByUuidAsRow(runUuid).get();
 
-      List<ExtendedDatasetVersionRow> inputs = datasetVersionDao.findInputsByRunId(runUuid);
+      List<ExtendedDatasetVersionRow> inputs =
+          datasetVersionDao.findInputDatasetVersionsFor(runUuid);
       runService.notify(
           new JobInputUpdate(
               RunId.of(runRow.getUuid()),

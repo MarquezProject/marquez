@@ -44,4 +44,8 @@ public class JobRow {
   public Optional<UUID> getCurrentVersionUuid() {
     return Optional.ofNullable(currentVersionUuid);
   }
+
+  public Optional<UUID> getJobContextUuid() {
+    return Optional.ofNullable(jobContextUuid);
+  }
 }
