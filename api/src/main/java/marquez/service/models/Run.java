@@ -25,7 +25,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import marquez.common.models.Facets;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 
@@ -46,7 +45,7 @@ public final class Run {
   private final String jobName;
   @Getter private final String location;
   @Getter private final Map<String, String> context;
-  @Nullable private final Facets facets;
+  @Getter private final ImmutableMap<String, Object> facets;
 
   public Run(
       @NonNull final RunId id,
@@ -63,7 +62,7 @@ public final class Run {
       String jobName,
       String location,
       Map<String, String> context,
-      @Nullable final Facets facets) {
+      @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -78,7 +77,7 @@ public final class Run {
     this.jobName = jobName;
     this.location = location;
     this.context = context;
-    this.facets = facets;
+    this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
   public Optional<Instant> getNominalStartTime() {
@@ -99,10 +98,6 @@ public final class Run {
 
   public Optional<Long> getDurationMs() {
     return Optional.ofNullable(durationMs);
-  }
-
-  public Optional<Facets> getFacets() {
-    return Optional.ofNullable(facets);
   }
 
   @JsonIgnore

@@ -26,7 +26,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import marquez.common.models.DatasetId;
-import marquez.common.models.Facets;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
@@ -47,7 +46,7 @@ public final class Job {
   @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
   @Nullable @Setter private Run latestRun;
-  @Nullable private final Facets facets;
+  @Getter private final ImmutableMap<String, Object> facets;
 
   public Job(
       @NonNull final JobId id,
@@ -61,7 +60,7 @@ public final class Job {
       @Nullable final ImmutableMap<String, String> context,
       @Nullable final String description,
       @Nullable final Run latestRun,
-      @Nullable final Facets facets) {
+      @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -74,7 +73,7 @@ public final class Job {
     this.context = (context == null) ? ImmutableMap.of() : context;
     this.description = description;
     this.latestRun = latestRun;
-    this.facets = facets;
+    this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
   public Optional<URL> getLocation() {
@@ -87,9 +86,5 @@ public final class Job {
 
   public Optional<Run> getLatestRun() {
     return Optional.ofNullable(latestRun);
-  }
-
-  public Optional<Facets> getFacets() {
-    return Optional.ofNullable(facets);
   }
 }

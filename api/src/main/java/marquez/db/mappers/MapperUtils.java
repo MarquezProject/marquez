@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.ImmutableMap;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -16,7 +17,6 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
-import marquez.common.models.Facets;
 import marquez.db.Columns;
 
 @Slf4j
@@ -40,7 +40,8 @@ public final class MapperUtils {
    * Creates a new {@link Facets} instance of type {com.fasterxml.jackson.databind.JsonNode}, or
    * {@code null} if not present in {java.sql.ResultSet}.
    */
-  static Facets toFacetsOrNull(@NonNull final ResultSet results) throws SQLException {
+  static ImmutableMap<String, Object> toFacetsOrNull(@NonNull final ResultSet results)
+      throws SQLException {
     if (!Columns.exists(results, Columns.FACETS)) {
       return null;
     }
@@ -71,7 +72,9 @@ public final class MapperUtils {
                           mergedFacetsAsJson.putPOJO(facet, currFacetValueAsJson);
                         });
               }
-              return Facets.of(mergedFacetsAsJson);
+              return Utils.getMapper()
+                  .convertValue(
+                      mergedFacetsAsJson, new TypeReference<ImmutableMap<String, Object>>() {});
             })
         .orElse(null);
   }
