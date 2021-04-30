@@ -37,19 +37,21 @@ public final class MapperUtils {
   }
 
   /**
-   * Returns a new {@link ImmutableMap} instance of facets present in the provided
-   * {java.sql.ResultSet}. the keys are the facet names
+   * Returns a new {@link ImmutableMap} instance of facets present in the provided {@link
+   * java.sql.ResultSet}, or an empty {@link ImmutableMap} if none are present. Note, {@code key}s
+   * in the resulting facet map are the facet names (ex: schema, dataSource, documentation, etc).
    */
   static ImmutableMap<String, Object> toFacetsOrNull(@NonNull final ResultSet results)
       throws SQLException {
-    // ...
+    // Return an empty map of facets if 'facet' column not present.
     if (!Columns.exists(results, Columns.FACETS)) {
       return ImmutableMap.of();
     }
+    // Return a map of facets from the facet array in the result set, or an empty facet map if
+    // 'facet' column is null.
     return Optional.ofNullable(stringOrNull(results, Columns.FACETS))
         .map(
             facetsAsString -> {
-              // ...
               final ObjectNode mergedFacetsAsJson = Utils.getMapper().createObjectNode();
 
               // Get the array of facets.
@@ -58,13 +60,15 @@ public final class MapperUtils {
                 facetsAsJsonArray =
                     Utils.fromJson(facetsAsString, new TypeReference<ArrayNode>() {});
               } catch (Exception e) {
-                // Log error, then return
+                // Log error for malformed facet, then return.
                 log.error("Failed to read facets: %s", facetsAsString, e);
                 return null;
               }
 
-              // NOTE: does not do a deep merge on facets
-              // Merge array of facets.
+              // Merge and flatten array of facets; facets are assumed to be in ascending order. As
+              // we loop over the facet array, newer facets will be added or overridden based on
+              // when the OpenLineage event was received. Note, we may want to expand functionality
+              // to do deep merge of facet values.
               for (final JsonNode facetsAsJson : facetsAsJsonArray) {
                 facetsAsJson
                     .fieldNames()
