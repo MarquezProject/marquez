@@ -1,2 +1,0 @@
-DROP TABLE job_versions_io_mapping_inputs;
-DROP TABLE job_versions_io_mapping_outputs;
