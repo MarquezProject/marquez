@@ -225,8 +225,7 @@ public final class Columns {
     }
   }
 
-  public static boolean exists(final ResultSet results, final String column)
-      throws SQLException {
+  public static boolean exists(final ResultSet results, final String column) throws SQLException {
     final ResultSetMetaData resultSetMetaData = results.getMetaData();
     final int columnCount = resultSetMetaData.getColumnCount();
     for (int i = 1; i <= columnCount; i++) {
