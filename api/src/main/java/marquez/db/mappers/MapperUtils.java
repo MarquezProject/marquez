@@ -39,7 +39,7 @@ public final class MapperUtils {
    * {@code null} if not present in {java.sql.ResultSet}.
    */
   static Facets toFacetsOrNull(@NonNull final ResultSet results) throws SQLException {
-    if (!Columns.columnExists(results, Columns.FACETS)) {
+    if (!Columns.exists(results, Columns.FACETS)) {
       return null;
     }
     return Optional.ofNullable(stringOrNull(results, Columns.FACETS))

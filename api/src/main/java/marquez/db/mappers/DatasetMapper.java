@@ -99,7 +99,7 @@ public final class DatasetMapper implements RowMapper<Dataset> {
   }
 
   private URL getUrl(ResultSet results, String column) throws SQLException, MalformedURLException {
-    if (!Columns.columnExists(results, column)) {
+    if (!Columns.exists(results, column)) {
       return null;
     }
     String url = stringOrNull(results, column);
