@@ -27,9 +27,10 @@ java {
 }
 
 ext {
-    jdbi3Version = '3.18.0'
+    jdbi3Version = '3.20.0'
     prometheusVersion = '0.10.0'
     testcontainersVersion = '1.15.2'
+    sentryVersion = '4.3.0'
 }
 
 dependencies {
@@ -43,10 +44,12 @@ dependencies {
     compile "io.prometheus:simpleclient_dropwizard:${prometheusVersion}"
     compile "io.prometheus:simpleclient_hotspot:${prometheusVersion}"
     compile "io.prometheus:simpleclient_servlet:${prometheusVersion}"
+    compile "org.jdbi:jdbi3-core:${jdbi3Version}"
     compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
     compile 'com.google.guava:guava:30.1-jre'
     compile 'org.dhatim:dropwizard-sentry:2.0.20'
+    compile "io.sentry:sentry:${sentryVersion}"
     compile 'org.flywaydb:flyway-core:6.5.7'
     compile "org.postgresql:postgresql:${postgresqlVersion}"
     compile 'com.graphql-java:graphql-java:16.2'

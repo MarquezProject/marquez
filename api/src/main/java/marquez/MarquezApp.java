@@ -15,6 +15,7 @@
 package marquez;
 
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
+import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -29,6 +30,19 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.hotspot.DefaultExports;
+import io.sentry.ISpan;
+import io.sentry.ITransaction;
+import io.sentry.Sentry;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.EnumSet;
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +50,8 @@ import marquez.cli.SeedCommand;
 import marquez.db.DbMigration;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.SqlLogger;
+import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
@@ -100,8 +116,108 @@ public final class MarquezApp extends Application<MarquezConfig> {
       onFatalError(errorOnDbMigrate); // Signal app termination.
     }
 
+    if (isSentryEnabled(config)) {
+      Sentry.init(
+          options -> {
+            options.setTracesSampleRate(config.getSentry().getTracesSampleRate());
+            options.setEnvironment(config.getSentry().getEnvironment());
+            options.setDsn(config.getSentry().getDsn());
+            options.setDebug(config.getSentry().isDebug());
+          });
+
+      env.servlets()
+          .addFilter("tracing-filter", new TracingServletFilter())
+          .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+    }
+
     registerResources(config, env, source);
     registerServlets(env);
+  }
+
+  private boolean isSentryEnabled(MarquezConfig config) {
+    return config.getSentry() != null
+        && !config.getSentry().getDsn().equals(SentryConfig.DEFAULT_DSN);
+  }
+
+  private static class TracingServletFilter implements Filter {
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
+      ITransaction transaction = transaction(request, response);
+      Sentry.configureScope(
+          scope -> {
+            scope.setTransaction(transaction);
+          });
+      try {
+        chain.doFilter(request, response);
+      } finally {
+        transaction.finish();
+      }
+    }
+
+    private ITransaction transaction(ServletRequest request, ServletResponse response) {
+      String transactionName = request.getProtocol();
+      String taskName = request.getProtocol();
+      String description = "";
+      if (request instanceof HttpServletRequest) {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        transactionName += " " + httpRequest.getMethod();
+        taskName = httpRequest.getMethod() + " " + httpRequest.getPathInfo();
+        description =
+            (httpRequest.getQueryString() == null ? "" : httpRequest.getQueryString() + "\n")
+                + "Input size: "
+                + request.getContentLengthLong();
+      }
+      return Sentry.startTransaction(transactionName, taskName, description);
+    }
+  }
+
+  private static class TracingSQLLogger implements SqlLogger {
+    private final SqlLogger delegate;
+    private static final SmartNameStrategy naming = new SmartNameStrategy();
+
+    public TracingSQLLogger(SqlLogger delegate) {
+      super();
+      this.delegate = delegate;
+    }
+
+    private String taskName(StatementContext context) {
+      return naming.getStatementName(context);
+    }
+
+    public void logBeforeExecution(StatementContext context) {
+      ISpan span = Sentry.getSpan();
+      if (span != null) {
+        String taskName = taskName(context);
+        String description =
+            "Executed SQL: "
+                + context.getParsedSql().getSql()
+                + "\nJDBI SQL: "
+                + context.getRenderedSql()
+                + "\nBinding: "
+                + context.getBinding();
+        span = span.startChild(taskName, description);
+      }
+      delegate.logBeforeExecution(context);
+    }
+
+    public void logAfterExecution(StatementContext context) {
+      ISpan span = Sentry.getSpan();
+      if (span != null) {
+        span.finish();
+      }
+      delegate.logAfterExecution(context);
+    }
+
+    public void logException(StatementContext context, SQLException ex) {
+      Sentry.captureException(ex);
+      ISpan span = Sentry.getSpan();
+      if (span != null) {
+        span.finish();
+      }
+      delegate.logException(context, ex);
+    }
   }
 
   public void registerResources(
@@ -112,7 +228,11 @@ public final class MarquezApp extends Application<MarquezConfig> {
             .build(env, config.getDataSourceFactory(), (ManagedDataSource) source, DB_POSTGRES)
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
-    jdbi.setSqlLogger(new InstrumentedSqlLogger(env.metrics()));
+    SqlLogger sqlLogger = new InstrumentedSqlLogger(env.metrics());
+    if (isSentryEnabled(config)) {
+      sqlLogger = new TracingSQLLogger(sqlLogger);
+    }
+    jdbi.setSqlLogger(sqlLogger);
 
     final MarquezContext context =
         MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();

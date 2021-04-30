@@ -43,4 +43,8 @@ public class MarquezConfig extends Configuration {
   @Getter
   @JsonProperty("graphql")
   private final GraphqlConfig graphql = new GraphqlConfig();
+
+  @Getter
+  @JsonProperty("sentry")
+  private final SentryConfig sentry = new SentryConfig();
 }
