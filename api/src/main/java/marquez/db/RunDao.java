@@ -78,8 +78,7 @@ public interface RunDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
-  /** */
-  String BASE_SELECT_RUN =
+  String BASE_RUN_SELECT =
       "SELECT r.*, ra.args, ra.args, ctx.context, "
           + "(SELECT JSON_AGG(tmp_facets) "
           + "   FROM ("
@@ -93,14 +92,14 @@ public interface RunDao extends BaseDao {
           + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid "
           + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid ";
 
-  @SqlQuery(BASE_SELECT_RUN + " WHERE r.uuid = :rowUuid")
+  @SqlQuery(BASE_RUN_SELECT + " WHERE r.uuid = :rowUuid")
   Optional<Run> findBy(UUID rowUuid);
 
-  @SqlQuery(BASE_SELECT_RUN + " WHERE r.uuid = :rowUuid")
+  @SqlQuery(BASE_RUN_SELECT + " WHERE r.uuid = :rowUuid")
   Optional<ExtendedRunRow> findByRow(UUID rowUuid);
 
   @SqlQuery(
-      BASE_SELECT_RUN
+      BASE_RUN_SELECT
           + "WHERE r.namespace_name = :namespace and r.job_name = :jobName "
           + "ORDER BY STARTED_AT DESC NULLS LAST "
           + "LIMIT :limit OFFSET :offset")
@@ -343,7 +342,7 @@ public interface RunDao extends BaseDao {
   void updateJobVersion(UUID runUuid, UUID jobVersionUuid);
 
   @SqlQuery(
-      BASE_SELECT_RUN
+      BASE_RUN_SELECT
           + "where r.job_name = :jobName and r.namespace_name = :namespaceName "
           + "order by transitioned_at desc limit 1")
   Optional<Run> findByLatestJob(String namespaceName, String jobName);

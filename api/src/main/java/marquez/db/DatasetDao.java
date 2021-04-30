@@ -75,7 +75,6 @@ public interface DatasetDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  /** */
   String BASE_DATASET_SELECT =
       "SELECT d.*, dv.fields, sv.schema_location, "
           + "ARRAY(SELECT t.name FROM tags AS t "

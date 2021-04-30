@@ -59,7 +59,6 @@ public interface JobDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  /** */
   String BASE_JOB_SELECT =
       "SELECT j.*, jc.context, "
           + "(SELECT JSON_AGG(tmp_facets) "

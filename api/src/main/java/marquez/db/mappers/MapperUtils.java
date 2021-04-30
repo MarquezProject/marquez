@@ -37,8 +37,8 @@ public final class MapperUtils {
   }
 
   /**
-   * Creates a new {@link Facets} instance of type {com.fasterxml.jackson.databind.JsonNode}, or
-   * {@code null} if not present in {java.sql.ResultSet}.
+   * Returns a new {@link ImmutableMap} instance of facets present in the provided
+   * {java.sql.ResultSet}.
    */
   static ImmutableMap<String, Object> toFacetsOrNull(@NonNull final ResultSet results)
       throws SQLException {
@@ -50,20 +50,20 @@ public final class MapperUtils {
             facetsAsString -> {
               final ObjectNode mergedFacetsAsJson = Utils.getMapper().createObjectNode();
 
-              // ...
+              // Get the array of facets.
               ArrayNode facetsAsJsonArray;
               try {
                 facetsAsJsonArray =
                     Utils.fromJson(facetsAsString, new TypeReference<ArrayNode>() {});
               } catch (Exception e) {
-                // log error ...
+                  // Log error, then return
+                log.error("Failed to read facets: %s", facetsAsString, e);
                 return null;
               }
 
-              // ...
+              // Merge array of facets.
               for (final JsonNode facetsAsJson : facetsAsJsonArray) {
                 final JsonNode currFacetsAsJson = facetsAsJson.get("facets");
-                // ...
                 currFacetsAsJson
                     .fieldNames()
                     .forEachRemaining(
@@ -76,6 +76,6 @@ public final class MapperUtils {
                   .convertValue(
                       mergedFacetsAsJson, new TypeReference<ImmutableMap<String, Object>>() {});
             })
-        .orElse(null);
+        .orElse(ImmutableMap.of());
   }
 }
