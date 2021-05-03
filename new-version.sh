@@ -111,7 +111,7 @@ done
 # (1) Bump python module versions
 PYTHON_MODULES=(clients/python/ integrations/airflow/)
 for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
-  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${RELEASE_VERSION}" --allow-dirty --no-commit)
+  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${RELEASE_VERSION}" --allow-dirty)
 done
 
 # (2) Bump java module versions
@@ -122,7 +122,7 @@ git commit -sam "Prepare for release ${RELEASE_VERSION}"
 
 # (4) Pull latest tags, then prepare release tag
 git fetch --all --tags
-git tag -sa "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
+git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
 # (5) Prepare next development version
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
