@@ -111,7 +111,7 @@ done
 # (1) Bump python module versions
 PYTHON_MODULES=(clients/python/ integrations/airflow/)
 for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
-  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${RELEASE_VERSION}")
+  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${RELEASE_VERSION}" --allow-dirty --no-commit)
 done
 
 # (2) Bump java module versions
