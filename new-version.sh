@@ -118,17 +118,17 @@ done
 sed -i "" "s/version=.*/version=${RELEASE_VERSION}/g" gradle.properties
 
 # (3) Prepare release commit
-git commit -am "Prepare for release ${RELEASE_VERSION}"
+git commit -sam "Prepare for release ${RELEASE_VERSION}"
 
 # (4) Pull latest tags, then prepare release tag
 git fetch --all --tags
-git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
+git tag -sa "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
 # (5) Prepare next development version
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 
 # (6) Prepare next development version commit
-git commit -am "Prepare next development version"
+git commit -sam "Prepare next development version"
 
 # (7) Push commits and tag
 git push origin main && git push origin "${RELEASE_VERSION}"
