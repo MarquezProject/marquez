@@ -14,10 +14,6 @@ only-on-release: &only-on-release
     branches:
       ignore: /.*/
 
-deploy-context: &deploy-context
-  context:
-    - deploy
-
 jobs:
   build-api:
     working_directory: ~/marquez
@@ -217,10 +213,10 @@ workflows:
           <<: *only-on-release
       - release-java:
           <<: *only-on-release
-          <<: *deploy-context
+          context: release
       - release-python:
           <<: *only-on-release
-          <<: *deploy-context
+          context: release
       - release-docker:
           <<: *only-on-release
-          <<: *deploy-context
+          context: release
