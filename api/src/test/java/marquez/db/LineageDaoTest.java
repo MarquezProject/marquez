@@ -581,4 +581,72 @@ public class LineageDaoTest {
         .hasSize(1)
         .contains(newRows.get(0).getId());
   }
+
+  @Test
+  public void testGetJobFromInputOrOutput() {
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "consumerJob",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset),
+        Arrays.asList());
+    Optional<UUID> jobNode =
+        lineageDao.getJobFromInputOrOutput(dataset.getName(), dataset.getNamespace());
+    assertThat(jobNode).isPresent().get().isEqualTo(writeJob.getJob().getUuid());
+  }
+
+  @Test
+  public void testGetJobFromInputOrOutputPrefersRecentOutputJob() {
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+
+    // add some consumer jobs prior to the write so we know that the sort isn't simply picking
+    // the first job created
+    for (int i = 0; i < 5; i++) {
+      LineageTestUtils.createLineageRow(
+          openLineageDao,
+          "consumerJob" + i,
+          "COMPLETE",
+          jobFacet,
+          Arrays.asList(dataset),
+          Arrays.asList());
+    }
+    // older write job- should be ignored.
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "olderWriteJob",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(),
+        Arrays.asList(dataset));
+
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "consumerJob",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset),
+        Arrays.asList());
+    Optional<UUID> jobNode =
+        lineageDao.getJobFromInputOrOutput(dataset.getName(), dataset.getNamespace());
+    assertThat(jobNode).isPresent().get().isEqualTo(writeJob.getJob().getUuid());
+  }
 }
