@@ -17,6 +17,7 @@ package marquez.service.models;
 import static marquez.common.models.DatasetType.DB_TABLE;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.Optional;
@@ -44,7 +45,8 @@ public final class DbTable extends Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Optional<UUID> currentVersionUuid) {
+      @Nullable final Optional<UUID> currentVersionUuid,
+      @Nullable final ImmutableMap<String, Object> facets) {
     super(
         id,
         DB_TABLE,
@@ -57,6 +59,7 @@ public final class DbTable extends Dataset {
         tags,
         lastModifiedAt,
         description,
-        currentVersionUuid);
+        currentVersionUuid,
+        facets);
   }
 }

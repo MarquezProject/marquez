@@ -136,7 +136,8 @@ public class MarquezClientTest {
           FIELDS,
           TAGS,
           null,
-          DB_TABLE_DESCRIPTION);
+          DB_TABLE_DESCRIPTION,
+          null);
   private static final DbTable DB_TABLE_MODIFIED =
       new DbTable(
           DB_TABLE_ID,
@@ -149,7 +150,8 @@ public class MarquezClientTest {
           FIELDS,
           TAGS,
           LAST_MODIFIED_AT,
-          DB_TABLE_DESCRIPTION);
+          DB_TABLE_DESCRIPTION,
+          null);
 
   // STREAM DATASET
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
@@ -171,7 +173,8 @@ public class MarquezClientTest {
           TAGS,
           null,
           STREAM_SCHEMA_LOCATION,
-          STREAM_DESCRIPTION);
+          STREAM_DESCRIPTION,
+          null);
   private static final Stream STREAM_MODIFIED =
       new Stream(
           STREAM_ID,
@@ -185,7 +188,8 @@ public class MarquezClientTest {
           TAGS,
           LAST_MODIFIED_AT,
           STREAM_SCHEMA_LOCATION,
-          STREAM_DESCRIPTION);
+          STREAM_DESCRIPTION,
+          null);
 
   // JOB
   private static final JobId JOB_ID = newJobIdWith(NAMESPACE_NAME);
@@ -209,6 +213,7 @@ public class MarquezClientTest {
           LOCATION,
           JOB_CONTEXT,
           JOB_DESCRIPTION,
+          null,
           null);
 
   // RUN
@@ -229,7 +234,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run RUNNING =
       new Run(
           newRunId(),
@@ -241,7 +247,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run COMPLETED =
       new Run(
           newRunId(),
@@ -253,7 +260,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run ABORTED =
       new Run(
           newRunId(),
@@ -265,7 +273,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run FAILED =
       new Run(
           newRunId(),
@@ -277,7 +286,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
 
   private static final String RUN_ID = newRunId();
   private static final Job JOB_WITH_LATEST_RUN =
@@ -303,7 +313,9 @@ public class MarquezClientTest {
               START_AT,
               ENDED_AT,
               DURATION,
-              RUN_ARGS));
+              RUN_ARGS,
+              null),
+          null);
 
   // DATASET VERSIONS
   private static final Run CREATED_BY_RUN = COMPLETED;

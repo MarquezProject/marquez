@@ -23,7 +23,7 @@ import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.db.BaseDao;
 import marquez.db.JobVersionDao;
-import marquez.db.JobVersionDao.JobVersionBag;
+import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.RunStateDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedRunRow;
@@ -54,10 +54,10 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
   public Run createRun(
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta) {
     log.info("Creating run for job '{}'...", jobName.getValue());
-    RunRow runRow = upsertFromRun(namespaceName, jobName, runMeta, NEW);
+    RunRow runRow = upsertRunMeta(namespaceName, jobName, runMeta, NEW);
     notify(new RunTransition(RunId.of(runRow.getUuid()), null, NEW));
 
-    return findBy(runRow.getUuid()).get();
+    return findRunByUuid(runRow.getUuid()).get();
   }
 
   public void markRunAs(
@@ -66,36 +66,39 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
     if (transitionedAt == null) {
       transitionedAt = Instant.now();
     }
-    ExtendedRunRow runRow = findByRow(runId.getValue()).get();
-    runStateDao.updateRunState(runId.getValue(), runState, transitionedAt);
+    ExtendedRunRow runRow = findRunByUuidAsRow(runId.getValue()).get();
+    runStateDao.updateRunStateFor(runId.getValue(), runState, transitionedAt);
 
     if (runState.isDone()) {
-      JobVersionBag jobVersionBag =
-          jobVersionDao.createJobVersionOnComplete(
-              transitionedAt,
-              runRow.getUuid(),
+      BagOfJobVersionInfo bagOfJobVersionInfo =
+          jobVersionDao.upsertJobVersionOnRunTransition(
               runRow.getNamespaceName(),
               runRow.getJobName(),
-              runState);
+              runRow.getUuid(),
+              runState,
+              transitionedAt);
 
+      // TODO: We should also notify that the outputs have been updated when a run is in a done
+      // state to be consistent with existing job versioning logic. We'll want to add testing to
+      // confirm the new behavior before updating the logic.
       if (runState == COMPLETED) {
         notify(
             new JobOutputUpdate(
                 RunId.of(runRow.getUuid()),
-                toJobVersionId(jobVersionBag.getJobVersionRow()),
+                toJobVersionId(bagOfJobVersionInfo.getJobVersionRow()),
                 JobName.of(runRow.getJobName()),
                 NamespaceName.of(runRow.getNamespaceName()),
-                buildRunOutputs(jobVersionBag.getOutputs())));
+                buildRunOutputs(bagOfJobVersionInfo.getOutputs())));
       }
 
       notify(
           new JobInputUpdate(
               RunId.of(runRow.getUuid()),
               buildRunMeta(runRow),
-              toJobVersionId(jobVersionBag.getJobVersionRow()),
+              toJobVersionId(bagOfJobVersionInfo.getJobVersionRow()),
               JobName.of(runRow.getJobName()),
               NamespaceName.of(runRow.getNamespaceName()),
-              buildRunInputs(jobVersionBag.getInputs())));
+              buildRunInputs(bagOfJobVersionInfo.getInputs())));
     }
 
     final RunState oldRunState = runRow.getCurrentRunState().map(RunState::valueOf).orElse(null);

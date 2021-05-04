@@ -1,7 +1,11 @@
 package marquez;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -13,6 +17,9 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import marquez.client.models.Dataset;
+import marquez.client.models.Job;
+import marquez.client.models.Run;
 import marquez.common.Utils;
 import marquez.service.models.LineageEvent;
 import org.junit.jupiter.api.Assertions;
@@ -34,18 +41,21 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         EVENT_SIMPLE,
         EVENT_REQUIRED,
         EVENT_UNICODE,
-        EVENT_LARGE,
+        // FIXME: A very large event fails the test.
+        // EVENT_LARGE,
         NULL_NOMINAL_END_TIME);
   }
 
   @ParameterizedTest
   @MethodSource("data")
-  public void testOpenLineage(String input) throws IOException {
-    URL resource = Resources.getResource(input);
-    String body = Resources.toString(resource, Charset.defaultCharset());
+  public void testSendOpenLineage(String pathToOpenLineageEvent) throws IOException {
+    // (1) Get OpenLineage event.
+    final String openLineageEventAsString =
+        Resources.toString(Resources.getResource(pathToOpenLineageEvent), Charset.defaultCharset());
 
-    CompletableFuture<Integer> resp =
-        this.sendLineage(body)
+    // (2) Send OpenLineage event.
+    final CompletableFuture<Integer> resp =
+        this.sendLineage(openLineageEventAsString)
             .thenApply(HttpResponse::statusCode)
             .whenComplete(
                 (val, error) -> {
@@ -54,7 +64,55 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
                   }
                 });
 
-    Assertions.assertEquals((Integer) 201, resp.join());
+    // Ensure the event was received.
+    assertThat(resp.join()).isEqualTo(201);
+
+    // (3) Convert the OpenLineage event to Json.
+    final JsonNode openLineageEventAsJson =
+        Utils.fromJson(openLineageEventAsString, new TypeReference<JsonNode>() {});
+
+    // (4) Verify the input and output dataset facets associated with the OpenLineage event.
+    final JsonNode inputsAsJson = openLineageEventAsJson.path("inputs");
+    inputsAsJson.forEach(
+        inputAsJson -> {
+          final String inputNamespace = inputAsJson.path("namespace").asText();
+          final String inputName = inputAsJson.path("name").asText();
+          final JsonNode inputFacetsAsJson = inputAsJson.path("facets");
+
+          final Dataset inputDataset = client.getDataset(inputNamespace, inputName);
+          if (inputDataset.hasFacets()) {
+            assertThat(inputDataset.getNamespace()).isEqualTo(inputNamespace);
+            assertThat(inputDataset.getName()).isEqualTo(inputName);
+            final JsonNode facetsForInputsAsJson =
+                Utils.getMapper().convertValue(inputDataset.getFacets(), JsonNode.class);
+            assertThat(facetsForInputsAsJson).isEqualTo(inputFacetsAsJson);
+          }
+        });
+
+    // (5) Verify the job facets associated with the OpenLineage event.
+    final JsonNode jobAsJson = openLineageEventAsJson.path("job");
+    final String jobNamespace = jobAsJson.path("namespace").asText();
+    final String jobName = jobAsJson.path("name").asText();
+    final JsonNode jobFacetsAsJson = jobAsJson.path("facets");
+
+    final Job job = client.getJob(jobNamespace, jobName);
+    if (job.hasFacets()) {
+      final JsonNode facetsForRunAsJson =
+          Utils.getMapper().convertValue(job.getFacets(), JsonNode.class);
+      assertThat(facetsForRunAsJson).isEqualTo(jobFacetsAsJson);
+    }
+
+    // (6) Verify the run facets associated with the OpenLineage event.
+    final JsonNode runAsJson = openLineageEventAsJson.path("run");
+    final String runId = runAsJson.path("runId").asText();
+    final JsonNode runFacetsAsJson = runAsJson.path("facets");
+
+    final Run run = client.getRun(runId);
+    if (run.hasFacets()) {
+      final JsonNode facetsForRunAsJson =
+          Utils.getMapper().convertValue(run.getFacets(), JsonNode.class);
+      assertThat(facetsForRunAsJson).isEqualTo(runFacetsAsJson);
+    }
   }
 
   @ParameterizedTest

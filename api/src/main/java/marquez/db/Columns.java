@@ -14,23 +14,29 @@
 
 package marquez.db;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.common.Utils;
 import org.postgresql.util.PGInterval;
 
 @Slf4j
 public final class Columns {
   private Columns() {}
+
+  private static final ObjectMapper MAPPER = Utils.getMapper();
 
   /* COMMON ROW COLUMNS */
   public static final String ROW_UUID = "uuid";
@@ -49,10 +55,9 @@ public final class Columns {
   public static final String JOB_VERSION_UUID = "job_version_uuid";
   public static final String CURRENT_VERSION_UUID = "current_version_uuid";
   public static final String CHECKSUM = "checksum";
-
-  /* COMMON RESULTSET COLUMNS */
   public static final String NAMESPACE_NAME = "namespace_name";
   public static final String DATASET_NAME = "dataset_name";
+  public static final String FACETS = "facets";
 
   /* NAMESPACE ROW COLUMNS */
   public static final String CURRENT_OWNER_NAME = "current_owner_name";
@@ -219,5 +224,17 @@ public final class Columns {
       log.error("Could not read source URI", e);
       return null;
     }
+  }
+
+  public static boolean exists(final ResultSet results, @NonNull final String column)
+      throws SQLException {
+    final ResultSetMetaData resultSetMetaData = results.getMetaData();
+    final int columnCount = resultSetMetaData.getColumnCount();
+    for (int i = 1; i <= columnCount; i++) {
+      if (resultSetMetaData.getColumnName(i).equals(column)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

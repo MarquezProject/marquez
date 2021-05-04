@@ -14,6 +14,10 @@
 
 package marquez.common;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.service.models.ServiceModelGenerator.newJobMeta;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
@@ -23,8 +27,15 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Map;
+import marquez.common.models.DatasetId;
+import marquez.common.models.JobName;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.Version;
+import marquez.service.models.JobMeta;
 import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("UnitTests")
@@ -94,6 +105,90 @@ public class UtilsTest {
     final String checksum0 = Utils.checksumFor(kvMap0);
     final String checksum1 = Utils.checksumFor(kvMap1);
     assertThat(checksum0).isNotEqualTo(checksum1);
+  }
+
+  @Test
+  public void testNewJobVersionFor_equal() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final JobName jobName = newJobName();
+    final JobMeta jobMeta = newJobMeta();
+
+    // Generate version0 and version1; versions will be equal.
+    final Version version0 =
+        Utils.newJobVersionFor(
+            namespaceName,
+            jobName,
+            jobMeta.getInputs(),
+            jobMeta.getOutputs(),
+            jobMeta.getContext(),
+            jobMeta.getLocation().map(URL::toString).orElse(null));
+    final Version version1 =
+        Utils.newJobVersionFor(
+            namespaceName,
+            jobName,
+            jobMeta.getInputs(),
+            jobMeta.getOutputs(),
+            jobMeta.getContext(),
+            jobMeta.getLocation().map(URL::toString).orElse(null));
+    assertThat(version0).isEqualTo(version1);
+  }
+
+  @Test
+  public void testNewJobVersionFor_equalOnUnsortedInputsAndOutputs() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final JobName jobName = newJobName();
+    final JobMeta jobMeta = newJobMeta();
+
+    // Generate version0 and version1; versions will be equal.
+    final Version version0 =
+        Utils.newJobVersionFor(
+            namespaceName,
+            jobName,
+            jobMeta.getInputs(),
+            jobMeta.getOutputs(),
+            jobMeta.getContext(),
+            jobMeta.getLocation().map(URL::toString).orElse(null));
+    // Unsort the job inputs and outputs for version1.
+    final ImmutableSet<DatasetId> unsortedJobInputIds =
+        jobMeta.getInputs().stream().sorted(Collections.reverseOrder()).collect(toImmutableSet());
+    final ImmutableSet<DatasetId> unsortedJobOutputIds =
+        jobMeta.getOutputs().stream().sorted(Collections.reverseOrder()).collect(toImmutableSet());
+    final Version version1 =
+        Utils.newJobVersionFor(
+            namespaceName,
+            jobName,
+            unsortedJobInputIds,
+            unsortedJobOutputIds,
+            jobMeta.getContext(),
+            jobMeta.getLocation().map(URL::toString).orElse(null));
+    assertThat(version0).isEqualTo(version1);
+  }
+
+  @Test
+  public void testNewJobVersionFor_notEqual() {
+    final NamespaceName namespaceName = newNamespaceName();
+    final JobName jobName = newJobName();
+    final JobMeta jobMeta0 = newJobMeta();
+    final JobMeta jobMeta1 = newJobMeta();
+
+    // Generate version0 and version1; versions will not be equal.
+    final Version version0 =
+        Utils.newJobVersionFor(
+            namespaceName,
+            jobName,
+            jobMeta0.getInputs(),
+            jobMeta0.getOutputs(),
+            jobMeta0.getContext(),
+            jobMeta0.getLocation().map(URL::toString).orElse(null));
+    final Version version1 =
+        Utils.newJobVersionFor(
+            namespaceName,
+            jobName,
+            jobMeta1.getInputs(),
+            jobMeta1.getOutputs(),
+            jobMeta1.getContext(),
+            jobMeta1.getLocation().map(URL::toString).orElse(null));
+    assertThat(version0).isNotEqualTo(version1);
   }
 
   @JsonAutoDetect(fieldVisibility = Visibility.ANY)

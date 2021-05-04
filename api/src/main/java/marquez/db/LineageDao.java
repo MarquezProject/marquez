@@ -135,6 +135,7 @@ public interface LineageDao {
           + "inner join job_versions_io_mapping io on io.job_version_uuid = jv.uuid\n"
           + "inner join datasets ds on ds.uuid = io.dataset_uuid\n"
           + "where ds.name = :datasetName and ds.namespace_name = :namespaceName\n"
+          + "order by io_type DESC, jv.created_at DESC\n"
           + "limit 1")
   Optional<UUID> getJobFromInputOrOutput(String datasetName, String namespaceName);
 
