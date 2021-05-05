@@ -217,6 +217,9 @@ workflows:
       - release-python:
           <<: *only-on-release
           context: release
+          requires:
+            - build-client-python
+            - build-integration-airflow
       - release-docker:
           <<: *only-on-release
           context: release
