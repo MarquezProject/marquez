@@ -20,8 +20,8 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    "attrs==19.3",
-    "requests==2.25.1",
+    "attrs>=19.3",
+    "requests>=2.24.0",
     "sqlparse==0.4.1",
 ]
 
@@ -45,7 +45,7 @@ extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(
     name="marquez-airflow",
-    version="0.14.0",
+    version="0.14.1",
     description="Marquez integration with Airflow",
     long_description=readme,
     long_description_content_type="text/markdown",
