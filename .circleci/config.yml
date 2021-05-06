@@ -100,11 +100,12 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - *checkout_project_root
-      - run: python setup.py bdist_wheel
+      - run: python setup.py sdist bdist_wheel
       - persist_to_workspace:
-          root: python/dist/
+          root: .
           paths:
-            - ./*
+            - ./dist/*.whl
+            - ./dist/*.tar.gz
 
   build-integration-spark:
     working_directory: ~/marquez/integrations/spark
@@ -150,11 +151,12 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - *checkout_project_root
-      - run: python setup.py bdist_wheel
+      - run: python setup.py sdist bdist_wheel
       - persist_to_workspace:
-          root: python/dist/
+          root: .
           paths:
-            - ./*
+            - ./dist/*.whl
+            - ./dist/*.tar.gz
 
   integration-test-airflow:
     working_directory: ~/marquez/integrations/airflow
@@ -207,6 +209,8 @@ workflows:
       - integration-test-airflow:
           requires:
             - test-integration-airflow
+      - build-client-python
+      - build-integration-airflow
   release:
     jobs:
       - build-client-python:
