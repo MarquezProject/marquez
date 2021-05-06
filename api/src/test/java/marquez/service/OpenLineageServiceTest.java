@@ -1,7 +1,6 @@
 package marquez.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
@@ -12,88 +11,100 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import marquez.IntegrationTests;
-import marquez.JdbiRuleInit;
+import java.util.stream.Stream;
 import marquez.common.Utils;
+import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.OpenLineageDao;
+import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.ExtendedDatasetVersionRow;
+import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.models.Dataset;
 import marquez.service.models.Job;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.DatasetFacets;
+import marquez.service.models.LineageEvent.DatasourceDatasetFacet;
+import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.Run;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.testing.JdbiRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 
-@RunWith(Parameterized.class)
-@Category({IntegrationTests.class})
+@org.junit.jupiter.api.Tag("IntegrationTests")
+@ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class OpenLineageServiceTest {
-  @ClassRule public static final JdbiRule dbRule = JdbiRuleInit.init();
+
+  public static final String NAMESPACE = "theNamespace";
+  public static final String JOB_NAME = "theJob";
+  public static final ZoneId TIMEZONE = ZoneId.of("America/Los_Angeles");
+  public static final String DATASET_NAME = "theDataset";
   private RunService runService;
   private OpenLineageDao openLineageDao;
+  private DatasetDao datasetDao;
   private DatasetVersionDao datasetVersionDao;
   private ArgumentCaptor<JobInputUpdate> runInputListener;
   private ArgumentCaptor<JobOutputUpdate> runOutputListener;
   private OpenLineageService lineageService;
-  private Jdbi jdbi;
 
   public static String EVENT_REQUIRED_ONLY = "open_lineage/event_required_only.json";
   public static String EVENT_SIMPLE = "open_lineage/event_simple.json";
   public static String EVENT_FULL = "open_lineage/event_full.json";
   public static String EVENT_UNICODE = "open_lineage/event_unicode.json";
   public static String EVENT_LARGE = "open_lineage/event_large.json";
-  private List<LineageEvent> eventList;
 
-  @Parameters(name = "{0}")
-  public static List<Object[]> data() throws IOException, URISyntaxException {
+  public static List<Object[]> getData() throws IOException, URISyntaxException {
     String prefix = "../integrations/spark/integrations";
     List<URI> rdd =
         Files.list(Paths.get(prefix + "/sparkrdd")).map(Path::toUri).collect(Collectors.toList());
     List<URI> sql =
         Files.list(Paths.get(prefix + "/sparksql")).map(Path::toUri).collect(Collectors.toList());
-    return Arrays.asList(
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_REQUIRED_ONLY).toURI()),
-          new ExpectedResults(0, 0, 0, 0)
-        },
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_SIMPLE).toURI()),
-          new ExpectedResults(2, 1, 1, 1)
-        },
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_FULL).toURI()), new ExpectedResults(1, 1, 1, 1)
-        },
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_UNICODE).toURI()),
-          new ExpectedResults(2, 1, 1, 1)
-        },
-        new Object[] {
-          Arrays.asList(
-              Resources.getResource("open_lineage/listener/1.json").toURI(),
-              Resources.getResource("open_lineage/listener/2.json").toURI()),
-          new ExpectedResults(3, 2, 2, 1)
-        },
-        new Object[] {rdd, new ExpectedResults(1, 0, 2, 2)},
-        new Object[] {sql, new ExpectedResults(1, 0, 4, 4)},
-        new Object[] {
-          Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()), new ExpectedResults(1, 1, 1, 1)
-        });
+    return Stream.of(
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_REQUIRED_ONLY).toURI()),
+              new ExpectedResults(0, 0, 0, 0)
+            },
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_SIMPLE).toURI()),
+              new ExpectedResults(2, 1, 1, 1)
+            },
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_FULL).toURI()),
+              new ExpectedResults(1, 1, 1, 1)
+            },
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_UNICODE).toURI()),
+              new ExpectedResults(2, 1, 1, 1)
+            },
+            new Object[] {
+              Arrays.asList(
+                  Resources.getResource("open_lineage/listener/1.json").toURI(),
+                  Resources.getResource("open_lineage/listener/2.json").toURI()),
+              new ExpectedResults(3, 2, 2, 1)
+            },
+            new Object[] {rdd, new ExpectedResults(1, 0, 2, 2)},
+            new Object[] {sql, new ExpectedResults(1, 0, 4, 4)},
+            new Object[] {
+              Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()),
+              new ExpectedResults(1, 1, 1, 1)
+            })
+        .collect(Collectors.toList());
   }
 
   public static class ExpectedResults {
@@ -111,15 +122,8 @@ public class OpenLineageServiceTest {
     }
   }
 
-  @Parameter(value = 0)
-  public List<URI> events;
-
-  @Parameter(value = 1)
-  public ExpectedResults expected;
-
-  @Before
-  public void setup() throws ExecutionException, InterruptedException {
-    jdbi = dbRule.getJdbi();
+  @BeforeEach
+  public void setup(Jdbi jdbi) {
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
     runService = mock(RunService.class);
@@ -128,61 +132,78 @@ public class OpenLineageServiceTest {
     runOutputListener = ArgumentCaptor.forClass(JobOutputUpdate.class);
     doNothing().when(runService).notify(runOutputListener.capture());
     lineageService = new OpenLineageService(openLineageDao, runService);
-
-    List<LineageEvent> eventList = new ArrayList<>();
-    for (URI event : events) {
-      LineageEvent l = getLineageEventFromResource(event);
-      lineageService.createAsync(l).get();
-      eventList.add(l);
-    }
-    this.eventList = eventList;
+    datasetDao = jdbi.onDemand(DatasetDao.class);
   }
 
-  @Test
-  public void testRunListenerInput() {
-    if (expected.inputDatasetCount > 0) {
-      assertEquals(
-          "RunInputListener events",
-          expected.inputEventCount,
-          runInputListener.getAllValues().size());
-      assertEquals(
-          "Dataset input count",
-          expected.inputDatasetCount,
+  private List<LineageEvent> initEvents(List<URI> uris) {
+    List<LineageEvent> events = new ArrayList<>();
+    for (URI uri : uris) {
+      try {
+        LineageEvent event = getLineageEventFromResource(uri);
+        lineageService.createAsync(event).get();
+        events.add(event);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return events;
+  }
+
+  @ParameterizedTest
+  @MethodSource("getData")
+  public void testRunListenerInput(List<URI> uris, ExpectedResults expectedResults) {
+    initEvents(uris);
+
+    if (expectedResults.inputDatasetCount > 0) {
+      Assertions.assertEquals(
+          expectedResults.inputEventCount,
+          runInputListener.getAllValues().size(),
+          "RunInputListener events");
+      Assertions.assertEquals(
+          expectedResults.inputDatasetCount,
           runInputListener
               .getAllValues()
               .get(runInputListener.getAllValues().size() - 1)
               .getInputs()
-              .size());
+              .size(),
+          "Dataset input count");
     }
   }
 
-  @Test
-  public void testRunListenerOutput() {
-    if (expected.outputDatasetCount > 0) {
-      assertEquals(
-          "RunOutputListener events",
-          expected.outputEventCount,
-          runOutputListener.getAllValues().size());
-      assertEquals(
-          "Dataset output count",
-          expected.outputDatasetCount,
-          runOutputListener.getAllValues().get(0).getOutputs().size());
+  @ParameterizedTest
+  @MethodSource("getData")
+  public void testRunListenerOutput(List<URI> uris, ExpectedResults expectedResults) {
+    initEvents(uris);
+
+    if (expectedResults.outputDatasetCount > 0) {
+      Assertions.assertEquals(
+          expectedResults.outputEventCount,
+          runOutputListener.getAllValues().size(),
+          "RunOutputListener events");
+      Assertions.assertEquals(
+          expectedResults.outputDatasetCount,
+          runOutputListener.getAllValues().get(0).getOutputs().size(),
+          "Dataset output count");
     }
   }
 
-  @Test
-  public void serviceCalls() {
+  @ParameterizedTest
+  @MethodSource({"getData"})
+  public void serviceCalls(List<URI> uris, ExpectedResults expectedResults) {
+    List<LineageEvent> events = initEvents(uris);
+
     JobService jobService = new JobService(openLineageDao, runService);
-    LineageEvent event = eventList.get(eventList.size() - 1);
+    LineageEvent event = events.get(events.size() - 1);
     Optional<Job> job =
         jobService.findWithRun(
             openLineageDao.formatNamespaceName(event.getJob().getNamespace()),
             event.getJob().getName());
-    assertTrue("Job does not exist: " + event.getJob().getName(), job.isPresent());
+    Assertions.assertTrue(job.isPresent(), "Job does not exist: " + event.getJob().getName());
 
     RunService runService = new RunService(openLineageDao, new ArrayList());
-    Optional<Run> run = runService.findBy(openLineageDao.runToUuid(event.getRun().getRunId()));
-    assertTrue("Should have run", run.isPresent());
+    Optional<Run> run =
+        runService.findRunByUuid(openLineageDao.runToUuid(event.getRun().getRunId()));
+    Assertions.assertTrue(run.isPresent(), "Should have run");
 
     if (event.getInputs() != null) {
       for (LineageEvent.Dataset ds : event.getInputs()) {
@@ -196,17 +217,131 @@ public class OpenLineageServiceTest {
     }
   }
 
+  @Test
+  public void testDatasetVersionUpdatedOnRunCompletion()
+      throws ExecutionException, InterruptedException {
+    LineageEvent.Dataset dataset =
+        LineageEvent.Dataset.builder()
+            .name(DATASET_NAME)
+            .namespace(NAMESPACE)
+            .facets(
+                DatasetFacets.builder()
+                    .dataSource(
+                        DatasourceDatasetFacet.builder()
+                            .name("theDatasource")
+                            .uri("http://thedatasource")
+                            .build())
+                    .build())
+            .build();
+
+    // First run creates the dataset without a currentVersionUuid
+    UUID firstRunId = UUID.randomUUID();
+    lineageService
+        .createAsync(
+            LineageEvent.builder()
+                .eventType("RUNNING")
+                .run(new LineageEvent.Run(firstRunId.toString(), RunFacet.builder().build()))
+                .job(LineageEvent.Job.builder().name(JOB_NAME).namespace(NAMESPACE).build())
+                .eventTime(Instant.now().atZone(TIMEZONE))
+                .inputs(new ArrayList<>())
+                .outputs(Collections.singletonList(dataset))
+                .build())
+        .get();
+    Optional<Dataset> datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
+    assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersionUuid).isNotPresent();
+
+    // On complete, the currentVersionUuid is updated
+    lineageService
+        .createAsync(
+            LineageEvent.builder()
+                .eventType("COMPLETE")
+                .run(new LineageEvent.Run(firstRunId.toString(), RunFacet.builder().build()))
+                .job(LineageEvent.Job.builder().name(JOB_NAME).namespace(NAMESPACE).build())
+                .eventTime(Instant.now().atZone(TIMEZONE))
+                .inputs(new ArrayList<>())
+                .outputs(Collections.singletonList(dataset))
+                .build())
+        .get();
+    datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
+    assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersionUuid).isPresent();
+
+    List<ExtendedDatasetVersionRow> outputs =
+        datasetVersionDao.findOutputDatasetVersionsFor(firstRunId);
+    assertThat(outputs).hasSize(1).map(DatasetVersionRow::getVersion).isNotNull();
+
+    UUID dsVersion1Id = outputs.get(0).getVersion();
+
+    // A consumer gets the currentVersionUuid as its input version
+    UUID secondRunId = UUID.randomUUID();
+    lineageService
+        .createAsync(
+            LineageEvent.builder()
+                .eventType("COMPLETE")
+                .run(new LineageEvent.Run(secondRunId.toString(), RunFacet.builder().build()))
+                .job(LineageEvent.Job.builder().name("AnInputJob").namespace(NAMESPACE).build())
+                .eventTime(Instant.now().atZone(TIMEZONE))
+                .inputs(Collections.singletonList(dataset))
+                .outputs(new ArrayList<>())
+                .build())
+        .get();
+    List<ExtendedDatasetVersionRow> inputs =
+        datasetVersionDao.findInputDatasetVersionsFor(secondRunId);
+    assertThat(inputs).hasSize(1).map(DatasetVersionRow::getVersion).contains(dsVersion1Id);
+
+    // fail to write the dataset - the currentVersionUuid is not updated
+    UUID failedRunId = UUID.randomUUID();
+    lineageService
+        .createAsync(
+            LineageEvent.builder()
+                .eventType("FAILED")
+                .run(new LineageEvent.Run(failedRunId.toString(), RunFacet.builder().build()))
+                .job(LineageEvent.Job.builder().name(JOB_NAME).namespace(NAMESPACE).build())
+                .eventTime(Instant.now().atZone(TIMEZONE))
+                .inputs(new ArrayList<>())
+                .outputs(Collections.singletonList(dataset))
+                .build())
+        .get();
+
+    Optional<Dataset> afterFailureDataset = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
+    assertThat(afterFailureDataset)
+        .isPresent()
+        .flatMap(Dataset::getCurrentVersionUuid)
+        .isPresent()
+        .get()
+        .isEqualTo(datasetRow.get().getCurrentVersionUuid().get());
+
+    // A new consumer job run only sees the first dataset version
+    UUID fourthRunId = UUID.randomUUID();
+    lineageService
+        .createAsync(
+            LineageEvent.builder()
+                .eventType("COMPLETE")
+                .run(new LineageEvent.Run(fourthRunId.toString(), RunFacet.builder().build()))
+                .job(LineageEvent.Job.builder().name("AnInputJob").namespace(NAMESPACE).build())
+                .eventTime(Instant.now().atZone(TIMEZONE))
+                .inputs(Collections.singletonList(dataset))
+                .outputs(new ArrayList<>())
+                .build())
+        .get();
+
+    // still version 1 is consumed since the second producer job run failed
+    assertThat(datasetVersionDao.findInputDatasetVersionsFor(secondRunId))
+        .hasSize(1)
+        .map(DatasetVersionRow::getVersion)
+        .contains(dsVersion1Id);
+  }
+
   private void checkExists(LineageEvent.Dataset ds) {
     DatasetService datasetService = new DatasetService(openLineageDao, runService);
 
     Optional<Dataset> dataset =
-        datasetService.find(
+        datasetService.findDatasetByName(
             openLineageDao.formatNamespaceName(ds.getNamespace()),
             openLineageDao.formatDatasetName(ds.getName()));
-    assertTrue("Dataset does not exist: " + ds, dataset.isPresent());
+    Assertions.assertTrue(dataset.isPresent(), "Dataset does not exist: " + ds);
   }
 
-  private LineageEvent getLineageEventFromResource(URI location) {
+  private static LineageEvent getLineageEventFromResource(URI location) {
     try {
       return Utils.newObjectMapper().readValue(location.toURL(), LineageEvent.class);
     } catch (Exception e) {

@@ -9,16 +9,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from typing import List
+from enum import Enum
+from typing import List, Union, Type, Optional, Dict
 from abc import ABC, abstractmethod
 
 from airflow import LoggingMixin
 from airflow.models import BaseOperator
 
 from marquez_airflow.models import DbTableSchema, DbColumn
+from openlineage.facet import BaseFacet
 
-from marquez_client.models import DatasetType
+
+class DatasetType(Enum):
+    DB_TABLE = "DB_TABLE"
+    STREAM = "STREAM"
 
 
 class Source:
@@ -42,11 +46,14 @@ class Source:
 
 class Field:
     def __init__(self, name: str, type: str,
-                 tags: List[str] = [], description: str = None):
+                 tags: List[str] = None, description: str = None):
         self.name = name
         self.type = type
         self.tags = tags
         self.description = description
+
+        if self.tags is None:
+            self.tags = []
 
     @staticmethod
     def from_column(column: DbColumn):
@@ -69,12 +76,18 @@ class Field:
 
 class Dataset:
     def __init__(self, source: Source, name: str, type: DatasetType,
-                 fields: List[Field] = [], description=None):
+                 fields: List[Field] = None, description: Optional[str] = None,
+                 custom_facets: Dict[str, Type[BaseFacet]] = None):
+        if fields is None:
+            fields = []
+        if custom_facets is None:
+            custom_facets = {}
         self.source = source
         self.name = name
         self.type = type
         self.fields = fields
         self.description = description
+        self.custom_facets = custom_facets
 
     @staticmethod
     def from_table(source: Source, table_name: str,
@@ -124,24 +137,33 @@ class Dataset:
 
 
 class StepMetadata:
-    # TODO: Define a common way across extractors to build the
-    # job name for an operator
-    name = None
-    location = None
-    inputs = []
-    outputs = []
-    context = {}
 
-    def __init__(self, name, location=None, inputs=None, outputs=None,
-                 context=None):
+    def __init__(
+            self,
+            name,
+            location=None,
+            inputs: List[Dataset] = None,
+            outputs: List[Dataset] = None,
+            context=None,
+            run_facets: Dict[str, BaseFacet] = None
+    ):
+        # TODO: Define a common way across extractors to build the
+        # job name for an operator
         self.name = name
         self.location = location
-        if inputs:
-            self.inputs = inputs
-        if outputs:
-            self.outputs = outputs
-        if context:
-            self.context = context
+        self.inputs = inputs
+        self.outputs = outputs
+        self.context = context
+        self.run_facets = run_facets
+
+        if not inputs:
+            self.inputs = []
+        if not outputs:
+            self.outputs = []
+        if not context:
+            self.context = {}
+        if not run_facets:
+            self.run_facets = {}
 
     def __repr__(self):
         return "name: {}\t inputs: {} \t outputs: {}".format(
@@ -151,8 +173,8 @@ class StepMetadata:
 
 
 class BaseExtractor(ABC, LoggingMixin):
-    operator: BaseOperator = None
-    operator_class = None
+    operator_class: Type[BaseOperator] = None
+    operator: operator_class = None
 
     def __init__(self, operator):
         self.operator = operator
@@ -166,12 +188,14 @@ class BaseExtractor(ABC, LoggingMixin):
         assert (self.operator_class is not None and
                 self.operator.__class__ == self.operator_class)
 
-    # TODO: Only return a single StepMetadata object.
     @abstractmethod
-    def extract(self) -> [StepMetadata]:
+    def extract(self) -> Union[StepMetadata, List[StepMetadata]]:
+        # In future releases, we'll want to deprecate returning a list of StepMetadata
+        # and simply return a StepMetadata object. We currently return a list
+        # for backwards compatibility.
         pass
 
-    def extract_on_complete(self, task_instance) -> [StepMetadata]:
+    def extract_on_complete(self, task_instance) -> Union[StepMetadata, List[StepMetadata]]:
         # TODO: This method allows for the partial updating of task
         # metadata on completion. Marquez currently doesn't support
         # partial updates within the context of a DAG run, but this feature

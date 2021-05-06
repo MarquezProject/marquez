@@ -23,11 +23,9 @@ import static marquez.client.models.ModelGenerator.newNamespaceName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
-import marquez.client.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class JobMetaTest {
   private static final JobMeta META = newJobMeta();
   private static final String JSON = JsonGenerator.newJsonFor(META);

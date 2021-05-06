@@ -310,7 +310,7 @@ public class LineageEvent {
 
     @NotNull private String namespace;
     @NotNull private String name;
-    private DatasetFacet facets;
+    private DatasetFacets facets;
   }
 
   @Builder
@@ -321,7 +321,7 @@ public class LineageEvent {
   @ToString
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonPropertyOrder({"documentation", "schema", "dataSource", "description"})
-  public static class DatasetFacet {
+  public static class DatasetFacets {
 
     private DocumentationDatasetFacet documentation;
     private SchemaDatasetFacet schema;

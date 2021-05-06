@@ -59,7 +59,10 @@ spec:
             - name: POSTGRES_USER
               value: {{ .Values.marquez.db.user }}
             - name: POSTGRES_PASSWORD
-              value: {{ .Values.marquez.db.password }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "marquez.secretName" . }}
+                  key: marquez-db-password
             - name: MIGRATE_ON_STARTUP
               value: {{ .Values.marquez.migrateOnStartup | quote }}
           {{- if .Values.marquez.resources }}

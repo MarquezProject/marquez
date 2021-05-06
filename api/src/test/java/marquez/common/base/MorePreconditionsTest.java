@@ -18,11 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
-import marquez.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class MorePreconditionsTest {
   private static final String NULL_ERROR_MESSAGE = null;
   private static final String NON_NULL_ERROR_MESSAGE = "test error message";

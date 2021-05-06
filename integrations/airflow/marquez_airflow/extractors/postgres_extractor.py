@@ -9,7 +9,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from contextlib import closing
 from typing import Optional
 
@@ -22,8 +21,8 @@ from marquez_airflow.models import (
     DbColumn
 )
 from marquez_airflow.utils import get_connection_uri
-from marquez_airflow.extractors.sql.experimental import SqlMeta
-from marquez_airflow.extractors.sql.experimental.parser import SqlParser
+from marquez_airflow.extractors.sql import SqlMeta
+from marquez_airflow.extractors.sql import SqlParser
 from marquez_airflow.extractors import (
     BaseExtractor,
     StepMetadata,
@@ -42,13 +41,14 @@ _UDT_NAME = 4
 
 class PostgresExtractor(BaseExtractor):
     operator_class = PostgresOperator
+    default_schema = 'public'
 
     def __init__(self, operator):
         super().__init__(operator)
 
-    def extract(self) -> [StepMetadata]:
+    def extract(self) -> StepMetadata:
         # (1) Parse sql statement to obtain input / output tables.
-        sql_meta: SqlMeta = SqlParser.parse(self.operator.sql)
+        sql_meta: SqlMeta = SqlParser.parse(self.operator.sql, self.default_schema)
 
         # (2) Default all inputs / outputs to current connection.
         # NOTE: We'll want to look into adding support for the `database`
@@ -81,14 +81,14 @@ class PostgresExtractor(BaseExtractor):
             )
         ]
 
-        return [StepMetadata(
+        return StepMetadata(
             name=f"{self.operator.dag_id}.{self.operator.task_id}",
             inputs=inputs,
             outputs=outputs,
             context={
                 'sql': self.operator.sql
             }
-        )]
+        )
 
     def _get_table_schemas(
             self, table_names: [DbTableName]
@@ -107,9 +107,7 @@ class PostgresExtractor(BaseExtractor):
         )
         with closing(hook.get_conn()) as conn:
             with closing(conn.cursor()) as cursor:
-                table_names_as_list = ",".join(map(
-                    lambda name: f"'{name}'", table_names
-                ))
+                table_names_as_list = ",".join([f"'{name.name}'" for name in table_names])
                 cursor.execute(
                     f"""
                     SELECT table_schema,

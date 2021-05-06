@@ -38,5 +38,5 @@ public interface RunArgsDao {
           + "UPDATE SET "
           + "args = :args "
           + "RETURNING *")
-  RunArgsRow upsert(UUID uuid, Instant now, String args, String checksum);
+  RunArgsRow upsertRunArgs(UUID uuid, Instant now, String args, String checksum);
 }

@@ -21,8 +21,7 @@ buildscript {
     dependencies {
         classpath 'com.adarshr:gradle-test-logger-plugin:2.1.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
-        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.11.0'
-        classpath 'net.researchgate:gradle-release:2.8.1'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.12.1'
     }
 }
 
@@ -39,13 +38,6 @@ subprojects {
     apply plugin: 'com.adarshr.test-logger'
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: "com.diffplug.spotless"
-    apply plugin: 'net.researchgate.release'
-
-    compileTestJava.doFirst {
-        if (project.hasProperty("jdk8.build") && System.getenv("JDK8_HOME")) {
-            println "Switching build to JDK8 installation at ${System.getenv('JDK8_HOME')}"
-        }
-    }
 
     project(':api') {
         apply plugin: 'application'
@@ -63,9 +55,26 @@ subprojects {
     }
 
     ext {
+        assertjVersion = '3.19.0'
+        dropwizardVersion = '2.0.20'
+        junit5Version = '5.7.1'
         lombokVersion = '1.18.18'
+        mockitoVersion = '3.8.0'
         slf4jVersion = '1.7.30'
-        isReleaseVersion = !version.endsWith("SNAPSHOT")
+        postgresqlVersion = '42.2.19'
+        isReleaseVersion = !version.endsWith('SNAPSHOT')
+    }
+
+    dependencies {
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+        testCompile "org.assertj:assertj-core:${assertjVersion}"
+        testCompile "org.junit.jupiter:junit-jupiter:${junit5Version}"
+        testCompile "org.mockito:mockito-core:${mockitoVersion}"
+        testCompile "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+        testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     }
 
     compileJava {
@@ -76,6 +85,12 @@ subprojects {
             options.fork = true
             sourceCompatibility = JavaVersion.VERSION_1_8
             targetCompatibility = JavaVersion.VERSION_1_8
+        }
+    }
+
+    compileTestJava.doFirst {
+        if (project.hasProperty("jdk8.build") && System.getenv("JDK8_HOME")) {
+            println "Switching build to JDK8 installation at ${System.getenv('JDK8_HOME')}"
         }
     }
 
@@ -106,12 +121,6 @@ subprojects {
         from javadoc.destinationDir
     }
 
-    release {
-        git {
-            requireBranch = 'main'
-        }
-    }
-
     spotless {
         def disallowWildcardImports = {
             String text = it
@@ -129,7 +138,6 @@ subprojects {
     }
 
     def reportsDir = "${buildDir}/reports";
-
     def coverageDir = "${reportsDir}/coverage";
 
     jacoco {

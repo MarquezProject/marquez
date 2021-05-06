@@ -11,116 +11,163 @@
 # limitations under the License.
 
 import logging
-import re
-from enum import Enum
+from typing import List, Tuple, Optional
 
 import sqlparse
-from sqlparse.sql import TokenList
-from sqlparse.tokens import Literal, Name, Punctuation
+from sqlparse.sql import T, TokenList, Parenthesis, Identifier, IdentifierList
+from sqlparse.tokens import Punctuation
+
+from marquez_airflow.models import DbTableName
 
 log = logging.getLogger(__name__)
 
 
-TABLE_REGEX = re.compile(
-    r'(((LEFT\s+|RIGHT\s+|FULL\s+)?(INNER\s+|OUTER\s+|STRAIGHT\s+)?'
-    r'|(CROSS\s+|NATURAL\s+)?)?JOIN$)|(FROM$)',
-    re.IGNORECASE | re.UNICODE)
+def _is_in_table(token):
+    return _match_on(token, [
+        'FROM',
+        'INNER JOIN',
+        'JOIN',
+        'FULL JOIN',
+        'FULL OUTER JOIN',
+        'LEFT JOIN',
+        'LEFT OUTER JOIN',
+        'RIGHT JOIN',
+        'RIGHT OUTER JOIN'
+    ])
 
 
-class State(Enum):
-    SEARCHING = 1
-    FINDING_TABLE = 2
-    BUILDING_TABLE = 3
-    FINDING_ALIAS = 4
-    BUILDING_ALIAS = 5
-    CHECKING_ALIAS = 6
+def _is_out_table(token):
+    return _match_on(token, ['INTO'])
+
+
+def _match_on(token, keywords):
+    return token.match(T.Keyword, values=keywords)
+
+
+def _get_tables(
+        tokens,
+        idx,
+        default_schema: Optional[str] = None
+) -> Tuple[int, List[DbTableName]]:
+    # Extract table identified by preceding SQL keyword at '_is_in_table'
+    def parse_ident(ident: Identifier) -> str:
+        # Extract table name from possible schema.table naming
+        token_list = ident.flatten()
+        table_name = next(token_list).value
+        try:
+            # Determine if the table contains the schema
+            # separated by a dot (format: 'schema.table')
+            dot = next(token_list)
+            if dot.match(Punctuation, '.'):
+                table_name += dot.value
+                table_name += next(token_list).value
+            elif default_schema:
+                table_name = f'{default_schema}.{table_name}'
+        except StopIteration:
+            if default_schema:
+                table_name = f'{default_schema}.{table_name}'
+        return table_name
+
+    idx, token = tokens.token_next(idx=idx)
+    tables = []
+    if isinstance(token, IdentifierList):
+        # Handle "comma separated joins" as opposed to explicit JOIN keyword
+        gidx = 0
+        tables.append(parse_ident(token.token_first(skip_ws=True, skip_cm=True)))
+        gidx, punc = token.token_next(gidx, skip_ws=True, skip_cm=True)
+        while punc and punc.value == ',':
+            gidx, name = token.token_next(gidx, skip_ws=True, skip_cm=True)
+            tables.append(parse_ident(name))
+            gidx, punc = token.token_next(gidx)
+    else:
+        tables.append(parse_ident(token))
+
+    return idx, [DbTableName(table) for table in tables]
+
+
+class SqlMeta:
+    # TODO: Only a single output table may exist, we'll want to rename
+    # SqlMeta.out_tables -> SqlMeta.out_table
+    def __init__(self, in_tables: List[DbTableName], out_tables: List[DbTableName]):
+        self.in_tables = in_tables
+        self.out_tables = out_tables
 
 
 class SqlParser:
+    """
+    This class parses a SQL statement.
+    """
 
-    @staticmethod
-    def is_table_keyword(t):
-        return t.is_keyword and TABLE_REGEX.match(t.normalized)
+    def __init__(self, default_schema: Optional[str] = None):
+        # In some cases like bigquery we can always get schema/dataset ID from client
+        self.default_schema = default_schema
+        self.ctes = set()
+        self.intables = set()
+        self.outtables = set()
 
-    @staticmethod
-    def get_tables(statement):
+    @classmethod
+    def parse(cls, sql: str, default_schema: Optional[str] = None) -> SqlMeta:
+        if sql is None:
+            raise ValueError("A sql statement must be provided.")
 
-        aliases = []
-        tables = []
+        # Tokenize the SQL statement
+        statements = sqlparse.parse(sql)
 
-        parsed = sqlparse.parse(statement)
-        if not parsed or len(parsed) == 0:
-            return set()
+        # We assume only one statement in SQL
+        tokens = TokenList(statements[0].tokens)
+        log.debug(f"Successfully tokenized sql statement: {tokens}")
+        parser = cls(default_schema)
+        return parser.recurse(tokens)
 
-        # flatten the identifiers
-        tokens = [t for t in TokenList(parsed[0].tokens).flatten()]
+    def recurse(self, tokens: TokenList) -> SqlMeta:
+        in_tables, out_tables = set(), set()
+        idx, token = tokens.token_next_by(t=T.Keyword)
+        while token:
 
-        curr_name = ''
-        alias_candidate = ''
-        last_non_whitespace = None
+            # Main parser switch
+            if self.is_cte(token):
+                cte_name, cte_intables = self.parse_cte(idx, tokens)
+                for intable in cte_intables:
+                    if intable not in self.ctes:
+                        in_tables.add(intable)
+            elif _is_in_table(token):
+                idx, extracted_tables = _get_tables(tokens, idx, self.default_schema)
+                for table in extracted_tables:
+                    if table.name not in self.ctes:
+                        in_tables.add(table)
+            elif _is_out_table(token):
+                idx, extracted_tables = _get_tables(tokens, idx, self.default_schema)
+                out_tables.add(extracted_tables[0])  # assuming only one out_table
 
-        _state = State.SEARCHING
-        for t in tokens:
+            idx, token = tokens.token_next_by(t=T.Keyword, idx=idx)
 
-            if _state == State.SEARCHING:
-                if SqlParser.is_table_keyword(t):
-                    _state = State.FINDING_TABLE
-                if (t.is_keyword and t.normalized == 'AS'
-                        and last_non_whitespace.ttype is Name):
-                    alias_candidate = last_non_whitespace
-                    _state = State.CHECKING_ALIAS
+        return SqlMeta(list(in_tables), list(out_tables))
 
-            elif _state == State.FINDING_TABLE:
-                if t.ttype is Name or t.ttype is Literal.String.Symbol:
-                    curr_name += t.value
-                    _state = State.BUILDING_TABLE
-                elif t.ttype is Punctuation or t.is_keyword:
-                    _state = State.SEARCHING
+    def is_cte(self, token: T):
+        return token.match(T.Keyword.CTE, values=['WITH'])
 
-            elif _state == State.BUILDING_TABLE:
-                if t.ttype is Name or t.ttype is Literal.String.Symbol or (
-                        t.value == '.'):
-                    curr_name += t.value
-                else:
-                    if curr_name not in tables:
-                        tables.append(curr_name)
-                    curr_name = ''
-                    if t.is_whitespace:
-                        _state = State.FINDING_ALIAS
-                    else:
-                        _state = State.SEARCHING
+    def parse_cte(self, idx, tokens: TokenList):
+        gidx, group = tokens.token_next(idx, skip_ws=True, skip_cm=True)
 
-            elif _state == State.FINDING_ALIAS:
-                if t.ttype is Name:
-                    curr_name += t.value
-                    _state = State.BUILDING_ALIAS
-                elif SqlParser.is_table_keyword(t):
-                    _state = State.FINDING_TABLE
-                elif t.ttype is Punctuation or t.is_keyword:
-                    _state = State.SEARCHING
+        # handle recursive keyword
+        if group.match(T.Keyword, values=['RECURSIVE']):
+            gidx, group = tokens.token_next(gidx, skip_ws=True, skip_cm=True)
 
-            elif _state == State.BUILDING_ALIAS:
-                if t.ttype is Name or t.value == '.':
-                    curr_name += t.value
-                else:
-                    aliases.append(curr_name)
-                    curr_name = ''
-                    if SqlParser.is_table_keyword(t):
-                        _state = State.FINDING_TABLE
-                    else:
-                        _state = State.SEARCHING
+        if not group.is_group:
+            return [], None
 
-            elif _state == State.CHECKING_ALIAS:
-                if SqlParser.is_table_keyword(t):
-                    _state = State.FINDING_TABLE
-                elif not t.is_whitespace:
-                    if t.value == '(':
-                        aliases.append(alias_candidate.value)
-                    _state = State.SEARCHING
+        # get CTE name
+        offset = 1
+        cte_name = group.token_first(skip_ws=True, skip_cm=True)
+        self.ctes.add(cte_name.value)
 
-            if not t.is_whitespace:
-                last_non_whitespace = t
+        # AS keyword
+        offset, as_keyword = group.token_next(offset, skip_ws=True, skip_cm=True)
+        if not as_keyword.match(T.Keyword, values=['AS']):
+            raise RuntimeError(f"CTE does not have AS keyword at index {gidx}")
 
-        # Naive way to get rid of aliases
-        tables = [t for t in tables if t.split('.')[0] not in aliases]
-        return tables
+        offset, parens = group.token_next(offset, skip_ws=True, skip_cm=True)
+        if isinstance(parens, Parenthesis) or parens.is_group:
+            # Parse CTE using recursion.
+            return cte_name.value, self.recurse(TokenList(parens.tokens)).in_tables
+        raise RuntimeError(f"Parens {parens} are not Parenthesis at index {gidx}")

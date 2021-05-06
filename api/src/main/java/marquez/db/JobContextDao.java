@@ -24,8 +24,8 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @RegisterRowMapper(JobContextRowMapper.class)
 public interface JobContextDao {
-  @SqlQuery("SELECT * FROM job_contexts WHERE uuid = :rowUuid")
-  Optional<JobContextRow> findBy(UUID rowUuid);
+  @SqlQuery("SELECT * FROM job_contexts WHERE uuid = :uuid")
+  Optional<JobContextRow> findContextByUuid(UUID uuid);
 
   @SqlQuery(
       "INSERT INTO job_contexts "

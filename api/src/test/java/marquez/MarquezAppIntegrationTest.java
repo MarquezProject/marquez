@@ -2,9 +2,9 @@ package marquez;
 
 import static java.time.Instant.EPOCH;
 import static marquez.Generator.newTimestamp;
-import static marquez.common.models.ModelGenerator.newDescription;
-import static marquez.common.models.ModelGenerator.newJobName;
-import static marquez.common.models.ModelGenerator.newSchemaLocation;
+import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newSchemaLocation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -34,10 +34,9 @@ import marquez.client.models.SourceMeta;
 import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-@Category(IntegrationTests.class)
+@org.junit.jupiter.api.Tag("IntegrationTests")
 public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
   @Test

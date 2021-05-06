@@ -86,7 +86,7 @@ public class JobResource extends BaseResource {
   @GET
   @Path("/namespaces/{namespace}/jobs/{job}")
   @Produces(APPLICATION_JSON)
-  public Response get(
+  public Response getJob(
       @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") JobName jobName) {
     throwIfNotExists(namespaceName);
 

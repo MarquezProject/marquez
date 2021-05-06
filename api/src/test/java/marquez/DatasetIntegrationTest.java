@@ -15,14 +15,14 @@ import marquez.client.models.JobMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.StreamVersion;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Category(IntegrationTests.class)
+@org.junit.jupiter.api.Tag("IntegrationTests")
 public class DatasetIntegrationTest extends BaseIntegrationTest {
 
-  @Before
+  @BeforeEach
   public void setup() {
     createNamespace(NAMESPACE_NAME);
     createSource(DB_TABLE_SOURCE_NAME);
@@ -166,22 +166,27 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     assertThat(createdRun.getNominalEndTime()).isEqualTo(run.getNominalEndTime());
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsDatasetName() {
-    client.getDataset(NAMESPACE_NAME, "not-existing");
+    Assertions.assertThrows(
+        Exception.class, () -> client.getDataset(NAMESPACE_NAME, "not-existing"));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsDatasetVersionName() {
-    client.getDatasetVersion(NAMESPACE_NAME, "not-existing", UUID.randomUUID().toString());
+    Assertions.assertThrows(
+        Exception.class,
+        () ->
+            client.getDatasetVersion(NAMESPACE_NAME, "not-existing", UUID.randomUUID().toString()));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsNamespace() {
-    client.getDataset("non-existing", "not-existing");
+    Assertions.assertThrows(
+        Exception.class, () -> client.getDataset("non-existing", "not-existing"));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsRun() {
     DbTableMeta RUN_NOT_EXISTS =
         DbTableMeta.builder()
@@ -192,10 +197,11 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .runId(UUID.randomUUID().toString())
             .build();
-    client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS);
+    Assertions.assertThrows(
+        Exception.class, () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
   }
 
-  @Test(expected = Exception.class)
+  @Test
   public void testApp_notExistsSource() {
     DbTableMeta RUN_NOT_EXISTS =
         DbTableMeta.builder()
@@ -206,7 +212,8 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .description(DB_TABLE_DESCRIPTION)
             .runId(UUID.randomUUID().toString())
             .build();
-    client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS);
+    Assertions.assertThrows(
+        Exception.class, () -> client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, RUN_NOT_EXISTS));
   }
 
   @Test

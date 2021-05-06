@@ -31,6 +31,7 @@ services:
       - MARQUEZ_NAMESPACE=food_delivery
       - MARQUEZ_LOG_LEVEL=DEBUG
     volumes:
+      - ./airflow/logs:/opt/airflow/logs
       - ./airflow/dags:/opt/bitnami/airflow/dags
       - ./airflow/config/log_config.py:/opt/bitnami/airflow/config/log_config.py
       - ./requirements.txt:/bitnami/python/requirements.txt
@@ -58,6 +59,7 @@ services:
       - MARQUEZ_URL=http://marquez:5000
       - MARQUEZ_NAMESPACE=food_delivery
     volumes:
+      - ./airflow/logs:/opt/airflow/logs
       - ./airflow/dags:/opt/bitnami/airflow/dags
       - ./airflow/config/log_config.py:/opt/bitnami/airflow/config/log_config.py
       - ./requirements.txt:/bitnami/python/requirements.txt
@@ -79,8 +81,10 @@ services:
       - AIRFLOW__CORE__LOGGING_CONFIG_CLASS=log_config.LOGGING_CONFIG
       - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=false
       - MARQUEZ_NAMESPACE=food_delivery
+      - MARQUEZ_URL=http://marquez:5000
       - MARQUEZ_LOG_LEVEL=DEBUG
     volumes:
+      - ./airflow/logs:/opt/airflow/logs
       - ./airflow/dags:/opt/bitnami/airflow/dags
       - ./airflow/config/log_config.py:/opt/bitnami/airflow/config/log_config.py
       - ./requirements.txt:/bitnami/python/requirements.txt
@@ -99,7 +103,7 @@ services:
     # command: ["postgres", "-c", "log_statement=all"]
 
   postgres:
-    image: bitnami/postgresql:9.6.18
+    image: bitnami/postgresql:12.1.0
     ports:
       - "5432:5432"
     environment:

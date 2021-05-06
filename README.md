@@ -74,21 +74,21 @@ Marquez uses a _multi_-project structure and contains the following modules:
 
 ## Building
 
-You can build most of the project modules using Java 11. We recommend setting `JAVA_HOME` to your local JDK 11 installation and invoking `./gradlew :<module>:shadowJar` with the specific module you'd like to build. For example, to build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
+You can build most of the project modules using Java 11. We recommend setting `JAVA_HOME` to your local JDK 11 installation and invoking `./gradlew :<module>:build` with the specific module you'd like to build. For example, to build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
 
 ```
-$ ./gradlew :api:shadowJar
+$ ./gradlew :api:build
 ```
 
 The executable can be found under `api/build/libs/`
-
-**The** [`spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) **integration requires Java 8 to build. The module can be built separately by setting** `JAVA_HOME` **to your local JDK 8 installation and invoking** `./gradlew :integrations:spark:shadowJar`.
 
 To build the entire project, set `JAVA_HOME` to your local JDK 11 installation and `JDK8_HOME` to your local JDK 8 installation. Then, build all modules with:
 
 ```
 $ ./gradlew build
 ```
+
+**The** [`spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) **integration requires Java 8 to build. The module can be built separately by setting** `JAVA_HOME` **to your local JDK 8 installation and invoking** `./gradlew :integrations:spark:build`.
 
 ## Configuration
 

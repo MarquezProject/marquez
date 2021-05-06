@@ -5,10 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-@Category(IntegrationTests.class)
+@org.junit.jupiter.api.Tag("IntegrationTests")
 public class NamespaceIntegrationTest extends BaseIntegrationTest {
 
   @Test

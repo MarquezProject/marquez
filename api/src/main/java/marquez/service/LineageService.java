@@ -109,6 +109,8 @@ public class LineageService extends DelegatingLineageDao {
         log.error("Could not find job node for {}", jobData);
         continue;
       }
+      data.setInputs(buildDatasetId(jobToDsInput.get(jobUuid)));
+      data.setOutputs(buildDatasetId(jobToDsOutput.get(jobUuid)));
 
       NodeId origin = NodeId.of(new JobId(data.getNamespace(), data.getName()));
       Node node =
@@ -137,6 +139,15 @@ public class LineageService extends DelegatingLineageDao {
     }
 
     return new Lineage(Lineage.withSortedNodes(Graph.directed().nodes(nodes).build()));
+  }
+
+  private ImmutableSet<DatasetId> buildDatasetId(Set<DatasetData> datasetData) {
+    if (datasetData == null) {
+      return ImmutableSet.of();
+    }
+    return datasetData.stream()
+        .map(ds -> new DatasetId(ds.getNamespace(), ds.getName()))
+        .collect(ImmutableSet.toImmutableSet());
   }
 
   private ImmutableSet<Edge> buildJobEdge(
