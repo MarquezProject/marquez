@@ -50,6 +50,7 @@ jobs:
             - v1-web-{{ .Branch }}
       - run: npm install
       - run: npm run test
+      - run: npm run dev
       - save_cache:
           paths:
             - node_modules
