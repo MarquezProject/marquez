@@ -195,7 +195,7 @@ jobs:
       - attach_workspace:
           at: .
       - run: pip install wheel twine
-      - run: ls
+      - run: ls dist
       #- run: python -m twine upload --non-interactive --repository pypi /tmp/workspace/python/*
 
 workflows:
