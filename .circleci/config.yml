@@ -176,7 +176,11 @@ jobs:
     steps:
       - checkout
       - run: ./.circleci/get-jdk11.sh
-      - run: ./gradlew publish
+      - run: |
+          # Get, then decode the GPG private key used to sign *.jar
+          export ORG_GRADLE_PROJECT_signingKey=$(echo $GPG_SIGNING_KEY | base64 -d)
+          # Publish *.jar
+          ./gradlew publish
 
 
   release-docker:
