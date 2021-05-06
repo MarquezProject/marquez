@@ -1,6 +1,13 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.14.1...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.14.2...HEAD)
+
+## [0.14.2](https://github.com/MarquezProject/marquez/compare/0.14.1...0.14.2)
+
+### Changed
+
+* Unpin `requests` dep in `marquez-airflow` integration [@wslulciuc](https://github.com/wslulciuc)
+* Unpin `attrs` dep in `marquez-airflow` integration [@wslulciuc](https://github.com/wslulciuc)
 
 ## [0.14.1](https://github.com/MarquezProject/marquez/compare/0.14.0...0.14.1) - 2021-04-05
 
