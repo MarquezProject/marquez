@@ -100,11 +100,12 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - *checkout_project_root
-      - run: python setup.py bdist_wheel
+      - run: python setup.py sdist bdist_wheel
       - persist_to_workspace:
-          root: python/dist/
+          root: .
           paths:
-            - ./*
+            - ./dist/*.whl
+            - ./dist/*.tar.gz
 
   build-integration-spark:
     working_directory: ~/marquez/integrations/spark
@@ -150,11 +151,12 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - *checkout_project_root
-      - run: python setup.py bdist_wheel
+      - run: python setup.py sdist bdist_wheel
       - persist_to_workspace:
-          root: python/dist/
+          root: .
           paths:
-            - ./*
+            - ./dist/*.whl
+            - ./dist/*.tar.gz
 
   integration-test-airflow:
     working_directory: ~/marquez/integrations/airflow
@@ -191,9 +193,9 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: /tmp/workspace
+          at: .
       - run: pip install wheel twine
-      - run: python -m twine upload --non-interactive --repository pypi /tmp/workspace/python/*
+      - run: python -m twine upload --non-interactive --verbose --repository pypi dist/*
 
 workflows:
   marquez:
@@ -203,12 +205,14 @@ workflows:
       - build-client-java
       - build-integration-spark
       - test-client-python
-      - build-client-python:
-          <<: *only-on-release
       - test-integration-airflow
       - integration-test-airflow:
           requires:
             - test-integration-airflow
+  release:
+    jobs:
+      - build-client-python:
+          <<: *only-on-release
       - build-integration-airflow:
           <<: *only-on-release
       - release-java:
