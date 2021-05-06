@@ -193,9 +193,10 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: /tmp/workspace
+          at: .
       - run: pip install wheel twine
-      - run: python -m twine upload --non-interactive --repository pypi /tmp/workspace/python/*
+      - run: ls
+      #- run: python -m twine upload --non-interactive --repository pypi /tmp/workspace/python/*
 
 workflows:
   marquez:
@@ -211,6 +212,11 @@ workflows:
             - test-integration-airflow
       - build-client-python
       - build-integration-airflow
+      - release-python:
+          context: release
+          requires:
+            - build-client-python
+            - build-integration-airflow
   release:
     jobs:
       - build-client-python:
