@@ -203,12 +203,14 @@ workflows:
       - build-client-java
       - build-integration-spark
       - test-client-python
-      - build-client-python:
-          <<: *only-on-release
       - test-integration-airflow
       - integration-test-airflow:
           requires:
             - test-integration-airflow
+  release:
+    jobs:
+      - build-client-python:
+          <<: *only-on-release
       - build-integration-airflow:
           <<: *only-on-release
       - release-java:
