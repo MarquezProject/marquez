@@ -30,6 +30,7 @@ public class InputDatasetVisitors
     list.add(
         new LogicalRelationVisitor(sqlContext.sparkContext(), marquezContext.getJobNamespace()));
     list.add(new DatasetSourceVisitor());
+    list.add(new LogicalRDDVisitor());
     list.add(new CommandPlanVisitor(new ArrayList<>(list)));
     return list;
   }
