@@ -50,6 +50,7 @@ import marquez.client.models.RunState;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Tag;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 @Slf4j
 public class MarquezClient {
@@ -292,6 +293,7 @@ public class MarquezClient {
   public static final class Builder {
     @VisibleForTesting URL baseUrl;
     @VisibleForTesting @Nullable String apiKey;
+    @VisibleForTesting CloseableHttpClient httpClient;
 
     private Builder() {
       this.baseUrl = DEFAULT_BASE_URL;
@@ -311,14 +313,28 @@ public class MarquezClient {
       return this;
     }
 
+    public Builder httpClient(@NonNull CloseableHttpClient httpClient) {
+      this.httpClient = httpClient;
+      return this;
+    }
+
     public MarquezClient build() {
-      return new MarquezClient(
-          MarquezUrl.create(baseUrl), MarquezHttp.create(MarquezClient.Version.get(), apiKey));
+      MarquezHttp marquezHttp;
+      if (httpClient != null) {
+        marquezHttp = MarquezHttp.create(httpClient, apiKey);
+      } else {
+        marquezHttp = MarquezHttp.create(MarquezClient.Version.get(), apiKey);
+      }
+      return new MarquezClient(MarquezUrl.create(baseUrl), marquezHttp);
     }
   }
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  public static String agentVersion() {
+    return MarquezHttp.UserAgent.of(Version.get()).getValue();
   }
 
   @Value

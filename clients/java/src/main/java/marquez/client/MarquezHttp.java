@@ -44,7 +44,7 @@ import org.apache.http.util.EntityUtils;
 
 @Slf4j
 class MarquezHttp implements Closeable {
-  private final HttpClient http;
+  @VisibleForTesting final HttpClient http;
   @VisibleForTesting @Nullable final String apiKey;
 
   MarquezHttp(@NonNull final HttpClient http, @Nullable final String apiKey) {
@@ -62,6 +62,11 @@ class MarquezHttp implements Closeable {
     final CloseableHttpClient http =
         HttpClientBuilder.create().setUserAgent(userAgent.getValue()).build();
     return new MarquezHttp(http, apiKey);
+  }
+
+  static MarquezHttp create(
+      @NonNull final CloseableHttpClient httpClient, @Nullable final String apiKey) {
+    return new MarquezHttp(httpClient, apiKey);
   }
 
   String post(URL url) {

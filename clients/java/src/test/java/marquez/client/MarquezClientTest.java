@@ -41,6 +41,7 @@ import static marquez.client.models.ModelGenerator.newTimestamp;
 import static marquez.client.models.ModelGenerator.newVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,11 +50,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import marquez.client.MarquezClient.DatasetVersions;
 import marquez.client.MarquezClient.Datasets;
 import marquez.client.MarquezClient.Jobs;
@@ -84,6 +90,8 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.StreamVersion;
 import marquez.client.models.Tag;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -372,6 +380,35 @@ public class MarquezClientTest {
     final String badUrlString = "test.com/api/v1";
     assertThatExceptionOfType(AssertionError.class)
         .isThrownBy(() -> MarquezClient.builder().baseUrl(badUrlString).build());
+  }
+
+  @Test
+  public void testClientBuilder_httpClient()
+      throws NoSuchAlgorithmException, KeyManagementException {
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    sslContext.init(new KeyManager[0], new TrustManager[0], null);
+    final CloseableHttpClient httpClient =
+        HttpClientBuilder.create()
+            .setSSLContext(sslContext)
+            .setUserAgent(MarquezClient.agentVersion())
+            .build();
+
+    final MarquezClient client = MarquezClient.builder().httpClient(httpClient).build();
+    assertThat(client.http.http).isEqualTo(httpClient);
+    assertThat(client.http.http).isInstanceOf(CloseableHttpClient.class);
+  }
+
+  @Test
+  public void testClientBuilder_nullHttpClient() {
+    assertThatNullPointerException()
+        .isThrownBy(() -> MarquezClient.builder().httpClient(null).build());
+  }
+
+  @Test
+  public void testClientBuilder_defaultHttpClient() {
+    final MarquezClient client = MarquezClient.builder().build();
+    assertThat(client.http.http).isNotNull();
+    assertThat(client.http.http).isInstanceOf(CloseableHttpClient.class);
   }
 
   @Test
