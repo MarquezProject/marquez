@@ -1,4 +1,4 @@
-package marquez.sentry;
+package marquez.tracing;
 
 import io.sentry.Sentry;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package marquez.sentry;
+package marquez.tracing;
 
 import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
 import io.sentry.ISpan;

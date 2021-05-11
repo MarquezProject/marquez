@@ -1,6 +1,6 @@
 package marquez.service;
 
-import static marquez.sentry.SentryPropagating.withSentry;
+import static marquez.tracing.SentryPropagating.withSentry;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;

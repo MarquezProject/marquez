@@ -1,6 +1,6 @@
 package marquez.service;
 
-import static marquez.sentry.SentryPropagating.withSentry;
+import static marquez.tracing.SentryPropagating.withSentry;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

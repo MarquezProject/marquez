@@ -1,4 +1,4 @@
-package marquez.sentry;
+package marquez.tracing;
 
 import io.sentry.ITransaction;
 import io.sentry.Sentry;
