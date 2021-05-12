@@ -1,5 +1,7 @@
 package marquez.service;
 
+import static marquez.tracing.SentryPropagating.withSentry;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import java.util.HashMap;
@@ -54,11 +56,12 @@ public class LineageService extends DelegatingLineageDao {
     } while (i++ < depth && !cur.isEmpty()); // working set is empty or depth is reached
     seen.add(job); // include the base job
 
-    CompletableFuture<List<JobData>> jobFuture = CompletableFuture.supplyAsync(() -> getJob(seen));
+    CompletableFuture<List<JobData>> jobFuture =
+        CompletableFuture.supplyAsync(withSentry(() -> getJob(seen)));
     CompletableFuture<List<DatasetData>> inFuture =
-        CompletableFuture.supplyAsync(() -> getInputDatasetsFromJobIds(seen));
+        CompletableFuture.supplyAsync(withSentry(() -> getInputDatasetsFromJobIds(seen)));
     CompletableFuture<List<DatasetData>> outFuture =
-        CompletableFuture.supplyAsync(() -> getOutputDatasetsFromJobIds(seen));
+        CompletableFuture.supplyAsync(withSentry(() -> getOutputDatasetsFromJobIds(seen)));
     CompletableFuture.allOf(jobFuture, inFuture, outFuture).get();
 
     List<Run> runs = getCurrentRuns(seen);

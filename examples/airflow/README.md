@@ -17,34 +17,46 @@ Before you begin, make sure you have installed:
 
 > **Note:** We recommend that you have allocated at least **2 CPUs** and **8 GB** of memory to Docker.
 
-## Step 1: Enable Marquez in Airflow
+## Step 1: Prepare the Environment
 
-* To download and install the latest [`marquez-airflow`](https://pypi.org/project/marquez-airflow) when starting Airflow, you'll need to create a `requirements.txt` file with the following content:
+First, if you haven't already, clone the Marquez repository and enter the `examples/airflow` directory.
 
-  ```
-  marquez-airflow
-  ```
+```bash
+$ git clone https://github.com/MarquezProject/marquez.git
+$ cd examples/airflow
+```
 
-* Next, we'll need to specify where to send DAG metadata. To do so, create a config file named `marquez.env` with the following environment variables:
+To make sure the latest [`marquez-airflow`](https://pypi.org/project/marquez-airflow) is downloaded when starting Airflow, you'll need to create a `requirements.txt` file with the following content:
 
-  ```bash
-  MARQUEZ_BACKEND=http             # Collect metadata using HTTP backend
-  MARQUEZ_URL=http://marquez:5000  # The URL of the HTTP backend
-  MARQUEZ_NAMESPACE=example        # The namespace associated with the collected metadata
-  ```
-  > **Note:** The `marquez.env` config file will be used by the `airflow`, `airflow_scheduler`, and `airflow_worker` containers to send lineage metadata to Marquez.
-  
-* Your `examples/airflow/` directory should now contain the following:
+```
+marquez-airflow
+```
+
+Next, we'll need to specify where we want Airflow to send DAG metadata. To do so, create a config file named `marquez.env` with the following environment variables and values:
+
+```bash
+MARQUEZ_BACKEND=http             # Collect metadata using HTTP backend
+MARQUEZ_URL=http://marquez:5000  # The URL of the HTTP backend
+MARQUEZ_NAMESPACE=example        # The namespace associated with the collected metadata
+```
+> **Note:** The `marquez.env` config file will be used by the `airflow`, `airflow_scheduler`, and `airflow_worker` containers to send lineage metadata to Marquez.
+
+Your `examples/airflow/` directory should now contain the following:
 
   ```
   .
-  ├── docker/
-  ├── docs/
+  ├── README.md
+  ├── docker
+  ├── docker-compose.yml
+  ├── docs
   ├── marquez.env
   └── requirements.txt
+
   ```
 
 ## Step 2: Write Airflow DAGs using Marquez
+
+In this step, we will create two new Airflow DAGs that perform simple tasks. The `counter` DAG will generate a random number every minute, while the `sum` DAG calculates a sum every five minutes. This will result in a simple pipeline containing two jobs and two datasets.
 
 First, let's create the `dags/` folder where our example DAGs will be located:
 
@@ -52,7 +64,7 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-When writing our DAGs, we'll use [`marquez-airflow`](https://pypi.org/project/marquez-airflow) enabling Marquez to observe the DAG and automatically collect task-level metadata. Below, in steps `2.1` and `2.2`, we create the DAGs `counter` and `sum` and add them to `dags/`. You'll notice that to begin collecting DAG metadata, we only make the following change:
+When writing our DAGs, we'll use [`marquez-airflow`](https://pypi.org/project/marquez-airflow), enabling Marquez to observe the DAG and automatically collect task-level metadata.  Notice that the only change required to begin collecting DAG metadata is to use `marquez-airflow` instead of `airflow`:
 
 ```diff
 - from airflow import DAG
@@ -61,7 +73,7 @@ When writing our DAGs, we'll use [`marquez-airflow`](https://pypi.org/project/ma
 
 ## Step 2.1: Create DAG `counter`
 
-Under `dags/`, create a file named `counter.py` and copy in the following code:
+Under `dags/`, create a file named `counter.py` and add the following code:
 
 ```python
 import random
@@ -117,7 +129,7 @@ t1 >> t2
 
 ## Step 2.2: Create DAG `sum`
 
-Under `dags/`, create a file named `sum.py` and copy in the following code:
+Under `dags/`, create a file named `sum.py` and add the following code:
 
 ```python
 from marquez_airflow import DAG
@@ -170,10 +182,12 @@ At this point, you should have the following under your `examples/airflow/` dire
 
 ```
 .
+├── README.md
 ├── dags
 │   ├── counter.py
 │   └── sum.py
 ├── docker/
+├── docker-compose.yml
 ├── docs/
 ├── marquez.env
 └── requirements.txt
@@ -181,7 +195,7 @@ At this point, you should have the following under your `examples/airflow/` dire
 
 ## Step 3: Start Airflow with Marquez
 
-Now that we have our DAGs defined using Marquez, let’s run the example! To start Airflow, run:
+Now that we have our DAGs defined and Marquez is enabled in Airflow, we can run the example! To start Airflow, run:
 
 ```bash
 $ docker-compose up
@@ -191,13 +205,18 @@ $ docker-compose up
 
 **The above command will:**
 
-* Start Airflow and install `marquez-airflow` used to collect DAG metadata
+* Start Airflow and install `marquez-airflow`
 * Start Marquez
 * Start Postgres
 
 To view the Airflow UI and verify it's running, open http://localhost:8080. Then, login using the username and password: `airflow` / `airflow`. You can also browse to http://localhost:3000 to view the Marquez UI.
 
+
 ## Step 4: View Collected Metadata
+
+To ensure that Airflow is executing `counter` and `sum`, navigate to the DAGs tab in Airflow and verify that they are both enabled and have a timestamp in the Last Run column.
+
+![](./docs/airflow-view-dag.png)
 
 To view DAG metadata collected by Marquez from Airflow, browse to the Marquez UI by visiting http://localhost:3000. Then, use the _search_ bar in the upper right-side of the page and search for the `counter.inc` job. To view lineage metadata for `counter.inc`, click on the job from the drop-down list:
 
