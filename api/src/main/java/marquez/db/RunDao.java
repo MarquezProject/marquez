@@ -80,18 +80,15 @@ public interface RunDao extends BaseDao {
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
   String BASE_RUN_SELECT =
-      "SELECT r.*, ra.args, ra.args, ctx.context, "
-          + "(SELECT JSON_AGG(facets_by_event.facets) "
-          + "   FROM ("
-          + "      SELECT event->'run'->'facets' AS facets "
-          + "        FROM lineage_events AS le "
-          + "       WHERE le.run_id = r.uuid::text "
-          + "       ORDER BY event_time ASC"
-          + "   ) AS facets_by_event "
-          + ") AS facets "
+      "SELECT r.*, ra.args, ra.args, ctx.context, f.facets\n"
           + "FROM runs AS r "
-          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid "
-          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid ";
+          + "LEFT OUTER JOIN "
+          + "(SELECT le.run_id, JSON_AGG(event->'run'->'facets') AS facets\n"
+          + "   FROM lineage_events le\n"
+          + "   GROUP BY le.run_id\n"
+          + ") AS f ON r.uuid::text=f.run_id\n"
+          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
+          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid \n";
 
   @SqlQuery(BASE_RUN_SELECT + " WHERE r.uuid = :runUuid")
   Optional<Run> findRunByUuid(UUID runUuid);
