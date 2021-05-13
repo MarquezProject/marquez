@@ -55,7 +55,7 @@ export const capitalize = (word: string) => {
   return `${word[0].toUpperCase()}${word.slice(1)}`
 }
 
-const customTimeFormat = timeFormat('%b %d, %Y %I:%m%p')
+const customTimeFormat = timeFormat('%b %d, %Y %I:%M%p')
 
 export const formatUpdatedAt = (updatedAt: string) => {
   const parsedDate = isoParse(updatedAt)
