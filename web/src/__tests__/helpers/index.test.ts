@@ -9,7 +9,8 @@ describe('formatUpdated Function', () => {
     expect(formatedDate).toBe('')
   })
   it('Should return a datetime string in format like "May 1, 2021 01:45pm"', () => {
-    const updatedAt = '2021-05-13T13:45:13.456+07:00'
+    // const updatedAt = '2021-05-13T13:45:13.456+07:00'
+    const updatedAt = '2021-05-13T13:45:13Z'
     const formatedDate = formatUpdatedAt(updatedAt)
     expect(formatedDate).toBe('May 13, 2021 01:45pm')
   })
