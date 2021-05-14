@@ -8,6 +8,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   setupTestFrameworkScriptFile: '<rootDir>/setupEnzyme.ts',
+  globalSetup: '<rootDir>globalSetup.ts',
   setupFiles: ['<rootDir>setupJest.ts'],
   globals: {
     'ts-jest': {

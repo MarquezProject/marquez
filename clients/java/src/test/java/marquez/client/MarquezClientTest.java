@@ -49,11 +49,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import marquez.client.MarquezClient.DatasetVersions;
 import marquez.client.MarquezClient.Datasets;
 import marquez.client.MarquezClient.Jobs;
@@ -372,6 +377,21 @@ public class MarquezClientTest {
     final String badUrlString = "test.com/api/v1";
     assertThatExceptionOfType(AssertionError.class)
         .isThrownBy(() -> MarquezClient.builder().baseUrl(badUrlString).build());
+  }
+
+  @Test
+  public void testClientBuilder_sslContext()
+      throws NoSuchAlgorithmException, KeyManagementException {
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    sslContext.init(new KeyManager[0], new TrustManager[0], null);
+
+    MarquezClient.Builder builder = MarquezClient.builder();
+    assertThat(builder.sslContext == null);
+
+    builder.sslContext(sslContext);
+    assertThat(builder.sslContext != null);
+
+    builder.build();
   }
 
   @Test
