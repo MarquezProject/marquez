@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import javax.annotation.Nullable;
+import javax.net.ssl.SSLContext;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
@@ -292,6 +293,7 @@ public class MarquezClient {
   public static final class Builder {
     @VisibleForTesting URL baseUrl;
     @VisibleForTesting @Nullable String apiKey;
+    @VisibleForTesting @Nullable SSLContext sslContext;
 
     private Builder() {
       this.baseUrl = DEFAULT_BASE_URL;
@@ -311,9 +313,15 @@ public class MarquezClient {
       return this;
     }
 
+    public Builder sslContext(@Nullable SSLContext sslContext) {
+      this.sslContext = sslContext;
+      return this;
+    }
+
     public MarquezClient build() {
       return new MarquezClient(
-          MarquezUrl.create(baseUrl), MarquezHttp.create(MarquezClient.Version.get(), apiKey));
+          MarquezUrl.create(baseUrl),
+          MarquezHttp.create(sslContext, MarquezClient.Version.get(), apiKey));
     }
   }
 
