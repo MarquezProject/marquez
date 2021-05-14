@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.time.Instant;
+import javax.net.ssl.SSLContext;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
@@ -90,6 +91,9 @@ public class MarquezHttpTest {
     assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null));
     assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null, API_KEY));
     assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null, null));
+    assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null, null, null));
+    assertThatNullPointerException()
+        .isThrownBy(() -> MarquezHttp.create(SSLContext.getDefault(), null, API_KEY));
   }
 
   @Test
