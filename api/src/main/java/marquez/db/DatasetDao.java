@@ -77,30 +77,33 @@ public interface DatasetDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  String BASE_DATASET_SELECT =
-      "SELECT d.*, dv.fields, sv.schema_location, "
-          + "ARRAY(SELECT t.name FROM tags AS t "
-          + "       INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid "
-          + "       WHERE d.uuid = m.dataset_uuid) AS tags, "
-          + "(SELECT JSON_AGG(facets_by_event.facets) "
-          + "   FROM ("
-          + "      (SELECT JSONB_ARRAY_ELEMENTS(event->'inputs')->'facets' AS facets "
-          + "         FROM lineage_events AS le "
-          + "        WHERE le.run_id = dv.run_uuid::text "
-          + "        ORDER BY event_time ASC) "
-          + "      UNION "
-          + "      (SELECT JSONB_ARRAY_ELEMENTS(event->'outputs')->'facets' AS facets "
-          + "         FROM lineage_events AS le "
-          + "        WHERE le.run_id = dv.run_uuid::text "
-          + "        ORDER BY event_time ASC) "
-          + "   ) AS facets_by_event "
-          + ") AS facets "
-          + "FROM datasets AS d "
-          + "LEFT OUTER JOIN stream_versions AS sv ON sv.dataset_version_uuid = d.current_version_uuid "
-          + "LEFT OUTER JOIN dataset_versions AS dv ON dv.uuid = d.current_version_uuid ";
-
   @SqlQuery(
-      BASE_DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
+      "SELECT d.*, dv.fields, sv.schema_location, facets, t.tags\n"
+          + "FROM datasets d\n"
+          + "LEFT JOIN dataset_versions dv on d.current_version_uuid = dv.uuid\n"
+          + "LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid\n"
+          + "LEFT JOIN (\n"
+          + "    SELECT ARRAY_AGG(t.name) AS tags, m.dataset_uuid\n"
+          + "    FROM tags AS t\n"
+          + "    INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid\n"
+          + "    GROUP BY m.dataset_uuid\n"
+          + ") t ON t.dataset_uuid=d.uuid\n"
+          + "LEFT JOIN (\n"
+          + "    SELECT d2.uuid, jsonb_agg(ds->'facets') AS facets\n"
+          + "    FROM datasets d2\n"
+          + "    INNER JOIN runs_input_mapping ri ON ri.dataset_version_uuid=d2.current_version_uuid\n"
+          + "    INNER JOIN (\n"
+          + "        SELECT run_uuid, ds\n"
+          + "        FROM lineage_events AS le,\n"
+          + "             jsonb_array_elements(event -> 'inputs' || event -> 'outputs') as ds\n"
+          + "        WHERE ds -> 'facets' IS NOT NULL\n"
+          + "    ) i ON ri.run_uuid = i.run_uuid AND ds->>'name'=d2.name\n"
+          + "    WHERE d2.name = :datasetName\n"
+          + "    AND d2.namespace_name = :namespaceName\n"
+          + "    GROUP BY d2.uuid\n"
+          + ") f ON f.uuid=d.uuid\n"
+          + "WHERE d.name = :datasetName\n"
+          + "AND d.namespace_name = :namespaceName")
   Optional<Dataset> findDatasetByName(String namespaceName, String datasetName);
 
   default Optional<Dataset> findWithTags(String namespaceName, String datasetName) {
@@ -127,8 +130,30 @@ public interface DatasetDao extends BaseDao {
   Optional<DatasetRow> getUuid(String namespaceName, String datasetName);
 
   @SqlQuery(
-      BASE_DATASET_SELECT
-          + "WHERE d.namespace_name = :namespaceName "
+      "SELECT d.*, dv.fields, sv.schema_location, facets, t.tags\n"
+          + "FROM datasets d\n"
+          + "INNER JOIN dataset_versions dv on d.current_version_uuid = dv.uuid\n"
+          + "LEFT OUTER JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "    SELECT ARRAY_AGG(t.name) AS tags, m.dataset_uuid\n"
+          + "    FROM tags AS t\n"
+          + "    INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid\n"
+          + "    GROUP BY m.dataset_uuid\n"
+          + ") t ON t.dataset_uuid=d.uuid\n"
+          + "LEFT JOIN (\n"
+          + "    SELECT d2.uuid, jsonb_agg(ds->'facets') AS facets\n"
+          + "    FROM datasets d2\n"
+          + "    INNER JOIN runs_input_mapping ri ON ri.dataset_version_uuid=d2.current_version_uuid\n"
+          + "    INNER JOIN (\n"
+          + "        SELECT run_uuid, ds\n"
+          + "        FROM lineage_events AS le,\n"
+          + "             jsonb_array_elements(event -> 'inputs' || event -> 'outputs') as ds\n"
+          + "        WHERE ds -> 'facets' IS NOT NULl\n"
+          + "    ) i ON ri.run_uuid = i.run_uuid AND ds->>'name'=d2.name\n"
+          + "    where d2.namespace_name = :namespaceName\n"
+          + "    GROUP BY d2.uuid\n"
+          + ") f ON f.uuid=d.uuid\n"
+          + "WHERE d.namespace_name = :namespaceName\n"
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
   List<Dataset> findAll(String namespaceName, int limit, int offset);

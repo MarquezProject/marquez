@@ -4,12 +4,14 @@ import static marquez.tracing.SentryPropagating.withSentry;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
@@ -61,6 +63,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                   }
                 });
 
+    UUID runUuid = runUuidFromEvent(event.getRun());
     CompletableFuture<Void> openLineage =
         CompletableFuture.runAsync(
             withSentry(
@@ -68,7 +71,8 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                     createLineageEvent(
                         event.getEventType() == null ? "" : event.getEventType(),
                         event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
-                        event.getRun().getRunId(),
+                        runUuid,
+                        runUuid,
                         event.getJob().getName(),
                         event.getJob().getNamespace(),
                         createJsonArray(event, mapper),
@@ -76,6 +80,23 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
             ForkJoinPool.commonPool());
 
     return CompletableFuture.allOf(marquez, openLineage);
+  }
+
+  /**
+   * Try to convert the run id to a UUID. If it isn't a properly formatted UUID, generate one from
+   * the string bytes
+   *
+   * @param run
+   * @return the {@link UUID} for the run
+   */
+  private UUID runUuidFromEvent(LineageEvent.Run run) {
+    UUID runUuid;
+    try {
+      runUuid = UUID.fromString(run.getRunId());
+    } catch (Exception e) {
+      runUuid = UUID.nameUUIDFromBytes(run.getRunId().getBytes(StandardCharsets.UTF_8));
+    }
+    return runUuid;
   }
 
   private Optional<JobOutputUpdate> buildJobOutputUpdate(UpdateLineageRow record) {
