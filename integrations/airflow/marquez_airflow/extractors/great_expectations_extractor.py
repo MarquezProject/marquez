@@ -9,14 +9,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import attr
 import functools
 import logging
 from collections import defaultdict
 
+import attr
 from typing import Optional, Any, Dict
 
-from marquez_airflow.extractors.base import BaseExtractor, StepMetadata
+from marquez_airflow.extractors import BaseExtractor, StepMetadata, Dataset
 from marquez_airflow.facets import DataQualityDatasetFacet, ColumnMetric
 from marquez_airflow.utils import get_job_name
 from marquez.dataset import Source, DatasetType, Dataset
