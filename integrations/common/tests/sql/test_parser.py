@@ -13,8 +13,8 @@
 import logging
 
 import pytest
-from marquez_airflow.models import DbTableName
-from marquez_airflow.extractors.sql import SqlParser
+from marquez.models import DbTableName
+from marquez.sql import SqlParser
 
 log = logging.getLogger(__name__)
 

@@ -13,13 +13,15 @@ import attr
 import functools
 import logging
 from collections import defaultdict
-from marquez_airflow.extractors import (
-    BaseExtractor,
-    StepMetadata, Dataset, Source, DatasetType,
-)
-from marquez_airflow.facets import DataQualityDatasetFacet, ColumnMetric
-from marquez_airflow.utils import get_from_nullable_chain, get_job_name
+
+import attr
 from typing import Optional, Any, Dict
+
+from marquez_airflow.extractors import BaseExtractor, StepMetadata, Dataset
+from marquez_airflow.facets import DataQualityDatasetFacet, ColumnMetric
+from marquez_airflow.utils import get_job_name
+from marquez.dataset import Source, DatasetType
+from marquez.utils import get_from_nullable_chain
 
 
 def wrap_callback(f):

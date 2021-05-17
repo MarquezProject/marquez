@@ -17,7 +17,7 @@ import sqlparse
 from sqlparse.sql import T, TokenList, Parenthesis, Identifier, IdentifierList
 from sqlparse.tokens import Punctuation
 
-from marquez_airflow.models import DbTableName
+from marquez.models import DbTableName
 
 log = logging.getLogger(__name__)
 

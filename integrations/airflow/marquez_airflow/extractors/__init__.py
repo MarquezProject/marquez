@@ -9,131 +9,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum
-from typing import List, Union, Type, Optional, Dict
+from typing import List, Union, Type, Dict, Optional
 from abc import ABC, abstractmethod
 
 from airflow import LoggingMixin
 from airflow.models import BaseOperator
 
-from marquez_airflow.models import DbTableSchema, DbColumn
+from marquez.dataset import Dataset
 from openlineage.facet import BaseFacet
-
-
-class DatasetType(Enum):
-    DB_TABLE = "DB_TABLE"
-    STREAM = "STREAM"
-
-
-class Source:
-    name = None
-    connection_url = None
-    type = None
-
-    def __init__(self, name, type, connection_url):
-        self.name = name
-        self.type = type
-        self.connection_url = connection_url
-
-    def __eq__(self, other):
-        return self.name == other.name and \
-               self.type == other.type and \
-               self.connection_url == other.connection_url
-
-    def __repr__(self):
-        return f"Source({self.name!r},{self.type!r},{self.connection_url!r})"
-
-
-class Field:
-    def __init__(self, name: str, type: str,
-                 tags: List[str] = None, description: str = None):
-        self.name = name
-        self.type = type
-        self.tags = tags
-        self.description = description
-
-        if self.tags is None:
-            self.tags = []
-
-    @staticmethod
-    def from_column(column: DbColumn):
-        return Field(
-            name=column.name,
-            type=column.type,
-            description=column.description
-        )
-
-    def __eq__(self, other):
-        return self.name == other.name and \
-               self.type == other.type and \
-               self.tags == other.tags and \
-               self.description == other.description
-
-    def __repr__(self):
-        return f"Field({self.name!r},{self.type!r}, \
-                       {self.tags!r},{self.description!r})"
-
-
-class Dataset:
-    def __init__(self, source: Source, name: str, type: DatasetType,
-                 fields: List[Field] = None, description: Optional[str] = None,
-                 custom_facets: Dict[str, BaseFacet] = None):
-        if fields is None:
-            fields = []
-        if custom_facets is None:
-            custom_facets = {}
-        self.source = source
-        self.name = name
-        self.type = type
-        self.fields = fields
-        self.description = description
-        self.custom_facets = custom_facets
-
-    @staticmethod
-    def from_table(source: Source, table_name: str,
-                   schema_name: str = None):
-        return Dataset(
-            type=DatasetType.DB_TABLE,
-            name=Dataset._to_name(
-                schema_name=schema_name,
-                table_name=table_name
-            ),
-            source=source
-        )
-
-    @staticmethod
-    def from_table_schema(source: Source, table_schema: DbTableSchema):
-        return Dataset(
-            type=DatasetType.DB_TABLE,
-            name=Dataset._to_name(
-                schema_name=table_schema.schema_name,
-                table_name=table_schema.table_name.name
-            ),
-            source=source,
-            fields=[
-                # We want to maintain column order using ordinal position.
-                Field.from_column(column) for column in sorted(
-                    table_schema.columns, key=lambda x: x.ordinal_position
-                )
-            ]
-        )
-
-    @staticmethod
-    def _to_name(table_name: str, schema_name: str = None):
-        # Prefix the table name with the schema name using
-        # the format: {table_schema}.{table_name}.
-        return f"{schema_name}.{table_name}" if schema_name else table_name
-
-    def __eq__(self, other):
-        return self.source == other.source and \
-               self.name == other.name and \
-               self.type == other.type and \
-               self.fields == other.fields and \
-               self.description == other.description
-
-    def __repr__(self):
-        return f"Dataset({self.source!r},{self.name!r}, \
-                         {self.type!r},{self.fields!r},{self.description!r})"
 
 
 class StepMetadata:
