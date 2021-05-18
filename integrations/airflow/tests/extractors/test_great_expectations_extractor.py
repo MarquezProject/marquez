@@ -66,6 +66,6 @@ def test_great_expectations_operator_batch_kwargs_success():
         }
     )
 
-    assert Serde.to_json(step.outputs[0].custom_facets['dataQuality']) == \
+    assert Serde.to_json(step.inputs[0].custom_facets['dataQuality']) == \
            Serde.to_json(expected_dq)
     assert result['success']

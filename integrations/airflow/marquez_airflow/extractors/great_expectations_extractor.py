@@ -150,7 +150,7 @@ class GreatExpectationsExtractorImpl(BaseExtractor):
                 return None
             return StepMetadata(
                 name=get_job_name(task=self.operator),
-                outputs=[dataset]
+                inputs=[dataset]
             )
         return None
 
