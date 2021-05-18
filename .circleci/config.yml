@@ -190,13 +190,13 @@ jobs:
             - ./dist/*.tar.gz
 
   integration-test-airflow:
-    working_directory: ~/marquez/integrations/airflow
+    working_directory: ~/marquez/integrations/
     machine: true
     steps:
       - *checkout_project_root
-      - run: ./../../.circleci/get-docker-compose.sh
-      - run: docker build -f Dockerfile.tests -t marquez-airflow-base .
-      - run: ./tests/integration/docker/up.sh
+      - run: ./../.circleci/get-docker-compose.sh
+      - run: docker build -f airflow/Dockerfile.tests -t marquez-airflow-base .
+      - run: ./airflow/tests/integration/docker/up.sh
 
   release-java:
     working_directory: ~/marquez

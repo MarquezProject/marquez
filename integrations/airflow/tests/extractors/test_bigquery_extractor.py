@@ -24,9 +24,9 @@ from airflow.models import TaskInstance, DAG
 from airflow.utils.state import State
 
 from marquez_airflow.extractors.bigquery_extractor import BigQueryExtractor
-from marquez.provider.bigquery import BigQueryStatisticsRunFacet, \
-    BigQueryErrorRunFacet, BigQueryStatisticsDatasetFacet
-from marquez_airflow.utils import get_from_nullable_chain
+from marquez.provider.bigquery import BigQueryStatisticsRunFacet, BigQueryStatisticsDatasetFacet, \
+    BigQueryErrorRunFacet
+from marquez.utils import get_from_nullable_chain
 
 log = logging.getLogger(__name__)
 

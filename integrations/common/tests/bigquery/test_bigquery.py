@@ -25,8 +25,9 @@ class TableMock(MagicMock):
 
 
 def test_bq_job_information():
+    job_details = read_file_json('tests/bigquery/job_details.json')
     client = MagicMock()
-    client.get_job.return_value._properties = read_file_json('tests/bigquery/job_details.json')
+    client.get_job.return_value._properties = job_details
 
     client.get_table.return_value = TableMock()
 
@@ -36,7 +37,7 @@ def test_bq_job_information():
         'bigQuery_statistics': BigQueryStatisticsRunFacet(
             cached=False,
             billedBytes=111149056,
-            properties=None
+            properties=json.dumps(job_details)
         )
     }
     assert statistics.inputs == [

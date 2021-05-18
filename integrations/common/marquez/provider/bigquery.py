@@ -163,7 +163,7 @@ class BigQueryStatisticsProvider:
         return BigQueryStatisticsRunFacet(
             cached=False,
             billedBytes=int(billed_bytes) if billed_bytes else None,
-            # properties=json_props
+            properties=json_props
         ), BigQueryStatisticsDatasetFacet(
             rowCount=int(out_rows),
             size=int(out_bytes)

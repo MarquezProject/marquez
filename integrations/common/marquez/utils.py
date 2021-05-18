@@ -18,7 +18,6 @@ def get_from_nullable_chain(source: Dict[str, Any], chain: List[str]) -> Optiona
     Get object from nested structure of dictionaries, where it's not guaranteed that
     all keys in the nested structure exist.
     Intended to replace chain of `dict.get()` statements.
-
     Example usage:
     if not job._properties.get('statistics')\
         or not job._properties.get('statistics').get('query')\
@@ -27,7 +26,6 @@ def get_from_nullable_chain(source: Dict[str, Any], chain: List[str]) -> Optiona
         return None
     result = job._properties.get('statistics').get('query')\
             .get('referencedTables')
-
     becomes:
     result = get_from_nullable_chain(properties, ['statistics', 'query', 'queryPlan'])
     if not result:
@@ -36,7 +34,11 @@ def get_from_nullable_chain(source: Dict[str, Any], chain: List[str]) -> Optiona
     chain.reverse()
     try:
         while chain:
-            source = source.get(chain.pop())
+            next_key = chain.pop()
+            if isinstance(source, dict):
+                source = source.get(next_key)
+            else:
+                source = getattr(source, next_key)
         return source
     except AttributeError:
         return

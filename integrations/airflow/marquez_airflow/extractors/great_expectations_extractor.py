@@ -17,10 +17,10 @@ from collections import defaultdict
 import attr
 from typing import Optional, Any, Dict
 
-from marquez_airflow.extractors import BaseExtractor, StepMetadata, Dataset
+from marquez_airflow.extractors.base import BaseExtractor, StepMetadata
 from marquez_airflow.facets import DataQualityDatasetFacet, ColumnMetric
 from marquez_airflow.utils import get_job_name
-from marquez.dataset import Source, DatasetType
+from marquez.dataset import Source, DatasetType, Dataset
 from marquez.utils import get_from_nullable_chain
 
 
@@ -42,10 +42,10 @@ try:
     from great_expectations_provider.operators.great_expectations import GreatExpectationsOperator
     _has_great_expectations = True
     GreatExpectationsOperator.execute = wrap_callback(GreatExpectationsOperator.execute)
-except (ImportError, ModuleNotFoundError):
+except Exception:
     # Create placeholder for GreatExpectationsOperator
     GreatExpectationsOperator = None
-    log.info('Did not find great_expectations_provider library')
+    log.exception('Did not find great_expectations_provider library or failed to import it')
     _has_great_expectations = False
 
 

@@ -22,7 +22,7 @@ from marquez.models import (
 )
 from marquez_airflow.utils import get_connection_uri
 from marquez.sql import SqlMeta, SqlParser
-from marquez_airflow.extractors import (
+from marquez_airflow.extractors.base import (
     BaseExtractor,
     StepMetadata
 )
