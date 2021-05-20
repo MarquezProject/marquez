@@ -1,6 +1,6 @@
 {
   "name": "marquez-ui",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "dist/index.js",
   "author": "peter@datakin.com",
   "private": false,
@@ -57,7 +57,7 @@
     "redux": "^4.0.1",
     "redux-logger": "^3.0.6",
     "redux-saga": "^1.0.2",
-    "webpack-merge": "^4.2.1"
+    "webpack-merge": "^5.0.0"
   },
   "devDependencies": {
     "@material-ui/styles": "^4.0.0-rc.0",
