@@ -1,6 +1,6 @@
 {
   "name": "marquez-ui",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "dist/index.js",
   "author": "peter@datakin.com",
   "private": false,
@@ -60,7 +60,7 @@
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
-    "@material-ui/styles": "^4.0.0-rc.0",
+    "@material-ui/styles": "4.11.4",
     "@types/classnames": "^2.2.10",
     "@types/d3": "^5.7.2",
     "@types/d3-axis": "^1.0.12",
