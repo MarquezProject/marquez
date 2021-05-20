@@ -1,6 +1,6 @@
 {
   "name": "marquez-ui",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "dist/index.js",
   "author": "peter@datakin.com",
   "private": false,
@@ -97,7 +97,7 @@
     "identity-obj-proxy": "^3.0.0",
     "prettier": "1.18.2",
     "redux-devtools-extension": "^2.13.8",
-    "redux-saga-test-plan": "^4.0.0-beta.3",
+    "redux-saga-test-plan": "4.0.1",
     "source-map-loader": "^0.2.4",
     "style-loader": "^0.23.1",
     "ts-jest": "^23.10.5",
