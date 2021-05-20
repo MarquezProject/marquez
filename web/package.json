@@ -1,6 +1,6 @@
 {
   "name": "marquez-ui",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "dist/index.js",
   "author": "peter@datakin.com",
   "private": false,
@@ -75,7 +75,7 @@
     "@types/material-ui": "^0.21.7",
     "@types/react": "^16.8.13",
     "@types/react-dom": "^16.8.3",
-    "@types/react-helmet": "^5.0.10",
+    "@types/react-helmet": "5.0.16",
     "@types/react-redux": "^7.0.6",
     "@types/react-tap-event-plugin": "^0.0.30",
     "@types/redux-logger": "^3.0.7",
