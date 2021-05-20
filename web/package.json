@@ -1,6 +1,6 @@
 {
   "name": "marquez-ui",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "dist/index.js",
   "author": "peter@datakin.com",
   "private": false,
@@ -47,7 +47,7 @@
     "jest": "26.6.3",
     "lodash": "^4.17.19",
     "postcss-loader": "^5.0.0",
-    "postcss-modules-values": "^2.0.0",
+    "postcss-modules-values": "^4.0.0",
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
     "react-helmet": "^6.1.0",
