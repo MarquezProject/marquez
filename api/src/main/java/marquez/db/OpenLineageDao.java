@@ -62,15 +62,17 @@ public interface OpenLineageDao extends BaseDao {
           + "event_type, "
           + "event_time, "
           + "run_id, "
+          + "run_uuid, "
           + "job_name, "
           + "job_namespace, "
           + "event, "
           + "producer) "
-          + "VALUES (?, ?, ?, ?, ?, ?, ?)")
+          + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
   void createLineageEvent(
       String eventType,
       Instant eventTime,
-      String runId,
+      UUID runId,
+      UUID runUuid,
       String jobName,
       String jobNamespace,
       PGobject event,
