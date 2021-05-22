@@ -45,7 +45,7 @@ dependencies {
     testImplementation "net.bytebuddy:byte-buddy-dep:${bytebuddyVersion}"
     testImplementation "org.apache.spark:spark-core_2.11:${sparkVersion}"
     testImplementation "org.apache.spark:spark-sql_2.11:${sparkVersion}"
-    testImplementation platform('org.junit:junit-bom:5.7.1')
+    testImplementation platform('org.junit:junit-bom:5.7.2')
     testImplementation "org.postgresql:postgresql:${postgresqlVersion}"
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
 }
