@@ -58,7 +58,7 @@ subprojects {
         assertjVersion = '3.19.0'
         dropwizardVersion = '2.0.21'
         junit5Version = '5.7.1'
-        lombokVersion = '1.18.18'
+        lombokVersion = '1.18.20'
         mockitoVersion = '3.9.0'
         slf4jVersion = '1.7.30'
         postgresqlVersion = '42.2.20'
