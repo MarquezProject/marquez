@@ -32,7 +32,7 @@ ext {
 
 dependencies {
     implementation 'org.javassist:javassist:3.27.0-GA'
-    implementation 'com.github.ok2c.hc5:hc5-async-json:0.2.1'
+    implementation 'com.github.ok2c.hc5:hc5-async-json:0.2.2'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.0.3'
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
