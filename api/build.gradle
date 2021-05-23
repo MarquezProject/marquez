@@ -27,7 +27,7 @@ java {
 }
 
 ext {
-    jdbi3Version = '3.18.1'
+    jdbi3Version = '3.20.0'
     prometheusVersion = '0.10.0'
     testcontainersVersion = '1.15.3'
 }
