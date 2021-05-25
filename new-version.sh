@@ -68,9 +68,9 @@ if [[ $# -eq 0 ]] ; then
   usage
 fi
 
-# check if we have either staged or unstaged changes in working tree
-if [[ -n "$(git status --porcelain)" ]] ; then
-  echo "error: you have changes in your working tree"
+# Ensure no unstaged changes are present in working directory
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]] ; then
+  echo "error: you have unstaged changes in your working directory!"
   exit 1;
 fi
 
@@ -108,29 +108,47 @@ for VERSION in "${VERSIONS[@]}"; do
   fi
 done
 
+# Ensure python module version matches X.Y.Z or X.Y.ZrcN (see: https://www.python.org/dev/peps/pep-0440/),
+PYTHON_RELEASE_VERSION=${RELEASE_VERSION}
+if [[ "${RELEASE_VERSION}" == *-rc.? ]]; then
+  RELEASE_CANDIDATE=${RELEASE_VERSION##*-}
+  PYTHON_RELEASE_VERSION="${RELEASE_VERSION%-*}${RELEASE_CANDIDATE//.}"
+fi
+
 # (1) Bump python module versions
 PYTHON_MODULES=(clients/python/ integrations/airflow/)
 for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
-  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${RELEASE_VERSION}" --allow-dirty)
+  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${PYTHON_RELEASE_VERSION}" --allow-dirty)
 done
 
 # (2) Bump java module versions
 sed -i "" "s/version=.*/version=${RELEASE_VERSION}/g" gradle.properties
 
-# (3) Prepare release commit
+# (3) Bump version in helm chart
+sed -i "" "s/^version:.*/version: ${RELEASE_VERSION}/g" ./chart/Chart.yaml
+sed -i "" "s/tag:.*/tag: ${RELEASE_VERSION}/g" ./chart/values.yaml
+
+# (4) Bump version in docs
+sed -i "" "s/^  version:.*/  version: ${RELEASE_VERSION}/g" ./spec/openapi.yml
+sed -i "" "s/<version>.*/<version>${RELEASE_VERSION}<\/version>/g" ./clients/java/README.md
+sed -i "" "s/marquez-java:.*/marquez-java:${RELEASE_VERSION}/g" ./clients/java/README.md
+sed -i "" "s/<version>.*/<version>${RELEASE_VERSION}<\/version>/g" ./integrations/spark/README.md
+sed -i "" "s/marquez-spark:.*/marquez-spark:${RELEASE_VERSION}/g" ./integrations/spark/README.md
+
+# (5) Prepare release commit
 git commit -sam "Prepare for release ${RELEASE_VERSION}"
 
-# (4) Pull latest tags, then prepare release tag
+# (6) Pull latest tags, then prepare release tag
 git fetch --all --tags
 git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
-# (5) Prepare next development version
+# (7) Prepare next development version
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 
-# (6) Prepare next development version commit
+# (8) Prepare next development version commit
 git commit -sam "Prepare next development version"
 
-# (7) Push commits and tag
+# (9) Push commits and tag
 git push origin main && git push origin "${RELEASE_VERSION}"
 
 echo "DONE!"
