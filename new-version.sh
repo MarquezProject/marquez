@@ -108,7 +108,7 @@ for VERSION in "${VERSIONS[@]}"; do
   fi
 done
 
-# Ensure python release version matches X.Y.Z or X.Y.ZrcN (see: https://www.python.org/dev/peps/pep-0440/),
+# Ensure python module version matches X.Y.Z or X.Y.ZrcN (see: https://www.python.org/dev/peps/pep-0440/),
 PYTHON_RELEASE_VERSION=${RELEASE_VERSION}
 if [[ "${RELEASE_VERSION}" == *-rc.? ]]; then
   RELEASE_CANDIDATE=${RELEASE_VERSION##*-}
