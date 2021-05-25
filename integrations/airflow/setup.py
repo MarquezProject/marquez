@@ -39,13 +39,14 @@ extras_require = {
         "apache-airflow[google]==1.10.12",
         "apache-airflow[postgres]==1.10.12",
         "snowflake-connector-python==2.4.3",
+        "airflow-provider-great-expectations==0.0.6",
     ],
 }
 extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(
     name="marquez-airflow",
-    version="0.14.2",
+    version="0.15.0",
     description="Marquez integration with Airflow",
     long_description=readme,
     long_description_content_type="text/markdown",

@@ -1,6 +1,25 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.14.2...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.15.0...HEAD)
+
+## [0.15.0](https://github.com/MarquezProject/marquez/compare/0.14.2...0.15.0)
+
+### Added
+
+* Add tracing visibility [@julienledem](https://github.com/julienledem)
+* **New** Add snowflake extractor :tada: [@mobuchowski](https://github.com/mobuchowski)
+* Add SSLContext to MarquezClient [@lewiesnyder](https://github.com/lewiesnyder)
+* Add support for LogicalRDDs in spark plan visitors [@collado-mike](https://github.com/collado-mike)
+* **New** Add Great Expectations based data quality facet support :tada: [@mobuchowski](https://github.com/mobuchowski)
+
+### Changed
+
+* Augment tutorial instructions & screenshots for Airflow example [@rossturk](https://github.com/rossturk)
+* Rewrite correlated subqueries when querying the lineage_events table [@collado-mike](https://github.com/collado-mike)
+
+###  Fixed
+
+* Web time formatting display fix [@kachontep](https://github.com/kachontep)
 
 ## [0.14.2](https://github.com/MarquezProject/marquez/compare/0.14.1...0.14.2)
 

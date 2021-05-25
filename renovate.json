@@ -3,9 +3,14 @@
   "extends": [
     "config:base",
     "docker:disable",
-    ":gitSignOff"
+    ":gitSignOff",
+    ":separateMultipleMajorReleases",
+    ":automergePatch"
   ],
   "baseBranches": ["update-deps"],
   "lockFileMaintenance": { "enabled": true },
-  "schedule": ["every weekend"]
+  "schedule": ["every weekend"],
+  "npm": {
+    "enabled": false
+  }
 }
