@@ -1,6 +1,60 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.13.1...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.15.0...HEAD)
+
+## [0.15.0](https://github.com/MarquezProject/marquez/compare/0.14.2...0.15.0)
+
+### Added
+
+* Add tracing visibility [@julienledem](https://github.com/julienledem)
+* **New** Add snowflake extractor :tada: [@mobuchowski](https://github.com/mobuchowski)
+* Add SSLContext to MarquezClient [@lewiesnyder](https://github.com/lewiesnyder)
+* Add support for LogicalRDDs in spark plan visitors [@collado-mike](https://github.com/collado-mike)
+* **New** Add Great Expectations based data quality facet support :tada: [@mobuchowski](https://github.com/mobuchowski)
+
+### Changed
+
+* Augment tutorial instructions & screenshots for Airflow example [@rossturk](https://github.com/rossturk)
+* Rewrite correlated subqueries when querying the lineage_events table [@collado-mike](https://github.com/collado-mike)
+
+###  Fixed
+
+* Web time formatting display fix [@kachontep](https://github.com/kachontep)
+
+## [0.14.2](https://github.com/MarquezProject/marquez/compare/0.14.1...0.14.2)
+
+### Changed
+
+* Unpin `requests` dep in `marquez-airflow` integration [@wslulciuc](https://github.com/wslulciuc)
+* Unpin `attrs` dep in `marquez-airflow` integration [@wslulciuc](https://github.com/wslulciuc)
+
+## [0.14.1](https://github.com/MarquezProject/marquez/compare/0.14.0...0.14.1) - 2021-04-05
+
+### Changed
+
+* Updated dataset lineage query to find most recent job that wrote to it [@collado-mike](https://github.com/collado-mike)
+* Pin http-proxy-middleware to 0.20.0 [@wslulciuc](https://github.com/wslulciuc)
+
+## [0.14.0](https://github.com/MarquezProject/marquez/compare/0.13.1...0.14.0) - 2021-04-03
+
+### Added
+
+*  GA tag for website tracking [@rossturk](https://github.com/rossturk)
+*  Basic CTE support in `marquez-airflow` [@mobuchowski](https://github.com/mobuchowski)
+*  Airflow custom facets, bigquery statistics facets [@mobuchowski](https://github.com/mobuchowski)
+*  Unit tests for **class** [`JobVersionDao`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/db/JobVersionDao.java) [@wslulciuc](https://github.com/wslulciuc)
+*  Sentry tracing support [@julienledem](https://github.com/julienledem)
+*  OpenLineage facets support to API response models :tada: [@wslulciuc](https://github.com/wslulciuc)
+
+### Changed
+
+*  `BigQueryRelationTransformer` and deleted `BigQueryNodeVisitor` [@collado-mike](https://github.com/collado-mike)
+*  Bump postgres to `12.1.0` [@wslulciuc](https://github.com/wslulciuc)
+*  Update spark job name to reflect spark application name and execution node [@collado-mike](https://github.com/collado-mike)
+*  Update `marquez-airflow` integration to use [OpenLineage](https://github.com/OpenLineage/OpenLineage) :tada: [@mobuchowski](https://github.com/mobuchowski)
+*  Migrate tests to junit 5 [@mobuchowski](https://github.com/mobuchowski)
+*  Rewrite lineage IO sql queries to avoid job_versions_io_mapping_* tables [@collado-mike](https://github.com/collado-mike)
+*  Updated OpenLineage impl to only update dataset version on run completion [@collado-mike](https://github.com/collado-mike)
 
 ## [0.13.1](https://github.com/MarquezProject/marquez/compare/0.13.0...0.13.1) - 2021-04-01
 

@@ -34,9 +34,9 @@ public class OutputDatasetVisitors
     list.add(new InsertIntoDataSourceVisitor(providers));
     list.add(new InsertIntoHadoopFsRelationVisitor());
     list.add(new SaveIntoDataSourceCommandVisitor(sqlContext, providers));
-    list.add(new JDBCRelationVisitor(sqlContext));
     list.add(new DatasetSourceVisitor());
     list.add(new AppendDataVisitor(providers));
+    list.add(new InsertIntoDirVisitor(sqlContext));
     return list;
   }
 }

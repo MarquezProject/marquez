@@ -170,19 +170,62 @@ public interface DatasetVersionDao extends BaseDao {
 
   String SELECT = "SELECT dv.* " + "FROM dataset_versions dv ";
 
-  String DATASET_VERSION_SELECT =
-      "select d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description, ARRAY(select t.name from tags t\n"
-          + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
-          + "    where d.uuid = m.dataset_uuid) as tags,\n"
-          + "dv.created_at, dv.version, dv.fields, dv.run_uuid as \"createdByRunUuid\", sv.schema_location\n"
-          + "from datasets d\n"
-          + "inner join dataset_versions dv on d.uuid = dv.dataset_uuid\n"
-          + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n";
-
-  @SqlQuery(DATASET_VERSION_SELECT + "WHERE dv.version = :version")
+  @SqlQuery(
+      "SELECT d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description,\n"
+          + "          dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,\n"
+          + "          t.tags,f.facets\n"
+          + "FROM datasets AS d\n"
+          + "INNER JOIN dataset_versions dv ON d.uuid = dv.dataset_uuid\n"
+          + "LEFT OUTER JOIN stream_versions sv ON sv.dataset_version_uuid = d.current_version_uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "    SELECT ARRAY_AGG(t.name) AS tags, m.dataset_uuid\n"
+          + "    FROM tags AS t\n"
+          + "    INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid\n"
+          + "    GROUP BY m.dataset_uuid, t.name\n"
+          + ") t ON t.dataset_uuid=d.uuid\n"
+          + "LEFT JOIN (\n"
+          + "    SELECT dv2.uuid, jsonb_agg(ds->'facets') AS facets\n"
+          + "    FROM dataset_versions dv2\n"
+          + "    LEFT OUTER JOIN runs_input_mapping ri ON ri.dataset_version_uuid=dv2.uuid\n"
+          + "    LEFT OUTER JOIN (\n"
+          + "        SELECT run_uuid, ds\n"
+          + "        FROM lineage_events AS le,\n"
+          + "             jsonb_array_elements(event -> 'inputs' || event -> 'outputs') as ds\n"
+          + "        WHERE ds -> 'facets' IS NOT NULl\n"
+          + "    ) i ON ri.run_uuid = i.run_uuid AND ds->>'name'=dv2.dataset_name\n"
+          + "    where dv2.version=:version\n"
+          + "    GROUP BY dv2.uuid\n"
+          + ") f ON f.uuid=d.uuid\n"
+          + "WHERE dv.version = :version")
   Optional<DatasetVersion> findBy(UUID version);
 
-  @SqlQuery(DATASET_VERSION_SELECT + "WHERE dv.uuid = :uuid")
+  @SqlQuery(
+      "SELECT d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description,\n"
+          + "          dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,\n"
+          + "          t.tags,f.facets\n"
+          + "FROM datasets AS d\n"
+          + "INNER JOIN dataset_versions dv ON d.uuid = dv.dataset_uuid\n"
+          + "LEFT OUTER JOIN stream_versions sv ON sv.dataset_version_uuid = d.current_version_uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "    SELECT ARRAY_AGG(t.name) AS tags, m.dataset_uuid\n"
+          + "    FROM tags AS t\n"
+          + "    INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid\n"
+          + "    GROUP BY m.dataset_uuid, t.name\n"
+          + ") t ON t.dataset_uuid=d.uuid\n"
+          + "LEFT JOIN (\n"
+          + "    SELECT dv2.uuid, jsonb_agg(ds->'facets') AS facets\n"
+          + "    FROM dataset_versions dv2\n"
+          + "    LEFT OUTER JOIN runs_input_mapping ri ON ri.dataset_version_uuid=dv2.uuid\n"
+          + "    LEFT OUTER JOIN (\n"
+          + "        SELECT run_uuid, ds\n"
+          + "        FROM lineage_events AS le,\n"
+          + "             jsonb_array_elements(event -> 'inputs' || event -> 'outputs') as ds\n"
+          + "        WHERE ds -> 'facets' IS NOT NULl\n"
+          + "    ) i ON ri.run_uuid = i.run_uuid AND ds->>'name'=dv2.dataset_name\n"
+          + "    where dv2.uuid=:uuid\n"
+          + "    GROUP BY dv2.uuid\n"
+          + ") f ON f.uuid=d.uuid\n"
+          + "WHERE dv.uuid = :uuid")
   Optional<DatasetVersion> findByUuid(UUID uuid);
 
   default Optional<DatasetVersion> findByWithRun(UUID version) {
@@ -191,7 +234,7 @@ public interface DatasetVersionDao extends BaseDao {
     v.ifPresent(
         ver -> {
           if (ver.getCreatedByRunUuid() != null) {
-            Optional<Run> run = createRunDao().findBy(ver.getCreatedByRunUuid());
+            Optional<Run> run = createRunDao().findRunByUuid(ver.getCreatedByRunUuid());
             run.ifPresent(ver::setCreatedByRun);
           }
         });
@@ -201,7 +244,7 @@ public interface DatasetVersionDao extends BaseDao {
   @SqlQuery(
       SELECT
           + " INNER JOIN runs_input_mapping m ON m.dataset_version_uuid = dv.uuid WHERE m.run_uuid = :runUuid")
-  List<ExtendedDatasetVersionRow> findInputsByRunId(UUID runUuid);
+  List<ExtendedDatasetVersionRow> findInputDatasetVersionsFor(UUID runUuid);
 
   /**
    * returns all Dataset Versions created by this run id
@@ -209,10 +252,34 @@ public interface DatasetVersionDao extends BaseDao {
    * @param runId - the run ID
    */
   @SqlQuery(SELECT + " WHERE run_uuid = :runId")
-  List<ExtendedDatasetVersionRow> findOutputsByRunId(@NonNull UUID runId);
+  List<ExtendedDatasetVersionRow> findOutputDatasetVersionsFor(@NonNull UUID runId);
 
   @SqlQuery(
-      DATASET_VERSION_SELECT
+      "SELECT d.type, d.name, d.physical_name, dv.namespace_name, d.source_name, d.description,\n"
+          + "          dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,\n"
+          + "          t.tags,f.facets\n"
+          + "FROM datasets AS d\n"
+          + "INNER JOIN dataset_versions dv ON d.uuid = dv.dataset_uuid\n"
+          + "LEFT OUTER JOIN stream_versions sv ON sv.dataset_version_uuid = d.current_version_uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "    SELECT ARRAY_AGG(t.name) AS tags, m.dataset_uuid\n"
+          + "    FROM tags AS t\n"
+          + "    INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid\n"
+          + "    GROUP BY m.dataset_uuid, t.name\n"
+          + ") t ON t.dataset_uuid=d.uuid\n"
+          + "LEFT JOIN (\n"
+          + "    SELECT dv2.uuid, jsonb_agg(ds->'facets') AS facets\n"
+          + "    FROM dataset_versions dv2\n"
+          + "    LEFT OUTER JOIN runs_input_mapping ri ON ri.dataset_version_uuid=dv2.uuid\n"
+          + "    LEFT OUTER JOIN (\n"
+          + "        SELECT run_uuid, ds\n"
+          + "        FROM lineage_events AS le,\n"
+          + "             jsonb_array_elements(event -> 'inputs' || event -> 'outputs') as ds\n"
+          + "        WHERE ds -> 'facets' IS NOT NULl\n"
+          + "    ) i ON ri.run_uuid = i.run_uuid AND ds->>'name'=dv2.dataset_name\n"
+          + "    where dv2.namespace_name = :namespaceName AND dv2.dataset_name = :datasetName\n"
+          + "    GROUP BY dv2.uuid\n"
+          + ") f ON f.uuid=d.uuid\n"
           + "WHERE dv.namespace_name = :namespaceName AND dv.dataset_name = :datasetName "
           + "ORDER BY dv.created_at DESC "
           + "LIMIT :limit OFFSET :offset")
@@ -225,7 +292,7 @@ public interface DatasetVersionDao extends BaseDao {
         .peek(
             ver -> {
               if (ver.getCreatedByRunUuid() != null) {
-                Optional<Run> run = createRunDao().findBy(ver.getCreatedByRunUuid());
+                Optional<Run> run = createRunDao().findRunByUuid(ver.getCreatedByRunUuid());
                 run.ifPresent(ver::setCreatedByRun);
               }
             })

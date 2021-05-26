@@ -16,6 +16,7 @@ package marquez.db;
 
 import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 
+import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -78,20 +79,48 @@ public interface RunDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
-  String SELECT_RUN =
-      "SELECT r.*, ra.args, ra.args, ctx.context "
-          + "FROM runs AS r "
-          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid "
-          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid ";
-
-  @SqlQuery(SELECT_RUN + " WHERE r.uuid = :rowUuid")
-  Optional<Run> findBy(UUID rowUuid);
-
-  @SqlQuery(SELECT_RUN + " WHERE r.uuid = :rowUuid")
-  Optional<ExtendedRunRow> findByRow(UUID rowUuid);
+  @SqlQuery(
+      "SELECT r.*, ra.args, ra.args, ctx.context, f.facets\n"
+          + "FROM runs AS r\n"
+          + "LEFT OUTER JOIN\n"
+          + "(\n"
+          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
+          + "    FROM lineage_events le\n"
+          + "    WHERE le.run_uuid=:runUuid\n"
+          + "    GROUP BY le.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
+          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
+          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
+          + "WHERE r.uuid = :runUuid")
+  Optional<Run> findRunByUuid(UUID runUuid);
 
   @SqlQuery(
-      SELECT_RUN
+      "SELECT r.*, ra.args, ra.args, ctx.context, f.facets\n"
+          + "FROM runs AS r\n"
+          + "LEFT OUTER JOIN\n"
+          + "(\n"
+          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
+          + "    FROM lineage_events le\n"
+          + "    WHERE le.run_uuid=:runUuid\n"
+          + "    GROUP BY le.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
+          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
+          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
+          + "WHERE r.uuid = :runUuid")
+  Optional<ExtendedRunRow> findRunByUuidAsRow(UUID runUuid);
+
+  @SqlQuery(
+      "SELECT r.*, ra.args, ra.args, ctx.context, f.facets\n"
+          + "FROM runs AS r\n"
+          + "LEFT OUTER JOIN\n"
+          + "(\n"
+          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
+          + "    FROM lineage_events le\n"
+          + "    WHERE le.job_name=:jobName AND le.job_namespace=:namespace\n"
+          + "    GROUP BY le.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
+          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
+          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
           + "WHERE r.namespace_name = :namespace and r.job_name = :jobName "
           + "ORDER BY STARTED_AT DESC NULLS LAST "
           + "LIMIT :limit OFFSET :offset")
@@ -211,21 +240,22 @@ public interface RunDao extends BaseDao {
 
     updateInputDatasetMapping(jobMeta.getInputs(), runUuid);
 
-    registerRunOutputDataset(runUuid, jobMeta);
+    upsertOutputDatasetsFor(runUuid, jobMeta.getOutputs());
   }
 
-  default void registerRunOutputDataset(UUID runUuid, JobMeta jobMeta) {
+  default void upsertOutputDatasetsFor(UUID runUuid, ImmutableSet<DatasetId> runOutputIds) {
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
     DatasetDao datasetDao = createDatasetDao();
     OpenLineageDao openLineageDao = createOpenLineageDao();
 
-    if (jobMeta.getOutputs() != null) {
-      for (DatasetId datasetId : jobMeta.getOutputs()) {
+    if (runOutputIds != null) {
+      for (DatasetId runOutputId : runOutputIds) {
         Optional<DatasetRow> dsRow =
-            datasetDao.findByRow(
-                datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+            datasetDao.findDatasetAsRow(
+                runOutputId.getNamespace().getValue(), runOutputId.getName().getValue());
         Optional<Dataset> ds =
-            datasetDao.find(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+            datasetDao.findDatasetByName(
+                runOutputId.getNamespace().getValue(), runOutputId.getName().getValue());
         ds.ifPresent(
             d -> {
               UUID version =
@@ -272,7 +302,8 @@ public interface RunDao extends BaseDao {
 
     for (DatasetId datasetId : inputs) {
       Optional<Dataset> dataset =
-          datasetDao.find(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+          datasetDao.findDatasetByName(
+              datasetId.getNamespace().getValue(), datasetId.getName().getValue());
       if (dataset.isPresent() && dataset.get().getCurrentVersionUuid().isPresent()) {
         updateInputMapping(runUuid, dataset.get().getCurrentVersionUuid().get());
       }
@@ -287,23 +318,25 @@ public interface RunDao extends BaseDao {
 
   /** Insert from run creates a run but does not associate any datasets. */
   @Transaction
-  default RunRow upsertFromRun(
+  default RunRow upsertRunMeta(
       NamespaceName namespaceName, JobName jobName, RunMeta runMeta, RunState currentState) {
     Instant now = Instant.now();
 
     NamespaceRow namespaceRow =
         createNamespaceDao()
-            .upsert(UUID.randomUUID(), now, namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
+            .upsertNamespaceRow(
+                UUID.randomUUID(), now, namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
 
     RunArgsRow runArgsRow =
         createRunArgsDao()
-            .upsert(
+            .upsertRunArgs(
                 UUID.randomUUID(),
                 now,
                 Utils.toJson(runMeta.getArgs()),
                 Utils.checksumFor(runMeta.getArgs()));
 
-    JobRow jobRow = createJobDao().findByRow(namespaceName.getValue(), jobName.getValue()).get();
+    JobRow jobRow =
+        createJobDao().findJobByNameAsRow(namespaceName.getValue(), jobName.getValue()).get();
 
     UUID uuid = runMeta.getId().map(RunId::getValue).orElse(UUID.randomUUID());
 
@@ -321,11 +354,11 @@ public interface RunDao extends BaseDao {
             namespaceRow.getName(),
             jobName.getValue(),
             jobRow.getLocation(),
-            jobRow.getJobContextUuid());
+            jobRow.getJobContextUuid().orElse(null));
 
     updateInputDatasetMapping(jobRow.getInputs(), uuid);
 
-    createRunStateDao().updateRunState(uuid, currentState, now);
+    createRunStateDao().updateRunStateFor(uuid, currentState, now);
 
     return runRow;
   }
@@ -334,8 +367,18 @@ public interface RunDao extends BaseDao {
   void updateJobVersion(UUID runUuid, UUID jobVersionUuid);
 
   @SqlQuery(
-      SELECT_RUN
-          + "where r.job_name = :jobName and r.namespace_name = :namespaceName "
+      "SELECT r.*, ra.args, ra.args, ctx.context, f.facets\n"
+          + "FROM runs AS r\n"
+          + "LEFT OUTER JOIN\n"
+          + "(\n"
+          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets' ORDER BY event_time) AS facets\n"
+          + "    FROM lineage_events le\n"
+          + "    WHERE le.job_name=:jobName AND le.job_namespace=:namespaceName\n"
+          + "    GROUP BY le.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
+          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
+          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
+          + "WHERE r.job_name = :jobName AND r.namespace_name = :namespaceName "
           + "order by transitioned_at desc limit 1")
   Optional<Run> findByLatestJob(String namespaceName, String jobName);
 }

@@ -17,6 +17,7 @@ package marquez.service.models;
 import static marquez.common.models.DatasetType.STREAM;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
@@ -50,7 +51,8 @@ public final class Stream extends Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      Optional<UUID> currentVersionUuid) {
+      @Nullable final Optional<UUID> currentVersionUuid,
+      @Nullable final ImmutableMap<String, Object> facets) {
     super(
         id,
         STREAM,
@@ -63,7 +65,8 @@ public final class Stream extends Dataset {
         tags,
         lastModifiedAt,
         description,
-        currentVersionUuid);
+        currentVersionUuid,
+        facets);
     this.schemaLocation = schemaLocation;
   }
 }

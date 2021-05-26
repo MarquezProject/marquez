@@ -1,12 +1,17 @@
 package marquez.service;
 
+import static marquez.tracing.SentryPropagating.withSentry;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
@@ -19,6 +24,7 @@ import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.db.BaseDao;
+import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.RunArgsRow;
@@ -44,9 +50,9 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
   }
 
   public CompletableFuture<Void> createAsync(LineageEvent event) {
-    CompletableFuture marquez =
+    CompletableFuture<Void> marquez =
         CompletableFuture.supplyAsync(
-                () -> updateMarquezModel(event, mapper), ForkJoinPool.commonPool())
+                withSentry(() -> updateMarquezModel(event, mapper)), ForkJoinPool.commonPool())
             .thenAccept(
                 (update) -> {
                   if (event.getEventType() != null) {
@@ -57,20 +63,40 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                   }
                 });
 
-    CompletableFuture openLineage =
+    UUID runUuid = runUuidFromEvent(event.getRun());
+    CompletableFuture<Void> openLineage =
         CompletableFuture.runAsync(
-            () ->
-                createLineageEvent(
-                    event.getEventType() == null ? "" : event.getEventType(),
-                    event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
-                    event.getRun().getRunId(),
-                    event.getJob().getName(),
-                    event.getJob().getNamespace(),
-                    createJsonArray(event, mapper),
-                    event.getProducer()),
+            withSentry(
+                () ->
+                    createLineageEvent(
+                        event.getEventType() == null ? "" : event.getEventType(),
+                        event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+                        runUuid,
+                        runUuid,
+                        event.getJob().getName(),
+                        event.getJob().getNamespace(),
+                        createJsonArray(event, mapper),
+                        event.getProducer())),
             ForkJoinPool.commonPool());
 
     return CompletableFuture.allOf(marquez, openLineage);
+  }
+
+  /**
+   * Try to convert the run id to a UUID. If it isn't a properly formatted UUID, generate one from
+   * the string bytes
+   *
+   * @param run
+   * @return the {@link UUID} for the run
+   */
+  private UUID runUuidFromEvent(LineageEvent.Run run) {
+    UUID runUuid;
+    try {
+      runUuid = UUID.fromString(run.getRunId());
+    } catch (Exception e) {
+      runUuid = UUID.nameUUIDFromBytes(run.getRunId().getBytes(StandardCharsets.UTF_8));
+    }
+    return runUuid;
   }
 
   private Optional<JobOutputUpdate> buildJobOutputUpdate(UpdateLineageRow record) {
@@ -99,7 +125,12 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
       RunId runId, JobVersionId jobVersionId, UpdateLineageRow record) {
     // We query for all datasets since they can come in slowly over time
     List<ExtendedDatasetVersionRow> datasets =
-        datasetVersionDao.findOutputsByRunId(record.getRun().getUuid());
+        datasetVersionDao.findOutputDatasetVersionsFor(record.getRun().getUuid());
+    DatasetDao datasetDao = createDatasetDao();
+    datasets.forEach(
+        versionRow ->
+            datasetDao.updateVersion(
+                versionRow.getDatasetUuid(), Instant.now(), versionRow.getUuid()));
 
     // Do not trigger a JobOutput event if there are no new datasets
     if (datasets.isEmpty() && record.getOutputs().isEmpty()) {
@@ -129,7 +160,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
       UpdateLineageRow record) {
     // We query for all datasets since they can come in slowly over time
     List<ExtendedDatasetVersionRow> datasets =
-        datasetVersionDao.findInputsByRunId(record.getRun().getUuid());
+        datasetVersionDao.findInputDatasetVersionsFor(record.getRun().getUuid());
     // Do not trigger a JobInput event if there are no new datasets
     if (datasets.isEmpty() || record.getInputs().isEmpty()) {
       return Optional.empty();

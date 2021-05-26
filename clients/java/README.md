@@ -10,14 +10,14 @@ Maven:
 <dependency>
     <groupId>io.github.marquezproject</groupId>
     <artifactId>marquez-java</artifactId>
-    <version>0.13.1</version>
+    <version>0.15.0</version>
 </dependency>
 ```
 
 or Gradle:
 
 ```groovy
-implementation 'io.github.marquezproject:marquez-java:0.13.1'
+implementation 'io.github.marquezproject:marquez-java:0.15.0'
 ```
 
 ## Usage
@@ -35,4 +35,21 @@ NamespaceMeta meta = NamespaceMeta().builder()
 
 // Create namespace
 Namespace namespace = client.createNamespace("my-namespace", meta);
+```
+
+### Supply an SSLContext to enable TLS
+```java
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import marquez.client.MarquezClient;
+...
+KeyManager[] keyManager = setUpKeyManagers();
+TrustManager[] trustManager = setUpTrustManagers();
+SSLContext sslContext = SSLContext.getInstance("TLS");
+sslContext.init(keyManager, trustManager, null);
+MarquezClient client = MarquezClient.builder()
+        .sslContext(sslContext)
+        .baseUrl("https://localhost:5000")
+        .build();
 ```

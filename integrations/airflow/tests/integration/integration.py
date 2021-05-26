@@ -17,7 +17,7 @@ import psycopg2
 from airflow.utils.state import State as DagState
 from airflow.version import version as AIRFLOW_VERSION
 
-from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
+from marquez_airflow import __version__ as MARQUEZ_AIRFLOW_VERSION
 from marquez_client import MarquezClient
 from marquez_client.models import (
     DatasetType,
@@ -183,7 +183,6 @@ def check_jobs_meta():
     # TODO: waiting for backend fix
     # assert if_not_exists_job['context']['sql'] is not None
     # assert if_not_exists_job['description'] == DAG_DESCRIPTION
-
     # TODO: no airflow context data yet
     # assert if_not_exists_job['context']['airflow.operator'] == \
     #        'airflow.operators.postgres_operator.PostgresOperator'

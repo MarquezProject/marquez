@@ -53,7 +53,6 @@ import marquez.service.models.DatasetVersion;
 @Slf4j
 @Path("/api/v1/namespaces/{namespace}/datasets")
 public class DatasetResource extends BaseResource {
-
   public DatasetResource(@NonNull final ServiceFactory serviceFactory) {
     super(serviceFactory);
   }
@@ -83,7 +82,7 @@ public class DatasetResource extends BaseResource {
   @GET
   @Path("{dataset}")
   @Produces(APPLICATION_JSON)
-  public Response get(
+  public Response getDataset(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName) {
     throwIfNotExists(namespaceName);

@@ -15,6 +15,7 @@
 package marquez.client.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +35,7 @@ public final class Run extends RunMeta {
   @Nullable private final Instant startedAt;
   @Nullable private final Long durationMs;
   @Nullable private final Instant endedAt;
+  @Getter private final Map<String, Object> facets;
 
   public Run(
       @NonNull final String id,
@@ -45,7 +47,8 @@ public final class Run extends RunMeta {
       @Nullable final Instant startedAt,
       @Nullable final Instant endedAt,
       @Nullable final Long durationMs,
-      @Nullable final Map<String, String> args) {
+      @Nullable final Map<String, String> args,
+      @Nullable final Map<String, Object> facets) {
     super(id, nominalStartTime, nominalEndTime, args);
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -53,6 +56,7 @@ public final class Run extends RunMeta {
     this.startedAt = startedAt;
     this.durationMs = durationMs;
     this.endedAt = endedAt;
+    this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
   }
 
   public Optional<Instant> getStartedAt() {
@@ -65,6 +69,10 @@ public final class Run extends RunMeta {
 
   public Optional<Long> getDurationMs() {
     return Optional.ofNullable(durationMs);
+  }
+
+  public boolean hasFacets() {
+    return !facets.isEmpty();
   }
 
   public static Run fromJson(@NonNull final String json) {

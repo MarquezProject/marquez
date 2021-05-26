@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.List;
@@ -61,6 +62,7 @@ public abstract class Dataset {
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
   private final Optional<UUID> currentVersionUuid;
+  @Getter ImmutableMap<String, Object> facets;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -74,7 +76,8 @@ public abstract class Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Optional<UUID> currentVersionUuid) {
+      @Nullable final Optional<UUID> currentVersionUuid,
+      @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -88,6 +91,7 @@ public abstract class Dataset {
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
     this.currentVersionUuid = currentVersionUuid;
+    this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
   public Optional<Instant> getLastModifiedAt() {

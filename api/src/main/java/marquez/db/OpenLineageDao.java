@@ -29,7 +29,7 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
-import marquez.db.JobVersionDao.JobVersionBag;
+import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -44,7 +44,7 @@ import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
-import marquez.service.models.LineageEvent.DatasetFacet;
+import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.Job;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
@@ -62,15 +62,17 @@ public interface OpenLineageDao extends BaseDao {
           + "event_type, "
           + "event_time, "
           + "run_id, "
+          + "run_uuid, "
           + "job_name, "
           + "job_namespace, "
           + "event, "
           + "producer) "
-          + "VALUES (?, ?, ?, ?, ?, ?, ?)")
+          + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
   void createLineageEvent(
       String eventType,
       Instant eventTime,
-      String runId,
+      UUID runId,
+      UUID runUuid,
       String jobName,
       String jobNamespace,
       PGobject event,
@@ -102,7 +104,7 @@ public interface OpenLineageDao extends BaseDao {
 
     UpdateLineageRow bag = new UpdateLineageRow();
     NamespaceRow namespace =
-        namespaceDao.upsert(
+        namespaceDao.upsertNamespaceRow(
             UUID.randomUUID(),
             now,
             formatNamespaceName(event.getJob().getNamespace()),
@@ -128,7 +130,7 @@ public interface OpenLineageDao extends BaseDao {
     }
 
     JobRow job =
-        jobDao.upsert(
+        jobDao.upsertJob(
             UUID.randomUUID(),
             getJobType(event.getJob()),
             now,
@@ -143,7 +145,7 @@ public interface OpenLineageDao extends BaseDao {
 
     Map<String, String> runArgsMap = createRunArgs(event);
     RunArgsRow runArgs =
-        runArgsDao.upsert(
+        runArgsDao.upsertRunArgs(
             UUID.randomUUID(), now, Utils.toJson(runArgsMap), Utils.checksumFor(runArgsMap));
     bag.setRunArgs(runArgs);
 
@@ -282,15 +284,15 @@ public interface OpenLineageDao extends BaseDao {
 
   default void updateMarquezOnComplete(
       LineageEvent event, UpdateLineageRow updateLineageRow, RunState runState) {
-    JobVersionBag jobVersionBag =
+    BagOfJobVersionInfo bagOfJobVersionInfo =
         createJobVersionDao()
-            .createJobVersionOnComplete(
-                event.getEventTime().toInstant(),
-                updateLineageRow.getRun().getUuid(),
+            .upsertJobVersionOnRunTransition(
                 updateLineageRow.getRun().getNamespaceName(),
                 updateLineageRow.getRun().getJobName(),
-                runState);
-    updateLineageRow.setJobVersionBag(jobVersionBag);
+                updateLineageRow.getRun().getUuid(),
+                runState,
+                event.getEventTime().toInstant());
+    updateLineageRow.setJobVersionBag(bagOfJobVersionInfo);
   }
 
   default String getUrlOrPlaceholder(String uri) {
@@ -326,7 +328,8 @@ public interface OpenLineageDao extends BaseDao {
       DatasetFieldDao datasetFieldDao,
       RunDao runDao) {
     NamespaceRow dsNamespace =
-        namespaceDao.upsert(UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
+        namespaceDao.upsertNamespaceRow(
+            UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
 
     SourceRow source;
     if (ds.getFacets() != null && ds.getFacets().getDataSource() != null) {
@@ -349,7 +352,7 @@ public interface OpenLineageDao extends BaseDao {
     }
 
     NamespaceRow datasetNamespace =
-        namespaceDao.upsert(
+        namespaceDao.upsertNamespaceRow(
             UUID.randomUUID(),
             now,
             formatNamespaceName(ds.getNamespace()),
@@ -370,7 +373,7 @@ public interface OpenLineageDao extends BaseDao {
 
     List<SchemaField> fields =
         Optional.ofNullable(ds.getFacets())
-            .map(DatasetFacet::getSchema)
+            .map(DatasetFacets::getSchema)
             .map(SchemaDatasetFacet::getFields)
             .orElse(null);
 
@@ -401,7 +404,6 @@ public interface OpenLineageDao extends BaseDao {
                           dsNamespace.getName(),
                           ds.getName());
 
-                  datasetDao.updateVersion(datasetRow.getUuid(), now, row.getUuid());
                   return row;
                 });
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();

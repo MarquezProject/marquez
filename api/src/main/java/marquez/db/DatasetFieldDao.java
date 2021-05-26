@@ -80,7 +80,7 @@ public interface DatasetFieldDao extends BaseDao {
             });
 
     updateTags(fieldUuid, tag.getUuid(), now);
-    return createDatasetDao().find(namespaceName, datasetName).get();
+    return createDatasetDao().findDatasetByName(namespaceName, datasetName).get();
   }
 
   @SqlUpdate(

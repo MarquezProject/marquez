@@ -32,7 +32,7 @@ public class ExtendedRunRow extends RunRow {
       final UUID uuid,
       final Instant createdAt,
       final Instant updatedAt,
-      final UUID jobVersionUuid,
+      @Nullable final UUID jobVersionUuid,
       final UUID runArgsUuid,
       final List<UUID> inputVersionUuids,
       @Nullable final Instant nominalStartTime,

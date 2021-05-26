@@ -20,8 +20,8 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    "attrs==19.3",
-    "requests==2.25.1",
+    "attrs>=19.3",
+    "requests>=2.24.0",
     "sqlparse==0.4.1",
 ]
 
@@ -38,13 +38,15 @@ extras_require = {
         "apache-airflow[gcp_api]==1.10.12",
         "apache-airflow[google]==1.10.12",
         "apache-airflow[postgres]==1.10.12",
+        "snowflake-connector-python==2.4.3",
+        "airflow-provider-great-expectations==0.0.6",
     ],
 }
 extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(
     name="marquez-airflow",
-    version="0.13.1",
+    version="0.15.0",
     description="Marquez integration with Airflow",
     long_description=readme,
     long_description_content_type="text/markdown",

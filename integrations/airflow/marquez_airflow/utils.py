@@ -14,11 +14,13 @@ import logging
 import os
 import subprocess
 import json
+from typing import Dict, Any, List, Optional
 
 import airflow
 from airflow.models import Connection
 from airflow.utils.db import provide_session
-from airflow.version import version as AIRFLOW_VERSION
+
+from marquez_airflow.facets import AirflowVersionRunFacet, AirflowRunArgsRunFacet
 
 try:
     # Import from pendulum 1.x version
@@ -26,8 +28,6 @@ try:
 except ImportError:
     # Import for Pendulum 2.x version
     from pendulum import DateTime as Pendulum, from_timestamp
-
-from marquez_airflow.version import VERSION as MARQUEZ_AIRFLOW_VERSION
 
 log = logging.getLogger(__name__)
 _NOMINAL_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -150,31 +150,17 @@ def get_job_name(task):
     return f'{task.dag_id}.{task.task_id}'
 
 
-def add_airflow_info_to(task, step_metadata):
-    log.debug(f"add_airflow_info_to({task}, {step_metadata})")
-
-    # Add operator info
-    operator = f'{task.__class__.__module__}.{task.__class__.__name__}'
-
-    step_metadata.context['airflow.operator'] = operator
-    step_metadata.context['airflow.task_info'] = str(task.__dict__)
-
-    # Add version info
-    step_metadata.context['airflow.version'] = AIRFLOW_VERSION
-    step_metadata.context['marquez_airflow.version'] = MARQUEZ_AIRFLOW_VERSION
-
-    return step_metadata
+def get_custom_facets(task, is_external_trigger: bool):
+    return {
+        "airflow_runArgs": AirflowRunArgsRunFacet(is_external_trigger),
+        "airflow_version": AirflowVersionRunFacet.from_task(task)
+    }
 
 
 class DagUtils:
 
     def get_execution_date(**kwargs):
         return kwargs.get('execution_date')
-
-    def get_run_args(**kwargs):
-        return {
-            'external_trigger': kwargs.get('external_trigger', False)
-        }
 
     @staticmethod
     def get_start_time(execution_date=None):
@@ -205,3 +191,34 @@ class DagUtils:
             return dt.format(_NOMINAL_TIME_FORMAT)
         else:
             return dt.strftime(_NOMINAL_TIME_FORMAT)
+
+
+def get_from_nullable_chain(source: Dict[str, Any], chain: List[str]) -> Optional[Any]:
+    """
+    Get object from nested structure of dictionaries, where it's not guaranteed that
+    all keys in the nested structure exist.
+    Intended to replace chain of `dict.get()` statements.
+    Example usage:
+    if not job._properties.get('statistics')\
+        or not job._properties.get('statistics').get('query')\
+        or not job._properties.get('statistics').get('query')\
+            .get('referencedTables'):
+        return None
+    result = job._properties.get('statistics').get('query')\
+            .get('referencedTables')
+    becomes:
+    result = get_from_nullable_chain(properties, ['statistics', 'query', 'queryPlan'])
+    if not result:
+        return None
+    """
+    chain.reverse()
+    try:
+        while chain:
+            next_key = chain.pop()
+            if isinstance(source, dict):
+                source = source.get(next_key)
+            else:
+                source = getattr(source, next_key)
+        return source
+    except AttributeError:
+        return

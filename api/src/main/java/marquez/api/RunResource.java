@@ -41,7 +41,9 @@ public class RunResource {
   @Produces(APPLICATION_JSON)
   public Response getRun() {
     final Run run =
-        runService.findBy(runId.getValue()).orElseThrow(() -> new RunNotFoundException(runId));
+        runService
+            .findRunByUuid(runId.getValue())
+            .orElseThrow(() -> new RunNotFoundException(runId));
     return Response.ok(run).build();
   }
 

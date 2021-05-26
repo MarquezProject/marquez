@@ -66,9 +66,10 @@ public class DatasetService extends DelegatingDaos.DelegatingDatasetDao {
       @NonNull DatasetMeta datasetMeta) {
     if (datasetMeta.getRunId().isPresent()) {
       UUID runUuid = datasetMeta.getRunId().get().getValue();
-      ExtendedRunRow runRow = runDao.findByRow(runUuid).get();
+      ExtendedRunRow runRow = runDao.findRunByUuidAsRow(runUuid).get();
 
-      List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findOutputsByRunId(runUuid);
+      List<ExtendedDatasetVersionRow> outputs =
+          datasetVersionDao.findOutputDatasetVersionsFor(runUuid);
       runService.notify(
           new JobOutputUpdate(
               RunId.of(runRow.getUuid()),
@@ -83,6 +84,6 @@ public class DatasetService extends DelegatingDaos.DelegatingDatasetDao {
         namespaceName.getValue(),
         datasetMeta);
 
-    return upsertDatasetMeta(namespaceName.getValue(), datasetName.getValue(), datasetMeta);
+    return upsertDatasetMeta(namespaceName, datasetName, datasetMeta);
   }
 }

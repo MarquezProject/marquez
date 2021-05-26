@@ -92,7 +92,8 @@ public final class ModelGenerator {
         newFields(2),
         newTagNames(2),
         null,
-        newDescription());
+        newDescription(),
+        null);
   }
 
   public static DbTableVersion newDbTableVersion() {
@@ -137,7 +138,8 @@ public final class ModelGenerator {
         newTagNames(2),
         null,
         newSchemaLocation(),
-        newDescription());
+        newDescription(),
+        null);
   }
 
   public static StreamVersion newStreamVersion() {
@@ -205,7 +207,8 @@ public final class ModelGenerator {
         newLocation(),
         newContext(),
         newDescription(),
-        latestRun);
+        latestRun,
+        null);
   }
 
   public static JobId newJobId() {
@@ -230,7 +233,8 @@ public final class ModelGenerator {
 
   public static Run newRun() {
     final Instant now = newTimestamp();
-    return new Run(newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs());
+    return new Run(
+        newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs(), null);
   }
 
   public static String newOwnerName() {

@@ -110,7 +110,7 @@ public class BaseResource {
   }
 
   void throwIfJobDoesNotMatchRun(RunId runId, String namespaceName, String jobName) {
-    Optional<Run> runRow = runService.findBy(runId.getValue());
+    Optional<Run> runRow = runService.findRunByUuid(runId.getValue());
     if (runRow.isEmpty()) {
       throw new RunNotFoundException(runId);
     }
