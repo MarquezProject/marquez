@@ -195,11 +195,14 @@ public class LineageDaoTest {
     // fetch the dataset lineage for the first "downstreamJob" job. It touches the "intermediate"
     // dataset, which is its input, and the "finalOutput", which is its output.
     // There are 3 "downstreamJob" instances which read the same input dataset and 1
-    // "finalConsumer" job, which reads the output. The returned datasets should have
-    // pointers to those consumers.
+    // "finalConsumer" job, which reads the output.
+    // The returned datasets should have pointers only to the consumers specified in the input arg
     JobLineage firstDownstream = downstreamJobs.get(0);
     List<DatasetData> inputDatasets =
-        lineageDao.getInputDatasetsFromJobIds(Collections.singleton(firstDownstream.getId()));
+        lineageDao.getInputDatasetsFromJobIds(
+            new HashSet<>(
+                Arrays.asList(
+                    firstDownstream.getId(), firstDownstream.getDownstreamJobs().get(0).getId())));
 
     // two datasets- intermediate and finalOutput
     assertThat(inputDatasets)
@@ -217,10 +220,8 @@ public class LineageDaoTest {
         .hasSize(1)
         .containsAll(finalConsumers.stream().map(JobLineage::getId)::iterator);
 
-    // second one has 3 consumers- the "downstreamJob"s
-    assertThat(inputDatasets.get(1).getJobUuids())
-        .hasSize(3)
-        .containsAll(downstreamJobs.stream().map(JobLineage::getId)::iterator);
+    // second one has 1 consumers- the "downstreamJob"
+    assertThat(inputDatasets.get(1).getJobUuids()).hasSize(1).contains(firstDownstream.getId());
   }
 
   /**
@@ -362,7 +363,10 @@ public class LineageDaoTest {
             dataset);
 
     List<DatasetData> inputData =
-        lineageDao.getInputDatasetsFromJobIds(Collections.singleton(newRows.get(0).getId()));
+        lineageDao.getInputDatasetsFromJobIds(
+            new HashSet<>(
+                Arrays.asList(
+                    newRows.get(0).getId(), newRows.get(0).getDownstreamJobs().get(0).getId())));
     assertThat(inputData)
         .hasSize(2)
         .map(ds -> ds.getName().getValue())
@@ -407,22 +411,23 @@ public class LineageDaoTest {
     // dataset, which is its input, and the "finalOutput", which is its output.
     JobLineage firstDownstream = downstreamJobs.get(0);
     List<DatasetData> outputDatasets =
-        lineageDao.getOutputDatasetsFromJobIds(Collections.singleton(firstDownstream.getId()));
+        lineageDao.getOutputDatasetsFromJobIds(
+            new HashSet<>(Arrays.asList(jobRows.get(0).getId(), firstDownstream.getId())));
 
-    // two datasets- intermediate and finalOutput
+    // three datasets- commonDataset, intermediate and finalOutput
     assertThat(outputDatasets)
-        .hasSize(2)
+        .hasSize(3)
         .map(DatasetData::getName)
         .map(DatasetName::getValue)
         .containsAll(
             Arrays.asList(
                 "finalOutput<-downstreamJob0<-intermediate<-readJob0<-commonDataset",
-                "intermediate<-readJob0<-commonDataset"));
+                "intermediate<-readJob0<-commonDataset",
+                "commonDataset"));
 
     // find the jobs that output those datasets
     assertThat(outputDatasets)
         .map(DatasetData::getJobUuids)
-        .allMatch(l -> l.size() == 1)
         .flatMap(Function.identity())
         .containsAll(Arrays.asList(firstDownstream.getId(), jobRows.get(0).getId()));
   }

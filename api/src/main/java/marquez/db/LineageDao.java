@@ -89,7 +89,7 @@ public interface LineageDao {
           + "    LEFT JOIN (SELECT dataset_uuid, ARRAY_AGG(DISTINCT v.job_uuid) AS job_ids\n"
           + "        FROM job_versions_io_mapping io2\n"
           + "        INNER JOIN job_versions v on io2.job_version_uuid = v.uuid\n"
-          + "        WHERE io2.io_type='INPUT'\n"
+          + "        WHERE io2.io_type='INPUT' AND v.job_uuid IN (<jobIds>)\n"
           + "        GROUP BY dataset_uuid\n"
           + "        ) io ON io.dataset_uuid=ds.uuid\n"
           + "    LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid;")
@@ -116,7 +116,7 @@ public interface LineageDao {
           + "    LEFT JOIN (SELECT dataset_uuid, ARRAY_AGG(DISTINCT v.job_uuid) AS job_ids\n"
           + "        FROM job_versions_io_mapping io2\n"
           + "        INNER JOIN job_versions v on io2.job_version_uuid = v.uuid\n"
-          + "        WHERE io2.io_type='OUTPUT'\n"
+          + "        WHERE io2.io_type='OUTPUT' AND v.job_uuid IN (<jobIds>)\n"
           + "        GROUP BY dataset_uuid\n"
           + "        ) io ON io.dataset_uuid=ds.uuid\n"
           + "    LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid;")
