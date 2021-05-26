@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -22,6 +21,7 @@ import marquez.common.models.TagName;
 @Value
 @EqualsAndHashCode(of = "id")
 public class DatasetData implements NodeData {
+  UUID uuid;
   @NonNull DatasetId id;
   @NonNull DatasetType type;
   @NonNull DatasetName name;
@@ -34,7 +34,6 @@ public class DatasetData implements NodeData {
   @NonNull ImmutableSet<TagName> tags;
   @Nullable Instant lastModifiedAt;
   @Nullable String description;
-  List<UUID> jobUuids;
 
   public Optional<Instant> getLastModifiedAt() {
     return Optional.ofNullable(lastModifiedAt);
@@ -45,7 +44,7 @@ public class DatasetData implements NodeData {
   }
 
   @JsonIgnore
-  public List<UUID> getJobUuids() {
-    return jobUuids;
+  public UUID getUuid() {
+    return uuid;
   }
 }
