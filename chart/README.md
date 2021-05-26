@@ -3,9 +3,10 @@
 Helm Chart for [Marquez](https://github.com/MarquezProject/marquez).
 
 ## TL;DR;
+Run all commands at the repository root folder.
 
 ```bash
-helm install marquez .
+helm install marquez chart --dependency-update
 ```
 
 ## Prerequisites
@@ -18,7 +19,7 @@ helm install marquez .
 To install the chart with the release name `marquez`:
 
 ```bash
-helm install marquez .
+helm install marquez chart --dependency-update
 ```
 
 > **Note:** For a list of parameters that can be overridden during installation, see the [configuration](#configuration) section.
@@ -118,7 +119,7 @@ the `values.yaml` file or within the Helm CLI command. Again, remove the
 pesky markdown escape character before running this command.
 
 ```bash
-helm install marquez chart --set marquez.db.host=$marquez_db_ip
+helm install marquez chart --dependency-update --set marquez.db.host=$marquez_db_ip
 ```
 
 Once the Kubernetes pods and services have been installed (usually within 5-10 seconds), connectivity
