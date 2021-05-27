@@ -5,12 +5,22 @@
     "docker:disable",
     ":gitSignOff",
     ":separateMultipleMajorReleases",
-    ":automergePatch"
+    ":automergePatch",
+    ":maintainLockFilesDisabled"
   ],
   "baseBranches": ["update-deps"],
-  "lockFileMaintenance": { "enabled": true },
   "schedule": ["every weekend"],
   "npm": {
     "enabled": false
-  }
+  },
+  "packageRules": [
+    {
+      "matchPackageNames": ["com.graphql-java:graphql-java"],
+      "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/"
+    },
+    {
+      "matchPackagePatterns": ["^org.apache.spark:", ".css$", "^gradle$"],
+      "automerge": false
+    }
+  ]
 }
