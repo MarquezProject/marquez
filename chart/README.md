@@ -3,9 +3,10 @@
 Helm Chart for [Marquez](https://github.com/MarquezProject/marquez).
 
 ## TL;DR;
+Run all commands within the "chart" folder.
 
 ```bash
-helm install marquez .
+helm install marquez . --dependency-update
 ```
 
 ## Prerequisites
@@ -18,7 +19,7 @@ helm install marquez .
 To install the chart with the release name `marquez`:
 
 ```bash
-helm install marquez .
+helm install marquez . --dependency-update
 ```
 
 > **Note:** For a list of parameters that can be overridden during installation, see the [configuration](#configuration) section.
@@ -99,11 +100,11 @@ helm delete marquez
 
 ## Local Installation Guide
 If you do not have an existing Postgres database, you can run the following command to create
-one using Docker. Contents of the ```./docker-compose-postgres..yml``` file can be customized
+one using Docker. Contents of the ```./../docker-compose-postgres..yml``` file can be customized
 to better represent your target environment.
 
 ```bash
-docker-compose -f ./docker-compose.postgres.yml -p marquez-postgres up
+docker-compose -f ./../docker-compose.postgres.yml -p marquez-postgres up
 ```
 
 Once the Postgres instance has been created, run the following command to locate the IP
@@ -118,7 +119,7 @@ the `values.yaml` file or within the Helm CLI command. Again, remove the
 pesky markdown escape character before running this command.
 
 ```bash
-helm install marquez chart --set marquez.db.host=$marquez_db_ip
+helm install marquez . --dependency-update --set marquez.db.host=$marquez_db_ip
 ```
 
 Once the Kubernetes pods and services have been installed (usually within 5-10 seconds), connectivity
