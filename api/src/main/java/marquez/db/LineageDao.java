@@ -57,20 +57,23 @@ public interface LineageDao {
           + "        LEFT JOIN job_versions_io_mapping io on v.uuid = io.job_version_uuid\n"
           + "        GROUP BY v.job_uuid\n"
           + "    ),\n"
-          + "    lineage AS (\n"
-          + "        SELECT job_uuid, inputs, outputs\n"
+          + "    lineage(job_uuid, inputs, outputs) AS (\n"
+          + "        SELECT job_uuid, inputs, outputs, 0 AS depth\n"
           + "        FROM job_io\n"
           + "        WHERE job_uuid IN (<jobIds>)\n"
           + "        UNION\n"
-          + "        SELECT io.job_uuid, io.inputs, io.outputs\n"
-          + "        FROM job_io io\n"
-          + "        INNER JOIN lineage l ON array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)\n"
+          + "        SELECT io.job_uuid, io.inputs, io.outputs, l.depth + 1\n"
+          + "        FROM job_io io,\n"
+          + "             lineage l\n"
+          + "        WHERE io.job_uuid != l.job_uuid AND\n"
+          + "        array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)\n"
+          + "        AND depth < :depth"
           + "    )\n"
-          + "SELECT j.*, inputs AS input_uuids, outputs AS output_uuids, jc.context\n"
+          + "SELECT DISTINCT ON (l2.job_uuid) j.*, inputs AS input_uuids, outputs AS output_uuids, jc.context\n"
           + "FROM lineage l2\n"
           + "INNER JOIN jobs j ON j.uuid=l2.job_uuid\n"
           + "LEFT JOIN job_contexts jc on jc.uuid = j.current_job_context_uuid")
-  Set<JobData> getLineage(@BindList Set<UUID> jobIds);
+  Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
 
   @SqlQuery("SELECT uuid from jobs where name = :jobName and namespace_name = :namespace")
   Optional<UUID> getJobUuid(String jobName, String namespace);

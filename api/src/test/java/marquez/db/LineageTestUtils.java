@@ -49,7 +49,7 @@ public class LineageTestUtils {
    * @param outputs
    * @return
    */
-  static UpdateLineageRow createLineageRow(
+  public static UpdateLineageRow createLineageRow(
       OpenLineageDao dao,
       String jobName,
       String status,
@@ -92,7 +92,7 @@ public class LineageTestUtils {
     return updateLineageRow;
   }
 
-  static DatasetFacets newDatasetFacet(SchemaField... fields) {
+  public static DatasetFacets newDatasetFacet(SchemaField... fields) {
     return DatasetFacets.builder()
         .documentation(
             new DocumentationDatasetFacet(PRODUCER_URL, SCHEMA_URL, "the dataset documentation"))
@@ -117,7 +117,7 @@ public class LineageTestUtils {
    * @param dataset
    * @return
    */
-  static List<JobLineage> writeDownstreamLineage(
+  public static List<JobLineage> writeDownstreamLineage(
       OpenLineageDao openLineageDao,
       List<DatasetConsumerJob> downstream,
       JobFacet jobFacet,
@@ -178,7 +178,7 @@ public class LineageTestUtils {
    * (if any) and a list of downstream jobs.
    */
   @Value
-  static class JobLineage {
+  public static class JobLineage {
 
     UUID id;
     String name;
@@ -189,7 +189,7 @@ public class LineageTestUtils {
 
   /** Entity that encapsulates a dataset's consumer jobs and their output dataset names (if any). */
   @Value
-  static class DatasetConsumerJob {
+  public static class DatasetConsumerJob {
 
     String name;
     int numConsumers;

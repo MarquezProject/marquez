@@ -130,7 +130,7 @@ public class LineageDaoTest {
             Arrays.asList());
     // fetch the first "readJob" lineage.
     Set<JobData> connectedJobs =
-        lineageDao.getLineage(new HashSet<>(Arrays.asList(jobRows.get(0).getId())));
+        lineageDao.getLineage(new HashSet<>(Arrays.asList(jobRows.get(0).getId())), 2);
 
     // 20 readJobs + 1 downstreamJob for each (20) + 1 write job = 41
     assertThat(connectedJobs).size().isEqualTo(41);
@@ -178,7 +178,7 @@ public class LineageDaoTest {
             Arrays.asList(),
             Arrays.asList(dataset));
     Set<UUID> lineage =
-        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid())).stream()
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2).stream()
             .map(JobData::getUuid)
             .collect(Collectors.toSet());
     assertThat(lineage).hasSize(1).contains(writeJob.getJob().getUuid());
@@ -191,7 +191,7 @@ public class LineageDaoTest {
         LineageTestUtils.createLineageRow(
             openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
     Set<UUID> lineage =
-        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid())).stream()
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2).stream()
             .map(JobData::getUuid)
             .collect(Collectors.toSet());
 
@@ -231,7 +231,7 @@ public class LineageDaoTest {
 
     // Validate that finalConsumer job only has a single dataset
     Set<UUID> jobIds = Collections.singleton(writeJob.getJob().getUuid());
-    Set<JobData> finalConsumer = lineageDao.getLineage(jobIds);
+    Set<JobData> finalConsumer = lineageDao.getLineage(jobIds, 2);
     assertThat(finalConsumer).hasSize(1).flatMap(JobData::getUuid).hasSize(1).containsAll(jobIds);
   }
 
@@ -256,7 +256,7 @@ public class LineageDaoTest {
         Arrays.asList(dataset),
         Arrays.asList());
     Set<JobData> lineage =
-        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()));
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
 
     assertThat(lineage)
         .hasSize(1)
@@ -311,7 +311,8 @@ public class LineageDaoTest {
         lineageDao.getLineage(
             new HashSet<>(
                 Arrays.asList(
-                    newRows.get(0).getId(), newRows.get(0).getDownstreamJobs().get(0).getId())));
+                    newRows.get(0).getId(), newRows.get(0).getDownstreamJobs().get(0).getId())),
+            2);
     assertThat(lineage)
         .hasSize(7)
         .extracting(JobData::getUuid)
@@ -375,7 +376,7 @@ public class LineageDaoTest {
         Arrays.asList(),
         Arrays.asList(dataset));
     Set<JobData> inputDatasets =
-        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()));
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
     assertThat(inputDatasets)
         .hasSize(1)
         .flatMap(JobData::getUuid)
@@ -401,7 +402,7 @@ public class LineageDaoTest {
 
     // the new job is still returned, even though it isn't connected
     Set<JobData> jobData =
-        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()));
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
     assertThat(jobData)
         .hasSize(1)
         .first()

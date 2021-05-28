@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
@@ -22,6 +23,7 @@ import marquez.service.models.Run;
 
 @Getter
 @AllArgsConstructor
+@ToString(of = {"namespace", "name", "type"})
 public class JobData implements NodeData {
   UUID uuid;
   @NonNull JobId id;

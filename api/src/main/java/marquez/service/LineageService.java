@@ -3,7 +3,6 @@ package marquez.service;
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +36,14 @@ public class LineageService extends DelegatingLineageDao {
     super(delegate);
   }
 
-  public Lineage lineage(NodeId nodeId, int depth) throws ExecutionException, InterruptedException {
+  public Lineage lineage(NodeId nodeId, int depth) {
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
       throw new NodeIdNotFoundException("Could not find node");
     }
     UUID job = optionalUUID.get();
 
-    Set<JobData> jobData = getLineage(Collections.singleton(job));
+    Set<JobData> jobData = getLineage(Collections.singleton(job), depth);
 
     List<Run> runs =
         getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
@@ -61,23 +59,16 @@ public class LineageService extends DelegatingLineageDao {
         }
       }
     }
-    Set<DatasetData> datasets =
-        getDatasetData(
-            jobData.stream()
-                .flatMap(
-                    jd -> Stream.concat(jd.getInputUuids().stream(), jd.getOutputUuids().stream()))
-                .collect(Collectors.toSet()));
+    Set<UUID> datasetIds =
+        jobData.stream()
+            .flatMap(jd -> Stream.concat(jd.getInputUuids().stream(), jd.getOutputUuids().stream()))
+            .collect(Collectors.toSet());
+    Set<DatasetData> datasets = new HashSet<>();
+    if (!datasetIds.isEmpty()) {
+      datasets.addAll(getDatasetData(datasetIds));
+    }
 
     return toLineage(jobData, datasets);
-  }
-
-  private URL jobLocation(String location) {
-    try {
-      return new URL(location);
-    } catch (Exception e) {
-      log.warn("Invalid URL for job row {}", location, e);
-      return null;
-    }
   }
 
   private Lineage toLineage(Set<JobData> jobData, Set<DatasetData> datasets) {

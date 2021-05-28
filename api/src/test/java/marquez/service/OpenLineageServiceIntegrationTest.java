@@ -49,7 +49,7 @@ import org.mockito.ArgumentCaptor;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
-public class OpenLineageServiceTest {
+public class OpenLineageServiceIntegrationTest {
 
   public static final String NAMESPACE = "theNamespace";
   public static final String JOB_NAME = "theJob";
