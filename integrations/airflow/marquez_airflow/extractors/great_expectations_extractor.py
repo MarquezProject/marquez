@@ -14,7 +14,6 @@ import functools
 import logging
 from collections import defaultdict
 
-import attr
 from typing import Optional, Any, Dict
 
 from marquez_airflow.extractors.base import BaseExtractor, StepMetadata
