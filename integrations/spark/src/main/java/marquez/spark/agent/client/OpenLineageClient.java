@@ -173,9 +173,7 @@ public class OpenLineageClient {
 
   private static String getUri() {
     return String.format(
-      "https://github.com/MarquezProject/marquez/tree/%s/integrations/spark",
-      getVersion()
-    );
+        "https://github.com/MarquezProject/marquez/tree/%s/integrations/spark", getVersion());
   }
 
   private static String getVersion() {
