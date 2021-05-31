@@ -66,6 +66,23 @@ test {
     ]
 }
 
+
+task createVersionProperties(dependsOn: processResources) {
+    doLast {
+        File dir = new File("$buildDir/resources/main/marquez/spark/agent/client/")
+        dir.mkdirs();
+        new File("$buildDir/resources/main/marquez/spark/agent/client/version.properties").withWriter { w ->
+            Properties p = new Properties()
+            p['version'] = project.version.toString()
+            p.store w, null
+        }
+    }
+}
+
+classes {
+    dependsOn createVersionProperties
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
