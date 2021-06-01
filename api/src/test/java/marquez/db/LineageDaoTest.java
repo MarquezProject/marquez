@@ -28,6 +28,7 @@ import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.LineageEvent.SourceCodeLocationJobFacet;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.assertj.core.api.ObjectAssert;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -196,6 +197,33 @@ public class LineageDaoTest {
             .collect(Collectors.toSet());
 
     assertThat(lineage).hasSize(1).first().isEqualTo(writeJob.getJob().getUuid());
+  }
+
+  @Test
+  public void testGetLineageWithNewJobInRunningState() {
+
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "RUNNING",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
+    Set<JobData> lineage =
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
+
+    // assert the job does exist
+    ObjectAssert<JobData> writeAssert = assertThat(lineage).hasSize(1).first();
+    writeAssert.extracting(JobData::getUuid).isEqualTo(writeJob.getJob().getUuid());
+
+    // job in running state doesn't yet have any datasets in its lineage
+    writeAssert
+        .extracting(JobData::getOutputUuids, InstanceOfAssertFactories.iterable(UUID.class))
+        .isEmpty();
+    writeAssert
+        .extracting(JobData::getInputUuids, InstanceOfAssertFactories.iterable(UUID.class))
+        .isEmpty();
   }
 
   /**
