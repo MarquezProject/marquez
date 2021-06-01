@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 import marquez.db.mappers.DatasetDataMapper;
 import marquez.db.mappers.JobDataMapper;
+import marquez.db.mappers.JobRowMapper;
 import marquez.db.mappers.RunMapper;
 import marquez.db.models.DatasetData;
 import marquez.db.models.JobData;
@@ -32,6 +33,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 @RegisterRowMapper(DatasetDataMapper.class)
 @RegisterRowMapper(JobDataMapper.class)
 @RegisterRowMapper(RunMapper.class)
+@RegisterRowMapper(JobRowMapper.class)
 public interface LineageDao {
 
   /**
@@ -45,89 +47,43 @@ public interface LineageDao {
    */
   @SqlQuery(
       // dataset_ids: all the input and output datasets of the current version of the specified jobs
-      "WITH dataset_ids AS (\n"
-          + "    SELECT DISTINCT dataset_uuid\n"
+      "WITH RECURSIVE\n"
+          + "    job_io AS (\n"
+          + "        SELECT job_uuid,\n"
+          + "        ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='INPUT') AS inputs,\n"
+          + "        ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='OUTPUT') AS outputs\n"
           + "        FROM jobs j\n"
-          + "        INNER JOIN job_versions_io_mapping io ON io.job_version_uuid=j.current_version_uuid\n"
-          + "        WHERE j.uuid IN (<jobIds>)\n"
-          + ")\n"
-          // SELECT DISTINCT j.uuid:
-          // all the jobs that have ever read from or written to those datasets.
-          // note that this includes previous versions of jobs that no longer interact with those
-          // datasets
-          + "SELECT DISTINCT j.uuid\n"
-          + "    FROM job_versions_io_mapping io\n"
-          + "    INNER JOIN dataset_ids ON io.dataset_uuid=dataset_ids.dataset_uuid\n"
-          + "    INNER JOIN job_versions jv ON jv.uuid=io.job_version_uuid\n"
-          + "    INNER JOIN jobs j ON j.uuid=jv.job_uuid")
-  Set<UUID> getLineage(@BindList Set<UUID> jobIds);
+          + "        INNER JOIN job_versions v on j.current_version_uuid = v.uuid\n"
+          + "        LEFT JOIN job_versions_io_mapping io on v.uuid = io.job_version_uuid\n"
+          + "        GROUP BY v.job_uuid\n"
+          + "    ),\n"
+          + "    lineage(job_uuid, inputs, outputs) AS (\n"
+          + "        SELECT job_uuid, inputs, outputs, 0 AS depth\n"
+          + "        FROM job_io\n"
+          + "        WHERE job_uuid IN (<jobIds>)\n"
+          + "        UNION\n"
+          + "        SELECT io.job_uuid, io.inputs, io.outputs, l.depth + 1\n"
+          + "        FROM job_io io,\n"
+          + "             lineage l\n"
+          + "        WHERE io.job_uuid != l.job_uuid AND\n"
+          + "        array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)\n"
+          + "        AND depth < :depth"
+          + "    )\n"
+          + "SELECT DISTINCT ON (l2.job_uuid) j.*, inputs AS input_uuids, outputs AS output_uuids, jc.context\n"
+          + "FROM lineage l2\n"
+          + "INNER JOIN jobs j ON j.uuid=l2.job_uuid\n"
+          + "LEFT JOIN job_contexts jc on jc.uuid = j.current_job_context_uuid")
+  Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
 
   @SqlQuery("SELECT uuid from jobs where name = :jobName and namespace_name = :namespace")
   Optional<UUID> getJobUuid(String jobName, String namespace);
 
-  // TODO- the input and output dataset methods below can be combined into a single SQL query
-  // that fetches input and output edges for the returned datasets all at once.
-
-  /**
-   * Return a list of datasets that are either inputs or outputs of the specified job ids and the
-   * <i>output</i> edges of those datasets. Jobs that have no inputs or outputs will return an empty
-   * list.
-   *
-   * @param jobIds
-   * @return
-   */
   @SqlQuery(
-      "WITH dataset_ids AS (\n"
-          + "    SELECT DISTINCT dataset_uuid\n"
-          + "    FROM jobs j\n"
-          + "    INNER JOIN job_versions_io_mapping io ON io.job_version_uuid=j.current_version_uuid\n"
-          + "    WHERE j.uuid IN (<jobIds>)\n"
-          + ")\n"
-          + "SELECT ds.*, COALESCE(job_ids, '{}') AS job_ids, dv.fields\n"
+      "SELECT ds.*, dv.fields\n"
           + "FROM datasets ds\n"
-          + "    INNER JOIN dataset_ids ON dataset_ids.dataset_uuid=ds.uuid\n"
-          + "    LEFT JOIN (SELECT dataset_uuid, ARRAY_AGG(DISTINCT v.job_uuid) AS job_ids\n"
-          + "        FROM job_versions_io_mapping io2\n"
-          + "        INNER JOIN job_versions v on io2.job_version_uuid = v.uuid\n"
-          + "        WHERE io2.io_type='INPUT'\n"
-          + "        GROUP BY dataset_uuid\n"
-          + "        ) io ON io.dataset_uuid=ds.uuid\n"
-          + "    LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid;")
-  List<DatasetData> getInputDatasetsFromJobIds(@BindList Set<UUID> jobIds);
-
-  /**
-   * Return a list of datasets that are either inputs or outputs of the specified job ids and the
-   * <i>input</i> edges of those datasets. Jobs that have no inputs or outputs will return an empty
-   * list.
-   *
-   * @param jobIds
-   * @return
-   */
-  @SqlQuery(
-      "WITH dataset_ids AS (\n"
-          + "    SELECT DISTINCT dataset_uuid\n"
-          + "    FROM jobs j\n"
-          + "    INNER JOIN job_versions_io_mapping io ON io.job_version_uuid=j.current_version_uuid\n"
-          + "    WHERE j.uuid IN (<jobIds>)\n"
-          + ")\n"
-          + "SELECT ds.*, COALESCE(job_ids, '{}') AS job_ids, dv.fields\n"
-          + "FROM datasets ds\n"
-          + "    INNER JOIN dataset_ids ON dataset_ids.dataset_uuid=ds.uuid\n"
-          + "    LEFT JOIN (SELECT dataset_uuid, ARRAY_AGG(DISTINCT v.job_uuid) AS job_ids\n"
-          + "        FROM job_versions_io_mapping io2\n"
-          + "        INNER JOIN job_versions v on io2.job_version_uuid = v.uuid\n"
-          + "        WHERE io2.io_type='OUTPUT'\n"
-          + "        GROUP BY dataset_uuid\n"
-          + "        ) io ON io.dataset_uuid=ds.uuid\n"
-          + "    LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid;")
-  List<DatasetData> getOutputDatasetsFromJobIds(@BindList Set<UUID> jobIds);
-
-  @SqlQuery(
-      "select j.*, jc.context\n"
-          + "from jobs j\n"
-          + "left outer join job_contexts jc on jc.uuid = j.current_job_context_uuid\n"
-          + "where j.uuid in (<uuid>)")
-  List<JobData> getJob(@BindList Collection<UUID> uuid);
+          + "LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid\n"
+          + "WHERE ds.uuid IN (<dsUuids>);")
+  Set<DatasetData> getDatasetData(@BindList Set<UUID> dsUuids);
 
   @SqlQuery(
       "select j.uuid from jobs j\n"

@@ -4,6 +4,7 @@ import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.urlOrNull;
+import static marquez.db.Columns.uuidArrayOrEmpty;
 import static marquez.db.Columns.uuidOrThrow;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -38,7 +39,9 @@ public class JobDataMapper implements RowMapper<JobData> {
         timestampOrThrow(results, Columns.UPDATED_AT),
         NamespaceName.of(stringOrThrow(results, Columns.NAMESPACE_NAME)),
         ImmutableSet.<DatasetId>of(),
+        ImmutableSet.copyOf(uuidArrayOrEmpty(results, Columns.INPUT_UUIDS)),
         ImmutableSet.<DatasetId>of(),
+        ImmutableSet.copyOf(uuidArrayOrEmpty(results, Columns.OUTPUT_UUIDS)),
         urlOrNull(results, "current_location"),
         toContext(results, Columns.CONTEXT),
         stringOrNull(results, Columns.DESCRIPTION),

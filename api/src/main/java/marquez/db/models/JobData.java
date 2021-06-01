@@ -6,12 +6,14 @@ import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
@@ -21,6 +23,7 @@ import marquez.service.models.Run;
 
 @Getter
 @AllArgsConstructor
+@ToString(of = {"namespace", "name", "type"})
 public class JobData implements NodeData {
   UUID uuid;
   @NonNull JobId id;
@@ -30,7 +33,9 @@ public class JobData implements NodeData {
   @NonNull Instant updatedAt;
   @NonNull NamespaceName namespace;
   @NonNull @Setter ImmutableSet<DatasetId> inputs;
+  @NonNull @Setter ImmutableSet<UUID> inputUuids;
   @NonNull @Setter ImmutableSet<DatasetId> outputs;
+  @NonNull @Setter ImmutableSet<UUID> outputUuids;
   @Nullable URL location;
   @NonNull ImmutableMap<String, String> context;
   @Nullable String description;
@@ -51,5 +56,15 @@ public class JobData implements NodeData {
   @JsonIgnore
   public UUID getUuid() {
     return uuid;
+  }
+
+  @JsonIgnore
+  public Set<UUID> getInputUuids() {
+    return inputUuids;
+  }
+
+  @JsonIgnore
+  public Set<UUID> getOutputUuids() {
+    return outputUuids;
   }
 }

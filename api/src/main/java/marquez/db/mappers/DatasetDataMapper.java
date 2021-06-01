@@ -4,7 +4,7 @@ import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
-import static marquez.db.Columns.uuidArrayOrThrow;
+import static marquez.db.Columns.uuidOrThrow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,6 +36,7 @@ public class DatasetDataMapper implements RowMapper<DatasetData> {
   public DatasetData map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
     return new DatasetData(
+        uuidOrThrow(results, Columns.ROW_UUID),
         new DatasetId(
             NamespaceName.of(stringOrThrow(results, Columns.NAMESPACE_NAME)),
             DatasetName.of(stringOrThrow(results, Columns.NAME))),
@@ -49,8 +50,7 @@ public class DatasetDataMapper implements RowMapper<DatasetData> {
         toFields(results, "fields"),
         ImmutableSet.of(),
         timestampOrNull(results, Columns.LAST_MODIFIED_AT),
-        stringOrNull(results, Columns.DESCRIPTION),
-        uuidArrayOrThrow(results, "job_ids"));
+        stringOrNull(results, Columns.DESCRIPTION));
   }
 
   public static ImmutableList<Field> toFields(ResultSet results, String column)
