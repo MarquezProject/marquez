@@ -5,17 +5,18 @@ import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.base.Functions;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import marquez.common.models.DatasetName;
+import java.util.stream.Stream;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
 import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.models.DatasetData;
@@ -26,6 +27,7 @@ import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.LineageEvent.SourceCodeLocationJobFacet;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -101,7 +103,7 @@ public class LineageDaoTest {
             jobFacet,
             dataset);
 
-    // don't expect a failed job job in the returned lineage
+    // don't expect a failed job in the returned lineage
     UpdateLineageRow failedJobRow =
         LineageTestUtils.createLineageRow(
             openLineageDao,
@@ -111,33 +113,57 @@ public class LineageDaoTest {
             Arrays.asList(dataset),
             Arrays.asList());
 
+    // don't expect a disjoint job in the returned lineage
+    UpdateLineageRow disjointJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeRandomDataset",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(
+                new Dataset(
+                    NAMESPACE,
+                    "randomDataset",
+                    newDatasetFacet(
+                        new SchemaField("firstname", "string", "the first name"),
+                        new SchemaField("lastname", "string", "the last name")))),
+            Arrays.asList());
     // fetch the first "readJob" lineage.
-    Set<UUID> connectedJobs =
-        lineageDao.getLineage(new HashSet<>(Arrays.asList(jobRows.get(0).getId())));
-    assertThat(connectedJobs).size().isEqualTo(22);
+    Set<JobData> connectedJobs =
+        lineageDao.getLineage(new HashSet<>(Arrays.asList(jobRows.get(0).getId())), 2);
 
+    // 20 readJobs + 1 downstreamJob for each (20) + 1 write job = 41
+    assertThat(connectedJobs).size().isEqualTo(41);
+
+    Set<UUID> jobIds = connectedJobs.stream().map(JobData::getUuid).collect(Collectors.toSet());
     // expect the job that wrote "commonDataset", which is readJob0's input
-    assertThat(connectedJobs).contains(writeJob.getJob().getUuid());
+    assertThat(jobIds).contains(writeJob.getJob().getUuid());
 
-    // expect all jobs that read the same input dataset as readJob0
+    // expect all downstream jobs
     Set<UUID> readJobUUIDs =
-        jobRows.stream().map(LineageTestUtils.JobLineage::getId).collect(Collectors.toSet());
-    assertThat(connectedJobs).contains(readJobUUIDs.toArray(UUID[]::new));
+        jobRows.stream()
+            .flatMap(row -> Stream.concat(Stream.of(row), row.getDownstreamJobs().stream()))
+            .map(JobLineage::getId)
+            .collect(Collectors.toSet());
+    assertThat(jobIds).containsAll(readJobUUIDs);
 
     // expect that the failed job that reads the same input dataset is not present
-    assertThat(connectedJobs).doesNotContain(failedJobRow.getJob().getUuid());
+    assertThat(jobIds).doesNotContain(failedJobRow.getJob().getUuid());
 
-    // also expect all jobs that read the output of readJob0 (downstreamJob0)
-    Optional<JobData> downstreamJob =
-        connectedJobs.stream()
-            .filter(id -> !readJobUUIDs.contains(id) && !id.equals(writeJob.getJob().getUuid()))
-            .flatMap(id -> lineageDao.getJob(Collections.singletonList(id)).stream())
-            .findAny();
-    assertThat(downstreamJob)
-        .isPresent()
-        .map(jd -> jd.getName().getValue())
-        .get()
-        .isEqualTo("downstreamJob0<-outputData<-readJob0<-commonDataset");
+    // expect that the disjoint job that reads a random dataset is not present
+    assertThat(jobIds).doesNotContain(disjointJob.getJob().getUuid());
+
+    Map<UUID, JobData> actualJobRows =
+        connectedJobs.stream().collect(Collectors.toMap(JobData::getUuid, Functions.identity()));
+    for (JobLineage expected : jobRows) {
+      JobData job = actualJobRows.get(expected.getId());
+      assertThat(job.getInputUuids())
+          .containsAll(
+              expected.getInput().map(ds -> ds.getDatasetRow().getUuid()).stream()::iterator);
+      assertThat(job.getOutputUuids())
+          .containsAll(
+              expected.getOutput().map(ds -> ds.getDatasetRow().getUuid()).stream()::iterator);
+    }
   }
 
   @Test
@@ -151,7 +177,10 @@ public class LineageDaoTest {
             jobFacet,
             Arrays.asList(),
             Arrays.asList(dataset));
-    Set<UUID> lineage = lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()));
+    Set<UUID> lineage =
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2).stream()
+            .map(JobData::getUuid)
+            .collect(Collectors.toSet());
     assertThat(lineage).hasSize(1).contains(writeJob.getJob().getUuid());
   }
 
@@ -161,66 +190,12 @@ public class LineageDaoTest {
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
-    Set<UUID> lineage = lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()));
-    assertThat(lineage).isEmpty();
-  }
+    Set<UUID> lineage =
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2).stream()
+            .map(JobData::getUuid)
+            .collect(Collectors.toSet());
 
-  /**
-   * Test the datasets that are inputs to the specified job are returned along with their output
-   * edges.
-   */
-  @Test
-  public void testGetInputDatasetsFromJobIds() {
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
-
-    // create a graph starting with the commonDataset, which spawns 20 consumers.
-    // each of those spawns 3 consumers of the "intermediate" dataset
-    // each of those spawns 1 consumer of the "finalOutput" dataset
-    List<JobLineage> jobRows =
-        writeDownstreamLineage(
-            openLineageDao,
-            new LinkedList<>(
-                Arrays.asList(
-                    new DatasetConsumerJob("readJob", 20, Optional.of("intermediate")),
-                    new DatasetConsumerJob("downstreamJob", 3, Optional.of("finalOutput")),
-                    new DatasetConsumerJob("finalConsumer", 1, Optional.empty()))),
-            jobFacet,
-            dataset);
-    // sanity check
-    List<JobLineage> downstreamJobs = jobRows.get(0).getDownstreamJobs();
-    assertThat(downstreamJobs).hasSize(3);
-
-    // fetch the dataset lineage for the first "downstreamJob" job. It touches the "intermediate"
-    // dataset, which is its input, and the "finalOutput", which is its output.
-    // There are 3 "downstreamJob" instances which read the same input dataset and 1
-    // "finalConsumer" job, which reads the output. The returned datasets should have
-    // pointers to those consumers.
-    JobLineage firstDownstream = downstreamJobs.get(0);
-    List<DatasetData> inputDatasets =
-        lineageDao.getInputDatasetsFromJobIds(Collections.singleton(firstDownstream.getId()));
-
-    // two datasets- intermediate and finalOutput
-    assertThat(inputDatasets)
-        .hasSize(2)
-        .map(DatasetData::getName)
-        .map(DatasetName::getValue)
-        .containsAll(
-            Arrays.asList(
-                "finalOutput<-downstreamJob0<-intermediate<-readJob0<-commonDataset",
-                "intermediate<-readJob0<-commonDataset"));
-
-    // first has 1 consumer- the "finalConsumer"
-    List<JobLineage> finalConsumers = firstDownstream.getDownstreamJobs();
-    assertThat(inputDatasets.get(0).getJobUuids())
-        .hasSize(1)
-        .containsAll(finalConsumers.stream().map(JobLineage::getId)::iterator);
-
-    // second one has 3 consumers- the "downstreamJob"s
-    assertThat(inputDatasets.get(1).getJobUuids())
-        .hasSize(3)
-        .containsAll(downstreamJobs.stream().map(JobLineage::getId)::iterator);
+    assertThat(lineage).hasSize(1).first().isEqualTo(writeJob.getJob().getUuid());
   }
 
   /**
@@ -228,7 +203,7 @@ public class LineageDaoTest {
    * the consumed dataset
    */
   @Test
-  public void testGetInputDatasetsWithJobThatSharesNoDatasets() {
+  public void testGetLineageWithJobThatSharesNoDatasets() {
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             openLineageDao,
@@ -256,46 +231,13 @@ public class LineageDaoTest {
 
     // Validate that finalConsumer job only has a single dataset
     Set<UUID> jobIds = Collections.singleton(writeJob.getJob().getUuid());
-    List<DatasetData> inputsForFinalConsumer = lineageDao.getInputDatasetsFromJobIds(jobIds);
-    assertThat(inputsForFinalConsumer)
-        .hasSize(1)
-        .flatMap(DatasetData::getJobUuids)
-        .hasSize(1)
-        .containsAll(jobIds);
-  }
-
-  @Test
-  public void testGetInputDatasetsWithJobThatHasNoDatasets() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
-
-    UpdateLineageRow writeJob =
-        LineageTestUtils.createLineageRow(
-            openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
-    Set<UUID> jobIds = Collections.singleton(writeJob.getJob().getUuid());
-    List<DatasetData> inputDatasets = lineageDao.getInputDatasetsFromJobIds(jobIds);
-    assertThat(inputDatasets).isEmpty();
-  }
-
-  @Test
-  public void testGetInputDatasetsWithJobThatHasOnlyOutputs() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
-
-    UpdateLineageRow writeJob =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "writeJob",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(),
-            Arrays.asList(dataset));
-    List<DatasetData> inputDatasets =
-        lineageDao.getInputDatasetsFromJobIds(Collections.singleton(writeJob.getJob().getUuid()));
-    assertThat(inputDatasets).hasSize(1).flatMap(DatasetData::getJobUuids).isEmpty();
+    Set<JobData> finalConsumer = lineageDao.getLineage(jobIds, 2);
+    assertThat(finalConsumer).hasSize(1).flatMap(JobData::getUuid).hasSize(1).containsAll(jobIds);
   }
 
   /** A failed consumer job doesn't show up in the datasets out edges */
   @Test
-  public void testGetInputDatasetsWithFailedConsumer() {
+  public void testGetLineageWithFailedConsumer() {
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
 
     UpdateLineageRow writeJob =
@@ -313,9 +255,13 @@ public class LineageDaoTest {
         jobFacet,
         Arrays.asList(dataset),
         Arrays.asList());
-    List<DatasetData> inputDatasets =
-        lineageDao.getInputDatasetsFromJobIds(Collections.singleton(writeJob.getJob().getUuid()));
-    assertThat(inputDatasets).hasSize(1).flatMap(DatasetData::getJobUuids).isEmpty();
+    Set<JobData> lineage =
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
+
+    assertThat(lineage)
+        .hasSize(1)
+        .extracting(JobData::getUuid)
+        .contains(writeJob.getJob().getUuid());
   }
 
   /**
@@ -361,144 +307,57 @@ public class LineageDaoTest {
             newVersionFacet,
             dataset);
 
-    List<DatasetData> inputData =
-        lineageDao.getInputDatasetsFromJobIds(Collections.singleton(newRows.get(0).getId()));
-    assertThat(inputData)
-        .hasSize(2)
-        .map(ds -> ds.getName().getValue())
-        .containsAll(Arrays.asList("outputData2<-readJob0<-commonDataset", "commonDataset"))
-        .doesNotContain("outputData<-readJob0<-commonDataset");
-
-    assertThat(inputData)
-        .filteredOn(ds -> ds.getName().getValue().equals("outputData2<-readJob0<-commonDataset"))
-        .isNotEmpty()
-        .map(DatasetData::getJobUuids)
-        .first()
-        .asList()
-        .hasSize(1)
-        .contains(newRows.get(0).getDownstreamJobs().get(0).getId());
-  }
-
-  /** */
-  @Test
-  public void testGetOutputDatasetsFromJobIds() {
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
-
-    // create a graph starting with the commonDataset, which spawns 20 consumers.
-    // each of those spawns 3 consumers of the "intermediate" dataset
-    // each of those spawns 1 consumer of the "finalOutput" dataset
-    List<JobLineage> jobRows =
-        writeDownstreamLineage(
-            openLineageDao,
-            new LinkedList<>(
+    Set<JobData> lineage =
+        lineageDao.getLineage(
+            new HashSet<>(
                 Arrays.asList(
-                    new DatasetConsumerJob("readJob", 20, Optional.of("intermediate")),
-                    new DatasetConsumerJob("downstreamJob", 3, Optional.of("finalOutput")),
-                    new DatasetConsumerJob("finalConsumer", 1, Optional.empty()))),
-            jobFacet,
-            dataset);
-    // sanity check
-    List<JobLineage> downstreamJobs = jobRows.get(0).getDownstreamJobs();
-    assertThat(downstreamJobs).hasSize(3);
-
-    // fetch the dataset lineage for the first "downstreamJob" job. It touches the "intermediate"
-    // dataset, which is its input, and the "finalOutput", which is its output.
-    JobLineage firstDownstream = downstreamJobs.get(0);
-    List<DatasetData> outputDatasets =
-        lineageDao.getOutputDatasetsFromJobIds(Collections.singleton(firstDownstream.getId()));
-
-    // two datasets- intermediate and finalOutput
-    assertThat(outputDatasets)
-        .hasSize(2)
-        .map(DatasetData::getName)
-        .map(DatasetName::getValue)
+                    newRows.get(0).getId(), newRows.get(0).getDownstreamJobs().get(0).getId())),
+            2);
+    assertThat(lineage)
+        .hasSize(7)
+        .extracting(JobData::getUuid)
         .containsAll(
-            Arrays.asList(
-                "finalOutput<-downstreamJob0<-intermediate<-readJob0<-commonDataset",
-                "intermediate<-readJob0<-commonDataset"));
-
-    // find the jobs that output those datasets
-    assertThat(outputDatasets)
-        .map(DatasetData::getJobUuids)
-        .allMatch(l -> l.size() == 1)
-        .flatMap(Function.identity())
-        .containsAll(Arrays.asList(firstDownstream.getId(), jobRows.get(0).getId()));
-  }
-
-  /**
-   * Validate a job that consumes a dataset, but shares no datasets with any other job returns only
-   * the consumed dataset
-   */
-  @Test
-  public void testGetOutputDatasetsWithJobThatSharesNoDatasets() {
-    UpdateLineageRow writeJob =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "writeJob",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(),
-            Arrays.asList(dataset));
-
-    // write a new dataset with a different name
-    Dataset anotherDataset =
-        new Dataset(
-            NAMESPACE,
-            "anUncommonDataset",
-            newDatasetFacet(
-                new SchemaField("firstname", "string", "the first name"),
-                new SchemaField("lastname", "string", "the last name"),
-                new SchemaField("birthdate", "date", "the date of birth")));
-    // write a bunch of jobs that share nothing with the writeJob
-    writeDownstreamLineage(
-        openLineageDao,
-        Arrays.asList(new DatasetConsumerJob("consumer", 5, Optional.empty())),
-        jobFacet,
-        anotherDataset);
-
-    Set<UUID> jobIds = Collections.singleton(writeJob.getJob().getUuid());
-    List<DatasetData> outputDatasets = lineageDao.getOutputDatasetsFromJobIds(jobIds);
-    assertThat(outputDatasets)
+            newRows.stream()
+                    .flatMap(r -> Stream.concat(Stream.of(r), r.getDownstreamJobs().stream()))
+                    .map(JobLineage::getId)
+                ::iterator);
+    assertThat(lineage)
+        .filteredOn(r -> r.getName().getValue().equals("readJob0<-commonDataset"))
         .hasSize(1)
-        .flatMap(DatasetData::getJobUuids)
+        .first()
+        .extracting(JobData::getOutputUuids, InstanceOfAssertFactories.iterable(UUID.class))
         .hasSize(1)
-        .containsAll(jobIds);
+        .first()
+        .isEqualTo(newRows.get(0).getOutput().get().getDatasetRow().getUuid());
+
+    assertThat(lineage)
+        .filteredOn(
+            r ->
+                r.getName()
+                    .getValue()
+                    .equals("downstreamJob0<-outputData2<-readJob0<-commonDataset"))
+        .hasSize(1)
+        .first()
+        .extracting(JobData::getInputUuids, InstanceOfAssertFactories.iterable(UUID.class))
+        .hasSize(1)
+        .first()
+        .isEqualTo(
+            newRows.get(0).getDownstreamJobs().get(0).getInput().get().getDatasetRow().getUuid());
+    assertThat(lineage)
+        .filteredOn(
+            r ->
+                r.getName()
+                    .getValue()
+                    .equals("downstreamJob0<-outputData2<-readJob0<-commonDataset"))
+        .hasSize(1)
+        .first()
+        .extracting(JobData::getOutputUuids, InstanceOfAssertFactories.iterable(UUID.class))
+        .isEmpty();
   }
 
+  /** A failed producer job doesn't show up in the lineage */
   @Test
-  public void testGetOutputDatasetsWithJobThatHasNoDatasets() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
-
-    UpdateLineageRow writeJob =
-        LineageTestUtils.createLineageRow(
-            openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
-    List<DatasetData> lineage =
-        lineageDao.getOutputDatasetsFromJobIds(Collections.singleton(writeJob.getJob().getUuid()));
-    assertThat(lineage).isEmpty();
-  }
-
-  @Test
-  public void testGetOutputDatasetsWithJobThatHasOnlyInputs() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
-
-    UpdateLineageRow writeJob =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "writeJob",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(dataset),
-            Arrays.asList());
-    Set<UUID> jobIds = Collections.singleton(writeJob.getJob().getUuid());
-    List<DatasetData> outputDatasets = lineageDao.getOutputDatasetsFromJobIds(jobIds);
-    assertThat(outputDatasets).hasSize(1).flatMap(DatasetData::getJobUuids).isEmpty();
-  }
-
-  /** A failed producer job doesn't show up in the datasets in edges */
-  @Test
-  public void testGetOutputDatasetsWithFailedProducer() {
+  public void testGetLineageWithFailedProducer() {
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
 
     UpdateLineageRow writeJob =
@@ -516,17 +375,19 @@ public class LineageDaoTest {
         jobFacet,
         Arrays.asList(),
         Arrays.asList(dataset));
-    List<DatasetData> inputDatasets =
-        lineageDao.getOutputDatasetsFromJobIds(Collections.singleton(writeJob.getJob().getUuid()));
+    Set<JobData> inputDatasets =
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
     assertThat(inputDatasets)
         .hasSize(1)
-        .flatMap(DatasetData::getJobUuids)
+        .flatMap(JobData::getUuid)
         .hasSize(1)
         .contains(writeJob.getJob().getUuid());
   }
 
+  /** A failed producer job doesn't show up in the lineage */
   @Test
-  public void testGetOuptutDatasetsWithJobThatHasMultipleVersions() {
+  public void testGetLineageChangedJobVersion() {
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -536,50 +397,18 @@ public class LineageDaoTest {
             jobFacet,
             Arrays.asList(),
             Arrays.asList(dataset));
+    LineageTestUtils.createLineageRow(
+        openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
 
-    writeDownstreamLineage(
-        openLineageDao,
-        new LinkedList<>(
-            Arrays.asList(
-                new DatasetConsumerJob("readJob", 3, Optional.of("outputData")),
-                new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
-        jobFacet,
-        dataset);
-
-    JobFacet newVersionFacet =
-        JobFacet.builder()
-            .sourceCodeLocation(
-                SourceCodeLocationJobFacet.builder().url("git@github:location").build())
-            .additional(LineageTestUtils.EMPTY_MAP)
-            .build();
-
-    // readJobV2 produces outputData2 and not outputData
-    List<JobLineage> newRows =
-        writeDownstreamLineage(
-            openLineageDao,
-            new LinkedList<>(
-                Arrays.asList(
-                    new DatasetConsumerJob("readJob", 3, Optional.of("outputData2")),
-                    new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
-            newVersionFacet,
-            dataset);
-
-    List<DatasetData> inputData =
-        lineageDao.getOutputDatasetsFromJobIds(Collections.singleton(newRows.get(0).getId()));
-    assertThat(inputData)
-        .hasSize(2)
-        .map(ds -> ds.getName().getValue())
-        .containsAll(Arrays.asList("outputData2<-readJob0<-commonDataset", "commonDataset"))
-        .doesNotContain("outputData<-readJob0<-commonDataset");
-
-    assertThat(inputData)
-        .filteredOn(ds -> ds.getName().getValue().equals("outputData2<-readJob0<-commonDataset"))
-        .isNotEmpty()
-        .map(DatasetData::getJobUuids)
-        .first()
-        .asList()
+    // the new job is still returned, even though it isn't connected
+    Set<JobData> jobData =
+        lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
+    assertThat(jobData)
         .hasSize(1)
-        .contains(newRows.get(0).getId());
+        .first()
+        .matches(jd -> jd.getUuid().equals(writeJob.getJob().getUuid()))
+        .extracting(JobData::getOutputUuids, InstanceOfAssertFactories.iterable(UUID.class))
+        .isEmpty();
   }
 
   @Test
@@ -648,5 +477,29 @@ public class LineageDaoTest {
     Optional<UUID> jobNode =
         lineageDao.getJobFromInputOrOutput(dataset.getName(), dataset.getNamespace());
     assertThat(jobNode).isPresent().get().isEqualTo(writeJob.getJob().getUuid());
+  }
+
+  @Test
+  public void testGetDatasetData() {
+    LineageTestUtils.createLineageRow(
+        openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+    List<JobLineage> newRows =
+        writeDownstreamLineage(
+            openLineageDao,
+            new LinkedList<>(
+                Arrays.asList(
+                    new DatasetConsumerJob("readJob", 3, Optional.of("outputData2")),
+                    new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
+            jobFacet,
+            dataset);
+    Set<DatasetData> datasetData =
+        lineageDao.getDatasetData(
+            newRows.stream()
+                .map(j -> j.getOutput().get().getDatasetRow().getUuid())
+                .collect(Collectors.toSet()));
+    assertThat(datasetData)
+        .hasSize(3)
+        .extracting(ds -> ds.getName().getValue())
+        .allMatch(str -> str.contains("outputData2"));
   }
 }

@@ -1,9 +1,9 @@
 package marquez.service;
 
-import static marquez.tracing.SentryPropagating.withSentry;
-
+import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -13,8 +13,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
@@ -36,36 +36,17 @@ public class LineageService extends DelegatingLineageDao {
     super(delegate);
   }
 
-  public Lineage lineage(NodeId nodeId, int depth) throws ExecutionException, InterruptedException {
+  public Lineage lineage(NodeId nodeId, int depth) {
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
       throw new NodeIdNotFoundException("Could not find node");
     }
     UUID job = optionalUUID.get();
 
-    Set<UUID> seen = new LinkedHashSet<>();
-    Set<UUID> cur = new HashSet<>();
-    cur.add(job);
+    Set<JobData> jobData = getLineage(Collections.singleton(job), depth);
 
-    int i = 0;
-    do {
-      cur = getLineage(cur);
-      cur = new HashSet<UUID>(cur); // allow it to be mutable
-      cur.removeAll(seen); // remove any dupes from current
-      seen.addAll(cur); // add to seen list
-    } while (i++ < depth && !cur.isEmpty()); // working set is empty or depth is reached
-    seen.add(job); // include the base job
-
-    CompletableFuture<List<JobData>> jobFuture =
-        CompletableFuture.supplyAsync(withSentry(() -> getJob(seen)));
-    CompletableFuture<List<DatasetData>> inFuture =
-        CompletableFuture.supplyAsync(withSentry(() -> getInputDatasetsFromJobIds(seen)));
-    CompletableFuture<List<DatasetData>> outFuture =
-        CompletableFuture.supplyAsync(withSentry(() -> getOutputDatasetsFromJobIds(seen)));
-    CompletableFuture.allOf(jobFuture, inFuture, outFuture).get();
-
-    List<Run> runs = getCurrentRuns(seen);
-    List<JobData> jobData = jobFuture.get();
+    List<Run> runs =
+        getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
     // todo fix runtime
     for (JobData j : jobData) {
       if (j.getLatestRun().isEmpty()) {
@@ -78,42 +59,44 @@ public class LineageService extends DelegatingLineageDao {
         }
       }
     }
+    Set<UUID> datasetIds =
+        jobData.stream()
+            .flatMap(jd -> Stream.concat(jd.getInputUuids().stream(), jd.getOutputUuids().stream()))
+            .collect(Collectors.toSet());
+    Set<DatasetData> datasets = new HashSet<>();
+    if (!datasetIds.isEmpty()) {
+      datasets.addAll(getDatasetData(datasetIds));
+    }
 
-    return toLineage(seen, jobData, inFuture.get(), outFuture.get());
+    return toLineage(jobData, datasets);
   }
 
-  private Lineage toLineage(
-      Set<UUID> seen, List<JobData> jobData, List<DatasetData> input, List<DatasetData> output) {
+  private Lineage toLineage(Set<JobData> jobData, Set<DatasetData> datasets) {
     Set<Node> nodes = new LinkedHashSet<>();
     // build mapping for later
-    Map<UUID, Set<DatasetData>> jobToDsInput = new HashMap<>();
+    Map<UUID, DatasetData> datasetById =
+        datasets.stream().collect(Collectors.toMap(DatasetData::getUuid, Functions.identity()));
+
     Map<DatasetData, Set<UUID>> dsInputToJob = new HashMap<>();
-    for (DatasetData data : input) {
-      for (UUID jobUuid : data.getJobUuids()) {
-        jobToDsInput.computeIfAbsent(jobUuid, e -> new HashSet<>()).add(data);
-      }
-      dsInputToJob.computeIfAbsent(data, e -> new HashSet<>()).addAll(data.getJobUuids());
-    }
-
-    Map<UUID, Set<DatasetData>> jobToDsOutput = new HashMap<>();
     Map<DatasetData, Set<UUID>> dsOutputToJob = new HashMap<>();
-    for (DatasetData data : output) {
-      for (UUID jobUuid : data.getJobUuids()) {
-        jobToDsOutput.computeIfAbsent(jobUuid, e -> new HashSet<>()).add(data);
-      }
-      dsOutputToJob.computeIfAbsent(data, e -> new HashSet<>()).addAll(data.getJobUuids());
-    }
-
     // build jobs
     Map<UUID, JobData> jobDataMap = Maps.uniqueIndex(jobData, JobData::getUuid);
-    for (UUID jobUuid : seen) {
-      JobData data = jobDataMap.get(jobUuid);
+    for (JobData data : jobData) {
       if (data == null) {
         log.error("Could not find job node for {}", jobData);
         continue;
       }
-      data.setInputs(buildDatasetId(jobToDsInput.get(jobUuid)));
-      data.setOutputs(buildDatasetId(jobToDsOutput.get(jobUuid)));
+      Set<DatasetData> inputs =
+          data.getInputUuids().stream().map(datasetById::get).collect(Collectors.toSet());
+      Set<DatasetData> outputs =
+          data.getOutputUuids().stream().map(datasetById::get).collect(Collectors.toSet());
+      data.setInputs(buildDatasetId(inputs));
+      data.setOutputs(buildDatasetId(outputs));
+
+      inputs.forEach(
+          ds -> dsInputToJob.computeIfAbsent(ds, e -> new HashSet<>()).add(data.getUuid()));
+      outputs.forEach(
+          ds -> dsOutputToJob.computeIfAbsent(ds, e -> new HashSet<>()).add(data.getUuid()));
 
       NodeId origin = NodeId.of(new JobId(data.getNamespace(), data.getName()));
       Node node =
@@ -121,14 +104,11 @@ public class LineageService extends DelegatingLineageDao {
               origin,
               NodeType.JOB,
               data,
-              buildDatasetEdge(jobToDsInput.get(jobUuid), origin),
-              buildDatasetEdge(origin, jobToDsOutput.get(jobUuid)));
+              buildDatasetEdge(inputs, origin),
+              buildDatasetEdge(origin, outputs));
       nodes.add(node);
     }
 
-    Set<DatasetData> datasets = new LinkedHashSet<>();
-    datasets.addAll(input);
-    datasets.addAll(output);
     for (DatasetData dataset : datasets) {
       NodeId origin = NodeId.of(new DatasetId(dataset.getNamespace(), dataset.getName()));
       Node node =

@@ -25,6 +25,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
@@ -188,6 +189,14 @@ public final class Columns {
       throws SQLException {
     if (results.getObject(column) == null) {
       throw new IllegalArgumentException();
+    }
+    return Arrays.asList((UUID[]) results.getArray(column).getArray());
+  }
+
+  public static List<UUID> uuidArrayOrEmpty(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      return Collections.emptyList();
     }
     return Arrays.asList((UUID[]) results.getArray(column).getArray());
   }
