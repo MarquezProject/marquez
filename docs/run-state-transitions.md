@@ -86,7 +86,7 @@ Assume the following job graph
   * JobB@Run1 consumes DatasetX@V1
   * JobB@Run1 produces DatasetY@V1
     
-![Consume and produce dataset](./docs/assets/dot/job_input_dataset_creation.dot.png)
+![Consume and produce dataset](./assets/dot/job_input_dataset_creation.dot.png)
 
 ### Successful Job Chain - Produce and Consume Existing Datasets
 * Given
@@ -148,7 +148,7 @@ Assume the following job graph
     * JobB@Run2 consumes DatasetX@**V1**
     * JobB@Run2 produces DatasetY@V2
 
-![Consume and produce dataset failed job](./docs/assets/dot/job_failed_dataset_creation.dot.png)
+![Consume and produce dataset failed job](./assets/dot/job_failed_dataset_creation.dot.png)
 
 ### Parent jobs with successful child jobs
 Parent job success/failure does not impact the status of the datasets created by child jobs.
@@ -174,7 +174,7 @@ Parent job success/failure does not impact the status of the datasets created by
   * JobC@Run1 consumes DatasetY@V2
   * JobC@Run1 produces DatasetZ@V2
 
-![Consume and produce dataset in parent job](./docs/assets/dot/parent_job_succeed_dataset_creation.dot.png)
+![Consume and produce dataset in parent job](./assets/dot/parent_job_succeed_dataset_creation.dot.png)
 
 ### Parent jobs with failed child jobs
 Parent job failure does not impact the status of the datasets created by child jobs.
@@ -199,7 +199,7 @@ Parent job failure does not impact the status of the datasets created by child j
   * JobC@Run1 consumes DatasetY@V1
   * JobC@Run1 produces DatasetZ@V2
   
-![Parent has failed child jobs](./docs/assets/dot/parent_job_component_failed_dataset_creation.dot.png)
+![Parent has failed child jobs](./assets/dot/parent_job_component_failed_dataset_creation.dot.png)
 
 ### Parent jobs **fails**
 Parent job failure does not impact the status of the datasets created by child jobs.
@@ -225,4 +225,4 @@ Parent job failure does not impact the status of the datasets created by child j
   * JobC@Run1 consumes DatasetY@V2
   * JobC@Run1 produces DatasetZ@V2
   
-![Parent has failed child jobs](./docs/assets/dot/parent_job_failed_dataset_creation.dot.png)
+![Parent has failed child jobs](./assets/dot/parent_job_failed_dataset_creation.dot.png)
