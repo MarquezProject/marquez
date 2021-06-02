@@ -2,7 +2,14 @@
 layout: quickstart
 ---
 
-## Quickstart
+# Quickstart
+
+* [Data Model](#data-model)
+* [Example](#example)
+* [Summary](#summary)
+* [Next Steps](#next-steps)
+
+This guide covers how you can quickly get started collecting _dataset_ and _job_ metadata using Marquez. We'll first introduce you to Marquez’s data model, show how to collect _run-level_ metadata using [OpenLineage](https://github.com/OpenLineage/OpenLineage) events, then explore the lineage graph via the web UI.
 
 #### PREREQUISITES
 
@@ -24,24 +31,32 @@ $ git clone git@github.com:MarquezProject/marquez.git && cd marquez
 The easiest way to get up and running is with Docker. From the base of the Marquez repository, run:
 
 ```
-$ docker-compose up
+$ ./docker/up.sh
 ```
 
 > **Tip:** Use the `--build` flag to build images from source, or `--pull` to pull a tagged image.
 
-Marquez listens on port `5000` for all API calls and port `5001` for the admin interface. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
+To view the Marquez UI and verify it's running, open http://localhost:3000. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run-level metadata of current and previous job runs, and much more! 
 
-> **Note:** By default, the HTTP API does not require any form of authentication or authorization.
+## Data Model
+
+Marquez's _centralized_ data model provides a normalized representation of the end-to-end metadata of your pipelines (composed of multiple jobs) with built-in metadata versioning support. The data model also enables highly flexible data lineage queries across all datasets, while reliably and efficiently associating (_upstream_, _downstream_) dependencies between jobs and the datasets they produce and consume. We encourage you to familiarize yourself with the below [data model](https://marquezproject.github.io/marquez/#data-model):
+
+<figure align="center">
+  <img src="./assets/images/model.png">
+</figure>
+
+The above data model generalizes very well when you start collecting basic metadata from multiple sources, schedulers and/or data processing frameworks. With metadata changes tracked, you can easily, for example, query the history of schema changes for a given dataset and compare a _previous_ schema version with the _latest_ schema version. Note this is especially useful for auditing or troubleshooting impacted jobs downstream of a schema change.
 
 ## Example
 
-In this example, we show how you can collect dataset and job metadata using Marquez. We encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](./openapi.html) of Marquez.
+In this example, we show how you can collect dataset and job metadata using Marquez. Using the [LineageAPI](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage), metadata will be collected as [OpenLineage](https://github.com/OpenLineage/OpenLineage) events using the run ID `d46e465b-d358-4d32-83d4-df660ff614dd`. The run ID will enable the tracking of run-level metadata for the job `my-job`. Let's get started!
 
-> **Note:** The example shows how to collect metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Java](https://github.com/MarquezProject/marquez-java) or [Python](https://github.com/MarquezProject/marquez-python).
+> **Note:** The example shows how to collect metadata via direct HTTP API calls using `curl`. But, you can also get started using our client library for [Java](https://github.com/MarquezProject/marquez/tree/main/clients/java) or [Python](https://github.com/MarquezProject/marquez/tree/main/clients/python).
 
 #### STEP 1: CREATE A NAMESPACE
 
-Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` helps you organize related dataset and job metadata. Note that datasets and jobs are unique within a namespace, but not across namespaces. For example, the job `my-job` may exist in the namespace `this-namespace` and `other-namespace`, but not both. In this example, we'll use the namespace `my-namespace`:
+Before we can begin collecting metadata, we must first create a _namespace_. A `namespace` helps you organize related dataset and job metadata. Note that datasets and jobs are unique within a namespace, but not across namespaces. For example, the job `my-job` may exist in the namespace `this-namespace` and `other-namespace`, or both. In this example, we'll use the namespace `my-namespace`:
 
 ##### REQUEST
 
@@ -65,6 +80,8 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace \
   "description": "My first namespace."
 }
 ```
+
+**`200 OK`**
 
 > **Note:** Marquez provides a `default` namespace to collect metadata, but we encourage you to create your own.
 
@@ -97,14 +114,16 @@ $ curl -X PUT http://localhost:5000/api/v1/sources/my-source \
 }
 ```
 
-#### STEP 3: ADD DATASET TO NAMESPACE
+**`200 OK`**
 
-Next, we need to create the dataset `my-dataset` and associate it with the existing source `my-source`. In Marquez, datasets have both a _logical_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name is how your dataset is known to your source. In this example, we refer to `my-dataset` as the logical name and `public.mytable` (_format_:`schema.table`) as the physical name:
+#### STEP 3: ADD INPUT DATASET TO NAMESPACE
+
+Next, we need to create the dataset `my-input` used by `my-job` and associate it with the existing source `my-source`. In Marquez, datasets have both a _logical_ and _physical_ name. The logical name is how your dataset is known to Marquez, while the physical name is how your dataset is known to your source. In this example, we refer to `my-input` as the logical name and `public.mytable` (_format_:`schema.table`) as the physical name:
 
 ##### REQUEST
 
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-dataset \
+$ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-input \
   -H 'Content-Type: application/json' \
   -d '{ 
         "type": "DB_TABLE",
@@ -126,10 +145,10 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
 {
   "id": {
     "namespace": "my-namespace",
-    "name": "my-dataset"
+    "name": "my-input"
   },
   "type": "DB_TABLE",
-  "name": "my-dataset",
+  "name": "my-input",
   "physicalName": "public.mytable",
   "createdAt": "2020-06-30T20:31:39.129483Z",
   "updatedAt": "2020-06-30T20:31:39.259853Z",
@@ -147,161 +166,116 @@ $ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/datasets/my-d
 }
 ```
 
-#### STEP 4: ADD JOB TO NAMESPACE
+**`200 OK`**
 
-With `my-dataset` in Marquez, we can collect metadata for the job `my-job`:
+##### VIEW INPUT DATASET IN UI
+
+Browse to http://localhost:3000/datasets/my-input to view the collected metadata for `my-input`. You should see the dataset `name`, `schema`, and `description`:
+
+<figure align="left">
+  <img src="./assets/images/tab-view-dataset-input.png">
+</figure>
+
+#### STEP 4: START A RUN
+
+Use `d46e465b-d358-4d32-83d4-df660ff614dd` to **start** the run for `my-job` with `my-input` as the input dataset:
 
 ##### REQUEST
 
 ```bash
-$ curl -X PUT http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job \
+$ curl -X POST http://localhost:5000/api/v1/lineage \
   -H 'Content-Type: application/json' \
   -d '{
-        "type": "BATCH",
+        "eventType": "START",
+        "eventTime": "2020-12-28T19:52:00.001+10:00",
+        "run": {
+          "runId": "d46e465b-d358-4d32-83d4-df660ff614dd"
+        },
+        "job": {
+          "namespace": "my-namespace",
+          "name": "my-job"
+        },
         "inputs": [{
-          "namespace": "my-namespace", 
-          "name": "my-dataset"
+          "namespace": "my-namespace",
+          "name": "my-input"
         }],
-        "outputs": [],
-        "location": "https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
-        "description": "My first job!"
+        "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
       }'
 ```
 
 ##### RESPONSE
 
-```bash
-{
-  "id": {
-    "namespace": "my-namespace",
-    "name": "my-job"
-  },
-  "type": "BATCH",
-  "name": "my-job",
-  "createdAt": "2020-06-30T20:32:55.570981Z",
-  "updatedAt": "2020-06-30T20:32:55.658594Z",
-  "namespace": "my-namespace",
-  "inputs": [{
-      "namespace": "my-namespace",
-      "name": "my-dataset"
-  }],
-  "outputs": [],
-  "location": "https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c",
-  "context": {},
-  "description": "My first job!",
-  "latestRun": null
-}
-```
+**`201 CREATED`**
 
-#### STEP 5: CREATE A RUN
+##### VIEW RUNNING JOB IN UI
 
-Now, let's create a run for `my-job` and capture any runtime arguments:
+Browse to http://localhost:3000/jobs/my-job to view the collected run-level metadata for `my-job`. You should see the job `namespace`, `name`, `my-input` as an input dataset in the lineage graph and the job run marked as `RUNNING`: 
+
+<figure align="left">
+  <img src="./assets/images/tab-view-job-running.png">
+</figure>
+
+#### STEP 5: COMPLETE A RUN
+
+Use `d46e465b-d358-4d32-83d4-df660ff614dd` to **complete** the run for `my-job` with `my-output` as the output dataset. We also specify the [`schema` facet](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.md#dataset-facets) to collect the schema for `my-output` before marking the run as completed. Note, you don't have to specify the input dataset `my-input` again since it already has been associated with the run ID:
 
 ##### REQUEST
 
 ```bash
-$ curl -X POST http://localhost:5000/api/v1/namespaces/my-namespace/jobs/my-job/runs \
+$ curl -X POST http://localhost:5000/api/v1/lineage \
   -H 'Content-Type: application/json' \
   -d '{
-        "args": {
-          "email": "me@example.com",
-          "emailOnFailure": false,
-          "emailOnRetry": true,
-          "retries": 1
-        }
+        "eventType": "COMPLETE",
+        "eventTime": "2020-12-28T20:52:00.001+10:00",
+        "run": {
+          "runId": "d46e465b-d358-4d32-83d4-df660ff614dd"
+        },
+        "job": {
+          "namespace": "my-namespace",
+          "name": "my-job"
+        },
+        "outputs": [{
+          "namespace": "my-namespace",
+          "name": "my-output",
+          "facets": {
+            "schema": {
+              "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+              "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+              "fields": [
+                { "name": "a", "type": "VARCHAR"},
+                { "name": "b", "type": "VARCHAR"}
+              ]
+            }
+          }
+        }],     
+        "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
       }'
 ```
 
 ##### RESPONSE
 
-```bash
-{
-  "id": "d46e465b-d358-4d32-83d4-df660ff614dd",
-  "createdAt": "2020-06-30T20:34:40.146354Z",
-  "updatedAt": "2020-06-30T20:34:40.165768Z",
-  "nominalStartTime": null,
-  "nominalEndTime": null,
-  "state": "NEW",
-  "startedAt": null,
-  "endedAt": null,
-  "durationMs": null,
-  "args": {
-    "email": "me@example.com",
-    "emailOnFailure": "false",
-    "emailOnRetry": "true",
-    "retries": "1"
-  }
-}
-```
+**`201 CREATED`**
 
-The call returns a **run ID** used to track the execution of our job.
+##### VIEW COMPLETED JOB IN UI
 
-> **Note:** In this example, we use the ID `d46e465b-d358-4d32-83d4-df660ff614dd` to update the run metadata for `my-job`, but you'll want to replace the ID with your own.
+Browse to http://localhost:3000/jobs/my-job to view the collected run-level metadata for `my-job`. You should see the job `namespace`, `name`, `my-input` as an input dataset and `my-output` as an output dataset in the lineage graph and the job run marked as `COMPLETED `: 
 
-#### STEP 6: START A RUN
+<figure align="left">
+  <img src="./assets/images/tab-view-job-completed.png">
+</figure>
 
-Use `d46e465b-d358-4d32-83d4-df660ff614dd` to **start** the run for `my-job`:
+##### VIEW OUTPUT DATASET IN UI
 
-##### REQUEST
+Browse to http://localhost:3000/datasets/my-output to view the collected metadata for `my-output`. You should see the dataset `name`, `schema`, and `description`:
 
-```bash
-$ curl -X POST http://localhost:5000/api/v1/jobs/runs/d46e465b-d358-4d32-83d4-df660ff614dd/start
-```
-
-##### RESPONSE
-
-```bash
-{
-  "id": "d46e465b-d358-4d32-83d4-df660ff614dd",
-  "createdAt": "2020-06-30T20:34:40.146354Z",
-  "updatedAt": "2020-06-30T20:37:43.746677Z",
-  "nominalStartTime": null,
-  "nominalEndTime": null,
-  "state": "RUNNING",
-  "startedAt": "2020-06-30T20:37:43.746677Z",
-  "endedAt": null,
-  "durationMs": null,
-  "args": {
-    "email": "me@example.com",
-    "emailOnFailure": "false",
-    "emailOnRetry": "true",
-    "retries": "1"
-  }
-}
-```
-
-#### STEP 7: COMPLETE A RUN
-
-Use `d46e465b-d358-4d32-83d4-df660ff614dd` to **complete** the run for `my-job`:
-
-##### REQUEST
-
-```bash
-$ curl -X POST http://localhost:5000/api/v1/jobs/runs/d46e465b-d358-4d32-83d4-df660ff614dd/complete
-```
-
-##### RESPONSE
-
-```bash
-{
-  "id": "d46e465b-d358-4d32-83d4-df660ff614dd",
-  "createdAt": "2020-06-30T20:34:40.146354Z",
-  "updatedAt": "2020-06-30T20:38:25.657449Z",
-  "nominalStartTime": null,
-  "nominalEndTime": null,
-  "state": "COMPLETED",
-  "startedAt": "2020-06-30T20:37:43.746677Z",
-  "endedAt": "2020-06-30T20:38:25.657449Z",
-  "durationMs": 41911,
-  "args": {
-    "email": "me@example.com",
-    "emailOnFailure": "false",
-    "emailOnRetry": "true",
-    "retries": "1"
-  }
-}
-```
+<figure align="left">
+  <img src="./assets/images/tab-view-dataset-output.png">
+</figure>
 
 ## Summary
 
-In this example, we showed you how to use Marquez to collect dataset and job metadata. We also walked you through the set of [API](https://marquezproject.github.io/marquez/openapi.html) calls to successfully mark a run as complete.
+In this example, we showed you how to use Marquez to collect dataset and job metadata with OpenLineage. We also walked you through the set of [API](https://marquezproject.github.io/marquez/openapi.html) calls to successfully mark a run as complete.
+
+## Next Steps
+
+* Take a look at our [`Airflow`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow) example
