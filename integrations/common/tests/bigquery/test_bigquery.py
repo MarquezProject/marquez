@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 from marquez.dataset import Dataset, Source, DatasetType, Field
 
-from marquez.provider.bigquery import BigQueryStatisticsProvider, BigQueryStatisticsRunFacet
+from marquez.provider.bigquery import BigQueryDatasetsProvider, BigQueryJobRunFacet
 
 
 def read_file_json(file):
@@ -31,10 +31,10 @@ def test_bq_job_information():
 
     client.get_table.return_value = TableMock()
 
-    statistics = BigQueryStatisticsProvider(client=client).get_statistics("job_id")
+    statistics = BigQueryDatasetsProvider(client=client).get_statistics("job_id")
 
     assert statistics.run_facets == {
-        'bigQuery_statistics': BigQueryStatisticsRunFacet(
+        'bigQuery_job': BigQueryJobRunFacet(
             cached=False,
             billedBytes=111149056,
             properties=json.dumps(job_details)

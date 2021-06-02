@@ -18,7 +18,7 @@ from typing import Optional
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 import attr
 
-from marquez.provider.bigquery import BigQueryStatisticsProvider, BigQueryErrorRunFacet
+from marquez.provider.bigquery import BigQueryDatasetsProvider, BigQueryErrorRunFacet
 
 from marquez_airflow.extractors.base import (
     BaseExtractor,
@@ -74,7 +74,7 @@ class BigQueryExtractor(BaseExtractor):
                 }
             )
 
-        stats = BigQueryStatisticsProvider().get_statistics(bigquery_job_id)
+        stats = BigQueryDatasetsProvider().get_statistics(bigquery_job_id)
         inputs = stats.inputs
         output = stats.output
         run_facets = stats.run_facets

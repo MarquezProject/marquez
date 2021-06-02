@@ -45,7 +45,7 @@ class BigQueryErrorRunFacet(BaseFacet):
 
 
 @attr.s
-class BigQueryStatisticsRunFacet(BaseFacet):
+class BigQueryJobRunFacet(BaseFacet):
     """
     Facet that represents relevant statistics of bigquery run.
     :param cached: bigquery caches query results. Rest of the statistics will not be provided
@@ -78,13 +78,13 @@ class BigQueryStatisticsDatasetFacet(BaseFacet):
 
 
 @attr.s
-class BigQueryStatistics:
+class BigQueryFacets:
     run_facets: Dict[str, BaseFacet] = attr.ib()
     inputs: List[Dataset] = attr.ib()
     output: Optional[Dataset] = attr.ib(default=None)
 
 
-class BigQueryStatisticsProvider:
+class BigQueryDatasetsProvider:
     def __init__(
         self,
         client: Optional[bigquery.Client] = None,
@@ -97,7 +97,7 @@ class BigQueryStatisticsProvider:
         if logger is None:
             self.logger = logging.getLogger(__name__)
 
-    def get_statistics(self, job_id: str) -> BigQueryStatistics:
+    def get_statistics(self, job_id: str) -> BigQueryFacets:
         inputs = []
         output = None
         run_facets = {}
@@ -109,7 +109,7 @@ class BigQueryStatisticsProvider:
                 run_stat_facet, dataset_stat_facet = self._get_output_statistics(props)
 
                 run_facets.update({
-                    "bigQuery_statistics": run_stat_facet
+                    "bigQuery_job": run_stat_facet
                 })
                 inputs = self._get_input_from_bq(props)
                 output = self._get_output_from_bq(props)
@@ -133,21 +133,21 @@ class BigQueryStatisticsProvider:
                     clientError=f"{e}: {traceback.format_exc()}",
                 )
             })
-        return BigQueryStatistics(run_facets, inputs, output)
+        return BigQueryFacets(run_facets, inputs, output)
 
     def _get_output_statistics(self, properties) \
-            -> Tuple[BigQueryStatisticsRunFacet, Optional[BigQueryStatisticsDatasetFacet]]:
+            -> Tuple[BigQueryJobRunFacet, Optional[BigQueryStatisticsDatasetFacet]]:
         stages = get_from_nullable_chain(properties, ['statistics', 'query', 'queryPlan'])
         json_props = json.dumps(properties)
 
         if not stages:
             if get_from_nullable_chain(properties, ['statistics', 'query', 'statementType']) \
                     == 'CREATE_VIEW':
-                return BigQueryStatisticsRunFacet(cached=False), None
+                return BigQueryJobRunFacet(cached=False), None
 
             # we're probably getting cached results
             if get_from_nullable_chain(properties, ['statistics', 'query', 'cacheHit']):
-                return BigQueryStatisticsRunFacet(cached=True), None
+                return BigQueryJobRunFacet(cached=True), None
             if get_from_nullable_chain(properties, ['status', 'state']) != "DONE":
                 raise ValueError("Trying to extract data from running bigquery job")
             raise ValueError(
@@ -160,7 +160,7 @@ class BigQueryStatisticsProvider:
         billed_bytes = get_from_nullable_chain(properties, [
             'statistics', 'query', 'totalBytesBilled'
         ])
-        return BigQueryStatisticsRunFacet(
+        return BigQueryJobRunFacet(
             cached=False,
             billedBytes=int(billed_bytes) if billed_bytes else None,
             properties=json_props

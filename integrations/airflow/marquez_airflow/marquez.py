@@ -4,13 +4,11 @@ from typing import Optional, Dict, Type
 
 from marquez_airflow.extractors import StepMetadata
 from marquez_airflow import __version__ as MARQUEZ_AIRFLOW_VERSION
-from marquez.dataset import Dataset
 
 from openlineage.client import OpenLineageClient
 from openlineage.facet import DocumentationJobFacet, SourceCodeLocationJobFacet, SqlJobFacet, \
-    DocumentationDatasetFacet, SchemaDatasetFacet, SchemaField, DataSourceDatasetFacet, \
     NominalTimeRunFacet, ParentRunFacet, BaseFacet
-from openlineage.run import Dataset as OpenLineageDataset, RunEvent, RunState, Run, Job
+from openlineage.run import RunEvent, RunState, Run, Job
 
 _DAG_DEFAULT_OWNER = 'anonymous'
 _DAG_DEFAULT_NAMESPACE = 'default'
