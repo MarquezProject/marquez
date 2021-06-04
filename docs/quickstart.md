@@ -137,11 +137,15 @@ To view lineage metadata collected by Marquez, browse to the UI by visiting http
   <img src="./assets/images/search-view-job.png">
 </figure>
 
+##### VIEW JOB METADATA
+
 You should see the job `namespace`, `name`, `my-input` as an input dataset and `my-output` as an output dataset in the lineage graph and the job run marked as `COMPLETED `: 
 
 <figure align="center">
   <img src="./assets/images/tab-view-job-completed.png">
 </figure>
+
+##### VIEW INPUT DATASET METADATA
 
 Finally, click on the output dataset `my-output` for `my-job`. You should see the dataset `name`, `schema`, and `description`:
 
