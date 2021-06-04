@@ -131,6 +131,8 @@ $ curl -X POST http://localhost:5000/api/v1/lineage \
 
 ## View Collected Lineage Metadata
 
+##### SEARCH JOB METADATA
+
 To view lineage metadata collected by Marquez, browse to the UI by visiting http://localhost:3000. Then, use the search bar in the upper right-side of the page and search for the job `my-job`. To view lineage metadata for `my-job`, click on the job from the drop-down list:
 
 <figure align="center">
