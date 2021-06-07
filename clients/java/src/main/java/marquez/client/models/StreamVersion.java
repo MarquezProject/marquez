@@ -19,6 +19,7 @@ import static marquez.client.models.DatasetType.STREAM;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -41,7 +42,8 @@ public final class StreamVersion extends DatasetVersion {
       @Nullable final Set<String> tags,
       @Nullable final URL schemaLocation,
       @Nullable final String description,
-      @Nullable final Run createdByRun) {
+      @Nullable final Run createdByRun,
+      @Nullable final Map<String, Object> facets) {
     super(
         id,
         STREAM,
@@ -53,7 +55,8 @@ public final class StreamVersion extends DatasetVersion {
         fields,
         tags,
         description,
-        createdByRun);
+        createdByRun,
+        facets);
     this.schemaLocation = schemaLocation;
   }
 
