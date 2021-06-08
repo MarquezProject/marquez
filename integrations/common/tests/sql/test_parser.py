@@ -237,6 +237,26 @@ def test_parse_recursive_cte():
     assert sql_meta.out_tables == [DbTableName('sub_employees')]
 
 
+@pytest.mark.skip(reason="no support for this right now")
+def test_multiple_ctes():
+    sql_meta = SqlParser.parse('''
+    WITH customers AS (
+            SELECT * FROM DEMO_DB.public.stg_customers
+        ),
+        orders AS (
+            SELECT * FROM DEMO_DB.public.stg_orders
+        )
+    SELECT *
+    FROM customers c
+    JOIN orders o
+    ON c.id = o.customer_id
+    ''')
+    assert sql_meta.in_tables == [
+        DbTableName('DEMO_DB.public.stg_customers'),
+        DbTableName('DEMO_DB.public.stg_orders')
+    ]
+
+
 def test_parse_default_schema():
     sql_meta = SqlParser.parse(
         '''
@@ -272,3 +292,11 @@ def test_parser_integration():
         "public"
     )
     assert sql_meta.in_tables == [DbTableName('public.top_delivery_times')]
+
+
+def test_bigquery_escaping():
+    sql_meta = SqlParser.parse(
+        "select * from `speedy-vim-308516`.`dbt_test1`.`source_table` where id = 1",
+        "public"
+    )
+    assert sql_meta.in_tables == [DbTableName('speedy-vim-308516.dbt_test1.source_table')]
