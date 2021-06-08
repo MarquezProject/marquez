@@ -97,7 +97,7 @@ class BigQueryDatasetsProvider:
         if logger is None:
             self.logger = logging.getLogger(__name__)
 
-    def get_statistics(self, job_id: str) -> BigQueryFacets:
+    def get_facets(self, job_id: str) -> BigQueryFacets:
         inputs = []
         output = None
         run_facets = {}

@@ -74,7 +74,7 @@ class BigQueryExtractor(BaseExtractor):
                 }
             )
 
-        stats = BigQueryDatasetsProvider().get_statistics(bigquery_job_id)
+        stats = BigQueryDatasetsProvider().get_facets(bigquery_job_id)
         inputs = stats.inputs
         output = stats.output
         run_facets = stats.run_facets
