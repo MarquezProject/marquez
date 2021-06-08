@@ -272,3 +272,11 @@ def test_parser_integration():
         "public"
     )
     assert sql_meta.in_tables == [DbTableName('public.top_delivery_times')]
+
+
+def test_bigquery_escaping():
+    sql_meta = SqlParser.parse(
+        "select * from `speedy-vim-308516`.`dbt_test1`.`source_table` where id = 1",
+        "public"
+    )
+    assert sql_meta.in_tables == [DbTableName('speedy-vim-308516.dbt_test1.source_table')]

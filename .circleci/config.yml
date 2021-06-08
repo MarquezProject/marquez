@@ -98,6 +98,18 @@ jobs:
       - run: pytest --cov=marquez_python tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
+  test-integration-dbt:
+    working_directory: ~/marquez/integrations/dbt
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - *checkout_project_root
+      - run: pip install -e .[dev]
+      - run: flake8
+      - run: python -m pytest --cov=dbt tests/
+      - run: pytest --cov=marquez_airflow tests/
+      - run: bash <(curl -s https://codecov.io/bash)
+
   build-client-python:
     working_directory: ~/marquez/clients/python
     docker:
@@ -253,6 +265,7 @@ workflows:
           <<: *only-on-release
       - build-integration-airflow:
           <<: *only-on-release
+      - test-integration-dbt
       - release-java:
           <<: *only-on-release
           context: release

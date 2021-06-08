@@ -28,7 +28,6 @@ from marquez_airflow.extractors.base import (
 )
 from marquez.dataset import Source, Dataset
 
-
 _TABLE_SCHEMA = 0
 _TABLE_NAME = 1
 _COLUMN_NAME = 2

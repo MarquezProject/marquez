@@ -21,6 +21,7 @@ dist/
 integrations/airflow/tests/integration/integration-requirements.txt
 integrations/airflow/tests/integration/requirements.txt
 out/*
+**/*.python-version
 
 # Marquez configuration
 marquez.yml
