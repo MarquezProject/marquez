@@ -10,7 +10,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from marquez_airflow.extractors.extractors import Extractors
-from marquez_airflow.extractors.base import BaseExtractor, StepMetadata
+from marquez.utils import get_from_nullable_chain
 
-__all__ = [Extractors, BaseExtractor, StepMetadata]
+
+def test_nullable_chain_fails():
+    x = {"first": {"second": {}}}
+    assert get_from_nullable_chain(x, ['first', 'second', 'third']) is None
+
+
+def test_nullable_chain_works():
+    x = {"first": {"second": {"third": 42}}}
+    assert get_from_nullable_chain(x, ['first', 'second', 'third']) == 42
+
+    x = {"first": {"second": {"third": 42, "fourth": {"empty": 56}}}}
+    assert get_from_nullable_chain(x, ['first', 'second', 'third']) == 42

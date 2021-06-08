@@ -10,7 +10,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from marquez_airflow.extractors.extractors import Extractors
-from marquez_airflow.extractors.base import BaseExtractor, StepMetadata
-
-__all__ = [Extractors, BaseExtractor, StepMetadata]
+GITHUB_LOCATION = "https://github.com/MarquezProject/marquez/blob/main/integrations/common/marquez/schema/"  # noqa: E501

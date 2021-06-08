@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "definitions": {
-    "BigQueryStatisticsRunFacet": {
+    "BigQueryJobRunFacet": {
       "allOf": [
         {
           "$ref": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/BaseFacet"

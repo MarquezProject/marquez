@@ -10,7 +10,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from marquez_airflow.extractors.extractors import Extractors
-from marquez_airflow.extractors.base import BaseExtractor, StepMetadata
-
-__all__ = [Extractors, BaseExtractor, StepMetadata]
+from marquez.sql.parser import SqlParser, SqlMeta  # noqa: F401

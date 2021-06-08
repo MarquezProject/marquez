@@ -1,5 +1,5 @@
-from marquez_airflow.extractors.sql import SqlParser
-from marquez_airflow.models import DbTableName
+from marquez.sql import SqlParser
+from marquez.models import DbTableName
 
 
 def test_tpcds_cte_query():

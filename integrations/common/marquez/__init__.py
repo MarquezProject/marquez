@@ -10,4 +10,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from marquez_airflow.extractors.sql.parser import SqlParser, SqlMeta  # noqa: F401
+__author__ = """Marquez Project"""
+__version__ = "0.14.2"

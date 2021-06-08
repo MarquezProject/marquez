@@ -9,8 +9,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from marquez.models import DbTableName
 
-from marquez_airflow.extractors.extractors import Extractors
-from marquez_airflow.extractors.base import BaseExtractor, StepMetadata
 
-__all__ = [Extractors, BaseExtractor, StepMetadata]
+def test_eq_table_name():
+    assert DbTableName('discounts') != DbTableName('public.discounts')
+    assert DbTableName('discounts').qualified_name is None
+    assert DbTableName('public.discounts').qualified_name == 'public.discounts'
