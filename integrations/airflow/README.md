@@ -120,7 +120,12 @@ $ export MARQUEZ_LOG_LEVEL=INFO
 To install all dependencies for _local_ development:
 
 ```bash
+# Bash
 $ pip3 install -e .[dev]
+```
+```zsh
+# escape the brackets in zsh
+$ pip3 install -e .\[dev\]
 ```
 
 To run the entire test suite, you'll first want to initialize the Airflow database:

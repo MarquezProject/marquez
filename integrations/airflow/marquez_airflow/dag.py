@@ -9,15 +9,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import time
 from typing import List, Union, Optional
 from uuid import uuid4
 
 import airflow.models
-import time
-
 from airflow.models import DagRun
+from airflow.utils.db import provide_session
 from airflow.utils.state import State
-
+# Handling of import of different airflow versions
+from airflow.version import version as AIRFLOW_VERSION
 from marquez_airflow.extractors import StepMetadata, BaseExtractor
 from marquez_airflow.extractors.extractors import Extractors
 from marquez_airflow.utils import (
@@ -26,10 +27,8 @@ from marquez_airflow.utils import (
     DagUtils,
     get_custom_facets
 )
-
-# Handling of import of different airflow versions
-from airflow.version import version as AIRFLOW_VERSION
 from pkg_resources import parse_version
+
 if parse_version(AIRFLOW_VERSION) >= parse_version("1.10.11"):
     from airflow import LoggingMixin
 else:
@@ -41,9 +40,44 @@ from marquez_airflow.marquez import MarquezAdapter
 _MARQUEZ = MarquezAdapter()
 
 
+@provide_session
+def task_run_id(run_id, task, session=None):
+    """
+    Macro function which returns the generated run id for a given task. This
+    can be used to forward the run id from a task to a child run so the job
+    hierarchy is preserved. Invoke as a jinja template, e.g.
+
+    PythonOperator(
+        task_id='render_template',
+        python_callable=my_task_function,
+        op_args=['{{ task_run_id(run_id, task) }}'], # task_run_id macro invoked
+        provide_context=False,
+        dag=dag
+    )
+
+    :param run_id:
+    :param task:
+    :param session:
+    :return:
+    """
+    name = DAG._marquez_job_name(task.dag_id, task.task_id)
+    ids = JobIdMapping.get(name, run_id, session)
+    if ids is None:
+        return ""
+    elif isinstance(ids, list):
+        return "" if len(ids) == 0 else ids[0]
+    else:
+        return str(ids)
+
+
 class DAG(airflow.models.DAG, LoggingMixin):
     def __init__(self, *args, extractor_mapper=None, **kwargs):
         self.log.debug("marquez-airflow dag starting")
+        macros = {}
+        if kwargs.__contains__("user_defined_macros"):
+            macros = kwargs["user_defined_macros"]
+        macros["task_run_id"] = task_run_id
+        kwargs["user_defined_macros"] = macros
         super().__init__(*args, **kwargs)
         self.extractors = {}
 

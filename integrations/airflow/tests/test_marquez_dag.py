@@ -9,22 +9,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import datetime
 import functools
-
-import pytest
-import mock
 import logging
+from uuid import UUID
 
+import mock
+import pytest
 from airflow.models import (TaskInstance, DagRun)
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.utils.decorators import apply_defaults
-from airflow.utils.db import provide_session
-from airflow.utils.dates import days_ago
+from airflow.operators.python_operator import PythonOperator
 from airflow.utils import timezone
+from airflow.utils.dates import days_ago
+from airflow.utils.db import provide_session
+from airflow.utils.decorators import apply_defaults
 from airflow.utils.state import State
 from airflow.version import version as AIRFLOW_VERSION
-
 from marquez_airflow import DAG
+from marquez_airflow import __version__ as MARQUEZ_AIRFLOW_VERSION
 from marquez_airflow.extractors import (
     BaseExtractor, StepMetadata
 )
@@ -41,10 +43,12 @@ from marquez.dataset import Source, Dataset
 
 from uuid import UUID
 
+from marquez_airflow.utils import get_location, get_job_name
 from openlineage.facet import NominalTimeRunFacet, SourceCodeLocationJobFacet, \
     DocumentationJobFacet, DataSourceDatasetFacet, SchemaDatasetFacet, \
     SchemaField, ParentRunFacet, SqlJobFacet
-from openlineage.run import RunEvent, RunState, Job, Run, Dataset as OpenLineageDataset
+from openlineage.run import RunEvent, RunState, Job, Run, \
+    Dataset as OpenLineageDataset
 
 log = logging.getLogger(__name__)
 
@@ -219,6 +223,46 @@ def test_marquez_dag(job_id_mapping, mock_get_or_create_openlineage_client,
         ))
     ]
     mock_marquez_client.emit.assert_has_calls(emit_calls)
+
+
+@mock.patch('marquez_airflow.marquez.MarquezAdapter.get_or_create_openlineage_client')
+@provide_session
+def test_task_run_id(mock_get_or_create_openlineage_client, session=None):
+    mock_marquez_client = mock.Mock()
+    mock_get_or_create_openlineage_client.return_value = mock_marquez_client
+
+    dag = DAG(
+        "test_task_run_id",
+        schedule_interval="@daily",
+        default_args=DAG_DEFAULT_ARGS,
+        description="test dag"
+    )
+    class Collector:
+
+        def update_task_id(self, tid):
+            self.task_id = tid
+            print(f"Got task id {self.task_id}")
+
+    collector = Collector()
+    t1 = PythonOperator(
+        task_id='show_template',
+        python_callable=collector.update_task_id,
+        op_args=['{{ task_run_id(run_id, task) }}'],
+        provide_context=False,
+        dag=dag
+    )
+
+    dag.clear()
+    today = datetime.datetime.now()
+    dagrun = dag.create_dagrun(
+        run_id="test_dag_run",
+        execution_date=timezone.datetime(today.year, month=today.month, day=today.day),
+        state=State.RUNNING,
+        session=session)
+    ti = dagrun.get_task_instance(t1.task_id)
+    ti.task = t1
+    ti.run()
+    assert collector.task_id != ""
 
 
 class TestFixtureDummyOperator(DummyOperator):
