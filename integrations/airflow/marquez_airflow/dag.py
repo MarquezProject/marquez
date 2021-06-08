@@ -11,7 +11,6 @@
 # limitations under the License.
 import time
 from typing import List, Union, Optional
-from uuid import uuid4
 
 import airflow.models
 from airflow.models import DagRun
@@ -25,7 +24,8 @@ from marquez_airflow.utils import (
     JobIdMapping,
     get_location,
     DagUtils,
-    get_custom_facets
+    get_custom_facets,
+    new_run_id
 )
 from pkg_resources import parse_version
 
@@ -128,7 +128,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 step = self._extract_metadata(dagrun, task)
 
                 job_name = self._marquez_job_name(self.dag_id, task.task_id)
-                run_id = self._marquez_run_id(dagrun.run_id, task.task_id)
+                run_id = new_run_id(dagrun.run_id, task_id)
 
                 task_run_id = _MARQUEZ.start_task(
                     run_id,
@@ -192,7 +192,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
         step = self._extract_metadata(dagrun, task, task_instance)
 
         job_name = self._marquez_job_name(self.dag_id, task.task_id)
-        run_id = self._marquez_run_id(dagrun.run_id, task.task_id)
+        run_id = new_run_id(dagrun.run_id, task.task_id)
 
         if not task_run_id:
             task_run_id = _MARQUEZ.start_task(
@@ -292,9 +292,6 @@ class DAG(airflow.models.DAG, LoggingMixin):
         return f'airflow_dag_id={self.dag_id} ' \
             f'duration_ms={(self._now_ms() - start_time)}'
 
-    def new_run_id(self) -> str:
-        return str(uuid4())
-
     @staticmethod
     def _get_location(task):
         try:
@@ -312,10 +309,6 @@ class DAG(airflow.models.DAG, LoggingMixin):
     @staticmethod
     def _marquez_job_name(dag_id: str, task_id: str) -> str:
         return f'{dag_id}.{task_id}'
-
-    @staticmethod
-    def _marquez_run_id(dag_run_id: str, task_id: str) -> str:
-        return f'{dag_run_id}.{task_id}'
 
     @staticmethod
     def _now_ms():
