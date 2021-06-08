@@ -19,11 +19,19 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
+
+package_name = "marquez-airflow"
+package_version = "0.15.0"
+description = """Marquez integration with Airflow"""
+
+
 requirements = [
-    "attrs>=19.3",
-    "requests>=2.24.0",
-    "sqlparse==0.4.1",
+    "attrs>=19.3.0",
+    "requests>=2.20.0",
+    "sqlparse>=0.3.1",
+    "openlineage-python==0.0.1rc6"
 ]
+
 
 extras_require = {
     "tests": [
@@ -31,23 +39,35 @@ extras_require = {
         "pytest-cov",
         "mock",
         "flake8",
-        "SQLAlchemy==1.3.24",       # must be set to 1.3.* for airflow tests compatibility
-        "Flask-SQLAlchemy==2.4.4",  # must be set to 2.4.* for airflow tests compatibility
-        "pandas-gbq==0.14.1",       # must be set to 0.14.* for airflow tests compatibility
+        "SQLAlchemy",       # must be set to 1.3.* for airflow tests compatibility
+        "Flask-SQLAlchemy",  # must be set to 2.4.* for airflow tests compatibility
+        "pandas-gbq",       # must be set to 0.14.* for airflow tests compatibility
+        "snowflake-connector-python",
         "apache-airflow==1.10.12",
         "apache-airflow[gcp_api]==1.10.12",
         "apache-airflow[google]==1.10.12",
         "apache-airflow[postgres]==1.10.12",
-        "snowflake-connector-python==2.4.3",
         "airflow-provider-great-expectations==0.0.6",
     ],
 }
+
+# extras_require = {
+#     "tests": [
+#         "pytest",
+#         "pytest-cov",
+#         "flake8",
+#         "apache-airflow[gcp,postgres]==1.10.12",
+#         "snowflake-connector-python",
+#         "sqlalchemy>=1.3,<1.4",
+#         "airflow-provider-great-expectations==0.0.6",
+#     ],
+# }
 extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(
-    name="marquez-airflow",
-    version="0.15.0",
-    description="Marquez integration with Airflow",
+    name=package_name,
+    version=package_version,
+    description=description,
     long_description=readme,
     long_description_content_type="text/markdown",
     author="Marquez Project",

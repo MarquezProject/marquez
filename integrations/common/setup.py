@@ -19,10 +19,14 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
+package_name = "marquez-common"
+package_version = "0.15.0"
+description = """The openlineage bigquery adapter plugin for dbt (data build tool)"""
+
 requirements = [
-    "attrs>=20.3.0",
-    "openlineage-python==0.0.1rc3",
-    "sqlparse>=0.4.1"
+    "attrs>=19.3.0",
+    "openlineage-python==0.0.1rc6",
+    "sqlparse>=0.3.1",
 ]
 
 extras_require = {
@@ -31,20 +35,19 @@ extras_require = {
         "google-auth>=1.30.0",
         "google-cloud-bigquery>=2.15.0",
         "google-cloud-core>=1.6.0",
-        "google-crc32c>=1.1.2"
+        "google-crc32c>=1.1.2",
     ],
     "tests": [
         "pytest",
         "pytest-cov",
-        "mock",
-        "flake8"
+        "flake8",
     ],
 }
 extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(
     name="marquez-common",
-    version="0.14.3",
+    version=package_version,
     description="Marquez common python library",
     long_description=readme,
     long_description_content_type="text/markdown",

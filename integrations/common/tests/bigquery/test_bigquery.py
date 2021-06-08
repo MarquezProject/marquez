@@ -31,7 +31,7 @@ def test_bq_job_information():
 
     client.get_table.return_value = TableMock()
 
-    statistics = BigQueryDatasetsProvider(client=client).get_statistics("job_id")
+    statistics = BigQueryDatasetsProvider(client=client).get_facets("job_id")
 
     assert statistics.run_facets == {
         'bigQuery_job': BigQueryJobRunFacet(

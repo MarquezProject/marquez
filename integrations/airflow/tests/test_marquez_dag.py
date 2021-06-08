@@ -12,7 +12,7 @@
 import functools
 
 import pytest
-import mock
+from unittest import mock
 import logging
 
 from airflow.models import (TaskInstance, DagRun)
@@ -150,7 +150,7 @@ def test_marquez_dag(job_id_mapping, mock_get_or_create_openlineage_client,
                 "parentRun": ParentRunFacet.create(
                     runId=DAG_RUN_ID,
                     namespace=DAG_NAMESPACE,
-                    job_name=f"{DAG_ID}.{TASK_ID_COMPLETED}"
+                    name=f"{DAG_ID}.{TASK_ID_COMPLETED}"
                 )
             }),
             job=Job("default", f"{DAG_ID}.{TASK_ID_COMPLETED}", {
@@ -169,7 +169,7 @@ def test_marquez_dag(job_id_mapping, mock_get_or_create_openlineage_client,
                 "parentRun": ParentRunFacet.create(
                     runId=DAG_RUN_ID,
                     namespace=DAG_NAMESPACE,
-                    job_name=f"{DAG_ID}.{TASK_ID_FAILED}"
+                    name=f"{DAG_ID}.{TASK_ID_FAILED}"
                 )
             }),
             job=Job("default", f"{DAG_ID}.{TASK_ID_FAILED}", {
@@ -367,7 +367,7 @@ def test_marquez_dag_with_extractor(
                 "parentRun": ParentRunFacet.create(
                     runId=dag_run_id,
                     namespace=DAG_NAMESPACE,
-                    job_name=f"{dag_id}.{TASK_ID_COMPLETED}"
+                    name=f"{dag_id}.{TASK_ID_COMPLETED}"
                 )
             }),
             Job("default", f"{dag_id}.{TASK_ID_COMPLETED}", {
@@ -482,7 +482,7 @@ def test_marquez_dag_with_extract_on_complete(
                 "parentRun": ParentRunFacet.create(
                     runId=dag_run_id,
                     namespace=DAG_NAMESPACE,
-                    job_name=f"{dag_id}.{TASK_ID_COMPLETED}"
+                    name=f"{dag_id}.{TASK_ID_COMPLETED}"
                 )
             }),
             job=Job("default",  f"{dag_id}.{TASK_ID_COMPLETED}", {
@@ -645,7 +645,7 @@ def test_marquez_dag_with_extractor_returning_two_steps(
                 "parentRun": ParentRunFacet.create(
                     runId=dag_run_id,
                     namespace=DAG_NAMESPACE,
-                    job_name=f"{dag_id}.{TASK_ID_COMPLETED}"
+                    name=f"{dag_id}.{TASK_ID_COMPLETED}"
                 )
             }),
             Job("default", f"{dag_id}.{TASK_ID_COMPLETED}", {
@@ -735,7 +735,7 @@ def test_marquez_dag_adds_custom_facets(
                 "parentRun": ParentRunFacet.create(
                     runId=DAG_RUN_ID,
                     namespace=DAG_NAMESPACE,
-                    job_name=f"{DAG_ID}.{TASK_ID_COMPLETED}"
+                    name=f"{DAG_ID}.{TASK_ID_COMPLETED}"
                 ),
                 "airflow_runArgs": AirflowRunArgsRunFacet(False),
                 "airflow_version": AirflowVersionRunFacet(
@@ -875,7 +875,7 @@ def test_marquez_dag_with_hooking_operator(
                 "parentRun": ParentRunFacet.create(
                     runId=dag_run_id,
                     namespace=DAG_NAMESPACE,
-                    job_name=f"{dag_id}.{TASK_ID_COMPLETED}"
+                    name=f"{dag_id}.{TASK_ID_COMPLETED}"
                 )
             }),
             Job("default", f"{dag_id}.{TASK_ID_COMPLETED}", {
