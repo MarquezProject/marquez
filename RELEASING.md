@@ -15,4 +15,5 @@
 
    ![](./docs/assets/images/new-release.png)
    
-6. Close the [project](https://github.com/MarquezProject/marquez/projects) for release `X.Y.Z`
+6. Close the [project](https://github.com/MarquezProject/marquez/projects) for the _current_ release
+7. Create a [new project](https://github.com/MarquezProject/marquez/projects/new) for the _next_ release
