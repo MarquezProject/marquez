@@ -21,9 +21,12 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Set;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -49,6 +52,17 @@ public class TagResource extends BaseResource {
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     final Set<Tag> tags = tagService.findAll(limit, offset);
     return Response.ok(new Tags(tags)).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  public Response create(@Valid Tag tag) {
+    Tag upsertedTag = tagService.upsert(tag);
+    return Response.ok(upsertedTag).build();
   }
 
   @Value

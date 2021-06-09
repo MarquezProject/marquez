@@ -831,6 +831,19 @@ public class MarquezClientTest {
     assertThat(tags).asList().containsExactlyInAnyOrderElementsOf(expectedTags);
   }
 
+  @Test
+  public void testCreateTag() throws Exception {
+    URL createTagUrl = buildUrlFor("/tags");
+    Tag tag = new Tag("tag2", "description");
+    String tagJson = tag.toJson();
+    when(http.put(createTagUrl, tagJson)).thenReturn(Utils.toJson(new Tag("tag2", "description")));
+
+    Tag createdTag = client.createTag("tag2", "description");
+
+    assertThat(createdTag.getName()).isEqualTo("tag2");
+    assertThat(createdTag.getDescription()).isNotEmpty().contains("description");
+  }
+
   private URL buildUrlFor(String pathTemplate, String... pathArgs) throws Exception {
     return new URL(DEFAULT_BASE_URL + BASE_PATH + String.format(pathTemplate, (Object[]) pathArgs));
   }

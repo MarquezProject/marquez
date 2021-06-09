@@ -290,6 +290,15 @@ public class MarquezClient {
     return Tags.fromJson(bodyAsJson).getValue();
   }
 
+  public Tag createTag(String name, String description) {
+    String tagAsJson = http.put(url.toCreateTagsUrl(), new Tag(name, description).toJson());
+    return Tag.fromJson(tagAsJson);
+  }
+
+  public Tag createTag(String tag) {
+    return createTag(tag, null);
+  }
+
   public static final class Builder {
     @VisibleForTesting URL baseUrl;
     @VisibleForTesting @Nullable String apiKey;

@@ -141,4 +141,8 @@ class MarquezUrl {
   URL toListTagsUrl(int limit, int offset) {
     return from(listTagsPath(), newQueryParamsWith(limit, offset));
   }
+
+  URL toCreateTagsUrl() {
+    return from(listTagsPath());
+  }
 }
