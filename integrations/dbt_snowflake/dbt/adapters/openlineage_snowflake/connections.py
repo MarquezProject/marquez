@@ -1,5 +1,6 @@
 import re
 import uuid
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Optional
 from dataclasses import dataclass
@@ -7,13 +8,16 @@ from dataclasses import dataclass
 from dbt.adapters.snowflake import SnowflakeCredentials, SnowflakeConnectionManager
 
 from dbt.adapters.openlineage_snowflake.version import __version__ as VERSION
-from dbt.exceptions import DatabaseException
+from dbt.exceptions import DatabaseException, FailedToConnectException, RuntimeException
 from dbt.logger import GLOBAL_LOGGER as logger
 
 from marquez.sql import SqlParser
 from openlineage.client import OpenLineageClientOptions, OpenLineageClient
 from openlineage.facet import SourceCodeLocationJobFacet, SqlJobFacet
 from openlineage.run import RunEvent, RunState, Run, Job, Dataset
+
+import snowflake.connector
+import snowflake.connector.errors
 
 
 @dataclass
@@ -48,10 +52,46 @@ class OpenLineageSnowflakeConnectionManager(SnowflakeConnectionManager):
     """
     TYPE = 'openlineage_snowflake'
 
-    @classmethod
-    def handle_error(cls, error, message):
-        error_msg = "\n".join([item['message'] for item in error.errors])
-        raise DatabaseException(error_msg)
+
+    @contextmanager
+    def exception_handler(self, sql):
+        try:
+            yield
+        except snowflake.connector.errors.ProgrammingError as e:
+            msg = str(e)
+
+            logger.debug('Snowflake query id: {}'.format(e.sfqid))
+            logger.debug('Snowflake error: {}'.format(msg))
+
+            self.emit_failed(sql)
+
+            if 'Empty SQL statement' in msg:
+                logger.debug("got empty sql statement, moving on")
+            elif 'This session does not have a current database' in msg:
+                raise FailedToConnectException(
+                    ('{}\n\nThis error sometimes occurs when invalid '
+                     'credentials are provided, or when your default role '
+                     'does not have access to use the specified database. '
+                     'Please double check your profile and try again.')
+                    .format(msg))
+            else:
+                raise DatabaseException(msg)
+        except Exception as e:
+            if isinstance(e, snowflake.connector.errors.Error):
+                logger.debug('Snowflake query id: {}'.format(e.sfqid))
+
+            logger.debug("Error running SQL: {}", sql)
+            logger.debug("Rolling back transaction.")
+
+            self.emit_failed(sql)
+
+            self.rollback_if_open()
+            if isinstance(e, RuntimeException):
+                # during a sql query, an internal to dbt exception was raised.
+                # this sounds a lot like a signal handler and probably has
+                # useful information, so raise it without modification.
+                raise
+            raise RuntimeException(str(e)) from e
 
     def get_openlineage_client(self):
         if not hasattr(self, '_openlineage_client'):
