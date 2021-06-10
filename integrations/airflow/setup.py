@@ -50,18 +50,6 @@ extras_require = {
         "airflow-provider-great-expectations==0.0.6",
     ],
 }
-
-# extras_require = {
-#     "tests": [
-#         "pytest",
-#         "pytest-cov",
-#         "flake8",
-#         "apache-airflow[gcp,postgres]==1.10.12",
-#         "snowflake-connector-python",
-#         "sqlalchemy>=1.3,<1.4",
-#         "airflow-provider-great-expectations==0.0.6",
-#     ],
-# }
 extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(

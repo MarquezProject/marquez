@@ -6,5 +6,5 @@ COPY common/marquez /app/marquez
 COPY airflow/marquez_airflow /app/marquez_airflow
 WORKDIR /app
 RUN ls -la
-RUN pip wheel --wheel-dir=/app/wheel .[tests]
+RUN pip wheel --no-deps --wheel-dir=/app/wheel .[tests]
 RUN cp -R /app/wheel /whl
