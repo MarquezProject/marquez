@@ -107,8 +107,7 @@ jobs:
       - *install_integration_common
       - run: pip install -e .[dev]
       - run: flake8
-      - run: python -m pytest --cov=dbt tests/
-      - run: pytest --cov=adapters tests/
+      - run: pytest --cov=dbt tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
   build-integration-dbt-bigquery:
@@ -134,8 +133,7 @@ jobs:
       - *install_integration_common
       - run: pip install -e .[dev]
       - run: flake8
-      - run: python -m pytest --cov=dbt tests/
-      - run: pytest --cov=adapters tests/
+      - run: pytest --cov=dbt tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
   build-integration-dbt-snowflake:
@@ -200,7 +198,6 @@ jobs:
       - run: pip install -e .[dev]
       - run: flake8 --exclude integration
       - run: airflow initdb
-      - run: python -m pytest --cov=marquez_airflow tests/
       - run: pytest --cov=marquez_airflow tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
@@ -226,7 +223,6 @@ jobs:
       - *checkout_project_root
       - run: pip install -e .[dev]
       - run: flake8
-      - run: python -m pytest --cov=marquez tests/
       - run: pytest --cov=marquez tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
