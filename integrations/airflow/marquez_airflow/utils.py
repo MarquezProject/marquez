@@ -157,7 +157,7 @@ def get_custom_facets(task, is_external_trigger: bool):
     }
 
 
-def new_run_id(dag_run_id: str, task_id: str) -> str:
+def new_lineage_run_id(dag_run_id: str, task_id: str) -> str:
     return str(uuid4())
 
 

@@ -36,7 +36,7 @@ job_name = 'job_name'
 jar = 'marquez-spark-0.15.1-SNAPSHOT.jar'
 files = [f"https://repo1.maven.org/maven2/io/github/marquezproject/marquez-spark/0.15.1-SNAPSHOT/marquez-spark-0.15.1-SNAPSHOT.jar"]
 
-# Using the task_run_id macro in the airflow integration
+# Using the lineage_run_id macro in the airflow integration
 t1 = DataProcPySparkOperator(
     task_id=job_name,
     gcp_conn_id='google_cloud_default',
@@ -47,7 +47,7 @@ t1 = DataProcPySparkOperator(
     job_name=job_name,
     dataproc_pyspark_properties={
       'spark.driver.extraJavaOptions':
-        f"-javaagent:{jar}={os.environ.get('MARQUEZ_URL')}/api/v1/namespaces/{os.getenv('MARQUEZ_NAMESPACE', 'default')}/jobs/{job_name}/runs/{{{{task_run_id(run_id, task)}}}}?api_key={os.environ.get('MARQUEZ_API_KEY')}"
+        f"-javaagent:{jar}={os.environ.get('MARQUEZ_URL')}/api/v1/namespaces/{os.getenv('MARQUEZ_NAMESPACE', 'default')}/jobs/{job_name}/runs/{{{{lineage_run_id(run_id, task)}}}}?api_key={os.environ.get('MARQUEZ_API_KEY')}"
     files=files,
     dag=dag)
 ```

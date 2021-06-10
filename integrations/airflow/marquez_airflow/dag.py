@@ -25,7 +25,7 @@ from marquez_airflow.utils import (
     get_location,
     DagUtils,
     get_custom_facets,
-    new_run_id
+    new_lineage_run_id
 )
 from pkg_resources import parse_version
 
@@ -41,7 +41,7 @@ _MARQUEZ = MarquezAdapter()
 
 
 @provide_session
-def task_run_id(run_id, task, session=None):
+def lineage_run_id(run_id, task, session=None):
     """
     Macro function which returns the generated run id for a given task. This
     can be used to forward the run id from a task to a child run so the job
@@ -76,7 +76,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
         macros = {}
         if kwargs.__contains__("user_defined_macros"):
             macros = kwargs["user_defined_macros"]
-        macros["task_run_id"] = task_run_id
+        macros["lineage_run_id"] = lineage_run_id
         kwargs["user_defined_macros"] = macros
         super().__init__(*args, **kwargs)
         self.extractors = {}
@@ -128,7 +128,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
                 step = self._extract_metadata(dagrun, task)
 
                 job_name = self._marquez_job_name(self.dag_id, task.task_id)
-                run_id = new_run_id(dagrun.run_id, task_id)
+                run_id = new_lineage_run_id(dagrun.run_id, task_id)
 
                 task_run_id = _MARQUEZ.start_task(
                     run_id,
@@ -192,7 +192,7 @@ class DAG(airflow.models.DAG, LoggingMixin):
         step = self._extract_metadata(dagrun, task, task_instance)
 
         job_name = self._marquez_job_name(self.dag_id, task.task_id)
-        run_id = new_run_id(dagrun.run_id, task.task_id)
+        run_id = new_lineage_run_id(dagrun.run_id, task.task_id)
 
         if not task_run_id:
             task_run_id = _MARQUEZ.start_task(
