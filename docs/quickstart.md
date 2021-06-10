@@ -7,6 +7,7 @@ layout: quickstart
 * [Marquez Data Model](#marquez-data-model)
 * [Write Sample Lineage Metadata to Marquez](#write-sample-lineage-metadata-to-marquez)
 * [Explore Sample Lineage Metadata using Marquez](#explore-sample-lineage-metadata-using-marquez)
+* [Collect Run-Level Metadata using OpenLineage](#collect-run-level-metadata-using-openlineage)
 * [Summary](#summary)
 * [Next Steps](#next-steps)
 
@@ -92,6 +93,10 @@ Finally, click on the output dataset `public.delivery_7_days` for `etl_delivery_
 <figure align="center">
   <img src="./assets/images/tab-view-dataset-output.png">
 </figure>
+
+## Collect Run-Level Metadata using OpenLineage
+
+To collect _run-level_ metadata as [OpenLineage](https://github.com/OpenLineage/OpenLineage) events using Marquez as the [HTTP backend](https://github.com/OpenLineage/OpenLineage#scope), see the OpenLineage [getting started](replace-with-real-link) guide!
 
 ## Summary
 
