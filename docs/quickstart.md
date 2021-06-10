@@ -56,9 +56,9 @@ Run-level metadata is tracked via HTTP API calls to `/lineage` using [OpenLineag
 
 ## Write Sample Lineage Metadata to Marquez
 
-In this example, we'll be using sample dataset, job, and run metadata for a hypothetical _Food Delivery_ website. The sample metadata consists of hourly and daily ETL jobs that query tables in a `postgres` database used for reporting and analytics.
+In this example, we'll be using sample dataset, job, and run metadata for a hypothetical _Food Delivery_ website. The sample metadata consists of hourly and daily ETL jobs that query tables in a `postgres` database used for reporting and analytics. So, let's get started!
 
-To start Marquez with sample metadata that will be used and referenced in the next section, run the following command from the base of the Marquez repository:
+To start Marquez with sample metadata that will be used and referenced in later sections, run the following command from the base of the Marquez repository:
 
 ```
 $ ./docker/up.sh --seed
