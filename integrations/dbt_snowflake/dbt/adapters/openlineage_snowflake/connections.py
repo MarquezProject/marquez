@@ -52,7 +52,6 @@ class OpenLineageSnowflakeConnectionManager(SnowflakeConnectionManager):
     """
     TYPE = 'openlineage_snowflake'
 
-
     @contextmanager
     def exception_handler(self, sql):
         try:

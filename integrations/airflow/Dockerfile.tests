@@ -4,7 +4,6 @@ ADD airflow/setup.py /app
 ADD airflow/README.md /app
 COPY common/marquez /app/marquez
 COPY airflow/marquez_airflow /app/marquez_airflow
-COPY airflow/openlineage /app/openlineage
 WORKDIR /app
 RUN ls -la
 RUN pip wheel --wheel-dir=/app/wheel .[tests]
