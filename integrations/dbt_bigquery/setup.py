@@ -2,9 +2,9 @@
 from setuptools import find_packages
 from setuptools import setup
 
-package_name = "marquez-dbt-openlineage-bigquery"
+package_name = "dbt-openlineage-bigquery"
 package_version = "0.15.0"
-description = """The openlineage bigquery adapter plugin for dbt (data build tool)"""
+description = """The OpenLineage bigquery adapter plugin for dbt (data build tool)"""
 
 extras_require = {
     "tests": [

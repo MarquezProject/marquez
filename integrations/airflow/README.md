@@ -42,30 +42,6 @@ $ python3 setup.py install
 
 ## Configuration
 
-The library depends on a _backend_. A `Backend` is configurable and lets the library know where to write dataset, job, and run metadata.
-
-### Backends
-
-* `HTTP`: Write metadata to Marquez
-* `FILE`: Write metadata to a file (as `json`) under `/tmp/marquez`
-* `LOG`: Simply just logs the metadata to the console
-
-By default, the `HTTP` backend will be used (see next sections on configuration). To override the default backend and write metadata to a file, use `MARQUEZ_BACKEND`:
-
-```
-MARQUEZ_BACKEND=FILE
-```
-
-> **Note:** Metadata will be written to `/tmp/marquez/client.requests.log`, but the location can be overridden with `MARQUEZ_FILE`.
-
-### `HTTP` Backend Authentication
-
-The `HTTP` backend supports using API keys to authenticate requests via `Bearer` auth. To include a key when making an API request, use `MARQUEZ_API_KEY`:
-
-```
-MARQUEZ_BACKEND=HTTP
-MARQUEZ_API_KEY=[YOUR_API_KEY]
-```
 
 ### `HTTP` Backend Environment Variables
 
