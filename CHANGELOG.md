@@ -1,6 +1,24 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.15.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.15.1...HEAD)
+
+## [0.15.1](https://github.com/MarquezProject/marquez/compare/0.15.0...0.15.1)
+
+### Added
+
+* Factored out common functionality in Python airflow integration [@mobuchowski](https://github.com/mobuchowski)
+* Added Airflow task run macro to expose task run id [@collado-mike](https://github.com/collado-mike)
+
+### Changed
+
+* Refactored ValuesAverageExpectationParser to ValuesSumExpectationParser and ValuesCountExpectationParser [@collado-mike](https://github.com/collado-mike)
+* Updated SparkListener to extend Spark's SparkListener abstract class [@collado-mike](https://github.com/collado-mike)
+
+###  Fixed
+
+* Use current project version in spark openlineage client [@mobuchowski](https://github.com/mobuchowski)
+* Rewrote LineageDao queries and LineageService for performance [@collado-mike](https://github.com/collado-mike)
+* Updated lineage query to include new jobs that have no job version yet [@collado-mike](https://github.com/collado-mike)
 
 ## [0.15.0](https://github.com/MarquezProject/marquez/compare/0.14.2...0.15.0)
 
