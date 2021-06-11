@@ -58,7 +58,7 @@ Run-level metadata is tracked via HTTP API calls to `/lineage` using [OpenLineag
 
 In this example, we'll be using sample dataset, job, and run metadata for a hypothetical _Food Delivery_ website. The sample metadata consists of hourly and daily ETL jobs that query tables in a `postgres` database used for reporting and analytics. So, let's get started!
 
-To start Marquez with sample metadata that will be used and referenced in later sections, run the following command from the base of the Marquez repository:
+To start Marquez with sample metadata that will be used and referenced in later sections, run the following script from the base of the Marquez repository (the `--seed` flag will execute the `marquez seed` [command](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/SeedCommand.java)):
 
 ```
 $ ./docker/up.sh --seed
@@ -80,7 +80,7 @@ To view lineage metadata collected by Marquez, browse to the UI by visiting [htt
 
 ##### VIEW JOB METADATA
 
-You should see the job `namespace`, `name`, `input` and `output` datasets, and the job run marked as `COMPLETED `: 
+You should see the job `namespace`, `name`, `input` and `output` datasets, and the job run marked as `COMPLETED`: 
 
 <figure align="center">
   <img src="./assets/images/tab-view-job-completed.png">
