@@ -107,6 +107,7 @@ In this simple example, we showed you how to write sample lineage metadata to a 
 * Take a look at our Airflow [example](https://github.com/MarquezProject/marquez/tree/main/examples/airflow) to learn how to enable metadata collection for Airflow DAGs and troubleshoot failing DAGs using Marquez.
 * Listen to [Solving Data Lineage Tracking And Data Discovery At WeWork](https://www.dataengineeringpodcast.com/marquez-data-lineage-episode-111).
 * Listen to [Unlocking The Power of Data Lineage In Your Platform with OpenLineage](https://www.dataengineeringpodcast.com/openlineage-data-lineage-specification-episode-187).
+* Watch [A Metadata Service for Data Abstraction, Data Lineage & Event-based Triggers](https://www.youtube.com/watch?v=dRaRKob-lRQ).
 
 ## Feedback
 
