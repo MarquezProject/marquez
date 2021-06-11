@@ -20,7 +20,7 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    "attrs>=19.3.0",
+    "attrs>=19.3",
     "openlineage-python==0.0.1rc6",
     "sqlparse>=0.3.1"
 ]
@@ -44,7 +44,7 @@ extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(
     name="marquez-common",
-    version="0.14.3",
+    version="0.15.1",
     description="Marquez common python library",
     long_description=readme,
     long_description_content_type="text/markdown",
