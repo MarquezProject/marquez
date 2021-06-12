@@ -70,7 +70,7 @@ web:
   image:
     registry: docker.io
     repository: marquezproject/marquez-web
-    tag: 0.15.0
+    tag: 0.15.1
     pullPolicy: IfNotPresent
   ## Marquez website will run on this port
   ##
