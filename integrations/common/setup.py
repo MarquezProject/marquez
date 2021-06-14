@@ -20,9 +20,9 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    "attrs>=20.3.0",
-    "openlineage-python==0.0.1rc3",
-    "sqlparse>=0.4.1"
+    "attrs>=19.3.0",
+    "openlineage-python==0.0.1rc6",
+    "sqlparse>=0.3.1"
 ]
 
 extras_require = {

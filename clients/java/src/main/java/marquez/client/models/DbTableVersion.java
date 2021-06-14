@@ -18,6 +18,7 @@ import static marquez.client.models.DatasetType.DB_TABLE;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
@@ -36,7 +37,8 @@ public final class DbTableVersion extends DatasetVersion {
       @Nullable final List<Field> fields,
       @Nullable final Set<String> tags,
       @Nullable final String description,
-      @Nullable final Run createdByRun) {
+      @Nullable final Run createdByRun,
+      @Nullable final Map<String, Object> facets) {
     super(
         id,
         DB_TABLE,
@@ -48,6 +50,7 @@ public final class DbTableVersion extends DatasetVersion {
         fields,
         tags,
         description,
-        createdByRun);
+        createdByRun,
+        facets);
   }
 }
