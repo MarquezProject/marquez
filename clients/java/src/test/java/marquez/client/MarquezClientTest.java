@@ -19,6 +19,7 @@ import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
 import static marquez.client.MarquezPathV1.BASE_PATH;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newContext;
+import static marquez.client.models.ModelGenerator.newDatasetFacets;
 import static marquez.client.models.ModelGenerator.newDatasetIdWith;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
@@ -128,6 +129,7 @@ public class MarquezClientTest {
   private static final String DB_TABLE_DESCRIPTION = newDescription();
   private static final List<Field> FIELDS = newFields(4);
   private static final Set<String> TAGS = newTagNames(4);
+  private static final Map<String, Object> DB_FACETS = newDatasetFacets(4);
 
   private static final DbTable DB_TABLE =
       new DbTable(
@@ -142,7 +144,7 @@ public class MarquezClientTest {
           TAGS,
           null,
           DB_TABLE_DESCRIPTION,
-          null);
+          DB_FACETS);
   private static final DbTable DB_TABLE_MODIFIED =
       new DbTable(
           DB_TABLE_ID,
@@ -156,7 +158,7 @@ public class MarquezClientTest {
           TAGS,
           LAST_MODIFIED_AT,
           DB_TABLE_DESCRIPTION,
-          null);
+          DB_FACETS);
 
   // STREAM DATASET
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
@@ -179,7 +181,7 @@ public class MarquezClientTest {
           null,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
-          null);
+          DB_FACETS);
   private static final Stream STREAM_MODIFIED =
       new Stream(
           STREAM_ID,
@@ -194,7 +196,7 @@ public class MarquezClientTest {
           LAST_MODIFIED_AT,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
-          null);
+          DB_FACETS);
 
   // JOB
   private static final JobId JOB_ID = newJobIdWith(NAMESPACE_NAME);
@@ -335,7 +337,8 @@ public class MarquezClientTest {
           FIELDS,
           TAGS,
           DB_TABLE_DESCRIPTION,
-          CREATED_BY_RUN);
+          CREATED_BY_RUN,
+          DB_FACETS);
   private static final StreamVersion STREAM_VERSION =
       new StreamVersion(
           STREAM_ID,
@@ -348,7 +351,8 @@ public class MarquezClientTest {
           TAGS,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
-          CREATED_BY_RUN);
+          CREATED_BY_RUN,
+          DB_FACETS);
 
   private final MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;

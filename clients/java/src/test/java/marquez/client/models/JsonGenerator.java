@@ -142,6 +142,7 @@ public final class JsonGenerator {
             .put("name", dbTable.getId().getName());
     final ArrayNode fields = MAPPER.valueToTree(dbTable.getFields());
     final ArrayNode tags = MAPPER.valueToTree(dbTable.getTags());
+    final ObjectNode facets = MAPPER.valueToTree(dbTable.getFacets());
 
     final ObjectNode obj = MAPPER.createObjectNode();
     obj.set("id", id);
@@ -156,6 +157,7 @@ public final class JsonGenerator {
     obj.putArray("tags").addAll(tags);
     obj.put("lastModifiedAt", dbTable.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("description", dbTable.getDescription().orElse(null));
+    obj.set("facets", facets);
 
     return obj.toString();
   }
@@ -168,6 +170,7 @@ public final class JsonGenerator {
             .put("name", dbTableVersion.getId().getName());
     final ArrayNode fields = MAPPER.valueToTree(dbTableVersion.getFields());
     final ArrayNode tags = MAPPER.valueToTree(dbTableVersion.getTags());
+    final ObjectNode facets = MAPPER.valueToTree(dbTableVersion.getFacets());
 
     final ObjectNode obj = MAPPER.createObjectNode();
     obj.set("id", id);
@@ -181,6 +184,7 @@ public final class JsonGenerator {
     obj.putArray("tags").addAll(tags);
     obj.put("description", dbTableVersion.getDescription().orElse(null));
     obj.set("createdByRun", toObj(dbTableVersion.getCreatedByRun().orElse(null)));
+    obj.set("facets", facets);
 
     return obj.toString();
   }
@@ -193,6 +197,7 @@ public final class JsonGenerator {
             .put("name", stream.getId().getName());
     final ArrayNode fields = MAPPER.valueToTree(stream.getFields());
     final ArrayNode tags = MAPPER.valueToTree(stream.getTags());
+    final ObjectNode facets = MAPPER.valueToTree(stream.getFacets());
 
     final ObjectNode obj = MAPPER.createObjectNode();
     obj.set("id", id);
@@ -208,6 +213,7 @@ public final class JsonGenerator {
     obj.put("lastModifiedAt", stream.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("schemaLocation", stream.getSchemaLocation().map(URL::toString).orElse(null));
     obj.put("description", stream.getDescription().orElse(null));
+    obj.set("facets", facets);
 
     return obj.toString();
   }
@@ -220,6 +226,7 @@ public final class JsonGenerator {
             .put("name", streamVersion.getId().getName());
     final ArrayNode fields = MAPPER.valueToTree(streamVersion.getFields());
     final ArrayNode tags = MAPPER.valueToTree(streamVersion.getTags());
+    final ObjectNode facets = MAPPER.valueToTree(streamVersion.getFacets());
 
     final ObjectNode obj = MAPPER.createObjectNode();
     obj.set("id", id);
@@ -234,6 +241,7 @@ public final class JsonGenerator {
     obj.put("schemaLocation", streamVersion.getSchemaLocation().map(URL::toString).orElse(null));
     obj.put("description", streamVersion.getDescription().orElse(null));
     obj.set("createdByRun", toObj(streamVersion.getCreatedByRun().orElse(null)));
+    obj.set("facets", facets);
 
     return obj.toString();
   }
