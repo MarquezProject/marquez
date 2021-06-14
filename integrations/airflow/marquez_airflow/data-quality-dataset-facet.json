@@ -14,21 +14,19 @@
             "bytes": {"type":  "int"},
             "columnMetrics": {
               "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "type": "object",
-                  "properties": {
-                    "nullCount": {"type": "integer"},
-                    "distinctCount": {"type":  "integer"},
-                    "sum": {"type":  "number"},
-                    "count": {"type":  "number"},
-                    "min": {"type": "number"},
-                    "max": {"type":  "number"},
-                    "quantiles": {
-                      "type": "object",
-                      "patternProperties": {
-                        "\\d+": {"type":  "number"}
-                      }
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "nullCount": {"type": "integer"},
+                  "distinctCount": {"type":  "integer"},
+                  "sum": {"type":  "number"},
+                  "count": {"type":  "number"},
+                  "min": {"type": "number"},
+                  "max": {"type":  "number"},
+                  "quantiles": {
+                    "type": "object",
+                    "patternProperties": {
+                      "\\d+": {"type":  "number"}
                     }
                   }
                 }
