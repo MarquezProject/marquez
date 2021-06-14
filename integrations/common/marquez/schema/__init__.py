@@ -10,4 +10,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-GITHUB_LOCATION = "https://github.com/MarquezProject/marquez/blob/main/integrations/common/marquez/schema/"  # noqa: E501
+GITHUB_LOCATION = "https://github.com/MarquezProject/marquez/tree/main/integrations/common/marquez/schema/"  # noqa: E501
