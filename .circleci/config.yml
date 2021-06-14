@@ -7,7 +7,7 @@ checkout_project_root: &checkout_project_root
     path: ~/marquez
 
 install_integration_common: &install_integration_common
-  run: (cd ~/marquez/integrations/common && pip install .)
+  run: (cd ~/marquez/integrations/common && pip install . --user)
 
 # Only trigger CI job on release (=X.Y.Z)
 only-on-release: &only-on-release
