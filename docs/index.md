@@ -67,7 +67,7 @@ Marquez's data model emphasizes immutability and timely processing of datasets. 
 The diagram below shows the metadata collected and cataloged for a given job over multiple runs, and the time-ordered sequence of changes applied to its input dataset.
 
 <figure align="center">
-  <img src="./assets/images/model.png">
+  <img src="./assets/images/versioning.png">
 </figure>
 
 **Job**: A job has an `owner`, unique `name`, `version`, and optional `description`. A job will define one or more _versioned_ inputs as dependencies, and one or more _versioned_ outputs as artifacts. Note that it's possible for a job to have only input, or only output datasets defined.

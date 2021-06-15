@@ -23,7 +23,7 @@ A library that integrates [Airflow `DAGs`]() with [Marquez](https://github.com/M
 
 ## Requirements
 
- - [Python 3.5.0](https://www.python.org/downloads)+
+ - [Python 3.6.0](https://www.python.org/downloads)+
  - [Airflow 1.10.4](https://pypi.org/project/apache-airflow)+
 
 ## Installation
@@ -42,7 +42,7 @@ $ python3 setup.py install
 
 ## Configuration
 
-The library depends on a _backend_. A `Backend` is configurable and lets the library know where to write dataset and job metadata.
+The library depends on a _backend_. A `Backend` is configurable and lets the library know where to write dataset, job, and run metadata.
 
 ### Backends
 
@@ -50,13 +50,13 @@ The library depends on a _backend_. A `Backend` is configurable and lets the lib
 * `FILE`: Write metadata to a file (as `json`) under `/tmp/marquez`
 * `LOG`: Simply just logs the metadata to the console
 
-By default, the `HTTP` backend will be used (see next section). To override the default backend and write metadata to a file, use `MARQUEZ_BACKEND`:
+By default, the `HTTP` backend will be used (see next sections on configuration). To override the default backend and write metadata to a file, use `MARQUEZ_BACKEND`:
 
 ```
 MARQUEZ_BACKEND=FILE
 ```
 
-> **Note:** Metadata will be written to `/tmp/marquez/client.requests.log`, but can be overridden with `MARQUEZ_FILE`.
+> **Note:** Metadata will be written to `/tmp/marquez/client.requests.log`, but the location can be overridden with `MARQUEZ_FILE`.
 
 ### `HTTP` Backend Authentication
 
@@ -64,10 +64,10 @@ The `HTTP` backend supports using API keys to authenticate requests via `Bearer`
 
 ```
 MARQUEZ_BACKEND=HTTP
-MARQUEZ_API_KEY=[API_KEY]
+MARQUEZ_API_KEY=[YOUR_API_KEY]
 ```
 
-### Pointing to your Marquez service
+### `HTTP` Backend Environment Variables
 
 `marquez-airflow` needs to know where to talk to the Marquez server API.  You can set these using environment variables to be read by your Airflow service.
 
@@ -93,8 +93,6 @@ If you do nothing, Marquez will receive the `Job` and the `Run` from your DAGs, 
 
 It's important to understand the inputs and outputs are lists and relate directly to the `Dataset` object in Marquez.  Datasets also include a source which relates directly to the `Source` object in Marquez.
 
-*A PostgresExtractor is currently in progress.  When that's merged, it will represent a good example of how to write custom extractors*
-
 ## Usage
 
 To begin collecting Airflow DAG metadata with Marquez, use:
@@ -109,7 +107,7 @@ When enabled, the library will:
 1. On DAG **start**, collect metadata for each task using an `Extractor` (the library defines a _default_ extractor to use otherwise)
 2. Collect task input / output metadata (`source`, `schema`, etc)
 3. Collect task run-level metadata (execution time, state, parameters, etc)
-4. On DAG **complete**, also mark the task as _complete_ in Marquez  
+4. On DAG **complete**, also mark the task as _complete_ in Marquez
 
 To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG`, `INFO`, or `ERROR`:
 
@@ -117,55 +115,48 @@ To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG`, 
 $ export MARQUEZ_LOG_LEVEL=INFO
 ```
 
-## Example
+## Triggering Child Jobs
+Commonly, Airflow DAGs will trigger processes on remote systems, such as an Apache Spark or Apache 
+Beam job. Those systems may have their own OpenLineage integration and report their own
+job runs and dataset inputs/outputs. To propagate the job hierarchy, tasks must send their own run 
+id so that the downstream process can report the [ParentRunFacet](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.json#/definitions/ParentRunFacet)
+with the proper run id.
 
+The `lineage_run_id` macro exists to inject the run id of a given task into the arguments sent to a
+remote processing job's Airflow operator. The macro requires the DAG run_id and the task to access
+the generated run id for that task. For example, a Spark job can be triggered using the
+`DataProcPySparkOperator` with the correct parent run id using the following configuration:
 ```python
-from datetime import datetime
-from marquez_airflow import DAG
-from airflow.operators.postgres_operator import PostgresOperator
-from airflow.utils.dates import days_ago
+t1 = DataProcPySparkOperator(
+    task_id=job_name,
+    #required pyspark configuration,
+    job_name=job_name,
+    dataproc_pyspark_properties={
+      'spark.driver.extraJavaOptions':
+        f"-javaagent:{jar}={os.environ.get('MARQUEZ_URL')}/api/v1/namespaces/{os.getenv('MARQUEZ_NAMESPACE', 'default')}/jobs/{job_name}/runs/{{{{lineage_run_id(run_id, task)}}}}?api_key={os.environ.get('MARQUEZ_API_KEY')}"
+    dag=dag)
+```
+## Development
 
-default_args = {
-    'owner': 'datascience',
-    'depends_on_past': False,
-    'start_date': days_ago(1),
-    'email_on_failure': False,
-    'email_on_retry': False,
-    'email': ['datascience@datakin.com']
-}
+To install all dependencies for _local_ development:
 
-dag = DAG(
-    'orders_popular_day_of_week',
-    schedule_interval='@weekly',
-    default_args=default_args,
-    description='Determines the popular day of week orders are placed.'
-)
+```bash
+# Bash
+$ pip3 install -e .[dev]
+```
+```zsh
+# escape the brackets in zsh
+$ pip3 install -e .\[dev\]
+```
 
-t1 = PostgresOperator(
-    task_id='if_not_exists',
-    postgres_conn_id='food_delivery_db',
-    sql='''
-    CREATE TABLE IF NOT EXISTS popular_orders_day_of_week (
-      order_day_of_week VARCHAR(64) NOT NULL,
-      order_placed_on   TIMESTAMP NOT NULL,
-      orders_placed     INTEGER NOT NULL
-    );''',
-    dag=dag
-)
+To run the entire test suite, you'll first want to initialize the Airflow database:
 
-t2 = PostgresOperator(
-    task_id='insert',
-    postgres_conn_id='food_delivery_db',
-    sql='''
-    INSERT INTO popular_orders_day_of_week (order_day_of_week, order_placed_on, orders_placed)
-      SELECT EXTRACT(ISODOW FROM order_placed_on) AS order_day_of_week,
-             order_placed_on,
-             COUNT(*) AS orders_placed
-        FROM top_delivery_times
-       GROUP BY order_placed_on;
-    ''',
-    dag=dag
-)
+```bash
+$ airflow initdb
+```
 
-t1 >> t2
+Then, run the test suite with:
+
+```bash
+$ pytest
 ```

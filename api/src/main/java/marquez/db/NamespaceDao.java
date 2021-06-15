@@ -18,6 +18,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
+import marquez.common.models.NamespaceName;
 import marquez.db.mappers.NamespaceMapper;
 import marquez.db.mappers.NamespaceRowMapper;
 import marquez.db.mappers.OwnerRowMapper;
@@ -36,19 +38,22 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 public interface NamespaceDao extends BaseDao {
 
   @Transaction
-  default Namespace upsert(String namespaceName, NamespaceMeta meta) {
+  default Namespace upsertNamespaceMeta(
+      @NonNull NamespaceName namespaceName, @NonNull NamespaceMeta meta) {
     Instant now = Instant.now();
     NamespaceRow namespaceRow;
     if (meta.getDescription().isPresent()) {
       namespaceRow =
-          upsert(
+          upsertNamespaceRow(
               UUID.randomUUID(),
               now,
-              namespaceName,
+              namespaceName.getValue(),
               meta.getOwnerName().getValue(),
               meta.getDescription().get());
     } else {
-      namespaceRow = upsert(UUID.randomUUID(), now, namespaceName, meta.getOwnerName().getValue());
+      namespaceRow =
+          upsertNamespaceRow(
+              UUID.randomUUID(), now, namespaceName.getValue(), meta.getOwnerName().getValue());
     }
     if (namespaceRow.getCurrentOwnerName() != null
         && !namespaceRow.getCurrentOwnerName().equalsIgnoreCase(meta.getOwnerName().getValue())) {
@@ -77,7 +82,7 @@ public interface NamespaceDao extends BaseDao {
   Optional<Namespace> findBy(String name);
 
   @SqlQuery("SELECT * FROM namespaces WHERE name = :name")
-  Optional<NamespaceRow> findByRow(String name);
+  Optional<NamespaceRow> findNamespaceByName(String name);
 
   @SqlQuery("SELECT * FROM namespaces ORDER BY name LIMIT :limit OFFSET :offset")
   List<Namespace> findAll(int limit, int offset);
@@ -94,12 +99,11 @@ public interface NamespaceDao extends BaseDao {
           + ":now, "
           + ":now, "
           + ":name, "
-          + ":currentOwnerName "
-          + ") ON CONFLICT(name) DO "
-          + "UPDATE SET "
-          + "updated_at = EXCLUDED.updated_at "
+          + ":currentOwnerName) "
+          + "ON CONFLICT(name) DO "
+          + "UPDATE SET updated_at = EXCLUDED.updated_at "
           + "RETURNING *")
-  NamespaceRow upsert(UUID uuid, Instant now, String name, String currentOwnerName);
+  NamespaceRow upsertNamespaceRow(UUID uuid, Instant now, String name, String currentOwnerName);
 
   @SqlQuery(
       "INSERT INTO namespaces ( "
@@ -120,7 +124,7 @@ public interface NamespaceDao extends BaseDao {
           + "UPDATE SET "
           + "updated_at = EXCLUDED.updated_at "
           + "RETURNING *")
-  NamespaceRow upsert(
+  NamespaceRow upsertNamespaceRow(
       UUID uuid, Instant now, String name, String currentOwnerName, String description);
 
   @SqlQuery(

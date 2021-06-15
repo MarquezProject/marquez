@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -19,26 +20,26 @@ import marquez.client.models.NamespaceMeta;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
 import marquez.client.models.SourceMeta;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@Category(UnitTests.class)
-@RunWith(MockitoJUnitRunner.class)
+@org.junit.jupiter.api.Tag("UnitTests")
+@ExtendWith(MockitoExtension.class)
 public class MarquezWriteOnlyClientTest {
   @Mock private Backend backend;
   private MarquezWriteOnlyClient client;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     client = Clients.newWriteOnlyClient(backend);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     verifyNoMoreInteractions(backend);
   }
@@ -92,10 +93,10 @@ public class MarquezWriteOnlyClientTest {
   }
 
   @Test
-  public void testMarkRunAs() {
+  public void testMarkRunAs() throws UnsupportedEncodingException {
     String runId = UUID.randomUUID().toString();
     Instant at = Instant.now();
-    String atParam = URLEncoder.encode(String.valueOf(at), UTF_8);
+    String atParam = URLEncoder.encode(String.valueOf(at), UTF_8.name());
     client.markRunAsRunning(runId, at);
     verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/start?at=" + atParam);
     client.markRunAsAborted(runId, at);
@@ -119,11 +120,15 @@ public class MarquezWriteOnlyClientTest {
     verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/fail");
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testMarkRunAsNew() {
-    String runId = UUID.randomUUID().toString();
-    Instant at = Instant.now();
-    client.markRunAs(runId, RunState.NEW, at);
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          String runId = UUID.randomUUID().toString();
+          Instant at = Instant.now();
+          client.markRunAs(runId, RunState.NEW, at);
+        });
   }
 
   @Test

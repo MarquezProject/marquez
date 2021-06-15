@@ -15,12 +15,14 @@
 package marquez.client.models;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -92,7 +94,8 @@ public final class ModelGenerator {
         newFields(2),
         newTagNames(2),
         null,
-        newDescription());
+        newDescription(),
+        newDatasetFacets(2));
   }
 
   public static DbTableVersion newDbTableVersion() {
@@ -108,7 +111,8 @@ public final class ModelGenerator {
         newFields(2),
         newTagNames(2),
         newDescription(),
-        newRun());
+        newRun(),
+        newDatasetFacets(2));
   }
 
   public static StreamMeta newStreamMeta() {
@@ -137,7 +141,8 @@ public final class ModelGenerator {
         newTagNames(2),
         null,
         newSchemaLocation(),
-        newDescription());
+        newDescription(),
+        newDatasetFacets(2));
   }
 
   public static StreamVersion newStreamVersion() {
@@ -154,7 +159,8 @@ public final class ModelGenerator {
         newTagNames(2),
         newSchemaLocation(),
         newDescription(),
-        newRun());
+        newRun(),
+        newDatasetFacets(2));
   }
 
   public static Set<DatasetId> newDatasetIds(final int limit) {
@@ -205,7 +211,8 @@ public final class ModelGenerator {
         newLocation(),
         newContext(),
         newDescription(),
-        latestRun);
+        latestRun,
+        null);
   }
 
   public static JobId newJobId() {
@@ -230,7 +237,8 @@ public final class ModelGenerator {
 
   public static Run newRun() {
     final Instant now = newTimestamp();
-    return new Run(newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs());
+    return new Run(
+        newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs(), null);
   }
 
   public static String newOwnerName() {
@@ -364,5 +372,31 @@ public final class ModelGenerator {
 
   public static String newVersion() {
     return UUID.randomUUID().toString();
+  }
+
+  public static Map<String, Object> newDatasetFacets(final int limit) {
+    return java.util.stream.Stream.generate(ModelGenerator::newDatasetFacet)
+        .limit(limit)
+        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  public static Map.Entry<String, Object> newDatasetFacet() {
+    return new AbstractMap.SimpleImmutableEntry<>(newFacetName(), newFacetFields());
+  }
+
+  public static String newFacetName() {
+    return "test_facet" + newId();
+  }
+
+  public static Map<Object, Object> newFacetFields() {
+    return ImmutableMap.builder().put(newFacetProducer()).put(newFacetSchemaURL()).build();
+  }
+
+  public static Map.Entry<String, String> newFacetProducer() {
+    return new AbstractMap.SimpleImmutableEntry<>("_producer", "test_producer" + newId());
+  }
+
+  public static Map.Entry<String, String> newFacetSchemaURL() {
+    return new AbstractMap.SimpleImmutableEntry<>("_schemaURL", "test_schemaURL" + newId());
   }
 }

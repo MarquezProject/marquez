@@ -1,2 +1,4 @@
 codecov:
   branch: main
+  status:
+    patch: off

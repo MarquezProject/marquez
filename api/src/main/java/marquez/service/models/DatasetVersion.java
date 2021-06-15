@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.Optional;
@@ -56,11 +57,12 @@ public abstract class DatasetVersion {
   @Getter private final Version version;
   @Getter private final NamespaceName namespace;
   @Getter private final SourceName sourceName;
-  @Getter private final ImmutableList<Field> fields;
-  @Getter private final ImmutableSet<TagName> tags;
+  @Getter @Setter private ImmutableList<Field> fields;
+  @Getter @Setter private ImmutableSet<TagName> tags;
   @Nullable private final String description;
   @Nullable @Setter private Run createdByRun;
   @Nullable @Setter private UUID createdByRunUuid;
+  @Getter private final ImmutableMap<String, Object> facets;
 
   public DatasetVersion(
       @NonNull final DatasetId id,
@@ -73,7 +75,8 @@ public abstract class DatasetVersion {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final Run createdByRun) {
+      @Nullable final Run createdByRun,
+      @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -86,6 +89,7 @@ public abstract class DatasetVersion {
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.description = description;
     this.createdByRun = createdByRun;
+    this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
   public Optional<String> getDescription() {

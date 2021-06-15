@@ -11,10 +11,12 @@ import static marquez.client.MarquezPathV1.sourcePath;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
+import lombok.extern.slf4j.Slf4j;
 import marquez.client.models.DatasetMeta;
 import marquez.client.models.JobMeta;
 import marquez.client.models.NamespaceMeta;
@@ -22,6 +24,7 @@ import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
 import marquez.client.models.SourceMeta;
 
+@Slf4j
 class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
 
   private final Backend backend;
@@ -42,9 +45,16 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
         } else {
           pathBuilder.append("&");
         }
-        String paramName = URLEncoder.encode(entry.getKey(), UTF_8);
-        String paramValue = URLEncoder.encode(String.valueOf(entry.getValue()), UTF_8);
-        pathBuilder.append(paramName).append("=").append(paramValue);
+        final String paramName = entry.getKey();
+        final String paramValue = String.valueOf(entry.getValue());
+        try {
+          final String paramNameEncoded = URLEncoder.encode(paramName, UTF_8.name());
+          final String paramValueEncoded = URLEncoder.encode(paramValue, UTF_8.name());
+          pathBuilder.append(paramNameEncoded).append("=").append(paramValueEncoded);
+        } catch (UnsupportedEncodingException e) {
+          log.error("Failed to append param '{}' with value '{}'.", paramName, paramValue, e);
+          throw new MarquezClientException(e);
+        }
       }
     }
     return pathBuilder.toString();

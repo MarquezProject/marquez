@@ -20,13 +20,17 @@ set -e
 project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}"/integrations/airflow/tests/integration
 
-GIT_URL=$(git config --get remote.origin.url \
-		          | sed 's|git@github.com:|https://github.com/|')
-GIT_REV=$(git rev-parse HEAD)
-MARQUEZ_AIRFLOW_LIB_WITH_REV="git+${GIT_URL}@${GIT_REV}#egg=marquez_airflow&subdirectory=integrations/airflow"
+if [[ "$(docker images -q marquez-airflow-base:latest 2> /dev/null)" == "" ]]; then
+  echo "Please run 'docker build -f Dockerfile.tests -t marquez-airflow-base .' at base folder"
+  exit 1
+fi
+
+# maybe overkill
+MARQUEZ_AIRFLOW_WHL=$(docker run marquez-airflow-base:latest sh -c "ls /whl/marquez*")
+MARQUEZ_AIRFLOW_WHL_ALL=$(docker run marquez-airflow-base:latest sh -c "ls /whl/*")
 
 # Add revision to requirements.txt
-echo "${MARQUEZ_AIRFLOW_LIB_WITH_REV}" > requirements.txt
+echo "${MARQUEZ_AIRFLOW_WHL_ALL}" > requirements.txt
 
 # Add revision to integration-requirements.txt
 cat > integration-requirements.txt <<EOL
@@ -45,7 +49,9 @@ google-api-python-client>=1.12.2
 pandas-gbq>=0.13.2
 google-cloud-storage>=1.31.2
 retrying==1.3.3
-${MARQUEZ_AIRFLOW_LIB_WITH_REV}
+snowflake-connector-python==2.4.3
+marquez-python
+${MARQUEZ_AIRFLOW_WHL}
 EOL
 
-docker-compose up --build --exit-code-from integration
+docker-compose up --build --force-recreate --exit-code-from integration

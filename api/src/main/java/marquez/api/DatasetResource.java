@@ -53,7 +53,6 @@ import marquez.service.models.DatasetVersion;
 @Slf4j
 @Path("/api/v1/namespaces/{namespace}/datasets")
 public class DatasetResource extends BaseResource {
-
   public DatasetResource(@NonNull final ServiceFactory serviceFactory) {
     super(serviceFactory);
   }
@@ -83,14 +82,14 @@ public class DatasetResource extends BaseResource {
   @GET
   @Path("{dataset}")
   @Produces(APPLICATION_JSON)
-  public Response get(
+  public Response getDataset(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName) {
     throwIfNotExists(namespaceName);
 
     final Dataset dataset =
         datasetService
-            .find(namespaceName.getValue(), datasetName.getValue())
+            .findWithTags(namespaceName.getValue(), datasetName.getValue())
             .orElseThrow(() -> new DatasetNotFoundException(datasetName));
     return Response.ok(dataset).build();
   }
@@ -148,7 +147,8 @@ public class DatasetResource extends BaseResource {
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     throwIfNotExists(namespaceName);
 
-    final List<Dataset> datasets = datasetService.findAll(namespaceName.getValue(), limit, offset);
+    final List<Dataset> datasets =
+        datasetService.findAllWithTags(namespaceName.getValue(), limit, offset);
     return Response.ok(new Datasets(datasets)).build();
   }
 

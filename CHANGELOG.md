@@ -1,6 +1,129 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.12.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.15.1...HEAD)
+
+## [0.15.1](https://github.com/MarquezProject/marquez/compare/0.15.0...0.15.1)
+
+### Added
+
+* Factored out common functionality in Python airflow integration [@mobuchowski](https://github.com/mobuchowski)
+* Added Airflow task run macro to expose task run id [@collado-mike](https://github.com/collado-mike)
+
+### Changed
+
+* Refactored ValuesAverageExpectationParser to ValuesSumExpectationParser and ValuesCountExpectationParser [@collado-mike](https://github.com/collado-mike)
+* Updated SparkListener to extend Spark's SparkListener abstract class [@collado-mike](https://github.com/collado-mike)
+
+###  Fixed
+
+* Use current project version in spark openlineage client [@mobuchowski](https://github.com/mobuchowski)
+* Rewrote LineageDao queries and LineageService for performance [@collado-mike](https://github.com/collado-mike)
+* Updated lineage query to include new jobs that have no job version yet [@collado-mike](https://github.com/collado-mike)
+
+## [0.15.0](https://github.com/MarquezProject/marquez/compare/0.14.2...0.15.0)
+
+### Added
+
+* Add tracing visibility [@julienledem](https://github.com/julienledem)
+* **New** Add snowflake extractor :tada: [@mobuchowski](https://github.com/mobuchowski)
+* Add SSLContext to MarquezClient [@lewiesnyder](https://github.com/lewiesnyder)
+* Add support for LogicalRDDs in spark plan visitors [@collado-mike](https://github.com/collado-mike)
+* **New** Add Great Expectations based data quality facet support :tada: [@mobuchowski](https://github.com/mobuchowski)
+
+### Changed
+
+* Augment tutorial instructions & screenshots for Airflow example [@rossturk](https://github.com/rossturk)
+* Rewrite correlated subqueries when querying the lineage_events table [@collado-mike](https://github.com/collado-mike)
+
+###  Fixed
+
+* Web time formatting display fix [@kachontep](https://github.com/kachontep)
+
+## [0.14.2](https://github.com/MarquezProject/marquez/compare/0.14.1...0.14.2)
+
+### Changed
+
+* Unpin `requests` dep in `marquez-airflow` integration [@wslulciuc](https://github.com/wslulciuc)
+* Unpin `attrs` dep in `marquez-airflow` integration [@wslulciuc](https://github.com/wslulciuc)
+
+## [0.14.1](https://github.com/MarquezProject/marquez/compare/0.14.0...0.14.1) - 2021-04-05
+
+### Changed
+
+* Updated dataset lineage query to find most recent job that wrote to it [@collado-mike](https://github.com/collado-mike)
+* Pin http-proxy-middleware to 0.20.0 [@wslulciuc](https://github.com/wslulciuc)
+
+## [0.14.0](https://github.com/MarquezProject/marquez/compare/0.13.1...0.14.0) - 2021-04-03
+
+### Added
+
+*  GA tag for website tracking [@rossturk](https://github.com/rossturk)
+*  Basic CTE support in `marquez-airflow` [@mobuchowski](https://github.com/mobuchowski)
+*  Airflow custom facets, bigquery statistics facets [@mobuchowski](https://github.com/mobuchowski)
+*  Unit tests for **class** [`JobVersionDao`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/db/JobVersionDao.java) [@wslulciuc](https://github.com/wslulciuc)
+*  Sentry tracing support [@julienledem](https://github.com/julienledem)
+*  OpenLineage facets support to API response models :tada: [@wslulciuc](https://github.com/wslulciuc)
+
+### Changed
+
+*  `BigQueryRelationTransformer` and deleted `BigQueryNodeVisitor` [@collado-mike](https://github.com/collado-mike)
+*  Bump postgres to `12.1.0` [@wslulciuc](https://github.com/wslulciuc)
+*  Update spark job name to reflect spark application name and execution node [@collado-mike](https://github.com/collado-mike)
+*  Update `marquez-airflow` integration to use [OpenLineage](https://github.com/OpenLineage/OpenLineage) :tada: [@mobuchowski](https://github.com/mobuchowski)
+*  Migrate tests to junit 5 [@mobuchowski](https://github.com/mobuchowski)
+*  Rewrite lineage IO sql queries to avoid job_versions_io_mapping_* tables [@collado-mike](https://github.com/collado-mike)
+*  Updated OpenLineage impl to only update dataset version on run completion [@collado-mike](https://github.com/collado-mike)
+
+## [0.13.1](https://github.com/MarquezProject/marquez/compare/0.13.0...0.13.1) - 2021-04-01
+
+### Changed
+
+* Remove unused implementation of SQL parser in `marquez-airflow` [@mobuchowski](https://github.com/mobuchowski)
+
+### Fixed
+
+* Add inputs and outputs to lineage graph [@henneberger](https://github.com/henneberger)
+* Updated `NodeId` regex to support URIs with scheme and ports [@collado-mike](https://github.com/collado-mike)
+
+## [0.13.0](https://github.com/MarquezProject/marquez/compare/0.12.2...0.13.0) - 2021-03-30
+
+### Added
+
+* Secret support for helm chart [@KevinMellott91](https://github.com/KevinMellott91)
+* **New** `seed` cmd to populate `marquez` database with source, dataset, and job metadata allowing users to try out features of Marquez (data lineage, view job run history, etc) :tada:
+* Docs on applying db migrations manually
+* **New** Lineage API to support data lineage queries :tada:
+* Support for logging errors via [sentry](https://sentry.io/)
+* **New** Airflow [example](https://github.com/MarquezProject/marquez/tree/main/examples/airflow) with Marquez :tada:
+
+### Changed
+
+* Update OpenLinageDao to stop converting URI structures to contain underscores instead of colons and slashes [@collado-mike](https://github.com/collado-mike)
+* Bump testcontainers dependency to `v1.15.2` [@ ShakirzyanovArsen](https://github.com/ShakirzyanovArsen)
+* Register output datasets for a run lazily [@henneberger](https://github.com/henneberger)
+* Refactor spark plan traversal to find input/output datasets from datasources [@collado-mike](https://github.com/collado-mike)
+* Web UI project settings and default marquez port [@phixMe](https://github.com/phixMe)
+* Associate dataset inputs on run start [@henneberger](https://github.com/henneberger)
+
+### Fixed
+
+* Dataset description is not overwritten on update [@henneberger](https://github.com/henneberger)
+* Latest tags are returned from dataset [@henneberger](https://github.com/henneberger)
+* Airflow integration tests on forked PRs [@mobuchowski](https://github.com/mobuchowski)
+* Empty nominal end time support [@henneberger](https://github.com/henneberger)
+* Ensure valid dataset fields for OpenLineage [@henneberger](https://github.com/henneberger)
+* Ingress context templating for helm chart [@KulykDmytro](https://github.com/KulykDmytro)
+
+## [0.12.2](https://github.com/MarquezProject/marquez/compare/0.12.0...0.12.2) - 2021-03-16
+
+### Changed
+
+* Use alpine image for `marquez` reducing image size by `+50%` [@KevinMellott91](https://github.com/KevinMellott91)
+* Use alpine image for `marquez-web` reducing image size by `+50%` [@KevinMellott91](https://github.com/KevinMellott91)
+
+### Fixed
+
+* Ensure `marquez.DAG` is (de)serializable
 
 ## [0.12.0](https://github.com/MarquezProject/marquez/compare/0.11.2...0.12.0) - 2021-02-08
 
@@ -12,7 +135,7 @@
 *  New `/lineage` endpoint for [OpenLineage](https://github.com/OpenLineage/OpenLineage) support [@henneberger](https://github.com/henneberger)
 *  New graphql endpoint [@henneberger](https://github.com/henneberger)
 *  New spark integration [@henneberger](https://github.com/henneberger)
-*  New API to list versions for a dataset 
+*  New API to list versions for a dataset
 
 ### Changed
 
@@ -43,7 +166,7 @@
 
 * Always migrate db schema on app start in development config
 * Update default db username / password
-* Use [`marquez.dev.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.dev.yml) in on docker compose `up` 
+* Use [`marquez.dev.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.dev.yml) in on docker compose `up`
 
 ## [0.11.1](https://github.com/MarquezProject/marquez/compare/0.11.0...0.11.1) - 2020-08-19
 
@@ -183,7 +306,7 @@
 
 ### Added
 
-* Link dataset versions with run inputs 
+* Link dataset versions with run inputs
 * Add schema required by tagging
 * More tests for class `common.Utils`
 * Add `ColumnsTest`
@@ -201,7 +324,7 @@
 ### Added
 
 * Add `Job.latestRun`
-* Add debug logging 
+* Add debug logging
 
 ### Changed
 
@@ -237,7 +360,7 @@
 
 ### Changed
 
-* Rename guid column to uuid 
+* Rename guid column to uuid
 * Use admin ping and health
 * Update `owner` to `ownerName`
 
@@ -247,7 +370,7 @@
 
 ### Fixed
 
-* Fix `marquez.jar` rename on `COPY` 
+* Fix `marquez.jar` rename on `COPY`
 
 ## [0.4.0](https://github.com/MarquezProject/marquez/compare/0.3.4...0.4.0) - 2019-06-04
 
@@ -266,19 +389,19 @@
 
 ### Changed
 
-* Set timestamps to `CURRENT_TIMESTAMP` 
+* Set timestamps to `CURRENT_TIMESTAMP`
 
 ## [0.3.2](https://github.com/MarquezProject/marquez/compare/0.3.1...0.3.2) - 2019-05-14
 
 ### Changed
 
-* Set `job_versions.updated_at` to `CURRENT_TIMESTAMP` 
+* Set `job_versions.updated_at` to `CURRENT_TIMESTAMP`
 
 ## [0.3.1](https://github.com/MarquezProject/marquez/compare/0.3.0...0.3.1) - 2019-05-14
 
 ### Added
 
-* Handle `Flyway.repair()` error 
+* Handle `Flyway.repair()` error
 
 ## [0.3.0](https://github.com/MarquezProject/marquez/compare/0.2.1...0.3.0) - 2019-05-14
 
@@ -288,7 +411,7 @@
 
 ### Changed
 
-* Return timestamp strings as ISO format 
+* Return timestamp strings as ISO format
 
 ### Removed
 

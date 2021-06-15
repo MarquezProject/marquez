@@ -40,12 +40,13 @@ public final class Job {
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final NamespaceName namespace;
-  @Getter private final Set<DatasetId> inputs;
-  @Getter private final Set<DatasetId> outputs;
+  @Getter @Setter private Set<DatasetId> inputs;
+  @Getter @Setter private Set<DatasetId> outputs;
   @Nullable private final URL location;
   @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
   @Nullable @Setter private Run latestRun;
+  @Getter private final ImmutableMap<String, Object> facets;
 
   public Job(
       @NonNull final JobId id,
@@ -58,7 +59,8 @@ public final class Job {
       @Nullable final URL location,
       @Nullable final ImmutableMap<String, String> context,
       @Nullable final String description,
-      @Nullable final Run latestRun) {
+      @Nullable final Run latestRun,
+      @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -71,6 +73,7 @@ public final class Job {
     this.context = (context == null) ? ImmutableMap.of() : context;
     this.description = description;
     this.latestRun = latestRun;
+    this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
   public Optional<URL> getLocation() {

@@ -1,8 +1,8 @@
 package marquez.client;
 
 import static org.apache.http.protocol.HTTP.USER_AGENT;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -11,17 +11,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import marquez.client.MarquezHttp.UserAgent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@Category(UnitTests.class)
-@RunWith(MockitoJUnitRunner.class)
+@org.junit.jupiter.api.Tag("UnitTests")
+@ExtendWith(MockitoExtension.class)
 public class FileBackendTest {
 
   private static final String HEADERS =
@@ -36,12 +35,12 @@ public class FileBackendTest {
 
   private FileBackend fileBackend;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     fileBackend = new FileBackend(new File("/tmp/test"), writer);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     verifyNoMoreInteractions(writer);
   }

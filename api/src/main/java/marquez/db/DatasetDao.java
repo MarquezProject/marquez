@@ -23,8 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.Value;
+import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.NamespaceName;
 import marquez.common.models.TagName;
 import marquez.db.mappers.DatasetMapper;
 import marquez.db.mappers.DatasetRowMapper;
@@ -50,9 +53,7 @@ public interface DatasetDao extends BaseDao {
   @SqlQuery(
       "SELECT EXISTS ("
           + "SELECT 1 FROM datasets AS d "
-          + "INNER JOIN namespaces AS n "
-          + "  ON (n.uuid = d.namespace_uuid AND n.name = :namespaceName) "
-          + "WHERE d.name = :datasetName)")
+          + "WHERE d.name = :datasetName AND d.namespace_name = :namespaceName)")
   boolean exists(String namespaceName, String datasetName);
 
   @SqlBatch(
@@ -76,47 +77,91 @@ public interface DatasetDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  String TAG_UUIDS =
-      "ARRAY(SELECT tag_uuid "
-          + "      FROM datasets_tag_mapping "
-          + "      WHERE dataset_uuid = d.uuid) AS tag_uuids ";
+  @SqlQuery(
+      "SELECT d.*, dv.fields, sv.schema_location, facets, t.tags\n"
+          + "FROM datasets d\n"
+          + "LEFT JOIN dataset_versions dv on d.current_version_uuid = dv.uuid\n"
+          + "LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid\n"
+          + "LEFT JOIN (\n"
+          + "    SELECT ARRAY_AGG(t.name) AS tags, m.dataset_uuid\n"
+          + "    FROM tags AS t\n"
+          + "    INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid\n"
+          + "    GROUP BY m.dataset_uuid\n"
+          + ") t ON t.dataset_uuid=d.uuid\n"
+          + "LEFT JOIN (\n"
+          + "    SELECT d2.uuid, jsonb_agg(ds->'facets') AS facets\n"
+          + "    FROM datasets d2\n"
+          + "    INNER JOIN runs_input_mapping ri ON ri.dataset_version_uuid=d2.current_version_uuid\n"
+          + "    INNER JOIN (\n"
+          + "        SELECT run_uuid, ds\n"
+          + "        FROM lineage_events AS le,\n"
+          + "             jsonb_array_elements(event -> 'inputs' || event -> 'outputs') as ds\n"
+          + "        WHERE ds -> 'facets' IS NOT NULL\n"
+          + "    ) i ON ri.run_uuid = i.run_uuid AND ds->>'name'=d2.name\n"
+          + "    WHERE d2.name = :datasetName\n"
+          + "    AND d2.namespace_name = :namespaceName\n"
+          + "    GROUP BY d2.uuid\n"
+          + ") f ON f.uuid=d.uuid\n"
+          + "WHERE d.name = :datasetName\n"
+          + "AND d.namespace_name = :namespaceName")
+  Optional<Dataset> findDatasetByName(String namespaceName, String datasetName);
 
-  String SELECT = "SELECT d.*, " + TAG_UUIDS + "FROM datasets AS d ";
+  default Optional<Dataset> findWithTags(String namespaceName, String datasetName) {
+    Optional<Dataset> dataset = findDatasetByName(namespaceName, datasetName);
+    dataset.ifPresent(this::setFields);
+    return dataset;
+  }
 
-  String DATASET_SELECT =
-      "select d.*, t_json.fields, ARRAY(select t.name from tags t\n"
-          + "    inner join datasets_tag_mapping m on m.tag_uuid = t.uuid\n"
-          + "    where d.uuid = m.dataset_uuid) as tags,"
-          + "    sv.schema_location\n"
-          + "from datasets d\n"
-          + "left outer join stream_versions sv on sv.dataset_version_uuid = d.current_version_uuid\n"
-          + "left outer join (\n"
-          + "    select fm.dataset_version_uuid, jsonb_agg((select x from (select f.name, f.type, f.description, t_agg.agg as tags) as x) ) as fields\n"
-          + "    from dataset_fields f\n"
-          + "    inner join dataset_versions_field_mapping fm on fm.dataset_field_uuid = f.uuid\n"
-          + "    left outer join (select m.dataset_field_uuid, jsonb_agg((select t.name)) agg\n"
-          + "        from dataset_fields_tag_mapping m\n"
-          + "        inner join tags t on m.tag_uuid = t.uuid\n"
-          + "        group by m.dataset_field_uuid\n"
-          + "        ) t_agg on t_agg.dataset_field_uuid = f.uuid\n"
-          + "    group by fm.dataset_version_uuid) t_json on t_json.dataset_version_uuid = d.current_version_uuid\n";
+  default void setFields(Dataset ds) {
+    DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
 
-  @SqlQuery(DATASET_SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
-  Optional<Dataset> find(String namespaceName, String datasetName);
-
-  @SqlQuery(SELECT + " WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
-  Optional<DatasetRow> findByRow(String namespaceName, String datasetName);
+    ds.getCurrentVersionUuid()
+        .ifPresent(
+            dsv -> {
+              ds.setFields(datasetFieldDao.find(dsv));
+            });
+  }
 
   @SqlQuery(
-      "SELECT uuid FROM datasets WHERE name = :datasetName AND namespace_name = :namespaceName")
-  Optional<UUID> getUuid(String namespaceName, String datasetName);
+      "SELECT d.* FROM datasets AS d WHERE d.name = :datasetName AND d.namespace_name = :namespaceName")
+  Optional<DatasetRow> findDatasetAsRow(String namespaceName, String datasetName);
+
+  @SqlQuery("SELECT * FROM datasets WHERE name = :datasetName AND namespace_name = :namespaceName")
+  Optional<DatasetRow> getUuid(String namespaceName, String datasetName);
 
   @SqlQuery(
-      DATASET_SELECT
-          + "WHERE d.namespace_name = :namespaceName "
+      "SELECT d.*, dv.fields, sv.schema_location, facets, t.tags\n"
+          + "FROM datasets d\n"
+          + "INNER JOIN dataset_versions dv on d.current_version_uuid = dv.uuid\n"
+          + "LEFT OUTER JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "    SELECT ARRAY_AGG(t.name) AS tags, m.dataset_uuid\n"
+          + "    FROM tags AS t\n"
+          + "    INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid\n"
+          + "    GROUP BY m.dataset_uuid\n"
+          + ") t ON t.dataset_uuid=d.uuid\n"
+          + "LEFT JOIN (\n"
+          + "    SELECT d2.uuid, jsonb_agg(ds->'facets') AS facets\n"
+          + "    FROM datasets d2\n"
+          + "    INNER JOIN runs_input_mapping ri ON ri.dataset_version_uuid=d2.current_version_uuid\n"
+          + "    INNER JOIN (\n"
+          + "        SELECT run_uuid, ds\n"
+          + "        FROM lineage_events AS le,\n"
+          + "             jsonb_array_elements(event -> 'inputs' || event -> 'outputs') as ds\n"
+          + "        WHERE ds -> 'facets' IS NOT NULl\n"
+          + "    ) i ON ri.run_uuid = i.run_uuid AND ds->>'name'=d2.name\n"
+          + "    where d2.namespace_name = :namespaceName\n"
+          + "    GROUP BY d2.uuid\n"
+          + ") f ON f.uuid=d.uuid\n"
+          + "WHERE d.namespace_name = :namespaceName\n"
           + "ORDER BY d.name "
           + "LIMIT :limit OFFSET :offset")
   List<Dataset> findAll(String namespaceName, int limit, int offset);
+
+  default List<Dataset> findAllWithTags(String namespaceName, int limit, int offset) {
+    List<Dataset> datasets = findAll(namespaceName, limit, offset);
+    return datasets.stream().peek(this::setFields).collect(Collectors.toList());
+  }
 
   @SqlQuery(
       "INSERT INTO datasets ("
@@ -162,12 +207,54 @@ public interface DatasetDao extends BaseDao {
       String physicalName,
       String description);
 
+  @SqlQuery(
+      "INSERT INTO datasets ("
+          + "uuid, "
+          + "type, "
+          + "created_at, "
+          + "updated_at, "
+          + "namespace_uuid, "
+          + "namespace_name, "
+          + "source_uuid, "
+          + "source_name, "
+          + "name, "
+          + "physical_name "
+          + ") VALUES ( "
+          + ":uuid, "
+          + ":type, "
+          + ":now, "
+          + ":now, "
+          + ":namespaceUuid, "
+          + ":namespaceName, "
+          + ":sourceUuid, "
+          + ":sourceName, "
+          + ":name, "
+          + ":physicalName) "
+          + "ON CONFLICT (namespace_uuid, name) "
+          + "DO UPDATE SET "
+          + "type = EXCLUDED.type, "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "physical_name = EXCLUDED.physical_name "
+          + "RETURNING *")
+  DatasetRow upsert(
+      UUID uuid,
+      DatasetType type,
+      Instant now,
+      UUID namespaceUuid,
+      String namespaceName,
+      UUID sourceUuid,
+      String sourceName,
+      String name,
+      String physicalName);
+
   @Transaction
   default Dataset upsertDatasetMeta(
-      String namespaceName, String datasetName, DatasetMeta datasetMeta) {
+      NamespaceName namespaceName, DatasetName datasetName, DatasetMeta datasetMeta) {
     Instant now = Instant.now();
     NamespaceRow namespaceRow =
-        createNamespaceDao().upsert(UUID.randomUUID(), now, namespaceName, DEFAULT_NAMESPACE_OWNER);
+        createNamespaceDao()
+            .upsertNamespaceRow(
+                UUID.randomUUID(), now, namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
     SourceRow sourceRow =
         createSourceDao()
             .upsertOrDefault(
@@ -177,20 +264,36 @@ public interface DatasetDao extends BaseDao {
                 datasetMeta.getSourceName().getValue(),
                 "");
     UUID newDatasetUuid = UUID.randomUUID();
-    DatasetRow datasetRow =
-        upsert(
-            newDatasetUuid,
-            datasetMeta.getType(),
-            now,
-            namespaceRow.getUuid(),
-            namespaceRow.getName(),
-            sourceRow.getUuid(),
-            sourceRow.getName(),
-            datasetName,
-            datasetMeta.getPhysicalName().getValue(),
-            datasetMeta.getDescription().orElse(null));
-    updateDatasetMetric(
-        namespaceName, datasetMeta.getType().toString(), newDatasetUuid, datasetRow.getUuid());
+    DatasetRow datasetRow;
+
+    if (datasetMeta.getDescription().isPresent()) {
+      datasetRow =
+          upsert(
+              newDatasetUuid,
+              datasetMeta.getType(),
+              now,
+              namespaceRow.getUuid(),
+              namespaceRow.getName(),
+              sourceRow.getUuid(),
+              sourceRow.getName(),
+              datasetName.getValue(),
+              datasetMeta.getPhysicalName().getValue(),
+              datasetMeta.getDescription().orElse(null));
+    } else {
+      datasetRow =
+          upsert(
+              newDatasetUuid,
+              datasetMeta.getType(),
+              now,
+              namespaceRow.getUuid(),
+              namespaceRow.getName(),
+              sourceRow.getUuid(),
+              sourceRow.getName(),
+              datasetName.getValue(),
+              datasetMeta.getPhysicalName().getValue());
+    }
+
+    updateDatasetMetric(namespaceName, datasetMeta.getType(), newDatasetUuid, datasetRow.getUuid());
 
     TagDao tagDao = createTagDao();
     List<DatasetTagMapping> datasetTagMappings = new ArrayList<>();
@@ -203,9 +306,13 @@ public interface DatasetDao extends BaseDao {
     DatasetVersionRow dvRow =
         createDatasetVersionDao()
             .upsertDatasetVersion(
-                datasetRow.getUuid(), now, namespaceName, datasetName, datasetMeta);
+                datasetRow.getUuid(),
+                now,
+                namespaceName.getValue(),
+                datasetName.getValue(),
+                datasetMeta);
 
-    return find(namespaceName, datasetName).get();
+    return findWithTags(namespaceName.getValue(), datasetName.getValue()).get();
   }
 
   default String toDefaultSourceType(DatasetType type) {
@@ -213,19 +320,22 @@ public interface DatasetDao extends BaseDao {
   }
 
   default void updateDatasetMetric(
-      String namespaceName, String type, UUID newDatasetUuid, UUID datasetUuid) {
-    if (newDatasetUuid != datasetUuid) {
-      DatasetService.datasets.labels(namespaceName, type).inc();
+      NamespaceName namespaceName,
+      DatasetType datasetType,
+      UUID newDatasetUuid,
+      UUID currentDatasetUuid) {
+    if (newDatasetUuid != currentDatasetUuid) {
+      DatasetService.datasets.labels(namespaceName.getValue(), datasetType.toString()).inc();
     }
   }
 
   default Dataset updateTags(String namespaceName, String datasetName, String tagName) {
     Instant now = Instant.now();
-    DatasetRow datasetRow = findByRow(namespaceName, datasetName).get();
+    DatasetRow datasetRow = findDatasetAsRow(namespaceName, datasetName).get();
     TagRow tagRow = createTagDao().upsert(UUID.randomUUID(), now, tagName);
     updateTagMapping(
         ImmutableList.of(new DatasetTagMapping(datasetRow.getUuid(), tagRow.getUuid(), now)));
-    return find(namespaceName, datasetName).get();
+    return findDatasetByName(namespaceName, datasetName).get();
   }
 
   @Value

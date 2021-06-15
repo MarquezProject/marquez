@@ -21,11 +21,13 @@ import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 import static marquez.db.mappers.DatasetMapper.toFields;
 import static marquez.db.mappers.DatasetMapper.toTags;
+import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetId;
@@ -46,6 +48,8 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
   @Override
   public DatasetVersion map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
+    Set<String> columnNames = MapperUtils.getColumnNames(results.getMetaData());
+
     DatasetType type = DatasetType.valueOf(stringOrThrow(results, Columns.TYPE));
     DatasetVersion datasetVersion;
     if (type == DatasetType.DB_TABLE) {
@@ -60,11 +64,10 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               Version.of(uuidOrThrow(results, Columns.VERSION)),
               SourceName.of(stringOrThrow(results, Columns.SOURCE_NAME)),
               toFields(results, "fields"),
-              toTags(results, "tags"),
+              columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
-              null);
-      datasetVersion.setCreatedByRunUuid(uuidOrNull(results, "createdByRunUuid"));
-      return datasetVersion;
+              null,
+              toFacetsOrNull(results));
     } else {
       datasetVersion =
           new StreamVersion(
@@ -78,9 +81,10 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               SourceName.of(stringOrThrow(results, Columns.SOURCE_NAME)),
               toURL(stringOrThrow(results, Columns.SCHEMA_LOCATION)),
               toFields(results, "fields"),
-              toTags(results, "tags"),
+              columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
-              null);
+              null,
+              toFacetsOrNull(results));
     }
     // The createdByRun can be brought in via join, similar to the JobMapper
     datasetVersion.setCreatedByRunUuid(uuidOrNull(results, "createdByRunUuid"));

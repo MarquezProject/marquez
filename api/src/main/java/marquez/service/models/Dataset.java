@@ -18,14 +18,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -54,11 +57,12 @@ public abstract class Dataset {
   @Getter private final Instant updatedAt;
   @Getter private final NamespaceName namespace;
   @Getter private final SourceName sourceName;
-  @Getter private final ImmutableList<Field> fields;
+  @Getter @Setter private List<Field> fields;
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
   private final Optional<UUID> currentVersionUuid;
+  @Getter ImmutableMap<String, Object> facets;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -72,7 +76,8 @@ public abstract class Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Optional<UUID> currentVersionUuid) {
+      @Nullable final Optional<UUID> currentVersionUuid,
+      @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -86,6 +91,7 @@ public abstract class Dataset {
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
     this.currentVersionUuid = currentVersionUuid;
+    this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
   public Optional<Instant> getLastModifiedAt() {

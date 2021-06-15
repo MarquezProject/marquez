@@ -23,12 +23,13 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.FieldType;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
-import marquez.db.JobVersionDao.JobVersionBag;
+import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -43,11 +44,14 @@ import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
+import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.Job;
+import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
+import org.slf4j.LoggerFactory;
 
 public interface OpenLineageDao extends BaseDao {
   public String DEFAULT_SOURCE_NAME = "default";
@@ -58,15 +62,17 @@ public interface OpenLineageDao extends BaseDao {
           + "event_type, "
           + "event_time, "
           + "run_id, "
+          + "run_uuid, "
           + "job_name, "
           + "job_namespace, "
           + "event, "
           + "producer) "
-          + "VALUES (?, ?, ?, ?, ?, ?, ?)")
+          + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
   void createLineageEvent(
       String eventType,
       Instant eventTime,
-      String runId,
+      UUID runId,
+      UUID runUuid,
       String jobName,
       String jobNamespace,
       PGobject event,
@@ -75,8 +81,9 @@ public interface OpenLineageDao extends BaseDao {
   @Transaction
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);
-    if (event.getEventType() != null && getRunState(event.getEventType()) == RunState.COMPLETED) {
-      updateMarquezOnComplete(event, updateLineageRow);
+    RunState runState = getRunState(event.getEventType());
+    if (event.getEventType() != null && runState.isDone()) {
+      updateMarquezOnComplete(event, updateLineageRow, runState);
     }
     return updateLineageRow;
   }
@@ -97,7 +104,7 @@ public interface OpenLineageDao extends BaseDao {
 
     UpdateLineageRow bag = new UpdateLineageRow();
     NamespaceRow namespace =
-        namespaceDao.upsert(
+        namespaceDao.upsertNamespaceRow(
             UUID.randomUUID(),
             now,
             formatNamespaceName(event.getJob().getNamespace()),
@@ -123,7 +130,7 @@ public interface OpenLineageDao extends BaseDao {
     }
 
     JobRow job =
-        jobDao.upsert(
+        jobDao.upsertJob(
             UUID.randomUUID(),
             getJobType(event.getJob()),
             now,
@@ -133,13 +140,12 @@ public interface OpenLineageDao extends BaseDao {
             description,
             jobContext.getUuid(),
             location,
-            jobDao.toJson(toDatasetId(event.getInputs()), mapper),
-            jobDao.toJson(toDatasetId(event.getOutputs()), mapper));
+            jobDao.toJson(toDatasetId(event.getInputs()), mapper));
     bag.setJob(job);
 
     Map<String, String> runArgsMap = createRunArgs(event);
     RunArgsRow runArgs =
-        runArgsDao.upsert(
+        runArgsDao.upsertRunArgs(
             UUID.randomUUID(), now, Utils.toJson(runArgsMap), Utils.checksumFor(runArgsMap));
     bag.setRunArgs(runArgs);
 
@@ -154,14 +160,16 @@ public interface OpenLineageDao extends BaseDao {
               .getNominalStartTime()
               .withZoneSameInstant(ZoneId.of("UTC"))
               .toInstant();
-      nominalEndTime =
-          event
-              .getRun()
-              .getFacets()
-              .getNominalTime()
-              .getNominalEndTime()
-              .withZoneSameInstant(ZoneId.of("UTC"))
-              .toInstant();
+      if (event.getRun().getFacets().getNominalTime().getNominalEndTime() != null) {
+        nominalEndTime =
+            event
+                .getRun()
+                .getFacets()
+                .getNominalTime()
+                .getNominalEndTime()
+                .withZoneSameInstant(ZoneId.of("UTC"))
+                .toInstant();
+      }
     }
 
     UUID runUuid = runToUuid(event.getRun().getRunId());
@@ -182,7 +190,8 @@ public interface OpenLineageDao extends BaseDao {
               now,
               namespace.getName(),
               job.getName(),
-              location);
+              location,
+              jobContext.getUuid());
     } else {
       run =
           runDao.upsert(
@@ -196,7 +205,8 @@ public interface OpenLineageDao extends BaseDao {
               namespace.getUuid(),
               namespace.getName(),
               job.getName(),
-              location);
+              location,
+              jobContext.getUuid());
     }
     bag.setRun(run);
 
@@ -272,15 +282,17 @@ public interface OpenLineageDao extends BaseDao {
     return set;
   }
 
-  default void updateMarquezOnComplete(LineageEvent event, UpdateLineageRow updateLineageRow) {
-    JobVersionBag jobVersionBag =
+  default void updateMarquezOnComplete(
+      LineageEvent event, UpdateLineageRow updateLineageRow, RunState runState) {
+    BagOfJobVersionInfo bagOfJobVersionInfo =
         createJobVersionDao()
-            .createJobVersionOnComplete(
-                event.getEventTime().toInstant(),
-                updateLineageRow.getRun().getUuid(),
+            .upsertJobVersionOnRunTransition(
                 updateLineageRow.getRun().getNamespaceName(),
-                updateLineageRow.getRun().getJobName());
-    updateLineageRow.setJobVersionBag(jobVersionBag);
+                updateLineageRow.getRun().getJobName(),
+                updateLineageRow.getRun().getUuid(),
+                runState,
+                event.getEventTime().toInstant());
+    updateLineageRow.setJobVersionBag(bagOfJobVersionInfo);
   }
 
   default String getUrlOrPlaceholder(String uri) {
@@ -297,7 +309,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default String formatNamespaceName(String namespace) {
-    return namespace.replaceAll("[^a-zA-Z0-9\\-_.]", "_");
+    return namespace.replaceAll("[^a-z:/A-Z0-9\\-_.]", "_");
   }
 
   default JobType getJobType(Job job) {
@@ -316,7 +328,8 @@ public interface OpenLineageDao extends BaseDao {
       DatasetFieldDao datasetFieldDao,
       RunDao runDao) {
     NamespaceRow dsNamespace =
-        namespaceDao.upsert(UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
+        namespaceDao.upsertNamespaceRow(
+            UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
 
     SourceRow source;
     if (ds.getFacets() != null && ds.getFacets().getDataSource() != null) {
@@ -339,7 +352,7 @@ public interface OpenLineageDao extends BaseDao {
     }
 
     NamespaceRow datasetNamespace =
-        namespaceDao.upsert(
+        namespaceDao.upsertNamespaceRow(
             UUID.randomUUID(),
             now,
             formatNamespaceName(ds.getNamespace()),
@@ -358,19 +371,41 @@ public interface OpenLineageDao extends BaseDao {
             ds.getName(),
             dsDescription);
 
-    List<SchemaField> fields = null;
-    if (ds.getFacets() != null && ds.getFacets().getSchema() != null) {
-      fields = ds.getFacets().getSchema().getFields();
-    }
+    List<SchemaField> fields =
+        Optional.ofNullable(ds.getFacets())
+            .map(DatasetFacets::getSchema)
+            .map(SchemaDatasetFacet::getFields)
+            .orElse(null);
 
-    UUID datasetVersion =
-        version(dsNamespace.getName(), source.getName(), datasetRow.getName(), fields, runUuid);
     DatasetVersionRow datasetVersionRow =
-        datasetVersionDao.upsert(
-            UUID.randomUUID(), now, datasetRow.getUuid(), datasetVersion, isInput ? null : runUuid);
+        datasetRow
+            .getCurrentVersionUuid()
+            .filter(v -> isInput) // only fetch the current version if this is a read
+            .flatMap(datasetVersionDao::findRowByUuid)
+            // if this is a write _or_ if the dataset has no current version,
+            // create a new version
+            .orElseGet(
+                () -> {
+                  UUID versionUuid =
+                      version(
+                          dsNamespace.getName(),
+                          source.getName(),
+                          datasetRow.getName(),
+                          fields,
+                          runUuid);
+                  DatasetVersionRow row =
+                      datasetVersionDao.upsert(
+                          UUID.randomUUID(),
+                          now,
+                          datasetRow.getUuid(),
+                          versionUuid,
+                          isInput ? null : runUuid,
+                          datasetVersionDao.toPgObjectSchemaFields(fields),
+                          dsNamespace.getName(),
+                          ds.getName());
 
-    datasetDao.updateVersion(datasetRow.getUuid(), now, datasetVersionRow.getUuid());
-
+                  return row;
+                });
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
     if (fields != null) {
       for (SchemaField field : fields) {
@@ -379,7 +414,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                field.getType(),
+                toFieldType(field.getType()),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -395,6 +430,19 @@ public interface OpenLineageDao extends BaseDao {
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
   }
 
+  default String toFieldType(String type) {
+    if (type == null) {
+      return null;
+    }
+
+    try {
+      return FieldType.valueOf(type.toUpperCase()).name();
+    } catch (Exception e) {
+      LoggerFactory.getLogger(getClass()).warn("Can't handle field of type {}", type.toUpperCase());
+      return null;
+    }
+  }
+
   default String formatDatasetName(String name) {
     return name;
   }
@@ -408,6 +456,9 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default RunState getRunState(String eventType) {
+    if (eventType == null) {
+      return RunState.RUNNING;
+    }
     switch (eventType.toLowerCase()) {
       case "complete":
         return RunState.COMPLETED;
@@ -418,7 +469,7 @@ public interface OpenLineageDao extends BaseDao {
       case "start":
         return RunState.RUNNING;
       default:
-        return RunState.NEW;
+        return RunState.RUNNING;
     }
   }
 
@@ -488,22 +539,18 @@ public interface OpenLineageDao extends BaseDao {
                 namespace,
                 sourceName,
                 datasetName,
-                sourceName,
                 fields == null
                     ? ImmutableList.of()
                     : fields.stream()
-                        .map(
-                            field ->
-                                versionField(
-                                    field.getName(), field.getType(), field.getDescription()))
+                        .map(field -> versionField(field.getName(), field.getType()))
                         .collect(joining(VERSION_DELIM)),
                 runId)
             .getBytes(UTF_8);
     return UUID.nameUUIDFromBytes(bytes);
   }
 
-  default String versionField(String fieldName, String type, String description) {
-    return VERSION_JOINER.join(fieldName, type, description);
+  default String versionField(String fieldName, String type) {
+    return VERSION_JOINER.join(fieldName, type);
   }
 
   default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {

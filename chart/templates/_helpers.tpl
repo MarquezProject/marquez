@@ -44,3 +44,14 @@ Return the proper Marquez web image name
 {{- define "web.image" -}}
 {{- include "common.images.image" (dict "imageRoot" .Values.web.image "global" .Values.global) -}}
 {{- end -}}
+
+{{/*
+Get the secret name
+*/}}
+{{- define "marquez.secretName" -}}
+{{- if .Values.marquez.existingSecretName -}}
+  {{- printf "%s" .Values.marquez.existingSecretName -}}
+{{- else -}}
+  {{- printf "%s" (include "common.names.fullname" .) -}}
+{{- end -}}
+{{- end -}}

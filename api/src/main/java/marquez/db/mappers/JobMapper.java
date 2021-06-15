@@ -18,6 +18,7 @@ import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.urlOrNull;
+import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -43,7 +44,7 @@ import org.postgresql.util.PGobject;
 
 @Slf4j
 public final class JobMapper implements RowMapper<Job> {
-  public static final ObjectMapper mapper = Utils.getMapper();
+  private static final ObjectMapper MAPPER = Utils.getMapper();
 
   @Override
   public Job map(@NonNull ResultSet results, @NonNull StatementContext context)
@@ -57,16 +58,17 @@ public final class JobMapper implements RowMapper<Job> {
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         getDatasetFromJsonOrNull(results, "current_inputs"),
-        getDatasetFromJsonOrNull(results, "current_outputs"),
+        new HashSet<>(),
         urlOrNull(results, "current_location"),
         toContext(results, Columns.CONTEXT),
         stringOrNull(results, Columns.DESCRIPTION),
         // Latest Run is resolved in the JobDao. This can be brought in via a join and
         //  and a jsonb but custom deserializers will need to be introduced
-        null);
+        null,
+        toFacetsOrNull(results));
   }
 
-  private ImmutableMap<String, String> toContext(ResultSet results, String column)
+  public static ImmutableMap<String, String> toContext(ResultSet results, String column)
       throws SQLException {
     if (results.getString(column) == null) {
       return null;
@@ -78,11 +80,16 @@ public final class JobMapper implements RowMapper<Job> {
   Set<DatasetId> getDatasetFromJsonOrNull(@NonNull ResultSet results, String column)
       throws SQLException {
     if (results.getObject(column) == null) {
-      return null;
+      return new HashSet<>();
     }
     PGobject pgObject = (PGobject) results.getObject(column);
     try {
-      return mapper.readValue(pgObject.getValue(), new TypeReference<Set<DatasetId>>() {});
+      Set<DatasetId> datasets =
+          MAPPER.readValue(pgObject.getValue(), new TypeReference<Set<DatasetId>>() {});
+      if (datasets == null) {
+        return new HashSet<>();
+      }
+      return datasets;
     } catch (JsonProcessingException e) {
       log.error(String.format("Could not read dataset from job row %s", column), e);
       return new HashSet<>();

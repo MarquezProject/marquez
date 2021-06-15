@@ -36,7 +36,6 @@ public class JobRow {
   @Nullable UUID jobContextUuid;
   @Nullable String location;
   @Nullable Set<DatasetId> inputs;
-  @Nullable Set<DatasetId> outputs;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
@@ -44,5 +43,9 @@ public class JobRow {
 
   public Optional<UUID> getCurrentVersionUuid() {
     return Optional.ofNullable(currentVersionUuid);
+  }
+
+  public Optional<UUID> getJobContextUuid() {
+    return Optional.ofNullable(jobContextUuid);
   }
 }

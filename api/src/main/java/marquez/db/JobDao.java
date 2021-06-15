@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
+import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
@@ -56,22 +57,34 @@ public interface JobDao extends BaseDao {
           + "SET updated_at = :updatedAt, "
           + "    current_version_uuid = :currentVersionUuid "
           + "WHERE uuid = :rowUuid")
-  void updateVersion(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
+  void updateVersionFor(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
-  String JOB_SELECT =
-      "SELECT j.*, jc.context "
-          + "FROM jobs AS j "
-          + "left outer join job_contexts jc on jc.uuid = j.current_job_context_uuid ";
-
-  @SqlQuery(JOB_SELECT + "WHERE j.namespace_name = :namespaceName AND " + "      j.name = :jobName")
-  Optional<Job> find(String namespaceName, String jobName);
+  @SqlQuery(
+      "SELECT j.*, jc.context, f.facets\n"
+          + "  FROM jobs AS j\n"
+          + "  LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid\n"
+          + "  LEFT OUTER JOIN job_contexts jc ON jc.uuid = j.current_job_context_uuid\n"
+          + "  LEFT OUTER JOIN (\n"
+          + "      SELECT run_uuid, JSON_AGG(e.facets) AS facets\n"
+          + "      FROM (\n"
+          + "       SELECT run_uuid, event->'job'->'facets' AS facets\n"
+          + "       FROM lineage_events AS le\n"
+          + "       INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=le.run_uuid\n"
+          + "       INNER JOIN jobs j2 ON j2.current_version_uuid=jv2.uuid\n"
+          + "       WHERE j2.name=:jobName AND j2.namespace_name=:namespaceName\n"
+          + "       ORDER BY event_time ASC\n"
+          + "   ) e\n"
+          + "    GROUP BY e.run_uuid\n"
+          + "  ) f ON f.run_uuid=jv.latest_run_uuid\n"
+          + "WHERE j.namespace_name = :namespaceName AND j.name = :jobName")
+  Optional<Job> findJobByName(String namespaceName, String jobName);
 
   default Optional<Job> findWithRun(String namespaceName, String jobName) {
-    Optional<Job> job = find(namespaceName, jobName);
+    Optional<Job> job = findJobByName(namespaceName, jobName);
     job.ifPresent(
         j -> {
           Optional<Run> run = createRunDao().findByLatestJob(namespaceName, jobName);
-          run.ifPresent(j::setLatestRun);
+          run.ifPresent(r -> this.setJobData(r, j));
         });
     return job;
   }
@@ -82,11 +95,26 @@ public interface JobDao extends BaseDao {
           + "  ON (n.name = :namespaceName AND "
           + "      j.namespace_uuid = n.uuid AND "
           + "      j.name = :jobName)")
-  Optional<JobRow> findByRow(String namespaceName, String jobName);
+  Optional<JobRow> findJobByNameAsRow(String namespaceName, String jobName);
 
   @SqlQuery(
-      JOB_SELECT
-          + "WHERE namespace_name = :namespaceName "
+      "SELECT j.*, jc.context, f.facets\n"
+          + "  FROM jobs AS j\n"
+          + "  LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid\n"
+          + "  LEFT OUTER JOIN job_contexts jc ON jc.uuid = j.current_job_context_uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "      SELECT run_uuid, JSON_AGG(e.facets) AS facets\n"
+          + "      FROM (\n"
+          + "       SELECT run_uuid, event->'job'->'facets' AS facets\n"
+          + "       FROM lineage_events AS le\n"
+          + "       INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=le.run_uuid\n"
+          + "       INNER JOIN jobs j2 ON j2.current_version_uuid=jv2.uuid\n"
+          + "       WHERE j2.namespace_name=:namespaceName\n"
+          + "       ORDER BY event_time ASC\n"
+          + "   ) e\n"
+          + "    GROUP BY e.run_uuid\n"
+          + "  ) f ON f.run_uuid=jv.latest_run_uuid\n"
+          + "WHERE j.namespace_name = :namespaceName\n"
           + "ORDER BY j.name "
           + "LIMIT :limit OFFSET :offset")
   List<Job> findAll(String namespaceName, int limit, int offset);
@@ -98,16 +126,37 @@ public interface JobDao extends BaseDao {
             j ->
                 runDao
                     .findByLatestJob(namespaceName, j.getName().getValue())
-                    .ifPresent(j::setLatestRun))
+                    .ifPresent(run -> this.setJobData(run, j)))
         .collect(Collectors.toList());
   }
 
-  default JobRow upsert(
+  default void setJobData(Run run, Job j) {
+    j.setLatestRun(run);
+    DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
+    j.setInputs(
+        datasetVersionDao.findInputDatasetVersionsFor(run.getId().getValue()).stream()
+            .map(
+                ds ->
+                    new DatasetId(
+                        NamespaceName.of(ds.getNamespaceName()),
+                        DatasetName.of(ds.getDatasetName())))
+            .collect(Collectors.toSet()));
+    j.setOutputs(
+        datasetVersionDao.findOutputDatasetVersionsFor(run.getId().getValue()).stream()
+            .map(
+                ds ->
+                    new DatasetId(
+                        NamespaceName.of(ds.getNamespaceName()),
+                        DatasetName.of(ds.getDatasetName())))
+            .collect(Collectors.toSet()));
+  }
+
+  default JobRow upsertJobMeta(
       NamespaceName namespaceName, JobName jobName, JobMeta jobMeta, ObjectMapper mapper) {
     Instant createdAt = Instant.now();
     NamespaceRow namespace =
         createNamespaceDao()
-            .upsert(
+            .upsertNamespaceRow(
                 UUID.randomUUID(), createdAt, namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
     JobContextRow contextRow =
         createJobContextDao()
@@ -117,7 +166,7 @@ public interface JobDao extends BaseDao {
                 Utils.toJson(jobMeta.getContext()),
                 Utils.checksumFor(jobMeta.getContext()));
 
-    return upsert(
+    return upsertJob(
         UUID.randomUUID(),
         jobMeta.getType(),
         createdAt,
@@ -127,8 +176,7 @@ public interface JobDao extends BaseDao {
         jobMeta.getDescription().orElse(null),
         contextRow.getUuid(),
         toUrlString(jobMeta.getLocation().orElse(null)),
-        toJson(jobMeta.getInputs(), mapper),
-        toJson(jobMeta.getOutputs(), mapper));
+        toJson(jobMeta.getInputs(), mapper));
   }
 
   default String toUrlString(URL url) {
@@ -161,8 +209,7 @@ public interface JobDao extends BaseDao {
           + "description,"
           + "current_job_context_uuid,"
           + "current_location,"
-          + "current_inputs,"
-          + "current_outputs "
+          + "current_inputs"
           + ") VALUES ( "
           + ":uuid, "
           + ":type, "
@@ -174,8 +221,7 @@ public interface JobDao extends BaseDao {
           + ":description, "
           + ":jobContextUuid, "
           + ":location, "
-          + ":inputs, "
-          + ":outputs "
+          + ":inputs "
           + ") ON CONFLICT (name, namespace_uuid) DO "
           + "UPDATE SET "
           + "updated_at = EXCLUDED.updated_at, "
@@ -183,10 +229,9 @@ public interface JobDao extends BaseDao {
           + "description = EXCLUDED.description, "
           + "current_job_context_uuid = EXCLUDED.current_job_context_uuid, "
           + "current_location = EXCLUDED.current_location, "
-          + "current_inputs = EXCLUDED.current_inputs, "
-          + "current_outputs = EXCLUDED.current_outputs "
+          + "current_inputs = EXCLUDED.current_inputs "
           + "RETURNING *")
-  JobRow upsert(
+  JobRow upsertJob(
       UUID uuid,
       JobType type,
       Instant now,
@@ -196,6 +241,5 @@ public interface JobDao extends BaseDao {
       String description,
       UUID jobContextUuid,
       String location,
-      PGobject inputs,
-      PGobject outputs);
+      PGobject inputs);
 }

@@ -35,13 +35,14 @@ public interface RunStateDao extends BaseDao {
   RunStateRow upsert(UUID uuid, Instant now, UUID runUuid, RunState runStateType);
 
   @Transaction
-  default void updateRunState(UUID runUuid, RunState runState, Instant transitionedAt) {
+  default void updateRunStateFor(UUID runUuid, RunState runState, Instant transitionedAt) {
     RunDao runDao = createRunDao();
     RunStateRow runStateRow = upsert(UUID.randomUUID(), transitionedAt, runUuid, runState);
     runDao.updateRunState(runUuid, transitionedAt, runState);
     if (runState.isDone()) {
       runDao.updateEndState(runUuid, transitionedAt, runStateRow.getUuid());
-      List<ExtendedDatasetVersionRow> outputs = createDatasetVersionDao().findByRunId(runUuid);
+      List<ExtendedDatasetVersionRow> outputs =
+          createDatasetVersionDao().findOutputDatasetVersionsFor(runUuid);
       List<UUID> outputUuids =
           outputs.stream().map(DatasetVersionRow::getDatasetUuid).collect(Collectors.toList());
       if (!outputUuids.isEmpty()) {

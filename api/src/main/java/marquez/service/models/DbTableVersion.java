@@ -17,6 +17,7 @@ package marquez.service.models;
 import static marquez.common.models.DatasetType.DB_TABLE;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import javax.annotation.Nullable;
@@ -42,7 +43,8 @@ public final class DbTableVersion extends DatasetVersion {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
-      @Nullable final Run createdByRun) {
+      @Nullable final Run createdByRun,
+      @Nullable final ImmutableMap<String, Object> facets) {
     super(
         id,
         DB_TABLE,
@@ -54,6 +56,7 @@ public final class DbTableVersion extends DatasetVersion {
         fields,
         tags,
         description,
-        createdByRun);
+        createdByRun,
+        facets);
   }
 }

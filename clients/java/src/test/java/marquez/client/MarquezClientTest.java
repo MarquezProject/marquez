@@ -19,6 +19,7 @@ import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
 import static marquez.client.MarquezPathV1.BASE_PATH;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
 import static marquez.client.models.ModelGenerator.newContext;
+import static marquez.client.models.ModelGenerator.newDatasetFacets;
 import static marquez.client.models.ModelGenerator.newDatasetIdWith;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
@@ -49,11 +50,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import marquez.client.MarquezClient.DatasetVersions;
 import marquez.client.MarquezClient.Datasets;
 import marquez.client.MarquezClient.Jobs;
@@ -84,15 +90,14 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.StreamVersion;
 import marquez.client.models.Tag;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
+@ExtendWith(MockitoExtension.class)
 public class MarquezClientTest {
   // COMMON
   private static final Instant CREATED_AT = newTimestamp();
@@ -124,6 +129,7 @@ public class MarquezClientTest {
   private static final String DB_TABLE_DESCRIPTION = newDescription();
   private static final List<Field> FIELDS = newFields(4);
   private static final Set<String> TAGS = newTagNames(4);
+  private static final Map<String, Object> DB_FACETS = newDatasetFacets(4);
 
   private static final DbTable DB_TABLE =
       new DbTable(
@@ -137,7 +143,8 @@ public class MarquezClientTest {
           FIELDS,
           TAGS,
           null,
-          DB_TABLE_DESCRIPTION);
+          DB_TABLE_DESCRIPTION,
+          DB_FACETS);
   private static final DbTable DB_TABLE_MODIFIED =
       new DbTable(
           DB_TABLE_ID,
@@ -150,7 +157,8 @@ public class MarquezClientTest {
           FIELDS,
           TAGS,
           LAST_MODIFIED_AT,
-          DB_TABLE_DESCRIPTION);
+          DB_TABLE_DESCRIPTION,
+          DB_FACETS);
 
   // STREAM DATASET
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
@@ -172,7 +180,8 @@ public class MarquezClientTest {
           TAGS,
           null,
           STREAM_SCHEMA_LOCATION,
-          STREAM_DESCRIPTION);
+          STREAM_DESCRIPTION,
+          DB_FACETS);
   private static final Stream STREAM_MODIFIED =
       new Stream(
           STREAM_ID,
@@ -186,7 +195,8 @@ public class MarquezClientTest {
           TAGS,
           LAST_MODIFIED_AT,
           STREAM_SCHEMA_LOCATION,
-          STREAM_DESCRIPTION);
+          STREAM_DESCRIPTION,
+          DB_FACETS);
 
   // JOB
   private static final JobId JOB_ID = newJobIdWith(NAMESPACE_NAME);
@@ -210,6 +220,7 @@ public class MarquezClientTest {
           LOCATION,
           JOB_CONTEXT,
           JOB_DESCRIPTION,
+          null,
           null);
 
   // RUN
@@ -230,7 +241,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run RUNNING =
       new Run(
           newRunId(),
@@ -242,7 +254,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run COMPLETED =
       new Run(
           newRunId(),
@@ -254,7 +267,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run ABORTED =
       new Run(
           newRunId(),
@@ -266,7 +280,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
   private static final Run FAILED =
       new Run(
           newRunId(),
@@ -278,7 +293,8 @@ public class MarquezClientTest {
           START_AT,
           ENDED_AT,
           DURATION,
-          RUN_ARGS);
+          RUN_ARGS,
+          null);
 
   private static final String RUN_ID = newRunId();
   private static final Job JOB_WITH_LATEST_RUN =
@@ -304,7 +320,9 @@ public class MarquezClientTest {
               START_AT,
               ENDED_AT,
               DURATION,
-              RUN_ARGS));
+              RUN_ARGS,
+              null),
+          null);
 
   // DATASET VERSIONS
   private static final Run CREATED_BY_RUN = COMPLETED;
@@ -319,7 +337,8 @@ public class MarquezClientTest {
           FIELDS,
           TAGS,
           DB_TABLE_DESCRIPTION,
-          CREATED_BY_RUN);
+          CREATED_BY_RUN,
+          DB_FACETS);
   private static final StreamVersion STREAM_VERSION =
       new StreamVersion(
           STREAM_ID,
@@ -332,15 +351,14 @@ public class MarquezClientTest {
           TAGS,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
-          CREATED_BY_RUN);
-
-  @Rule public final MockitoRule rule = MockitoJUnit.rule();
+          CREATED_BY_RUN,
+          DB_FACETS);
 
   private final MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;
   private MarquezClient client;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     client = new MarquezClient(marquezUrl, http);
   }
@@ -363,6 +381,21 @@ public class MarquezClientTest {
     final String badUrlString = "test.com/api/v1";
     assertThatExceptionOfType(AssertionError.class)
         .isThrownBy(() -> MarquezClient.builder().baseUrl(badUrlString).build());
+  }
+
+  @Test
+  public void testClientBuilder_sslContext()
+      throws NoSuchAlgorithmException, KeyManagementException {
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    sslContext.init(new KeyManager[0], new TrustManager[0], null);
+
+    MarquezClient.Builder builder = MarquezClient.builder();
+    assertThat(builder.sslContext == null);
+
+    builder.sslContext(sslContext);
+    assertThat(builder.sslContext != null);
+
+    builder.build();
   }
 
   @Test

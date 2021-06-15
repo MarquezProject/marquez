@@ -17,9 +17,9 @@
     "node": "12.21.0"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/react-fontawesome": "^0.1.12",
-    "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
@@ -33,7 +33,11 @@
     "@visx/scale": "1.7.0",
     "@visx/shape": "1.7.0",
     "@visx/zoom": "1.7.0",
+<<<<<<< HEAD
     "autoprefixer": "^10.0.0",
+=======
+    "autoprefixer": "^9.5.1",
+>>>>>>> main
     "classnames": "^2.2.6",
     "connected-react-router": "^6.4.0",
     "css-loader": "^5.0.0",

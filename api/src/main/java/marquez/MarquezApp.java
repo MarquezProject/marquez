@@ -29,13 +29,20 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.hotspot.DefaultExports;
+import io.sentry.Sentry;
+import java.util.EnumSet;
+import javax.servlet.DispatcherType;
 import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.cli.SeedCommand;
 import marquez.db.DbMigration;
-import marquez.db.FlywayFactory;
+import marquez.tracing.TracingContainerResponseFilter;
+import marquez.tracing.TracingSQLLogger;
+import marquez.tracing.TracingServletFilter;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.SqlLogger;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
@@ -72,6 +79,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
             bootstrap.getConfigurationSourceProvider(),
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
 
+    // Add CLI commands
+    bootstrap.addCommand(new SeedCommand());
+
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     bootstrap.addBundle(
@@ -88,19 +98,37 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final DataSource source = sourceFactory.build(env.metrics(), DB_SOURCE_NAME);
 
     log.info("Running startup actions...");
-    if (config.isMigrateOnStartup()) {
-      final FlywayFactory flywayFactory = config.getFlywayFactory();
-      try {
-        DbMigration.migrateDbOrError(flywayFactory, source);
-      } catch (FlywayException errorOnDbMigrate) {
-        log.info("Stopping app...");
-        // Propagate throwable up the stack.
-        onFatalError(errorOnDbMigrate); // Signal app termination.
-      }
-    }
-    registerResources(config, env, source);
 
+    try {
+      DbMigration.migrateDbOrError(config.getFlywayFactory(), source, config.isMigrateOnStartup());
+    } catch (FlywayException errorOnDbMigrate) {
+      log.info("Stopping app...");
+      // Propagate throwable up the stack.
+      onFatalError(errorOnDbMigrate); // Signal app termination.
+    }
+
+    if (isSentryEnabled(config)) {
+      Sentry.init(
+          options -> {
+            options.setTracesSampleRate(config.getSentry().getTracesSampleRate());
+            options.setEnvironment(config.getSentry().getEnvironment());
+            options.setDsn(config.getSentry().getDsn());
+            options.setDebug(config.getSentry().isDebug());
+          });
+
+      env.servlets()
+          .addFilter("tracing-filter", new TracingServletFilter())
+          .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+      env.jersey().register(new TracingContainerResponseFilter());
+    }
+
+    registerResources(config, env, source);
     registerServlets(env);
+  }
+
+  private boolean isSentryEnabled(MarquezConfig config) {
+    return config.getSentry() != null
+        && !config.getSentry().getDsn().equals(SentryConfig.DEFAULT_DSN);
   }
 
   public void registerResources(
@@ -111,7 +139,11 @@ public final class MarquezApp extends Application<MarquezConfig> {
             .build(env, config.getDataSourceFactory(), (ManagedDataSource) source, DB_POSTGRES)
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
-    jdbi.setSqlLogger(new InstrumentedSqlLogger(env.metrics()));
+    SqlLogger sqlLogger = new InstrumentedSqlLogger(env.metrics());
+    if (isSentryEnabled(config)) {
+      sqlLogger = new TracingSQLLogger(sqlLogger);
+    }
+    jdbi.setSqlLogger(sqlLogger);
 
     final MarquezContext context =
         MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();

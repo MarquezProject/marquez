@@ -17,11 +17,9 @@ package marquez.client.models;
 import static marquez.client.models.ModelGenerator.newStreamVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import marquez.client.UnitTests;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-@Category(UnitTests.class)
+@org.junit.jupiter.api.Tag("UnitTests")
 public class StreamVersionTest {
   private static final DatasetVersion STREAM_VERSION = newStreamVersion();
   private static final String JSON = JsonGenerator.newJsonFor(STREAM_VERSION);

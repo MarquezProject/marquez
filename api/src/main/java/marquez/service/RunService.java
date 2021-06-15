@@ -23,7 +23,7 @@ import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.db.BaseDao;
 import marquez.db.JobVersionDao;
-import marquez.db.JobVersionDao.JobVersionBag;
+import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.RunStateDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedRunRow;
@@ -54,10 +54,10 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
   public Run createRun(
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta) {
     log.info("Creating run for job '{}'...", jobName.getValue());
-    RunRow runRow = upsertFromRun(namespaceName, jobName, runMeta, NEW);
+    RunRow runRow = upsertRunMeta(namespaceName, jobName, runMeta, NEW);
     notify(new RunTransition(RunId.of(runRow.getUuid()), null, NEW));
 
-    return findBy(runRow.getUuid()).get();
+    return findRunByUuid(runRow.getUuid()).get();
   }
 
   public void markRunAs(
@@ -66,38 +66,44 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
     if (transitionedAt == null) {
       transitionedAt = Instant.now();
     }
-    ExtendedRunRow runRow = findByRow(runId.getValue()).get();
-    runStateDao.updateRunState(runId.getValue(), runState, transitionedAt);
+    ExtendedRunRow runRow = findRunByUuidAsRow(runId.getValue()).get();
+    runStateDao.updateRunStateFor(runId.getValue(), runState, transitionedAt);
 
-    if (runState == COMPLETED) {
-      JobVersionBag jobVersionBag =
-          jobVersionDao.createJobVersionOnComplete(
-              transitionedAt, runRow.getUuid(), runRow.getNamespaceName(), runRow.getJobName());
+    if (runState.isDone()) {
+      BagOfJobVersionInfo bagOfJobVersionInfo =
+          jobVersionDao.upsertJobVersionOnRunTransition(
+              runRow.getNamespaceName(),
+              runRow.getJobName(),
+              runRow.getUuid(),
+              runState,
+              transitionedAt);
 
-      notifyCompleteHandler(jobVersionBag, runRow);
+      // TODO: We should also notify that the outputs have been updated when a run is in a done
+      // state to be consistent with existing job versioning logic. We'll want to add testing to
+      // confirm the new behavior before updating the logic.
+      if (runState == COMPLETED) {
+        notify(
+            new JobOutputUpdate(
+                RunId.of(runRow.getUuid()),
+                toJobVersionId(bagOfJobVersionInfo.getJobVersionRow()),
+                JobName.of(runRow.getJobName()),
+                NamespaceName.of(runRow.getNamespaceName()),
+                buildRunOutputs(bagOfJobVersionInfo.getOutputs())));
+      }
+
+      notify(
+          new JobInputUpdate(
+              RunId.of(runRow.getUuid()),
+              buildRunMeta(runRow),
+              toJobVersionId(bagOfJobVersionInfo.getJobVersionRow()),
+              JobName.of(runRow.getJobName()),
+              NamespaceName.of(runRow.getNamespaceName()),
+              buildRunInputs(bagOfJobVersionInfo.getInputs())));
     }
 
     final RunState oldRunState = runRow.getCurrentRunState().map(RunState::valueOf).orElse(null);
     notify(new RunTransition(runId, oldRunState, runState));
     JobMetrics.emitRunStateCounterMetric(runState);
-  }
-
-  public void notifyCompleteHandler(JobVersionBag jobVersionBag, ExtendedRunRow runRow) {
-    notify(
-        new JobOutputUpdate(
-            RunId.of(runRow.getUuid()),
-            toJobVersionId(jobVersionBag.getJobVersionRow()),
-            JobName.of(runRow.getJobName()),
-            NamespaceName.of(runRow.getNamespaceName()),
-            buildRunOutputs(jobVersionBag.getOutputs())));
-    notify(
-        new JobInputUpdate(
-            RunId.of(runRow.getUuid()),
-            buildRunMeta(runRow),
-            toJobVersionId(jobVersionBag.getJobVersionRow()),
-            JobName.of(runRow.getJobName()),
-            NamespaceName.of(runRow.getNamespaceName()),
-            buildRunInputs(jobVersionBag.getInputs())));
   }
 
   public static RunMeta buildRunMeta(ExtendedRunRow runRow) {
@@ -110,26 +116,19 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
 
   public static List<RunInput> buildRunInputs(List<ExtendedDatasetVersionRow> inputs) {
     return inputs.stream()
-        .map(
-            (v) ->
-                new RunInput(
-                    new DatasetVersionId(
-                        NamespaceName.of(v.getNamespaceName()),
-                        DatasetName.of(v.getDatasetName()),
-                        v.getUuid())))
+        .map((v) -> new RunInput(buildDatasetVersionId(v)))
         .collect(Collectors.toList());
   }
 
   public static List<RunOutput> buildRunOutputs(List<ExtendedDatasetVersionRow> outputs) {
     return outputs.stream()
-        .map(
-            (v) ->
-                new RunOutput(
-                    new DatasetVersionId(
-                        NamespaceName.of(v.getNamespaceName()),
-                        DatasetName.of(v.getDatasetName()),
-                        v.getUuid())))
+        .map((v) -> new RunOutput(buildDatasetVersionId(v)))
         .collect(Collectors.toList());
+  }
+
+  private static DatasetVersionId buildDatasetVersionId(ExtendedDatasetVersionRow v) {
+    return new DatasetVersionId(
+        NamespaceName.of(v.getNamespaceName()), DatasetName.of(v.getDatasetName()), v.getUuid());
   }
 
   private JobVersionId toJobVersionId(JobVersionRow jobVersion) {
