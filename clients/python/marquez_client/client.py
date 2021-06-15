@@ -348,6 +348,16 @@ class MarquezClient:
             }
         )
 
+    def create_tag(self, name, description=None):
+        payload = {
+            'description': description
+        }
+
+        return self._put(
+            self._url('/tags/{0}', name),
+            payload=payload
+        )
+
     def __mark_job_run_as(self, run_id, action, at=None):
         Utils.is_valid_uuid(run_id, 'run_id')
 
