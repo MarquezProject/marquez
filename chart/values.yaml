@@ -16,11 +16,7 @@ marquez:
   image:
     registry: docker.io
     repository: marquezproject/marquez
-<<<<<<< HEAD
-    tag: 0.12.2
-=======
     tag: 0.15.1
->>>>>>> main
     pullPolicy: IfNotPresent
   ## Name of the existing secret containing credentials for the Marquez installation.
   ## When this is specified, it will take precedence over the values configured in the 'db' section.
