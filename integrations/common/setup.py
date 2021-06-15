@@ -44,7 +44,7 @@ extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(
     name="marquez-integration-common",
-    version="0.15.2rc2",
+    version="version="0.15.2rc2"",
     description="Marquez common python library",
     long_description=readme,
     long_description_content_type="text/markdown",

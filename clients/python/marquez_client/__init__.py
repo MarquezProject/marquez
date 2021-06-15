@@ -13,7 +13,7 @@
 # -*- coding: utf-8 -*-
 
 __author__ = """Marquez Project"""
-__version__ = "0.15.2rc2"
+__version__ = "__version__ = "0.15.2rc2""
 
 from marquez_client.client import MarquezClient              # noqa: F401
 from marquez_client.client_wo import MarquezWriteOnlyClient  # noqa: F401
