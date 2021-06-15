@@ -837,10 +837,11 @@ public class MarquezClientTest {
 
   @Test
   public void testCreateTag() throws Exception {
-    URL createTagUrl = buildUrlFor("/tags");
-    Tag tag = new Tag("tag2", "description");
-    String tagJson = tag.toJson();
-    when(http.put(createTagUrl, tagJson)).thenReturn(Utils.toJson(new Tag("tag2", "description")));
+    URL createTagUrl = buildUrlFor("/tags/tag2");
+    MarquezClient.TagDescription tag = new MarquezClient.TagDescription("description");
+    String tagDescriptionJson = tag.toJson();
+    when(http.put(createTagUrl, tagDescriptionJson))
+        .thenReturn(Utils.toJson(new Tag("tag2", "description")));
 
     Tag createdTag = client.createTag("tag2", "description");
 

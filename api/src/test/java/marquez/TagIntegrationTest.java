@@ -32,9 +32,9 @@ public class TagIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testApp_testCreateTag() {
-    Tag tag = client.createTag("tag", "Tag Description");
+    Tag tag = client.createTag("tag", "Description");
     assertThat(tag.getName()).isEqualTo("tag");
-    assertThat(tag.getDescription()).contains("Tag Description");
+    assertThat(tag.getDescription()).contains("Description");
 
     Tag tagWithoutDescription = client.createTag("tag2");
     assertThat(tagWithoutDescription.getName()).isEqualTo("tag2");
@@ -43,14 +43,14 @@ public class TagIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testApp_testUpsertTag() {
-    Tag tag = client.createTag("tag", "Tag Description");
+    Tag tag = client.createTag("tag", "Description");
     assertThat(tag.getName()).isEqualTo("tag");
-    assertThat(tag.getDescription()).contains("Tag Description");
+    assertThat(tag.getDescription()).contains("Description");
 
     Tag tagWithoutDescription = client.createTag("tag", "New Description");
 
     assertThat(tagWithoutDescription.getName()).isEqualTo("tag");
-    assertThat(tag.getDescription()).contains("Tag Description");
+    assertThat(tagWithoutDescription.getDescription()).contains("Description");
   }
 
   @Test
