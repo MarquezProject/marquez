@@ -33,6 +33,10 @@ public final class CommonModelGenerator extends Generator {
   public static NamespaceName newNamespaceName() {
     return NamespaceName.of("test_namespace" + newId());
   }
+  
+  public static NamespaceName newDatasetNamespaceName() {
+    return NamespaceName.of("database://" + newId());
+  }
 
   public static OwnerName newOwnerName() {
     return OwnerName.of("test_owner" + newId());

@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.time.Instant;
+import java.util.List;
 import javax.net.ssl.SSLContext;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.Namespace;
@@ -103,9 +104,21 @@ public class MarquezHttpTest {
     final String path = String.format(pathTemplate, pathArg);
 
     URL expected = new URL(BASE_URL_STRING + BASE_PATH + path);
-    URL actual = marquezUrl.from(path(path, pathArg));
+    URL actual = marquezUrl.from(path(pathTemplate, pathArg));
     assertThat(actual).isEqualTo(expected);
   }
+
+  @Test
+  public void testClient_properlyFormatsNamespaces() throws Exception {
+    final String pathTemplate = "/namespaces/%s";
+    final String pathArg = "database://localhost:1234";
+    final String path = "/namespaces/database:%2F%2Flocalhost:1234";
+
+    URL expected = new URL(BASE_URL_STRING + BASE_PATH + path);
+    URL actual = marquezUrl.from(path(pathTemplate, pathArg));
+    assertThat(actual).isEqualTo(expected);
+  }
+
 
   @Test
   public void testPost_noHttpBody() throws Exception {

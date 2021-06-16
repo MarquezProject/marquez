@@ -68,6 +68,7 @@ public class DatasetResource extends BaseResource {
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("dataset") DatasetName datasetName,
       @Valid DatasetMeta datasetMeta) {
+    log.info("asdf");
     throwIfNotExists(namespaceName);
     datasetMeta.getRunId().ifPresent(this::throwIfNotExists);
     throwIfSourceNotExists(datasetMeta.getSourceName());

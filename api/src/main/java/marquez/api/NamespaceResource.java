@@ -34,12 +34,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.common.models.NamespaceName;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
 
+@Slf4j
 @Path("/api/v1")
 public class NamespaceResource extends BaseResource {
   public NamespaceResource(@NonNull final ServiceFactory serviceFactory) {
@@ -50,11 +52,12 @@ public class NamespaceResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @PUT
-  @Path("/namespaces/{namespace}")
+  @Path("/namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
       @PathParam("namespace") NamespaceName name, @Valid NamespaceMeta meta) {
+    log.info("PutNamespace {}", name);
     final Namespace namespace = namespaceService.createOrUpdate(name, meta);
     return Response.ok(namespace).build();
   }
@@ -63,9 +66,10 @@ public class NamespaceResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("/namespaces/{namespace}")
+  @Path("/namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}")
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("namespace") NamespaceName name) {
+    log.info("GetNamespace {}", name);
     final Namespace namespace =
         namespaceService
             .findBy(name.getValue())

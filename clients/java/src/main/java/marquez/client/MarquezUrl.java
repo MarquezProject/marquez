@@ -26,7 +26,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.client.models.RunState;
@@ -47,6 +51,26 @@ class MarquezUrl {
   @VisibleForTesting
   URL from(String path) {
     return from(path, ImmutableMap.of());
+  }
+
+  @VisibleForTesting
+  URL from(List<String> path) {
+    return from(path, ImmutableMap.of());
+  }
+
+  @VisibleForTesting
+  URL from(List<String> path, @Nullable Map<String, Object> queryParams) {
+    try {
+      final URIBuilder builder = new URIBuilder(baseUrl.toURI()).setPathSegments(path);
+      if (queryParams != null) {
+        queryParams.forEach((name, value) -> builder.addParameter(name, String.valueOf(value)));
+      }
+      return builder.build().toURL();
+    } catch (URISyntaxException | MalformedURLException e) {
+      throw new IllegalArgumentException(
+        "can not build url from parameters: " + path + " " + queryParams, e);
+    }
+
   }
 
   @VisibleForTesting

@@ -17,6 +17,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import lombok.Value;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DbTable;
@@ -35,17 +37,20 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
 public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
-  @Test
-  public void testApp_createNamespace() {
+  @ParameterizedTest
+  @ValueSource(strings={"DEFAULT", "database://localhost:1234", "s3://bucket", "bigquery:"})
+  public void testApp_createNamespace(String namespaceName) {
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    final Namespace namespace = client.createNamespace(NAMESPACE_NAME, namespaceMeta);
-    assertThat(namespace.getName()).isEqualTo(NAMESPACE_NAME);
+    final Namespace namespace = client.createNamespace(namespaceName, namespaceMeta);
+    assertThat(namespace.getName()).isEqualTo(namespaceName);
     assertThat(namespace.getCreatedAt()).isAfter(EPOCH);
     assertThat(namespace.getUpdatedAt()).isAfter(EPOCH);
     assertThat(namespace.getOwnerName()).isEqualTo(OWNER_NAME);
@@ -53,7 +58,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     assertThat(
             client.listNamespaces().stream()
-                .filter(other -> other.getName().equals(NAMESPACE_NAME))
+                .filter(other -> other.getName().equals(namespaceName))
                 .count())
         .isEqualTo(1);
   }
@@ -104,6 +109,11 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(dataset.getFields().get(0).getTags()).isEqualTo(fieldTag);
   }
 
+  @Test
+  public void testDatasetWithSlashesInNamespace() {
+    createNamespace(NAMESPACE_NAME+"23");
+  }
+  
   @Test
   public void testDatasetFieldChange() {
     createNamespace(NAMESPACE_NAME);

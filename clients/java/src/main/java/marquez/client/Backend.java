@@ -1,6 +1,7 @@
 package marquez.client;
 
 import java.io.Closeable;
+import java.util.List;
 import javax.annotation.Nullable;
 
 /**
@@ -11,9 +12,17 @@ public interface Backend extends Closeable {
 
   void put(String path, String json);
 
+  default void put(List<String> path, String json) {
+    put(String.join("/", path), json);
+  }
+
+  void post(String path, @Nullable String json);
+
   default void post(String path) {
     post(path, null);
   }
 
-  void post(String path, @Nullable String json);
+  default void post(List<String> path, String json) {
+    put(String.join("/", path), json);
+  }
 }

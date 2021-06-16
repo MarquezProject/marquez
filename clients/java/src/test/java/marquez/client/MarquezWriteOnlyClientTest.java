@@ -11,6 +11,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import marquez.client.models.DatasetMeta;
 import marquez.client.models.DbTableMeta;
@@ -111,7 +113,9 @@ public class MarquezWriteOnlyClientTest {
   public void testMarkRunAsNoAt() {
     String runId = UUID.randomUUID().toString();
     client.markRunAsRunning(runId);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/start");
+    verify(backend, times(1)).post(Arrays.asList(
+      "api", "v1", "jobs", "runs", runId, "start"
+    ), null);
     client.markRunAsAborted(runId);
     verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/abort");
     client.markRunAsCompleted(runId);
