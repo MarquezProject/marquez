@@ -114,38 +114,15 @@ To ensure your pull request is accepted, follow these guidelines:
 
 # Dependencies
 
-We use [renovate](https://github.com/renovatebot/renovate) to manage dependencies for all of our project modules. Renovate automatically opens pull requests against our [`update-deps`](https://github.com/MarquezProject/marquez/tree/update-deps) branch in order to ensure builds pass before merging into `main`. To merge dependencies updates:
+We use [renovate](https://github.com/renovatebot/renovate) to manage dependencies for most of our project modules,
+with a couple of exceptions. Renovate automatically detects new dependency versions, and opens pull
+requests to upgrade dependencies in accordance to the [configured rules](https://github.com/MarquezProject/marquez/blob/main/renovate.json).
 
-> **Note:** Make sure you've pulled the latest upstream changes for `update-deps` and `main`.
+The following dependencies are managed manually
 
-1. Switch to `update-deps`:
-
-   ```bash
-   $ git checkout update-deps
-   ```
-
-2. Merge `main` into `update-deps` (make sure to address any merge conflicts, if any), then push:
-
-   ```bash
-   $ git merge main
-   $ git push origin update-deps
-   ```
-
-3. Branch off `update-deps`:
-
-
-   ```bash
-   $ git checkout -b deps/renovate
-   ```
-
-4. Push your branch:
-
-
-   ```bash
-   $ git push origin deps/renovate
-   ```
-
-5. Then, open a pull request against `main`
+* _Web code_ - it is challenging to programmatically validate web content
+* _Spark versions_ - the internal query plans parsed by the Spark OpenLineage integration are not stable across Spark versions
+* _Gradle_ - this tool orchestrates the entire build pipeline and was excluded to ensure stability
 
 # Sign Your Work
 

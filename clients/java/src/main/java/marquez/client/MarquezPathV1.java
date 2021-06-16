@@ -107,4 +107,8 @@ class MarquezPathV1 {
   static String listTagsPath() {
     return path("/tags");
   }
+
+  static String createTagPath(String name) {
+    return path("/tags/%s", name);
+  }
 }

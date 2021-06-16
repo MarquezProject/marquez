@@ -1,6 +1,11 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.15.1...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.15.2...HEAD)
+
+## [0.15.2](https://github.com/MarquezProject/marquez/compare/0.15.1...0.15.2)
+### Fixed
+
+* Fixed build & release process for python marquez-integration-common package [@collado-mike](https://github.com/collado-mike)
 
 ## [0.15.1](https://github.com/MarquezProject/marquez/compare/0.15.0...0.15.1)
 
@@ -14,7 +19,7 @@
 * Refactored ValuesAverageExpectationParser to ValuesSumExpectationParser and ValuesCountExpectationParser [@collado-mike](https://github.com/collado-mike)
 * Updated SparkListener to extend Spark's SparkListener abstract class [@collado-mike](https://github.com/collado-mike)
 
-###  Fixed
+### Fixed
 
 * Use current project version in spark openlineage client [@mobuchowski](https://github.com/mobuchowski)
 * Rewrote LineageDao queries and LineageService for performance [@collado-mike](https://github.com/collado-mike)

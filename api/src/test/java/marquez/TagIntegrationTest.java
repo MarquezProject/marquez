@@ -3,6 +3,7 @@ package marquez;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import marquez.client.models.Dataset;
+import marquez.client.models.Tag;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,29 @@ public class TagIntegrationTest extends BaseIntegrationTest {
 
     Dataset taggedDataset = client.tagDatasetWith(NAMESPACE_NAME, DB_TABLE_NAME, "TESTDATASETTAG");
     assertThat(taggedDataset.getTags()).contains("TESTDATASETTAG");
+  }
+
+  @Test
+  public void testApp_testCreateTag() {
+    Tag tag = client.createTag("tag", "Description");
+    assertThat(tag.getName()).isEqualTo("tag");
+    assertThat(tag.getDescription()).contains("Description");
+
+    Tag tagWithoutDescription = client.createTag("tag2");
+    assertThat(tagWithoutDescription.getName()).isEqualTo("tag2");
+    assertThat(tagWithoutDescription.getDescription()).isEmpty();
+  }
+
+  @Test
+  public void testApp_testUpsertTag() {
+    Tag tag = client.createTag("tag", "Description");
+    assertThat(tag.getName()).isEqualTo("tag");
+    assertThat(tag.getDescription()).contains("Description");
+
+    Tag tagWithoutDescription = client.createTag("tag", "New Description");
+
+    assertThat(tagWithoutDescription.getName()).isEqualTo("tag");
+    assertThat(tagWithoutDescription.getDescription()).contains("Description");
   }
 
   @Test
