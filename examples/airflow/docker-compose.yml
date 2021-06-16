@@ -20,7 +20,10 @@ services:
       - AIRFLOW_CONN_EXAMPLE_DB=postgres://example:example@postgres:5432/example
     volumes:
       - ./dags:/opt/bitnami/airflow/dags
-      - ./requirements.txt:/bitnami/python/requirements.txt
+      - ${PWD}/whl:/whl
+      - type: bind
+        source: ${PWD}/requirements.txt
+        target: /bitnami/python/requirements.txt
 
   airflow_scheduler:
     image: bitnami/airflow-scheduler:1.10.13
@@ -37,7 +40,10 @@ services:
       - AIRFLOW_CONN_EXAMPLE_DB=postgres://example:example@postgres:5432/example
     volumes:
       - ./dags:/opt/bitnami/airflow/dags
-      - ./requirements.txt:/bitnami/python/requirements.txt
+      - ${PWD}/whl:/whl
+      - type: bind
+        source: ${PWD}/requirements.txt
+        target: /bitnami/python/requirements.txt
 
   airflow_worker:
     image: bitnami/airflow-worker:1.10.13
@@ -54,7 +60,10 @@ services:
       - AIRFLOW_CONN_EXAMPLE_DB=postgres://example:example@postgres:5432/example
     volumes:
       - ./dags:/opt/bitnami/airflow/dags
-      - ./requirements.txt:/bitnami/python/requirements.txt
+      - ${PWD}/whl:/whl
+      - type: bind
+        source: ${PWD}/requirements.txt
+        target: /bitnami/python/requirements.txt
 
   marquez:
     image: marquezproject/marquez:latest
