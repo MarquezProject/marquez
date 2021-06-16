@@ -96,7 +96,7 @@ Finally, click on the output dataset `public.delivery_7_days` for `etl_delivery_
 
 ## Collect Run-Level Metadata using OpenLineage
 
-To collect _run-level_ metadata as [OpenLineage](https://github.com/OpenLineage/OpenLineage) events using Marquez as the [HTTP backend](https://github.com/OpenLineage/OpenLineage#scope), see the OpenLineage [getting started](replace-with-real-link) guide!
+To collect _run-level_ metadata as [OpenLineage](https://github.com/OpenLineage/OpenLineage) events using Marquez as the [HTTP backend](https://github.com/OpenLineage/OpenLineage#scope), see the OpenLineage [getting started](https://openlineage.io/getting-started) guide!
 
 ## Summary
 
