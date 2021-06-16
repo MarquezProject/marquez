@@ -38,7 +38,6 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.time.Instant;
-import java.util.List;
 import javax.net.ssl.SSLContext;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.Namespace;
@@ -118,7 +117,6 @@ public class MarquezHttpTest {
     URL actual = marquezUrl.from(path(pathTemplate, pathArg));
     assertThat(actual).isEqualTo(expected);
   }
-
 
   @Test
   public void testPost_noHttpBody() throws Exception {

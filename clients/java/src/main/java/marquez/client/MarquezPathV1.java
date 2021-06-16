@@ -1,12 +1,11 @@
 package marquez.client;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.client.models.RunState;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class MarquezPathV1 {
   @VisibleForTesting static final String BASE_PATH = "/api/v1";
@@ -14,15 +13,15 @@ class MarquezPathV1 {
   @VisibleForTesting
   static List<String> path(String pathTemplate, @Nullable String... pathArgs) {
     /*
-      Converts path template (prepended with BASE_PATH), where path parts are separated
-      by slashes, and formats strings filling pathArgs in place of %s placeholder.
-      Example:
-      Path template "/namespaces/%s/datasets/%s/versions/%s"
-      with args
-      "nName", "dName", "vName"
-      is converted to list
-      ["api", "v1", "namespaces", "nName", "datasets", "dName", "versions", "vName"]
-     */
+     Converts path template (prepended with BASE_PATH), where path parts are separated
+     by slashes, and formats strings filling pathArgs in place of %s placeholder.
+     Example:
+     Path template "/namespaces/%s/datasets/%s/versions/%s"
+     with args
+     "nName", "dName", "vName"
+     is converted to list
+     ["api", "v1", "namespaces", "nName", "datasets", "dName", "versions", "vName"]
+    */
     List<String> resultPath = new ArrayList<>();
     pathTemplate = BASE_PATH + pathTemplate;
     int argsIndex = 0;

@@ -5,6 +5,7 @@ import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.CommonModelGenerator.newContext;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDatasetNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newDbSourceType;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newFieldName;
@@ -12,7 +13,6 @@ import static marquez.common.models.CommonModelGenerator.newFieldType;
 import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
-import static marquez.common.models.CommonModelGenerator.newDatasetNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.CommonModelGenerator.newSchemaLocation;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
@@ -25,14 +25,12 @@ import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import marquez.client.MarquezClient;
@@ -120,10 +118,6 @@ public abstract class BaseIntegrationTest {
   protected static void setupAll() throws Exception {
     NAMESPACE_NAME = newNamespaceName().getValue();
     DATASET_NAMESPACE_NAME = newDatasetNamespaceName().getValue();
-//    ENCODED_DATASET_NAMESPACE_NAME = URLEncoder.encode(
-//      newDatasetNamespaceName().getValue(),
-//      StandardCharsets.UTF_8.toString()
-//    );
     OWNER_NAME = newOwnerName().getValue();
     NAMESPACE_DESCRIPTION = newDescription();
 

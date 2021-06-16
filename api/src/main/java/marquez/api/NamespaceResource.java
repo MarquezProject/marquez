@@ -57,7 +57,6 @@ public class NamespaceResource extends BaseResource {
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
       @PathParam("namespace") NamespaceName name, @Valid NamespaceMeta meta) {
-    log.info("PutNamespace {}", name);
     final Namespace namespace = namespaceService.createOrUpdate(name, meta);
     return Response.ok(namespace).build();
   }
@@ -69,7 +68,6 @@ public class NamespaceResource extends BaseResource {
   @Path("/namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}")
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("namespace") NamespaceName name) {
-    log.info("GetNamespace {}", name);
     final Namespace namespace =
         namespaceService
             .findBy(name.getValue())

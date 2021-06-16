@@ -17,8 +17,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import lombok.Value;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DbTable;
@@ -44,7 +42,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
   @ParameterizedTest
-  @ValueSource(strings={"DEFAULT", "database://localhost:1234", "s3://bucket", "bigquery:"})
+  @ValueSource(strings = {"DEFAULT", "database://localhost:1234", "s3://bucket", "bigquery:"})
   public void testApp_createNamespace(String namespaceName) {
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
@@ -111,9 +109,9 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testDatasetWithSlashesInNamespace() {
-    createNamespace(NAMESPACE_NAME+"23");
+    createNamespace(NAMESPACE_NAME + "23");
   }
-  
+
   @Test
   public void testDatasetFieldChange() {
     createNamespace(NAMESPACE_NAME);

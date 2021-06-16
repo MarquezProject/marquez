@@ -13,16 +13,20 @@ public interface Backend extends Closeable {
   void put(String path, String json);
 
   default void put(List<String> path, String json) {
-    put(String.join("/", path), json);
+    put(path, "", json);
+  }
+
+  default void put(List<String> path, String queryParams, String json) {
+    post(String.join("/", path) + queryParams, json);
   }
 
   void post(String path, @Nullable String json);
 
-  default void post(String path) {
-    post(path, null);
+  default void post(List<String> path, String json) {
+    post(path, "", json);
   }
 
-  default void post(List<String> path, String json) {
-    put(String.join("/", path), json);
+  default void post(List<String> path, String queryParams, String json) {
+    post(String.join("/", path) + queryParams, json);
   }
 }

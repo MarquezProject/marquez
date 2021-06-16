@@ -81,14 +81,14 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
 
   @Override
   public void createRun(String namespaceName, String jobName, RunMeta runMeta) {
-    backend.post(createRunPath(namespaceName, jobName), runMeta.toJson());
+    backend.post(createRunPath(namespaceName, jobName), null, runMeta.toJson());
   }
 
   @Override
   public void markRunAs(String runId, RunState runState, Instant at) {
     Map<String, Object> queryParams =
         at == null ? null : ImmutableMap.of("at", ISO_INSTANT.format(at));
-    backend.post(runTransitionPath(runId, runState), queryPath(queryParams));
+    backend.post(runTransitionPath(runId, runState), queryPath(queryParams), null);
   }
 
   @Override

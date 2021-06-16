@@ -45,7 +45,7 @@ public class LoggingBackendTest {
 
   @Test
   public void testLoggingBackendPostNoPayload() throws IOException {
-    loggingBackend.post("postPath");
+    loggingBackend.post("postPath", null);
     verify(logger, times(1)).info("POST postPath");
   }
 

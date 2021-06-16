@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import marquez.client.models.DatasetMeta;
 import marquez.client.models.DbTableMeta;
@@ -50,14 +49,16 @@ public class MarquezWriteOnlyClientTest {
   public void testCreateNamespace() {
     NamespaceMeta namespaceMeta = new NamespaceMeta("owner", "description");
     client.createNamespace("foo", namespaceMeta);
-    verify(backend, times(1)).put("/api/v1/namespaces/foo", namespaceMeta.toJson());
+    verify(backend, times(1))
+        .put(Arrays.asList("api", "v1", "namespaces", "foo"), namespaceMeta.toJson());
   }
 
   @Test
   public void testCreateSource() throws URISyntaxException {
     SourceMeta sourceMeta = new SourceMeta("type", new URI("connection:uri"), "description");
     client.createSource("sourceFoo", sourceMeta);
-    verify(backend, times(1)).put("/api/v1/sources/sourceFoo", sourceMeta.toJson());
+    verify(backend, times(1))
+        .put(Arrays.asList("api", "v1", "sources", "sourceFoo"), sourceMeta.toJson());
   }
 
   @Test
@@ -66,7 +67,9 @@ public class MarquezWriteOnlyClientTest {
         DbTableMeta.builder().physicalName("physical").sourceName("source").build();
     client.createDataset("namespaceName", "datasetName", datasetMeta);
     verify(backend, times(1))
-        .put("/api/v1/namespaces/namespaceName/datasets/datasetName", datasetMeta.toJson());
+        .put(
+            Arrays.asList("api", "v1", "namespaces", "namespaceName", "datasets"),
+            datasetMeta.toJson());
   }
 
   @Test
@@ -74,7 +77,9 @@ public class MarquezWriteOnlyClientTest {
     JobMeta jobMeta = JobMeta.builder().type(JobType.BATCH).build();
     client.createJob("namespaceName", "jobName", jobMeta);
     verify(backend, times(1))
-        .put("/api/v1/namespaces/namespaceName/jobs/jobName", jobMeta.toJson());
+        .put(
+            Arrays.asList("api", "v1", "namespaces", "namespaceName", "jobs", "jobName"),
+            jobMeta.toJson());
   }
 
   @Test
@@ -82,7 +87,9 @@ public class MarquezWriteOnlyClientTest {
     RunMeta runMeta = RunMeta.builder().build();
     client.createRun("namespaceName", "jobName", runMeta);
     verify(backend, times(1))
-        .post("/api/v1/namespaces/namespaceName/jobs/jobName/runs", runMeta.toJson());
+        .post(
+            Arrays.asList("api", "v1", "namespaces", "namespaceName", "jobs", "jobName", "runs"),
+            runMeta.toJson());
   }
 
   @Test
@@ -100,28 +107,35 @@ public class MarquezWriteOnlyClientTest {
     Instant at = Instant.now();
     String atParam = URLEncoder.encode(String.valueOf(at), UTF_8.name());
     client.markRunAsRunning(runId, at);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/start?at=" + atParam);
+    verify(backend, times(1))
+        .post(Arrays.asList("api", "v1", "jobs", "runs", runId, "start"), "?at=" + atParam, null);
     client.markRunAsAborted(runId, at);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/abort?at=" + atParam);
+    verify(backend, times(1))
+        .post(Arrays.asList("api", "v1", "jobs", "runs", runId, "abort"), "?at=" + atParam, null);
     client.markRunAsCompleted(runId, at);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/complete?at=" + atParam);
+    verify(backend, times(1))
+        .post(
+            Arrays.asList("api", "v1", "jobs", "runs", runId, "complete"), "?at=" + atParam, null);
     client.markRunAsFailed(runId, at);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/fail?at=" + atParam);
+    verify(backend, times(1))
+        .post(Arrays.asList("api", "v1", "jobs", "runs", runId, "fail"), "?at=" + atParam, null);
   }
 
   @Test
   public void testMarkRunAsNoAt() {
     String runId = UUID.randomUUID().toString();
     client.markRunAsRunning(runId);
-    verify(backend, times(1)).post(Arrays.asList(
-      "api", "v1", "jobs", "runs", runId, "start"
-    ), null);
+    verify(backend, times(1))
+        .post(Arrays.asList("api", "v1", "jobs", "runs", runId, "start"), "", null);
     client.markRunAsAborted(runId);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/abort");
+    verify(backend, times(1))
+        .post(Arrays.asList("api", "v1", "jobs", "runs", runId, "abort"), "", null);
     client.markRunAsCompleted(runId);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/complete");
+    verify(backend, times(1))
+        .post(Arrays.asList("api", "v1", "jobs", "runs", runId, "complete"), "", null);
     client.markRunAsFailed(runId);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/fail");
+    verify(backend, times(1))
+        .post(Arrays.asList("api", "v1", "jobs", "runs", runId, "fail"), "", null);
   }
 
   @Test
