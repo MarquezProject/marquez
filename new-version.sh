@@ -18,6 +18,7 @@
 # Requirements:
 #   * You're on the 'main' branch
 #   * You've installed 'bump2version'
+#   * You've installed 'redoc-cli'
 #
 # Usage: $ ./new-version.sh --release-version RELEASE_VERSION --next-version NEXT_VERSION
 
