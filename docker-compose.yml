@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   api:
-    image: marquezproject/marquez:latest
+    image: "marquezproject/marquez:${TAG}"
     container_name: marquez-api
     ports:
       - "5000:5000"
@@ -15,7 +15,7 @@ services:
     entrypoint: ["./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
 
   web:
-    image: marquezproject/marquez-web:latest
+    image: "marquezproject/marquez-web:${TAG}"
     container_name: marquez-web
     environment:
       - MARQUEZ_HOST=api

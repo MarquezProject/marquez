@@ -15,19 +15,15 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://rawgit.com/hippich/bower-semver/master/semver.min.js"></script>
   </head>
   <body>
     <script>
-      var gitHubPath = 'MarquezProject/marquez';
-      var url = 'https://api.github.com/repos/' + gitHubPath + '/tags';
+      var githubRepo = 'MarquezProject/marquez';
+      var githubUrl = 'https://api.github.com/repos/' + githubRepo + '/releases/latest';
 
-      $.get(url).done(function (data) {
-        var versions = data.sort(function (v1, v2) {
-          return semver.compare(v2.name, v1.name)
-        });
-        $('#result').html(versions[0].name);
-        document.getElementById("tag_url").href = "{{ site.github.repository_url }}/releases/tag/" + versions[0].name;
+      $.get(githubUrl).done(function (data) {
+        $('#result').html(data.tag_name);
+        document.getElementById("tag_url").href = "{{ site.github.repository_url }}/releases/tag/" + data.tag_name;
       });
     </script>
     
