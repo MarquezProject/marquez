@@ -1,11 +1,13 @@
 package marquez.client.models;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.client.Utils;
 
 @EqualsAndHashCode
 @ToString
@@ -20,5 +22,13 @@ public final class Tag {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public static Tag fromJson(String tagAsJson) {
+    return Utils.fromJson(tagAsJson, new TypeReference<Tag>() {});
+  }
+
+  public String toJson() {
+    return Utils.toJson(this);
   }
 }

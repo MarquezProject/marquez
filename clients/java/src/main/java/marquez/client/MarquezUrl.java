@@ -3,6 +3,7 @@ package marquez.client;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static marquez.client.MarquezPathV1.createRunPath;
+import static marquez.client.MarquezPathV1.createTagPath;
 import static marquez.client.MarquezPathV1.datasetPath;
 import static marquez.client.MarquezPathV1.datasetTagPath;
 import static marquez.client.MarquezPathV1.datasetVersionPath;
@@ -140,5 +141,9 @@ class MarquezUrl {
 
   URL toListTagsUrl(int limit, int offset) {
     return from(listTagsPath(), newQueryParamsWith(limit, offset));
+  }
+
+  URL toCreateTagsUrl(String name) {
+    return from(createTagPath(name));
   }
 }

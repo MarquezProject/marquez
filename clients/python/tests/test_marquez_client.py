@@ -219,6 +219,17 @@ DB_TABLE_VERSION = {
     'createdByRun': COMPLETED
 }
 
+# TAGS
+TAG_NAME2 = "second_tag"
+TAG_DESCRIPTION2 = "second tag description"
+TAG = {
+    'name': TAG_NAME,
+    'description': DESCRIPTION
+}
+TAG_LIST = {
+    'tags': [{TAG_NAME: DESCRIPTION}, {TAG_NAME2: TAG_DESCRIPTION2}]
+}
+
 
 @pytest.fixture
 def client():
@@ -855,5 +866,49 @@ def test_mark_job_run_as_failed(mock_post, client):
         ),
         headers=mock.ANY,
         json=None,
+        timeout=mock.ANY
+    )
+
+
+@mock.patch('requests.put')
+def test_create_tag(mock_put, client):
+    mock_put.return_value.status_code.return_value = HTTPStatus.OK
+    mock_put.return_value.json.return_value = TAG
+
+    tag = client.create_tag(TAG_NAME, DESCRIPTION)
+
+    assert tag['name'] == TAG_NAME
+    assert tag['description'] == DESCRIPTION
+
+    mock_put.assert_called_once_with(
+        url=client._url(
+            '/tags/{0}', TAG_NAME
+        ),
+        headers=mock.ANY,
+        json={
+            "description": DESCRIPTION
+        },
+        timeout=mock.ANY
+    )
+
+
+@mock.patch('requests.get')
+def test_list_tags(mock_get, client):
+    mock_get.return_value.status_code.return_value = HTTPStatus.OK
+    mock_get.return_value.json.return_value = TAG_LIST
+
+    tags = client.list_tags(limit=DEFAULT_LIMIT, offset=DEFAULT_OFFSET)
+
+    assert tags == TAG_LIST
+
+    mock_get.assert_called_once_with(
+        url=client._url(
+            '/tags'
+        ),
+        headers=mock.ANY,
+        params={
+            'limit': DEFAULT_LIMIT,
+            'offset': DEFAULT_OFFSET
+        },
         timeout=mock.ANY
     )
