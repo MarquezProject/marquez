@@ -36,7 +36,7 @@ usage() {
   echo
   echo
   echo "Arguments:"
-  echo "  -t, --tag string      image tag (ex: X.Y.Z, X.Y.Z-rc.*)"
+  echo "  -t, --tag string      image tag (default: latest)"
   echo "  -b, --build           build image from source"
   echo "  -s, --seed            seed HTTP server with metadata"
   echo "  -h, --help            show help for script"
