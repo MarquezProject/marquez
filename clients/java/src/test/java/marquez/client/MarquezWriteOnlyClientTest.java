@@ -68,8 +68,7 @@ public class MarquezWriteOnlyClientTest {
     client.createDataset("namespaceName", "datasetName", datasetMeta);
     verify(backend, times(1))
         .put(
-            Arrays.asList("api", "v1", "namespaces", "namespaceName", "datasets"),
-            "",
+            Arrays.asList("api", "v1", "namespaces", "namespaceName", "datasets", "datasetName"),
             datasetMeta.toJson());
   }
 

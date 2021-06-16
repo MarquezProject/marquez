@@ -81,7 +81,7 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
 
   @Override
   public void createRun(String namespaceName, String jobName, RunMeta runMeta) {
-    backend.post(createRunPath(namespaceName, jobName), null, runMeta.toJson());
+    backend.post(createRunPath(namespaceName, jobName), "", runMeta.toJson());
   }
 
   @Override
