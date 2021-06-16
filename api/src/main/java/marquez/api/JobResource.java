@@ -61,7 +61,7 @@ public class JobResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @PUT
-  @Path("/namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}/jobs/{job}")
+  @Path("/namespaces/{namespace}/jobs/{job}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
@@ -84,7 +84,7 @@ public class JobResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("/namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}/jobs/{job}")
+  @Path("/namespaces/{namespace}/jobs/{job}")
   @Produces(APPLICATION_JSON)
   public Response getJob(
       @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") JobName jobName) {
@@ -101,7 +101,7 @@ public class JobResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("/namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}/jobs")
+  @Path("/namespaces/{namespace}/jobs")
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
@@ -117,7 +117,7 @@ public class JobResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @POST
-  @Path("namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}/jobs/{job}/runs")
+  @Path("namespaces/{namespace}/jobs/{job}/runs")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createRun(
@@ -138,7 +138,7 @@ public class JobResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("/namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}/jobs/{job}/runs")
+  @Path("/namespaces/{namespace}/jobs/{job}/runs")
   @Produces(APPLICATION_JSON)
   public Response listRuns(
       @PathParam("namespace") NamespaceName namespaceName,

@@ -1,8 +1,12 @@
 package marquez.client;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.util.ArrayList;
+
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.client.models.RunState;
@@ -23,22 +27,25 @@ class MarquezPathV1 {
      is converted to list
      ["api", "v1", "namespaces", "nName", "datasets", "dName", "versions", "vName"]
     */
-    List<String> resultPath = new ArrayList<>();
-    pathTemplate = BASE_PATH + pathTemplate;
-    int argsIndex = 0;
-    for (String part : pathTemplate.split("/")) {
-      if (part == null || part.isEmpty()) {
-        continue;
-      }
-      if (part.equals("%s")) {
-        resultPath.add(pathArgs[argsIndex]);
-        argsIndex++;
-      } else {
-        resultPath.add(part);
-      }
+    int placeholderAmount = pathTemplate.split("%s").length;
+    int argsLength = pathArgs == null ? 0 : pathArgs.length;
+    if (placeholderAmount != argsLength) {
+      throw new MarquezClientException(String.format(
+        "Amount of placeholders %s differ from amount of provided path arguments %s",
+        pathTemplate.split("%s").length,
+        argsLength
+      ));
     }
-    return resultPath;
+    
+    pathTemplate = BASE_PATH + pathTemplate;
+    Iterator<String> iterator = Arrays.stream(pathArgs).iterator();
+    return Stream.of(pathTemplate.split("/"))
+      .filter(it-> it != null && !it.isEmpty())
+      .map(it->it.equals("%s") ? iterator.next() : it)
+      .collect(Collectors.toList());
   }
+
+
 
   static List<String> listNamespacesPath() {
     return path("/namespaces");

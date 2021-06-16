@@ -52,7 +52,7 @@ public class NamespaceResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @PUT
-  @Path("/namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}")
+  @Path("/namespaces/{namespace}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(
@@ -65,7 +65,7 @@ public class NamespaceResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("/namespaces/{namespace: [a-zA-Z0-9_\\-:/.%]*}")
+  @Path("/namespaces/{namespace}")
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("namespace") NamespaceName name) {
     final Namespace namespace =

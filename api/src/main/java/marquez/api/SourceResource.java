@@ -50,7 +50,7 @@ public class SourceResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @PUT
-  @Path("{source: [a-zA-Z0-9_\\-:/.%]*}")
+  @Path("{source}")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response createOrUpdate(@PathParam("source") SourceName name, @Valid SourceMeta meta) {
@@ -62,7 +62,7 @@ public class SourceResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("{source: [a-zA-Z0-9_\\-:/.%]*}")
+  @Path("{source}")
   @Produces(APPLICATION_JSON)
   public Response get(@PathParam("source") SourceName name) {
     final Source source =

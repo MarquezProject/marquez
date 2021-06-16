@@ -21,6 +21,7 @@ import static marquez.client.MarquezPathV1.runTransitionPath;
 import static marquez.client.MarquezPathV1.sourcePath;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -46,11 +47,6 @@ class MarquezUrl {
   }
 
   @VisibleForTesting
-  URL from(String path) {
-    return from(path, ImmutableMap.of());
-  }
-
-  @VisibleForTesting
   URL from(List<String> path) {
     return from(path, ImmutableMap.of());
   }
@@ -59,20 +55,6 @@ class MarquezUrl {
   URL from(List<String> path, @Nullable Map<String, Object> queryParams) {
     try {
       final URIBuilder builder = new URIBuilder(baseUrl.toURI()).setPathSegments(path);
-      if (queryParams != null) {
-        queryParams.forEach((name, value) -> builder.addParameter(name, String.valueOf(value)));
-      }
-      return builder.build().toURL();
-    } catch (URISyntaxException | MalformedURLException e) {
-      throw new IllegalArgumentException(
-          "can not build url from parameters: " + path + " " + queryParams, e);
-    }
-  }
-
-  @VisibleForTesting
-  URL from(String path, @Nullable Map<String, Object> queryParams) {
-    try {
-      final URIBuilder builder = new URIBuilder(baseUrl.toURI()).setPath(baseUrl.getPath() + path);
       if (queryParams != null) {
         queryParams.forEach((name, value) -> builder.addParameter(name, String.valueOf(value)));
       }

@@ -2,7 +2,7 @@ server:
   applicationConnectors:
   - type: http
     port: 8080
-    httpCompliance: RFC2616_LEGACY
+    httpCompliance: RFC7230_LEGACY
   adminConnectors:
   - type: http
     port: 8081
