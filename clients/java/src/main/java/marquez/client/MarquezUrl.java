@@ -24,6 +24,7 @@ import static marquez.client.MarquezPathV1.sourcePath;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
@@ -53,7 +54,7 @@ class MarquezUrl {
   @VisibleForTesting
   URL from(String path, @Nullable Map<String, Object> queryParams) {
     try {
-      final URIBuilder builder = new URIBuilder(baseUrl.toURI()).setPath(baseUrl.getPath() + path);
+      final URIBuilder builder = new URIBuilder(URI.create(baseUrl.toURI() + path));
       if (queryParams != null) {
         queryParams.forEach((name, value) -> builder.addParameter(name, String.valueOf(value)));
       }

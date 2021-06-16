@@ -64,7 +64,7 @@ public class UtilsTest {
   @Test
   public void testToUrl() throws Exception {
     final String urlString = "http://test.com:8080";
-    final URL expected = new URL(urlString);
+    final URL expected = new URL(urlString + "/");
     final URL actual = Utils.toUrl(urlString);
     assertThat(actual).isEqualTo(expected);
   }

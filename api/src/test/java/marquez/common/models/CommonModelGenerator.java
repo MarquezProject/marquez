@@ -31,7 +31,7 @@ public final class CommonModelGenerator extends Generator {
   private CommonModelGenerator() {}
 
   public static NamespaceName newNamespaceName() {
-    return NamespaceName.of("test_namespace" + newId());
+    return NamespaceName.of("s3://test_namespace" + newId());
   }
 
   public static OwnerName newOwnerName() {

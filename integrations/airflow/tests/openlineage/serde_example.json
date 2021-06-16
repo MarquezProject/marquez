@@ -4,7 +4,7 @@
 	"run": {
 		"facets": {
 			"nominalTime": {
-				"_producer": "marquez-airflow",
+				"_producer": "openlineage-python",
 				"_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/NominalTimeRunFacet",
 				"nominalEndTime": "2020-01-02",
 				"nominalStartTime": "2020-01-01"

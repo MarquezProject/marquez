@@ -204,7 +204,7 @@ public abstract class BaseIntegrationTest {
   protected CompletableFuture<HttpResponse<String>> sendLineage(String body) {
     HttpRequest request =
         HttpRequest.newBuilder()
-            .uri(URI.create(baseUrl + "/api/v1/lineage"))
+            .uri(URI.create(baseUrl + "api/v1/lineage"))
             .header("Content-Type", "application/json")
             .POST(BodyPublishers.ofString(body))
             .build();

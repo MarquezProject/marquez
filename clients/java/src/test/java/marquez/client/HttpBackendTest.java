@@ -46,7 +46,7 @@ public class HttpBackendTest {
 
   @Test
   public void testPut() throws MalformedURLException {
-    URL url = new URL(DEFAULT_BASE_URL + "/path");
+    URL url = new URL(DEFAULT_BASE_URL + "path");
     when(marquezHttp.put(url, "json")).thenReturn("ignored");
     httpBackend.put("/path", "json");
     verify(marquezHttp, times(1)).put(url, "json");
@@ -54,7 +54,7 @@ public class HttpBackendTest {
 
   @Test
   public void testPost() throws MalformedURLException {
-    URL url = new URL(DEFAULT_BASE_URL + "/path");
+    URL url = new URL(DEFAULT_BASE_URL + "path");
     when(marquezHttp.post(url, "json")).thenReturn("ignored");
     httpBackend.post("/path", "json");
     verify(marquezHttp, times(1)).post(url, "json");

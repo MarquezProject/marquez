@@ -21,7 +21,7 @@ from openlineage.facet import BaseFacet
 from marquez_airflow.extractors.base import BaseExtractor, StepMetadata
 from marquez_airflow.facets import DataQualityDatasetFacet, ColumnMetric
 from marquez_airflow.utils import get_job_name
-from marquez.dataset import Source, DatasetType, Dataset
+from marquez.dataset import Source, Dataset
 from marquez.utils import get_from_nullable_chain
 
 
@@ -79,6 +79,11 @@ class GreatExpectationsAssertionsDatasetFacet(BaseFacet):
         return "https://github.com/MarquezProject/marquez/tree/main/integrations/airflow/marquez_airflow/extractors/ge-assertions-dataset-facet.json"  # noqa
 
 
+def provide_dataset_info(operator, namespace: str, name: str):
+    operator._expectations_namespace = namespace
+    operator._expectations_name = name
+
+
 class GreatExpectationsExtractorImpl(BaseExtractor):
     """
     Great Expectations extractor extracts validation data from CheckpointResult object and
@@ -112,17 +117,28 @@ class GreatExpectationsExtractorImpl(BaseExtractor):
                 validation_result,
                 ['meta', 'batch_kwargs']
             )
+
+            scheme, authority, namespace, name = None, None, None, None
+
             # To match dataset name we need canonical datasource name
-            name = batch_kwargs.get('datasource', None)
-            path = batch_kwargs.get('path', None)
+            if hasattr(self.operator, '_expectations_namespace'):
+                namespace = self.operator._expectations_namespace
+                name = self.operator._expectations_name
+                if '://' in namespace:
+                    scheme, authority = namespace.split('://')
+                elif ':' in namespace:
+                    scheme, authority = namespace.split(':')
+            else:
+                name = batch_kwargs.get('datasource', None)
+                path = batch_kwargs.get('path', None)
+                namespace = f'{name}:{path}'
             return Dataset(
                 source=Source(
-                    name=name,
-                    type='GREAT_EXPECTATIONS',
-                    connection_url=path
+                    scheme=scheme,
+                    authority=authority,
+                    name=namespace if not scheme and authority else None
                 ),
                 name=name,
-                type=DatasetType.DB_TABLE,
                 custom_facets={
                     'dataQuality': data_quality_facet,
                     'greatExpectations_assertions': assertions_facet
@@ -130,7 +146,7 @@ class GreatExpectationsExtractorImpl(BaseExtractor):
             )
 
         except ValueError:
-            pass
+            log.exception("Exception while retrieving great expectations dataset")
         return None
 
     def parse_data_quality_facet(self, validation_result: Dict) \

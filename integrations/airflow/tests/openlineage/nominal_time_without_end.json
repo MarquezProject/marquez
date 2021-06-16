@@ -1,5 +1,5 @@
 {
-  "_producer": "marquez-airflow",
+  "_producer": "openlineage-python",
   "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/NominalTimeRunFacet",
   "nominalStartTime": "2020-01-01"
 }

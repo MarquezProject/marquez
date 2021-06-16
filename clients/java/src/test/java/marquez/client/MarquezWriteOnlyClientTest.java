@@ -48,14 +48,14 @@ public class MarquezWriteOnlyClientTest {
   public void testCreateNamespace() {
     NamespaceMeta namespaceMeta = new NamespaceMeta("owner", "description");
     client.createNamespace("foo", namespaceMeta);
-    verify(backend, times(1)).put("/api/v1/namespaces/foo", namespaceMeta.toJson());
+    verify(backend, times(1)).put("api/v1/namespaces/foo", namespaceMeta.toJson());
   }
 
   @Test
   public void testCreateSource() throws URISyntaxException {
     SourceMeta sourceMeta = new SourceMeta("type", new URI("connection:uri"), "description");
     client.createSource("sourceFoo", sourceMeta);
-    verify(backend, times(1)).put("/api/v1/sources/sourceFoo", sourceMeta.toJson());
+    verify(backend, times(1)).put("api/v1/sources/sourceFoo", sourceMeta.toJson());
   }
 
   @Test
@@ -64,15 +64,14 @@ public class MarquezWriteOnlyClientTest {
         DbTableMeta.builder().physicalName("physical").sourceName("source").build();
     client.createDataset("namespaceName", "datasetName", datasetMeta);
     verify(backend, times(1))
-        .put("/api/v1/namespaces/namespaceName/datasets/datasetName", datasetMeta.toJson());
+        .put("api/v1/namespaces/namespaceName/datasets/datasetName", datasetMeta.toJson());
   }
 
   @Test
   public void testCreateJob() {
     JobMeta jobMeta = JobMeta.builder().type(JobType.BATCH).build();
     client.createJob("namespaceName", "jobName", jobMeta);
-    verify(backend, times(1))
-        .put("/api/v1/namespaces/namespaceName/jobs/jobName", jobMeta.toJson());
+    verify(backend, times(1)).put("api/v1/namespaces/namespaceName/jobs/jobName", jobMeta.toJson());
   }
 
   @Test
@@ -80,7 +79,7 @@ public class MarquezWriteOnlyClientTest {
     RunMeta runMeta = RunMeta.builder().build();
     client.createRun("namespaceName", "jobName", runMeta);
     verify(backend, times(1))
-        .post("/api/v1/namespaces/namespaceName/jobs/jobName/runs", runMeta.toJson());
+        .post("api/v1/namespaces/namespaceName/jobs/jobName/runs", runMeta.toJson());
   }
 
   @Test
@@ -89,7 +88,7 @@ public class MarquezWriteOnlyClientTest {
     RunMeta runMeta = RunMeta.builder().id(id).build();
     client.createRun("namespaceName", "jobName", runMeta);
     verify(backend, times(1))
-        .post("/api/v1/namespaces/namespaceName/jobs/jobName/runs", runMeta.toJson());
+        .post("api/v1/namespaces/namespaceName/jobs/jobName/runs", runMeta.toJson());
   }
 
   @Test
@@ -98,26 +97,26 @@ public class MarquezWriteOnlyClientTest {
     Instant at = Instant.now();
     String atParam = URLEncoder.encode(String.valueOf(at), UTF_8.name());
     client.markRunAsRunning(runId, at);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/start?at=" + atParam);
+    verify(backend, times(1)).post("api/v1/jobs/runs/" + runId + "/start?at=" + atParam);
     client.markRunAsAborted(runId, at);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/abort?at=" + atParam);
+    verify(backend, times(1)).post("api/v1/jobs/runs/" + runId + "/abort?at=" + atParam);
     client.markRunAsCompleted(runId, at);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/complete?at=" + atParam);
+    verify(backend, times(1)).post("api/v1/jobs/runs/" + runId + "/complete?at=" + atParam);
     client.markRunAsFailed(runId, at);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/fail?at=" + atParam);
+    verify(backend, times(1)).post("api/v1/jobs/runs/" + runId + "/fail?at=" + atParam);
   }
 
   @Test
   public void testMarkRunAsNoAt() {
     String runId = UUID.randomUUID().toString();
     client.markRunAsRunning(runId);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/start");
+    verify(backend, times(1)).post("api/v1/jobs/runs/" + runId + "/start");
     client.markRunAsAborted(runId);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/abort");
+    verify(backend, times(1)).post("api/v1/jobs/runs/" + runId + "/abort");
     client.markRunAsCompleted(runId);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/complete");
+    verify(backend, times(1)).post("api/v1/jobs/runs/" + runId + "/complete");
     client.markRunAsFailed(runId);
-    verify(backend, times(1)).post("/api/v1/jobs/runs/" + runId + "/fail");
+    verify(backend, times(1)).post("api/v1/jobs/runs/" + runId + "/fail");
   }
 
   @Test

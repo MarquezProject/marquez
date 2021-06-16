@@ -5,7 +5,7 @@ import pytest
 
 import openlineage.facet
 from openlineage import run
-from openlineage.run import Serde
+from openlineage.serde import Serde
 
 
 def get_sorted_json(file_name: str) -> str:

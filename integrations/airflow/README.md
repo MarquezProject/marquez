@@ -93,6 +93,11 @@ If you do nothing, Marquez will receive the `Job` and the `Run` from your DAGs, 
 
 It's important to understand the inputs and outputs are lists and relate directly to the `Dataset` object in Marquez.  Datasets also include a source which relates directly to the `Source` object in Marquez.
 
+#### Great Expectations
+
+`great_expectations` extractor requires more care than that. For technical reasons, you need to manually provide dataset 
+name and namespace for dataset provided to great expectations operator by calling function `marquez_airflow.extractors.great_expectations_extractor.provide_dataset_info`. 
+
 ## Usage
 
 To begin collecting Airflow DAG metadata with Marquez, use:

@@ -36,6 +36,11 @@ class HttpBackend implements Backend {
 
   private URL url(String path) {
     try {
+      if (baseUrl.toString().endsWith("/") && path.startsWith("/")) {
+        path = path.substring(1);
+      } else if (!baseUrl.toString().endsWith("/") && !path.startsWith("/")) {
+        path = "/" + path;
+      }
       return new URL(this.baseUrl.toString() + path);
     } catch (MalformedURLException e) {
       throw new IllegalArgumentException("Invalid path " + path, e);

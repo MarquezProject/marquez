@@ -12,6 +12,7 @@
 .settings
 .vscode/
 __pycache__
+.pytest_cache
 venv
 api/out/
 bin/
