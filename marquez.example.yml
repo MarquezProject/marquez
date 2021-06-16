@@ -17,6 +17,7 @@ server:
   applicationConnectors:
   - type: http
     port: ${MARQUEZ_PORT:-8080}
+    httpCompliance: RFC7230_LEGACY
   adminConnectors:
   - type: http
     port: ${MARQUEZ_ADMIN_PORT:-8081}

@@ -70,6 +70,14 @@ public class UtilsTest {
   }
 
   @Test
+  public void testToUrl_stripsTrailingSlash() throws Exception {
+    final String urlString = "http://test.com:8080/";
+    final URL expected = new URL("http://test.com:8080");
+    final URL actual = Utils.toUrl(urlString);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
   public void testToUrl_throwsOnNull() {
     assertThatNullPointerException().isThrownBy(() -> Utils.toUrl(null));
   }

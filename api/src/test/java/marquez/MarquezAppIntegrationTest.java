@@ -35,17 +35,20 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
 public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
-  @Test
-  public void testApp_createNamespace() {
+  @ParameterizedTest
+  @ValueSource(strings = {"DEFAULT", "database://localhost:1234", "s3://bucket", "bigquery:"})
+  public void testApp_createNamespace(String namespaceName) {
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
-    final Namespace namespace = client.createNamespace(NAMESPACE_NAME, namespaceMeta);
-    assertThat(namespace.getName()).isEqualTo(NAMESPACE_NAME);
+    final Namespace namespace = client.createNamespace(namespaceName, namespaceMeta);
+    assertThat(namespace.getName()).isEqualTo(namespaceName);
     assertThat(namespace.getCreatedAt()).isAfter(EPOCH);
     assertThat(namespace.getUpdatedAt()).isAfter(EPOCH);
     assertThat(namespace.getOwnerName()).isEqualTo(OWNER_NAME);
@@ -53,13 +56,14 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     assertThat(
             client.listNamespaces().stream()
-                .filter(other -> other.getName().equals(NAMESPACE_NAME))
+                .filter(other -> other.getName().equals(namespaceName))
                 .count())
         .isEqualTo(1);
   }
 
-  @Test
-  public void testApp_createSource() {
+  @ParameterizedTest
+  @ValueSource(strings = {"test_source312", "s3://bucket", "asdf", "bigquery:"})
+  public void testApp_createSource(String sourceName) {
     final SourceMeta sourceMeta =
         SourceMeta.builder()
             .type(SOURCE_TYPE)
@@ -67,9 +71,9 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(SOURCE_DESCRIPTION)
             .build();
 
-    final Source source = client.createSource(SOURCE_NAME, sourceMeta);
+    final Source source = client.createSource(sourceName, sourceMeta);
     assertThat(source.getType()).isEqualTo(SOURCE_TYPE);
-    assertThat(source.getName()).isEqualTo(SOURCE_NAME);
+    assertThat(source.getName()).isEqualTo(sourceName);
     assertThat(source.getCreatedAt()).isAfter(EPOCH);
     assertThat(source.getUpdatedAt()).isAfter(EPOCH);
     assertThat(source.getConnectionUrl()).isEqualTo(CONNECTION_URL);
@@ -77,7 +81,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     assertThat(
             client.listSources().stream()
-                .filter(other -> other.getName().equals(SOURCE_NAME))
+                .filter(other -> other.getName().equals(sourceName))
                 .count())
         .isEqualTo(1);
   }
