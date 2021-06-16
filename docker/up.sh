@@ -12,12 +12,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage: $ ./up.sh [--build | --pull] [--seed]
+# Usage:
+#  # Build image from source
+#  $ ./up.sh --build
+#
+#  # Build image from source, then seed the HTTP API server
+#  $ ./up.sh --build --seed
+#
+#  # Build a tagged image
+#  $ ./up.sh --tag X.Y.X
+#
+#  # Build a tagged image, then seed the HTTP API server
+#  $ ./up.sh --tag X.Y.X --seed
 
 set -e
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) [--build | --pull] [--seed]"
+  echo "usage: ./$(basename -- ${0}) [--tag TAG] [--build] [--seed]"
+  echo
+  echo "A script used to run Marquez via Docker"
+  echo
+  echo "Examples:"
+  echo "  # Build image from source"
+  echo "  $ ./up.sh --build"
+  echo
+  echo "  # Build image from source, then seed HTTP server with metadata"
+  echo "  $ ./up.sh --build --seed"
+  echo
+  echo "  # Build tagged image"
+  echo "  ./up.sh --tag X.Y.X"
+  echo
+  echo "  # Build tagged image, then seed HTTP server with metadata"
+  echo "  ./up.sh --tag X.Y.X --seed"
+  echo
+  echo
+  echo "Arguments:"
+  echo "  -t, --tag string      image tag (ex: X.Y.Z, X.Y.Z-rc.*)"
+  echo "  -b, --build           build image from source"
+  echo "  -s, --seed            seed HTTP server with metadata"
+  echo "  -h, --help            show help for script"
   exit 1
 }
 
@@ -28,13 +61,15 @@ cd "${project_root}"
 compose_files="-f docker-compose.yml"
 args="-V --force-recreate"
 
+TAG="latest"
 while [ $# -gt 0 ]; do
   case $1 in
+    '--tag'|-t)
+       shift
+       TAG="${1}"
+       ;;
     '--build'|-b)
        BUILD='true'
-       ;;
-    '--pull'|-p)
-       PULL='true'
        ;;
     '--seed'|-s)
        SEED='true'
@@ -53,12 +88,10 @@ done
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   args+=" --build"
-elif [[ "${PULL}" = "true" ]]; then
-  docker-compose pull
 fi
 
 if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-docker-compose $compose_files up $args
+TAG=${TAG} docker-compose $compose_files up $args

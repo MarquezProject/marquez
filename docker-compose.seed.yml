@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   seed_marquez:
-    image: marquezproject/marquez:latest
+    image: "marquezproject/marquez:${TAG}"
     environment:
       - MARQUEZ_HOST=api
       - MARQUEZ_PORT=5000
