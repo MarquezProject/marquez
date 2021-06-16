@@ -15,6 +15,7 @@ class MarquezPathV1 {
     /*
      Converts path template (prepended with BASE_PATH), where path parts are separated
      by slashes, and formats strings filling pathArgs in place of %s placeholder.
+     This is required to properly handle double slashes in URLs using URIBuilder.
      Example:
      Path template "/namespaces/%s/datasets/%s/versions/%s"
      with args
