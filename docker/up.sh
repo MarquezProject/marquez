@@ -12,18 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Usage:
-#  # Build image from source
-#  $ ./up.sh --build
-#
-#  # Build image from source, then seed the HTTP API server
-#  $ ./up.sh --build --seed
-#
-#  # Build a tagged image
-#  $ ./up.sh --tag X.Y.X
-#
-#  # Build a tagged image, then seed the HTTP API server
-#  $ ./up.sh --tag X.Y.X --seed
+# Usage: $ ./up.sh [--tag TAG] [--build] [--seed]
 
 set -e
 
