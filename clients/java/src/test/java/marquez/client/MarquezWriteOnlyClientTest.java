@@ -50,7 +50,7 @@ public class MarquezWriteOnlyClientTest {
     NamespaceMeta namespaceMeta = new NamespaceMeta("owner", "description");
     client.createNamespace("foo", namespaceMeta);
     verify(backend, times(1))
-        .put(Arrays.asList("api", "v1", "namespaces", "foo"), namespaceMeta.toJson());
+        .put(Arrays.asList("api", "v1", "namespaces", "foo"), "", namespaceMeta.toJson());
   }
 
   @Test
@@ -58,7 +58,7 @@ public class MarquezWriteOnlyClientTest {
     SourceMeta sourceMeta = new SourceMeta("type", new URI("connection:uri"), "description");
     client.createSource("sourceFoo", sourceMeta);
     verify(backend, times(1))
-        .put(Arrays.asList("api", "v1", "sources", "sourceFoo"), sourceMeta.toJson());
+        .put(Arrays.asList("api", "v1", "sources", "sourceFoo"), "", sourceMeta.toJson());
   }
 
   @Test
@@ -69,6 +69,7 @@ public class MarquezWriteOnlyClientTest {
     verify(backend, times(1))
         .put(
             Arrays.asList("api", "v1", "namespaces", "namespaceName", "datasets", "datasetName"),
+            "",
             datasetMeta.toJson());
   }
 
@@ -79,6 +80,7 @@ public class MarquezWriteOnlyClientTest {
     verify(backend, times(1))
         .put(
             Arrays.asList("api", "v1", "namespaces", "namespaceName", "jobs", "jobName"),
+            "",
             jobMeta.toJson());
   }
 

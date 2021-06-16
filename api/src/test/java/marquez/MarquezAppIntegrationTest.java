@@ -61,8 +61,9 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
         .isEqualTo(1);
   }
 
-  @Test
-  public void testApp_createSource() {
+  @ParameterizedTest
+  @ValueSource(strings = {"test_source312", "s3://bucket", "asdf", "bigquery:"})
+  public void testApp_createSource(String sourceName) {
     final SourceMeta sourceMeta =
         SourceMeta.builder()
             .type(SOURCE_TYPE)
@@ -70,9 +71,9 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .description(SOURCE_DESCRIPTION)
             .build();
 
-    final Source source = client.createSource(SOURCE_NAME, sourceMeta);
+    final Source source = client.createSource(sourceName, sourceMeta);
     assertThat(source.getType()).isEqualTo(SOURCE_TYPE);
-    assertThat(source.getName()).isEqualTo(SOURCE_NAME);
+    assertThat(source.getName()).isEqualTo(sourceName);
     assertThat(source.getCreatedAt()).isAfter(EPOCH);
     assertThat(source.getUpdatedAt()).isAfter(EPOCH);
     assertThat(source.getConnectionUrl()).isEqualTo(CONNECTION_URL);
@@ -80,7 +81,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     assertThat(
             client.listSources().stream()
-                .filter(other -> other.getName().equals(SOURCE_NAME))
+                .filter(other -> other.getName().equals(sourceName))
                 .count())
         .isEqualTo(1);
   }

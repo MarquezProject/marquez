@@ -61,22 +61,22 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
 
   @Override
   public void createNamespace(String namespaceName, NamespaceMeta namespaceMeta) {
-    backend.put(namespacePath(namespaceName), namespaceMeta.toJson());
+    backend.put(namespacePath(namespaceName), "", namespaceMeta.toJson());
   }
 
   @Override
   public void createSource(String sourceName, SourceMeta sourceMeta) {
-    backend.put(sourcePath(sourceName), sourceMeta.toJson());
+    backend.put(sourcePath(sourceName), "", sourceMeta.toJson());
   }
 
   @Override
   public void createDataset(String namespaceName, String datasetName, DatasetMeta datasetMeta) {
-    backend.put(datasetPath(namespaceName, datasetName), datasetMeta.toJson());
+    backend.put(datasetPath(namespaceName, datasetName), "", datasetMeta.toJson());
   }
 
   @Override
   public void createJob(String namespaceName, String jobName, JobMeta jobMeta) {
-    backend.put(jobPath(namespaceName, jobName), jobMeta.toJson());
+    backend.put(jobPath(namespaceName, jobName), "", jobMeta.toJson());
   }
 
   @Override
