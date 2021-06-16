@@ -69,6 +69,7 @@ public class MarquezWriteOnlyClientTest {
     verify(backend, times(1))
         .put(
             Arrays.asList("api", "v1", "namespaces", "namespaceName", "datasets"),
+            "",
             datasetMeta.toJson());
   }
 
@@ -89,6 +90,7 @@ public class MarquezWriteOnlyClientTest {
     verify(backend, times(1))
         .post(
             Arrays.asList("api", "v1", "namespaces", "namespaceName", "jobs", "jobName", "runs"),
+            "",
             runMeta.toJson());
   }
 
@@ -98,7 +100,10 @@ public class MarquezWriteOnlyClientTest {
     RunMeta runMeta = RunMeta.builder().id(id).build();
     client.createRun("namespaceName", "jobName", runMeta);
     verify(backend, times(1))
-        .post("/api/v1/namespaces/namespaceName/jobs/jobName/runs", runMeta.toJson());
+        .post(
+            Arrays.asList("api", "v1", "namespaces", "namespaceName", "jobs", "jobName", "runs"),
+            "",
+            runMeta.toJson());
   }
 
   @Test
