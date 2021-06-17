@@ -111,11 +111,10 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     latestRun,
     location,
     namespace,
-    context = { SQL: '' }
+    context = { sql: '' }
   } = job as IJob
 
   const latestRuns = job ? job.latestRuns || [] : []
-  const { SQL } = context
 
   return (
     <Box
@@ -157,7 +156,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           <MqText subdued>{description}</MqText>
         </Box>
       </Box>
-      <Code>{SQL}</Code>
+      <Code code={context.sql} />
       <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
         <div className={classes.latestRunContainer}>
           {latestRuns.map(r => {
