@@ -25,20 +25,20 @@ usage() {
   echo "  # Build image from source"
   echo "  $ ./up.sh --build"
   echo
-  echo "  # Build image from source, then seed HTTP server with metadata"
+  echo "  # Build image from source, then seed HTTP API server with metadata"
   echo "  $ ./up.sh --build --seed"
   echo
-  echo "  # Build tagged image"
+  echo "  # Use tagged image"
   echo "  ./up.sh --tag X.Y.X"
   echo
-  echo "  # Build tagged image, then seed HTTP server with metadata"
+  echo "  # Use tagged image, then seed HTTP API server with metadata"
   echo "  ./up.sh --tag X.Y.X --seed"
   echo
   echo
   echo "Arguments:"
   echo "  -t, --tag string      image tag (default: latest)"
   echo "  -b, --build           build image from source"
-  echo "  -s, --seed            seed HTTP server with metadata"
+  echo "  -s, --seed            seed HTTP API server with metadata"
   echo "  -h, --help            show help for script"
   exit 1
 }
