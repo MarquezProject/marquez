@@ -34,14 +34,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.common.models.NamespaceName;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
 
-@Slf4j
 @Path("/api/v1")
 public class NamespaceResource extends BaseResource {
   public NamespaceResource(@NonNull final ServiceFactory serviceFactory) {

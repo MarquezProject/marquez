@@ -1,7 +1,6 @@
 package marquez.client;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -29,29 +28,28 @@ class MarquezPathV1 {
     */
     // Find amount of placeholders
     int placeholderAmount = 0;
-    for (int pos = pathTemplate.indexOf("%s"); pos >= 0; pos = pathTemplate.indexOf("%s", pos + 1)) {
+    for (int pos = pathTemplate.indexOf("%s");
+        pos >= 0;
+        pos = pathTemplate.indexOf("%s", pos + 1)) {
       placeholderAmount++;
     }
 
     int argsLength = pathArgs == null ? 0 : pathArgs.length;
     if (placeholderAmount != argsLength) {
-      throw new MarquezClientException(String.format(
-        "Amount of placeholders %s differ from amount of provided path arguments %s",
-        pathTemplate.split("%s").length-1,
-        argsLength
-      ));
+      throw new MarquezClientException(
+          String.format(
+              "Amount of placeholders %s differ from amount of provided path arguments %s",
+              pathTemplate.split("%s").length - 1, argsLength));
     }
 
     // Replace placeholders with path templates, removing empty strings
     pathTemplate = BASE_PATH + pathTemplate;
     Iterator<String> iterator = Arrays.stream(pathArgs).iterator();
     return Stream.of(pathTemplate.split("/"))
-      .filter(it-> it != null && !it.isEmpty())
-      .map(it->it.equals("%s") ? iterator.next() : it)
-      .collect(Collectors.toList());
+        .filter(it -> it != null && !it.isEmpty())
+        .map(it -> it.equals("%s") ? iterator.next() : it)
+        .collect(Collectors.toList());
   }
-
-
 
   static List<String> listNamespacesPath() {
     return path("/namespaces");

@@ -5,7 +5,6 @@ import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.CommonModelGenerator.newContext;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
-import static marquez.common.models.CommonModelGenerator.newDatasetNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newDbSourceType;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newFieldName;
@@ -65,7 +64,6 @@ public abstract class BaseIntegrationTest {
 
   // NAMESPACE
   protected static String NAMESPACE_NAME;
-  protected static String DATASET_NAMESPACE_NAME;
   protected static String OWNER_NAME;
   protected static String NAMESPACE_DESCRIPTION;
 
@@ -117,7 +115,6 @@ public abstract class BaseIntegrationTest {
   @BeforeAll
   protected static void setupAll() throws Exception {
     NAMESPACE_NAME = newNamespaceName().getValue();
-    DATASET_NAMESPACE_NAME = newDatasetNamespaceName().getValue();
     OWNER_NAME = newOwnerName().getValue();
     NAMESPACE_DESCRIPTION = newDescription();
 

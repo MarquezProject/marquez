@@ -24,73 +24,70 @@ public class MarquezPathV1Test {
   @Test
   void testPath_namespaceUrl() {
     Assertions.assertEquals(
-      ImmutableList.of("api", "v1", "namespaces", "s3://bucket"),
-      MarquezPathV1.namespacePath("s3://bucket"));
+        ImmutableList.of("api", "v1", "namespaces", "s3://bucket"),
+        MarquezPathV1.namespacePath("s3://bucket"));
 
     Assertions.assertEquals(
-      ImmutableList.of("api", "v1", "namespaces", "bigquery:"),
-      MarquezPathV1.namespacePath("bigquery:"));
+        ImmutableList.of("api", "v1", "namespaces", "bigquery:"),
+        MarquezPathV1.namespacePath("bigquery:"));
 
     Assertions.assertEquals(
-      ImmutableList.of("api", "v1", "namespaces", "usual-namespace-name"),
-      MarquezPathV1.namespacePath("usual-namespace-name"));
+        ImmutableList.of("api", "v1", "namespaces", "usual-namespace-name"),
+        MarquezPathV1.namespacePath("usual-namespace-name"));
   }
 
   @Test
   void testPath_datasetUrl() {
     Assertions.assertEquals(
-      ImmutableList.of("api", "v1", "namespaces", "s3://buckets", "dataset", "source-file.json"),
-      MarquezPathV1.datasetPath("s3://bucket", "source-file.json"));
+        ImmutableList.of("api", "v1", "namespaces", "s3://buckets", "dataset", "source-file.json"),
+        MarquezPathV1.datasetPath("s3://bucket", "source-file.json"));
   }
-  
+
   @Test
   void testPath_placeholderReplacement() {
     Assertions.assertEquals(
-      ImmutableList.of("api", "v1", "whatever", "replace1", "next"),
-      MarquezPathV1.path("/whatever/%s/next", "replace1")
-    );
+        ImmutableList.of("api", "v1", "whatever", "replace1", "next"),
+        MarquezPathV1.path("/whatever/%s/next", "replace1"));
 
     Assertions.assertEquals(
-      ImmutableList.of("api", "v1", "whatever", "next"),
-      MarquezPathV1.path("/whatever/next")
-    );
+        ImmutableList.of("api", "v1", "whatever", "next"), MarquezPathV1.path("/whatever/next"));
   }
 
   @Test
   void testPath_notEnoughPlaceholders() {
-    Assertions.assertThrows(MarquezClientException.class,
-      () -> {
-        MarquezPathV1.path("/whatever/%s/next/%s", "replace1");
-      }
-    );
+    Assertions.assertThrows(
+        MarquezClientException.class,
+        () -> {
+          MarquezPathV1.path("/whatever/%s/next/%s", "replace1");
+        });
 
-    Assertions.assertThrows(MarquezClientException.class,
-      () -> {
-        MarquezPathV1.path("/whatever/%s/next/%s/%s", "replace1");
-      }
-    );
+    Assertions.assertThrows(
+        MarquezClientException.class,
+        () -> {
+          MarquezPathV1.path("/whatever/%s/next/%s/%s", "replace1");
+        });
   }
 
   @Test
   void testPath_tooMuchPlaceholders() {
-    Assertions.assertThrows(MarquezClientException.class,
-      () -> {
-        MarquezPathV1.path("/whatever/%s/next", "replace1", "replace2");
-      }
-    );
+    Assertions.assertThrows(
+        MarquezClientException.class,
+        () -> {
+          MarquezPathV1.path("/whatever/%s/next", "replace1", "replace2");
+        });
   }
-  
+
   @Test
   void testPath_noPlaceholders() {
-    Assertions.assertThrows(MarquezClientException.class,
-      () -> {
-        MarquezPathV1.path("/whatever/%s");
-      }
-    );
-    Assertions.assertThrows(MarquezClientException.class,
-      () -> {
-        MarquezPathV1.path("/whatever/%s/next/%s");
-      }
-    );
+    Assertions.assertThrows(
+        MarquezClientException.class,
+        () -> {
+          MarquezPathV1.path("/whatever/%s");
+        });
+    Assertions.assertThrows(
+        MarquezClientException.class,
+        () -> {
+          MarquezPathV1.path("/whatever/%s/next/%s");
+        });
   }
 }

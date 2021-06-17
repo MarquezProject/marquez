@@ -15,23 +15,22 @@
 package marquez.client;
 
 import com.google.common.collect.ImmutableList;
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 @org.junit.jupiter.api.Tag("UnitTests")
 public class MarquezUrlTest {
   static String basePath = "http://marquez:5000";
   static MarquezUrl marquezUrl;
-  
+
   @BeforeAll
   static void beforeAll() throws MalformedURLException {
     marquezUrl = MarquezUrl.create(new URL(basePath));
   }
-  
+
   @Test
   void testBasicMarquezUrl() {
     URL url = marquezUrl.from(ImmutableList.of("namespace", "nname", "job", "jname"));
@@ -41,6 +40,7 @@ public class MarquezUrlTest {
   @Test
   void testEncodedMarquezUrl() {
     URL url = marquezUrl.from(ImmutableList.of("namespace", "s3://bucket", "job", "jname"));
-    Assertions.assertEquals("http://marquez:5000/namespace/s3:%2F%2Fbucket/job/jname", url.toString());
+    Assertions.assertEquals(
+        "http://marquez:5000/namespace/s3:%2F%2Fbucket/job/jname", url.toString());
   }
 }

@@ -109,11 +109,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDatasetWithSlashesInNamespace() {
-    createNamespace(NAMESPACE_NAME + "23");
-  }
-
-  @Test
   public void testDatasetFieldChange() {
     createNamespace(NAMESPACE_NAME);
     createSource("my-source");
