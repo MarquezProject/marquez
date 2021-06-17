@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import marquez.db.models.UpdateLineageRow;
+import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -58,6 +60,30 @@ class OpenLineageDaoTest {
     assertThat(readJob.getInputs()).isPresent().get().asList().size().isEqualTo(1);
     assertThat(readJob.getInputs().get().get(0).getDatasetVersionRow())
         .isEqualTo(writeJob.getOutputs().get().get(0).getDatasetVersionRow());
+  }
+
+  /**
+   * When reading a new dataset, a version is created and the dataset's current version is updated
+   * immediately.
+   */
+  @Test
+  void testUpdateMarquezModelWithInputOnlyDataset() {
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            dao,
+            WRITE_JOB_NAME,
+            "RUNNING",
+            jobFacet,
+            Arrays.asList(new Dataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets)),
+            Arrays.asList());
+
+    assertThat(writeJob.getInputs())
+        .isPresent()
+        .get(InstanceOfAssertFactories.list(DatasetRecord.class))
+        .hasSize(1)
+        .first()
+        .matches(v -> v.getDatasetRow().getCurrentVersionUuid().isPresent());
   }
 
   /**
