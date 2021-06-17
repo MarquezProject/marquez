@@ -39,7 +39,7 @@ public class MarquezPathV1Test {
   @Test
   void testPath_datasetUrl() {
     Assertions.assertEquals(
-        ImmutableList.of("api", "v1", "namespaces", "s3://buckets", "dataset", "source-file.json"),
+        ImmutableList.of("api", "v1", "namespaces", "s3://buckets", "datasets", "source-file.json"),
         MarquezPathV1.datasetPath("s3://bucket", "source-file.json"));
   }
 
