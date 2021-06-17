@@ -4,6 +4,10 @@
 
 ## [0.15.2](https://github.com/MarquezProject/marquez/compare/0.15.1...0.15.2)
 
+### Added
+
+* Add endpoint to create tags [@hanbei](https://github.com/hanbei)
+
 ### Fixed
 
 * Fixed build & release process for python marquez-integration-common package [@collado-mike](https://github.com/collado-mike)
