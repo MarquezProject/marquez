@@ -377,6 +377,7 @@ public interface OpenLineageDao extends BaseDao {
             .map(SchemaDatasetFacet::getFields)
             .orElse(null);
 
+    final DatasetRow dsRow = datasetRow;
     DatasetVersionRow datasetVersionRow =
         datasetRow
             .getCurrentVersionUuid()
@@ -390,14 +391,14 @@ public interface OpenLineageDao extends BaseDao {
                       version(
                           dsNamespace.getName(),
                           source.getName(),
-                          datasetRow.getName(),
+                          dsRow.getName(),
                           fields,
                           runUuid);
                   DatasetVersionRow row =
                       datasetVersionDao.upsert(
                           UUID.randomUUID(),
                           now,
-                          datasetRow.getUuid(),
+                          dsRow.getUuid(),
                           versionUuid,
                           isInput ? null : runUuid,
                           datasetVersionDao.toPgObjectSchemaFields(fields),
@@ -425,6 +426,14 @@ public interface OpenLineageDao extends BaseDao {
 
     if (isInput) {
       runDao.updateInputMapping(runUuid, datasetVersionRow.getUuid());
+
+      // TODO - this is a short term fix until
+      // https://github.com/MarquezProject/marquez/issues/1361
+      // is fully thought out
+      if (datasetRow.getCurrentVersionUuid().isEmpty()) {
+        datasetDao.updateVersion(dsRow.getUuid(), now, datasetVersionRow.getUuid());
+        datasetRow = datasetRow.withCurrentVersionUuid(datasetVersionRow.getUuid());
+      }
     }
 
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
