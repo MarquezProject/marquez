@@ -64,7 +64,7 @@ To start Marquez with sample metadata that will be used and referenced in later 
 $ ./docker/up.sh --seed
 ```
 
-> **Tip:** Use the `--build` flag to build images from source, or `--pull` to pull a tagged image.
+> **Tip:** Use the `--build` flag to build images from source, or `--tag X.Y.Z` to use a tagged image.
 
 To view the Marquez UI and verify it's running, open [http://localhost:3000](http://localhost:3000). The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run-level metadata of current and previous job runs, and much more!
 

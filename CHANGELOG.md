@@ -3,10 +3,12 @@
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.15.2...HEAD)
 
 ## [0.15.2](https://github.com/MarquezProject/marquez/compare/0.15.1...0.15.2)
+
 ### Fixed
 
 * Fixed build & release process for python marquez-integration-common package [@collado-mike](https://github.com/collado-mike)
 * Fixed snowflake and bigquery errors when connector libraries not loaded [@collado-mike](https://github.com/collado-mike)
+* Fixed Openlineage API does not set Dataset current_version_uuid #1361 [@collado-mike](https://github.com/collado-mike)
 
 ## [0.15.1](https://github.com/MarquezProject/marquez/compare/0.15.0...0.15.1)
 
