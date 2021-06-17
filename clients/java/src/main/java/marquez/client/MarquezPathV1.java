@@ -27,16 +27,22 @@ class MarquezPathV1 {
      is converted to list
      ["api", "v1", "namespaces", "nName", "datasets", "dName", "versions", "vName"]
     */
-    int placeholderAmount = pathTemplate.split("%s").length;
+    // Find amount of placeholders
+    int placeholderAmount = 0;
+    for (int pos = pathTemplate.indexOf("%s"); pos >= 0; pos = pathTemplate.indexOf("%s", pos + 1)) {
+      placeholderAmount++;
+    }
+
     int argsLength = pathArgs == null ? 0 : pathArgs.length;
     if (placeholderAmount != argsLength) {
       throw new MarquezClientException(String.format(
         "Amount of placeholders %s differ from amount of provided path arguments %s",
-        pathTemplate.split("%s").length,
+        pathTemplate.split("%s").length-1,
         argsLength
       ));
     }
-    
+
+    // Replace placeholders with path templates, removing empty strings
     pathTemplate = BASE_PATH + pathTemplate;
     Iterator<String> iterator = Arrays.stream(pathArgs).iterator();
     return Stream.of(pathTemplate.split("/"))

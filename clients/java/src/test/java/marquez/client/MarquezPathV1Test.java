@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 public class MarquezPathV1Test {
 
   @Test
-  void testNamespaceUrl() {
+  void testPath_namespaceUrl() {
     Assertions.assertEquals(
       ImmutableList.of("api", "v1", "namespaces", "s3://bucket"),
       MarquezPathV1.namespacePath("s3://bucket"));
@@ -37,9 +37,60 @@ public class MarquezPathV1Test {
   }
 
   @Test
-  void testDatasetUrl() {
+  void testPath_datasetUrl() {
     Assertions.assertEquals(
       ImmutableList.of("api", "v1", "namespaces", "s3://buckets", "dataset", "source-file.json"),
       MarquezPathV1.datasetPath("s3://bucket", "source-file.json"));
+  }
+  
+  @Test
+  void testPath_placeholderReplacement() {
+    Assertions.assertEquals(
+      ImmutableList.of("api", "v1", "whatever", "replace1", "next"),
+      MarquezPathV1.path("/whatever/%s/next", "replace1")
+    );
+
+    Assertions.assertEquals(
+      ImmutableList.of("api", "v1", "whatever", "next"),
+      MarquezPathV1.path("/whatever/next")
+    );
+  }
+
+  @Test
+  void testPath_notEnoughPlaceholders() {
+    Assertions.assertThrows(MarquezClientException.class,
+      () -> {
+        MarquezPathV1.path("/whatever/%s/next/%s", "replace1");
+      }
+    );
+
+    Assertions.assertThrows(MarquezClientException.class,
+      () -> {
+        MarquezPathV1.path("/whatever/%s/next/%s/%s", "replace1");
+      }
+    );
+  }
+
+  @Test
+  void testPath_tooMuchPlaceholders() {
+    Assertions.assertThrows(MarquezClientException.class,
+      () -> {
+        MarquezPathV1.path("/whatever/%s/next", "replace1", "replace2");
+      }
+    );
+  }
+  
+  @Test
+  void testPath_noPlaceholders() {
+    Assertions.assertThrows(MarquezClientException.class,
+      () -> {
+        MarquezPathV1.path("/whatever/%s");
+      }
+    );
+    Assertions.assertThrows(MarquezClientException.class,
+      () -> {
+        MarquezPathV1.path("/whatever/%s/next/%s");
+      }
+    );
   }
 }
