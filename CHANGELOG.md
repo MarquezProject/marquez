@@ -6,6 +6,7 @@
 ### Fixed
 
 * Fixed build & release process for python marquez-integration-common package [@collado-mike](https://github.com/collado-mike)
+* Fixed snowflake and bigquery errors when connector libraries not loaded [@collado-mike](https://github.com/collado-mike)
 
 ## [0.15.1](https://github.com/MarquezProject/marquez/compare/0.15.0...0.15.1)
 
