@@ -50,7 +50,7 @@ public class TagIntegrationTest extends BaseIntegrationTest {
     Tag tagWithoutDescription = client.createTag("tag", "New Description");
 
     assertThat(tagWithoutDescription.getName()).isEqualTo("tag");
-    assertThat(tagWithoutDescription.getDescription()).contains("Description");
+    assertThat(tagWithoutDescription.getDescription()).contains("New Description");
   }
 
   @Test
