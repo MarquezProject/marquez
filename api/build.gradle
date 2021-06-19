@@ -47,7 +47,7 @@ dependencies {
     compile "org.jdbi:jdbi3-core:${jdbi3Version}"
     compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
-    compile 'com.google.guava:guava:30.1-jre'
+    compile 'com.google.guava:guava:30.1.1-jre'
     compile 'org.dhatim:dropwizard-sentry:2.0.20'
     compile "io.sentry:sentry:${sentryVersion}"
     compile 'org.flywaydb:flyway-core:6.5.7'
