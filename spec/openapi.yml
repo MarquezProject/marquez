@@ -300,6 +300,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/jobs'
 
+  /namespaces/{namespace}/jobs/{job}/versions:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/job'
+    get:
+      summary: get a list of versions for a given job name
+      description: returns a list of versions for a given job name and namespace
+      tags:
+        - Jobs
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JOB_VERSION_LIST'
+
+  /namespaces/{namespace}/jobs/{job}/versions/{version}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/job'
+      - $ref: '#/components/parameters/version'
+    get:
+      summary: get the details of a given job name
+      description: returns a specified version for a given job name and namespace
+      tags:
+        - Jobs
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JOB_VERSION'
+
   /namespaces/{namespace}/jobs/{job}/runs:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -550,7 +585,7 @@ components:
     version:
       name: version
       in: path
-      description: The ID of the dataset version.
+      description: The ID of the job or dataset version.
       required: true
       schema:
         type: string
@@ -1274,6 +1309,90 @@ components:
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
         latestRun: null
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
+
+    JOB_VERSION_LIST:
+      type: object
+      properties:
+        versions:
+          items:
+            $ref: '#/components/schemas/JOB_VERSION'
+
+    JOB_VERSION:
+      type: object
+      properties:
+        id:
+          description: The ID of the job.
+          type: object
+          properties:
+            namespace:
+              type: string
+              description: The namespace of the job.
+            name:
+              type: string
+              description: The name of the job.
+            version:
+              type: string
+              description: The version of the job
+        name:
+          description: The name of the job.
+          type: string
+        version:
+          description: The version of the job
+          type: string
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job version was created.
+          type: string
+          format: date-time
+        namespace:
+          description: The namespace of the job.
+          type: string
+        inputs:
+          description: The set of **input** dataset ids.
+          type: array
+          items:
+            type: string
+            description: the dataset UUID for each input dataset
+            format: UUID
+          uniqueItems: true
+        outputs:
+          description: The set of **output** dataset ids.
+          type: array
+          items:
+            type: string
+            description: the dataset UUID for each output dataset
+            format: UUID
+          uniqueItems: true
+        location:
+          description: The URL of the job source code or artifact for the given job version.
+          type: string
+          format: URL
+        context:
+          description: Deprecated- Use facet. A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
+          type: object
+          deprecated: true
+        facets:
+          $ref: '#/components/schemas/jobFacets'
+      example:
+        id:
+          namespace: my-namespace
+          name: my-job
+          version: 56472c57-a2ef-4218-b7b7-d2af02a343fd
+        type: BATCH
+        name: my-job
+        version: 56472c57-a2ef-4218-b7b7-d2af02a343fd
+        createdAt: 2019-05-09T19:49:24.201361Z
+        namespace: my-namespace
+        inputs: ["7b10f8dd-6091-403d-ab86-20de85d23a4a", "95eaa980-0894-4f66-bccb-64a6697407ad"]
+        outputs: ["01d658b0-d1ab-4842-89bb-3ba2edb9f65d"]
+        location: https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+        context: {'SQL': "SELECT * FROM mytable;"}
+        description: My first job!
         facets: {
           'context': {
             '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
