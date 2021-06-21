@@ -9,6 +9,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from unittest.mock import patch, MagicMock
 
 import pytest
 from marquez_client.utils import Utils
@@ -111,5 +112,6 @@ def test_is_instance_of():
                              variable_enum_type=RunState)
 
 
+@patch("time.time", MagicMock(return_value=1500100900))
 def test_now_ms():
     assert int(round(time.time() * 1000)) == Utils.now_ms()
