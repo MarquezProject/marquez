@@ -17,7 +17,9 @@ package marquez.api.models;
 import com.google.common.collect.ImmutableMap;
 import java.net.URL;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,6 +40,8 @@ public final class JobVersion {
   @Getter private final NamespaceName namespace;
   @Nullable private final URL location;
   @Getter private final ImmutableMap<String, String> context;
+  @Getter private final List<UUID> inputs;
+  @Getter private final List<UUID> outputs;
 
   public JobVersion(
       @NonNull final JobId id,
@@ -45,7 +49,9 @@ public final class JobVersion {
       @NonNull final Instant createdAt,
       @NonNull final Version version,
       @Nullable final URL location,
-      @Nullable final ImmutableMap<String, String> context) {
+      @Nullable final ImmutableMap<String, String> context,
+      List<UUID> inputs,
+      List<UUID> outputs) {
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;
@@ -53,6 +59,8 @@ public final class JobVersion {
     this.namespace = id.getNamespace();
     this.location = location;
     this.context = (context == null) ? ImmutableMap.of() : context;
+    this.inputs = inputs;
+    this.outputs = outputs;
   }
 
   public Optional<URL> getLocation() {

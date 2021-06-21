@@ -4,6 +4,7 @@ import static marquez.db.Columns.mapOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.urlOrNull;
+import static marquez.db.Columns.uuidArrayOrEmpty;
 import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
@@ -32,6 +33,8 @@ public class JobVersionMapper implements RowMapper<JobVersion> {
         timestampOrThrow(results, Columns.CREATED_AT),
         Version.of(uuidOrThrow(results, Columns.ROW_UUID)),
         urlOrNull(results, Columns.LOCATION),
-        mapOrNull(results, Columns.CONTEXT));
+        mapOrNull(results, Columns.CONTEXT),
+        uuidArrayOrEmpty(results, Columns.INPUT_UUIDS),
+        uuidArrayOrEmpty(results, Columns.OUTPUT_UUIDS));
   }
 }

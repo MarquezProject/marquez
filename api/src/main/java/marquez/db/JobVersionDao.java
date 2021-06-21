@@ -58,16 +58,29 @@ public interface JobVersionDao extends BaseDao {
   }
 
   String BASE_SELECT_ON_JOB_VERSIONS =
-      "SELECT jv.*, jc.context FROM job_versions AS jv "
-          + "LEFT OUTER JOIN job_contexts AS jc "
-          + "  ON jc.uuid = jv.job_context_uuid ";
+      "WITH job_version_io AS (\n"
+          + "    SELECT io.job_version_uuid,\n"
+          + "           array_agg(io.dataset_uuid) FILTER (WHERE io.io_type='INPUT') AS input_uuids,\n"
+          + "           array_agg(io.dataset_uuid) FILTER (WHERE io.io_type='OUTPUT') AS output_uuids\n"
+          + "    FROM job_versions_io_mapping io\n"
+          + "    INNER JOIN job_versions jv ON jv.uuid=io.job_version_uuid\n"
+          + "    GROUP BY io.job_version_uuid\n"
+          + ")\n"
+          + "SELECT jv.*, dsio.input_uuids, dsio.output_uuids, jc.context\n"
+          + "FROM job_versions AS jv\n"
+          + "LEFT JOIN job_version_io dsio ON dsio.job_version_uuid=jv.uuid\n"
+          + "LEFT OUTER JOIN job_contexts AS jc ON jc.uuid = jv.job_context_uuid\n";
 
-  @SqlUpdate(
-      "UPDATE job_versions "
-          + "SET updated_at = :updatedAt, "
-          + "    latest_run_uuid = :latestRunUuid "
-          + "WHERE uuid = :rowUuid")
-  void updateLatestRun(UUID rowUuid, Instant updatedAt, UUID latestRunUuid);
+  @SqlQuery(
+      BASE_SELECT_ON_JOB_VERSIONS
+          + "WHERE namespace_name = :namespaceName AND job_name  = :jobName AND jv.version = :jobVersionUuid")
+  Optional<JobVersion> findJobVersion(String namespaceName, String jobName, UUID jobVersionUuid);
+
+  @SqlQuery(
+      BASE_SELECT_ON_JOB_VERSIONS
+          + "WHERE namespace_name = :namespaceName AND job_name = :jobName "
+          + "LIMIT :limit OFFSET :offset")
+  List<JobVersion> findAllJobVersions(String namespaceName, String jobName, int limit, int offset);
 
   /**
    * Used to upsert a {@link JobVersionRow} object; on version conflict, the job version object is
@@ -206,33 +219,6 @@ public interface JobVersionDao extends BaseDao {
   /** Returns the unique ID of the latest {@link Run} for a given job version. */
   @SqlQuery("SELECT latest_run_uuid FROM job_versions WHERE uuid = :jobVersionUuid")
   Optional<UUID> findLatestRunFor(UUID jobVersionUuid);
-
-  @SqlQuery(
-      BASE_SELECT_ON_JOB_VERSIONS
-          + "WHERE namespace_name = :namespaceName AND job_name  = :jobName AND jv.uuid = :jobVersionUuid")
-  Optional<JobVersion> findJobVersion(String namespaceName, String jobName, UUID jobVersionUuid);
-
-  @SqlQuery(
-      BASE_SELECT_ON_JOB_VERSIONS
-          + "WHERE namespace_name = :namespaceName AND job_name = :jobName "
-          + "LIMIT :limit OFFSET :offset")
-  List<JobVersion> findAllJobVersions(String namespaceName, String jobName, int limit, int offset);
-
-  default JobVersionBag createJobVersionOnComplete(
-      Instant transitionedAt, UUID runUuid, String namespaceName, String jobName) {
-    DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
-    JobVersionDao jobVersionDao = createJobVersionDao();
-    JobDao jobDao = createJobDao();
-    JobContextDao jobContextDao = createJobContextDao();
-    JobRow jobRow = jobDao.findByRow(namespaceName, jobName).get();
-    Optional<JobContextRow> jobContextRow = jobContextDao.findBy(jobRow.getJobContextUuid());
-    Map context =
-        jobContextRow
-            .map(e -> Utils.fromJson(e.getContext(), new TypeReference<Map<String, String>>() {}))
-            .orElse(new HashMap<>());
-    List<ExtendedDatasetVersionRow> inputs = datasetVersionDao.findInputsByRunId(runUuid);
-    List<ExtendedDatasetVersionRow> outputs = datasetVersionDao.findByRunId(runUuid);
-    NamespaceRow namespaceRow = createNamespaceDao().findByRow(jobRow.getNamespaceName()).get();
 
   /** Returns the {@link JobVersionRow} object for a given the unique run ID . */
   @SqlQuery("SELECT * FROM job_versions WHERE latest_run_uuid = :runUuid")

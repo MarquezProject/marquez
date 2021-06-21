@@ -71,6 +71,7 @@ public class LineageServiceTest {
           handle.execute("DELETE FROM lineage_events");
           handle.execute("DELETE FROM runs_input_mapping");
           handle.execute("DELETE FROM dataset_versions_field_mapping");
+          handle.execute("DELETE FROM stream_versions");
           handle.execute("DELETE FROM dataset_versions");
           handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
           handle.execute("DELETE FROM run_states");
