@@ -3,7 +3,7 @@ package marquez.spark.agent.lifecycle;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -17,9 +17,13 @@ import marquez.spark.agent.client.LineageEvent.Job;
 import marquez.spark.agent.client.LineageEvent.ParentRunFacet;
 import marquez.spark.agent.client.LineageEvent.RunFacet;
 import marquez.spark.agent.client.OpenLineageClient;
+import marquez.spark.agent.facets.AdditionalFacetWrapper;
 import marquez.spark.agent.facets.ErrorFacet;
 import marquez.spark.agent.facets.LogicalPlanFacet;
+import marquez.spark.agent.facets.UnknownEntryFacet;
+import marquez.spark.agent.lifecycle.plan.PlanTraversal;
 import marquez.spark.agent.lifecycle.plan.PlanUtils;
+import marquez.spark.agent.lifecycle.plan.UnknownEntryFacetListener;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.ActiveJob;
 import org.apache.spark.scheduler.JobFailed;
@@ -73,14 +77,31 @@ public class SparkSQLExecutionContext implements ExecutionContext {
       log.info("No execution info {}", queryExecution);
       return;
     }
+    UnknownEntryFacetListener unknownEntryFacetListener = new UnknownEntryFacetListener();
+    PartialFunction<LogicalPlan, List<Dataset>> outputFunc = PlanUtils.merge(outputDatasetSupplier);
     List<Dataset> outputDatasets =
-        PlanUtils.applyFirst(outputDatasetSupplier, queryExecution.optimizedPlan());
+        PlanTraversal.<LogicalPlan, List<Dataset>>builder()
+            .processor(outputFunc)
+            .processedElementListener(unknownEntryFacetListener)
+            .build()
+            .apply(queryExecution.optimizedPlan());
+
+    PartialFunction<LogicalPlan, List<Dataset>> inputFunc = PlanUtils.merge(inputDatasetSupplier);
     List<Dataset> inputDatasets =
         JavaConversions.seqAsJavaList(
-                queryExecution.optimizedPlan().collect(PlanUtils.merge(inputDatasetSupplier)))
+                queryExecution
+                    .optimizedPlan()
+                    .collect(
+                        PlanTraversal.<LogicalPlan, List<Dataset>>builder()
+                            .processor(inputFunc)
+                            .processedElementListener(unknownEntryFacetListener)
+                            .build()))
             .stream()
             .flatMap(List::stream)
             .collect(Collectors.toList());
+
+    UnknownEntryFacet unknownFacet =
+        unknownEntryFacetListener.build(queryExecution.optimizedPlan());
     LineageEvent event =
         LineageEvent.builder()
             .inputs(inputDatasets)
@@ -88,9 +109,11 @@ public class SparkSQLExecutionContext implements ExecutionContext {
             .run(
                 buildRun(
                     buildRunFacets(
-                        buildLogicalPlanFacet(queryExecution.optimizedPlan()),
-                        null,
-                        buildParentFacet())))
+                        buildParentFacet(),
+                        AdditionalFacetWrapper.compose(
+                            "spark.logicalPlan",
+                            buildLogicalPlanFacet(queryExecution.optimizedPlan())),
+                        AdditionalFacetWrapper.compose("spark.unknown", unknownFacet))))
             .job(buildJob(queryExecution))
             .eventTime(toZonedTime(jobStart.time()))
             .eventType("START")
@@ -133,9 +156,11 @@ public class SparkSQLExecutionContext implements ExecutionContext {
             .run(
                 buildRun(
                     buildRunFacets(
-                        buildLogicalPlanFacet(queryExecution.logical()),
-                        buildJobErrorFacet(jobEnd.jobResult()),
-                        buildParentFacet())))
+                        buildParentFacet(),
+                        AdditionalFacetWrapper.compose(
+                            "spark.logicalPlan", buildLogicalPlanFacet(queryExecution.logical())),
+                        AdditionalFacetWrapper.compose(
+                            "spark.exception", buildJobErrorFacet(jobEnd.jobResult())))))
             .job(buildJob(queryExecution))
             .eventTime(toZonedTime(jobEnd.time()))
             .eventType(getEventType(jobEnd.jobResult()))
@@ -162,15 +187,14 @@ public class SparkSQLExecutionContext implements ExecutionContext {
   }
 
   protected RunFacet buildRunFacets(
-      LogicalPlanFacet logicalPlanFacet, ErrorFacet jobError, ParentRunFacet parentRunFacet) {
-    Map<String, Object> additionalFacets = new HashMap<>();
-    if (logicalPlanFacet != null) {
-      additionalFacets.put("spark.logicalPlan", logicalPlanFacet);
-    }
-    if (jobError != null) {
-      additionalFacets.put("spark.exception", jobError);
-    }
-    return RunFacet.builder().parent(parentRunFacet).additional(additionalFacets).build();
+      ParentRunFacet parentRunFacet, AdditionalFacetWrapper... additionalFacets) {
+    Map<String, Object> facets =
+        Arrays.stream(additionalFacets)
+            .filter((a) -> a.getFacet() != null)
+            .collect(
+                Collectors.toMap(
+                    AdditionalFacetWrapper::getName, AdditionalFacetWrapper::getFacet));
+    return RunFacet.builder().parent(parentRunFacet).additional(facets).build();
   }
 
   protected LogicalPlanFacet buildLogicalPlanFacet(LogicalPlan plan) {
