@@ -1057,7 +1057,7 @@ components:
     datasetVersions:
       type: object
       properties:
-        datasets:
+        versions:
           items:
             $ref: '#/components/schemas/datasetVersion'
 
