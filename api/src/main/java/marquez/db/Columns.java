@@ -42,7 +42,7 @@ public final class Columns {
   private static final ObjectMapper MAPPER = Utils.getMapper();
 
   /* COMMON ROW COLUMNS */
-  public static final String ROW_UUID = "uuid";
+  public static final String api/src/main/java/marquez/db/Columns.javaROW_UUID = "uuid";
   public static final String TYPE = "type";
   public static final String CREATED_AT = "created_at";
   public static final String UPDATED_AT = "updated_at";
@@ -114,6 +114,8 @@ public final class Columns {
   public static final String END_RUN_STATE_UUID = "end_run_state_uuid";
 
   public static final String JOB_VERSION = "job_version";
+  public static final String INPUT_VERSIONS = "input_versions";
+  public static final String OUTPUT_VERSIONS = "output_versions";
 
   /* RUN ARGS ROW COLUMNS */
   public static final String ARGS = "args";

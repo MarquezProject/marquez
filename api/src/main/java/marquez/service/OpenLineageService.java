@@ -196,7 +196,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
 
   private DatasetVersionId buildDatasetVersionId(ExtendedDatasetVersionRow ds) {
     return DatasetVersionId.builder()
-        .versionUuid(ds.getUuid())
+        .version(ds.getUuid())
         .namespace(NamespaceName.of(ds.getNamespaceName()))
         .name(DatasetName.of(ds.getDatasetName()))
         .build();
