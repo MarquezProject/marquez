@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.UUID;
 import marquez.BaseIntegrationTest;
-import marquez.IntegrationTests;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.Run;
@@ -18,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
-public class JobIntegrationTest extends BaseIntegrationTest {
+public class JobResourceIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   public void setup() {
