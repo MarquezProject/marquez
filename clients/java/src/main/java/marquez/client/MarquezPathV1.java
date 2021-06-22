@@ -1,17 +1,62 @@
 package marquez.client;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.client.models.RunState;
+import org.apache.maven.shared.utils.StringUtils;
 
 class MarquezPathV1 {
-
   @VisibleForTesting static final String BASE_PATH = "/api/v1";
 
   @VisibleForTesting
   static String path(String pathTemplate, @Nullable String... pathArgs) {
-    return BASE_PATH + String.format(pathTemplate, (Object[]) pathArgs);
+    /*
+     Converts path template (prepended with BASE_PATH), where path parts are separated
+     by slashes, and formats strings filling pathArgs in place of %s placeholder.
+     This is required to properly handle double slashes in URLs using URIBuilder.
+     Example:
+     Path template "/namespaces/%s/datasets/%s/versions/%s"
+     with args
+     "s3://bucket", "dName", "vName"
+     is converted to
+     "/api/v1/namespaces/s3%3A%2F%2Fbucket/datasets/nName/versions/vName"
+    */
+    int argsLength = pathArgs == null ? 0 : pathArgs.length;
+    if (StringUtils.countMatches(pathTemplate, "%s") != argsLength) {
+      throw new MarquezClientException(
+          String.format(
+              "Amount of placeholders %s differ from amount of provided path arguments %s",
+              pathTemplate.split("%s").length - 1, argsLength));
+    }
+
+    pathTemplate = BASE_PATH + pathTemplate;
+    if (pathArgs == null) {
+      return pathTemplate;
+    }
+
+    // Replace placeholders with path templates, removing empty strings
+    Iterator<String> iterator = Arrays.stream(pathArgs).iterator();
+    return Stream.of(pathTemplate.split("/"))
+        .filter(it -> it != null && !it.isEmpty())
+        .map(it -> it.equals("%s") ? iterator.next() : it)
+        .map(MarquezPathV1::encode)
+        .collect(Collectors.joining("/", "/", ""));
+  }
+
+  static String encode(String input) {
+    try {
+      return URLEncoder.encode(input, StandardCharsets.UTF_8.toString());
+    } catch (UnsupportedEncodingException e) {
+      throw new MarquezClientException(e);
+    }
   }
 
   static String listNamespacesPath() {
