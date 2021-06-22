@@ -113,7 +113,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
   public JobVersionId buildJobVersionId(UpdateLineageRow record) {
     if (record.getJobVersionBag() != null) {
       return JobVersionId.builder()
-          .versionUuid(record.getJobVersionBag().getJobVersionRow().getUuid())
+          .version(record.getJobVersionBag().getJobVersionRow().getUuid())
           .namespace(NamespaceName.of(record.getNamespace().getName()))
           .name(JobName.of(record.getJob().getName()))
           .build();

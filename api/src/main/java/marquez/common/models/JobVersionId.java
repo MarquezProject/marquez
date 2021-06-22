@@ -27,5 +27,5 @@ import lombok.Value;
 public class JobVersionId {
   @NonNull NamespaceName namespace;
   @NonNull JobName name;
-  @NonNull UUID versionUuid;
+  @NonNull UUID version;
 }

@@ -19,39 +19,39 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import marquez.common.models.JobId;
+import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
+import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.Version;
 
 @EqualsAndHashCode
 @ToString
 public final class JobVersion {
-  @Getter private final JobId id;
+  @Getter private final JobVersionId id;
   @Getter private final JobName name;
   @Getter private final Instant createdAt;
   @Getter private final Version version;
   @Getter private final NamespaceName namespace;
   @Nullable private final URL location;
   @Getter private final ImmutableMap<String, String> context;
-  @Getter private final List<UUID> inputs;
-  @Getter private final List<UUID> outputs;
+  @Getter private final List<DatasetId> inputs;
+  @Getter private final List<DatasetId> outputs;
 
   public JobVersion(
-      @NonNull final JobId id,
+      @NonNull final JobVersionId id,
       @NonNull final JobName name,
       @NonNull final Instant createdAt,
       @NonNull final Version version,
       @Nullable final URL location,
       @Nullable final ImmutableMap<String, String> context,
-      List<UUID> inputs,
-      List<UUID> outputs) {
+      List<DatasetId> inputs,
+      List<DatasetId> outputs) {
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;

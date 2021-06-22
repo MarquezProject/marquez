@@ -92,6 +92,9 @@ public final class Columns {
   public static final String OUTPUT_UUIDS = "output_uuids";
   public static final String IO_TYPE = "io_type";
 
+  public static final String INPUT_DATASETS = "input_datasets";
+  public static final String OUTPUT_DATASETS = "output_datasets";
+
   /* JOB VERSION ROW COLUMNS */
   public static final String JOB_UUID = "job_uuid";
   public static final String JOB_CONTEXT_UUID = "job_context_uuid";

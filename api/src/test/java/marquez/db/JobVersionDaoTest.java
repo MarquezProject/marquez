@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.BaseIntegrationTest;
+import marquez.api.models.JobVersion;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.common.models.Version;
@@ -94,6 +95,9 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
 
     final int rowsAfterConflict = jobVersionDao.count();
     assertThat(rowsAfterConflict).isEqualTo(rowsBeforeConflict);
+    Optional<JobVersion> jobVersion = jobVersionDao
+        .findJobVersion(jobRow.getNamespaceName(), jobRow.getName(), version.getValue());
+    assertThat(jobVersion).isPresent();
   }
 
   @Test
