@@ -29,7 +29,7 @@ java {
 ext {
     jdbi3Version = '3.20.1'
     prometheusVersion = '0.10.0'
-    testcontainersVersion = '1.15.2'
+    testcontainersVersion = '1.15.3'
     sentryVersion = '4.3.0'
 }
 
