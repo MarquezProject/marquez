@@ -2,6 +2,7 @@ version: "3.7"
 services:
   seed_marquez:
     image: "marquezproject/marquez:${TAG}"
+    container_name: seed-marquez-with-metadata
     environment:
       - MARQUEZ_HOST=api
       - MARQUEZ_PORT=5000

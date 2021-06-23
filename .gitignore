@@ -20,6 +20,9 @@ clients/java/out/
 dist/
 integrations/airflow/tests/integration/integration-requirements.txt
 integrations/airflow/tests/integration/requirements.txt
+examples/airflow/whl
+examples/airflow/requirements.txt
+examples/airflow/marquez.env
 out/*
 
 # Marquez configuration

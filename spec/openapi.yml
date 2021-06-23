@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.15.2-rc.2
+  version: 0.15.2
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -436,6 +436,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/graph'
+
+  /tags/{tag}:
+    parameters:
+      - $ref: '#/components/parameters/tag'
+    put:
+      summary: Create a tag
+      description: Creates a new tag object.
+      tags:
+        - Tags
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newTag'
 
   /tags:
     get:
@@ -1701,3 +1715,12 @@ components:
         destination:
           description: The ID of the destination node.
           type: string
+
+    newTag:
+      type: object
+      properties:
+        description:
+          description: The description of the tag.
+          type: string
+      example:
+        description: My first tag!

@@ -37,7 +37,9 @@ public interface TagDao {
   @SqlQuery(
       "INSERT INTO tags (uuid, created_at, updated_at, name, description) "
           + "VALUES (:uuid, :updatedAt, :updatedAt, :name, :description) "
-          + "ON CONFLICT(name) DO UPDATE SET updated_at = EXCLUDED.updated_at "
+          + "ON CONFLICT(name) DO UPDATE SET "
+          + "updated_at = EXCLUDED.updated_at, "
+          + "description = EXCLUDED.description "
           + "RETURNING *")
   TagRow upsert(UUID uuid, Instant updatedAt, String name, String description);
 

@@ -27,9 +27,9 @@ java {
 }
 
 ext {
-    jdbi3Version = '3.20.0'
-    prometheusVersion = '0.10.0'
-    testcontainersVersion = '1.15.2'
+    jdbi3Version = '3.20.1'
+    prometheusVersion = '0.11.0'
+    testcontainersVersion = '1.15.3'
     sentryVersion = '4.3.0'
 }
 
@@ -47,7 +47,7 @@ dependencies {
     compile "org.jdbi:jdbi3-core:${jdbi3Version}"
     compile "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     compile "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
-    compile 'com.google.guava:guava:30.1-jre'
+    compile 'com.google.guava:guava:30.1.1-jre'
     compile 'org.dhatim:dropwizard-sentry:2.0.20'
     compile "io.sentry:sentry:${sentryVersion}"
     compile 'org.flywaydb:flyway-core:6.5.7'

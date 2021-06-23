@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import lombok.With;
 
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -38,7 +39,7 @@ public class DatasetRow {
   @Getter @NonNull private final String physicalName;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
-  @Nullable private final UUID currentVersionUuid;
+  @With @Nullable private final UUID currentVersionUuid;
 
   public Optional<Instant> getLastModifiedAt() {
     return Optional.ofNullable(lastModifiedAt);
