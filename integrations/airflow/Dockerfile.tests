@@ -1,4 +1,6 @@
 FROM python:3.6-slim
+RUN apt-get update && \
+    apt-get install -y libmysqlclient-dev
 RUN mkdir /app
 ADD airflow/setup.py /app
 ADD airflow/README.md /app
