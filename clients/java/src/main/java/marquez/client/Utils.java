@@ -59,7 +59,11 @@ public final class Utils {
 
   public static URL toUrl(@NonNull final String urlString) {
     try {
-      return new URL(urlString);
+      String url = urlString;
+      if (url.endsWith("/")) {
+        url = url.substring(0, url.length() - 1);
+      }
+      return new URL(url);
     } catch (MalformedURLException e) {
       final AssertionError error = new AssertionError("Malformed URL: " + urlString);
       error.initCause(e);

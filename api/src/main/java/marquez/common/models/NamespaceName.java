@@ -41,7 +41,8 @@ public final class NamespaceName {
     checkArgument(
         PATTERN.matcher(value).matches(),
         "namespace '%s' must contain only letters (a-z, A-Z), numbers (0-9), "
-            + "underscores (_), dashes (-), or dots (.) with a maximum length of %s characters.",
+            + "underscores (_), dashes (-), colons (:), slashes (/) or dots (.) with a maximum "
+            + "length of %s characters.",
         value,
         MAX_SIZE);
     this.value = value;
