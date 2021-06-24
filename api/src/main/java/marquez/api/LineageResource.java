@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.service.ServiceFactory;
 import marquez.service.models.NodeId;
 
-@Path("/api/v1-beta")
+@Path("/api/")
 @Slf4j
 public class LineageResource extends BaseResource {
   private static final String DEFAULT_DEPTH = "20";
@@ -32,7 +32,7 @@ public class LineageResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("/lineage")
+  @Path("{version:v1-beta|v1}/lineage")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response getLineage(
