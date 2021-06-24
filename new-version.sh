@@ -18,6 +18,7 @@
 # Requirements:
 #   * You're on the 'main' branch
 #   * You've installed 'bump2version'
+#   * You've installed 'redoc-cli'
 #
 # Usage: $ ./new-version.sh --release-version RELEASE_VERSION --next-version NEXT_VERSION
 
@@ -55,6 +56,12 @@ cd "${project_root}"
 # Verify bump2version is installed
 if [[ ! $(type -P bump2version) ]]; then
   echo "bump2version not installed! Please see https://github.com/c4urself/bump2version#installation"
+  exit 1;
+fi
+
+# Verify redoc-cli is installed
+if [[ ! $(type -P redoc-cli) ]]; then
+  echo "redoc-cli not installed! Please see https://www.npmjs.com/package/redoc-cli"
   exit 1;
 fi
 
@@ -135,20 +142,23 @@ sed -i "" "s/marquez-java:.*/marquez-java:${RELEASE_VERSION}/g" ./clients/java/R
 sed -i "" "s/<version>.*/<version>${RELEASE_VERSION}<\/version>/g" ./integrations/spark/README.md
 sed -i "" "s/marquez-spark:.*/marquez-spark:${RELEASE_VERSION}/g" ./integrations/spark/README.md
 
-# (5) Prepare release commit
+# (5) Bundle openAPI docs
+redoc-cli bundle spec/openapi.yml -o docs/openapi.html  --title "Marquez API Reference"
+
+# (6) Prepare release commit
 git commit -sam "Prepare for release ${RELEASE_VERSION}"
 
-# (6) Pull latest tags, then prepare release tag
+# (7) Pull latest tags, then prepare release tag
 git fetch --all --tags
 git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
-# (7) Prepare next development version
+# (8) Prepare next development version
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 
-# (8) Prepare next development version commit
+# (9) Prepare next development version commit
 git commit -sam "Prepare next development version"
 
-# (9) Push commits and tag
+# (10) Push commits and tag
 git push origin main && git push origin "${RELEASE_VERSION}"
 
 echo "DONE!"

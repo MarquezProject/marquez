@@ -26,8 +26,8 @@ java {
 }
 
 ext {
-    bytebuddyVersion = '1.10.21'
-    sparkVersion = '2.4.7'
+    bytebuddyVersion = '1.11.5'
+    sparkVersion = '2.4.8'
     jacksonVersion = '2.12.3'
 }
 

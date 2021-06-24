@@ -33,9 +33,8 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
     this.backend = backend;
   }
 
-  private static String path(String path, Map<String, Object> queryParams) {
-    StringBuilder pathBuilder = new StringBuilder();
-    pathBuilder.append(path);
+  private static String pathWithQueryParams(String path, Map<String, Object> queryParams) {
+    StringBuilder pathBuilder = new StringBuilder(path);
     if (queryParams != null && !queryParams.isEmpty()) {
       boolean first = true;
       for (Entry<String, Object> entry : queryParams.entrySet()) {
@@ -89,7 +88,7 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
   public void markRunAs(String runId, RunState runState, Instant at) {
     Map<String, Object> queryParams =
         at == null ? null : ImmutableMap.of("at", ISO_INSTANT.format(at));
-    backend.post(path(runTransitionPath(runId, runState), queryParams));
+    backend.post(pathWithQueryParams(runTransitionPath(runId, runState), queryParams));
   }
 
   @Override

@@ -102,8 +102,19 @@ public class MarquezHttpTest {
     final String pathArg = "default";
     final String path = String.format(pathTemplate, pathArg);
 
-    URL expected = new URL(BASE_URL_STRING + BASE_PATH + path);
-    URL actual = marquezUrl.from(path(path, pathArg));
+    URL expected = new URL(BASE_URL + BASE_PATH + path);
+    URL actual = marquezUrl.from(path(pathTemplate, pathArg));
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void testClient_properlyFormatsNamespaces() throws Exception {
+    final String pathTemplate = "/namespaces/%s";
+    final String pathArg = "database://localhost:1234";
+    final String path = "/namespaces/database%3A%2F%2Flocalhost%3A1234";
+
+    URL expected = new URL(BASE_URL + BASE_PATH + path);
+    URL actual = marquezUrl.from(path(pathTemplate, pathArg));
     assertThat(actual).isEqualTo(expected);
   }
 
