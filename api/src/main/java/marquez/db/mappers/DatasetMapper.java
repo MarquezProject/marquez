@@ -77,7 +77,7 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
           stringOrNull(results, Columns.DESCRIPTION),
           Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)),
-          toFacetsOrNull(results));
+          toFacetsOrNull(results, Columns.FACETS));
     } else {
       return new Stream(
           new DatasetId(
@@ -94,7 +94,7 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
           stringOrNull(results, Columns.DESCRIPTION),
           Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)),
-          toFacetsOrNull(results));
+          toFacetsOrNull(results, Columns.FACETS));
     }
   }
 

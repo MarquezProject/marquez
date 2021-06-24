@@ -315,7 +315,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JOB_VERSION_LIST'
+                $ref: '#/components/schemas/jobVersionList'
 
   /namespaces/{namespace}/jobs/{job}/versions/{version}:
     parameters:
@@ -333,7 +333,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JOB_VERSION'
+                $ref: '#/components/schemas/jobVersion'
 
   /namespaces/{namespace}/jobs/{job}/runs:
     parameters:
@@ -860,19 +860,22 @@ components:
         fields: []
         description: "My first stream dataset!"
 
+    datasetId:
+      type: object
+      description: The ID of the dataset.
+      properties:
+        namespace:
+          type: string
+          description: The namespace of the dataset.
+        name:
+          type: string
+          description: The name of the dataset.
+
     DATASET:
       type: object
       properties:
         id:
-          description: The ID of the dataset.
-          type: object
-          properties:
-            namespace:
-              type: string
-              description: The namespace of the dataset.
-            name:
-              type: string
-              description: The name of the dataset.
+          $ref: '#/components/schemas/datasetId'
         type:
           description: The type of the dataset.
           type: string
@@ -1136,27 +1139,13 @@ components:
           description: The set of **input** datasets.
           type: array
           items:
-            type: object
-            properties:
-              namespace:
-                type: string
-                description: The namespace of the **input** dataset.
-              name:
-                type: string
-                description: The name of the **input** dataset.
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         outputs:
           description: The set of **output** datasets.
           type: array
           items:
-            type: object
-            properties:
-              namespace:
-                type: string
-                description: The namespace of the **output** dataset.
-              name:
-                type: string
-                description: The name of the **output** dataset.
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         location:
           description: The URL of the job source code or artifact.
@@ -1217,27 +1206,13 @@ components:
           description: The set of **input** datasets.
           type: array
           items:
-            type: object
-            properties:
-              namespace:
-                type: string
-                description: The namespace of the **input** dataset.
-              name:
-                type: string
-                description: The name of the **input** dataset.
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         outputs:
           description: The set of **output** datasets.
           type: array
           items:
-            type: object
-            properties:
-              namespace:
-                type: string
-                description: The namespace of the **output** dataset.
-              name:
-                type: string
-                description: The name of the **output** dataset.
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         location:
           description: The URL of the job source code or artifact.
@@ -1316,14 +1291,14 @@ components:
           }
         }
 
-    JOB_VERSION_LIST:
+    jobVersionList:
       type: object
       properties:
         versions:
           items:
-            $ref: '#/components/schemas/JOB_VERSION'
+            $ref: '#/components/schemas/jobVersion'
 
-    JOB_VERSION:
+    jobVersion:
       type: object
       properties:
         id:
@@ -1353,20 +1328,16 @@ components:
           description: The namespace of the job.
           type: string
         inputs:
-          description: The set of **input** dataset ids.
+          description: The set of **input** datasets
           type: array
           items:
-            type: string
-            description: the dataset UUID for each input dataset
-            format: UUID
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         outputs:
-          description: The set of **output** dataset ids.
+          description: The set of **output** datasets
           type: array
           items:
-            type: string
-            description: the dataset UUID for each output dataset
-            format: UUID
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         location:
           description: The URL of the job source code or artifact for the given job version.
@@ -1376,6 +1347,46 @@ components:
           description: Deprecated- Use facet. A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
           type: object
           deprecated: true
+        latestRun:
+          description: The latest run associated with the job version.
+          type: object
+          properties:
+            id:
+              description: The ID of the run.
+              type: string
+              format: uuid
+            createdAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+              type: string
+              format: date-time
+            updatedAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+              type: string
+              format: date-time
+            nominalStartTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+              type: string
+              format: date-time
+            nominalEndTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+              type: string
+              format: date-time
+            state:
+              description: The current state of the run.
+              type: string
+              enum: [ NEW, RUNNING, COMPLETED, FAILED, ABORTED ]
+            startedAt:
+              type: integer
+              description: The time at which the run was started. Measured in seconds since the Unix epoch.
+            endedAt:
+              type: integer
+              description: The time at which the run was ended. Measured in seconds since the Unix epoch.
+            durationMs:
+              type: integer
+              description: The total duration of the run. Measured in milliseconds.
+            args:
+              description: The arguments of the run.
+              type: object
         facets:
           $ref: '#/components/schemas/jobFacets'
       example:
@@ -1388,8 +1399,8 @@ components:
         version: 56472c57-a2ef-4218-b7b7-d2af02a343fd
         createdAt: 2019-05-09T19:49:24.201361Z
         namespace: my-namespace
-        inputs: ["7b10f8dd-6091-403d-ab86-20de85d23a4a", "95eaa980-0894-4f66-bccb-64a6697407ad"]
-        outputs: ["01d658b0-d1ab-4842-89bb-3ba2edb9f65d"]
+        inputs: [{namespace: my-namespace, name: my-dataset}]
+        outputs: []
         location: https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!

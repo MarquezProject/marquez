@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.JobVersion;
@@ -21,14 +22,22 @@ import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.Version;
 import marquez.db.Columns;
+import marquez.service.models.Run;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
 @Slf4j
 public class JobVersionMapper implements RowMapper<JobVersion> {
+  private final RunMapper runMapper = new RunMapper("run_");
+
   @Override
   public JobVersion map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
+    Set<String> columnNames = MapperUtils.getColumnNames(results.getMetaData());
+    Run latestRun = null;
+    if (columnNames.contains(Columns.RUN_UUID) && results.getString(Columns.RUN_UUID) != null) {
+      latestRun = runMapper.map(results, context);
+    }
     return new JobVersion(
         new JobVersionId(
             NamespaceName.of(stringOrThrow(results, Columns.NAMESPACE_NAME)),
@@ -36,11 +45,12 @@ public class JobVersionMapper implements RowMapper<JobVersion> {
             uuidOrThrow(results, Columns.VERSION)),
         JobName.of(stringOrThrow(results, Columns.JOB_NAME)),
         timestampOrThrow(results, Columns.CREATED_AT),
-        Version.of(uuidOrThrow(results, Columns.ROW_UUID)),
+        Version.of(uuidOrThrow(results, Columns.VERSION)),
         urlOrNull(results, Columns.LOCATION),
         mapOrNull(results, Columns.CONTEXT),
         toDatasetIdsList(results, Columns.INPUT_DATASETS),
-        toDatasetIdsList(results, Columns.OUTPUT_DATASETS));
+        toDatasetIdsList(results, Columns.OUTPUT_DATASETS),
+        latestRun);
   }
 
   private List<DatasetId> toDatasetIdsList(ResultSet rs, String column) throws SQLException {

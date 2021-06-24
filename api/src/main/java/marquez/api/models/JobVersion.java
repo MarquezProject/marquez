@@ -29,6 +29,7 @@ import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.Version;
+import marquez.service.models.Run;
 
 @EqualsAndHashCode
 @ToString
@@ -42,6 +43,7 @@ public final class JobVersion {
   @Getter private final ImmutableMap<String, String> context;
   @Getter private final List<DatasetId> inputs;
   @Getter private final List<DatasetId> outputs;
+  @Getter @Nullable private final Run latestRun;
 
   public JobVersion(
       @NonNull final JobVersionId id,
@@ -51,7 +53,8 @@ public final class JobVersion {
       @Nullable final URL location,
       @Nullable final ImmutableMap<String, String> context,
       List<DatasetId> inputs,
-      List<DatasetId> outputs) {
+      List<DatasetId> outputs,
+      @Nullable Run latestRun) {
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;
@@ -61,6 +64,7 @@ public final class JobVersion {
     this.context = (context == null) ? ImmutableMap.of() : context;
     this.inputs = inputs;
     this.outputs = outputs;
+    this.latestRun = latestRun;
   }
 
   public Optional<URL> getLocation() {

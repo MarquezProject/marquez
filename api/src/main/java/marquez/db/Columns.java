@@ -113,6 +113,8 @@ public final class Columns {
   public static final String START_RUN_STATE_UUID = "start_run_state_uuid";
   public static final String END_RUN_STATE_UUID = "end_run_state_uuid";
 
+  public static final String JOB_VERSION = "job_version";
+
   /* RUN ARGS ROW COLUMNS */
   public static final String ARGS = "args";
 

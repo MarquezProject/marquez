@@ -54,7 +54,7 @@ public interface JobVersionDao extends BaseDao {
   /** An {@code enum} used to determine the input / output dataset type for a given job version. */
   enum IoType {
     INPUT,
-    OUTPUT;
+    OUTPUT
   }
 
   String BASE_SELECT_ON_JOB_VERSIONS =
@@ -67,21 +67,37 @@ public interface JobVersionDao extends BaseDao {
           + "    FROM job_versions_io_mapping io\n"
           + "    INNER JOIN job_versions jv ON jv.uuid=io.job_version_uuid\n"
           + "    INNER JOIN datasets ds ON ds.uuid=io.dataset_uuid\n"
+          + "    WHERE jv.namespace_name=:namespaceName AND jv.job_name=:jobName\n"
           + "    GROUP BY io.job_version_uuid\n"
           + ")\n"
-          + "SELECT jv.*, dsio.input_datasets, dsio.output_datasets, jc.context\n"
+          + "SELECT jv.*, dsio.input_datasets, dsio.output_datasets, jc.context,\n"
+          + "r.uuid AS run_uuid, r.created_at AS run_created_at, r.updated_at AS run_updated_at,\n"
+          + "r.nominal_start_time AS run_nominal_start_time, r.nominal_end_time AS run_nominal_end_time,\n"
+          + "r.current_run_state AS run_current_run_state, r.started_at AS run_started_at, r.ended_at AS run_ended_at,\n"
+          + "r.namespace_name AS run_namespace_name, r.job_name AS run_job_name, r.location AS run_location,\n"
+          + "ra.args AS run_args, ctx.context AS run_context, f.facets AS run_facets\n"
           + "FROM job_versions AS jv\n"
           + "LEFT JOIN job_version_io dsio ON dsio.job_version_uuid=jv.uuid\n"
-          + "LEFT OUTER JOIN job_contexts AS jc ON jc.uuid = jv.job_context_uuid\n";
+          + "LEFT OUTER JOIN job_contexts AS jc ON jc.uuid = jv.job_context_uuid\n"
+          + "LEFT OUTER JOIN runs r ON r.uuid=jv.latest_run_uuid\n"
+          + "LEFT OUTER JOIN\n"
+          + "(\n"
+          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
+          + "    FROM lineage_events le\n"
+          + "    WHERE le.job_namespace=:namespaceName AND le.job_name=:jobName\n"
+          + "    GROUP BY le.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
+          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
+          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n";
 
   @SqlQuery(
       BASE_SELECT_ON_JOB_VERSIONS
-          + "WHERE namespace_name = :namespaceName AND job_name  = :jobName AND jv.version = :jobVersionUuid")
+          + "WHERE jv.namespace_name = :namespaceName AND jv.job_name  = :jobName AND jv.version = :jobVersionUuid")
   Optional<JobVersion> findJobVersion(String namespaceName, String jobName, UUID jobVersionUuid);
 
   @SqlQuery(
       BASE_SELECT_ON_JOB_VERSIONS
-          + "WHERE namespace_name = :namespaceName AND job_name = :jobName "
+          + "WHERE jv.namespace_name = :namespaceName AND jv.job_name = :jobName "
           + "LIMIT :limit OFFSET :offset")
   List<JobVersion> findAllJobVersions(String namespaceName, String jobName, int limit, int offset);
 
