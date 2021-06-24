@@ -25,12 +25,20 @@ if [[ "$(docker images -q marquez-airflow-base:latest 2> /dev/null)" == "" ]]; t
   exit 1
 fi
 
-# maybe overkill
-MARQUEZ_AIRFLOW_WHL=$(docker run marquez-airflow-base:latest sh -c "ls /whl/marquez*")
-MARQUEZ_AIRFLOW_WHL_ALL=$(docker run marquez-airflow-base:latest sh -c "ls /whl/*")
+# Allow containers to read gcloud credentials
+mkdir -p gcloud
+echo $GCLOUD_SERVICE_KEY > gcloud/gcloud-service-key.json
+chmod 644 gcloud/gcloud-service-key.json
 
+MARQUEZ_AIRFLOW_WHL=$(docker run marquez-airflow-base:latest sh -c "ls /whl/marquez*")
 # Add revision to requirements.txt
-echo "${MARQUEZ_AIRFLOW_WHL_ALL}" > requirements.txt
+echo "${MARQUEZ_AIRFLOW_WHL}" > requirements.txt
+
+# overkill version
+# MARQUEZ_AIRFLOW_WHL_ALL=$(docker run marquez-airflow-base:latest sh -c "ls /whl/*")
+# Add revision to requirements.txt
+# echo "${MARQUEZ_AIRFLOW_WHL_A::}" > requirements.txt
+
 
 # Add revision to integration-requirements.txt
 cat > integration-requirements.txt <<EOL
@@ -50,6 +58,7 @@ pandas-gbq>=0.13.2
 google-cloud-storage>=1.31.2
 retrying==1.3.3
 snowflake-connector-python==2.4.3
+pytest==6.2.2
 marquez-python
 ${MARQUEZ_AIRFLOW_WHL}
 EOL

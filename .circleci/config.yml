@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  gcp-cli: circleci/gcp-cli@2.2.0
+
 # Define reusable config (see: https://yaml.org/spec/1.2/spec.html#id2765878)
 checkout_project_root: &checkout_project_root
   # Override checkout path to project root (see: https://circleci.com/docs/2.0/configuration-reference/#checkout)
@@ -198,7 +201,7 @@ jobs:
       - run: pip install -e .[dev]
       - run: flake8 --exclude integration
       - run: airflow initdb
-      - run: pytest --cov=marquez_airflow tests/
+      - run: pytest --cov=marquez_airflow --ignore tests/integration tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
   build-integration-airflow:
@@ -244,6 +247,8 @@ jobs:
     machine: true
     steps:
       - *checkout_project_root
+      - gcp-cli/install
+      - gcp-cli/initialize
       - run: ./../.circleci/get-docker-compose.sh
       - run: bash -c '(cd ~/marquez && docker build -t marquezproject/marquez . )'
       - run: docker build -f airflow/Dockerfile.tests -t marquez-airflow-base .
@@ -295,8 +300,11 @@ workflows:
       - test-integration-dbt-bigquery
       - test-integration-dbt-snowflake
       - integration-test-airflow:
+          context: integration-tests
           requires:
             - test-integration-airflow
+            - test-integration-common
+            - test-client-python
   release:
     jobs:
       - build-integration-common:

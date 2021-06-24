@@ -84,6 +84,9 @@ class BigQueryFacets:
     output: Optional[Dataset] = attr.ib(default=None)
 
 
+g_logger = logging.getLogger(__name__)
+
+
 class BigQueryDatasetsProvider:
     def __init__(
         self,
@@ -93,9 +96,10 @@ class BigQueryDatasetsProvider:
         self.client = client
         if client is None:
             self.client = bigquery.Client()
-        self.logger = logger
-        if logger is None:
-            self.logger = logging.getLogger(__name__)
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = g_logger
 
     def get_facets(self, job_id: str) -> BigQueryFacets:
         inputs = []
@@ -179,24 +183,21 @@ class BigQueryDatasetsProvider:
         input_table_names = [
             self._bq_table_name(bq_t) for bq_t in bq_input_tables
         ]
-        sources = [
-            self._source() for bq_t in bq_input_tables
-        ]
         try:
             return [
                 Dataset.from_table_schema(
-                    source=source,
+                    source=self._source(),
                     table_schema=table_schema
                 )
-                for table_schema, source in zip(self._get_table_schemas(
+                for table_schema in (self._get_table_schemas(
                     input_table_names
-                ), sources)
+                ))
             ]
         except Exception as e:
             self.logger.warning(f'Could not extract schema from bigquery. {e}')
             return [
-                Dataset.from_table(source, table)
-                for table, source in zip(input_table_names, sources)
+                Dataset.from_table(self._source(), table)
+                for table in input_table_names
             ]
 
     def _get_output_from_bq(self, properties) -> Optional[Dataset]:
