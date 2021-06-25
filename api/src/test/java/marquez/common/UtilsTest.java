@@ -28,9 +28,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
@@ -68,6 +72,12 @@ public class UtilsTest {
     final Object actual =
         Utils.fromJson(this.getClass().getResourceAsStream("/lineage/node.json"), TYPE);
     assertThat(actual).isNotNull();
+  }
+
+  @Test
+  public void testFromIOExceptionThrownByFromJson() {
+    assertThatExceptionOfType(UncheckedIOException.class)
+        .isThrownBy(() -> Utils.fromJson(new ByteArrayInputStream(JSON.getBytes()), new TypeReference<List>() {}));
   }
 
   @Test
