@@ -26,9 +26,17 @@ import marquez.service.models.Run;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
+/**
+ * Convert a database row to a {@link JobVersion}. For the {@link JobVersion#latestRun}, we delegate
+ * to the {@link RunMapper} with a specified prefix of {@value #RUN_COLUMN_PREFIX}, meaning all
+ * run-related columns should be prefixed in the SQL query. This avoids conflicts between common
+ * column names, such as created_at, uuid, and context.
+ */
 @Slf4j
 public class JobVersionMapper implements RowMapper<JobVersion> {
-  private final RunMapper runMapper = new RunMapper("run_");
+
+  public static final String RUN_COLUMN_PREFIX = "run_";
+  private final RunMapper runMapper = new RunMapper(RUN_COLUMN_PREFIX);
 
   @Override
   public JobVersion map(@NonNull ResultSet results, @NonNull StatementContext context)

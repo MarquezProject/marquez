@@ -31,6 +31,10 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.Version;
 import marquez.service.models.Run;
 
+/**
+ * Models a single version of a {@link marquez.service.models.Job}. Optionally includes the latest
+ * {@link Run} for the version of the {@link marquez.service.models.Job}.
+ */
 @EqualsAndHashCode
 @ToString
 public final class JobVersion {

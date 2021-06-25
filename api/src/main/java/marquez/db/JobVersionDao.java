@@ -57,6 +57,10 @@ public interface JobVersionDao extends BaseDao {
     OUTPUT
   }
 
+  /**
+   * Returns JobVersion fields, along with Run-related fields, prefixed with "run_". Input and
+   * Output datasets are constructed as JSON strings that can be deserialized into DatasetIds.
+   */
   String BASE_SELECT_ON_JOB_VERSIONS =
       "WITH job_version_io AS (\n"
           + "    SELECT io.job_version_uuid,\n"
