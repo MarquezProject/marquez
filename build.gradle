@@ -57,11 +57,11 @@ subprojects {
     ext {
         assertjVersion = '3.20.2'
         dropwizardVersion = '2.0.23'
-        junit5Version = '5.7.1'
-        lombokVersion = '1.18.18'
-        mockitoVersion = '3.8.0'
+        junit5Version = '5.7.2'
+        lombokVersion = '1.18.20'
+        mockitoVersion = '3.10.0'
         slf4jVersion = '1.7.30'
-        postgresqlVersion = '42.2.19'
+        postgresqlVersion = '42.2.20'
         isReleaseVersion = !version.endsWith('SNAPSHOT')
     }
 
