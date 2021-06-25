@@ -28,7 +28,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -77,7 +76,10 @@ public class UtilsTest {
   @Test
   public void testFromIOExceptionThrownByFromJson() {
     assertThatExceptionOfType(UncheckedIOException.class)
-        .isThrownBy(() -> Utils.fromJson(new ByteArrayInputStream(JSON.getBytes()), new TypeReference<List>() {}));
+        .isThrownBy(
+            () ->
+                Utils.fromJson(
+                    new ByteArrayInputStream(JSON.getBytes()), new TypeReference<List>() {}));
   }
 
   @Test
