@@ -78,8 +78,10 @@ public interface JobVersionDao extends BaseDao {
           + "r.uuid AS run_uuid, r.created_at AS run_created_at, r.updated_at AS run_updated_at,\n"
           + "r.nominal_start_time AS run_nominal_start_time, r.nominal_end_time AS run_nominal_end_time,\n"
           + "r.current_run_state AS run_current_run_state, r.started_at AS run_started_at, r.ended_at AS run_ended_at,\n"
-          + "r.namespace_name AS run_namespace_name, r.job_name AS run_job_name, r.location AS run_location,\n"
-          + "ra.args AS run_args, ctx.context AS run_context, f.facets AS run_facets\n"
+          + "r.namespace_name AS run_namespace_name, r.job_name AS run_job_name,\n"
+          + "jv.version AS run_job_version, r.location AS run_location,\n"
+          + "ra.args AS run_args, ctx.context AS run_context, f.facets AS run_facets,\n"
+          + "ri.input_versions AS run_input_versions, ro.output_versions AS run_output_versions\n"
           + "FROM job_versions AS jv\n"
           + "LEFT JOIN job_version_io dsio ON dsio.job_version_uuid=jv.uuid\n"
           + "LEFT OUTER JOIN job_contexts AS jc ON jc.uuid = jv.job_context_uuid\n"
@@ -92,7 +94,22 @@ public interface JobVersionDao extends BaseDao {
           + "    GROUP BY le.run_uuid\n"
           + ") AS f ON r.uuid=f.run_uuid\n"
           + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
-          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n";
+          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + " SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
+          + "        'name', dv.dataset_name,\n"
+          + "        'version', dv.version)) AS input_versions\n"
+          + " FROM runs_input_mapping im\n"
+          + " INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid\n"
+          + " GROUP BY im.run_uuid\n"
+          + ") ri ON ri.run_uuid=r.uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "  SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
+          + "                                              'name', dataset_name,\n"
+          + "                                              'version', version)) AS output_versions\n"
+          + "  FROM dataset_versions\n"
+          + "  GROUP BY run_uuid\n"
+          + ") ro ON ro.run_uuid=r.uuid\n";
 
   @SqlQuery(
       BASE_SELECT_ON_JOB_VERSIONS

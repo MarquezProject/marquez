@@ -83,10 +83,10 @@ public final class RunMapper implements RowMapper<Run> {
         toArgs(results, columnPrefix + Columns.ARGS),
         stringOrThrow(results, columnPrefix + Columns.NAMESPACE_NAME),
         stringOrThrow(results, columnPrefix + Columns.JOB_NAME),
-        uuidOrNull(results, columnPrefix + Columns.JOB_VERSION_UUID),
+        uuidOrNull(results, columnPrefix + Columns.JOB_VERSION),
         stringOrNull(results, columnPrefix + Columns.LOCATION),
         columnNames.contains(columnPrefix + Columns.INPUT_VERSIONS)
-            ? toDatasetVersion(results,columnPrefix + Columns.INPUT_VERSIONS)
+            ? toDatasetVersion(results, columnPrefix + Columns.INPUT_VERSIONS)
             : ImmutableList.of(),
         columnNames.contains(columnPrefix + Columns.OUTPUT_VERSIONS)
             ? toDatasetVersion(results, columnPrefix + Columns.OUTPUT_VERSIONS)

@@ -81,7 +81,7 @@ public interface RunDao extends BaseDao {
 
   String BASE_FIND_RUN_SQL =
       "SELECT r.*, ra.args, ctx.context, f.facets,\n"
-          + "jv.namespace_name, jv.job_name, jv.version,\n"
+          + "jv.namespace_name, jv.job_name, jv.version AS job_version,\n"
           + "ri.input_versions, ro.output_versions\n"
           + "FROM runs AS r\n"
           + "LEFT OUTER JOIN\n"
@@ -117,7 +117,7 @@ public interface RunDao extends BaseDao {
 
   @SqlQuery(
       "SELECT r.*, ra.args, ctx.context, f.facets,\n"
-          + "jv.namespace_name, jv.job_name, jv.version,\n"
+          + "jv.namespace_name, jv.job_name, jv.version AS job_version,\n"
           + "ri.input_versions, ro.output_versions\n"
           + "FROM runs AS r\n"
           + "LEFT OUTER JOIN\n"
