@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetVersionId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.db.LineageDao;
@@ -29,6 +30,7 @@ import marquez.service.models.Node;
 import marquez.service.models.NodeId;
 import marquez.service.models.NodeType;
 import marquez.service.models.Run;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.Condition;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.api.ObjectAssert;
@@ -147,17 +149,26 @@ public class LineageServiceTest {
         .isEmpty();
 
     // assert the second run of writeJob is returned
-    assertThat(lineage.getGraph())
-        .filteredOn(node -> node.getType().equals(NodeType.JOB) && jobNameEquals(node, "writeJob"))
-        .hasSize(1)
-        .first()
+    AbstractObjectAssert<?, Run> runAssert =
+        assertThat(lineage.getGraph())
+            .filteredOn(
+                node -> node.getType().equals(NodeType.JOB) && jobNameEquals(node, "writeJob"))
+            .hasSize(1)
+            .first()
+            .extracting(
+                n -> ((JobData) n.getData()).getLatestRun(),
+                InstanceOfAssertFactories.optional(Run.class))
+            .isPresent()
+            .get();
+    runAssert.extracting(r -> r.getId().getValue()).isEqualTo(secondRun.getRun().getUuid());
+    runAssert
         .extracting(
-            n -> ((JobData) n.getData()).getLatestRun(),
-            InstanceOfAssertFactories.optional(Run.class))
-        .isPresent()
-        .get()
-        .extracting(r -> r.getId().getValue())
-        .isEqualTo(secondRun.getRun().getUuid());
+            Run::getInputDatasetVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .hasSize(0);
+    runAssert
+        .extracting(
+            Run::getOutputDatasetVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .hasSize(1);
 
     // check the output edges for the commonDataset node
     assertThat(lineage.getGraph())
