@@ -9,8 +9,10 @@ import static marquez.client.MarquezPathV1.datasetTagPath;
 import static marquez.client.MarquezPathV1.datasetVersionPath;
 import static marquez.client.MarquezPathV1.fieldTagPath;
 import static marquez.client.MarquezPathV1.jobPath;
+import static marquez.client.MarquezPathV1.jobVersionPath;
 import static marquez.client.MarquezPathV1.listDatasetVersionsPath;
 import static marquez.client.MarquezPathV1.listDatasetsPath;
+import static marquez.client.MarquezPathV1.listJobVersionsPath;
 import static marquez.client.MarquezPathV1.listJobsPath;
 import static marquez.client.MarquezPathV1.listNamespacesPath;
 import static marquez.client.MarquezPathV1.listRunsPath;
@@ -93,6 +95,14 @@ class MarquezUrl {
 
   URL toJobUrl(String namespaceName, String jobName) {
     return from(jobPath(namespaceName, jobName));
+  }
+
+  URL toListJobVersionsUrl(@NonNull String namespaceName, String jobName, int limit, int offset) {
+    return from(listJobVersionsPath(namespaceName, jobName), newQueryParamsWith(limit, offset));
+  }
+
+  URL toJobVersionUrl(String namespaceName, String jobName, String version) {
+    return from(jobVersionPath(namespaceName, jobName, version));
   }
 
   URL toCreateRunUrl(String namespaceName, String jobName) {

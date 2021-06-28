@@ -43,6 +43,7 @@ import marquez.client.models.DatasetMeta;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
+import marquez.client.models.JobVersion;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Run;
@@ -197,6 +198,12 @@ public class MarquezClient {
     return Job.fromJson(bodyAsJson);
   }
 
+  public JobVersion getJobVersion(
+      @NonNull String namespaceName, @NonNull String jobName, String version) {
+    final String bodyAsJson = http.get(url.toJobVersionUrl(namespaceName, jobName, version));
+    return JobVersion.fromJson(bodyAsJson);
+  }
+
   public List<Job> listJobs(String namespaceName) {
     return listJobs(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
@@ -204,6 +211,13 @@ public class MarquezClient {
   public List<Job> listJobs(@NonNull String namespaceName, int limit, int offset) {
     final String bodyAsJson = http.get(url.toListJobsUrl(namespaceName, limit, offset));
     return Jobs.fromJson(bodyAsJson).getValue();
+  }
+
+  public List<JobVersion> listJobVersions(
+      @NonNull String namespaceName, String jobName, int limit, int offset) {
+    final String bodyAsJson =
+        http.get(url.toListJobVersionsUrl(namespaceName, jobName, limit, offset));
+    return JobVersions.fromJson(bodyAsJson).getValue();
   }
 
   public Run createRun(String namespaceName, String jobName, RunMeta runMeta) {
@@ -434,6 +448,20 @@ public class MarquezClient {
 
     static Jobs fromJson(final String json) {
       return Utils.fromJson(json, new TypeReference<Jobs>() {});
+    }
+  }
+
+  @Value
+  static class JobVersions {
+    @Getter List<JobVersion> value;
+
+    @JsonCreator
+    JobVersions(@JsonProperty("versions") final List<JobVersion> value) {
+      this.value = ImmutableList.copyOf(value);
+    }
+
+    static JobVersions fromJson(final String json) {
+      return Utils.fromJson(json, new TypeReference<JobVersions>() {});
     }
   }
 
