@@ -54,8 +54,8 @@ public final class Run {
   private final String jobName;
   private final UUID jobVersion;
   private final String location;
-  @Getter private final List<DatasetVersionId> inputDatasetVersions;
-  @Getter private final List<DatasetVersionId> outputDatasetVersions;
+  @Getter private final List<DatasetVersionId> inputVersions;
+  @Getter private final List<DatasetVersionId> outputVersions;
   @Getter private final Map<String, String> context;
   @Getter private final ImmutableMap<String, Object> facets;
 
@@ -74,8 +74,8 @@ public final class Run {
       String jobName,
       UUID jobVersion,
       String location,
-      List<DatasetVersionId> inputDatasetVersions,
-      List<DatasetVersionId> outputDatasetVersions,
+      List<DatasetVersionId> inputVersions,
+      List<DatasetVersionId> outputVersions,
       Map<String, String> context,
       @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
@@ -92,8 +92,8 @@ public final class Run {
     this.jobName = jobName;
     this.jobVersion = jobVersion;
     this.location = location;
-    this.inputDatasetVersions = inputDatasetVersions;
-    this.outputDatasetVersions = outputDatasetVersions;
+    this.inputVersions = inputVersions;
+    this.outputVersions = outputVersions;
     this.context = context;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }

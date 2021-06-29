@@ -94,8 +94,7 @@ class RunDaoTest {
     assertThat(run)
         .isPresent()
         .get()
-        .extracting(
-            Run::getInputDatasetVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(jobMeta.getInputs().size())
         .map(DatasetVersionId::getName)
         .containsAll(
@@ -103,8 +102,7 @@ class RunDaoTest {
 
     assertThat(run)
         .get()
-        .extracting(
-            Run::getOutputDatasetVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(jobMeta.getOutputs().size())
         .map(DatasetVersionId::getName)
         .containsAll(

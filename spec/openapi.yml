@@ -1068,11 +1068,11 @@ components:
               type: object
             jobVersion:
               $ref: '#/components/schemas/jobVersionId'
-            inputDatasetVersions:
+            inputVersions:
               type: array
               items:
                 $ref: '#/components/schemas/datasetVersionId'
-            outputDatasetVersions:
+            outputVersions:
               type: array
               items:
                 $ref: '#/components/schemas/datasetVersionId'
@@ -1111,14 +1111,14 @@ components:
             "name": "my_processing_job",
             "versionUuid": "0ba5b13b-350e-40f3-ba3f-cc00a4e92d11"
           },
-          "inputDatasetVersions": [
+          "inputVersions": [
             {
               "namespace": "my-namespace",
               "name": "an_input_dataset",
               "versionUuid": "d224dac0-35d7-4d9b-bbbe-6fff1a8485ad"
             }
           ],
-          "outputDatasetVersions": [
+          "outputVersions": [
             {
               "namespace": "my-namespace",
               "name": "my-dataset",
@@ -1302,11 +1302,11 @@ components:
               type: object
             jobVersion:
               $ref: '#/components/schemas/jobVersionId'
-            inputDatasetVersions:
+            inputVersions:
               type: array
               items:
                 $ref: '#/components/schemas/datasetVersionId'
-            outputDatasetVersions:
+            outputVersions:
               type: array
               items:
                 $ref: '#/components/schemas/datasetVersionId'
@@ -1448,11 +1448,11 @@ components:
               type: object
             jobVersion:
               $ref: '#/components/schemas/jobVersionId'
-            inputDatasetVersions:
+            inputVersions:
               type: array
               items:
                 $ref: '#/components/schemas/datasetVersionId'
-            outputDatasetVersions:
+            outputVersions:
               type: array
               items:
                 $ref: '#/components/schemas/datasetVersionId'
@@ -1553,11 +1553,11 @@ components:
           type: object
         jobVersion:
           $ref: '#/components/schemas/jobVersionId'
-        inputDatasetVersions:
+        inputVersions:
           type: array
           items:
             $ref: '#/components/schemas/datasetVersionId'
-        outputDatasetVersions:
+        outputVersions:
           type: array
           items:
             $ref: '#/components/schemas/datasetVersionId'
@@ -1685,11 +1685,11 @@ components:
           type: object
         jobVersion:
           $ref: '#/components/schemas/jobVersionId'
-        inputDatasetVersions:
+        inputVersions:
           type: array
           items:
             $ref: '#/components/schemas/datasetVersionId'
-        outputDatasetVersions:
+        outputVersions:
           type: array
           items:
             $ref: '#/components/schemas/datasetVersionId'

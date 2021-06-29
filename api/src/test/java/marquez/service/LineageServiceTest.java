@@ -162,12 +162,10 @@ public class LineageServiceTest {
             .get();
     runAssert.extracting(r -> r.getId().getValue()).isEqualTo(secondRun.getRun().getUuid());
     runAssert
-        .extracting(
-            Run::getInputDatasetVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(0);
     runAssert
-        .extracting(
-            Run::getOutputDatasetVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(1);
 
     // check the output edges for the commonDataset node
