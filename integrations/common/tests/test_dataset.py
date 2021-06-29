@@ -3,7 +3,7 @@ from openlineage.facet import DataSourceDatasetFacet, SchemaDatasetFacet, Schema
 
 from marquez.models import DbTableName, DbColumn, DbTableSchema
 
-from marquez.dataset import Source, Dataset, DatasetType
+from marquez.dataset import Source, Dataset
 
 from openlineage.run import Dataset as OpenLineageDataset
 
@@ -11,20 +11,14 @@ from openlineage.run import Dataset as OpenLineageDataset
 @pytest.fixture
 def source():
     return Source(
-        type="DummySource",
-        name="dummy_source_name",
-        connection_url="http://dummy/source/url"
+        scheme="dummy",
+        authority="localhost:1234",
+        connection_url="dummy://localhost:1234"
     )
 
 
 @pytest.fixture
-def table_schema():
-    source = Source(
-        type="DummySource",
-        name="dummy_source_name",
-        connection_url="http://dummy/source/url"
-    )
-
+def table_schema(source):
     schema_name = 'public'
     table_name = DbTableName('discounts')
     columns = [
@@ -64,21 +58,26 @@ def table_schema():
 
 def test_dataset_from(source):
     dataset = Dataset.from_table(source, 'source_table', 'public')
-    assert dataset == Dataset(source=source, type=DatasetType.DB_TABLE, name='public.source_table')
+    assert dataset == Dataset(source=source, name='public.source_table')
+
+
+def test_dataset_with_db_name(source):
+    dataset = Dataset.from_table(source, 'source_table', 'public', 'food_delivery')
+    assert dataset == Dataset(source=source, name='food_delivery.public.source_table')
 
 
 def test_dataset_to_openlineage(table_schema):
-    namespace = 'namespace'
+    source_name = 'dummy://localhost:1234'
     source, columns, schema = table_schema
 
     dataset_schema = Dataset.from_table_schema(source, schema)
-    assert dataset_schema.to_openlineage_dataset(namespace) == OpenLineageDataset(
-        namespace=namespace,
+    assert dataset_schema.to_openlineage_dataset() == OpenLineageDataset(
+        namespace=source_name,
         name='public.discounts',
         facets={
             'dataSource': DataSourceDatasetFacet(
-                name='dummy_source_name',
-                uri='http://dummy/source/url'
+                name=source_name,
+                uri=source_name
             ),
             'schema': SchemaDatasetFacet(
                 fields=[
