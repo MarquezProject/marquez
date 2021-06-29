@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
-class LineageResourceTest {
+class OpenLineageResourceTest {
   private static ResourceExtension UNDER_TEST;
 
   static {
@@ -29,7 +29,7 @@ class LineageResourceTest {
 
     Node testNode =
         Utils.fromJson(
-            LineageResourceTest.class.getResourceAsStream("/lineage/node.json"),
+            OpenLineageResourceTest.class.getResourceAsStream("/lineage/node.json"),
             new TypeReference<>() {});
 
     when(lineageService.lineage(any(NodeId.class), anyInt()))
@@ -39,7 +39,10 @@ class LineageResourceTest {
         ApiTestUtils.mockServiceFactory(Map.of(LineageService.class, lineageService));
 
     UNDER_TEST =
-        ResourceExtension.builder().addResource(new LineageResource(serviceFactory)).build();
+        ResourceExtension.builder()
+            .addResource(new OpenLineageResource(serviceFactory))
+            .addResource(new LineageResource(serviceFactory))
+            .build();
   }
 
   @Test

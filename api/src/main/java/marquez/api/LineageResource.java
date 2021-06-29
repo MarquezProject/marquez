@@ -19,8 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.service.ServiceFactory;
 import marquez.service.models.NodeId;
 
-@Path("/api/")
+/**
+ * @deprecated This resource is no longer supported
+ *     <p>Use {@link OpenLineageResource#getLineage(NodeId, int)} instead.
+ */
+@Path("/api/v1-beta")
 @Slf4j
+@Deprecated(since = "0.16")
 public class LineageResource extends BaseResource {
   private static final String DEFAULT_DEPTH = "20";
 
@@ -32,7 +37,7 @@ public class LineageResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("{version:v1-beta|v1}/lineage")
+  @Path("/lineage")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response getLineage(
