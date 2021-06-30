@@ -15,9 +15,17 @@ import static marquez.service.models.ServiceModelGenerator.newDbTableMetaWith;
 import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;
 import static marquez.service.models.ServiceModelGenerator.newRunMeta;
 
+import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
@@ -201,5 +209,54 @@ final class DbTestUtils {
     final RunDao runDao = jdbi.onDemand(RunDao.class);
     runDao.upsertOutputDatasetsFor(runUuid, runOutputIds);
     return run;
+  }
+
+  /**
+   * Simple utility for querying records from a table and returning the rows as a stream of maps.
+   * This is just here for quickly debugging tests and ensuring the contents of the database are
+   * what you expect them to be.
+   *
+   * @param jdbi
+   * @param sql
+   * @return
+   */
+  public static Stream<Map<String, Object>> query(Jdbi jdbi, String sql) {
+    return jdbi.inTransaction(
+        (handle) ->
+            handle
+                .createQuery(sql)
+                .scanResultSet(
+                    (rs, ctx) -> {
+                      ResultSet resultSet = rs.get();
+                      return Stream.generate(
+                              () -> {
+                                try {
+                                  if (resultSet.next()) {
+                                    ResultSetMetaData metaData = resultSet.getMetaData();
+                                    int keys = metaData.getColumnCount();
+                                    return IntStream.range(1, keys + 1)
+                                        .mapToObj(
+                                            i -> {
+                                              try {
+                                                return Map.entry(
+                                                    metaData.getColumnName(i),
+                                                    Optional.ofNullable(resultSet.getObject(i))
+                                                        .orElse("NULL"));
+                                              } catch (SQLException e) {
+                                                throw new RuntimeException(e);
+                                              }
+                                            })
+                                        .collect(
+                                            Collectors.toMap(
+                                                Map.Entry::getKey, Map.Entry::getValue));
+                                  } else {
+                                    return null;
+                                  }
+                                } catch (SQLException e) {
+                                  throw new RuntimeException(e);
+                                }
+                              })
+                          .takeWhile(Predicates.notNull());
+                    }));
   }
 }

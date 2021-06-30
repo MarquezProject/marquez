@@ -1,12 +1,14 @@
 package marquez.db;
 
 import java.net.URI;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,6 +30,7 @@ import marquez.service.models.LineageEvent.Run;
 import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
+import org.postgresql.util.PGobject;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 public class LineageTestUtils {
@@ -62,19 +65,34 @@ public class LineageTestUtils {
     nominalTimeRunFacet.setNominalEndTime(
         nominalTimeRunFacet.getNominalStartTime().plus(1, ChronoUnit.HOURS));
 
-    UpdateLineageRow updateLineageRow =
-        dao.updateMarquezModel(
-            new LineageEvent(
-                status,
-                Instant.now().atZone(LOCAL_ZONE),
-                new Run(
-                    UUID.randomUUID().toString(),
-                    new RunFacet(nominalTimeRunFacet, null, ImmutableMap.of())),
-                new Job(NAMESPACE, jobName, jobFacet),
-                inputs,
-                outputs,
-                PRODUCER_URL.toString()),
-            Utils.getMapper());
+    UUID runId = UUID.randomUUID();
+    LineageEvent event =
+        new LineageEvent(
+            status,
+            Instant.now().atZone(LOCAL_ZONE),
+            new Run(runId.toString(), new RunFacet(nominalTimeRunFacet, null, ImmutableMap.of())),
+            new Job(NAMESPACE, jobName, jobFacet),
+            inputs,
+            outputs,
+            PRODUCER_URL.toString());
+    UpdateLineageRow updateLineageRow = dao.updateMarquezModel(event, Utils.getMapper());
+    PGobject jsonObject = new PGobject();
+    jsonObject.setType("json");
+    try {
+      jsonObject.setValue(Utils.toJson(event));
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    dao.createLineageEvent(
+        event.getEventType() == null ? "" : event.getEventType(),
+        event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+        runId,
+        runId,
+        event.getJob().getName(),
+        event.getJob().getNamespace(),
+        jsonObject,
+        event.getProducer());
+
     if (status.equals("COMPLETE")) {
       DatasetDao datasetDao = dao.createDatasetDao();
       updateLineageRow
@@ -93,6 +111,10 @@ public class LineageTestUtils {
   }
 
   public static DatasetFacets newDatasetFacet(SchemaField... fields) {
+    return newDatasetFacet(EMPTY_MAP, fields);
+  }
+
+  public static DatasetFacets newDatasetFacet(Map<String, Object> facets, SchemaField... fields) {
     return DatasetFacets.builder()
         .documentation(
             new DocumentationDatasetFacet(PRODUCER_URL, SCHEMA_URL, "the dataset documentation"))
@@ -101,7 +123,7 @@ public class LineageTestUtils {
             new DatasourceDatasetFacet(
                 PRODUCER_URL, SCHEMA_URL, "the source", "http://thesource.com"))
         .description("the dataset description")
-        .additional(EMPTY_MAP)
+        .additional(facets)
         .build();
   }
 
