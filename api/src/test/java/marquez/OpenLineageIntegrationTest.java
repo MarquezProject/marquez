@@ -75,21 +75,10 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
     // (4) Verify the input and output dataset facets associated with the OpenLineage event.
     final JsonNode inputsAsJson = openLineageEventAsJson.path("inputs");
-    inputsAsJson.forEach(
-        inputAsJson -> {
-          final String inputNamespace = inputAsJson.path("namespace").asText();
-          final String inputName = inputAsJson.path("name").asText();
-          final JsonNode inputFacetsAsJson = inputAsJson.path("facets");
+    inputsAsJson.forEach(this::validateDatasetFacets);
 
-          final Dataset inputDataset = client.getDataset(inputNamespace, inputName);
-          if (inputDataset.hasFacets()) {
-            assertThat(inputDataset.getNamespace()).isEqualTo(inputNamespace);
-            assertThat(inputDataset.getName()).isEqualTo(inputName);
-            final JsonNode facetsForInputsAsJson =
-                Utils.getMapper().convertValue(inputDataset.getFacets(), JsonNode.class);
-            assertThat(facetsForInputsAsJson).isEqualTo(inputFacetsAsJson);
-          }
-        });
+    final JsonNode outputsAsJson = openLineageEventAsJson.path("outputs");
+    outputsAsJson.forEach(this::validateDatasetFacets);
 
     // (5) Verify the job facets associated with the OpenLineage event.
     final JsonNode jobAsJson = openLineageEventAsJson.path("job");
@@ -114,6 +103,21 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
       final JsonNode facetsForRunAsJson =
           Utils.getMapper().convertValue(run.getFacets(), JsonNode.class);
       assertThat(facetsForRunAsJson).isEqualTo(runFacetsAsJson);
+    }
+  }
+
+  private void validateDatasetFacets(JsonNode json) {
+    final String namespace = json.path("namespace").asText();
+    final String output = json.path("name").asText();
+    final JsonNode expectedFacets = json.path("facets");
+
+    final Dataset dataset = client.getDataset(namespace, output);
+    if (dataset.hasFacets()) {
+      assertThat(dataset.getNamespace()).isEqualTo(namespace);
+      assertThat(dataset.getName()).isEqualTo(output);
+      final JsonNode facetsForDataset =
+          Utils.getMapper().convertValue(dataset.getFacets(), JsonNode.class);
+      assertThat(facetsForDataset).isEqualTo(expectedFacets);
     }
   }
 
