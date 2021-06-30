@@ -98,6 +98,58 @@ jobs:
       - run: pytest --cov=marquez_python tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
+  test-integration-dbt-bigquery:
+    working_directory: ~/marquez/integrations/dbt/bigquery
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - *checkout_project_root
+      - *install_integration_common
+      - run: pip install -e .[dev]
+      - run: flake8
+      - run: pytest --cov=dbt tests/
+      - run: bash <(curl -s https://codecov.io/bash)
+
+  build-integration-dbt-bigquery:
+    working_directory: ~/marquez/integrations/dbt/bigquery
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - *checkout_project_root
+      - *install_integration_common
+      - run: python setup.py sdist bdist_wheel
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./dist/*.whl
+            - ./dist/*.tar.gz
+
+  test-integration-dbt-snowflake:
+    working_directory: ~/marquez/integrations/dbt/snowflake
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - *checkout_project_root
+      - *install_integration_common
+      - run: pip install -e .[dev]
+      - run: flake8
+      - run: pytest --cov=dbt tests/
+      - run: bash <(curl -s https://codecov.io/bash)
+
+  build-integration-dbt-snowflake:
+    working_directory: ~/marquez/integrations/dbt/snowflake
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - *checkout_project_root
+      - *install_integration_common
+      - run: python setup.py sdist bdist_wheel
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./dist/*.whl
+            - ./dist/*.tar.gz
+
   build-client-python:
     working_directory: ~/marquez/clients/python
     docker:
@@ -146,7 +198,6 @@ jobs:
       - run: pip install -e .[dev]
       - run: flake8 --exclude integration
       - run: airflow initdb
-      - run: python -m pytest --cov=marquez_airflow tests/
       - run: pytest --cov=marquez_airflow tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
@@ -172,7 +223,6 @@ jobs:
       - *checkout_project_root
       - run: pip install -e .[dev]
       - run: flake8
-      - run: python -m pytest --cov=marquez tests/
       - run: pytest --cov=marquez tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
@@ -213,7 +263,6 @@ jobs:
           # Publish *.jar
           ./gradlew publish
 
-
   release-docker:
     working_directory: ~/marquez
     machine: true
@@ -243,6 +292,8 @@ workflows:
       - test-client-python
       - test-integration-common
       - test-integration-airflow
+      - test-integration-dbt-bigquery
+      - test-integration-dbt-snowflake
       - integration-test-airflow:
           requires:
             - test-integration-airflow
@@ -253,6 +304,10 @@ workflows:
       - build-client-python:
           <<: *only-on-release
       - build-integration-airflow:
+          <<: *only-on-release
+      - build-integration-dbt-bigquery:
+          <<: *only-on-release
+      - build-integration-dbt-snowflake:
           <<: *only-on-release
       - release-java:
           <<: *only-on-release

@@ -39,8 +39,8 @@ class Source:
                self.connection_url == other.connection_url
 
     def __repr__(self):
-        authority = '://' + self.authority if self.authority else ''
-        return f"Source({self.scheme!r}{authority} - {self.connection_url!r})"
+        authority = '//' + self.authority if self.authority else ''
+        return f"Source({self.scheme!r}:{authority} - {self.connection_url!r})"
 
     @property
     def name(self) -> str:
@@ -48,7 +48,7 @@ class Source:
             return self._name
         if self.authority:
             return f'{self.scheme}://{self.authority}'
-        return f'{self.scheme}:'
+        return f'{self.scheme}'
 
 
 class Field:

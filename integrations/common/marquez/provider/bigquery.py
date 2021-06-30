@@ -26,7 +26,7 @@ from openlineage.facet import BaseFacet
 
 from marquez.utils import get_from_nullable_chain
 
-_BIGQUERY_CONN_URL = 'bigquery:{}'
+_BIGQUERY_CONN_URL = 'bigquery'
 
 
 @attr.s
@@ -262,7 +262,7 @@ class BigQueryDatasetsProvider:
     def _source(self) -> Source:
         return Source(
             scheme='bigquery',
-            connection_url='bigquery:'
+            connection_url='bigquery'
         )
 
     def _bq_table_name(self, bq_table):
