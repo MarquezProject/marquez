@@ -61,11 +61,23 @@ def _get_tables(
             if dot.match(Punctuation, '.'):
                 table_name += dot.value
                 table_name += next(token_list).value
+
+                # And again, to match bigquery's 'database.schema.table'
+                try:
+                    dot = next(token_list)
+                    if dot.match(Punctuation, '.'):
+                        table_name += dot.value
+                        table_name += next(token_list).value
+                except StopIteration:
+                    # Do not insert database name if it's not specified
+                    pass
             elif default_schema:
                 table_name = f'{default_schema}.{table_name}'
         except StopIteration:
             if default_schema:
                 table_name = f'{default_schema}.{table_name}'
+
+        table_name = table_name.replace('`', '')
         return table_name
 
     idx, token = tokens.token_next(idx=idx)

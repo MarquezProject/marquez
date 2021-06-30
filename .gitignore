@@ -25,6 +25,7 @@ examples/airflow/whl
 examples/airflow/requirements.txt
 examples/airflow/marquez.env
 out/*
+**/*.python-version
 
 # Marquez configuration
 marquez.yml
