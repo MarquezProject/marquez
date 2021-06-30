@@ -24,6 +24,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetVersionId;
 
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -34,7 +35,8 @@ public class RunRow {
   @Getter @NonNull private final Instant updatedAt;
   @Nullable private final UUID jobVersionUuid;
   @Getter @NonNull private final UUID runArgsUuid;
-  @Getter @NonNull private final List<UUID> inputVersionUuids;
+  @Getter @NonNull private final List<DatasetVersionId> inputVersions;
+  @Getter @NonNull private final List<DatasetVersionId> outputVersions;
   @Nullable private final Instant nominalStartTime;
   @Nullable private final Instant nominalEndTime;
   @Nullable private final String currentRunState;
@@ -46,7 +48,7 @@ public class RunRow {
   @Getter private final String jobName;
 
   public boolean hasInputVersionUuids() {
-    return !inputVersionUuids.isEmpty();
+    return !inputVersions.isEmpty();
   }
 
   public Optional<UUID> getJobVersionUuid() {

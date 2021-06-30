@@ -962,19 +962,25 @@ components:
           items:
             $ref: '#/components/schemas/DATASET'
 
+    datasetVersionId:
+      type: object
+      properties:
+        namespace:
+          type: string
+          description: The namespace of the dataset.
+        name:
+          type: string
+          description: The name of the dataset.
+        version:
+          type: string
+          format: uuid
+          description: The version of the dataset
+
     datasetVersion:
       type: object
       properties:
         id:
-          description: The ID of the dataset.
-          type: object
-          properties:
-            namespace:
-              type: string
-              description: The namespace of the dataset.
-            name:
-              type: string
-              description: The name of the dataset.
+          $ref: '#/components/schemas/datasetVersionId'
         type:
           description: The type of the dataset.
           type: string
@@ -1060,6 +1066,16 @@ components:
             args:
               description: The arguments of the run.
               type: object
+            jobVersion:
+              $ref: '#/components/schemas/jobVersionId'
+            inputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
+            outputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
       example:
         id:
           namespace: my-namespace
@@ -1090,6 +1106,25 @@ components:
           "endedAt": "2021-02-05T18:53:41.461122Z",
           "durationMs": 8216,
           "args": { 'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1 }
+          "jobVersion": {
+            "namespace": "my-namespace",
+            "name": "my_processing_job",
+            "versionUuid": "0ba5b13b-350e-40f3-ba3f-cc00a4e92d11"
+          },
+          "inputVersions": [
+            {
+              "namespace": "my-namespace",
+              "name": "an_input_dataset",
+              "versionUuid": "d224dac0-35d7-4d9b-bbbe-6fff1a8485ad"
+            }
+          ],
+          "outputVersions": [
+            {
+              "namespace": "my-namespace",
+              "name": "my-dataset",
+              "versionUuid": "16e04029-2035-37f1-8206-d57be374333f"
+            }
+          ]SparkListener
         }
 
     datasetVersions:
@@ -1103,7 +1138,7 @@ components:
       type: object
       properties:
         name:
-          description: The name of the tag.
+          description: The name qof the tag.
           type: string
         description:
           description: The description of the tag.
@@ -1265,6 +1300,16 @@ components:
             args:
               description: The arguments of the run.
               type: object
+            jobVersion:
+              $ref: '#/components/schemas/jobVersionId'
+            inputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
+            outputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
             facets:
               $ref: '#/components/schemas/runFacets'
         facets:
@@ -1297,6 +1342,20 @@ components:
         versions:
           items:
             $ref: '#/components/schemas/jobVersion'
+
+    jobVersionId:
+      type: object
+      properties:
+        namespace:
+          type: string
+          description: The namespace of the job.
+        name:
+          type: string
+          description: The name of the job.
+        versionUuid:
+          type: string
+          format: uuid
+          description: The version of the job
 
     jobVersion:
       type: object
@@ -1387,6 +1446,16 @@ components:
             args:
               description: The arguments of the run.
               type: object
+            jobVersion:
+              $ref: '#/components/schemas/jobVersionId'
+            inputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
+            outputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
         facets:
           $ref: '#/components/schemas/jobFacets'
       example:
@@ -1482,6 +1551,16 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        jobVersion:
+          $ref: '#/components/schemas/jobVersionId'
+        inputVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetVersionId'
+        outputVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetVersionId'
         facets:
           $ref: '#/components/schemas/runFacets'
       example:
@@ -1604,6 +1683,16 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        jobVersion:
+          $ref: '#/components/schemas/jobVersionId'
+        inputVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetVersionId'
+        outputVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetVersionId'
         facets:
           $ref: '#/components/schemas/runFacets'
       example:

@@ -96,14 +96,35 @@ public interface LineageDao {
   Optional<UUID> getJobFromInputOrOutput(String datasetName, String namespaceName);
 
   @SqlQuery(
-      "select distinct on(r.job_name, r.namespace_name) r.uuid, r.created_at, r.updated_at, "
-          + "r.nominal_start_time, r.nominal_end_time, r.current_run_state, r.started_at, r.ended_at, "
-          + "r.namespace_name, r.job_name, r.location, ra.args, ra.args, ctx.context \n"
+      "select distinct on(r.job_name, r.namespace_name) r.*, ra.args, ctx.context, f.facets,\n"
+          + "jv.namespace_name, jv.job_name, jv.version AS job_version,\n"
+          + "ri.input_versions, ro.output_versions\n"
           + "from runs AS r\n"
-          + "inner join jobs j on j.name = r.job_name AND j.namespace_name = r.namespace_name\n"
           + "left outer join run_args AS ra ON ra.uuid = r.run_args_uuid \n"
           + "left outer join job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
-          + "where j.uuid in (<jobUuid>)\n"
-          + "order by job_name, namespace_name, created_at DESC")
+          + "LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
+          + "LEFT OUTER JOIN\n"
+          + "(\n"
+          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
+          + "    FROM lineage_events le\n"
+          + "    GROUP BY le.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + " SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
+          + "        'name', dv.dataset_name,\n"
+          + "        'version', dv.version)) AS input_versions\n"
+          + " FROM runs_input_mapping im\n"
+          + " INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid\n"
+          + " GROUP BY im.run_uuid\n"
+          + ") ri ON ri.run_uuid=r.uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "  SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
+          + "                                              'name', dataset_name,\n"
+          + "                                              'version', version)) AS output_versions\n"
+          + "  FROM dataset_versions\n"
+          + "  GROUP BY run_uuid\n"
+          + ") ro ON ro.run_uuid=r.uuid\n"
+          + "where jv.job_uuid in (<jobUuid>)\n"
+          + "order by r.job_name, r.namespace_name, created_at DESC")
   List<Run> getCurrentRuns(@BindList Collection<UUID> jobUuid);
 }

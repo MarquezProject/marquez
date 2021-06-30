@@ -94,7 +94,7 @@ public final class NodeId {
   }
 
   public static NodeId of(@NonNull DatasetVersionId versionId) {
-    return NodeId.of(versionId.getNamespace(), versionId.getName(), versionId.getVersionUuid());
+    return NodeId.of(versionId.getNamespace(), versionId.getName(), versionId.getVersion());
   }
 
   public static NodeId of(@NonNull JobVersionId versionId) {

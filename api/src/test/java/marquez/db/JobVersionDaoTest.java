@@ -325,5 +325,15 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     for (final ExtendedDatasetVersionRow outputDatasetVersion : bagOfJobVersionInfo.getOutputs()) {
       assertThat(jobVersionOutputDatasetUuids).contains(outputDatasetVersion.getDatasetUuid());
     }
+    Optional<JobVersion> jobVersion =
+        jobVersionDao.findJobVersion(
+            jobRow.getNamespaceName(),
+            jobRow.getName(),
+            bagOfJobVersionInfo.getJobVersionRow().getVersion());
+    assertThat(jobVersion)
+        .isPresent()
+        .get()
+        .extracting(JobVersion::getInputs, InstanceOfAssertFactories.list(UUID.class))
+        .isNotEmpty();
   }
 }
