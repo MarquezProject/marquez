@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.Hashing;
 import io.dropwizard.jackson.Jackson;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -77,6 +78,15 @@ public final class Utils {
   }
 
   public static <T> T fromJson(@NonNull final String json, @NonNull final TypeReference<T> type) {
+    try {
+      return MAPPER.readValue(json, type);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  public static <T> T fromJson(
+      @NonNull final InputStream json, @NonNull final TypeReference<T> type) {
     try {
       return MAPPER.readValue(json, type);
     } catch (IOException e) {

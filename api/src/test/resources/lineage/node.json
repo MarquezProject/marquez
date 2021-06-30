@@ -1,0 +1,53 @@
+{
+  "id": "dataset:namespace:commonDataset",
+  "type": "DATASET",
+  "data": {
+    "type": "DATASET",
+    "id": {
+      "namespace": "namespace",
+      "name": "commonDataset"
+    },
+    "type": "DB_TABLE",
+    "name": "commonDataset",
+    "physicalName": "commonDataset",
+    "createdAt": 1624539874.421452000,
+    "updatedAt": 1624539878.907181000,
+    "namespace": "namespace",
+    "sourceName": "the source",
+    "fields": [
+      {
+        "name": "firstname",
+        "type": "STRING",
+        "tags": [],
+        "description": "the first name"
+      },
+      {
+        "name": "lastname",
+        "type": "STRING",
+        "tags": [],
+        "description": "the last name"
+      },
+      {
+        "name": "birthdate",
+        "type": "DATE",
+        "tags": [],
+        "description": "the date of birth"
+      }
+    ],
+    "tags": [],
+    "lastModifiedAt": null,
+    "description": "the dataset documentation"
+  },
+  "inEdges": [
+    {
+      "origin": "job:namespace:writeJob",
+      "destination": "dataset:namespace:commonDataset"
+    }
+  ],
+  "outEdges": [
+    {
+      "origin": "dataset:namespace:commonDataset",
+      "destination": "job:namespace:readJob19<-commonDataset"
+    }
+  ]
+}

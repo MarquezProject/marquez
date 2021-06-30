@@ -22,12 +22,16 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutionException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
@@ -35,10 +39,13 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.service.ServiceFactory;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.NodeId;
 
 @Slf4j
 @Path("/api/v1/lineage")
 public class OpenLineageResource extends BaseResource {
+  private static final String DEFAULT_DEPTH = "20";
+
   public OpenLineageResource(@NonNull final ServiceFactory serviceFactory) {
     super(serviceFactory);
   }
@@ -63,5 +70,18 @@ public class OpenLineageResource extends BaseResource {
                 asyncResponse.resume(Response.status(201).build());
               }
             });
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  public Response getLineage(
+      @QueryParam("nodeId") @NotNull NodeId nodeId,
+      @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth)
+      throws ExecutionException, InterruptedException {
+    return Response.ok(lineageService.lineage(nodeId, depth)).build();
   }
 }
