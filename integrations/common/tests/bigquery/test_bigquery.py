@@ -44,7 +44,7 @@ def test_bq_job_information():
         Dataset(
             source=Source(
                 scheme='bigquery',
-                connection_url='bigquery:'
+                connection_url='bigquery'
             ),
             name='bigquery-public-data.usa_names.usa_1910_2013',
             fields=[
@@ -59,7 +59,7 @@ def test_bq_job_information():
     assert statistics.output == Dataset(
         source=Source(
             scheme='bigquery',
-            connection_url='bigquery:'
+            connection_url='bigquery'
         ),
         name='bq-airflow-marquez.new_dataset.output_table',
     )
