@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.Value;
+import marquez.api.models.JobVersion;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -33,6 +34,7 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.common.models.Version;
 import marquez.db.mappers.ExtendedJobVersionRowMapper;
+import marquez.db.mappers.JobVersionMapper;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.JobContextRow;
@@ -47,12 +49,94 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 /** The DAO for {@code JobVersion}. */
 @RegisterRowMapper(ExtendedJobVersionRowMapper.class)
+@RegisterRowMapper(JobVersionMapper.class)
 public interface JobVersionDao extends BaseDao {
   /** An {@code enum} used to determine the input / output dataset type for a given job version. */
   enum IoType {
     INPUT,
-    OUTPUT;
+    OUTPUT
   }
+
+  /**
+   * Returns JobVersion fields, along with Run-related fields, prefixed with "run_". Input and
+   * Output datasets are constructed as JSON strings that can be deserialized into DatasetIds.
+   */
+  String BASE_SELECT_ON_JOB_VERSIONS =
+      "WITH job_version_io AS (\n"
+          + "    SELECT io.job_version_uuid,\n"
+          + "           JSON_AGG(json_build_object('namespace', ds.namespace_name,\n"
+          + "                                      'name', ds.name))\n"
+          + "           FILTER (WHERE io.io_type = 'INPUT') AS input_datasets,\n"
+          + "           JSON_AGG(json_build_object('namespace', ds.namespace_name,\n"
+          + "                                      'name', ds.name))\n"
+          + "           FILTER (WHERE io.io_type = 'OUTPUT') AS output_datasets\n"
+          + "    FROM job_versions_io_mapping io\n"
+          + "             INNER JOIN job_versions jv ON jv.uuid = io.job_version_uuid\n"
+          + "             INNER JOIN datasets ds ON ds.uuid = io.dataset_uuid\n"
+          + "    WHERE jv.namespace_name = :namespaceName\n"
+          + "      AND jv.job_name = :jobName\n"
+          + "    GROUP BY io.job_version_uuid\n"
+          + "), relevant_job_versions AS (\n"
+          + "    SELECT jv.*, jc.context\n"
+          + "    FROM job_versions jv\n"
+          + "    LEFT OUTER JOIN job_contexts AS jc ON jc.uuid = jv.job_context_uuid\n"
+          + "    WHERE job_name = :jobName AND namespace_name=:namespaceName\n"
+          + "    ORDER BY jv.created_at DESC\n"
+          + ")\n"
+          + "SELECT jv.*,\n"
+          + "       dsio.input_datasets,\n"
+          + "       dsio.output_datasets,\n"
+          + "       r.uuid               AS run_uuid,\n"
+          + "       r.created_at         AS run_created_at,\n"
+          + "       r.updated_at         AS run_updated_at,\n"
+          + "       r.nominal_start_time AS run_nominal_start_time,\n"
+          + "       r.nominal_end_time   AS run_nominal_end_time,\n"
+          + "       r.current_run_state  AS run_current_run_state,\n"
+          + "       r.started_at         AS run_started_at,\n"
+          + "       r.ended_at           AS run_ended_at,\n"
+          + "       r.namespace_name     AS run_namespace_name,\n"
+          + "       r.job_name           AS run_job_name,\n"
+          + "       jv.version           AS run_job_version,\n"
+          + "       r.location           AS run_location,\n"
+          + "       ra.args              AS run_args,\n"
+          + "       jv.context           AS run_context,\n"
+          + "       f.facets             AS run_facets,\n"
+          + "       ri.input_versions    AS run_input_versions,\n"
+          + "       ro.output_versions   AS run_output_versions\n"
+          + "FROM relevant_job_versions AS jv\n"
+          + "LEFT JOIN job_version_io dsio ON dsio.job_version_uuid = jv.uuid\n"
+          + "LEFT OUTER JOIN runs r ON r.uuid = jv.latest_run_uuid\n"
+          + "LEFT JOIN LATERAL (\n"
+          + "    SELECT le.run_uuid, JSON_AGG(event -> 'run' -> 'facets') AS facets\n"
+          + "    FROM lineage_events le\n"
+          + "    WHERE le.run_uuid=jv.latest_run_uuid\n"
+          + "    GROUP BY le.run_uuid\n"
+          + ") AS f ON r.uuid = f.run_uuid\n"
+          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
+          + "LEFT JOIN LATERAL (\n"
+          + "    SELECT im.run_uuid,\n"
+          + "           JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
+          + "                                      'name', dv.dataset_name,\n"
+          + "                                      'version', dv.version)) AS input_versions\n"
+          + "    FROM runs_input_mapping im\n"
+          + "    INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid\n"
+          + "    WHERE im.run_uuid=jv.latest_run_uuid\n"
+          + "    GROUP BY im.run_uuid\n"
+          + ") ri ON ri.run_uuid = r.uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "    SELECT run_uuid,\n"
+          + "           JSON_AGG(json_build_object('namespace', namespace_name,\n"
+          + "                                      'name', dataset_name,\n"
+          + "                                      'version', version)) AS output_versions\n"
+          + "    FROM dataset_versions\n"
+          + "    GROUP BY run_uuid\n"
+          + ") ro ON ro.run_uuid = r.uuid\n";
+
+  @SqlQuery(BASE_SELECT_ON_JOB_VERSIONS + "WHERE jv.version = :jobVersionUuid")
+  Optional<JobVersion> findJobVersion(String namespaceName, String jobName, UUID jobVersionUuid);
+
+  @SqlQuery(BASE_SELECT_ON_JOB_VERSIONS + "LIMIT :limit OFFSET :offset")
+  List<JobVersion> findAllJobVersions(String namespaceName, String jobName, int limit, int offset);
 
   /**
    * Used to upsert a {@link JobVersionRow} object; on version conflict, the job version object is

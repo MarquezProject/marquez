@@ -27,5 +27,5 @@ import lombok.Value;
 public class DatasetVersionId {
   @NonNull NamespaceName namespace;
   @NonNull DatasetName name;
-  @NonNull UUID versionUuid;
+  @NonNull UUID version;
 }

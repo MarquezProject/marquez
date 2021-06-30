@@ -19,6 +19,10 @@ public class JobId {
     this.jobName = jobName;
   }
 
+  public static JobId of(final NamespaceName namespaceName, final JobName jobName) {
+    return new JobId(namespaceName, jobName);
+  }
+
   public NamespaceName getNamespace() {
     return namespaceName;
   }

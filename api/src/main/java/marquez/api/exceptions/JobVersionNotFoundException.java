@@ -12,20 +12,17 @@
  * limitations under the License.
  */
 
-package marquez.common.models;
+package marquez.api.exceptions;
 
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Value;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-/** Version ID for {@code Job}. */
-@Value
-@Builder
-@AllArgsConstructor
-public class JobVersionId {
-  @NonNull NamespaceName namespace;
-  @NonNull JobName name;
-  @NonNull UUID version;
+import javax.ws.rs.NotFoundException;
+import marquez.common.models.Version;
+
+public final class JobVersionNotFoundException extends NotFoundException {
+  private static final long serialVersionUID = 1L;
+
+  public JobVersionNotFoundException(final Version version) {
+    super(String.format("Job version '%s' not found.", checkNotNull(version).getValue()));
+  }
 }

@@ -103,6 +103,14 @@ class MarquezPathV1 {
     return path("/namespaces/%s/jobs/%s", namespaceName, jobName);
   }
 
+  static String listJobVersionsPath(@NonNull String namespaceName, String jobName) {
+    return path("/namespaces/%s/jobs/%s/versions", namespaceName, jobName);
+  }
+
+  static String jobVersionPath(String namespaceName, String jobName, String version) {
+    return path("/namespaces/%s/jobs/%s/versions/%s", namespaceName, jobName, version);
+  }
+
   static String createRunPath(String namespaceName, String jobName) {
     return path("/namespaces/%s/jobs/%s/runs", namespaceName, jobName);
   }

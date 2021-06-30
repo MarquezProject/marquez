@@ -9,13 +9,17 @@ import static marquez.db.models.DbModelGenerator.newRowUuid;
 import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.BaseIntegrationTest;
+import marquez.api.models.JobVersion;
+import marquez.common.models.DatasetId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.common.models.Version;
+import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.ExtendedRunRow;
@@ -26,6 +30,7 @@ import marquez.db.models.RunRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -94,6 +99,10 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
 
     final int rowsAfterConflict = jobVersionDao.count();
     assertThat(rowsAfterConflict).isEqualTo(rowsBeforeConflict);
+    Optional<JobVersion> jobVersion =
+        jobVersionDao.findJobVersion(
+            jobRow.getNamespaceName(), jobRow.getName(), version.getValue());
+    assertThat(jobVersion).isPresent();
   }
 
   @Test
@@ -135,6 +144,94 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     // Ensure the latest run is associated with the job version.
     final Optional<UUID> latestRunUuid = jobVersionDao.findLatestRunFor(jobVersionRow.getUuid());
     assertThat(latestRunUuid).isPresent().contains(runRow.getUuid());
+  }
+
+  @Test
+  public void testGetJobVersion() {
+    final JobMeta jobMeta = newJobMetaWith(NamespaceName.of(namespaceRow.getName()));
+    final JobRow jobRow =
+        DbTestUtils.newJobWith(
+            jdbiForTesting, namespaceRow.getName(), newJobName().getValue(), jobMeta);
+    Version version = newVersion();
+    final ExtendedJobVersionRow jobVersionRow =
+        jobVersionDao.upsertJobVersion(
+            newRowUuid(),
+            newTimestamp(),
+            jobRow.getUuid(),
+            jobRow.getJobContextUuid().get(),
+            newLocation().toString(),
+            version.getValue(),
+            jobRow.getName(),
+            namespaceRow.getUuid(),
+            namespaceRow.getName());
+    DatasetDao datasetDao = jdbiForTesting.onDemand(DatasetDao.class);
+    for (DatasetId ds : jobMeta.getInputs()) {
+      DatasetRow dataset =
+          datasetDao
+              .findDatasetAsRow(ds.getNamespace().getValue(), ds.getName().getValue())
+              .orElseThrow(
+                  () -> new IllegalStateException("Can't find test dataset " + ds.getName()));
+
+      jobVersionDao.upsertInputDatasetFor(jobVersionRow.getUuid(), dataset.getUuid());
+    }
+    for (DatasetId ds : jobMeta.getOutputs()) {
+      DatasetRow dataset =
+          datasetDao
+              .findDatasetAsRow(ds.getNamespace().getValue(), ds.getName().getValue())
+              .orElseThrow(
+                  () -> new IllegalStateException("Can't find test dataset " + ds.getName()));
+
+      jobVersionDao.upsertOutputDatasetFor(jobVersionRow.getUuid(), dataset.getUuid());
+    }
+    Optional<JobVersion> jobVersion =
+        jobVersionDao.findJobVersion(namespaceRow.getName(), jobRow.getName(), version.getValue());
+    assertThat(jobVersion)
+        .isPresent()
+        .get()
+        .extracting(JobVersion::getInputs, InstanceOfAssertFactories.list(DatasetId.class))
+        .containsAll(jobMeta.getInputs());
+    assertThat(jobVersion)
+        .get()
+        .extracting(JobVersion::getOutputs, InstanceOfAssertFactories.list(DatasetId.class))
+        .containsAll(jobMeta.getOutputs());
+    assertThat(jobVersion).get().extracting(JobVersion::getLatestRun).isNull();
+  }
+
+  @Test
+  public void testGetJobVersions() {
+    final JobMeta jobMeta = newJobMetaWith(NamespaceName.of(namespaceRow.getName()));
+    final JobRow jobRow =
+        DbTestUtils.newJobWith(
+            jdbiForTesting, namespaceRow.getName(), newJobName().getValue(), jobMeta);
+
+    final RunRow runRow =
+        DbTestUtils.newRun(jdbiForTesting, jobRow.getNamespaceName(), jobRow.getName());
+    final Run runCompleted =
+        DbTestUtils.transitionRunWithOutputs(
+            jdbiForTesting, runRow.getUuid(), RunState.COMPLETED, jobMeta.getOutputs());
+
+    jobVersionDao.upsertJobVersionOnRunTransition(
+        jobRow.getNamespaceName(),
+        jobRow.getName(),
+        runRow.getUuid(),
+        RunState.COMPLETED,
+        Instant.now());
+
+    List<JobVersion> jobVersions =
+        jobVersionDao.findAllJobVersions(namespaceRow.getName(), jobRow.getName(), 10, 0);
+    assertThat(jobVersions)
+        .hasSize(1)
+        .first()
+        .extracting(JobVersion::getInputs, InstanceOfAssertFactories.list(DatasetId.class))
+        .containsAll(jobMeta.getInputs());
+
+    assertThat(jobVersions)
+        .hasSize(1)
+        .first()
+        .extracting(JobVersion::getLatestRun)
+        .isNotNull()
+        .extracting(Run::getId)
+        .isEqualTo(runCompleted.getId());
   }
 
   @Test
@@ -228,5 +325,15 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     for (final ExtendedDatasetVersionRow outputDatasetVersion : bagOfJobVersionInfo.getOutputs()) {
       assertThat(jobVersionOutputDatasetUuids).contains(outputDatasetVersion.getDatasetUuid());
     }
+    Optional<JobVersion> jobVersion =
+        jobVersionDao.findJobVersion(
+            jobRow.getNamespaceName(),
+            jobRow.getName(),
+            bagOfJobVersionInfo.getJobVersionRow().getVersion());
+    assertThat(jobVersion)
+        .isPresent()
+        .get()
+        .extracting(JobVersion::getInputs, InstanceOfAssertFactories.list(UUID.class))
+        .isNotEmpty();
   }
 }
