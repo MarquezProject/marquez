@@ -79,50 +79,75 @@ public interface RunDao extends BaseDao {
           + "WHERE uuid = :rowUuid")
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
-  @SqlQuery(
-      "SELECT r.*, ra.args, ra.args, ctx.context, f.facets\n"
+  String BASE_FIND_RUN_SQL =
+      "SELECT r.*, ra.args, ctx.context, f.facets,\n"
+          + "jv.namespace_name, jv.job_name, jv.version AS job_version,\n"
+          + "ri.input_versions, ro.output_versions\n"
           + "FROM runs AS r\n"
           + "LEFT OUTER JOIN\n"
           + "(\n"
           + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
           + "    FROM lineage_events le\n"
-          + "    WHERE le.run_uuid=:runUuid\n"
           + "    GROUP BY le.run_uuid\n"
           + ") AS f ON r.uuid=f.run_uuid\n"
           + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
           + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
-          + "WHERE r.uuid = :runUuid")
+          + "LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + " SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
+          + "        'name', dv.dataset_name,\n"
+          + "        'version', dv.version)) AS input_versions\n"
+          + " FROM runs_input_mapping im\n"
+          + " INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid\n"
+          + " GROUP BY im.run_uuid\n"
+          + ") ri ON ri.run_uuid=r.uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "  SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
+          + "                                              'name', dataset_name,\n"
+          + "                                              'version', version)) AS output_versions\n"
+          + "  FROM dataset_versions\n"
+          + "  GROUP BY run_uuid\n"
+          + ") ro ON ro.run_uuid=r.uuid\n";
+
+  @SqlQuery(BASE_FIND_RUN_SQL + "WHERE r.uuid = :runUuid")
   Optional<Run> findRunByUuid(UUID runUuid);
 
-  @SqlQuery(
-      "SELECT r.*, ra.args, ra.args, ctx.context, f.facets\n"
-          + "FROM runs AS r\n"
-          + "LEFT OUTER JOIN\n"
-          + "(\n"
-          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
-          + "    FROM lineage_events le\n"
-          + "    WHERE le.run_uuid=:runUuid\n"
-          + "    GROUP BY le.run_uuid\n"
-          + ") AS f ON r.uuid=f.run_uuid\n"
-          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
-          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
-          + "WHERE r.uuid = :runUuid")
+  @SqlQuery(BASE_FIND_RUN_SQL + "WHERE r.uuid = :runUuid")
   Optional<ExtendedRunRow> findRunByUuidAsRow(UUID runUuid);
 
   @SqlQuery(
-      "SELECT r.*, ra.args, ra.args, ctx.context, f.facets\n"
+      "SELECT r.*, ra.args, ctx.context, f.facets,\n"
+          + "jv.namespace_name, jv.job_name, jv.version AS job_version,\n"
+          + "ri.input_versions, ro.output_versions\n"
           + "FROM runs AS r\n"
           + "LEFT OUTER JOIN\n"
           + "(\n"
-          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
-          + "    FROM lineage_events le\n"
-          + "    WHERE le.job_name=:jobName AND le.job_namespace=:namespace\n"
-          + "    GROUP BY le.run_uuid\n"
+          + "  SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
+          + "  FROM lineage_events le\n"
+          + "  INNER JOIN runs ON runs.uuid=le.run_uuid\n"
+          + "  WHERE runs.job_name=:jobName AND runs.namespace_name=:namespace\n"
+          + "  GROUP BY le.run_uuid\n"
           + ") AS f ON r.uuid=f.run_uuid\n"
           + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
           + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
-          + "WHERE r.namespace_name = :namespace and r.job_name = :jobName "
-          + "ORDER BY STARTED_AT DESC NULLS LAST "
+          + "LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + " SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
+          + "        'name', dv.dataset_name,\n"
+          + "        'version', dv.version)) AS input_versions\n"
+          + " FROM runs_input_mapping im\n"
+          + " INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid\n"
+          + " GROUP BY im.run_uuid\n"
+          + ") ri ON ri.run_uuid=r.uuid\n"
+          + "LEFT OUTER JOIN (\n"
+          + "  SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
+          + "                                              'name', dataset_name,\n"
+          + "                                              'version', version)) AS output_versions\n"
+          + "  FROM dataset_versions\n"
+          + "  GROUP BY run_uuid\n"
+          + ") ro ON ro.run_uuid=r.uuid\n"
+          + "WHERE r.namespace_name = :namespace and r.job_name = :jobName\n"
+          + "ORDER BY STARTED_AT DESC NULLS LAST\n"
           + "LIMIT :limit OFFSET :offset")
   List<Run> findAll(String namespace, String jobName, int limit, int offset);
 
@@ -367,18 +392,11 @@ public interface RunDao extends BaseDao {
   void updateJobVersion(UUID runUuid, UUID jobVersionUuid);
 
   @SqlQuery(
-      "SELECT r.*, ra.args, ra.args, ctx.context, f.facets\n"
-          + "FROM runs AS r\n"
-          + "LEFT OUTER JOIN\n"
-          + "(\n"
-          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets' ORDER BY event_time) AS facets\n"
-          + "    FROM lineage_events le\n"
-          + "    WHERE le.job_name=:jobName AND le.job_namespace=:namespaceName\n"
-          + "    GROUP BY le.run_uuid\n"
-          + ") AS f ON r.uuid=f.run_uuid\n"
-          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
-          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
-          + "WHERE r.job_name = :jobName AND r.namespace_name = :namespaceName "
-          + "order by transitioned_at desc limit 1")
-  Optional<Run> findByLatestJob(String namespaceName, String jobName);
+      BASE_FIND_RUN_SQL
+          + "WHERE r.uuid=(\n"
+          + "    SELECT uuid FROM runs WHERE namespace_name = :namespace and job_name = :jobName\n"
+          + "    ORDER BY transitioned_at DESC\n"
+          + "    LIMIT 1\n"
+          + ")")
+  Optional<Run> findByLatestJob(String namespace, String jobName);
 }

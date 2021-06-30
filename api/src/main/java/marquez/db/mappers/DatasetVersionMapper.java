@@ -67,7 +67,7 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
               null,
-              toFacetsOrNull(results));
+              toFacetsOrNull(results, Columns.FACETS));
     } else {
       datasetVersion =
           new StreamVersion(
@@ -84,7 +84,7 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
               null,
-              toFacetsOrNull(results));
+              toFacetsOrNull(results, Columns.FACETS));
     }
     // The createdByRun can be brought in via join, similar to the JobMapper
     datasetVersion.setCreatedByRunUuid(uuidOrNull(results, "createdByRunUuid"));

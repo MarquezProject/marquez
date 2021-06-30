@@ -18,16 +18,19 @@ import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
-import static marquez.db.Columns.uuidArrayOrThrow;
 import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import lombok.NonNull;
+import marquez.common.Utils;
+import marquez.common.models.DatasetVersionId;
 import marquez.db.Columns;
 import marquez.db.models.ExtendedRunRow;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -45,9 +48,12 @@ public final class ExtendedRunRowMapper implements RowMapper<ExtendedRunRow> {
         timestampOrThrow(results, Columns.UPDATED_AT),
         uuidOrNull(results, Columns.JOB_VERSION_UUID),
         uuidOrThrow(results, Columns.RUN_ARGS_UUID),
-        columnNames.contains(Columns.INPUT_VERSION_UUIDS)
-            ? uuidArrayOrThrow(results, Columns.INPUT_VERSION_UUIDS)
-            : ImmutableList.<UUID>of(),
+        columnNames.contains(Columns.INPUT_VERSIONS)
+            ? toDatasetVersion(results, Columns.INPUT_VERSIONS)
+            : ImmutableList.of(),
+        columnNames.contains(Columns.OUTPUT_VERSIONS)
+            ? toDatasetVersion(results, Columns.OUTPUT_VERSIONS)
+            : ImmutableList.of(),
         timestampOrNull(results, Columns.NOMINAL_START_TIME),
         timestampOrNull(results, Columns.NOMINAL_END_TIME),
         stringOrNull(results, Columns.CURRENT_RUN_STATE),
@@ -60,5 +66,13 @@ public final class ExtendedRunRowMapper implements RowMapper<ExtendedRunRow> {
         columnNames.contains(Columns.ARGS) ? stringOrThrow(results, Columns.ARGS) : "",
         stringOrThrow(results, Columns.NAMESPACE_NAME),
         stringOrThrow(results, Columns.JOB_NAME));
+  }
+
+  private List<DatasetVersionId> toDatasetVersion(ResultSet rs, String column) throws SQLException {
+    String dsString = rs.getString(column);
+    if (dsString == null) {
+      return Collections.emptyList();
+    }
+    return Utils.fromJson(dsString, new TypeReference<List<DatasetVersionId>>() {});
   }
 }

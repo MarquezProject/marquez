@@ -41,10 +41,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Value;
 import marquez.api.exceptions.JobNotFoundException;
+import marquez.api.exceptions.JobVersionNotFoundException;
+import marquez.api.models.JobVersion;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.common.models.Version;
+import marquez.db.JobVersionDao;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
@@ -53,8 +58,12 @@ import marquez.service.models.RunMeta;
 
 @Path("/api/v1")
 public class JobResource extends BaseResource {
-  public JobResource(@NonNull final ServiceFactory serviceFactory) {
+  private final JobVersionDao jobVersionDao;
+
+  public JobResource(
+      @NonNull final ServiceFactory serviceFactory, @NonNull final JobVersionDao jobVersionDao) {
     super(serviceFactory);
+    this.jobVersionDao = jobVersionDao;
   }
 
   @Timed
@@ -95,6 +104,46 @@ public class JobResource extends BaseResource {
             .findWithRun(namespaceName.getValue(), jobName.getValue())
             .orElseThrow(() -> new JobNotFoundException(jobName));
     return Response.ok(job).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Path("/namespaces/{namespace}/jobs/{job}/versions/{version}")
+  @Produces(APPLICATION_JSON)
+  public Response getJobVersion(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("job") JobName jobName,
+      @PathParam("version") Version version) {
+    throwIfNotExists(namespaceName);
+    throwIfNotExists(namespaceName, jobName);
+
+    final JobVersion jobVersion =
+        jobVersionDao
+            .findJobVersion(namespaceName.getValue(), jobName.getValue(), version.getValue())
+            .orElseThrow(() -> new JobVersionNotFoundException(version));
+    return Response.ok(jobVersion).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Path("/namespaces/{namespace}/jobs/{job}/versions")
+  @Produces(APPLICATION_JSON)
+  public Response listJobVersions(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("job") JobName jobName,
+      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
+      @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
+    throwIfNotExists(namespaceName);
+    throwIfNotExists(namespaceName, jobName);
+
+    final List<JobVersion> jobVersions =
+        jobVersionDao.findAllJobVersions(
+            namespaceName.getValue(), jobName.getValue(), limit, offset);
+    return Response.ok(new JobVersions(jobVersions)).build();
   }
 
   @Timed
@@ -166,6 +215,13 @@ public class JobResource extends BaseResource {
     @NonNull
     @JsonProperty("jobs")
     public List<Job> value;
+  }
+
+  @Value
+  static class JobVersions {
+    @NonNull
+    @JsonProperty("versions")
+    List<JobVersion> value;
   }
 
   @NoArgsConstructor

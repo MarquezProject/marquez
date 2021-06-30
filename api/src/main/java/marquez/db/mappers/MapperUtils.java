@@ -42,15 +42,15 @@ public final class MapperUtils {
    * in the resulting facet map are the facet names (ex: 'schema', 'dataSource', 'documentation',
    * etc).
    */
-  static ImmutableMap<String, Object> toFacetsOrNull(@NonNull final ResultSet results)
-      throws SQLException {
+  static ImmutableMap<String, Object> toFacetsOrNull(
+      @NonNull final ResultSet results, String facetsColumn) throws SQLException {
     // Return an empty map of facets if 'facet' column not present.
-    if (!Columns.exists(results, Columns.FACETS)) {
+    if (!Columns.exists(results, facetsColumn)) {
       return ImmutableMap.of();
     }
     // Return a map of facets from the facet array in the result set, or an empty facet map if
     // 'facet' column is null.
-    return Optional.ofNullable(stringOrNull(results, Columns.FACETS))
+    return Optional.ofNullable(stringOrNull(results, facetsColumn))
         .map(
             facetsAsString -> {
               final ObjectNode mergedFacetsAsJson = Utils.getMapper().createObjectNode();

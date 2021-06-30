@@ -133,7 +133,7 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
 
   private JobVersionId toJobVersionId(JobVersionRow jobVersion) {
     return JobVersionId.builder()
-        .versionUuid(jobVersion.getUuid())
+        .version(jobVersion.getUuid())
         .namespace(NamespaceName.of(jobVersion.getNamespaceName()))
         .name(JobName.of(jobVersion.getJobName()))
         .build();

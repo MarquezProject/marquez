@@ -1,22 +1,29 @@
-package marquez;
+package marquez.common.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.UUID;
+import marquez.BaseIntegrationTest;
+import marquez.client.MarquezHttpException;
+import marquez.client.models.DbTableMeta;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
+import marquez.client.models.JobVersion;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
+import marquez.client.models.RunState;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
+import marquez.common.models.CommonModelGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
-public class JobIntegrationTest extends BaseIntegrationTest {
+public class JobResourceIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   public void setup() {
@@ -125,6 +132,128 @@ public class JobIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_notExistsJob() {
     Assertions.assertThrows(Exception.class, () -> client.getJob(NAMESPACE_NAME, "not-existing"));
+  }
+
+  @Test
+  public void testApp_listJobVersions() {
+    String runId = UUID.randomUUID().toString();
+    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+    client.markRunAs(runId, RunState.COMPLETED);
+
+    List<JobVersion> jobVersions = client.listJobVersions(NAMESPACE_NAME, JOB_NAME, 5, 0);
+    assertThat(jobVersions)
+        .hasSize(1)
+        .first()
+        .extracting(JobVersion::getLatestRun)
+        .extracting(Run::getId)
+        .isEqualTo(runId);
+
+    String newRunId = UUID.randomUUID().toString();
+    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(newRunId).build());
+    final JobMeta newVersionMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(CommonModelGenerator.newLocation())
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .runId(newRunId)
+            .build();
+    client.createJob(NAMESPACE_NAME, JOB_NAME, newVersionMeta);
+    client.markRunAs(newRunId, RunState.COMPLETED);
+
+    jobVersions = client.listJobVersions(NAMESPACE_NAME, JOB_NAME, 5, 0);
+    assertThat(jobVersions)
+        .hasSize(2)
+        .first()
+        .extracting(JobVersion::getLatestRun)
+        .extracting(Run::getId)
+        .isEqualTo(newRunId);
+  }
+
+  @Test
+  public void testApp_listJobVersionsWithInvalidJobName() {
+    try {
+      client.listJobVersions(NAMESPACE_NAME, "a fake job name", 5, 0);
+      fail("No exception thrown hitting invalid job version URL");
+    } catch (MarquezHttpException e) {
+      assertThat(e.getCode()).isEqualTo(404);
+    }
+  }
+
+  @Test
+  public void testApp_getJobVersion() {
+    String runId = UUID.randomUUID().toString();
+    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
+    client.markRunAs(runId, RunState.COMPLETED);
+
+    List<JobVersion> jobVersions = client.listJobVersions(NAMESPACE_NAME, JOB_NAME, 5, 0);
+    assertThat(jobVersions)
+        .first()
+        .extracting(JobVersion::getLatestRun)
+        .extracting(Run::getId)
+        .isEqualTo(runId);
+    UUID version = jobVersions.get(0).getVersion();
+    JobVersion jobVersion = client.getJobVersion(NAMESPACE_NAME, JOB_NAME, version.toString());
+    assertThat(jobVersion)
+        .isNotNull()
+        .matches(jv -> jv.getVersion().equals(version))
+        .matches(jv -> jv.getInputs().isEmpty())
+        .matches(jv -> jv.getOutputs().isEmpty())
+        .extracting(JobVersion::getLatestRun)
+        .isNotNull()
+        .extracting(Run::getId)
+        .isEqualTo(runId);
+  }
+
+  @Test
+  public void testApp_getJobVersionWithInputsAndOutputs() {
+    createSource(STREAM_SOURCE_NAME);
+    createSource(DB_TABLE_SOURCE_NAME);
+    client.createDataset(NAMESPACE_NAME, STREAM_NAME, STREAM_META);
+    client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+
+    String jobName = "newJob";
+    final JobMeta newVersionMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of(STREAM_ID))
+            .outputs(ImmutableSet.of(DB_TABLE_ID))
+            .location(CommonModelGenerator.newLocation())
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+    client.createJob(NAMESPACE_NAME, jobName, newVersionMeta);
+
+    String runId = UUID.randomUUID().toString();
+    client.createRun(NAMESPACE_NAME, jobName, RunMeta.builder().id(runId).build());
+    client.createDataset(
+        NAMESPACE_NAME,
+        DB_TABLE_NAME,
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(DB_TABLE_FIELDS)
+            .tags(DB_TABLE_TAGS)
+            .description(DB_TABLE_DESCRIPTION)
+            .runId(runId)
+            .build());
+    client.markRunAs(runId, RunState.COMPLETED);
+
+    List<JobVersion> jobVersions = client.listJobVersions(NAMESPACE_NAME, jobName, 5, 0);
+    assertThat(jobVersions)
+        .first()
+        .extracting(JobVersion::getLatestRun)
+        .extracting(Run::getId)
+        .isEqualTo(runId);
+    JobVersion jobVersion =
+        client.getJobVersion(
+            NAMESPACE_NAME, jobName, jobVersions.get(0).getId().getVersion().toString());
+    assertThat(jobVersion)
+        .isNotNull()
+        .matches(jv -> jv.getInputs().size() == 1, "has one input")
+        .matches(jv -> jv.getOutputs().size() == 1, "has one output");
   }
 
   @Test

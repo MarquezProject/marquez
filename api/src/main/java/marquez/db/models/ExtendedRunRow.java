@@ -22,6 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetVersionId;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -34,7 +35,8 @@ public class ExtendedRunRow extends RunRow {
       final Instant updatedAt,
       @Nullable final UUID jobVersionUuid,
       final UUID runArgsUuid,
-      final List<UUID> inputVersionUuids,
+      final List<DatasetVersionId> inputVersions,
+      final List<DatasetVersionId> outputVersions,
       @Nullable final Instant nominalStartTime,
       @Nullable final Instant nominalEndTime,
       @Nullable final String currentRunState,
@@ -51,7 +53,8 @@ public class ExtendedRunRow extends RunRow {
         updatedAt,
         jobVersionUuid,
         runArgsUuid,
-        inputVersionUuids,
+        inputVersions,
+        outputVersions,
         nominalStartTime,
         nominalEndTime,
         currentRunState,

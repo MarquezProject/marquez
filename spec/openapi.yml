@@ -300,6 +300,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/jobs'
 
+  /namespaces/{namespace}/jobs/{job}/versions:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/job'
+    get:
+      summary: get a list of versions for a given job name
+      description: returns a list of versions for a given job name and namespace
+      tags:
+        - Jobs
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobVersionList'
+
+  /namespaces/{namespace}/jobs/{job}/versions/{version}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/job'
+      - $ref: '#/components/parameters/version'
+    get:
+      summary: get the details of a given job name
+      description: returns a specified version for a given job name and namespace
+      tags:
+        - Jobs
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobVersion'
+
   /namespaces/{namespace}/jobs/{job}/runs:
     parameters:
       - $ref: '#/components/parameters/namespace'
@@ -550,7 +585,7 @@ components:
     version:
       name: version
       in: path
-      description: The ID of the dataset version.
+      description: The ID of the job or dataset version.
       required: true
       schema:
         type: string
@@ -825,19 +860,22 @@ components:
         fields: []
         description: "My first stream dataset!"
 
+    datasetId:
+      type: object
+      description: The ID of the dataset.
+      properties:
+        namespace:
+          type: string
+          description: The namespace of the dataset.
+        name:
+          type: string
+          description: The name of the dataset.
+
     DATASET:
       type: object
       properties:
         id:
-          description: The ID of the dataset.
-          type: object
-          properties:
-            namespace:
-              type: string
-              description: The namespace of the dataset.
-            name:
-              type: string
-              description: The name of the dataset.
+          $ref: '#/components/schemas/datasetId'
         type:
           description: The type of the dataset.
           type: string
@@ -924,19 +962,25 @@ components:
           items:
             $ref: '#/components/schemas/DATASET'
 
+    datasetVersionId:
+      type: object
+      properties:
+        namespace:
+          type: string
+          description: The namespace of the dataset.
+        name:
+          type: string
+          description: The name of the dataset.
+        version:
+          type: string
+          format: uuid
+          description: The version of the dataset
+
     datasetVersion:
       type: object
       properties:
         id:
-          description: The ID of the dataset.
-          type: object
-          properties:
-            namespace:
-              type: string
-              description: The namespace of the dataset.
-            name:
-              type: string
-              description: The name of the dataset.
+          $ref: '#/components/schemas/datasetVersionId'
         type:
           description: The type of the dataset.
           type: string
@@ -1022,6 +1066,16 @@ components:
             args:
               description: The arguments of the run.
               type: object
+            jobVersion:
+              $ref: '#/components/schemas/jobVersionId'
+            inputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
+            outputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
       example:
         id:
           namespace: my-namespace
@@ -1052,6 +1106,25 @@ components:
           "endedAt": "2021-02-05T18:53:41.461122Z",
           "durationMs": 8216,
           "args": { 'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1 }
+          "jobVersion": {
+            "namespace": "my-namespace",
+            "name": "my_processing_job",
+            "versionUuid": "0ba5b13b-350e-40f3-ba3f-cc00a4e92d11"
+          },
+          "inputVersions": [
+            {
+              "namespace": "my-namespace",
+              "name": "an_input_dataset",
+              "versionUuid": "d224dac0-35d7-4d9b-bbbe-6fff1a8485ad"
+            }
+          ],
+          "outputVersions": [
+            {
+              "namespace": "my-namespace",
+              "name": "my-dataset",
+              "versionUuid": "16e04029-2035-37f1-8206-d57be374333f"
+            }
+          ]SparkListener
         }
 
     datasetVersions:
@@ -1065,7 +1138,7 @@ components:
       type: object
       properties:
         name:
-          description: The name of the tag.
+          description: The name qof the tag.
           type: string
         description:
           description: The description of the tag.
@@ -1101,27 +1174,13 @@ components:
           description: The set of **input** datasets.
           type: array
           items:
-            type: object
-            properties:
-              namespace:
-                type: string
-                description: The namespace of the **input** dataset.
-              name:
-                type: string
-                description: The name of the **input** dataset.
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         outputs:
           description: The set of **output** datasets.
           type: array
           items:
-            type: object
-            properties:
-              namespace:
-                type: string
-                description: The namespace of the **output** dataset.
-              name:
-                type: string
-                description: The name of the **output** dataset.
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         location:
           description: The URL of the job source code or artifact.
@@ -1182,27 +1241,13 @@ components:
           description: The set of **input** datasets.
           type: array
           items:
-            type: object
-            properties:
-              namespace:
-                type: string
-                description: The namespace of the **input** dataset.
-              name:
-                type: string
-                description: The name of the **input** dataset.
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         outputs:
           description: The set of **output** datasets.
           type: array
           items:
-            type: object
-            properties:
-              namespace:
-                type: string
-                description: The namespace of the **output** dataset.
-              name:
-                type: string
-                description: The name of the **output** dataset.
+            $ref: '#/components/schemas/datasetId'
           uniqueItems: true
         location:
           description: The URL of the job source code or artifact.
@@ -1255,6 +1300,16 @@ components:
             args:
               description: The arguments of the run.
               type: object
+            jobVersion:
+              $ref: '#/components/schemas/jobVersionId'
+            inputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
+            outputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
             facets:
               $ref: '#/components/schemas/runFacets'
         facets:
@@ -1274,6 +1329,150 @@ components:
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
         latestRun: null
+        facets: {
+          'context': {
+            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
+            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
+          }
+        }
+
+    jobVersionList:
+      type: object
+      properties:
+        versions:
+          items:
+            $ref: '#/components/schemas/jobVersion'
+
+    jobVersionId:
+      type: object
+      properties:
+        namespace:
+          type: string
+          description: The namespace of the job.
+        name:
+          type: string
+          description: The name of the job.
+        versionUuid:
+          type: string
+          format: uuid
+          description: The version of the job
+
+    jobVersion:
+      type: object
+      properties:
+        id:
+          description: The ID of the job.
+          type: object
+          properties:
+            namespace:
+              type: string
+              description: The namespace of the job.
+            name:
+              type: string
+              description: The name of the job.
+            version:
+              type: string
+              description: The version of the job
+        name:
+          description: The name of the job.
+          type: string
+        version:
+          description: The version of the job
+          type: string
+        createdAt:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job version was created.
+          type: string
+          format: date-time
+        namespace:
+          description: The namespace of the job.
+          type: string
+        inputs:
+          description: The set of **input** datasets
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetId'
+          uniqueItems: true
+        outputs:
+          description: The set of **output** datasets
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetId'
+          uniqueItems: true
+        location:
+          description: The URL of the job source code or artifact for the given job version.
+          type: string
+          format: URL
+        context:
+          description: Deprecated- Use facet. A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
+          type: object
+          deprecated: true
+        latestRun:
+          description: The latest run associated with the job version.
+          type: object
+          properties:
+            id:
+              description: The ID of the run.
+              type: string
+              format: uuid
+            createdAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
+              type: string
+              format: date-time
+            updatedAt:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
+              type: string
+              format: date-time
+            nominalStartTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
+              type: string
+              format: date-time
+            nominalEndTime:
+              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
+              type: string
+              format: date-time
+            state:
+              description: The current state of the run.
+              type: string
+              enum: [ NEW, RUNNING, COMPLETED, FAILED, ABORTED ]
+            startedAt:
+              type: integer
+              description: The time at which the run was started. Measured in seconds since the Unix epoch.
+            endedAt:
+              type: integer
+              description: The time at which the run was ended. Measured in seconds since the Unix epoch.
+            durationMs:
+              type: integer
+              description: The total duration of the run. Measured in milliseconds.
+            args:
+              description: The arguments of the run.
+              type: object
+            jobVersion:
+              $ref: '#/components/schemas/jobVersionId'
+            inputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
+            outputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/datasetVersionId'
+        facets:
+          $ref: '#/components/schemas/jobFacets'
+      example:
+        id:
+          namespace: my-namespace
+          name: my-job
+          version: 56472c57-a2ef-4218-b7b7-d2af02a343fd
+        type: BATCH
+        name: my-job
+        version: 56472c57-a2ef-4218-b7b7-d2af02a343fd
+        createdAt: 2019-05-09T19:49:24.201361Z
+        namespace: my-namespace
+        inputs: [{namespace: my-namespace, name: my-dataset}]
+        outputs: []
+        location: https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
+        context: {'SQL': "SELECT * FROM mytable;"}
+        description: My first job!
         facets: {
           'context': {
             '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
@@ -1352,6 +1551,16 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        jobVersion:
+          $ref: '#/components/schemas/jobVersionId'
+        inputVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetVersionId'
+        outputVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetVersionId'
         facets:
           $ref: '#/components/schemas/runFacets'
       example:
@@ -1474,6 +1683,16 @@ components:
         args:
           description: The arguments of the run.
           type: object
+        jobVersion:
+          $ref: '#/components/schemas/jobVersionId'
+        inputVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetVersionId'
+        outputVersions:
+          type: array
+          items:
+            $ref: '#/components/schemas/datasetVersionId'
         facets:
           $ref: '#/components/schemas/runFacets'
       example:

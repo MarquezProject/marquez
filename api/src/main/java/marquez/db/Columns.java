@@ -14,7 +14,9 @@
 
 package marquez.db;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -90,6 +92,9 @@ public final class Columns {
   public static final String OUTPUT_UUIDS = "output_uuids";
   public static final String IO_TYPE = "io_type";
 
+  public static final String INPUT_DATASETS = "input_datasets";
+  public static final String OUTPUT_DATASETS = "output_datasets";
+
   /* JOB VERSION ROW COLUMNS */
   public static final String JOB_UUID = "job_uuid";
   public static final String JOB_CONTEXT_UUID = "job_context_uuid";
@@ -107,6 +112,10 @@ public final class Columns {
   public static final String CURRENT_RUN_STATE = "current_run_state";
   public static final String START_RUN_STATE_UUID = "start_run_state_uuid";
   public static final String END_RUN_STATE_UUID = "end_run_state_uuid";
+
+  public static final String JOB_VERSION = "job_version";
+  public static final String INPUT_VERSIONS = "input_versions";
+  public static final String OUTPUT_VERSIONS = "output_versions";
 
   /* RUN ARGS ROW COLUMNS */
   public static final String ARGS = "args";
@@ -245,5 +254,14 @@ public final class Columns {
       }
     }
     return false;
+  }
+
+  public static ImmutableMap<String, String> mapOrNull(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getString(column) == null) {
+      return null;
+    }
+    final String mapAsString = results.getString(column);
+    return Utils.fromJson(mapAsString, new TypeReference<>() {});
   }
 }
