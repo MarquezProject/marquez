@@ -6,8 +6,6 @@ from typing import Optional
 from dataclasses import dataclass
 
 from dbt.adapters.snowflake import SnowflakeCredentials, SnowflakeConnectionManager
-
-from dbt.adapters.openlineage_snowflake import __version__ as VERSION
 from dbt.exceptions import DatabaseException, FailedToConnectException, RuntimeException
 from dbt.logger import GLOBAL_LOGGER as logger
 
@@ -44,7 +42,7 @@ class RunMeta:
 
 
 BQ_QUERY_JOB_SPLIT = '-----Query Job SQL Follows-----'
-PRODUCER = f"openlineage-dbt_snowflake/{VERSION}"
+PRODUCER = f"openlineage-dbt_snowflake/{dbt.adapters.openlineage_snowflake.__version__}"
 
 
 class OpenLineageSnowflakeConnectionManager(SnowflakeConnectionManager):
