@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 from dbt.adapters.snowflake import SnowflakeCredentials, SnowflakeConnectionManager
 
-from dbt.adapters.openlineage_snowflake.version import __version__ as VERSION
+from dbt.adapters.openlineage_snowflake import __version__ as VERSION
 from dbt.exceptions import DatabaseException, FailedToConnectException, RuntimeException
 from dbt.logger import GLOBAL_LOGGER as logger
 

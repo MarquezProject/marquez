@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 from dbt.adapters.bigquery.connections import BigQueryAdapterResponse, BigQueryCredentials, \
     BigQueryConnectionManager
-from dbt.adapters.openlineage_bigquery.version import __version__ as VERSION
+from dbt.adapters.openlineage_bigquery import __version__ as VERSION
 from dbt.clients import agate_helper
 from dbt.exceptions import DatabaseException, RuntimeException
 from dbt.logger import GLOBAL_LOGGER as logger
