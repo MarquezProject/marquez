@@ -10,7 +10,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import Enum
 from typing import List, Optional, Dict
 
 from marquez.models import DbTableSchema, DbColumn
@@ -19,28 +18,37 @@ from openlineage.facet import BaseFacet, DataSourceDatasetFacet, DocumentationDa
 from openlineage.run import Dataset as OpenLineageDataset
 
 
-class DatasetType(Enum):
-    DB_TABLE = "DB_TABLE"
-    STREAM = "STREAM"
-
-
 class Source:
-    name = None
-    connection_url = None
-    type = None
-
-    def __init__(self, name, type, connection_url):
-        self.name = name
-        self.type = type
+    def __init__(
+            self,
+            scheme: Optional[str] = None,
+            authority: Optional[str] = None,
+            connection_url: Optional[str] = None,
+            name: Optional[str] = None
+    ):
+        self.scheme = scheme
+        self.authority = authority
+        self._name = name
         self.connection_url = connection_url
+
+        if (scheme or authority) and name:
+            raise RuntimeError('scheme + authority and namespace are exclusive options')
 
     def __eq__(self, other):
         return self.name == other.name and \
-               self.type == other.type and \
                self.connection_url == other.connection_url
 
     def __repr__(self):
-        return f"Source({self.name!r},{self.type!r},{self.connection_url!r})"
+        authority = '://' + self.authority if self.authority else ''
+        return f"Source({self.scheme!r}{authority} - {self.connection_url!r})"
+
+    @property
+    def name(self) -> str:
+        if self._name:
+            return self._name
+        if self.authority:
+            return f'{self.scheme}://{self.authority}'
+        return f'{self.scheme}:'
 
 
 class Field:
@@ -74,39 +82,48 @@ class Field:
 
 
 class Dataset:
-    def __init__(self, source: Source, name: str, type: DatasetType,
-                 fields: List[Field] = None, description: Optional[str] = None,
-                 custom_facets: Dict[str, BaseFacet] = None):
+    def __init__(
+            self,
+            source: Source,
+            name: str, fields: List[Field] = None,
+            description: Optional[str] = None,
+            custom_facets: Dict[str, BaseFacet] = None
+    ):
         if fields is None:
             fields = []
         if custom_facets is None:
             custom_facets = {}
         self.source = source
         self.name = name
-        self.type = type
         self.fields = fields
         self.description = description
         self.custom_facets = custom_facets
 
     @staticmethod
-    def from_table(source: Source, table_name: str,
-                   schema_name: str = None):
+    def from_table(source: Source,
+                   table_name: str,
+                   schema_name: str = None,
+                   database_name: str = None):
         return Dataset(
-            type=DatasetType.DB_TABLE,
             name=Dataset._to_name(
                 schema_name=schema_name,
-                table_name=table_name
+                table_name=table_name,
+                database_name=database_name
             ),
             source=source
         )
 
     @staticmethod
-    def from_table_schema(source: Source, table_schema: DbTableSchema):
+    def from_table_schema(
+            source: Source,
+            table_schema: DbTableSchema,
+            database_name: str = None
+    ):
         return Dataset(
-            type=DatasetType.DB_TABLE,
             name=Dataset._to_name(
                 schema_name=table_schema.schema_name,
-                table_name=table_schema.table_name.name
+                table_name=table_schema.table_name.name,
+                database_name=database_name
             ),
             source=source,
             fields=[
@@ -118,23 +135,28 @@ class Dataset:
         )
 
     @staticmethod
-    def _to_name(table_name: str, schema_name: str = None):
-        # Prefix the table name with the schema name using
-        # the format: {table_schema}.{table_name}.
-        return f"{schema_name}.{table_name}" if schema_name else table_name
+    def _to_name(table_name: str, schema_name: str = None, database_name: str = None):
+        # Prefix the table name with database and schema name using
+        # the format: {database_name}.{table_schema}.{table_name}.
+        name = [table_name]
+        if schema_name is not None:
+            name = [schema_name] + name
+        if database_name is not None:
+            name = [database_name] + name
+
+        return ".".join(name)
 
     def __eq__(self, other):
         return self.source == other.source and \
                self.name == other.name and \
-               self.type == other.type and \
                self.fields == other.fields and \
                self.description == other.description
 
     def __repr__(self):
         return f"Dataset({self.source!r},{self.name!r}, \
-                         {self.type!r},{self.fields!r},{self.description!r})"
+                         {self.fields!r},{self.description!r})"
 
-    def to_openlineage_dataset(self, namespace: str) -> OpenLineageDataset:
+    def to_openlineage_dataset(self) -> OpenLineageDataset:
         facets = {
             "dataSource": DataSourceDatasetFacet(
                 self.source.name,
@@ -162,7 +184,7 @@ class Dataset:
             facets.update(self.custom_facets)
 
         return OpenLineageDataset(
-            namespace=namespace,
+            namespace=self.source.name,
             name=self.name,
             facets=facets
         )

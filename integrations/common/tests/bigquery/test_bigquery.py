@@ -1,7 +1,7 @@
 import json
 from unittest.mock import MagicMock
 
-from marquez.dataset import Dataset, Source, DatasetType, Field
+from marquez.dataset import Dataset, Source, Field
 
 from marquez.provider.bigquery import BigQueryDatasetsProvider, BigQueryJobRunFacet
 
@@ -42,13 +42,11 @@ def test_bq_job_information():
     }
     assert statistics.inputs == [
         Dataset(
-            Source(
-                'bq-airflow-marquez',
-                'BIGQUERY',
-                'bigquery:bigquery-public-data.usa_names.usa_1910_2013'
+            source=Source(
+                scheme='bigquery',
+                connection_url='bigquery:'
             ),
             name='bigquery-public-data.usa_names.usa_1910_2013',
-            type=DatasetType.DB_TABLE,
             fields=[
                 Field('state', 'STRING', [], '2-digit state code'),
                 Field('gender', 'STRING', [], 'Sex (M=male or F=female)'),
@@ -59,11 +57,9 @@ def test_bq_job_information():
         )
     ]
     assert statistics.output == Dataset(
-        Source(
-            'svc-bq-airflow-marquez@bq-airflow-marquez.iam.gserviceaccount.com',
-            'BIGQUERY',
-            'bigquery:bq-airflow-marquez.new_dataset.output_table'
+        source=Source(
+            scheme='bigquery',
+            connection_url='bigquery:'
         ),
         name='bq-airflow-marquez.new_dataset.output_table',
-        type=DatasetType.DB_TABLE
     )

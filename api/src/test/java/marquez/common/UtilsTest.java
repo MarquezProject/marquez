@@ -28,8 +28,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobName;
@@ -57,15 +61,32 @@ public class UtilsTest {
   }
 
   @Test
-  public void testFromJson() {
+  public void testFromStringJson() {
     final Object actual = Utils.fromJson(JSON, TYPE);
     assertThat(actual).isEqualToComparingFieldByField(OBJECT);
   }
 
   @Test
+  public void testFromISJson() {
+    final Object actual =
+        Utils.fromJson(this.getClass().getResourceAsStream("/lineage/node.json"), TYPE);
+    assertThat(actual).isNotNull();
+  }
+
+  @Test
+  public void testFromIOExceptionThrownByFromJson() {
+    assertThatExceptionOfType(UncheckedIOException.class)
+        .isThrownBy(
+            () ->
+                Utils.fromJson(
+                    new ByteArrayInputStream(JSON.getBytes()), new TypeReference<List>() {}));
+  }
+
+  @Test
   public void testFromJson_throwsOnNull() {
-    assertThatNullPointerException().isThrownBy(() -> Utils.fromJson(JSON, (TypeReference) null));
-    assertThatNullPointerException().isThrownBy(() -> Utils.fromJson(null, TYPE));
+    assertThatNullPointerException().isThrownBy(() -> Utils.fromJson(JSON, null));
+    assertThatNullPointerException().isThrownBy(() -> Utils.fromJson((InputStream) null, TYPE));
+    assertThatNullPointerException().isThrownBy(() -> Utils.fromJson((String) null, TYPE));
   }
 
   @Test
