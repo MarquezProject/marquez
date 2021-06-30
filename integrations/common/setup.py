@@ -33,6 +33,9 @@ extras_require = {
         "google-cloud-core>=1.6.0",
         "google-crc32c>=1.1.2"
     ],
+    "dbt": [
+        "dbt-core>=0.19.1"
+    ],
     "tests": [
         "pytest",
         "pytest-cov",
@@ -45,7 +48,7 @@ extras_require["dev"] = set(sum(extras_require.values(), []))
 setup(
     name="marquez-integration-common",
     version="0.15.2",
-    description="Marquez common python library",
+    description="Marquez common python library for integrations",
     long_description=readme,
     long_description_content_type="text/markdown",
     author="Marquez Project",

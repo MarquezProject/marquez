@@ -123,7 +123,7 @@ if [[ "${RELEASE_VERSION}" == *-rc.? ]]; then
 fi
 
 # (1) Bump python module versions
-PYTHON_MODULES=(clients/python/ integrations/airflow/ integrations/common/)
+PYTHON_MODULES=(clients/python/ integrations/airflow/ integrations/common/ integrations/dbt/bigquery/ integrations/dbt/snowflake/)
 for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
   (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${PYTHON_RELEASE_VERSION}" --allow-dirty)
 done
