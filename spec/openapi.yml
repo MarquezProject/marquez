@@ -300,31 +300,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/jobs'
 
-  /namespaces/{namespace}/jobs/{job}/versions:
-    parameters:
-      - $ref: '#/components/parameters/namespace'
-      - $ref: '#/components/parameters/job'
-    get:
-      summary: get a list of versions for a given job name
-      description: returns a list of versions for a given job name and namespace
-      tags:
-        - Jobs
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/jobVersionList'
-
   /namespaces/{namespace}/jobs/{job}/versions/{version}:
     parameters:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/job'
       - $ref: '#/components/parameters/version'
     get:
-      summary: get the details of a given job name
-      description: returns a specified version for a given job name and namespace
+      summary: Retrieve a version for a job
+      description: Returns a version for a job.
       tags:
         - Jobs
       responses:
@@ -334,6 +317,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/jobVersion'
+
+  /namespaces/{namespace}/jobs/{job}/versions:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+      - $ref: '#/components/parameters/job'
+    get:
+      summary: List all versions for a job
+      description: Returns a list of versions for a job.
+      tags:
+        - Jobs
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobVersionList'
 
   /namespaces/{namespace}/jobs/{job}/runs:
     parameters:
@@ -1105,7 +1105,7 @@ components:
           "startedAt": "2021-02-05T18:53:33.245492Z",
           "endedAt": "2021-02-05T18:53:41.461122Z",
           "durationMs": 8216,
-          "args": { 'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1 }
+          "args": { 'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1 },
           "jobVersion": {
             "namespace": "my-namespace",
             "name": "my_processing_job",
@@ -1124,7 +1124,7 @@ components:
               "name": "my-dataset",
               "versionUuid": "16e04029-2035-37f1-8206-d57be374333f"
             }
-          ]SparkListener
+          ]
         }
 
     datasetVersions:
