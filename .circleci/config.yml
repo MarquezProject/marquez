@@ -319,6 +319,8 @@ workflows:
             - build-client-python
             - build-integration-airflow
             - build-integration-common
+            - build-integration-dbt-bigquery
+            - build-integration-dbt-snowflake
       - release-docker:
           <<: *only-on-release
           context: release
