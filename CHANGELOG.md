@@ -20,6 +20,8 @@
 * Allow upsert of tags [@hanbei](https://github.com/hanbei)
 * Allow potentially ambiguous URIs with encoded path segments [@mobuchowski](https://github.com/mobuchowski)
 * Use source [naming convetion](https://github.com/OpenLineage/OpenLineage/blob/main/spec/Naming.md) defined by OpenLineage [@mobuchowski](https://github.com/mobuchowski)
+* Return dataset facets [@collado-mike](https://github.com/collado-mike)
+* BigQuery source naming in integrations [@mobuchowski](https://github.com/mobuchowski)
 
 ## [0.15.2](https://github.com/MarquezProject/marquez/compare/0.15.1...0.15.2)
 
