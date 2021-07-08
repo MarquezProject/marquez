@@ -9,11 +9,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -30,40 +25,23 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Tag("integration-test")
+@Testcontainers
 public class SparkContainerIntegrationTest {
 
   private static final Network network = Network.newNetwork();
-  private static final PostgreSQLContainer<?> postgres = makePostgresContainer();
-  private static final GenericContainer<?> marquez = makeMarquezContainer();
+  @Container private static final PostgreSQLContainer<?> postgres = makePostgresContainer();
+  @Container private static final GenericContainer<?> marquez = makeMarquezContainer();
   private static GenericContainer<?> pyspark;
   private static HttpHost marquezHost;
   private static DefaultHttpClient httpClient;
 
   @BeforeAll
-  public static void setup() throws InterruptedException {
-    BlockingQueue<Boolean> doneQueue = new ArrayBlockingQueue<>(1);
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
-    executorService.submit(
-        () -> {
-          postgres.start();
-          marquez.start();
-          doneQueue.offer(true);
-        });
-    try {
-      doneQueue.poll(180, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      Logger logger = LoggerFactory.getLogger(SparkContainerIntegrationTest.class);
-      logger.error("Unable to start containers. Shutting them down", e);
-      tearDown();
-      Thread.currentThread().interrupt();
-      throw e;
-    } finally {
-      executorService.shutdownNow();
-    }
-
+  public static void setup() {
     marquezHost = new HttpHost(marquez.getHost(), marquez.getFirstMappedPort());
     httpClient = new DefaultHttpClient(new PoolingClientConnectionManager());
   }
