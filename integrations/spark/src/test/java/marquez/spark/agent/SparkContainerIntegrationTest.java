@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -45,11 +46,12 @@ public class SparkContainerIntegrationTest {
   public static void setup() throws InterruptedException {
     BlockingQueue<Boolean> doneQueue = new ArrayBlockingQueue<>(1);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
-    executorService.submit(() -> {
-      postgres.start();
-      marquez.start();
-      doneQueue.offer(true);
-    });
+    executorService.submit(
+        () -> {
+          postgres.start();
+          marquez.start();
+          doneQueue.offer(true);
+        });
     try {
       doneQueue.poll(180, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
@@ -108,8 +110,7 @@ public class SparkContainerIntegrationTest {
                 "MARQUEZ_DB", "marquez",
                 "MARQUEZ_USER", "marquez",
                 "MARQUEZ_PASSWORD", "marquez"))
-        .withFileSystemBind(
-            "../../docker/init-db.sh", "/docker-entrypoint-initdb.d/init-db.sh");
+        .withFileSystemBind("../../docker/init-db.sh", "/docker-entrypoint-initdb.d/init-db.sh");
   }
 
   private static GenericContainer<?> makeMarquezContainer() {
@@ -160,27 +161,71 @@ public class SparkContainerIntegrationTest {
 
   @Test
   public void testPysparkWordCountWithCliArgs() throws IOException, InterruptedException {
-    pyspark = makePysparkContainer(
-        "--master", "local",
-        "--conf", "spark.openlineage.host=http://marquez:5000",
-        "--conf", "spark.openlineage.namespace=spark_integration_tests",
-        "--conf", "spark.extraListeners="+ SparkListener.class.getName(),
-        "--jars", "/opt/libs/" + System.getProperty("marquez.spark.jar"),
-        "/opt/spark_scripts/spark_word_count.py"
-    );
+    pyspark =
+        makePysparkContainer(
+            "--master",
+            "local",
+            "--conf",
+            "spark.openlineage.host=http://marquez:5000",
+            "--conf",
+            "spark.openlineage.namespace=testPysparkWordCountWithCliArgs",
+            "--conf",
+            "spark.extraListeners=" + SparkListener.class.getName(),
+            "--jars",
+            "/opt/libs/" + System.getProperty("marquez.spark.jar"),
+            "/opt/spark_scripts/spark_word_count.py");
     pyspark.setWaitStrategy(Wait.forLogMessage(".*ShutdownHookManager: Shutdown hook called.*", 1));
     pyspark.start();
 
-    HttpResponse response = httpClient.execute(marquezHost,
-        new HttpGet("/api/v1/namespaces/spark_integration_tests/jobs"));
+    HttpResponse response =
+        httpClient.execute(
+            marquezHost, new HttpGet("/api/v1/namespaces/testPysparkWordCountWithCliArgs/jobs"));
     assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
     JsonNode jsonNode = new ObjectMapper().readTree(response.getEntity().getContent());
-    assertThat(jsonNode).matches(j -> ((JsonNode)j).has("jobs"), "Has jobs key");
+    assertThat(jsonNode).matches(j -> ((JsonNode) j).has("jobs"), "Has jobs key");
     assertThat(jsonNode.get("jobs"))
-        .matches(j -> ((JsonNode)j).isArray())
+        .matches(j -> ((JsonNode) j).isArray())
         .hasSize(1)
         .first()
         .extracting(j -> j.get("name").textValue())
-        .isEqualTo("open_lineage_integration_word_count.execute_insert_into_hadoop_fs_relation_command");
+        .isEqualTo(
+            "open_lineage_integration_word_count.execute_insert_into_hadoop_fs_relation_command");
+  }
+
+  @Test
+  public void testPysparkRddToTable() throws IOException, InterruptedException {
+    pyspark =
+        makePysparkContainer(
+            "--master",
+            "local",
+            "--conf",
+            "spark.openlineage.host=http://marquez:5000",
+            "--conf",
+            "spark.openlineage.namespace=testPysparkRddToTable",
+            "--conf",
+            "spark.extraListeners=" + SparkListener.class.getName(),
+            "--jars",
+            "/opt/libs/" + System.getProperty("marquez.spark.jar"),
+            "/opt/spark_scripts/spark_rdd_to_table.py");
+    pyspark.setWaitStrategy(Wait.forLogMessage(".*ShutdownHookManager: Shutdown hook called.*", 1));
+    pyspark.start();
+
+    HttpResponse response =
+        httpClient.execute(
+            marquezHost, new HttpGet("/api/v1/namespaces/testPysparkRddToTable/jobs"));
+    assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+    JsonNode jsonNode = new ObjectMapper().readTree(response.getEntity().getContent());
+    assertThat(jsonNode).matches(j -> ((JsonNode) j).has("jobs"), "Has jobs key");
+    assertThat(jsonNode.get("jobs"))
+        .matches(j -> ((JsonNode) j).isArray())
+        .hasSize(2)
+        .map(j -> j.get("name").textValue())
+        .containsAll(
+            Arrays.asList(
+                "spark_rdd_to_table.map_partitions_python_list_of_random_words_and_numbers",
+                "spark_rdd_to_table.execute_insert_into_hadoop_fs_relation_command"));
+    for (JsonNode n : jsonNode.get("jobs")) {
+      assertThat(n.get("outputs")).hasSize(1);
+    }
   }
 }

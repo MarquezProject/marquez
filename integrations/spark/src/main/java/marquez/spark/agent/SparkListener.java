@@ -267,8 +267,9 @@ public class SparkListener extends org.apache.spark.scheduler.SparkListener {
       String namespace = findSparkConfigKey(conf, SPARK_CONF_NAMESPACE_KEY, "default");
       String jobName = findSparkConfigKey(conf, SPARK_CONF_JOB_NAME_KEY, conf.getAppId());
       String runId = findSparkConfigKey(conf, SPARK_CONF_PARENT_RUN_ID_KEY, "");
-      Optional<String> apiKey = Optional.ofNullable(findSparkConfigKey(conf, SPARK_CONF_API_KEY, ""))
-          .filter(str -> !str.isEmpty());
+      Optional<String> apiKey =
+          Optional.ofNullable(findSparkConfigKey(conf, SPARK_CONF_API_KEY, ""))
+              .filter(str -> !str.isEmpty());
       return new ArgumentParser(host, version, namespace, jobName, runId, apiKey);
     }
   }

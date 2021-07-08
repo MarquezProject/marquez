@@ -37,3 +37,5 @@ marquez.yml
 chart/charts/
 
 integrations/spark/src/test/resources/test_data/test_output
+integrations/spark/src/test/resources/test_data/rdd_to_csv_output
+integrations/spark/src/test/resources/test_data/rdd_to_table
