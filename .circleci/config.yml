@@ -188,6 +188,52 @@ jobs:
           paths:
             - ~/.gradle
 
+  image-api:
+    working_directory: ~/marquez
+    machine: true
+    steps:
+      - checkout
+      - run: ./.circleci/get-jdk11.sh
+      - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
+      - run: mkdir ./build && docker save -o ./build/marquezproject-api-image.tar "marquezproject/marquez:${CIRCLE_SHA1}"
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./build/marquezproject-api-image.tar
+
+  integration-test-spark:
+    working_directory: ~/marquez/integrations/spark
+    docker:
+      - image: circleci/openjdk:8-jdk
+    environment:
+      TESTCONTAINERS_RYUK_DISABLED: "true"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
+            - v1-integration-spark-{{ .Branch }}
+      - setup_remote_docker:
+          version: 20.10.6
+      - attach_workspace:
+          at: .
+      - run: docker load -i ./build/marquezproject-api-image.tar
+      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:shadowJar
+      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:integrationTest -Dmarquez.image.tag=
+      - run:
+          when: on_fail
+          command: cat integrations/spark/build/test-results/integrationTests/TEST-*.xml
+      - run: ./gradlew --no-daemon :integrations:spark:jacocoTestReport
+      - store_test_results:
+          path: integrations/spark/build/test-results/integrationTests
+      - store_artifacts:
+          path: integrations/spark/build/reports/tests/integrationTests
+          destination: test-report
+      - save_cache:
+          key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.gradle
+
   test-integration-airflow:
     working_directory: ~/marquez/integrations/airflow
     docker:
@@ -286,12 +332,17 @@ workflows:
   marquez:
     jobs:
       - build-api
+      - image-api
+      - build-integration-spark
+      - integration-test-spark:
+          requires:
+            - image-api
+            - build-integration-spark
+      - test-integration-airflow
       - test-web
       - build-client-java
-      - build-integration-spark
       - test-client-python
       - test-integration-common
-      - test-integration-airflow
       - test-integration-dbt-bigquery
       - test-integration-dbt-snowflake
       - integration-test-airflow:
