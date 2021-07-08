@@ -178,6 +178,7 @@ jobs:
           when: on_fail
           command: cat integrations/spark/build/test-results/test/TEST-*.xml
       - run: ./gradlew --no-daemon :integrations:spark:jacocoTestReport
+      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:shadowJar # generate the fat jar
       - store_test_results:
           path: integrations/spark/build/test-results/test
       - store_artifacts:
@@ -187,6 +188,10 @@ jobs:
           key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.gradle
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./integrations/spark/build/libs/*.jar
 
   image-api:
     working_directory: ~/marquez
@@ -202,24 +207,21 @@ jobs:
             - ./build/marquezproject-api-image.tar
 
   integration-test-spark:
-    working_directory: ~/marquez/integrations/spark
-    docker:
-      - image: circleci/openjdk:8-jdk
+    working_directory: ~/marquez
+    machine: true
     environment:
       TESTCONTAINERS_RYUK_DISABLED: "true"
+      JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
             - v1-integration-spark-{{ .Branch }}
-      - setup_remote_docker:
-          version: 20.10.6
       - attach_workspace:
           at: .
       - run: docker load -i ./build/marquezproject-api-image.tar
-      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:shadowJar
-      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:integrationTest -Dmarquez.image.tag=
+      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:integrationTest -Pmarquez.image.tag=${CIRCLE_SHA1}
       - run:
           when: on_fail
           command: cat integrations/spark/build/test-results/integrationTests/TEST-*.xml
