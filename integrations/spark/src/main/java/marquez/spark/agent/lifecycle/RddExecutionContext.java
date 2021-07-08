@@ -164,6 +164,7 @@ public class RddExecutionContext implements ExecutionContext {
             .producer(OpenLineageClient.OPEN_LINEAGE_CLIENT_URI)
             .build();
 
+    log.debug("Posting event for start {}: {}", jobStart, event);
     marquezContext.emit(event);
   }
 
@@ -180,6 +181,7 @@ public class RddExecutionContext implements ExecutionContext {
             .producer(OpenLineageClient.OPEN_LINEAGE_CLIENT_URI)
             .build();
 
+    log.debug("Posting event for end {}: {}", jobEnd, event);
     marquezContext.emit(event);
   }
 
