@@ -100,9 +100,12 @@ def _get_tables(
 class SqlMeta:
     # TODO: Only a single output table may exist, we'll want to rename
     # SqlMeta.out_tables -> SqlMeta.out_table
-    def __init__(self, in_tables: List[DbTableName], out_tables: List[DbTableName]):
+    def __init__(self, in_tables: List[DbTableName] = None, out_tables: List[DbTableName] = None):
         self.in_tables = in_tables
         self.out_tables = out_tables
+
+    def __repr__(self):
+        return f"SqlMeta({self.in_tables!r},{self.out_tables!r})"
 
 
 class SqlParser:
@@ -125,11 +128,18 @@ class SqlParser:
         # Tokenize the SQL statement
         statements = sqlparse.parse(sql)
 
-        # We assume only one statement in SQL
-        tokens = TokenList(statements[0].tokens)
-        log.debug(f"Successfully tokenized sql statement: {tokens}")
-        parser = cls(default_schema)
-        return parser.recurse(tokens)
+        # ...
+        sql_meta = SqlMeta([], [])
+        for statement in statements:
+            tokens = TokenList(statement.tokens)
+            log.debug(f"Successfully tokenized sql statement: {tokens}")
+            parser = cls(default_schema)
+            curr_sql_meta = parser.recurse(tokens)
+            sql_meta.in_tables = sql_meta.in_tables + curr_sql_meta.in_tables
+            sql_meta.out_tables = sql_meta.out_tables + curr_sql_meta.out_tables
+            print("meta: ", sql_meta)
+
+        return sql_meta
 
     def recurse(self, tokens: TokenList) -> SqlMeta:
         in_tables, out_tables = set(), set()
