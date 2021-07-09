@@ -21,14 +21,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Map.entry;
 import static org.apache.http.Consts.UTF_8;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
 public class FlowIntegrationTest extends BaseIntegrationTest {
@@ -93,27 +97,36 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
     assertDatasetVersionDiffers(createdRun);
   }
 
+  @Test
+  public void testSameInputAndOutputDatasetCreatedViaJobAndDatasetApi() throws IOException {
+    Dataset dataset = createDataset(null);
+    createJob(null);
+    Run createdRun = client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build());
+    createJob(createdRun.getId());
+    Map<String, Object> runResponse = getRunResponse(createdRun);
+    Dataset outputDataset = createDataset(createdRun.getId());
+    Map<String, Object> runResponse2 = getRunResponse(createdRun);
+    client.markRunAs(createdRun.getId(), RunState.COMPLETED);
+    assertDatasetVersionDiffers(createdRun);
+  }
+
   private void assertDatasetVersionDiffers(Run createdRun) throws IOException {
     Map<String, Object> body = getRunResponse(createdRun);
 
     List<Map<String, String>> inputDatasetVersionIds = ((List<Map<String, String>>) body.get("inputVersions"));
-    assertThat(inputDatasetVersionIds).hasSize(1);
-    assertThat(inputDatasetVersionIds.get(0))
-        .containsEntry("namespace", NAMESPACE_NAME)
-        .containsEntry("name", DATASET_NAME);
+    assertThat(inputDatasetVersionIds.stream().map(Map::entrySet).collect(Collectors.toList()))
+        .allMatch(e->e.contains(entry("namespace", NAMESPACE_NAME)))
+        .allMatch(e->e.contains(entry("name", DATASET_NAME)));
 
     List<Map<String, String>> outputDatasetVersionIds = ((List<Map<String, String>>) body.get("outputVersions"));
-    assertThat(outputDatasetVersionIds).hasSize(1);
-    assertThat(outputDatasetVersionIds.get(0))
-        .containsEntry("namespace", NAMESPACE_NAME)
-        .containsEntry("name", DATASET_NAME);
+    assertThat(outputDatasetVersionIds.stream().map(Map::entrySet).collect(Collectors.toList()))
+        .allMatch(e->e.contains(entry("namespace", NAMESPACE_NAME)))
+        .allMatch(e->e.contains(entry("name", DATASET_NAME)));
 
-    String outputVersion = outputDatasetVersionIds.stream().findFirst().map(it -> it.get("version"))
-        .orElseThrow(() -> new AssertionError("can't find version"));
-    String inputVersion = inputDatasetVersionIds.stream().findFirst().map(it -> it.get("version"))
-        .orElseThrow(() -> new AssertionError("can't find version"));
+    List<String> inputVersions = inputDatasetVersionIds.stream().map(it -> it.get("version")).collect(Collectors.toList());
+    List<String> outputVersions = outputDatasetVersionIds.stream().map(it -> it.get("version")).collect(Collectors.toList());
 
-    assertThat(inputVersion).isNotEqualTo(outputVersion);
+    assertThat(Collections.disjoint(inputVersions, outputVersions)).isTrue();
   }
 
   private List<String> extractVersion(List<Map<String, String>> datasetVersionIds) {
