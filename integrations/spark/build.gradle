@@ -156,9 +156,11 @@ shadowJar {
     classifier = ''
     // avoid conflict with any client version of that lib
     relocate 'com.github.ok2c.hc5', 'marquez.com.github.ok2c.hc5'
+    relocate 'com.ok2c.hc5.json', 'marquez.com.ok2c.hc5.json'
     relocate 'org.apache.httpcomponents.client5', 'marquez.org.apache.httpcomponents.client5'
     relocate 'javassist', 'marquez.javassist'
     relocate 'com.fasterxml.jackson', 'marquez.com.fasterxml.jackson'
+    relocate 'org.apache.hc.client5', 'marquez.org.apache.hc.client5'
 
     manifest {
         attributes(
