@@ -35,3 +35,5 @@ marquez.yml
 
 # Dependent Helm charts
 chart/charts/
+
+integrations/spark/src/test/resources/test_data/test_output

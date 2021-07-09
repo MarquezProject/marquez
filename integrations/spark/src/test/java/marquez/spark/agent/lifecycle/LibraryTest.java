@@ -60,7 +60,7 @@ public class LibraryTest {
             .config("spark.driver.bindAddress", "127.0.0.1")
             .getOrCreate();
 
-    URL url = Resources.getResource("data.txt");
+    URL url = Resources.getResource("test_data/data.txt");
     final Dataset<String> data = spark.read().textFile(url.getPath());
 
     final long numAs = data.filter((FilterFunction<String>) s -> s.contains("a")).count();
@@ -140,7 +140,7 @@ public class LibraryTest {
     when(marquezContext.getParentJobName()).thenReturn("job_name");
     when(marquezContext.getParentRunId()).thenReturn("8d99e33e-2a1c-4254-9600-18f23435fc3b");
 
-    URL url = Resources.getResource("data.txt");
+    URL url = Resources.getResource("test_data/data.txt");
     SparkConf conf = new SparkConf().setAppName("Word Count").setMaster("local[*]");
     JavaSparkContext sc = new JavaSparkContext(conf);
     JavaRDD<String> textFile = sc.textFile(url.getPath());

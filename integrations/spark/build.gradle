@@ -29,6 +29,7 @@ ext {
     bytebuddyVersion = '1.11.6'
     sparkVersion = '2.4.8'
     jacksonVersion = '2.12.4'
+    testcontainersVersion = '1.15.3'
 }
 
 dependencies {
@@ -51,11 +52,15 @@ dependencies {
     testImplementation "org.postgresql:postgresql:${postgresqlVersion}"
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
     testImplementation('org.xerial:sqlite-jdbc:3.36.0.1')
+    testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
+    testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:1.18.16"
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'integration-test'
+    }
     forkEvery 1
     maxParallelForks 3
     testLogging {
@@ -66,6 +71,24 @@ test {
             'junit.platform.output.capture.stdout': 'true',
             'junit.platform.output.capture.stderr': 'true'
     ]
+}
+
+tasks.register("integrationTests", Test) {
+    useJUnitPlatform {
+        includeTags "integration-test"
+    }
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
+    systemProperties = [
+            'junit.platform.output.capture.stdout': 'true',
+            'junit.platform.output.capture.stderr': 'true',
+            'marquez.image.tag': project.getProperty('marquez.image.tag'),
+            'spark.version': project.getProperty('spark.version'),
+            'marquez.spark.jar': jar.archiveFile.get().asFile.name
+    ]
+    mustRunAfter shadowJar
 }
 
 publishing {
