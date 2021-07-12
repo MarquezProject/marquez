@@ -16,6 +16,8 @@ package marquez.service.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.List;
@@ -23,12 +25,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.models.JobVersion;
 import marquez.common.models.DatasetVersionId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
@@ -36,9 +40,17 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 
+/**
+ * Service model for a job run. Job attributes are serialized as {@link JobVersion} attributes. The
+ * {@link #location} field is ignored entirely in the serialized output. Deserializing from JSON
+ * constructs the original Run as best as possible- the {@link JobVersion} is deconstructed and
+ * component attributes are set, but the location field will not be set, as it's missing in the
+ * serialized output.
+ */
 @EqualsAndHashCode
 @ToString
 @Slf4j
+@JsonDeserialize(builder = Run.Builder.class)
 public final class Run {
   @Getter private final RunId id;
   @Getter private final Instant createdAt;
@@ -139,5 +151,52 @@ public final class Run {
   @JsonIgnore
   public String getLocation() {
     return location;
+  }
+
+  /**
+   * JSON deserializer that reconstructs the Run parameters from the JSON serialized format (i.e.,
+   * extracts namespace, job, and version from the {@link JobVersion} structure).
+   */
+  @JsonPOJOBuilder
+  @Data
+  public static class Builder {
+    private RunId id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    @Nullable private Instant nominalStartTime;
+    @Nullable private Instant nominalEndTime;
+    private RunState state;
+    @Nullable private Instant startedAt;
+    @Nullable private Instant endedAt;
+    @Nullable @Setter private Long durationMs;
+    private Map<String, String> args;
+    private JobVersionId jobVersion;
+    private String location;
+    private List<DatasetVersionId> inputVersions;
+    private List<DatasetVersionId> outputVersions;
+    private Map<String, String> context;
+    private ImmutableMap<String, Object> facets;
+
+    public Run build() {
+      return new Run(
+          id,
+          createdAt,
+          updatedAt,
+          nominalStartTime,
+          nominalEndTime,
+          state,
+          startedAt,
+          endedAt,
+          durationMs,
+          args,
+          jobVersion.getNamespace().getValue(),
+          jobVersion.getName().getValue(),
+          jobVersion.getVersion(),
+          location,
+          inputVersions,
+          outputVersions,
+          context,
+          facets);
+    }
   }
 }
