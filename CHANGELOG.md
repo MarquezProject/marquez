@@ -2,6 +2,15 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.16.0...HEAD)
 
+### Fixed
+
+* dbt packages should look for namespace packages [@mobuchowski](https://github.com/mobuchowski)
+* Add common integration dependency to dbt plugins [@mobuchowski](https://github.com/mobuchowski)
+* `DatasetVersionDao` queries missing input and output facets [@dominiquetipton](https://github.com/dominiquetipton)
+* (De)serialization issue for `Run` and `JobData` models [@collado-mike](https://github.com/collado-mike)
+* Prefix spark `openlineage.*` configuration parameters with `spark.*` [@collado-mike](https://github.com/collado-mike)
+* Parse multi-statement sql in **class** `SqlParser` used in Airflow integration [@wslulciuc](https://github.com/wslulciuc)
+
 ## [0.16.0](https://github.com/MarquezProject/marquez/compare/0.15.2...0.16.0)
 
 ### Added
