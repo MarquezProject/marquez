@@ -32,10 +32,10 @@ public class JobData implements NodeData {
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
   @NonNull NamespaceName namespace;
-  @NonNull @Setter ImmutableSet<DatasetId> inputs;
-  @NonNull @Setter ImmutableSet<UUID> inputUuids;
-  @NonNull @Setter ImmutableSet<DatasetId> outputs;
-  @NonNull @Setter ImmutableSet<UUID> outputUuids;
+  @Setter ImmutableSet<DatasetId> inputs = ImmutableSet.of();
+  @Setter ImmutableSet<UUID> inputUuids = ImmutableSet.of();
+  @Setter ImmutableSet<DatasetId> outputs = ImmutableSet.of();
+  @Setter ImmutableSet<UUID> outputUuids = ImmutableSet.of();
   @Nullable URL location;
   @NonNull ImmutableMap<String, String> context;
   @Nullable String description;
