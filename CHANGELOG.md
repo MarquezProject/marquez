@@ -10,6 +10,7 @@
 * (De)serialization issue for `Run` and `JobData` models [@collado-mike](https://github.com/collado-mike)
 * Prefix spark `openlineage.*` configuration parameters with `spark.*` [@collado-mike](https://github.com/collado-mike)
 * Parse multi-statement sql in **class** `SqlParser` used in Airflow integration [@wslulciuc](https://github.com/wslulciuc)
+* URL-encode namespace on calls to API backend [@phixMe](https://github.com/phixMe) 
 
 ## [0.16.0](https://github.com/MarquezProject/marquez/compare/0.15.2...0.16.0)
 
