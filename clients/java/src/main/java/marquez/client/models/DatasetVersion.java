@@ -93,6 +93,10 @@ public abstract class DatasetVersion {
     return Optional.ofNullable(createdByRun);
   }
 
+  public boolean hasFacets() {
+    return !facets.isEmpty();
+  }
+
   public static DatasetVersion fromJson(@NonNull final String json) {
     return Utils.fromJson(json, new TypeReference<DatasetVersion>() {});
   }

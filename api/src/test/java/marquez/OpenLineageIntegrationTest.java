@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import marquez.client.models.Dataset;
+import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.Run;
 import marquez.common.Utils;
@@ -76,9 +77,11 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     // (4) Verify the input and output dataset facets associated with the OpenLineage event.
     final JsonNode inputsAsJson = openLineageEventAsJson.path("inputs");
     inputsAsJson.forEach(this::validateDatasetFacets);
+    inputsAsJson.forEach(this::validateDatasetVersionFacets);
 
     final JsonNode outputsAsJson = openLineageEventAsJson.path("outputs");
     outputsAsJson.forEach(this::validateDatasetFacets);
+    outputsAsJson.forEach(this::validateDatasetVersionFacets);
 
     // (5) Verify the job facets associated with the OpenLineage event.
     final JsonNode jobAsJson = openLineageEventAsJson.path("job");
@@ -87,10 +90,12 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     final JsonNode jobFacetsAsJson = jobAsJson.path("facets");
 
     final Job job = client.getJob(jobNamespace, jobName);
-    if (job.hasFacets()) {
+    if (!jobFacetsAsJson.isMissingNode()) {
       final JsonNode facetsForRunAsJson =
           Utils.getMapper().convertValue(job.getFacets(), JsonNode.class);
       assertThat(facetsForRunAsJson).isEqualTo(jobFacetsAsJson);
+    } else {
+      assertThat(job.getFacets()).isEmpty();
     }
 
     // (6) Verify the run facets associated with the OpenLineage event.
@@ -99,10 +104,12 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     final JsonNode runFacetsAsJson = runAsJson.path("facets");
 
     final Run run = client.getRun(runId);
-    if (run.hasFacets()) {
+    if (!runFacetsAsJson.isMissingNode()) {
       final JsonNode facetsForRunAsJson =
           Utils.getMapper().convertValue(run.getFacets(), JsonNode.class);
       assertThat(facetsForRunAsJson).isEqualTo(runFacetsAsJson);
+    } else {
+      assertThat(run.getFacets()).isEmpty();
     }
   }
 
@@ -112,12 +119,34 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     final JsonNode expectedFacets = json.path("facets");
 
     final Dataset dataset = client.getDataset(namespace, output);
-    if (dataset.hasFacets()) {
+    if (!expectedFacets.isMissingNode()) {
       assertThat(dataset.getNamespace()).isEqualTo(namespace);
       assertThat(dataset.getName()).isEqualTo(output);
       final JsonNode facetsForDataset =
           Utils.getMapper().convertValue(dataset.getFacets(), JsonNode.class);
       assertThat(facetsForDataset).isEqualTo(expectedFacets);
+    } else {
+      assertThat(dataset.getFacets()).isEmpty();
+    }
+  }
+
+  private void validateDatasetVersionFacets(JsonNode json) {
+    final String namespace = json.path("namespace").asText();
+    final String output = json.path("name").asText();
+    final JsonNode expectedFacets = json.path("facets");
+
+    List<DatasetVersion> datasetVersions = client.listDatasetVersions(namespace, output);
+    assertThat(datasetVersions).isNotEmpty();
+
+    DatasetVersion latestDatasetVersion = datasetVersions.get(0);
+    if (!expectedFacets.isMissingNode()) {
+      assertThat(latestDatasetVersion.getNamespace()).isEqualTo(namespace);
+      assertThat(latestDatasetVersion.getName()).isEqualTo(output);
+      final JsonNode facetsForDatasetVersion =
+          Utils.getMapper().convertValue(latestDatasetVersion.getFacets(), JsonNode.class);
+      assertThat(facetsForDatasetVersion).isEqualTo(expectedFacets);
+    } else {
+      assertThat(latestDatasetVersion.getFacets()).isEmpty();
     }
   }
 
