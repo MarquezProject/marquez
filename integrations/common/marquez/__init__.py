@@ -11,4 +11,4 @@
 # limitations under the License.
 
 __author__ = """Marquez Project"""
-__version__ = "0.16.0"
+__version__ = "0.16.1rc1"
