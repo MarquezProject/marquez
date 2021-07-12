@@ -2,11 +2,18 @@ package marquez;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.net.http.HttpResponse;
+import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DatasetVersion;
@@ -15,6 +22,9 @@ import marquez.client.models.JobMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.StreamVersion;
+import marquez.common.Utils;
+import marquez.db.LineageTestUtils;
+import marquez.service.models.LineageEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,24 +79,86 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testApp_getTableVersion() {
+  public void testApp_getTableVersions() {
     client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
-    List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
-    assertThat(versions).hasSizeGreaterThan(0);
-    DatasetVersion datasetVersion =
-        client.getDatasetVersion(NAMESPACE_NAME, DB_TABLE_NAME, versions.get(0).getVersion());
 
-    assertThat(datasetVersion.getId()).isEqualTo(new DatasetId(NAMESPACE_NAME, DB_TABLE_NAME));
-    assertThat(datasetVersion.getName()).isEqualTo(DB_TABLE_NAME);
-    assertThat(datasetVersion.getCreatedAt()).isNotNull();
-    assertThat(datasetVersion.getNamespace()).isEqualTo(NAMESPACE_NAME);
-    assertThat(datasetVersion.getVersion()).isNotNull();
-    assertThat(datasetVersion.getPhysicalName()).isEqualTo(DB_TABLE_META.getPhysicalName());
-    assertThat(datasetVersion.getSourceName()).isEqualTo(DB_TABLE_META.getSourceName());
-    assertThat(datasetVersion.getDescription()).isEqualTo(DB_TABLE_META.getDescription());
-    assertThat(datasetVersion.getFields()).hasSameElementsAs(DB_TABLE_META.getFields());
-    assertThat(datasetVersion.getTags()).isEqualTo(DB_TABLE_META.getTags());
-    assertThat(datasetVersion.getCreatedByRun()).isEqualTo(Optional.empty());
+    final LineageEvent.DatasetFacets datasetFacets =
+        LineageTestUtils.newDatasetFacet(
+            ImmutableMap.of("outputFacetKey", "outputFacetValue"),
+            LineageEvent.SchemaField.builder()
+                .name("firstname")
+                .type("string")
+                .description("the first name")
+                .build());
+    datasetFacets
+        .getDocumentation()
+        .setDescription(DB_TABLE_META.getDescription().orElse("the dataset documentation"));
+
+    final LineageEvent lineageEvent =
+        LineageEvent.builder()
+            .producer("testApp_getTableVersions")
+            .eventType("COMPLETE")
+            .run(
+                new LineageEvent.Run(
+                    UUID.randomUUID().toString(), LineageEvent.RunFacet.builder().build()))
+            .job(LineageEvent.Job.builder().namespace(NAMESPACE_NAME).name(JOB_NAME).build())
+            .eventTime(ZonedDateTime.now())
+            .inputs(Collections.emptyList())
+            .outputs(
+                Collections.singletonList(
+                    LineageEvent.Dataset.builder()
+                        .namespace(NAMESPACE_NAME)
+                        .name(DB_TABLE_NAME)
+                        .facets(datasetFacets)
+                        .build()))
+            .build();
+
+    final CompletableFuture<Integer> resp =
+        this.sendLineage(Utils.toJson(lineageEvent))
+            .thenApply(HttpResponse::statusCode)
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+    assertThat(resp.join()).isEqualTo(201);
+
+    List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
+    assertThat(versions).hasSizeGreaterThanOrEqualTo(2);
+    versions.forEach(
+        datasetVersion -> {
+          assertThat(datasetVersion.getId())
+              .isEqualTo(new DatasetId(NAMESPACE_NAME, DB_TABLE_NAME));
+          assertThat(datasetVersion.getName()).isEqualTo(DB_TABLE_NAME);
+          assertThat(datasetVersion.getCreatedAt()).isNotNull();
+          assertThat(datasetVersion.getNamespace()).isEqualTo(NAMESPACE_NAME);
+          assertThat(datasetVersion.getVersion()).isNotNull();
+          assertThat(datasetVersion.getDescription()).isEqualTo(DB_TABLE_META.getDescription());
+        });
+
+    final DatasetVersion initialDatasetVersion =
+        client.getDatasetVersion(
+            NAMESPACE_NAME, DB_TABLE_NAME, versions.get(versions.size() - 1).getVersion());
+    assertThat(initialDatasetVersion.getPhysicalName()).isEqualTo(DB_TABLE_META.getPhysicalName());
+    assertThat(initialDatasetVersion.getSourceName()).isEqualTo(DB_TABLE_META.getSourceName());
+    assertThat(initialDatasetVersion.getFields()).hasSameElementsAs(DB_TABLE_META.getFields());
+    assertThat(initialDatasetVersion.getTags()).isEqualTo(DB_TABLE_META.getTags());
+    assertThat(initialDatasetVersion.getCreatedByRun()).isNotPresent();
+    assertThat(initialDatasetVersion.hasFacets()).isFalse();
+
+    final DatasetVersion latestDatasetVersion =
+        client.getDatasetVersion(NAMESPACE_NAME, DB_TABLE_NAME, versions.get(0).getVersion());
+    assertThat(latestDatasetVersion.getCreatedByRun()).isPresent();
+    assertThat(latestDatasetVersion.getCreatedByRun().get().getId())
+        .isEqualTo(lineageEvent.getRun().getRunId());
+    assertThat(latestDatasetVersion.hasFacets()).isTrue();
+    assertThat(latestDatasetVersion.getFacets())
+        .isEqualTo(
+            Utils.getMapper()
+                .convertValue(
+                    lineageEvent.getOutputs().get(0).getFacets(),
+                    new TypeReference<Map<String, Object>>() {}));
   }
 
   @Test
