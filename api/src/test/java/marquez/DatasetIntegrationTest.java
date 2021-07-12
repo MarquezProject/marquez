@@ -82,9 +82,13 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
   public void testApp_getTableVersions() {
     client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
 
+    ImmutableMap<String, Object> outputFacets =
+        ImmutableMap.of("outputFacetKey", "outputFacetValue");
+    ImmutableMap<String, Object> inputFacets = ImmutableMap.of("inputFacetKey", "inputFacetValue");
+
     final LineageEvent.DatasetFacets datasetFacets =
         LineageTestUtils.newDatasetFacet(
-            ImmutableMap.of("outputFacetKey", "outputFacetValue"),
+            outputFacets,
             LineageEvent.SchemaField.builder()
                 .name("firstname")
                 .type("string")
@@ -124,6 +128,44 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
                 });
     assertThat(resp.join()).isEqualTo(201);
 
+    datasetFacets.setAdditional(inputFacets);
+    final LineageEvent readEvent =
+        LineageEvent.builder()
+            .producer("testApp_getTableVersions")
+            .eventType("COMPLETE")
+            .run(
+                new LineageEvent.Run(
+                    UUID.randomUUID().toString(), LineageEvent.RunFacet.builder().build()))
+            .job(LineageEvent.Job.builder().namespace(NAMESPACE_NAME).name("aReadOnlyJob").build())
+            .eventTime(ZonedDateTime.now())
+            .inputs(
+                Collections.singletonList(
+                    LineageEvent.Dataset.builder()
+                        .namespace(NAMESPACE_NAME)
+                        .name(DB_TABLE_NAME)
+                        .facets(datasetFacets)
+                        .build()))
+            .outputs(Collections.emptyList())
+            .build();
+
+    final CompletableFuture<Integer> readResp =
+        this.sendLineage(Utils.toJson(readEvent))
+            .thenApply(HttpResponse::statusCode)
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+    assertThat(readResp.join()).isEqualTo(201);
+
+    // update dataset facet to include input and output facets
+    // save the expected facets as a map for comparison
+    datasetFacets.setAdditional(
+        ImmutableMap.<String, Object>builder().putAll(inputFacets).putAll(outputFacets).build());
+    Map<String, Object> expectedFacetsMap =
+        Utils.getMapper().convertValue(datasetFacets, new TypeReference<Map<String, Object>>() {});
+
     List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
     assertThat(versions).hasSizeGreaterThanOrEqualTo(2);
     versions.forEach(
@@ -136,6 +178,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
           assertThat(datasetVersion.getVersion()).isNotNull();
           assertThat(datasetVersion.getDescription()).isEqualTo(DB_TABLE_META.getDescription());
         });
+    assertThat(versions.get(0).getFacets()).isEqualTo(expectedFacetsMap);
 
     final DatasetVersion initialDatasetVersion =
         client.getDatasetVersion(
@@ -153,12 +196,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     assertThat(latestDatasetVersion.getCreatedByRun().get().getId())
         .isEqualTo(lineageEvent.getRun().getRunId());
     assertThat(latestDatasetVersion.hasFacets()).isTrue();
-    assertThat(latestDatasetVersion.getFacets())
-        .isEqualTo(
-            Utils.getMapper()
-                .convertValue(
-                    lineageEvent.getOutputs().get(0).getFacets(),
-                    new TypeReference<Map<String, Object>>() {}));
+    assertThat(latestDatasetVersion.getFacets()).isEqualTo(expectedFacetsMap);
   }
 
   @Test
