@@ -318,3 +318,4 @@ def test_parse_multi_statement():
     )
     assert sql_meta.in_tables == [DbTableName('schema0.table0')]
     assert sql_meta.out_tables == [DbTableName('schema1.table1')]
+
