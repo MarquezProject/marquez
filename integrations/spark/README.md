@@ -10,14 +10,14 @@ Maven:
 <dependency>
     <groupId>io.github.marquezproject</groupId>
     <artifactId>marquez-spark</artifactId>
-    <version>0.16.0</version>
+    <version>0.16.1-rc.1</version>
 </dependency>
 ```
 
 or Gradle:
 
 ```groovy
-implementation 'io.github.marquezproject:marquez-spark:0.16.0
+implementation 'io.github.marquezproject:marquez-spark:0.16.1-rc.1
 ```
 
 ## Getting started
@@ -52,9 +52,9 @@ from pyspark.sql import SparkSession
 
 spark = (SparkSession.builder.master('local')
          .appName('sample_spark')
-         .config('spark.jars.packages', 'io.github.marquezproject:marquez-spark:0.16.0
+         .config('spark.jars.packages', 'io.github.marquezproject:marquez-spark:0.16.1-rc.1
          .config('spark.extraListeners', 'marquez.spark.agent.SparkListener')
-         .config('openlineage.url', 'http://marquez:5000/api/v1/namespaces/spark_integration/')
+         .config('spark.openlineage.url', 'http://marquez:5000/api/v1/namespaces/spark_integration/')
          .getOrCreate())
 ```
 To use the local jar, you can build it with 
@@ -74,7 +74,7 @@ spark = (SparkSession.builder.master('local').appName('rdd_to_dataframe')
              .config('spark.jars', file)
              .config('spark.jars.packages', 'org.postgresql:postgresql:42.2.+')
              .config('spark.extraListeners', 'marquez.spark.agent.SparkListener')
-             .config('openlineage.url', 'http://marquez:5000/api/v1/namespaces/spark_integration/')
+             .config('spark.openlineage.url', 'http://marquez:5000/api/v1/namespaces/spark_integration/')
              .getOrCreate())
 ```
 
@@ -123,8 +123,8 @@ t1 = DataProcPySparkOperator(
     job_name=job_name,
     dataproc_pyspark_properties={
       "spark.extraListeners": "marquez.spark.agent.SparkListener",
-      "spark.jars.packages": "io.github.marquezproject:marquez-spark:0.16.0
-      "openlineage.url": f"{marquez_url}/api/v1/namespaces/{marquez_namespace}/jobs/dump_orders_to_gcs/runs/{{{{task_run_id(run_id, task)}}}}?api_key={api_key}"
+      "spark.jars.packages": "io.github.marquezproject:marquez-spark:0.16.1-rc.1
+      "spark.openlineage.url": f"{marquez_url}/api/v1/namespaces/{marquez_namespace}/jobs/dump_orders_to_gcs/runs/{{{{task_run_id(run_id, task)}}}}?api_key={api_key}"
     },
     dag=dag)
 ```
@@ -156,8 +156,8 @@ t1 = DataprocClusterCreateOperator(
     init_actions_uris=['gs://dataproc-initialization-actions/cloud-sql-proxy/cloud-sql-proxy.sh'],
     properties={
       "spark.extraListeners": "marquez.spark.agent.SparkListener",
-      "spark.jars.packages": "io.github.marquezproject:marquez-spark:0.16.0
-      "openlineage.url": "{marquez_url}/api/v1/namespaces/{marquez_namespace}/?api_key={api_key}"
+      "spark.jars.packages": "io.github.marquezproject:marquez-spark:0.16.1-rc.1
+      "spark.openlineage.url": "{marquez_url}/api/v1/namespaces/{marquez_namespace}/?api_key={api_key}"
     },
     dag=dag)
 ```
@@ -198,15 +198,15 @@ t1 = DataProcPySparkOperator(
 
 ### Spark Listener
 The SparkListener reads its configuration from SparkConf parameters. These can be specified on the
-command line (e.g., `--conf "openlineage.url=http://marquez:5000/api/v1/namespaces/my_namespace/job/the_job"`)
+command line (e.g., `--conf "spark.openlineage.url=http://marquez:5000/api/v1/namespaces/my_namespace/job/the_job"`)
 or from the `conf/spark-defaults.conf` file. The following parameters can be specified
 | Parameter | Definition | Example |
-| openlineage.host | The hostname of the OpenLineage API server where events should be reported | http://localhost:5000 |
-| openlineage.version | The API version of the OpenLineage API server | 1|
-| openlineage.namespace | The default namespace to be applied for any jobs submitted | MyNamespace|
-| openlineage.parentJobName | The job name to be used for the parent job facet | ParentJobName | 
-| openlineage.parentRunId | The RunId of the parent job that initiated this Spark job | xxxx-xxxx-xxxx-xxxx |
-| openlineage.apiKey | An API key to be used when sending events to the OpenLineage server | abcdefghijk |
+| spark.openlineage.host | The hostname of the OpenLineage API server where events should be reported | http://localhost:5000 |
+| spark.openlineage.version | The API version of the OpenLineage API server | 1|
+| spark.openlineage.namespace | The default namespace to be applied for any jobs submitted | MyNamespace|
+| spark.openlineage.parentJobName | The job name to be used for the parent job facet | ParentJobName | 
+| spark.openlineage.parentRunId | The RunId of the parent job that initiated this Spark job | xxxx-xxxx-xxxx-xxxx |
+| spark.openlineage.apiKey | An API key to be used when sending events to the OpenLineage server | abcdefghijk |
 
 ### Java Agent
 The java agent accepts an argument in the form of a uri. It includes the location of Marquez, the

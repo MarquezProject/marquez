@@ -2,13 +2,20 @@ package marquez;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.time.Instant;
 import java.util.UUID;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.JobMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
+import marquez.common.Utils;
+import marquez.common.models.RunId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -76,5 +83,34 @@ public class RunIntegrationTest extends BaseIntegrationTest {
     client.createDataset(NAMESPACE_NAME, "my-output-ds", DB_TABLE_META_UPDATED);
 
     client.markRunAs(createdRun.getId(), RunState.COMPLETED);
+  }
+
+  @Test
+  public void testSerialization() throws JsonProcessingException {
+    marquez.service.models.Run run =
+        new marquez.service.models.Run(
+            new RunId(UUID.randomUUID().toString()),
+            Instant.now(),
+            Instant.now(),
+            Instant.now(),
+            Instant.now(),
+            marquez.common.models.RunState.COMPLETED,
+            Instant.now(),
+            Instant.now(),
+            100L,
+            ImmutableMap.of(),
+            NAMESPACE_NAME,
+            JOB_NAME,
+            UUID.randomUUID(),
+            "location",
+            ImmutableList.of(),
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            ImmutableMap.of());
+    ObjectMapper objectMapper = Utils.newObjectMapper();
+    String json = objectMapper.writeValueAsString(run);
+    marquez.service.models.Run deser =
+        objectMapper.readValue(json, marquez.service.models.Run.class);
+    assertThat(deser).usingRecursiveComparison().ignoringFields("location").isEqualTo(run);
   }
 }
