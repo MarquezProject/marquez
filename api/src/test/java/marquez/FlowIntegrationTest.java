@@ -1,17 +1,29 @@
 package marquez;
 
+import static java.util.Map.entry;
+import static org.apache.http.Consts.UTF_8;
+import static org.apache.http.HttpHeaders.ACCEPT;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import marquez.client.Utils;
 import marquez.client.models.Dataset;
 import marquez.client.models.DbTableMeta;
+import marquez.client.models.Field;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
+import marquez.common.models.FieldType;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -19,20 +31,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static java.util.Map.entry;
-import static org.apache.http.Consts.UTF_8;
-import static org.apache.http.HttpHeaders.ACCEPT;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.hasItems;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
 public class FlowIntegrationTest extends BaseIntegrationTest {
@@ -47,7 +45,6 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
     createSource(STREAM_SOURCE_NAME);
   }
 
-
   @Test
   public void testSameInputAndOutputDatasetCreatedViaDatasetApi() throws IOException {
 
@@ -61,9 +58,8 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
 
     client.markRunAs(createdRun.getId(), RunState.COMPLETED);
 
-    assertDatasetVersionDiffers(createdRun);
+    assertInputDatasetVersionDiffersFromOutput(getRunResponse(createdRun));
   }
-
 
   @Test
   public void testSameInputAndOutputDatasetWithJobRunIdUpdated() throws IOException {
@@ -79,7 +75,7 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
 
     Run completed = client.markRunAs(createdRun.getId(), RunState.COMPLETED);
 
-    assertDatasetVersionDiffers(createdRun);
+    assertInputDatasetVersionDiffersFromOutput(getRunResponse(createdRun));
   }
 
   @Test
@@ -94,54 +90,63 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
     Run completed = client.markRunAs(createdRun.getId(), RunState.COMPLETED);
     createJob(createdRun.getId());
 
-    assertDatasetVersionDiffers(createdRun);
+    assertInputDatasetVersionDiffersFromOutput(getRunResponse(createdRun));
   }
 
   @Test
-  public void testSameInputAndOutputDatasetCreatedViaJobAndDatasetApi() throws IOException {
+  public void testOutputVersionShouldBeOnlyOneCreatedViaJobAndDatasetApi() throws IOException {
     Dataset dataset = createDataset(null);
     createJob(null);
     Run createdRun = client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build());
     createJob(createdRun.getId());
-    Map<String, Object> runResponse = getRunResponse(createdRun);
     Dataset outputDataset = createDataset(createdRun.getId());
-    Map<String, Object> runResponse2 = getRunResponse(createdRun);
+    Map<String, Object> runResponse = getRunResponse(createdRun);
     client.markRunAs(createdRun.getId(), RunState.COMPLETED);
-    assertDatasetVersionDiffers(createdRun);
+
+    Map<String, Object> body = getRunResponse(createdRun);
+    assertThat(((List<Map<String, String>>) body.get("outputVersions"))).size().isEqualTo(1);
+    assertInputDatasetVersionDiffersFromOutput(body);
   }
 
-  private void assertDatasetVersionDiffers(Run createdRun) throws IOException {
-    Map<String, Object> body = getRunResponse(createdRun);
+  private void assertInputDatasetVersionDiffersFromOutput(Map<String, Object> body)
+      throws IOException {
 
-    List<Map<String, String>> inputDatasetVersionIds = ((List<Map<String, String>>) body.get("inputVersions"));
+    List<Map<String, String>> inputDatasetVersionIds =
+        ((List<Map<String, String>>) body.get("inputVersions"));
     assertThat(inputDatasetVersionIds.stream().map(Map::entrySet).collect(Collectors.toList()))
-        .allMatch(e->e.contains(entry("namespace", NAMESPACE_NAME)))
-        .allMatch(e->e.contains(entry("name", DATASET_NAME)));
+        .allMatch(e -> e.contains(entry("namespace", NAMESPACE_NAME)))
+        .allMatch(e -> e.contains(entry("name", DATASET_NAME)));
 
-    List<Map<String, String>> outputDatasetVersionIds = ((List<Map<String, String>>) body.get("outputVersions"));
+    List<Map<String, String>> outputDatasetVersionIds =
+        ((List<Map<String, String>>) body.get("outputVersions"));
     assertThat(outputDatasetVersionIds.stream().map(Map::entrySet).collect(Collectors.toList()))
-        .allMatch(e->e.contains(entry("namespace", NAMESPACE_NAME)))
-        .allMatch(e->e.contains(entry("name", DATASET_NAME)));
+        .allMatch(e -> e.contains(entry("namespace", NAMESPACE_NAME)))
+        .allMatch(e -> e.contains(entry("name", DATASET_NAME)));
 
-    List<String> inputVersions = inputDatasetVersionIds.stream().map(it -> it.get("version")).collect(Collectors.toList());
-    List<String> outputVersions = outputDatasetVersionIds.stream().map(it -> it.get("version")).collect(Collectors.toList());
+    List<String> inputVersions =
+        inputDatasetVersionIds.stream().map(it -> it.get("version")).collect(Collectors.toList());
+    List<String> outputVersions =
+        outputDatasetVersionIds.stream().map(it -> it.get("version")).collect(Collectors.toList());
 
     assertThat(Collections.disjoint(inputVersions, outputVersions)).isTrue();
   }
 
   private List<String> extractVersion(List<Map<String, String>> datasetVersionIds) {
-    return datasetVersionIds.stream().flatMap(it -> it.entrySet().stream()).
-        filter(e -> e.getKey().equals("version"))
-        .map(Map.Entry::getValue).collect(Collectors.toList());
+    return datasetVersionIds.stream()
+        .flatMap(it -> it.entrySet().stream())
+        .filter(e -> e.getKey().equals("version"))
+        .map(Map.Entry::getValue)
+        .collect(Collectors.toList());
   }
 
   private Map<String, Object> getRunResponse(Run run) throws IOException {
-    final HttpGet request = new HttpGet(String.format(baseUrl + "/api/v1/jobs/runs/%s", run.getId()));
+    final HttpGet request =
+        new HttpGet(String.format(baseUrl + "/api/v1/jobs/runs/%s", run.getId()));
     request.addHeader(ACCEPT, APPLICATION_JSON.toString());
     final HttpResponse response = http.execute(request);
 
-    return Utils.fromJson(EntityUtils.toString(response.getEntity(), UTF_8), new TypeReference<>() {
-    });
+    return Utils.fromJson(
+        EntityUtils.toString(response.getEntity(), UTF_8), new TypeReference<>() {});
   }
 
   private Dataset createDataset(String runId) {
@@ -149,7 +154,13 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
         DbTableMeta.builder()
             .physicalName(DB_TABLE_PHYSICAL_NAME)
             .sourceName(DB_TABLE_SOURCE_NAME)
-            .fields(ImmutableList.of(newFieldWith(SENSITIVE.getName()), newField()))
+            .fields(
+                ImmutableList.of(
+                    new Field(
+                        "test_field1",
+                        FieldType.BOOL.name(),
+                        ImmutableSet.of(SENSITIVE.getName()),
+                        "test_description")))
             .tags(ImmutableSet.of(PII.getName()))
             .description(DB_TABLE_DESCRIPTION)
             .runId(runId)
@@ -171,5 +182,4 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
             .build();
     return client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
   }
-
 }

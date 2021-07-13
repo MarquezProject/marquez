@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import marquez.common.Utils;
+import marquez.common.VersionUtils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.Field;
 import marquez.common.models.JobName;
@@ -284,12 +285,14 @@ public interface RunDao extends BaseDao {
         ds.ifPresent(
             d -> {
               UUID version =
-                  openLineageDao.version(
-                      d.getNamespace().getValue(),
-                      d.getSourceName().getValue(),
-                      d.getName().getValue(),
-                      toSchemaFields(d.getFields()),
-                      runUuid);
+                  VersionUtils.newDatasetVersionFor(
+                          d.getNamespace().getValue(),
+                          d.getSourceName().getValue(),
+                          d.getPhysicalName().getValue(),
+                          d.getName().getValue(),
+                          toSchemaFields(d.getFields()),
+                          runUuid)
+                      .getValue();
               datasetVersionDao.upsert(
                   UUID.randomUUID(),
                   Instant.now(),
