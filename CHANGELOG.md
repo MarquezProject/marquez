@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.16.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.16.1...HEAD)
+
+## [0.16.1](https://github.com/MarquezProject/marquez/compare/0.16.0...0.16.1)
 
 ### Fixed
 
