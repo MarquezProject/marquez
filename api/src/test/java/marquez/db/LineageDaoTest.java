@@ -27,6 +27,7 @@ import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.LineageEvent.SourceCodeLocationJobFacet;
+import marquez.service.models.Run;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.api.ObjectAssert;
 import org.jdbi.v3.core.Jdbi;
@@ -529,5 +530,104 @@ public class LineageDaoTest {
         .hasSize(3)
         .extracting(ds -> ds.getName().getValue())
         .allMatch(str -> str.contains("outputData2"));
+  }
+
+  @Test
+  public void testGetCurrentRuns() {
+
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
+    List<JobLineage> newRows =
+        writeDownstreamLineage(
+            openLineageDao,
+            new LinkedList<>(
+                Arrays.asList(
+                    new DatasetConsumerJob("readJob", 3, Optional.of("outputData2")),
+                    new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
+            jobFacet,
+            dataset);
+
+    Set<UUID> expectedRunIds =
+        Stream.concat(
+                Stream.of(writeJob.getRun().getUuid()), newRows.stream().map(JobLineage::getRunId))
+            .collect(Collectors.toSet());
+    Set<UUID> jobids =
+        Stream.concat(
+                Stream.of(writeJob.getJob().getUuid()), newRows.stream().map(JobLineage::getId))
+            .collect(Collectors.toSet());
+
+    List<Run> currentRuns = lineageDao.getCurrentRuns(jobids);
+
+    // assert the job does exist
+    assertThat(currentRuns)
+        .hasSize(expectedRunIds.size())
+        .extracting(r -> r.getId().getValue())
+        .containsAll(expectedRunIds);
+  }
+
+  @Test
+  public void testGetCurrentRunsWithFailedJob() {
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao, "writeJob", "FAIL", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+
+    Set<UUID> jobids = Collections.singleton(writeJob.getJob().getUuid());
+
+    List<Run> currentRuns = lineageDao.getCurrentRuns(jobids);
+
+    // assert the job does exist
+    assertThat(currentRuns)
+        .hasSize(1)
+        .extracting(r -> r.getId().getValue())
+        .contains(writeJob.getRun().getUuid());
+  }
+
+  @Test
+  public void testGetCurrentRunsGetsLatestRun() {
+    for (int i = 0; i < 5; i++) {
+      LineageTestUtils.createLineageRow(
+          openLineageDao,
+          "writeJob",
+          "COMPLETE",
+          jobFacet,
+          Arrays.asList(),
+          Arrays.asList(dataset));
+    }
+
+    List<JobLineage> newRows =
+        writeDownstreamLineage(
+            openLineageDao,
+            new LinkedList<>(
+                Arrays.asList(
+                    new DatasetConsumerJob("readJob", 3, Optional.of("outputData2")),
+                    new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
+            jobFacet,
+            dataset);
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao, "writeJob", "FAIL", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+
+    Set<UUID> expectedRunIds =
+        Stream.concat(
+                Stream.of(writeJob.getRun().getUuid()), newRows.stream().map(JobLineage::getRunId))
+            .collect(Collectors.toSet());
+    Set<UUID> jobids =
+        Stream.concat(
+                Stream.of(writeJob.getJob().getUuid()), newRows.stream().map(JobLineage::getId))
+            .collect(Collectors.toSet());
+
+    List<Run> currentRuns = lineageDao.getCurrentRuns(jobids);
+
+    // assert the job does exist
+    assertThat(currentRuns)
+        .hasSize(expectedRunIds.size())
+        .extracting(r -> r.getId().getValue())
+        .containsAll(expectedRunIds);
   }
 }
