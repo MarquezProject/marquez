@@ -9,17 +9,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import marquez.common.Utils;
+import marquez.common.models.JobName;
+import marquez.common.models.NamespaceName;
 import marquez.db.JobVersionDao.IoType;
+import marquez.db.LineageDao;
 import marquez.graphql.mapper.LineageResultMapper.DatasetResult;
 import marquez.graphql.mapper.LineageResultMapper.JobResult;
 import marquez.graphql.mapper.LineageResultMapper.LineageResult;
+import marquez.service.LineageService;
+import marquez.service.models.NodeId;
 import org.jdbi.v3.core.Jdbi;
 
 public class GraphqlDataFetchers {
   private GraphqlDaos dao;
+  private LineageService lineageService;
 
   public GraphqlDataFetchers(Jdbi jdbi) {
     this.dao = jdbi.onDemand(GraphqlDaos.class);
+    this.lineageService = new LineageService(jdbi.onDemand(LineageDao.class));
   }
 
   public DataFetcher getDatasets() {
@@ -413,13 +420,10 @@ public class GraphqlDataFetchers {
 
   public DataFetcher getLineage() {
     return dataFetchingEnvironment -> {
-      String jobName = dataFetchingEnvironment.getArgument("name");
-      String namespace = dataFetchingEnvironment.getArgument("namespace");
+      String nodeId = dataFetchingEnvironment.getArgument("nodeId");
       Integer depth = dataFetchingEnvironment.getArgument("depth");
 
-      List<JobResult> results = dao.getLineage(jobName, namespace, depth);
-      Set<LineageResult> formattedResults = flattenToLineageRows(results);
-      return ImmutableMap.of("graph", formattedResults);
+      return lineageService.lineage(NodeId.of(nodeId), depth);
     };
   }
 

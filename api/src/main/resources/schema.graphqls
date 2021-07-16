@@ -1,6 +1,19 @@
 scalar UUID
 scalar DateTime
 scalar Json
+scalar NodeId
+scalar NodeType
+scalar NamespaceName
+scalar DatasetName
+scalar DatasetType
+scalar SourceName
+scalar FieldName
+scalar FieldType
+scalar TagName
+scalar JobName
+scalar JobType
+scalar RunId
+scalar RunState
 
 type Query {
   datasets: [Dataset]
@@ -8,37 +21,26 @@ type Query {
   namespace(name: String!): Namespace
   jobs: [Job]
   job(namespace: String!, name: String): Job
-  lineageFromJob(namespace: String!, name: String!, depth: Int = 10): LineageRoot
+  lineage(nodeId: String!, depth: Int = 10): LineageRoot
 }
 
 type LineageRoot {
-  graph: [LineageResultEntry]
+  graph: [Node]
 }
 
-union LineageResultEntry = DatasetLineageEntry | JobLineageEntry
-
-type DatasetLineageEntry {
-  name: String!
-  namespace: String!
-  type: String!
-  data: Dataset!
+type Node {
+  id: NodeId!
+  type: NodeType!
+  data: NodeData!
   inEdges: [EdgeEntry]
   outEdges: [EdgeEntry]
 }
 
-type JobLineageEntry {
-  name: String!
-  namespace: String!
-  type: String!
-  data: Job!
-  inEdges: [EdgeEntry]
-  outEdges: [EdgeEntry]
-}
+union NodeData = Dataset | Job
 
 type EdgeEntry {
-  name: String!
-  namespace: String!
-  type: String!
+  origin: NodeId!
+  destination: NodeId!
 }
 
 type Tag {
@@ -65,19 +67,22 @@ type RunStateRecord {
   run: Run
 }
 type Run {
+  id: RunId
   createdAt: DateTime
   updatedAt: DateTime
   nominalStartTime: DateTime
   nominalEndTime: DateTime
-
-  jobVersion: JobVersion
-  runArgs: Json
-  currentState: String
-  startState: RunStateRecord
-  endState: RunStateRecord
-  states: [RunStateRecord]
-  inputs: [DatasetVersion]
-  outputs: [DatasetVersion]
+  state: RunState
+  startedAt: DateTime
+  endedAt: DateTime
+  durationMs: Int
+  args: Json
+  jobVersion: JobVersionId
+  location: String
+  inputVersions: [DatasetVersionId]
+  outputVersions: [DatasetVersionId]
+  context: Json
+  facets: Json
 }
 type Owner {
   createdAt: DateTime
@@ -94,6 +99,12 @@ type Namespace {
   jobs: [Job]
   datasets: [Dataset]
 }
+
+type JobVersionId {
+  namespace: NamespaceName
+  name: JobName
+  version: UUID
+}
 type JobVersion {
   createdAt: DateTime
   updatedAt: DateTime
@@ -105,15 +116,29 @@ type JobVersion {
   inputs: [Dataset]
   outputs: [Dataset]
 }
+type JobId {
+  namespace: NamespaceName
+  name: JobName
+}
 type Job {
-  type: String
-  name: String
+  id: JobId
+  type: JobType
+  name: JobName
   createdAt: DateTime
   updatedAt: DateTime
+  namespace: NamespaceName
+  inputs: [DatasetId]
+  outputs: [DatasetId]
+  location: Json
+  context: String
   description: String
-  versions: [JobVersion]
-  namespace: Namespace
-  currentVersion: JobVersion
+  latestRun: Run
+}
+
+type DatasetVersionId {
+  namespace: NamespaceName
+  name: DatasetName
+  version: UUID
 }
 type DatasetVersion {
   createdAt: DateTime
@@ -132,20 +157,30 @@ type DatasetField {
   versions: [DatasetVersion]
   tags: [Tag]
 }
+
+type DatasetId {
+  namespace: NamespaceName
+  name: DatasetName
+}
+
+type Field {
+  name: FieldName
+  type: FieldType
+  tags: [TagName]
+  description: String!
+}
+
 type Dataset {
-  type: String
-  name: String
-  physicalName: String
+  id: DatasetId
+  type: DatasetType
+  name: DatasetName
+  physicalName: DatasetName
   createdAt: DateTime
   updatedAt: DateTime
+  namespace: NamespaceName
+  sourceName: SourceName
+  fields: [Field]
+  tags: [TagName]
   lastModifiedAt: DateTime
   description: String
-  source: Source
-  fields: [DatasetField]
-  jobVersionAsInput: [JobVersion]
-  jobVersionAsOutput: [JobVersion]
-  namespace: Namespace
-  tags: [Tag]
-  currentVersion: DatasetVersion
-  versions: [DatasetVersion]
 }

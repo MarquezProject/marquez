@@ -23,9 +23,25 @@ import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import lombok.SneakyThrows;
+import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetType;
+import marquez.common.models.FieldName;
+import marquez.common.models.FieldType;
+import marquez.common.models.JobName;
+import marquez.common.models.JobType;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
+import marquez.common.models.RunState;
+import marquez.common.models.SourceName;
+import marquez.common.models.TagName;
+import marquez.db.models.DatasetData;
+import marquez.db.models.JobData;
 import marquez.graphql.mapper.LineageResultMapper.DatasetResult;
 import marquez.graphql.mapper.LineageResultMapper.JobResult;
+import marquez.service.models.NodeId;
+import marquez.service.models.NodeType;
 import org.jdbi.v3.core.Jdbi;
 
 public class GraphqlSchemaBuilder {
@@ -59,7 +75,7 @@ public class GraphqlSchemaBuilder {
                 .dataFetcher("namespace", dataFetchers.getNamespaceByName())
                 .dataFetcher("jobs", dataFetchers.getJobs())
                 .dataFetcher("job", dataFetchers.getQueryJobByNamespaceAndName())
-                .dataFetcher("lineageFromJob", dataFetchers.getLineage()))
+                .dataFetcher("lineage", dataFetchers.getLineage()))
         .type(
             newTypeWiring("Dataset")
                 .dataFetcher("source", dataFetchers.getSourcesByDataset())
@@ -123,43 +139,65 @@ public class GraphqlSchemaBuilder {
             newTypeWiring("DatasetLineageEntry")
                 .dataFetcher("data", dataFetchers.getLineageDatasetsByNamespaceAndName()))
         .type(
-            newTypeWiring("LineageResultEntry")
+            newTypeWiring("NodeData")
                 .typeResolver(
                     new TypeResolver() {
                       @Override
                       public GraphQLObjectType getType(TypeResolutionEnvironment env) {
                         Object javaObject = env.getObject();
-                        if (javaObject instanceof JobResult) {
-                          return env.getSchema().getObjectType("JobLineageEntry");
-                        } else if (javaObject instanceof DatasetResult) {
-                          return env.getSchema().getObjectType("DatasetLineageEntry");
+                        if (javaObject instanceof JobData) {
+                          return env.getSchema().getObjectType("Job");
+                        } else if (javaObject instanceof DatasetData) {
+                          return env.getSchema().getObjectType("Dataset");
                         } else {
                           throw new RuntimeException("Lineage type not recognized");
                         }
                       }
                     }))
+        .scalar(GraphQLScalarType.newScalar()
+            .name("NodeId")
+            .coercing(coerce(NodeId::getValue, NodeId::of)).build()
+        )
+        .scalar(GraphQLScalarType.newScalar()
+                .name("NodeType")
+                .coercing(coerce(NodeType::toString, NodeType::valueOf)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("NamespaceName")
+            .coercing(coerce(NamespaceName::getValue, NamespaceName::of)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("DatasetName")
+            .coercing(coerce(DatasetName::getValue, DatasetName::of)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("DatasetType")
+            .coercing(coerce(DatasetType::toString, DatasetType::valueOf)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("SourceName")
+            .coercing(coerce(SourceName::getValue, SourceName::of)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("FieldName")
+            .coercing(coerce(FieldName::getValue, FieldName::of)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("FieldType")
+            .coercing(coerce(FieldType::toString, FieldType::valueOf)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("TagName")
+            .coercing(coerce(TagName::getValue, TagName::of)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("JobName")
+            .coercing(coerce(JobName::getValue, JobName::of)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("JobType")
+            .coercing(coerce(JobType::toString, JobType::valueOf)).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("RunId")
+            .coercing(coerce((RunId r) -> r.getValue().toString(), s -> RunId.of(UUID.fromString(s)))).build())
+        .scalar(GraphQLScalarType.newScalar()
+            .name("RunState")
+            .coercing(coerce(RunState::toString, RunState::valueOf)).build())
         .scalar(
             GraphQLScalarType.newScalar()
                 .name("UUID")
-                .coercing(
-                    new Coercing<UUID, String>() {
-
-                      @Override
-                      public String serialize(Object dataFetcherResult)
-                          throws CoercingSerializeException {
-                        return dataFetcherResult.toString();
-                      }
-
-                      @Override
-                      public UUID parseValue(Object input) throws CoercingParseValueException {
-                        return UUID.fromString(input.toString());
-                      }
-
-                      @Override
-                      public UUID parseLiteral(Object input) throws CoercingParseLiteralException {
-                        return UUID.fromString(input.toString());
-                      }
-                    })
+                .coercing(coerce(UUID::toString, UUID::fromString))
                 .build())
         .scalar(
             GraphQLScalarType.newScalar()
@@ -214,5 +252,24 @@ public class GraphqlSchemaBuilder {
                       }
                     })
                 .build());
+  }
+
+  private <I> Coercing<I, String> coerce(Function<I, String> ser, Function<String, I> deser) {
+    return new Coercing<>() {
+      @Override
+      public String serialize(Object dataFetcherResult) throws CoercingSerializeException {
+        return ser.apply((I) dataFetcherResult);
+      }
+
+      @Override
+      public I parseValue(Object input) throws CoercingParseValueException {
+        return deser.apply(input.toString());
+      }
+
+      @Override
+      public I parseLiteral(Object input) throws CoercingParseLiteralException {
+        return deser.apply(input.toString());
+      }
+    };
   }
 }
