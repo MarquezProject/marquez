@@ -23,11 +23,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import marquez.common.Utils;
-import marquez.common.models.DatasetName;
+import marquez.common.VersionUtils;
 import marquez.common.models.Field;
 import marquez.common.models.FieldName;
 import marquez.common.models.FieldType;
-import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
@@ -67,8 +66,7 @@ public interface DatasetVersionDao extends BaseDao {
     TagDao tagDao = createTagDao();
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
 
-    final Version version =
-        datasetMeta.version(NamespaceName.of(namespaceName), DatasetName.of(datasetName));
+    Version version = VersionUtils.newDatasetVersionFor(namespaceName, datasetName, datasetMeta);
     UUID newDatasetVersionUuid = UUID.randomUUID();
     DatasetVersionRow datasetVersionRow =
         upsert(

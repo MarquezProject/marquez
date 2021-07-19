@@ -60,6 +60,7 @@ dependencies {
     testCompile "org.junit.vintage:junit-vintage-engine:${junit5Version}"
     testCompile "org.testcontainers:postgresql:${testcontainersVersion}"
     testCompile "org.testcontainers:junit-jupiter:${testcontainersVersion}"
+    testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
 }
 
 task testUnit(type: Test) {
