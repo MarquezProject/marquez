@@ -28,12 +28,12 @@ log = logging.getLogger(__name__)
 NAMESPACE_NAME = 'food_delivery'
 
 # AIRFLOW
-DAG_ID = 'orders_popular_day_of_week'
+DAG_ID = 'postgres_orders_popular_day_of_week'
 DAG_OWNER = 'anonymous'
 DAG_DESCRIPTION = \
     'Determines the popular day of week orders are placed.'
-IF_NOT_EXISTS_TASK_ID = 'if_not_exists'
-INSERT_TASK_ID = 'insert'
+IF_NOT_EXISTS_TASK_ID = 'postgres_if_not_exists'
+INSERT_TASK_ID = 'postgres_insert'
 
 # SOURCE
 SOURCE_NAME = 'postgres://postgres:5432'
@@ -240,7 +240,7 @@ def check_jobs_run_meta():
     assert insert_job_run['state'] == RunState.COMPLETED.value
 
 
-def main():
+def test_integration_postgres():
     # (1) Wait for DAG to complete
     wait_for_dag()
     # (2) Run checks on DAG metadata collected
@@ -250,6 +250,3 @@ def main():
     check_jobs_meta()
     check_jobs_run_meta()
 
-
-if __name__ == "__main__":
-    main()
