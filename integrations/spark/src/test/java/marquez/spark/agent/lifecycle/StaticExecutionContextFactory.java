@@ -1,5 +1,7 @@
 package marquez.spark.agent.lifecycle;
 
+import static marquez.spark.agent.SparkAgentTestExtension.marquezContext;
+
 import java.net.URI;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -8,9 +10,12 @@ import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import marquez.spark.agent.MarquezContext;
-import marquez.spark.agent.lifecycle.plan.InputDatasetVisitors;
-import marquez.spark.agent.lifecycle.plan.OutputDatasetVisitors;
+import openlineage.spark.agent.OpenLineageSparkContext;
+import openlineage.spark.agent.lifecycle.ContextFactory;
+import openlineage.spark.agent.lifecycle.RddExecutionContext;
+import openlineage.spark.agent.lifecycle.SparkSQLExecutionContext;
+import openlineage.spark.agent.lifecycle.plan.InputDatasetVisitors;
+import openlineage.spark.agent.lifecycle.plan.OutputDatasetVisitors;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.execution.SQLExecution;
 import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionEnd;
@@ -20,7 +25,7 @@ import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionStart;
 public class StaticExecutionContextFactory extends ContextFactory {
   public static final Semaphore semaphore = new Semaphore(1);
 
-  public StaticExecutionContextFactory(MarquezContext marquezContext) {
+  public StaticExecutionContextFactory(OpenLineageSparkContext marquezContext) {
     super(marquezContext);
   }
 
