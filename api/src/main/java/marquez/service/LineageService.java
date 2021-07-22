@@ -1,9 +1,10 @@
 package marquez.service;
 
 import com.google.common.base.Functions;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import java.util.Collections;
+import graphql.schema.DataFetchingFieldSelectionSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -37,16 +38,42 @@ public class LineageService extends DelegatingLineageDao {
   }
 
   public Lineage lineage(NodeId nodeId, int depth) {
+    return lineage(nodeId, depth, null);
+  }
+
+  public Lineage lineage(NodeId nodeId, int depth, DataFetchingFieldSelectionSet lineageFields) {
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
       throw new NodeIdNotFoundException("Could not find node");
     }
     UUID job = optionalUUID.get();
 
-    Set<JobData> jobData = getLineage(Collections.singleton(job), depth);
+    Stopwatch sw = Stopwatch.createStarted();
+    DataFetchingFieldSelectionSet dataSelectionSet =
+        lineageFields == null
+            ? null
+            : lineageFields.getFields("graph/data").get(0).getSelectionSet();
+    Set<JobData> jobData = getLineage(job, depth, dataSelectionSet);
+    sw.stop();
+    log.info("Elapsed {} millis for getLineage", sw.elapsed().toMillis());
 
-    List<Run> runs =
-        getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
+    sw.reset();
+    sw.start();
+    DataFetchingFieldSelectionSet runSelectionSet = null;
+    if (lineageFields != null && lineageFields.contains("graph/data/latestRun")) {
+      runSelectionSet = lineageFields.getFields("graph/data/latestRun").get(0).getSelectionSet();
+    }
+    List<Run> runs;
+    if (runSelectionSet == null) {
+      runs = getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
+    } else {
+      runs =
+          getCurrentRuns(
+              jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()), runSelectionSet);
+    }
+    sw.stop();
+    log.info("Elapsed {} millis for getCurrentRuns", sw.elapsed().toMillis());
+    sw.reset();
     // todo fix runtime
     for (JobData j : jobData) {
       if (j.getLatestRun().isEmpty()) {
@@ -59,6 +86,7 @@ public class LineageService extends DelegatingLineageDao {
         }
       }
     }
+    sw.start();
     Set<UUID> datasetIds =
         jobData.stream()
             .flatMap(jd -> Stream.concat(jd.getInputUuids().stream(), jd.getOutputUuids().stream()))
@@ -67,6 +95,8 @@ public class LineageService extends DelegatingLineageDao {
     if (!datasetIds.isEmpty()) {
       datasets.addAll(getDatasetData(datasetIds));
     }
+    sw.stop();
+    log.info("Elapsed {} millis for getDatasetData", sw.elapsed().toMillis());
 
     return toLineage(jobData, datasets);
   }

@@ -140,9 +140,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin());
     SqlLogger sqlLogger = new InstrumentedSqlLogger(env.metrics());
-    if (isSentryEnabled(config)) {
-      sqlLogger = new TracingSQLLogger(sqlLogger);
-    }
+    sqlLogger = new TracingSQLLogger(sqlLogger);
     jdbi.setSqlLogger(sqlLogger);
 
     final MarquezContext context =

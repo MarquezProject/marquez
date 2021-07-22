@@ -3,10 +3,6 @@ services:
   api:
     build: .
 
-  web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
 
   seed_marquez:
     build: .

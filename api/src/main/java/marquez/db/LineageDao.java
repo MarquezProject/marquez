@@ -14,11 +14,34 @@
 
 package marquez.db;
 
+import static org.jooq.impl.DSL.inline;
+import static org.jooq.impl.DSL.jsonbArrayAgg;
+import static org.jooq.impl.DSL.jsonbObject;
+import static org.jooq.impl.DSL.lateral;
+import static org.jooq.impl.DSL.one;
+import static org.jooq.impl.DSL.param;
+import static org.jooq.impl.DSL.using;
+import static org.jooq.impl.DSL.zero;
+import static org.jooq.util.postgres.PostgresDSL.arrayAggDistinct;
+import static org.jooq.util.postgres.PostgresDSL.arrayCat;
+import static org.jooq.util.postgres.PostgresDSL.arrayOverlap;
+import static org.jooq.util.postgres.PostgresDSL.field;
+import static org.jooq.util.postgres.PostgresDSL.name;
+import static org.jooq.util.postgres.PostgresDSL.table;
+
+import graphql.schema.DataFetchingFieldSelectionSet;
+import graphql.schema.SelectedField;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import marquez.db.mappers.DatasetDataMapper;
 import marquez.db.mappers.JobDataMapper;
 import marquez.db.mappers.JobRowMapper;
@@ -26,15 +49,82 @@ import marquez.db.mappers.RunMapper;
 import marquez.db.models.DatasetData;
 import marquez.db.models.JobData;
 import marquez.service.models.Run;
+import org.jdbi.v3.core.Handle;
+import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.JSONB;
+import org.jooq.Record;
+import org.jooq.Record2;
+import org.jooq.SQLDialect;
+import org.jooq.SelectFieldOrAsterisk;
+import org.jooq.SelectJoinStep;
+import org.jooq.SelectOnConditionStep;
+import org.jooq.SelectQuery;
+import org.jooq.WithStep;
+import org.jooq.conf.ParamType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RegisterRowMapper(DatasetDataMapper.class)
 @RegisterRowMapper(JobDataMapper.class)
 @RegisterRowMapper(RunMapper.class)
 @RegisterRowMapper(JobRowMapper.class)
-public interface LineageDao {
+public interface LineageDao extends SqlObject {
+
+  DSLContext ctx = using(SQLDialect.POSTGRES);
+  WithStep lineageQuery =
+      ctx.withRecursive("job_io", "job_uuid", "inputs", "outputs")
+          .as(
+              ctx.select(
+                      field("j.uuid").as("job_uuid"),
+                      field(
+                          arrayAggDistinct(field("io.dataset_uuid"))
+                              .filterWhere(field("io_type").eq(inline("INPUT")))
+                              .as("inputs")),
+                      field(
+                          arrayAggDistinct(field("io.dataset_uuid"))
+                              .filterWhere(field("io_type").eq(inline("OUTPUT")))
+                              .as("outputs")))
+                  .from(table("jobs").as("j"))
+                  .leftJoin(table(name("job_versions")).as("v"))
+                  .on(field("j.current_version_uuid").eq(field("v.uuid")))
+                  .leftJoin(table(name("job_versions_io_mapping")).as("io"))
+                  .on(field("v.uuid").eq(field("io.job_version_uuid")))
+                  .groupBy(field("j.uuid"))
+                  .getQuery())
+          .with("lineage", "job_uuid", "inputs", "outputs", "depth")
+          .as(
+              ctx.select(
+                      field("job_uuid", UUID.class),
+                      field("inputs", UUID[].class),
+                      field("outputs", UUID[].class),
+                      zero().as("depth"))
+                  .from(table("job_io"))
+                  .where(field("job_uuid").in(param("jobId")))
+                  .union(
+                      ctx.select(
+                              field("io.job_uuid", UUID.class),
+                              field("io.inputs", UUID[].class),
+                              field("io.outputs", UUID[].class),
+                              field("l.depth", Integer.class).plus(one()))
+                          .from(table("job_io").as("io"))
+                          .innerJoin(table("lineage").as("l"))
+                          .on(field("io.job_uuid").notEqual(field("l.job_uuid")))
+                          .and(
+                              arrayOverlap(
+                                  arrayCat(
+                                      field("io.inputs", UUID[].class),
+                                      field("io.outputs", UUID[].class)),
+                                  arrayCat(
+                                      field("l.inputs", UUID[].class),
+                                      field("l.outputs", UUID[].class))))
+                          .where(field("depth").lt(param("depth")))
+                          .getQuery())
+                  .getQuery());
 
   /**
    * Fetch all of the jobs that consume or produce the datasets that are consumed or produced by the
@@ -46,7 +136,6 @@ public interface LineageDao {
    * @return
    */
   @SqlQuery(
-      // dataset_ids: all the input and output datasets of the current version of the specified jobs
       "WITH RECURSIVE\n"
           + "    job_io AS (\n"
           + "        SELECT j.uuid AS job_uuid,\n"
@@ -74,6 +163,52 @@ public interface LineageDao {
           + "INNER JOIN jobs j ON j.uuid=l2.job_uuid\n"
           + "LEFT JOIN job_contexts jc on jc.uuid = j.current_job_context_uuid")
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
+
+  default Set<JobData> getLineage(
+      UUID jobId, int depth, DataFetchingFieldSelectionSet selectionSet) {
+    if (selectionSet == null) {
+      return getLineage(Collections.singleton(jobId), depth);
+    }
+    Collection<SelectFieldOrAsterisk> selectedFields = new ArrayList<>();
+    selectedFields.addAll(
+        Arrays.asList(
+            table("j").asterisk(),
+            field("inputs").as("input_uuids"),
+            field("outputs").as("output_uuids")));
+    Stream<SelectedField> jobFields =
+        selectionSet.getImmediateFields().stream()
+            .filter(n -> n.getObjectType().getName().equals("Job"));
+    boolean includeContext = false;
+    if (jobFields.anyMatch(n -> n.getName().equals("context"))) {
+      selectedFields.add(field("jc.context"));
+      includeContext = true;
+    }
+    SelectOnConditionStep<Record> selectQuery =
+        lineageQuery
+            .select(selectedFields)
+            .distinctOn(field("l2.job_uuid"))
+            .from(table("lineage").as("l2"))
+            .innerJoin(table("jobs").as("j"))
+            .on(field("j.uuid", UUID.class).eq(field("l2.job_uuid", UUID.class)));
+    if (includeContext) {
+      selectQuery =
+          selectQuery
+              .innerJoin(table("job_contexts").as("jc"))
+              .on(field("jc.uuid").eq(field("j.current_job_context_uuid")));
+    }
+
+    SelectQuery<Record> query = selectQuery.getQuery();
+
+    Logger logger = LoggerFactory.getLogger(LineageDao.class);
+    String sql = query.getSQL(ParamType.NAMED);
+    logger.info(sql);
+    JobDataMapper mapper = new JobDataMapper();
+    Set<JobData> data =
+        getHandle().createQuery(sql).bind("jobId", jobId).bind("depth", depth).map(mapper).stream()
+            .collect(Collectors.toSet());
+    logger.info("Elapsed {} millis mapping job data", mapper.getSw().elapsed().toMillis());
+    return data;
+  }
 
   @SqlQuery("SELECT uuid from jobs where name = :jobName and namespace_name = :namespace")
   Optional<UUID> getJobUuid(String jobName, String namespace);
@@ -133,4 +268,144 @@ public interface LineageDao {
           + "    GROUP BY run_uuid\n"
           + ") ro ON ro.run_uuid=r.uuid")
   List<Run> getCurrentRuns(@BindList Collection<UUID> jobUuid);
+
+  default List<Run> getCurrentRuns(
+      Collection<UUID> jobUuid, DataFetchingFieldSelectionSet runFields) {
+    DSLContext ctx = using(SQLDialect.POSTGRES);
+    List<Field<?>> selectedRunFields = new ArrayList<>();
+    selectedRunFields.add(field("r.*"));
+    selectedRunFields.addAll(selectRunFields(runFields));
+    boolean includeArgs = selectedRunFields.contains(field("ra.args"));
+    boolean includeCtx = selectedRunFields.contains(field("ctx.context"));
+    boolean includeFacets = selectedRunFields.contains(field("f.facets"));
+    boolean includeInputVersions = false;
+    boolean includeOutputVersions = false;
+    if (runFields.contains("inputVersions/*")) {
+      selectedRunFields.add(field("ri.input_versions"));
+      includeInputVersions = true;
+    }
+    if (runFields.contains("outputVersions/*")) {
+      selectedRunFields.add(field("ro.output_versions"));
+      includeOutputVersions = true;
+    }
+    SelectJoinStep<Record> selectQuery =
+        ctx.with("latest_runs")
+            .as(getLatestRunsQuery(ctx))
+            .select(selectedRunFields)
+            .from(table("latest_runs").as("r"));
+    if (includeArgs) {
+      selectQuery =
+          selectQuery
+              .leftJoin(table("run_args").as("ra"))
+              .on(field("ra.uuid").eq(field("r.run_args_uuid")));
+    }
+    if (includeCtx) {
+      // job_contexts AS ctx ON r.job_context_uuid = ctx.uuid
+      selectQuery =
+          selectQuery
+              .leftJoin(table("job_contexts").as("ctx"))
+              .on(field("r.job_context_uuid").eq(field("ctx.uuid")));
+    }
+    if (includeInputVersions) {
+      selectQuery =
+          selectQuery
+              .leftJoin(lateral(selectInputDatasets(ctx, field("r.uuid", UUID.class))).as("ri"))
+              .on(field("ri.run_uuid").eq(field("r.uuid")));
+    }
+    if (includeOutputVersions) {
+      selectQuery =
+          selectQuery
+              .leftJoin(lateral(selectOutputDatasets(ctx, field("r.uuid", UUID.class))).as("ro"))
+              .on(field("ro.run_uuid").eq(field("r.uuid")));
+    }
+    if (includeFacets) {
+      // f ON r.uuid=f.run_uuid
+      selectQuery =
+          selectQuery
+              .leftJoin(lateral(getRunFacets(ctx, field("r.uuid", UUID.class))).as("f"))
+              .on(field("f.run_uuid").eq(field("r.uuid")));
+    }
+    String sql = selectQuery.getQuery().getSQL();
+    Handle handle = getHandle();
+    return handle.createQuery(sql).bindList("jobIds", jobUuid).map(new RunMapper()).stream()
+        .collect(Collectors.toList());
+  }
+
+  private List<Field<?>> selectRunFields(DataFetchingFieldSelectionSet runFields) {
+    return runFields.getImmediateFields().stream()
+        .map(
+            f -> {
+              switch (f.getName()) {
+                case "args":
+                  return field("ra.args");
+                case "context":
+                  return field("ctx.context");
+                case "facets":
+                  return field("f.facets");
+                default:
+                  return null;
+              }
+            })
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+  }
+
+  default SelectQuery<Record> getLatestRunsQuery(DSLContext ctx) {
+    return ctx.select(table("r").asterisk(), field("jv.version").as("job_version"))
+        .distinctOn(field("r.job_name"), field("r.namespace_name"))
+        .from(table("runs").as("r"))
+        .join(table("job_versions").as("jv"))
+        .on(field("jv.uuid").eq(field("r.job_version_uuid")))
+        .where(field("jv.job_uuid").in(field("<jobIds>")))
+        .orderBy(field("r.job_name"), field("r.namespace_name"), field("created_at").desc())
+        .getQuery();
+  }
+
+  default SelectQuery<Record2<UUID, JSONB>> getRunFacets(DSLContext ctx, Field<UUID> runId) {
+    return ctx.select(
+            field("le.run_uuid", UUID.class), jsonbArrayAgg(field("event->'run'->'facets'")))
+        .from(table("lineage_events").as("le"))
+        .where(field("le.run_uuid").eq(runId))
+        .groupBy(field("le.run_uuid"))
+        .getQuery();
+  }
+
+  default SelectQuery<Record2<UUID, JSONB>> selectInputDatasets(DSLContext ctx, Field<UUID> runId) {
+    return ctx.select(
+            field("im.run_uuid", UUID.class),
+            jsonbArrayAgg(
+                    jsonbObject(
+                        inline("namespace"),
+                        field("dv.namespace_name"),
+                        inline("name"),
+                        field("dv.dataset_name"),
+                        inline("version"),
+                        field("dv.version")))
+                .as("input_versions"))
+        .from(table("runs_input_mapping").as("im"))
+        .innerJoin(table("dataset_versions").as("dv"))
+        .on(field("im.dataset_version-uuid").eq(field("dv.uuid")))
+        .where(field("im.run_uuid").eq(runId))
+        .groupBy(field("im.run_uuid"))
+        .getQuery();
+  }
+
+  default SelectQuery<Record2<UUID, JSONB>> selectOutputDatasets(
+      DSLContext ctx, Field<UUID> runId) {
+    return ctx.select(
+            field("run_uuid", UUID.class),
+            jsonbArrayAgg(
+                    jsonbObject(
+                        inline("namespace"),
+                        field("dv.namespace_name"),
+                        inline("name"),
+                        field("dv.dataset_name"),
+                        inline("version"),
+                        field("dv.version")))
+                .as("input_versions"))
+        .from(table("dataset_versions").as("dv"))
+        .where(field("dv.run_uuid").eq(runId))
+        .groupBy(field("dv.run_uuid"))
+        .getQuery();
+  }
 }

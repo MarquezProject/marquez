@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import marquez.common.Utils;
-import marquez.common.models.JobName;
-import marquez.common.models.NamespaceName;
 import marquez.db.JobVersionDao.IoType;
 import marquez.db.LineageDao;
 import marquez.graphql.mapper.LineageResultMapper.DatasetResult;
@@ -422,8 +420,8 @@ public class GraphqlDataFetchers {
     return dataFetchingEnvironment -> {
       String nodeId = dataFetchingEnvironment.getArgument("nodeId");
       Integer depth = dataFetchingEnvironment.getArgument("depth");
-
-      return lineageService.lineage(NodeId.of(nodeId), depth);
+      return lineageService.lineage(
+          NodeId.of(nodeId), depth, dataFetchingEnvironment.getSelectionSet());
     };
   }
 

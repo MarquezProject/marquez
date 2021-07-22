@@ -26,6 +26,7 @@ import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -64,6 +65,18 @@ public final class RunMapper implements RowMapper<Run> {
     Optional<Long> durationMs =
         Optional.ofNullable(timestampOrNull(results, columnPrefix + Columns.ENDED_AT))
             .flatMap(endedAt -> startedAt.map(s -> s.until(endedAt, MILLIS)));
+    Map<String, String> args =
+        columnNames.contains(columnPrefix + Columns.ARGS)
+            ? toArgs(results, columnPrefix + Columns.ARGS)
+            : ImmutableMap.of();
+    ImmutableMap<String, Object> facets =
+        columnNames.contains(columnPrefix + Columns.FACETS)
+            ? toFacetsOrNull(results, columnPrefix + Columns.FACETS)
+            : ImmutableMap.of();
+    ImmutableMap<String, String> jobContext =
+        columnNames.contains(columnPrefix + Columns.CONTEXT)
+            ? JobMapper.toContext(results, columnPrefix + Columns.CONTEXT)
+            : ImmutableMap.of();
     return new Run(
         RunId.of(uuidOrThrow(results, columnPrefix + Columns.ROW_UUID)),
         timestampOrThrow(results, columnPrefix + Columns.CREATED_AT),
@@ -80,7 +93,7 @@ public final class RunMapper implements RowMapper<Run> {
             ? timestampOrNull(results, columnPrefix + Columns.ENDED_AT)
             : null,
         durationMs.orElse(null),
-        toArgs(results, columnPrefix + Columns.ARGS),
+        args,
         stringOrThrow(results, columnPrefix + Columns.NAMESPACE_NAME),
         stringOrThrow(results, columnPrefix + Columns.JOB_NAME),
         uuidOrNull(results, columnPrefix + Columns.JOB_VERSION),
@@ -91,8 +104,8 @@ public final class RunMapper implements RowMapper<Run> {
         columnNames.contains(columnPrefix + Columns.OUTPUT_VERSIONS)
             ? toDatasetVersion(results, columnPrefix + Columns.OUTPUT_VERSIONS)
             : ImmutableList.of(),
-        JobMapper.toContext(results, columnPrefix + Columns.CONTEXT),
-        toFacetsOrNull(results, columnPrefix + Columns.FACETS));
+        jobContext,
+        facets);
   }
 
   private List<DatasetVersionId> toDatasetVersion(ResultSet rs, String column) throws SQLException {

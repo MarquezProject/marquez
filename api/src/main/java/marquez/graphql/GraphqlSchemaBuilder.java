@@ -38,8 +38,6 @@ import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 import marquez.db.models.DatasetData;
 import marquez.db.models.JobData;
-import marquez.graphql.mapper.LineageResultMapper.DatasetResult;
-import marquez.graphql.mapper.LineageResultMapper.JobResult;
 import marquez.service.models.NodeId;
 import marquez.service.models.NodeType;
 import org.jdbi.v3.core.Jdbi;
@@ -154,46 +152,72 @@ public class GraphqlSchemaBuilder {
                         }
                       }
                     }))
-        .scalar(GraphQLScalarType.newScalar()
-            .name("NodeId")
-            .coercing(coerce(NodeId::getValue, NodeId::of)).build()
-        )
-        .scalar(GraphQLScalarType.newScalar()
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("NodeId")
+                .coercing(coerce(NodeId::getValue, NodeId::of))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
                 .name("NodeType")
-                .coercing(coerce(NodeType::toString, NodeType::valueOf)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("NamespaceName")
-            .coercing(coerce(NamespaceName::getValue, NamespaceName::of)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("DatasetName")
-            .coercing(coerce(DatasetName::getValue, DatasetName::of)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("DatasetType")
-            .coercing(coerce(DatasetType::toString, DatasetType::valueOf)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("SourceName")
-            .coercing(coerce(SourceName::getValue, SourceName::of)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("FieldName")
-            .coercing(coerce(FieldName::getValue, FieldName::of)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("FieldType")
-            .coercing(coerce(FieldType::toString, FieldType::valueOf)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("TagName")
-            .coercing(coerce(TagName::getValue, TagName::of)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("JobName")
-            .coercing(coerce(JobName::getValue, JobName::of)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("JobType")
-            .coercing(coerce(JobType::toString, JobType::valueOf)).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("RunId")
-            .coercing(coerce((RunId r) -> r.getValue().toString(), s -> RunId.of(UUID.fromString(s)))).build())
-        .scalar(GraphQLScalarType.newScalar()
-            .name("RunState")
-            .coercing(coerce(RunState::toString, RunState::valueOf)).build())
+                .coercing(coerce(NodeType::toString, NodeType::valueOf))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("NamespaceName")
+                .coercing(coerce(NamespaceName::getValue, NamespaceName::of))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("DatasetName")
+                .coercing(coerce(DatasetName::getValue, DatasetName::of))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("DatasetType")
+                .coercing(coerce(DatasetType::toString, DatasetType::valueOf))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("SourceName")
+                .coercing(coerce(SourceName::getValue, SourceName::of))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("FieldName")
+                .coercing(coerce(FieldName::getValue, FieldName::of))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("FieldType")
+                .coercing(coerce(FieldType::toString, FieldType::valueOf))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("TagName")
+                .coercing(coerce(TagName::getValue, TagName::of))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("JobName")
+                .coercing(coerce(JobName::getValue, JobName::of))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("JobType")
+                .coercing(coerce(JobType::toString, JobType::valueOf))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("RunId")
+                .coercing(
+                    coerce((RunId r) -> r.getValue().toString(), s -> RunId.of(UUID.fromString(s))))
+                .build())
+        .scalar(
+            GraphQLScalarType.newScalar()
+                .name("RunState")
+                .coercing(coerce(RunState::toString, RunState::valueOf))
+                .build())
         .scalar(
             GraphQLScalarType.newScalar()
                 .name("UUID")

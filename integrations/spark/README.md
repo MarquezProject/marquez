@@ -123,7 +123,7 @@ t1 = DataProcPySparkOperator(
     job_name=job_name,
     dataproc_pyspark_properties={
       "spark.extraListeners": "marquez.spark.agent.SparkListener",
-      "spark.jars.packages": "io.github.marquezproject:marquez-spark:0.16.1
+      "spark.jars.packages": "io.github.marquezproject:marquez-spark:0.16.1",
       "spark.openlineage.url": f"{marquez_url}/api/v1/namespaces/{marquez_namespace}/jobs/dump_orders_to_gcs/runs/{{{{task_run_id(run_id, task)}}}}?api_key={api_key}"
     },
     dag=dag)
