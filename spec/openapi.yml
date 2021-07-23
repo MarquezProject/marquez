@@ -18,7 +18,8 @@ paths:
       summary: Create a namespace
       description: Creates a new namespace object. A namespace enables the contextual grouping of related
         jobs and datasets. Namespaces must contain only letters (`a-z`, `A-Z`), numbers (`0-9`),
-        underscores (`_`), or dots (`.`). A namespace is case-insensitive with a maximum length of `1024` characters.
+        underscores (`_`), dashes (`-`), colons (`:`), slashes (`/`), or dots (`.`).
+        A namespace is case-insensitive with a maximum length of `1024` characters.
         Note jobs and datasets will be unique within a namespace, but not across namespaces.
       tags:
         - Namespaces
@@ -342,6 +343,7 @@ paths:
     post:
       summary: Create a run
       description: Creates a new run object for a job.
+      deprecated: true
       tags:
         - Jobs
       requestBody:
@@ -395,6 +397,7 @@ paths:
     post:
       summary: Start a run
       description: Marks the run as `RUNNING`.
+      deprecated: true
       tags:
         - Jobs
       responses:
@@ -412,6 +415,7 @@ paths:
     post:
       summary: Complete a run
       description: Marks the run as `COMPLETED`.
+      deprecated: true
       tags:
         - Jobs
       responses:
@@ -429,6 +433,7 @@ paths:
     post:
       summary: Fail a run
       description: Marks the run as `FAILED`.
+      deprecated: true
       tags:
         - Jobs
       responses:
@@ -446,6 +451,7 @@ paths:
     post:
       summary: Abort a run
       description: Marks the run as `ABORTED`.
+      deprecated: true
       tags:
         - Jobs
       responses:
@@ -457,10 +463,23 @@ paths:
                 $ref: '#/components/schemas/runAsAborted'
 
   /lineage:
-    parameters:
-      - $ref: '#/components/parameters/nodeId'
-      - $ref: '#/components/parameters/depth'
+    post:
+      summary: Record a single lineage event
+      description: Receive, process, and store lineage metadata using the [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.json) standard.
+      tags:
+        - Lineage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/lineageEvent'
+      responses:
+        '200':
+          description: OK
     get:
+      parameters:
+        - $ref: '#/components/parameters/nodeId'
+        - $ref: '#/components/parameters/depth'
       tags:
         - Lineage
       summary: Get a lineage graph
@@ -688,7 +707,7 @@ components:
           description: The type of the source.
           type: string
         connectionUrl:
-          description: The URL to be used to connect to the source.
+          description: The URL to the location of the source.
           type: string
           format: URL
         description:
@@ -720,7 +739,7 @@ components:
           type: string
           format: date-time
         connectionUrl:
-          description: The URL to be used to connect to the source.
+          description: The URL to the location of the source.
           type: string
           format: URL
         description:
@@ -793,10 +812,10 @@ components:
         physicalName: public.mytable
         sourceName: my-source
         fields: [
-          {'name': 'a', 'type': 'INTEGER'},
-          {'name': 'b', 'type': 'TIMESTAMP'},
-          {'name': 'c', 'type': 'INTEGER'},
-          {'name': 'd', 'type': 'INTEGER'}
+          {name: a, type: INTEGER},
+          {name: b, type: TIMESTAMP},
+          {name: c, type: INTEGER},
+          {name: d, type: INTEGER}
         ]
         description: "My first dataset!"
 
@@ -940,20 +959,15 @@ components:
         namespace: my-namespace
         sourceName: my-source
         fields: [
-          {'name': 'a', 'type': 'INTEGER', 'tags': []},
-          {'name': 'b', 'type': 'TIMESTAMP', 'tags': []},
-          {'name': 'c', 'type': 'INTEGER', 'tags': []},
-          {'name': 'd', 'type': 'INTEGER', 'tags': []}
+          {name': a, type: INTEGER, tags: []},
+          {name': b, type: TIMESTAMP, tags: []},
+          {name': c, type: INTEGER, tags: []},
+          {name': d, type: INTEGER, tags: []}
         ]
         tags: []
         lastModifiedAt: null
         description: "My first dataset!"
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
+        facets: {}
 
     datasets:
       type: object
@@ -974,7 +988,7 @@ components:
         version:
           type: string
           format: uuid
-          description: The version of the dataset
+          description: The version of the dataset.
 
     datasetVersion:
       type: object
@@ -1088,10 +1102,10 @@ components:
         namespace: my-namespace
         sourceName: my-source
         fields: [
-          {'name': 'a', 'type': 'INTEGER', 'tags': []},
-          {'name': 'b', 'type': 'TIMESTAMP', 'tags': []},
-          {'name': 'c', 'type': 'INTEGER', 'tags': []},
-          {'name': 'd', 'type': 'INTEGER', 'tags': []}
+          {name: a, type: INTEGER, tags: []},
+          {name: b, type: TIMESTAMP, tags: []},
+          {name: c, type: INTEGER, tags: []},
+          {name: d, type: INTEGER, tags: []}
         ]
         tags: []
         description: "My first dataset!"
@@ -1109,20 +1123,20 @@ components:
           "jobVersion": {
             "namespace": "my-namespace",
             "name": "my_processing_job",
-            "versionUuid": "0ba5b13b-350e-40f3-ba3f-cc00a4e92d11"
+            "version": "0ba5b13b-350e-40f3-ba3f-cc00a4e92d11"
           },
           "inputVersions": [
             {
               "namespace": "my-namespace",
               "name": "an_input_dataset",
-              "versionUuid": "d224dac0-35d7-4d9b-bbbe-6fff1a8485ad"
+              "version": "d224dac0-35d7-4d9b-bbbe-6fff1a8485ad"
             }
           ],
           "outputVersions": [
             {
               "namespace": "my-namespace",
               "name": "my-dataset",
-              "versionUuid": "16e04029-2035-37f1-8206-d57be374333f"
+              "version": "16e04029-2035-37f1-8206-d57be374333f"
             }
           ]
         }
@@ -1138,7 +1152,7 @@ components:
       type: object
       properties:
         name:
-          description: The name qof the tag.
+          description: The name of the tag.
           type: string
         description:
           description: The description of the tag.
@@ -1189,6 +1203,7 @@ components:
         context:
           description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
           type: object
+          deprecated: true
         description:
           description: The description of the job.
           type: string
@@ -1204,7 +1219,7 @@ components:
         inputs: [{ namespace: my-namespace, name: my-dataset}]
         outputs: []
         location: https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
-        context: {'SQL': "SELECT * FROM mytable;"}
+        context: {sql: 'SELECT * FROM mytable;'}
         description: My first job!
 
     JOB:
@@ -1254,7 +1269,7 @@ components:
           type: string
           format: URL
         context:
-          description: Deprecated- Use facet. A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
+          description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
           type: object
           deprecated: true
         description:
@@ -1329,12 +1344,7 @@ components:
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
         latestRun: null
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
+        facets: {}
 
     jobVersionList:
       type: object
@@ -1352,10 +1362,10 @@ components:
         name:
           type: string
           description: The name of the job.
-        versionUuid:
+        version:
           type: string
           format: uuid
-          description: The version of the job
+          description: The version of the job.
 
     jobVersion:
       type: object
@@ -1473,12 +1483,7 @@ components:
         location: https://github.com/my-jobs/blob/124f6089ad4c5fcbb1d7b33cbb5d3a9521c5d32c
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
+        facets: {}
 
     jobs:
       type: object
@@ -1574,12 +1579,7 @@ components:
         endedAt: null
         durationMs: null
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
+        facets: {}
 
     runAsRunning:
       type: object
@@ -1635,12 +1635,7 @@ components:
         endedAt: null
         durationMs: null
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
+        facets: {}
 
     runAsCompleted:
       type: object
@@ -1706,12 +1701,7 @@ components:
         endedAt: 2019-05-09T20:05:46.815920Z
         durationMs: 4250894125
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
+        facets: {}
 
     runAsFailed:
       type: object
@@ -1767,12 +1757,7 @@ components:
         endedAt: 2019-05-09T20:05:46.815920Z
         durationMs: 4250894125
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
+        facets: {}
 
     runAsAborted:
       type: object
@@ -1828,12 +1813,7 @@ components:
         endedAt: 2019-05-09T20:05:46.815920Z
         durationMs: 4250894125
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-        facets: {
-          'context': {
-            '_producer': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client',
-            '_schemaURL': 'https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet'
-          }
-        }
+        facets: {}
     runs:
       type: object
       properties:
@@ -1943,3 +1923,27 @@ components:
           type: string
       example:
         description: My first tag!
+
+    lineageEvent:
+      example:
+        eventType: COMPLETE
+        eventTime: 2019-05-09T19:49:24.201361Z
+        run: {runId: d46e465b-d358-4d32-83d4-df660ff614dd}
+        job: {namespace: my-namespace,name: my-job}
+        outputs: [{
+          namespace: my-namespace,
+          name: my-output,
+          facets: {
+            schema": {
+              _producer: https://github:.com/OpenLineage/OpenLineage/blob/v1-0-0/client,
+              _schemaURL: https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet,
+              fields": [
+                {name: a, type: INTEGER},
+                {name: b, type: TIMESTAMP},
+                {name: c, type: INTEGER},
+                {name: d, type: INTEGER}
+              ]
+            }
+          }
+        }]     
+        producer: https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client

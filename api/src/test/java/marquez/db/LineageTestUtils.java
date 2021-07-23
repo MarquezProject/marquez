@@ -187,6 +187,7 @@ public class LineageTestUtils {
                       .collect(Collectors.toList());
               return new JobLineage(
                   row.getJob().getUuid(),
+                  row.getRun().getUuid(),
                   row.getJob().getName(),
                   row.getInputs().filter(l -> !l.isEmpty()).map(l -> l.get(0)),
                   row.getOutputs().filter(l -> !l.isEmpty()).map(l -> l.get(0)),
@@ -203,6 +204,7 @@ public class LineageTestUtils {
   public static class JobLineage {
 
     UUID id;
+    UUID runId;
     String name;
     Optional<DatasetRecord> input;
     Optional<DatasetRecord> output;
