@@ -163,36 +163,6 @@ jobs:
             - ./dist/*.whl
             - ./dist/*.tar.gz
 
-  build-integration-spark:
-    working_directory: ~/marquez/integrations/spark
-    docker:
-      - image: circleci/openjdk:8-jdk
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
-            - v1-integration-spark-{{ .Branch }}
-      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:build
-      - run:
-          when: on_fail
-          command: cat integrations/spark/build/test-results/test/TEST-*.xml
-      - run: ./gradlew --no-daemon :integrations:spark:jacocoTestReport
-      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:shadowJar # generate the fat jar
-      - store_test_results:
-          path: integrations/spark/build/test-results/test
-      - store_artifacts:
-          path: build/reports/tests/test
-          destination: test-report
-      - save_cache:
-          key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ~/.gradle
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./integrations/spark/build/libs/*.jar
-
   image-api:
     working_directory: ~/marquez
     machine: true
@@ -205,36 +175,6 @@ jobs:
           root: .
           paths:
             - ./build/marquezproject-api-image.tar
-
-  integration-test-spark:
-    working_directory: ~/marquez
-    machine: true
-    environment:
-      TESTCONTAINERS_RYUK_DISABLED: "true"
-      JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
-            - v1-integration-spark-{{ .Branch }}
-      - attach_workspace:
-          at: .
-      - run: docker load -i ./build/marquezproject-api-image.tar
-      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:integrationTest -Pmarquez.image.tag=${CIRCLE_SHA1}
-      - run:
-          when: on_fail
-          command: cat integrations/spark/build/test-results/integrationTests/TEST-*.xml
-      - run: ./gradlew --no-daemon :integrations:spark:jacocoTestReport
-      - store_test_results:
-          path: integrations/spark/build/test-results/integrationTests
-      - store_artifacts:
-          path: integrations/spark/build/reports/tests/integrationTests
-          destination: test-report
-      - save_cache:
-          key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ~/.gradle
 
   test-integration-airflow:
     working_directory: ~/marquez/integrations/airflow
@@ -335,11 +275,6 @@ workflows:
     jobs:
       - build-api
       - image-api
-      - build-integration-spark
-      - integration-test-spark:
-          requires:
-            - image-api
-            - build-integration-spark
       - test-integration-airflow
       - test-web
       - build-client-java
@@ -368,6 +303,7 @@ workflows:
       - release-python:
           <<: *only-on-release
           context: release
+          requires:
           requires:
             - build-client-python
             - build-integration-airflow
