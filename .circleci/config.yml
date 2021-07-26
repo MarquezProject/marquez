@@ -236,33 +236,6 @@ jobs:
           paths:
             - ~/.gradle
 
-  test-integration-airflow:
-    working_directory: ~/marquez/integrations/airflow
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - *checkout_project_root
-      - *install_integration_common
-      - run: pip install -e .[dev]
-      - run: flake8 --exclude integration
-      - run: airflow initdb
-      - run: pytest --cov=marquez_airflow tests/
-      - run: bash <(curl -s https://codecov.io/bash)
-
-  build-integration-airflow:
-    working_directory: ~/marquez/integrations/airflow
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - *checkout_project_root
-      - *install_integration_common
-      - run: python setup.py sdist bdist_wheel
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./dist/*.whl
-            - ./dist/*.tar.gz
-
   test-integration-common:
     working_directory: ~/marquez/integrations/common
     docker:
@@ -286,16 +259,6 @@ jobs:
           paths:
             - ./dist/*.whl
             - ./dist/*.tar.gz
-
-  integration-test-airflow:
-    working_directory: ~/marquez/integrations/
-    machine: true
-    steps:
-      - *checkout_project_root
-      - run: ./../.circleci/get-docker-compose.sh
-      - run: bash -c '(cd ~/marquez && docker build -t marquezproject/marquez . )'
-      - run: docker build -f airflow/Dockerfile.tests -t marquez-airflow-base .
-      - run: ./airflow/tests/integration/docker/up.sh
 
   release-java:
     working_directory: ~/marquez
@@ -340,23 +303,17 @@ workflows:
           requires:
             - image-api
             - build-integration-spark
-      - test-integration-airflow
       - test-web
       - build-client-java
       - test-client-python
       - test-integration-common
       - test-integration-dbt-bigquery
       - test-integration-dbt-snowflake
-      - integration-test-airflow:
-          requires:
-            - test-integration-airflow
   release:
     jobs:
       - build-integration-common:
           <<: *only-on-release
       - build-client-python:
-          <<: *only-on-release
-      - build-integration-airflow:
           <<: *only-on-release
       - build-integration-dbt-bigquery:
           <<: *only-on-release
@@ -370,7 +327,6 @@ workflows:
           context: release
           requires:
             - build-client-python
-            - build-integration-airflow
             - build-integration-common
             - build-integration-dbt-bigquery
             - build-integration-dbt-snowflake
