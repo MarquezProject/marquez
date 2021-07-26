@@ -27,14 +27,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/newNamespace'
+              $ref: '#/components/schemas/CreatedNamespace'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/namespace'
+                $ref: '#/components/schemas/Namespace'
     get:
       summary: Retrieve a namespace
       description: Returns a namespace.
@@ -46,7 +46,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/namespace'
+                $ref: '#/components/schemas/Namespace'
 
   /namespaces:
     get:
@@ -63,7 +63,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/namespaces'
+                $ref: '#/components/schemas/NamespaceList'
 
   /sources/{source}:
     parameters:
@@ -79,14 +79,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/newSource'
+              $ref: '#/components/schemas/CreatedSource'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/source'
+                $ref: '#/components/schemas/Source'
     get:
       summary: Retrieve a source
       description: Returns a source.
@@ -98,7 +98,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/source'
+                $ref: '#/components/schemas/Source'
 
   /sources:
     get:
@@ -115,7 +115,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sources'
+                $ref: '#/components/schemas/SourceList'
 
   /namespaces/{namespace}/datasets/{dataset}:
     parameters:
@@ -131,15 +131,15 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/DB_TABLE'
-                - $ref: '#/components/schemas/STREAM'
+                - $ref: '#/components/schemas/DbTable'
+                - $ref: '#/components/schemas/Stream'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DATASET'
+                $ref: '#/components/schemas/Dataset'
     get:
       summary: Retrieve a dataset
       description: Returns a dataset.
@@ -151,7 +151,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DATASET'
+                $ref: '#/components/schemas/Dataset'
 
   /namespaces/{namespace}/datasets/{dataset}/versions/{version}:
     parameters:
@@ -169,7 +169,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/datasetVersion'
+                $ref: '#/components/schemas/DatasetVersion'
 
   /namespaces/{namespace}/datasets/{dataset}/versions:
     parameters:
@@ -186,7 +186,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/datasetVersions'
+                $ref: '#/components/schemas/DatasetVersionList'
 
   /namespaces/{namespace}/datasets:
     parameters:
@@ -206,7 +206,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/datasets'
+                $ref: '#/components/schemas/DatasetList'
 
   /namespaces/{namespace}/datasets/{dataset}/tags/{tag}:
     parameters:
@@ -224,7 +224,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DATASET'
+                $ref: '#/components/schemas/Dataset'
 
   /namespaces/{namespace}/datasets/{dataset}/fields/{field}/tags/{tag}:
     parameters:
@@ -243,7 +243,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DATASET'
+                $ref: '#/components/schemas/Dataset'
 
   /namespaces/{namespace}/jobs/{job}:
     parameters:
@@ -261,14 +261,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/newJob'
+              $ref: '#/components/schemas/CreatedJob'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JOB'
+                $ref: '#/components/schemas/Job'
     get:
       summary: Retrieve a job
       description: Retrieve a job.
@@ -280,7 +280,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JOB'
+                $ref: '#/components/schemas/Job'
 
   /namespaces/{namespace}/jobs:
     parameters:
@@ -299,7 +299,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jobs'
+                $ref: '#/components/schemas/JobList'
 
   /namespaces/{namespace}/jobs/{job}/versions/{version}:
     parameters:
@@ -317,7 +317,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jobVersion'
+                $ref: '#/components/schemas/JobVersion'
 
   /namespaces/{namespace}/jobs/{job}/versions:
     parameters:
@@ -334,7 +334,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jobVersionList'
+                $ref: '#/components/schemas/JobVersionList'
 
   /namespaces/{namespace}/jobs/{job}/runs:
     parameters:
@@ -350,14 +350,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/newRun'
+              $ref: '#/components/schemas/CreatedRun'
       responses:
         '201':
           description: CREATED
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runAsNew'
+                $ref: '#/components/schemas/Run'
     get:
       parameters:
         - $ref: '#/components/parameters/limit'
@@ -372,7 +372,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runs'
+                $ref: '#/components/schemas/RunList'
 
   /jobs/runs/{id}:
     parameters:
@@ -388,7 +388,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runAsNew'
+                $ref: '#/components/schemas/IncompleteRun'
 
   /jobs/runs/{id}/start:
     parameters:
@@ -406,7 +406,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runAsRunning'
+                $ref: '#/components/schemas/IncompleteRun'
 
   /jobs/runs/{id}/complete:
     parameters:
@@ -424,7 +424,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runAsCompleted'
+                $ref: '#/components/schemas/Run'
 
   /jobs/runs/{id}/fail:
     parameters:
@@ -442,7 +442,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runAsFailed'
+                $ref: '#/components/schemas/IncompleteRun'
 
   /jobs/runs/{id}/abort:
     parameters:
@@ -460,7 +460,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runAsAborted'
+                $ref: '#/components/schemas/IncompleteRun'
 
   /lineage:
     post:
@@ -472,7 +472,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/lineageEvent'
+              $ref: '#/components/schemas/LineageEvent'
       responses:
         '200':
           description: OK
@@ -489,7 +489,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/graph'
+                $ref: '#/components/schemas/LineageGraph'
 
   /tags/{tag}:
     parameters:
@@ -503,7 +503,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/newTag'
+              $ref: '#/components/schemas/CreatedTag'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagList'
 
   /tags:
     get:
@@ -520,7 +527,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/tags'
+                $ref: '#/components/schemas/TagList'
 
 components:
   parameters:
@@ -647,10 +654,10 @@ components:
         example: 50
         default: 20
         description: The maximum number of edges from node.
-        required: false
+      required: false
 
   schemas:
-    newNamespace:
+    CreatedNamespace:
       type: object
       properties:
         ownerName:
@@ -665,7 +672,7 @@ components:
         ownerName: me
         description: My first namespace!
 
-    namespace:
+    Namespace:
       type: object
       properties:
         name:
@@ -692,15 +699,15 @@ components:
         ownerName: me
         description: My first namespace!
 
-    namespaces:
+    NamespaceList:
       type: object
       properties:
         namespaces:
           type: array
           items:
-            $ref: '#/components/schemas/namespace'
+            $ref: '#/components/schemas/Namespace'
 
-    newSource:
+    CreatedSource:
       type: object
       properties:
         type:
@@ -721,7 +728,7 @@ components:
         connectionUrl: jdbc:postgresql://db.example.com/mydb
         description: My first source!
 
-    source:
+    Source:
       type: object
       properties:
         type:
@@ -753,14 +760,19 @@ components:
         connectionUrl: jdbc:postgresql://db.example.com/mydb
         description: My first source!
 
-    sources:
+    SourceList:
       type: object
       properties:
         sources:
           items:
-            $ref: '#/components/schemas/source'
+            $ref: '#/components/schemas/Source'
 
-    DB_TABLE:
+    DatasetType:
+      type: enum
+      enum: [DB_TABLE, STREAM]
+      description: The type of dataset
+
+    DbTable:
       type: object
       properties:
         type:
@@ -783,7 +795,7 @@ components:
                 description: The name of the field.
                 type: string
               type:
-                $ref: '#/components/schemas/fieldType'
+                $ref: '#/components/schemas/FieldType'
               tags:
                 description: List of tags.
                 type: string
@@ -795,7 +807,9 @@ components:
               - type
         tags:
           description: List of tags.
-          type: string
+          type: array
+          items:
+            type: string
         description:
           description:  The description of the table.
           type: string
@@ -819,7 +833,7 @@ components:
         ]
         description: "My first dataset!"
 
-    STREAM:
+    Stream:
       type: object
       properties:
         type:
@@ -879,7 +893,7 @@ components:
         fields: []
         description: "My first stream dataset!"
 
-    datasetId:
+    DatasetId:
       type: object
       description: The ID of the dataset.
       properties:
@@ -890,11 +904,11 @@ components:
           type: string
           description: The name of the dataset.
 
-    DATASET:
+    Dataset:
       type: object
       properties:
         id:
-          $ref: '#/components/schemas/datasetId'
+          $ref: '#/components/schemas/DatasetId'
         type:
           description: The type of the dataset.
           type: string
@@ -928,7 +942,7 @@ components:
                 description: The name of the field.
                 type: string
               type:
-                $ref: '#/components/schemas/fieldType'
+                $ref: '#/components/schemas/FieldType'
               tags:
                 description: List of tags.
                 type: string
@@ -946,7 +960,7 @@ components:
           description:  The description of the dataset.
           type: string
         facets:
-          $ref: '#/components/schemas/datasetFacets'
+          $ref: '#/components/schemas/DatasetFacets'
       example:
         id:
           namespace: my-namespace
@@ -969,14 +983,16 @@ components:
         description: "My first dataset!"
         facets: {}
 
-    datasets:
+    DatasetList:
       type: object
       properties:
         datasets:
           items:
-            $ref: '#/components/schemas/DATASET'
+            $ref: '#/components/schemas/Dataset'
+      required:
+        - datasets
 
-    datasetVersionId:
+    DatasetVersionId:
       type: object
       properties:
         namespace:
@@ -989,12 +1005,16 @@ components:
           type: string
           format: uuid
           description: The version of the dataset.
+      required:
+        - namespace
+        - name
+        - version
 
-    datasetVersion:
+    DatasetVersion:
       type: object
       properties:
         id:
-          $ref: '#/components/schemas/datasetVersionId'
+          $ref: '#/components/schemas/DatasetVersionId'
         type:
           description: The type of the dataset.
           type: string
@@ -1027,7 +1047,7 @@ components:
                 description: The name of the field.
                 type: string
               type:
-                $ref: '#/components/schemas/fieldType'
+                $ref: '#/components/schemas/FieldType'
               tags:
                 description: List of tags.
                 type: string
@@ -1041,55 +1061,19 @@ components:
           description:  The description of the dataset.
           type: string
         createdByRun:
-          description: The run associated with the dataset version.
-          type: object
-          properties:
-            id:
-              description: The ID of the run.
-              type: string
-              format: uuid
-            createdAt:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-              type: string
-              format: date-time
-            updatedAt:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-              type: string
-              format: date-time
-            nominalStartTime:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-              type: string
-              format: date-time
-            nominalEndTime:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-              type: string
-              format: date-time
-            state:
-              description: The current state of the run.
-              type: string
-              enum: [ NEW, RUNNING, COMPLETED, FAILED, ABORTED ]
-            startedAt:
-              type: integer
-              description: The time at which the run was started. Measured in seconds since the Unix epoch.
-            endedAt:
-              type: integer
-              description: The time at which the run was ended. Measured in seconds since the Unix epoch.
-            durationMs:
-              type: integer
-              description: The total duration of the run. Measured in milliseconds.
-            args:
-              description: The arguments of the run.
-              type: object
-            jobVersion:
-              $ref: '#/components/schemas/jobVersionId'
-            inputVersions:
-              type: array
-              items:
-                $ref: '#/components/schemas/datasetVersionId'
-            outputVersions:
-              type: array
-              items:
-                $ref: '#/components/schemas/datasetVersionId'
+          $ref: '#/components/schemas/Run'
+        facets:
+          $ref: '#/components/schemas/DatasetFacets'
+      required:
+        - id
+        - type
+        - name
+        - physicalName
+        - createdAt
+        - version
+        - namespace
+        - sourceName
+        - description
       example:
         id:
           namespace: my-namespace
@@ -1141,14 +1125,14 @@ components:
           ]
         }
 
-    datasetVersions:
+    DatasetVersionList:
       type: object
       properties:
         versions:
           items:
-            $ref: '#/components/schemas/datasetVersion'
+            $ref: '#/components/schemas/DatasetVersion'
 
-    tag:
+    Tag:
       type: object
       properties:
         name:
@@ -1161,13 +1145,19 @@ components:
         name: SENSITIVE
         description: Contains sensitive information
 
-    tags:
+    TagList:
       type: object
       properties:
         tags:
           items:
-            $ref: '#/components/schemas/tag'
-    newJob:
+            $ref: '#/components/schemas/Tag'
+
+    JobType:
+      type: enum
+      enum: [BATCH, STREAM, SERVICE]
+      description: The type of the job.
+
+    CreatedJob:
       type: object
       properties:
         id:
@@ -1181,20 +1171,18 @@ components:
               type: string
               description: The name of the job.
         type:
-          description: The type of the job.
-          type: string
-          enum: [BATCH, STREAM, SERVICE]
+          $ref: '#/components/schemas/JobType'
         inputs:
           description: The set of **input** datasets.
           type: array
           items:
-            $ref: '#/components/schemas/datasetId'
+            $ref: '#/components/schemas/DatasetId'
           uniqueItems: true
         outputs:
           description: The set of **output** datasets.
           type: array
           items:
-            $ref: '#/components/schemas/datasetId'
+            $ref: '#/components/schemas/DatasetId'
           uniqueItems: true
         location:
           description: The URL of the job source code or artifact.
@@ -1222,19 +1210,21 @@ components:
         context: {sql: 'SELECT * FROM mytable;'}
         description: My first job!
 
-    JOB:
+    JobId:
+      description: The ID of the job.
+      type: object
+      properties:
+        namespace:
+          type: string
+          description: The namespace of the job.
+        name:
+          type: string
+          description: The name of the job.
+    Job:
       type: object
       properties:
         id:
-          description: The ID of the job.
-          type: object
-          properties:
-            namespace:
-              type: string
-              description: The namespace of the job.
-            name:
-              type: string
-              description: The name of the job.
+          $ref: '#/components/schemas/JobId'
         type:
           description: The type of the job.
           type: string
@@ -1256,13 +1246,13 @@ components:
           description: The set of **input** datasets.
           type: array
           items:
-            $ref: '#/components/schemas/datasetId'
+            $ref: '#/components/schemas/DatasetId'
           uniqueItems: true
         outputs:
           description: The set of **output** datasets.
           type: array
           items:
-            $ref: '#/components/schemas/datasetId'
+            $ref: '#/components/schemas/DatasetId'
           uniqueItems: true
         location:
           description: The URL of the job source code or artifact.
@@ -1276,59 +1266,9 @@ components:
           description: The description of the job.
           type: string
         latestRun:
-          description: The latest run of the job.
-          type: object
-          properties:
-            id:
-              description: The ID of the run.
-              type: string
-              format: uuid
-            createdAt:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-              type: string
-              format: date-time
-            updatedAt:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-              type: string
-              format: date-time
-            nominalStartTime:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-              type: string
-              format: date-time
-            nominalEndTime:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-              type: string
-              format: date-time
-            state:
-              description: The current state of the run.
-              type: string
-              enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-            startedAt:
-              type: integer
-              description: The time at which the run was started. Measured in seconds since the Unix epoch.
-            endedAt:
-              type: integer
-              description: The time at which the run was ended. Measured in seconds since the Unix epoch.
-            durationMs:
-              type: integer
-              description: The total duration of the run. Measured in milliseconds.
-            args:
-              description: The arguments of the run.
-              type: object
-            jobVersion:
-              $ref: '#/components/schemas/jobVersionId'
-            inputVersions:
-              type: array
-              items:
-                $ref: '#/components/schemas/datasetVersionId'
-            outputVersions:
-              type: array
-              items:
-                $ref: '#/components/schemas/datasetVersionId'
-            facets:
-              $ref: '#/components/schemas/runFacets'
+          $ref: '#/components/schemas/Run'
         facets:
-          $ref: '#/components/schemas/jobFacets'
+          $ref: '#/components/schemas/JobFacets'
       example:
         id:
           namespace: my-namespace
@@ -1346,14 +1286,14 @@ components:
         latestRun: null
         facets: {}
 
-    jobVersionList:
+    JobVersionList:
       type: object
       properties:
         versions:
           items:
-            $ref: '#/components/schemas/jobVersion'
+            $ref: '#/components/schemas/JobVersion'
 
-    jobVersionId:
+    JobVersionId:
       type: object
       properties:
         namespace:
@@ -1367,22 +1307,11 @@ components:
           format: uuid
           description: The version of the job.
 
-    jobVersion:
+    JobVersion:
       type: object
       properties:
         id:
-          description: The ID of the job.
-          type: object
-          properties:
-            namespace:
-              type: string
-              description: The namespace of the job.
-            name:
-              type: string
-              description: The name of the job.
-            version:
-              type: string
-              description: The version of the job
+          $ref: '#/components/schemas/JobVersionId'
         name:
           description: The name of the job.
           type: string
@@ -1400,13 +1329,13 @@ components:
           description: The set of **input** datasets
           type: array
           items:
-            $ref: '#/components/schemas/datasetId'
+            $ref: '#/components/schemas/DatasetId'
           uniqueItems: true
         outputs:
           description: The set of **output** datasets
           type: array
           items:
-            $ref: '#/components/schemas/datasetId'
+            $ref: '#/components/schemas/DatasetId'
           uniqueItems: true
         location:
           description: The URL of the job source code or artifact for the given job version.
@@ -1417,57 +1346,9 @@ components:
           type: object
           deprecated: true
         latestRun:
-          description: The latest run associated with the job version.
-          type: object
-          properties:
-            id:
-              description: The ID of the run.
-              type: string
-              format: uuid
-            createdAt:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-              type: string
-              format: date-time
-            updatedAt:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-              type: string
-              format: date-time
-            nominalStartTime:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-              type: string
-              format: date-time
-            nominalEndTime:
-              description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-              type: string
-              format: date-time
-            state:
-              description: The current state of the run.
-              type: string
-              enum: [ NEW, RUNNING, COMPLETED, FAILED, ABORTED ]
-            startedAt:
-              type: integer
-              description: The time at which the run was started. Measured in seconds since the Unix epoch.
-            endedAt:
-              type: integer
-              description: The time at which the run was ended. Measured in seconds since the Unix epoch.
-            durationMs:
-              type: integer
-              description: The total duration of the run. Measured in milliseconds.
-            args:
-              description: The arguments of the run.
-              type: object
-            jobVersion:
-              $ref: '#/components/schemas/jobVersionId'
-            inputVersions:
-              type: array
-              items:
-                $ref: '#/components/schemas/datasetVersionId'
-            outputVersions:
-              type: array
-              items:
-                $ref: '#/components/schemas/datasetVersionId'
+          $ref: '#/components/schemas/Run'
         facets:
-          $ref: '#/components/schemas/jobFacets'
+          $ref: '#/components/schemas/JobFacets'
       example:
         id:
           namespace: my-namespace
@@ -1485,15 +1366,15 @@ components:
         description: My first job!
         facets: {}
 
-    jobs:
+    JobList:
       type: object
       properties:
         jobs:
           type: array
           items:
-            $ref: '#/components/schemas/JOB'
+            $ref: '#/components/schemas/Job'
 
-    newRun:
+    CreatedRun:
       type: object
       properties:
         id:
@@ -1515,73 +1396,7 @@ components:
       example:
         args: {'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
 
-    runAsNew:
-      type: object
-      properties:
-        id:
-          description: The ID of the run.
-          type: string
-          format: uuid
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-          type: string
-          format: date-time
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        state:
-          description: The current state of the run.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        startedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the start time of the run.
-          type: string
-          format: date-time
-        endedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the end time of the run.
-          type: string
-          format: date-time
-        durationMs:
-          type: integer
-          description: The total duration of the run. Measured in milliseconds.
-        args:
-          description: The arguments of the run.
-          type: object
-        jobVersion:
-          $ref: '#/components/schemas/jobVersionId'
-        inputVersions:
-          type: array
-          items:
-            $ref: '#/components/schemas/datasetVersionId'
-        outputVersions:
-          type: array
-          items:
-            $ref: '#/components/schemas/datasetVersionId'
-        facets:
-          $ref: '#/components/schemas/runFacets'
-      example:
-        id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        nominalStartTime: null
-        nominalEndTime: null
-        state: NEW
-        startedAt: null
-        endedAt: null
-        durationMs: null
-        args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-        facets: {}
-
-    runAsRunning:
+    IncompleteRun:
       type: object
       properties:
         id:
@@ -1623,7 +1438,7 @@ components:
           description: The arguments of the run.
           type: object
         facets:
-          $ref: '#/components/schemas/runFacets'
+          $ref: '#/components/schemas/RunFacets'
       example:
         id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         createdAt: 2019-05-09T19:49:24.201361Z
@@ -1637,59 +1452,24 @@ components:
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
         facets: {}
 
-    runAsCompleted:
+    Run:
       type: object
-      properties:
-        id:
-          description: The ID of the run.
-          type: string
-          format: uuid
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-          type: string
-          format: date-time
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        state:
-          description: The current state of the run.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        startedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the start time of the run.
-          type: string
-          format: date-time
-        endedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the end time of the run.
-          type: string
-          format: date-time
-        durationMs:
-          type: integer
-          description: The total duration of the run. Measured in milliseconds.
-        args:
-          description: The arguments of the run.
-          type: object
-        jobVersion:
-          $ref: '#/components/schemas/jobVersionId'
-        inputVersions:
-          type: array
-          items:
-            $ref: '#/components/schemas/datasetVersionId'
-        outputVersions:
-          type: array
-          items:
-            $ref: '#/components/schemas/datasetVersionId'
-        facets:
-          $ref: '#/components/schemas/runFacets'
+      allOf:
+        - $ref: '#/components/schemas/IncompleteRun'
+        - type: object
+          properties:
+            jobVersion:
+              $ref: '#/components/schemas/JobVersionId'
+            inputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/DatasetVersionId'
+            outputVersions:
+              type: array
+              items:
+                $ref: '#/components/schemas/DatasetVersionId'
+            facets:
+              $ref: '#/components/schemas/RunFacets'
       example:
         id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
         createdAt: 2019-05-09T19:49:24.201361Z
@@ -1703,152 +1483,41 @@ components:
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
         facets: {}
 
-    runAsFailed:
-      type: object
-      properties:
-        id:
-          description: The ID of the run.
-          type: string
-          format: uuid
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-          type: string
-          format: date-time
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        state:
-          description: The current state of the run.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        startedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the start time of the run.
-          type: string
-          format: date-time
-        endedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the end time of the run.
-          type: string
-          format: date-time
-        durationMs:
-          type: integer
-          description: The total duration of the run. Measured in milliseconds.
-        args:
-          description: The arguments of the run.
-          type: object
-        facets:
-          $ref: '#/components/schemas/runFacets'
-      example:
-        id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        nominalStartTime: null
-        nominalEndTime: null
-        state: FAILED
-        startedAt: 2019-05-09T15:17:32.690346
-        endedAt: 2019-05-09T20:05:46.815920Z
-        durationMs: 4250894125
-        args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-        facets: {}
-
-    runAsAborted:
-      type: object
-      properties:
-        id:
-          description: The ID of the run.
-          type: string
-          format: uuid
-        createdAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was created.
-          type: string
-          format: date-time
-        updatedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the run was updated.
-          type: string
-          format: date-time
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        state:
-          description: The current state of the run.
-          type: string
-          enum: [NEW, RUNNING, COMPLETED, FAILED, ABORTED]
-        startedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the start time of the run.
-          type: string
-          format: date-time
-        endedAt:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the end time of the run.
-          type: string
-          format: date-time
-        durationMs:
-          type: integer
-          description: The total duration of the run. Measured in milliseconds.
-        args:
-          description: The arguments of the run.
-          type: object
-        facets:
-          $ref: '#/components/schemas/runFacets'
-      example:
-        id: 870492da-ecfb-4be0-91b9-9a89ddd3db90
-        createdAt: 2019-05-09T19:49:24.201361Z
-        updatedAt: 2019-05-09T19:49:24.201361Z
-        nominalStartTime: null
-        nominalEndTime: null
-        state: ABORTED
-        startedAt: 2019-05-09T15:17:32.690346
-        endedAt: 2019-05-09T20:05:46.815920Z
-        durationMs: 4250894125
-        args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
-        facets: {}
-    runs:
+    RunList:
       type: object
       properties:
         runs:
           type: array
           items:
-            $ref: '#/components/schemas/runAsCompleted'
+            $ref: '#/components/schemas/Run'
 
-    datasetFacets:
+    DatasetFacets:
       description: The facets of the dataset. For a full list of standard dataset facets, see [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.md#standard-facets).
       type: object
       additionalProperties:
-        $ref: '#/components/schemas/customFacet'
+        $ref: '#/components/schemas/CustomFacet'
 
-    jobFacets:
+    JobFacets:
       description: The facets of the job. For a full list of standard job facets, see [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.md#standard-facets).
       type: object
       additionalProperties:
-        $ref: '#/components/schemas/customFacet'
+        $ref: '#/components/schemas/CustomFacet'
 
-    runFacets:
+    RunFacets:
       description: The facets of the run. For a full list of standard run facets, see [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.md#standard-facets).
       type: object
       additionalProperties:
-        $ref: '#/components/schemas/customFacet'
+        $ref: '#/components/schemas/CustomFacet'
 
-    customFacet:
+    CustomFacet:
       description: A custom facet enables the extension of _dataset_, _job_, and _run_ metadata. A custom facet **must** also have a schema,
                    where a version of the schema is identifiable via a URL. A field within the schema **must** not start with an underscore (`_`).
       allOf:
-        - $ref: '#/components/schemas/baseFacet'
+        - $ref: '#/components/schemas/BaseFacet'
         - type: object
           additionalProperties: true
 
-    baseFacet:
+    BaseFacet:
       description: All base facet fields are prefixed with an underscore (`_`) to avoid field naming conflicts defined with other facets.
       type: object
       properties:
@@ -1865,47 +1534,55 @@ components:
       required:
         - _producer
         - _schemaURL
-    fieldType:
+    FieldType:
       description: The type of the field.
       type: string
       enum: [ARRAY, BIGINT, BINARY, BOOL, BOOLEAN, BPCHAR, CHAR, CHARACTER, DATE, DATETIME, DECIMAL, DOUBLE, FLOAT, FLOAT4, FLOAT8, GEOMETRY, INT, INT2, INT4, INT8, INTEGER, NCHAR, NUMBER, NUMERIC, NVARCHAR, OBJECT, REAL, SMALLINT, STRING, TEXT, TIME, TIMESTAMP, TIMESTAMPTZ, TIMESTAMP_LTZ, TIMESTAMP_NTZ, TIMESTAMP_TZ, VARBINARY, VARCHAR, VARIANT, VARYING]
 
-    graph:
+    LineageGraph:
       type: object
       properties:
         graph:
           type: array
           items:
-            $ref: '#/components/schemas/node'
+            $ref: '#/components/schemas/GraphNode'
 
-    node:
+    GraphNode:
       type: object
       properties:
         id:
           type: string
           description: The ID of the node.
         type:
-          type: enum
-          description: The type of the node.
-          enum: [ DATASET, JOB ]
+          $ref: '#/components/schemas/NodeType'
         data:
           type: object
           description: The data of the node.
+          discriminator:
+            propertyName: type
+            mapping:
+              'DATASET': '#/components/schemas/Dataset'
+              'JOB': '#/components/schemas/Job'
           oneOf:
-            - $ref: '#/components/schemas/DATASET'
-            - $ref: '#/components/schemas/JOB'
+            - $ref: '#/components/schemas/Dataset'
+            - $ref: '#/components/schemas/Job'
         inEdges:
           type: array
           description: The in edges of the node.
           items:
-            $ref: '#/components/schemas/edge'
+            $ref: '#/components/schemas/GraphEdge'
         outEdges:
           type: array
           description: The out edges of the node.
           items:
-            $ref: '#/components/schemas/edge'
+            $ref: '#/components/schemas/GraphEdge'
 
-    edge:
+    NodeType:
+      type: enum
+      enum: [ JOB, DATASET ]
+      description: The type of the diff node.
+
+    GraphEdge:
       type: object
       properties:
         origin:
@@ -1915,7 +1592,7 @@ components:
           description: The ID of the destination node.
           type: string
 
-    newTag:
+    CreatedTag:
       type: object
       properties:
         description:
@@ -1924,7 +1601,7 @@ components:
       example:
         description: My first tag!
 
-    lineageEvent:
+    LineageEvent:
       example:
         eventType: COMPLETE
         eventTime: 2019-05-09T19:49:24.201361Z
