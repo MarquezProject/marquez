@@ -6,11 +6,13 @@ import static marquez.common.Utils.KV_JOINER;
 import static marquez.common.models.DatasetType.DB_TABLE;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -112,7 +114,7 @@ public class VersionUtils {
     return newDatasetVersionFor(datasetVersionData);
   }
 
-  public static Version newDatasetVersionFor(DatasetVersionData data) {
+  private static Version newDatasetVersionFor(DatasetVersionData data) {
     if (data == null) return Version.of(UUID.nameUUIDFromBytes(("".getBytes())));
     final byte[] bytes =
         VERSION_JOINER
@@ -136,30 +138,34 @@ public class VersionUtils {
 
   @Getter
   @Builder
-  public static class DatasetVersionData {
+  private static class DatasetVersionData {
     private String namespace;
     private String sourceName;
     private String physicalName;
     private String datasetName;
     private String schemaLocation;
-    private List<Triple<String, String, String>> fields;
+    private Set<Triple<String, String, String>> fields;
     private UUID runId;
 
     public static class DatasetVersionDataBuilder {
+      private static final Function<LineageEvent.SchemaField, Triple<String, String, String>>
+          schemaFieldToTripleFunction =
+              f -> Triple.of(f.getName(), f.getType(), f.getDescription());
+      private static final Function<Field, Triple<String, String, String>> fieldToTripleFunction =
+          f ->
+              Triple.of(
+                  f.getName().getValue(), f.getType().name(), f.getDescription().orElse(null));
 
       private String sourceName;
       private String physicalName;
       private String schemaLocation;
-      private List<Triple<String, String, String>> fields = ImmutableList.of();
+      private Set<Triple<String, String, String>> fields = ImmutableSet.of();
       private UUID runId;
 
       public DatasetVersionData.DatasetVersionDataBuilder schemaFields(
           List<LineageEvent.SchemaField> schemaFields) {
         if (schemaFields == null) return this;
-        this.fields =
-            schemaFields.stream()
-                .map(f -> Triple.of(f.getName(), f.getType(), f.getDescription()))
-                .collect(Collectors.toList());
+        setFields(schemaFields, schemaFieldToTripleFunction);
         return this;
       }
 
@@ -188,16 +194,17 @@ public class VersionUtils {
 
       private DatasetVersionData.DatasetVersionDataBuilder fields(List<Field> fields) {
         if (fields == null) return this;
-        this.fields =
-            fields.stream()
-                .map(
-                    f ->
-                        Triple.of(
-                            f.getName().getValue(),
-                            f.getType().name(),
-                            f.getDescription().orElse(null)))
-                .collect(Collectors.toList());
+        setFields(fields, fieldToTripleFunction);
         return this;
+      }
+
+      private <T> void setFields(
+          List<T> fields, Function<T, Triple<String, String, String>> mapper) {
+        if (!this.fields.isEmpty()) {
+          throw new IllegalStateException(
+              "'fields' and 'schemaFields' methods are mutually exclusive");
+        }
+        this.fields = fields.stream().map(mapper).collect(Collectors.toCollection(TreeSet::new));
       }
     }
   }

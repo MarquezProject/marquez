@@ -12,12 +12,15 @@ import static marquez.service.models.ServiceModelGenerator.newJobMeta;
 import static marquez.service.models.ServiceModelGenerator.newStreamMeta;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
@@ -231,28 +234,75 @@ class VersionUtilsTest {
 
   @Test
   public void testDatasetVersionWithNullFields() {
-    List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
-
     Version version = VersionUtils.newDatasetVersionFor(null, null, null, null, null, null);
 
-    assertThat(version).isNotNull();
+    assertThat(version.getValue()).isNotNull();
   }
 
   @Test
   public void testDatasetVersionWithNullDatasetFields() {
-    List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
-
     Version version = VersionUtils.newDatasetVersionFor(null, null, null);
 
-    assertThat(version).isNotNull();
+    assertThat(version.getValue()).isNotNull();
   }
 
   @Test
-  public void testDatasetVersionWithNullDataVersion() {
+  public void testNewDatasetVersionFor_equalOnUnsortedSchemaFields() {
+    final NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    DatasetName physicalName = newDatasetName();
+    SourceName sourceName = newSourceName();
     List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
+    RunId runId = newRunId();
 
-    Version version = VersionUtils.newDatasetVersionFor(null);
+    Version first =
+        VersionUtils.newDatasetVersionFor(
+            namespaceName.getValue(),
+            sourceName.getValue(),
+            physicalName.getValue(),
+            datasetName.getValue(),
+            schemaFields,
+            runId.getValue());
 
-    assertThat(version).isNotNull();
+    List<LineageEvent.SchemaField> shuffleSchemaFields = new ArrayList<>(schemaFields);
+    Collections.shuffle(shuffleSchemaFields);
+    Version second =
+        VersionUtils.newDatasetVersionFor(
+            namespaceName.getValue(),
+            sourceName.getValue(),
+            physicalName.getValue(),
+            datasetName.getValue(),
+            shuffleSchemaFields,
+            runId.getValue());
+
+    assertThat(first).isEqualTo(second);
+  }
+
+  @Test
+  public void testNewDatasetVersionFor_equalOnUnsortedFields() {
+    NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    DbTableMeta dbTableMeta = newDbTableMeta();
+
+    Version first =
+        VersionUtils.newDatasetVersionFor(
+            namespaceName.getValue(), datasetName.getValue(), dbTableMeta);
+
+    List<Field> fields = new ArrayList<>(dbTableMeta.getFields());
+    Collections.shuffle(fields);
+    DbTableMeta dbTableMetaUnsortedFields =
+        new DbTableMeta(
+            dbTableMeta.getPhysicalName(),
+            dbTableMeta.getSourceName(),
+            ImmutableList.copyOf(fields),
+            dbTableMeta.getTags(),
+            dbTableMeta.getDescription().orElse(null),
+            dbTableMeta.getRunId().orElse(null));
+
+    Version second =
+        VersionUtils.newDatasetVersionFor(
+            namespaceName.getValue(), datasetName.getValue(), dbTableMetaUnsortedFields);
+
+    assertThat(first).isEqualTo(second);
   }
 }
