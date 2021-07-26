@@ -304,7 +304,6 @@ workflows:
           <<: *only-on-release
           context: release
           requires:
-          requires:
             - build-client-python
             - build-integration-airflow
             - build-integration-common
