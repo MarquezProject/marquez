@@ -29,7 +29,7 @@ ext {
     bytebuddyVersion = '1.11.8'
     sparkVersion = '2.4.8'
     jacksonVersion = '2.12.4'
-    testcontainersVersion = '1.15.3'
+    testcontainersVersion = '1.16.0'
 }
 
 dependencies {
