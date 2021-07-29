@@ -30,7 +30,7 @@ import marquez.service.models.LineageEvent.Job;
 @ToString
 @JsonDeserialize(converter = NodeId.FromValue.class)
 @JsonSerialize(converter = NodeId.ToValue.class)
-public final class NodeId {
+public final class NodeId implements Comparable<NodeId> {
   public static final String ID_DELIM = ":";
   public static final Joiner ID_JOINER = Joiner.on(ID_DELIM);
 
@@ -227,6 +227,11 @@ public final class NodeId {
     String[] parts = parts(4, ID_PREFX_DATASET);
     return new DatasetVersionId(
         NamespaceName.of(parts[1]), DatasetName.of(parts[2]), UUID.fromString(parts[3]));
+  }
+
+  @Override
+  public int compareTo(NodeId o) {
+    return value.compareTo(o.getValue());
   }
 
   public static class FromValue extends StdConverter<String, NodeId> {
