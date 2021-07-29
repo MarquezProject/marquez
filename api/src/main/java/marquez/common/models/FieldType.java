@@ -55,5 +55,6 @@ public enum FieldType {
   VARBINARY,
   VARCHAR,
   VARIANT,
-  VARYING;
+  VARYING,
+  UNKNOWN;
 }
