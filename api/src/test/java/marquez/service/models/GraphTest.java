@@ -43,17 +43,17 @@ public class GraphTest {
 
   @Test
   public void testDirectedGraph_edges_unordered() {
-    final Node nodeWithUnorderedEdges =
+    final Node nodeWithEdgesUnordered =
         Node.job().id(NodeId.of("job:test-namespace:c")).inEdges(E1, E0).outEdges(E2, E3).build();
-    final Graph graph = Graph.directed().nodes(N0, N1, nodeWithUnorderedEdges, N3, N4).build();
+    final Graph graph = Graph.directed().nodes(N0, N1, nodeWithEdgesUnordered, N3, N4).build();
     assertThat(graph.nodes()).containsExactly(N0, N1, N3, N4, N2);
   }
 
   @Test
   public void testDirectedGraph_edges_backwards() {
-    final Node nodeWithUnorderedEdges =
+    final Node nodeWithEdgesBackwards =
         Node.job().id(NodeId.of("job:test-namespace:c")).inEdges(E1, E0).outEdges(E3, E2).build();
-    final Graph graph = Graph.directed().nodes(N0, N1, nodeWithUnorderedEdges, N3, N4).build();
+    final Graph graph = Graph.directed().nodes(N0, N1, nodeWithEdgesBackwards, N3, N4).build();
     assertThat(graph.nodes()).containsExactly(N0, N1, N3, N4, N2);
   }
 }
