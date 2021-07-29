@@ -52,7 +52,7 @@ public class GraphTest {
   @Test
   public void testDirectedGraph_edges_backwards() {
     final Node nodeWithUnorderedEdges =
-            Node.job().id(NodeId.of("job:test-namespace:c")).inEdges(E1, E0).outEdges(E3, E2).build();
+        Node.job().id(NodeId.of("job:test-namespace:c")).inEdges(E1, E0).outEdges(E3, E2).build();
     final Graph graph = Graph.directed().nodes(N0, N1, nodeWithUnorderedEdges, N3, N4).build();
     assertThat(graph.nodes()).containsExactly(N0, N1, N3, N4, N2);
   }

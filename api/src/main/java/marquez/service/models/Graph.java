@@ -12,6 +12,8 @@ import lombok.ToString;
 public final class Graph {
   private final Set<Node> mutableNodes = Sets.newTreeSet();
 
+  private Graph() {}
+
   public void add(@NonNull final Node node) {
     addAll(Sets.newHashSet(node));
   }
