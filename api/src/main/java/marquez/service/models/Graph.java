@@ -15,7 +15,7 @@ public final class Graph {
   private Graph() {}
 
   public void add(@NonNull final Node node) {
-    addAll(Sets.newHashSet(node));
+    mutableNodes.add(node);
   }
 
   public void addAll(@NonNull final Set<Node> nodes) {
