@@ -150,13 +150,13 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testDatasetWithUnknownFieldType() {
-    // (1) Create namespace for stream
+    // (1) Create namespace for db table
     final NamespaceMeta namespaceMeta =
         NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
 
     client.createNamespace(NAMESPACE_NAME, namespaceMeta);
 
-    // (2) Create source for stream
+    // (2) Create source for db table
     final SourceMeta sourceMeta =
         SourceMeta.builder()
             .type(STREAM_SOURCE_TYPE)
@@ -166,27 +166,19 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     client.createSource(DB_TABLE_SOURCE_NAME, sourceMeta);
 
-    // (3) Create dataset ...
+    // (3) Create db table with invalid field type
     final DatasetName datasetName = newDatasetName();
-    final ImmutableList<Field> fields =
-        ImmutableList.of(
-            Field.builder().name("a").type("INTEGER").build(),
-            Field.builder().name("b").type("UNKNOWN_FIELD_TYPE").build());
     final DbTableMeta dbTableMeta =
         DbTableMeta.builder()
             .physicalName(datasetName.getValue())
             .sourceName(DB_TABLE_SOURCE_NAME)
-            .fields(fields)
+            .fields(
+                ImmutableList.of(Field.builder().name("b").type("NOT_A_VALID_FIELD_TYPE").build()))
             .build();
-
-    final ImmutableList<Field> expectedFields =
-        ImmutableList.of(
-            Field.builder().name("a").type("INTEGER").build(),
-            Field.builder().name("b").type("UNKNOWN").build());
-
-    client.createDataset(NAMESPACE_NAME, datasetName.getValue(), dbTableMeta);
-    Dataset dataset = client.getDataset(NAMESPACE_NAME, datasetName.getValue());
-    assertThat(dataset.getFields()).hasSameElementsAs(expectedFields);
+    final Dataset dataset =
+        client.createDataset(NAMESPACE_NAME, datasetName.getValue(), dbTableMeta);
+    assertThat(dataset.getFields())
+        .containsExactly(Field.builder().name("b").type("UNKNOWN").build());
   }
 
   @Test
