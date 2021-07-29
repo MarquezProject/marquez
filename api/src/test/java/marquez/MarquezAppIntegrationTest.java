@@ -173,12 +173,12 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .physicalName(datasetName.getValue())
             .sourceName(DB_TABLE_SOURCE_NAME)
             .fields(
-                ImmutableList.of(Field.builder().name("b").type("NOT_A_VALID_FIELD_TYPE").build()))
+                ImmutableList.of(Field.builder().name("a").type("NOT_A_VALID_FIELD_TYPE").build()))
             .build();
     final Dataset dataset =
         client.createDataset(NAMESPACE_NAME, datasetName.getValue(), dbTableMeta);
     assertThat(dataset.getFields())
-        .containsExactly(Field.builder().name("b").type("UNKNOWN").build());
+        .containsExactly(Field.builder().name("a").type("UNKNOWN").build());
   }
 
   @Test
