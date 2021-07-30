@@ -20,6 +20,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.google.common.base.Enums;
 import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -48,7 +49,9 @@ public final class Field {
       final String description) {
     this(
         FieldName.of(nameAsString),
-        FieldType.valueOf(typeAsString),
+        (typeAsString == null)
+            ? FieldType.UNKNOWN
+            : Enums.getIfPresent(FieldType.class, typeAsString).or(FieldType.UNKNOWN),
         (tagsAsString == null)
             ? ImmutableSet.of()
             : tagsAsString.stream().map(TagName::of).collect(toImmutableSet()),
