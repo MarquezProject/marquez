@@ -14,13 +14,13 @@ import lombok.ToString;
 @ToString
 public class Field {
   @Getter private final String name;
-  @Getter private final String type;
+  @Nullable private final String type;
   @Getter private final Set<String> tags;
   @Nullable String description;
 
   public Field(
       @NonNull final String name,
-      @NonNull final String type,
+      @Nullable final String type,
       @Nullable final Set<String> tags,
       @Nullable final String description) {
     this.name = name;
@@ -29,6 +29,9 @@ public class Field {
     this.description = description;
   }
 
+  public Optional<String> getType() {
+    return Optional.ofNullable(type);
+  }
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
   }
@@ -39,9 +42,9 @@ public class Field {
 
   public static final class Builder {
     private String name;
-    private String type;
+    @Nullable private String type;
     private Set<String> tags;
-    @Nullable String description;
+    @Nullable private String description;
 
     private Builder() {
       this.tags = Sets.newHashSet();
@@ -52,7 +55,7 @@ public class Field {
       return this;
     }
 
-    public Builder type(@NonNull String type) {
+    public Builder type(@Nullable String type) {
       this.type = type;
       return this;
     }
