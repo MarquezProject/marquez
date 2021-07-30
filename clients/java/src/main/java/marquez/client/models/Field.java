@@ -32,6 +32,7 @@ public class Field {
   public Optional<String> getType() {
     return Optional.ofNullable(type);
   }
+
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
   }
