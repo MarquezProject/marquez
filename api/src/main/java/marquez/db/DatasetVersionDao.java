@@ -26,6 +26,7 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.FieldName;
+import marquez.common.models.FieldType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
@@ -148,7 +149,7 @@ public interface DatasetVersionDao extends BaseDao {
             f ->
                 new Field(
                     FieldName.of(f.getName()),
-                    openLineageDao.toFieldType(f.getType()),
+                    FieldType.fromString(f.getType()),
                     ImmutableSet.of(),
                     f.getDescription()))
         .collect(Collectors.toList());

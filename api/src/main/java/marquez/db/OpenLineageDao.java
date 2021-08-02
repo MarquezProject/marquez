@@ -414,7 +414,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                toFieldType(field.getType()).name(),
+                FieldType.fromString(field.getType()).name(),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -436,10 +436,6 @@ public interface OpenLineageDao extends BaseDao {
     }
 
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
-  }
-
-  default FieldType toFieldType(String type) {
-    return FieldType.fromString(type);
   }
 
   default String formatDatasetName(String name) {
