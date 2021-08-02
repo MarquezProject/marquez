@@ -51,7 +51,6 @@ import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
-import org.slf4j.LoggerFactory;
 
 public interface OpenLineageDao extends BaseDao {
   public String DEFAULT_SOURCE_NAME = "default";
@@ -415,7 +414,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                toFieldType(field.getType()),
+                FieldType.fromString(field.getType()).name(),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -437,19 +436,6 @@ public interface OpenLineageDao extends BaseDao {
     }
 
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
-  }
-
-  default String toFieldType(String type) {
-    if (type == null) {
-      return null;
-    }
-
-    try {
-      return FieldType.valueOf(type.toUpperCase()).name();
-    } catch (Exception e) {
-      LoggerFactory.getLogger(getClass()).warn("Can't handle field of type {}", type.toUpperCase());
-      return null;
-    }
   }
 
   default String formatDatasetName(String name) {

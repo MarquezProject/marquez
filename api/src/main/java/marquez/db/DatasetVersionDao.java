@@ -149,9 +149,7 @@ public interface DatasetVersionDao extends BaseDao {
             f ->
                 new Field(
                     FieldName.of(f.getName()),
-                    openLineageDao.toFieldType(f.getType()) != null
-                        ? FieldType.valueOf(openLineageDao.toFieldType(f.getType()))
-                        : FieldType.VARCHAR,
+                    FieldType.fromString(f.getType()),
                     ImmutableSet.of(),
                     f.getDescription()))
         .collect(Collectors.toList());
