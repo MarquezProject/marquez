@@ -14,6 +14,10 @@
 
 package marquez.common.models;
 
+import com.google.common.base.Enums;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public enum FieldType {
   ARRAY,
   BIGINT,
@@ -57,4 +61,18 @@ public enum FieldType {
   VARIANT,
   VARYING,
   UNKNOWN;
+
+  private static final Pattern EXTRACT_TYPE = Pattern.compile("(.*)\\(.*\\)");
+
+  public static FieldType fromString(String typeAsString) {
+    if (typeAsString == null) return UNKNOWN;
+    String type = typeAsString.toUpperCase();
+    return Enums.getIfPresent(FieldType.class, type)
+        .or(Enums.getIfPresent(FieldType.class, tryToRemoveTypeSize(type)).or(UNKNOWN));
+  }
+
+  private static String tryToRemoveTypeSize(String typeAsString) {
+    Matcher matcher = EXTRACT_TYPE.matcher(typeAsString);
+    return matcher.find() ? matcher.group(1) : typeAsString;
+  }
 }

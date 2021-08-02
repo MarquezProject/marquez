@@ -6,7 +6,6 @@ import static marquez.common.Utils.VERSION_DELIM;
 import static marquez.common.Utils.VERSION_JOINER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Enums;
 import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -440,9 +439,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default FieldType toFieldType(String type) {
-    return type == null
-        ? FieldType.UNKNOWN
-        : Enums.getIfPresent(FieldType.class, type).or(FieldType.UNKNOWN);
+    return FieldType.fromString(type);
   }
 
   default String formatDatasetName(String name) {
