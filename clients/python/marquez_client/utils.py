@@ -26,12 +26,11 @@ class Utils:
         for field in fields:
             if 'name' not in field:
                 raise ValueError('field name must not be None')
-            if 'type' not in field:
-                raise ValueError('field type must not be None')
             new_field = {
                 'name': field['name'],
-                'type': field['type'].upper(),
             }
+            if 'type' in field:
+                new_field['type'] = field['type']
             if 'tags' in field:
                 new_field['tags'] = field['tags']
             if 'description' in field:
