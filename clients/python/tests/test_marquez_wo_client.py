@@ -62,9 +62,9 @@ def test_create_dataset(wo_client):
         physical_name='test-physical-dataset',
         source_name='test-source',
         fields=[
-            {'name': 'field0', 'type': 'int4'},
-            {'name': 'field1', 'type': 'varchar'},
-            {'name': 'field2', 'type': 'varchar'},
+            {'name': 'field0', 'type': 'INT4'},
+            {'name': 'field1', 'type': 'VARCHAR'},
+            {'name': 'field2', 'type': 'VARCHAR'},
         ]
     )
 
