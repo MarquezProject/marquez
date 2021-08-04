@@ -144,10 +144,6 @@ def check_datasets_meta():
         dataset_name=OUT_TABLE_NAME
     )
 
-    # testing...
-    for key, value in out_table.items():
-        print(key, ' : ', value)
-
     assert out_table['id'] == {
         'namespace': SOURCE_NAME,
         'name': OUT_TABLE_NAME
