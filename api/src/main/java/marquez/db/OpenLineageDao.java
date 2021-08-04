@@ -537,7 +537,7 @@ public interface OpenLineageDao extends BaseDao {
                 fields == null
                     ? ImmutableList.of()
                     : fields.stream()
-                        .map(field -> versionField(field.getName(), field.getType().toUpperCase()))
+                        .map(field -> versionField(field.getName(), field.getType()))
                         .collect(joining(VERSION_DELIM)),
                 runId)
             .getBytes(UTF_8);
@@ -545,7 +545,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default String versionField(String fieldName, String type) {
-    return VERSION_JOINER.join(fieldName, type);
+    return VERSION_JOINER.join(fieldName, type.toUpperCase());
   }
 
   default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {
