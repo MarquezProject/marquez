@@ -102,7 +102,7 @@ public interface DatasetVersionDao extends BaseDao {
               UUID.randomUUID(),
               now,
               field.getName().getValue(),
-              Utils.toUpperCaseIfPresent(field.getType()),
+              field.getType(),
               field.getDescription().orElse(null),
               datasetUuid);
       for (TagName tagName : field.getTags()) {

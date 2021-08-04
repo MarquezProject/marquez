@@ -413,7 +413,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                Utils.toUpperCaseIfPresent(field.getType()),
+                field.getType(),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -537,11 +537,7 @@ public interface OpenLineageDao extends BaseDao {
                 fields == null
                     ? ImmutableList.of()
                     : fields.stream()
-                        .map(
-                            field ->
-                                versionField(
-                                    field.getName(),
-                                    Utils.toUpperCaseIfPresent(field.getType().toUpperCase())))
+                        .map(field -> versionField(field.getName(), field.getType().toUpperCase()))
                         .collect(joining(VERSION_DELIM)),
                 runId)
             .getBytes(UTF_8);

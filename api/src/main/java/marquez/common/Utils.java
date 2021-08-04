@@ -172,8 +172,4 @@ public final class Utils {
             .getBytes(UTF_8);
     return Version.of(UUID.nameUUIDFromBytes(bytes));
   }
-
-  public static @Nullable String toUpperCaseIfPresent(@Nullable final String value) {
-    return (value == null) ? null : value.toUpperCase();
-  }
 }
