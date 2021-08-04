@@ -48,7 +48,7 @@ public final class Field {
       final String description) {
     this(
         FieldName.of(nameAsString),
-        FieldType.valueOf(typeAsString),
+        FieldType.fromString(typeAsString),
         (tagsAsString == null)
             ? ImmutableSet.of()
             : tagsAsString.stream().map(TagName::of).collect(toImmutableSet()),

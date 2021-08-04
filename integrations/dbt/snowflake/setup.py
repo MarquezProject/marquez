@@ -24,13 +24,14 @@ __version__ = "0.16.1"
 data = {
     'dbt': [
         'include/openlineage_snowflake/macros/*.sql',
+        'include/openlineage_snowflake/macros/materializations/*.sql',
         'include/openlineage_snowflake/dbt_project.yml',
     ]
 }
 
 requirements = [
-    "dbt-core>=0.20.0b1",
-    "dbt-snowflake>=0.20.0b1",
+    "dbt-core>=0.20.0",
+    "dbt-snowflake>=0.20.0",
     "sqlparse>=0.3.1",
     f"marquez-integration-common=={__version__}",
     "openlineage-python>=0.0.1rc6"

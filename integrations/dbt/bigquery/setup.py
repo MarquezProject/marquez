@@ -24,13 +24,14 @@ __version__ = "0.16.1"
 data = {
     "dbt": [
         "include/openlineage_bigquery/macros/*.sql",
+        "include/openlineage_bigquery/macros/materializations/*.sql",
         "include/openlineage_bigquery/dbt_project.yml",
     ]
 }
 
 requirements = [
-    "dbt-core>=0.20.0b1",
-    "dbt-bigquery>=0.20.0b1",
+    "dbt-core>=0.20.0",
+    "dbt-bigquery>=0.20.0",
     "sqlparse>=0.3.1",
     f"marquez-integration-common=={__version__}",
     "openlineage-python==0.0.1rc6"
