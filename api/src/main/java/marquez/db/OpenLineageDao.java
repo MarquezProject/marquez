@@ -545,7 +545,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default String versionField(String fieldName, String type) {
-    return VERSION_JOINER.join(fieldName, type.toUpperCase());
+    return VERSION_JOINER.join(fieldName, (type == null) ? null : type.toUpperCase());
   }
 
   default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {

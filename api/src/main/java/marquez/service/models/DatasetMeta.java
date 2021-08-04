@@ -83,6 +83,8 @@ public abstract class DatasetMeta {
 
   protected static String joinField(final Field field) {
     return VERSION_JOINER.join(
-        field.getName(), field.getType().toUpperCase(), field.getDescription());
+        field.getName(),
+        (field.getType() == null) ? null : field.getType().toUpperCase(),
+        field.getDescription());
   }
 }
