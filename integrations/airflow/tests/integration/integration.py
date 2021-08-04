@@ -49,19 +49,19 @@ OUT_TABLE_PHYSICAL_NAME = OUT_TABLE_NAME
 OUT_TABLE_FIELDS = [
     {
         'name': 'order_day_of_week',
-        'type': 'varchar',
+        'type': 'VARCHAR',
         'tags': [],
         'description': None
     },
     {
         'name': 'order_placed_on',
-        'type': 'timestamp',
+        'type': 'TIMESTAMP',
         'tags': [],
         'description': None
     },
     {
         'name': 'orders_placed',
-        'type': 'int4',
+        'type': 'INT4',
         'tags': [],
         'description': None
     }
