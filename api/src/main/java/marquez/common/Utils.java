@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.Hashing;
 import io.dropwizard.jackson.Jackson;
+import io.dropwizard.util.Strings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -171,5 +172,9 @@ public final class Utils {
                 KV_JOINER.join(jobContext))
             .getBytes(UTF_8);
     return Version.of(UUID.nameUUIDFromBytes(bytes));
+  }
+
+  public static @Nullable String toUpperCaseIfPresent(@Nullable final String value) {
+    return Strings.isNullOrEmpty(value) ? null : value.toUpperCase();
   }
 }

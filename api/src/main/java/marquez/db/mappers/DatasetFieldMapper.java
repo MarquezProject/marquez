@@ -25,7 +25,6 @@ import java.util.List;
 import lombok.NonNull;
 import marquez.common.models.Field;
 import marquez.common.models.FieldName;
-import marquez.common.models.FieldType;
 import marquez.common.models.TagName;
 import marquez.db.Columns;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -37,8 +36,8 @@ public final class DatasetFieldMapper implements RowMapper<Field> {
       throws SQLException {
     return new Field(
         FieldName.of(stringOrThrow(results, Columns.NAME)),
-        FieldType.valueOf(stringOrThrow(results, Columns.TYPE)),
-        toTagNames(stringArrayOrThrow(results, "tags")),
+        stringOrNull(results, Columns.TYPE),
+        toTagNames(stringArrayOrThrow(results, Columns.TAGS)),
         stringOrNull(results, Columns.DESCRIPTION));
   }
 

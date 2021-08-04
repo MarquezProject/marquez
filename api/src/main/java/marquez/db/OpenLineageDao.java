@@ -23,7 +23,6 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
-import marquez.common.models.FieldType;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
@@ -414,7 +413,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                FieldType.fromString(field.getType()).name(),
+                Utils.toUpperCaseIfPresent(field.getType()),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -522,6 +521,7 @@ public interface OpenLineageDao extends BaseDao {
     }
   }
 
+  // TODO(wslulciuc): Move to Utils.newDatasetVersionFor()
   default UUID version(
       String namespace,
       String sourceName,
@@ -537,7 +537,11 @@ public interface OpenLineageDao extends BaseDao {
                 fields == null
                     ? ImmutableList.of()
                     : fields.stream()
-                        .map(field -> versionField(field.getName(), field.getType()))
+                        .map(
+                            field ->
+                                versionField(
+                                    field.getName(),
+                                    Utils.toUpperCaseIfPresent(field.getType().toUpperCase())))
                         .collect(joining(VERSION_DELIM)),
                 runId)
             .getBytes(UTF_8);
