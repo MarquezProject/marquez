@@ -36,7 +36,7 @@ public final class Field {
   @Getter
   private final FieldName name;
 
-  @Getter private final FieldType type;
+  @Nullable @Getter private final String type;
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final String description;
 
@@ -48,7 +48,7 @@ public final class Field {
       final String description) {
     this(
         FieldName.of(nameAsString),
-        FieldType.fromString(typeAsString),
+        typeAsString,
         (tagsAsString == null)
             ? ImmutableSet.of()
             : tagsAsString.stream().map(TagName::of).collect(toImmutableSet()),
@@ -57,7 +57,7 @@ public final class Field {
 
   public Field(
       @NonNull final FieldName name,
-      @NonNull final FieldType type,
+      @Nullable final String type,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description) {
     this.name = name;

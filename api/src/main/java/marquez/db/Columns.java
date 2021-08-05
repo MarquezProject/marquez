@@ -61,6 +61,7 @@ public final class Columns {
   public static final String NAMESPACE_NAME = "namespace_name";
   public static final String DATASET_NAME = "dataset_name";
   public static final String FACETS = "facets";
+  public static final String TAGS = "tags";
 
   /* NAMESPACE ROW COLUMNS */
   public static final String CURRENT_OWNER_NAME = "current_owner_name";
@@ -220,7 +221,7 @@ public final class Columns {
 
   public static URI uriOrNull(ResultSet results, String column) {
     try {
-      String result = stringOrNull(results, column);
+      final String result = stringOrNull(results, column);
       if (result == null) {
         return null;
       }
@@ -233,7 +234,7 @@ public final class Columns {
 
   public static URL urlOrNull(ResultSet results, String column) {
     try {
-      String result = stringOrNull(results, column);
+      final String result = stringOrNull(results, column);
       if (result == null) {
         return null;
       }

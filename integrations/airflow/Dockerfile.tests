@@ -1,5 +1,7 @@
 FROM python:3.6-slim
 RUN mkdir /app
+RUN apt-get update && \
+    apt-get install -y git
 ADD airflow/setup.py /app
 ADD airflow/README.md /app
 COPY common /tmp/marquez-integration-common
