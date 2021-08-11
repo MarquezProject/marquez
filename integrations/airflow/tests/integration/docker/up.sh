@@ -50,6 +50,7 @@ pandas-gbq>=0.13.2
 google-cloud-storage>=1.31.2
 retrying==1.3.3
 snowflake-connector-python==2.4.3
+git+git://github.com/MarquezProject/marquez.git@main#egg=marquez_python&subdirectory=clients/python
 marquez-python
 ${MARQUEZ_AIRFLOW_WHL}
 EOL

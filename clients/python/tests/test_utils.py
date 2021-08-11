@@ -19,11 +19,10 @@ import time
 
 def test_mk_fields_from():
     fields_name_error = [{}]
-    fields_type_error = [{"name": "flight_id"}]
     fields_valid = [
         {
             "name": "flight_id",
-            "type": "integer",
+            "type": "INTEGER",
             "description": "flight id",
             "tags": ["tag1", "tag2"]
         },
@@ -35,7 +34,7 @@ def test_mk_fields_from():
         },
         {
             "name": "flight_date",
-            "type": "timestamp",
+            "type": "TIMESTAMP",
             "description": "flight date"
         }
     ]
@@ -61,8 +60,6 @@ def test_mk_fields_from():
     assert Utils.mk_fields_from(fields=fields_valid) == new_fields_valid
     with pytest.raises(ValueError):
         Utils.mk_fields_from(fields=fields_name_error)
-    with pytest.raises(ValueError):
-        Utils.mk_fields_from(fields=fields_type_error)
 
 
 def test_is_none():

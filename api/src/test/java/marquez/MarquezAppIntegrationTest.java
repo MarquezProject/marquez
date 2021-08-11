@@ -2,7 +2,9 @@ package marquez;
 
 import static java.time.Instant.EPOCH;
 import static marquez.Generator.newTimestamp;
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newFieldType;
 import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newSchemaLocation;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +36,7 @@ import marquez.client.models.SourceMeta;
 import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
+import marquez.common.models.DatasetName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -144,6 +147,39 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     client.createDataset(NAMESPACE_NAME, datasetName, newDbTableMeta);
     Dataset updatedDataset = client.getDataset(NAMESPACE_NAME, datasetName);
     assertThat(updatedDataset.getFields()).hasSameElementsAs(newFields);
+  }
+
+  @Test
+  public void testDatasetWithUnknownFieldType() {
+    // (1) Create namespace for db table
+    final NamespaceMeta namespaceMeta =
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
+
+    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+
+    // (2) Create source for db table
+    final SourceMeta sourceMeta =
+        SourceMeta.builder()
+            .type(STREAM_SOURCE_TYPE)
+            .connectionUrl(STREAM_CONNECTION_URL)
+            .description(STREAM_SOURCE_DESCRIPTION)
+            .build();
+
+    client.createSource(DB_TABLE_SOURCE_NAME, sourceMeta);
+
+    // (3) Create db table with invalid field type
+    final Field field0 = Field.builder().name("field0").type(newFieldType()).build();
+    final Field field1 = Field.builder().name("field1").type(null).build();
+    final DatasetName datasetName = newDatasetName();
+    final DbTableMeta dbTableMeta =
+        DbTableMeta.builder()
+            .physicalName(datasetName.getValue())
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(ImmutableList.of(field0, field1))
+            .build();
+    final Dataset dataset =
+        client.createDataset(NAMESPACE_NAME, datasetName.getValue(), dbTableMeta);
+    assertThat(dataset.getFields()).containsExactly(field0, field1);
   }
 
   @Test

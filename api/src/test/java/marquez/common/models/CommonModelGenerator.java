@@ -105,8 +105,8 @@ public final class CommonModelGenerator extends Generator {
     return FieldName.of("test_field" + newId());
   }
 
-  public static FieldType newFieldType() {
-    return FieldType.values()[newIdWithBound(FieldType.values().length - 1)];
+  public static String newFieldType() {
+    return String.format("VARCHAR(%d)", newIdWithBound(255));
   }
 
   public static ImmutableList<Field> newFields(final int limit) {
