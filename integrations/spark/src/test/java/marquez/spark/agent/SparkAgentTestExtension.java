@@ -4,7 +4,7 @@ import static org.mockito.Mockito.mock;
 
 import marquez.spark.agent.lifecycle.StaticExecutionContextFactory;
 import net.bytebuddy.agent.ByteBuddyAgent;
-import openlineage.spark.agent.OpenLineageSparkContext;
+import openlineage.spark.agent.OpenLineageContext;
 import openlineage.spark.agent.SparkAgent;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -24,7 +24,7 @@ import org.mockito.Mockito;
  * extension and ends up running before other Spark tests, those subsequent tests will fail.
  */
 public class SparkAgentTestExtension implements BeforeAllCallback, BeforeEachCallback {
-  public static final OpenLineageSparkContext marquezContext = mock(OpenLineageSparkContext.class);
+  public static final OpenLineageContext marquezContext = mock(OpenLineageContext.class);
 
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {

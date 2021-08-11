@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import openlineage.spark.agent.OpenLineageSparkContext;
+import openlineage.spark.agent.OpenLineageContext;
 import openlineage.spark.agent.lifecycle.ContextFactory;
 import openlineage.spark.agent.lifecycle.RddExecutionContext;
 import openlineage.spark.agent.lifecycle.SparkSQLExecutionContext;
@@ -25,7 +25,7 @@ import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionStart;
 public class StaticExecutionContextFactory extends ContextFactory {
   public static final Semaphore semaphore = new Semaphore(1);
 
-  public StaticExecutionContextFactory(OpenLineageSparkContext marquezContext) {
+  public StaticExecutionContextFactory(OpenLineageContext marquezContext) {
     super(marquezContext);
   }
 
