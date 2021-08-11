@@ -8,7 +8,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
-[![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
+[![status](https://img.shields.io/badge/status-active-brightgreen.svg)](#status)
 [![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](http://bit.ly/MarquezSlack)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
