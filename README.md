@@ -21,7 +21,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/marquez) incubation project under active development and we'd love your help!
 
 <p align="center">
-  <img src="./docs/assets/images/lfaidata-project-badge-incubation-black.png" width="270px" />
+  <img src="./docs/assets/images/lfaidata-project-badge-incubation-black.png" width="250px" />
 </p>
 
 ## Quickstart
