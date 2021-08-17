@@ -54,8 +54,3 @@ Fix all style issues in project
 ```
    $ npm run eslint-fix 
 ```
-
-### Seeding data
-
-Mock data can be found in the `docker/db/data` folder.
-Feel free to edit the mock data if you like. (Grant worked really hard on making it pretty.)
