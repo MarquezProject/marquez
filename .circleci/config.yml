@@ -98,58 +98,6 @@ jobs:
       - run: pytest --cov=marquez_python tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
-  test-integration-dbt-bigquery:
-    working_directory: ~/marquez/integrations/dbt/bigquery
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - *checkout_project_root
-      - *install_integration_common
-      - run: pip install -e .[dev]
-      - run: flake8
-      - run: pytest --cov=dbt tests/
-      - run: bash <(curl -s https://codecov.io/bash)
-
-  build-integration-dbt-bigquery:
-    working_directory: ~/marquez/integrations/dbt/bigquery
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - *checkout_project_root
-      - *install_integration_common
-      - run: python setup.py sdist bdist_wheel
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./dist/*.whl
-            - ./dist/*.tar.gz
-
-  test-integration-dbt-snowflake:
-    working_directory: ~/marquez/integrations/dbt/snowflake
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - *checkout_project_root
-      - *install_integration_common
-      - run: pip install -e .[dev]
-      - run: flake8
-      - run: pytest --cov=dbt tests/
-      - run: bash <(curl -s https://codecov.io/bash)
-
-  build-integration-dbt-snowflake:
-    working_directory: ~/marquez/integrations/dbt/snowflake
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - *checkout_project_root
-      - *install_integration_common
-      - run: python setup.py sdist bdist_wheel
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./dist/*.whl
-            - ./dist/*.tar.gz
-
   build-client-python:
     working_directory: ~/marquez/clients/python
     docker:
@@ -345,8 +293,6 @@ workflows:
       - build-client-java
       - test-client-python
       - test-integration-common
-      - test-integration-dbt-bigquery
-      - test-integration-dbt-snowflake
       - integration-test-airflow:
           requires:
             - test-integration-airflow
@@ -358,10 +304,6 @@ workflows:
           <<: *only-on-release
       - build-integration-airflow:
           <<: *only-on-release
-      - build-integration-dbt-bigquery:
-          <<: *only-on-release
-      - build-integration-dbt-snowflake:
-          <<: *only-on-release
       - release-java:
           <<: *only-on-release
           context: release
@@ -372,8 +314,6 @@ workflows:
             - build-client-python
             - build-integration-airflow
             - build-integration-common
-            - build-integration-dbt-bigquery
-            - build-integration-dbt-snowflake
       - release-docker:
           <<: *only-on-release
           context: release
