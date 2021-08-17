@@ -52,7 +52,7 @@ dependencies {
     compile "io.sentry:sentry:${sentryVersion}"
     compile 'org.flywaydb:flyway-core:6.5.7'
     compile "org.postgresql:postgresql:${postgresqlVersion}"
-    compile 'com.graphql-java:graphql-java:16.2'
+    compile 'com.graphql-java:graphql-java:17.1'
     compile 'com.graphql-java-kickstart:graphql-java-servlet:11.1.1'
 
     testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
