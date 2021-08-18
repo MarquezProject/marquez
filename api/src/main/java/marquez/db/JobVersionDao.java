@@ -27,7 +27,6 @@ import lombok.NonNull;
 import lombok.Value;
 import marquez.api.models.JobVersion;
 import marquez.common.Utils;
-import marquez.common.VersionUtils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
@@ -288,7 +287,7 @@ public interface JobVersionDao extends BaseDao {
 
   /**
    * Used to upsert an immutable {@link JobVersionRow} object when a {@link Run} has transitioned. A
-   * {@link Version} is generated using {@link VersionUtils#newJobVersionFor(NamespaceName, JobName,
+   * {@link Version} is generated using {@link Utils#newJobVersionFor(NamespaceName, JobName,
    * ImmutableSet, ImmutableSet, ImmutableMap, String)} based on the jobs inputs and inputs, source
    * code location, and context. A version for a given job is created <i>only</i> when a {@link Run}
    * transitions into a {@code COMPLETED}, {@code ABORTED}, or {@code FAILED} state.
@@ -331,7 +330,7 @@ public interface JobVersionDao extends BaseDao {
 
     // Generate the version for the job; the version may already exist.
     final Version jobVersion =
-        VersionUtils.newJobVersionFor(
+        Utils.newJobVersionFor(
             NamespaceName.of(jobRow.getNamespaceName()),
             JobName.of(jobRow.getName()),
             toDatasetIds(jobVersionInputs),

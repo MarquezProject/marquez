@@ -107,7 +107,7 @@ public final class CommonModelGenerator extends Generator {
 
   public static LineageEvent.SchemaField newSchemaField() {
     return new LineageEvent.SchemaField(
-        newFieldName().getValue(), newFieldType().name(), newDescription());
+        newFieldName().getValue(), newFieldType(), newDescription());
   }
 
   public static List<LineageEvent.SchemaField> newSchemaFields(int amount) {
@@ -116,7 +116,7 @@ public final class CommonModelGenerator extends Generator {
         .map(
             i ->
                 new LineageEvent.SchemaField(
-                    newFieldName().getValue(), newFieldType().name(), newDescription()))
+                    newFieldName().getValue(), newFieldType(), newDescription()))
         .collect(Collectors.toList());
   }
 

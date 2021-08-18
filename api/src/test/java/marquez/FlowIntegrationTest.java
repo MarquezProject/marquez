@@ -23,7 +23,6 @@ import marquez.client.models.JobMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
-import marquez.common.models.FieldType;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -72,6 +71,7 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
     Run runningState = client.markRunAs(createdRun.getId(), RunState.RUNNING);
 
     createJob(createdRun.getId());
+    createDataset(createdRun.getId());
 
     Run completed = client.markRunAs(createdRun.getId(), RunState.COMPLETED);
 
@@ -158,7 +158,7 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
                 ImmutableList.of(
                     new Field(
                         "test_field1",
-                        FieldType.BOOL.name(),
+                        "BOOL",
                         ImmutableSet.of(SENSITIVE.getName()),
                         "test_description")))
             .tags(ImmutableSet.of(PII.getName()))

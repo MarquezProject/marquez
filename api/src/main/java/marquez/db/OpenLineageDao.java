@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import marquez.common.Utils;
-import marquez.common.VersionUtils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
@@ -381,7 +380,7 @@ public interface OpenLineageDao extends BaseDao {
             .orElseGet(
                 () -> {
                   UUID versionUuid =
-                      VersionUtils.newDatasetVersionFor(
+                      Utils.newDatasetVersionFor(
                               dsNamespace.getName(),
                               source.getName(),
                               dsRow.getPhysicalName(),
@@ -516,33 +515,6 @@ public interface OpenLineageDao extends BaseDao {
       // Allow non-UUID runId
       return UUID.nameUUIDFromBytes(runId.getBytes());
     }
-  }
-
-  // TODO(wslulciuc): Move to Utils.newDatasetVersionFor()
-  default UUID version(
-      String namespace,
-      String sourceName,
-      String datasetName,
-      List<SchemaField> fields,
-      UUID runId) {
-    final byte[] bytes =
-        VERSION_JOINER
-            .join(
-                namespace,
-                sourceName,
-                datasetName,
-                fields == null
-                    ? ImmutableList.of()
-                    : fields.stream()
-                        .map(field -> versionField(field.getName(), field.getType()))
-                        .collect(joining(VERSION_DELIM)),
-                runId)
-            .getBytes(UTF_8);
-    return UUID.nameUUIDFromBytes(bytes);
-  }
-
-  default String versionField(String fieldName, String type) {
-    return VERSION_JOINER.join(fieldName, (type == null) ? null : type.toUpperCase());
   }
 
   default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {
