@@ -23,10 +23,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import marquez.common.Utils;
+import marquez.common.models.DatasetName;
 import marquez.common.VersionUtils;
 import marquez.common.models.Field;
 import marquez.common.models.FieldName;
-import marquez.common.models.FieldType;
+import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
@@ -101,7 +102,7 @@ public interface DatasetVersionDao extends BaseDao {
               UUID.randomUUID(),
               now,
               field.getName().getValue(),
-              field.getType().name(),
+              field.getType(),
               field.getDescription().orElse(null),
               datasetUuid);
       for (TagName tagName : field.getTags()) {
@@ -146,10 +147,7 @@ public interface DatasetVersionDao extends BaseDao {
         .map(
             f ->
                 new Field(
-                    FieldName.of(f.getName()),
-                    FieldType.fromString(f.getType()),
-                    ImmutableSet.of(),
-                    f.getDescription()))
+                    FieldName.of(f.getName()), f.getType(), ImmutableSet.of(), f.getDescription()))
         .collect(Collectors.toList());
   }
 

@@ -316,7 +316,7 @@ public interface RunDao extends BaseDao {
             f ->
                 SchemaField.builder()
                     .name(f.getName().getValue())
-                    .type(f.getType().name())
+                    .type(f.getType())
                     .description(f.getDescription().orElse(null))
                     .build())
         .collect(Collectors.toList());

@@ -25,7 +25,7 @@ import lombok.Value;
 @Value
 public class DatasetFieldRow {
   @NonNull UUID uuid;
-  @NonNull String type;
+  @Nullable String type;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
   @NonNull UUID datasetUuid;

@@ -4,6 +4,7 @@ import static java.time.Instant.EPOCH;
 import static marquez.Generator.newTimestamp;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newFieldType;
 import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newSchemaLocation;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -167,22 +168,18 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     client.createSource(DB_TABLE_SOURCE_NAME, sourceMeta);
 
     // (3) Create db table with invalid field type
+    final Field field0 = Field.builder().name("field0").type(newFieldType()).build();
+    final Field field1 = Field.builder().name("field1").type(null).build();
     final DatasetName datasetName = newDatasetName();
     final DbTableMeta dbTableMeta =
         DbTableMeta.builder()
             .physicalName(datasetName.getValue())
             .sourceName(DB_TABLE_SOURCE_NAME)
-            .fields(
-                ImmutableList.of(
-                    Field.builder().name("a").type("NOT_A_VALID_FIELD_TYPE").build(),
-                    Field.builder().name("b").type(null).build()))
+            .fields(ImmutableList.of(field0, field1))
             .build();
     final Dataset dataset =
         client.createDataset(NAMESPACE_NAME, datasetName.getValue(), dbTableMeta);
-    assertThat(dataset.getFields())
-        .containsExactly(
-            Field.builder().name("a").type("UNKNOWN").build(),
-            Field.builder().name("b").type("UNKNOWN").build());
+    assertThat(dataset.getFields()).containsExactly(field0, field1);
   }
 
   @Test

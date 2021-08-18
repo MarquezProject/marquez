@@ -22,22 +22,13 @@ from pyrfc3339 import generate
 class Utils:
     @staticmethod
     def mk_fields_from(fields):
-        new_fields = []
+        # TODO(wslulciuc) We don't need to copy the fields. This method
+        # can be removed when we generate the client models from the
+        # Marquez openAPI spec
         for field in fields:
             if 'name' not in field:
                 raise ValueError('field name must not be None')
-            if 'type' not in field:
-                raise ValueError('field type must not be None')
-            new_field = {
-                'name': field['name'],
-                'type': field['type'].upper(),
-            }
-            if 'tags' in field:
-                new_field['tags'] = field['tags']
-            if 'description' in field:
-                new_field['description'] = field['description']
-            new_fields.append(new_field)
-        return new_fields
+        return fields
 
     @staticmethod
     def to_seconds(timeout_ms):

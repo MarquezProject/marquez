@@ -18,7 +18,6 @@ import marquez.common.VersionUtils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
-import marquez.common.models.FieldType;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
@@ -411,7 +410,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                FieldType.fromString(field.getType()).name(),
+                field.getType(),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -517,6 +516,33 @@ public interface OpenLineageDao extends BaseDao {
       // Allow non-UUID runId
       return UUID.nameUUIDFromBytes(runId.getBytes());
     }
+  }
+
+  // TODO(wslulciuc): Move to Utils.newDatasetVersionFor()
+  default UUID version(
+      String namespace,
+      String sourceName,
+      String datasetName,
+      List<SchemaField> fields,
+      UUID runId) {
+    final byte[] bytes =
+        VERSION_JOINER
+            .join(
+                namespace,
+                sourceName,
+                datasetName,
+                fields == null
+                    ? ImmutableList.of()
+                    : fields.stream()
+                        .map(field -> versionField(field.getName(), field.getType()))
+                        .collect(joining(VERSION_DELIM)),
+                runId)
+            .getBytes(UTF_8);
+    return UUID.nameUUIDFromBytes(bytes);
+  }
+
+  default String versionField(String fieldName, String type) {
+    return VERSION_JOINER.join(fieldName, (type == null) ? null : type.toUpperCase());
   }
 
   default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {
