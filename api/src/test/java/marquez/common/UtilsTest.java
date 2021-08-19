@@ -15,9 +15,15 @@
 package marquez.common;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.common.models.CommonModelGenerator.newRunId;
+import static marquez.common.models.CommonModelGenerator.newSchemaFields;
+import static marquez.common.models.CommonModelGenerator.newSourceName;
+import static marquez.service.models.ServiceModelGenerator.newDbTableMeta;
 import static marquez.service.models.ServiceModelGenerator.newJobMeta;
+import static marquez.service.models.ServiceModelGenerator.newStreamMeta;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
@@ -26,20 +32,29 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import marquez.common.models.DatasetId;
+import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
+import marquez.common.models.SourceName;
 import marquez.common.models.Version;
+import marquez.service.models.DbTableMeta;
 import marquez.service.models.JobMeta;
+import marquez.service.models.LineageEvent;
+import marquez.service.models.StreamMeta;
 import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("UnitTests")
@@ -128,6 +143,16 @@ public class UtilsTest {
     assertThat(checksum0).isNotEqualTo(checksum1);
   }
 
+  @JsonAutoDetect(fieldVisibility = Visibility.ANY)
+  static final class Object {
+    final String value;
+
+    @JsonCreator
+    Object(final String value) {
+      this.value = value;
+    }
+  }
+
   @Test
   public void testNewJobVersionFor_equal() {
     final NamespaceName namespaceName = newNamespaceName();
@@ -212,13 +237,186 @@ public class UtilsTest {
     assertThat(version0).isNotEqualTo(version1);
   }
 
-  @JsonAutoDetect(fieldVisibility = Visibility.ANY)
-  static final class Object {
-    final String value;
+  @Test
+  public void testDatasetVersionForDBTableMetaDataEqualOnSameData() {
+    NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    DbTableMeta dbTableMeta = newDbTableMeta();
 
-    @JsonCreator
-    Object(final String value) {
-      this.value = value;
-    }
+    Version first =
+        Utils.newDatasetVersionFor(namespaceName.getValue(), datasetName.getValue(), dbTableMeta);
+    Version second =
+        Utils.newDatasetVersionFor(namespaceName.getValue(), datasetName.getValue(), dbTableMeta);
+
+    assertThat(first).isEqualTo(second);
+  }
+
+  @Test
+  public void testDatasetVersionForStreamMetaDataEqualOnSameData() {
+    NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    StreamMeta streamMeta = newStreamMeta();
+
+    Version first =
+        Utils.newDatasetVersionFor(namespaceName.getValue(), datasetName.getValue(), streamMeta);
+    Version second =
+        Utils.newDatasetVersionFor(namespaceName.getValue(), datasetName.getValue(), streamMeta);
+
+    assertThat(first).isEqualTo(second);
+  }
+
+  @Test
+  public void testDatasetVersionEqualOnSameData() {
+    final NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    DatasetName physicalName = newDatasetName();
+    SourceName sourceName = newSourceName();
+    List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
+    RunId runId = newRunId();
+
+    Version first =
+        Utils.newDatasetVersionFor(
+            namespaceName.getValue(),
+            sourceName.getValue(),
+            physicalName.getValue(),
+            datasetName.getValue(),
+            schemaFields,
+            runId.getValue());
+    Version second =
+        Utils.newDatasetVersionFor(
+            namespaceName.getValue(),
+            sourceName.getValue(),
+            physicalName.getValue(),
+            datasetName.getValue(),
+            schemaFields,
+            runId.getValue());
+
+    assertThat(first).isEqualTo(second);
+  }
+
+  @Test
+  public void testDatasetVersionForDBTableMetaDataIsNotEqualOnDifferentData() {
+    DbTableMeta dbTableMeta = newDbTableMeta();
+
+    Version first =
+        Utils.newDatasetVersionFor(
+            newNamespaceName().getValue(), newDatasetName().getValue(), dbTableMeta);
+    Version second =
+        Utils.newDatasetVersionFor(
+            newNamespaceName().getValue(), newNamespaceName().getValue(), dbTableMeta);
+
+    assertThat(first).isNotEqualTo(second);
+  }
+
+  @Test
+  public void testDatasetVersionForStreamMetaDataIsNotEqualOnDifferentData() {
+    StreamMeta streamMeta = newStreamMeta();
+
+    Version first =
+        Utils.newDatasetVersionFor(
+            newNamespaceName().getValue(), newDatasetName().getValue(), streamMeta);
+    Version second =
+        Utils.newDatasetVersionFor(
+            newNamespaceName().getValue(), newDatasetName().getValue(), streamMeta);
+
+    assertThat(first).isNotEqualTo(second);
+  }
+
+  @Test
+  public void testDatasetVersionIsNotEqualOnDifferentData() {
+    List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
+
+    Version first =
+        Utils.newDatasetVersionFor(
+            newNamespaceName().getValue(),
+            newSourceName().getValue(),
+            newDatasetName().getValue(),
+            newDatasetName().getValue(),
+            schemaFields,
+            newRunId().getValue());
+
+    Version second =
+        Utils.newDatasetVersionFor(
+            newNamespaceName().getValue(),
+            newSourceName().getValue(),
+            newDatasetName().getValue(),
+            newDatasetName().getValue(),
+            schemaFields,
+            newRunId().getValue());
+
+    assertThat(first).isNotEqualTo(second);
+  }
+
+  @Test
+  public void testDatasetVersionWithNullFields() {
+    Version version = Utils.newDatasetVersionFor(null, null, null, null, null, null);
+
+    assertThat(version.getValue()).isNotNull();
+  }
+
+  @Test
+  public void testDatasetVersionWithNullDatasetFields() {
+    Version version = Utils.newDatasetVersionFor(null, null, null);
+
+    assertThat(version.getValue()).isNotNull();
+  }
+
+  @Test
+  public void testNewDatasetVersionFor_equalOnUnsortedSchemaFields() {
+    final NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    DatasetName physicalName = newDatasetName();
+    SourceName sourceName = newSourceName();
+    List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
+    RunId runId = newRunId();
+
+    Version first =
+        Utils.newDatasetVersionFor(
+            namespaceName.getValue(),
+            sourceName.getValue(),
+            physicalName.getValue(),
+            datasetName.getValue(),
+            schemaFields,
+            runId.getValue());
+
+    List<LineageEvent.SchemaField> shuffleSchemaFields = new ArrayList<>(schemaFields);
+    Collections.shuffle(shuffleSchemaFields);
+    Version second =
+        Utils.newDatasetVersionFor(
+            namespaceName.getValue(),
+            sourceName.getValue(),
+            physicalName.getValue(),
+            datasetName.getValue(),
+            shuffleSchemaFields,
+            runId.getValue());
+
+    assertThat(first).isEqualTo(second);
+  }
+
+  @Test
+  public void testNewDatasetVersionFor_equalOnUnsortedFields() {
+    NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    DbTableMeta dbTableMeta = newDbTableMeta();
+
+    Version first =
+        Utils.newDatasetVersionFor(namespaceName.getValue(), datasetName.getValue(), dbTableMeta);
+
+    List<Field> fields = new ArrayList<>(dbTableMeta.getFields());
+    Collections.shuffle(fields);
+    DbTableMeta dbTableMetaUnsortedFields =
+        new DbTableMeta(
+            dbTableMeta.getPhysicalName(),
+            dbTableMeta.getSourceName(),
+            ImmutableList.copyOf(fields),
+            dbTableMeta.getTags(),
+            dbTableMeta.getDescription().orElse(null),
+            dbTableMeta.getRunId().orElse(null));
+
+    Version second =
+        Utils.newDatasetVersionFor(
+            namespaceName.getValue(), datasetName.getValue(), dbTableMetaUnsortedFields);
+
+    assertThat(first).isEqualTo(second);
   }
 }

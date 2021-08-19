@@ -284,12 +284,14 @@ public interface RunDao extends BaseDao {
         ds.ifPresent(
             d -> {
               UUID version =
-                  openLineageDao.version(
-                      d.getNamespace().getValue(),
-                      d.getSourceName().getValue(),
-                      d.getName().getValue(),
-                      toSchemaFields(d.getFields()),
-                      runUuid);
+                  Utils.newDatasetVersionFor(
+                          d.getNamespace().getValue(),
+                          d.getSourceName().getValue(),
+                          d.getPhysicalName().getValue(),
+                          d.getName().getValue(),
+                          toSchemaFields(d.getFields()),
+                          runUuid)
+                      .getValue();
               datasetVersionDao.upsert(
                   UUID.randomUUID(),
                   Instant.now(),

@@ -22,10 +22,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.Utils;
+import marquez.service.models.LineageEvent;
 
 public final class CommonModelGenerator extends Generator {
   private CommonModelGenerator() {}
@@ -99,6 +103,21 @@ public final class CommonModelGenerator extends Generator {
 
   public static Field newField() {
     return new Field(newFieldName(), newFieldType(), newTagNames(2), newDescription());
+  }
+
+  public static LineageEvent.SchemaField newSchemaField() {
+    return new LineageEvent.SchemaField(
+        newFieldName().getValue(), newFieldType(), newDescription());
+  }
+
+  public static List<LineageEvent.SchemaField> newSchemaFields(int amount) {
+    return IntStream.range(0, amount)
+        .boxed()
+        .map(
+            i ->
+                new LineageEvent.SchemaField(
+                    newFieldName().getValue(), newFieldType(), newDescription()))
+        .collect(Collectors.toList());
   }
 
   public static FieldName newFieldName() {
