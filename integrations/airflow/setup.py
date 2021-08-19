@@ -21,31 +21,8 @@ with open("README.md") as readme_file:
 
 
 requirements = [
-    "attrs>=19.3",
-    "requests>=2.20.0",
-    "sqlparse>=0.3.1",
-    "marquez-integration-common==0.16.1",
+    "openlineage-airflow==0.1.0",
 ]
-
-
-extras_require = {
-    "tests": [
-        "pytest",
-        "pytest-cov",
-        "mock",
-        "flake8",
-        "SQLAlchemy",       # must be set to 1.3.* for airflow tests compatibility
-        "Flask-SQLAlchemy",  # must be set to 2.4.* for airflow tests compatibility
-        "pandas-gbq",       # must be set to 0.14.* for airflow tests compatibility
-        "snowflake-connector-python",
-        "apache-airflow==1.10.12",
-        "apache-airflow[gcp_api]==1.10.12",
-        "apache-airflow[google]==1.10.12",
-        "apache-airflow[postgres]==1.10.12",
-        "airflow-provider-great-expectations==0.0.6",
-    ],
-}
-extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(
     name="marquez-airflow",
@@ -57,7 +34,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,
-    extras_require=extras_require,
     python_requires=">=3.6",
     zip_safe=False,
     keywords="marquez",

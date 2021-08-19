@@ -6,6 +6,9 @@ checkout_project_root: &checkout_project_root
   checkout:
     path: ~/marquez
 
+install_integration_common: &install_integration_common
+  run: (cd ~/marquez/integrations/common && pip install . --user)
+
 # Only trigger CI job on release (=X.Y.Z)
 only-on-release: &only-on-release
   filters:
@@ -181,20 +184,32 @@ jobs:
           paths:
             - ~/.gradle
 
-  test-integration-airflow:
+  build-integration-airflow:
     working_directory: ~/marquez/integrations/airflow
     docker:
       - image: circleci/python:3.6
     steps:
       - *checkout_project_root
+      - run: python setup.py sdist bdist_wheel
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./dist/*.whl
+            - ./dist/*.tar.gz
+
+  test-integration-common:
+    working_directory: ~/marquez/integrations/common
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - *checkout_project_root
       - run: pip install -e .[dev]
-      - run: flake8 --exclude integration
-      - run: airflow initdb
-      - run: pytest --cov=marquez_airflow tests/
+      - run: flake8
+      - run: pytest --cov=marquez tests/
       - run: bash <(curl -s https://codecov.io/bash)
 
-  build-integration-airflow:
-    working_directory: ~/marquez/integrations/airflow
+  build-integration-common:
+    working_directory: ~/marquez/integrations/common
     docker:
       - image: circleci/python:3.6
     steps:
@@ -259,15 +274,15 @@ workflows:
           requires:
             - image-api
             - build-integration-spark
-      - test-integration-airflow
       - test-web
       - build-client-java
       - test-client-python
-      - integration-test-airflow:
-          requires:
-            - test-integration-airflow
+      - test-integration-common
+      - integration-test-airflow
   release:
     jobs:
+      - build-integration-common:
+          <<: *only-on-release
       - build-client-python:
           <<: *only-on-release
       - build-integration-airflow:
@@ -281,6 +296,7 @@ workflows:
           requires:
             - build-client-python
             - build-integration-airflow
+            - build-integration-common
       - release-docker:
           <<: *only-on-release
           context: release
