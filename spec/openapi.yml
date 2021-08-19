@@ -795,7 +795,8 @@ components:
                 description: The name of the field.
                 type: string
               type:
-                $ref: '#/components/schemas/FieldType'
+                description: The data type of the field.
+                type: string
               tags:
                 description: List of tags.
                 type: string
@@ -942,7 +943,8 @@ components:
                 description: The name of the field.
                 type: string
               type:
-                $ref: '#/components/schemas/FieldType'
+                description: The data type of the field.
+                type: string
               tags:
                 description: List of tags.
                 type: string
@@ -1047,7 +1049,8 @@ components:
                 description: The name of the field.
                 type: string
               type:
-                $ref: '#/components/schemas/FieldType'
+                description: The data type of the field.
+                type: string
               tags:
                 description: List of tags.
                 type: string
@@ -1534,10 +1537,6 @@ components:
       required:
         - _producer
         - _schemaURL
-    FieldType:
-      description: The type of the field.
-      type: string
-      enum: [ARRAY, BIGINT, BINARY, BOOL, BOOLEAN, BPCHAR, CHAR, CHARACTER, DATE, DATETIME, DECIMAL, DOUBLE, FLOAT, FLOAT4, FLOAT8, GEOMETRY, INT, INT2, INT4, INT8, INTEGER, NCHAR, NUMBER, NUMERIC, NVARCHAR, OBJECT, REAL, SMALLINT, STRING, TEXT, TIME, TIMESTAMP, TIMESTAMPTZ, TIMESTAMP_LTZ, TIMESTAMP_NTZ, TIMESTAMP_TZ, VARBINARY, VARCHAR, VARIANT, VARYING]
 
     LineageGraph:
       type: object
