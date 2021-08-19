@@ -184,26 +184,12 @@ jobs:
           paths:
             - ~/.gradle
 
-  test-integration-airflow:
-    working_directory: ~/marquez/integrations/airflow
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - *checkout_project_root
-      - *install_integration_common
-      - run: pip install -e .[dev]
-      - run: flake8 --exclude integration
-      - run: airflow initdb
-      - run: pytest --cov=marquez_airflow tests/
-      - run: bash <(curl -s https://codecov.io/bash)
-
   build-integration-airflow:
     working_directory: ~/marquez/integrations/airflow
     docker:
       - image: circleci/python:3.6
     steps:
       - *checkout_project_root
-      - *install_integration_common
       - run: python setup.py sdist bdist_wheel
       - persist_to_workspace:
           root: .
@@ -288,14 +274,11 @@ workflows:
           requires:
             - image-api
             - build-integration-spark
-      - test-integration-airflow
       - test-web
       - build-client-java
       - test-client-python
       - test-integration-common
-      - integration-test-airflow:
-          requires:
-            - test-integration-airflow
+      - integration-test-airflow
   release:
     jobs:
       - build-integration-common:
