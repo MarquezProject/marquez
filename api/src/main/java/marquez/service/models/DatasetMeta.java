@@ -14,8 +14,6 @@
 
 package marquez.service.models;
 
-import static marquez.common.Utils.VERSION_JOINER;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
@@ -29,11 +27,9 @@ import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.Field;
-import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
-import marquez.common.models.Version;
 
 @EqualsAndHashCode
 @ToString
@@ -77,14 +73,5 @@ public abstract class DatasetMeta {
 
   public Optional<RunId> getRunId() {
     return Optional.ofNullable(runId);
-  }
-
-  public abstract Version version(NamespaceName namespaceName, DatasetName datasetName);
-
-  protected static String joinField(final Field field) {
-    return VERSION_JOINER.join(
-        field.getName(),
-        (field.getType() == null) ? null : field.getType().toUpperCase(),
-        field.getDescription());
   }
 }
