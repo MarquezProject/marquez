@@ -33,24 +33,12 @@ ext {
 }
 
 dependencies {
-    implementation 'org.javassist:javassist:3.28.0-GA'
-    implementation 'com.github.ok2c.hc5:hc5-async-json:0.2.2'
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.1'
-    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-    implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    implementation 'io.openlineage:openlineage-spark:0.1.0'
     compileOnly "org.apache.spark:spark-core_2.11:${sparkVersion}"
-    compileOnly "org.apache.spark:spark-sql_2.11:${sparkVersion}"
-    compileOnly 'com.google.cloud.spark:spark-bigquery_2.11:0.22.0'
 
     testImplementation 'com.google.cloud.spark:spark-bigquery-with-dependencies_2.11:0.21.1'
-    testImplementation "net.bytebuddy:byte-buddy-agent:${bytebuddyVersion}"
-    testImplementation "net.bytebuddy:byte-buddy-dep:${bytebuddyVersion}"
-    testImplementation "org.apache.spark:spark-core_2.11:${sparkVersion}"
     testImplementation "org.apache.spark:spark-sql_2.11:${sparkVersion}"
     testImplementation platform('org.junit:junit-bom:5.7.2')
-    testImplementation "org.postgresql:postgresql:${postgresqlVersion}"
-    testImplementation 'org.hamcrest:hamcrest-library:2.2'
     testImplementation('org.xerial:sqlite-jdbc:3.36.0.1')
     testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
     testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
@@ -164,8 +152,8 @@ shadowJar {
 
     manifest {
         attributes(
-                "Premain-Class": 'marquez.spark.agent.MarquezAgent',
-                "Agent-Class": 'marquez.spark.agent.MarquezAgent',
+                "Premain-Class": 'openlineage.spark.agent.SparkAgent',
+                "Agent-Class": 'openlineage.spark.agent.SparkAgent',
                 'Created-By': "Gradle ${gradle.gradleVersion}",
                 'Built-By': System.getProperty('user.name'),
                 'Build-Jdk': System.getProperty('java.version'),
@@ -189,19 +177,10 @@ task createVersionProperties(dependsOn: processResources) {
     }
 }
 
-task bumpVersionTestFiles() {
-    doLast {
-        def dir = new File(project.projectDir.path + '/integrations')
-        dir.eachFileRecurse (FileType.FILES) { file ->
-            ant.replace(file: file, token: "\$VERSION", value: project.version.toString())
-        }
-    }
-}
-
 classes {
     dependsOn createVersionProperties
 }
 
-test {
-    dependsOn bumpVersionTestFiles
+assemble {
+    dependsOn shadowJar
 }
