@@ -1,12 +1,6 @@
 package marquez.db;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static java.util.stream.Collectors.joining;
-import static marquez.common.Utils.VERSION_DELIM;
-import static marquez.common.Utils.VERSION_JOINER;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -386,12 +380,14 @@ public interface OpenLineageDao extends BaseDao {
             .orElseGet(
                 () -> {
                   UUID versionUuid =
-                      version(
-                          dsNamespace.getName(),
-                          source.getName(),
-                          dsRow.getName(),
-                          fields,
-                          runUuid);
+                      Utils.newDatasetVersionFor(
+                              dsNamespace.getName(),
+                              source.getName(),
+                              dsRow.getPhysicalName(),
+                              dsRow.getName(),
+                              fields,
+                              runUuid)
+                          .getValue();
                   DatasetVersionRow row =
                       datasetVersionDao.upsert(
                           UUID.randomUUID(),
@@ -519,33 +515,6 @@ public interface OpenLineageDao extends BaseDao {
       // Allow non-UUID runId
       return UUID.nameUUIDFromBytes(runId.getBytes());
     }
-  }
-
-  // TODO(wslulciuc): Move to Utils.newDatasetVersionFor()
-  default UUID version(
-      String namespace,
-      String sourceName,
-      String datasetName,
-      List<SchemaField> fields,
-      UUID runId) {
-    final byte[] bytes =
-        VERSION_JOINER
-            .join(
-                namespace,
-                sourceName,
-                datasetName,
-                fields == null
-                    ? ImmutableList.of()
-                    : fields.stream()
-                        .map(field -> versionField(field.getName(), field.getType()))
-                        .collect(joining(VERSION_DELIM)),
-                runId)
-            .getBytes(UTF_8);
-    return UUID.nameUUIDFromBytes(bytes);
-  }
-
-  default String versionField(String fieldName, String type) {
-    return VERSION_JOINER.join(fieldName, (type == null) ? null : type.toUpperCase());
   }
 
   default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {
