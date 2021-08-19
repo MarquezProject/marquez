@@ -1,34 +1,48 @@
 package marquez.spark.agent.lifecycle;
 
+import io.openlineage.client.OpenLineage;
 import java.net.URI;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import marquez.spark.agent.MarquezContext;
-import marquez.spark.agent.lifecycle.plan.InputDatasetVisitors;
-import marquez.spark.agent.lifecycle.plan.OutputDatasetVisitors;
+import openlineage.spark.agent.OpenLineageContext;
+import openlineage.spark.agent.OpenLineageSparkListener;
+import openlineage.spark.agent.lifecycle.ContextFactory;
+import openlineage.spark.agent.lifecycle.RddExecutionContext;
+import openlineage.spark.agent.lifecycle.SparkSQLExecutionContext;
+import openlineage.spark.agent.lifecycle.plan.BigQueryNodeVisitor;
+import openlineage.spark.agent.lifecycle.plan.CommandPlanVisitor;
+import openlineage.spark.agent.lifecycle.plan.DatasetSourceVisitor;
+import openlineage.spark.agent.lifecycle.plan.InputDatasetVisitors;
+import openlineage.spark.agent.lifecycle.plan.LogicalRDDVisitor;
+import openlineage.spark.agent.lifecycle.plan.LogicalRelationVisitor;
+import openlineage.spark.agent.lifecycle.plan.OutputDatasetVisitors;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.apache.spark.sql.execution.SQLExecution;
 import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionEnd;
 import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionStart;
+import scala.PartialFunction;
 
 /** Returns deterministic fields for contexts */
 public class StaticExecutionContextFactory extends ContextFactory {
   public static final Semaphore semaphore = new Semaphore(1);
 
-  public StaticExecutionContextFactory(MarquezContext marquezContext) {
-    super(marquezContext);
+  public StaticExecutionContextFactory(OpenLineageContext sparkContext) {
+    super(sparkContext);
   }
 
   /**
-   * The {@link marquez.spark.agent.SparkListener} is invoked by a {@link
-   * org.apache.spark.util.ListenerBus} on a separate thread. In order for the tests to know that
-   * the listener events have been processed, they can invoke this method which will wait up to one
-   * second for the processing to complete. After that
+   * The {@link OpenLineageSparkListener} is invoked by a {@link org.apache.spark.util.ListenerBus}
+   * on a separate thread. In order for the tests to know that the listener events have been
+   * processed, they can invoke this method which will wait up to one second for the processing to
+   * complete. After that
    *
    * @throws InterruptedException
    */
@@ -37,7 +51,7 @@ public class StaticExecutionContextFactory extends ContextFactory {
     if (!acquired) {
       throw new TimeoutException(
           "Unable to acquire permit within expected timeout- "
-              + "SparkListener processing may not have completed correctly");
+              + "OpenLineageSparkListener processing may not have completed correctly");
     }
     semaphore.release();
   }
@@ -45,7 +59,7 @@ public class StaticExecutionContextFactory extends ContextFactory {
   @Override
   public RddExecutionContext createRddExecutionContext(int jobId) {
     RddExecutionContext rdd =
-        new RddExecutionContext(jobId, marquezContext) {
+        new RddExecutionContext(jobId, sparkContext) {
           @Override
           protected ZonedDateTime toZonedTime(long time) {
             return getZonedTime();
@@ -65,14 +79,17 @@ public class StaticExecutionContextFactory extends ContextFactory {
         .map(
             qe -> {
               SQLContext sqlContext = qe.sparkPlan().sqlContext();
+              List<PartialFunction<LogicalPlan, List<OpenLineage.Dataset>>> commonDatasetVisitors =
+                  commonDatasetVisitors(sqlContext, sparkContext);
+
               InputDatasetVisitors inputDatasetVisitors =
-                  new InputDatasetVisitors(sqlContext, marquezContext);
+                  new InputDatasetVisitors(commonDatasetVisitors);
               OutputDatasetVisitors outputDatasetVisitors =
-                  new OutputDatasetVisitors(sqlContext, inputDatasetVisitors);
+                  new OutputDatasetVisitors(sqlContext, commonDatasetVisitors);
               SparkSQLExecutionContext sparksql =
                   new SparkSQLExecutionContext(
                       executionId,
-                      marquezContext,
+                      sparkContext,
                       outputDatasetVisitors.get(),
                       inputDatasetVisitors.get()) {
                     @Override
@@ -105,7 +122,20 @@ public class StaticExecutionContextFactory extends ContextFactory {
         .orElseGet(
             () ->
                 new SparkSQLExecutionContext(
-                    executionId, marquezContext, Collections.emptyList(), Collections.emptyList()));
+                    executionId, sparkContext, Collections.emptyList(), Collections.emptyList()));
+  }
+
+  private static List<PartialFunction<LogicalPlan, List<OpenLineage.Dataset>>>
+      commonDatasetVisitors(SQLContext sqlContext, OpenLineageContext sparkContext) {
+    List<PartialFunction<LogicalPlan, List<OpenLineage.Dataset>>> list = new ArrayList<>();
+    list.add(new LogicalRelationVisitor(sqlContext.sparkContext(), sparkContext.getJobNamespace()));
+    list.add(new DatasetSourceVisitor());
+    list.add(new LogicalRDDVisitor());
+    list.add(new CommandPlanVisitor(new ArrayList<>(list)));
+    if (BigQueryNodeVisitor.hasBigQueryClasses()) {
+      list.add(new BigQueryNodeVisitor(sqlContext));
+    }
+    return list;
   }
 
   private static ZonedDateTime getZonedTime() {
