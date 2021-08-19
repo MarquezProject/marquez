@@ -53,7 +53,7 @@ usage() {
 
 # Change working directory to project root
 project_root=$(git rev-parse --show-toplevel)
-cd "${project_root}"
+cd "${project_root}/"
 
 compose_files="-f docker-compose.yml"
 args="-V --force-recreate"
@@ -68,7 +68,7 @@ while [ $# -gt 0 ]; do
        shift
        API_PORT="${1}"
        ;;
-    -a|'--api-admin-port')
+    -m|'--api-admin-port')
        shift
        API_ADMIN_PORT="${1}"
        ;;
