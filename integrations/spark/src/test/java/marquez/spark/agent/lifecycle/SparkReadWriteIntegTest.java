@@ -34,7 +34,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import marquez.spark.agent.SparkAgentTestExtension;
-import openlineage.spark.agent.facets.OutputStatisticsFacet;
 import openlineage.spark.agent.lifecycle.plan.PlanUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -163,13 +162,14 @@ public class SparkReadWriteIntegTest {
     OpenLineage.OutputDataset output = outputs.get(0);
     assertEquals("file", output.getNamespace());
     assertEquals(outputDir, output.getName());
-    assertEquals(PlanUtils.schemaFacet(tableSchema), output.getFacets().getSchema());
+    OpenLineage.SchemaDatasetFacet schemaDatasetFacet = PlanUtils.schemaFacet(tableSchema);
+    assertThat(output.getFacets().getSchema())
+        .usingRecursiveComparison()
+        .isEqualTo(schemaDatasetFacet);
+
     assertNotNull(output.getFacets().getAdditionalProperties());
 
-    assertThat(output.getFacets().getAdditionalProperties())
-        .containsKey("stats")
-        .extractingByKey("stats")
-        .isInstanceOf(OutputStatisticsFacet.class);
+    assertThat(output.getOutputFacets().getOutputStatistics()).isNotNull();
   }
 
   @Test
@@ -225,11 +225,8 @@ public class SparkReadWriteIntegTest {
     assertEquals(tableName, output.getName());
     assertNotNull(output.getFacets().getAdditionalProperties());
 
-    assertThat(output.getFacets().getAdditionalProperties())
-        .containsKey("stats")
-        .extractingByKey("stats")
-        .isInstanceOf(OutputStatisticsFacet.class)
-        // SaveIntoDataSourceCommand doesn't accurately report stats :(
+    assertThat(output.getOutputFacets().getOutputStatistics())
+        .isNotNull()
         .hasFieldOrPropertyWithValue("rowCount", 0L);
   }
 
