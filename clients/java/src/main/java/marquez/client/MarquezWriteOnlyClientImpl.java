@@ -25,6 +25,7 @@ import marquez.client.models.RunState;
 import marquez.client.models.SourceMeta;
 
 @Slf4j
+@Deprecated(since = "0.17.0", forRemoval = true)
 class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
 
   private final Backend backend;

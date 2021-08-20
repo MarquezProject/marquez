@@ -19,6 +19,7 @@ import marquez.client.models.SourceMeta;
  * The contract of a write only client to instrument jobs actions. Can be taken synchronously or
  * asynchronously
  */
+@Deprecated(since = "0.17.0", forRemoval = true)
 public interface MarquezWriteOnlyClient extends Closeable {
 
   public void createNamespace(String namespaceName, NamespaceMeta namespaceMeta);

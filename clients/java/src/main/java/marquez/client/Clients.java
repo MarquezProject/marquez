@@ -23,6 +23,7 @@ public final class Clients {
    * @param backend the underlying protocol to use to transmit information
    * @return the MarquezWriteOnlyClient implementation
    */
+  @Deprecated(since = "0.17.0", forRemoval = true)
   public static MarquezWriteOnlyClient newWriteOnlyClient(@NonNull final Backend backend) {
     return new MarquezWriteOnlyClientImpl(backend);
   }
