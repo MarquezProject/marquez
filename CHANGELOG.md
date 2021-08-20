@@ -22,7 +22,7 @@
 * Dbt integration lib. [@wslulciuc](https://github.com/wslulciuc)
 * Common integration lib. [@wslulciuc](https://github.com/wslulciuc)
 
-## [0.16.1](https://github.com/MarquezProject/marquez/compare/0.16.0...0.16.1)
+## [0.16.1](https://github.com/MarquezProject/marquez/compare/0.16.0...0.16.1) - 2021-07-13
 
 ### Fixed
 
@@ -34,7 +34,7 @@
 * Parse multi-statement sql in **class** `SqlParser` used in Airflow integration [@wslulciuc](https://github.com/wslulciuc)
 * URL-encode namespace on calls to API backend [@phixMe](https://github.com/phixMe) 
 
-## [0.16.0](https://github.com/MarquezProject/marquez/compare/0.15.2...0.16.0)
+## [0.16.0](https://github.com/MarquezProject/marquez/compare/0.15.2...0.16.0) - 2021-07-01
 
 ### Added
 
@@ -55,7 +55,7 @@
 * Return dataset facets [@collado-mike](https://github.com/collado-mike)
 * BigQuery source naming in integrations [@mobuchowski](https://github.com/mobuchowski)
 
-## [0.15.2](https://github.com/MarquezProject/marquez/compare/0.15.1...0.15.2)
+## [0.15.2](https://github.com/MarquezProject/marquez/compare/0.15.1...0.15.2) - 2021-06-17
 
 ### Added
 
@@ -67,7 +67,7 @@
 * Fixed snowflake and bigquery errors when connector libraries not loaded [@collado-mike](https://github.com/collado-mike)
 * Fixed Openlineage API does not set Dataset current_version_uuid #1361 [@collado-mike](https://github.com/collado-mike)
 
-## [0.15.1](https://github.com/MarquezProject/marquez/compare/0.15.0...0.15.1)
+## [0.15.1](https://github.com/MarquezProject/marquez/compare/0.15.0...0.15.1) - 2021-06-11
 
 ### Added
 
@@ -85,7 +85,7 @@
 * Rewrote LineageDao queries and LineageService for performance [@collado-mike](https://github.com/collado-mike)
 * Updated lineage query to include new jobs that have no job version yet [@collado-mike](https://github.com/collado-mike)
 
-## [0.15.0](https://github.com/MarquezProject/marquez/compare/0.14.2...0.15.0)
+## [0.15.0](https://github.com/MarquezProject/marquez/compare/0.14.2...0.15.0) - 2021-05-24
 
 ### Added
 
@@ -104,21 +104,21 @@
 
 * Web time formatting display fix [@kachontep](https://github.com/kachontep)
 
-## [0.14.2](https://github.com/MarquezProject/marquez/compare/0.14.1...0.14.2)
+## [0.14.2](https://github.com/MarquezProject/marquez/compare/0.14.1...0.14.2) - 2021-05-06
 
 ### Changed
 
 * Unpin `requests` dep in `marquez-airflow` integration [@wslulciuc](https://github.com/wslulciuc)
 * Unpin `attrs` dep in `marquez-airflow` integration [@wslulciuc](https://github.com/wslulciuc)
 
-## [0.14.1](https://github.com/MarquezProject/marquez/compare/0.14.0...0.14.1) - 2021-04-05
+## [0.14.1](https://github.com/MarquezProject/marquez/compare/0.14.0...0.14.1) - 2021-05-05
 
 ### Changed
 
 * Updated dataset lineage query to find most recent job that wrote to it [@collado-mike](https://github.com/collado-mike)
 * Pin http-proxy-middleware to 0.20.0 [@wslulciuc](https://github.com/wslulciuc)
 
-## [0.14.0](https://github.com/MarquezProject/marquez/compare/0.13.1...0.14.0) - 2021-04-03
+## [0.14.0](https://github.com/MarquezProject/marquez/compare/0.13.1...0.14.0) - 2021-05-03
 
 ### Added
 
