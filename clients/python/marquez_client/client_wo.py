@@ -29,9 +29,6 @@ log = logging.getLogger(__name__)
 
 
 # Marquez Write Only Client
-@deprecated(deprecated_in="0.17.0",
-            details="Prefer `MarquezClient`. This class is scheduled to be removed "
-                    "in release `0.19.0`.")
 class MarquezWriteOnlyClient:
     def __init__(self, backend):
         self._backend = backend
