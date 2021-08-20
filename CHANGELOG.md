@@ -1,6 +1,26 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.16.1...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.17.0...HEAD)
+
+## [0.17.0](https://github.com/MarquezProject/marquez/compare/0.16.1...0.17.0) - 2021-08-20
+
+### Changed
+
+* Updated Lineage runs query to improve performance, added tests [@collado-mike](https://github.com/collado-mike)
+* Add **POST** `/api/v1/lineage` endpoint to docs and **deprecate** run endpoints [@wslulciuc](https://github.com/wslulciuc)
+* Drop `FieldType` enum [@wslulciuc](https://github.com/wslulciuc)
+
+### Deprecated
+
+* Run API [endpoints](https://marquezproject.github.io/marquez/openapi.html#tag/Jobs) that create or modify a job run (**scheduled to be removed in** `0.19.0`). Please use the **POST** `/api/v1/lineage` [endpoint](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) when collecting job run metadata. [@wslulciuc](https://github.com/wslulciuc)
+* Airflow integration, please use the [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) library instead. [@wslulciuc](https://github.com/wslulciuc)
+* Spark integration, please use the [`openlineage-spark`](https://search.maven.org/artifact/io.openlineage/openlineage-spark) library instead. [@wslulciuc](https://github.com/wslulciuc)
+* Write only clients for `java` and `python` (**scheduled to be removed in** `0.19.0`) [@wslulciuc](https://github.com/wslulciuc)
+
+### Removed
+
+* Dbt integration lib. [@wslulciuc](https://github.com/wslulciuc)
+* Common integration lib. [@wslulciuc](https://github.com/wslulciuc)
 
 ## [0.16.1](https://github.com/MarquezProject/marquez/compare/0.16.0...0.16.1)
 
