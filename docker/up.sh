@@ -61,7 +61,7 @@ args="-V --force-recreate"
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
-TAG=0.16.1
+TAG=0.17.0
 while [ $# -gt 0 ]; do
   case $1 in
     -a|'--api-port')
