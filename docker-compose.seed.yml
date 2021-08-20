@@ -5,7 +5,7 @@ services:
     container_name: seed-marquez-with-metadata
     environment:
       - MARQUEZ_HOST=api
-      - MARQUEZ_PORT=5000
+      - MARQUEZ_PORT=${API_PORT}
     volumes:
       - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
       - ./docker/seed.sh:/usr/src/app/seed.sh
@@ -13,4 +13,4 @@ services:
       - "db:postgres"
     depends_on:
       - api
-    entrypoint: ["./wait-for-it.sh", "api:5000", "--", "./seed.sh"]
+    entrypoint: ["./wait-for-it.sh", "api:${API_PORT}", "--", "./seed.sh"]
