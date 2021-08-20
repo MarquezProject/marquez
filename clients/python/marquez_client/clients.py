@@ -12,6 +12,8 @@
 
 import os
 
+from deprecation import deprecated
+
 from marquez_client import MarquezClient, MarquezWriteOnlyClient
 from marquez_client.http_backend import HttpBackend
 from marquez_client.file_backend import FileBackend
@@ -35,6 +37,9 @@ class Clients(object):
         )
 
     @staticmethod
+    @deprecated(deprecated_in="0.17.0",
+                details="Prefer `Clients.new_client()`. This method is scheduled to be removed "
+                        "in release `0.19.0`.")
     def new_write_only_client():
         return MarquezWriteOnlyClient(
             backend=Clients._backend_from_env(),

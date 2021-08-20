@@ -130,7 +130,7 @@ if [[ "${RELEASE_VERSION}" == *-rc.? ]]; then
 fi
 
 # (1) Bump python module versions
-PYTHON_MODULES=(clients/python/ integrations/airflow/ integrations/common/ integrations/dbt/bigquery/ integrations/dbt/snowflake/)
+PYTHON_MODULES=(clients/python/ integrations/airflow/)
 for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
   (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${PYTHON_RELEASE_VERSION}" --allow-dirty)
 done
@@ -149,8 +149,6 @@ sed -i "" "s/TAG=.*/TAG=${RELEASE_VERSION}/g" ./docker/up.sh
 sed -i "" "s/^  version:.*/  version: ${RELEASE_VERSION}/g" ./spec/openapi.yml
 sed -i "" "s/<version>.*/<version>${RELEASE_VERSION}<\/version>/g" ./clients/java/README.md
 sed -i "" "s/marquez-java:.*/marquez-java:${RELEASE_VERSION}/g" ./clients/java/README.md
-sed -i "" "s/<version>.*/<version>${RELEASE_VERSION}<\/version>/g" ./integrations/spark/README.md
-sed -i "" "s/marquez-spark:.*/marquez-spark:${RELEASE_VERSION}/g" ./integrations/spark/README.md
 
 # (6) Bundle openAPI docs
 redoc-cli bundle spec/openapi.yml --output docs/openapi.html --title "Marquez API Reference"

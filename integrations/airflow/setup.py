@@ -19,14 +19,13 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-
 requirements = [
     "openlineage-airflow==0.1.0",
 ]
 
 setup(
     name="marquez-airflow",
-    version="0.16.1",
+    version="0.17.0",
     description="Marquez integration with Airflow",
     long_description=readme,
     long_description_content_type="text/markdown",
