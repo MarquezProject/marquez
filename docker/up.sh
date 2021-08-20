@@ -50,7 +50,7 @@ cd "${project_root}"
 compose_files="-f docker-compose.yml"
 args="-V --force-recreate"
 
-TAG="latest"
+TAG=0.16.1
 while [ $# -gt 0 ]; do
   case $1 in
     '--tag'|-t)
